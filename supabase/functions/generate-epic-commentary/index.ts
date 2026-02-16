@@ -87,45 +87,98 @@ async function generateEpicText(book: string, chapter: number | null, scope: str
   return data.choices[0].message.content;
 }
 
+/**
+ * Split text into chunks at sentence boundaries, each under maxLen characters.
+ */
+function splitTextIntoChunks(text: string, maxLen = 4000): string[] {
+  if (text.length <= maxLen) return [text];
+
+  const chunks: string[] = [];
+  let remaining = text;
+
+  while (remaining.length > 0) {
+    if (remaining.length <= maxLen) {
+      chunks.push(remaining);
+      break;
+    }
+
+    // Find the last sentence boundary within the limit
+    let splitAt = remaining.lastIndexOf(". ", maxLen);
+    if (splitAt === -1 || splitAt < maxLen * 0.3) {
+      splitAt = remaining.lastIndexOf("! ", maxLen);
+    }
+    if (splitAt === -1 || splitAt < maxLen * 0.3) {
+      splitAt = remaining.lastIndexOf("? ", maxLen);
+    }
+    if (splitAt === -1 || splitAt < maxLen * 0.3) {
+      splitAt = remaining.lastIndexOf("\n", maxLen);
+    }
+    if (splitAt === -1 || splitAt < maxLen * 0.3) {
+      // Hard split at maxLen as last resort
+      splitAt = maxLen;
+    } else {
+      splitAt += 1; // Include the punctuation
+    }
+
+    chunks.push(remaining.substring(0, splitAt).trim());
+    remaining = remaining.substring(splitAt).trim();
+  }
+
+  return chunks;
+}
+
 async function generateEpicAudio(
   text: string,
   book: string,
   chapter: number,
   supabaseAdmin: ReturnType<typeof createClient>,
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
-  // Generate audio via OpenAI TTS
-  const ttsResponse = await fetch("https://api.openai.com/v1/audio/speech", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${OPENAI_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "tts-1-hd",
-      input: text,
-      voice: "onyx", // Deep, dramatic voice
-      response_format: "mp3",
-      speed: 0.95,
-    }),
-  });
+  const chunks = splitTextIntoChunks(text, 4000);
+  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s)`);
 
-  if (!ttsResponse.ok) {
-    const err = await ttsResponse.text();
-    throw new Error(`OpenAI TTS error: ${ttsResponse.status} - ${err}`);
+  const audioBuffers: ArrayBuffer[] = [];
+
+  for (let i = 0; i < chunks.length; i++) {
+    const ttsResponse = await fetch("https://api.openai.com/v1/audio/speech", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "tts-1-hd",
+        input: chunks[i],
+        voice: "onyx",
+        response_format: "mp3",
+        speed: 0.95,
+      }),
+    });
+
+    if (!ttsResponse.ok) {
+      const err = await ttsResponse.text();
+      throw new Error(`OpenAI TTS error (chunk ${i + 1}/${chunks.length}): ${ttsResponse.status} - ${err}`);
+    }
+
+    audioBuffers.push(await ttsResponse.arrayBuffer());
   }
 
-  const audioBuffer = await ttsResponse.arrayBuffer();
-  const fileSizeBytes = audioBuffer.byteLength;
+  // Concatenate all audio buffers
+  const totalSize = audioBuffers.reduce((sum, buf) => sum + buf.byteLength, 0);
+  const combined = new Uint8Array(totalSize);
+  let offset = 0;
+  for (const buf of audioBuffers) {
+    combined.set(new Uint8Array(buf), offset);
+    offset += buf.byteLength;
+  }
 
-  // Estimate duration (~16KB/sec for mp3 at typical bitrate)
+  const fileSizeBytes = combined.byteLength;
   const durationMs = Math.round((fileSizeBytes / 16000) * 1000);
 
-  // Upload to storage
   const storagePath = `${book.toLowerCase().replace(/\s+/g, "-")}/${chapter}.mp3`;
 
   const { error: uploadError } = await supabaseAdmin.storage
     .from("epic-audio")
-    .upload(storagePath, audioBuffer, {
+    .upload(storagePath, combined.buffer, {
       contentType: "audio/mpeg",
       upsert: true,
     });
