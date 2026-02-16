@@ -180,7 +180,7 @@ export const Navigation = () => {
                   asChild
                   className="hidden lg:flex text-primary hover:text-primary/80 hover:bg-primary/10"
                 >
-                  <Link to="/workspace">
+                  <Link to={`/workspace?from=${encodeURIComponent(location.pathname)}`}>
                     <Columns2 className="h-4 w-4 mr-1" />
                     <span>Workspace</span>
                   </Link>

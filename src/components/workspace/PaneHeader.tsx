@@ -1,11 +1,13 @@
 import { DEFAULT_NAV_TABS, type NavTab } from "@/data/navTabs";
-import { X } from "lucide-react";
+import { X, Minus, Maximize2 } from "lucide-react";
 
 interface PaneHeaderProps {
   currentPath: string;
   onSelectTab: (path: string) => void;
   onClose?: () => void;
   showClose?: boolean;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 // Filter to only navigable tabs (no dropdowns with "#" as path)
@@ -15,7 +17,14 @@ function getTabForPath(path: string): NavTab | undefined {
   return selectableTabs.find(tab => tab.to === path);
 }
 
-export function PaneHeader({ currentPath, onSelectTab, onClose, showClose = false }: PaneHeaderProps) {
+export function PaneHeader({
+  currentPath,
+  onSelectTab,
+  onClose,
+  showClose = false,
+  collapsed = false,
+  onToggleCollapse,
+}: PaneHeaderProps) {
   const activeTab = getTabForPath(currentPath);
   const gradientFrom = activeTab?.gradient.from.replace("/10", "/30") ?? "from-slate-500/30";
   const gradientTo = activeTab?.gradient.to.replace("/10", "/30") ?? "to-slate-500/30";
@@ -37,6 +46,22 @@ export function PaneHeader({ currentPath, onSelectTab, onClose, showClose = fals
         ))}
       </select>
 
+      {/* Collapse/expand toggle */}
+      {onToggleCollapse && (
+        <button
+          onClick={onToggleCollapse}
+          className="p-0.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+          title={collapsed ? "Expand pane" : "Collapse pane"}
+        >
+          {collapsed ? (
+            <Maximize2 className="h-3.5 w-3.5" />
+          ) : (
+            <Minus className="h-3.5 w-3.5" />
+          )}
+        </button>
+      )}
+
+      {/* Close button */}
       {showClose && onClose && (
         <button
           onClick={onClose}

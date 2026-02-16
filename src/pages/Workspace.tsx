@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { WorkspaceToolbar, type LayoutMode } from "@/components/workspace/WorkspaceToolbar";
 import { PaneHeader } from "@/components/workspace/PaneHeader";
 
@@ -10,6 +11,9 @@ const DEFAULT_PANES: Record<LayoutMode, string[]> = {
   thirds: ["/palace", "/bible", "/notes"],
   quad: ["/palace", "/bible", "/study-buddy", "/notes"],
 };
+
+// Pages that shouldn't be auto-injected (workspace itself, auth, etc.)
+const NON_INJECTABLE_PATHS = ["/workspace", "/auth", "/", ""];
 
 function getPaneCount(layout: LayoutMode): number {
   return layout === "half" ? 2 : layout === "thirds" ? 3 : 4;
@@ -33,8 +37,26 @@ function buildIframeSrc(path: string): string {
 }
 
 export default function Workspace() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [layout, setLayout] = useState<LayoutMode>(() => loadState().layout);
   const [panes, setPanes] = useState<string[]>(() => loadState().panes);
+  const [collapsedPanes, setCollapsedPanes] = useState<Set<number>>(new Set());
+
+  // Auto-include the page the user came from
+  useEffect(() => {
+    const fromPage = searchParams.get("from");
+    if (fromPage && !NON_INJECTABLE_PATHS.includes(fromPage)) {
+      setPanes(prev => {
+        // If the page is already in a pane, no change needed
+        if (prev.includes(fromPage)) return prev;
+        // Replace the first pane with the page the user came from
+        const next = [...prev];
+        next[0] = fromPage;
+        return next;
+      });
+    }
+  }, []); // Only on mount
 
   // Persist state
   useEffect(() => {
@@ -42,8 +64,20 @@ export default function Workspace() {
     localStorage.setItem(STORAGE_KEY_PANES, JSON.stringify(panes));
   }, [layout, panes]);
 
+  // Keyboard shortcut: Escape to exit workspace
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        navigate("/palace");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigate]);
+
   const handleLayoutChange = useCallback((mode: LayoutMode) => {
     setLayout(mode);
+    setCollapsedPanes(new Set()); // Reset collapsed state on layout change
     setPanes(prev => {
       const count = getPaneCount(mode);
       if (prev.length >= count) {
@@ -67,35 +101,117 @@ export default function Workspace() {
     });
   }, []);
 
+  const handleToggleCollapse = useCallback((index: number) => {
+    setCollapsedPanes(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleClosePane = useCallback((index: number) => {
+    setPanes(prev => {
+      if (prev.length <= 1) return prev; // Don't close the last pane
+      const next = prev.filter((_, i) => i !== index);
+      return next;
+    });
+    // Clean up collapsed state
+    setCollapsedPanes(prev => {
+      const next = new Set<number>();
+      prev.forEach(i => {
+        if (i < index) next.add(i);
+        else if (i > index) next.add(i - 1);
+        // Skip the closed index
+      });
+      return next;
+    });
+    // Adjust layout to match pane count
+    setPanes(prev => {
+      const count = prev.length;
+      if (count <= 2) setLayout("half");
+      else if (count === 3) setLayout("thirds");
+      return prev;
+    });
+  }, []);
+
   const paneCount = getPaneCount(layout);
   const activePanes = panes.slice(0, paneCount);
 
-  const gridClass =
-    layout === "half"
-      ? "grid-cols-2 grid-rows-1"
-      : layout === "thirds"
-      ? "grid-cols-3 grid-rows-1"
-      : "grid-cols-2 grid-rows-2";
+  // Count non-collapsed panes to determine grid sizing
+  const expandedCount = activePanes.filter((_, i) => !collapsedPanes.has(i)).length;
+
+  // Build dynamic grid template based on collapsed state
+  const getGridStyle = () => {
+    if (layout === "quad") {
+      // 2x2 grid — collapsed panes shrink their row/col
+      const colSizes = [0, 1].map(col => {
+        const topCollapsed = collapsedPanes.has(col);
+        const bottomCollapsed = collapsedPanes.has(col + 2);
+        return (topCollapsed && bottomCollapsed) ? "36px" : "1fr";
+      });
+      const rowSizes = [0, 1].map(row => {
+        const leftCollapsed = collapsedPanes.has(row * 2);
+        const rightCollapsed = collapsedPanes.has(row * 2 + 1);
+        return (leftCollapsed && rightCollapsed) ? "36px" : "1fr";
+      });
+      return {
+        gridTemplateColumns: colSizes.join(" "),
+        gridTemplateRows: rowSizes.join(" "),
+      };
+    }
+
+    // For half/thirds: single row, collapsed panes become narrow
+    const colSizes = activePanes.map((_, i) =>
+      collapsedPanes.has(i) ? "36px" : "1fr"
+    );
+    return {
+      gridTemplateColumns: colSizes.join(" "),
+      gridTemplateRows: "1fr",
+    };
+  };
+
+  const gridBaseClass =
+    layout === "quad" ? "grid-cols-2 grid-rows-2" : "";
 
   return (
     <div className="hidden lg:flex flex-col h-screen w-screen fixed inset-0 z-[100] bg-background">
       <WorkspaceToolbar layout={layout} onLayoutChange={handleLayoutChange} />
 
-      <div className={`grid flex-1 gap-px bg-border overflow-hidden ${gridClass}`}>
-        {activePanes.map((panePath, index) => (
-          <div key={index} className="flex flex-col min-h-0 bg-background">
-            <PaneHeader
-              currentPath={panePath}
-              onSelectTab={(path) => handleSelectTab(index, path)}
-              showClose={false}
-            />
-            <iframe
-              src={buildIframeSrc(panePath)}
-              className="flex-1 w-full border-none"
-              title={`Workspace pane ${index + 1}`}
-            />
-          </div>
-        ))}
+      <div
+        className="grid flex-1 gap-px bg-border overflow-hidden"
+        style={getGridStyle()}
+      >
+        {activePanes.map((panePath, index) => {
+          const isCollapsed = collapsedPanes.has(index);
+          return (
+            <div
+              key={`${index}-${panePath}`}
+              className={`flex flex-col bg-background overflow-hidden transition-all duration-200 ${
+                isCollapsed ? "min-h-0" : "min-h-0"
+              }`}
+            >
+              <PaneHeader
+                currentPath={panePath}
+                onSelectTab={(path) => handleSelectTab(index, path)}
+                showClose={activePanes.length > 1}
+                onClose={() => handleClosePane(index)}
+                collapsed={isCollapsed}
+                onToggleCollapse={() => handleToggleCollapse(index)}
+              />
+              {!isCollapsed && (
+                <iframe
+                  src={buildIframeSrc(panePath)}
+                  className="flex-1 w-full border-none"
+                  title={`Workspace pane ${index + 1}`}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Mobile fallback */}
