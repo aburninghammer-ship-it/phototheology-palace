@@ -164,9 +164,9 @@ export async function generateCommentary(options: CommentaryOptions): Promise<Co
 // CommentarySource type is defined at top of file
 
 /**
- * Generate Preacher Mentor commentary for a verse (2-step pipeline)
- * Step 1: Passage analysis (lens detection) — with fallback if analyzer unavailable
- * Step 2: Mentor commentary generation via Jeeves
+ * Generate Preacher Mentor commentary for a verse
+ * Tries dedicated preacher-mentor mode first, falls back to deep-palace-commentary,
+ * then to standard commentary as last resort.
  */
 export async function generatePreacherMentorCommentary(options: CommentaryOptions): Promise<CommentaryResult | null> {
   const { book, chapter, verse, verseText, generateAudio = false, voice = "onyx" } = options;
@@ -183,83 +183,82 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
     };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    // Step 1: Passage Analysis (with fallback defaults if analyzer not deployed)
-    let analysis = {
-      primary_room: "sr",
-      secondary_rooms: [] as string[],
-      genre: "narrative",
-    };
+    // Try preacher-mentor-commentary mode first, fall back to deep-palace-commentary
+    let commentaryText = "";
 
+    // Attempt 1: Dedicated preacher-mentor mode
     try {
-      const analyzeRes = await fetch(
-        `${supabaseUrl}/functions/v1/pt-passage-analyzer`,
+      const mentorRes = await fetch(
+        `${supabaseUrl}/functions/v1/jeeves`,
         {
           method: "POST",
           headers,
-          body: JSON.stringify({ book, chapter, verse, verseText }),
+          body: JSON.stringify({
+            mode: "preacher-mentor-commentary",
+            book,
+            chapter,
+            verseText: { verse, text: verseText },
+            primary_room: "sr",
+            secondary_rooms: [],
+            genre: "narrative",
+            override_room: null,
+          }),
         }
       );
 
-      if (analyzeRes.ok) {
-        const analyzeData = await analyzeRes.json();
-        if (analyzeData.primary_room) {
-          analysis = analyzeData;
-          console.log(`[Preacher Mentor] Analysis: primary=${analysis.primary_room}, genre=${analysis.genre}`);
+      if (mentorRes.ok) {
+        const data = await mentorRes.json();
+        const content = data.content;
+        if (typeof content === "string") {
+          commentaryText = content;
+        } else if (content?.sections) {
+          const parts = [
+            content.sections.meaning,
+            content.sections.cross_scripture,
+            content.sections.palace_framing,
+            content.sections.preaching_orientation,
+          ].filter(Boolean);
+          commentaryText = parts.join("\n\n");
+        } else if (content) {
+          commentaryText = typeof content === "string" ? content : JSON.stringify(content);
         }
-      } else {
-        console.warn(`[Preacher Mentor] Analyzer unavailable (${analyzeRes.status}), using default lens`);
       }
-    } catch (analyzeError) {
-      console.warn("[Preacher Mentor] Analyzer fetch failed, using default lens:", analyzeError);
+    } catch (e) {
+      console.warn("[Preacher Mentor] Dedicated mode failed, trying deep-palace:", e);
     }
 
-    // Step 2: Commentary Generation via Jeeves
-    const commentaryRes = await fetch(
-      `${supabaseUrl}/functions/v1/jeeves`,
-      {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          mode: "preacher-mentor-commentary",
-          book,
-          chapter,
-          verseText: { verse, text: verseText },
-          primary_room: analysis.primary_room,
-          secondary_rooms: analysis.secondary_rooms,
-          genre: analysis.genre,
-          override_room: null,
-        }),
-      }
-    );
-
-    if (!commentaryRes.ok) {
-      console.error("[Preacher Mentor] Commentary failed:", commentaryRes.status, "— falling back to standard");
-      return generateCommentary({ ...options, tier: "surface" });
-    }
-
-    const commentaryData = await commentaryRes.json();
-    const content = commentaryData.content;
-
-    // Handle both structured JSON response and plain text response
-    let commentaryText = "";
-    if (typeof content === "string") {
-      commentaryText = content;
-    } else if (content?.sections) {
-      const sections = content.sections;
-      const parts = [
-        sections.meaning,
-        sections.cross_scripture,
-        sections.palace_framing,
-        sections.preaching_orientation,
-      ].filter(Boolean);
-      commentaryText = parts.join("\n\n");
-    } else if (content) {
-      commentaryText = JSON.stringify(content);
-    }
-
+    // Attempt 2: Fall back to deep-palace-commentary (always deployed)
     if (!commentaryText) {
-      console.error("[Preacher Mentor] No commentary content — falling back to standard");
-      return generateCommentary({ ...options, tier: "surface" });
+      console.log("[Preacher Mentor] Using deep-palace-commentary fallback");
+      try {
+        const palaceRes = await fetch(
+          `${supabaseUrl}/functions/v1/jeeves`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              mode: "deep-palace-commentary",
+              book,
+              chapter,
+              verseText: { verse, text: verseText },
+              maxWords: 350,
+            }),
+          }
+        );
+
+        if (palaceRes.ok) {
+          const data = await palaceRes.json();
+          commentaryText = typeof data.content === "string" ? data.content : "";
+        }
+      } catch (e) {
+        console.warn("[Preacher Mentor] Deep palace fallback failed:", e);
+      }
+    }
+
+    // Attempt 3: Standard commentary as last resort
+    if (!commentaryText) {
+      console.log("[Preacher Mentor] All Jeeves modes failed, using standard commentary");
+      return generateCommentary({ ...options, tier: "intermediate" });
     }
 
     // Generate audio if requested
@@ -274,15 +273,16 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
       cached: false,
     };
   } catch (error) {
-    console.error("[Preacher Mentor Commentary] Error:", error, "— falling back to standard");
-    return generateCommentary({ ...options, tier: "surface" });
+    console.error("[Preacher Mentor Commentary] Error:", error);
+    return generateCommentary({ ...options, tier: "intermediate" });
   }
 }
 
 /**
  * Generate Story Mode commentary for a verse
- * Produces a warm, narrative-style retelling that brings the passage to life
- * for newcomers, seekers, and those wanting an immersive Bible experience.
+ * Simple, warm explanation with devotional thought for newcomers.
+ * Tries dedicated story-mode first, falls back to verse-explanation,
+ * then to standard surface commentary.
  */
 export async function generateStoryModeCommentary(options: CommentaryOptions): Promise<CommentaryResult | null> {
   const { book, chapter, verse, verseText, generateAudio = false, voice = "fable" } = options;
@@ -299,32 +299,65 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
     };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const commentaryRes = await fetch(
-      `${supabaseUrl}/functions/v1/jeeves`,
-      {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          mode: "story-mode-commentary",
-          book,
-          chapter,
-          verseText: { verse, text: verseText },
-        }),
-      }
-    );
+    let commentaryText = "";
 
-    if (!commentaryRes.ok) {
-      console.error("[Story Mode] Commentary failed:", commentaryRes.status, "— falling back to standard");
-      return generateCommentary({ ...options, tier: "surface" });
+    // Attempt 1: Dedicated story-mode-commentary in Jeeves
+    try {
+      const storyRes = await fetch(
+        `${supabaseUrl}/functions/v1/jeeves`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            mode: "story-mode-commentary",
+            book,
+            chapter,
+            verseText: { verse, text: verseText },
+          }),
+        }
+      );
+
+      if (storyRes.ok) {
+        const data = await storyRes.json();
+        commentaryText = typeof data.content === "string"
+          ? data.content
+          : data.content?.narrative || "";
+      }
+    } catch (e) {
+      console.warn("[Story Mode] Dedicated mode failed, trying verse-explanation:", e);
     }
 
-    const commentaryData = await commentaryRes.json();
-    const commentaryText = typeof commentaryData.content === "string"
-      ? commentaryData.content
-      : commentaryData.content?.narrative || JSON.stringify(commentaryData.content);
-
+    // Attempt 2: Fall back to verse-explanation mode (always deployed)
     if (!commentaryText) {
-      console.error("[Story Mode] No commentary content — falling back to standard");
+      console.log("[Story Mode] Using verse-explanation fallback");
+      try {
+        const explainRes = await fetch(
+          `${supabaseUrl}/functions/v1/jeeves`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              mode: "verse-explanation",
+              book,
+              chapter,
+              verse,
+              verseText,
+            }),
+          }
+        );
+
+        if (explainRes.ok) {
+          const data = await explainRes.json();
+          commentaryText = typeof data.content === "string" ? data.content : "";
+        }
+      } catch (e) {
+        console.warn("[Story Mode] Verse-explanation fallback failed:", e);
+      }
+    }
+
+    // Attempt 3: Standard surface commentary as last resort
+    if (!commentaryText) {
+      console.log("[Story Mode] All Jeeves modes failed, using standard commentary");
       return generateCommentary({ ...options, tier: "surface" });
     }
 
@@ -340,7 +373,7 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
       cached: false,
     };
   } catch (error) {
-    console.error("[Story Mode Commentary] Error:", error, "— falling back to standard");
+    console.error("[Story Mode Commentary] Error:", error);
     return generateCommentary({ ...options, tier: "surface" });
   }
 }
