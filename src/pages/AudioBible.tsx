@@ -120,6 +120,9 @@ export default function AudioBible() {
   const [customChapter, setCustomChapter] = useState(1);
   const [themes, setThemes] = useState<Theme[]>([]);
   
+  // Starting verse for chapter playback
+  const [startVerse, setStartVerse] = useState(1);
+
   // Custom playlist add mode state
   const [customAddMode, setCustomAddMode] = useState<"single" | "chapter-range" | "book-range">("single");
   const [rangeStartChapter, setRangeStartChapter] = useState(1);
@@ -136,9 +139,16 @@ export default function AudioBible() {
   useEffect(() => {
     const book = searchParams.get("book");
     const chapter = searchParams.get("chapter");
+    const verse = searchParams.get("verse");
     if (book) setSelectedBook(book);
     if (chapter) setSelectedChapter(parseInt(chapter, 10));
+    if (verse) setStartVerse(parseInt(verse, 10));
   }, [searchParams]);
+
+  // Reset start verse when book or chapter changes
+  useEffect(() => {
+    setStartVerse(1);
+  }, [selectedBook, selectedChapter]);
 
   const loadThemes = async () => {
     const data = await getThemes();
@@ -151,12 +161,17 @@ export default function AudioBible() {
     return book?.chapters || 1;
   };
 
-  // Handle play for single chapter
+  // Handle play for single chapter (starting from selected verse)
   const handlePlayChapter = async () => {
     await unlock();
-    const verses = await fetchChapterVerses(selectedBook, selectedChapter);
-    if (verses.length > 0) {
-      playChapter(selectedBook, selectedChapter, verses);
+    const allVerses = await fetchChapterVerses(selectedBook, selectedChapter);
+    if (allVerses.length > 0) {
+      const verses = startVerse > 1
+        ? allVerses.filter(v => v.verse >= startVerse)
+        : allVerses;
+      if (verses.length > 0) {
+        playChapter(selectedBook, selectedChapter, verses);
+      }
     }
   };
 
@@ -484,9 +499,31 @@ export default function AudioBible() {
                           </Select>
                         </div>
                       </div>
+
+                      {/* Start from verse */}
+                      <div className="space-y-2">
+                        <Label>Start from verse</Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min={1}
+                            value={startVerse}
+                            onChange={(e) => setStartVerse(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                            className="w-24"
+                          />
+                          {startVerse > 1 && (
+                            <span className="text-sm text-muted-foreground">
+                              Playing from verse {startVerse} onward
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
                       <Button size="lg" className="w-full" onClick={handlePlayChapter} disabled={isLoading}>
                         {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
-                        {t('audioBible.playBookChapter', { book: selectedBook, chapter: selectedChapter })}
+                        {startVerse > 1
+                          ? `Play ${selectedBook} ${selectedChapter} from verse ${startVerse}`
+                          : t('audioBible.playBookChapter', { book: selectedBook, chapter: selectedChapter })}
                       </Button>
                     </TabsContent>
 
