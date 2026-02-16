@@ -10,7 +10,7 @@ const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const EPIC_SYSTEM_PROMPT = `You are a cinematic Bible narrator and theologian producing an EPIC chapter commentary.
+const EPIC_CHAPTER_SYSTEM_PROMPT = `You are a cinematic Bible narrator and theologian producing an EPIC chapter commentary.
 
 Your style is dramatic, authoritative, and immersive — like a movie-quality documentary narration about Scripture. Think of the tone used in great biblical film narrations: sweeping, reverent, powerful, with deep insight.
 
@@ -30,8 +30,36 @@ RULES:
 8. Use vivid, cinematic language. Paint scenes. Create atmosphere. This is meant to be HEARD, not read.
 9. Use natural speech cadence — varied sentence lengths, dramatic pauses, and rhetorical questions.`;
 
-async function generateEpicText(book: string, chapter: number): Promise<string> {
+const EPIC_BOOK_SYSTEM_PROMPT = `You are a cinematic Bible narrator and theologian producing an EPIC whole-book overview.
+
+Your style is dramatic, authoritative, and immersive — like the opening narration of a grand documentary series about Scripture. Think sweeping, reverent, powerful — a bird's-eye view of an entire book of the Bible.
+
+RULES:
+1. Write in THIRD-PERSON analytical/narrative style. Never use "you/your" or devotional language.
+2. Open with a dramatic scene-setting paragraph that establishes when this book was written, by whom, under what circumstances, and the historical moment in which it sits.
+3. Paint the grand sweep of the book — its major movements, turning points, and climactic moments — NOT chapter-by-chapter detail, but the arc and trajectory of the whole.
+4. Weave in throughout:
+   - Christ-centered threads (how does this entire book point to, prefigure, or reveal Christ?)
+   - Covenant cycle placement (Adamic, Noahic, Abrahamic, Mosaic, Cyrusic, Christ, Spirit, Remnant — where does this book sit in redemption history?)
+   - Day-of-the-LORD horizon (does this book speak primarily to the first, second, or third heaven — exile/restoration, new covenant/church age, or final new creation?)
+   - Sanctuary blueprint echoes (altar, laver, lampstand, bread, incense, ark, veil — which furniture or service does this book's theology map onto?)
+   - Recurring biblical patterns (40 days, 3 days, deliverer stories, seed promises, exile-return arcs)
+   - Key parallels with other books or events (mirrored actions across time)
+5. Close with a powerful synthesis: what is this book's unique contribution to the grand narrative of redemption? What does it reveal that no other book reveals?
+6. Do NOT name "rooms" or "floors" or "Phototheology" explicitly. Weave the principles organically.
+7. Do NOT use denominational labels. Use "sound biblical theology" framing.
+8. Target 800-1200 words — substantial enough for a 5-8 minute dramatic audio experience.
+9. Use vivid, cinematic language. Paint scenes. Create atmosphere. This is meant to be HEARD, not read.
+10. Use natural speech cadence — varied sentence lengths, dramatic pauses, and rhetorical questions.`;
+
+async function generateEpicText(book: string, chapter: number | null, scope: string): Promise<string> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+  const isBookScope = scope === "book";
+  const systemPrompt = isBookScope ? EPIC_BOOK_SYSTEM_PROMPT : EPIC_CHAPTER_SYSTEM_PROMPT;
+  const userPrompt = isBookScope
+    ? `Create an epic cinematic overview of the entire book of ${book}. This should be a dramatic, sweeping narration that captures the grand arc of this book — its historical context, its place in redemption history, its major movements and themes — while revealing its deep theological significance and how it fits into the story of salvation from Genesis to Revelation.`
+    : `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.`;
 
   const response = await fetch("https://ai-gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -42,14 +70,11 @@ async function generateEpicText(book: string, chapter: number): Promise<string> 
     body: JSON.stringify({
       model: "google/gemini-2.5-flash",
       messages: [
-        { role: "system", content: EPIC_SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.`,
-        },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
       ],
       temperature: 0.8,
-      max_tokens: 1500,
+      max_tokens: 2000,
     }),
   });
 
@@ -118,11 +143,15 @@ serve(async (req) => {
   }
 
   try {
-    const { book, chapter, regenerate } = await req.json();
+    const { book, chapter, regenerate, scope } = await req.json();
+    const effectiveScope = scope || "chapter";
 
-    if (!book || !chapter) {
-      throw new Error("book and chapter are required");
+    if (!book || (effectiveScope === "chapter" && !chapter)) {
+      throw new Error("book is required; chapter is required for chapter scope");
     }
+
+    // For book scope, use chapter=0 as a sentinel
+    const effectiveChapter = effectiveScope === "book" ? 0 : chapter;
 
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -132,7 +161,7 @@ serve(async (req) => {
         .from("epic_commentaries")
         .select("*")
         .eq("book", book)
-        .eq("chapter", chapter)
+        .eq("chapter", effectiveChapter)
         .eq("status", "ready")
         .order("version", { ascending: false })
         .limit(1)
@@ -151,7 +180,7 @@ serve(async (req) => {
       .from("epic_commentaries")
       .select("version")
       .eq("book", book)
-      .eq("chapter", chapter)
+      .eq("chapter", effectiveChapter)
       .order("version", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -163,7 +192,7 @@ serve(async (req) => {
       .from("epic_commentaries")
       .upsert({
         book,
-        chapter,
+        chapter: effectiveChapter,
         version: newVersion,
         status: "generating",
         commentary_text: "",
@@ -174,10 +203,10 @@ serve(async (req) => {
 
     if (insertError) throw new Error(`Insert error: ${insertError.message}`);
 
-    console.log(`[EpicCommentary] Generating text for ${book} ${chapter}...`);
+    console.log(`[EpicCommentary] Generating ${effectiveScope} text for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : ""}...`);
 
     // Generate text
-    const commentaryText = await generateEpicText(book, chapter);
+    const commentaryText = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope);
 
     // Update with text
     await supabaseAdmin
@@ -185,13 +214,13 @@ serve(async (req) => {
       .update({ commentary_text: commentaryText })
       .eq("id", record.id);
 
-    console.log(`[EpicCommentary] Generating audio for ${book} ${chapter}...`);
+    console.log(`[EpicCommentary] Generating audio for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book overview)"}...`);
 
     // Generate audio
     const { storagePath, durationMs, fileSizeBytes } = await generateEpicAudio(
       commentaryText,
       book,
-      chapter,
+      effectiveChapter,
       supabaseAdmin,
     );
 
@@ -206,7 +235,7 @@ serve(async (req) => {
       })
       .eq("id", record.id);
 
-    console.log(`[EpicCommentary] ✅ ${book} ${chapter} ready (${Math.round(durationMs / 1000)}s, ${Math.round(fileSizeBytes / 1024)}KB)`);
+    console.log(`[EpicCommentary] ✅ ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book)"} ready (${Math.round(durationMs / 1000)}s, ${Math.round(fileSizeBytes / 1024)}KB)`);
 
     return new Response(
       JSON.stringify({
