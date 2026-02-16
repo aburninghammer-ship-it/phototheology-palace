@@ -141,12 +141,14 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     book: string;
     chapter: number;
     verse: number;
+    source: CommentarySource;
     result: { commentary: string; audioUrl: string | null } | null;
   } | null>(null);
 
   /**
    * Pre-fetch commentary for current verse while verse audio is playing
    * This helps mobile by having the data ready when needed
+   * Respects the current commentary source (standard, story-mode, preacher-mentor)
    */
   const prefetchCurrentCommentary = useCallback(async () => {
     const item = currentItemRef.current;
@@ -156,17 +158,20 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     const verse = item.verses[verseIdx];
     if (!verse) return;
 
-    // Don't prefetch if we already have it
+    const source = commentarySourceRef.current;
+
+    // Don't prefetch if we already have it for the same source
     if (prefetchedCommentaryRef.current?.book === item.book &&
         prefetchedCommentaryRef.current?.chapter === item.chapter &&
-        prefetchedCommentaryRef.current?.verse === verse.verse) {
+        prefetchedCommentaryRef.current?.verse === verse.verse &&
+        prefetchedCommentaryRef.current?.source === source) {
       return;
     }
 
-    console.log(`[useAudioBible] Pre-fetching commentary for ${item.book} ${item.chapter}:${verse.verse}`);
+    console.log(`[useAudioBible] Pre-fetching ${source} commentary for ${item.book} ${item.chapter}:${verse.verse}`);
 
     try {
-      const result = await generateCommentary({
+      const opts = {
         book: item.book,
         chapter: item.chapter,
         verse: verse.verse,
@@ -174,16 +179,23 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         tier: commentaryTierRef.current,
         generateAudio: true,
         voice: commentaryVoiceRef.current,
-      });
+      };
+
+      const result = source === "preacher-mentor"
+        ? await generatePreacherMentorCommentary(opts)
+        : source === "story-mode"
+        ? await generateStoryModeCommentary(opts)
+        : await generateCommentary(opts);
 
       if (result && !isStoppedRef.current) {
         prefetchedCommentaryRef.current = {
           book: item.book,
           chapter: item.chapter,
           verse: verse.verse,
+          source,
           result: { commentary: result.commentary, audioUrl: result.audioUrl },
         };
-        console.log(`[useAudioBible] Pre-fetched commentary ready for ${item.book} ${item.chapter}:${verse.verse}`);
+        console.log(`[useAudioBible] Pre-fetched ${source} commentary ready for ${item.book} ${item.chapter}:${verse.verse}`);
       }
     } catch (error) {
       console.error("[useAudioBible] Pre-fetch error:", error);
@@ -207,17 +219,20 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     try {
       console.log(`[useAudioBible] Playing commentary for ${item.book} ${item.chapter}:${verse.verse}`);
 
-      // Check if we have pre-fetched commentary
+      // Check if we have pre-fetched commentary matching the current source
       let result: { commentary: string; audioUrl: string | null } | null = null;
 
       if (prefetchedCommentaryRef.current?.book === item.book &&
           prefetchedCommentaryRef.current?.chapter === item.chapter &&
           prefetchedCommentaryRef.current?.verse === verse.verse &&
+          prefetchedCommentaryRef.current?.source === commentarySourceRef.current &&
           prefetchedCommentaryRef.current?.result) {
         console.log("[useAudioBible] Using pre-fetched commentary");
         result = prefetchedCommentaryRef.current.result;
         prefetchedCommentaryRef.current = null; // Clear after use
       } else {
+        // Clear stale prefetch from wrong source
+        prefetchedCommentaryRef.current = null;
         // Fetch if not pre-fetched (with timeout)
         console.log(`[useAudioBible] Fetching commentary (source: ${commentarySourceRef.current})`);
         const timeoutPromise = new Promise<null>((_, reject) => {

@@ -297,8 +297,8 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
     });
 
     if (error) {
-      console.error("[Story Mode] Error:", error);
-      return null;
+      console.warn("[Story Mode] Jeeves call failed, falling back to standard commentary:", error);
+      return generateCommentary({ ...options, tier: "surface" });
     }
 
     const commentaryText = typeof data?.content === "string"
@@ -306,8 +306,8 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
       : data?.content?.story || "";
 
     if (!commentaryText) {
-      console.error("[Story Mode] No content in response");
-      return null;
+      console.warn("[Story Mode] No content in response, falling back to standard commentary");
+      return generateCommentary({ ...options, tier: "surface" });
     }
 
     // Generate audio if requested
@@ -322,8 +322,8 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
       cached: false,
     };
   } catch (error) {
-    console.error("[Story Mode Commentary] Error:", error);
-    return null;
+    console.warn("[Story Mode] Error, falling back to standard commentary:", error);
+    return generateCommentary({ ...options, tier: "surface" });
   }
 }
 
