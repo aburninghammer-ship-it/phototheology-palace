@@ -2950,6 +2950,64 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
 
+    } else if (mode === "story-mode-commentary") {
+      // Story Mode Commentary — simple narrative explanation for newcomers
+      systemPrompt = `You are a warm, friendly Bible storyteller explaining Scripture to someone who may be reading it for the very first time. Your job is to make the text come alive in plain, conversational language.
+
+RULES:
+- Write as if you're sitting across from a friend at a coffee shop explaining what they just read.
+- Use simple, everyday language. No theological jargon. No Greek/Hebrew terms.
+- Start by briefly setting the scene: Who's involved? Where are we? What just happened before this verse?
+- Then explain what's actually happening in this specific verse — the action, the meaning, the emotion.
+- End with a single sentence about why this matters or what it reveals.
+- Keep it SHORT: 60-100 words. This will be read aloud as audio commentary between verses.
+- Do NOT preach, moralize, or give application points. Just explain the story.
+- Do NOT use bullet points, numbered lists, or section headers.
+- Do NOT use phrases like "In this verse..." or "The Bible says..." — just tell the story naturally.
+- Write in present tense to make it vivid: "Jesus turns to them and says..." not "Jesus turned to them and said..."`;
+
+      userPrompt = `Explain this verse in simple, story-telling language:
+
+${book} ${chapter}:${verseText.verse}
+"${verseText.text}"
+
+Remember: plain language, set the scene briefly, explain what's happening, one sentence on why it matters. 60-100 words.`;
+
+      const storyResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!storyResponse.ok) {
+        const errorText = await storyResponse.text();
+        console.error('AI Gateway error:', storyResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${storyResponse.status}`);
+      }
+
+      const storyData = await storyResponse.json();
+      const storyContent = storyData.choices?.[0]?.message?.content || "No story commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: storyContent,
+          principlesUsed: ["Story Mode Commentary"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
     } else if (mode === "preacher-mentor-commentary") {
       // Preacher Mentor Commentary Engine v1
       // Imports canonical rooms from ./canonical-rooms.ts

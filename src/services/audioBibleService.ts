@@ -14,7 +14,7 @@ import {
 
 export type CommentaryTier = "surface" | "intermediate" | "scholarly";
 
-export type CommentarySource = "standard" | "preacher-mentor";
+export type CommentarySource = "standard" | "preacher-mentor" | "story-mode";
 
 export type OpenAIVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "nova" | "onyx" | "sage" | "shimmer";
 
@@ -275,6 +275,54 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
     };
   } catch (error) {
     console.error("[Preacher Mentor Commentary] Error:", error);
+    return null;
+  }
+}
+
+/**
+ * Generate Story Mode commentary for a verse
+ * Simple, narrative explanation for newcomers — what's happening, who's involved, why it matters
+ */
+export async function generateStoryModeCommentary(options: CommentaryOptions): Promise<CommentaryResult | null> {
+  const { book, chapter, verse, verseText, generateAudio = false, voice = "nova" } = options;
+
+  try {
+    const { data, error } = await supabase.functions.invoke("jeeves", {
+      body: {
+        mode: "story-mode-commentary",
+        book,
+        chapter,
+        verseText: { verse, text: verseText },
+      },
+    });
+
+    if (error) {
+      console.error("[Story Mode] Error:", error);
+      return null;
+    }
+
+    const commentaryText = typeof data?.content === "string"
+      ? data.content
+      : data?.content?.story || "";
+
+    if (!commentaryText) {
+      console.error("[Story Mode] No content in response");
+      return null;
+    }
+
+    // Generate audio if requested
+    let audioUrl: string | null = null;
+    if (generateAudio && commentaryText) {
+      audioUrl = await generateTTSAudio({ text: commentaryText, voice });
+    }
+
+    return {
+      commentary: commentaryText,
+      audioUrl,
+      cached: false,
+    };
+  } catch (error) {
+    console.error("[Story Mode Commentary] Error:", error);
     return null;
   }
 }

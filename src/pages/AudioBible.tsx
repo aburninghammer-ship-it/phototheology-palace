@@ -38,6 +38,7 @@ import {
   BookText,
   Layers,
   Crown,
+  BookHeart,
 } from "lucide-react";
 
 interface Theme {
@@ -331,10 +332,18 @@ export default function AudioBible() {
                         Preach Mode
                       </Badge>
                     )}
+                    {includeCommentary && commentarySource === "story-mode" && (
+                      <Badge variant="outline" className="text-xs px-2 py-0.5 border-emerald-500/50 text-emerald-400">
+                        <BookHeart className="h-3 w-3 mr-1" />
+                        Story Mode
+                      </Badge>
+                    )}
                     <Badge variant={isPlayingCommentary ? "secondary" : "default"} className="text-sm px-3 py-1">
                       {isPlayingCommentary
                         ? commentarySource === "preacher-mentor"
                           ? "Preacher Mentor"
+                          : commentarySource === "story-mode"
+                          ? "Story Mode"
                           : t('audioBible.tierCommentary', { tier: commentaryTier })
                         : t('audioBible.scripture')}
                     </Badge>
@@ -843,8 +852,8 @@ export default function AudioBible() {
                   <CardDescription>{t('audioBible.chooseHowToListen')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Bible Only vs With Commentary vs Preacher Mentor */}
-                  <div className="grid grid-cols-3 gap-2">
+                  {/* Listening Mode Grid */}
+                  <div className="grid grid-cols-2 gap-2">
                     <Button
                       variant={!includeCommentary ? "default" : "outline"}
                       className="h-auto py-3 px-2 flex-col gap-1 text-center"
@@ -856,6 +865,18 @@ export default function AudioBible() {
                       <BookOpen className="h-5 w-5 mb-0.5" />
                       <span className="font-semibold text-sm leading-tight">{t('audioBible.bibleOnly')}</span>
                       <span className="text-[10px] opacity-80 leading-tight">{t('audioBible.justScripture')}</span>
+                    </Button>
+                    <Button
+                      variant={includeCommentary && commentarySource === "story-mode" ? "default" : "outline"}
+                      className="h-auto py-3 px-2 flex-col gap-1 text-center"
+                      onClick={() => {
+                        setIncludeCommentary(true);
+                        setCommentarySource("story-mode");
+                      }}
+                    >
+                      <BookHeart className="h-5 w-5 mb-0.5" />
+                      <span className="font-semibold text-sm leading-tight">Story Mode</span>
+                      <span className="text-[10px] opacity-80 leading-tight">Simple explainer</span>
                     </Button>
                     <Button
                       variant={includeCommentary && commentarySource === "standard" ? "default" : "outline"}

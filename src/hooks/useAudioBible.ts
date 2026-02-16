@@ -9,6 +9,7 @@ import {
   generateTTSAudio,
   generateCommentary,
   generatePreacherMentorCommentary,
+  generateStoryModeCommentary,
   generateChapterCommentary,
   prefetchUpcomingCommentary,
   CommentaryTier,
@@ -223,8 +224,18 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
           setTimeout(() => reject(new Error("Commentary generation timed out")), 45000);
         });
 
-        const commentaryPromise = commentarySourceRef.current === "preacher-mentor"
+        const source = commentarySourceRef.current;
+        const commentaryPromise = source === "preacher-mentor"
           ? generatePreacherMentorCommentary({
+              book: item.book,
+              chapter: item.chapter,
+              verse: verse.verse,
+              verseText: verse.text,
+              generateAudio: true,
+              voice: commentaryVoiceRef.current,
+            })
+          : source === "story-mode"
+          ? generateStoryModeCommentary({
               book: item.book,
               chapter: item.chapter,
               verse: verse.verse,
