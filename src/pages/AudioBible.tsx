@@ -312,7 +312,7 @@ export default function AudioBible() {
     setIsEpicLoading(true);
     try {
       // Fetch cached epic commentary
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("epic_commentaries")
         .select("*")
         .eq("book", book)
@@ -324,10 +324,37 @@ export default function AudioBible() {
 
       if (error) throw error;
 
+      // If not cached, generate on demand
       if (!data || !data.audio_storage_path) {
-        toast.error(`Epic Mode is not yet available for ${book} ${chapter}. Coming soon!`);
-        setIsEpicLoading(false);
-        return;
+        toast.info(`Generating Epic commentary for ${book} ${chapter}... This may take a moment.`);
+        
+        const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
+          body: { book, chapter },
+        });
+
+        if (genResponse.error || genResponse.data?.error) {
+          throw new Error(genResponse.data?.error || genResponse.error?.message || "Generation failed");
+        }
+
+        // Re-fetch the now-cached commentary
+        const refetch = await supabase
+          .from("epic_commentaries")
+          .select("*")
+          .eq("book", book)
+          .eq("chapter", chapter)
+          .eq("status", "ready")
+          .order("version", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (refetch.error) throw refetch.error;
+        data = refetch.data;
+
+        if (!data || !data.audio_storage_path) {
+          toast.error("Epic commentary generation completed but audio not found.");
+          setIsEpicLoading(false);
+          return;
+        }
       }
 
       // Get public URL for the audio
