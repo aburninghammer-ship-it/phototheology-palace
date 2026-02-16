@@ -281,36 +281,54 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
 
 /**
  * Generate Story Mode commentary for a verse
- * Simple, narrative explanation for newcomers — what's happening, who's involved, why it matters
+ * Produces a warm, narrative-style retelling that brings the passage to life
+ * for newcomers, seekers, and those wanting an immersive Bible experience.
  */
 export async function generateStoryModeCommentary(options: CommentaryOptions): Promise<CommentaryResult | null> {
-  const { book, chapter, verse, verseText, generateAudio = false, voice = "nova" } = options;
+  const { book, chapter, verse, verseText, generateAudio = false, voice = "fable" } = options;
 
   try {
-    const { data, error } = await supabase.functions.invoke("jeeves", {
-      body: {
-        mode: "story-mode-commentary",
-        book,
-        chapter,
-        verseText: { verse, text: verseText },
-      },
-    });
+    const session = await supabase.auth.getSession();
+    const token = session.data.session?.access_token;
+    const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "";
+    const anonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "";
 
-    if (error) {
-      console.warn("[Story Mode] Jeeves call failed, falling back to standard commentary:", error);
-      return generateCommentary({ ...options, tier: "surface" });
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      apikey: anonKey,
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const commentaryRes = await fetch(
+      `${supabaseUrl}/functions/v1/jeeves`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          mode: "story-mode-commentary",
+          book,
+          chapter,
+          verseText: { verse, text: verseText },
+        }),
+      }
+    );
+
+    if (!commentaryRes.ok) {
+      console.error("[Story Mode] Commentary failed:", commentaryRes.status);
+      return null;
     }
 
-    const commentaryText = typeof data?.content === "string"
-      ? data.content
-      : data?.content?.story || "";
+    const commentaryData = await commentaryRes.json();
+    const commentaryText = typeof commentaryData.content === "string"
+      ? commentaryData.content
+      : commentaryData.content?.narrative || JSON.stringify(commentaryData.content);
 
     if (!commentaryText) {
-      console.warn("[Story Mode] No content in response, falling back to standard commentary");
-      return generateCommentary({ ...options, tier: "surface" });
+      console.error("[Story Mode] No commentary content in response");
+      return null;
     }
 
-    // Generate audio if requested
+    // Generate audio if requested — default to "fable" voice for narrative feel
     let audioUrl: string | null = null;
     if (generateAudio && commentaryText) {
       audioUrl = await generateTTSAudio({ text: commentaryText, voice });
@@ -322,8 +340,8 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
       cached: false,
     };
   } catch (error) {
-    console.warn("[Story Mode] Error, falling back to standard commentary:", error);
-    return generateCommentary({ ...options, tier: "surface" });
+    console.error("[Story Mode Commentary] Error:", error);
+    return null;
   }
 }
 
