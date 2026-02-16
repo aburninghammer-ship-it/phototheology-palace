@@ -799,42 +799,42 @@ export default function AudioBible() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Bible Only vs With Commentary vs Preacher Mentor */}
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-2">
                     <Button
                       variant={!includeCommentary ? "default" : "outline"}
-                      className="h-auto py-4 flex-col gap-1"
+                      className="h-auto py-3 px-2 flex-col gap-1 text-center"
                       onClick={() => {
                         setIncludeCommentary(false);
                         setCommentarySource("standard");
                       }}
                     >
-                      <BookOpen className="h-6 w-6 mb-1" />
-                      <span className="font-semibold">{t('audioBible.bibleOnly')}</span>
-                      <span className="text-xs opacity-80">{t('audioBible.justScripture')}</span>
+                      <BookOpen className="h-5 w-5 mb-0.5" />
+                      <span className="font-semibold text-sm leading-tight">{t('audioBible.bibleOnly')}</span>
+                      <span className="text-[10px] opacity-80 leading-tight">{t('audioBible.justScripture')}</span>
                     </Button>
                     <Button
                       variant={includeCommentary && commentarySource === "standard" ? "default" : "outline"}
-                      className="h-auto py-4 flex-col gap-1"
+                      className="h-auto py-3 px-2 flex-col gap-1 text-center"
                       onClick={() => {
                         setIncludeCommentary(true);
                         setCommentarySource("standard");
                       }}
                     >
-                      <MessageSquare className="h-6 w-6 mb-1" />
-                      <span className="font-semibold">{t('audioBible.withCommentary')}</span>
-                      <span className="text-xs opacity-80">{t('audioBible.phototheologyInsights')}</span>
+                      <MessageSquare className="h-5 w-5 mb-0.5" />
+                      <span className="font-semibold text-sm leading-tight">Commentary</span>
+                      <span className="text-[10px] opacity-80 leading-tight">PT insights</span>
                     </Button>
                     <Button
                       variant={includeCommentary && commentarySource === "preacher-mentor" ? "default" : "outline"}
-                      className="h-auto py-4 flex-col gap-1"
+                      className="h-auto py-3 px-2 flex-col gap-1 text-center"
                       onClick={() => {
                         setIncludeCommentary(true);
                         setCommentarySource("preacher-mentor");
                       }}
                     >
-                      <Crown className="h-6 w-6 mb-1" />
-                      <span className="font-semibold">Preacher Mentor</span>
-                      <span className="text-xs opacity-80">Mentor commentary</span>
+                      <Crown className="h-5 w-5 mb-0.5" />
+                      <span className="font-semibold text-sm leading-tight">Mentor</span>
+                      <span className="text-[10px] opacity-80 leading-tight">Preacher mode</span>
                     </Button>
                   </div>
 
