@@ -90,6 +90,8 @@ export default function AudioBible() {
     setCommentaryTier,
     includeCommentary,
     setIncludeCommentary,
+    commentaryOnly,
+    setCommentaryOnly,
     commentaryMode,
     setCommentaryMode,
     commentarySource,
@@ -338,8 +340,13 @@ export default function AudioBible() {
                         Story Mode
                       </Badge>
                     )}
+                    {commentaryOnly && (
+                      <Badge variant="outline" className="text-xs px-2 py-0.5 border-violet-500/50 text-violet-400">
+                        Commentary Only
+                      </Badge>
+                    )}
                     <Badge variant={isPlayingCommentary ? "secondary" : "default"} className="text-sm px-3 py-1">
-                      {isPlayingCommentary
+                      {isPlayingCommentary || commentaryOnly
                         ? commentarySource === "preacher-mentor"
                           ? "Preacher Mentor"
                           : commentarySource === "story-mode"
@@ -907,8 +914,33 @@ export default function AudioBible() {
                   {/* Commentary Options (only show if enabled) */}
                   {includeCommentary && (
                     <>
-                      {/* Commentary Mode: Verse by Verse or Chapter Summary */}
+                      {/* Reading Style: Scripture + Commentary or Commentary Only */}
                       <div className="space-y-2 pt-2">
+                        <Label>Reading Style</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            variant={!commentaryOnly ? "default" : "outline"}
+                            size="sm"
+                            className="h-auto py-2 flex-col"
+                            onClick={() => setCommentaryOnly(false)}
+                          >
+                            <span className="font-medium">Scripture + Commentary</span>
+                            <span className="text-xs opacity-80">Read verse, then explain</span>
+                          </Button>
+                          <Button
+                            variant={commentaryOnly ? "default" : "outline"}
+                            size="sm"
+                            className="h-auto py-2 flex-col"
+                            onClick={() => setCommentaryOnly(true)}
+                          >
+                            <span className="font-medium">Commentary Only</span>
+                            <span className="text-xs opacity-80">Skip verse audio</span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Commentary Mode: Verse by Verse or Chapter Summary */}
+                      <div className="space-y-2">
                         <Label>{t('audioBible.commentaryStyle')}</Label>
                         <div className="grid grid-cols-2 gap-2">
                           <Button
