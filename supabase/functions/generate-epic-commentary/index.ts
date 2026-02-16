@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
+const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY")!;;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -139,24 +139,32 @@ async function generateEpicAudio(
   const audioBuffers: ArrayBuffer[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const ttsResponse = await fetch("https://api.openai.com/v1/audio/speech", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
+    const voiceId = "onwK4e9ZLuTAKqWW03F9"; // Daniel - deep British male
+    const ttsResponse = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": ELEVENLABS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: chunks[i],
+          model_id: "eleven_multilingual_v2",
+          voice_settings: {
+            stability: 0.55,
+            similarity_boost: 0.8,
+            style: 0.35,
+            use_speaker_boost: true,
+            speed: 0.92,
+          },
+        }),
       },
-      body: JSON.stringify({
-        model: "tts-1-hd",
-        input: chunks[i],
-        voice: "onyx",
-        response_format: "mp3",
-        speed: 0.95,
-      }),
-    });
+    );
 
     if (!ttsResponse.ok) {
       const err = await ttsResponse.text();
-      throw new Error(`OpenAI TTS error (chunk ${i + 1}/${chunks.length}): ${ttsResponse.status} - ${err}`);
+      throw new Error(`ElevenLabs TTS error (chunk ${i + 1}/${chunks.length}): ${ttsResponse.status} - ${err}`);
     }
 
     audioBuffers.push(await ttsResponse.arrayBuffer());
