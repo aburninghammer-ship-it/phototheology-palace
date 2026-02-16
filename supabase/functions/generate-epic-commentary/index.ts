@@ -148,7 +148,7 @@ async function generateEpicAudio(
       body: JSON.stringify({
         model: "tts-1-hd",
         input: chunks[i],
-        voice: "onyx",
+        voice: "fable",
         response_format: "mp3",
         speed: 0.95,
       }),
@@ -249,7 +249,7 @@ serve(async (req) => {
         version: newVersion,
         status: "generating",
         commentary_text: "",
-        voice_id: "onyx",
+        voice_id: "fable",
       }, { onConflict: "book,chapter,version" })
       .select()
       .single();
