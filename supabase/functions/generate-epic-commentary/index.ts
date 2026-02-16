@@ -156,7 +156,7 @@ async function generateEpicAudio(
             similarity_boost: 0.75,
             style: 0.0,
             use_speaker_boost: true,
-            speed: 1.0,
+            speed: 1.2,
           },
         }),
       },
