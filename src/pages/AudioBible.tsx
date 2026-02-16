@@ -299,13 +299,9 @@ export default function AudioBible() {
 
   // Epic Mode handler
   const handleEpicModeSelect = useCallback(() => {
-    if (!freeTier.isPremium && !freeTier.isLoading) {
-      toast.error("Epic Mode is a premium feature. Upgrade to unlock cinematic Bible commentary.");
-      return;
-    }
     setCommentarySource("epic");
-    setIncludeCommentary(false); // Epic mode bypasses verse-by-verse commentary
-  }, [freeTier.isPremium, freeTier.isLoading, setCommentarySource, setIncludeCommentary]);
+    setIncludeCommentary(true);
+  }, [setCommentarySource, setIncludeCommentary]);
 
   // Play Epic commentary for a chapter
   const handlePlayEpic = useCallback(async (book: string, chapter: number) => {
@@ -503,8 +499,54 @@ export default function AudioBible() {
             </div>
           </div>
 
+          {/* Epic Mode Now Playing Card */}
+          {(isEpicPlaying || isEpicLoading) && (
+            <Card className="mb-8 border-amber-500/30 bg-gradient-to-br from-amber-900/20 to-transparent">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-sm text-amber-400/80">
+                      <Film className="h-4 w-4 inline mr-1" />
+                      Epic Cinematic Commentary
+                    </p>
+                    <h2 className="text-2xl font-bold">
+                      {selectedBook} {selectedChapter}
+                    </h2>
+                  </div>
+                  <Badge variant="outline" className="text-xs px-2 py-0.5 border-amber-500/50 bg-amber-500/10 text-amber-300">
+                    {isEpicLoading ? "Generating..." : "Playing"}
+                  </Badge>
+                </div>
+                {isEpicLoading ? (
+                  <div className="flex items-center gap-3 text-muted-foreground py-4">
+                    <Loader2 className="h-5 w-5 animate-spin text-amber-400" />
+                    <span>Generating cinematic commentary... This may take a moment.</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="border-amber-500/30 hover:bg-amber-500/10"
+                      onClick={() => {
+                        if (epicAudioRef.current) {
+                          epicAudioRef.current.pause();
+                          epicAudioRef.current = null;
+                        }
+                        setIsEpicPlaying(false);
+                      }}
+                    >
+                      <Square className="h-5 w-5 mr-2" />
+                      Stop
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Now Playing Card (when active) */}
-          {!isIdle && (
+          {!isIdle && !(isEpicPlaying || isEpicLoading) && (
             <Card className="mb-8 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
