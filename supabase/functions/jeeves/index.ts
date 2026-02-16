@@ -7539,6 +7539,15 @@ ${BIBLE_BOOKS.join(', ')}
 Return ONLY valid JSON.`;
     }
 
+    // Guard: if no prompt was set for this mode, return a helpful error instead of sending empty content
+    if (!systemPrompt || !userPrompt) {
+      console.error(`No prompt generated for mode: ${mode}`);
+      return new Response(
+        JSON.stringify({ error: "Unable to process your request. Please try again.", content: `I wasn't able to generate a response for this mode. Please try again or switch to a different study mode.` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
