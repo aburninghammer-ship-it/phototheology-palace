@@ -277,7 +277,7 @@ Return ONLY the JSON object with scores for each room code, genre, doctrinal_sen
   } catch (error) {
     console.error("PT Passage Analyzer error:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Analysis failed" }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "Analysis failed" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
