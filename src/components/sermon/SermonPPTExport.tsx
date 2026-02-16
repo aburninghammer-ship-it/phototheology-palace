@@ -63,8 +63,6 @@ interface GammaResult {
   numCards: number;
 }
 
-const GAMMA_API_KEY_STORAGE_KEY = 'phototheology_gamma_api_key';
-
 export function SermonPPTExport({ sermon, variant = "outline", size = "sm" }: SermonPPTExportProps) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"full-sermon" | "verses-only">("full-sermon");
@@ -87,19 +85,36 @@ export function SermonPPTExport({ sermon, variant = "outline", size = "sm" }: Se
   const [gammaImageStyle, setGammaImageStyle] = useState<"photorealistic" | "illustration" | "none">("photorealistic");
   const [gammaTextAmount, setGammaTextAmount] = useState<"brief" | "medium" | "detailed">("medium");
 
-  // Load saved Gamma API key on mount
+  // Load Gamma API key from Supabase profile on mount (not localStorage)
   useEffect(() => {
-    const savedKey = localStorage.getItem(GAMMA_API_KEY_STORAGE_KEY);
-    if (savedKey) {
-      setGammaApiKey(savedKey);
-    }
+    const loadGammaKey = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("gamma_api_key")
+        .eq("id", user.id)
+        .single();
+      if (profile?.gamma_api_key) {
+        setGammaApiKey(profile.gamma_api_key);
+      }
+    };
+    loadGammaKey();
+    // Clean up any previously stored key from localStorage
+    try { localStorage.removeItem('phototheology_gamma_api_key'); } catch (_) {}
   }, []);
 
-  // Save Gamma API key when changed
-  const handleGammaApiKeyChange = (value: string) => {
+  // Save Gamma API key to Supabase profile only (never localStorage)
+  const handleGammaApiKeyChange = async (value: string) => {
     setGammaApiKey(value);
     if (value.startsWith('sk-gamma-')) {
-      localStorage.setItem(GAMMA_API_KEY_STORAGE_KEY, value);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from("profiles")
+          .update({ gamma_api_key: value })
+          .eq("id", user.id);
+      }
     }
   };
 

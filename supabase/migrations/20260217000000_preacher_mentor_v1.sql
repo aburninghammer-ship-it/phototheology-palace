@@ -26,12 +26,12 @@ USING (true);
 
 CREATE POLICY "Service role can insert passage analysis"
 ON public.passage_analysis_cache FOR INSERT
-TO authenticated
+TO service_role
 WITH CHECK (true);
 
 CREATE POLICY "Service role can update passage analysis"
 ON public.passage_analysis_cache FOR UPDATE
-TO authenticated
+TO service_role
 USING (true);
 
 CREATE INDEX idx_passage_analysis_ref ON public.passage_analysis_cache(passage_ref);
@@ -64,12 +64,12 @@ USING (true);
 
 CREATE POLICY "Service role can insert commentary versions"
 ON public.commentary_core_versions FOR INSERT
-TO authenticated
+TO service_role
 WITH CHECK (true);
 
 CREATE POLICY "Service role can update commentary versions"
 ON public.commentary_core_versions FOR UPDATE
-TO authenticated
+TO service_role
 USING (true);
 
 CREATE INDEX idx_commentary_ref ON public.commentary_core_versions(passage_ref);

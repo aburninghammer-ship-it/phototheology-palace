@@ -165,7 +165,7 @@ export async function generateCommentary(options: CommentaryOptions): Promise<Co
 
 /**
  * Generate Preacher Mentor commentary for a verse (2-step pipeline)
- * Step 1: Passage analysis (lens detection)
+ * Step 1: Passage analysis (lens detection) — with fallback if analyzer unavailable
  * Step 2: Mentor commentary generation via Jeeves
  */
 export async function generatePreacherMentorCommentary(options: CommentaryOptions): Promise<CommentaryResult | null> {
@@ -183,24 +183,37 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
     };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    // Step 1: Passage Analysis
-    const analyzeRes = await fetch(
-      `${supabaseUrl}/functions/v1/pt-passage-analyzer`,
-      {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ book, chapter, verse, verseText }),
-      }
-    );
+    // Step 1: Passage Analysis (with fallback defaults if analyzer not deployed)
+    let analysis = {
+      primary_room: "sr",
+      secondary_rooms: [] as string[],
+      genre: "narrative",
+    };
 
-    if (!analyzeRes.ok) {
-      console.error("[Preacher Mentor] Analysis failed:", analyzeRes.status);
-      return null;
+    try {
+      const analyzeRes = await fetch(
+        `${supabaseUrl}/functions/v1/pt-passage-analyzer`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ book, chapter, verse, verseText }),
+        }
+      );
+
+      if (analyzeRes.ok) {
+        const analyzeData = await analyzeRes.json();
+        if (analyzeData.primary_room) {
+          analysis = analyzeData;
+          console.log(`[Preacher Mentor] Analysis: primary=${analysis.primary_room}, genre=${analysis.genre}`);
+        }
+      } else {
+        console.warn(`[Preacher Mentor] Analyzer unavailable (${analyzeRes.status}), using default lens`);
+      }
+    } catch (analyzeError) {
+      console.warn("[Preacher Mentor] Analyzer fetch failed, using default lens:", analyzeError);
     }
 
-    const analysis = await analyzeRes.json();
-
-    // Step 2: Commentary Generation
+    // Step 2: Commentary Generation via Jeeves
     const commentaryRes = await fetch(
       `${supabaseUrl}/functions/v1/jeeves`,
       {
@@ -227,16 +240,27 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
     const commentaryData = await commentaryRes.json();
     const content = commentaryData.content;
 
-    // Flatten structured sections into readable text for audio
-    const sections = content?.sections || {};
-    const parts = [
-      sections.meaning,
-      sections.cross_scripture,
-      sections.palace_framing,
-      sections.preaching_orientation,
-    ].filter(Boolean);
+    // Handle both structured JSON response and plain text response
+    let commentaryText = "";
+    if (typeof content === "string") {
+      commentaryText = content;
+    } else if (content?.sections) {
+      const sections = content.sections;
+      const parts = [
+        sections.meaning,
+        sections.cross_scripture,
+        sections.palace_framing,
+        sections.preaching_orientation,
+      ].filter(Boolean);
+      commentaryText = parts.join("\n\n");
+    } else if (content) {
+      commentaryText = JSON.stringify(content);
+    }
 
-    const commentaryText = parts.join("\n\n");
+    if (!commentaryText) {
+      console.error("[Preacher Mentor] No commentary content in response");
+      return null;
+    }
 
     // Generate audio if requested
     let audioUrl: string | null = null;
