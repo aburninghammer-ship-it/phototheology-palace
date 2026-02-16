@@ -309,13 +309,21 @@ export default function AudioBible() {
                       {currentBook} {currentChapter}:{currentVerse}
                     </h2>
                   </div>
-                  <Badge variant={isPlayingCommentary ? "secondary" : "default"} className="text-sm px-3 py-1">
-                    {isPlayingCommentary
-                      ? commentarySource === "preacher-mentor"
-                        ? "Preacher Mentor"
-                        : t('audioBible.tierCommentary', { tier: commentaryTier })
-                      : t('audioBible.scripture')}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    {includeCommentary && commentarySource === "preacher-mentor" && (
+                      <Badge variant="outline" className="text-xs px-2 py-0.5 border-amber-500/50 text-amber-400">
+                        <Crown className="h-3 w-3 mr-1" />
+                        Preach Mode
+                      </Badge>
+                    )}
+                    <Badge variant={isPlayingCommentary ? "secondary" : "default"} className="text-sm px-3 py-1">
+                      {isPlayingCommentary
+                        ? commentarySource === "preacher-mentor"
+                          ? "Preacher Mentor"
+                          : t('audioBible.tierCommentary', { tier: commentaryTier })
+                        : t('audioBible.scripture')}
+                    </Badge>
+                  </div>
                 </div>
 
                 {/* Current text - Always visible */}
