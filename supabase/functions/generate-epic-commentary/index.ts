@@ -139,7 +139,7 @@ async function generateEpicAudio(
   const audioBuffers: ArrayBuffer[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const voiceId = "JBFqnCBsd6RMkjVDRZzb"; // George - mature British documentary narrator
+    const voiceId = "fjnwTZkKtQOJaYzGLa6n"; // User-selected documentary voice
     const ttsResponse = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
       {
