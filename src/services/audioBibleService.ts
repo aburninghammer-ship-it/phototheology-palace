@@ -14,7 +14,7 @@ import {
 
 export type CommentaryTier = "surface" | "intermediate" | "scholarly";
 
-export type CommentarySource = "standard" | "preacher-mentor" | "story-mode";
+export type CommentarySource = "standard" | "preacher-mentor" | "story-mode" | "epic";
 
 export type OpenAIVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "nova" | "onyx" | "sage" | "shimmer";
 

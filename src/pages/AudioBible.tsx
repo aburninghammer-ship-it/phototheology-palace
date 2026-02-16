@@ -3,7 +3,7 @@
  * Listen to Bible chapters with optional Phototheology Commentary
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
@@ -39,7 +39,11 @@ import {
   Layers,
   Crown,
   BookHeart,
+  Film,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useFreeTier } from "@/hooks/useFreeTier";
+import { toast } from "sonner";
 
 interface Theme {
   id: string;
@@ -63,6 +67,12 @@ export default function AudioBible() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { preferences } = useUserPreferences();
+  const freeTier = useFreeTier();
+
+  // Epic mode state
+  const [isEpicPlaying, setIsEpicPlaying] = useState(false);
+  const [isEpicLoading, setIsEpicLoading] = useState(false);
+  const [epicAudioRef] = useState<{ current: HTMLAudioElement | null }>({ current: null });
 
   // Audio Bible hook
   const {
@@ -287,6 +297,77 @@ export default function AudioBible() {
     }
   };
 
+  // Epic Mode handler
+  const handleEpicModeSelect = useCallback(() => {
+    if (!freeTier.isPremium && !freeTier.isLoading) {
+      toast.error("Epic Mode is a premium feature. Upgrade to unlock cinematic Bible commentary.");
+      return;
+    }
+    setCommentarySource("epic");
+    setIncludeCommentary(false); // Epic mode bypasses verse-by-verse commentary
+  }, [freeTier.isPremium, freeTier.isLoading, setCommentarySource, setIncludeCommentary]);
+
+  // Play Epic commentary for a chapter
+  const handlePlayEpic = useCallback(async (book: string, chapter: number) => {
+    setIsEpicLoading(true);
+    try {
+      // Fetch cached epic commentary
+      const { data, error } = await supabase
+        .from("epic_commentaries")
+        .select("*")
+        .eq("book", book)
+        .eq("chapter", chapter)
+        .eq("status", "ready")
+        .order("version", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data || !data.audio_storage_path) {
+        toast.error(`Epic Mode is not yet available for ${book} ${chapter}. Coming soon!`);
+        setIsEpicLoading(false);
+        return;
+      }
+
+      // Get public URL for the audio
+      const { data: urlData } = supabase.storage
+        .from("epic-audio")
+        .getPublicUrl(data.audio_storage_path);
+
+      if (!urlData?.publicUrl) {
+        throw new Error("Could not get audio URL");
+      }
+
+      // Stop any current playback
+      stop();
+      if (epicAudioRef.current) {
+        epicAudioRef.current.pause();
+        epicAudioRef.current = null;
+      }
+
+      // Play the epic audio
+      const audio = new Audio(urlData.publicUrl);
+      epicAudioRef.current = audio;
+      audio.volume = volume;
+
+      audio.onplay = () => { setIsEpicPlaying(true); setIsEpicLoading(false); };
+      audio.onended = () => { setIsEpicPlaying(false); epicAudioRef.current = null; };
+      audio.onerror = () => { 
+        toast.error("Failed to play Epic commentary audio.");
+        setIsEpicPlaying(false); 
+        setIsEpicLoading(false);
+        epicAudioRef.current = null;
+      };
+
+      await audio.play();
+    } catch (err) {
+      console.error("[Epic Mode] Error:", err);
+      toast.error("Failed to load Epic commentary.");
+      setIsEpicLoading(false);
+    }
+  }, [stop, volume]);
+
   const progress = totalVerses > 0 ? ((currentVerseIndex + 1) / totalVerses) * 100 : 0;
 
   return (
@@ -340,6 +421,12 @@ export default function AudioBible() {
                         Story Mode
                       </Badge>
                     )}
+                    {commentarySource === "epic" && (
+                      <Badge variant="outline" className="text-xs px-2 py-0.5 border-amber-500/50 bg-amber-500/10 text-amber-300">
+                        <Film className="h-3 w-3 mr-1" />
+                        Epic Mode
+                      </Badge>
+                    )}
                     {commentaryOnly && (
                       <Badge variant="outline" className="text-xs px-2 py-0.5 border-violet-500/50 text-violet-400">
                         Commentary Only
@@ -351,6 +438,8 @@ export default function AudioBible() {
                           ? "Preacher Mentor"
                           : commentarySource === "story-mode"
                           ? "Story Mode"
+                          : commentarySource === "epic"
+                          ? "Epic Commentary"
                           : t('audioBible.tierCommentary', { tier: commentaryTier })
                         : t('audioBible.scripture')}
                     </Badge>
@@ -535,12 +624,19 @@ export default function AudioBible() {
                         </div>
                       </div>
 
-                      <Button size="lg" className="w-full" onClick={handlePlayChapter} disabled={isLoading}>
-                        {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
-                        {startVerse > 1
-                          ? `Play ${selectedBook} ${selectedChapter} from verse ${startVerse}`
-                          : t('audioBible.playBookChapter', { book: selectedBook, chapter: selectedChapter })}
-                      </Button>
+                      {commentarySource === "epic" ? (
+                        <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => handlePlayEpic(selectedBook, selectedChapter)} disabled={isEpicLoading}>
+                          {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
+                          Epic Mode: {selectedBook} {selectedChapter}
+                        </Button>
+                      ) : (
+                        <Button size="lg" className="w-full" onClick={handlePlayChapter} disabled={isLoading}>
+                          {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
+                          {startVerse > 1
+                            ? `Play ${selectedBook} ${selectedChapter} from verse ${startVerse}`
+                            : t('audioBible.playBookChapter', { book: selectedBook, chapter: selectedChapter })}
+                        </Button>
+                      )}
                     </TabsContent>
 
                     {/* Whole Book */}
@@ -862,7 +958,7 @@ export default function AudioBible() {
                   {/* Listening Mode Grid */}
                   <div className="grid grid-cols-2 gap-2">
                     <Button
-                      variant={!includeCommentary ? "default" : "outline"}
+                      variant={!includeCommentary && commentarySource !== "epic" ? "default" : "outline"}
                       className="h-auto py-3 px-2 flex-col gap-1 text-center"
                       onClick={() => {
                         setIncludeCommentary(false);
@@ -910,6 +1006,31 @@ export default function AudioBible() {
                       <span className="text-[10px] opacity-80 leading-tight">Preacher mode</span>
                     </Button>
                   </div>
+
+                  {/* Epic Mode - Full Width Premium Button */}
+                  <Button
+                    variant={commentarySource === "epic" ? "default" : "outline"}
+                    className={`w-full h-auto py-3 px-3 flex items-center gap-3 text-left ${
+                      commentarySource === "epic"
+                        ? "bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 border-amber-500/50"
+                        : "border-amber-500/30 hover:border-amber-500/50"
+                    }`}
+                    onClick={() => handleEpicModeSelect()}
+                  >
+                    <Film className={`h-6 w-6 flex-shrink-0 ${commentarySource === "epic" ? "text-white" : "text-amber-400"}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`font-bold text-sm ${commentarySource === "epic" ? "text-white" : ""}`}>Epic Mode</span>
+                        <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-amber-500/20 border-amber-500/30 text-amber-300">
+                          <Crown className="h-2.5 w-2.5 mr-0.5" />
+                          Premium
+                        </Badge>
+                      </div>
+                      <span className={`text-[10px] leading-tight ${commentarySource === "epic" ? "text-white/80" : "opacity-70"}`}>
+                        Cinematic chapter experience
+                      </span>
+                    </div>
+                  </Button>
 
                   {/* Commentary Options (only show if enabled) */}
                   {includeCommentary && (

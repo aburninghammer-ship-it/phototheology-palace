@@ -4928,6 +4928,54 @@ export type Database = {
         }
         Relationships: []
       }
+      epic_commentaries: {
+        Row: {
+          audio_duration_ms: number | null
+          audio_file_size_bytes: number | null
+          audio_storage_path: string | null
+          book: string
+          chapter: number
+          commentary_text: string
+          created_at: string
+          error_message: string | null
+          id: string
+          status: string
+          updated_at: string
+          version: number
+          voice_id: string
+        }
+        Insert: {
+          audio_duration_ms?: number | null
+          audio_file_size_bytes?: number | null
+          audio_storage_path?: string | null
+          book: string
+          chapter: number
+          commentary_text: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+          version?: number
+          voice_id?: string
+        }
+        Update: {
+          audio_duration_ms?: number | null
+          audio_file_size_bytes?: number | null
+          audio_storage_path?: string | null
+          book?: string
+          chapter?: number
+          commentary_text?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+          version?: number
+          voice_id?: string
+        }
+        Relationships: []
+      }
       equation_challenges: {
         Row: {
           created_at: string | null

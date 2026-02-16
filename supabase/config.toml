@@ -288,3 +288,9 @@ verify_jwt = false
 
 [functions.generate-daily-cards]
 verify_jwt = false
+
+[functions.generate-epic-commentary]
+verify_jwt = false
+
+[functions.batch-generate-epic]
+verify_jwt = true
