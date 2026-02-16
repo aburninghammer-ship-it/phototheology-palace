@@ -148,7 +148,7 @@ async function generateEpicAudio(
       body: JSON.stringify({
         model: "tts-1-hd",
         input: chunks[i],
-        voice: "fable",
+        voice: "onyx",
         response_format: "mp3",
         speed: 0.95,
       }),
