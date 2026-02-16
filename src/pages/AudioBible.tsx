@@ -395,6 +395,87 @@ export default function AudioBible() {
     }
   }, [stop, volume]);
 
+  // Play Epic commentary for an entire book (overview)
+  const handlePlayEpicBook = useCallback(async (book: string) => {
+    setIsEpicLoading(true);
+    try {
+      // Book-level epic uses chapter=0 as sentinel
+      let { data, error } = await supabase
+        .from("epic_commentaries")
+        .select("*")
+        .eq("book", book)
+        .eq("chapter", 0)
+        .eq("status", "ready")
+        .order("version", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data || !data.audio_storage_path) {
+        toast.info(`Generating Epic overview for ${book}... This may take a moment.`);
+        
+        const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
+          body: { book, scope: "book" },
+        });
+
+        if (genResponse.error || genResponse.data?.error) {
+          throw new Error(genResponse.data?.error || genResponse.error?.message || "Generation failed");
+        }
+
+        const refetch = await supabase
+          .from("epic_commentaries")
+          .select("*")
+          .eq("book", book)
+          .eq("chapter", 0)
+          .eq("status", "ready")
+          .order("version", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (refetch.error) throw refetch.error;
+        data = refetch.data;
+
+        if (!data || !data.audio_storage_path) {
+          toast.error("Epic overview generation completed but audio not found.");
+          setIsEpicLoading(false);
+          return;
+        }
+      }
+
+      const { data: urlData } = supabase.storage
+        .from("epic-audio")
+        .getPublicUrl(data.audio_storage_path);
+
+      if (!urlData?.publicUrl) throw new Error("Could not get audio URL");
+
+      stop();
+      if (epicAudioRef.current) {
+        epicAudioRef.current.pause();
+        epicAudioRef.current = null;
+      }
+
+      const audio = new Audio(urlData.publicUrl);
+      epicAudioRef.current = audio;
+      audio.volume = volume;
+
+      audio.onplay = () => { setIsEpicPlaying(true); setIsEpicLoading(false); };
+      audio.onended = () => { setIsEpicPlaying(false); epicAudioRef.current = null; };
+      audio.onerror = () => { 
+        toast.error("Failed to play Epic overview audio.");
+        setIsEpicPlaying(false); 
+        setIsEpicLoading(false);
+        epicAudioRef.current = null;
+      };
+
+      await audio.play();
+    } catch (err) {
+      console.error("[Epic Book Mode] Error:", err);
+      toast.error("Failed to load Epic book overview.");
+      setIsEpicLoading(false);
+    }
+  }, [stop, volume]);
+
   const progress = totalVerses > 0 ? ((currentVerseIndex + 1) / totalVerses) * 100 : 0;
 
   return (
@@ -688,10 +769,17 @@ export default function AudioBible() {
                       <p className="text-sm text-muted-foreground">
                         {t('audioBible.listenToAllChapters', { count: getChapterCount(), book: selectedBook })}
                       </p>
-                      <Button size="lg" className="w-full" onClick={handlePlayBook} disabled={isLoading}>
-                        {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
-                        {t('audioBible.playEntireBook', { book: selectedBook })}
-                      </Button>
+                      {commentarySource === "epic" ? (
+                        <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => handlePlayEpicBook(selectedBook)} disabled={isEpicLoading}>
+                          {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
+                          Epic Overview: {selectedBook}
+                        </Button>
+                      ) : (
+                        <Button size="lg" className="w-full" onClick={handlePlayBook} disabled={isLoading}>
+                          {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
+                          {t('audioBible.playEntireBook', { book: selectedBook })}
+                        </Button>
+                      )}
                     </TabsContent>
 
                     {/* Custom Selection */}
