@@ -40,6 +40,14 @@ export default function LivingManna() {
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'home');
 
+  // Sync tab state when URL search params change (e.g. from internal navigate calls)
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
+
   // Get church ID from URL or from membership
   const urlChurchId = searchParams.get('church');
   const effectiveChurchId = urlChurchId || memberChurchId || subscription.church.churchId;

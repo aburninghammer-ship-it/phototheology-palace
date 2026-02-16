@@ -263,12 +263,25 @@ export function MemberHome({ churchId, churchName = "Living Manna" }: MemberHome
             {[
               { name: "Bible", path: "/bible", icon: "📖" },
               { name: "Jeeves AI", path: "/jeeves", icon: "🎩" },
+              { name: "Devotionals", path: "/devotionals", icon: "🕊️" },
+              { name: "Study Buddy", path: "/study-buddy", icon: "🧠" },
               { name: "Memory Palace", path: "/memory", icon: "🏛️" },
-              { name: "Challenges", path: "/challenge", icon: "🎯" },
+              { name: "Mind Map", path: "/mind-map", icon: "🗺️" },
+              { name: "Study Ideas", path: "/study-ideas", icon: "💡" },
+              { name: "Give Me A Gem", path: "/give-me-a-gem", icon: "💎" },
+              { name: "Reading Plans", path: "/reading-plans", icon: "📅" },
+              { name: "Study Deck", path: "/card-deck", icon: "✨" },
+              { name: "Image Bible", path: "/image-bible", icon: "🖼️" },
+              { name: "Encyclopedia", path: "/encyclopedia", icon: "🔍" },
+              { name: "Notes", path: "/notes", icon: "📝" },
+              { name: "Polish", path: "/polish", icon: "🎬" },
+              { name: "Dojo", path: "/spiritual-training", icon: "⚔️" },
+              { name: "Sermon Builder", path: "/sermon-builder", icon: "🎤" },
+              { name: "Challenges", path: "/daily-challenges", icon: "🎯" },
             ].map((tool, index) => (
-              <Button 
+              <Button
                 key={index}
-                variant="outline" 
+                variant="outline"
                 size="sm"
                 className="text-sm"
                 onClick={() => navigate(tool.path)}
