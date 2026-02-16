@@ -8,9 +8,11 @@ import { audioEngine, AudioState } from "@/lib/AudioEngine";
 import {
   generateTTSAudio,
   generateCommentary,
+  generatePreacherMentorCommentary,
   generateChapterCommentary,
   prefetchUpcomingCommentary,
   CommentaryTier,
+  CommentarySource,
   OpenAIVoice,
   OPENAI_VOICES,
 } from "@/services/audioBibleService";
@@ -57,6 +59,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   const [includeCommentary, setIncludeCommentary] = useState(true);
   const [commentaryOnly, setCommentaryOnly] = useState(false);
   const [commentaryMode, setCommentaryMode] = useState<"verse" | "chapter">("verse");
+  const [commentarySource, setCommentarySource] = useState<CommentarySource>("standard");
 
   // Playback tracking
   const [currentBook, setCurrentBook] = useState<string>("");
@@ -82,6 +85,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   const commentaryOnlyRef = useRef(commentaryOnly);
   const commentaryTierRef = useRef(commentaryTier);
   const commentaryModeRef = useRef(commentaryMode);
+  const commentarySourceRef = useRef(commentarySource);
   const voiceRef = useRef(voice);
   const commentaryVoiceRef = useRef(commentaryVoice);
   const onChapterCompleteRef = useRef(onChapterComplete);
@@ -100,6 +104,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   useEffect(() => { commentaryOnlyRef.current = commentaryOnly; }, [commentaryOnly]);
   useEffect(() => { commentaryTierRef.current = commentaryTier; }, [commentaryTier]);
   useEffect(() => { commentaryModeRef.current = commentaryMode; }, [commentaryMode]);
+  useEffect(() => { commentarySourceRef.current = commentarySource; }, [commentarySource]);
   useEffect(() => { voiceRef.current = voice; }, [voice]);
   useEffect(() => { commentaryVoiceRef.current = commentaryVoice; }, [commentaryVoice]);
   useEffect(() => { onChapterCompleteRef.current = onChapterComplete; }, [onChapterComplete]);
@@ -213,20 +218,29 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         prefetchedCommentaryRef.current = null; // Clear after use
       } else {
         // Fetch if not pre-fetched (with timeout)
-        console.log("[useAudioBible] Fetching commentary (not pre-fetched)");
+        console.log(`[useAudioBible] Fetching commentary (source: ${commentarySourceRef.current})`);
         const timeoutPromise = new Promise<null>((_, reject) => {
-          setTimeout(() => reject(new Error("Commentary generation timed out")), 30000);
+          setTimeout(() => reject(new Error("Commentary generation timed out")), 45000);
         });
 
-        const commentaryPromise = generateCommentary({
-          book: item.book,
-          chapter: item.chapter,
-          verse: verse.verse,
-          verseText: verse.text,
-          tier: commentaryTierRef.current,
-          generateAudio: true,
-          voice: commentaryVoiceRef.current,
-        });
+        const commentaryPromise = commentarySourceRef.current === "preacher-mentor"
+          ? generatePreacherMentorCommentary({
+              book: item.book,
+              chapter: item.chapter,
+              verse: verse.verse,
+              verseText: verse.text,
+              generateAudio: true,
+              voice: commentaryVoiceRef.current,
+            })
+          : generateCommentary({
+              book: item.book,
+              chapter: item.chapter,
+              verse: verse.verse,
+              verseText: verse.text,
+              tier: commentaryTierRef.current,
+              generateAudio: true,
+              voice: commentaryVoiceRef.current,
+            });
 
         result = await Promise.race([commentaryPromise, timeoutPromise]);
       }
@@ -689,6 +703,8 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     setCommentaryOnly,
     commentaryMode,
     setCommentaryMode,
+    commentarySource,
+    setCommentarySource,
 
     // Actions
     unlock,

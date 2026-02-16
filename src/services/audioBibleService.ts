@@ -159,6 +159,100 @@ export async function generateCommentary(options: CommentaryOptions): Promise<Co
   }
 }
 
+export type CommentarySource = "standard" | "preacher-mentor";
+
+/**
+ * Generate Preacher Mentor commentary for a verse (2-step pipeline)
+ * Step 1: Passage analysis (lens detection)
+ * Step 2: Mentor commentary generation via Jeeves
+ */
+export async function generatePreacherMentorCommentary(options: CommentaryOptions): Promise<CommentaryResult | null> {
+  const { book, chapter, verse, verseText, generateAudio = false, voice = "onyx" } = options;
+
+  try {
+    const session = await supabase.auth.getSession();
+    const token = session.data.session?.access_token;
+    const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "";
+    const anonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "";
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      apikey: anonKey,
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    // Step 1: Passage Analysis
+    const analyzeRes = await fetch(
+      `${supabaseUrl}/functions/v1/pt-passage-analyzer`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ book, chapter, verse, verseText }),
+      }
+    );
+
+    if (!analyzeRes.ok) {
+      console.error("[Preacher Mentor] Analysis failed:", analyzeRes.status);
+      return null;
+    }
+
+    const analysis = await analyzeRes.json();
+
+    // Step 2: Commentary Generation
+    const commentaryRes = await fetch(
+      `${supabaseUrl}/functions/v1/jeeves`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          mode: "preacher-mentor-commentary",
+          book,
+          chapter,
+          verseText: { verse, text: verseText },
+          primary_room: analysis.primary_room,
+          secondary_rooms: analysis.secondary_rooms,
+          genre: analysis.genre,
+          override_room: null,
+        }),
+      }
+    );
+
+    if (!commentaryRes.ok) {
+      console.error("[Preacher Mentor] Commentary failed:", commentaryRes.status);
+      return null;
+    }
+
+    const commentaryData = await commentaryRes.json();
+    const content = commentaryData.content;
+
+    // Flatten structured sections into readable text for audio
+    const sections = content?.sections || {};
+    const parts = [
+      sections.meaning,
+      sections.cross_scripture,
+      sections.palace_framing,
+      sections.preaching_orientation,
+    ].filter(Boolean);
+
+    const commentaryText = parts.join("\n\n");
+
+    // Generate audio if requested
+    let audioUrl: string | null = null;
+    if (generateAudio && commentaryText) {
+      audioUrl = await generateTTSAudio({ text: commentaryText, voice });
+    }
+
+    return {
+      commentary: commentaryText,
+      audioUrl,
+      cached: false,
+    };
+  } catch (error) {
+    console.error("[Preacher Mentor Commentary] Error:", error);
+    return null;
+  }
+}
+
 /**
  * Chapter commentary options
  */
