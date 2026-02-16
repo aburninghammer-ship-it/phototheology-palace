@@ -22,6 +22,7 @@ import { ServeTab } from "@/components/living-manna/ServeTab";
 import { GivingTab } from "@/components/living-manna/GivingTab";
 import { LibraryTab } from "@/components/living-manna/LibraryTab";
 import { LMLiveTab } from "@/components/living-manna/LMLiveTab";
+import { LiveMembersStrip } from "@/components/living-manna/LiveMembersStrip";
 import { BaptismTrack } from "@/components/living-manna/baptism-track/BaptismTrack";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -201,6 +202,11 @@ export default function LivingManna() {
                 </Button>
               </div>
             </div>
+            {effectiveChurchId && (
+              <div className="mt-2 px-1">
+                <LiveMembersStrip churchId={effectiveChurchId} />
+              </div>
+            )}
           </div>
         )}
 
@@ -234,6 +240,11 @@ export default function LivingManna() {
                         </>
                       )}
                     </p>
+                    {effectiveChurchId && (
+                      <div className="mt-1.5">
+                        <LiveMembersStrip churchId={effectiveChurchId} />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
