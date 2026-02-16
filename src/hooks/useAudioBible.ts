@@ -455,7 +455,9 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
       const verseWithRef = `${item.book} chapter ${item.chapter}, verse ${verse.verse}. ${verse.text}`;
       const audioUrl = await generateTTSAudio({ text: verseWithRef, voice: voiceRef.current });
 
-      if (audioUrl && !isStoppedRef.current) {
+      if (isStoppedRef.current) return;
+
+      if (audioUrl) {
         // Start playing verse audio
         await audioEngine.play(audioUrl);
 
@@ -463,9 +465,36 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         if (includeCommentaryRef.current && !commentaryOnlyRef.current) {
           prefetchCurrentCommentary().catch(console.error);
         }
+      } else {
+        // TTS failed for this verse - log and advance to next verse instead of silently stopping
+        console.warn(`[useAudioBible] TTS failed for ${item.book} ${item.chapter}:${verse.verse}, advancing...`);
+        loadingRef.current = false;
+        const nextIndex = index + 1;
+        if (nextIndex < item.verses.length) {
+          setCurrentVerseIndexSync(nextIndex);
+          playVerseAtIndexRef.current?.(item, nextIndex);
+        } else {
+          onChapterCompleteRef.current?.(item.book, item.chapter);
+          if (playbackQueueRef.current.length > 0) {
+            const nextItem = playbackQueueRef.current.shift()!;
+            startPlayback(nextItem);
+          } else {
+            currentItemRef.current = null;
+            setAudioState("idle");
+          }
+        }
+        return;
       }
     } catch (error) {
       console.error("[useAudioBible] Verse playback error:", error);
+      // On error, advance to next verse instead of stopping
+      loadingRef.current = false;
+      const nextIndex = index + 1;
+      if (!isStoppedRef.current && nextIndex < item.verses.length) {
+        setCurrentVerseIndexSync(nextIndex);
+        playVerseAtIndexRef.current?.(item, nextIndex);
+      }
+      return;
     } finally {
       loadingRef.current = false;
     }
