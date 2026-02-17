@@ -219,6 +219,18 @@ async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, to
   return ttsResponse.arrayBuffer();
 }
 
+/**
+ * Add natural pause cues to text before sending to TTS.
+ * Inserts ellipsis at paragraph breaks so the voice engine pauses between sections.
+ */
+function addPauseMarkers(text: string): string {
+  return text
+    // Normalize paragraph breaks and add pause marker between them
+    .replace(/\n{2,}/g, "\n\n...\n\n")
+    // Add a brief pause after sentences ending with colons (list intros)
+    .replace(/:\s*\n/g, ": ...\n");
+}
+
 async function generateEpicAudio(
   text: string,
   book: string,
@@ -226,7 +238,8 @@ async function generateEpicAudio(
   supabaseAdmin: any,
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
   const useElevenLabs = !!ELEVENLABS_API_KEY;
-  const chunks = splitTextIntoChunks(text, useElevenLabs ? 5000 : 4000);
+  const processedText = addPauseMarkers(text);
+  const chunks = splitTextIntoChunks(processedText, useElevenLabs ? 5000 : 4000);
   console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? "ElevenLabs (William)" : "OpenAI (fable)"}`);
 
   const audioBuffers: ArrayBuffer[] = [];
