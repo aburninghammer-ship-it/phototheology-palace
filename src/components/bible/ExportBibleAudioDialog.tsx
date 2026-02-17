@@ -27,8 +27,8 @@ import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 
 // Mobile-friendly download function
 export const downloadAudioFile = async (blob: Blob, filename: string): Promise<boolean> => {
+  // Try native share API first (mobile), but don't let failures block download
   try {
-    // Check if we can use the native share API with files (mobile)
     if (navigator.share && navigator.canShare) {
       const file = new File([blob], filename, { type: 'audio/wav' });
       const shareData = { files: [file], title: filename };
@@ -38,16 +38,17 @@ export const downloadAudioFile = async (blob: Blob, filename: string): Promise<b
         return true;
       }
     }
+  } catch (shareError) {
+    // Share cancelled or failed — fall through to standard download
+    console.log("Share API unavailable or cancelled, using standard download", shareError);
+  }
 
-    // Fallback: Create object URL and trigger download
+  try {
     const url = URL.createObjectURL(blob);
     
-    // For iOS Safari and some mobile browsers, open in new tab
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
     if (isIOS) {
-      // iOS Safari: Open audio in new tab for user to save
       window.open(url, '_blank');
       toast.info("Tap and hold the audio to save it to your device", { duration: 5000 });
       return true;
@@ -59,11 +60,8 @@ export const downloadAudioFile = async (blob: Blob, filename: string): Promise<b
     a.download = filename;
     a.style.display = 'none';
     document.body.appendChild(a);
-    
-    // Use click() for most browsers
     a.click();
     
-    // Cleanup after a delay to ensure download starts
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
