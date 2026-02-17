@@ -191,7 +191,7 @@ async function generateEpicAudio(
   text: string,
   book: string,
   chapter: number,
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: any,
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
   const useElevenLabs = !!ELEVENLABS_API_KEY;
   const chunks = splitTextIntoChunks(text, useElevenLabs ? 5000 : 4000);

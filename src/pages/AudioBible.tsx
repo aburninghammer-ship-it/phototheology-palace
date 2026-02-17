@@ -534,11 +534,11 @@ export default function AudioBible() {
                     <span>Generating cinematic commentary... This may take a moment.</span>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center gap-3">
+                  <div className="flex flex-wrap items-center justify-center gap-3">
                     <Button
                       variant="outline"
                       size="lg"
-                      className="border-amber-500/30 hover:bg-amber-500/10"
+                      className="border-amber-500/30 hover:bg-amber-500/10 min-w-[120px]"
                       onClick={() => {
                         if (epicAudioRef.current) {
                           if (isEpicPaused) {
@@ -562,7 +562,7 @@ export default function AudioBible() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="border-red-500/30 hover:bg-red-500/10 text-red-400"
+                      className="border-red-500/30 hover:bg-red-500/10 text-red-400 min-w-[120px]"
                       onClick={() => {
                         if (epicAudioRef.current) {
                           epicAudioRef.current.pause();
