@@ -100,26 +100,50 @@ export function useAudioMixer() {
       ]);
       await audioCtx.close();
 
-      // Create offline context sized to speech duration
+      // Create offline context with extra tail for fade-out
       setProgress(50);
       const sampleRate = speechBuffer.sampleRate;
       const numChannels = Math.max(speechBuffer.numberOfChannels, 2);
-      const offlineCtx = new OfflineAudioContext(numChannels, speechBuffer.length, sampleRate);
+      const fadeOutDuration = 3; // seconds of fade-out tail
+      const totalLength = speechBuffer.length + Math.floor(fadeOutDuration * sampleRate);
+      const offlineCtx = new OfflineAudioContext(numChannels, totalLength, sampleRate);
 
-      // Speech source at full volume
+      // Crossfade the music buffer for seamless looping
+      const crossfadeSamples = Math.min(Math.floor(sampleRate * 2), Math.floor(musicBuffer.length / 4));
+      const crossfadedMusic = offlineCtx.createBuffer(musicBuffer.numberOfChannels, musicBuffer.length, sampleRate);
+      for (let ch = 0; ch < musicBuffer.numberOfChannels; ch++) {
+        const src = musicBuffer.getChannelData(ch);
+        const dst = crossfadedMusic.getChannelData(ch);
+        dst.set(src);
+        // Blend the tail into the head for seamless loop points
+        for (let i = 0; i < crossfadeSamples; i++) {
+          const t = i / crossfadeSamples; // 0→1
+          const tailIdx = musicBuffer.length - crossfadeSamples + i;
+          dst[i] = src[i] * t + src[tailIdx] * (1 - t);
+          dst[tailIdx] = src[tailIdx] * t + src[i] * (1 - t);
+        }
+      }
+
+      // Speech source — gentle fade-out in last 0.5s to avoid abrupt ending
       const speechSource = offlineCtx.createBufferSource();
       speechSource.buffer = speechBuffer;
       const speechGain = offlineCtx.createGain();
-      speechGain.gain.value = 1.0;
+      speechGain.gain.setValueAtTime(1.0, 0);
+      const speechEnd = speechBuffer.length / sampleRate;
+      speechGain.gain.setValueAtTime(1.0, Math.max(0, speechEnd - 0.5));
+      speechGain.gain.linearRampToValueAtTime(0, speechEnd);
       speechSource.connect(speechGain);
       speechGain.connect(offlineCtx.destination);
 
-      // Music source with looping and user volume
+      // Music source with crossfaded buffer, looping, and fade-out at end
       const musicSource = offlineCtx.createBufferSource();
-      musicSource.buffer = musicBuffer;
+      musicSource.buffer = crossfadedMusic;
       musicSource.loop = true;
       const musicGain = offlineCtx.createGain();
-      musicGain.gain.value = musicVolume;
+      musicGain.gain.setValueAtTime(musicVolume, 0);
+      // Start fading music out when speech ends
+      musicGain.gain.setValueAtTime(musicVolume, speechEnd);
+      musicGain.gain.linearRampToValueAtTime(0, speechEnd + fadeOutDuration);
       musicSource.connect(musicGain);
       musicGain.connect(offlineCtx.destination);
 
