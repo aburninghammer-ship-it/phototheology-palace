@@ -71,6 +71,7 @@ export default function AudioBible() {
 
   // Epic mode state
   const [isEpicPlaying, setIsEpicPlaying] = useState(false);
+  const [isEpicPaused, setIsEpicPaused] = useState(false);
   const [isEpicLoading, setIsEpicLoading] = useState(false);
   const [epicAudioRef] = useState<{ current: HTMLAudioElement | null }>({ current: null });
 
@@ -378,11 +379,12 @@ export default function AudioBible() {
       epicAudioRef.current = audio;
       audio.volume = volume;
 
-      audio.onplay = () => { setIsEpicPlaying(true); setIsEpicLoading(false); };
-      audio.onended = () => { setIsEpicPlaying(false); epicAudioRef.current = null; };
-      audio.onerror = () => { 
+      audio.onplay = () => { setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false); };
+      audio.onended = () => { setIsEpicPlaying(false); setIsEpicPaused(false); epicAudioRef.current = null; };
+      audio.onerror = () => {
         toast.error("Failed to play Epic commentary audio.");
-        setIsEpicPlaying(false); 
+        setIsEpicPlaying(false);
+        setIsEpicPaused(false);
         setIsEpicLoading(false);
         epicAudioRef.current = null;
       };
@@ -463,11 +465,12 @@ export default function AudioBible() {
       epicAudioRef.current = audio;
       audio.volume = volume;
 
-      audio.onplay = () => { setIsEpicPlaying(true); setIsEpicLoading(false); };
-      audio.onended = () => { setIsEpicPlaying(false); epicAudioRef.current = null; };
-      audio.onerror = () => { 
+      audio.onplay = () => { setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false); };
+      audio.onended = () => { setIsEpicPlaying(false); setIsEpicPaused(false); epicAudioRef.current = null; };
+      audio.onerror = () => {
         toast.error("Failed to play Epic overview audio.");
-        setIsEpicPlaying(false); 
+        setIsEpicPlaying(false);
+        setIsEpicPaused(false);
         setIsEpicLoading(false);
         epicAudioRef.current = null;
       };
@@ -508,7 +511,7 @@ export default function AudioBible() {
           </div>
 
           {/* Epic Mode Now Playing Card */}
-          {(isEpicPlaying || isEpicLoading) && (
+          {(isEpicPlaying || isEpicPaused || isEpicLoading) && (
             <Card className="mb-8 border-amber-500/30 bg-gradient-to-br from-amber-900/20 to-transparent">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -522,7 +525,7 @@ export default function AudioBible() {
                     </h2>
                   </div>
                   <Badge variant="outline" className="text-xs px-2 py-0.5 border-amber-500/50 bg-amber-500/10 text-amber-300">
-                    {isEpicLoading ? "Generating..." : "Playing"}
+                    {isEpicLoading ? "Generating..." : isEpicPaused ? "Paused" : "Playing"}
                   </Badge>
                 </div>
                 {isEpicLoading ? (
@@ -538,10 +541,35 @@ export default function AudioBible() {
                       className="border-amber-500/30 hover:bg-amber-500/10"
                       onClick={() => {
                         if (epicAudioRef.current) {
+                          if (isEpicPaused) {
+                            epicAudioRef.current.play();
+                            setIsEpicPaused(false);
+                            setIsEpicPlaying(true);
+                          } else {
+                            epicAudioRef.current.pause();
+                            setIsEpicPaused(true);
+                            setIsEpicPlaying(false);
+                          }
+                        }
+                      }}
+                    >
+                      {isEpicPaused ? (
+                        <><Play className="h-5 w-5 mr-2" /> Play</>
+                      ) : (
+                        <><Pause className="h-5 w-5 mr-2" /> Pause</>
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="border-red-500/30 hover:bg-red-500/10 text-red-400"
+                      onClick={() => {
+                        if (epicAudioRef.current) {
                           epicAudioRef.current.pause();
                           epicAudioRef.current = null;
                         }
                         setIsEpicPlaying(false);
+                        setIsEpicPaused(false);
                       }}
                     >
                       <Square className="h-5 w-5 mr-2" />
