@@ -3,7 +3,7 @@
  * Listen to Bible chapters with optional Phototheology Commentary
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
@@ -78,6 +78,11 @@ export default function AudioBible() {
   const [epicAudioRef] = useState<{ current: HTMLAudioElement | null }>({ current: null });
   const [epicAudioUrl, setEpicAudioUrl] = useState("");
   const [showEpicExport, setShowEpicExport] = useState(false);
+  const [epicNowPlayingBook, setEpicNowPlayingBook] = useState("");
+  const [epicNowPlayingChapter, setEpicNowPlayingChapter] = useState(0);
+  const epicQueueRef = useRef<ChapterSelection[]>([]);
+  const epicQueueIndexRef = useRef(0);
+  const playEpicRef = useRef<(book: string, chapter: number) => Promise<void>>();
 
   // Audio Bible hook
   const {
@@ -311,6 +316,8 @@ export default function AudioBible() {
   // Play Epic commentary for a chapter
   const handlePlayEpic = useCallback(async (book: string, chapter: number) => {
     setIsEpicLoading(true);
+    setEpicNowPlayingBook(book);
+    setEpicNowPlayingChapter(chapter);
     try {
       // Fetch cached epic commentary
       let { data, error } = await supabase
@@ -328,7 +335,7 @@ export default function AudioBible() {
       // If not cached, generate on demand
       if (!data || !data.audio_storage_path) {
         toast.info(`Generating Epic commentary for ${book} ${chapter}... This may take a moment.`);
-        
+
         const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
           body: { book, chapter },
         });
@@ -386,7 +393,21 @@ export default function AudioBible() {
       audio.volume = volume;
 
       audio.onplay = () => { setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false); };
-      audio.onended = () => { setIsEpicPlaying(false); setIsEpicPaused(false); epicAudioRef.current = null; };
+      audio.onended = () => {
+        // Auto-advance epic queue
+        const queue = epicQueueRef.current;
+        const nextIdx = epicQueueIndexRef.current + 1;
+        if (queue.length > 1 && nextIdx < queue.length) {
+          epicQueueIndexRef.current = nextIdx;
+          playEpicRef.current?.(queue[nextIdx].book, queue[nextIdx].chapter);
+        } else {
+          setIsEpicPlaying(false);
+          setIsEpicPaused(false);
+          epicAudioRef.current = null;
+          epicQueueRef.current = [];
+          epicQueueIndexRef.current = 0;
+        }
+      };
       audio.onerror = () => {
         toast.error("Failed to play Epic commentary audio.");
         setIsEpicPlaying(false);
@@ -403,9 +424,17 @@ export default function AudioBible() {
     }
   }, [stop, volume]);
 
+  // Keep ref in sync so onended callbacks always call latest version
+  playEpicRef.current = handlePlayEpic;
+
   // Play Epic commentary for an entire book (overview)
   const handlePlayEpicBook = useCallback(async (book: string) => {
     setIsEpicLoading(true);
+    setEpicNowPlayingBook(book);
+    setEpicNowPlayingChapter(0);
+    // Single-item queue for book overview
+    epicQueueRef.current = [{ book, chapter: 0 }];
+    epicQueueIndexRef.current = 0;
     try {
       // Book-level epic uses chapter=0 as sentinel
       let { data, error } = await supabase
@@ -491,6 +520,54 @@ export default function AudioBible() {
     }
   }, [stop, volume]);
 
+  // Play epic commentary for a custom chapter queue
+  const handlePlayEpicCustom = useCallback(async () => {
+    if (customChapters.length === 0) return;
+    epicQueueRef.current = customChapters;
+    epicQueueIndexRef.current = 0;
+    const first = customChapters[0];
+    handlePlayEpic(first.book, first.chapter);
+  }, [customChapters, handlePlayEpic]);
+
+  // Play epic chapter-by-chapter for an entire book
+  const handlePlayEpicBookChapters = useCallback(async (bookName: string) => {
+    const chapterCount = BIBLE_BOOK_METADATA.find((b) => b.name === bookName)?.chapters || 1;
+    const queue: ChapterSelection[] = Array.from({ length: chapterCount }, (_, i) => ({
+      book: bookName,
+      chapter: i + 1,
+    }));
+    epicQueueRef.current = queue;
+    epicQueueIndexRef.current = 0;
+    handlePlayEpic(queue[0].book, queue[0].chapter);
+  }, [handlePlayEpic]);
+
+  // Skip to next/previous in epic queue
+  const handleEpicSkipNext = useCallback(() => {
+    const queue = epicQueueRef.current;
+    const nextIdx = epicQueueIndexRef.current + 1;
+    if (queue.length > 1 && nextIdx < queue.length) {
+      if (epicAudioRef.current) {
+        epicAudioRef.current.pause();
+        epicAudioRef.current = null;
+      }
+      epicQueueIndexRef.current = nextIdx;
+      playEpicRef.current?.(queue[nextIdx].book, queue[nextIdx].chapter);
+    }
+  }, []);
+
+  const handleEpicSkipPrevious = useCallback(() => {
+    const queue = epicQueueRef.current;
+    const prevIdx = epicQueueIndexRef.current - 1;
+    if (queue.length > 1 && prevIdx >= 0) {
+      if (epicAudioRef.current) {
+        epicAudioRef.current.pause();
+        epicAudioRef.current = null;
+      }
+      epicQueueIndexRef.current = prevIdx;
+      playEpicRef.current?.(queue[prevIdx].book, queue[prevIdx].chapter);
+    }
+  }, []);
+
   const progress = totalVerses > 0 ? ((currentVerseIndex + 1) / totalVerses) * 100 : 0;
 
   return (
@@ -527,9 +604,14 @@ export default function AudioBible() {
                     <p className="text-sm text-amber-400/80">
                       <Film className="h-4 w-4 inline mr-1" />
                       Epic Cinematic Commentary
+                      {epicQueueRef.current.length > 1 && (
+                        <span className="ml-2 opacity-70">
+                          ({epicQueueIndexRef.current + 1} of {epicQueueRef.current.length})
+                        </span>
+                      )}
                     </p>
                     <h2 className="text-2xl font-bold">
-                      {selectedBook} {selectedChapter}
+                      {epicNowPlayingBook || selectedBook} {epicNowPlayingChapter === 0 ? "(Overview)" : epicNowPlayingChapter || selectedChapter}
                     </h2>
                   </div>
                   <Badge variant="outline" className="text-xs px-2 py-0.5 border-amber-500/50 bg-amber-500/10 text-amber-300">
@@ -543,6 +625,17 @@ export default function AudioBible() {
                   </div>
                 ) : (
                   <div className="flex flex-wrap items-center justify-center gap-3">
+                    {epicQueueRef.current.length > 1 && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="border-amber-500/30 hover:bg-amber-500/10 h-10 w-10 rounded-full"
+                        onClick={handleEpicSkipPrevious}
+                        disabled={epicQueueIndexRef.current === 0}
+                      >
+                        <SkipBack className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="lg"
@@ -567,6 +660,17 @@ export default function AudioBible() {
                         <><Pause className="h-5 w-5 mr-2" /> Pause</>
                       )}
                     </Button>
+                    {epicQueueRef.current.length > 1 && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="border-amber-500/30 hover:bg-amber-500/10 h-10 w-10 rounded-full"
+                        onClick={handleEpicSkipNext}
+                        disabled={epicQueueIndexRef.current >= epicQueueRef.current.length - 1}
+                      >
+                        <SkipForward className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="lg"
@@ -578,6 +682,8 @@ export default function AudioBible() {
                         }
                         setIsEpicPlaying(false);
                         setIsEpicPaused(false);
+                        epicQueueRef.current = [];
+                        epicQueueIndexRef.current = 0;
                       }}
                     >
                       <Square className="h-5 w-5 mr-2" />
@@ -829,7 +935,11 @@ export default function AudioBible() {
                       </div>
 
                       {commentarySource === "epic" ? (
-                        <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => handlePlayEpic(selectedBook, selectedChapter)} disabled={isEpicLoading}>
+                        <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => {
+                          epicQueueRef.current = [{ book: selectedBook, chapter: selectedChapter }];
+                          epicQueueIndexRef.current = 0;
+                          handlePlayEpic(selectedBook, selectedChapter);
+                        }} disabled={isEpicLoading}>
                           {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
                           Epic Mode: {selectedBook} {selectedChapter}
                         </Button>
@@ -866,10 +976,16 @@ export default function AudioBible() {
                         {t('audioBible.listenToAllChapters', { count: getChapterCount(), book: selectedBook })}
                       </p>
                       {commentarySource === "epic" ? (
-                        <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => handlePlayEpicBook(selectedBook)} disabled={isEpicLoading}>
-                          {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
-                          Epic Overview: {selectedBook}
-                        </Button>
+                        <div className="space-y-2 w-full">
+                          <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => handlePlayEpicBookChapters(selectedBook)} disabled={isEpicLoading}>
+                            {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
+                            Epic All Chapters: {selectedBook}
+                          </Button>
+                          <Button size="lg" variant="outline" className="w-full border-amber-500/30 hover:bg-amber-500/10 text-amber-400" onClick={() => handlePlayEpicBook(selectedBook)} disabled={isEpicLoading}>
+                            {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
+                            Epic Overview: {selectedBook}
+                          </Button>
+                        </div>
                       ) : (
                         <Button size="lg" className="w-full" onClick={handlePlayBook} disabled={isLoading}>
                           {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
@@ -1107,15 +1223,27 @@ export default function AudioBible() {
                         </div>
                       )}
 
-                      <Button
-                        size="lg"
-                        className="w-full"
-                        onClick={handlePlayCustom}
-                        disabled={isLoading || customChapters.length === 0}
-                      >
-                        {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
-                        {t('audioBible.playChapters', { count: customChapters.length })}
-                      </Button>
+                      {commentarySource === "epic" ? (
+                        <Button
+                          size="lg"
+                          className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+                          onClick={handlePlayEpicCustom}
+                          disabled={isEpicLoading || customChapters.length === 0}
+                        >
+                          {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
+                          Epic: {customChapters.length} Chapter{customChapters.length !== 1 ? "s" : ""}
+                        </Button>
+                      ) : (
+                        <Button
+                          size="lg"
+                          className="w-full"
+                          onClick={handlePlayCustom}
+                          disabled={isLoading || customChapters.length === 0}
+                        >
+                          {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
+                          {t('audioBible.playChapters', { count: customChapters.length })}
+                        </Button>
+                      )}
                     </TabsContent>
                   </Tabs>
                 </CardContent>
@@ -1426,8 +1554,8 @@ export default function AudioBible() {
         open={showEpicExport}
         onOpenChange={setShowEpicExport}
         epicAudioUrl={epicAudioUrl}
-        book={selectedBook}
-        chapter={selectedChapter}
+        book={epicNowPlayingBook || selectedBook}
+        chapter={epicNowPlayingChapter || selectedChapter}
       />
     </div>
   );
