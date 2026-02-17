@@ -58,15 +58,26 @@ export default function AuthCallback() {
           if (exchangeError) throw exchangeError;
         }
 
-        // No further fallback needed; if neither code nor hash created a session,
-        // getSession() below will remain null and we surface a clear error.
+        // Wait for the session to be established — sometimes it takes a moment
+        // after code exchange or hash token extraction.
+        let session = null;
+        let sessionError = null;
         
-        // Handle the OAuth callback
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const result = await supabase.auth.getSession();
+          sessionError = result.error;
+          session = result.data?.session;
+          
+          if (sessionError || session) break;
+          
+          // Wait progressively longer between retries
+          await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+          console.log(`[AuthCallback] Session not ready, retry ${attempt + 1}/5...`);
+        }
         
         if (sessionError) throw sessionError;
         if (!session) {
-          throw new Error('No session found after OAuth');
+          throw new Error('No session found after OAuth. Please try signing in again.');
         }
 
         // If a platform was specified, this is a social media connection (not app auth)
