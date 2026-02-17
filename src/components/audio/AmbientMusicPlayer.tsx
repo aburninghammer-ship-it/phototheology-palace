@@ -905,17 +905,17 @@ export function AmbientMusicPlayer({
       <Popover open={showControls} onOpenChange={setShowControls}>
         <PopoverTrigger asChild>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             className={cn(
-              "relative",
-              isPlaying && "text-primary",
+              "relative h-9 w-9 border-primary/40 bg-primary/10 hover:bg-primary/20 text-primary shadow-sm shadow-primary/20",
+              isPlaying && "border-primary bg-primary/20 shadow-md shadow-primary/30 animate-pulse",
               className
             )}
           >
             <Music className="h-5 w-5" />
             {isPlaying && (
-              <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full animate-pulse" />
+              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 bg-primary rounded-full animate-ping" />
             )}
           </Button>
         </PopoverTrigger>
