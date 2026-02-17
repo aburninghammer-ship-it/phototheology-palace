@@ -6,9 +6,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY")!;;
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
+const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+// ElevenLabs "William" voice — deep, engaging storyteller
+const EPIC_ELEVENLABS_VOICE_ID = "fjnwTZkKtQOJaYzGLa6n";
 
 const EPIC_CHAPTER_SYSTEM_PROMPT = `You are a cinematic Bible narrator and theologian producing an EPIC chapter commentary.
 
@@ -127,47 +131,78 @@ function splitTextIntoChunks(text: string, maxLen = 4000): string[] {
   return chunks;
 }
 
+async function generateEpicAudioChunkElevenLabs(text: string, chunkIndex: number, totalChunks: number): Promise<ArrayBuffer> {
+  const ttsResponse = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${EPIC_ELEVENLABS_VOICE_ID}`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": ELEVENLABS_API_KEY!,
+        "Content-Type": "application/json",
+        "Accept": "audio/mpeg",
+      },
+      body: JSON.stringify({
+        text,
+        model_id: "eleven_multilingual_v2",
+        voice_settings: {
+          stability: 0.4,
+          similarity_boost: 0.8,
+          style: 0.6,
+          use_speaker_boost: true,
+        },
+      }),
+    },
+  );
+
+  if (!ttsResponse.ok) {
+    const err = await ttsResponse.text();
+    throw new Error(`ElevenLabs TTS error (chunk ${chunkIndex + 1}/${totalChunks}): ${ttsResponse.status} - ${err}`);
+  }
+
+  return ttsResponse.arrayBuffer();
+}
+
+async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, totalChunks: number): Promise<ArrayBuffer> {
+  const ttsResponse = await fetch("https://api.openai.com/v1/audio/speech", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "tts-1-hd",
+      input: text,
+      voice: "fable",
+      response_format: "mp3",
+      speed: 0.95,
+    }),
+  });
+
+  if (!ttsResponse.ok) {
+    const err = await ttsResponse.text();
+    throw new Error(`OpenAI TTS error (chunk ${chunkIndex + 1}/${totalChunks}): ${ttsResponse.status} - ${err}`);
+  }
+
+  return ttsResponse.arrayBuffer();
+}
+
 async function generateEpicAudio(
   text: string,
   book: string,
   chapter: number,
   supabaseAdmin: ReturnType<typeof createClient>,
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
-  const chunks = splitTextIntoChunks(text, 4000);
-  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s)`);
+  const useElevenLabs = !!ELEVENLABS_API_KEY;
+  const chunks = splitTextIntoChunks(text, useElevenLabs ? 5000 : 4000);
+  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? "ElevenLabs (William)" : "OpenAI (fable)"}`);
 
   const audioBuffers: ArrayBuffer[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const voiceId = "fjnwTZkKtQOJaYzGLa6n"; // User-selected documentary voice
-    const ttsResponse = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
-      {
-        method: "POST",
-        headers: {
-          "xi-api-key": ELEVENLABS_API_KEY,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: chunks[i],
-          model_id: "eleven_multilingual_v2",
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.0,
-            use_speaker_boost: true,
-            speed: 1.2,
-          },
-        }),
-      },
-    );
-
-    if (!ttsResponse.ok) {
-      const err = await ttsResponse.text();
-      throw new Error(`ElevenLabs TTS error (chunk ${i + 1}/${chunks.length}): ${ttsResponse.status} - ${err}`);
-    }
-
-    audioBuffers.push(await ttsResponse.arrayBuffer());
+    const buffer = useElevenLabs
+      ? await generateEpicAudioChunkElevenLabs(chunks[i], i, chunks.length)
+      : await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
+    audioBuffers.push(buffer);
   }
 
   // Concatenate all audio buffers
@@ -257,7 +292,7 @@ serve(async (req) => {
         version: newVersion,
         status: "generating",
         commentary_text: "",
-        voice_id: "fable",
+        voice_id: ELEVENLABS_API_KEY ? `elevenlabs:${EPIC_ELEVENLABS_VOICE_ID}` : "fable",
       }, { onConflict: "book,chapter,version" })
       .select()
       .single();
