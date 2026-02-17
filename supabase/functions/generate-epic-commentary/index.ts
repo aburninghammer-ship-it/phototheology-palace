@@ -45,21 +45,7 @@ L. SPIRITUAL OBJECT LESSONS FROM THE TEXT: Wherever the biblical narrative natur
 const PALACE_PRINCIPLES_INSTRUCTION = `
 PHOTOTHEOLOGY PALACE CONNECTIONS — weave these organically into the commentary (never name rooms/floors explicitly):
 
-After your cinematic narration of the chapter, include a section that reveals 3-5 powerful principle connections from the Palace framework. Present these as natural theological insights, not labeled categories. Weave them as "deeper currents beneath the surface of this chapter":
-
-1. CHRIST CENTER: Every chapter must explicitly name how Christ appears — as type, promise, shadow, fulfillment, or presence. What name or role does Christ take in this chapter?
-
-2. SANCTUARY MAPPING: Which piece of sanctuary furniture or service does this chapter connect to? (Altar of burnt offering, laver, lampstand, table of showbread, altar of incense, ark, veil, gate). How does the sanctuary pattern illuminate the chapter's meaning?
-
-3. CYCLE PLACEMENT: Place the chapter in its covenant cycle (Adamic @Ad, Noahic @No, Abrahamic @Ab, Mosaic @Mo, Cyrusic @Cy, Cyrus-Christ @CyC, Spirit @Sp, Remnant @Re) and Day-of-the-LORD horizon (1H: exile/restoration, 2H: new covenant/church age, 3H: final new creation). Show how this chapter echoes or advances the cycle pattern of Fall → Covenant → Sanctuary → Enemy → Restoration.
-
-4. PATTERNS & PARALLELS: Identify at least one recurring biblical pattern (40 days, 3 days, deliverer motif, seed promise, exile-return) or one parallel (mirrored action from another era). Show the echo across time.
-
-5. PROPHETIC THREAD: For prophetic/apocalyptic chapters, trace the timeline and its historical fulfillment. For narrative chapters, show how the events cast a prophetic shadow forward.
-
-6. GENRE AWARENESS: Acknowledge the chapter's genre (narrative, prophecy, poetry, epistle, gospel, apocalyptic, wisdom, law) and how that genre shapes interpretation.
-
-Present these as flowing, interconnected insights — "Beneath the surface of this chapter flows a deeper current..." or "The sanctuary pattern illuminates what happens here..." — never as a numbered checklist.
+Weave these 3-5 principle connections DIRECTLY INTO the narrative itself — they must be embedded organically throughout the commentary, not gathered into a separate section, summary, or "deeper currents" block. They should feel like natural revelations arising mid-narration:
 `;
 
 const EPIC_CHAPTER_SYSTEM_PROMPT = `You are a cinematic Bible narrator and theologian producing an EPIC chapter commentary.
@@ -79,8 +65,8 @@ RULES:
    - Sanctuary connections where applicable (altar, laver, lampstand, veil, ark)
    - Cycle placement (which covenant era: Adamic, Noahic, Abrahamic, Mosaic, Cyrusic, Christ, Spirit, Remnant)
    - Parallels with other biblical events (mirrored actions across time)
-4. After the narrative, include a "deeper currents" section with 3-5 Palace principle connections woven as flowing theological insight.
-5. Close with a powerful synthesis that ties the chapter into the grand narrative of redemption.
+4. Do NOT create separate sections, subheadings, or labeled blocks (e.g., "Lessons from this chapter", "Deeper Currents", "Key Themes"). The entire commentary must be ONE continuous, flowing cinematic narration from opening to close — no structural breaks.
+5. Close with a powerful synthesis that ties the chapter into the grand narrative of redemption — as part of the same flowing narration, not as a labeled conclusion.
 6. Do NOT name "rooms" or "floors" or "Phototheology" explicitly. Weave the principles organically.
 7. Do NOT use denominational labels. Use "sound biblical theology" framing.
 8. Target 800-1200 words — substantial enough for a 5-8 minute dramatic audio experience.
@@ -107,8 +93,8 @@ RULES:
    - Sanctuary blueprint echoes (altar, laver, lampstand, bread, incense, ark, veil — which furniture or service does this book's theology map onto?)
    - Recurring biblical patterns (40 days, 3 days, deliverer stories, seed promises, exile-return arcs)
    - Key parallels with other books or events (mirrored actions across time)
-5. After the narrative sweep, include a "deeper currents" section revealing 3-5 Palace principle connections as flowing theological insight.
-6. Close with a powerful synthesis: what is this book's unique contribution to the grand narrative of redemption?
+5. Do NOT create separate sections, subheadings, or labeled blocks (e.g., "Key Themes", "Deeper Currents", "Lessons"). The entire overview must be ONE continuous, flowing cinematic narration — no structural breaks.
+6. Close with a powerful synthesis of this book's unique contribution to the grand narrative of redemption — as part of the same flowing narration, not as a labeled conclusion.
 7. Do NOT name "rooms" or "floors" or "Phototheology" explicitly. Weave the principles organically.
 8. Do NOT use denominational labels. Use "sound biblical theology" framing.
 9. Target 1000-1500 words — substantial enough for a 6-10 minute dramatic audio experience.
