@@ -231,9 +231,11 @@ export default function SermonBuilder() {
   }, [editId]);
 
   // Auto-save to database every 15 seconds when there's content
+  const hasAnyContent = sermon.title || sermon.theme_passage || sermon.smooth_stones.length > 0 || sermon.bridges.length > 0 || sermon.full_sermon || Object.keys(sermon.movie_structure).length > 0;
+
   const performAutoSave = useCallback(async () => {
-    // Only auto-save if we have meaningful content (title or theme)
-    if (!sermon.title && !sermon.theme_passage) return;
+    // Auto-save if we have ANY meaningful content
+    if (!hasAnyContent) return;
     
     setIsAutoSaving(true);
     try {
@@ -278,24 +280,21 @@ export default function SermonBuilder() {
       setLastAutoSave(new Date());
     } catch (error) {
       console.error("Auto-save failed:", error);
-      // Don't show error toast for auto-save to avoid spam
     } finally {
       setIsAutoSaving(false);
     }
-  }, [sermon, currentStep, currentSermonId]);
+  }, [sermon, currentStep, currentSermonId, hasAnyContent]);
 
-  // Set up auto-save timer
+  // Set up auto-save timer — save every 10 seconds when there's content
   useEffect(() => {
-    // Clear existing timer
     if (autoSaveTimerRef.current) {
       clearInterval(autoSaveTimerRef.current);
     }
 
-    // Only start auto-save if there's content
-    if (sermon.title || sermon.theme_passage || sermon.smooth_stones.length > 0 || sermon.full_sermon) {
+    if (hasAnyContent) {
       autoSaveTimerRef.current = setInterval(() => {
         performAutoSave();
-      }, 15000); // 15 seconds
+      }, 10000); // 10 seconds
     }
 
     return () => {
@@ -303,7 +302,24 @@ export default function SermonBuilder() {
         clearInterval(autoSaveTimerRef.current);
       }
     };
-  }, [performAutoSave, sermon.title, sermon.theme_passage, sermon.smooth_stones.length, sermon.full_sermon]);
+  }, [performAutoSave, hasAnyContent]);
+
+  // Save immediately when leaving the page (beforeunload + cleanup)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (hasAnyContent) {
+        performAutoSave();
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      // Also save on component unmount (navigation away)
+      if (hasAnyContent) {
+        performAutoSave();
+      }
+    };
+  }, [performAutoSave, hasAnyContent]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
