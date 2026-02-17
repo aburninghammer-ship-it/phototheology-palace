@@ -26,7 +26,7 @@ import { Verse } from "@/types/bible";
 import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 
 // Mobile-friendly download function
-const downloadAudioFile = async (blob: Blob, filename: string): Promise<boolean> => {
+export const downloadAudioFile = async (blob: Blob, filename: string): Promise<boolean> => {
   try {
     // Check if we can use the native share API with files (mobile)
     if (navigator.share && navigator.canShare) {
@@ -77,7 +77,7 @@ const downloadAudioFile = async (blob: Blob, filename: string): Promise<boolean>
 };
 
 // System ambient tracks
-const AMBIENT_TRACKS = [
+export const AMBIENT_TRACKS = [
   { id: "none", name: "No Music", url: "" },
   { id: "flight", name: "Flight", url: "/audio/flight.mp3" },
   { id: "wings-of-stillness", name: "Wings of Stillness", url: "/audio/wings-of-stillness.mp3" },
@@ -108,7 +108,7 @@ export const ExportBibleAudioDialog = ({
 }: ExportBibleAudioDialogProps) => {
   const [selectedVoice, setSelectedVoice] = useState<VoiceId>("onyx");
   const [selectedTrack, setSelectedTrack] = useState("none");
-  const [musicVolume, setMusicVolume] = useState(15);
+  const [musicVolume, setMusicVolume] = useState(30);
   const [includeCommentary, setIncludeCommentary] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
@@ -292,7 +292,7 @@ export const ExportBibleAudioDialog = ({
                 value={[musicVolume]}
                 onValueChange={(v) => setMusicVolume(v[0])}
                 min={5}
-                max={50}
+                max={100}
                 step={5}
               />
             </div>

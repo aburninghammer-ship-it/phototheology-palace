@@ -40,10 +40,12 @@ import {
   Crown,
   BookHeart,
   Film,
+  Download,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import { toast } from "sonner";
+import { ExportEpicAudioDialog } from "@/components/audio/ExportEpicAudioDialog";
 
 interface Theme {
   id: string;
@@ -74,6 +76,8 @@ export default function AudioBible() {
   const [isEpicPaused, setIsEpicPaused] = useState(false);
   const [isEpicLoading, setIsEpicLoading] = useState(false);
   const [epicAudioRef] = useState<{ current: HTMLAudioElement | null }>({ current: null });
+  const [epicAudioUrl, setEpicAudioUrl] = useState("");
+  const [showEpicExport, setShowEpicExport] = useState(false);
 
   // Audio Bible hook
   const {
@@ -367,6 +371,8 @@ export default function AudioBible() {
         throw new Error("Could not get audio URL");
       }
 
+      setEpicAudioUrl(urlData.publicUrl);
+
       // Stop any current playback
       stop();
       if (epicAudioRef.current) {
@@ -454,6 +460,8 @@ export default function AudioBible() {
       }
 
       if (!urlData?.publicUrl) throw new Error("Could not get audio URL");
+
+      setEpicAudioUrl(urlData.publicUrl);
 
       stop();
       if (epicAudioRef.current) {
@@ -574,6 +582,16 @@ export default function AudioBible() {
                     >
                       <Square className="h-5 w-5 mr-2" />
                       Stop
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
+                      onClick={() => setShowEpicExport(true)}
+                      disabled={!epicAudioUrl}
+                    >
+                      <Download className="h-5 w-5 mr-2" />
+                      Export
                     </Button>
                   </div>
                 )}
@@ -1403,6 +1421,14 @@ export default function AudioBible() {
           </div>
         </div>
       </div>
+
+      <ExportEpicAudioDialog
+        open={showEpicExport}
+        onOpenChange={setShowEpicExport}
+        epicAudioUrl={epicAudioUrl}
+        book={selectedBook}
+        chapter={selectedChapter}
+      />
     </div>
   );
 }
