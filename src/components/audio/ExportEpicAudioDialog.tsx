@@ -38,7 +38,7 @@ export const ExportEpicAudioDialog = ({
   chapter,
 }: ExportEpicAudioDialogProps) => {
   const [selectedTrack, setSelectedTrack] = useState("none");
-  const [musicVolume, setMusicVolume] = useState(30);
+  const [musicVolume, setMusicVolume] = useState(15);
 
   const { mixAndDownload, isProcessing, progress, error } = useAudioMixer();
 
@@ -115,7 +115,7 @@ export const ExportEpicAudioDialog = ({
                 value={[musicVolume]}
                 onValueChange={(v) => setMusicVolume(v[0])}
                 min={5}
-                max={100}
+                max={50}
                 step={5}
               />
             </div>

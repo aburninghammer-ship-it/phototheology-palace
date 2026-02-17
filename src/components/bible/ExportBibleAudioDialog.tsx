@@ -108,7 +108,7 @@ export const ExportBibleAudioDialog = ({
 }: ExportBibleAudioDialogProps) => {
   const [selectedVoice, setSelectedVoice] = useState<VoiceId>("onyx");
   const [selectedTrack, setSelectedTrack] = useState("none");
-  const [musicVolume, setMusicVolume] = useState(30);
+  const [musicVolume, setMusicVolume] = useState(15);
   const [includeCommentary, setIncludeCommentary] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
@@ -292,7 +292,7 @@ export const ExportBibleAudioDialog = ({
                 value={[musicVolume]}
                 onValueChange={(v) => setMusicVolume(v[0])}
                 min={5}
-                max={100}
+                max={50}
                 step={5}
               />
             </div>

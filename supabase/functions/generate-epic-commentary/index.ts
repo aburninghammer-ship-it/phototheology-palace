@@ -156,11 +156,11 @@ async function generateEpicAudioChunkElevenLabs(
     text,
     model_id: "eleven_multilingual_v2",
     voice_settings: {
-      stability: 0.5,
+      stability: 0.65,
       similarity_boost: 0.75,
       style: 0.0,
       use_speaker_boost: true,
-      speed: 1.0,
+      speed: 0.9,
     },
   };
 
@@ -226,9 +226,15 @@ async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, to
 function addPauseMarkers(text: string): string {
   return text
     // Normalize paragraph breaks and add pause marker between them
-    .replace(/\n{2,}/g, "\n\n...\n\n")
+    .replace(/\n{2,}/g, "\n\n... ...\n\n")
     // Add a brief pause after sentences ending with colons (list intros)
-    .replace(/:\s*\n/g, ": ...\n");
+    .replace(/:\s*\n/g, ": ...\n")
+    // Add micro-pauses between sentences for breathing room
+    .replace(/\. ([A-Z])/g, ". ... $1")
+    // Add pause after question marks
+    .replace(/\? ([A-Z])/g, "? ... $1")
+    // Add pause after exclamation marks
+    .replace(/! ([A-Z])/g, "! ... $1");
 }
 
 async function generateEpicAudio(
