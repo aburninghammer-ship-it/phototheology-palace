@@ -599,8 +599,8 @@ export default function AudioBible() {
             </Card>
           )}
 
-          {/* Now Playing Card (when active) */}
-          {!isIdle && !(isEpicPlaying || isEpicLoading) && (
+          {/* Now Playing Card (when active and has data) */}
+          {!isIdle && !(isEpicPlaying || isEpicLoading) && totalVerses > 0 && (
             <Card className="mb-8 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
