@@ -908,14 +908,18 @@ export function AmbientMusicPlayer({
             variant="outline"
             size="icon"
             className={cn(
-              "relative h-9 w-9 border-primary/40 bg-primary/10 hover:bg-primary/20 text-primary shadow-sm shadow-primary/20",
-              isPlaying && "border-primary bg-primary/20 shadow-md shadow-primary/30 animate-pulse",
+              "relative h-11 w-11 rounded-full border-2 border-primary/50 bg-primary/15 hover:bg-primary/25 text-primary shadow-lg shadow-primary/25 transition-all duration-300",
+              isPlaying && "border-primary bg-primary/25 shadow-xl shadow-primary/40 ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
+              !isPlaying && "animate-[pulse_3s_ease-in-out_infinite]",
               className
             )}
           >
-            <Music className="h-5 w-5" />
+            <Music className="h-6 w-6" />
             {isPlaying && (
-              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 bg-primary rounded-full animate-ping" />
+              <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full animate-ping" />
+            )}
+            {!isPlaying && (
+              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 bg-primary/70 rounded-full" />
             )}
           </Button>
         </PopoverTrigger>
