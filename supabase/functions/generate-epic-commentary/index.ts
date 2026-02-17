@@ -208,7 +208,7 @@ async function generateEpicAudioChunkElevenLabs(
       similarity_boost: 0.75,
       style: 0.0,
       use_speaker_boost: true,
-      speed: 0.9,
+      speed: 1.0,
     },
   };
 
@@ -273,16 +273,18 @@ async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, to
  */
 function addPauseMarkers(text: string): string {
   return text
-    // Normalize paragraph breaks and add pause marker between them
-    .replace(/\n{2,}/g, "\n\n... ...\n\n")
-    // Add a brief pause after sentences ending with colons (list intros)
-    .replace(/:\s*\n/g, ": ...\n")
-    // Add micro-pauses between sentences for breathing room
-    .replace(/\. ([A-Z])/g, ". ... $1")
-    // Add pause after question marks
-    .replace(/\? ([A-Z])/g, "? ... $1")
-    // Add pause after exclamation marks
-    .replace(/! ([A-Z])/g, "! ... $1");
+    // Normalize paragraph breaks and add longer pause marker between them
+    .replace(/\n{2,}/g, "\n\n... ... ...\n\n")
+    // Add a pause after sentences ending with colons (list intros)
+    .replace(/:\s*\n/g, ": ... ...\n")
+    // Add pauses between sentences at periods for breathing room
+    .replace(/\. ([A-Z])/g, ". ... ... $1")
+    // Add pauses after question marks
+    .replace(/\? ([A-Z])/g, "? ... ... $1")
+    // Add pauses after exclamation marks
+    .replace(/! ([A-Z])/g, "! ... ... $1")
+    // Add micro-pauses at commas for natural breathing
+    .replace(/, /g, ", ... ");
 }
 
 async function generateEpicAudio(
