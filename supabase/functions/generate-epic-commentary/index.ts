@@ -30,6 +30,12 @@ E. REVELATION 13 & APOSTATE PROTESTANTISM: The second beast (earth beast) of Rev
 F. REVELATION 9 (SIXTH TRUMPET): The Sixth Trumpet spans 1449 to August 11, 1840, representing the Ottoman Empire period. This historical fulfillment validated the day-for-a-year prophetic principle and directed attention to Daniel 8:14 and 1844.
 
 G. NO DENOMINATIONAL LABELS: Never use "Adventist," "SDA," or any denominational label. Present all theology as "sound biblical teaching" grounded in Scripture.
+
+H. PRE-FLOOD GEOGRAPHY: Before the Flood (Genesis 1-6), Earth's geography was fundamentally different. There were no islands, no separated continents, no oceans as we know them. The world was one connected landmass watered by rivers and mist. Never project post-flood geography (islands, separated continents, ocean barriers) onto pre-flood narratives.
+
+I. GENESIS 6 — SONS OF GOD AND DAUGHTERS OF MEN: The "sons of God" in Genesis 6 are the descendants of Seth — the faithful covenant lineage. The "daughters of men" are the descendants of Cain — the worldly, rebellious lineage. This is NOT an angel-human hybrid narrative. The crisis of Genesis 6 is the mingling of the faithful line with the unfaithful line through intermarriage, which corrupted the earth and precipitated the Flood. Never present the "sons of God" as fallen angels or celestial beings.
+
+J. HISTORICAL-THEOLOGICAL CONSISTENCY: Always ensure descriptions of geography, culture, technology, and society are consistent with the biblical timeline of the passage being narrated. Do not anachronistically import later realities (post-flood, post-Babel, post-exile) into earlier narratives. Consult the weight of conservative biblical scholarship and the spirit of prophecy tradition (without naming sources) for interpretive guidance on contested passages.
 `;
 
 const PALACE_PRINCIPLES_INSTRUCTION = `
