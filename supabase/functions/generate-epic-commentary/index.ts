@@ -134,7 +134,7 @@ async function generateEpicAudio(
   const audioBuffers: ArrayBuffer[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const voiceId = "NFG5qt843uXKj4pFvR7C"; // User-selected voice
+    const voiceId = "fjnwTZkKtQOJaYzGLa6n"; // William - Deep Engaging Storyteller
     const ttsResponse = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
       {
@@ -247,7 +247,7 @@ serve(async (req) => {
         version: newVersion,
         status: "generating",
         commentary_text: "",
-        voice_id: "NFG5qt843uXKj4pFvR7C",
+        voice_id: "fjnwTZkKtQOJaYzGLa6n",
       }, { onConflict: "book,chapter,version" })
       .select()
       .single();
