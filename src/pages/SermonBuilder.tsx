@@ -1274,6 +1274,10 @@ export default function SermonBuilder() {
                   setSermon={setSermon}
                   themePassage={sermon.theme_passage}
                   sermonId={currentSermonId || editId || undefined}
+                  onSermonCreated={(newId) => {
+                    currentSermonIdRef.current = newId;
+                    setCurrentSermonId(newId);
+                  }}
                 />
               )}
 
