@@ -9,8 +9,15 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
   Film, Plus, Edit, Trash2, Copy, FileText, Calendar, 
-  CheckCircle2, Clock, Loader2, ArrowLeft, Presentation 
+  CheckCircle2, Clock, Loader2, ArrowLeft, Presentation,
+  Download, ClipboardCopy
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import {
   AlertDialog,
@@ -112,6 +119,53 @@ export default function SermonArchive() {
     }
   };
 
+  const formatSermonText = (sermon: Sermon): string => {
+    const parts: string[] = [];
+    parts.push(sermon.title);
+    parts.push("=".repeat(sermon.title.length));
+    if (sermon.theme_passage) parts.push(`\nPassage: ${sermon.theme_passage}`);
+    if (sermon.sermon_style) parts.push(`Style: ${sermon.sermon_style}`);
+    
+    const stones = Array.isArray(sermon.smooth_stones) ? sermon.smooth_stones : [];
+    if (stones.length > 0) {
+      parts.push("\n--- 5 Smooth Stones ---");
+      stones.forEach((s: string, i: number) => parts.push(`${i + 1}. ${s}`));
+    }
+    
+    const bridges = Array.isArray(sermon.bridges) ? sermon.bridges : [];
+    if (bridges.length > 0) {
+      parts.push("\n--- Bridges ---");
+      bridges.forEach((b: string, i: number) => parts.push(`${i + 1}. ${b}`));
+    }
+    
+    const ms = sermon.movie_structure || {};
+    if (ms.opening) parts.push(`\n--- Opening ---\n${ms.opening}`);
+    if (ms.climax) parts.push(`\n--- Climax ---\n${ms.climax}`);
+    if (ms.resolution) parts.push(`\n--- Resolution ---\n${ms.resolution}`);
+    if (ms.call_to_action) parts.push(`\n--- Call to Action ---\n${ms.call_to_action}`);
+    
+    return parts.join("\n");
+  };
+
+  const copySermon = (sermon: Sermon) => {
+    navigator.clipboard.writeText(formatSermonText(sermon));
+    toast.success("Sermon copied to clipboard!");
+  };
+
+  const downloadSermonTxt = (sermon: Sermon) => {
+    const text = formatSermonText(sermon);
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${sermon.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Sermon downloaded!");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
@@ -196,6 +250,25 @@ export default function SermonArchive() {
                       <Edit className="w-4 h-4 mr-1" />
                       {t('common.edit')}
                     </Button>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="outline">
+                          <Download className="w-4 h-4 mr-1" />
+                          Export
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => copySermon(sermon)}>
+                          <ClipboardCopy className="w-4 h-4 mr-2" />
+                          Copy to Clipboard
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => downloadSermonTxt(sermon)}>
+                          <FileText className="w-4 h-4 mr-2" />
+                          Download .txt
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     
                     <SermonPDFExport sermon={sermon} />
                     
