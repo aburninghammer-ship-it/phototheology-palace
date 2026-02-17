@@ -129,6 +129,8 @@ export default function SermonBuilder() {
   const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [currentSermonId, setCurrentSermonId] = useState<string | null>(editId);
+  const currentSermonIdRef = useRef<string | null>(editId);
+  const isAutoSavingRef = useRef(false);
 
   // Sparks for sermon building insights - use unique context per session
   // Generate a stable unique ID for new sermons based on timestamp to prevent gem mixing
@@ -227,6 +229,7 @@ export default function SermonBuilder() {
     if (editId) {
       loadSermon(editId);
       setCurrentSermonId(editId);
+      currentSermonIdRef.current = editId;
     }
   }, [editId]);
 
@@ -236,7 +239,10 @@ export default function SermonBuilder() {
   const performAutoSave = useCallback(async () => {
     // Auto-save if we have ANY meaningful content
     if (!hasAnyContent) return;
+    // Prevent concurrent auto-saves
+    if (isAutoSavingRef.current) return;
     
+    isAutoSavingRef.current = true;
     setIsAutoSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -255,12 +261,14 @@ export default function SermonBuilder() {
         status: currentStep >= 5 ? "complete" : "in_progress",
       };
 
-      if (currentSermonId) {
+      const idToUse = currentSermonIdRef.current;
+
+      if (idToUse) {
         // Update existing sermon
         const { error } = await supabase
           .from("sermons")
           .update(sermonData)
-          .eq("id", currentSermonId);
+          .eq("id", idToUse);
         if (error) throw error;
       } else {
         // Create new sermon and store the ID
@@ -271,6 +279,7 @@ export default function SermonBuilder() {
           .single();
         if (error) throw error;
         if (data?.id) {
+          currentSermonIdRef.current = data.id;
           setCurrentSermonId(data.id);
           // Update URL without full navigation to preserve state
           window.history.replaceState({}, '', `/sermon-builder?id=${data.id}`);
@@ -281,9 +290,10 @@ export default function SermonBuilder() {
     } catch (error) {
       console.error("Auto-save failed:", error);
     } finally {
+      isAutoSavingRef.current = false;
       setIsAutoSaving(false);
     }
-  }, [sermon, currentStep, currentSermonId, hasAnyContent]);
+  }, [sermon, currentStep, hasAnyContent]);
 
   // Set up auto-save timer — save every 10 seconds when there's content
   useEffect(() => {
@@ -490,6 +500,8 @@ export default function SermonBuilder() {
         if (error) throw error;
         // Navigate to the new sermon so user can continue editing
         if (data?.id) {
+          currentSermonIdRef.current = data.id;
+          setCurrentSermonId(data.id);
           navigate(`/sermon-builder?id=${data.id}`, { replace: true });
         }
       }
@@ -527,6 +539,7 @@ export default function SermonBuilder() {
     setAiHelp("");
     setScriptureArmory({});
     setCurrentSermonId(null); // Reset sermon ID for new sermon
+    currentSermonIdRef.current = null;
     setLastAutoSave(null);
 
     // Clear persisted state directly from localStorage to avoid race conditions
