@@ -36,7 +36,7 @@ import { GameInvitationNotification } from "@/components/scrabble/GameInvitation
 import { CallToPlayButton } from "@/components/scrabble/CallToPlayButton";
 import { ScheduledGamesPanel } from "@/components/scrabble/ScheduledGamesPanel";
 import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/types/scrabble";
-import { positionKey, isValidPlacement, assignCardsToPositions } from "@/types/scrabble";
+import { positionKey, isValidPlacement, assignCardsToPositions, getValidPlacements } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
 
 type GamePhase = "menu" | "verse-selection" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-verse-selection" | "multiplayer-playing";
@@ -188,15 +188,29 @@ export default function PTScrabble() {
       return;
     }
 
-    // Get adjacent cards for this position
-    const { valid, adjacentCards } = isValidPlacement(position, boardState);
+    // Try the pre-assigned position first
+    let { valid, adjacentCards } = isValidPlacement(position, boardState);
+    let finalPosition = position;
+
+    // If pre-assigned position is no longer valid (e.g. occupied or stale),
+    // find the first available valid position on the board
+    if (!valid) {
+      const validPositions = getValidPlacements(boardState);
+      if (validPositions.length > 0) {
+        finalPosition = validPositions[0];
+        const recheck = isValidPlacement(finalPosition, boardState);
+        valid = recheck.valid;
+        adjacentCards = recheck.adjacentCards;
+      }
+    }
+
     if (!valid) return;
 
     // Open the connection modal directly
     setConnectionModal({
       isOpen: true,
       card,
-      position,
+      position: finalPosition,
       adjacentCards,
     });
   }, [user, boardState]);

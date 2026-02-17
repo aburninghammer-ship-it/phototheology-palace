@@ -131,7 +131,36 @@ function splitTextIntoChunks(text: string, maxLen = 4000): string[] {
   return chunks;
 }
 
-async function generateEpicAudioChunkElevenLabs(text: string, chunkIndex: number, totalChunks: number): Promise<ArrayBuffer> {
+async function generateEpicAudioChunkElevenLabs(
+  text: string,
+  chunkIndex: number,
+  totalChunks: number,
+  previousChunkText?: string,
+  nextChunkText?: string,
+): Promise<ArrayBuffer> {
+  // Build request body with stitching context for smooth multi-chunk transitions
+  const body: Record<string, unknown> = {
+    text,
+    model_id: "eleven_multilingual_v2",
+    voice_settings: {
+      stability: 0.5,
+      similarity_boost: 0.75,
+      style: 0.0,
+      use_speaker_boost: true,
+      speed: 1.0,
+    },
+  };
+
+  // Add stitching context to maintain consistent prosody across chunks
+  if (previousChunkText) {
+    // Use last ~200 chars as context
+    body.previous_text = previousChunkText.slice(-200);
+  }
+  if (nextChunkText) {
+    // Use first ~200 chars as context
+    body.next_text = nextChunkText.slice(0, 200);
+  }
+
   const ttsResponse = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${EPIC_ELEVENLABS_VOICE_ID}?output_format=mp3_44100_128`,
     {
@@ -141,17 +170,7 @@ async function generateEpicAudioChunkElevenLabs(text: string, chunkIndex: number
         "Content-Type": "application/json",
         "Accept": "audio/mpeg",
       },
-      body: JSON.stringify({
-        text,
-        model_id: "eleven_multilingual_v2",
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.0,
-          use_speaker_boost: true,
-          speed: 1.2,
-        },
-      }),
+      body: JSON.stringify(body),
     },
   );
 
@@ -201,7 +220,11 @@ async function generateEpicAudio(
 
   for (let i = 0; i < chunks.length; i++) {
     const buffer = useElevenLabs
-      ? await generateEpicAudioChunkElevenLabs(chunks[i], i, chunks.length)
+      ? await generateEpicAudioChunkElevenLabs(
+          chunks[i], i, chunks.length,
+          i > 0 ? chunks[i - 1] : undefined,
+          i < chunks.length - 1 ? chunks[i + 1] : undefined,
+        )
       : await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
     audioBuffers.push(buffer);
   }
