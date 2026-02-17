@@ -4976,6 +4976,74 @@ export type Database = {
         }
         Relationships: []
       }
+      epic_playlist_items: {
+        Row: {
+          book: string
+          chapter: number
+          created_at: string
+          id: string
+          playlist_id: string
+          position: number
+        }
+        Insert: {
+          book: string
+          chapter: number
+          created_at?: string
+          id?: string
+          playlist_id: string
+          position?: number
+        }
+        Update: {
+          book?: string
+          chapter?: number
+          created_at?: string
+          id?: string
+          playlist_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epic_playlist_items_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "epic_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      epic_playlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          music_track_id: string | null
+          music_volume: number | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          music_track_id?: string | null
+          music_volume?: number | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          music_track_id?: string | null
+          music_volume?: number | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       equation_challenges: {
         Row: {
           created_at: string | null

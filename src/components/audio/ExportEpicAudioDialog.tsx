@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -17,9 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Download, Music } from "lucide-react";
+import { Loader2, Download, Music, ListPlus, Plus } from "lucide-react";
 import { useAudioMixer } from "@/hooks/useAudioMixer";
 import { AMBIENT_TRACKS, downloadAudioFile } from "@/components/bible/ExportBibleAudioDialog";
+import { useEpicPlaylists } from "@/hooks/useEpicPlaylists";
 import { toast } from "sonner";
 
 interface ExportEpicAudioDialogProps {
@@ -39,8 +41,12 @@ export const ExportEpicAudioDialog = ({
 }: ExportEpicAudioDialogProps) => {
   const [selectedTrack, setSelectedTrack] = useState("none");
   const [musicVolume, setMusicVolume] = useState(15);
+  const [showNewPlaylist, setShowNewPlaylist] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState("");
+  const [selectedPlaylist, setSelectedPlaylist] = useState("");
 
   const { mixAndDownload, isProcessing, progress, error } = useAudioMixer();
+  const { playlists, createPlaylist, addToPlaylist } = useEpicPlaylists();
 
   const handleExport = async () => {
     if (!epicAudioUrl) {
@@ -73,6 +79,21 @@ export const ExportEpicAudioDialog = ({
     }
   };
 
+  const handleSaveToPlaylist = async () => {
+    if (showNewPlaylist && newPlaylistName.trim()) {
+      const playlist = await createPlaylist(newPlaylistName.trim(), undefined, selectedTrack, musicVolume);
+      if (playlist) {
+        await addToPlaylist(playlist.id, book, chapter);
+        setNewPlaylistName("");
+        setShowNewPlaylist(false);
+      }
+    } else if (selectedPlaylist) {
+      await addToPlaylist(selectedPlaylist, book, chapter);
+    } else {
+      toast.error("Select or create a playlist first");
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -82,7 +103,7 @@ export const ExportEpicAudioDialog = ({
             Export Epic {book} {chapter}
           </DialogTitle>
           <DialogDescription>
-            Download this Epic commentary as an audio file with optional background music
+            Download or save to a playlist with optional background music
           </DialogDescription>
         </DialogHeader>
 
@@ -121,6 +142,65 @@ export const ExportEpicAudioDialog = ({
             </div>
           )}
 
+          {/* Save to Playlist */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <ListPlus className="h-4 w-4" />
+              Save to Epic Playlist
+            </Label>
+            {!showNewPlaylist ? (
+              <div className="flex gap-2">
+                <Select value={selectedPlaylist} onValueChange={setSelectedPlaylist}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Select playlist..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {playlists.map((pl) => (
+                      <SelectItem key={pl.id} value={pl.id}>
+                        {pl.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowNewPlaylist(true)}
+                  title="Create new playlist"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  placeholder="New playlist name..."
+                  value={newPlaylistName}
+                  onChange={(e) => setNewPlaylistName(e.target.value)}
+                  className="flex-1"
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveToPlaylist()}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNewPlaylist(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-full"
+              onClick={handleSaveToPlaylist}
+              disabled={!showNewPlaylist && !selectedPlaylist}
+            >
+              <ListPlus className="h-4 w-4 mr-2" />
+              {showNewPlaylist ? "Create & Add" : "Add to Playlist"}
+            </Button>
+          </div>
+
           {/* Progress */}
           {isProcessing && (
             <div className="space-y-2">
@@ -143,7 +223,7 @@ export const ExportEpicAudioDialog = ({
           <div className="p-3 rounded-lg bg-accent/30 border border-accent/20">
             <p className="text-xs text-muted-foreground">
               Epic commentary will be exported as a high-quality WAV file.
-              {selectedTrack !== "none" && " Background music will be mixed in and looped to match the commentary length."}
+              {selectedTrack !== "none" && " Background music will be mixed in at a gentle level to complement the narration."}
             </p>
           </div>
         </div>
