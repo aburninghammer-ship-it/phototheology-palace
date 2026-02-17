@@ -247,7 +247,7 @@ serve(async (req) => {
         version: newVersion,
         status: "generating",
         commentary_text: "",
-        voice_id: "fable",
+        voice_id: "NFG5qt843uXKj4pFvR7C",
       }, { onConflict: "book,chapter,version" })
       .select()
       .single();
