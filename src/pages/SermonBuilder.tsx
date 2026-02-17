@@ -1273,7 +1273,7 @@ export default function SermonBuilder() {
                   sermon={sermon}
                   setSermon={setSermon}
                   themePassage={sermon.theme_passage}
-                  sermonId={editId || undefined}
+                  sermonId={currentSermonId || editId || undefined}
                 />
               )}
 
