@@ -35,9 +35,10 @@ interface SermonWritingStepProps {
   setSermon: (sermon: any) => void;
   themePassage: string;
   sermonId?: string;
+  onSermonCreated?: (newId: string) => void;
 }
 
-export function SermonWritingStep({ sermon, setSermon, themePassage, sermonId }: SermonWritingStepProps) {
+export function SermonWritingStep({ sermon, setSermon, themePassage, sermonId, onSermonCreated }: SermonWritingStepProps) {
   const [suggestedVerses, setSuggestedVerses] = useState<SuggestedVerse[]>([]);
   const [loadingVerses, setLoadingVerses] = useState(false);
   const [showPanel, setShowPanel] = useState(true);
@@ -818,17 +819,55 @@ Return ONLY valid JSON, no other text.`
                 variant="outline"
                 size="sm"
                 onClick={async () => {
-                  if (!sermonId) {
-                    toast.error("No sermon to save yet");
-                    return;
-                  }
                   setIsSaving(true);
                   try {
-                    const { error } = await supabase
-                      .from('sermons')
-                      .update({ full_sermon: sermon.full_sermon, updated_at: new Date().toISOString() })
-                      .eq('id', sermonId);
-                    if (error) throw error;
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) {
+                      toast.error("You must be logged in to save");
+                      return;
+                    }
+
+                    if (sermonId) {
+                      // Update existing sermon
+                      const { error } = await supabase
+                        .from('sermons')
+                        .update({ 
+                          title: sermon.title || "Untitled Sermon",
+                          theme_passage: sermon.theme_passage,
+                          sermon_style: sermon.sermon_style,
+                          smooth_stones: sermon.smooth_stones,
+                          bridges: sermon.bridges,
+                          movie_structure: sermon.movie_structure,
+                          full_sermon: sermon.full_sermon, 
+                          updated_at: new Date().toISOString() 
+                        })
+                        .eq('id', sermonId);
+                      if (error) throw error;
+                    } else {
+                      // Create new sermon if user skipped steps
+                      const { data, error } = await supabase
+                        .from('sermons')
+                        .insert({
+                          user_id: user.id,
+                          title: sermon.title || "Untitled Sermon",
+                          theme_passage: sermon.theme_passage,
+                          sermon_style: sermon.sermon_style,
+                          smooth_stones: sermon.smooth_stones,
+                          bridges: sermon.bridges,
+                          movie_structure: sermon.movie_structure,
+                          full_sermon: sermon.full_sermon,
+                          current_step: 5,
+                          status: "in_progress",
+                        })
+                        .select('id')
+                        .single();
+                      if (error) throw error;
+                      if (data?.id) {
+                        // Update URL so future saves update instead of insert
+                        window.history.replaceState({}, '', `/sermon-builder?id=${data.id}`);
+                        onSermonCreated?.(data.id);
+                      }
+                    }
                     lastSavedContentRef.current = sermon.full_sermon;
                     setLastSaved(new Date());
                     toast.success("Sermon saved!");
