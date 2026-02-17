@@ -3,13 +3,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2?target=deno
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// Full Bible book list with chapter counts
 const BIBLE_BOOKS: [string, number][] = [
   ["Genesis", 50], ["Exodus", 40], ["Leviticus", 27], ["Numbers", 36], ["Deuteronomy", 34],
   ["Joshua", 24], ["Judges", 21], ["Ruth", 4], ["1 Samuel", 31], ["2 Samuel", 24],
@@ -37,11 +36,12 @@ serve(async (req) => {
   try {
     // Verify admin access
     const authHeader = req.headers.get("Authorization");
+    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
     if (authHeader) {
       const token = authHeader.replace("Bearer ", "");
-      const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-      const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-      
+      const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
       if (authError || !user) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
@@ -49,14 +49,13 @@ serve(async (req) => {
         });
       }
 
-      // Check if user is admin/creator
-      const { data: profile } = await supabaseAuth
+      const { data: profile } = await supabaseAdmin
         .from("profiles")
         .select("is_creator")
         .eq("id", user.id)
         .single();
 
-      const { data: adminCheck } = await supabaseAuth
+      const { data: adminCheck } = await supabaseAdmin
         .from("admin_users")
         .select("id")
         .eq("user_id", user.id)
@@ -70,63 +69,38 @@ serve(async (req) => {
       }
     }
 
-    const { startBook, startChapter, batchSize = 5, regenerate = false } = await req.json();
+    const { startBook, startChapter, batchSize = 3 } = await req.json();
 
-    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-    // Build queue of chapters to generate
+    // Build queue of ALL chapters starting from the given point
     const queue: { book: string; chapter: number }[] = [];
-    let started = !startBook; // If no startBook, start from beginning
+    let started = !startBook;
 
     for (const [book, chapters] of BIBLE_BOOKS) {
       if (!started && book === startBook) started = true;
       if (!started) continue;
 
       const startCh = book === startBook && startChapter ? startChapter : 1;
-
       for (let ch = startCh; ch <= chapters; ch++) {
         queue.push({ book, chapter: ch });
       }
     }
 
-    // Filter out already-generated chapters (unless regenerate)
-    let toGenerate = queue;
-    if (!regenerate) {
-      const { data: existing } = await supabaseAdmin
-        .from("epic_commentaries")
-        .select("book, chapter")
-        .eq("status", "ready");
-
-      const existingSet = new Set(
-        (existing || []).map((e) => `${e.book}:${e.chapter}`),
-      );
-
-      toGenerate = queue.filter(
-        (q) => !existingSet.has(`${q.book}:${q.chapter}`),
-      );
-    }
-
-    // Take only batchSize items
-    const batch = toGenerate.slice(0, batchSize);
+    const batch = queue.slice(0, batchSize);
 
     if (batch.length === 0) {
       return new Response(
-        JSON.stringify({
-          message: "All chapters already generated!",
-          totalRemaining: 0,
-        }),
+        JSON.stringify({ message: "All chapters processed!", totalRemaining: 0 }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    console.log(`[BatchEpic] Processing ${batch.length} chapters. ${toGenerate.length - batch.length} remaining after this batch.`);
+    console.log(`[RefreshEpic] Processing ${batch.length} chapters. ${queue.length - batch.length} remaining.`);
 
-    // Process sequentially to avoid rate limits
     const results: { book: string; chapter: number; status: string; error?: string }[] = [];
 
     for (const item of batch) {
       try {
-        console.log(`[BatchEpic] → ${item.book} ${item.chapter}`);
+        console.log(`[RefreshEpic] → ${item.book} ${item.chapter}`);
 
         const response = await fetch(
           `${SUPABASE_URL}/functions/v1/generate-epic-commentary`,
@@ -139,7 +113,7 @@ serve(async (req) => {
             body: JSON.stringify({
               book: item.book,
               chapter: item.chapter,
-              regenerate,
+              regenerate: true,
             }),
           },
         );
@@ -152,8 +126,8 @@ serve(async (req) => {
           error: data.error,
         });
 
-        // Brief pause between generations to respect rate limits
-        await new Promise((r) => setTimeout(r, 2000));
+        // Pause between generations
+        await new Promise((r) => setTimeout(r, 3000));
       } catch (error) {
         results.push({
           book: item.book,
@@ -164,13 +138,37 @@ serve(async (req) => {
       }
     }
 
-    // Next batch starting point
-    const nextItem = toGenerate[batch.length];
+    const nextItem = queue[batch.length];
+
+    // Auto-chain: trigger next batch if there are more chapters
+    let chainStatus = "not_started";
+    if (nextItem) {
+      try {
+        // Fire and forget the next batch
+        fetch(`${SUPABASE_URL}/functions/v1/refresh-epic-batch`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+          },
+          body: JSON.stringify({
+            startBook: nextItem.book,
+            startChapter: nextItem.chapter,
+            batchSize,
+          }),
+        }).catch((e) => console.error("[RefreshEpic] Chain error:", e));
+        chainStatus = "chained";
+      } catch (e) {
+        chainStatus = "chain_failed";
+        console.error("[RefreshEpic] Chain setup error:", e);
+      }
+    }
 
     return new Response(
       JSON.stringify({
         processed: results,
-        totalRemaining: toGenerate.length - batch.length,
+        totalRemaining: queue.length - batch.length,
+        chainStatus,
         nextBatch: nextItem
           ? { startBook: nextItem.book, startChapter: nextItem.chapter }
           : null,
@@ -178,7 +176,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
-    console.error("[BatchEpic Error]:", error);
+    console.error("[RefreshEpic Error]:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       {
