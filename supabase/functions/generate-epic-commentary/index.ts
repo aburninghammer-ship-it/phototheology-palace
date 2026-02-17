@@ -273,18 +273,10 @@ async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, to
  */
 function addPauseMarkers(text: string): string {
   return text
-    // Normalize paragraph breaks and add longer pause marker between them
-    .replace(/\n{2,}/g, "\n\n... ... ...\n\n")
-    // Add a pause after sentences ending with colons (list intros)
-    .replace(/:\s*\n/g, ": ... ...\n")
-    // Add pauses between sentences at periods for breathing room
-    .replace(/\. ([A-Z])/g, ". ... ... $1")
-    // Add pauses after question marks
-    .replace(/\? ([A-Z])/g, "? ... ... $1")
-    // Add pauses after exclamation marks
-    .replace(/! ([A-Z])/g, "! ... ... $1")
-    // Add micro-pauses at commas for natural breathing
-    .replace(/, /g, ", ... ");
+    // Normalize paragraph breaks and add a brief pause between them
+    .replace(/\n{2,}/g, "\n\n...\n\n")
+    // Add a short pause after colons introducing lists
+    .replace(/:\s*\n/g, ": ...\n");
 }
 
 async function generateEpicAudio(
