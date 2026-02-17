@@ -408,24 +408,43 @@ export function AmbientMusicPlayer({
       setCurrentTrackId(nextTrackToPlay.id);
       
       const audio = audioRef.current;
-      audio.src = nextTrackToPlay.url;
-      audio.load();
       
-      // Play after a short delay to ensure src is set
-      setTimeout(() => {
-        if (audioRef.current) {
-          audioRef.current.play()
-            .then(() => {
-              console.log('[AmbientMusic] Next track started successfully:', nextTrackToPlay.name);
-              setIsPlaying(true);
-            })
-            .catch((err) => {
-              console.error('[AmbientMusic] Failed to play next track:', err);
-              // Try again with next track after a delay
-              setTimeout(() => playNextTrackFromState(), 500);
-            });
-        }
-      }, 150);
+      // For same-track replay (single track in "all" mode), reset currentTime
+      // instead of just setting src, to ensure proper restart
+      const isSameTrack = audio.src.endsWith(nextTrackToPlay.url) || audio.src === nextTrackToPlay.url;
+      
+      if (isSameTrack) {
+        // Same track - just restart from beginning
+        audio.currentTime = 0;
+        audio.play()
+          .then(() => {
+            console.log('[AmbientMusic] Same track restarted:', nextTrackToPlay.name);
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.error('[AmbientMusic] Failed to restart track:', err);
+          });
+      } else {
+        // Different track - load new source
+        audio.src = nextTrackToPlay.url;
+        audio.load();
+        
+        // Play after a short delay to ensure src is set
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.play()
+              .then(() => {
+                console.log('[AmbientMusic] Next track started successfully:', nextTrackToPlay.name);
+                setIsPlaying(true);
+              })
+              .catch((err) => {
+                console.error('[AmbientMusic] Failed to play next track:', err);
+                // Try again with next track after a delay
+                setTimeout(() => playNextTrackFromState(), 500);
+              });
+          }
+        }, 150);
+      }
     }
   }, []);
 
@@ -525,8 +544,13 @@ export function AmbientMusicPlayer({
   // Update audio source when track changes - only reset src if URL actually changed
   useEffect(() => {
     if (audioRef.current && currentTrack) {
-      // Only change src if it's actually different to prevent restart
-      if (audioRef.current.src !== currentTrack.url) {
+      // Compare using resolved URLs to prevent unnecessary reloads
+      // audioRef.current.src is always absolute, currentTrack.url may be relative
+      const currentSrc = audioRef.current.src;
+      const trackUrl = currentTrack.url;
+      const isSameSrc = currentSrc.endsWith(trackUrl) || currentSrc === trackUrl;
+      
+      if (!isSameSrc) {
         const wasPlaying = isPlaying;
         audioRef.current.src = currentTrack.url;
         audioRef.current.volume = isMuted ? 0 : volume * duckMultiplier;
