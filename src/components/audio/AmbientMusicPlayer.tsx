@@ -140,14 +140,6 @@ const AMBIENT_TRACKS: Array<{
     url: "/audio/eternal-echoes.mp3",
   },
   {
-    id: "sky-between-heartbeats",
-    name: "Sky Between Heartbeats",
-    description: "Ethereal reflective soundscape",
-    category: "study-music",
-    mood: "ethereal, reflective, peaceful",
-    url: "/music/Sky_Between_Heartbeats.mp3",
-  },
-  {
     id: "moon-of-the-still-waters",
     name: "Moon Of The Still Waters",
     description: "Calm lunar meditation soundscape",
