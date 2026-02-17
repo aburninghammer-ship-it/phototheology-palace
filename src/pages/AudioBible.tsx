@@ -353,10 +353,14 @@ export default function AudioBible() {
         }
       }
 
-      // Get public URL for the audio
+      // Get public URL for the audio (cache-bust with created_at)
       const { data: urlData } = supabase.storage
         .from("epic-audio")
         .getPublicUrl(data.audio_storage_path);
+      if (urlData?.publicUrl) {
+        const cacheBust = new Date(data.created_at).getTime();
+        urlData.publicUrl = `${urlData.publicUrl}?v=${cacheBust}`;
+      }
 
       if (!urlData?.publicUrl) {
         throw new Error("Could not get audio URL");
@@ -442,6 +446,10 @@ export default function AudioBible() {
       const { data: urlData } = supabase.storage
         .from("epic-audio")
         .getPublicUrl(data.audio_storage_path);
+      if (urlData?.publicUrl) {
+        const cacheBust = new Date(data.created_at).getTime();
+        urlData.publicUrl = `${urlData.publicUrl}?v=${cacheBust}`;
+      }
 
       if (!urlData?.publicUrl) throw new Error("Could not get audio URL");
 
