@@ -32,7 +32,8 @@ RULES:
 6. Do NOT use denominational labels. Use "sound biblical theology" framing.
 7. Target 600-900 words — substantial enough for a 4-6 minute dramatic audio experience.
 8. Use vivid, cinematic language. Paint scenes. Create atmosphere. This is meant to be HEARD, not read.
-9. Use natural speech cadence — varied sentence lengths, dramatic pauses, and rhetorical questions.`;
+9. Use natural speech cadence — varied sentence lengths, dramatic pauses, and rhetorical questions.
+10. NEVER include stage directions, sound effects, or parenthetical notes like "(Sound of wind)" or "(Pause)". Write ONLY spoken narration text.`;
 
 const EPIC_BOOK_SYSTEM_PROMPT = `You are a cinematic Bible narrator and theologian producing an EPIC whole-book overview.
 
@@ -54,7 +55,19 @@ RULES:
 7. Do NOT use denominational labels. Use "sound biblical theology" framing.
 8. Target 800-1200 words — substantial enough for a 5-8 minute dramatic audio experience.
 9. Use vivid, cinematic language. Paint scenes. Create atmosphere. This is meant to be HEARD, not read.
-10. Use natural speech cadence — varied sentence lengths, dramatic pauses, and rhetorical questions.`;
+10. Use natural speech cadence — varied sentence lengths, dramatic pauses, and rhetorical questions.
+11. NEVER include stage directions, sound effects, or parenthetical notes like "(Sound of wind)" or "(Pause)". Write ONLY spoken narration text.`;
+
+/**
+ * Strip parenthetical stage directions like (Sound of wind) or (Pause) from text
+ * so TTS doesn't read them aloud.
+ */
+function sanitizeForTTS(text: string): string {
+  return text
+    .replace(/\(([^)]{0,100})\)/g, '') // Remove short parentheticals (stage directions)
+    .replace(/\n{3,}/g, '\n\n')         // Collapse excess blank lines
+    .trim();
+}
 
 async function generateEpicText(book: string, chapter: number | null, scope: string): Promise<string> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -336,9 +349,12 @@ serve(async (req) => {
 
     console.log(`[EpicCommentary] Generating audio for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book overview)"}...`);
 
+    // Sanitize text for TTS (strip stage directions, parentheticals)
+    const ttsText = sanitizeForTTS(commentaryText);
+
     // Generate audio
     const { storagePath, durationMs, fileSizeBytes } = await generateEpicAudio(
-      commentaryText,
+      ttsText,
       book,
       effectiveChapter,
       supabaseAdmin,
