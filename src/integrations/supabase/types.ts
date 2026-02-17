@@ -12812,6 +12812,7 @@ export type Database = {
           bridges: Json | null
           created_at: string
           current_step: number
+          full_sermon: string | null
           id: string
           movie_structure: Json | null
           polish_analysis: Json | null
@@ -12827,6 +12828,7 @@ export type Database = {
           bridges?: Json | null
           created_at?: string
           current_step?: number
+          full_sermon?: string | null
           id?: string
           movie_structure?: Json | null
           polish_analysis?: Json | null
@@ -12842,6 +12844,7 @@ export type Database = {
           bridges?: Json | null
           created_at?: string
           current_step?: number
+          full_sermon?: string | null
           id?: string
           movie_structure?: Json | null
           polish_analysis?: Json | null

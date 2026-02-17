@@ -1,0 +1,1 @@
+ALTER TABLE public.sermons ADD COLUMN IF NOT EXISTS full_sermon TEXT DEFAULT '';
