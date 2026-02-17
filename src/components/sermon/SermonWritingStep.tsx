@@ -813,6 +813,39 @@ Return ONLY valid JSON, no other text.`
 
           {activeTab === "write" && (
             <div className="flex items-center gap-2">
+              {/* Manual Save Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  if (!sermonId) {
+                    toast.error("No sermon to save yet");
+                    return;
+                  }
+                  setIsSaving(true);
+                  try {
+                    const { error } = await supabase
+                      .from('sermons')
+                      .update({ full_sermon: sermon.full_sermon, updated_at: new Date().toISOString() })
+                      .eq('id', sermonId);
+                    if (error) throw error;
+                    lastSavedContentRef.current = sermon.full_sermon;
+                    setLastSaved(new Date());
+                    toast.success("Sermon saved!");
+                  } catch (err) {
+                    console.error("Manual save failed:", err);
+                    toast.error("Failed to save sermon");
+                  } finally {
+                    setIsSaving(false);
+                  }
+                }}
+                className="gap-2"
+                disabled={isSaving}
+              >
+                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                <span className="hidden sm:inline">Save</span>
+              </Button>
+
               {/* Block Mode Toggle */}
               <Button
                 variant={blockMode ? "default" : "outline"}
