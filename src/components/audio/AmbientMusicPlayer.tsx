@@ -147,6 +147,14 @@ const AMBIENT_TRACKS: Array<{
     mood: "ethereal, reflective, peaceful",
     url: "/music/Sky_Between_Heartbeats.mp3",
   },
+  {
+    id: "moon-of-the-still-waters",
+    name: "Moon Of The Still Waters",
+    description: "Calm lunar meditation soundscape",
+    category: "study-music",
+    mood: "calm, meditative, serene",
+    url: "/music/Moon_Of_The_Still_Waters.mp3",
+  },
 ];
 
 interface AmbientMusicPlayerProps {
