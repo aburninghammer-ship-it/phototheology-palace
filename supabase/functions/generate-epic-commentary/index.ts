@@ -415,56 +415,18 @@ async function generateEpicAudio(
   chapter: number,
   supabaseAdmin: any,
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
-  // Azure voice routing: test Guy on Genesis 4, Davis on Genesis 5
-  const isGenesis4 = book.toLowerCase() === "genesis" && chapter === 4;
-  const isGenesis5 = book.toLowerCase() === "genesis" && chapter === 5;
-  const useAzure = AZURE_TTS_KEY && (isGenesis4 || isGenesis5);
-  const azureVoice = isGenesis4 ? "en-US-GuyNeural" : "en-US-DavisNeural";
-
-  const useElevenLabs = !useAzure && !!ELEVENLABS_API_KEY;
+  // All Epic audio uses OpenAI Onyx
+  const useElevenLabs = false;
   const processedText = addPauseMarkers(text);
-  // Azure/OpenAI TTS hard limit ~3900 chars; ElevenLabs supports 5000
-  const chunkSize = useElevenLabs ? 5000 : 3900;
+  const chunkSize = 3900;
   const chunks = splitTextIntoChunks(processedText, chunkSize);
 
-  const providerLabel = useAzure
-    ? `Azure (${azureVoice})`
-    : useElevenLabs
-    ? "ElevenLabs (William)"
-    : "OpenAI (onyx)";
-  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${providerLabel}`);
+  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: OpenAI (onyx)`);
 
   const audioBuffers: ArrayBuffer[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    let buffer: ArrayBuffer;
-
-    if (useAzure) {
-      buffer = await generateEpicAudioChunkAzure(chunks[i], azureVoice, i, chunks.length);
-    } else if (useElevenLabs) {
-      try {
-        buffer = await generateEpicAudioChunkElevenLabs(
-          chunks[i], i, chunks.length,
-          i > 0 ? chunks[i - 1] : undefined,
-          i < chunks.length - 1 ? chunks[i + 1] : undefined,
-        );
-      } catch (elevenErr) {
-        const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
-        if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429")) {
-          console.warn(`[EpicCommentary] ElevenLabs quota/auth error on chunk ${i + 1}, falling back to OpenAI TTS: ${errMsg}`);
-          const openAISubChunks = splitTextIntoChunks(chunks[i], 3900);
-          for (let j = 0; j < openAISubChunks.length; j++) {
-            const subBuf = await generateEpicAudioChunkOpenAI(openAISubChunks[j], i * 10 + j, chunks.length * 10);
-            audioBuffers.push(subBuf);
-          }
-          continue;
-        } else {
-          throw elevenErr;
-        }
-      }
-    } else {
-      buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
-    }
+    const buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
     audioBuffers.push(buffer);
   }
 
@@ -546,15 +508,8 @@ serve(async (req) => {
 
     const newVersion = regenerate ? (latestVersion?.version || 0) + 1 : 1;
 
-    // Determine voice label for record
-    const isGenesis4 = book.toLowerCase() === "genesis" && effectiveChapter === 4;
-    const isGenesis5 = book.toLowerCase() === "genesis" && effectiveChapter === 5;
-    const useAzureForRecord = AZURE_TTS_KEY && (isGenesis4 || isGenesis5);
-    const voiceIdLabel = useAzureForRecord
-      ? (isGenesis4 ? "azure:en-US-GuyNeural" : "azure:en-US-DavisNeural")
-      : ELEVENLABS_API_KEY
-      ? `elevenlabs:${EPIC_ELEVENLABS_VOICE_ID}`
-      : "onyx";
+    // All Epic audio uses OpenAI Onyx
+    const voiceIdLabel = "onyx";
 
     // Create pending record
     const { data: record, error: insertError } = await supabaseAdmin
