@@ -154,6 +154,9 @@ ${THEOLOGICAL_GUARDRAILS}
 
 ${PALACE_PRINCIPLES_INSTRUCTION}
 
+TENSE — THIS IS MANDATORY:
+Write in PRESENT TENSE throughout. Not "Moses led" but "Moses leads." Not "the serpent spoke" but "the serpent speaks." Not "David fell" but "David falls." Present tense creates immediacy — the listener is not observing history, they are inside it. Every scene unfolds NOW. Every decision is being made THIS MOMENT. The only exception: dialogue quoting past historical facts or prophetic statements may use their natural tense. But narration itself is always present tense.
+
 RULES:
 1. Write ONLY in the cinematic narrator voice shown in the sample above. Third-person, never second-person. Never devotional or preachy.
 2. Open in whatever way the chapter DEMANDS — not every chapter requires cosmic or eternal framing. Some chapters open mid-action, mid-crisis, mid-whisper. Read the chapter's energy and match it. Let the material dictate the opening, not a formula. The only rule: open with drama, tension, or weight. Never with academic preamble.
@@ -180,6 +183,9 @@ ${STYLE_GUIDE}
 ${THEOLOGICAL_GUARDRAILS}
 
 ${PALACE_PRINCIPLES_INSTRUCTION}
+
+TENSE — THIS IS MANDATORY:
+Write in PRESENT TENSE throughout. Not "Moses led" but "Moses leads." Not "the nation fell" but "the nation falls." Present tense creates immediacy — the listener is standing inside the sweep of redemption history as it unfolds NOW. The only exception: dialogue or prophetic statements that quote historical facts may use their natural tense. But all narration is present tense.
 
 RULES:
 1. Write ONLY in the cinematic narrator voice shown in the sample above. Third-person, never second-person. Never devotional or preachy.
