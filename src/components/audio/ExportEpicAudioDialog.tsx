@@ -112,16 +112,19 @@ export const ExportEpicAudioDialog = ({
     // If we already have a full URL, use it directly
     if (ch.audioUrl && ch.audioUrl.startsWith("http")) return ch.audioUrl;
 
-    // Look up cached storage path from epic_commentaries
-    const { data, error } = await supabase
+    // Look up cached storage path from epic_commentaries (get latest version)
+    const { data: rows } = await supabase
       .from("epic_commentaries" as any)
       .select("audio_storage_path")
       .eq("book", ch.book)
       .eq("chapter", ch.chapter)
       .eq("status", "ready")
-      .maybeSingle() as unknown as { data: { audio_storage_path: string } | null; error: unknown };
+      .order("version", { ascending: false })
+      .limit(1) as unknown as { data: { audio_storage_path: string }[] | null };
 
-    if (!error && data?.audio_storage_path) {
+    const data = rows?.[0] ?? null;
+
+    if (data?.audio_storage_path) {
       const { data: urlData } = supabase.storage
         .from("epic-audio")
         .getPublicUrl(data.audio_storage_path);
