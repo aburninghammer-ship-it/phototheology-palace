@@ -154,7 +154,7 @@ ${PALACE_PRINCIPLES_INSTRUCTION}
 
 RULES:
 1. Write ONLY in the cinematic narrator voice shown in the sample above. Third-person, never second-person. Never devotional or preachy.
-2. Open with cosmic/eternal framing BEFORE the story begins — the weight, the context, the stakes of what is about to unfold.
+2. Open in whatever way the chapter DEMANDS — not every chapter requires cosmic or eternal framing. Some chapters open mid-action, mid-crisis, mid-whisper. Read the chapter's energy and match it. Let the material dictate the opening, not a formula. The only rule: open with drama, tension, or weight. Never with academic preamble.
 3. Walk through the chapter's key moments as a narrator who understands their eternal significance, weaving in:
    - Christ-centered connections (every text reveals Christ)
    - DEEP CROSS-BIBLICAL PARALLELS — this is the highest priority. Connect moments to stunning echoes across all of Scripture. These should feel like revelations, not lectures.
