@@ -789,6 +789,9 @@ export const Navigation = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
                       <DropdownMenuItem asChild>
+                        <Link to="/research-assistant">Research Assistant</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
                         <Link to="/bible-reference">PT Codebook</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>

@@ -51,6 +51,7 @@ export const SimplifiedNav = () => {
   ];
 
   const researchLinks = [
+    { to: "/research-assistant", label: "Research Assistant", icon: BookOpen },
     { to: "/research-mode", label: "Research Mode", icon: BookOpen },
     { to: "/prophecy-watch", label: "Prophecy Watch", icon: BookOpen },
     { to: "/culture-controversy", label: "Culture & Controversy", icon: BookOpen },

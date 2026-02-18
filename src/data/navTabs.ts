@@ -4,7 +4,8 @@ import {
   Sword, MessageSquare, CreditCard, Users, Crown, Church, Layers, Shield, Gamepad2,
   CalendarDays,
   Film,
-  LayoutGrid
+  LayoutGrid,
+  GraduationCap
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -82,6 +83,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
       border: "border-slate-500/20",
       text: "from-slate-500 to-zinc-500",
       glow: "rgba(100,116,139,0.5)"
+    }
+  },
+  {
+    id: "research-assistant",
+    to: "/research-assistant",
+    label: "Research Assistant",
+    shortLabel: "Research",
+    icon: GraduationCap,
+    gradient: {
+      from: "from-emerald-500/10",
+      to: "to-teal-500/10",
+      border: "border-emerald-500/20",
+      text: "from-emerald-600 to-teal-600",
+      glow: "rgba(16,185,129,0.5)"
     }
   },
   {

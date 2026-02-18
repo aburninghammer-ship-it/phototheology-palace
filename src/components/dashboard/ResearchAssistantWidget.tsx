@@ -130,12 +130,16 @@ function formatContent(text: string) {
   return <>{parts}</>;
 }
 
-export function ResearchAssistantWidget() {
+interface ResearchAssistantWidgetProps {
+  defaultExpanded?: boolean;
+}
+
+export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAssistantWidgetProps) {
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);

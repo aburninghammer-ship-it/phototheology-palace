@@ -129,6 +129,7 @@ const categoryConfig = {
     title: "Research",
     icon: Zap,
     links: [
+      { to: "/research-assistant", label: "Research Assistant", icon: "🎓" },
       { to: "/research-mode", label: "Research Mode", icon: "🔬" },
       { to: "/prophecy-watch", label: "Prophecy Watch", icon: "👁️" },
       { to: "/sermon-archive", label: "Sermon Archive", icon: "🎙️" },

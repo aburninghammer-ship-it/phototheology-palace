@@ -95,6 +95,7 @@ const Feedback = lazy(() => import("./pages/Feedback"));
 const CultureControversy = lazy(() => import("./pages/CultureControversy"));
 const ProphecyWatch = lazy(() => import("./pages/ProphecyWatch"));
 const ResearchMode = lazy(() => import("./pages/ResearchMode"));
+const ResearchAssistant = lazy(() => import("./pages/ResearchAssistant"));
 const BibleImageLibrary = lazy(() => import("./pages/BibleImageLibrary"));
 const SermonBuilder = lazy(() => import("./pages/SermonBuilder"));
 const SermonSimmer = lazy(() => import("./pages/SermonSimmer"));
@@ -548,6 +549,7 @@ function App() {
           <Route path="/culture-controversy" element={<ProtectedRoute><CultureControversy /></ProtectedRoute>} />
           <Route path="/prophecy-watch" element={<ProtectedRoute><ProphecyWatch /></ProtectedRoute>} />
           <Route path="/research-mode" element={<ProtectedRoute><ResearchMode /></ProtectedRoute>} />
+          <Route path="/research-assistant" element={<ProtectedRoute><ResearchAssistant /></ProtectedRoute>} />
             <Route path="/bible-image-library" element={<ProtectedRoute><BibleImageLibrary /></ProtectedRoute>} />
           <Route path="/sermon-builder" element={<ProtectedRoute><SermonBuilder /></ProtectedRoute>} />
           <Route path="/sermon-simmer" element={<ProtectedRoute><SermonSimmer /></ProtectedRoute>} />
