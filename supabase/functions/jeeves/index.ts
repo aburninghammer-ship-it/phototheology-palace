@@ -274,7 +274,20 @@ serve(async (req) => {
       // Floor level for study questions
       floorLevel,
       messages,
-      chatMessages
+      chatMessages,
+      // Defense Mode properties
+      opponent,
+      defenseTopicId,
+      opponentWorldview,
+      opponentStyle,
+      opponentTargets,
+      opponentEndPrompt,
+      opponentSteelmanRules,
+      phase,
+      conversationHistory,
+      opponentAttack,
+      discipleResponse,
+      defenseTopicName
     } = requestBody;
     
     // Handle both message formats
@@ -6991,6 +7004,152 @@ ${category === "people" ? `**PEOPLE:**
 
 
       userPrompt = `Please provide comprehensive encyclopedia information about: ${query}`;
+
+    } else if (mode === "defense-sparring") {
+      // Defense Mode: AI opponent attacks an SDA doctrine
+      const difficultyInstruction = difficulty === 'advanced'
+        ? 'Present the ABSOLUTE STRONGEST version of your argument. Use counter-exegesis, scholarly sources, original language arguments, and pre-refute anticipated responses. Leave no easy escape routes.'
+        : difficulty === 'intermediate'
+        ? 'Present 2-3 connected arguments that build on each other. Include follow-up questions and challenge weak reasoning. Use scholarly sources and historical arguments.'
+        : 'Present ONE clear argument at a time. Use a conversational, approachable tone. Stay focused on the single most common challenge.';
+
+      const conversationBlock = phase === 'follow-up' && conversationHistory
+        ? `\n\nCONVERSATION SO FAR:\n${conversationHistory}\n\nCRITICAL: Review the disciple's previous response. Identify weak points, unaddressed arguments, or logical gaps. Press HARDER on those weaknesses. Escalate your challenge. Do NOT repeat the same argument — build on it or pivot to a stronger angle.`
+        : '';
+
+      systemPrompt = `You are roleplaying as a theological debater with the following worldview and identity. Stay FULLY in character at all times.
+
+WORLDVIEW:
+${opponentWorldview}
+
+ARGUMENT STYLE:
+${opponentStyle}
+
+ATTACK TARGETS (doctrines you challenge):
+${(opponentTargets || []).map((t: string) => `- ${t}`).join('\n')}
+
+STEELMAN RULES:
+${opponentSteelmanRules || 'Present the strongest possible version of your arguments. No strawmen, no mockery. Genuine intellectual debate.'}
+
+DIFFICULTY LEVEL: ${difficulty || 'intermediate'}
+${difficultyInstruction}
+
+TOPIC FOCUS: ${defenseTopicName || 'General theology'}
+
+YOUR TASK:
+Present a compelling theological challenge against the Seventh-day Adventist position on this topic. Stay in character as someone who genuinely holds this worldview. Make your argument tight, specific, and hard to dismiss.
+
+RULES:
+- Stay in character. Do NOT break character or acknowledge you are an AI.
+- Do NOT present the SDA counter-argument yourself.
+- Do NOT be rude or mocking — this is iron sharpening iron.
+- End your challenge with your signature prompt.
+- Keep your challenge to 2-4 paragraphs maximum.
+${conversationBlock}
+
+SIGNATURE CLOSING LINE: "${opponentEndPrompt || 'Defend this from Scripture.'}"`;
+
+      userPrompt = phase === 'follow-up'
+        ? `Continue the debate. The disciple has responded. Review their response in the conversation history and press harder on weak points or pivot to a new angle of attack on ${defenseTopicName || 'this topic'}.`
+        : `Present your opening challenge against the Seventh-day Adventist position on: ${defenseTopicName || 'this doctrine'}. Make it specific, scholarly, and hard to dismiss.`;
+
+    } else if (mode === "defense-coach") {
+      // Defense Mode: Jeeves coaches the disciple's response
+
+      // Anti-cheat: require a real response
+      if (!discipleResponse || discipleResponse.trim().length < 30) {
+        return new Response(
+          JSON.stringify({
+            content: "Defense Mode requires YOUR attempt first. Write at least a few sentences defending the truth before requesting coaching. This is how iron sharpens iron — you must engage your own mind before receiving a model answer.",
+            score: 0
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in DEFENSE COACH mode. A disciple has been sparring with an AI theological opponent and has submitted their defense. Your job is to evaluate their response and coach them to a stronger defense.
+
+THE PALACE METHOD ROOMS FOR ANALYSIS:
+${PALACE_SCHEMA}
+
+OPPONENT'S ATTACK:
+${opponentAttack}
+
+DISCIPLE'S RESPONSE:
+${discipleResponse}
+
+TOPIC: ${defenseTopicName || 'General theology'}
+
+YOUR 5-STEP COACHING EVALUATION:
+
+1. LOGIC ASSESSMENT (Score 1-10):
+   - Evaluate the reasoning structure
+   - Identify any logical fallacies in the disciple's response
+   - Check if they actually addressed the opponent's specific arguments
+   - Note if they created strawmen or dodged the real challenge
+
+2. SCRIPTURE USAGE (Score 1-10):
+   - Are the verses cited accurately and in context?
+   - Do the verses actually support their argument?
+   - Are there better verses they missed?
+   - Did they handle the opponent's proof-texts?
+
+3. PT ROOM ANALYSIS (Score 1-10):
+   - Which PT Palace rooms apply to this defense?
+   - Investigation Room: Did they dig into the original language or historical context?
+   - Context Room: Did they consider the broader biblical narrative?
+   - Connect-6: Did they identify genre and use appropriate hermeneutics?
+   - Dimensions Room: Did they apply the verse across multiple dimensions (literal, Christ, personal, church, heaven)?
+   - Freestyle: Creative connections or applications?
+
+4. SDA DOCTRINAL REFINEMENT (Score 1-10):
+   - Sanctuary typology: Did they connect to the heavenly sanctuary ministry?
+   - Prophetic framework: Did they use the historicist method?
+   - Three Angels' Messages relevance?
+   - Spirit of Prophecy alignment (without relying on it as primary proof)?
+
+5. MODEL DEFENSE:
+   ONLY AFTER providing the coaching above, give a complete Scripture-rich model defense that:
+   - Addresses every point the opponent raised
+   - Uses KJV Scripture with full verse citations
+   - Applies PT Palace room methods
+   - Connects to sanctuary typology where relevant
+   - Is stronger and more comprehensive than the disciple's attempt
+   - Shows how a master defender would handle this challenge
+
+FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
+---
+LOGIC ASSESSMENT: [X]/10
+[Your analysis]
+
+SCRIPTURE USAGE: [X]/10
+[Your analysis]
+
+PT ROOM ANALYSIS: [X]/10
+[Your analysis]
+
+SDA DOCTRINAL REFINEMENT: [X]/10
+[Your analysis]
+
+TOTAL SCORE: [sum]/40
+
+MODEL DEFENSE:
+[Your complete model defense]
+---
+
+CRITICAL RULES:
+- Be encouraging but HONEST. Do not inflate scores.
+- Use KJV Scripture ONLY.
+- Reference specific PT Palace rooms by their codes (IR, CR, DR, C6, BL, etc.).
+- The model defense must be SIGNIFICANTLY better than the disciple's attempt.
+- NEVER use the word "dear" in any form.`;
+
+      userPrompt = `Evaluate this disciple's defense and provide your 5-step coaching analysis. The disciple was defending the SDA position on "${defenseTopicName || 'this doctrine'}" against an opponent's attack. Be thorough, honest, and constructive.`;
+
     } else if (mode === "guesthouse_generate_prompt") {
       // GuestHouse: Generate a game prompt for live sessions
       const { gameType, verse: gameVerse, difficulty: gameDifficulty } = requestBody;
@@ -8367,7 +8526,13 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
 
     // Extract principles used from commentary mode
     let responseData: any = { content };
-    
+
+    // Defense coach mode: extract score from response
+    if (mode === "defense-coach") {
+      const scoreMatch = content.match(/TOTAL SCORE:\s*(\d+)\s*\/\s*40/i);
+      responseData.score = scoreMatch ? parseInt(scoreMatch[1], 10) : 0;
+    }
+
     // Add map/chart image for encyclopedia maps or charts mode
     if (mode === "encyclopedia" && (category === "maps" || category === "charts") && mapImageUrl) {
       responseData.mapImageUrl = mapImageUrl;

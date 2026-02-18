@@ -7,7 +7,7 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio, Shield } from "lucide-react";
 import { useTheme } from "next-themes";
 import { SmallGroupsHub } from "@/components/living-manna/SmallGroupsHub";
 import { MemberHome } from "@/components/living-manna/MemberHome";
@@ -17,6 +17,7 @@ import { GrowTab } from "@/components/living-manna/GrowTab";
 import { YouthSpace } from "@/components/living-manna/YouthSpace";
 import { PersonalDevotionalDiary } from "@/components/living-manna/PersonalDevotionalDiary";
 import { ExploitsHub } from "@/components/living-manna/ExploitsHub";
+import { DefenseMode } from "@/components/living-manna/DefenseMode";
 import { ChurchAdminTab } from "@/components/living-manna/ChurchAdminTab";
 import { ServeTab } from "@/components/living-manna/ServeTab";
 import { GivingTab } from "@/components/living-manna/GivingTab";
@@ -344,6 +345,10 @@ export default function LivingManna() {
                     <Sprout className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Grow</span>
                   </TabsTrigger>
+                  <TabsTrigger value="defense" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Shield className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Defense</span>
+                  </TabsTrigger>
                   {(isChurchAdmin || memberRole === 'leader') && (
                     <TabsTrigger value="admin" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                       <Settings className="h-4 w-4" />
@@ -403,6 +408,10 @@ export default function LivingManna() {
 
               <TabsContent value="grow">
                 <GrowTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="defense">
+                <DefenseMode churchId={effectiveChurchId!} />
               </TabsContent>
 
               {(isChurchAdmin || memberRole === 'leader') && (
