@@ -110,15 +110,20 @@ export const ExportEpicAudioDialog = ({
   // ── Fetch audio URL for a chapter that doesn't have one yet ─────────────
   const resolveAudioUrl = async (ch: EpicChapter): Promise<string> => {
     if (ch.audioUrl) return ch.audioUrl;
-    // Look up cached URL from database
+    // Look up cached storage path from database
     const { data } = await (supabase as any)
       .from("epic_commentaries")
-      .select("audio_url")
+      .select("audio_storage_path")
       .eq("book", ch.book)
       .eq("chapter", ch.chapter)
       .eq("status", "ready")
       .maybeSingle();
-    return data?.audio_url || "";
+    if (!data?.audio_storage_path) return "";
+    // Construct public URL from storage path
+    const { data: urlData } = supabase.storage
+      .from("epic-audio")
+      .getPublicUrl(data.audio_storage_path);
+    return urlData?.publicUrl || "";
   };
 
   // ── Export ───────────────────────────────────────────────────────────────
