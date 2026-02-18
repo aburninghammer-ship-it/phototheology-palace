@@ -41,6 +41,7 @@ import { IdentityLoopWidget } from "@/components/IdentityLoopWidget";
 import { StudyToolsQuickAccess } from "@/components/StudyToolsQuickAccess";
 import { FeatureHighlights } from "@/components/FeatureHighlights";
 import { SermonForgeWidget } from "@/components/dashboard/SermonForgeWidget";
+import { ResearchAssistantWidget } from "@/components/dashboard/ResearchAssistantWidget";
 import { WeeklyChallengeWidget, WinnerBanner } from "@/components/weekly-challenge";
 
 interface DashboardStats {
@@ -219,6 +220,10 @@ export default function Dashboard() {
 
         <div className="mb-8">
           <StudyToolsQuickAccess />
+        </div>
+
+        <div className="mb-8">
+          <ResearchAssistantWidget />
         </div>
 
         <Card className={`mb-8 ${featured.gradient} border-0 text-white overflow-hidden relative`}>
