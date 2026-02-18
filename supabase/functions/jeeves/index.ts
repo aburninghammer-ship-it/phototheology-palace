@@ -287,7 +287,8 @@ serve(async (req) => {
       conversationHistory,
       opponentAttack,
       discipleResponse,
-      defenseTopicName
+      defenseTopicName,
+      isSignatureTopic
     } = requestBody;
     
     // Handle both message formats
@@ -7035,9 +7036,12 @@ DIFFICULTY LEVEL: ${difficulty || 'intermediate'}
 ${difficultyInstruction}
 
 TOPIC FOCUS: ${defenseTopicName || 'General theology'}
+${isSignatureTopic ? 'MODE: SIGNATURE TOPIC — You are arguing IN FAVOR of your own belief/position. This is YOUR home turf.' : 'MODE: ATTACK — You are challenging the Seventh-day Adventist position on this topic.'}
 
 YOUR TASK:
-Present a compelling theological challenge against the Seventh-day Adventist position on this topic. Stay in character as someone who genuinely holds this worldview. Make your argument tight, specific, and hard to dismiss.
+${isSignatureTopic
+  ? `Present the STRONGEST POSSIBLE CASE FOR your own position on this topic. This is YOUR signature belief — the hill you would die on. Build your affirmative case using your best scriptures, logic, historical evidence, and theological reasoning. Make it so compelling that the disciple must work hard to refute it. You are not merely attacking SDA doctrine here — you are BUILDING YOUR OWN CASE and daring the disciple to tear it down.`
+  : `Present a compelling theological challenge against the Seventh-day Adventist position on this topic. Stay in character as someone who genuinely holds this worldview. Make your argument tight, specific, and hard to dismiss.`}
 
 RULES:
 - Stay in character. Do NOT break character or acknowledge you are an AI.
@@ -7051,6 +7055,8 @@ SIGNATURE CLOSING LINE: "${opponentEndPrompt || 'Defend this from Scripture.'}"`
 
       userPrompt = phase === 'follow-up'
         ? `Continue the debate. The disciple has responded. Review their response in the conversation history and press harder on weak points or pivot to a new angle of attack on ${defenseTopicName || 'this topic'}.`
+        : isSignatureTopic
+        ? `Present your strongest affirmative case FOR your position on: ${defenseTopicName || 'this doctrine'}. This is YOUR home turf — build the most compelling argument you can and challenge the disciple to dismantle it.`
         : `Present your opening challenge against the Seventh-day Adventist position on: ${defenseTopicName || 'this doctrine'}. Make it specific, scholarly, and hard to dismiss.`;
 
     } else if (mode === "defense-coach") {

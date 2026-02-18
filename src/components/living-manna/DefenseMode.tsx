@@ -101,6 +101,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           opponentTargets: selectedOpponent.attackTargets,
           opponentEndPrompt: selectedOpponent.endPrompt,
           opponentSteelmanRules: selectedOpponent.steelmanRules,
+          isSignatureTopic: !!selectedTopic.isSignature,
           phase: "opening",
         },
       });
@@ -204,6 +205,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           opponentTargets: selectedOpponent.attackTargets,
           opponentEndPrompt: selectedOpponent.endPrompt,
           opponentSteelmanRules: selectedOpponent.steelmanRules,
+          isSignatureTopic: !!selectedTopic?.isSignature,
           phase: "follow-up",
           conversationHistory: buildConversationHistory(),
         },
@@ -299,12 +301,13 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         </div>
 
         {/* Topic Selector */}
-        <div>
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
             Select Topic
           </h3>
+          {/* Core SDA Topics */}
           <div className="flex flex-wrap gap-2">
-            {DEFENSE_TOPICS.map((topic) => (
+            {DEFENSE_TOPICS.filter((t) => !t.isSignature).map((topic) => (
               <Badge
                 key={topic.id}
                 variant={selectedTopic?.id === topic.id ? "default" : "outline"}
@@ -319,8 +322,38 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
               </Badge>
             ))}
           </div>
+          {/* Signature Topics (shown when opponent is selected) */}
+          {selectedOpponent && (() => {
+            const sigTopics = DEFENSE_TOPICS.filter(
+              (t) => t.isSignature && selectedOpponent.signatureTopics.includes(t.id)
+            );
+            if (sigTopics.length === 0) return null;
+            return (
+              <div>
+                <p className="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-2">
+                  {selectedOpponent.name}'s Home Turf
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {sigTopics.map((topic) => (
+                    <Badge
+                      key={topic.id}
+                      variant={selectedTopic?.id === topic.id ? "default" : "outline"}
+                      className={`cursor-pointer text-sm py-1.5 px-3 transition-all ${
+                        selectedTopic?.id === topic.id
+                          ? "bg-orange-600 text-white shadow border-orange-600"
+                          : "border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
+                      }`}
+                      onClick={() => setSelectedTopic(topic)}
+                    >
+                      {topic.name}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
           {selectedTopic && (
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground mt-1">
               {selectedTopic.description}
             </p>
           )}

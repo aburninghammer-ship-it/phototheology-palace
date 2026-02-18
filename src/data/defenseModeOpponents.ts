@@ -10,6 +10,7 @@ export interface DefenseOpponent {
   worldview: string;
   argumentStyle: string;
   attackTargets: string[];
+  signatureTopics: string[]; // topic IDs where this opponent argues FOR their own position
   steelmanRules: string;
   endPrompt: string;
 }
@@ -18,6 +19,7 @@ export interface DefenseTopic {
   id: string;
   name: string;
   description: string;
+  isSignature?: boolean; // true = opponent argues FOR their own position
 }
 
 export interface DifficultyLevel {
@@ -45,6 +47,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "Prophecy as post-hoc rationalization",
       "Morality without God",
     ],
+    signatureTopics: ["naturalism", "problem-of-evil", "secular-morality"],
     steelmanRules:
       "Present the STRONGEST version of atheist arguments. Do not use weak objections like 'science disproves God' in vague terms — use specific challenges (thermodynamics, fossil record, textual criticism). Never mock or belittle. Argue as an intellectually honest philosopher would.",
     endPrompt: "Defend this from evidence and reason alone.",
@@ -66,6 +69,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "Paul as the true founder of Christianity",
       "The Sabbath as originally Islamic",
     ],
+    signatureTopics: ["quran-preservation", "islamic-monotheism", "prophet-muhammad"],
     steelmanRules:
       "Present Islamic arguments at their scholarly best. Reference actual Quranic verses and hadith. Use real textual criticism debates (e.g., Mark's ending, Johannine Comma). Never use crude arguments — argue as a trained Islamic scholar would at an interfaith debate.",
     endPrompt:
@@ -88,6 +92,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "Priesthood authority and ordinances",
       "The Remnant Church claim",
     ],
+    signatureTopics: ["joseph-smith", "book-of-mormon", "continuing-revelation"],
     steelmanRules:
       "Present LDS arguments as a well-trained missionary would — with sincerity and theological sophistication. Reference actual Book of Mormon passages and LDS theology. Do not caricature LDS beliefs. Present the strongest case for continuing revelation and restored authority.",
     endPrompt:
@@ -110,6 +115,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "The 144,000 and heavenly hope",
       "The Sabbath (arguing it was fulfilled in Christ)",
     ],
+    signatureTopics: ["jehovah-only-god", "jesus-is-created", "paradise-earth"],
     steelmanRules:
       "Use actual Watchtower arguments and New World Translation renderings. Present the strongest JW case against the Trinity using John 14:28, Colossians 1:15, Revelation 3:14. Do not use weak arguments. Debate as a well-prepared JW elder would.",
     endPrompt:
@@ -132,6 +138,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "Law and Gospel relationship",
       "The Remnant Church claim as exclusive",
     ],
+    signatureTopics: ["sunday-resurrection", "grace-alone", "once-saved"],
     steelmanRules:
       "Present the BEST evangelical arguments against SDA distinctives. Use real scholarly critiques (Desmond Ford, Dale Ratzlaff). Do not strawman the grace position. Argue as a seminary-trained evangelical pastor would — with genuine love and strong exegesis.",
     endPrompt: "Defend this from Scripture alone — not Ellen White.",
@@ -153,6 +160,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "The Real Presence in the Eucharist",
       "Protestant fragmentation as proof of error",
     ],
+    signatureTopics: ["papal-authority", "eucharist", "sacred-tradition"],
     steelmanRules:
       "Present Catholic arguments at their intellectual best. Cite actual Church Fathers, councils, and papal documents. Do not use popular-level arguments — debate as a trained Catholic theologian would. Reference real patristic texts and historical evidence.",
     endPrompt:
@@ -175,10 +183,34 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "Feast days vs. SDA Sabbath-only",
       "The Remnant identity claim",
     ],
+    signatureTopics: ["true-israel-identity", "salvation-israel-only", "feast-days-required"],
     steelmanRules:
       "Present BHI arguments with their full scriptural chain-referencing. Use actual verses they cite (Deuteronomy 28, 2 Esdras 6:54-59, Baruch 3). Do not mock or dismiss identity claims. Present the strongest exegetical case a BHI teacher would make, including historical arguments about the slave trade.",
     endPrompt:
       "Show me precept upon precept where the Scriptures prove this — line upon line.",
+  },
+  {
+    id: "former-sda",
+    name: "The Former SDA",
+    emoji: "🚪",
+    color: "border-slate-500",
+    description: "Left the church and now dismantles SDA theology from the inside",
+    worldview:
+      "You are a former Seventh-day Adventist who left the church after years of deep study. You know SDA theology intimately — the 28 Fundamental Beliefs, the sanctuary doctrine, the Investigative Judgment, Ellen White's writings, the Great Controversy narrative, and Adventist eschatology. You left because you became convinced that 1844 is built on a failed prediction (the Great Disappointment), that Ellen White plagiarized and made false prophecies, that the Investigative Judgment has no biblical support, and that SDA creates a works-based anxiety system disguised as grace. You are now either evangelical, agnostic, or simply non-denominational. You are familiar with the work of Dale Ratzlaff (Sabbath in Christ), Desmond Ford (the Glacier View crisis), Walter Rea (The White Lie), and former SDA forums. You know the insider language, the proof-texts, and the emotional manipulation tactics.",
+    argumentStyle:
+      "Devastatingly personal and insider-knowledgeable. You quote Ellen White against herself, cite the Great Disappointment history in detail, and press on the emotional/psychological damage of Investigative Judgment theology. You challenge from WITHIN — using the very texts SDAs rely on. You are empathetic but unflinching, speaking as someone who once believed everything and now sees it as a system of control.",
+    attackTargets: [
+      "1844 and the Investigative Judgment",
+      "Ellen White's prophetic authority",
+      "The Great Disappointment as the foundation",
+      "SDA as a works-anxiety system",
+      "The Remnant Church claim as cult-like exclusivity",
+    ],
+    signatureTopics: ["ellen-white-exposed", "1844-debunked", "sda-to-freedom"],
+    steelmanRules:
+      "Present the strongest insider critique of SDA. Use actual Ellen White quotes, real historical events (1843-1844 timeline, Glacier View, plagiarism evidence), and genuine theological critiques. Do not be bitter or hateful — be the calm, well-studied former member who simply followed the evidence out. This is the hardest opponent because they KNOW the system.",
+    endPrompt:
+      "I used to believe this too. Show me why I was wrong to leave.",
   },
 ];
 
@@ -224,6 +256,182 @@ export const DEFENSE_TOPICS: DefenseTopic[] = [
     name: "Remnant Church",
     description:
       "Revelation 12:17 — identifying marks of God's end-time remnant people and the spirit of prophecy",
+  },
+  // ── Atheist Signature Topics ───────────────────────────────
+  {
+    id: "naturalism",
+    name: "Naturalism",
+    description:
+      "The Atheist argues FOR: The universe needs no creator — natural laws explain everything without invoking the supernatural",
+    isSignature: true,
+  },
+  {
+    id: "problem-of-evil",
+    name: "Problem of Evil",
+    description:
+      "The Atheist argues FOR: An all-powerful, all-loving God is logically incompatible with the suffering we observe in the world",
+    isSignature: true,
+  },
+  {
+    id: "secular-morality",
+    name: "Secular Morality",
+    description:
+      "The Atheist argues FOR: Morality is grounded in human well-being and empathy, not divine command — we don't need God to be good",
+    isSignature: true,
+  },
+  // ── Muslim Signature Topics ────────────────────────────────
+  {
+    id: "quran-preservation",
+    name: "Quran Preservation",
+    description:
+      "The Muslim argues FOR: The Quran is perfectly preserved word-for-word since revelation — unlike the corrupted Bible manuscripts",
+    isSignature: true,
+  },
+  {
+    id: "islamic-monotheism",
+    name: "Islamic Monotheism",
+    description:
+      "The Muslim argues FOR: Tawhid (pure monotheism) is the original religion of all prophets — the Trinity is a later pagan corruption",
+    isSignature: true,
+  },
+  {
+    id: "prophet-muhammad",
+    name: "Prophet Muhammad",
+    description:
+      "The Muslim argues FOR: Muhammad is prophesied in the Bible (Deuteronomy 18:18, John 14:16) as the final messenger of God",
+    isSignature: true,
+  },
+  // ── Mormon Signature Topics ────────────────────────────────
+  {
+    id: "joseph-smith",
+    name: "Joseph Smith",
+    description:
+      "The Mormon argues FOR: Joseph Smith was a true prophet who restored Christ's original church after the Great Apostasy",
+    isSignature: true,
+  },
+  {
+    id: "book-of-mormon",
+    name: "Book of Mormon",
+    description:
+      "The Mormon argues FOR: The Book of Mormon is another testament of Jesus Christ — confirming and completing the Bible's witness",
+    isSignature: true,
+  },
+  {
+    id: "continuing-revelation",
+    name: "Continuing Revelation",
+    description:
+      "The Mormon argues FOR: God still speaks through living prophets today — the canon is not closed",
+    isSignature: true,
+  },
+  // ── JW Signature Topics ────────────────────────────────────
+  {
+    id: "jehovah-only-god",
+    name: "Jehovah Alone Is God",
+    description:
+      "The JW argues FOR: Jehovah is the one true God — the Trinity is a pagan invention not found in Scripture",
+    isSignature: true,
+  },
+  {
+    id: "jesus-is-created",
+    name: "Jesus Is Created",
+    description:
+      "The JW argues FOR: Jesus is Michael the Archangel, God's first creation — not co-equal or co-eternal with Jehovah",
+    isSignature: true,
+  },
+  {
+    id: "paradise-earth",
+    name: "Paradise Earth",
+    description:
+      "The JW argues FOR: Only 144,000 go to heaven — the 'great crowd' will live forever on a paradise earth",
+    isSignature: true,
+  },
+  // ── Evangelical Signature Topics ───────────────────────────
+  {
+    id: "sunday-resurrection",
+    name: "Sunday Worship",
+    description:
+      "The Evangelical argues FOR: Sunday worship honors Christ's resurrection and the new covenant — the Sabbath was fulfilled",
+    isSignature: true,
+  },
+  {
+    id: "grace-alone",
+    name: "Grace Alone",
+    description:
+      "The Evangelical argues FOR: Salvation is by grace through faith ALONE — any addition of works or law-keeping is a false gospel",
+    isSignature: true,
+  },
+  {
+    id: "once-saved",
+    name: "Once Saved Always Saved",
+    description:
+      "The Evangelical argues FOR: True believers cannot lose their salvation — eternal security is guaranteed by God's promise",
+    isSignature: true,
+  },
+  // ── Catholic Signature Topics ──────────────────────────────
+  {
+    id: "papal-authority",
+    name: "Papal Authority",
+    description:
+      "The Catholic argues FOR: Christ built His church on Peter, and the Pope holds the keys of authority in unbroken apostolic succession",
+    isSignature: true,
+  },
+  {
+    id: "eucharist",
+    name: "The Eucharist",
+    description:
+      "The Catholic argues FOR: The bread and wine literally become Christ's body and blood — transubstantiation is biblical and patristic",
+    isSignature: true,
+  },
+  {
+    id: "sacred-tradition",
+    name: "Sacred Tradition",
+    description:
+      "The Catholic argues FOR: Scripture alone is insufficient — Sacred Tradition and the Magisterium are equally authoritative",
+    isSignature: true,
+  },
+  // ── Former SDA Signature Topics ─────────────────────────────
+  {
+    id: "ellen-white-exposed",
+    name: "Ellen White Exposed",
+    description:
+      "The Former SDA argues FOR: Ellen White plagiarized, made false prophecies, and contradicted Scripture — she fails the biblical prophet test",
+    isSignature: true,
+  },
+  {
+    id: "1844-debunked",
+    name: "1844 Debunked",
+    description:
+      "The Former SDA argues FOR: The Investigative Judgment was invented to cover the Great Disappointment — Daniel 8:14 has nothing to do with 1844",
+    isSignature: true,
+  },
+  {
+    id: "sda-to-freedom",
+    name: "SDA to Freedom",
+    description:
+      "The Former SDA argues FOR: Leaving Adventism brought genuine peace — the SDA system creates fear, guilt, and works-based anxiety",
+    isSignature: true,
+  },
+  // ── BHI Signature Topics ───────────────────────────────────
+  {
+    id: "true-israel-identity",
+    name: "True Israel Identity",
+    description:
+      "The BHI argues FOR: African Americans, Hispanics, and Natives are the true 12 tribes of Israel — proven by Deuteronomy 28 curses",
+    isSignature: true,
+  },
+  {
+    id: "salvation-israel-only",
+    name: "Salvation for Israel Only",
+    description:
+      "The BHI argues FOR: God's covenant of salvation is exclusively with Israel — Gentiles have no part in the promises",
+    isSignature: true,
+  },
+  {
+    id: "feast-days-required",
+    name: "Feast Days Required",
+    description:
+      "The BHI argues FOR: All Torah feast days are mandatory forever — keeping only the Sabbath is incomplete obedience",
+    isSignature: true,
   },
 ];
 
