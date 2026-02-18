@@ -94,12 +94,17 @@ export function useSparks({
     
     setLoading(true);
     try {
+      // Only show sparks from the last 24 hours that haven't been dismissed or saved
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      
       let query = supabase
         .from('sparks')
         .select('*')
         .eq('user_id', user.id)
         .eq('context_type', contextType)
         .is('dismissed_at', null)
+        .is('saved_at', null)
+        .gte('created_at', since)
         .order('created_at', { ascending: false })
         .limit(maxSparks);
       
