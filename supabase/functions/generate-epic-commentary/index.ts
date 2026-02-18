@@ -13,8 +13,8 @@ const AZURE_TTS_REGION = Deno.env.get("AZURE_TTS_REGION") || "eastus";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// ElevenLabs "William" voice — deep, engaging storyteller
-const EPIC_ELEVENLABS_VOICE_ID = "bIHbv24MWmeRgasZH58o";
+// ElevenLabs "William - Deep Engaging Storyteller" voice
+const EPIC_ELEVENLABS_VOICE_ID = "fjnwTZkKtQOJaYzGLa6n";
 
 const THEOLOGICAL_GUARDRAILS = `
 MANDATORY THEOLOGICAL GUARDRAILS — violations will be treated as critical errors:
