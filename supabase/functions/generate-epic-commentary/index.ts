@@ -346,7 +346,7 @@ async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, to
     body: JSON.stringify({
       model: "tts-1-hd",
       input: text,
-      voice: "fable",
+      voice: "onyx",
       response_format: "mp3",
       speed: 0.95,
     }),
@@ -382,7 +382,7 @@ async function generateEpicAudio(
   const processedText = addPauseMarkers(text);
   // OpenAI TTS hard limit is 4096 chars — use 3900 to be safe; ElevenLabs supports 5000
   const chunks = splitTextIntoChunks(processedText, useElevenLabs ? 5000 : 3900);
-  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? "ElevenLabs (William)" : "OpenAI (fable)"}`);
+  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? "ElevenLabs (William)" : "OpenAI (onyx)"}`);
 
   const audioBuffers: ArrayBuffer[] = [];
 
@@ -504,7 +504,7 @@ serve(async (req) => {
         version: newVersion,
         status: "generating",
         commentary_text: "",
-        voice_id: ELEVENLABS_API_KEY ? `elevenlabs:${EPIC_ELEVENLABS_VOICE_ID}` : "fable",
+        voice_id: ELEVENLABS_API_KEY ? `elevenlabs:${EPIC_ELEVENLABS_VOICE_ID}` : "onyx",
       }, { onConflict: "book,chapter,version" })
       .select()
       .single();
