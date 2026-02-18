@@ -88,7 +88,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         return;
       }
       const audioSrc = data.audioUrl
-        ? await fetch(data.audioUrl).then((r) => r.ok ? URL.createObjectURL(r.blob()) : data.audioUrl).catch(() => data.audioUrl)
+        ? await fetch(data.audioUrl).then(async (r) => r.ok ? URL.createObjectURL(await r.blob()) : data.audioUrl).catch(() => data.audioUrl)
         : `data:audio/mpeg;base64,${data.audioContent}`;
       const audio = new Audio(audioSrc as string);
       audio.volume = 0.9;
