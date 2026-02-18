@@ -5944,11 +5944,25 @@ If they said "NO" or corrected you, acknowledge and adjust your answer.
 
 Be helpful, specific, and direct. Avoid generic theological overviews when they want specific answers.`;
     } else if (mode === "research") {
-      // Research mode - HIGH-PRECISION HISTORICAL & THEOLOGICAL VERIFICATION ENGINE
-      const { conversationHistory } = requestBody;
+      // Research mode - supports both concise (widget) and deep (full research) responses
+      const { conversationHistory, systemInstructions } = requestBody;
+      const isQuickMode = !!systemInstructions;
 
       console.log('Research mode activated for question:', question);
+      console.log('Quick mode (systemInstructions provided):', isQuickMode);
 
+      if (isQuickMode) {
+        // CONCISE MODE — used by Research Assistant widget
+        // Respects the frontend systemInstructions for direct, concise answers
+        systemPrompt = `You are Jeeves, ${greeting}'s Research Assistant in Phototheology Palace.
+
+${systemInstructions}
+
+${THEOLOGICAL_REASONING}
+
+${PALACE_SCHEMA}`;
+      } else {
+        // DEEP RESEARCH MODE — used by Research Mode page for scholarly briefs
       systemPrompt = `You are operating as Jeeves, ${greeting}'s HIGH-PRECISION HISTORICAL AND THEOLOGICAL RESEARCH ENGINE for long-form analysis intended for publication, teaching, and documentary use.
 
 Your task is to produce a rigorously sourced, fact-checked, and internally coherent research brief on the assigned topic.
@@ -6063,6 +6077,7 @@ Assume this material may be:
 
 If you encounter weak evidence, say so explicitly.
 Proceed with disciplined scholarship.`;
+      } // end deep research mode else
 
       const contextSection = context ? `
 
@@ -6078,7 +6093,14 @@ ${conversationHistory.map((msg: any) => `${msg.role === 'user' ? 'Student' : 'Je
 
 Build upon previous scholarly discussion while maintaining verification standards for any new claims.` : '';
 
-      userPrompt = `Research Question: "${question}"${contextSection}${historySection}
+      if (isQuickMode) {
+        // CONCISE user prompt — just ask the question, let systemInstructions control format
+        userPrompt = `${question}${contextSection}${historySection}
+
+Answer directly and concisely. Quote verses in full when listing them. End with 2-3 suggested follow-up questions.`;
+      } else {
+        // DEEP RESEARCH user prompt — full scholarly brief structure
+        userPrompt = `Research Question: "${question}"${contextSection}${historySection}
 
 Provide a comprehensive, rigorously sourced research brief with this REQUIRED structure:
 
@@ -6174,6 +6196,7 @@ List key sources referenced:
 • For complex topics: 1500-2500 words
 • Show your epistemic humility when evidence is thin
 ────────────────────────────────`;
+      }
     } else if (mode === "prophecy-watch") {
       // ═══════════════════════════════════════════════════════════════════════
       // PROPHECY WATCH MODE — v1.1
