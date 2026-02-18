@@ -164,7 +164,7 @@ RULES:
    - Cycle placement (which covenant era: Adamic, Noahic, Abrahamic, Mosaic, Cyrusic, Christ, Spirit, Remnant)
    - Numerical/temporal patterns (3 days, 40 days, 3 years, 1260 years, etc.)
    - Great Controversy dimension — how does this moment reveal the cosmic war?
-4. Do NOT create separate sections, subheadings, or labeled blocks. ONE continuous, flowing cinematic narration from opening to close.
+4. ABSOLUTELY NO SUBHEADINGS, section titles, markdown headers (##, ###), bold labels, or any structural breaks of any kind. ONE continuous, flowing cinematic narration from opening to close. If you use a heading or subheading, your output will be rejected.
 5. Close with the theological reverberation of this chapter — what it means for the grand story of redemption — woven into the narration, not announced as a conclusion.
 6. Do NOT name "rooms" or "floors" or "Phototheology." Weave principles organically.
 7. Do NOT use denominational labels.
@@ -203,12 +203,16 @@ RULES:
 
 /**
  * Strip parenthetical stage directions like (Sound of wind) or (Pause) from text
- * so TTS doesn't read them aloud.
+ * so TTS doesn't read them aloud. Also strips markdown subheadings (##, ###, **bold**).
  */
 function sanitizeForTTS(text: string): string {
   return text
-    .replace(/\(([^)]{0,100})\)/g, '') // Remove short parentheticals (stage directions)
-    .replace(/\n{3,}/g, '\n\n')         // Collapse excess blank lines
+    .replace(/\(([^)]{0,100})\)/g, '')  // Remove short parentheticals (stage directions)
+    .replace(/^#{1,6}\s+.+$/gm, '')      // Remove markdown headings (# ## ###)
+    .replace(/\*\*([^*]+)\*\*/g, '$1')   // Strip bold markdown, keep text
+    .replace(/\*([^*]+)\*/g, '$1')        // Strip italic markdown, keep text
+    .replace(/^---+$/gm, '')              // Remove horizontal rules
+    .replace(/\n{3,}/g, '\n\n')           // Collapse excess blank lines
     .trim();
 }
 
