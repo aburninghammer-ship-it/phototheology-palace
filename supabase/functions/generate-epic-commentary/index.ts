@@ -330,13 +330,27 @@ async function generateEpicAudio(
   const audioBuffers: ArrayBuffer[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const buffer = useElevenLabs
-      ? await generateEpicAudioChunkElevenLabs(
+    let buffer: ArrayBuffer;
+    if (useElevenLabs) {
+      try {
+        buffer = await generateEpicAudioChunkElevenLabs(
           chunks[i], i, chunks.length,
           i > 0 ? chunks[i - 1] : undefined,
           i < chunks.length - 1 ? chunks[i + 1] : undefined,
-        )
-      : await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
+        );
+      } catch (elevenErr) {
+        const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
+        // If quota exceeded or any ElevenLabs error, fall back to OpenAI TTS
+        if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429")) {
+          console.warn(`[EpicCommentary] ElevenLabs quota/auth error on chunk ${i + 1}, falling back to OpenAI TTS: ${errMsg}`);
+          buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
+        } else {
+          throw elevenErr;
+        }
+      }
+    } else {
+      buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
+    }
     audioBuffers.push(buffer);
   }
 
