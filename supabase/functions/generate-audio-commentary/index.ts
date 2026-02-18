@@ -136,12 +136,36 @@ serve(async (req) => {
 
     if (cached?.commentary_text) {
       console.log(`[Commentary] Cache hit for ${book} ${chapter}:${verse}`);
+
+      // If we have a cached audio URL, return it immediately (no TTS cost)
+      if (cached.audio_url) {
+        console.log(`[Commentary] Returning cached audio for ${book} ${chapter}:${verse}`);
+        return new Response(
+          JSON.stringify({
+            commentary: cached.commentary_text,
+            audioUrl: cached.audio_url,
+            cached: true,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Commentary exists but no audio yet — generate & store audio now so future requests are free
+      if (generateAudio) {
+        console.log(`[Commentary] Generating missing audio for cached commentary ${book} ${chapter}:${verse}`);
+        const audioUrl = await generateTTSAudio(cached.commentary_text, voice, openaiKey, supabase, book, chapter, verse, tier);
+        if (audioUrl) {
+          await supabase.from("bible_commentaries").update({ audio_url: audioUrl, updated_at: new Date().toISOString() })
+            .eq("book", book).eq("chapter", chapter).eq("verse", verse).eq("tier", tier);
+        }
+        return new Response(
+          JSON.stringify({ commentary: cached.commentary_text, audioUrl, cached: true }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       return new Response(
-        JSON.stringify({
-          commentary: cached.commentary_text,
-          audioUrl: cached.audio_url,
-          cached: true,
-        }),
+        JSON.stringify({ commentary: cached.commentary_text, audioUrl: null, cached: true }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -207,13 +231,12 @@ Provide insightful commentary following the tier guidelines and PhotoTheology fr
 
     console.log(`[Commentary] Generated ${commentary.length} chars for ${book} ${chapter}:${verse}`);
 
-    // Generate audio if requested
-    let audioUrl = null;
-    if (generateAudio) {
-      audioUrl = await generateTTSAudio(commentary, voice, openaiKey, supabase, book, chapter, verse, tier);
-    }
+    // Always generate audio when creating new commentary — pay once, play forever for free
+    // This ensures every cached commentary entry has an audio URL stored in Storage
+    console.log(`[Commentary] Generating audio for new commentary ${book} ${chapter}:${verse}`);
+    const audioUrl = await generateTTSAudio(commentary, voice, openaiKey, supabase, book, chapter, verse, tier);
 
-    // Cache the commentary
+    // Cache the commentary + audio URL together
     await supabase.from("bible_commentaries").upsert({
       book,
       chapter,
