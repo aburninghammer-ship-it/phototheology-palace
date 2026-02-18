@@ -122,16 +122,17 @@ export function useSubscription() {
 
       // If database shows active subscription or church access, use that
       if (hasAccessFromDb || hasChurchAccess) {
-        // Church members should always show as 'active'/'premium' regardless of
-        // stale trial/expired status in user_subscriptions
-        const effectiveStatus = hasChurchAccess && !hasAccessFromDb ? 'active' : statusFromDb;
-        const effectiveTier = hasChurchAccess && !hasAccessFromDb ? 'premium' : tierFromDb;
+        // Church members should ALWAYS show as 'active'/'premium' regardless of
+        // ANY stale trial/expired status in user_subscriptions or profiles.
+        // Church access is the highest priority override.
+        const effectiveStatus = hasChurchAccess ? 'active' : statusFromDb;
+        const effectiveTier = hasChurchAccess ? 'premium' : tierFromDb;
 
         setSubscription({
           status: effectiveStatus,
           tier: effectiveTier,
           isStudent: effectiveTier === 'student',
-          trialEndsAt: hasChurchAccess && !hasAccessFromDb ? null : trialEndsAtFromDb,
+          trialEndsAt: hasChurchAccess ? null : trialEndsAtFromDb,
           studentExpiresAt: null,
           promotionalExpiresAt: null,
           hasAccess: true,
