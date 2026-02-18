@@ -216,14 +216,55 @@ function sanitizeForTTS(text: string): string {
     .trim();
 }
 
-async function generateEpicText(book: string, chapter: number | null, scope: string): Promise<string> {
+async function generateEpicText(
+  book: string,
+  chapter: number | null,
+  scope: string,
+  supabaseAdmin?: ReturnType<typeof createClient>,
+): Promise<string> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
   const isBookScope = scope === "book";
   const systemPrompt = isBookScope ? EPIC_BOOK_SYSTEM_PROMPT : EPIC_CHAPTER_SYSTEM_PROMPT;
+
+  // ── Fetch curated Christ-in-Every-Chapter anchors from the database ──
+  let cecAnchorBlock = "";
+  if (!isBookScope && chapter !== null && supabaseAdmin) {
+    const { data: findings } = await supabaseAdmin
+      .from("christ_chapter_findings")
+      .select("christ_name, christ_action, crosslink_verses, notes")
+      .eq("book", book)
+      .eq("chapter", chapter);
+
+    if (findings && findings.length > 0) {
+      const anchorLines = findings.map((f: {
+        christ_name: string;
+        christ_action: string;
+        crosslink_verses: string[];
+        notes: string | null;
+      }) => {
+        let line = `• CHRIST AS ${f.christ_name.toUpperCase()}: ${f.christ_action}`;
+        if (f.crosslink_verses?.length) {
+          line += ` [Cross-links: ${f.crosslink_verses.join(", ")}]`;
+        }
+        if (f.notes) {
+          line += ` [NOTE: ${f.notes}]`;
+        }
+        return line;
+      }).join("\n");
+
+      cecAnchorBlock = `\n\nCURATED CHRIST-IN-EVERY-CHAPTER ANCHORS FOR ${book.toUpperCase()} ${chapter}:
+These are theologically verified typological connections. You MUST weave ALL of these into your narration — not as a list, but organically within the cinematic flow. They represent the highest-priority theological content for this chapter:
+
+${anchorLines}
+
+These anchors are non-negotiable. They have been drawn from careful typological study of this chapter. Do not omit any of them. Integrate each one naturally into the narration as a discovery the listener experiences, not a fact being reported.`;
+    }
+  }
+
   const userPrompt = isBookScope
     ? `Create an epic cinematic overview of the entire book of ${book}. This should be a dramatic, sweeping narration that captures the grand arc of this book — its historical context, its place in redemption history, its major movements and themes — while revealing its deep theological significance and how it fits into the story of salvation from Genesis to Revelation.`
-    : `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.`;
+    : `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.${cecAnchorBlock}`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -558,7 +599,7 @@ serve(async (req) => {
     console.log(`[EpicCommentary] Generating ${effectiveScope} text for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : ""}...`);
 
     // Generate text
-    const commentaryText = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope);
+    const commentaryText = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope, supabaseAdmin);
 
     // Update with text
     await supabaseAdmin
