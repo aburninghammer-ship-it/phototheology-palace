@@ -17,16 +17,20 @@ import {
   Link2,
   Hash,
   Sparkles,
+  Save,
+  Check,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
+import { toast } from "sonner";
 
 interface ChatMessage {
   id: string;
@@ -143,6 +147,10 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionName, setSessionName] = useState("");
+  const [savedStudyId, setSavedStudyId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<
     Array<{ role: string; content: string }>
   >([]);
@@ -158,6 +166,14 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
   useEffect(() => {
     if (messages.length > 0 && !expanded) {
       setExpanded(true);
+    }
+  }, [messages.length]);
+
+  // Auto-save after each assistant reply
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.role === "assistant" && messages.length >= 2) {
+      saveSession(messages, sessionName, savedStudyId);
     }
   }, [messages.length]);
 
@@ -207,7 +223,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
     if (!query.trim() || isLoading) return;
 
     const userMsg = query.trim();
-    addMessage("user", userMsg);
+    const userMsgObj = addMessage("user", userMsg);
     setInput("");
     setIsLoading(true);
 
@@ -234,11 +250,14 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
 
       const { cleanText, suggestions } = parseSuggestions(rawResponse);
 
-      addMessage("assistant", cleanText, suggestions);
-      setConversationHistory([
+      const assistantMsg = addMessage("assistant", cleanText, suggestions);
+      const newHistory = [
         ...updatedHistory,
         { role: "assistant", content: rawResponse },
-      ]);
+      ];
+      setConversationHistory(newHistory);
+
+      // Auto-save is triggered via useEffect watching messages
     } catch (err) {
       console.error("Research query error:", err);
       addMessage(
@@ -280,10 +299,48 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
     sendQuery(suggestion);
   };
 
+  const buildStudyContent = (msgs: ChatMessage[], name: string) => {
+    const title = name.trim() || `Research: ${msgs[0]?.content.slice(0, 60) || "Session"}`;
+    const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    let content = `# ${title}\n\n**Date:** ${date}\n\n---\n\n`;
+    msgs.forEach((m) => {
+      content += m.role === "user"
+        ? `## ❓ Question\n\n${m.content}\n\n`
+        : `## 📖 Research Response\n\n${m.content}\n\n---\n\n`;
+    });
+    return { title, content };
+  };
+
+  const saveSession = useCallback(async (msgs: ChatMessage[], name: string, existingId: string | null) => {
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { title, content } = buildStudyContent(msgs, name);
+      const tags = ["research", "jeeves"];
+      if (existingId) {
+        await supabase.from("user_studies").update({ title, content, tags, updated_at: new Date().toISOString() }).eq("id", existingId);
+      } else {
+        const { data, error } = await supabase.from("user_studies").insert({
+          user_id: user.id, title, content, tags, category: "jeeves_response",
+        }).select("id").single();
+        if (!error && data) setSavedStudyId(data.id);
+      }
+      setJustSaved(true);
+      setTimeout(() => setJustSaved(false), 2000);
+    } catch (e) {
+      console.error("Auto-save error:", e);
+    } finally {
+      setIsSaving(false);
+    }
+  }, []);
+
   const clearChat = () => {
     setMessages([]);
     setConversationHistory([]);
     setInput("");
+    setSessionName("");
+    setSavedStudyId(null);
   };
 
   const handleVoiceTranscript = useCallback((text: string) => {
@@ -510,6 +567,36 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
                   )}
                 </div>
               </div>
+
+              {/* Session name + auto-save indicator */}
+              {messages.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={sessionName}
+                    onChange={(e) => setSessionName(e.target.value)}
+                    placeholder="Name this research session…"
+                    className="h-8 text-xs bg-background/60 border-border/50 focus:border-emerald-500/50 rounded-lg flex-1"
+                    onBlur={() => {
+                      if (messages.length >= 2) saveSession(messages, sessionName, savedStudyId);
+                    }}
+                  />
+                  <div className="flex items-center gap-1 text-[11px] shrink-0">
+                    {isSaving ? (
+                      <span className="flex items-center gap-1 text-muted-foreground">
+                        <Loader2 className="h-3 w-3 animate-spin" /> Saving…
+                      </span>
+                    ) : justSaved ? (
+                      <span className="flex items-center gap-1 text-emerald-400">
+                        <Check className="h-3 w-3" /> Saved
+                      </span>
+                    ) : savedStudyId ? (
+                      <span className="text-muted-foreground/60 flex items-center gap-1">
+                        <Save className="h-3 w-3" /> Auto-saved
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              )}
 
               {/* Input Area */}
               <div className="space-y-2">
