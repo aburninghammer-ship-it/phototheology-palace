@@ -415,18 +415,42 @@ async function generateEpicAudio(
   chapter: number,
   supabaseAdmin: any,
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
-  // All Epic audio uses OpenAI Onyx
-  const useElevenLabs = false;
+  // All Epic audio uses ElevenLabs William
+  const useElevenLabs = !!ELEVENLABS_API_KEY;
   const processedText = addPauseMarkers(text);
-  const chunkSize = 3900;
+  const chunkSize = useElevenLabs ? 5000 : 3900;
   const chunks = splitTextIntoChunks(processedText, chunkSize);
 
-  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: OpenAI (onyx)`);
+  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? "ElevenLabs (William)" : "OpenAI (onyx)"}`);
 
   const audioBuffers: ArrayBuffer[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
+    let buffer: ArrayBuffer;
+    if (useElevenLabs) {
+      try {
+        buffer = await generateEpicAudioChunkElevenLabs(
+          chunks[i], i, chunks.length,
+          i > 0 ? chunks[i - 1] : undefined,
+          i < chunks.length - 1 ? chunks[i + 1] : undefined,
+        );
+      } catch (elevenErr) {
+        const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
+        if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429")) {
+          console.warn(`[EpicCommentary] ElevenLabs error on chunk ${i + 1}, falling back to OpenAI TTS: ${errMsg}`);
+          const openAISubChunks = splitTextIntoChunks(chunks[i], 3900);
+          for (let j = 0; j < openAISubChunks.length; j++) {
+            const subBuf = await generateEpicAudioChunkOpenAI(openAISubChunks[j], i * 10 + j, chunks.length * 10);
+            audioBuffers.push(subBuf);
+          }
+          continue;
+        } else {
+          throw elevenErr;
+        }
+      }
+    } else {
+      buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
+    }
     audioBuffers.push(buffer);
   }
 
@@ -508,8 +532,8 @@ serve(async (req) => {
 
     const newVersion = regenerate ? (latestVersion?.version || 0) + 1 : 1;
 
-    // All Epic audio uses OpenAI Onyx
-    const voiceIdLabel = "onyx";
+    // Voice label for record
+    const voiceIdLabel = ELEVENLABS_API_KEY ? `elevenlabs:${EPIC_ELEVENLABS_VOICE_ID}` : "onyx";
 
     // Create pending record
     const { data: record, error: insertError } = await supabaseAdmin
