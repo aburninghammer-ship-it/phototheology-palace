@@ -220,6 +220,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "research",
+          query: userMsg,
           question: userMsg,
           conversationHistory: updatedHistory,
           systemInstructions: SYSTEM_INSTRUCTIONS,
