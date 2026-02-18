@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Swords, Send, Loader2, RotateCcw, ArrowRight, Trophy, ChevronRight } from "lucide-react";
+import { Shield, Swords, Send, Loader2, RotateCcw, ArrowRight, Trophy, ChevronRight, Volume2, Mic } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
+import { VoiceInput } from "@/components/analyze/VoiceInput";
 import {
   DEFENSE_OPPONENTS,
   DEFENSE_TOPICS,
@@ -47,12 +49,65 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [roundCount, setRoundCount] = useState(0);
   const [lastScore, setLastScore] = useState<number | null>(null);
 
+  // Audio state
+  const [audioMode, setAudioMode] = useState(false);
+  const [autoSpeakId, setAutoSpeakId] = useState<string | null>(null);
+
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
+
+  // Auto-speak opponent/coach messages when audio mode is on
+  useEffect(() => {
+    if (!audioMode) return;
+    const lastMsg = messages[messages.length - 1];
+    if (!lastMsg) return;
+    if (lastMsg.role !== "opponent" && lastMsg.role !== "coach") return;
+    // Only auto-speak new messages we haven't spoken yet
+    if (lastMsg.id === autoSpeakId) return;
+    setAutoSpeakId(lastMsg.id);
+    // Trigger cloud TTS via the text-to-speech edge function
+    autoSpeak(lastMsg.content);
+  }, [messages, audioMode]);
+
+  const autoSpeak = useCallback(async (text: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("text-to-speech", {
+        body: { text, voice: "onyx", returnType: "url" },
+      });
+      if (error || !data) {
+        // Fallback to browser TTS
+        if ("speechSynthesis" in window) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "en-US";
+          speechSynthesis.speak(utterance);
+        }
+        return;
+      }
+      const audioSrc = data.audioUrl
+        ? await fetch(data.audioUrl).then((r) => r.ok ? URL.createObjectURL(r.blob()) : data.audioUrl).catch(() => data.audioUrl)
+        : `data:audio/mpeg;base64,${data.audioContent}`;
+      const audio = new Audio(audioSrc as string);
+      audio.volume = 0.9;
+      await audio.play().catch(() => {
+        // Autoplay blocked — fallback to browser TTS
+        if ("speechSynthesis" in window) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "en-US";
+          speechSynthesis.speak(utterance);
+        }
+      });
+    } catch {
+      if ("speechSynthesis" in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        speechSynthesis.speak(utterance);
+      }
+    }
+  }, []);
 
   const addMessage = (msg: Omit<ChatMessage, "id" | "timestamp">) => {
     setMessages((prev) => [
@@ -231,6 +286,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   };
 
   const resetMatch = () => {
+    // Stop any playing audio
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
     setPhase("setup");
     setMessages([]);
     setSelectedOpponent(null);
@@ -239,7 +296,16 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     setUserInput("");
     setRoundCount(0);
     setLastScore(null);
+    setAutoSpeakId(null);
   };
+
+  // Handle voice transcript — append to current input
+  const handleVoiceTranscript = useCallback((text: string) => {
+    setUserInput((prev) => {
+      const separator = prev.trim() ? " " : "";
+      return prev + separator + text;
+    });
+  }, []);
 
   // Check if the last disciple message is long enough for coaching
   const lastDiscipleMsg = messages.filter((m) => m.role === "disciple").pop();
@@ -382,6 +448,29 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </p>
         </div>
 
+        {/* Audio Mode Toggle */}
+        <div className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-black/5">
+          <div className="flex items-center gap-2">
+            <Volume2 className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <p className="text-sm font-medium">Voice Mode</p>
+              <p className="text-xs text-muted-foreground">AI speaks aloud, respond with your mic</p>
+            </div>
+          </div>
+          <Button
+            variant={audioMode ? "default" : "outline"}
+            size="sm"
+            onClick={() => setAudioMode(!audioMode)}
+            className={audioMode ? "bg-purple-600 hover:bg-purple-700" : ""}
+          >
+            {audioMode ? (
+              <><Mic className="h-4 w-4 mr-1" /> On</>
+            ) : (
+              "Off"
+            )}
+          </Button>
+        </div>
+
         {/* Begin Button */}
         <Button
           size="lg"
@@ -413,10 +502,25 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             {selectedDifficulty}
           </Badge>
         </div>
-        <Button variant="ghost" size="sm" onClick={resetMatch}>
-          <RotateCcw className="h-4 w-4 mr-1" />
-          New Match
-        </Button>
+        <div className="flex items-center gap-1">
+          {/* Audio mode toggle in arena */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setAudioMode(!audioMode);
+              if (audioMode && "speechSynthesis" in window) speechSynthesis.cancel();
+            }}
+            className={audioMode ? "text-purple-400" : "text-muted-foreground"}
+            title={audioMode ? "Voice Mode On" : "Voice Mode Off"}
+          >
+            {audioMode ? <Volume2 className="h-4 w-4" /> : <Volume2 className="h-4 w-4 opacity-40" />}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={resetMatch}>
+            <RotateCcw className="h-4 w-4 mr-1" />
+            New Match
+          </Button>
+        </div>
       </div>
 
       {/* Phase Indicator */}
@@ -480,9 +584,17 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                   >
                     <div className="flex items-center gap-1.5 mb-1">
                       {msg.role === "opponent" && (
-                        <span className="text-xs font-semibold text-red-400">
-                          {selectedOpponent?.emoji} {selectedOpponent?.name}
-                        </span>
+                        <>
+                          <span className="text-xs font-semibold text-red-400">
+                            {selectedOpponent?.emoji} {selectedOpponent?.name}
+                          </span>
+                          <QuickAudioButton
+                            text={msg.content}
+                            variant="ghost"
+                            size="icon"
+                            className="h-5 w-5 ml-auto text-red-400/60 hover:text-red-400"
+                          />
+                        </>
                       )}
                       {msg.role === "disciple" && (
                         <span className="text-xs font-semibold text-blue-400">
@@ -501,6 +613,12 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                               {msg.score}/40
                             </Badge>
                           )}
+                          <QuickAudioButton
+                            text={msg.content}
+                            variant="ghost"
+                            size="icon"
+                            className="h-5 w-5 ml-1 text-amber-400/60 hover:text-amber-400"
+                          />
                         </>
                       )}
                     </div>
@@ -531,7 +649,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       {phase === "responding" && (
         <div className="space-y-2">
           <Textarea
-            placeholder="Type your defense... (minimum 50 characters)"
+            placeholder={audioMode ? "Speak or type your defense... (minimum 50 characters)" : "Type your defense... (minimum 50 characters)"}
             className="min-h-[80px] max-h-[160px] bg-background/50"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
@@ -543,18 +661,27 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             }}
           />
           <div className="flex items-center justify-between">
-            <span className={`text-xs ${userInput.trim().length >= 50 ? "text-green-500" : "text-muted-foreground"}`}>
-              {userInput.trim().length}/50 min characters
-            </span>
-            <Button
-              size="sm"
-              disabled={userInput.trim().length < 50}
-              onClick={submitDefense}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Send className="h-4 w-4 mr-1" />
-              Submit Defense
-            </Button>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs ${userInput.trim().length >= 50 ? "text-green-500" : "text-muted-foreground"}`}>
+                {userInput.trim().length}/50 min characters
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {/* Voice Input — always available */}
+              <VoiceInput
+                onTranscript={handleVoiceTranscript}
+                variant="icon"
+              />
+              <Button
+                size="sm"
+                disabled={userInput.trim().length < 50}
+                onClick={submitDefense}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Send className="h-4 w-4 mr-1" />
+                Submit Defense
+              </Button>
+            </div>
           </div>
         </div>
       )}
