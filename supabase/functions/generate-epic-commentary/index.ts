@@ -14,7 +14,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 // ElevenLabs "William" voice — deep, engaging storyteller
-const EPIC_ELEVENLABS_VOICE_ID = "fjnwTZkKtQOJaYzGLa6n";
+const EPIC_ELEVENLABS_VOICE_ID = "bIHbv24MWmeRgasZH58o";
 
 const THEOLOGICAL_GUARDRAILS = `
 MANDATORY THEOLOGICAL GUARDRAILS — violations will be treated as critical errors:
