@@ -1,5 +1,6 @@
 /**
- * useAudioMixer - Mix speech audio with background music using Web Audio API
+ * useAudioMixer - Mix one or more speech tracks (concatenated) with one or
+ * more music tracks (chained to cover full speech length) using Web Audio API.
  */
 
 import { useState } from 'react';
@@ -48,83 +49,119 @@ function encodeWav(buffer: AudioBuffer): Blob {
   return new Blob([arrayBuffer], { type: 'audio/wav' });
 }
 
+/** Concatenate multiple AudioBuffers into one, normalising to the same sample rate / channel count */
+function concatBuffers(buffers: AudioBuffer[], sampleRate: number, numChannels: number): AudioBuffer {
+  const totalLength = buffers.reduce((sum, b) => sum + b.length, 0);
+  const result = new AudioContext().createBuffer(numChannels, totalLength, sampleRate);
+
+  let offset = 0;
+  for (const buf of buffers) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      const srcCh = ch < buf.numberOfChannels ? buf.getChannelData(ch) : new Float32Array(buf.length);
+      result.getChannelData(ch).set(srcCh, offset);
+    }
+    offset += buf.length;
+  }
+  return result;
+}
+
 export function useAudioMixer() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Mix one or more speech URLs (concatenated in order) with one or more
+   * music URLs (chained to cover the full speech length) and return a WAV blob.
+   *
+   * @param speechUrls  Single URL or array of speech audio URLs (max 5 for Epic)
+   * @param musicUrls   Single URL or array of music track URLs to chain in sequence
+   * @param musicVolume 0–1 gain for the music layer
+   * @param _filename   Target filename (unused here, returned to caller)
+   */
   const mixAndDownload = async (
-    speechUrl: string,
-    musicUrl: string,
+    speechUrls: string | string[],
+    musicUrls: string | string[],
     musicVolume: number,
     _filename: string
   ): Promise<Blob | null> => {
+    const speechList = Array.isArray(speechUrls)
+      ? speechUrls.filter(Boolean)
+      : speechUrls ? [speechUrls] : [];
+    const musicList = Array.isArray(musicUrls)
+      ? musicUrls.filter(Boolean)
+      : musicUrls ? [musicUrls] : [];
+
+    if (speechList.length === 0) {
+      setError('No speech audio provided');
+      return null;
+    }
+
     setIsProcessing(true);
     setError(null);
     setProgress(0);
 
     try {
-      // No music — just fetch and return speech blob
-      if (!musicUrl) {
-        setProgress(20);
-        const response = await fetch(speechUrl);
-        if (!response.ok) throw new Error('Failed to fetch audio');
-        const blob = await response.blob();
+      // ── Fetch all speech files ────────────────────────────────────────────
+      setProgress(5);
+      const speechResponses = await Promise.all(speechList.map(url => fetch(url)));
+      for (const r of speechResponses) {
+        if (!r.ok) throw new Error(`Failed to fetch speech audio: ${r.url}`);
+      }
+      setProgress(15);
+
+      const speechArrayBuffers = await Promise.all(speechResponses.map(r => r.arrayBuffer()));
+      setProgress(25);
+
+      // ── Decode speech audio ───────────────────────────────────────────────
+      const decodeCtx = new AudioContext();
+      const speechBuffers = await Promise.all(
+        speechArrayBuffers.map(ab => decodeCtx.decodeAudioData(ab.slice(0)))
+      );
+      await decodeCtx.close();
+      setProgress(35);
+
+      // Normalise to highest channel count / sample rate among speech tracks
+      const sampleRate = Math.max(...speechBuffers.map(b => b.sampleRate));
+      const numChannels = Math.max(Math.max(...speechBuffers.map(b => b.numberOfChannels)), 2);
+
+      // Concatenate speech if multiple chapters
+      const speechBuffer = speechBuffers.length === 1
+        ? speechBuffers[0]
+        : concatBuffers(speechBuffers, sampleRate, numChannels);
+      setProgress(45);
+
+      // ── No music branch ───────────────────────────────────────────────────
+      if (musicList.length === 0) {
+        const wavBlob = encodeWav(speechBuffer);
         setProgress(100);
         setIsProcessing(false);
-        return blob;
+        return wavBlob;
       }
 
-      // Fetch both audio files
-      setProgress(10);
-      const [speechResponse, musicResponse] = await Promise.all([
-        fetch(speechUrl),
-        fetch(musicUrl),
-      ]);
-
-      if (!speechResponse.ok) throw new Error('Failed to fetch speech audio');
-      if (!musicResponse.ok) throw new Error('Failed to fetch music audio');
-
-      setProgress(30);
-      const [speechArrayBuffer, musicArrayBuffer] = await Promise.all([
-        speechResponse.arrayBuffer(),
-        musicResponse.arrayBuffer(),
-      ]);
-
-      // Decode audio buffers
-      setProgress(40);
-      const audioCtx = new AudioContext();
-      const [speechBuffer, musicBuffer] = await Promise.all([
-        audioCtx.decodeAudioData(speechArrayBuffer),
-        audioCtx.decodeAudioData(musicArrayBuffer),
-      ]);
-      await audioCtx.close();
-
-      // Create offline context with extra tail for fade-out
+      // ── Fetch all music files ─────────────────────────────────────────────
       setProgress(50);
-      const sampleRate = speechBuffer.sampleRate;
-      const numChannels = Math.max(speechBuffer.numberOfChannels, 2);
-      const fadeOutDuration = 3; // seconds of fade-out tail
+      const musicResponses = await Promise.all(musicList.map(url => fetch(url)));
+      for (const r of musicResponses) {
+        if (!r.ok) throw new Error(`Failed to fetch music audio: ${r.url}`);
+      }
+
+      const musicArrayBuffers = await Promise.all(musicResponses.map(r => r.arrayBuffer()));
+      setProgress(58);
+
+      const decodeCtx2 = new AudioContext();
+      const musicBuffers = await Promise.all(
+        musicArrayBuffers.map(ab => decodeCtx2.decodeAudioData(ab.slice(0)))
+      );
+      await decodeCtx2.close();
+      setProgress(65);
+
+      // ── Build offline context ─────────────────────────────────────────────
+      const fadeOutDuration = 3;
       const totalLength = speechBuffer.length + Math.floor(fadeOutDuration * sampleRate);
       const offlineCtx = new OfflineAudioContext(numChannels, totalLength, sampleRate);
 
-      // Crossfade the music buffer for seamless looping
-      const crossfadeSamples = Math.min(Math.floor(sampleRate * 2), Math.floor(musicBuffer.length / 4));
-      const crossfadedMusic = offlineCtx.createBuffer(musicBuffer.numberOfChannels, musicBuffer.length, sampleRate);
-      for (let ch = 0; ch < musicBuffer.numberOfChannels; ch++) {
-        const src = musicBuffer.getChannelData(ch);
-        const dst = crossfadedMusic.getChannelData(ch);
-        dst.set(src);
-        // Blend the tail into the head for seamless loop points
-        for (let i = 0; i < crossfadeSamples; i++) {
-          const t = i / crossfadeSamples; // 0→1
-          const tailIdx = musicBuffer.length - crossfadeSamples + i;
-          dst[i] = src[i] * t + src[tailIdx] * (1 - t);
-          dst[tailIdx] = src[tailIdx] * t + src[i] * (1 - t);
-        }
-      }
-
-      // Speech source — gentle fade-out in last 0.5s to avoid abrupt ending
+      // ── Speech source ─────────────────────────────────────────────────────
       const speechSource = offlineCtx.createBufferSource();
       speechSource.buffer = speechBuffer;
       const speechGain = offlineCtx.createGain();
@@ -134,31 +171,72 @@ export function useAudioMixer() {
       speechGain.gain.linearRampToValueAtTime(0, speechEnd);
       speechSource.connect(speechGain);
       speechGain.connect(offlineCtx.destination);
-
-      // Music source with crossfaded buffer, looping, and fade-out at end
-      const musicSource = offlineCtx.createBufferSource();
-      musicSource.buffer = crossfadedMusic;
-      musicSource.loop = true;
-      const musicGain = offlineCtx.createGain();
-      musicGain.gain.setValueAtTime(musicVolume, 0);
-      // Start fading music out when speech ends
-      musicGain.gain.setValueAtTime(musicVolume, speechEnd);
-      musicGain.gain.linearRampToValueAtTime(0, speechEnd + fadeOutDuration);
-      musicSource.connect(musicGain);
-      musicGain.connect(offlineCtx.destination);
-
-      // Start both sources
       speechSource.start(0);
-      musicSource.start(0);
 
-      // Render
-      setProgress(60);
+      // ── Music source(s) — chained to cover the full speech length ─────────
+      // We schedule each music track back-to-back; the last one loops until
+      // the speech ends, then all fade out together.
+      const crossfadeTime = 1.5; // seconds cross-fade between songs
+
+      let musicOffset = 0;
+      for (let mi = 0; mi < musicBuffers.length; mi++) {
+        const mb = musicBuffers[mi];
+        const isLast = mi === musicBuffers.length - 1;
+
+        // Apply crossfade within the buffer for seamless looping
+        const crossfadeSamples = Math.min(
+          Math.floor(sampleRate * 2),
+          Math.floor(mb.length / 4)
+        );
+        const xfadedBuf = offlineCtx.createBuffer(mb.numberOfChannels, mb.length, sampleRate);
+        for (let ch = 0; ch < mb.numberOfChannels; ch++) {
+          const src = mb.getChannelData(ch);
+          const dst = xfadedBuf.getChannelData(ch);
+          dst.set(src);
+          for (let i = 0; i < crossfadeSamples; i++) {
+            const t = i / crossfadeSamples;
+            const tailIdx = mb.length - crossfadeSamples + i;
+            dst[i] = src[i] * t + src[tailIdx] * (1 - t);
+            dst[tailIdx] = src[tailIdx] * t + src[i] * (1 - t);
+          }
+        }
+
+        const musicSrc = offlineCtx.createBufferSource();
+        musicSrc.buffer = xfadedBuf;
+        musicSrc.loop = isLast; // only the last track loops to fill remaining time
+
+        const musicGainNode = offlineCtx.createGain();
+
+        // Fade-in: crossfade from previous track (or from silence at start)
+        const fadeInStart = mi === 0 ? 0 : musicOffset - crossfadeTime;
+        musicGainNode.gain.setValueAtTime(mi === 0 ? musicVolume : 0, Math.max(0, fadeInStart));
+        if (mi > 0) {
+          musicGainNode.gain.linearRampToValueAtTime(musicVolume, musicOffset);
+        }
+
+        // Fade-out when speech ends
+        musicGainNode.gain.setValueAtTime(musicVolume, speechEnd);
+        musicGainNode.gain.linearRampToValueAtTime(0, speechEnd + fadeOutDuration);
+
+        musicSrc.connect(musicGainNode);
+        musicGainNode.connect(offlineCtx.destination);
+
+        const startAt = Math.max(0, musicOffset - (mi === 0 ? 0 : crossfadeTime));
+        musicSrc.start(startAt);
+
+        musicOffset += mb.duration;
+
+        // If we've covered enough time for speech and this isn't the last track, stop
+        if (!isLast && musicOffset >= speechEnd + fadeOutDuration) break;
+      }
+
+      setProgress(75);
+
+      // ── Render ────────────────────────────────────────────────────────────
       const renderedBuffer = await offlineCtx.startRendering();
+      setProgress(88);
 
-      // Encode as WAV
-      setProgress(80);
       const wavBlob = encodeWav(renderedBuffer);
-
       setProgress(100);
       setIsProcessing(false);
       return wavBlob;

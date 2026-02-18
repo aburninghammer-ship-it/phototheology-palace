@@ -1556,6 +1556,7 @@ export default function AudioBible() {
         epicAudioUrl={epicAudioUrl}
         book={epicNowPlayingBook || selectedBook}
         chapter={epicNowPlayingChapter || selectedChapter}
+        queue={epicQueueRef.current.map((q) => ({ book: q.book, chapter: q.chapter }))}
       />
     </div>
   );
