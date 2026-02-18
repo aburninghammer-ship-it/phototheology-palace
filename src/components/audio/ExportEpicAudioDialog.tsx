@@ -109,21 +109,41 @@ export const ExportEpicAudioDialog = ({
 
   // ── Fetch audio URL for a chapter that doesn't have one yet ─────────────
   const resolveAudioUrl = async (ch: EpicChapter): Promise<string> => {
-    if (ch.audioUrl) return ch.audioUrl;
-    // Look up cached storage path from database
-    const { data } = await (supabase as any)
-      .from("epic_commentaries")
+    // If we already have a full URL, use it directly
+    if (ch.audioUrl && ch.audioUrl.startsWith("http")) return ch.audioUrl;
+
+    // Look up cached storage path from epic_commentaries
+    const { data, error } = await supabase
+      .from("epic_commentaries" as any)
       .select("audio_storage_path")
       .eq("book", ch.book)
       .eq("chapter", ch.chapter)
       .eq("status", "ready")
+      .maybeSingle() as unknown as { data: { audio_storage_path: string } | null; error: unknown };
+
+    if (!error && data?.audio_storage_path) {
+      const { data: urlData } = supabase.storage
+        .from("epic-audio")
+        .getPublicUrl(data.audio_storage_path);
+      if (urlData?.publicUrl) return urlData.publicUrl;
+    }
+
+    // Fallback: check chapter_commentary_cache table
+    const { data: cached } = await supabase
+      .from("chapter_commentary_cache")
+      .select("audio_storage_path")
+      .eq("book", ch.book)
+      .eq("chapter", ch.chapter)
       .maybeSingle();
-    if (!data?.audio_storage_path) return "";
-    // Construct public URL from storage path
-    const { data: urlData } = supabase.storage
-      .from("epic-audio")
-      .getPublicUrl(data.audio_storage_path);
-    return urlData?.publicUrl || "";
+
+    if (cached?.audio_storage_path) {
+      const { data: urlData } = supabase.storage
+        .from("epic-audio")
+        .getPublicUrl(cached.audio_storage_path);
+      if (urlData?.publicUrl) return urlData.publicUrl;
+    }
+
+    return "";
   };
 
   // ── Export ───────────────────────────────────────────────────────────────
