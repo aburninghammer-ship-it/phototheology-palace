@@ -324,7 +324,8 @@ async function generateEpicAudio(
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
   const useElevenLabs = !!ELEVENLABS_API_KEY;
   const processedText = addPauseMarkers(text);
-  const chunks = splitTextIntoChunks(processedText, useElevenLabs ? 5000 : 4000);
+  // OpenAI TTS hard limit is 4096 chars — use 3900 to be safe; ElevenLabs supports 5000
+  const chunks = splitTextIntoChunks(processedText, useElevenLabs ? 5000 : 3900);
   console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? "ElevenLabs (William)" : "OpenAI (fable)"}`);
 
   const audioBuffers: ArrayBuffer[] = [];
@@ -343,7 +344,13 @@ async function generateEpicAudio(
         // If quota exceeded or any ElevenLabs error, fall back to OpenAI TTS
         if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429")) {
           console.warn(`[EpicCommentary] ElevenLabs quota/auth error on chunk ${i + 1}, falling back to OpenAI TTS: ${errMsg}`);
-          buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
+          // OpenAI TTS has a 4096 char limit — re-chunk if the ElevenLabs chunk is too large
+          const openAISubChunks = splitTextIntoChunks(chunks[i], 3900);
+          for (let j = 0; j < openAISubChunks.length; j++) {
+            const subBuf = await generateEpicAudioChunkOpenAI(openAISubChunks[j], i * 10 + j, chunks.length * 10);
+            audioBuffers.push(subBuf);
+          }
+          continue; // skip the audioBuffers.push(buffer) below
         } else {
           throw elevenErr;
         }
