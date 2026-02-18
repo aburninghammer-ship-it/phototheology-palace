@@ -59,29 +59,22 @@ const QUICK_ACTIONS: QuickAction[] = [
   { label: "Show connections", icon: Link2, prefix: "Show me the thematic and textual connections between ", color: "text-indigo-400 border-indigo-500/40 hover:bg-indigo-500/10" },
 ];
 
-const SYSTEM_INSTRUCTIONS = `You are the Research Assistant for Phototheology Palace. Your #1 rule is: ANSWER EXACTLY WHAT IS ASKED — nothing more.
+const SYSTEM_INSTRUCTIONS = `You are a Bible research assistant. Answer EXACTLY what was asked — nothing more.
 
-CRITICAL — CONCISE BY DEFAULT:
-- If the user asks "Show me verses about X", respond with a LIST OF VERSES. Do NOT add commentary, theological analysis, historical context, or essays unless the user explicitly asks for it.
-- If the user asks "How many times is word X used?", give the COUNT and the list. That's it.
-- If the user asks "What's the Greek word for X?", give the word, transliteration, Strong's number, and meaning. Done.
-- NEVER dump walls of text, numbered sections, or multi-page essays for simple lookup questions.
-- Keep answers SHORT and DIRECT. The user can always ask follow-up questions if they want more depth.
-- Only give deep analysis, historical context, theological perspectives, or commentary when the user explicitly requests a "deep dive", "explain", "what does this mean", or similar.
+STRICT RULES — match your response length to the question:
+- Simple lookup ("Where does Jeremiah say X?", "Where is the verse about X?", "What verse talks about Y?") → Give the reference and quote the FULL verse text. Short answer only. No intro, no sections, no essays.
+- "List verses about X" → List the verses with full text. No intro, no history, no commentary sections.
+- "How many times is X used?" → Give the count and list the occurrences. Nothing else.
+- "Greek/Hebrew word for X?" → Give the word, transliteration, Strong's number, and meaning. Done.
+- "What do commentaries say?" → Present views labeled by source. No padding.
+- Deep analysis ONLY when user explicitly says: "deep dive", "explain fully", "full study", "give me analysis", "scholarly brief".
 
-FORMATTING RULES:
-1. AUTO-PASTE VERSES: When listing verses, ALWAYS quote the full text. Format each verse like:
-   **Genesis 1:1** — "In the beginning God created the heaven and the earth."
-2. FOLLOW-UP SUGGESTIONS: After your answer, end with "Suggested follow-ups:" containing 2-3 short numbered questions.
-3. CLARIFYING QUESTIONS: If a query is genuinely ambiguous, ask 1 brief clarifying question. Do NOT over-clarify obvious requests.
+ABSOLUTELY FORBIDDEN unless user explicitly requests it: introductions, "Overview" sections, "Biblical Foundation" sections, "Historical Context" sections, "Theological Perspectives" sections, "Practical Applications" sections, multi-page numbered outlines (1. 2. 3. etc.), repeating the user's name, flattery ("great question!", "fantastic!", "this is fascinating"), or ANY filler padding of any kind.
 
-WHEN DEEP DETAIL IS REQUESTED:
-- Word studies: transliteration, Strong's number, root meaning, usage across passages.
-- Commentary views: present multiple viewpoints fairly, label each source/tradition.
-- Connections: structured analysis of thematic parallels, typological links, cross-references. Give analytical feedback on strength of each connection.
-- Denominational views: present each tradition's view fairly and clearly labeled.
+VERSE FORMAT — always quote the full text inline:
+**Jeremiah 31:31** — "Behold, the days come, saith the LORD, that I will make a new covenant with the house of Israel, and with the house of Judah."
 
-Remember: the user is a researcher who wants precise answers. Respect their time. Answer the question, paste the verses, suggest follow-ups. Stop.`;
+END every answer with 2-3 short "Suggested follow-ups:" questions.`;
 
 // Format response content: bold headers, verse highlights, etc.
 function formatContent(text: string) {
@@ -106,38 +99,68 @@ function formatContent(text: string) {
     const verseMatch = line.match(/^\*\*([^*]+)\*\*\s*[-—]\s*["""](.+)["""]?\s*$/);
     if (verseMatch) {
       parts.push(
-        <div
-          key={key}
-          className="my-1.5 rounded-md bg-emerald-900/30 border-l-2 border-emerald-400/60 px-3 py-2"
-        >
-          <span className="font-semibold text-emerald-300 text-xs">{verseMatch[1]}</span>
-          <p className="text-foreground/90 italic text-[13px] mt-0.5">"{verseMatch[2].replace(/[""]$/, "")}"</p>
+        <div key={key} className="my-2 pl-3 border-l-2 border-emerald-500/40 bg-emerald-500/5 rounded-r py-1">
+          <span className="font-semibold text-emerald-400 text-[12px]">{verseMatch[1]}</span>
+          <span className="text-foreground/80 text-[13px]"> — </span>
+          <span className="italic text-foreground/90 text-[13px]">"{verseMatch[2]}"</span>
         </div>
       );
       return;
     }
 
-    // Inline bold
-    const boldParts = line.split(/(\*\*[^*]+\*\*)/g);
-    const rendered = boldParts.map((part, i) => {
-      if (part.startsWith("**") && part.endsWith("**")) {
-        return (
-          <span key={i} className="font-semibold text-foreground">
-            {part.slice(2, -2)}
-          </span>
-        );
-      }
-      return part;
-    });
+    // Bullet points
+    if (line.trim().startsWith("- ") || line.trim().startsWith("• ")) {
+      const content = line.trim().slice(2);
+      parts.push(
+        <div key={key} className="flex gap-2 my-0.5">
+          <span className="text-emerald-400/60 mt-1 text-[10px]">◆</span>
+          <span className="text-[13px] text-foreground/85">{renderInlineBold(content)}</span>
+        </div>
+      );
+      return;
+    }
 
+    // Numbered list
+    const numMatch = line.match(/^(\d+)\.\s+(.+)/);
+    if (numMatch) {
+      parts.push(
+        <div key={key} className="flex gap-2 my-0.5">
+          <span className="text-emerald-400/70 text-[12px] font-mono w-4 shrink-0">{numMatch[1]}.</span>
+          <span className="text-[13px] text-foreground/85">{renderInlineBold(numMatch[2])}</span>
+        </div>
+      );
+      return;
+    }
+
+    // Empty lines
+    if (!line.trim()) {
+      parts.push(<div key={key} className="h-1.5" />);
+      return;
+    }
+
+    // Regular text with inline bold
     parts.push(
-      <div key={key} className={line.trim() === "" ? "h-2" : ""}>
-        {rendered}
+      <div key={key} className="text-[13px] text-foreground/85 leading-relaxed">
+        {renderInlineBold(line)}
       </div>
     );
   });
 
-  return <>{parts}</>;
+  return parts;
+}
+
+function renderInlineBold(text: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <span key={i} className="font-semibold text-foreground">
+          {part.slice(2, -2)}
+        </span>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
 }
 
 interface ResearchAssistantWidgetProps {
@@ -145,176 +168,103 @@ interface ResearchAssistantWidgetProps {
 }
 
 export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAssistantWidgetProps) {
-  const isMobile = useIsMobile();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [conversationHistory, setConversationHistory] = useState<Array<{ role: string; content: string }>>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionName, setSessionName] = useState("");
+  const [showQuickActions, setShowQuickActions] = useState(true);
+  const [sessionName, setSessionName] = useState("Research Session");
   const [savedStudyId, setSavedStudyId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
-  const [conversationHistory, setConversationHistory] = useState<
-    Array<{ role: string; content: string }>
-  >([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isMobile = useIsMobile();
 
-  // Auto-scroll on new messages
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, isLoading]);
-
-  // Auto-expand when user has messages
-  useEffect(() => {
-    if (messages.length > 0 && !expanded) {
-      setExpanded(true);
-    }
-  }, [messages.length]);
+  }, [messages]);
 
   // Auto-save after each assistant reply
   useEffect(() => {
+    if (messages.length === 0) return;
     const lastMsg = messages[messages.length - 1];
     if (lastMsg?.role === "assistant" && messages.length >= 2) {
       saveSession(messages, sessionName, savedStudyId);
     }
   }, [messages.length]);
 
-  const addMessage = (
-    role: "user" | "assistant",
-    content: string,
-    suggestions?: string[]
-  ): ChatMessage => {
-    const msg: ChatMessage = {
-      id: crypto.randomUUID(),
-      role,
-      content,
-      timestamp: new Date(),
-      suggestions,
-    };
-    setMessages((prev) => [...prev, msg]);
-    return msg;
-  };
-
-  const parseSuggestions = (text: string): { cleanText: string; suggestions: string[] } => {
-    const patterns = [
-      /\n\n(?:Suggested follow-ups?|Follow-up questions?|You might also explore|Next steps?|Related questions?):\s*\n([\s\S]+)$/i,
-    ];
-
-    for (const pattern of patterns) {
-      const match = text.match(pattern);
-      if (match) {
-        const suggestionsBlock = match[0];
-        const cleanText = text.slice(0, text.length - suggestionsBlock.length).trim();
-        const suggestions = suggestionsBlock
-          .split("\n")
-          .map((line) => line.replace(/^\d+\.\s*/, "").trim())
-          .filter(
-            (line) =>
-              line.length > 10 &&
-              !line.match(/^(Suggested|Follow-up|You might|Next|Related)/i)
-          );
-        if (suggestions.length >= 2) {
-          return { cleanText, suggestions };
-        }
+  const buildStudyContent = (msgs: ChatMessage[], name: string) => {
+    const lines: string[] = [`# ${name}`, `*Research session — ${new Date().toLocaleDateString()}*`, ""];
+    for (const msg of msgs) {
+      if (msg.role === "user") {
+        lines.push(`**Question:** ${msg.content}`, "");
+      } else {
+        lines.push(msg.content, "");
       }
     }
-    return { cleanText: text, suggestions: [] };
+    return lines.join("\n");
   };
 
   const sendQuery = async (query: string) => {
     if (!query.trim() || isLoading) return;
 
-    const userMsg = query.trim();
-    const userMsgObj = addMessage("user", userMsg);
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: query,
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+    setShowQuickActions(false);
 
-    const updatedHistory = [
+    const newHistory = [
       ...conversationHistory,
-      { role: "user", content: userMsg },
+      { role: "user", content: query },
     ];
 
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "research",
-          query: userMsg,
-          question: userMsg,
-          conversationHistory: updatedHistory,
+          query: query,
+          question: query,
+          conversationHistory: newHistory,
           systemInstructions: SYSTEM_INSTRUCTIONS,
         },
       });
 
       if (error) throw error;
 
-      const rawResponse =
-        data?.response || data?.content || data?.answer || "No response received.";
+      const responseText =
+        data?.response ||
+        data?.answer ||
+        (typeof data === "string" ? data : "I couldn't find an answer. Please try rephrasing.");
 
-      const { cleanText, suggestions } = parseSuggestions(rawResponse);
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: responseText,
+        timestamp: new Date(),
+      };
 
-      const assistantMsg = addMessage("assistant", cleanText, suggestions);
-      const newHistory = [
-        ...updatedHistory,
-        { role: "assistant", content: rawResponse },
-      ];
-      setConversationHistory(newHistory);
-
-      // Auto-save is triggered via useEffect watching messages
+      setMessages((prev) => [...prev, assistantMessage]);
+      setConversationHistory([
+        ...newHistory,
+        { role: "assistant", content: responseText },
+      ]);
     } catch (err) {
-      console.error("Research query error:", err);
-      addMessage(
-        "assistant",
-        "I encountered an error processing your research request. Please try again."
-      );
+      console.error("Research error:", err);
+      toast.error("Research failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendQuery(input);
-    }
-  };
-
-  const handleQuickAction = (action: QuickAction) => {
-    setExpanded(true);
-    // If the prefix contains empty quotes "" for user to fill in, place cursor there
-    const quoteIdx = action.prefix.indexOf('""');
-    if (quoteIdx !== -1) {
-      setInput(action.prefix);
-      setTimeout(() => {
-        if (textareaRef.current) {
-          textareaRef.current.focus();
-          // Place cursor between the quotes
-          textareaRef.current.setSelectionRange(quoteIdx + 1, quoteIdx + 1);
-        }
-      }, 100);
-    } else {
-      setInput(action.prefix);
-      setTimeout(() => textareaRef.current?.focus(), 100);
-    }
-  };
-
-  const handleSuggestionClick = (suggestion: string) => {
-    sendQuery(suggestion);
-  };
-
-  const buildStudyContent = (msgs: ChatMessage[], name: string) => {
-    const title = name.trim() || `Research: ${msgs[0]?.content.slice(0, 60) || "Session"}`;
-    const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    let content = `# ${title}\n\n**Date:** ${date}\n\n---\n\n`;
-    msgs.forEach((m) => {
-      content += m.role === "user"
-        ? `## ❓ Question\n\n${m.content}\n\n`
-        : `## 📖 Research Response\n\n${m.content}\n\n---\n\n`;
-    });
-    return { title, content };
   };
 
   const saveSession = useCallback(async (msgs: ChatMessage[], name: string, existingId: string | null) => {
@@ -322,20 +272,27 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { title, content } = buildStudyContent(msgs, name);
-      const tags = ["research", "jeeves"];
+
+      const content = buildStudyContent(msgs, name);
+
       if (existingId) {
-        await supabase.from("user_studies").update({ title, content, tags, updated_at: new Date().toISOString() }).eq("id", existingId);
+        await supabase
+          .from("user_studies")
+          .update({ content, title: name, updated_at: new Date().toISOString() })
+          .eq("id", existingId);
       } else {
-        const { data, error } = await supabase.from("user_studies").insert({
-          user_id: user.id, title, content, tags, category: "jeeves_response",
-        }).select("id").single();
-        if (!error && data) setSavedStudyId(data.id);
+        const { data } = await supabase
+          .from("user_studies")
+          .insert({ user_id: user.id, title: name, content, study_type: "research" })
+          .select("id")
+          .single();
+        if (data?.id) setSavedStudyId(data.id);
       }
+
       setJustSaved(true);
       setTimeout(() => setJustSaved(false), 2000);
-    } catch (e) {
-      console.error("Auto-save error:", e);
+    } catch (err) {
+      console.error("Save failed:", err);
     } finally {
       setIsSaving(false);
     }
@@ -344,303 +301,207 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
   const clearChat = () => {
     setMessages([]);
     setConversationHistory([]);
-    setInput("");
-    setSessionName("");
+    setShowQuickActions(true);
+    setSessionName("Research Session");
     setSavedStudyId(null);
+    setJustSaved(false);
   };
 
-  const handleVoiceTranscript = useCallback((text: string) => {
-    setExpanded(true);
-    setInput((prev) => {
-      const separator = prev.trim() ? " " : "";
-      return prev + separator + text;
-    });
-  }, []);
-
-  const timeLabel = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendQuery(input);
+    }
   };
 
   return (
     <Card className="overflow-hidden border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-background to-teal-500/5 shadow-lg shadow-emerald-500/5">
       {/* Header */}
       <CardHeader
-        className="cursor-pointer select-none pb-3"
-        onClick={() => setExpanded(!expanded)}
+        className="pb-3 cursor-pointer select-none"
+        onClick={() => !defaultExpanded && setIsExpanded((p) => !p)}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 shadow-lg shadow-emerald-600/30">
-                <Search className="h-5 w-5 text-white" />
-              </div>
-              <div className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 border-2 border-background animate-pulse" />
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+              <Search className="h-4 w-4 text-emerald-400" />
             </div>
             <div>
-              <CardTitle className="text-base flex items-center gap-2">
-                Research Assistant
-                <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Verses, Greek/Hebrew, commentaries, cross-references, and deep dives
-              </CardDescription>
+              <CardTitle className="text-base font-semibold">Research Assistant</CardTitle>
+              <CardDescription className="text-xs">Bible study, word studies, commentary research</CardDescription>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {messages.length > 0 && (
-              <Badge
-                variant="secondary"
-                className="text-[10px] bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-              >
-                {messages.length} msg
-              </Badge>
+              <div className="flex items-center gap-1.5">
+                {isSaving ? (
+                  <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                    <Loader2 className="h-2.5 w-2.5 animate-spin" /> Saving...
+                  </span>
+                ) : justSaved ? (
+                  <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+                    <Check className="h-2.5 w-2.5" /> Saved
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground/50">Auto-saved</span>
+                )}
+              </div>
             )}
-            <div className="p-1 rounded-md hover:bg-muted/50 transition-colors">
-              {expanded ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              )}
-            </div>
+            {!defaultExpanded && (
+              isExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            )}
           </div>
         </div>
       </CardHeader>
 
       <AnimatePresence>
-        {expanded && (
+        {(isExpanded || defaultExpanded) && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="overflow-hidden"
+            transition={{ duration: 0.2 }}
           >
-            <CardContent className="pt-0 space-y-4">
-              {/* Quick Action Chips — scrollable row on mobile, wrap on desktop */}
-              <div className={isMobile ? "overflow-x-auto -mx-4 px-4 pb-1" : ""}>
-                <div className={`flex gap-2 ${isMobile ? "min-w-max" : "flex-wrap"}`}>
-                  {QUICK_ACTIONS.map((action) => (
-                    <Badge
-                      key={action.label}
-                      variant="outline"
-                      className={`cursor-pointer py-1.5 px-3 text-[11px] transition-all whitespace-nowrap ${action.color}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleQuickAction(action);
-                      }}
-                    >
-                      <action.icon className="h-3 w-3 mr-1.5 shrink-0" />
-                      {action.label}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              {/* Chat Thread */}
-              <div
-                className={`${
-                  isMobile ? "h-[320px]" : "h-[440px]"
-                } rounded-xl border border-border/40 bg-gradient-to-b from-black/5 to-black/10 dark:from-black/10 dark:to-black/20 overflow-y-auto`}
-              >
-                <div ref={scrollRef} className="p-3 space-y-3">
-                  {/* Empty State */}
-                  {messages.length === 0 && !isLoading && (
-                    <div className="flex flex-col items-center justify-center min-h-[240px] text-center px-6">
-                      <div className="relative mb-4">
-                        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-                          <Search className="h-8 w-8 text-emerald-500/50" />
-                        </div>
-                        <div className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-amber-500/15 border border-amber-500/25">
-                          <Languages className="h-3.5 w-3.5 text-amber-400/60" />
-                        </div>
-                      </div>
-                      <p className="text-sm font-medium text-foreground/70 mb-1">
-                        What would you like to research?
-                      </p>
-                      <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
-                        Ask about word counts, Greek/Hebrew meanings, commentary views,
-                        denominational beliefs, cross-references, or any Bible topic.
-                        I'll quote verses in full and suggest follow-ups.
-                      </p>
-                    </div>
-                  )}
-
-                  <AnimatePresence>
-                    {messages.map((msg) => (
-                      <motion.div
-                        key={msg.id}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className={`flex ${
-                          msg.role === "user" ? "justify-end" : "justify-start"
-                        }`}
-                      >
-                        <div
-                          className={`max-w-[88%] rounded-xl text-sm ${
-                            msg.role === "user"
-                              ? "bg-blue-600/20 border border-blue-500/30 p-3"
-                              : "bg-emerald-950/25 border border-emerald-600/25 p-4"
-                          }`}
-                        >
-                          {/* Message header */}
-                          <div className="flex items-center gap-1.5 mb-1.5">
-                            {msg.role === "user" ? (
-                              <>
-                                <span className="text-[11px] font-semibold text-blue-400">
-                                  You
-                                </span>
-                                <span className="text-[10px] text-blue-400/40 ml-auto">
-                                  {timeLabel(msg.timestamp)}
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <div className="p-0.5 rounded bg-emerald-500/20">
-                                  <Search className="h-2.5 w-2.5 text-emerald-400" />
-                                </div>
-                                <span className="text-[11px] font-semibold text-emerald-400">
-                                  Jeeves Research
-                                </span>
-                                <span className="text-[10px] text-emerald-400/40 ml-auto mr-1">
-                                  {timeLabel(msg.timestamp)}
-                                </span>
-                                <QuickAudioButton
-                                  text={msg.content}
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-5 w-5 text-emerald-400/50 hover:text-emerald-400"
-                                />
-                              </>
-                            )}
-                          </div>
-
-                          {/* Message body */}
-                          <div className="text-[13px] leading-relaxed text-foreground/90">
-                            {msg.role === "assistant"
-                              ? formatContent(msg.content)
-                              : msg.content}
-                          </div>
-
-                          {/* Suggested Follow-ups */}
-                          {msg.suggestions && msg.suggestions.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-emerald-500/20 space-y-1">
-                              <p className="text-[10px] font-semibold text-emerald-400/70 uppercase tracking-wider mb-1.5">
-                                Continue researching
-                              </p>
-                              {msg.suggestions.map((s, i) => (
-                                <motion.div
-                                  key={i}
-                                  initial={{ opacity: 0, x: -5 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: i * 0.1 }}
-                                >
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-start text-xs h-auto py-2 px-2.5 text-left text-emerald-300/70 hover:text-emerald-200 hover:bg-emerald-500/10 rounded-lg transition-colors"
-                                    onClick={() => handleSuggestionClick(s)}
-                                  >
-                                    <ChevronDown className="h-3 w-3 mr-1.5 rotate-[-90deg] shrink-0 text-emerald-500/50" />
-                                    <span className="line-clamp-2">{s}</span>
-                                  </Button>
-                                </motion.div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-
-                  {/* Loading indicator */}
-                  {isLoading && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex justify-start"
-                    >
-                      <div className="flex items-center gap-2.5 rounded-xl bg-emerald-950/20 border border-emerald-600/20 p-3 text-sm">
-                        <div className="flex gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "300ms" }} />
-                        </div>
-                        <span className="text-xs text-emerald-400/70">Researching...</span>
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-              </div>
-
-              {/* Session name + auto-save indicator */}
-              {messages.length > 0 && (
-                <div className="flex items-center gap-2">
+            <CardContent className="pt-0 pb-4 px-4">
+              {/* Session name + save status */}
+              {messages.length >= 2 && (
+                <div className="flex items-center gap-2 mb-3">
+                  <Save className="h-3 w-3 text-muted-foreground/50 shrink-0" />
                   <Input
                     value={sessionName}
                     onChange={(e) => setSessionName(e.target.value)}
-                    placeholder="Name this research session…"
+                    placeholder="Name this research..."
                     className="h-8 text-xs bg-background/60 border-border/50 focus:border-emerald-500/50 rounded-lg flex-1"
                     onBlur={() => {
                       if (messages.length >= 2) saveSession(messages, sessionName, savedStudyId);
                     }}
                   />
-                  <div className="flex items-center gap-1 text-[11px] shrink-0">
-                    {isSaving ? (
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Loader2 className="h-3 w-3 animate-spin" /> Saving…
-                      </span>
-                    ) : justSaved ? (
-                      <span className="flex items-center gap-1 text-emerald-400">
-                        <Check className="h-3 w-3" /> Saved
-                      </span>
-                    ) : savedStudyId ? (
-                      <span className="text-muted-foreground/60 flex items-center gap-1">
-                        <Save className="h-3 w-3" /> Auto-saved
-                      </span>
-                    ) : null}
-                  </div>
                 </div>
               )}
 
-              {/* Input Area */}
-              <div className="space-y-2">
-                <div className="relative">
-                  <Textarea
-                    ref={textareaRef}
-                    placeholder="Ask about verses, Greek words, commentaries, connections..."
-                    className="min-h-[48px] max-h-[120px] bg-background/60 border-border/60 text-sm pr-24 resize-none rounded-xl focus:border-emerald-500/50 focus:ring-emerald-500/20"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                  />
-                  <div className="absolute right-2 bottom-2 flex items-center gap-1">
-                    <VoiceInput onTranscript={handleVoiceTranscript} variant="icon" />
-                    <Button
-                      size="icon"
-                      disabled={!input.trim() || isLoading}
-                      onClick={() => sendQuery(input)}
-                      className="h-8 w-8 bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-md shadow-emerald-600/20"
-                    >
-                      <Send className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-                {messages.length > 0 && (
-                  <div className="flex justify-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearChat}
-                      className="text-[11px] text-muted-foreground/60 hover:text-muted-foreground h-6"
-                    >
-                      <Trash2 className="h-3 w-3 mr-1" />
-                      Clear conversation
-                    </Button>
-                  </div>
+              {/* Quick Actions */}
+              <AnimatePresence>
+                {showQuickActions && messages.length === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mb-4"
+                  >
+                    <p className="text-[11px] text-muted-foreground/60 mb-2 font-medium uppercase tracking-wide">Quick Research</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {QUICK_ACTIONS.map((action) => {
+                        const Icon = action.icon;
+                        return (
+                          <button
+                            key={action.label}
+                            onClick={() => setInput(action.prefix)}
+                            className={`flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${action.color}`}
+                          >
+                            <Icon className="h-3 w-3" />
+                            {action.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
                 )}
+              </AnimatePresence>
+
+              {/* Messages */}
+              {messages.length > 0 && (
+                <ScrollArea className="h-[400px] mb-4 pr-2">
+                  <div className="space-y-4">
+                    {messages.map((msg) => (
+                      <motion.div
+                        key={msg.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                      >
+                        {msg.role === "user" ? (
+                          <div className="max-w-[80%] bg-emerald-500/15 border border-emerald-500/20 rounded-2xl rounded-tr-sm px-3 py-2">
+                            <p className="text-[13px] text-foreground/90">{msg.content}</p>
+                            <p className="text-[10px] text-emerald-400/40 ml-auto mr-1 text-right mt-1">
+                              {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="max-w-[92%] bg-background/60 border border-border/40 rounded-2xl rounded-tl-sm px-4 py-3 space-y-1">
+                            <div className="flex items-center gap-1.5 mb-2">
+                              <Sparkles className="h-3 w-3 text-emerald-400" />
+                              <span className="text-[10px] text-emerald-400/70 font-medium">Research Assistant</span>
+                            </div>
+                            <div className="text-[13px] leading-relaxed text-foreground/90">
+                              {formatContent(msg.content)}
+                            </div>
+                            <div className="flex items-center justify-between mt-2 pt-1">
+                              <p className="text-[10px] text-muted-foreground/40">
+                                {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                              </p>
+                              <QuickAudioButton text={msg.content} size="sm" />
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-background/60 border border-border/40 rounded-2xl rounded-tl-sm px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-400" />
+                            <span className="text-[12px] text-muted-foreground">Searching Scripture...</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={scrollRef} />
+                  </div>
+                </ScrollArea>
+              )}
+
+              {/* Input area */}
+              <div className="relative">
+                <Textarea
+                  ref={textareaRef}
+                  placeholder="Ask about verses, Greek words, commentaries, connections..."
+                  className="min-h-[48px] max-h-[120px] bg-background/60 border-border/60 text-sm pr-24 resize-none rounded-xl focus:border-emerald-500/50 focus:ring-emerald-500/20"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={isLoading}
+                />
+                <div className="absolute right-2 bottom-2 flex items-center gap-1">
+                  <VoiceInput onTranscript={(t) => setInput((prev) => prev + t)} />
+                  <Button
+                    size="icon"
+                    className="h-8 w-8 bg-emerald-500 hover:bg-emerald-600 rounded-lg"
+                    onClick={() => sendQuery(input)}
+                    disabled={isLoading || !input.trim()}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Send className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                </div>
               </div>
+
+              {/* Clear button */}
+              {messages.length > 0 && (
+                <div className="flex justify-end mt-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearChat}
+                    className="text-[11px] text-muted-foreground/60 hover:text-muted-foreground h-6"
+                  >
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    Clear chat
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </motion.div>
         )}
