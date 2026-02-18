@@ -8,6 +8,8 @@ const corsHeaders = {
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
+const AZURE_TTS_KEY = Deno.env.get("AZURE_TTS_KEY");
+const AZURE_TTS_REGION = Deno.env.get("AZURE_TTS_REGION") || "eastus";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -361,6 +363,41 @@ async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, to
 }
 
 /**
+ * Azure Neural TTS — supports "Guy" and "Davis" voices among others.
+ * voice: e.g. "en-US-GuyNeural" or "en-US-DavisNeural"
+ */
+async function generateEpicAudioChunkAzure(text: string, voiceName: string, chunkIndex: number, totalChunks: number): Promise<ArrayBuffer> {
+  if (!AZURE_TTS_KEY) throw new Error("AZURE_TTS_KEY is not configured");
+
+  const ssml = `<speak version='1.0' xml:lang='en-US'>
+    <voice xml:lang='en-US' name='${voiceName}'>
+      <prosody rate='-5%' pitch='-2%'>${text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</prosody>
+    </voice>
+  </speak>`;
+
+  const ttsResponse = await fetch(
+    `https://${AZURE_TTS_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`,
+    {
+      method: "POST",
+      headers: {
+        "Ocp-Apim-Subscription-Key": AZURE_TTS_KEY,
+        "Content-Type": "application/ssml+xml",
+        "X-Microsoft-OutputFormat": "audio-48khz-96kbitrate-mono-mp3",
+        "User-Agent": "PhototheologyPalace",
+      },
+      body: ssml,
+    },
+  );
+
+  if (!ttsResponse.ok) {
+    const err = await ttsResponse.text();
+    throw new Error(`Azure TTS error (chunk ${chunkIndex + 1}/${totalChunks}): ${ttsResponse.status} - ${err}`);
+  }
+
+  return ttsResponse.arrayBuffer();
+}
+
+/**
  * Add natural pause cues to text before sending to TTS.
  * Inserts ellipsis at paragraph breaks so the voice engine pauses between sections.
  */
@@ -378,17 +415,33 @@ async function generateEpicAudio(
   chapter: number,
   supabaseAdmin: any,
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
-  const useElevenLabs = !!ELEVENLABS_API_KEY;
+  // Azure voice routing: test Guy on Genesis 4, Davis on Genesis 5
+  const isGenesis4 = book.toLowerCase() === "genesis" && chapter === 4;
+  const isGenesis5 = book.toLowerCase() === "genesis" && chapter === 5;
+  const useAzure = AZURE_TTS_KEY && (isGenesis4 || isGenesis5);
+  const azureVoice = isGenesis4 ? "en-US-GuyNeural" : "en-US-DavisNeural";
+
+  const useElevenLabs = !useAzure && !!ELEVENLABS_API_KEY;
   const processedText = addPauseMarkers(text);
-  // OpenAI TTS hard limit is 4096 chars — use 3900 to be safe; ElevenLabs supports 5000
-  const chunks = splitTextIntoChunks(processedText, useElevenLabs ? 5000 : 3900);
-  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? "ElevenLabs (William)" : "OpenAI (onyx)"}`);
+  // Azure/OpenAI TTS hard limit ~3900 chars; ElevenLabs supports 5000
+  const chunkSize = useElevenLabs ? 5000 : 3900;
+  const chunks = splitTextIntoChunks(processedText, chunkSize);
+
+  const providerLabel = useAzure
+    ? `Azure (${azureVoice})`
+    : useElevenLabs
+    ? "ElevenLabs (William)"
+    : "OpenAI (onyx)";
+  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${providerLabel}`);
 
   const audioBuffers: ArrayBuffer[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
     let buffer: ArrayBuffer;
-    if (useElevenLabs) {
+
+    if (useAzure) {
+      buffer = await generateEpicAudioChunkAzure(chunks[i], azureVoice, i, chunks.length);
+    } else if (useElevenLabs) {
       try {
         buffer = await generateEpicAudioChunkElevenLabs(
           chunks[i], i, chunks.length,
@@ -397,16 +450,14 @@ async function generateEpicAudio(
         );
       } catch (elevenErr) {
         const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
-        // If quota exceeded or any ElevenLabs error, fall back to OpenAI TTS
         if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429")) {
           console.warn(`[EpicCommentary] ElevenLabs quota/auth error on chunk ${i + 1}, falling back to OpenAI TTS: ${errMsg}`);
-          // OpenAI TTS has a 4096 char limit — re-chunk if the ElevenLabs chunk is too large
           const openAISubChunks = splitTextIntoChunks(chunks[i], 3900);
           for (let j = 0; j < openAISubChunks.length; j++) {
             const subBuf = await generateEpicAudioChunkOpenAI(openAISubChunks[j], i * 10 + j, chunks.length * 10);
             audioBuffers.push(subBuf);
           }
-          continue; // skip the audioBuffers.push(buffer) below
+          continue;
         } else {
           throw elevenErr;
         }
@@ -495,6 +546,16 @@ serve(async (req) => {
 
     const newVersion = regenerate ? (latestVersion?.version || 0) + 1 : 1;
 
+    // Determine voice label for record
+    const isGenesis4 = book.toLowerCase() === "genesis" && effectiveChapter === 4;
+    const isGenesis5 = book.toLowerCase() === "genesis" && effectiveChapter === 5;
+    const useAzureForRecord = AZURE_TTS_KEY && (isGenesis4 || isGenesis5);
+    const voiceIdLabel = useAzureForRecord
+      ? (isGenesis4 ? "azure:en-US-GuyNeural" : "azure:en-US-DavisNeural")
+      : ELEVENLABS_API_KEY
+      ? `elevenlabs:${EPIC_ELEVENLABS_VOICE_ID}`
+      : "onyx";
+
     // Create pending record
     const { data: record, error: insertError } = await supabaseAdmin
       .from("epic_commentaries")
@@ -504,7 +565,7 @@ serve(async (req) => {
         version: newVersion,
         status: "generating",
         commentary_text: "",
-        voice_id: ELEVENLABS_API_KEY ? `elevenlabs:${EPIC_ELEVENLABS_VOICE_ID}` : "onyx",
+        voice_id: voiceIdLabel,
       }, { onConflict: "book,chapter,version" })
       .select()
       .single();
