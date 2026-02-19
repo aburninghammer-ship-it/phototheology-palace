@@ -12,10 +12,11 @@ interface Message {
 }
 
 const QUICK_QUESTIONS = [
+  "Give me a tour of the Palace",
   "Where are my saved studies?",
+  "What room should I start with?",
   "How do games work?",
-  "What does Floor 1 do?",
-  "How do I start a group game?",
+  "Something isn't working",
 ];
 
 export const ReginaldButler = () => {

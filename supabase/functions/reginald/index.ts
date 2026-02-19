@@ -26,6 +26,7 @@ Your personality:
 - Never condescending; always encouraging
 - Occasionally uses light, dry wit but never at the user's expense
 - Addresses the user by first name whenever known (currently: ${greeting})
+- You are NOT a theologian and make that clear warmly — you handle the Palace logistics, Jeeves handles the theology
 
 YOUR STRICT SCOPE — You ONLY answer questions about:
 - What features, tabs, pages, or tools exist in the app and what they do
@@ -37,13 +38,34 @@ YOUR STRICT SCOPE — You ONLY answer questions about:
 - How subscriptions, tiers, or trial features work
 - General onboarding or "how do I get started" questions
 - Technical usage questions (e.g. "how do I upload a PDF?")
+- Giving guided tours of the Palace rooms, floors, and features
+- Recommending which rooms, games, or tabs to try next based on what the user is interested in
+- Receiving bug reports or "something isn't working" messages from users
 
 YOU DO NOT ANSWER:
 - Theological questions, Bible interpretation, or doctrinal matters (redirect warmly to Jeeves)
 - Questions about the app's internal code, APIs, or engineering
 - Personal life advice unrelated to app usage
 
-WHEN someone asks a theological question, say something like: "Ah, that's precisely the domain of my colleague Jeeves — your theological AI study assistant. I focus on helping you find your way around the Palace itself. Shall I point you to where you can chat with Jeeves?"
+WHEN someone asks a theological question, warmly deflect: "I must be transparent with you — I'm no theologian! My expertise is entirely in the Palace's rooms, halls, and corridors. For anything theological, my distinguished colleague Jeeves is your man. You'll find him in the Jeeves chat or the Research Assistant. Shall I point you there?"
+
+GIVING TOURS — When a user asks for a tour, a recommendation, or says "what should I try first?":
+- Walk them through the floors in order or by their interest
+- Be specific: name rooms, describe what you do in them, give examples of what you'd discover
+- Always end a tour stop by asking "Shall I show you the next room, or is there a specific area you'd like to explore?"
+- Suggest beginner-friendly entry points: Story Room (Floor 1), Nature Freestyle (Floor 3), Concentration Room (Floor 4)
+
+PROACTIVE SUGGESTIONS — Regularly offer next steps:
+- "Have you tried the Freestyle Floor yet? It's excellent for on-the-go Bible thinking."
+- "The Gems Room is a favourite — you save your best discoveries there."
+- "If you enjoy games, the Card Battle and Escape Rooms are particularly popular."
+- "The Challenges section offers daily and weekly missions with Jeeves feedback — a wonderful habit-builder."
+
+BUG REPORTS — When a user tells you something is broken or not working:
+- Respond warmly: "I'm dreadfully sorry to hear that. I've noted it and will ensure it reaches the Palace's chief engineer immediately. Could you describe what you were doing and what happened?"
+- After gathering details, say: "Splendid — I have what I need. I'll dispatch this report straightaway. You can expect it to be looked into promptly."
+- Then trigger the bug report by including this EXACT marker at the END of your reply (on its own line, the user won't see it):
+  [BUG_REPORT: {description of issue from user}]
 
 KEY FEATURES OF THE PHOTOTHEOLOGY PALACE (for your reference):
 - THE PALACE: 8-floor Bible study system based on Phototheology principles
@@ -100,7 +122,7 @@ Keep responses concise and warm — 2-5 sentences for simple navigation question
           { role: "system", content: systemPrompt },
           ...messages,
         ],
-        max_tokens: 600,
+        max_tokens: 800,
         temperature: 0.6,
       }),
     });
@@ -112,7 +134,42 @@ Keep responses concise and warm — 2-5 sentences for simple navigation question
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "I do beg your pardon — I seem to have misplaced my response. Shall we try again?";
+    let content = data.choices?.[0]?.message?.content || "I do beg your pardon — I seem to have misplaced my response. Shall we try again?";
+
+    // Check for bug report marker and send email if found
+    const bugReportMatch = content.match(/\[BUG_REPORT:\s*([\s\S]+?)\]/);
+    if (bugReportMatch) {
+      // Strip the marker from the user-visible response
+      content = content.replace(/\n?\[BUG_REPORT:[\s\S]+?\]/, "").trim();
+
+      // Send bug report email via Resend
+      const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+      if (RESEND_API_KEY) {
+        const bugDescription = bugReportMatch[1].trim();
+        const userLabel = userName ?? "Unknown user";
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "Reginald <feedback@thephototheologyapp.com>",
+            to: ["aburninghammer@gmail.com"],
+            subject: `🐛 Palace Bug Report — via Reginald`,
+            html: `
+              <h2>Bug Report from Reginald</h2>
+              <p><strong>Reported by:</strong> ${userLabel}</p>
+              <p><strong>Issue:</strong></p>
+              <p>${bugDescription.replace(/\n/g, "<br>")}</p>
+              <hr>
+              <p style="color:#666;font-size:12px;">Reported at: ${new Date().toLocaleString()}</p>
+            `,
+          }),
+        });
+        console.log("[REGINALD] Bug report email sent for:", bugDescription);
+      }
+    }
 
     return new Response(
       JSON.stringify({ response: content }),
