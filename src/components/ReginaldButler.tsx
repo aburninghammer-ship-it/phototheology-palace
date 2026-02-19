@@ -35,6 +35,7 @@ interface Message {
 }
 
 const QUICK_QUESTIONS = [
+  "What does this tab do?",
   "Give me a tour of the Palace",
   "Where are my saved studies?",
   "What room should I start with?",
