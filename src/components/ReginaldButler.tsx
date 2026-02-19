@@ -151,14 +151,14 @@ export const ReginaldButler = () => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="relative flex items-center gap-2"
+            className="flex items-center gap-2"
           >
-            <div className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-full shadow-lg pointer-events-none bg-amber-900/90 text-amber-100">
+            <span className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-full shadow-lg bg-amber-900/90 text-amber-100">
               Reginald
-            </div>
+            </span>
             <Button
               onClick={() => setOpen(true)}
-              className="h-11 w-11 rounded-full shadow-xl border-2 border-amber-500/40 p-0 flex items-center justify-center"
+              className="h-11 w-11 rounded-full shadow-xl border-2 border-amber-500/40 p-0 flex items-center justify-center flex-shrink-0"
               style={{ background: "linear-gradient(135deg, #78350f, #92400e)" }}
               aria-label="Open Reginald the Palace Butler"
             >
@@ -168,16 +168,16 @@ export const ReginaldButler = () => {
         )}
       </AnimatePresence>
 
-      {/* Chat panel */}
+      {/* Chat panel — fixed to viewport bottom-right */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            initial={{ opacity: 0, y: 20, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.95 }}
+            exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="absolute bottom-0 right-full mr-3 w-[calc(100vw-2rem)] max-w-sm flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border"
-            style={{ maxHeight: "min(560px, calc(100vh - 100px))" }}
+            className="fixed bottom-20 right-3 md:bottom-6 md:right-5 z-[999] w-[min(92vw,22rem)] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border bg-background"
+            style={{ height: "min(480px, calc(100vh - 160px))" }}
           >
             {/* Header */}
             <div
