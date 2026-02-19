@@ -33,6 +33,7 @@ import {
   Network,
   Image,
   Lightbulb,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Separator } from "@/components/ui/separator";
@@ -582,10 +583,10 @@ export const EnhancedMobileDrawer = () => {
                   <Link
                     to="/manage-subscription"
                     onClick={handleLinkClick}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors border-b border-border/30"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 active:bg-primary/20 transition-colors border-b border-border/30"
                   >
-                    <CreditCard className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-muted-foreground">{t('nav.manageSubscription')}</span>
+                    <Settings className="h-5 w-5 text-primary" />
+                    <span className="font-medium text-foreground">{t('nav.manageSubscription')}</span>
                   </Link>
                   <button
                     onClick={() => {
