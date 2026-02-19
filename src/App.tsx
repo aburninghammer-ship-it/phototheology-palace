@@ -32,8 +32,6 @@ import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { ReginaldButler } from "@/components/ReginaldButler";
-import { JeevesWidget } from "@/components/JeevesWidget";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
 import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
@@ -712,8 +710,6 @@ function App() {
                   {!isWorkspacePane && (
                     <div className="fixed bottom-20 right-3 z-50 md:bottom-6 md:right-5 flex flex-col items-end gap-2">
                       <AmbientMusicPlayer minimal />
-                      <JeevesWidget />
-                      <ReginaldButler />
                     </div>
                   )}
                 </div>
