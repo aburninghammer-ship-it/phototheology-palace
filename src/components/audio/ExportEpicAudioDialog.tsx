@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -56,7 +56,6 @@ export const ExportEpicAudioDialog = ({
   queue = [],
 }: ExportEpicAudioDialogProps) => {
   // ── Chapter selection ───────────────────────────────────────────────────
-  // Pre-populate with the current chapter; user can add more from the queue
   const [selectedChapters, setSelectedChapters] = useState<EpicChapter[]>([
     { book, chapter, audioUrl: epicAudioUrl },
   ]);
@@ -74,6 +73,16 @@ export const ExportEpicAudioDialog = ({
   const [exportedFilename, setExportedFilename] = useState("");
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
+
+  // Reset to the current chapter whenever the dialog opens or the primary chapter changes
+  useEffect(() => {
+    if (open) {
+      setSelectedChapters([{ book, chapter, audioUrl: epicAudioUrl }]);
+      setExportedBlob(null);
+      setExportedFilename("");
+      setShowSharePanel(false);
+    }
+  }, [open, book, chapter, epicAudioUrl]);
 
   const { mixAndDownload, isProcessing, progress, error } = useAudioMixer();
   const { playlists, createPlaylist, addToPlaylist } = useEpicPlaylists();
