@@ -1838,36 +1838,6 @@ serve(async (req) => {
           }
         }
 
-        // Send progress notification after each batch
-        const currentSent = results.filter(r => r.success).length;
-        const currentFailed = results.filter(r => !r.success).length;
-        const progress = Math.round((batchNumber / totalBatches) * 100);
-
-        await sendAdminNotification(
-          resendApiKey,
-          adminEmail,
-          `📧 ${campaignType.toUpperCase()} Campaign - Batch ${batchNumber}/${totalBatches} (${progress}%)`,
-          `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
-              <h2 style="color: #3b82f6; margin-bottom: 16px;">📨 Batch ${batchNumber} Complete</h2>
-              
-              <div style="background: white; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                <p style="margin: 4px 0;"><strong>Campaign:</strong> ${campaignType}</p>
-                <p style="margin: 4px 0;"><strong>Email Subject:</strong> ${group.template.subject}</p>
-                <p style="margin: 4px 0;"><strong>Batch:</strong> ${batchNumber} of ${totalBatches}</p>
-                <p style="margin: 4px 0;"><strong>Recipients this batch:</strong> ${batchRecipients.length}</p>
-              </div>
-              
-              <div style="background: white; padding: 16px; border-radius: 8px;">
-                <h3 style="margin-top: 0;">Running Totals</h3>
-                <p style="margin: 4px 0; color: #22c55e;">✅ Sent: ${currentSent}</p>
-                <p style="margin: 4px 0; color: #ef4444;">❌ Failed: ${currentFailed}</p>
-                <p style="margin: 4px 0;">📊 Progress: ${progress}%</p>
-              </div>
-            </div>
-          `
-        );
-
         // small delay between all requests
         await new Promise(resolve => setTimeout(resolve, MIN_DELAY_BETWEEN_REQUESTS_MS));
       }
