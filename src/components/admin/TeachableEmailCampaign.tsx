@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Send, Users, AlertTriangle, GraduationCap } from "lucide-react";
+import { Loader2, Send, Users, AlertTriangle, GraduationCap, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,12 @@ const FILTER_DESCRIPTIONS: Record<TeachableFilter, string> = {
   not_paying: "Users not currently paying anything",
 };
 
+interface CampaignStats {
+  sent: number;
+  failed: number;
+  lastSent: string | null;
+}
+
 export function TeachableEmailCampaign() {
   const { toast } = useToast();
   const [subject, setSubject] = useState("");
@@ -32,12 +38,44 @@ export function TeachableEmailCampaign() {
   const [testMode, setTestMode] = useState(true);
   const [testEmail, setTestEmail] = useState("");
   const [sending, setSending] = useState(false);
+  const [campaignStats, setCampaignStats] = useState<CampaignStats | null>(null);
   const [lastResult, setLastResult] = useState<{
     success: boolean;
     sent: number;
     total: number;
     message: string;
   } | null>(null);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const { data: sent } = await supabase
+        .from("email_campaign_logs")
+        .select("sent_at")
+        .eq("email_type", "teachable")
+        .eq("status", "sent")
+        .order("sent_at", { ascending: false })
+        .limit(1);
+
+      const { count: sentCount } = await supabase
+        .from("email_campaign_logs")
+        .select("*", { count: "exact", head: true })
+        .eq("email_type", "teachable")
+        .eq("status", "sent");
+
+      const { count: failedCount } = await supabase
+        .from("email_campaign_logs")
+        .select("*", { count: "exact", head: true })
+        .eq("email_type", "teachable")
+        .eq("status", "failed");
+
+      setCampaignStats({
+        sent: sentCount || 0,
+        failed: failedCount || 0,
+        lastSent: sent?.[0]?.sent_at || null,
+      });
+    };
+    loadStats();
+  }, []);
 
   const handleSend = async () => {
     if (!subject.trim() || !content.trim()) {
@@ -111,6 +149,52 @@ export function TeachableEmailCampaign() {
 
   return (
     <div className="space-y-6">
+      {/* Campaign Status Banner */}
+      {campaignStats && (
+        <Card className="border-border bg-muted/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Teachable Campaign History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                <div>
+                  <p className="text-2xl font-bold">{campaignStats.sent.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Successfully Sent</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <XCircle className="h-4 w-4 text-destructive shrink-0" />
+                <div>
+                  <p className="text-2xl font-bold text-destructive">{campaignStats.failed.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Failed (rate limit — now fixed)</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div>
+                  <p className="text-sm font-medium">
+                    {campaignStats.lastSent
+                      ? new Date(campaignStats.lastSent).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                      : "Never"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Last Sent</p>
+                </div>
+              </div>
+            </div>
+            {campaignStats.failed > 100 && (
+              <div className="mt-3 flex items-start gap-2 p-2 rounded-md bg-amber-500/10 border border-amber-500/30">
+                <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  Previous campaign hit Resend's rate limit (2 req/sec). The system now uses batch sending (100 emails/request) — re-sending will reach all {campaignStats.failed.toLocaleString()} missed students.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="border-orange-500/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -90,16 +89,21 @@ serve(async (req) => {
         );
       }
 
-      const resend = new Resend(RESEND_API_KEY);
-      
-      const emailResponse = await resend.emails.send({
-        from: "PhotoTheology <noreply@thephototheologyapp.com>",
-        to: [testEmail],
-        subject: `[TEST] ${subject}`,
-        html: htmlContent,
+      const testResponse = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "PhotoTheology <support@thephototheologyapp.com>",
+          to: [testEmail],
+          subject: `[TEST] ${subject}`,
+          html: htmlContent,
+        }),
       });
 
-      console.log("Test email sent:", emailResponse);
+      console.log("Test email sent:", testResponse.status);
 
       return new Response(
         JSON.stringify({
@@ -154,62 +158,78 @@ serve(async (req) => {
     const emails = [...new Set(pickaxeMembers.map(m => m.pickaxe_email).filter(Boolean))];
     console.log(`Sending to ${emails.length} Pickaxe members with filter: ${filter}`);
 
-    const resend = new Resend(RESEND_API_KEY);
+    const RESEND_API_KEY_VAL = Deno.env.get("RESEND_API_KEY")!;
     let sentCount = 0;
     let errorCount = 0;
 
-    // Create a campaign name for logging
     const campaignName = `Pickaxe Campaign - ${filter} - ${new Date().toISOString().split('T')[0]}`;
 
-    // Send emails in batches of 10
-    const batchSize = 10;
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
-      
-      // Send emails sequentially within batch to respect rate limits (2 req/sec)
-      for (const email of batch) {
-        try {
-          const emailResponse = await resend.emails.send({
-            from: "PhotoTheology <noreply@thephototheologyapp.com>",
+    // Use Resend batch API — 100 per request, no rate limit issues
+    const BATCH_SIZE = 100;
+
+    for (let i = 0; i < emails.length; i += BATCH_SIZE) {
+      const batch = emails.slice(i, i + BATCH_SIZE);
+
+      try {
+        const response = await fetch("https://api.resend.com/emails/batch", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${RESEND_API_KEY_VAL}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(batch.map(email => ({
+            from: "PhotoTheology <support@thephototheologyapp.com>",
             to: [email],
             subject,
             html: htmlContent,
-          });
-          
-          // Log successful send with resend email ID for tracking opens
-          await supabase.from("email_campaign_logs").insert({
-            campaign_name: campaignName,
-            recipient_email: email,
-            email_type: "pickaxe",
-            status: "sent",
-            sent_at: new Date().toISOString(),
-            resend_email_id: emailResponse.data?.id || null,
-          });
-          
-          // Update pickaxe_connections with email_sent_at
+          }))),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Batch ${i / BATCH_SIZE} error:`, errorText);
+
+          await supabase.from("email_campaign_logs").insert(
+            batch.map(email => ({
+              campaign_name: campaignName,
+              recipient_email: email,
+              email_type: "pickaxe",
+              status: "failed",
+              error_message: errorText,
+              sent_at: new Date().toISOString(),
+            }))
+          );
+          errorCount += batch.length;
+        } else {
+          const result = await response.json();
+          sentCount += batch.length;
+          console.log(`Batch ${Math.floor(i / BATCH_SIZE) + 1} sent: ${batch.length} emails`);
+
+          await supabase.from("email_campaign_logs").insert(
+            batch.map((email, idx) => ({
+              campaign_name: campaignName,
+              recipient_email: email,
+              email_type: "pickaxe",
+              status: "sent",
+              sent_at: new Date().toISOString(),
+              resend_email_id: result?.data?.[idx]?.id || null,
+            }))
+          );
+
+          // Update pickaxe_connections timestamp in bulk
           await supabase.from("pickaxe_connections")
             .update({ email_sent_at: new Date().toISOString() })
-            .eq("pickaxe_email", email);
-          
-          sentCount++;
-          console.log(`Sent email ${sentCount} to ${email}`);
-        } catch (err) {
-          console.error(`Failed to send to ${email}:`, err);
-          
-          // Log failed send
-          await supabase.from("email_campaign_logs").insert({
-            campaign_name: campaignName,
-            recipient_email: email,
-            email_type: "pickaxe",
-            status: "failed",
-            error_message: err instanceof Error ? err.message : "Unknown error",
-          });
-          
-          errorCount++;
+            .in("pickaxe_email", batch);
         }
-        
-        // Delay between each email to respect Resend rate limit (2 req/sec = 600ms delay)
-        await new Promise(resolve => setTimeout(resolve, 600));
+      } catch (batchErr) {
+        const msg = batchErr instanceof Error ? batchErr.message : String(batchErr);
+        console.error(`Batch ${i / BATCH_SIZE} exception:`, msg);
+        errorCount += batch.length;
+      }
+
+      // 1 second delay between batches
+      if (i + BATCH_SIZE < emails.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
