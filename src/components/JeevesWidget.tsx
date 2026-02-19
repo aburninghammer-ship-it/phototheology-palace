@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import jeevesAvatar from "@/assets/avatars/jeeves-avatar.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -166,11 +167,11 @@ export const JeevesWidget = () => {
             </span>
             <Button
               onClick={() => setOpen(true)}
-              className="h-11 w-11 rounded-full shadow-xl border-2 border-indigo-500/40 p-0 flex items-center justify-center flex-shrink-0"
+              className="h-11 w-11 rounded-full shadow-xl border-2 border-indigo-500/40 p-0 flex items-center justify-center flex-shrink-0 overflow-hidden"
               style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81)" }}
               aria-label="Open Jeeves the Theological Guide"
             >
-              <span className="text-xl leading-none select-none">📖</span>
+              <img src={jeevesAvatar} alt="Jeeves" className="h-full w-full object-cover object-top" />
             </Button>
           </motion.div>
         )}
@@ -194,10 +195,9 @@ export const JeevesWidget = () => {
             >
               <div className="flex items-center gap-3">
                 <div
-                  className="h-9 w-9 rounded-full flex items-center justify-center text-lg select-none border border-indigo-400/30"
-                  style={{ background: "rgba(49,46,129,0.6)" }}
+                  className="h-9 w-9 rounded-full overflow-hidden flex-shrink-0 border border-indigo-400/30"
                 >
-                  📖
+                  <img src={jeevesAvatar} alt="Jeeves" className="h-full w-full object-cover object-top" />
                 </div>
                 <div>
                   <p className="font-semibold text-sm leading-tight text-indigo-50">Jeeves</p>
