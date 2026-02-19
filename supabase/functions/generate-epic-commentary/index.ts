@@ -147,18 +147,27 @@ KEY STYLE ELEMENTS TO LOCK IN:
 `;
 
 const PRESENT_TENSE_ENFORCEMENT = `
-⚡ ABSOLUTE RULE — PRESENT TENSE ONLY ⚡
+⚡ ABSOLUTE RULE — PRESENT TENSE ONLY — ZERO EXCEPTIONS ⚡
 
-Every single sentence of narration MUST be written in PRESENT TENSE. This is the single most important stylistic rule.
+Every single sentence of narration MUST be in PRESENT TENSE. This overrides everything else.
 
-CORRECT: "Moses stands at the edge of the sea." / "The serpent speaks." / "David falls." / "The crowd watches."
-WRONG: "Moses stood at the edge of the sea." / "The serpent spoke." / "David fell." / "The crowd watched."
+CORRECT — USE THESE: stands, speaks, falls, watches, walks, runs, declares, rises, sees, hears, knows, moves, breaks, trembles, weeps, calls, sends, comes, goes, opens, closes, reveals, carries, lifts, strikes, dies, lives, conquers, breathes, stands, holds, reaches, returns, builds, destroys.
 
-Before you output a single word, commit to this: you are narrating live events. You are not a historian. You are not looking back. You are INSIDE the moment, watching it happen NOW.
+WRONG — NEVER USE THESE IN NARRATION: stood, spoke, fell, watched, walked, ran, declared, rose, saw, heard, knew, moved, broke, trembled, wept, called, sent, came, went, opened, closed, revealed, carried, lifted, struck, died, lived, conquered, breathed, held, reached, returned, built, destroyed.
 
-Scan every sentence before you write it. If it uses a past-tense verb in narration, rewrite it in present tense immediately. There are NO exceptions for narration. Only direct speech / quoted dialogue may reflect the speaker's natural tense.
+COMMON FAILURES TO AVOID:
+❌ "Abraham went to the mountain" → ✅ "Abraham goes to the mountain"
+❌ "Moses led Israel through the sea" → ✅ "Moses leads Israel through the sea"
+❌ "The soldiers carried the ark" → ✅ "The soldiers carry the ark"
+❌ "David fell before God" → ✅ "David falls before God"
+❌ "Jesus wept" → ✅ "Jesus weeps"
+❌ "Paul wrote to the church" → ✅ "Paul writes to the church"
+❌ "The serpent spoke to the woman" → ✅ "The serpent speaks to the woman"
+❌ "God commanded Noah" → ✅ "God commands Noah"
 
-PAST TENSE NARRATION IS A FAILURE. PRESENT TENSE NARRATION IS SUCCESS.
+You are NOT a historian looking back. You are INSIDE the moment. The events unfold NOW. Before you finalize your output, scan EVERY verb in EVERY sentence. Any past-tense verb in narration must be converted to present tense. No exceptions. The only exception: direct speech/quoted dialogue spoken by characters may use their speaker's natural tense.
+
+PAST TENSE NARRATION = FAILURE. PRESENT TENSE NARRATION = SUCCESS.
 `;
 
 const EPIC_CHAPTER_SYSTEM_PROMPT = `You are a cinematic philosopher-narrator producing an EPIC Bible chapter commentary that sounds like a cosmic documentary — the voice of eternity narrating the events of Scripture with drama, theological depth, and philosophical gravity.
