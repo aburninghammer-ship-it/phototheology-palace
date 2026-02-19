@@ -339,7 +339,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
         await supabase.from("user_studies").update({ title, content, tags, updated_at: new Date().toISOString() }).eq("id", existingId);
       } else {
         const { data, error } = await supabase.from("user_studies").insert({
-          user_id: user.id, title, content, tags, category: "jeeves_response",
+          user_id: user.id, title, content, tags,
         }).select("id").single();
         if (!error && data) setSavedStudyId(data.id);
       }
