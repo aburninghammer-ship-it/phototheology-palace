@@ -29,8 +29,6 @@ import { LiveMembersStrip } from "@/components/living-manna/LiveMembersStrip";
 import { BaptismTrack } from "@/components/living-manna/baptism-track/BaptismTrack";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { JeevesWidget } from "@/components/JeevesWidget";
-import { ReginaldButler } from "@/components/ReginaldButler";
 export default function LivingManna() {
   const { user } = useAuth();
   const { subscription, loading: subscriptionLoading } = useSubscription();
@@ -446,11 +444,6 @@ export default function LivingManna() {
             </Tabs>
           </Card>
         </div>
-      </div>
-      {/* Jeeves & Reginald — scoped to Living Manna space */}
-      <div className="fixed bottom-20 right-3 z-50 md:bottom-6 md:right-5 flex flex-col items-end gap-2">
-        <JeevesWidget />
-        <ReginaldButler />
       </div>
     </DirectMessagesProvider>
   );
