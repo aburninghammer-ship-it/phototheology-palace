@@ -348,6 +348,112 @@ export const DEFENSE_TOPICS: DefenseTopic[] = [
     description:
       "The futurist system (Darby, Scofield, Left Behind) — its Jesuit origins, the 7-year tribulation gap theory, and why it fails exegetically",
   },
+  // ── Cross-Opponent "Positive Case" Topics ─────────────────
+  {
+    id: "muhammad-in-bible",
+    name: "Muhammad in the Bible",
+    description:
+      "The Muslim argues FOR: Muhammad is foretold in Deuteronomy 18:18 ('a prophet like me') and John 14:16 ('Paraclete/Ahmad') — these are unfulfilled prophecies pointing to Islam's final messenger",
+    isSignature: true,
+  },
+  {
+    id: "tongues-evidence",
+    name: "Tongues as Evidence",
+    description:
+      "The Pentecostal argues FOR: Speaking in tongues is the initial physical evidence of Holy Spirit baptism — Acts 2, 10, and 19 establish the pattern for all believers today",
+    isSignature: true,
+  },
+  {
+    id: "prosperity-gospel",
+    name: "Health & Wealth Gospel",
+    description:
+      "The Word of Faith teacher argues FOR: God's covenant guarantees physical healing and financial blessing to the faithful — Abraham's blessing is our covenant right",
+    isSignature: true,
+  },
+  {
+    id: "infant-baptism",
+    name: "Infant Baptism",
+    description:
+      "The Catholic/Reformed argues FOR: Baptism replaces circumcision as the covenant sign — household baptisms in Acts include infants, and the church has practiced this from antiquity",
+    isSignature: true,
+  },
+  {
+    id: "purgatory",
+    name: "Purgatory",
+    description:
+      "The Catholic argues FOR: 1 Corinthians 3:15, 2 Maccabees 12, and patristic tradition teach a purifying state after death — prayer for the dead has always been Christian practice",
+    isSignature: true,
+  },
+  {
+    id: "mary-coredemptrix",
+    name: "Mary & the Saints",
+    description:
+      "The Catholic argues FOR: Mary is Co-Redemptrix and Queen of Heaven — intercession of the saints is biblical (Revelation 5:8) and part of the one body of Christ",
+    isSignature: true,
+  },
+  {
+    id: "predestination",
+    name: "Predestination (Calvinism)",
+    description:
+      "The Reformed/Calvinist argues FOR: God unconditionally elected the saved before the foundation of the world — Romans 9 and Ephesians 1 leave no room for free-will salvation",
+    isSignature: true,
+  },
+  {
+    id: "no-law-for-christians",
+    name: "Law Abolished for Christians",
+    description:
+      "The Antinomian/Evangelical argues FOR: Christ abolished the entire Mosaic law at the cross — Colossians 2:14-16 and Galatians 3 prove Christians are completely free from law-keeping including the Sabbath",
+    isSignature: true,
+  },
+  {
+    id: "soul-sleep-wrong",
+    name: "Immortal Soul at Death",
+    description:
+      "The Evangelical/Catholic argues FOR: The soul is conscious after death — Luke 16 (rich man and Lazarus), 2 Corinthians 5:8 ('absent from body, present with Lord'), and Revelation 6:10 prove the dead are alive and aware",
+    isSignature: true,
+  },
+  {
+    id: "eternal-hell",
+    name: "Eternal Conscious Torment",
+    description:
+      "The Evangelical argues FOR: Hell is a real place of unending, conscious suffering — Matthew 25:46, Mark 9:48, and Revelation 14:11 describe eternal, unquenchable fire for the wicked",
+    isSignature: true,
+  },
+  {
+    id: "secret-rapture",
+    name: "Secret Pre-Trib Rapture",
+    description:
+      "The Evangelical argues FOR: 1 Thessalonians 4:17 and John 14:3 describe a secret catching away before the Tribulation — the church will not go through Daniel's 70th week",
+    isSignature: true,
+  },
+  {
+    id: "all-foods-clean",
+    name: "All Foods Are Now Clean",
+    description:
+      "The Evangelical argues FOR: Mark 7:19 declares all foods clean, Acts 10 removes dietary distinctions, and Colossians 2:16 says no one may judge you on food — the dietary laws are abolished under the new covenant",
+    isSignature: true,
+  },
+  {
+    id: "sunday-is-new-sabbath",
+    name: "Sunday Is the New Sabbath",
+    description:
+      "The Evangelical/Catholic argues FOR: The early church unanimously worshipped on Sunday from the resurrection — Acts 20:7, 1 Corinthians 16:2, and Revelation 1:10 ('Lord's Day') confirm Sunday as the Christian day of worship",
+    isSignature: true,
+  },
+  {
+    id: "flat-earth-cosmology",
+    name: "Preterist 70AD Fulfillment",
+    description:
+      "The Preterist argues FOR: Matthew 24's 'coming of the Son of Man' and most of Revelation were fulfilled in 70 AD — 'this generation' means exactly that, and we are now in the age of new covenant fulfillment",
+    isSignature: true,
+  },
+  {
+    id: "name-only-salvation",
+    name: "Jesus Only (Oneness)",
+    description:
+      "The Oneness Pentecostal argues FOR: There is only one name — Jesus. The 'Father, Son, Holy Spirit' are not three persons but three manifestations of Jesus. Baptism must be in 'Jesus' name only' (Acts 2:38), and speaking in tongues is required for salvation",
+    isSignature: true,
+  },
   // ── Atheist Signature Topics ───────────────────────────────
   {
     id: "naturalism",
