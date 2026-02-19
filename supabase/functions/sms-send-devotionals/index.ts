@@ -20,43 +20,6 @@ interface SMSRecipient {
   total_sms_sent: number;
 }
 
-interface DevotionalPlan {
-  id: string;
-  title: string;
-  user_id: string;
-}
-
-interface DevotionalDay {
-  day_number: number;
-  devotional_text: string;
-  scripture_reference: string;
-  theme: string;
-}
-
-interface DevotionalProfile {
-  id: string;
-  user_id: string;
-  name: string;
-  phone_number: string;
-  phone_country_code: string;
-  plan_id: string;
-  current_day: number;
-  sms_opt_in: boolean;
-}
-
-/**
- * SMS Devotional Sender
- * 
- * Sends daily devotionals via SMS to opted-in recipients.
- * Called by cron job at the top of each hour.
- * 
- * Flow:
- * 1. Get all active recipients whose preferred send hour matches current hour in their timezone
- * 2. For each recipient, get their devotional plan and current day
- * 3. Send SMS via Twilio
- * 4. Log the result
- */
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -65,27 +28,25 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-    const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID') ?? '';
-    const twilioAuthToken = Deno.env.get('TWILIO_AUTH_TOKEN') ?? '';
-    const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER') ?? '';
+    const awsAccessKeyId = Deno.env.get('AWS_ACCESS_KEY_ID') ?? '';
+    const awsSecretAccessKey = Deno.env.get('AWS_SECRET_ACCESS_KEY') ?? '';
+    const awsRegion = Deno.env.get('AWS_REGION') ?? 'us-east-1';
 
-    if (!twilioAccountSid || !twilioAuthToken || !twilioPhoneNumber) {
-      console.error('Missing Twilio credentials');
+    if (!awsAccessKeyId || !awsSecretAccessKey) {
+      console.error('Missing AWS credentials');
       return new Response(
-        JSON.stringify({ error: 'Missing Twilio credentials' }),
+        JSON.stringify({ error: 'Missing AWS credentials' }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse request body for test mode options
     const body = await req.json().catch(() => ({}));
-    const forceNow = body.forceNow === true; // Bypass time check
-    const skipDailyCheck = body.skipDailyCheck === true; // Bypass "already sent today" check
-    const testRecipientId = body.recipientId; // Send to specific recipient only
+    const forceNow = body.forceNow === true;
+    const skipDailyCheck = body.skipDailyCheck === true;
+    const testRecipientId = body.recipientId;
 
-    // Get current UTC hour
     const now = new Date();
     const currentUtcHour = now.getUTCHours();
     
@@ -98,7 +59,6 @@ serve(async (req) => {
       .eq('is_active', true)
       .is('opted_out_at', null);
 
-    // If testing specific recipient, filter by ID
     if (testRecipientId) {
       recipientsQuery = recipientsQuery.eq('id', testRecipientId);
     }
@@ -135,20 +95,17 @@ serve(async (req) => {
     for (const recipient of (allRecipients || [])) {
       results.processed++;
       
-      // Check if it's the right time for this recipient's timezone (skip if forceNow)
       if (!forceNow) {
         const recipientHour = getHourInTimezone(now, recipient.timezone);
-        
         if (recipientHour !== recipient.preferred_send_hour) {
           results.skipped++;
-          console.log(`[SMS Send] Skipping ${recipient.name} - current hour ${recipientHour} != preferred ${recipient.preferred_send_hour} in ${recipient.timezone}`);
+          console.log(`[SMS Send] Skipping ${recipient.name} - current hour ${recipientHour} != preferred ${recipient.preferred_send_hour}`);
           continue;
         }
       } else {
         console.log(`[SMS Send] Force sending to ${recipient.name} (bypassing time check)`);
       }
 
-      // Check if already sent today (skip if skipDailyCheck)
       if (!skipDailyCheck) {
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
@@ -168,12 +125,10 @@ serve(async (req) => {
         }
       }
 
-      // Get devotional content
       let messageBody = '';
       let dayNumber = 1;
 
       if (recipient.plan_id) {
-        // Get plan details
         const { data: plan } = await supabase
           .from('devotional_plans')
           .select('*')
@@ -181,10 +136,8 @@ serve(async (req) => {
           .single();
 
         if (plan) {
-          // Get current day (based on total sent + 1)
           dayNumber = (recipient.total_sms_sent % (plan.total_days || 30)) + 1;
           
-          // Get the day's devotional
           const { data: dayContent } = await supabase
             .from('devotional_days')
             .select('*')
@@ -204,33 +157,25 @@ serve(async (req) => {
         messageBody = `📖 Your daily devotional is ready!\nOpen the app to begin.\n-PT`;
       }
 
-      // Send SMS via Twilio
-      const sendResult = await sendTwilioSMS(
-        twilioAccountSid,
-        twilioAuthToken,
-        twilioPhoneNumber,
-        `${recipient.phone_country_code}${recipient.phone_number}`,
-        messageBody
-      );
+      const phoneNumber = `${recipient.phone_country_code}${recipient.phone_number}`;
+      const sendResult = await sendSNSSMS(awsAccessKeyId, awsSecretAccessKey, awsRegion, phoneNumber, messageBody);
 
-      // Log the result
       await supabase.from('sms_send_log').insert({
         user_id: recipient.user_id,
         recipient_type: 'standalone',
         recipient_id: recipient.id,
-        phone_number: `${recipient.phone_country_code}${recipient.phone_number}`,
+        phone_number: phoneNumber,
         plan_id: recipient.plan_id,
         day_number: dayNumber,
         message_type: 'devotional',
         message_body: messageBody,
-        twilio_sid: sendResult.sid,
+        twilio_sid: sendResult.messageId, // reuse column for SNS message ID
         status: sendResult.status,
         error_code: sendResult.errorCode,
         error_message: sendResult.errorMessage,
-        segments: sendResult.segments || 1,
+        segments: 1,
       });
 
-      // Update recipient stats
       if (sendResult.success) {
         await supabase
           .from('sms_devotional_recipients')
@@ -242,7 +187,7 @@ serve(async (req) => {
           .eq('id', recipient.id);
 
         results.sent++;
-        console.log(`[SMS Send] Sent to ${recipient.name} (${recipient.phone_country_code}${recipient.phone_number})`);
+        console.log(`[SMS Send] Sent to ${recipient.name} (${phoneNumber})`);
       } else {
         results.errors++;
         console.error(`[SMS Send] Failed for ${recipient.name}: ${sendResult.errorMessage}`);
@@ -260,24 +205,20 @@ serve(async (req) => {
     for (const profile of (profileRecipients || [])) {
       results.processed++;
 
-      // Check if already processed as standalone
-      const alreadyProcessed = results.details.some(
-        d => d.name === profile.name
-      );
+      const alreadyProcessed = results.details.some(d => d.name === profile.name);
       if (alreadyProcessed) {
         results.skipped++;
         continue;
       }
 
-      // Check timezone and preferred hour (default to 8 AM Eastern)
-      const recipientHour = getHourInTimezone(now, 'America/New_York');
-      
-      if (recipientHour !== 8) {
-        results.skipped++;
-        continue;
+      if (!forceNow) {
+        const recipientHour = getHourInTimezone(now, 'America/New_York');
+        if (recipientHour !== 8) {
+          results.skipped++;
+          continue;
+        }
       }
 
-      // Check if already sent today
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
       
@@ -294,7 +235,6 @@ serve(async (req) => {
         continue;
       }
 
-      // Get devotional content
       let messageBody = '';
       const dayNumber = profile.current_day || 1;
 
@@ -316,17 +256,8 @@ serve(async (req) => {
       }
 
       const phoneNumber = `${profile.phone_country_code || '+1'}${profile.phone_number}`;
+      const sendResult = await sendSNSSMS(awsAccessKeyId, awsSecretAccessKey, awsRegion, phoneNumber, messageBody);
 
-      // Send SMS
-      const sendResult = await sendTwilioSMS(
-        twilioAccountSid,
-        twilioAuthToken,
-        twilioPhoneNumber,
-        phoneNumber,
-        messageBody
-      );
-
-      // Log
       await supabase.from('sms_send_log').insert({
         user_id: profile.user_id,
         recipient_type: 'profile',
@@ -336,11 +267,11 @@ serve(async (req) => {
         day_number: dayNumber,
         message_type: 'devotional',
         message_body: messageBody,
-        twilio_sid: sendResult.sid,
+        twilio_sid: sendResult.messageId,
         status: sendResult.status,
         error_code: sendResult.errorCode,
         error_message: sendResult.errorMessage,
-        segments: sendResult.segments || 1,
+        segments: 1,
       });
 
       if (sendResult.success) {
@@ -363,10 +294,7 @@ serve(async (req) => {
     console.log(`[SMS Send] Complete: ${results.sent} sent, ${results.skipped} skipped, ${results.errors} errors`);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        results,
-      }),
+      JSON.stringify({ success: true, results }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
@@ -390,7 +318,6 @@ function getHourInTimezone(date: Date, timezone: string): number {
     const hourPart = parts.find(p => p.type === 'hour');
     return hourPart ? parseInt(hourPart.value, 10) : date.getUTCHours();
   } catch {
-    // Default to UTC if timezone is invalid
     return date.getUTCHours();
   }
 }
@@ -399,12 +326,9 @@ function formatDevotionalMessage(name: string, dayNumber: number, dayContent: an
   const scripture = dayContent.scripture_reference || '';
   const theme = dayContent.theme || '';
   
-  // SHORTENED: Keep under 160 chars (1 segment) to avoid carrier filtering
-  // Format: "Day X: Theme\nScripture\n-PT"
   let message = `Day ${dayNumber}`;
   
   if (theme) {
-    // Truncate theme to ~40 chars
     const shortTheme = theme.length > 40 ? theme.substring(0, 37) + '...' : theme;
     message += `: ${shortTheme}`;
   }
@@ -413,12 +337,10 @@ function formatDevotionalMessage(name: string, dayNumber: number, dayContent: an
     message += `\n📖 ${scripture}`;
   }
   
-  // Add a brief excerpt if space allows (aim for 160 total)
-  let devotionalText = dayContent.devotional_text || '';
+  const devotionalText = dayContent.devotional_text || '';
   const remainingChars = 145 - message.length;
   
   if (devotionalText && remainingChars > 30) {
-    // Extract first sentence or truncate
     const firstSentence = devotionalText.split(/[.!?]/)[0];
     if (firstSentence && firstSentence.length < remainingChars - 5) {
       message += `\n${firstSentence}.`;
@@ -427,7 +349,6 @@ function formatDevotionalMessage(name: string, dayNumber: number, dayContent: an
   
   message += `\n-PT`;
   
-  // Hard cap at 160 chars (1 SMS segment)
   if (message.length > 160) {
     message = message.substring(0, 157) + '...';
   }
@@ -435,68 +356,128 @@ function formatDevotionalMessage(name: string, dayNumber: number, dayContent: an
   return message;
 }
 
-function getTimeBasedGreeting(): string {
-  const hour = new Date().getUTCHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
-}
-
-async function sendTwilioSMS(
-  accountSid: string,
-  authToken: string,
-  from: string,
-  to: string,
-  body: string
+// AWS Signature V4 helper for SNS
+async function sendSNSSMS(
+  accessKeyId: string,
+  secretAccessKey: string,
+  region: string,
+  phoneNumber: string,
+  message: string
 ): Promise<{
   success: boolean;
-  sid?: string;
+  messageId?: string;
   status?: string;
   errorCode?: string;
   errorMessage?: string;
-  segments?: number;
 }> {
   try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-    
-    // Add status callback URL for delivery tracking
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const statusCallbackUrl = `${supabaseUrl}/functions/v1/sms-webhook`;
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        To: to,
-        From: from,
-        Body: body,
-        StatusCallback: statusCallbackUrl,
-      }),
+    const endpoint = `https://sns.${region}.amazonaws.com/`;
+    const params = new URLSearchParams({
+      Action: 'Publish',
+      PhoneNumber: phoneNumber,
+      Message: message,
+      'MessageAttributes.entry.1.Name': 'AWS.SNS.SMS.SMSType',
+      'MessageAttributes.entry.1.Value.DataType': 'String',
+      'MessageAttributes.entry.1.Value.StringValue': 'Transactional',
     });
 
-    const data = await response.json();
+    const body = params.toString();
+    const now = new Date();
+    const amzDate = now.toISOString().replace(/[:\-]|\.\d{3}/g, '').slice(0, 15) + 'Z';
+    const dateStamp = amzDate.slice(0, 8);
+
+    const canonicalUri = '/';
+    const canonicalQueryString = '';
+    const canonicalHeaders = `content-type:application/x-www-form-urlencoded\nhost:sns.${region}.amazonaws.com\nx-amz-date:${amzDate}\n`;
+    const signedHeaders = 'content-type;host;x-amz-date';
+
+    const bodyHash = await sha256Hex(new TextEncoder().encode(body));
+    const canonicalRequest = [
+      'POST',
+      canonicalUri,
+      canonicalQueryString,
+      canonicalHeaders,
+      signedHeaders,
+      bodyHash,
+    ].join('\n');
+
+    const algorithm = 'AWS4-HMAC-SHA256';
+    const credentialScope = `${dateStamp}/${region}/sns/aws4_request`;
+    const stringToSign = [
+      algorithm,
+      amzDate,
+      credentialScope,
+      await sha256Hex(new TextEncoder().encode(canonicalRequest)),
+    ].join('\n');
+
+    const signingKey = await getSigningKey(secretAccessKey, dateStamp, region, 'sns');
+    const signature = await hmacHex(signingKey, stringToSign);
+
+    const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Amz-Date': amzDate,
+        'Authorization': authorizationHeader,
+      },
+      body,
+    });
+
+    const responseText = await response.text();
 
     if (!response.ok) {
+      // Parse XML error
+      const codeMatch = responseText.match(/<Code>([^<]+)<\/Code>/);
+      const messageMatch = responseText.match(/<Message>([^<]+)<\/Message>/);
       return {
         success: false,
-        errorCode: data.code?.toString(),
-        errorMessage: data.message || 'Twilio API error',
+        errorCode: codeMatch?.[1],
+        errorMessage: messageMatch?.[1] || `SNS error: ${response.status}`,
       };
     }
 
+    // Parse MessageId from XML response
+    const messageIdMatch = responseText.match(/<MessageId>([^<]+)<\/MessageId>/);
     return {
       success: true,
-      sid: data.sid,
-      status: data.status,
-      segments: data.num_segments ? parseInt(data.num_segments, 10) : 1,
+      messageId: messageIdMatch?.[1],
+      status: 'sent',
     };
   } catch (error: any) {
     return {
       success: false,
-      errorMessage: error.message || 'Failed to send SMS',
+      errorMessage: error.message || 'Failed to send SMS via SNS',
     };
   }
+}
+
+// AWS Signature V4 crypto helpers using Web Crypto API
+async function sha256Hex(data: Uint8Array): Promise<string> {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hmacSha256(key: ArrayBuffer | Uint8Array, data: string): Promise<ArrayBuffer> {
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    key instanceof Uint8Array ? key : key,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  return crypto.subtle.sign('HMAC', cryptoKey, new TextEncoder().encode(data));
+}
+
+async function hmacHex(key: ArrayBuffer, data: string): Promise<string> {
+  const sig = await hmacSha256(key, data);
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function getSigningKey(secretKey: string, dateStamp: string, region: string, service: string): Promise<ArrayBuffer> {
+  const kDate = await hmacSha256(new TextEncoder().encode('AWS4' + secretKey), dateStamp);
+  const kRegion = await hmacSha256(kDate, region);
+  const kService = await hmacSha256(kRegion, service);
+  return hmacSha256(kService, 'aws4_request');
 }
