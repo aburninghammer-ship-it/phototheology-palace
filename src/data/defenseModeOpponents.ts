@@ -523,3 +523,22 @@ export const DIFFICULTY_LEVELS: DifficultyLevel[] = [
       "Present the ABSOLUTE STRONGEST version of your argument. Use counter-exegesis — take the SAME verses your opponent would use and show how they support YOUR position. Anticipate their responses and pre-refute them. Use scholarly sources, original language arguments, and historical context. Leave no easy escape routes. This is iron sharpening iron.",
   },
 ];
+
+export interface TemperamentTrait {
+  id: string;
+  label: string;
+  emoji: string;
+  description: string;
+}
+
+export const TEMPERAMENT_TRAITS: TemperamentTrait[] = [
+  { id: "polite",         label: "Polite",        emoji: "🤝", description: "Civil, gracious — lethal in argument but never rude" },
+  { id: "respectful",    label: "Respectful",    emoji: "🎩", description: "Treats you as an equal, disagrees honestly" },
+  { id: "brilliant",     label: "Brilliant",     emoji: "🧠", description: "Advanced scholarly firepower, cites experts by name" },
+  { id: "condescending", label: "Condescending", emoji: "👆", description: "Speaks as though you cannot match their reasoning" },
+  { id: "dismissive",    label: "Dismissive",    emoji: "🙄", description: "Pre-dismisses your answers before you make them" },
+  { id: "haughty",       label: "Haughty",       emoji: "🫡", description: "Air of superiority — a courtesy to debate you" },
+  { id: "aggressive",    label: "Aggressive",    emoji: "⚡", description: "Relentless pressure, piles on questions rapidly" },
+  { id: "angry",         label: "Angry",         emoji: "🔥", description: "Genuine frustration and moral outrage" },
+  { id: "rude",          label: "Rude",          emoji: "💢", description: "Blunt, cutting, openly disrespectful" },
+];

@@ -1,11 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Swords, Send, Loader2, RotateCcw, ArrowRight, Trophy, ChevronRight, Volume2, Mic } from "lucide-react";
+import {
+  Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
+  Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
@@ -14,6 +19,7 @@ import {
   DEFENSE_OPPONENTS,
   DEFENSE_TOPICS,
   DIFFICULTY_LEVELS,
+  TEMPERAMENT_TRAITS,
   type DefenseOpponent,
   type DefenseTopic,
 } from "@/data/defenseModeOpponents";
@@ -26,7 +32,7 @@ type Phase = "setup" | "sparring" | "responding" | "coaching" | "review";
 
 interface ChatMessage {
   id: string;
-  role: "opponent" | "disciple" | "coach" | "system";
+  role: "opponent" | "disciple" | "coach" | "assist" | "system";
   content: string;
   timestamp: Date;
   score?: number;
@@ -40,12 +46,15 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [selectedOpponent, setSelectedOpponent] = useState<DefenseOpponent | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<DefenseTopic | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState("intermediate");
+  const [selectedTemperaments, setSelectedTemperaments] = useState<string[]>(["polite"]);
+  const [assistMode, setAssistMode] = useState(true);
 
   // Combat state
   const [phase, setPhase] = useState<Phase>("setup");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isAssistLoading, setIsAssistLoading] = useState(false);
   const [roundCount, setRoundCount] = useState(0);
   const [lastScore, setLastScore] = useState<number | null>(null);
 
@@ -58,7 +67,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isLoading]);
+  }, [messages, isLoading, isAssistLoading]);
 
   // Auto-speak opponent/coach messages when audio mode is on
   useEffect(() => {
@@ -66,10 +75,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     const lastMsg = messages[messages.length - 1];
     if (!lastMsg) return;
     if (lastMsg.role !== "opponent" && lastMsg.role !== "coach") return;
-    // Only auto-speak new messages we haven't spoken yet
     if (lastMsg.id === autoSpeakId) return;
     setAutoSpeakId(lastMsg.id);
-    // Trigger cloud TTS via the text-to-speech edge function
     autoSpeak(lastMsg.content);
   }, [messages, audioMode]);
 
@@ -79,7 +86,6 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         body: { text, voice: "onyx", returnType: "url" },
       });
       if (error || !data) {
-        // Fallback to browser TTS
         if ("speechSynthesis" in window) {
           const utterance = new SpeechSynthesisUtterance(text);
           utterance.lang = "en-US";
@@ -93,7 +99,6 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       const audio = new Audio(audioSrc as string);
       audio.volume = 0.9;
       await audio.play().catch(() => {
-        // Autoplay blocked — fallback to browser TTS
         if ("speechSynthesis" in window) {
           const utterance = new SpeechSynthesisUtterance(text);
           utterance.lang = "en-US";
@@ -118,7 +123,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
   const buildConversationHistory = () => {
     return messages
-      .filter((m) => m.role !== "system")
+      .filter((m) => m.role !== "system" && m.role !== "assist")
       .map((m) => {
         const label =
           m.role === "opponent"
@@ -130,6 +135,37 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       })
       .join("\n\n");
   };
+
+  const toggleTemperament = (id: string) => {
+    setSelectedTemperaments((prev) =>
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
+    );
+  };
+
+  // Trigger Jeeves assist after opponent speaks
+  const triggerAssist = useCallback(async (opponentAttack: string) => {
+    if (!assistMode || !selectedOpponent || !selectedTopic) return;
+    setIsAssistLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-assist",
+          opponentAttack,
+          opponentName: selectedOpponent.name,
+          defenseTopicName: selectedTopic.name,
+          opponentPersonality: selectedTemperaments.join(", "),
+        },
+      });
+      if (error) throw error;
+      if (data?.content) {
+        addMessage({ role: "assist", content: data.content });
+      }
+    } catch (err) {
+      console.error("Assist error:", err);
+    } finally {
+      setIsAssistLoading(false);
+    }
+  }, [assistMode, selectedOpponent, selectedTopic, selectedTemperaments]);
 
   const startSparring = async () => {
     if (!selectedOpponent || !selectedTopic) return;
@@ -151,6 +187,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           defenseTopicId: selectedTopic.id,
           defenseTopicName: selectedTopic.name,
           difficulty: selectedDifficulty,
+          temperament: selectedTemperaments,
           opponentWorldview: selectedOpponent.worldview,
           opponentStyle: selectedOpponent.argumentStyle,
           opponentTargets: selectedOpponent.attackTargets,
@@ -163,17 +200,15 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
       if (error) throw error;
 
-      addMessage({
-        role: "opponent",
-        content: data.content || "The opponent could not formulate an argument.",
-      });
+      const opponentContent = data.content || "The opponent could not formulate an argument.";
+      addMessage({ role: "opponent", content: opponentContent });
       setPhase("responding");
+
+      // Trigger real-time assist
+      triggerAssist(opponentContent);
     } catch (err) {
       console.error("Sparring error:", err);
-      addMessage({
-        role: "system",
-        content: "Failed to start sparring. Please try again.",
-      });
+      addMessage({ role: "system", content: "Failed to start sparring. Please try again." });
       setPhase("setup");
     } finally {
       setIsLoading(false);
@@ -182,24 +217,17 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
   const submitDefense = () => {
     if (userInput.trim().length < 50) return;
-
     addMessage({ role: "disciple", content: userInput.trim() });
     setUserInput("");
-    setPhase("sparring"); // Waiting state before coaching
+    setPhase("sparring");
   };
 
   const requestCoaching = async () => {
     setPhase("coaching");
     setIsLoading(true);
 
-    const opponentAttack =
-      messages
-        .filter((m) => m.role === "opponent")
-        .pop()?.content || "";
-    const discipleResponse =
-      messages
-        .filter((m) => m.role === "disciple")
-        .pop()?.content || "";
+    const opponentAttack = messages.filter((m) => m.role === "opponent").pop()?.content || "";
+    const discipleResponse = messages.filter((m) => m.role === "disciple").pop()?.content || "";
 
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
@@ -215,19 +243,11 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
       const score = data.score || 0;
       setLastScore(score);
-
-      addMessage({
-        role: "coach",
-        content: data.content || "Coaching unavailable.",
-        score,
-      });
+      addMessage({ role: "coach", content: data.content || "Coaching unavailable.", score });
       setPhase("review");
     } catch (err) {
       console.error("Coaching error:", err);
-      addMessage({
-        role: "system",
-        content: "Coaching request failed. Please try again.",
-      });
+      addMessage({ role: "system", content: "Coaching request failed. Please try again." });
       setPhase("responding");
     } finally {
       setIsLoading(false);
@@ -255,6 +275,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           defenseTopicId: selectedTopic.id,
           defenseTopicName: selectedTopic.name,
           difficulty: selectedDifficulty,
+          temperament: selectedTemperaments,
           opponentWorldview: selectedOpponent.worldview,
           opponentStyle: selectedOpponent.argumentStyle,
           opponentTargets: selectedOpponent.attackTargets,
@@ -268,17 +289,15 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
       if (error) throw error;
 
-      addMessage({
-        role: "opponent",
-        content: data.content || "The opponent could not continue.",
-      });
+      const opponentContent = data.content || "The opponent could not continue.";
+      addMessage({ role: "opponent", content: opponentContent });
       setPhase("responding");
+
+      // Trigger real-time assist for follow-up
+      triggerAssist(opponentContent);
     } catch (err) {
       console.error("Follow-up sparring error:", err);
-      addMessage({
-        role: "system",
-        content: "Failed to continue sparring. Please try again.",
-      });
+      addMessage({ role: "system", content: "Failed to continue sparring. Please try again." });
       setPhase("review");
     } finally {
       setIsLoading(false);
@@ -286,20 +305,19 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   };
 
   const resetMatch = () => {
-    // Stop any playing audio
     if ("speechSynthesis" in window) speechSynthesis.cancel();
     setPhase("setup");
     setMessages([]);
     setSelectedOpponent(null);
     setSelectedTopic(null);
     setSelectedDifficulty("intermediate");
+    setSelectedTemperaments(["polite"]);
     setUserInput("");
     setRoundCount(0);
     setLastScore(null);
     setAutoSpeakId(null);
   };
 
-  // Handle voice transcript — append to current input
   const handleVoiceTranscript = useCallback((text: string) => {
     setUserInput((prev) => {
       const separator = prev.trim() ? " " : "";
@@ -307,7 +325,6 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     });
   }, []);
 
-  // Check if the last disciple message is long enough for coaching
   const lastDiscipleMsg = messages.filter((m) => m.role === "disciple").pop();
   const canRequestCoaching =
     phase === "sparring" &&
@@ -327,8 +344,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             <h2 className="text-2xl font-bold">Defense Mode</h2>
           </div>
           <p className="text-muted-foreground text-sm max-w-lg mx-auto">
-            Theological Combat Simulator — Train to defend the faith against
-            real-world challengers. Select your opponent, topic, and difficulty.
+            Theological Combat Simulator — Train to defend the faith against real-world challengers.
           </p>
         </div>
 
@@ -339,11 +355,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </h3>
           <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-3 lg:grid-cols-4"} gap-3`}>
             {DEFENSE_OPPONENTS.map((opp) => (
-              <motion.div
-                key={opp.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
+              <motion.div key={opp.id} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Card
                   variant="glass"
                   className={`cursor-pointer transition-all ${opp.color} border-2 ${
@@ -355,16 +367,10 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                 >
                   <CardContent className="p-3 text-center space-y-1">
                     <div className="relative mx-auto w-16 h-16 rounded-full overflow-hidden border-2 border-current mb-1">
-                      <img
-                        src={opp.avatar}
-                        alt={opp.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={opp.avatar} alt={opp.name} className="w-full h-full object-cover" />
                     </div>
                     <p className="font-semibold text-sm">{opp.name}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {opp.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">{opp.description}</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -374,19 +380,14 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
         {/* Topic Selector */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-            Select Topic
-          </h3>
-          {/* Core SDA Topics */}
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Select Topic</h3>
           <div className="flex flex-wrap gap-2">
             {DEFENSE_TOPICS.filter((t) => !t.isSignature).map((topic) => (
               <Badge
                 key={topic.id}
                 variant={selectedTopic?.id === topic.id ? "default" : "outline"}
                 className={`cursor-pointer text-sm py-1.5 px-3 transition-all ${
-                  selectedTopic?.id === topic.id
-                    ? "bg-primary text-primary-foreground shadow"
-                    : "hover:bg-primary/10"
+                  selectedTopic?.id === topic.id ? "bg-primary text-primary-foreground shadow" : "hover:bg-primary/10"
                 }`}
                 onClick={() => setSelectedTopic(topic)}
               >
@@ -394,7 +395,6 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
               </Badge>
             ))}
           </div>
-          {/* Signature Topics (shown when opponent is selected) */}
           {selectedOpponent && (() => {
             const sigTopics = DEFENSE_TOPICS.filter(
               (t) => t.isSignature && selectedOpponent.signatureTopics.includes(t.id)
@@ -425,17 +425,13 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             );
           })()}
           {selectedTopic && (
-            <p className="text-xs text-muted-foreground mt-1">
-              {selectedTopic.description}
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">{selectedTopic.description}</p>
           )}
         </div>
 
         {/* Difficulty */}
         <div>
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Difficulty
-          </h3>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Difficulty</h3>
           <div className="flex gap-2">
             {DIFFICULTY_LEVELS.map((level) => (
               <Button
@@ -454,6 +450,58 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </p>
         </div>
 
+        {/* Challenger Temperament */}
+        <div>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+            Challenger Personality
+          </h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Select one or more traits. Real challengers aren't always polite.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {TEMPERAMENT_TRAITS.map((trait) => (
+              <button
+                key={trait.id}
+                onClick={() => toggleTemperament(trait.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                  selectedTemperaments.includes(trait.id)
+                    ? "bg-primary/20 border-primary text-primary"
+                    : "bg-transparent border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                }`}
+                title={trait.description}
+              >
+                <span>{trait.emoji}</span>
+                <span>{trait.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Assist Mode Toggle */}
+        <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-950/20 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-400" />
+              <div>
+                <p className="text-sm font-semibold text-amber-300">Jeeves Assist Mode</p>
+                <p className="text-xs text-muted-foreground">
+                  Jeeves coaches you live after each opponent attack — fallacies, counters, composure
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={assistMode}
+              onCheckedChange={setAssistMode}
+              className="data-[state=checked]:bg-amber-500"
+            />
+          </div>
+          {assistMode && (
+            <p className="text-xs text-amber-400/80 border-t border-amber-500/20 pt-2">
+              ✓ Jeeves will whisper in your corner — exposing fallacies, blind spots, and coaching your composure before you respond.
+            </p>
+          )}
+        </div>
+
         {/* Audio Mode Toggle */}
         <div className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-black/5">
           <div className="flex items-center gap-2">
@@ -469,11 +517,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             onClick={() => setAudioMode(!audioMode)}
             className={audioMode ? "bg-purple-600 hover:bg-purple-700" : ""}
           >
-            {audioMode ? (
-              <><Mic className="h-4 w-4 mr-1" /> On</>
-            ) : (
-              "Off"
-            )}
+            {audioMode ? <><Mic className="h-4 w-4 mr-1" /> On</> : "Off"}
           </Button>
         </div>
 
@@ -498,11 +542,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-current shrink-0">
-            <img
-              src={selectedOpponent?.avatar}
-              alt={selectedOpponent?.name}
-              className="w-full h-full object-cover"
-            />
+            <img src={selectedOpponent?.avatar} alt={selectedOpponent?.name} className="w-full h-full object-cover" />
           </div>
           <div>
             <p className="font-semibold text-sm">{selectedOpponent?.name}</p>
@@ -510,12 +550,25 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
               {selectedTopic?.name} · Round {roundCount}
             </p>
           </div>
-          <Badge variant="outline" className="text-xs ml-2">
-            {selectedDifficulty}
-          </Badge>
+          <Badge variant="outline" className="text-xs ml-2">{selectedDifficulty}</Badge>
+          {selectedTemperaments.length > 0 && (
+            <div className="flex gap-1 ml-1">
+              {selectedTemperaments.slice(0, 3).map((t) => {
+                const trait = TEMPERAMENT_TRAITS.find((tr) => tr.id === t);
+                return trait ? (
+                  <span key={t} title={trait.label} className="text-sm">{trait.emoji}</span>
+                ) : null;
+              })}
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-1">
-          {/* Audio mode toggle in arena */}
+          {assistMode && (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-950/30 border border-amber-500/30">
+              <Sparkles className="h-3 w-3 text-amber-400" />
+              <span className="text-xs text-amber-400 font-medium">Assist</span>
+            </div>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -543,18 +596,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           { label: "Coach", active: phase === "coaching" || phase === "review" },
         ].map((step, i) => (
           <div key={step.label} className="flex items-center gap-1">
-            <div
-              className={`h-2.5 w-2.5 rounded-full transition-colors ${
-                step.active
-                  ? "bg-primary shadow-sm shadow-primary/50"
-                  : "bg-muted-foreground/30"
-              }`}
-            />
-            <span
-              className={`text-xs ${
-                step.active ? "text-primary font-semibold" : "text-muted-foreground"
-              }`}
-            >
+            <div className={`h-2.5 w-2.5 rounded-full transition-colors ${step.active ? "bg-primary shadow-sm shadow-primary/50" : "bg-muted-foreground/30"}`} />
+            <span className={`text-xs ${step.active ? "text-primary font-semibold" : "text-muted-foreground"}`}>
               {step.label}
             </span>
             {i < 2 && <ChevronRight className="h-3 w-3 text-muted-foreground/50" />}
@@ -563,7 +606,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       </div>
 
       {/* Message Thread */}
-      <ScrollArea className={`${isMobile ? "h-[350px]" : "h-[450px]"} rounded-lg border border-border/50 bg-black/10 p-3`}>
+      <ScrollArea className={`${isMobile ? "h-[370px]" : "h-[480px]"} rounded-lg border border-border/50 bg-black/10 p-3`}>
         <div ref={scrollRef} className="space-y-3">
           <AnimatePresence>
             {messages.map((msg) => (
@@ -577,6 +620,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                     ? "justify-end"
                     : msg.role === "system"
                     ? "justify-center"
+                    : msg.role === "assist"
+                    ? "justify-start"
                     : "justify-start"
                 }`}
               >
@@ -584,6 +629,18 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                   <p className="text-xs text-muted-foreground italic text-center px-4 py-1">
                     {msg.content}
                   </p>
+                ) : msg.role === "assist" ? (
+                  /* Jeeves Assist — Corner Coach bubble */
+                  <div className="max-w-[90%] rounded-xl p-3 text-sm whitespace-pre-wrap bg-gradient-to-br from-amber-950/60 to-yellow-950/40 border border-amber-500/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-1.5 flex-1">
+                        <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                        <span className="text-xs font-bold text-amber-400">JEEVES — Your Corner</span>
+                      </div>
+                      <span className="text-xs text-amber-500/60 font-medium">ASSIST</span>
+                    </div>
+                    <div className="text-amber-100/90 text-xs leading-relaxed">{msg.content}</div>
+                  </div>
                 ) : (
                   <div
                     className={`max-w-[85%] rounded-lg p-3 text-sm whitespace-pre-wrap ${
@@ -614,16 +671,12 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                         </>
                       )}
                       {msg.role === "disciple" && (
-                        <span className="text-xs font-semibold text-blue-400">
-                          You
-                        </span>
+                        <span className="text-xs font-semibold text-blue-400">You</span>
                       )}
                       {msg.role === "coach" && (
                         <>
                           <Shield className="h-3 w-3 text-amber-400" />
-                          <span className="text-xs font-semibold text-amber-400">
-                            Coach Jeeves
-                          </span>
+                          <span className="text-xs font-semibold text-amber-400">Coach Jeeves</span>
                           {msg.score !== undefined && msg.score > 0 && (
                             <Badge variant="outline" className="text-xs ml-auto border-amber-500/50 text-amber-400">
                               <Trophy className="h-3 w-3 mr-1" />
@@ -646,16 +699,20 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             ))}
           </AnimatePresence>
 
-          {/* Loading indicator */}
+          {/* Loading indicators */}
           {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-start"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
               <div className="flex items-center gap-2 rounded-lg bg-muted/30 border border-border/50 p-3 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 {phase === "coaching" ? "Jeeves is analyzing your defense..." : "Opponent is thinking..."}
+              </div>
+            </motion.div>
+          )}
+          {isAssistLoading && assistMode && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+              <div className="flex items-center gap-2 rounded-xl bg-amber-950/30 border border-amber-500/30 p-3 text-xs text-amber-400">
+                <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+                Jeeves is analyzing the attack for you...
               </div>
             </motion.div>
           )}
@@ -678,17 +735,11 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             }}
           />
           <div className="flex items-center justify-between">
+            <span className={`text-xs ${userInput.trim().length >= 50 ? "text-green-500" : "text-muted-foreground"}`}>
+              {userInput.trim().length}/50 min characters
+            </span>
             <div className="flex items-center gap-2">
-              <span className={`text-xs ${userInput.trim().length >= 50 ? "text-green-500" : "text-muted-foreground"}`}>
-                {userInput.trim().length}/50 min characters
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Voice Input — always available */}
-              <VoiceInput
-                onTranscript={handleVoiceTranscript}
-                variant="icon"
-              />
+              <VoiceInput onTranscript={handleVoiceTranscript} variant="icon" />
               <Button
                 size="sm"
                 disabled={userInput.trim().length < 50}
@@ -712,19 +763,14 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             onClick={requestCoaching}
           >
             <Shield className="h-5 w-5 mr-2" />
-            Get Coaching from Jeeves
+            Get Full Coaching from Jeeves
           </Button>
         </motion.div>
       )}
 
       {/* Review Actions */}
       {phase === "review" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-3"
-        >
-          {/* Score Display */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
           {lastScore !== null && (
             <div className="text-center p-4 rounded-lg bg-gradient-to-r from-amber-950/30 to-yellow-950/30 border border-amber-700/30">
               <Trophy className="h-8 w-8 text-amber-400 mx-auto mb-1" />
@@ -740,21 +786,12 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
               </p>
             </div>
           )}
-
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={continueSparring}
-            >
+            <Button variant="outline" className="flex-1" onClick={continueSparring}>
               <ArrowRight className="h-4 w-4 mr-1" />
               Continue Sparring
             </Button>
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={resetMatch}
-            >
+            <Button variant="outline" className="flex-1" onClick={resetMatch}>
               <RotateCcw className="h-4 w-4 mr-1" />
               New Match
             </Button>
