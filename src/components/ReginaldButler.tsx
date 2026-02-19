@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Send, Loader2, ChevronDown, Volume2, VolumeX } from "lucide-react";
+import { Send, Loader2, ChevronDown, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
 
 // Web Speech API TTS helper
 function speakText(text: string, onEnd?: () => void) {
@@ -53,6 +53,8 @@ export const ReginaldButler = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef<InstanceType<typeof window.SpeechRecognition> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -141,6 +143,34 @@ export const ReginaldButler = () => {
       setSpeaking(false);
     }
     setAudioEnabled((prev) => !prev);
+  };
+
+  const toggleMic = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+    const recognition = new SR();
+    recognitionRef.current = recognition;
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.onstart = () => setListening(true);
+    recognition.onresult = (e: SpeechRecognitionEvent) => {
+      const transcript = Array.from(e.results)
+        .map((r) => r[0].transcript)
+        .join("");
+      setInput(transcript);
+      if (e.results[e.results.length - 1].isFinal) {
+        setListening(false);
+      }
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+    recognition.start();
   };
 
   return (
@@ -285,12 +315,22 @@ export const ReginaldButler = () => {
 
             {/* Input */}
             <div className="bg-background border-t border-border px-3 py-2.5 flex gap-2 flex-shrink-0">
+              <Button
+                type="button"
+                onClick={toggleMic}
+                size="icon"
+                variant="ghost"
+                className={`h-9 w-9 flex-shrink-0 transition-colors ${listening ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
+                title={listening ? "Stop recording" : "Speak your question"}
+              >
+                {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </Button>
               <Input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                placeholder="Ask Reginald about the Palace…"
+                placeholder={listening ? "Listening…" : "Ask Reginald about the Palace…"}
                 disabled={loading}
                 className="flex-1 text-sm h-9"
               />
