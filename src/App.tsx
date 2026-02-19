@@ -31,6 +31,8 @@ import { LiveDemoNotification } from "@/components/live/LiveDemoNotification";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
+import { JeevesWidget } from "@/components/JeevesWidget";
+import { ReginaldButler } from "@/components/ReginaldButler";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
 import { DonationBanner } from "@/components/DonationBanner";
@@ -708,9 +710,15 @@ function App() {
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
                   {!isWorkspacePane && (
-                    <div className="fixed bottom-32 right-4 z-50 md:bottom-6 md:right-4 flex flex-col items-end gap-2">
-                      <AmbientMusicPlayer minimal />
-                    </div>
+                    <>
+                      <div className="fixed bottom-32 right-4 z-50 md:bottom-6 md:right-4 flex flex-col items-end gap-2">
+                        <AmbientMusicPlayer minimal />
+                      </div>
+                      <div className="fixed bottom-52 right-4 z-50 md:bottom-28 md:right-4 flex flex-col items-end gap-3">
+                        <JeevesWidget />
+                        <ReginaldButler />
+                      </div>
+                    </>
                   )}
                 </div>
               </ChangeManagerProvider>
