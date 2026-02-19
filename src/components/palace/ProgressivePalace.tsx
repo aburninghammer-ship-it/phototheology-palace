@@ -332,15 +332,6 @@ const RoomCard = ({ room, floorNumber, gradient }: RoomCardProps) => {
           "absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
         )} />
 
-        {/* Newly Renovated Badge - always show for rooms with libraries */}
-        {isRenovated && (
-          <div className="absolute top-2 left-2 z-20">
-            <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-[10px] px-1.5 py-0.5 animate-pulse shadow-lg">
-              <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />
-              {t('floorRoomCard.newlyRenovated', 'Newly Renovated')}
-            </Badge>
-          </div>
-        )}
         
         {/* Content */}
         <div className="relative z-10 p-3 w-full text-left">
