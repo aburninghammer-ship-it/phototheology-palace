@@ -257,11 +257,12 @@ function sanitizeForTTS(text: string): string {
     .trim();
 }
 
+// deno-lint-ignore no-explicit-any
 async function generateEpicText(
   book: string,
   chapter: number | null,
   scope: string,
-  supabaseAdmin?: ReturnType<typeof createClient>,
+  supabaseAdmin?: any,
 ): Promise<string> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
