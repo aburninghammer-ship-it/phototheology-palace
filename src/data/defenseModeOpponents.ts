@@ -1,10 +1,20 @@
 // Defense Mode — Theological Combat Simulator Data
 // 7 AI opponents, 7 topics, 3 difficulty levels
 
+import atheistAvatar from "@/assets/defense/atheist.jpg";
+import muslimAvatar from "@/assets/defense/muslim.jpg";
+import mormonAvatar from "@/assets/defense/mormon.jpg";
+import jwAvatar from "@/assets/defense/jw.jpg";
+import evangelicalAvatar from "@/assets/defense/evangelical.jpg";
+import catholicAvatar from "@/assets/defense/catholic.jpg";
+import bhiAvatar from "@/assets/defense/bhi.jpg";
+import formerSdaAvatar from "@/assets/defense/former-sda.jpg";
+
 export interface DefenseOpponent {
   id: string;
   name: string;
   emoji: string;
+  avatar: string;
   color: string;
   description: string;
   worldview: string;
@@ -34,6 +44,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
     id: "atheist",
     name: "The Atheist",
     emoji: "🧪",
+    avatar: atheistAvatar,
     color: "border-gray-500",
     description: "Demands empirical evidence and rejects faith claims",
     worldview:
@@ -56,6 +67,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
     id: "muslim",
     name: "The Muslim Apologist",
     emoji: "☪️",
+    avatar: muslimAvatar,
     color: "border-green-600",
     description: "Challenges the Trinity, biblical corruption, and Christ's deity",
     worldview:
@@ -79,6 +91,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
     id: "mormon",
     name: "The LDS Missionary",
     emoji: "📖",
+    avatar: mormonAvatar,
     color: "border-blue-400",
     description: "Presents restored gospel claims and extra-biblical authority",
     worldview:
@@ -102,6 +115,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
     id: "jw",
     name: "The Jehovah's Witness",
     emoji: "🏠",
+    avatar: jwAvatar,
     color: "border-purple-500",
     description: "Denies the Trinity, hell, and challenges the Sabbath",
     worldview:
@@ -125,6 +139,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
     id: "evangelical",
     name: "The Sunday Evangelical",
     emoji: "⛪",
+    avatar: evangelicalAvatar,
     color: "border-amber-500",
     description: "Champions grace alone and challenges SDA distinctives",
     worldview:
@@ -147,6 +162,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
     id: "catholic",
     name: "The Catholic Theologian",
     emoji: "✝️",
+    avatar: catholicAvatar,
     color: "border-yellow-600",
     description: "Defends tradition, papal authority, and apostolic succession",
     worldview:
@@ -170,6 +186,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
     id: "bhi",
     name: "The Hebrew Israelite",
     emoji: "🦁",
+    avatar: bhiAvatar,
     color: "border-red-600",
     description: "Claims ethnic identity as the true Israel and challenges SDA",
     worldview:
@@ -193,6 +210,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
     id: "former-sda",
     name: "The Former SDA",
     emoji: "🚪",
+    avatar: formerSdaAvatar,
     color: "border-slate-500",
     description: "Left the church and now dismantles SDA theology from the inside",
     worldview:
