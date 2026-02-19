@@ -23,6 +23,8 @@ import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from 'react-i18next';
+import { JeevesWidget } from "@/components/JeevesWidget";
+import { ReginaldButler } from "@/components/ReginaldButler";
 
 const Palace = () => {
   const { t } = useTranslation();
@@ -363,6 +365,11 @@ const Palace = () => {
         </div>
       </div>
       <Footer />
+      {/* Jeeves & Reginald widgets */}
+      <div className="fixed bottom-20 right-3 z-50 md:bottom-6 md:right-5 flex flex-col items-end gap-2">
+        <JeevesWidget />
+        <ReginaldButler />
+      </div>
     </div>
   );
 };
