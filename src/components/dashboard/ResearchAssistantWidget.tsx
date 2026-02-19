@@ -32,12 +32,19 @@ import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
 import { toast } from "sonner";
 
+interface Citation {
+  title: string;
+  url: string;
+}
+
 interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
   suggestions?: string[];
+  citations?: Citation[];
+  isWebSearch?: boolean;
 }
 
 interface QuickAction {
@@ -195,10 +202,33 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length, sessionName, savedStudyId]);
 
+  // Detect if a query is asking for internet/web search
+  const isWebSearchQuery = (q: string): boolean => {
+    const lower = q.toLowerCase();
+    return (
+      lower.includes("search the internet") ||
+      lower.includes("search online") ||
+      lower.includes("find links") ||
+      lower.includes("scholarly links") ||
+      lower.includes("search for links") ||
+      lower.includes("find articles") ||
+      lower.includes("current events") ||
+      lower.includes("latest news") ||
+      lower.includes("what's happening") ||
+      lower.includes("recent news") ||
+      lower.includes("news about") ||
+      lower.includes("web search") ||
+      lower.includes("internet search") ||
+      lower.includes("google") && lower.includes("search")
+    );
+  };
+
   const addMessage = (
     role: "user" | "assistant",
     content: string,
-    suggestions?: string[]
+    suggestions?: string[],
+    citations?: Citation[],
+    isWebSearch?: boolean
   ): ChatMessage => {
     const msg: ChatMessage = {
       id: crypto.randomUUID(),
@@ -206,6 +236,8 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
       content,
       timestamp: new Date(),
       suggestions,
+      citations,
+      isWebSearch,
     };
     setMessages((prev) => [...prev, msg]);
     return msg;
@@ -241,7 +273,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
     if (!query.trim() || isLoading) return;
 
     const userMsg = query.trim();
-    const userMsgObj = addMessage("user", userMsg);
+    addMessage("user", userMsg);
     setInput("");
     setIsLoading(true);
 
@@ -250,25 +282,42 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
       { role: "user", content: userMsg },
     ];
 
+    const webSearch = isWebSearchQuery(userMsg);
+
     try {
-      const { data, error } = await supabase.functions.invoke("jeeves", {
-        body: {
-          mode: "research",
-          query: userMsg,
-          question: userMsg,
-          conversationHistory: updatedHistory,
-          systemInstructions: SYSTEM_INSTRUCTIONS,
-        },
-      });
+      let rawResponse = "";
+      let citations: Citation[] = [];
 
-      if (error) throw error;
-
-      const rawResponse =
-        data?.response || data?.content || data?.answer || "No response received.";
+      if (webSearch) {
+        // Route through dedicated web search function
+        const { data, error } = await supabase.functions.invoke("web-research-assistant", {
+          body: {
+            query: userMsg,
+            conversationHistory: updatedHistory,
+            systemInstructions: SYSTEM_INSTRUCTIONS,
+          },
+        });
+        if (error) throw error;
+        rawResponse = data?.response || "No response received.";
+        citations = data?.citations || [];
+      } else {
+        // Standard research via Jeeves
+        const { data, error } = await supabase.functions.invoke("jeeves", {
+          body: {
+            mode: "research",
+            query: userMsg,
+            question: userMsg,
+            conversationHistory: updatedHistory,
+            systemInstructions: SYSTEM_INSTRUCTIONS,
+          },
+        });
+        if (error) throw error;
+        rawResponse = data?.response || data?.content || data?.answer || "No response received.";
+      }
 
       const { cleanText, suggestions } = parseSuggestions(rawResponse);
 
-      const assistantMsg = addMessage("assistant", cleanText, suggestions);
+      addMessage("assistant", cleanText, suggestions, citations.length > 0 ? citations : undefined, webSearch);
       const newHistory = [
         ...updatedHistory,
         { role: "assistant", content: rawResponse },
@@ -534,6 +583,38 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
                               ? formatContent(msg.content)
                               : msg.content}
                           </div>
+
+                          {/* Web Search Badge */}
+                          {msg.isWebSearch && (
+                            <div className="mt-2 flex items-center gap-1">
+                              <Globe className="h-3 w-3 text-cyan-400" />
+                              <span className="text-[10px] text-cyan-400/70 font-medium">Web-assisted response</span>
+                            </div>
+                          )}
+
+                          {/* Citations / Source Links */}
+                          {msg.citations && msg.citations.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-cyan-500/20 space-y-1.5">
+                              <p className="text-[10px] font-semibold text-cyan-400/70 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                <Globe className="h-3 w-3" />
+                                Sources
+                              </p>
+                              {msg.citations.map((c, i) => (
+                                <a
+                                  key={i}
+                                  href={c.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-start gap-2 text-[11px] text-cyan-300/80 hover:text-cyan-200 transition-colors group"
+                                >
+                                  <Link2 className="h-3 w-3 mt-0.5 shrink-0 text-cyan-500/50 group-hover:text-cyan-400 transition-colors" />
+                                  <span className="line-clamp-1 underline underline-offset-2 decoration-cyan-500/30">
+                                    {c.title.length > 70 ? c.title.slice(0, 70) + "…" : c.title}
+                                  </span>
+                                </a>
+                              ))}
+                            </div>
+                          )}
 
                           {/* Suggested Follow-ups */}
                           {msg.suggestions && msg.suggestions.length > 0 && (
