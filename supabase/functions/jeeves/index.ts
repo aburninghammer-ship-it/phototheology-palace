@@ -6078,7 +6078,8 @@ Build upon previous scholarly discussion while maintaining verification standard
 
       if (isQuickMode) {
         // CONCISE user prompt — just ask the question, let systemInstructions control format
-        userPrompt = `${question}${contextSection}${historySection}
+        // For quick mode, conversation history is passed as real message turns (see researchMessages below)
+        userPrompt = `${question}${contextSection}
 
 Answer directly and concisely. Quote verses in full when listing them. End with 2-3 suggested follow-up questions.`;
       } else {
@@ -7719,6 +7720,23 @@ Return ONLY valid JSON.`;
       );
     }
 
+    // Build messages array — for research quick mode, pass conversation history as real message turns
+    // so the AI maintains full conversational context instead of receiving history as embedded text.
+    let finalMessages: Array<{ role: string; content: string }> = [
+      { role: "system", content: systemPrompt },
+    ];
+
+    if (mode === "research" && requestBody.systemInstructions && requestBody.conversationHistory && Array.isArray(requestBody.conversationHistory) && requestBody.conversationHistory.length > 0) {
+      // Inject prior turns as real multi-turn messages so the AI has genuine conversational context
+      requestBody.conversationHistory.forEach((msg: any) => {
+        finalMessages.push({ role: msg.role === "assistant" ? "assistant" : "user", content: msg.content });
+      });
+      // Add the current question as the final user turn
+      finalMessages.push({ role: "user", content: userPrompt });
+    } else {
+      finalMessages.push({ role: "user", content: userPrompt });
+    }
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -7727,10 +7745,7 @@ Return ONLY valid JSON.`;
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
+        messages: finalMessages,
         temperature: 0.9, // High temperature for variety
       }),
     });
