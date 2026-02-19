@@ -354,7 +354,13 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                   onClick={() => setSelectedOpponent(opp)}
                 >
                   <CardContent className="p-3 text-center space-y-1">
-                    <div className="text-3xl">{opp.emoji}</div>
+                    <div className="relative mx-auto w-16 h-16 rounded-full overflow-hidden border-2 border-current mb-1">
+                      <img
+                        src={opp.avatar}
+                        alt={opp.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <p className="font-semibold text-sm">{opp.name}</p>
                     <p className="text-xs text-muted-foreground line-clamp-2">
                       {opp.description}
@@ -491,7 +497,13 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       {/* Opponent Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">{selectedOpponent?.emoji}</span>
+          <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-current shrink-0">
+            <img
+              src={selectedOpponent?.avatar}
+              alt={selectedOpponent?.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div>
             <p className="font-semibold text-sm">{selectedOpponent?.name}</p>
             <p className="text-xs text-muted-foreground">
@@ -585,6 +597,11 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                     <div className="flex items-center gap-1.5 mb-1">
                       {msg.role === "opponent" && (
                         <>
+                          <img
+                            src={selectedOpponent?.avatar}
+                            alt={selectedOpponent?.name}
+                            className="w-5 h-5 rounded-full object-cover border border-red-700/50"
+                          />
                           <span className="text-xs font-semibold text-red-400">
                             {selectedOpponent?.emoji} {selectedOpponent?.name}
                           </span>
