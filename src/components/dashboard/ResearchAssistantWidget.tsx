@@ -192,7 +192,8 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
     if (lastMsg?.role === "assistant" && messages.length >= 2) {
       saveSession(messages, sessionName, savedStudyId);
     }
-  }, [messages.length]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length, sessionName, savedStudyId]);
 
   const addMessage = (
     role: "user" | "assistant",
