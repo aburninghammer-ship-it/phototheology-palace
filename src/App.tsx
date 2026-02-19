@@ -33,6 +33,7 @@ import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ReginaldButler } from "@/components/ReginaldButler";
+import { JeevesWidget } from "@/components/JeevesWidget";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
 import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
@@ -712,6 +713,7 @@ function App() {
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
                   {!isWorkspacePane && <ReginaldButler />}
+                  {!isWorkspacePane && <JeevesWidget />}
                 </div>
               </ChangeManagerProvider>
               </SidebarProvider>
