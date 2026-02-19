@@ -14,7 +14,7 @@ const logStep = (step: string, details?: any) => {
 interface EmailRequest {
   subject: string;
   htmlContent: string;
-  filter: 'all' | 'active' | 'not_paid' | 'paid_only';
+  filter: 'all' | 'active' | 'not_paid' | 'paid_only' | 'teachable_not_signed_up';
   testMode?: boolean;
   testEmail?: string;
 }
@@ -67,9 +67,33 @@ serve(async (req) => {
       // Test mode - only send to test email
       emails = [testEmail];
       logStep("Test mode - sending to", { testEmail });
+    } else if (filter === 'teachable_not_signed_up') {
+      // Special filter: Teachable members who haven't signed up for the Suite
+      // Pull all teachable emails
+      const { data: teachableStudents, error: teachableError } = await supabaseClient
+        .from("teachable_students")
+        .select("teachable_email");
+      
+      if (teachableError) throw teachableError;
+      logStep("Teachable students fetched", { count: teachableStudents?.length });
+
+      // Get all emails that already have a Suite account (from auth)
+      const { data: authUsers } = await supabaseClient.auth.admin.listUsers({ perPage: 1000 });
+      const suiteEmails = new Set(
+        (authUsers?.users || []).map(u => u.email?.toLowerCase()).filter(Boolean)
+      );
+
+      // Return only Teachable members NOT already in the Suite
+      const teachableEmails = (teachableStudents || [])
+        .map(s => s.teachable_email?.toLowerCase())
+        .filter((email): email is string => !!email && !suiteEmails.has(email));
+
+      // Deduplicate
+      emails = [...new Set(teachableEmails)];
+      logStep("Teachable-only emails filtered", { total: teachableStudents?.length, notInSuite: emails.length });
     } else {
       // Get all users with emails from auth.users using admin API
-      const { data: authUsers, error: authError } = await supabaseClient.auth.admin.listUsers();
+      const { data: authUsers, error: authError } = await supabaseClient.auth.admin.listUsers({ perPage: 1000 });
       if (authError) throw authError;
 
       logStep("Auth users fetched", { count: authUsers.users?.length });
