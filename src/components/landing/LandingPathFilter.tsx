@@ -52,13 +52,8 @@ export function LandingPathFilter() {
     
     // Navigate based on auth state
     if (user) {
-      // Check if user has completed PT onboarding
-      const hasCompletedPTOnboarding = localStorage.getItem("pt_onboarding_complete") === "true";
-      if (!hasCompletedPTOnboarding) {
-        navigate("/pt-onboarding");
-      } else {
-        navigate(intent.authPath);
-      }
+      // Go directly to the gatehouse (blue/red choice page) — no multi-step onboarding
+      navigate("/gatehouse");
     } else {
       navigate(intent.path);
     }

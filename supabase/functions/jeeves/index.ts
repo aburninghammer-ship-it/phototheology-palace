@@ -5937,13 +5937,10 @@ Be helpful, specific, and direct. Avoid generic theological overviews when they 
       if (isQuickMode) {
         // CONCISE MODE — used by Research Assistant widget
         // Respects the frontend systemInstructions for direct, concise answers
-        systemPrompt = `You are Jeeves, ${greeting}'s Research Assistant in Phototheology Palace.
+        // CONCISE MODE: Keep prompt lean to avoid timeouts. PALACE_SCHEMA omitted here.
+        systemPrompt = `You are Jeeves, a Bible research assistant in Phototheology Palace.
 
-${systemInstructions}
-
-${THEOLOGICAL_REASONING}
-
-${PALACE_SCHEMA}`;
+${systemInstructions}`;
       } else {
         // DEEP RESEARCH MODE — used by Research Mode page for scholarly briefs
       systemPrompt = `You are operating as Jeeves, ${greeting}'s HIGH-PRECISION HISTORICAL AND THEOLOGICAL RESEARCH ENGINE for long-form analysis intended for publication, teaching, and documentary use.
@@ -7737,6 +7734,9 @@ Return ONLY valid JSON.`;
       finalMessages.push({ role: "user", content: userPrompt });
     }
 
+    // Use lower temperature for research mode to improve reliability and reduce timeouts
+    const modelTemperature = (mode === "research") ? 0.4 : 0.9;
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -7746,7 +7746,8 @@ Return ONLY valid JSON.`;
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: finalMessages,
-        temperature: 0.9, // High temperature for variety
+        temperature: modelTemperature,
+        max_tokens: mode === "research" ? 2048 : 4096,
       }),
     });
 
