@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Building2, Columns2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen, Globe } from "lucide-react";
+import { Building2, Columns2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen, Globe, Settings } from "lucide-react";
 import { DraggableNavTabs } from "@/components/navigation/DraggableNavTabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -870,9 +870,9 @@ export const Navigation = () => {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/manage-subscription" className="text-muted-foreground">
-                          <CreditCard className="h-4 w-4 mr-2" />
-                          Manage Subscription
+                        <Link to="/manage-subscription">
+                          <Settings className="h-4 w-4 mr-2 text-primary" />
+                          <span className="font-medium">Manage Subscription</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
