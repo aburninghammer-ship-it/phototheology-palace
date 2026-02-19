@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -159,11 +160,11 @@ export const ReginaldButler = () => {
             </span>
             <Button
               onClick={() => setOpen(true)}
-              className="h-11 w-11 rounded-full shadow-xl border-2 border-amber-500/40 p-0 flex items-center justify-center flex-shrink-0"
+              className="h-11 w-11 rounded-full shadow-xl border-2 border-amber-500/40 p-0 flex items-center justify-center flex-shrink-0 overflow-hidden"
               style={{ background: "linear-gradient(135deg, #78350f, #92400e)" }}
               aria-label="Open Reginald the Palace Butler"
             >
-              <span className="text-xl leading-none select-none">🎩</span>
+              <img src={reginaldAvatar} alt="Reginald" className="h-full w-full object-cover object-top" />
             </Button>
           </motion.div>
         )}
@@ -186,9 +187,8 @@ export const ReginaldButler = () => {
               style={{ background: "linear-gradient(to right, #451a03, #78350f)" }}
             >
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full flex items-center justify-center text-lg select-none border border-amber-500/30"
-                  style={{ background: "rgba(120,53,15,0.6)" }}>
-                  🎩
+                <div className="h-9 w-9 rounded-full overflow-hidden flex-shrink-0 border border-amber-500/30">
+                  <img src={reginaldAvatar} alt="Reginald" className="h-full w-full object-cover object-top" />
                 </div>
                 <div>
                   <p className="font-semibold text-sm leading-tight text-amber-50">Reginald</p>
