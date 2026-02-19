@@ -11,7 +11,7 @@ const FROM_EMAIL = "Phototheology <support@thephototheologyapp.com>";
 interface EmailRequest {
   subject: string;
   htmlContent: string;
-  filter: 'all' | 'master_class_active' | 'master_class_inactive' | 'free_signup' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
+  filter: 'all' | 'master_class_active' | 'master_class_inactive' | 'free_signup' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying' | 'not_suite_subscribers';
   testMode: boolean;
   testEmail?: string;
 }
@@ -123,59 +123,129 @@ serve(async (req) => {
       );
     }
 
-    // Fetch all students with pagination (bypass 1000 row limit)
-    let allStudents: Array<{ teachable_email: string | null; user_id: string | null; is_active: boolean | null; mrr: number | null }> = [];
-    let hasMore = true;
-    let offset = 0;
-    const pageSize = 1000;
+    // Special filter: Teachable users NOT subscribed to the Suite
+    // These are users in teachable_students whose linked app account has no active/trial subscription
+    // OR who have no linked account at all (unlinked).
+    let emails: string[] = [];
 
-    while (hasMore) {
-      let query = supabase
-        .from("teachable_students")
-        .select("teachable_email, user_id, is_active, mrr")
-        .range(offset, offset + pageSize - 1);
-
-      switch (filter) {
-        case 'master_class_active':
-          query = query.eq("is_master_class", true).eq("is_active", true);
-          break;
-        case 'master_class_inactive':
-          query = query.eq("is_master_class", true).eq("is_active", false);
-          break;
-        case 'free_signup':
-          query = query.eq("is_master_class", false);
-          break;
-        case 'linked':
-          query = query.not("user_id", "is", null);
-          break;
-        case 'unlinked':
-          query = query.is("user_id", null);
-          break;
-        case 'premium_paying':
-          query = query.gte("mrr", 15);
-          break;
-        case 'not_paying':
-          query = query.or("mrr.is.null,mrr.eq.0");
-          break;
+    if (filter === 'not_suite_subscribers') {
+      // 1. Get all teachable students (paginated)
+      let allStudents: Array<{ teachable_email: string | null; user_id: string | null }> = [];
+      let hasMore = true;
+      let offset = 0;
+      const pageSize = 1000;
+      while (hasMore) {
+        const { data: pageData, error: pageError } = await supabase
+          .from("teachable_students")
+          .select("teachable_email, user_id")
+          .range(offset, offset + pageSize - 1);
+        if (pageError) throw pageError;
+        if (pageData && pageData.length > 0) {
+          allStudents = allStudents.concat(pageData);
+          offset += pageSize;
+          hasMore = pageData.length === pageSize;
+        } else {
+          hasMore = false;
+        }
       }
 
-      const { data: pageData, error: pageError } = await query;
-      if (pageError) throw pageError;
+      // 2. Collect user_ids that are linked
+      const linkedUserIds = allStudents
+        .map(s => s.user_id)
+        .filter((id): id is string => !!id);
 
-      if (pageData && pageData.length > 0) {
-        allStudents = allStudents.concat(pageData);
-        offset += pageSize;
-        hasMore = pageData.length === pageSize;
-      } else {
-        hasMore = false;
+      // 3. Get active/trial subscriber user_ids from user_subscriptions
+      let activeSubscriberIds = new Set<string>();
+      if (linkedUserIds.length > 0) {
+        // Batch in chunks of 500 to avoid query size limits
+        const chunkSize = 500;
+        for (let i = 0; i < linkedUserIds.length; i += chunkSize) {
+          const chunk = linkedUserIds.slice(i, i + chunkSize);
+          const { data: subData } = await supabase
+            .from("user_subscriptions")
+            .select("user_id")
+            .in("user_id", chunk)
+            .in("subscription_status", ["active", "trial", "trialing"]);
+          (subData || []).forEach(s => activeSubscriberIds.add(s.user_id));
+        }
+
+        // Also check profiles for lifetime access
+        for (let i = 0; i < linkedUserIds.length; i += chunkSize) {
+          const chunk = linkedUserIds.slice(i, i + chunkSize);
+          const { data: lifetimeData } = await supabase
+            .from("profiles")
+            .select("id")
+            .in("id", chunk)
+            .eq("has_lifetime_access", true);
+          (lifetimeData || []).forEach(p => activeSubscriberIds.add(p.id));
+        }
       }
+
+      // 4. Filter: keep students who are unlinked OR linked but not active subscribers
+      const filtered = allStudents.filter(s => {
+        if (!s.teachable_email) return false;
+        if (!s.user_id) return true; // unlinked = never used the app = not a subscriber
+        return !activeSubscriberIds.has(s.user_id); // linked but not paying
+      });
+
+      emails = [...new Set(filtered.map(s => s.teachable_email).filter((e): e is string => !!e && e.trim() !== ''))];
+      logStep("not_suite_subscribers filter result", { total: allStudents.length, filtered: emails.length });
+
+    } else {
+      // Fetch all students with pagination (bypass 1000 row limit)
+      let allStudents: Array<{ teachable_email: string | null; user_id: string | null; is_active: boolean | null; mrr: number | null }> = [];
+      let hasMore = true;
+      let offset = 0;
+      const pageSize = 1000;
+
+      while (hasMore) {
+        let query = supabase
+          .from("teachable_students")
+          .select("teachable_email, user_id, is_active, mrr")
+          .range(offset, offset + pageSize - 1);
+
+        switch (filter) {
+          case 'master_class_active':
+            query = query.eq("is_master_class", true).eq("is_active", true);
+            break;
+          case 'master_class_inactive':
+            query = query.eq("is_master_class", true).eq("is_active", false);
+            break;
+          case 'free_signup':
+            query = query.eq("is_master_class", false);
+            break;
+          case 'linked':
+            query = query.not("user_id", "is", null);
+            break;
+          case 'unlinked':
+            query = query.is("user_id", null);
+            break;
+          case 'premium_paying':
+            query = query.gte("mrr", 15);
+            break;
+          case 'not_paying':
+            query = query.or("mrr.is.null,mrr.eq.0");
+            break;
+        }
+
+        const { data: pageData, error: pageError } = await query;
+        if (pageError) throw pageError;
+
+        if (pageData && pageData.length > 0) {
+          allStudents = allStudents.concat(pageData);
+          offset += pageSize;
+          hasMore = pageData.length === pageSize;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      emails = [...new Set(
+        allStudents
+          .map(s => s.teachable_email)
+          .filter((e): e is string => !!e && e.trim() !== '')
+      )];
     }
-
-    const emails = [...new Set(
-      allStudents
-        .map(s => s.teachable_email)
-        .filter((e): e is string => !!e && e.trim() !== '')
-    )];
 
     logStep("Emails fetched", { filter, count: emails.length });
 
