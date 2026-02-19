@@ -159,19 +159,19 @@ export const JeevesWidget = () => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="relative"
+            className="relative flex items-center gap-2"
           >
+            <div className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-full shadow-lg pointer-events-none bg-indigo-950/90 text-indigo-100">
+              Jeeves
+            </div>
             <Button
               onClick={() => setOpen(true)}
-              className="h-14 w-14 rounded-full shadow-xl border-2 border-indigo-500/40 p-0 flex items-center justify-center"
+              className="h-11 w-11 rounded-full shadow-xl border-2 border-indigo-500/40 p-0 flex items-center justify-center"
               style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81)" }}
               aria-label="Open Jeeves the Theological Guide"
             >
-              <span className="text-2xl leading-none select-none">📖</span>
+              <span className="text-xl leading-none select-none">📖</span>
             </Button>
-            <div className="absolute bottom-full right-0 mb-2 whitespace-nowrap text-xs font-medium px-3 py-1.5 rounded-full shadow-lg pointer-events-none bg-indigo-950 text-indigo-100">
-              Ask Jeeves
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -184,8 +184,8 @@ export const JeevesWidget = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="absolute bottom-full right-0 mb-2 w-[calc(100vw-2rem)] max-w-sm flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border"
-            style={{ maxHeight: "min(560px, calc(100vh - 120px))" }}
+            className="absolute bottom-0 right-full mr-3 w-[calc(100vw-2rem)] max-w-sm flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border"
+            style={{ maxHeight: "min(560px, calc(100vh - 100px))" }}
           >
             {/* Header */}
             <div
