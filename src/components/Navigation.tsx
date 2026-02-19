@@ -872,7 +872,7 @@ export const Navigation = () => {
                       <DropdownMenuItem asChild>
                         <Link to="/manage-subscription" className="text-muted-foreground">
                           <CreditCard className="h-4 w-4 mr-2" />
-                          Cancel Subscription
+                          Manage Subscription
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
