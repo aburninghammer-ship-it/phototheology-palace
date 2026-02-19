@@ -348,6 +348,24 @@ export const DEFENSE_TOPICS: DefenseTopic[] = [
     description:
       "The futurist system (Darby, Scofield, Left Behind) — its Jesuit origins, the 7-year tribulation gap theory, and why it fails exegetically",
   },
+  {
+    id: "second-coming",
+    name: "Second Coming",
+    description:
+      "The visible, literal, bodily return of Christ — every eye shall see Him. Against secret comings, spiritual returns, and preterist fulfillment in 70 AD",
+  },
+  {
+    id: "antiochus-epiphanes",
+    name: "Antiochus Epiphanes",
+    description:
+      "The historicist vs. preterist debate — does Daniel 8 describe Antiochus IV as the little horn, or does the 2,300-day prophecy point forward to the heavenly sanctuary judgment of 1844?",
+  },
+  {
+    id: "israel-identity",
+    name: "Israel's Identity",
+    description:
+      "Who is Israel in prophecy? Literal ethnic Israel restored vs. spiritual Israel — the church as the covenant people, against dispensationalism and Christian Zionism",
+  },
   // ── Cross-Opponent "Positive Case" Topics ─────────────────
   {
     id: "muhammad-in-bible",
