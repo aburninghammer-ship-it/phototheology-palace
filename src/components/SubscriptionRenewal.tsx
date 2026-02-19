@@ -164,7 +164,7 @@ export function SubscriptionRenewal() {
 
         {/* Action Buttons */}
         <div className="space-y-2">
-          {!isStudent && subscription.status === 'active' && (
+          {!isStudent && (subscription.status === 'active' || subscription.status === 'trial') && (
             <>
               <Button
                 variant="outline"
@@ -180,12 +180,12 @@ export function SubscriptionRenewal() {
                 ) : (
                   <>
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Manage Billing
+                    Manage Subscription & Billing
                   </>
                 )}
               </Button>
               <p className="text-xs text-muted-foreground text-center">
-                Update payment method, view invoices, or cancel subscription
+                Change plan, update payment method, view invoices, or cancel subscription
               </p>
             </>
           )}
