@@ -265,6 +265,7 @@ async function generateEpicText(
   supabaseAdmin?: any,
 ): Promise<string> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  const OPENAI_API_KEY_LOCAL = Deno.env.get("OPENAI_API_KEY");
 
   const isBookScope = scope === "book";
   const systemPrompt = isBookScope ? EPIC_BOOK_SYSTEM_PROMPT : EPIC_CHAPTER_SYSTEM_PROMPT;
@@ -308,30 +309,64 @@ These anchors are non-negotiable. They have been drawn from careful typological 
     ? `Create an epic cinematic overview of the entire book of ${book}. This should be a dramatic, sweeping narration that captures the grand arc of this book — its historical context, its place in redemption history, its major movements and themes — while revealing its deep theological significance and how it fits into the story of salvation from Genesis to Revelation.`
     : `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.${cecAnchorBlock}`;
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.8,
-      max_tokens: 8000,
-    }),
-  });
+  // Try Lovable AI gateway first, fall back to OpenAI directly
+  const tryLovable = async () => {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-pro",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.8,
+        max_tokens: 8000,
+      }),
+    });
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Lovable AI error: ${response.status} - ${err}`);
+    }
+    const data = await response.json();
+    return data.choices[0].message.content as string;
+  };
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`AI error: ${response.status} - ${err}`);
+  const tryOpenAI = async () => {
+    if (!OPENAI_API_KEY_LOCAL) throw new Error("No OpenAI API key available");
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENAI_API_KEY_LOCAL}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.8,
+        max_tokens: 8000,
+      }),
+    });
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`OpenAI error: ${response.status} - ${err}`);
+    }
+    const data = await response.json();
+    return data.choices[0].message.content as string;
+  };
+
+  try {
+    return await tryLovable();
+  } catch (lovableErr) {
+    console.warn(`[EpicCommentary] Lovable AI failed, falling back to OpenAI: ${lovableErr}`);
+    return await tryOpenAI();
   }
-
-  const data = await response.json();
-  return data.choices[0].message.content;
 }
 
 /**
