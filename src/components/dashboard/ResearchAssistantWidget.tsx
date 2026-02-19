@@ -160,9 +160,32 @@ function formatContent(text: string) {
 
 interface ResearchAssistantWidgetProps {
   defaultExpanded?: boolean;
+  resumeStudyId?: string;
 }
 
-export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAssistantWidgetProps) {
+// Parse saved study content back into chat messages
+function parseStudyContentToMessages(content: string): ChatMessage[] {
+  const msgs: ChatMessage[] = [];
+  // Split on Q/A markers written by buildStudyContent
+  const blocks = content.split(/## (?:❓ Question|📖 Research Response)\n\n/);
+  // blocks[0] is the header (title, date, ---), skip it
+  for (let i = 1; i < blocks.length; i++) {
+    const text = blocks[i].replace(/\n\n---\n\n$/, "").trim();
+    if (!text) continue;
+    // Alternate: odd indices after header = user, even = assistant
+    // The split pattern alternates: Q then R
+    const isUser = i % 2 === 1;
+    msgs.push({
+      id: crypto.randomUUID(),
+      role: isUser ? "user" : "assistant",
+      content: text,
+      timestamp: new Date(),
+    });
+  }
+  return msgs;
+}
+
+export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId }: ResearchAssistantWidgetProps) {
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -171,13 +194,36 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingResume, setIsLoadingResume] = useState(false);
   const [sessionName, setSessionName] = useState("");
-  const [savedStudyId, setSavedStudyId] = useState<string | null>(null);
+  const [savedStudyId, setSavedStudyId] = useState<string | null>(resumeStudyId ?? null);
   const [isSaving, setIsSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<
     Array<{ role: string; content: string }>
   >([]);
+
+  // Load a resumed study session on mount
+  useEffect(() => {
+    if (!resumeStudyId) return;
+    setIsLoadingResume(true);
+    supabase
+      .from("user_studies")
+      .select("title, content")
+      .eq("id", resumeStudyId)
+      .single()
+      .then(({ data, error }) => {
+        if (error || !data) { setIsLoadingResume(false); return; }
+        const parsed = parseStudyContentToMessages(data.content);
+        if (parsed.length > 0) {
+          setMessages(parsed);
+          setSessionName(data.title || "");
+          const history = parsed.map((m) => ({ role: m.role, content: m.content }));
+          setConversationHistory(history);
+        }
+        setIsLoadingResume(false);
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -504,8 +550,16 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
                 } rounded-xl border border-border/40 bg-gradient-to-b from-black/5 to-black/10 dark:from-black/10 dark:to-black/20 overflow-y-auto`}
               >
                 <div ref={scrollRef} className="p-3 space-y-3">
+                  {/* Loading resume state */}
+                  {isLoadingResume && (
+                    <div className="flex flex-col items-center justify-center min-h-[240px] text-center px-6">
+                      <Loader2 className="h-8 w-8 text-emerald-400 animate-spin mb-3" />
+                      <p className="text-sm text-muted-foreground">Loading your research session…</p>
+                    </div>
+                  )}
+
                   {/* Empty State */}
-                  {messages.length === 0 && !isLoading && (
+                  {messages.length === 0 && !isLoading && !isLoadingResume && (
                     <div className="flex flex-col items-center justify-center min-h-[240px] text-center px-6">
                       <div className="relative mb-4">
                         <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
@@ -525,6 +579,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false }: ResearchAss
                       </p>
                     </div>
                   )}
+
 
                   <AnimatePresence>
                     {messages.map((msg) => (
