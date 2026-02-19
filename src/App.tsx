@@ -710,15 +710,12 @@ function App() {
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
                   {!isWorkspacePane && (
-                    <>
-                      <div className="fixed bottom-44 right-4 z-50 md:bottom-16 md:right-4 flex flex-col items-end gap-2">
-                        <AmbientMusicPlayer minimal />
-                      </div>
-                      <div className="fixed bottom-64 right-4 z-50 md:bottom-36 md:right-4 flex flex-col items-end gap-3">
-                        <JeevesWidget />
-                        <ReginaldButler />
-                      </div>
-                    </>
+                    <div className="fixed bottom-24 md:bottom-16 right-4 z-50 flex flex-col-reverse items-end gap-3">
+                      {/* flex-col-reverse: DOM order = bottom-most first, stacking upward */}
+                      <AmbientMusicPlayer minimal />
+                      <JeevesWidget />
+                      <ReginaldButler />
+                    </div>
                   )}
                 </div>
               </ChangeManagerProvider>
