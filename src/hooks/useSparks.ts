@@ -63,6 +63,35 @@ export function useSparks({
   const [generating, setGenerating] = useState(false);
   const lastGenerationTime = useRef<number>(0);
   const dismissedCount = useRef(0);
+  const sessionClearedRef = useRef(false);
+
+  // On new session mount: dismiss all previous unsaved sparks for this context
+  useEffect(() => {
+    if (!user?.id || sessionClearedRef.current) return;
+    sessionClearedRef.current = true;
+
+    const clearOldSparks = async () => {
+      try {
+        let query = supabase
+          .from('sparks')
+          .update({ dismissed_at: new Date().toISOString() })
+          .eq('user_id', user.id)
+          .eq('context_type', contextType)
+          .is('dismissed_at', null)
+          .is('saved_at', null);
+
+        if (contextId && contextId !== '*') {
+          query = query.eq('context_id', contextId);
+        }
+
+        await query;
+      } catch (err) {
+        console.error('[Sparks] Session clear error:', err);
+      }
+    };
+
+    clearOldSparks();
+  }, [user?.id, contextType, contextId]);
 
   // Fetch user preferences
   useEffect(() => {
