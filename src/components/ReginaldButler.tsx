@@ -151,7 +151,7 @@ export const ReginaldButler = () => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6"
+            className="relative"
           >
             <Button
               onClick={() => setOpen(true)}
@@ -176,7 +176,7 @@ export const ReginaldButler = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6 w-[calc(100vw-2rem)] max-w-sm flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border"
+            className="absolute bottom-full right-0 mb-2 w-[calc(100vw-2rem)] max-w-sm flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border"
             style={{ maxHeight: "min(560px, calc(100vh - 120px))" }}
           >
             {/* Header */}

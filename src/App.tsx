@@ -712,8 +712,12 @@ function App() {
                   </main>
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
-                  {!isWorkspacePane && <ReginaldButler />}
-                  {!isWorkspacePane && <JeevesWidget />}
+                  {!isWorkspacePane && (
+                    <div className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6 flex flex-row-reverse items-end gap-3">
+                      <ReginaldButler />
+                      <JeevesWidget />
+                    </div>
+                  )}
                 </div>
               </ChangeManagerProvider>
               </SidebarProvider>
