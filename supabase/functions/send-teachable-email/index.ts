@@ -1,15 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Verified sender domain (Resend)
-const FROM_EMAIL = "Phototheology <noreply@thephototheologyapp.com>";
-
+const FROM_EMAIL = "Phototheology <support@thephototheologyapp.com>";
 
 interface EmailRequest {
   subject: string;
@@ -18,6 +15,11 @@ interface EmailRequest {
   testMode: boolean;
   testEmail?: string;
 }
+
+const logStep = (step: string, details?: unknown) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[SEND-TEACHABLE-EMAIL] ${step}${detailsStr}`);
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -85,7 +87,7 @@ serve(async (req) => {
       );
     }
 
-    // If test mode, just send to test email
+    // Test mode — single send
     if (testMode) {
       if (!testEmail) {
         return new Response(
@@ -94,34 +96,34 @@ serve(async (req) => {
         );
       }
 
-      const resend = new Resend(RESEND_API_KEY);
-
-      const { data, error } = await resend.emails.send({
-        from: FROM_EMAIL,
-        to: [testEmail],
-        subject: `[TEST] ${subject}`,
-        html: htmlContent,
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: FROM_EMAIL,
+          to: [testEmail],
+          subject: `[TEST] ${subject}`,
+          html: htmlContent,
+        }),
       });
 
-      if (error) {
-        console.error("Resend test email error:", error);
-        throw new Error(error.message);
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`Resend error: ${err}`);
       }
 
-      console.log("Test email sent:", data);
+      logStep("Test email sent", { testEmail });
 
       return new Response(
-        JSON.stringify({
-          success: true,
-          sent: 1,
-          total: 1,
-          message: `Test email sent to ${testEmail}`,
-        }),
+        JSON.stringify({ success: true, sent: 1, total: 1, message: `Test email sent to ${testEmail}` }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Build query based on filter - fetch ALL rows (no default 1000 limit)
+    // Fetch all students with pagination (bypass 1000 row limit)
     let allStudents: Array<{ teachable_email: string | null; user_id: string | null; is_active: boolean | null; mrr: number | null }> = [];
     let hasMore = true;
     let offset = 0;
@@ -155,15 +157,10 @@ serve(async (req) => {
         case 'not_paying':
           query = query.or("mrr.is.null,mrr.eq.0");
           break;
-        // 'all' - no additional filter
       }
 
       const { data: pageData, error: pageError } = await query;
-
-      if (pageError) {
-        console.error("Error fetching Teachable students page:", pageError);
-        throw pageError;
-      }
+      if (pageError) throw pageError;
 
       if (pageData && pageData.length > 0) {
         allStudents = allStudents.concat(pageData);
@@ -174,96 +171,110 @@ serve(async (req) => {
       }
     }
 
-    const teachableStudents = allStudents;
+    const emails = [...new Set(
+      allStudents
+        .map(s => s.teachable_email)
+        .filter((e): e is string => !!e && e.trim() !== '')
+    )];
 
-    if (!teachableStudents || teachableStudents.length === 0) {
+    logStep("Emails fetched", { filter, count: emails.length });
+
+    if (emails.length === 0) {
       return new Response(
-        JSON.stringify({
-          success: true,
-          sent: 0,
-          total: 0,
-          message: "No Teachable students found matching the filter",
-        }),
+        JSON.stringify({ success: true, sent: 0, total: 0, message: "No Teachable students found matching the filter" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Get unique emails (filter out nulls and cast to string)
-    const emails = [...new Set(
-      teachableStudents
-        .map(s => s.teachable_email)
-        .filter((e): e is string => e !== null && e !== undefined && e.trim() !== '')
-    )];
-    console.log(`Sending to ${emails.length} Teachable students with filter: ${filter}`);
-
-    const resend = new Resend(RESEND_API_KEY);
+    const campaignName = `Teachable Campaign - ${filter} - ${new Date().toISOString().split('T')[0]}`;
+    // Use Resend batch API — up to 100 per request
+    const BATCH_SIZE = 100;
     let sentCount = 0;
     let errorCount = 0;
-    const campaignName = `Teachable Campaign - ${filter} - ${new Date().toISOString().split('T')[0]}`;
+    const errorMessages: string[] = [];
 
-    // Send emails sequentially with delay to respect Resend rate limit (2/sec)
-    for (let i = 0; i < emails.length; i++) {
-      const email = emails[i];
-      
+    for (let i = 0; i < emails.length; i += BATCH_SIZE) {
+      const batch = emails.slice(i, i + BATCH_SIZE);
+
       try {
-        const emailResponse = await resend.emails.send({
-          from: FROM_EMAIL,
-          to: [email],
-          subject,
-          html: htmlContent,
+        const response = await fetch("https://api.resend.com/emails/batch", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(batch.map(email => ({
+            from: FROM_EMAIL,
+            to: [email],
+            subject,
+            html: htmlContent,
+          }))),
         });
 
-        if (emailResponse.error) {
-          throw new Error(emailResponse.error.message);
+        if (!response.ok) {
+          const errorText = await response.text();
+          logStep("Batch send error", { batchIndex: i, error: errorText });
+          errorMessages.push(`Batch ${Math.floor(i / BATCH_SIZE) + 1}: ${errorText}`);
+          errorCount += batch.length;
+
+          // Log failures
+          await supabase.from("email_campaign_logs").insert(
+            batch.map(email => ({
+              campaign_name: campaignName,
+              email_type: "teachable",
+              recipient_email: email,
+              status: "failed",
+              error_message: errorText,
+              sent_at: new Date().toISOString(),
+            }))
+          );
+        } else {
+          const result = await response.json();
+          sentCount += batch.length;
+          logStep("Batch sent", { batchIndex: i, count: batch.length });
+
+          // Log successes
+          await supabase.from("email_campaign_logs").insert(
+            batch.map((email, idx) => ({
+              campaign_name: campaignName,
+              email_type: "teachable",
+              recipient_email: email,
+              status: "sent",
+              sent_at: new Date().toISOString(),
+              resend_email_id: result?.data?.[idx]?.id || null,
+            }))
+          );
         }
-
-        sentCount++;
-
-        // Log successful send with resend email ID for tracking opens
-        await supabase.from("email_campaign_logs").insert({
-          campaign_name: campaignName,
-          email_type: "teachable",
-          recipient_email: email,
-          status: "sent",
-          sent_at: new Date().toISOString(),
-          resend_email_id: emailResponse.data?.id || null,
-        });
-      } catch (err) {
-        console.error(`Failed to send to ${email}:`, err);
-        errorCount++;
-        
-        // Log failed send
-        await supabase.from("email_campaign_logs").insert({
-          campaign_name: campaignName,
-          email_type: "teachable",
-          recipient_email: email,
-          status: "failed",
-          error_message: err instanceof Error ? err.message : "Unknown error",
-          sent_at: new Date().toISOString(),
-        });
+      } catch (batchErr) {
+        const msg = batchErr instanceof Error ? batchErr.message : String(batchErr);
+        logStep("Batch exception", { batchIndex: i, error: msg });
+        errorMessages.push(`Batch ${Math.floor(i / BATCH_SIZE) + 1}: ${msg}`);
+        errorCount += batch.length;
       }
 
-      // Delay 600ms between emails to stay under 2 req/sec rate limit
-      if (i < emails.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 600));
+      // 1 second delay between batches to stay well under rate limits
+      if (i + BATCH_SIZE < emails.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
-    console.log(`Email campaign complete: ${sentCount} sent, ${errorCount} errors`);
+    logStep("Campaign complete", { sentCount, errorCount });
 
     return new Response(
       JSON.stringify({
         success: true,
         sent: sentCount,
         total: emails.length,
-        message: `Successfully sent ${sentCount} emails to Teachable students`,
+        errors: errorCount,
+        message: `Successfully sent ${sentCount} of ${emails.length} emails to Teachable students`,
+        errorDetails: errorMessages.length > 0 ? errorMessages : undefined,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
   } catch (error: unknown) {
-    console.error("Error in send-teachable-email:", error);
     const errorMessage = error instanceof Error ? error.message : "Internal server error";
+    console.error("Error in send-teachable-email:", errorMessage);
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
