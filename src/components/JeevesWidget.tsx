@@ -165,14 +165,14 @@ export const JeevesWidget = () => {
             <span className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-full shadow-lg bg-indigo-950/90 text-indigo-100">
               Jeeves
             </span>
-            <Button
+            <button
               onClick={() => setOpen(true)}
-              className="h-11 w-11 rounded-full shadow-xl border-2 border-indigo-500/40 p-0 flex items-center justify-center flex-shrink-0 overflow-hidden"
-              style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81)" }}
+              className="h-11 w-11 rounded-full shadow-xl border-2 border-indigo-500/40 flex-shrink-0 overflow-hidden"
+              style={{ background: "#fff", padding: 0 }}
               aria-label="Open Jeeves the Theological Guide"
             >
-              <img src={jeevesAvatar} alt="Jeeves" className="h-full w-full object-cover object-top" />
-            </Button>
+              <img src={jeevesAvatar} alt="Jeeves" className="h-full w-full object-cover object-center" />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
