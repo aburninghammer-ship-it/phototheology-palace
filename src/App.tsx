@@ -32,6 +32,7 @@ import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { ReginaldButler } from "@/components/ReginaldButler";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
 import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
@@ -710,6 +711,7 @@ function App() {
                   </main>
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
+                  {!isWorkspacePane && <ReginaldButler />}
                 </div>
               </ChangeManagerProvider>
               </SidebarProvider>
