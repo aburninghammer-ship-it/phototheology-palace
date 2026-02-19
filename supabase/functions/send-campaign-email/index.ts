@@ -1853,63 +1853,112 @@ serve(async (req) => {
     logStep("Campaign complete", { sent, failed });
 
     // Send final campaign completion summary
+    const durationLabel = durationMinutes > 0 ? `${durationMinutes} min` : `${Math.round(durationMs / 1000)} sec`;
+    const successRate = recipients.length > 0 ? Math.round((sent / recipients.length) * 100) : 100;
+    const campaignLabel = campaignType.toUpperCase().replace(/_/g, ' ');
+
     await sendAdminNotification(
       resendApiKey,
       adminEmail,
-      `🎉 ${campaignType.toUpperCase()} Campaign Complete - ${sent} Emails Sent`,
-      `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
-          <h1 style="color: #f5d742; text-align: center; margin-bottom: 24px;">🎉 Campaign Complete!</h1>
-          
-          <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-            <h2 style="color: #4ecdc4; margin-top: 0;">Campaign Summary</h2>
-            <table style="width: 100%; color: #e5e5e5;">
-              <tr>
-                <td style="padding: 8px 0;"><strong>Campaign Type:</strong></td>
-                <td style="padding: 8px 0;">${campaignType.toUpperCase()}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0;"><strong>Started:</strong></td>
-                <td style="padding: 8px 0;">${campaignStartTime.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0;"><strong>Completed:</strong></td>
-                <td style="padding: 8px 0;">${campaignEndTime.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0;"><strong>Duration:</strong></td>
-                <td style="padding: 8px 0;">${durationMinutes > 0 ? durationMinutes + ' minutes' : Math.round(durationMs / 1000) + ' seconds'}</td>
-              </tr>
-            </table>
-          </div>
-          
-          <div style="display: flex; gap: 16px; margin-bottom: 20px;">
-            <div style="flex: 1; background: rgba(34, 197, 94, 0.2); padding: 16px; border-radius: 8px; text-align: center;">
-              <p style="font-size: 36px; font-weight: bold; color: #22c55e; margin: 0;">${sent}</p>
-              <p style="color: #22c55e; margin: 4px 0 0 0;">Emails Sent</p>
-            </div>
-            <div style="flex: 1; background: rgba(239, 68, 68, 0.2); padding: 16px; border-radius: 8px; text-align: center;">
-              <p style="font-size: 36px; font-weight: bold; color: #ef4444; margin: 0;">${failed}</p>
-              <p style="color: #ef4444; margin: 4px 0 0 0;">Failed</p>
-            </div>
-          </div>
-          
-          <div style="background: rgba(255,255,255,0.1); padding: 16px; border-radius: 8px;">
-            <p style="color: #a0a0a0; margin: 0; text-align: center;">
-              ${success ? '✅ All emails sent successfully!' : `⚠️ ${failed} emails failed to send. Check the email logs for details.`}
-            </p>
-          </div>
-          
-          ${failed > 0 ? `
-            <div style="background: rgba(239, 68, 68, 0.1); padding: 16px; border-radius: 8px; margin-top: 16px;">
-              <h3 style="color: #ef4444; margin-top: 0;">Failed Emails (first 10):</h3>
-              <ul style="color: #e5e5e5; margin: 0; padding-left: 20px;">
-                ${results.filter(r => !r.success).slice(0, 10).map(r => `<li>${r.email}: ${r.error || 'Unknown error'}</li>`).join('')}
-              </ul>
-            </div>
-          ` : ''}
+      `🎉 ${campaignLabel} Campaign Complete — ${sent.toLocaleString()} Emails Sent`,
+      `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0; padding:0; background:#0f0f1a; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f1a; padding: 40px 16px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%;">
+
+      <!-- Top accent bar -->
+      <tr><td style="background: linear-gradient(90deg, #f5d742, #ff6b6b, #4ecdc4, #a855f7); height: 5px; border-radius: 8px 8px 0 0;"></td></tr>
+
+      <!-- Header -->
+      <tr><td style="background: linear-gradient(160deg, #1a1a3e 0%, #12122a 100%); padding: 48px 40px 36px; text-align: center; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06);">
+        <div style="font-size: 52px; line-height: 1; margin-bottom: 16px;">🎉</div>
+        <h1 style="margin: 0 0 8px; font-size: 32px; font-weight: 800; color: #f5d742; letter-spacing: -0.5px;">Campaign Complete!</h1>
+        <p style="margin: 0; font-size: 16px; color: #8b8baa;">${campaignLabel} · ${campaignEndTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      </td></tr>
+
+      <!-- Stats row -->
+      <tr><td style="background: #12122a; padding: 0 40px; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06);">
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: -24px 0 0;">
+          <tr>
+            <td width="48%" style="padding: 0 8px 0 0;">
+              <div style="background: linear-gradient(135deg, #064e3b, #065f46); border: 1px solid #10b981; border-radius: 16px; padding: 28px 20px; text-align: center;">
+                <div style="font-size: 48px; font-weight: 900; color: #34d399; letter-spacing: -2px; line-height: 1;">${sent.toLocaleString()}</div>
+                <div style="font-size: 13px; font-weight: 600; color: #6ee7b7; letter-spacing: 1px; text-transform: uppercase; margin-top: 6px;">✓ Delivered</div>
+              </div>
+            </td>
+            <td width="4%"></td>
+            <td width="48%" style="padding: 0 0 0 8px;">
+              <div style="background: ${failed > 0 ? 'linear-gradient(135deg, #450a0a, #7f1d1d)' : 'linear-gradient(135deg, #1e1b4b, #312e81)'}; border: 1px solid ${failed > 0 ? '#ef4444' : '#6366f1'}; border-radius: 16px; padding: 28px 20px; text-align: center;">
+                <div style="font-size: 48px; font-weight: 900; color: ${failed > 0 ? '#f87171' : '#a5b4fc'}; letter-spacing: -2px; line-height: 1;">${failed.toLocaleString()}</div>
+                <div style="font-size: 13px; font-weight: 600; color: ${failed > 0 ? '#fca5a5' : '#c7d2fe'}; letter-spacing: 1px; text-transform: uppercase; margin-top: 6px;">${failed > 0 ? '✗ Failed' : '✓ No Errors'}</div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+
+      <!-- Details card -->
+      <tr><td style="background: #12122a; padding: 32px 40px; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06);">
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px 28px;">
+          <h2 style="margin: 0 0 20px; font-size: 13px; font-weight: 700; color: #4ecdc4; letter-spacing: 2px; text-transform: uppercase;">📊 Campaign Details</h2>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px; width: 40%;">Campaign Type</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e5e5f0; font-size: 14px; font-weight: 600;">${campaignLabel}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px;">Total Recipients</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e5e5f0; font-size: 14px; font-weight: 600;">${recipients.length.toLocaleString()}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px;">Success Rate</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px; font-weight: 700; color: ${successRate === 100 ? '#34d399' : successRate > 90 ? '#fbbf24' : '#f87171'};">${successRate}%</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px;">Started</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e5e5f0; font-size: 14px;">${campaignStartTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px;">Completed</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e5e5f0; font-size: 14px;">${campaignEndTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Duration</td>
+              <td style="padding: 10px 0; color: #e5e5f0; font-size: 14px; font-weight: 600;">⚡ ${durationLabel}</td>
+            </tr>
+          </table>
         </div>
-      `
+      </td></tr>
+
+      <!-- Status banner -->
+      <tr><td style="background: #12122a; padding: 0 40px 40px; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06);">
+        <div style="background: ${success ? 'linear-gradient(135deg, #064e3b, #065f46)' : 'linear-gradient(135deg, #450a0a, #7f1d1d)'}; border: 1px solid ${success ? '#10b981' : '#ef4444'}; border-radius: 12px; padding: 18px 24px; text-align: center;">
+          <span style="font-size: 15px; font-weight: 700; color: ${success ? '#34d399' : '#f87171'};">
+            ${success ? '✅ All emails delivered successfully — great send!' : `⚠️ ${failed} email${failed !== 1 ? 's' : ''} failed. Review logs for details.`}
+          </span>
+        </div>
+        ${failed > 0 ? `
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 20px 24px; margin-top: 16px;">
+          <h3 style="margin: 0 0 12px; font-size: 13px; font-weight: 700; color: #f87171; text-transform: uppercase; letter-spacing: 1px;">Failed Recipients (first 10)</h3>
+          <ul style="margin: 0; padding-left: 20px; color: #fca5a5; font-size: 13px; line-height: 1.8;">
+            ${results.filter(r => !r.success).slice(0, 10).map(r => `<li>${r.email}: ${r.error || 'Unknown error'}</li>`).join('')}
+          </ul>
+        </div>` : ''}
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="background: #0c0c1d; border: 1px solid rgba(255,255,255,0.06); border-top: none; border-radius: 0 0 8px 8px; padding: 24px 40px; text-align: center;">
+        <p style="margin: 0; font-size: 12px; color: #4b4b6b;">PhotoTheology Admin · Campaign Report · ${campaignEndTime.getFullYear()}</p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`
     );
 
     return new Response(
