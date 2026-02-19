@@ -300,6 +300,54 @@ export const DEFENSE_TOPICS: DefenseTopic[] = [
     description:
       "Revelation 12:17 — identifying marks of God's end-time remnant people and the spirit of prophecy",
   },
+  {
+    id: "hellfire",
+    name: "Hellfire",
+    description:
+      "Eternal conscious torment vs. conditional immortality — what does the Bible actually teach about the final fate of the wicked?",
+  },
+  {
+    id: "diet",
+    name: "Diet & Clean Foods",
+    description:
+      "Leviticus 11 and Acts 10 — are God's dietary laws still binding, and what does health reform have to do with the gospel?",
+  },
+  {
+    id: "little-horn",
+    name: "The Little Horn",
+    description:
+      "Daniel 7 & 8 — identifying the little horn power historically and prophetically, and its role in the great controversy",
+  },
+  {
+    id: "rapture",
+    name: "The Rapture",
+    description:
+      "Pre-tribulation rapture vs. the biblical Second Coming — is the secret rapture found in Scripture or is it a modern invention?",
+  },
+  {
+    id: "tongues",
+    name: "Speaking in Tongues",
+    description:
+      "Acts 2 glossolalia vs. charismatic ecstatic speech — what are the genuine biblical gift of tongues and its purpose?",
+  },
+  {
+    id: "antichrist",
+    name: "The Antichrist",
+    description:
+      "Who or what is the Antichrist? Historicist vs. futurist interpretations — a system, a person, or both?",
+  },
+  {
+    id: "preterism",
+    name: "Preterism",
+    description:
+      "The preterist view that most prophecy was fulfilled in 70 AD — and why the historicist method better handles Daniel and Revelation",
+  },
+  {
+    id: "futurism",
+    name: "Futurism",
+    description:
+      "The futurist system (Darby, Scofield, Left Behind) — its Jesuit origins, the 7-year tribulation gap theory, and why it fails exegetically",
+  },
   // ── Atheist Signature Topics ───────────────────────────────
   {
     id: "naturalism",
