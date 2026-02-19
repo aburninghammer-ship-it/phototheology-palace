@@ -6,22 +6,34 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Send, Loader2, ChevronDown, Volume2, VolumeX } from "lucide-react";
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
+
+const QUICK_QUESTIONS = [
+  "Who is Christ in Genesis?",
+  "Explain the Sanctuary types",
+  "What is the Great Controversy?",
+  "Walk me through Daniel 7",
+  "How does the Gospel connect all floors?",
+];
+
 // Web Speech API TTS helper
 function speakText(text: string, onEnd?: () => void) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.92;
-  utterance.pitch = 0.9;
+  utterance.rate = 0.95;
+  utterance.pitch = 1.0;
   utterance.volume = 1.0;
-  // Prefer a distinguished British-ish voice
+  // Prefer a deep British-ish voice if available
   const voices = window.speechSynthesis.getVoices();
   const preferred = voices.find(
     (v) =>
       v.name.toLowerCase().includes("daniel") ||
       v.name.toLowerCase().includes("george") ||
       v.name.toLowerCase().includes("david") ||
-      v.name.toLowerCase().includes("arthur") ||
       v.name.toLowerCase().includes("male")
   );
   if (preferred) utterance.voice = preferred;
@@ -29,20 +41,7 @@ function speakText(text: string, onEnd?: () => void) {
   window.speechSynthesis.speak(utterance);
 }
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
-
-const QUICK_QUESTIONS = [
-  "Give me a tour of the Palace",
-  "Where are my saved studies?",
-  "What room should I start with?",
-  "How do games work?",
-  "Something isn't working",
-];
-
-export const ReginaldButler = () => {
+export const JeevesWidget = () => {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -54,7 +53,7 @@ export const ReginaldButler = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch user name once
+  // Fetch user name
   useEffect(() => {
     if (!user) return;
     supabase
@@ -71,25 +70,24 @@ export const ReginaldButler = () => {
   useEffect(() => {
     if (open && messages.length === 0) {
       const greeting = userName ?? "there";
-      const msg = `Good day, ${greeting}! I'm Reginald, your Palace concierge. I'm here to help you navigate every corner of the Phototheology Palace — from finding your saved studies to understanding how each room works. What may I assist you with today?`;
+      const msg = `Good day, ${greeting}. I am Jeeves, your theological guide through the Phototheology Palace. I am here to illuminate Scripture, trace Christ through every chapter, expound the Palace principles, and help you mine the treasures of the Word. What shall we explore today?`;
       setMessages([{ role: "assistant", content: msg }]);
       if (audioEnabled) speakText(msg, () => setSpeaking(false));
     }
   }, [open, userName, messages.length, audioEnabled]);
 
-  // Auto-scroll to latest message
+  // Auto-scroll
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, loading]);
 
-  // Focus input when opened
+  // Focus input
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 200);
   }, [open]);
 
-  // Don't render for unauthenticated users (after all hooks)
   if (!user) return null;
 
   const sendMessage = async (text?: string) => {
@@ -103,16 +101,25 @@ export const ReginaldButler = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("reginald", {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
-          messages: updatedMessages.map((m) => ({ role: m.role, content: m.content })),
+          mode: "qa",
+          message: content,
+          conversationHistory: updatedMessages.slice(-10).map((m) => ({
+            role: m.role,
+            content: m.content,
+          })),
           userName,
         },
       });
 
       if (error) throw error;
 
-      const reply = data.response || "I do beg your pardon — let us try that again.";
+      const reply =
+        data?.response ||
+        data?.answer ||
+        "My apologies — I seem to have lost my train of thought. Do try again.";
+
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
 
       if (audioEnabled) {
@@ -120,12 +127,13 @@ export const ReginaldButler = () => {
         speakText(reply, () => setSpeaking(false));
       }
     } catch (err) {
-      console.error("Reginald error:", err);
+      console.error("Jeeves widget error:", err);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "I do beg your pardon — something went amiss on my end. Please try again in a moment.",
+          content:
+            "I do beg your pardon — something interrupted my contemplation. Shall we try once more?",
         },
       ]);
     } finally {
@@ -143,7 +151,7 @@ export const ReginaldButler = () => {
 
   return (
     <>
-      {/* Floating trigger button */}
+      {/* Floating trigger */}
       <AnimatePresence>
         {!open && (
           <motion.div
@@ -151,18 +159,18 @@ export const ReginaldButler = () => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6"
+            className="fixed bottom-36 right-4 z-50 md:bottom-24 md:right-6"
           >
             <Button
               onClick={() => setOpen(true)}
-              className="h-14 w-14 rounded-full shadow-xl border-2 border-amber-500/40 p-0 flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #78350f, #92400e)" }}
-              aria-label="Open Reginald the Palace Butler"
+              className="h-14 w-14 rounded-full shadow-xl border-2 border-indigo-500/40 p-0 flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81)" }}
+              aria-label="Open Jeeves the Theological Guide"
             >
-              <span className="text-2xl leading-none select-none">🎩</span>
+              <span className="text-2xl leading-none select-none">📖</span>
             </Button>
-            <div className="absolute bottom-full right-0 mb-2 whitespace-nowrap text-xs font-medium px-3 py-1.5 rounded-full shadow-lg pointer-events-none bg-amber-900 text-amber-100">
-              Ask Reginald
+            <div className="absolute bottom-full right-0 mb-2 whitespace-nowrap text-xs font-medium px-3 py-1.5 rounded-full shadow-lg pointer-events-none bg-indigo-950 text-indigo-100">
+              Ask Jeeves
             </div>
           </motion.div>
         )}
@@ -176,22 +184,24 @@ export const ReginaldButler = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6 w-[calc(100vw-2rem)] max-w-sm flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border"
-            style={{ maxHeight: "min(560px, calc(100vh - 120px))" }}
+            className="fixed bottom-36 right-4 z-50 md:bottom-24 md:right-6 w-[calc(100vw-2rem)] max-w-sm flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border"
+            style={{ maxHeight: "min(560px, calc(100vh - 180px))" }}
           >
             {/* Header */}
             <div
               className="px-4 py-3 flex items-center justify-between flex-shrink-0"
-              style={{ background: "linear-gradient(to right, #451a03, #78350f)" }}
+              style={{ background: "linear-gradient(to right, #1e1b4b, #312e81)" }}
             >
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full flex items-center justify-center text-lg select-none border border-amber-500/30"
-                  style={{ background: "rgba(120,53,15,0.6)" }}>
-                  🎩
+                <div
+                  className="h-9 w-9 rounded-full flex items-center justify-center text-lg select-none border border-indigo-400/30"
+                  style={{ background: "rgba(49,46,129,0.6)" }}
+                >
+                  📖
                 </div>
                 <div>
-                  <p className="font-semibold text-sm leading-tight text-amber-50">Reginald</p>
-                  <p className="text-xs text-amber-300/80">Palace Concierge &amp; Tour Guide</p>
+                  <p className="font-semibold text-sm leading-tight text-indigo-50">Jeeves</p>
+                  <p className="text-xs text-indigo-300/80">Theological Guide &amp; Scripture Scholar</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -199,9 +209,9 @@ export const ReginaldButler = () => {
                   variant="ghost"
                   size="icon"
                   onClick={toggleAudio}
-                  className="h-7 w-7 text-amber-300 hover:text-amber-100"
+                  className="h-7 w-7 text-indigo-300 hover:text-indigo-100"
                   style={{ background: "transparent" }}
-                  title={audioEnabled ? "Mute Reginald" : "Enable Reginald's voice"}
+                  title={audioEnabled ? "Mute Jeeves" : "Enable Jeeves voice"}
                 >
                   {audioEnabled ? (
                     <Volume2 className="h-3.5 w-3.5" />
@@ -217,7 +227,7 @@ export const ReginaldButler = () => {
                     window.speechSynthesis?.cancel();
                     setSpeaking(false);
                   }}
-                  className="text-amber-300 hover:text-amber-100 h-7 w-7"
+                  className="text-indigo-300 hover:text-indigo-100 h-7 w-7"
                   style={{ background: "transparent" }}
                 >
                   <ChevronDown className="h-4 w-4" />
@@ -250,13 +260,13 @@ export const ReginaldButler = () => {
                 <div className="flex justify-start">
                   <div className="bg-muted border border-border px-3 py-2 rounded-2xl rounded-bl-sm flex items-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    Reginald is consulting the Palace plans…
+                    Jeeves is searching the Scriptures…
                   </div>
                 </div>
               )}
               {speaking && (
                 <div className="flex justify-start">
-                  <div className="bg-amber-950/30 border border-amber-500/20 px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs text-amber-300">
+                  <div className="bg-indigo-950/30 border border-indigo-500/20 px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs text-indigo-300">
                     <Volume2 className="h-3 w-3 animate-pulse" />
                     Speaking…
                   </div>
@@ -264,10 +274,10 @@ export const ReginaldButler = () => {
               )}
             </div>
 
-            {/* Quick questions (only show after greeting) */}
+            {/* Quick questions */}
             {messages.length === 1 && !loading && (
               <div className="bg-background border-t border-border px-4 py-2 flex-shrink-0">
-                <p className="text-xs text-muted-foreground mb-2 font-medium">Quick questions:</p>
+                <p className="text-xs text-muted-foreground mb-2 font-medium">Suggested questions:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {QUICK_QUESTIONS.map((q) => (
                     <button
@@ -289,7 +299,7 @@ export const ReginaldButler = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                placeholder="Ask Reginald about the Palace…"
+                placeholder="Ask Jeeves a theological question…"
                 disabled={loading}
                 className="flex-1 text-sm h-9"
               />
@@ -297,8 +307,8 @@ export const ReginaldButler = () => {
                 onClick={() => sendMessage()}
                 disabled={loading || !input.trim()}
                 size="icon"
-                className="h-9 w-9 flex-shrink-0 text-primary-foreground"
-                style={{ background: "linear-gradient(135deg, #78350f, #92400e)" }}
+                className="h-9 w-9 flex-shrink-0 text-white"
+                style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81)" }}
               >
                 <Send className="h-3.5 w-3.5" />
               </Button>
