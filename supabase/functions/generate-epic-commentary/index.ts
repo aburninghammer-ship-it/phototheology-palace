@@ -321,7 +321,7 @@ These anchors are non-negotiable. They have been drawn from careful typological 
         { role: "user", content: userPrompt },
       ],
       temperature: 0.8,
-      max_tokens: 5000,
+      max_tokens: 8000,
     }),
   });
 
@@ -607,32 +607,20 @@ serve(async (req) => {
       }
     }
 
-    // Determine version
-    const { data: latestVersion } = await supabaseAdmin
-      .from("epic_commentaries")
-      .select("version")
-      .eq("book", book)
-      .eq("chapter", effectiveChapter)
-      .order("version", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const newVersion = regenerate ? (latestVersion?.version || 0) + 1 : 1;
-
     // Voice label for record
     const voiceIdLabel = ELEVENLABS_API_KEY ? `elevenlabs:${EPIC_ELEVENLABS_VOICE_ID}` : "onyx";
 
-    // Create pending record
+    // Upsert on (book, chapter) — unique constraint prevents duplicates
     const { data: record, error: insertError } = await supabaseAdmin
       .from("epic_commentaries")
       .upsert({
         book,
         chapter: effectiveChapter,
-        version: newVersion,
+        version: 1,
         status: "generating",
         commentary_text: "",
         voice_id: voiceIdLabel,
-      }, { onConflict: "book,chapter,version" })
+      }, { onConflict: "book,chapter" })
       .select()
       .single();
 
