@@ -708,7 +708,7 @@ function App() {
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
                   {!isWorkspacePane && (
-                    <div className="fixed bottom-20 right-3 z-50 md:bottom-6 md:right-5 flex flex-col items-end gap-2">
+                    <div className="fixed bottom-32 right-4 z-50 md:bottom-6 md:right-4 flex flex-col items-end gap-2">
                       <AmbientMusicPlayer minimal />
                     </div>
                   )}
