@@ -365,8 +365,8 @@ const Palace = () => {
         </div>
       </div>
       <Footer />
-      {/* Jeeves & Reginald widgets */}
-      <div className="fixed bottom-20 right-3 z-50 md:bottom-6 md:right-5 flex flex-col items-end gap-2">
+      {/* Jeeves & Reginald widgets — positioned above the ambient music player */}
+      <div className="fixed bottom-36 right-3 z-50 md:bottom-24 md:right-5 flex flex-col items-end gap-2">
         <JeevesWidget />
         <ReginaldButler />
       </div>
