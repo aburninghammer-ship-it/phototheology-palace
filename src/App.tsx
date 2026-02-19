@@ -371,10 +371,7 @@ function App() {
                         <ExitIntentPopup />
                         {/* Session Mode Prompt Dialog */}
                         <SessionPromptDialog />
-                        {/* Floating Ambient Music Player - higher z-index to avoid being blocked by popups */}
-                        <div className="fixed bottom-32 sm:bottom-28 right-4 z-[60]">
-                          <AmbientMusicPlayer minimal />
-                        </div>
+                        {/* Floating Ambient Music Player - moved into widget stack */}
                         {/* Change Manager Guided Path Checklist */}
                         <GuidedPathChecklist />
                         </>}
@@ -713,9 +710,10 @@ function App() {
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
                   {!isWorkspacePane && (
-                    <div className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6 flex flex-row-reverse items-end gap-3">
-                      <ReginaldButler />
+                    <div className="fixed bottom-20 right-3 z-50 md:bottom-6 md:right-5 flex flex-col items-end gap-2">
+                      <AmbientMusicPlayer minimal />
                       <JeevesWidget />
+                      <ReginaldButler />
                     </div>
                   )}
                 </div>
