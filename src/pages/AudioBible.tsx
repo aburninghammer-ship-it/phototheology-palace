@@ -42,9 +42,11 @@ import {
   Film,
   Download,
   Zap,
+  RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFreeTier } from "@/hooks/useFreeTier";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { ExportEpicAudioDialog } from "@/components/audio/ExportEpicAudioDialog";
 import { useNarrativeSoundEffects, type SfxCue } from "@/hooks/useNarrativeSoundEffects";
@@ -72,6 +74,7 @@ export default function AudioBible() {
   const [searchParams] = useSearchParams();
   const { preferences } = useUserPreferences();
   const freeTier = useFreeTier();
+  const { isAdmin } = useIsAdmin();
 
   // Epic mode state
   const [isEpicPlaying, setIsEpicPlaying] = useState(false);
@@ -440,6 +443,36 @@ export default function AudioBible() {
       setIsEpicLoading(false);
     }
   }, [stop, volume, narrativeSfx]);
+
+  // Regenerate epic commentary (admin only) — forces new script + audio
+  const handleRegenerateEpic = useCallback(async (book: string, chapter: number) => {
+    setIsEpicLoading(true);
+    setEpicNowPlayingBook(book);
+    setEpicNowPlayingChapter(chapter);
+    try {
+      toast.info(`Regenerating Epic commentary for ${book} ${chapter}... This may take 1-2 minutes.`);
+
+      const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
+        body: { book, chapter, regenerate: true },
+      });
+
+      if (genResponse.error || genResponse.data?.error) {
+        throw new Error(genResponse.data?.error || genResponse.error?.message || "Regeneration failed");
+      }
+
+      toast.success(`Regenerated ${book} ${chapter}! Now playing new version.`);
+
+      // Play the freshly generated commentary
+      epicQueueRef.current = [{ book, chapter }];
+      epicQueueIndexRef.current = 0;
+      await handlePlayEpic(book, chapter);
+    } catch (err: any) {
+      console.error("[Epic Regenerate] Error:", err);
+      const msg = err?.message || String(err);
+      toast.error(`Regeneration error: ${msg}`);
+      setIsEpicLoading(false);
+    }
+  }, [handlePlayEpic]);
 
   // Keep ref in sync so onended callbacks always call latest version
   playEpicRef.current = handlePlayEpic;
@@ -1038,14 +1071,28 @@ export default function AudioBible() {
                       </div>
 
                       {commentarySource === "epic" ? (
-                        <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => {
-                          epicQueueRef.current = [{ book: selectedBook, chapter: selectedChapter }];
-                          epicQueueIndexRef.current = 0;
-                          handlePlayEpic(selectedBook, selectedChapter);
-                        }} disabled={isEpicLoading}>
-                          {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
-                          Epic Mode: {selectedBook} {selectedChapter}
-                        </Button>
+                        <div className="space-y-2 w-full">
+                          <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => {
+                            epicQueueRef.current = [{ book: selectedBook, chapter: selectedChapter }];
+                            epicQueueIndexRef.current = 0;
+                            handlePlayEpic(selectedBook, selectedChapter);
+                          }} disabled={isEpicLoading}>
+                            {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
+                            Epic Mode: {selectedBook} {selectedChapter}
+                          </Button>
+                          {isAdmin && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
+                              onClick={() => handleRegenerateEpic(selectedBook, selectedChapter)}
+                              disabled={isEpicLoading}
+                            >
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              Regenerate Script & Audio
+                            </Button>
+                          )}
+                        </div>
                       ) : (
                         <Button size="lg" className="w-full" onClick={handlePlayChapter} disabled={isLoading}>
                           {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
