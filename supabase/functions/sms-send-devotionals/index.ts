@@ -454,15 +454,15 @@ async function sendSNSSMS(
 }
 
 // AWS Signature V4 crypto helpers using Web Crypto API
-async function sha256Hex(data: Uint8Array): Promise<string> {
+async function sha256Hex(data: ArrayBuffer): Promise<string> {
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function hmacSha256(key: ArrayBuffer | Uint8Array, data: string): Promise<ArrayBuffer> {
+async function hmacSha256(key: ArrayBuffer, data: string): Promise<ArrayBuffer> {
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
-    key instanceof Uint8Array ? key : key,
+    key,
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign']

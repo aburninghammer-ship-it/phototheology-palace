@@ -731,6 +731,44 @@ export default function AudioBible() {
                       <Button
                         variant="outline"
                         size="lg"
+                        className="border-orange-500/30 hover:bg-orange-500/10 text-orange-400"
+                        title="Force regenerate audio from latest script"
+                        onClick={async () => {
+                          const book = epicNowPlayingBook || selectedBook;
+                          const chapter = epicNowPlayingChapter || selectedChapter;
+                          if (!book || !chapter) return;
+                          // Stop current playback
+                          narrativeSfx.stopScheduling();
+                          if (epicAudioRef.current) {
+                            epicAudioRef.current.pause();
+                            epicAudioRef.current = null;
+                          }
+                          setIsEpicPlaying(false);
+                          setIsEpicPaused(false);
+                          toast.info(`Regenerating audio for ${book} ${chapter}...`);
+                          setIsEpicLoading(true);
+                          try {
+                            const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
+                              body: { book, chapter, regenerate: true },
+                            });
+                            if (genResponse.error || genResponse.data?.error) {
+                              throw new Error(genResponse.data?.error || genResponse.error?.message || "Regeneration failed");
+                            }
+                            toast.success("Audio regenerated! Playing now...");
+                            // Re-play the chapter with fresh audio
+                            handlePlayEpic(book, chapter);
+                          } catch (err: any) {
+                            toast.error(err.message || "Failed to regenerate audio");
+                            setIsEpicLoading(false);
+                          }
+                        }}
+                      >
+                        <Loader2 className="h-5 w-5 mr-2" />
+                        Regen Audio
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
                         className="border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
                         onClick={() => setShowEpicExport(true)}
                         disabled={!epicAudioUrl}
