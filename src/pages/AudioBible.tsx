@@ -41,11 +41,13 @@ import {
   BookHeart,
   Film,
   Download,
+  Zap,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import { toast } from "sonner";
 import { ExportEpicAudioDialog } from "@/components/audio/ExportEpicAudioDialog";
+import { useNarrativeSoundEffects, type SfxCue } from "@/hooks/useNarrativeSoundEffects";
 
 interface Theme {
   id: string;
@@ -80,6 +82,10 @@ export default function AudioBible() {
   const [showEpicExport, setShowEpicExport] = useState(false);
   const [epicNowPlayingBook, setEpicNowPlayingBook] = useState("");
   const [epicNowPlayingChapter, setEpicNowPlayingChapter] = useState(0);
+  const [epicSfxCues, setEpicSfxCues] = useState<SfxCue[]>([]);
+
+  // Narrative sound effects engine
+  const narrativeSfx = useNarrativeSoundEffects();
   const epicQueueRef = useRef<ChapterSelection[]>([]);
   const epicQueueIndexRef = useRef(0);
   const playEpicRef = useRef<(book: string, chapter: number) => Promise<void>>();
@@ -319,10 +325,10 @@ export default function AudioBible() {
     setEpicNowPlayingBook(book);
     setEpicNowPlayingChapter(chapter);
     try {
-      // Fetch cached epic commentary
+      // Fetch cached epic commentary (including SFX cues)
       let { data, error } = await supabase
         .from("epic_commentaries")
-        .select("*")
+        .select("*, sfx_cues")
         .eq("book", book)
         .eq("chapter", chapter)
         .eq("status", "ready")
@@ -380,8 +386,13 @@ export default function AudioBible() {
 
       setEpicAudioUrl(urlData.publicUrl);
 
+      // Store SFX cues if available
+      const cues: SfxCue[] = (data as any)?.sfx_cues || [];
+      setEpicSfxCues(cues);
+
       // Stop any current playback
       stop();
+      narrativeSfx.stopScheduling();
       if (epicAudioRef.current) {
         epicAudioRef.current.pause();
         epicAudioRef.current = null;
@@ -392,8 +403,15 @@ export default function AudioBible() {
       epicAudioRef.current = audio;
       audio.volume = volume;
 
-      audio.onplay = () => { setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false); };
+      audio.onplay = () => {
+        setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
+        // Start SFX scheduling when audio plays
+        if (cues.length > 0) {
+          narrativeSfx.startScheduling(audio, cues);
+        }
+      };
       audio.onended = () => {
+        narrativeSfx.stopScheduling();
         // Auto-advance epic queue
         const queue = epicQueueRef.current;
         const nextIdx = epicQueueIndexRef.current + 1;
@@ -409,6 +427,7 @@ export default function AudioBible() {
         }
       };
       audio.onerror = () => {
+        narrativeSfx.stopScheduling();
         toast.error("Failed to play Epic commentary audio.");
         setIsEpicPlaying(false);
         setIsEpicPaused(false);
@@ -422,7 +441,7 @@ export default function AudioBible() {
       toast.error("Failed to load Epic commentary.");
       setIsEpicLoading(false);
     }
-  }, [stop, volume]);
+  }, [stop, volume, narrativeSfx]);
 
   // Keep ref in sync so onended callbacks always call latest version
   playEpicRef.current = handlePlayEpic;
@@ -439,7 +458,7 @@ export default function AudioBible() {
       // Book-level epic uses chapter=0 as sentinel
       let { data, error } = await supabase
         .from("epic_commentaries")
-        .select("*")
+        .select("*, sfx_cues")
         .eq("book", book)
         .eq("chapter", 0)
         .eq("status", "ready")
@@ -492,7 +511,12 @@ export default function AudioBible() {
 
       setEpicAudioUrl(urlData.publicUrl);
 
+      // Store SFX cues if available
+      const cues: SfxCue[] = (data as any)?.sfx_cues || [];
+      setEpicSfxCues(cues);
+
       stop();
+      narrativeSfx.stopScheduling();
       if (epicAudioRef.current) {
         epicAudioRef.current.pause();
         epicAudioRef.current = null;
@@ -502,9 +526,18 @@ export default function AudioBible() {
       epicAudioRef.current = audio;
       audio.volume = volume;
 
-      audio.onplay = () => { setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false); };
-      audio.onended = () => { setIsEpicPlaying(false); setIsEpicPaused(false); epicAudioRef.current = null; };
+      audio.onplay = () => {
+        setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
+        if (cues.length > 0) {
+          narrativeSfx.startScheduling(audio, cues);
+        }
+      };
+      audio.onended = () => {
+        narrativeSfx.stopScheduling();
+        setIsEpicPlaying(false); setIsEpicPaused(false); epicAudioRef.current = null;
+      };
       audio.onerror = () => {
+        narrativeSfx.stopScheduling();
         toast.error("Failed to play Epic overview audio.");
         setIsEpicPlaying(false);
         setIsEpicPaused(false);
@@ -518,7 +551,7 @@ export default function AudioBible() {
       toast.error("Failed to load Epic book overview.");
       setIsEpicLoading(false);
     }
-  }, [stop, volume]);
+  }, [stop, volume, narrativeSfx]);
 
   // Play epic commentary for a custom chapter queue
   const handlePlayEpicCustom = useCallback(async () => {
@@ -624,82 +657,115 @@ export default function AudioBible() {
                     <span>Generating cinematic commentary... This may take a moment.</span>
                   </div>
                 ) : (
-                  <div className="flex flex-wrap items-center justify-center gap-3">
-                    {epicQueueRef.current.length > 1 && (
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="border-amber-500/30 hover:bg-amber-500/10 h-10 w-10 rounded-full"
-                        onClick={handleEpicSkipPrevious}
-                        disabled={epicQueueIndexRef.current === 0}
-                      >
-                        <SkipBack className="h-4 w-4" />
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="border-amber-500/30 hover:bg-amber-500/10 min-w-[120px]"
-                      onClick={() => {
-                        if (epicAudioRef.current) {
-                          if (isEpicPaused) {
-                            epicAudioRef.current.play();
-                            setIsEpicPaused(false);
-                            setIsEpicPlaying(true);
-                          } else {
-                            epicAudioRef.current.pause();
-                            setIsEpicPaused(true);
-                            setIsEpicPlaying(false);
-                          }
-                        }
-                      }}
-                    >
-                      {isEpicPaused ? (
-                        <><Play className="h-5 w-5 mr-2" /> Play</>
-                      ) : (
-                        <><Pause className="h-5 w-5 mr-2" /> Pause</>
+                  <>
+                    <div className="flex flex-wrap items-center justify-center gap-3">
+                      {epicQueueRef.current.length > 1 && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="border-amber-500/30 hover:bg-amber-500/10 h-10 w-10 rounded-full"
+                          onClick={handleEpicSkipPrevious}
+                          disabled={epicQueueIndexRef.current === 0}
+                        >
+                          <SkipBack className="h-4 w-4" />
+                        </Button>
                       )}
-                    </Button>
-                    {epicQueueRef.current.length > 1 && (
                       <Button
                         variant="outline"
-                        size="icon"
-                        className="border-amber-500/30 hover:bg-amber-500/10 h-10 w-10 rounded-full"
-                        onClick={handleEpicSkipNext}
-                        disabled={epicQueueIndexRef.current >= epicQueueRef.current.length - 1}
+                        size="lg"
+                        className="border-amber-500/30 hover:bg-amber-500/10 min-w-[120px]"
+                        onClick={() => {
+                          if (epicAudioRef.current) {
+                            if (isEpicPaused) {
+                              epicAudioRef.current.play();
+                              setIsEpicPaused(false);
+                              setIsEpicPlaying(true);
+                              // Resume SFX scheduling
+                              if (epicSfxCues.length > 0) {
+                                narrativeSfx.startScheduling(epicAudioRef.current, epicSfxCues);
+                              }
+                            } else {
+                              epicAudioRef.current.pause();
+                              setIsEpicPaused(true);
+                              setIsEpicPlaying(false);
+                              narrativeSfx.stopScheduling();
+                            }
+                          }
+                        }}
                       >
-                        <SkipForward className="h-4 w-4" />
+                        {isEpicPaused ? (
+                          <><Play className="h-5 w-5 mr-2" /> Play</>
+                        ) : (
+                          <><Pause className="h-5 w-5 mr-2" /> Pause</>
+                        )}
                       </Button>
+                      {epicQueueRef.current.length > 1 && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="border-amber-500/30 hover:bg-amber-500/10 h-10 w-10 rounded-full"
+                          onClick={handleEpicSkipNext}
+                          disabled={epicQueueIndexRef.current >= epicQueueRef.current.length - 1}
+                        >
+                          <SkipForward className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="border-red-500/30 hover:bg-red-500/10 text-red-400 min-w-[120px]"
+                        onClick={() => {
+                          narrativeSfx.stopScheduling();
+                          if (epicAudioRef.current) {
+                            epicAudioRef.current.pause();
+                            epicAudioRef.current = null;
+                          }
+                          setIsEpicPlaying(false);
+                          setIsEpicPaused(false);
+                          epicQueueRef.current = [];
+                          epicQueueIndexRef.current = 0;
+                        }}
+                      >
+                        <Square className="h-5 w-5 mr-2" />
+                        Stop
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
+                        onClick={() => setShowEpicExport(true)}
+                        disabled={!epicAudioUrl}
+                      >
+                        <Download className="h-5 w-5 mr-2" />
+                        Export
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className={`border-amber-500/30 hover:bg-amber-500/10 ${narrativeSfx.isEnabled ? "text-amber-400" : "text-muted-foreground"}`}
+                        onClick={narrativeSfx.toggle}
+                        title={narrativeSfx.isEnabled ? "Disable sound effects" : "Enable sound effects"}
+                      >
+                        <Zap className="h-5 w-5 mr-2" />
+                        SFX {narrativeSfx.isEnabled ? "On" : "Off"}
+                      </Button>
+                    </div>
+                    {/* SFX Volume Control */}
+                    {narrativeSfx.isEnabled && epicSfxCues.length > 0 && (
+                      <div className="flex items-center gap-3 mt-4 max-w-xs mx-auto">
+                        <Zap className="h-4 w-4 text-amber-400/70" />
+                        <Slider
+                          value={[narrativeSfx.sfxVolume * 100]}
+                          onValueChange={([v]) => narrativeSfx.setSfxVolume(v / 100)}
+                          min={5}
+                          max={60}
+                          step={5}
+                          className="flex-1"
+                        />
+                        <span className="text-xs text-muted-foreground w-10 text-right">SFX {Math.round(narrativeSfx.sfxVolume * 100)}%</span>
+                      </div>
                     )}
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="border-red-500/30 hover:bg-red-500/10 text-red-400 min-w-[120px]"
-                      onClick={() => {
-                        if (epicAudioRef.current) {
-                          epicAudioRef.current.pause();
-                          epicAudioRef.current = null;
-                        }
-                        setIsEpicPlaying(false);
-                        setIsEpicPaused(false);
-                        epicQueueRef.current = [];
-                        epicQueueIndexRef.current = 0;
-                      }}
-                    >
-                      <Square className="h-5 w-5 mr-2" />
-                      Stop
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
-                      onClick={() => setShowEpicExport(true)}
-                      disabled={!epicAudioUrl}
-                    >
-                      <Download className="h-5 w-5 mr-2" />
-                      Export
-                    </Button>
-                  </div>
+                  </>
                 )}
               </CardContent>
             </Card>

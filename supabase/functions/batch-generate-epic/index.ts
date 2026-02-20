@@ -70,22 +70,44 @@ serve(async (req) => {
       }
     }
 
-    const { startBook, startChapter, batchSize = 5, regenerate = false } = await req.json();
+    const { startBook, startChapter, batchSize = 5, regenerate = false, books: targetBooks } = await req.json();
 
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Build queue of chapters to generate
     const queue: { book: string; chapter: number }[] = [];
-    let started = !startBook; // If no startBook, start from beginning
 
-    for (const [book, chapters] of BIBLE_BOOKS) {
-      if (!started && book === startBook) started = true;
-      if (!started) continue;
+    if (targetBooks && Array.isArray(targetBooks) && targetBooks.length > 0) {
+      // Targeted mode: generate specific books/chapters
+      // e.g. [{ book: "Daniel", chapters: [1,2,...,12] }, { book: "Revelation", chapters: [1,...,22] }, { book: "Matthew", chapters: [24] }]
+      for (const entry of targetBooks) {
+        if (!entry.book) continue;
+        if (entry.chapters && Array.isArray(entry.chapters)) {
+          for (const ch of entry.chapters) {
+            queue.push({ book: entry.book, chapter: ch });
+          }
+        } else {
+          // If no chapters specified, look up the chapter count
+          const bookEntry = BIBLE_BOOKS.find(([b]) => b === entry.book);
+          if (bookEntry) {
+            for (let ch = 1; ch <= bookEntry[1]; ch++) {
+              queue.push({ book: entry.book, chapter: ch });
+            }
+          }
+        }
+      }
+    } else {
+      // Sequential mode: start from startBook/startChapter and continue through the Bible
+      let started = !startBook;
+      for (const [book, chapters] of BIBLE_BOOKS) {
+        if (!started && book === startBook) started = true;
+        if (!started) continue;
 
-      const startCh = book === startBook && startChapter ? startChapter : 1;
+        const startCh = book === startBook && startChapter ? startChapter : 1;
 
-      for (let ch = startCh; ch <= chapters; ch++) {
-        queue.push({ book, chapter: ch });
+        for (let ch = startCh; ch <= chapters; ch++) {
+          queue.push({ book, chapter: ch });
+        }
       }
     }
 

@@ -175,6 +175,133 @@ You are NOT a historian looking back. You are INSIDE the moment. The events unfo
 PAST TENSE NARRATION = FAILURE. PRESENT TENSE NARRATION = SUCCESS.
 `;
 
+// ── Book-specific prophetic frameworks derived from pastoral teaching corpus ──
+
+const PROPHETIC_FRAMEWORK_DANIEL = `
+BOOK-SPECIFIC PROPHETIC FRAMEWORK — DANIEL:
+This framework MUST shape your narration of every Daniel chapter. These are the theological convictions that govern how Daniel is read:
+
+REPEAT-AND-ENLARGE HERMENEUTIC:
+Daniel is structured as a progressive amplification: Daniel 2 → 7 → 8 → 9 → 11 → 12. Each cycle repeats and enlarges the same prophetic sweep — from Babylon to the establishment of God's eternal kingdom. Every chapter you narrate must reflect awareness of where it sits in this expanding spiral. Daniel 2 is the skeleton; Daniel 11 is the full anatomy.
+
+DANIEL 1–4 AS PROPHETIC TEMPLATE:
+The literal history of Daniel 1–4 (Babylon vs Egypt vs Jerusalem) is a prophetic template for Daniel 11:40–45. Nebuchadnezzar's experience — troubling dream (ch.2), image of forced worship with death decree (ch.3), divine humbling of a proud king (ch.4) — foreshadows the end-time sequence: the rise of a counterfeit kingdom, enforced worship, death decree against the faithful, and the ultimate humbling of Satan's system.
+
+DANIEL 2 — THE STONE AND THE LAW:
+The stone "cut out without hands" (Daniel 2:34) parallels the Ten Commandment tablets, also "cut" by God alone without human hands (Exodus 31:18, 32:16). Daniel 2 is not merely "Christ destroys the kingdoms" — it reveals that God's law is the rule of judgment. The iron and clay in the feet represent the forbidden mingling of churchcraft and statecraft — the same sin pattern from Genesis 6 (sons of God + daughters of men) through to the final church-state union. The toes are NOT merely European nations — they represent a global system of enforced religious-political authority.
+
+DANIEL 11:40–45 — THE PRE-CLOSE-OF-PROBATION CRISIS:
+Daniel 11:40–45 maps the mechanics of the final crisis BEFORE probation closes:
+• King of the South = atheism / anti-Bible systems (spiritual Egypt — "Who is the LORD?" Exodus 5:2)
+• King of the North = ultimately Satan himself working through religious-political power
+• The "whirlwind" (v.40) = counterfeit Second Coming — Satan appearing as Christ (cf. Isaiah 66:15, Ezekiel 1 whirlwind+glory, Job 38:1, 2 Kings 2:1)
+• "Chariots and horsemen" = demonic angels impersonating holy angels (cf. Psalm 68:17)
+• "Ships" = spiritualism / demons impersonating the dead (the "deep" = death realm)
+• "Enter the glorious land" (v.41) = persecution turns toward God's faithful people
+• "Tidings from the east and north" (v.44) = the Sealing Angel (Revelation 7, from the east) + Three Angels' Messages (Revelation 14, authority from the north/throne of God)
+• "Plant tabernacles of his palaces" (v.45) = establish a global church-state theocracy — tabernacles (worship system) + palaces (state power) = the image of the beast
+• "Between the seas and the glorious holy mountain" = Satan positions himself between the masses (seas = peoples, Rev 17:15) and God's true authority (holy mountain = New Jerusalem, Rev 21:10)
+
+DANIEL 12:1 — CLOSE OF PROBATION:
+Michael (Christ — not a created being) stands up = probation closes. The events of Daniel 11:40–45 DIRECTLY trigger Michael standing up. Daniel 12:1 begins Phase B of the time of trouble — the seven last plagues.
+
+TWO-PHASE TIME OF TROUBLE:
+Phase A (Before probation closes): Satan appears, miracles deceive, Sunday enforcement escalates, Loud Cry goes forth, death decree issued, gospel still being preached.
+Phase B (After probation closes, Daniel 12:1): Michael stands up, plagues fall, deliverance of the saints, Second Coming.
+
+THE ABOMINATION OF DESOLATION:
+The abomination of desolation = Satan appearing as Christ and standing in the place of God (Matthew 24:15, 2 Thessalonians 2:4). This is the counterfeit appearing — not merely a political or institutional power, but a supernatural deception event.
+
+ARMAGEDDON:
+Har (mountain) + Megiddo (congregation) = Satan sitting on the mount of the congregation (Isaiah 14:13). This is a sanctuary-symbolic reading — the final battle is over worship, not geography.
+`;
+
+const PROPHETIC_FRAMEWORK_REVELATION = `
+BOOK-SPECIFIC PROPHETIC FRAMEWORK — REVELATION:
+This framework MUST shape your narration of every Revelation chapter. These are the theological convictions that govern how Revelation is read:
+
+THE DEADLY WOUND AND ITS HEALING:
+The deadly wound (1798) is NOT healed until the WHOLE WORLD unanimously wonders after the beast (Revelation 13:3). Current political or diplomatic influence does NOT constitute healing. The wound heals through SUPERNATURAL MIRACLES — specifically Satan's counterfeit appearing as Christ. No natural event — political alliance, climate crisis, or pandemic — can unite atheists, Muslims, Buddhists, and secularists under one religious banner. Only a visible, supernatural manifestation achieves this.
+
+REVELATION 13 — THE MECHANISM OF GLOBAL UNITY:
+The sequence is: Miracles (Rev 13:13-14) → Deception → Global unity → Image of the beast → Mark enforcement → Death decree.
+"Fire from heaven" (Rev 13:13) = counterfeit of Christ's coming in flaming fire (2 Thess 1:7-8). Satan appears as an angel of light/fire.
+The image of the beast is formed when apostate Protestantism unites with civil power to enforce religious legislation — but this is INITIATED by Satan's supernatural appearing, not by politics or climate.
+
+THREEFOLD UNION:
+The final global power structure is: Protestantism + Catholicism + Spiritualism (GC 588). Dragon (paganism/spiritualism) + Beast (papacy) + False Prophet (apostate Protestantism) = the three unclean spirits of Revelation 16.
+
+SPIRITUALISM AS MASTER DECEPTION:
+Spiritualism is NOT fringe occultism — it will imitate Christianity with miracles, healing, and apparent resurrections. Revelation 18:2 — "habitation of devils" = not occasional visitation but permanent demonic manifestation. Spirits of the dead appear continuously, validating false religious authority. This is the culmination of the error of the immortality of the soul.
+
+THE TWO GREAT ERRORS:
+Immortality of the soul → Spiritualism (the supernatural deception system).
+Sunday sacredness → False worship enforcement system.
+Both converge in the crowning deception: Satan appearing as Christ and commanding Sunday worship.
+
+THREE FROGS (REVELATION 16):
+The three unclean spirits like frogs = the final counterfeit miracle movement. Frogs were the LAST plague the Egyptian magicians could counterfeit (Exodus 8:7). This is the ultimate counterfeit before God's plagues fall.
+
+REVELATION 14 — LOUD CRY DURING CRISIS:
+The Three Angels' Messages go forth during the final crisis — WHILE Satan's deception is active, WHILE probation is still open. The Loud Cry empowered by the Latter Rain occurs amid persecution, not before it.
+
+SATAN APPEARS BEFORE SUNDAY LAW:
+Sunday enforcement is NOT initiated by politics, climate, or papal diplomacy. It is initiated by Satan's miraculous appearing. When the world sees "Christ" visibly present, democracy collapses into theocracy. The constitution becomes irrelevant. Church-state union becomes "logical" to the masses. THEN worship legislation follows.
+
+THE IMAGE OF THE BEAST SEQUENCE:
+1. Satan appears as Christ (miracles)
+2. World deception (global "conversion")
+3. Image of the Beast formed (church-state theocracy)
+4. Sunday law enforcement
+5. Economic sanctions (buy/sell — Rev 13:17 = Daniel 11:43 gold/silver control)
+6. Death decree
+7. Close of probation (Michael stands up)
+`;
+
+const PROPHETIC_FRAMEWORK_MATTHEW = `
+BOOK-SPECIFIC PROPHETIC FRAMEWORK — MATTHEW 24:
+This framework MUST shape your narration of Matthew 24. These are the theological convictions that govern how this chapter is read:
+
+MATTHEW 24 AS CHRONOLOGICAL END-TIME TIMELINE:
+Matthew 24 functions as a sequential end-time timeline with dual fulfillment — AD 70 (destruction of Jerusalem) as TYPE, and the final generation as ANTITYPE. The signs are not random or scattered — they follow a chronological progression within the final generation.
+
+THE CHRONOLOGICAL STRUCTURE:
+• v.4–5: DECEPTION PHASE — False Christs, rise of spiritualism, preparatory delusions. This is the FIRST sign, not an afterthought. Deception warnings imply probation is still open.
+• v.6–8: CRISIS ESCALATION — Wars, famines, pestilences, earthquakes. Satan-induced calamities that create psychological demand for religious solutions. Disasters blamed on God's faithful people.
+• v.9: PERSECUTION BEGINS — Remnant becomes the focal target. Religious hostility intensifies. Legal persecution structures form. Narrative shifts: God's people blamed for global calamities.
+• v.14: THE LOUD CRY — "This gospel of the kingdom shall be preached in all the world for a witness unto all nations; and THEN shall the end come." This is the Loud Cry empowered by the Latter Rain. If the gospel is still being preached globally, probation CANNOT be closed. Everything before v.14 is pre-close-of-probation.
+• v.15–28: FINAL CRISIS INTENSIFICATION — Abomination of desolation (Satan appearing as Christ, standing in the holy place). Death decree. The great tribulation of Matthew 24:21. Flee to the mountains = separate from Babylon.
+• v.29: CLOSE OF PROBATION / PLAGUES — "Immediately after the tribulation of those days shall the sun be darkened..." Cosmic signs = divine judgment phase begins.
+• v.30: SECOND COMING — "Then shall appear the sign of the Son of man in heaven."
+
+FALSE CHRISTS AS THE FIRST SIGN:
+Deception is the FIRST warning Jesus gives (v.4-5), not the last. The appearing of false Christs — culminating in Satan's own impersonation — is the opening salvo of the final generation's experience.
+
+THE DECEPTION MUST OCCUR BEFORE PROBATION CLOSES:
+If Satan appears after probation closes: sealed saints cannot be deceived, warnings would be unnecessary, the "crowning act" of deception would have no salvific function. Therefore, the deception MUST occur while probation is still open — it is "on the test."
+
+TWO-GENERATION MODEL:
+One generation = Jerusalem (AD 70). One generation = end of the world. "This generation shall not pass" (v.34) applies to the final generation that sees ALL these things compressed into their experience.
+
+MATTHEW 24 ↔ REVELATION 13–19 PARALLEL:
+Matthew 24:4-5 ↔ Revelation 13 (Deception + Miracles + Image of Beast)
+Matthew 24:14 ↔ Revelation 14 (Loud Cry / Everlasting Gospel)
+Matthew 24:29 ↔ Revelation 15-16 (Seven Last Plagues)
+Matthew 24:30 ↔ Revelation 19 (Second Coming)
+
+ABOMINATION OF DESOLATION:
+In AD 70 = Roman armies surrounding Jerusalem (Luke 21:20).
+In the antitype = Satan appearing as Christ and standing where he ought not (Mark 13:14). The abomination is not merely institutional — it is a supernatural impersonation event. When you see it, "flee" = separate from Babylon completely.
+
+TWO GREAT ERRORS CONVERGE:
+Immortality of the soul → Spiritualism (supernatural deception)
+Sunday sacredness → False worship enforcement
+Both unite in the crowning deception described in Matthew 24:24: "great signs and wonders; insomuch that, if it were possible, they shall deceive the very elect."
+
+EMOTIONAL DECEPTION > PHYSICAL PERSECUTION:
+The hardest part of the final crisis is mental anguish, not physical torture. Dead loved ones appearing, family pressure, emotional manipulation, and Satan's skillful use of Scripture — these constitute the real "time of trouble" for believers. Christ's mental suffering on the cross is the template.
+`;
+
 const EPIC_CHAPTER_SYSTEM_PROMPT = `You are a cinematic philosopher-narrator producing an EPIC Bible chapter commentary that sounds like a cosmic documentary — the voice of eternity narrating the events of Scripture with drama, theological depth, and philosophical gravity. The listener is THERE. They are standing in the scene. Everything happens NOW, in PRESENT TENSE.
 
 ${STYLE_GUIDE}
@@ -203,10 +330,13 @@ RULES:
 6. Do NOT name "rooms" or "floors" or "Phototheology." Weave principles organically.
 7. Do NOT use denominational labels.
 8. Target 1200-1800 words — this voice requires space to breathe and build.
-9. NEVER include stage directions, sound effects, or parenthetical notes. Write ONLY spoken narration text.
+9. NEVER include stage directions or parenthetical notes in the narration text. Write ONLY spoken narration text.
 10. AIM FOR AT LEAST 3-5 deep cross-biblical parallels. They should feel like mind-blowing revelations.
 11. NEVER open with "In this chapter..." or "The text tells us..." or any academic preamble. Open with drama.
-12. PRESENT TENSE IS MANDATORY. "Abraham takes his son up the mountain." "Moses ascends." "Joshua shouts." "The waters part." "David stands before the giant." The listener is LIVING the moment, not reading about it afterward. Past tense narration is a critical error.`;
+12. PRESENT TENSE IS MANDATORY. "Abraham takes his son up the mountain." "Moses ascends." "Joshua shouts." "The waters part." "David stands before the giant." The listener is LIVING the moment, not reading about it afterward. Past tense narration is a critical error.
+13. SOUND EFFECT CUES: After your narration, add a line "---SFX_CUES---" followed by a JSON array of sound effect cues. Each cue has: "at" (percentage position 0-100 in the narration), "effect" (one of: wind, thunder, rain, fire, ocean, tension, heavenly, trumpet, battle, earthquake), "duration" (seconds, 3-10), and optionally "volume" (0.1-0.5, default 0.3). Place 4-8 cues per chapter at dramatically appropriate moments. Example:
+---SFX_CUES---
+[{"at":0,"effect":"wind","duration":8},{"at":25,"effect":"tension","duration":5},{"at":60,"effect":"thunder","duration":4},{"at":90,"effect":"heavenly","duration":8}]`;
 
 const EPIC_BOOK_SYSTEM_PROMPT = `You are a cinematic philosopher-narrator producing an EPIC whole-book Bible overview that sounds like the opening of a grand cosmic documentary — the voice of eternity surveying an entire book of Scripture with drama, philosophical gravity, and theological depth. The listener is THERE. They stand at the threshold of this book as its story unfolds before them in real time.
 
@@ -237,10 +367,13 @@ RULES:
 7. Do NOT name "rooms" or "floors" or "Phototheology." Weave principles organically.
 8. Do NOT use denominational labels.
 9. Target 1400-2000 words — this voice requires space to breathe, build, and arrive.
-10. NEVER include stage directions, sound effects, or parenthetical notes. Write ONLY spoken narration text.
+10. NEVER include stage directions or parenthetical notes in the narration text. Write ONLY spoken narration text.
 11. AIM FOR AT LEAST 5-7 deep cross-biblical parallels. They should feel like revelations.
 12. NEVER open with "In this book..." or "The author tells us..." — open with cosmic drama.
-13. PRESENT TENSE IS MANDATORY. "Israel stands at Sinai." "The exile begins." "The prophet speaks." "The kingdom rises." The listener walks THROUGH the book's story as it happens, not as history recounted. Past tense narration is a critical error.`;
+13. PRESENT TENSE IS MANDATORY. "Israel stands at Sinai." "The exile begins." "The prophet speaks." "The kingdom rises." The listener walks THROUGH the book's story as it happens, not as history recounted. Past tense narration is a critical error.
+14. SOUND EFFECT CUES: After your narration, add a line "---SFX_CUES---" followed by a JSON array of sound effect cues. Each cue has: "at" (percentage position 0-100 in the narration), "effect" (one of: wind, thunder, rain, fire, ocean, tension, heavenly, trumpet, battle, earthquake), "duration" (seconds, 3-10), and optionally "volume" (0.1-0.5, default 0.3). Place 5-10 cues per book overview at dramatically appropriate moments. Example:
+---SFX_CUES---
+[{"at":0,"effect":"wind","duration":8},{"at":20,"effect":"tension","duration":6},{"at":50,"effect":"battle","duration":5},{"at":80,"effect":"heavenly","duration":8}]`;
 
 /**
  * Strip parenthetical stage directions like (Sound of wind) or (Pause) from text
@@ -257,13 +390,18 @@ function sanitizeForTTS(text: string): string {
     .trim();
 }
 
+interface GeneratedEpic {
+  text: string;
+  sfxCues: Array<{ at: number; effect: string; duration?: number; volume?: number }>;
+}
+
 // deno-lint-ignore no-explicit-any
 async function generateEpicText(
   book: string,
   chapter: number | null,
   scope: string,
   supabaseAdmin?: any,
-): Promise<string> {
+): Promise<GeneratedEpic> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   const OPENAI_API_KEY_LOCAL = Deno.env.get("OPENAI_API_KEY");
 
@@ -305,9 +443,20 @@ These anchors are non-negotiable. They have been drawn from careful typological 
     }
   }
 
+  // ── Inject book-specific prophetic framework for Daniel, Revelation, Matthew ──
+  let propheticFrameworkBlock = "";
+  const bookUpper = book.toUpperCase().trim();
+  if (bookUpper === "DANIEL") {
+    propheticFrameworkBlock = `\n\n${PROPHETIC_FRAMEWORK_DANIEL}`;
+  } else if (bookUpper === "REVELATION") {
+    propheticFrameworkBlock = `\n\n${PROPHETIC_FRAMEWORK_REVELATION}`;
+  } else if (bookUpper === "MATTHEW" && (chapter === 24 || isBookScope)) {
+    propheticFrameworkBlock = `\n\n${PROPHETIC_FRAMEWORK_MATTHEW}`;
+  }
+
   const userPrompt = isBookScope
-    ? `Create an epic cinematic overview of the entire book of ${book}. This should be a dramatic, sweeping narration that captures the grand arc of this book — its historical context, its place in redemption history, its major movements and themes — while revealing its deep theological significance and how it fits into the story of salvation from Genesis to Revelation.`
-    : `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.${cecAnchorBlock}`;
+    ? `Create an epic cinematic overview of the entire book of ${book}. This should be a dramatic, sweeping narration that captures the grand arc of this book — its historical context, its place in redemption history, its major movements and themes — while revealing its deep theological significance and how it fits into the story of salvation from Genesis to Revelation.${propheticFrameworkBlock}`
+    : `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.${cecAnchorBlock}${propheticFrameworkBlock}`;
 
   // Try Lovable AI gateway first, fall back to OpenAI directly
   const tryLovable = async () => {
@@ -361,12 +510,35 @@ These anchors are non-negotiable. They have been drawn from careful typological 
     return data.choices[0].message.content as string;
   };
 
+  let rawContent: string;
   try {
-    return await tryLovable();
+    rawContent = await tryLovable();
   } catch (lovableErr) {
     console.warn(`[EpicCommentary] Lovable AI failed, falling back to OpenAI: ${lovableErr}`);
-    return await tryOpenAI();
+    rawContent = await tryOpenAI();
   }
+
+  // Parse SFX cues from the AI output
+  const sfxDelimiter = "---SFX_CUES---";
+  const sfxIdx = rawContent.indexOf(sfxDelimiter);
+  let text = rawContent;
+  let sfxCues: Array<{ at: number; effect: string; duration?: number; volume?: number }> = [];
+
+  if (sfxIdx !== -1) {
+    text = rawContent.substring(0, sfxIdx).trim();
+    const sfxBlock = rawContent.substring(sfxIdx + sfxDelimiter.length).trim();
+    try {
+      const jsonMatch = sfxBlock.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        sfxCues = JSON.parse(jsonMatch[0]);
+        console.log(`[EpicCommentary] Parsed ${sfxCues.length} SFX cues`);
+      }
+    } catch (parseErr) {
+      console.warn("[EpicCommentary] Failed to parse SFX cues, continuing without them:", parseErr);
+    }
+  }
+
+  return { text, sfxCues };
 }
 
 /**
@@ -663,13 +835,16 @@ serve(async (req) => {
 
     console.log(`[EpicCommentary] Generating ${effectiveScope} text for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : ""}...`);
 
-    // Generate text
-    const commentaryText = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope, supabaseAdmin);
+    // Generate text + SFX cues
+    const { text: commentaryText, sfxCues } = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope, supabaseAdmin);
 
-    // Update with text
+    // Update with text and SFX cues
     await supabaseAdmin
       .from("epic_commentaries")
-      .update({ commentary_text: commentaryText })
+      .update({
+        commentary_text: commentaryText,
+        sfx_cues: sfxCues.length > 0 ? sfxCues : null,
+      })
       .eq("id", record.id);
 
     console.log(`[EpicCommentary] Generating audio for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book overview)"}...`);

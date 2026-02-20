@@ -311,6 +311,50 @@ async function generateAndCacheAudio(
   }
 }
 
+// ── Book-specific prophetic frameworks derived from pastoral teaching corpus ──
+function getPropheticFramework(bookKey: string): string {
+  const frameworks: Record<string, string> = {
+    DANIEL: `
+PROPHETIC FRAMEWORK FOR DANIEL — MUST SHAPE COMMENTARY:
+• Repeat-and-Enlarge: Daniel 2 → 7 → 8 → 9 → 11 → 12 progressively amplifies the same prophetic sweep. Show awareness of where each chapter sits in this expanding spiral.
+• Daniel 1–4 literal history is a prophetic template for Daniel 11:40–45: Nebuchadnezzar's troubling dream (ch.2), forced worship with death decree (ch.3), divine humbling of a proud king (ch.4) foreshadow the end-time counterfeit kingdom, enforced worship, and fall of Satan's system.
+• The stone "cut without hands" (Daniel 2:34) parallels the Ten Commandment tablets cut by God alone (Exodus 31:18, 32:16). Daniel 2 reveals God's law as the rule of judgment. Iron + clay = churchcraft + statecraft — the forbidden mingling from Genesis 6 through to the final church-state union. The toes represent a global system, not merely European nations.
+• Daniel 11:40–45 maps the pre-close-of-probation crisis: King of South = atheism/anti-Bible systems; King of North = ultimately Satan working through religious-political power; "whirlwind" (v.40) = counterfeit Second Coming; "chariots/horsemen" = demonic angels; "ships" = spiritualism; "tabernacles of palaces" (v.45) = global church-state theocracy (image of the beast); "tidings from east and north" (v.44) = Sealing Angel + Three Angels' Messages.
+• Daniel 12:1: Michael (Christ) stands up = close of probation. Two-phase time of trouble: Phase A (before probation closes — Satan appears, Sunday enforcement, Loud Cry, death decree); Phase B (after — plagues, deliverance, Second Coming).
+• The abomination of desolation = Satan appearing as Christ, standing where he ought not (Matthew 24:15, 2 Thessalonians 2:4).
+• Armageddon = Har (mountain) + Megiddo (congregation) = Satan on the mount of the congregation (Isaiah 14:13) — a worship battle, not a geographic war.`,
+
+    REVELATION: `
+PROPHETIC FRAMEWORK FOR REVELATION — MUST SHAPE COMMENTARY:
+• The deadly wound (1798) is NOT healed until the WHOLE WORLD wonders after the beast (Rev 13:3). Healing requires supernatural miracles — Satan's counterfeit appearing as Christ — not politics or diplomacy.
+• Revelation 13 sequence: Miracles (13:13-14) → Deception → Global unity → Image of beast → Mark enforcement → Death decree. "Fire from heaven" (13:13) = counterfeit of Christ's coming in flaming fire (2 Thess 1:7-8). Satan appears as an angel of light.
+• Threefold union: Protestantism + Catholicism + Spiritualism (GC 588) = Dragon + Beast + False Prophet = three unclean spirits of Revelation 16.
+• Spiritualism is NOT fringe occultism — it imitates Christianity with miracles, healing, apparent resurrections. Rev 18:2 "habitation of devils" = permanent demonic manifestation, not occasional visitation. Culmination of the immortality-of-the-soul error.
+• Two great errors converge in the crowning deception: immortality of the soul → spiritualism; Sunday sacredness → false worship enforcement. Satan appearing as Christ commands Sunday worship.
+• Three frogs (Rev 16) = final counterfeit miracle movement. Frogs = last plague Egyptian magicians could counterfeit (Exodus 8:7).
+• Rev 14 Three Angels' Messages go forth during the final crisis — while Satan's deception is active, while probation is still open. Loud Cry empowered by Latter Rain occurs amid persecution.
+• Satan appears BEFORE Sunday law — enforcement is initiated by supernatural appearing, not politics. When "Christ" is visibly present, democracy collapses into theocracy.
+• Image of Beast sequence: Satan appears → world deception → church-state theocracy formed → Sunday law → economic sanctions (buy/sell = Dan 11:43) → death decree → close of probation.`,
+
+    MATTHEW: `
+PROPHETIC FRAMEWORK FOR MATTHEW 24 — MUST SHAPE COMMENTARY:
+• Matthew 24 is a chronological end-time timeline with dual fulfillment: AD 70 (type) and final generation (antitype).
+• v.4–5: DECEPTION PHASE — False Christs, spiritualism, preparatory delusions. First sign, not afterthought. Warnings imply probation still open.
+• v.6–8: CRISIS ESCALATION — Wars, famines, pestilences. Satan-induced calamities creating demand for religious solutions. Disasters blamed on faithful believers.
+• v.9: PERSECUTION — Remnant targeted. Legal persecution forms. Narrative shifts to blame God's people.
+• v.14: LOUD CRY — Gospel preached to all world BEFORE the end. If gospel is still preached, probation CANNOT be closed. Everything before v.14 is pre-close-of-probation.
+• v.15–28: FINAL CRISIS — Abomination of desolation = Satan appearing as Christ (standing in holy place). Death decree. Great tribulation.
+• v.29: CLOSE OF PROBATION / PLAGUES — Cosmic signs, divine judgment phase.
+• v.30: SECOND COMING.
+• Matthew 24 ↔ Revelation 13–19: v.4-5 ↔ Rev 13 (deception/miracles); v.14 ↔ Rev 14 (Loud Cry); v.29 ↔ Rev 15-16 (plagues); v.30 ↔ Rev 19 (Second Coming).
+• Two great errors converge: immortality of soul → spiritualism; Sunday sacredness → false worship. Both unite in Matthew 24:24: "great signs and wonders; insomuch that, if it were possible, they shall deceive the very elect."
+• Emotional deception > physical persecution: dead loved ones appearing, family pressure, Satan's skillful Scripture use — the real "time of trouble" for believers.`,
+  };
+
+  const framework = frameworks[bookKey];
+  return framework ? `\n${framework}\n` : "";
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -401,19 +445,31 @@ serve(async (req) => {
     const systemPrompt = getSystemPrompt(depth as CommentaryDepth, userName, language as SupportedLanguage);
     const maxTokens = getMaxTokens(depth as CommentaryDepth);
 
-    const userPrompt = depth === "depth" 
-      ? `The reader just finished ${book} chapter ${chapter}. 
+    // ── Inject book-specific prophetic framework for Daniel, Revelation, Matthew ──
+    let propheticFrameworkSection = "";
+    const bookUpper = book.toUpperCase().trim();
+    const chapterNum2 = parseInt(chapter);
+    if (bookUpper === "DANIEL") {
+      propheticFrameworkSection = getPropheticFramework("DANIEL");
+    } else if (bookUpper === "REVELATION") {
+      propheticFrameworkSection = getPropheticFramework("REVELATION");
+    } else if (bookUpper === "MATTHEW" && chapterNum2 === 24) {
+      propheticFrameworkSection = getPropheticFramework("MATTHEW");
+    }
+
+    const userPrompt = depth === "depth"
+      ? `The reader just finished ${book} chapter ${chapter}.
 
 ${chapterText ? `Here's the chapter content:\n${chapterText}\n\n` : ""}
-${userStudiesSection}
+${userStudiesSection}${propheticFrameworkSection}
 Please provide a comprehensive, scholarly verse-by-verse commentary applying the full Phototheology Palace framework.
 CRITICAL: Start at verse 1 and move sequentially through the chapter (1, 2, 3, 4, ...). Do NOT skip any verses, especially verses 1-3. If you group verses, clearly label the group (for example, "verses 1-3" or "verses 4-5") and ensure every verse in the chapter is covered.
 Cover every verse with at least one clear sentence of commentary. Make it thorough enough for serious Bible students while keeping it accessible for spoken delivery.
 ${hasUserStudies ? "BUILD UPON the user's previous study insights where relevant—acknowledge and extend their discoveries." : ""}`
-      : `The reader just finished ${book} chapter ${chapter}. 
+      : `The reader just finished ${book} chapter ${chapter}.
 
 ${chapterText ? `Here's the chapter content:\n${chapterText}\n\n` : ""}
-${userStudiesSection}
+${userStudiesSection}${propheticFrameworkSection}
 Please provide a ${depth === "intermediate" ? "thorough" : "brief"}, Christ-centered commentary applying Phototheology principles naturally. Remember to keep it conversational and suitable for spoken audio delivery.
 ${hasUserStudies ? "BUILD UPON the user's previous study insights where relevant—acknowledge and extend their discoveries." : ""}`;
 
