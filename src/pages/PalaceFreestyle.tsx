@@ -47,8 +47,10 @@ export default function PalaceFreestyle() {
 
   // Last assistant message = the meal
   const lastMeal = [...messages].reverse().find(m => m.role === "assistant");
+  const isStreaming = lastMeal?.streaming === true;
   // Conversation continues after initial meal
   const hasConversation = messages.length > 0;
+  const wordCount = lastMeal?.content ? lastMeal.content.trim().split(/\s+/).filter(Boolean).length : 0;
 
   const handleCook = async () => {
     if (!ingredients.trim() || isLoading) return;
@@ -228,7 +230,7 @@ export default function PalaceFreestyle() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <Card className="border-purple-500/30 bg-slate-900/60 backdrop-blur-sm overflow-hidden">
+              <Card className="border-purple-500/30 bg-card/60 backdrop-blur-sm overflow-hidden">
                 {/* Meal Header */}
                 <div className="flex items-center gap-3 px-5 py-4 border-b border-purple-500/20 bg-purple-500/5">
                   <div className="p-2 rounded-lg bg-purple-500/20">
@@ -236,11 +238,23 @@ export default function PalaceFreestyle() {
                   </div>
                   <div>
                     <h2 className="font-semibold text-purple-200 text-sm uppercase tracking-widest">The Meal</h2>
-                    <p className="text-xs text-muted-foreground">Jeeves' full study — prepared from your ingredients</p>
+                    <p className="text-xs text-muted-foreground">
+                      {isStreaming ? "Jeeves is writing..." : `Jeeves' full study — ${wordCount.toLocaleString()} words`}
+                    </p>
                   </div>
                   <div className="ml-auto flex items-center gap-1">
-                    <BookOpen className="h-3.5 w-3.5 text-purple-400" />
-                    <span className="text-xs text-purple-400">Deep Study</span>
+                    {isStreaming ? (
+                      <div className="flex gap-1">
+                        <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
+                    ) : (
+                      <>
+                        <BookOpen className="h-3.5 w-3.5 text-purple-400" />
+                        <span className="text-xs text-purple-400">Deep Study</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -274,41 +288,43 @@ export default function PalaceFreestyle() {
                   )}
                 </div>
 
-                {/* Exit-to-Precision Bar */}
-                <div className="px-5 py-3 border-t border-purple-500/20 bg-slate-950/30">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-muted-foreground font-medium">Refine further:</span>
-                    {EXIT_COMMANDS.map((cmd) => {
-                      const Icon = cmd.icon;
-                      return (
-                        <Button
-                          key={cmd.id}
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 text-xs gap-1.5 text-purple-400 hover:text-purple-200 hover:bg-purple-500/10"
-                          onClick={() => handleExitCommand(cmd.id)}
-                          disabled={isLoading}
-                        >
-                          <Icon className="h-3 w-3" />
-                          {cmd.label}
-                        </Button>
-                      );
-                    })}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-xs gap-1.5 text-indigo-400 hover:text-indigo-200 hover:bg-indigo-500/10 ml-auto"
-                      onClick={() => {
-                        setIngredients("");
-                        textareaRef.current?.focus();
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                    >
-                      <RefreshCw className="h-3 w-3" />
-                      New ingredients
-                    </Button>
+                {/* Exit-to-Precision Bar — only show when done streaming */}
+                {!isStreaming && (
+                  <div className="px-5 py-3 border-t border-purple-500/20 bg-background/30">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs text-muted-foreground font-medium">Refine further:</span>
+                      {EXIT_COMMANDS.map((cmd) => {
+                        const Icon = cmd.icon;
+                        return (
+                          <Button
+                            key={cmd.id}
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs gap-1.5 text-purple-400 hover:text-purple-200 hover:bg-purple-500/10"
+                            onClick={() => handleExitCommand(cmd.id)}
+                            disabled={isLoading}
+                          >
+                            <Icon className="h-3 w-3" />
+                            {cmd.label}
+                          </Button>
+                        );
+                      })}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs gap-1.5 text-indigo-400 hover:text-indigo-200 hover:bg-indigo-500/10 ml-auto"
+                        onClick={() => {
+                          setIngredients("");
+                          textareaRef.current?.focus();
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                      >
+                        <RefreshCw className="h-3 w-3" />
+                        New ingredients
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )}
               </Card>
 
               {/* Previous meals in conversation */}

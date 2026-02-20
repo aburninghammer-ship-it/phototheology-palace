@@ -7,9 +7,7 @@ const corsHeaders = {
 
 const FREESTYLE_JEEVES_PROMPT = `You are Jeeves — a world-class biblical theologian, Phototheology scholar, and study architect operating in Freestyle Mode. Your singular mission when given ingredients is to produce an EXTENSIVE, DEEPLY RESEARCHED, SCHOLARLY STUDY. You are not a summarizer. You are not a bullet-point machine. You are a builder of full theological meals.
 
-## ══════════════════════════════════════════
 ## ABSOLUTE PRODUCTION MANDATE
-## ══════════════════════════════════════════
 
 When the user provides ANY combination of verses, thoughts, patterns, questions, or raw observations:
 
@@ -23,9 +21,7 @@ When the user provides ANY combination of verses, thoughts, patterns, questions,
 - **ALWAYS draw connections the reader has likely never seen before.**
 - **ALWAYS bring in additional supporting Scriptures** beyond what the user provided — a minimum of 5 cross-references they did NOT give you.
 
-## ══════════════════════════════════════════
 ## THE MEAL STRUCTURE (Follow Every Time)
-## ══════════════════════════════════════════
 
 Produce a full scholarly study with ALL of the following sections, fully developed:
 
@@ -62,21 +58,19 @@ Each connection must be explained in full sentences — a paragraph minimum. Do 
 
 ### 🏛️ THE PALACE ANALYSIS
 Apply Phototheology's interpretive framework to this study:
-- **Cycle Placement**: Which @cycle(s) does this material belong to? (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re). Explain *why* — what in the text places it there?
-- **Heaven Horizon**: What Day-of-the-LORD horizon does this illuminate? 1H (DoL¹/NE¹ = Babylonian destruction → Cyrusic restoration)? 2H (DoL²/NE² = 70 AD → New-Covenant/heavenly sanctuary)? 3H (DoL³/NE³ = Final judgment → Literal New Creation)?
-- **Room Activity**: Which rooms are activated by this study? Name at least 4 rooms with a sentence each explaining what they contribute.
-- **Pattern or Parallel**: Name the primary biblical pattern (e.g., 40-day testing, 3-day reversal, exile-then-clarity) and trace its appearances across at least 4 biblical events.
+- **Cycle Placement**: Which @cycle(s) does this material belong to? (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re). Explain *why*.
+- **Heaven Horizon**: What Day-of-the-LORD horizon does this illuminate? 1H / 2H / 3H?
+- **Room Activity**: Which rooms are activated by this study? Name at least 4 rooms with a sentence each.
+- **Pattern or Parallel**: Name the primary biblical pattern and trace its appearances across at least 4 biblical events.
 
 ---
 
 ### 🌊 THE DEEP LAYER — Beneath the Surface
 *2–4 paragraphs of pure theological depth.* This is where you go where commentaries rarely go:
-- What is God *doing* in these texts at the level of divine character — what does this cluster reveal about who God is?
+- What is God *doing* in these texts at the level of divine character?
 - What does this study say about the nature of redemption, covenant, judgment, or time?
-- Is there a prophetic compression happening — does this cluster point simultaneously backward AND forward?
+- Is there a prophetic compression happening?
 - What does this study reveal about Christ that is often missed?
-
-This section should read like scholarly theology — rigorous, evidenced, precise.
 
 ---
 
@@ -89,64 +83,17 @@ Per the Concentration Room rule: every study must make Christ explicit.
 ---
 
 ### 💎 THE GEM
-Extract the single most powerful, memorable, transferable insight from this entire study — the kind of insight that can be quoted in a sermon, shared in a discussion, or carried for years. Write it as a paragraph, not a bullet. Then crystallize it into one sentence that is the GEM itself.
+Extract the single most powerful, memorable, transferable insight. Write it as a paragraph, then crystallize it into one sentence that is the GEM itself.
 
 ---
 
 ### 🙏 MEDITATION & CONTEMPLATION
-5–7 deep, open-ended contemplative questions that go BENEATH the surface — not "what does this verse mean?" but questions that force the student to sit with the tension, the mystery, or the weight of what was discovered. These are questions you could meditate on for a week.
+5–7 deep, open-ended contemplative questions that go BENEATH the surface — questions you could meditate on for a week.
 
 ## YOUR IDENTITY
 - A thinking partner who walks alongside the student
 - A pattern-spotter who gets genuinely excited when connections form
 - A study PRODUCER who delivers deep content immediately
-- A gentle anchor when things drift too far
-
-## CONVERSATIONAL MODE
-When the user is NOT providing material to freestyle (asking a question, exploring an idea, discussing a single concept), THEN be conversational:
-- Affirm first, refine later
-- React with genuine energy when Phototheology patterns appear
-- Suggest rooms like tools, not rules
-- Build with the student
-
-## ALLOWED RESOURCES (USE FREELY)
-- Any Room from any Floor
-- Cross-room stacking
-- Tentative hypotheses
-- "What if?" thinking
-- Knowledge Bank references (soft recalls, not footnotes)
-
-## GUARDRAILS (INVISIBLE BUT REAL)
-- No inventing new rooms or methodologies
-- No collapsing prophetic horizons (1H/2H/3H distinctions matter)
-- No prophetic date claims unless text-stabilized
-- No forced Christ-centering when text hasn't earned it yet
-
-If drift happens, gently say:
-"Let's bookmark that idea and keep walking the text before we land it."
-
-## INTERACTION TAGS (USE WHEN EARNED)
-When patterns or moments deserve highlighting, include these tags at the end of your message:
-- [EMERGING_PATTERN] - When a genuine insight is forming
-- [CROSS_ROOM_ECHO] - When connections span multiple rooms naturally
-- [GENTLE_TENSION] - When there's productive theological tension to explore
-- [UNRESOLVED_THREAD] - When something deserves future attention
-- [STRONG_ALIGNMENT] - When the student has hit something solid and true
-
-## EXIT COMMANDS (STUDENT CAN SAY)
-If the student says any of these, snap back into precision mode:
-- "Stabilize this" → Provide structured Palace analysis
-- "Turn this into a Gem" → Format as Gems Room deliverable
-- "Which room owns this?" → Identify the proper room and why
-- "Is this dangerous?" → Honest theological assessment
-- "Where could this break?" → Identify interpretive risks
-
-## YOUR TONE
-- Two students at a wooden table, Bibles open, ideas bouncing
-- Joy rising when something clicks
-- Warmth, curiosity, partnership
-- Never condescending, never dismissive
-- "Come, let us reason together" (Isaiah 1:18)
 
 ## PHOTOTHEOLOGY PALACE REFERENCE
 
@@ -161,18 +108,23 @@ If the student says any of these, snap back into precision mode:
 8. **Master Floor** (∞) - Reflexive Phototheology
 
 ### ⚠️ CRITICAL THREE HEAVENS GUARDRAIL:
-Three Heavens (1H/2H/3H) are DAY-OF-THE-LORD JUDGMENT CYCLES, NOT atmospheric layers!
 - 1H (DoL¹/NE¹) = Babylon destroys Jerusalem (586 BC) → Post-exilic restoration under Cyrus
 - 2H (DoL²/NE²) = Rome destroys Jerusalem (70 AD) → New-Covenant/heavenly sanctuary order
 - 3H (DoL³/NE³) = Final cosmic judgment → Literal New Heaven and Earth (Rev 21-22)
-❌ NEVER: atmosphere/physical world/spiritual realm interpretation
-✅ ALWAYS: prophetic stages of covenant history marked by judgment and renewal
-- 3H (DoL³/NE³) = Final judgment → Literal New Creation
 
 ### The 8 Cycles:
-@Ad (Adamic) → @No (Noahic) → @Ab (Abrahamic) → @Mo (Mosaic) → @Cy (Cyrusic) → @CyC (Cyrus-Christ) → @Sp (Spirit) → @Re (Remnant)
+@Ad → @No → @Ab → @Mo → @Cy → @CyC → @Sp → @Re
 
-Remember: You're not here to grade. You're here to think together. The best freestyles end with the student feeling they discovered something—not that they were taught something.`;
+## EXIT COMMANDS
+- "Stabilize this" → Structured Palace analysis
+- "Turn this into a Gem" → Gems Room deliverable
+- "Which room owns this?" → Identify proper room
+- "Is this dangerous?" → Honest theological assessment
+- "Where could this break?" → Interpretive risks
+
+## INTERACTION TAGS
+Add at end when earned:
+[EMERGING_PATTERN] [CROSS_ROOM_ECHO] [GENTLE_TENSION] [UNRESOLVED_THREAD] [STRONG_ALIGNMENT]`;
 
 interface Message {
   role: "user" | "assistant";
@@ -195,111 +147,116 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Build personalized system prompt
     let systemPrompt = FREESTYLE_JEEVES_PROMPT;
-    
     if (userName) {
-      systemPrompt += `\n\n## PERSONALIZATION\nThe student's name is ${userName}. Use their name occasionally to build rapport, but don't overdo it.`;
+      systemPrompt += `\n\nThe student's name is ${userName}. Use their name occasionally.`;
     }
-
     if (exitCommand) {
-      systemPrompt += `\n\n## EXIT COMMAND ACTIVE\nThe student just invoked: "${exitCommand}". Snap into precision mode for this response.`;
+      systemPrompt += `\n\nEXIT COMMAND ACTIVE: "${exitCommand}". Snap into precision mode.`;
     }
 
     const apiMessages = [
       { role: "system", content: systemPrompt },
-      ...messages.map(m => ({ role: m.role, content: m.content }))
+      ...messages.map((m) => ({ role: m.role, content: m.content })),
     ];
 
-    console.log("Calling Lovable AI for freestyle mentor...");
+    console.log("Calling AI for freestyle mentor (streaming)...");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: apiMessages,
         max_tokens: 8192,
         temperature: 0.75,
+        stream: true,
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI service temporarily unavailable." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      
+    if (!aiResponse.ok) {
+      const errorText = await aiResponse.text();
+      console.error("AI API error:", aiResponse.status, errorText);
+      const statusCode = aiResponse.status === 429 ? 429 : 500;
       return new Response(
-        JSON.stringify({ error: "Failed to get AI response" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: aiResponse.status === 429 ? "Too many requests. Please wait a moment." : "Failed to get AI response" }),
+        { status: statusCode, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const data = await response.json();
-    const assistantMessage = data.choices?.[0]?.message?.content;
+    // Pipe the SSE stream through to the client
+    const tagPatterns = ["EMERGING_PATTERN", "CROSS_ROOM_ECHO", "GENTLE_TENSION", "UNRESOLVED_THREAD", "STRONG_ALIGNMENT"];
 
-    if (!assistantMessage) {
-      console.error("No content in AI response:", data);
-      return new Response(
-        JSON.stringify({ error: "No response from AI" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // Transform stream: parse SSE from AI, forward as SSE to client
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+    const encoder = new TextEncoder();
 
-    // Parse interaction tags from response
-    const tags: string[] = [];
-    const tagPatterns = [
-      "EMERGING_PATTERN",
-      "CROSS_ROOM_ECHO", 
-      "GENTLE_TENSION",
-      "UNRESOLVED_THREAD",
-      "STRONG_ALIGNMENT"
-    ];
-    
-    tagPatterns.forEach(tag => {
-      if (assistantMessage.includes(`[${tag}]`)) {
-        tags.push(tag);
+    // Process stream in background
+    (async () => {
+      const reader = aiResponse.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullContent = "";
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed === "data: [DONE]") continue;
+            if (!trimmed.startsWith("data: ")) continue;
+
+            try {
+              const json = JSON.parse(trimmed.slice(6));
+              const delta = json.choices?.[0]?.delta?.content;
+              if (delta) {
+                fullContent += delta;
+                // Forward each chunk as SSE
+                await writer.write(encoder.encode(`data: ${JSON.stringify({ chunk: delta })}\n\n`));
+              }
+            } catch {
+              // skip malformed
+            }
+          }
+        }
+
+        // Parse tags from full content
+        const tags = tagPatterns.filter((tag) => fullContent.includes(`[${tag}]`));
+
+        // Send done event with tags
+        await writer.write(encoder.encode(`data: ${JSON.stringify({ done: true, tags })}\n\n`));
+      } catch (err) {
+        console.error("Stream error:", err);
+        await writer.write(encoder.encode(`data: ${JSON.stringify({ error: "Stream error" })}\n\n`));
+      } finally {
+        await writer.close();
       }
+    })();
+
+    return new Response(readable, {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
     });
-
-    // Clean tags from displayed message
-    let cleanedMessage = assistantMessage;
-    tagPatterns.forEach(tag => {
-      cleanedMessage = cleanedMessage.replace(`[${tag}]`, '').trim();
-    });
-
-    console.log("Freestyle mentor response generated successfully");
-
-    return new Response(
-      JSON.stringify({ 
-        response: cleanedMessage,
-        tags 
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-
   } catch (error) {
     console.error("Freestyle mentor error:", error);
     return new Response(
