@@ -484,8 +484,115 @@ export default function AudioBible() {
     }
   }, [handlePlayEpic]);
 
-  // Keep ref in sync so onended callbacks always call latest version
-  playEpicRef.current = handlePlayEpic;
+  // Regenerate all chapters in a book (admin only)
+  const handleRegenerateBook = useCallback(async (book: string) => {
+    const bookMeta = BIBLE_BOOK_METADATA.find(b => b.name === book);
+    if (!bookMeta) return;
+
+    const totalChapters = bookMeta.chapters;
+
+    // Check which chapters were already regenerated recently (within last 24h)
+    const { data: recentlyDone } = await supabase
+      .from("epic_commentaries")
+      .select("chapter, updated_at")
+      .eq("book", book)
+      .eq("status", "ready");
+
+    const skipped: number[] = [];
+    const toRegen: number[] = [];
+    for (let ch = 1; ch <= totalChapters; ch++) {
+      const existing = recentlyDone?.find(r => r.chapter === ch);
+      if (existing?.updated_at) {
+        const hoursSince = (Date.now() - new Date(existing.updated_at).getTime()) / (1000 * 60 * 60);
+        if (hoursSince < 24) { skipped.push(ch); continue; }
+      }
+      toRegen.push(ch);
+    }
+
+    if (toRegen.length === 0) {
+      toast.warning(`All ${totalChapters} chapters of ${book} were already regenerated within the last 24 hours. No regeneration needed.`, { duration: 6000 });
+      return;
+    }
+
+    if (skipped.length > 0) {
+      toast.info(`Skipping ${skipped.length} recently regenerated chapter(s). Queuing ${toRegen.length} chapter(s) for ${book}...`, { duration: 5000 });
+    } else {
+      toast.info(`Queuing all ${toRegen.length} chapters of ${book} for regeneration...`, { duration: 4000 });
+    }
+
+    // Use batch-generate-epic edge function for efficiency
+    const { data, error } = await supabase.functions.invoke("batch-generate-epic", {
+      body: {
+        books: [{ book, chapters: toRegen }],
+        batchSize: toRegen.length,
+        regenerate: true,
+      },
+    });
+
+    if (error) {
+      toast.error(`Book regeneration error: ${error.message}`);
+    } else {
+      const processed = data?.processed || [];
+      const succeeded = processed.filter((r: any) => r.status === "ready").length;
+      toast.success(`${book}: ${succeeded}/${toRegen.length} chapters regenerated successfully.`, { duration: 6000 });
+    }
+  }, []);
+
+  // Regenerate the whole Bible (admin only)
+  const handleRegenerateWholeBible = useCallback(async () => {
+    // Check all chapters for recent regeneration
+    const { data: recentlyDone } = await supabase
+      .from("epic_commentaries")
+      .select("book, chapter, updated_at")
+      .eq("status", "ready");
+
+    const recentSet = new Set<string>();
+    for (const row of recentlyDone || []) {
+      if (row.updated_at) {
+        const hoursSince = (Date.now() - new Date(row.updated_at).getTime()) / (1000 * 60 * 60);
+        if (hoursSince < 24) recentSet.add(`${row.book}:${row.chapter}`);
+      }
+    }
+
+    const toRegen: { book: string; chapters: number[] }[] = [];
+    let totalSkipped = 0;
+    let totalQueued = 0;
+
+    for (const bookMeta of BIBLE_BOOK_METADATA) {
+      const chapters: number[] = [];
+      for (let ch = 1; ch <= bookMeta.chapters; ch++) {
+        if (recentSet.has(`${bookMeta.name}:${ch}`)) { totalSkipped++; continue; }
+        chapters.push(ch);
+        totalQueued++;
+      }
+      if (chapters.length > 0) toRegen.push({ book: bookMeta.name, chapters });
+    }
+
+    if (totalQueued === 0) {
+      toast.warning(`All 1,189 Bible chapters were already regenerated within the last 24 hours. Nothing to regenerate.`, { duration: 8000 });
+      return;
+    }
+
+    toast.info(`Starting whole-Bible regeneration: ${totalQueued} chapters queued, ${totalSkipped} skipped (recently done). This will run in batches in the background.`, { duration: 8000 });
+
+    // Fire in batches of 5 books at a time using batch-generate-epic
+    const { data, error } = await supabase.functions.invoke("batch-generate-epic", {
+      body: {
+        books: toRegen,
+        batchSize: 10,
+        regenerate: true,
+      },
+    });
+
+    if (error) {
+      toast.error(`Whole-Bible regeneration error: ${error.message}`);
+    } else {
+      const processed = data?.processed || [];
+      const succeeded = processed.filter((r: any) => r.status === "ready").length;
+      const remaining = data?.totalRemaining || 0;
+      toast.success(`First batch done: ${succeeded} chapters regenerated. ${remaining} chapters remaining — continue using the batch tool from admin panel.`, { duration: 10000 });
+    }
+  }, []);
 
   // Play Epic commentary for an entire book (overview)
   const handlePlayEpicBook = useCallback(async (book: string) => {
@@ -1012,16 +1119,38 @@ export default function AudioBible() {
                             Epic Mode: {selectedBook} {selectedChapter}
                           </Button>
                           {isAdmin && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="w-full border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
-                              onClick={() => handleRegenerateEpic(selectedBook, selectedChapter)}
-                              disabled={isEpicLoading}
-                            >
-                              <RefreshCw className="h-4 w-4 mr-2" />
-                              Regenerate Script & Audio
-                            </Button>
+                            <div className="space-y-1.5 w-full">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
+                                onClick={() => handleRegenerateEpic(selectedBook, selectedChapter)}
+                                disabled={isEpicLoading}
+                              >
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Regenerate Script & Audio
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
+                                onClick={() => handleRegenerateBook(selectedBook)}
+                                disabled={isEpicLoading}
+                              >
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Regenerate Book ({selectedBook})
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full border-red-500/30 hover:bg-red-500/10 text-red-400"
+                                onClick={handleRegenerateWholeBible}
+                                disabled={isEpicLoading}
+                              >
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Regenerate Whole Bible
+                              </Button>
+                            </div>
                           )}
                         </div>
                       ) : (
