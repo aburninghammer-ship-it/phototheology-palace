@@ -11929,6 +11929,27 @@ export type Database = {
           },
         ]
       }
+      saved_daily_verses: {
+        Row: {
+          id: string
+          saved_at: string
+          user_id: string
+          verse_id: string
+        }
+        Insert: {
+          id?: string
+          saved_at?: string
+          user_id: string
+          verse_id: string
+        }
+        Update: {
+          id?: string
+          saved_at?: string
+          user_id?: string
+          verse_id?: string
+        }
+        Relationships: []
+      }
       saved_powerpoints: {
         Row: {
           content_type: string

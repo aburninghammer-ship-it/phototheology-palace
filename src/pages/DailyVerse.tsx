@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Book, Sparkles, CheckCircle2, Calendar, Share2, Archive, ChevronLeft, ChevronRight } from "lucide-react";
+import { Book, Sparkles, CheckCircle2, Calendar, Share2, Archive, ChevronLeft, ChevronRight, Bookmark, BookmarkCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
@@ -83,6 +83,45 @@ export default function DailyVerse() {
       return !!data;
     },
     enabled: !!todayVerse && !!user,
+  });
+
+  const { data: isSaved, refetch: refetchSaved } = useQuery({
+    queryKey: ['verse-saved', todayVerse?.id, user?.id],
+    queryFn: async () => {
+      if (!todayVerse || !user) return false;
+      const { data } = await supabase
+        .from('saved_daily_verses' as any)
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('verse_id', todayVerse.id)
+        .single();
+      return !!data;
+    },
+    enabled: !!todayVerse && !!user,
+  });
+
+  const saveVerseMutation = useMutation({
+    mutationFn: async () => {
+      if (!todayVerse || !user) return;
+      if (isSaved) {
+        const { error } = await supabase
+          .from('saved_daily_verses' as any)
+          .delete()
+          .eq('user_id', user.id)
+          .eq('verse_id', todayVerse.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('saved_daily_verses' as any)
+          .insert({ user_id: user.id, verse_id: todayVerse.id });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      refetchSaved();
+      queryClient.invalidateQueries({ queryKey: ['saved-daily-verses'] });
+      toast.success(isSaved ? 'Verse removed from saved' : 'Verse saved to your Library!');
+    },
   });
 
   // Archive queries
@@ -414,6 +453,20 @@ export default function DailyVerse() {
               <Sparkles className="mr-2 h-4 w-4" />
               {t('dailyVerse.refreshPrinciples')}
             </Button>
+            {user && (
+              <Button
+                onClick={() => saveVerseMutation.mutate()}
+                disabled={saveVerseMutation.isPending}
+                variant={isSaved ? "secondary" : "outline"}
+              >
+                {isSaved ? (
+                  <BookmarkCheck className="mr-2 h-4 w-4 text-primary" />
+                ) : (
+                  <Bookmark className="mr-2 h-4 w-4" />
+                )}
+                {isSaved ? 'Saved' : 'Save'}
+              </Button>
+            )}
             <Button onClick={handleShare} variant="outline">
               <Share2 className="mr-2 h-4 w-4" />
               {t('common.share')}
