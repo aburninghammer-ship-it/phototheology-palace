@@ -44,6 +44,19 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     }
   },
   {
+    id: "freestyle",
+    to: "/palace/freestyle",
+    label: "Freestyle",
+    icon: Zap,
+    gradient: {
+      from: "from-lime-500/10",
+      to: "to-green-500/10",
+      border: "border-lime-500/20",
+      text: "from-lime-600 to-green-600",
+      glow: "rgba(132,204,22,0.5)"
+    }
+  },
+  {
     id: "church-space",
     to: "/living-manna",
     label: "My Church Space",
