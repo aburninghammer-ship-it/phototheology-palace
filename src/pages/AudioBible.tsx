@@ -405,10 +405,8 @@ export default function AudioBible() {
 
       audio.onplay = () => {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
-        // Start SFX scheduling when audio plays
-        if (cues.length > 0) {
-          narrativeSfx.startScheduling(audio, cues);
-        }
+        // Start SFX scheduling when audio plays (ambient mode if no cues)
+        narrativeSfx.startScheduling(audio, cues);
       };
       audio.onended = () => {
         narrativeSfx.stopScheduling();
@@ -559,9 +557,8 @@ export default function AudioBible() {
 
       audio.onplay = () => {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
-        if (cues.length > 0) {
-          narrativeSfx.startScheduling(audio, cues);
-        }
+        // Start SFX scheduling when audio plays (ambient mode if no cues)
+        narrativeSfx.startScheduling(audio, cues);
       };
       audio.onended = () => {
         narrativeSfx.stopScheduling();
@@ -712,10 +709,8 @@ export default function AudioBible() {
                               epicAudioRef.current.play();
                               setIsEpicPaused(false);
                               setIsEpicPlaying(true);
-                              // Resume SFX scheduling
-                              if (epicSfxCues.length > 0) {
-                                narrativeSfx.startScheduling(epicAudioRef.current, epicSfxCues);
-                              }
+                              // Resume SFX scheduling (ambient mode if no cues)
+                              narrativeSfx.startScheduling(epicAudioRef.current, epicSfxCues);
                             } else {
                               epicAudioRef.current.pause();
                               setIsEpicPaused(true);
@@ -783,7 +778,7 @@ export default function AudioBible() {
                       </Button>
                     </div>
                     {/* SFX Volume Control */}
-                    {narrativeSfx.isEnabled && epicSfxCues.length > 0 && (
+                    {narrativeSfx.isEnabled && (
                       <div className="flex items-center gap-3 mt-4 max-w-xs mx-auto">
                         <Zap className="h-4 w-4 text-amber-400/70" />
                         <Slider

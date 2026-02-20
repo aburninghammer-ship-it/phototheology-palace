@@ -482,6 +482,8 @@ export function useNarrativeSoundEffects() {
    * Start scheduling SFX cues against a playing HTMLAudioElement.
    * Call this when epic playback starts. Polls the audio's currentTime and
    * triggers cues when their position is reached.
+   * If no cues are provided, falls back to ambient mode: random atmospheric
+   * sounds are played at random intervals throughout playback.
    */
   const startScheduling = useCallback(
     (audioEl: HTMLAudioElement, cues: SfxCue[]) => {
@@ -489,7 +491,54 @@ export function useNarrativeSoundEffects() {
       stopScheduling();
       scheduledRef.current.clear();
 
-      if (!cues || cues.length === 0 || !isEnabled) return;
+      if (!isEnabled) return;
+
+      // ── Ambient fallback mode (no cues provided) ───────────────────────────
+      if (!cues || cues.length === 0) {
+        const AMBIENT_EFFECTS: SfxType[] = ["wind", "tension", "heavenly", "fire", "rain", "ocean"];
+        let ambientTimeout: ReturnType<typeof setTimeout> | null = null;
+
+        const scheduleNext = () => {
+          if (audioEl.paused || audioEl.ended) {
+            // Check again later
+            ambientTimeout = setTimeout(scheduleNext, 2000);
+            return;
+          }
+          // Pick a random effect
+          const effect = AMBIENT_EFFECTS[Math.floor(Math.random() * AMBIENT_EFFECTS.length)];
+          const duration = 6 + Math.random() * 6; // 6–12s
+          playSfx(effect, duration);
+
+          // Schedule next in 15–35s
+          const delay = (15 + Math.random() * 20) * 1000;
+          ambientTimeout = setTimeout(scheduleNext, delay);
+        };
+
+        // Start first ambient sound after a short delay
+        ambientTimeout = setTimeout(scheduleNext, 3000);
+
+        // Store cleanup in the interval ref using a fake setInterval wrapper
+        intervalRef.current = setInterval(() => {
+          // Just a keep-alive; real scheduling is in ambientTimeout chain
+          if (audioEl.ended) {
+            clearInterval(intervalRef.current!);
+            intervalRef.current = null;
+            if (ambientTimeout) clearTimeout(ambientTimeout);
+          }
+        }, 5000) as ReturnType<typeof setInterval>;
+
+        // Attach cleanup to stopScheduling by patching activeRef with a sentinel
+        const cleanup = () => {
+          if (ambientTimeout) clearTimeout(ambientTimeout);
+        };
+        // Wrap cleanup in a dummy AudioNode-like entry (nodes = [])
+        activeRef.current.push({ nodes: [], stopTime: Infinity });
+        // Override the last entry's nodes disconnect to call cleanup
+        const sentinel = activeRef.current[activeRef.current.length - 1];
+        (sentinel as any)._cleanupFn = cleanup;
+
+        return;
+      }
 
       const check = () => {
         if (audioEl.paused || audioEl.ended) return;
@@ -522,8 +571,11 @@ export function useNarrativeSoundEffects() {
       intervalRef.current = null;
     }
     scheduledRef.current.clear();
-    // Disconnect any active effects
+    // Disconnect any active effects and call sentinel cleanup fns
     for (const effect of activeRef.current) {
+      if ((effect as any)._cleanupFn) {
+        try { (effect as any)._cleanupFn(); } catch { /* ignore */ }
+      }
       for (const node of effect.nodes) {
         try {
           node.disconnect();
