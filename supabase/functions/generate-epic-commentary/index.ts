@@ -427,6 +427,7 @@ async function generateEpicText(
   chapter: number | null,
   scope: string,
   supabaseAdmin?: any,
+  customInstructions?: string,
 ): Promise<GeneratedEpic> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   const OPENAI_API_KEY_LOCAL = Deno.env.get("OPENAI_API_KEY");
@@ -482,7 +483,7 @@ These anchors are non-negotiable. They have been drawn from careful typological 
 
   const userPrompt = isBookScope
     ? `Create an epic cinematic overview of the entire book of ${book}. This should be a dramatic, sweeping narration that captures the grand arc of this book — its historical context, its place in redemption history, its major movements and themes — while revealing its deep theological significance and how it fits into the story of salvation from Genesis to Revelation.${propheticFrameworkBlock}`
-    : `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.${cecAnchorBlock}${propheticFrameworkBlock}`;
+    : `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.${cecAnchorBlock}${propheticFrameworkBlock}${customInstructions ? `\n\nSPECIAL CONTENT INSTRUCTIONS FOR THIS REGENERATION (MUST BE FOLLOWED):\n${customInstructions}` : ""}`;
 
   // Try Lovable AI gateway first, fall back to OpenAI directly
   const tryLovable = async () => {
@@ -808,7 +809,7 @@ serve(async (req) => {
   }
 
   try {
-    const { book, chapter, regenerate, scope } = await req.json();
+    const { book, chapter, regenerate, scope, customInstructions } = await req.json();
     const effectiveScope = scope || "chapter";
 
     if (!book || (effectiveScope === "chapter" && !chapter)) {
@@ -862,7 +863,7 @@ serve(async (req) => {
     console.log(`[EpicCommentary] Generating ${effectiveScope} text for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : ""}...`);
 
     // Generate text + SFX cues
-    const { text: commentaryText, sfxCues } = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope, supabaseAdmin);
+    const { text: commentaryText, sfxCues } = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope, supabaseAdmin, customInstructions);
 
     // Update with text (sfx_cues stored separately if column exists)
     const textUpdateResult = await supabaseAdmin
