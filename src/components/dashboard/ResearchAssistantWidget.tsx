@@ -22,6 +22,8 @@ import {
   FolderOpen,
   PlayCircle,
   CalendarDays,
+  Wand2,
+  RefreshCcw,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +36,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
 import { toast } from "sonner";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
 interface Citation {
   title: string;
@@ -104,6 +107,35 @@ WHEN DEEP DETAIL IS REQUESTED:
 
 Remember: the user is a researcher. Respect their time. Use the conversation history. Answer the question. Suggest follow-ups. Stop.`;
 
+const FREESTYLE_SYSTEM_INSTRUCTIONS = `You are Jeeves, the user's personal biblical study weaver. You receive a list of thoughts, concepts, Bible texts, and ideas — and you weave them into a DEEP, PROFOUND, INTERCONNECTED study.
+
+YOUR OUTPUT MUST FOLLOW THIS EXACT STRUCTURE:
+
+## The Golden Thread
+A 2-3 paragraph opening that identifies the unifying theme connecting ALL the user's inputs. This should feel like a revelation — "here's what ties everything together."
+
+## Verse-by-Verse Tapestry
+Take each Bible text the user provided and show how it connects to the others. Quote each verse in full. Show the Greek/Hebrew where it illuminates meaning. Draw lines between the verses that the reader may never have seen before.
+
+## Unexpected Connections
+This is where you shine. Find at LEAST 3 connections between the user's inputs that are surprising, deep, or theologically profound. These should make the reader say "I never saw that before."
+
+## The Deeper Layer
+Go beneath the surface. What typological, prophetic, or structural patterns emerge when these inputs are laid side by side? Think like a scholar but write like a poet.
+
+## Practical Meditation
+End with 3-5 contemplative questions or devotional prompts that help the reader sit with these truths and let them transform their thinking.
+
+FORMATTING RULES:
+- Use ## for section headers (exactly as shown above)
+- Bold key terms with **term**
+- Quote full verse text: **Book Ch:V** — "verse text here"
+- Use bullet points for lists
+- Be generous with content — this is a DEEP study, not a summary
+- Each time you generate a study from the same inputs, take a COMPLETELY DIFFERENT ANGLE — different golden thread, different connections, different meditation prompts
+
+You are not summarizing. You are WEAVING. Make it rich, interconnected, and profound.`;
+
 // Format response content: bold headers, verse highlights, etc.
 function formatContent(text: string) {
   const parts: React.ReactNode[] = [];
@@ -167,6 +199,7 @@ interface SavedResearch {
   created_at: string;
   updated_at: string;
   content: string;
+  tags?: string[];
 }
 
 interface ResearchAssistantWidgetProps {
@@ -202,7 +235,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const [activeTab, setActiveTab] = useState<"chat" | "saved">("chat");
+  const [activeTab, setActiveTab] = useState<"chat" | "saved" | "freestyle">("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -217,18 +250,41 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
   const [savedResearches, setSavedResearches] = useState<SavedResearch[]>([]);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
 
+  // Freestyle tab state
+  const [freestyleInput, setFreestyleInput] = useState("");
+  const [freestyleOutput, setFreestyleOutput] = useState("");
+  const [freestyleIsLoading, setFreestyleIsLoading] = useState(false);
+  const [freestyleRemixCount, setFreestyleRemixCount] = useState(0);
+  const [freestyleSavedId, setFreestyleSavedId] = useState<string | null>(null);
+  const [freestyleSessionName, setFreestyleSessionName] = useState("");
+  const freestyleTextareaRef = useRef<HTMLTextAreaElement>(null);
+
   const fetchSavedResearches = useCallback(async () => {
     setIsLoadingSaved(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data, error } = await supabase
+      // Fetch both research and freestyle studies
+      const { data: researchData, error: researchError } = await supabase
         .from("user_studies")
-        .select("id, title, created_at, updated_at, content")
+        .select("id, title, created_at, updated_at, content, tags")
         .eq("user_id", user.id)
         .contains("tags", ["research"])
         .order("updated_at", { ascending: false });
-      if (!error && data) setSavedResearches(data as SavedResearch[]);
+      const { data: freestyleData, error: freestyleError } = await supabase
+        .from("user_studies")
+        .select("id, title, created_at, updated_at, content, tags")
+        .eq("user_id", user.id)
+        .contains("tags", ["freestyle"])
+        .order("updated_at", { ascending: false });
+      const combined = [
+        ...((researchData as SavedResearch[]) || []),
+        ...((freestyleData as SavedResearch[]) || []),
+      ];
+      // Deduplicate by id and sort by updated_at descending
+      const deduped = Array.from(new Map(combined.map(s => [s.id, s])).values())
+        .sort((a, b) => new Date(b.updated_at || b.created_at).getTime() - new Date(a.updated_at || a.created_at).getTime());
+      if (!researchError && !freestyleError) setSavedResearches(deduped);
     } catch (e) {
       console.error("Error fetching saved researches:", e);
     } finally {
@@ -497,6 +553,88 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
     });
   }, []);
 
+  const handleFreestyleVoiceTranscript = useCallback((text: string) => {
+    setExpanded(true);
+    setFreestyleInput((prev) => {
+      const separator = prev.trim() ? "\n" : "";
+      return prev + separator + text;
+    });
+  }, []);
+
+  const generateFreestyle = async (isRemix = false) => {
+    const trimmed = freestyleInput.trim();
+    if (!trimmed || freestyleIsLoading) return;
+
+    setFreestyleIsLoading(true);
+    const currentRemix = isRemix ? freestyleRemixCount + 1 : 0;
+    if (isRemix) setFreestyleRemixCount(currentRemix);
+
+    const remixHint = currentRemix > 0
+      ? `\n\nThis is remix #${currentRemix}. Take a COMPLETELY DIFFERENT ANGLE than any previous generation. Different golden thread, different connections, different insights.`
+      : "";
+
+    const query = `Here are my thoughts, concepts, and Bible texts to weave into a study:\n\n${trimmed}${remixHint}`;
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "research",
+          query,
+          question: query,
+          conversationHistory: [],
+          systemInstructions: FREESTYLE_SYSTEM_INSTRUCTIONS,
+          maxTokens: 4096,
+        },
+      });
+      if (error) throw error;
+      const response = data?.response || data?.content || data?.answer || "No response received.";
+      setFreestyleOutput(response);
+    } catch (err) {
+      console.error("Freestyle generation error:", err);
+      toast.error("Failed to generate freestyle study. Please try again.");
+    } finally {
+      setFreestyleIsLoading(false);
+    }
+  };
+
+  const saveFreestyleStudy = async () => {
+    if (!freestyleOutput) return;
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const title = freestyleSessionName.trim() || `Freestyle: ${freestyleInput.slice(0, 60)}`;
+      const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const content = `# ${title}\n\n**Date:** ${date}\n**Type:** Freestyle Study\n\n---\n\n## 🎯 Inputs\n\n${freestyleInput}\n\n---\n\n${freestyleOutput}`;
+      const tags = ["freestyle", "jeeves"];
+
+      if (freestyleSavedId) {
+        await supabase.from("user_studies").update({ title, content, tags, updated_at: new Date().toISOString() }).eq("id", freestyleSavedId);
+      } else {
+        const { data, error } = await supabase.from("user_studies").insert({
+          user_id: user.id, title, content, tags,
+        }).select("id").single();
+        if (!error && data) setFreestyleSavedId(data.id);
+      }
+      setJustSaved(true);
+      setTimeout(() => setJustSaved(false), 2000);
+      toast.success("Freestyle study saved!");
+    } catch (e) {
+      console.error("Freestyle save error:", e);
+      toast.error("Failed to save freestyle study.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const clearFreestyle = () => {
+    setFreestyleInput("");
+    setFreestyleOutput("");
+    setFreestyleRemixCount(0);
+    setFreestyleSavedId(null);
+    setFreestyleSessionName("");
+  };
+
   const timeLabel = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   };
@@ -587,6 +725,17 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
                   </span>
                 )}
               </button>
+              <button
+                onClick={() => setActiveTab("freestyle")}
+                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-medium border-b-2 transition-colors -mb-px ${
+                  activeTab === "freestyle"
+                    ? "border-emerald-500 text-emerald-400"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Wand2 className="h-3.5 w-3.5" />
+                Freestyle
+              </button>
             </div>
 
             <CardContent className="pt-4 space-y-4">
@@ -646,9 +795,17 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-foreground/90 truncate mb-0.5">
-                                  {study.title}
-                                </p>
+                                <div className="flex items-center gap-2 mb-0.5">
+                                  <p className="text-sm font-medium text-foreground/90 truncate">
+                                    {study.title}
+                                  </p>
+                                  {study.tags?.includes("freestyle") && (
+                                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-amber-500/40 text-amber-400 shrink-0">
+                                      <Wand2 className="h-2.5 w-2.5 mr-0.5" />
+                                      Freestyle
+                                    </Badge>
+                                  )}
+                                </div>
                                 {preview && (
                                   <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
                                     {preview}
@@ -931,6 +1088,152 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
                     )}
                   </div>
                 </>
+              )}
+
+              {/* ── FREESTYLE TAB ── */}
+              {activeTab === "freestyle" && (
+                <div className="space-y-4">
+                  {/* Input Area */}
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <Textarea
+                        ref={freestyleTextareaRef}
+                        placeholder={"Enter your thoughts, concepts, and Bible texts — one per line:\n\nExample:\nJohn 3:16\nThe concept of adoption into God's family\nRomans 8:15\nEphesians 1:5\nHow does grace transform identity?\nThe prodigal son as adoption story"}
+                        className="min-h-[140px] max-h-[200px] bg-background/60 border-border/60 text-sm pr-12 resize-none rounded-xl focus:border-emerald-500/50 focus:ring-emerald-500/20"
+                        value={freestyleInput}
+                        onChange={(e) => setFreestyleInput(e.target.value)}
+                        disabled={freestyleIsLoading}
+                      />
+                      <div className="absolute right-2 bottom-2">
+                        <VoiceInput onTranscript={handleFreestyleVoiceTranscript} variant="icon" />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => generateFreestyle(false)}
+                        disabled={!freestyleInput.trim() || freestyleIsLoading}
+                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20"
+                      >
+                        {freestyleIsLoading ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Wand2 className="h-4 w-4 mr-2" />
+                        )}
+                        {freestyleIsLoading ? "Weaving study…" : "Generate Study"}
+                      </Button>
+                      {freestyleOutput && (
+                        <Button
+                          onClick={() => generateFreestyle(true)}
+                          disabled={freestyleIsLoading}
+                          variant="outline"
+                          className="border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+                        >
+                          <RefreshCcw className="h-4 w-4 mr-2" />
+                          Remix
+                          {freestyleRemixCount > 0 && (
+                            <span className="ml-1 text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded-full">
+                              #{freestyleRemixCount}
+                            </span>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Output Area */}
+                  {freestyleIsLoading && !freestyleOutput && (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <div className="flex gap-1.5 mb-3">
+                        <span className="h-2 w-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="h-2 w-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="h-2 w-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
+                      <p className="text-sm text-emerald-400/70">Weaving your study together…</p>
+                      <p className="text-xs text-muted-foreground mt-1">This may take a moment for deep studies</p>
+                    </div>
+                  )}
+
+                  {freestyleOutput && (
+                    <div className="space-y-3">
+                      {/* Save Controls */}
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={freestyleSessionName}
+                          onChange={(e) => setFreestyleSessionName(e.target.value)}
+                          placeholder="Name this freestyle study…"
+                          className="h-8 text-xs bg-background/60 border-border/50 focus:border-emerald-500/50 rounded-lg flex-1"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={saveFreestyleStudy}
+                          disabled={isSaving}
+                          className="h-8 px-3 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          {isSaving ? (
+                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                          ) : justSaved ? (
+                            <Check className="h-3 w-3 mr-1" />
+                          ) : (
+                            <Save className="h-3 w-3 mr-1" />
+                          )}
+                          {justSaved ? "Saved" : "Save"}
+                        </Button>
+                        <QuickAudioButton
+                          text={freestyleOutput}
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-2.5 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+                        />
+                      </div>
+
+                      {/* Rendered Output */}
+                      <div
+                        className={`rounded-xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/10 to-black/10 dark:from-emerald-950/20 dark:to-black/20 overflow-y-auto p-5 ${
+                          isMobile ? "max-h-[400px]" : "max-h-[500px]"
+                        }`}
+                      >
+                        <div className="text-[13px] leading-relaxed text-foreground/90">
+                          {formatJeevesResponse(freestyleOutput)}
+                        </div>
+                      </div>
+
+                      {/* Clear Button */}
+                      <div className="flex justify-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearFreestyle}
+                          className="text-[11px] text-muted-foreground/60 hover:text-muted-foreground h-6"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Clear freestyle
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {!freestyleOutput && !freestyleIsLoading && (
+                    <div className="flex flex-col items-center justify-center py-8 text-center px-6">
+                      <div className="relative mb-4">
+                        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                          <Wand2 className="h-8 w-8 text-emerald-500/50" />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-amber-500/15 border border-amber-500/25">
+                          <Sparkles className="h-3.5 w-3.5 text-amber-400/60" />
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium text-foreground/70 mb-1">
+                        Freestyle Bible Study Weaver
+                      </p>
+                      <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+                        Enter a mix of Bible verses, theological concepts, and questions above.
+                        Jeeves will weave them into a deep, interconnected study with surprising connections.
+                        Hit "Remix" for a fresh angle on the same inputs.
+                      </p>
+                    </div>
+                  )}
+                </div>
               )}
             </CardContent>
           </motion.div>

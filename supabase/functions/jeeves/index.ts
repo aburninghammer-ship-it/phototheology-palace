@@ -7804,7 +7804,7 @@ Return ONLY valid JSON.`;
         model: "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: mode === "research" ? 2048 : 4096,
+        max_tokens: requestBody.maxTokens || (mode === "research" ? 2048 : 4096),
       }),
     });
 
