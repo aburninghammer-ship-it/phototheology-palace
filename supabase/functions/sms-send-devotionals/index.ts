@@ -391,7 +391,7 @@ async function sendSNSSMS(
     const canonicalHeaders = `content-type:application/x-www-form-urlencoded\nhost:sns.${region}.amazonaws.com\nx-amz-date:${amzDate}\n`;
     const signedHeaders = 'content-type;host;x-amz-date';
 
-    const bodyHash = await sha256Hex(new TextEncoder().encode(body));
+    const bodyHash = await sha256Hex(new TextEncoder().encode(body).buffer);
     const canonicalRequest = [
       'POST',
       canonicalUri,
@@ -407,7 +407,7 @@ async function sendSNSSMS(
       algorithm,
       amzDate,
       credentialScope,
-      await sha256Hex(new TextEncoder().encode(canonicalRequest)),
+      await sha256Hex(new TextEncoder().encode(canonicalRequest).buffer),
     ].join('\n');
 
     const signingKey = await getSigningKey(secretAccessKey, dateStamp, region, 'sns');
@@ -476,7 +476,7 @@ async function hmacHex(key: ArrayBuffer, data: string): Promise<string> {
 }
 
 async function getSigningKey(secretKey: string, dateStamp: string, region: string, service: string): Promise<ArrayBuffer> {
-  const kDate = await hmacSha256(new TextEncoder().encode('AWS4' + secretKey), dateStamp);
+  const kDate = await hmacSha256(new TextEncoder().encode('AWS4' + secretKey).buffer, dateStamp);
   const kRegion = await hmacSha256(kDate, region);
   const kService = await hmacSha256(kRegion, service);
   return hmacSha256(kService, 'aws4_request');
