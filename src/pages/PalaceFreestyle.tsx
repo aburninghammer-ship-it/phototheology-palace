@@ -17,12 +17,17 @@ import {
   FlaskConical,
   RefreshCw,
   Trash2,
-  ArrowDown
+  ArrowDown,
+  BookmarkPlus,
+  Loader2,
+  Check
 } from "lucide-react";
 import { useFreestyleMentor, type ExitCommand } from "@/hooks/useFreestyleMentor";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const EXIT_COMMANDS: { id: ExitCommand; label: string; icon: React.ElementType }[] = [
   { id: "stabilize", label: "Stabilize This", icon: Target },
@@ -42,6 +47,8 @@ const INGREDIENT_EXAMPLES = [
 export default function PalaceFreestyle() {
   const { messages, isLoading, sendMessage, clearMessages } = useFreestyleMentor();
   const [ingredients, setIngredients] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mealRef = useRef<HTMLDivElement>(null);
 
@@ -68,6 +75,37 @@ export default function PalaceFreestyle() {
   const handleReset = () => {
     clearMessages();
     setIngredients("");
+    setSaved(false);
+  };
+
+  const handleSaveMeal = async () => {
+    if (!lastMeal?.content || saving) return;
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error("Please sign in to save"); return; }
+
+      const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const title = `Freestyle: ${ingredients.trim().slice(0, 60)}${ingredients.trim().length > 60 ? '...' : ''}`;
+      const content = `# ${title}\n\n**Date:** ${date}\n\n---\n\n## Ingredients\n\n${ingredients.trim()}\n\n---\n\n## The Meal\n\n${lastMeal.content}`;
+
+      const { error } = await supabase.from("user_studies").insert({
+        user_id: user.id,
+        title,
+        content,
+        tags: ["freestyle", ...(lastMeal.tags || [])],
+        category: "freestyle_study",
+      });
+
+      if (error) throw error;
+      toast.success("Saved to My Studies!");
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch {
+      toast.error("Failed to save");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleExample = (ex: string) => {
@@ -242,7 +280,7 @@ export default function PalaceFreestyle() {
                       {isStreaming ? "Jeeves is writing..." : `Jeeves' full study — ${wordCount.toLocaleString()} words`}
                     </p>
                   </div>
-                  <div className="ml-auto flex items-center gap-1">
+                  <div className="ml-auto flex items-center gap-2">
                     {isStreaming ? (
                       <div className="flex gap-1">
                         <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -253,6 +291,27 @@ export default function PalaceFreestyle() {
                       <>
                         <BookOpen className="h-3.5 w-3.5 text-purple-400" />
                         <span className="text-xs text-purple-400">Deep Study</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleSaveMeal}
+                          disabled={saving}
+                          className={cn(
+                            "h-7 text-xs gap-1.5 ml-1",
+                            saved
+                              ? "text-green-400 hover:text-green-300"
+                              : "text-purple-400 hover:text-purple-200 hover:bg-purple-500/10"
+                          )}
+                        >
+                          {saving ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : saved ? (
+                            <Check className="h-3.5 w-3.5" />
+                          ) : (
+                            <BookmarkPlus className="h-3.5 w-3.5" />
+                          )}
+                          {saved ? "Saved!" : "Save"}
+                        </Button>
                       </>
                     )}
                   </div>
