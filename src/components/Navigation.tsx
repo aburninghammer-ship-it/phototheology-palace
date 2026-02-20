@@ -446,6 +446,13 @@ export const Navigation = () => {
                     </Link>
                   )}
                   <Link
+                    to="/daily-verse"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20 ${isActiveTab('/daily-verse') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">Verse of the Day</span>
+                  </Link>
+                  <Link
                     to="/bible"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:from-blue-500/20 hover:to-cyan-500/20 ${isActiveTab('/bible') ? 'shadow-[0_0_12px_2px_rgba(59,130,246,0.5)] border-blue-400/60' : ''}`}
                   >

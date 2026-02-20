@@ -367,7 +367,7 @@ export default function DailyVerse() {
             </h1>
             <p className="text-foreground/80 font-medium flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              {new Date(todayVerse.date).toLocaleDateString('en-US', { 
+              {new Date(todayVerse.date + 'T12:00:00').toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 

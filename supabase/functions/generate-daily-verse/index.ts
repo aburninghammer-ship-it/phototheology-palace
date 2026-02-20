@@ -307,6 +307,14 @@ serve(async (req) => {
     
 const prompt = `You are a Phototheology Master analyzing Scripture through the 8-Floor Palace framework.
 
+⚠️ PLAIN LANGUAGE RULE — CRITICAL: Your output text must be written in plain, natural English that any Bible reader can understand. Do NOT include technical shorthand codes in your output. This means:
+- NO DoL¹/NE¹, DoL²/NE², DoL³/NE³ in any text
+- NO @Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re cycle codes
+- NO 1H, 2H, 3H heaven codes
+- NO room codes like SR, IR, TR, GR, OR, DC, ST, QR, CR, DR, PRm, P‖, FRt, BL, PR, 3A, FRm, MR in the written text
+These codes are for INTERNAL ANALYSIS ONLY. Describe their concepts using full English words instead (e.g., say "the First Heaven judgment cycle" instead of "DoL¹/NE¹", "the Story Room" instead of "SR", "the Remnant cycle" instead of "@Re").
+
+
 ═══════════════════════════════════════════════════════════════
 ⚠️ CRITICAL GUARDRAIL: THREE HEAVENS DEFINITION ⚠️
 ═══════════════════════════════════════════════════════════════
