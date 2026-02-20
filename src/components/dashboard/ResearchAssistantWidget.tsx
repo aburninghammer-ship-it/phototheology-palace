@@ -19,6 +19,9 @@ import {
   Sparkles,
   Save,
   Check,
+  FolderOpen,
+  PlayCircle,
+  CalendarDays,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -158,6 +161,14 @@ function formatContent(text: string) {
   return <>{parts}</>;
 }
 
+interface SavedResearch {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  content: string;
+}
+
 interface ResearchAssistantWidgetProps {
   defaultExpanded?: boolean;
   resumeStudyId?: string;
@@ -191,6 +202,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const [activeTab, setActiveTab] = useState<"chat" | "saved">("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -202,6 +214,27 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
   const [conversationHistory, setConversationHistory] = useState<
     Array<{ role: string; content: string }>
   >([]);
+  const [savedResearches, setSavedResearches] = useState<SavedResearch[]>([]);
+  const [isLoadingSaved, setIsLoadingSaved] = useState(false);
+
+  const fetchSavedResearches = useCallback(async () => {
+    setIsLoadingSaved(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data, error } = await supabase
+        .from("user_studies")
+        .select("id, title, created_at, updated_at, content")
+        .eq("user_id", user.id)
+        .contains("tags", ["research"])
+        .order("updated_at", { ascending: false });
+      if (!error && data) setSavedResearches(data as SavedResearch[]);
+    } catch (e) {
+      console.error("Error fetching saved researches:", e);
+    } finally {
+      setIsLoadingSaved(false);
+    }
+  }, []);
 
   // Load a resumed study session on mount
   useEffect(() => {
@@ -522,6 +555,390 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className="overflow-hidden"
           >
+            {/* Tab Navigation */}
+            <div className="flex border-b border-border/40 px-4 pt-1">
+              <button
+                onClick={() => setActiveTab("chat")}
+                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-medium border-b-2 transition-colors -mb-px ${
+                  activeTab === "chat"
+                    ? "border-emerald-500 text-emerald-400"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Search className="h-3.5 w-3.5" />
+                Research Chat
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("saved");
+                  fetchSavedResearches();
+                }}
+                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-medium border-b-2 transition-colors -mb-px ${
+                  activeTab === "saved"
+                    ? "border-emerald-500 text-emerald-400"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <FolderOpen className="h-3.5 w-3.5" />
+                Saved Research
+                {savedResearches.length > 0 && (
+                  <span className="ml-1 bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded-full">
+                    {savedResearches.length}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            <CardContent className="pt-4 space-y-4">
+              {/* ── SAVED RESEARCH TAB ── */}
+              {activeTab === "saved" && (
+                <div>
+                  {isLoadingSaved ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                      <Loader2 className="h-6 w-6 animate-spin mb-2" />
+                      <p className="text-xs">Loading saved research…</p>
+                    </div>
+                  ) : savedResearches.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center px-6">
+                      <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-4">
+                        <FolderOpen className="h-8 w-8 text-emerald-500/40" />
+                      </div>
+                      <p className="text-sm font-medium text-foreground/60 mb-1">No saved research yet</p>
+                      <p className="text-xs text-muted-foreground max-w-xs">
+                        Start a research conversation and it will be automatically saved here.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className={`space-y-2 overflow-y-auto ${isMobile ? "max-h-[400px]" : "max-h-[500px]"}`}>
+                      {savedResearches.map((study, i) => {
+                        const updated = new Date(study.updated_at || study.created_at);
+                        const now = new Date();
+                        const diffMs = now.getTime() - updated.getTime();
+                        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                        const diffMins = Math.floor(diffMs / (1000 * 60));
+
+                        let timeAgo: string;
+                        if (diffMins < 1) timeAgo = "Just now";
+                        else if (diffMins < 60) timeAgo = `${diffMins}m ago`;
+                        else if (diffHours < 24) timeAgo = `${diffHours}h ago`;
+                        else if (diffDays === 1) timeAgo = "Yesterday";
+                        else if (diffDays < 7) timeAgo = `${diffDays} days ago`;
+                        else timeAgo = updated.toLocaleDateString("en-US", { month: "short", day: "numeric", year: diffDays > 365 ? "numeric" : undefined });
+
+                        const dateLabel = updated.toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        });
+
+                        const previewMatch = study.content.match(/## ❓ Question\n\n(.+?)(?:\n|$)/);
+                        const preview = previewMatch ? previewMatch[1].slice(0, 100) : "";
+
+                        return (
+                          <motion.div
+                            key={study.id}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.04 }}
+                            className="group rounded-xl border border-border/40 bg-gradient-to-r from-emerald-500/5 to-transparent hover:border-emerald-500/30 hover:from-emerald-500/10 transition-all p-3"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground/90 truncate mb-0.5">
+                                  {study.title}
+                                </p>
+                                {preview && (
+                                  <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
+                                    {preview}
+                                  </p>
+                                )}
+                                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60">
+                                  <CalendarDays className="h-3 w-3 shrink-0" />
+                                  <span className="font-medium text-muted-foreground/80">{timeAgo}</span>
+                                  <span>·</span>
+                                  <span>{dateLabel}</span>
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="shrink-0 h-8 px-2.5 text-[11px] text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => {
+                                  const parsed = parseStudyContentToMessages(study.content);
+                                  if (parsed.length > 0) {
+                                    setMessages(parsed);
+                                    setSessionName(study.title || "");
+                                    setConversationHistory(parsed.map((m) => ({ role: m.role, content: m.content })));
+                                    setSavedStudyId(study.id);
+                                  }
+                                  setActiveTab("chat");
+                                  toast.success("Research session loaded");
+                                }}
+                              >
+                                <PlayCircle className="h-3.5 w-3.5 mr-1" />
+                                Resume
+                              </Button>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── CHAT TAB ── */}
+              {activeTab === "chat" && (
+                <>
+                  {/* Quick Action Chips */}
+                  <div className={isMobile ? "overflow-x-auto -mx-4 px-4 pb-1" : ""}>
+                    <div className={`flex gap-2 ${isMobile ? "min-w-max" : "flex-wrap"}`}>
+                      {QUICK_ACTIONS.map((action) => (
+                        <Badge
+                          key={action.label}
+                          variant="outline"
+                          className={`cursor-pointer py-1.5 px-3 text-[11px] transition-all whitespace-nowrap ${action.color}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQuickAction(action);
+                          }}
+                        >
+                          <action.icon className="h-3 w-3 mr-1.5 shrink-0" />
+                          {action.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Chat Thread */}
+                  <div
+                    className={`${
+                      isMobile ? "h-[320px]" : "h-[440px]"
+                    } rounded-xl border border-border/40 bg-gradient-to-b from-black/5 to-black/10 dark:from-black/10 dark:to-black/20 overflow-y-auto`}
+                  >
+                    <div ref={scrollRef} className="p-3 space-y-3">
+                      {isLoadingResume && (
+                        <div className="flex flex-col items-center justify-center min-h-[240px] text-center px-6">
+                          <Loader2 className="h-8 w-8 text-emerald-400 animate-spin mb-3" />
+                          <p className="text-sm text-muted-foreground">Loading your research session…</p>
+                        </div>
+                      )}
+
+                      {messages.length === 0 && !isLoading && !isLoadingResume && (
+                        <div className="flex flex-col items-center justify-center min-h-[240px] text-center px-6">
+                          <div className="relative mb-4">
+                            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                              <Search className="h-8 w-8 text-emerald-500/50" />
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-amber-500/15 border border-amber-500/25">
+                              <Languages className="h-3.5 w-3.5 text-amber-400/60" />
+                            </div>
+                          </div>
+                          <p className="text-sm font-medium text-foreground/70 mb-1">
+                            What would you like to research?
+                          </p>
+                          <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+                            Ask about word counts, Greek/Hebrew meanings, commentary views,
+                            denominational beliefs, cross-references, or any Bible topic.
+                            I'll quote verses in full and suggest follow-ups.
+                          </p>
+                        </div>
+                      )}
+
+                      <AnimatePresence>
+                        {messages.map((msg) => (
+                          <motion.div
+                            key={msg.id}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                          >
+                            <div
+                              className={`max-w-[88%] rounded-xl text-sm ${
+                                msg.role === "user"
+                                  ? "bg-blue-600/20 border border-blue-500/30 p-3"
+                                  : "bg-emerald-950/25 border border-emerald-600/25 p-4"
+                              }`}
+                            >
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                {msg.role === "user" ? (
+                                  <>
+                                    <span className="text-[11px] font-semibold text-blue-400">You</span>
+                                    <span className="text-[10px] text-blue-400/40 ml-auto">{timeLabel(msg.timestamp)}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="p-0.5 rounded bg-emerald-500/20">
+                                      <Search className="h-2.5 w-2.5 text-emerald-400" />
+                                    </div>
+                                    <span className="text-[11px] font-semibold text-emerald-400">Jeeves Research</span>
+                                    <span className="text-[10px] text-emerald-400/40 ml-auto mr-1">{timeLabel(msg.timestamp)}</span>
+                                    <QuickAudioButton
+                                      text={msg.content}
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-5 w-5 text-emerald-400/50 hover:text-emerald-400"
+                                    />
+                                  </>
+                                )}
+                              </div>
+
+                              <div className="text-[13px] leading-relaxed text-foreground/90">
+                                {msg.role === "assistant" ? formatContent(msg.content) : msg.content}
+                              </div>
+
+                              {msg.isWebSearch && (
+                                <div className="mt-2 flex items-center gap-1">
+                                  <Globe className="h-3 w-3 text-cyan-400" />
+                                  <span className="text-[10px] text-cyan-400/70 font-medium">Web-assisted response</span>
+                                </div>
+                              )}
+
+                              {msg.citations && msg.citations.length > 0 && (
+                                <div className="mt-3 pt-3 border-t border-cyan-500/20 space-y-1.5">
+                                  <p className="text-[10px] font-semibold text-cyan-400/70 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                    <Globe className="h-3 w-3" /> Sources
+                                  </p>
+                                  {msg.citations.map((c, i) => (
+                                    <a
+                                      key={i}
+                                      href={c.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-start gap-2 text-[11px] text-cyan-300/80 hover:text-cyan-200 transition-colors group"
+                                    >
+                                      <Link2 className="h-3 w-3 mt-0.5 shrink-0 text-cyan-500/50 group-hover:text-cyan-400 transition-colors" />
+                                      <span className="line-clamp-1 underline underline-offset-2 decoration-cyan-500/30">
+                                        {c.title.length > 70 ? c.title.slice(0, 70) + "…" : c.title}
+                                      </span>
+                                    </a>
+                                  ))}
+                                </div>
+                              )}
+
+                              {msg.suggestions && msg.suggestions.length > 0 && (
+                                <div className="mt-3 pt-3 border-t border-emerald-500/20 space-y-1">
+                                  <p className="text-[10px] font-semibold text-emerald-400/70 uppercase tracking-wider mb-1.5">
+                                    Continue researching
+                                  </p>
+                                  {msg.suggestions.map((s, i) => (
+                                    <motion.div
+                                      key={i}
+                                      initial={{ opacity: 0, x: -5 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: i * 0.1 }}
+                                    >
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="w-full justify-start text-xs h-auto py-2 px-2.5 text-left text-emerald-300/70 hover:text-emerald-200 hover:bg-emerald-500/10 rounded-lg transition-colors"
+                                        onClick={() => handleSuggestionClick(s)}
+                                      >
+                                        <ChevronDown className="h-3 w-3 mr-1.5 rotate-[-90deg] shrink-0 text-emerald-500/50" />
+                                        <span className="line-clamp-2">{s}</span>
+                                      </Button>
+                                    </motion.div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+
+                      {isLoading && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+                          <div className="flex items-center gap-2.5 rounded-xl bg-emerald-950/20 border border-emerald-600/20 p-3 text-sm">
+                            <div className="flex gap-1">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                            </div>
+                            <span className="text-xs text-emerald-400/70">Researching...</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
+
+                  {messages.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={sessionName}
+                        onChange={(e) => setSessionName(e.target.value)}
+                        placeholder="Name this research session…"
+                        className="h-8 text-xs bg-background/60 border-border/50 focus:border-emerald-500/50 rounded-lg flex-1"
+                        onBlur={() => {
+                          if (messages.length >= 2) saveSession(messages, sessionName, savedStudyId);
+                        }}
+                      />
+                      <div className="flex items-center gap-1 text-[11px] shrink-0">
+                        {isSaving ? (
+                          <span className="flex items-center gap-1 text-muted-foreground">
+                            <Loader2 className="h-3 w-3 animate-spin" /> Saving…
+                          </span>
+                        ) : justSaved ? (
+                          <span className="flex items-center gap-1 text-emerald-400">
+                            <Check className="h-3 w-3" /> Saved
+                          </span>
+                        ) : savedStudyId ? (
+                          <span className="text-muted-foreground/60 flex items-center gap-1">
+                            <Save className="h-3 w-3" /> Auto-saved
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Textarea
+                        ref={textareaRef}
+                        placeholder="Ask about verses, Greek words, commentaries, connections..."
+                        className="min-h-[48px] max-h-[120px] bg-background/60 border-border/60 text-sm pr-24 resize-none rounded-xl focus:border-emerald-500/50 focus:ring-emerald-500/20"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                      />
+                      <div className="absolute right-2 bottom-2 flex items-center gap-1">
+                        <VoiceInput onTranscript={handleVoiceTranscript} variant="icon" />
+                        <Button
+                          size="icon"
+                          disabled={!input.trim() || isLoading}
+                          onClick={() => sendQuery(input)}
+                          className="h-8 w-8 bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-md shadow-emerald-600/20"
+                        >
+                          <Send className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                    {messages.length > 0 && (
+                      <div className="flex justify-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearChat}
+                          className="text-[11px] text-muted-foreground/60 hover:text-muted-foreground h-6"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Clear conversation
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Card>
+  );
+}
             <CardContent className="pt-0 space-y-4">
               {/* Quick Action Chips — scrollable row on mobile, wrap on desktop */}
               <div className={isMobile ? "overflow-x-auto -mx-4 px-4 pb-1" : ""}>
