@@ -838,14 +838,16 @@ serve(async (req) => {
     // Generate text + SFX cues
     const { text: commentaryText, sfxCues } = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope, supabaseAdmin);
 
-    // Update with text and SFX cues
-    await supabaseAdmin
+    // Update with text (sfx_cues stored separately if column exists)
+    const textUpdateResult = await supabaseAdmin
       .from("epic_commentaries")
-      .update({
-        commentary_text: commentaryText,
-        sfx_cues: sfxCues.length > 0 ? sfxCues : null,
-      })
+      .update({ commentary_text: commentaryText })
       .eq("id", record.id);
+
+    if (textUpdateResult.error) {
+      console.error("[EpicCommentary] Failed to save commentary text:", textUpdateResult.error.message);
+      throw new Error(`Text save error: ${textUpdateResult.error.message}`);
+    }
 
     console.log(`[EpicCommentary] Generating audio for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book overview)"}...`);
 
