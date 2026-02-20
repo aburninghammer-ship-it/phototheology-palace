@@ -376,7 +376,7 @@ export default function AudioBible() {
         .from("epic-audio")
         .getPublicUrl(data.audio_storage_path);
       if (urlData?.publicUrl) {
-        const cacheBust = new Date(data.created_at).getTime();
+        const cacheBust = new Date(data.updated_at || data.created_at).getTime();
         urlData.publicUrl = `${urlData.publicUrl}?v=${cacheBust}`;
       }
 
@@ -503,7 +503,7 @@ export default function AudioBible() {
         .from("epic-audio")
         .getPublicUrl(data.audio_storage_path);
       if (urlData?.publicUrl) {
-        const cacheBust = new Date(data.created_at).getTime();
+        const cacheBust = new Date(data.updated_at || data.created_at).getTime();
         urlData.publicUrl = `${urlData.publicUrl}?v=${cacheBust}`;
       }
 
