@@ -436,9 +436,10 @@ export default function AudioBible() {
       };
 
       await audio.play();
-    } catch (err) {
+    } catch (err: any) {
       console.error("[Epic Mode] Error:", err);
-      toast.error("Failed to load Epic commentary.");
+      const msg = err?.message || err?.error_description || String(err);
+      toast.error(`Epic commentary error: ${msg}`);
       setIsEpicLoading(false);
     }
   }, [stop, volume, narrativeSfx]);
@@ -546,9 +547,10 @@ export default function AudioBible() {
       };
 
       await audio.play();
-    } catch (err) {
+    } catch (err: any) {
       console.error("[Epic Book Mode] Error:", err);
-      toast.error("Failed to load Epic book overview.");
+      const msg = err?.message || err?.error_description || String(err);
+      toast.error(`Epic overview error: ${msg}`);
       setIsEpicLoading(false);
     }
   }, [stop, volume, narrativeSfx]);
