@@ -431,6 +431,31 @@ export default function AudioBible() {
 
   // Regenerate epic commentary (admin only) — forces new script + audio
   const handleRegenerateEpic = useCallback(async (book: string, chapter: number) => {
+    // Check if already regenerated recently (within last 24h)
+    const { data: existing } = await supabase
+      .from("epic_commentaries")
+      .select("updated_at, version")
+      .eq("book", book)
+      .eq("chapter", chapter)
+      .eq("status", "ready")
+      .order("version", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (existing?.updated_at) {
+      const updatedAt = new Date(existing.updated_at);
+      const hoursSince = (Date.now() - updatedAt.getTime()) / (1000 * 60 * 60);
+      if (hoursSince < 24) {
+        const timeAgo = hoursSince < 1
+          ? `${Math.round(hoursSince * 60)} minutes ago`
+          : `${Math.round(hoursSince)} hours ago`;
+        toast.warning(`${book} ${chapter} was already regenerated to the latest script ${timeAgo} (v${existing.version}). No need to regenerate again.`, {
+          duration: 6000,
+        });
+        return;
+      }
+    }
+
     setIsEpicLoading(true);
     setEpicNowPlayingBook(book);
     setEpicNowPlayingChapter(chapter);
