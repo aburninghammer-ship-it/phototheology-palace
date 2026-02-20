@@ -9821,7 +9821,7 @@ export type Database = {
           trial_ends_at: string | null
           trial_started_at: string | null
           updated_at: string | null
-          username: string
+          username: string | null
           website: string | null
         }
         Insert: {
@@ -9901,7 +9901,7 @@ export type Database = {
           trial_ends_at?: string | null
           trial_started_at?: string | null
           updated_at?: string | null
-          username: string
+          username?: string | null
           website?: string | null
         }
         Update: {
@@ -9981,7 +9981,7 @@ export type Database = {
           trial_ends_at?: string | null
           trial_started_at?: string | null
           updated_at?: string | null
-          username?: string
+          username?: string | null
           website?: string | null
         }
         Relationships: []
