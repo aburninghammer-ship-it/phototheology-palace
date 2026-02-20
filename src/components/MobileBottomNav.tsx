@@ -1,4 +1,4 @@
-import { Home, BookOpen, Building2, Lightbulb, MessageCircle, CalendarDays } from "lucide-react";
+import { Home, BookOpen, Building2, MessageCircle, Zap } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -8,7 +8,7 @@ const navItemDefs = [
   { icon: Home, labelKey: "common.home", path: "/dashboard" },
   { icon: BookOpen, labelKey: "nav.bible", path: "/bible" },
   { icon: MessageCircle, labelKey: "nav.chat", path: "/public-chat" },
-  { icon: CalendarDays, labelKey: "nav.schedule", path: "/schedule" },
+  { icon: Zap, labelKey: "nav.freestyle", path: "/palace/freestyle" },
   { icon: Building2, labelKey: "nav.palace", path: "/palace" },
 ];
 
