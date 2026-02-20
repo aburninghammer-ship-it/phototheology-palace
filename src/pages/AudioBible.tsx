@@ -328,7 +328,7 @@ export default function AudioBible() {
       // Fetch cached epic commentary (including SFX cues)
       let { data, error } = await supabase
         .from("epic_commentaries")
-        .select("*, sfx_cues")
+        .select("*")
         .eq("book", book)
         .eq("chapter", chapter)
         .eq("status", "ready")
@@ -458,7 +458,7 @@ export default function AudioBible() {
       // Book-level epic uses chapter=0 as sentinel
       let { data, error } = await supabase
         .from("epic_commentaries")
-        .select("*, sfx_cues")
+        .select("*")
         .eq("book", book)
         .eq("chapter", 0)
         .eq("status", "ready")
