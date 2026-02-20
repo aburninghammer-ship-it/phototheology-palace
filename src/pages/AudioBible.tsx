@@ -49,7 +49,7 @@ import { useFreeTier } from "@/hooks/useFreeTier";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { ExportEpicAudioDialog } from "@/components/audio/ExportEpicAudioDialog";
-import { useNarrativeSoundEffects, type SfxCue } from "@/hooks/useNarrativeSoundEffects";
+
 
 interface Theme {
   id: string;
@@ -85,10 +85,6 @@ export default function AudioBible() {
   const [showEpicExport, setShowEpicExport] = useState(false);
   const [epicNowPlayingBook, setEpicNowPlayingBook] = useState("");
   const [epicNowPlayingChapter, setEpicNowPlayingChapter] = useState(0);
-  const [epicSfxCues, setEpicSfxCues] = useState<SfxCue[]>([]);
-
-  // Narrative sound effects engine
-  const narrativeSfx = useNarrativeSoundEffects();
   const epicQueueRef = useRef<ChapterSelection[]>([]);
   const epicQueueIndexRef = useRef(0);
   const playEpicRef = useRef<(book: string, chapter: number) => Promise<void>>();
@@ -386,13 +382,8 @@ export default function AudioBible() {
       const epicUrl = signedData.signedUrl;
       setEpicAudioUrl(epicUrl);
 
-      // Store SFX cues if available
-      const cues: SfxCue[] = (data as any)?.sfx_cues || [];
-      setEpicSfxCues(cues);
-
       // Stop any current playback
       stop();
-      narrativeSfx.stopScheduling();
       if (epicAudioRef.current) {
         epicAudioRef.current.pause();
         epicAudioRef.current = null;
@@ -405,11 +396,8 @@ export default function AudioBible() {
 
       audio.onplay = () => {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
-        // Start SFX scheduling when audio plays (ambient mode if no cues)
-        narrativeSfx.startScheduling(audio, cues);
       };
       audio.onended = () => {
-        narrativeSfx.stopScheduling();
         // Auto-advance epic queue
         const queue = epicQueueRef.current;
         const nextIdx = epicQueueIndexRef.current + 1;
@@ -425,7 +413,6 @@ export default function AudioBible() {
         }
       };
       audio.onerror = () => {
-        narrativeSfx.stopScheduling();
         toast.error("Failed to play Epic commentary audio.");
         setIsEpicPlaying(false);
         setIsEpicPaused(false);
@@ -440,7 +427,7 @@ export default function AudioBible() {
       toast.error(`Epic commentary error: ${msg}`);
       setIsEpicLoading(false);
     }
-  }, [stop, volume, narrativeSfx]);
+  }, [stop, volume]);
 
   // Regenerate epic commentary (admin only) — forces new script + audio
   const handleRegenerateEpic = useCallback(async (book: string, chapter: number) => {
@@ -540,12 +527,7 @@ export default function AudioBible() {
       const epicUrl = signedData.signedUrl;
       setEpicAudioUrl(epicUrl);
 
-      // Store SFX cues if available
-      const cues: SfxCue[] = (data as any)?.sfx_cues || [];
-      setEpicSfxCues(cues);
-
       stop();
-      narrativeSfx.stopScheduling();
       if (epicAudioRef.current) {
         epicAudioRef.current.pause();
         epicAudioRef.current = null;
@@ -557,15 +539,11 @@ export default function AudioBible() {
 
       audio.onplay = () => {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
-        // Start SFX scheduling when audio plays (ambient mode if no cues)
-        narrativeSfx.startScheduling(audio, cues);
       };
       audio.onended = () => {
-        narrativeSfx.stopScheduling();
         setIsEpicPlaying(false); setIsEpicPaused(false); epicAudioRef.current = null;
       };
       audio.onerror = () => {
-        narrativeSfx.stopScheduling();
         toast.error("Failed to play Epic overview audio.");
         setIsEpicPlaying(false);
         setIsEpicPaused(false);
@@ -580,7 +558,7 @@ export default function AudioBible() {
       toast.error(`Epic overview error: ${msg}`);
       setIsEpicLoading(false);
     }
-  }, [stop, volume, narrativeSfx]);
+  }, [stop, volume]);
 
   // Play epic commentary for a custom chapter queue
   const handlePlayEpicCustom = useCallback(async () => {
@@ -709,13 +687,10 @@ export default function AudioBible() {
                               epicAudioRef.current.play();
                               setIsEpicPaused(false);
                               setIsEpicPlaying(true);
-                              // Resume SFX scheduling (ambient mode if no cues)
-                              narrativeSfx.startScheduling(epicAudioRef.current, epicSfxCues);
                             } else {
                               epicAudioRef.current.pause();
                               setIsEpicPaused(true);
                               setIsEpicPlaying(false);
-                              narrativeSfx.stopScheduling();
                             }
                           }
                         }}
@@ -742,7 +717,6 @@ export default function AudioBible() {
                         size="lg"
                         className="border-red-500/30 hover:bg-red-500/10 text-red-400 min-w-[120px]"
                         onClick={() => {
-                          narrativeSfx.stopScheduling();
                           if (epicAudioRef.current) {
                             epicAudioRef.current.pause();
                             epicAudioRef.current = null;
@@ -766,32 +740,7 @@ export default function AudioBible() {
                         <Download className="h-5 w-5 mr-2" />
                         Export
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className={`border-amber-500/30 hover:bg-amber-500/10 ${narrativeSfx.isEnabled ? "text-amber-400" : "text-muted-foreground"}`}
-                        onClick={narrativeSfx.toggle}
-                        title={narrativeSfx.isEnabled ? "Disable sound effects" : "Enable sound effects"}
-                      >
-                        <Zap className="h-5 w-5 mr-2" />
-                        SFX {narrativeSfx.isEnabled ? "On" : "Off"}
-                      </Button>
                     </div>
-                    {/* SFX Volume Control */}
-                    {narrativeSfx.isEnabled && (
-                      <div className="flex items-center gap-3 mt-4 max-w-xs mx-auto">
-                        <Zap className="h-4 w-4 text-amber-400/70" />
-                        <Slider
-                          value={[narrativeSfx.sfxVolume * 100]}
-                          onValueChange={([v]) => narrativeSfx.setSfxVolume(v / 100)}
-                          min={5}
-                          max={60}
-                          step={5}
-                          className="flex-1"
-                        />
-                        <span className="text-xs text-muted-foreground w-10 text-right">SFX {Math.round(narrativeSfx.sfxVolume * 100)}%</span>
-                      </div>
-                    )}
                   </>
                 )}
               </CardContent>
