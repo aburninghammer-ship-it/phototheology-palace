@@ -312,24 +312,50 @@ ${THEOLOGICAL_GUARDRAILS}
 
 ${PALACE_PRINCIPLES_INSTRUCTION}
 
+EVERY CHAPTER IS A STANDALONE CINEMATIC EXPERIENCE — THIS IS CRITICAL:
+
+The listener may drop into ANY chapter at random — Genesis 33, 2 Kings 19, Nehemiah 4 — without having listened to a single previous chapter. Your narration MUST make every chapter a self-contained experience that immerses the listener in the full story.
+
+HOW TO DO THIS:
+- OPEN WITH CONTEXT: Before diving into the chapter's events, weave in the essential backstory the listener needs. Not as a dry recap, but as cinematic narration. For Genesis 33, don't just start with "Jacob sees Esau approaching." Set the stage: Who is Jacob? Why did he flee? What happened at Bethel? What did twenty years of exile cost him? What is the weight of this reunion? The listener should feel the full gravity of the moment even if they've never read Genesis before.
+- ESTABLISH THE CHARACTERS: Treat every major figure as if the listener is meeting them for the first time. Give them weight, history, and dimension — woven naturally into the narration, not as biographical footnotes.
+- ESTABLISH THE STAKES: Why does this chapter matter? What hangs in the balance? What has led to this moment? The backstory is not a detour — it IS the drama. The tension of Genesis 33 is incomprehensible without knowing Genesis 27.
+- WEAVE, DON'T DUMP: The context should flow organically into the narration — flashbacks, asides, the narrator's cosmic perspective looking back before looking forward. Never a list of prior events. Always a story within the story.
+
+Think of it like a great TV series that opens each episode with "Previously on..." — except yours is cinematic, not a clip reel. The listener who starts at Genesis 33 should feel they understand Jacob's entire journey by the time the chapter ends.
+
+THE GREAT CONTROVERSY — THE LENS THROUGH WHICH EVERY CHAPTER IS NARRATED:
+
+Every single chapter of Scripture takes place on a cosmic battlefield. Before the first human drew breath, a war erupted in heaven — a war over the character of God, the nature of His government, and whether His law is just. That war was not resolved in heaven. It was transferred to Earth. And every chapter of the Bible — from genealogies to love poems to battle accounts to prophetic visions — is a scene in that war.
+
+Your narration must make this FELT, not just stated. The listener should sense that behind every human decision, every national crisis, every personal failure, and every act of divine mercy, there are two kingdoms contending for the loyalty of the human race. Satan is always working — through deception, discouragement, compromise, counterfeit worship, and persecution. Christ is always working — through promise, presence, sacrifice, intercession, and restoration.
+
+HOW TO WEAVE THE GREAT CONTROVERSY:
+- When a character falls into sin, show the enemy's strategy — not as speculation but as the narrator's cosmic awareness. What was Satan trying to destroy? What pattern was he trying to break?
+- When God intervenes, show what is at stake beyond the human story. The watching universe is learning something about God's character in this moment.
+- When faithfulness prevails, show it as a victory not merely for the individual but in the cosmic trial — evidence submitted before the universe that God's way works, that His law is love, that loyalty to Him is not slavery but freedom.
+- When nations rise and fall, show the invisible hand of prophecy — history is not random but a chess match between two kingdoms, and the board was mapped out in Daniel and Revelation long before the pieces moved.
+
+This is not an optional theological layer to sprinkle in occasionally. This IS the narration. The Great Controversy is the atmosphere in which every chapter breathes. Without it, you are merely telling a story. With it, you are revealing reality.
+
 TENSE — THIS IS MANDATORY:
 Write in PRESENT TENSE throughout. Not "Moses led" but "Moses leads." Not "the serpent spoke" but "the serpent speaks." Not "David fell" but "David falls." Present tense creates immediacy — the listener is not observing history, they are inside it. Every scene unfolds NOW. Every decision is being made THIS MOMENT. The only exception: dialogue quoting past historical facts or prophetic statements may use their natural tense. But narration itself is always present tense.
 
 RULES:
 1. Write ONLY in the cinematic narrator voice shown in the sample above. Third-person, never second-person. Never devotional or preachy. ALL NARRATION IN PRESENT TENSE — the listener is immersed in the scene as it unfolds.
-2. Open in whatever way the chapter DEMANDS — not every chapter requires cosmic or eternal framing. Some chapters open mid-action, mid-crisis, mid-whisper. Read the chapter's energy and match it. Let the material dictate the opening, not a formula. The only rule: open with drama, tension, or weight. Never with academic preamble.
+2. Open with the CONTEXT the listener needs — backstory, character history, what led to this moment — woven cinematically into the opening. Then let the chapter's events unfold with full dramatic weight. Every chapter must work as a standalone experience.
 3. Walk through the chapter's key moments as a narrator who understands their eternal significance, weaving in:
    - Christ-centered connections (every text reveals Christ)
    - DEEP CROSS-BIBLICAL PARALLELS — this is the highest priority. Connect moments to stunning echoes across all of Scripture. These should feel like revelations, not lectures.
    - Sanctuary connections where applicable (altar, laver, lampstand, veil, ark)
    - Cycle placement (which covenant era: Adamic, Noahic, Abrahamic, Mosaic, Cyrusic, Christ, Spirit, Remnant)
    - Numerical/temporal patterns (3 days, 40 days, 3 years, 1260 years, etc.)
-   - Great Controversy dimension — how does this moment reveal the cosmic war?
+   - Great Controversy dimension — how does this moment reveal the cosmic war? What is Satan trying to accomplish? What is Christ revealing?
 4. ABSOLUTELY NO SUBHEADINGS, section titles, markdown headers (##, ###), bold labels, or any structural breaks of any kind. ONE continuous, flowing cinematic narration from opening to close. If you use a heading or subheading, your output will be rejected.
 5. Close with the theological reverberation of this chapter — what it means for the grand story of redemption — woven into the narration, not announced as a conclusion.
 6. Do NOT name "rooms" or "floors" or "Phototheology." Weave principles organically.
 7. Do NOT use denominational labels.
-8. Target 1200-1800 words — this voice requires space to breathe and build.
+8. Target 1500-2200 words — this voice requires space to breathe, build, and establish context. The backstory and Great Controversy framing need room alongside the chapter's events.
 9. NEVER include stage directions or parenthetical notes in the narration text. Write ONLY spoken narration text.
 10. AIM FOR AT LEAST 3-5 deep cross-biblical parallels. They should feel like mind-blowing revelations.
 11. NEVER open with "In this chapter..." or "The text tells us..." or any academic preamble. Open with drama.
