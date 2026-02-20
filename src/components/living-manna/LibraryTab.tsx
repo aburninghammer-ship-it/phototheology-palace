@@ -1,10 +1,11 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Library, BookOpen, Music, BookHeart, Mic } from "lucide-react";
+import { Library, BookOpen, Music, BookHeart, Mic, Bookmark } from "lucide-react";
 import { ResourceLibrary } from "./library/ResourceLibrary";
 import { WorshipPlaylists } from "./library/WorshipPlaylists";
 import { FamilyDevotionals } from "./library/FamilyDevotionals";
 import { SermonStudyLibrary } from "./library/SermonStudyLibrary";
+import { SavedVersesLibrary } from "./library/SavedVersesLibrary";
 
 interface LibraryTabProps {
   churchId: string;
@@ -43,6 +44,10 @@ export function LibraryTab({ churchId }: LibraryTabProps) {
             <Mic className="h-4 w-4" />
             Sermon Studies
           </TabsTrigger>
+          <TabsTrigger value="saved-verses" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Bookmark className="h-4 w-4" />
+            Saved Verses
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="resources">
@@ -60,7 +65,12 @@ export function LibraryTab({ churchId }: LibraryTabProps) {
         <TabsContent value="sermon-studies">
           <SermonStudyLibrary churchId={churchId} />
         </TabsContent>
+
+        <TabsContent value="saved-verses">
+          <SavedVersesLibrary />
+        </TabsContent>
       </Tabs>
     </div>
   );
 }
+
