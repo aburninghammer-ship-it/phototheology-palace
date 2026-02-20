@@ -426,7 +426,7 @@ async function generateEpicText(
       }) => {
         let line = `• CHRIST AS ${f.christ_name.toUpperCase()}: ${f.christ_action}`;
         if (f.crosslink_verses?.length) {
-          line += ` [Cross-links: ${f.crosslink_verses.join(", ")}]`;
+          line += ` (see also ${f.crosslink_verses.join(", ")})`;
         }
         if (f.notes) {
           line += ` [NOTE: ${f.notes}]`;
