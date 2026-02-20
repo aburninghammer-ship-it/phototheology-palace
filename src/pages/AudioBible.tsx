@@ -371,20 +371,17 @@ export default function AudioBible() {
         }
       }
 
-      // Get public URL for the audio (cache-bust with created_at)
-      const { data: urlData } = supabase.storage
+      // Use signed URL to bypass CDN caching and always fetch latest audio
+      const { data: signedData, error: signedError } = await supabase.storage
         .from("epic-audio")
-        .getPublicUrl(data.audio_storage_path);
-      if (urlData?.publicUrl) {
-        const cacheBust = new Date(data.updated_at || data.created_at).getTime();
-        urlData.publicUrl = `${urlData.publicUrl}?v=${cacheBust}`;
+        .createSignedUrl(data.audio_storage_path, 3600);
+
+      if (signedError || !signedData?.signedUrl) {
+        throw new Error(signedError?.message || "Could not get audio URL");
       }
 
-      if (!urlData?.publicUrl) {
-        throw new Error("Could not get audio URL");
-      }
-
-      setEpicAudioUrl(urlData.publicUrl);
+      const epicUrl = signedData.signedUrl;
+      setEpicAudioUrl(epicUrl);
 
       // Store SFX cues if available
       const cues: SfxCue[] = (data as any)?.sfx_cues || [];
@@ -399,7 +396,7 @@ export default function AudioBible() {
       }
 
       // Play the epic audio
-      const audio = new Audio(urlData.publicUrl);
+      const audio = new Audio(epicUrl);
       epicAudioRef.current = audio;
       audio.volume = volume;
 
@@ -500,17 +497,17 @@ export default function AudioBible() {
         }
       }
 
-      const { data: urlData } = supabase.storage
+      // Use signed URL to bypass CDN caching and always fetch latest audio
+      const { data: signedData, error: signedError } = await supabase.storage
         .from("epic-audio")
-        .getPublicUrl(data.audio_storage_path);
-      if (urlData?.publicUrl) {
-        const cacheBust = new Date(data.updated_at || data.created_at).getTime();
-        urlData.publicUrl = `${urlData.publicUrl}?v=${cacheBust}`;
+        .createSignedUrl(data.audio_storage_path, 3600);
+
+      if (signedError || !signedData?.signedUrl) {
+        throw new Error(signedError?.message || "Could not get audio URL");
       }
 
-      if (!urlData?.publicUrl) throw new Error("Could not get audio URL");
-
-      setEpicAudioUrl(urlData.publicUrl);
+      const epicUrl = signedData.signedUrl;
+      setEpicAudioUrl(epicUrl);
 
       // Store SFX cues if available
       const cues: SfxCue[] = (data as any)?.sfx_cues || [];
@@ -523,7 +520,7 @@ export default function AudioBible() {
         epicAudioRef.current = null;
       }
 
-      const audio = new Audio(urlData.publicUrl);
+      const audio = new Audio(epicUrl);
       epicAudioRef.current = audio;
       audio.volume = volume;
 

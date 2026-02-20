@@ -134,10 +134,10 @@ export const ExportEpicAudioDialog = ({
     const data = rows?.[0] ?? null;
 
     if (data?.audio_storage_path) {
-      const { data: urlData } = supabase.storage
+      const { data: signedData } = await supabase.storage
         .from("epic-audio")
-        .getPublicUrl(data.audio_storage_path);
-      if (urlData?.publicUrl) return urlData.publicUrl;
+        .createSignedUrl(data.audio_storage_path, 3600);
+      if (signedData?.signedUrl) return signedData.signedUrl;
     }
 
     // Fallback: check chapter_commentary_cache table
@@ -149,10 +149,10 @@ export const ExportEpicAudioDialog = ({
       .maybeSingle();
 
     if (cached?.audio_storage_path) {
-      const { data: urlData } = supabase.storage
+      const { data: signedData } = await supabase.storage
         .from("epic-audio")
-        .getPublicUrl(cached.audio_storage_path);
-      if (urlData?.publicUrl) return urlData.publicUrl;
+        .createSignedUrl(cached.audio_storage_path, 3600);
+      if (signedData?.signedUrl) return signedData.signedUrl;
     }
 
     return "";
