@@ -282,6 +282,10 @@ CRITICAL: The quarterly's content must appear first and complete. PT principles 
             prose-a:text-primary prose-a:underline-offset-2 prose-a:decoration-primary/40 hover:prose-a:decoration-primary
             prose-li:text-foreground prose-li:marker:text-primary/60
             prose-ul:my-3 prose-ol:my-3
+            prose-code:font-sans prose-code:text-[0.95rem] prose-code:font-normal prose-code:bg-transparent prose-code:p-0 prose-code:before:content-none prose-code:after:content-none
+            prose-pre:font-sans prose-pre:text-[0.95rem] prose-pre:bg-transparent prose-pre:p-0 prose-pre:whitespace-pre-wrap
+            [&_code]:font-sans [&_code]:text-[0.95rem] [&_code]:font-normal [&_code]:bg-transparent
+            [&_pre]:font-sans [&_pre]:bg-transparent [&_pre]:whitespace-pre-wrap
             [&_table]:w-full [&_table]:border-collapse [&_td]:p-2 [&_td]:border [&_td]:border-border/40
             [&_img]:rounded-lg [&_img]:shadow-sm [&_img]:my-4"
           dangerouslySetInnerHTML={{ __html: cleaned }}
