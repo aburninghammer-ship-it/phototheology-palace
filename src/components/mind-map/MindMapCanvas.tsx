@@ -152,21 +152,21 @@ function MindMapCanvasInner({
       // Max zoom is 2, so keep clicked nodes readable (0.8-1.2 range for detail views)
       let targetZoom = 1.0;
       if (node.data.type === 'principle') {
-        targetZoom = 1.2; // Zoom in for detailed content (but not too close)
+        targetZoom = 1.6; // Magnify to fill viewport, read all text
       } else if (node.data.type === 'sub-principle') {
-        targetZoom = 1.0; // Show sub-principle details
+        targetZoom = 1.4; // Similar detail-level magnification
       } else if (node.data.type === 'room') {
-        targetZoom = 0.7; // Show room and its sub-principles (zoom out a bit more)
+        targetZoom = 1.0; // Zoom in closer to see room + its principles
       } else if (node.data.type === 'floor') {
-        targetZoom = 0.45; // Zoom OUT to show floor + all its rooms
+        targetZoom = 0.55; // Slightly closer to read room labels
       } else if (node.data.type === 'root') {
-        targetZoom = 0.35; // Overview of entire map
+        targetZoom = 0.35; // Keep overview unchanged
       } else if (node.data.type === 'sanctuary') {
-        targetZoom = 0.45; // Show sanctuary + zones
+        targetZoom = 0.55; // Match floor behavior
       } else if (node.data.type === 'sanctuary-zone') {
-        targetZoom = 0.6; // Show zone + elements
+        targetZoom = 0.8; // Closer view of zone elements
       } else if (node.data.type === 'sanctuary-element') {
-        targetZoom = 1.0; // Show element details
+        targetZoom = 1.4; // Magnify like principle nodes
       }
 
       // Smooth zoom to the clicked node

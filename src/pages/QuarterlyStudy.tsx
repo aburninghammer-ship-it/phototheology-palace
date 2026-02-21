@@ -6,12 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, BookOpen, Calendar, Sparkles, Bot } from "lucide-react";
+import { Loader2, BookOpen, Calendar, Sparkles, Bot, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentQuarterly, getQuarterlyLesson, type Quarterly, type QuarterlyLesson } from "@/services/quarterlyApi";
 import { Navigation } from "@/components/Navigation";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { q4_2025_lessons } from "@/data/q4-2025-lesson-content";
 
 const QuarterlyStudy = () => {
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ const QuarterlyStudy = () => {
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("");
   const [userLessonInput, setUserLessonInput] = useState<string>("");
   const [userQuestion, setUserQuestion] = useState<string>("");
+  const [showPdfViewer, setShowPdfViewer] = useState(false);
   const { toast } = useToast();
 
   const rooms = [
@@ -213,6 +215,16 @@ const QuarterlyStudy = () => {
     return lessonContent.days?.find((d: any) => d.id === selectedDay);
   };
 
+  // Auto-populate the study textarea when a day is selected
+  useEffect(() => {
+    const dayContent = getCurrentDayContent();
+    if (dayContent?.content) {
+      // Strip HTML tags if present, keep plain text
+      const plainText = dayContent.content.replace(/<[^>]*>/g, '').trim();
+      setUserLessonInput(plainText);
+    }
+  }, [selectedDay, lessonContent]);
+
   if (loading && !quarterly) {
     return (
       <div className="min-h-screen bg-background">
@@ -336,6 +348,49 @@ const QuarterlyStudy = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* PDF Viewer */}
+            {selectedLesson && (() => {
+              const lessonKey = selectedLesson.id.padStart(2, '0');
+              const lessonData = q4_2025_lessons[lessonKey];
+              const pdfStartPage = lessonData?.pdfStartPage;
+              if (!pdfStartPage) return null;
+              return (
+                <Card className="border border-primary/20">
+                  <CardHeader className="pb-2">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-between px-0 hover:bg-transparent"
+                      onClick={() => setShowPdfViewer(!showPdfViewer)}
+                    >
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <FileText className="h-5 w-5 text-primary" />
+                        View Quarterly PDF
+                      </CardTitle>
+                      {showPdfViewer ? (
+                        <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </Button>
+                    {!showPdfViewer && (
+                      <CardDescription className="text-xs">
+                        Pages {pdfStartPage}–{lessonData?.pdfEndPage || pdfStartPage} of the quarterly
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  {showPdfViewer && (
+                    <CardContent className="pt-0">
+                      <iframe
+                        src={`/quarterlies/Q4-2025-Christ-Object-Lessons.pdf#page=${pdfStartPage}`}
+                        className="w-full h-[600px] rounded-lg border"
+                        title={`Quarterly PDF — Lesson ${selectedLesson.index}`}
+                      />
+                    </CardContent>
+                  )}
+                </Card>
+              );
+            })()}
 
             {/* Lesson Content Input */}
             <Card>

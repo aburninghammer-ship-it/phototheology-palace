@@ -224,7 +224,7 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
           relative rounded-xl cursor-pointer overflow-hidden
           transition-all duration-300 hover:scale-105
           min-w-[180px] max-w-[200px]
-          ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
+          ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background animate-magnify-pulse' : ''}
           ${parentFloorSelected ? 'animate-child-glow' : ''}
           hover:shadow-lg hover:shadow-primary/10
         `}
@@ -316,7 +316,7 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
       className={`
         relative rounded-2xl
         transition-all duration-300 flex flex-col
-        ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
+        ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background animate-magnify-pulse' : ''}
         w-[320px] h-[450px] shadow-2xl
       `}
     >

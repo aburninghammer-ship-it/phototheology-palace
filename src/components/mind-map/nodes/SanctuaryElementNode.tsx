@@ -188,7 +188,7 @@ const SanctuaryElementNode = memo(({ data, selected }: NodeProps<SanctuaryElemen
           relative rounded-xl cursor-pointer overflow-hidden
           transition-all duration-300 hover:scale-105
           min-w-[160px] max-w-[180px]
-          ${selected ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-background' : ''}
+          ${selected ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-background animate-magnify-pulse' : ''}
           ${hasInsights ? 'shadow-lg shadow-yellow-500/20' : ''}
         `}
       >
@@ -271,7 +271,7 @@ const SanctuaryElementNode = memo(({ data, selected }: NodeProps<SanctuaryElemen
       className={`
         relative rounded-2xl overflow-hidden
         transition-all duration-300
-        ${selected ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-background' : ''}
+        ${selected ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-background animate-magnify-pulse' : ''}
         w-[320px] max-h-[500px] shadow-2xl
       `}
     >

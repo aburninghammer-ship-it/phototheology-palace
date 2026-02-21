@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Q1_2026_LESSONS, Q1_2026_TITLE, Q1_2026_DESCRIPTION, Q1_2026_QUARTER } from "@/data/quarterlyQ1_2026";
+import { q4_2025_lessons } from "@/data/q4-2025-lesson-content";
 
 export interface QuarterlyLesson {
   id: string;
@@ -186,6 +187,27 @@ export async function getQuarterlyLesson(
           date: day.date,
           read: `<p><strong>${day.title}</strong></p><p>Scriptures: ${day.scriptures.join(", ")}</p><p>${day.content}</p>`,
           content: `<p><strong>${day.title}</strong></p><p>Scriptures: ${day.scriptures.join(", ")}</p><p>${day.content}</p>`,
+        })),
+      };
+    }
+
+    // Fallback: Use PDF-derived Q4 2025 lesson content
+    const lessonData = q4_2025_lessons[lessonId];
+    if (lessonData) {
+      return {
+        lesson: {
+          id: lessonId,
+          title: lessonData.lessonTitle,
+          bible_reading: lessonData.lessonScripture,
+          aid: lessonData.aid,
+          description: lessonData.description,
+        },
+        days: lessonData.days.map((day) => ({
+          id: day.id,
+          title: day.title,
+          date: "",
+          read: day.content,
+          content: day.content,
         })),
       };
     }

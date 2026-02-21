@@ -5,7 +5,7 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Heart, Skull, Trophy } from "lucide-react";
+import { ArrowLeft, Heart, Skull, Trophy, Bot, Lightbulb, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -56,6 +56,9 @@ export default function EscapeTheDragon() {
   const [defense, setDefense] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [jeevesAssistEnabled, setJeevesAssistEnabled] = useState(true);
+  const [jeevesHint, setJeevesHint] = useState("");
+  const [isRequestingHint, setIsRequestingHint] = useState(false);
 
   // Save score when game ends
   useEffect(() => {
@@ -88,6 +91,7 @@ export default function EscapeTheDragon() {
     setHand(shuffled.slice(0, 5));
     setSelectedCards([]);
     setDefense("");
+    setJeevesHint("");
   };
 
   const toggleCard = (card: string) => {
@@ -95,6 +99,26 @@ export default function EscapeTheDragon() {
       setSelectedCards(selectedCards.filter(c => c !== card));
     } else if (selectedCards.length < 2) {
       setSelectedCards([...selectedCards, card]);
+    }
+  };
+
+  const requestJeevesHint = async () => {
+    setIsRequestingHint(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('jeeves', {
+        body: {
+          mode: "dragon_defense_hint",
+          attack: currentAttack,
+          cards: hand,
+        }
+      });
+      if (error) throw error;
+      setJeevesHint(data.hint || data.content || "Consider which cards relate to the biblical principles that counter this specific attack.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Could not get Jeeves hint. Try again.");
+    } finally {
+      setIsRequestingHint(false);
     }
   };
 
@@ -125,9 +149,12 @@ export default function EscapeTheDragon() {
       const { survived, feedback } = data;
 
       if (survived) {
-        toast.success(t('games.escapeTheDragon.defenseSuccessful', { feedback }), {
-          duration: 8000, // 8 seconds to read the feedback
-        });
+        toast.success(
+          jeevesAssistEnabled
+            ? t('games.escapeTheDragon.defenseSuccessful', { feedback })
+            : t('games.escapeTheDragon.defenseSuccessful', { feedback: "Well defended!" }),
+          { duration: 8000 }
+        );
         setRound(prev => prev + 1);
         
         if (round >= 10) {
@@ -139,9 +166,12 @@ export default function EscapeTheDragon() {
         }
       } else {
         setLives(prev => prev - 1);
-        toast.error(t('games.escapeTheDragon.failedDefense', { feedback }), {
-          duration: 8000, // 8 seconds to read the feedback
-        });
+        toast.error(
+          jeevesAssistEnabled
+            ? t('games.escapeTheDragon.failedDefense', { feedback })
+            : t('games.escapeTheDragon.failedDefense', { feedback: "Defense breached!" }),
+          { duration: 8000 }
+        );
         
         if (lives - 1 <= 0) {
           toast.error(t('games.escapeTheDragon.dragonWins'), {
@@ -311,7 +341,21 @@ export default function EscapeTheDragon() {
 
           <Card className="bg-black/40 border-orange-500/50">
             <CardHeader>
-              <CardTitle className="text-orange-300">{t('games.escapeTheDragon.theologicalDefense')}</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-orange-300">{t('games.escapeTheDragon.theologicalDefense')}</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setJeevesAssistEnabled(!jeevesAssistEnabled)}
+                  className="text-xs text-orange-200/60 hover:text-orange-200"
+                >
+                  {jeevesAssistEnabled ? (
+                    <><Eye className="h-4 w-4 mr-1" /> Jeeves Assist On</>
+                  ) : (
+                    <><EyeOff className="h-4 w-4 mr-1" /> Jeeves Assist Off</>
+                  )}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
@@ -320,9 +364,35 @@ export default function EscapeTheDragon() {
                 placeholder={t('games.escapeTheDragon.defensePlaceholder')}
                 className="bg-black/60 border-orange-500/30 text-white min-h-32"
               />
-              <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full">
-                {isSubmitting ? t('games.escapeTheDragon.defending') : t('games.escapeTheDragon.defendAgainstAttack')}
-              </Button>
+
+              {/* Jeeves Hint - always available */}
+              {jeevesHint && (
+                <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Bot className="h-4 w-4 text-blue-400" />
+                    <span className="text-sm font-medium text-blue-300">Jeeves Hint</span>
+                  </div>
+                  <p className="text-sm text-blue-100/80">{jeevesHint}</p>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
+                  {isSubmitting ? t('games.escapeTheDragon.defending') : t('games.escapeTheDragon.defendAgainstAttack')}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={requestJeevesHint}
+                  disabled={isRequestingHint}
+                  className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
+                >
+                  {isRequestingHint ? (
+                    <Bot className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <><Lightbulb className="h-4 w-4 mr-1" /> Hint</>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

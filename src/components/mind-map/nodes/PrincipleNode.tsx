@@ -67,7 +67,7 @@ const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) =>
         className={`
           relative rounded-xl cursor-pointer overflow-hidden
           transition-all duration-300 hover:scale-105
-          ${selected ? 'ring-2 ring-green-400 ring-offset-2 ring-offset-background' : ''}
+          ${selected ? 'ring-2 ring-green-400 ring-offset-2 ring-offset-background animate-magnify-pulse' : ''}
           ${parentRoomSelected ? 'animate-child-glow' : ''}
           w-[200px] hover:shadow-lg hover:shadow-green-500/20
         `}
@@ -113,7 +113,7 @@ const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) =>
       className={`
         relative rounded-2xl cursor-pointer overflow-hidden
         transition-all duration-300
-        ${selected ? 'ring-2 ring-green-400 ring-offset-2 ring-offset-background' : ''}
+        ${selected ? 'ring-2 ring-green-400 ring-offset-2 ring-offset-background animate-magnify-pulse' : ''}
         ${showExpound && expoundResult ? 'w-[380px]' : 'w-[280px]'} shadow-2xl shadow-green-500/20
       `}
     >

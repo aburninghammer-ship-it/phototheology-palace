@@ -751,6 +751,20 @@ All colors MUST be HSL.
   animation: child-glow 1.5s ease-in-out infinite;
 }
 
+/* Mind Map magnify pulse animation on node selection */
+@keyframes magnify-pulse {
+  0% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-magnify-pulse {
+  animation: magnify-pulse 0.4s ease-out forwards;
+}
+
 /* Mobile scrolling fixes */
 @media (max-width: 768px) {
   /* Ensure the main content area scrolls properly on mobile */

@@ -5556,6 +5556,52 @@ Player's defense: ${defense}
 Does this defense biblically answer the attack? Does it use the cards effectively?
 Return JSON: { "survived": true/false, "feedback": "brief comment" }`;
 
+    } else if (mode === "dragon_defense_hint") {
+      // EscapeTheDragon hint - give the player a clue without giving the full answer
+      systemPrompt = `You are Jeeves, a theological mentor. Give a brief, helpful hint to guide the player's defense without giving away the full answer. Be encouraging but not too specific.`;
+      userPrompt = `The dragon is attacking with: "${attack}"
+The player has these defense cards available: ${cards.join(', ')}
+
+Card meanings:
+- Ep: Epistles Prophecy (prophetic teachings in NT letters)
+- Ef: Epistles Faith (faith and doctrine from NT letters)
+- |GC: Great Controversy (cosmic conflict between Christ and Satan)
+- |TP: Time Prophecy (Daniel/Revelation prophetic timelines)
+- |S: Sanctuary (Hebrew sanctuary system pointing to Christ)
+- ⚖: Judgment (God's righteous judgment and justice)
+- ALTAR: Altar (sacrifice of Christ on the cross)
+- LAMP: Lampstand (light of truth, witness, Holy Spirit)
+- ARK: Ark of Covenant (God's law, mercy seat, His presence)
+
+Give a 1-2 sentence hint about which cards might be most relevant and a brief clue about the biblical principle to use. Do NOT give the full defense — just a nudge in the right direction.
+Return JSON: { "hint": "your hint here" }`;
+
+    } else if (mode === "study_suggestion") {
+      // Weekly Study interactive suggestion - explore a discussion question deeper
+      const suggestionAction = requestBody.suggestion_action || requestBody.action || "expound";
+      const studyTitle = requestBody.study_title || lessonTitle || "Weekly Study";
+      const keyPassages = requestBody.key_passages || bibleVerses || [];
+      const targetQuestion = requestBody.question || question || "";
+
+      const actionInstructions: Record<string, string> = {
+        expound: "Go deeper into this question. Unpack the theological layers, historical context, and spiritual significance. Draw out insights the reader may have missed.",
+        apply_principle: "Apply a Palace principle to this question. Show how a specific principle from the Phototheology Palace (e.g., Christ in All Scripture, Repeat and Enlarge, Sanctuary Pattern) illuminates this question in a fresh way.",
+        explore_passage: "Dive deeply into the scripture reference connected to this question. Provide word study insights, cross-references, and contextual background that enriches understanding.",
+        connect_theme: "Find related themes across Scripture. Show how this question connects to a broader biblical theme, tracing the thread through Old and New Testaments.",
+      };
+
+      systemPrompt = `You are Jeeves, a Christ-centered theological study assistant for the Phototheology Palace. You help believers go deeper into Bible study through scholarly yet accessible insights. Always center your response on Christ and practical application.`;
+      userPrompt = `Study: "${studyTitle}"
+Key Passages: ${Array.isArray(keyPassages) ? keyPassages.join(', ') : keyPassages}
+Discussion Question: "${targetQuestion}"
+
+Action requested: ${suggestionAction}
+${actionInstructions[suggestionAction] || actionInstructions.expound}
+
+Provide a focused, rich response (3-5 paragraphs). Include specific scripture references. End with a practical application point.
+
+Return JSON: { "content": "your response here", "scriptures": ["Ref 1", "Ref 2"], "relatedTheme": "brief theme name" }`;
+
     } else if (mode === "validate_equation") {
       // EquationBuilder game validation - properties already destructured from requestBody
       systemPrompt = `You are Jeeves, validating theological equations. Check if the player's equation is logically coherent and biblically sound.`;
@@ -8598,10 +8644,10 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     }
 
     // Parse JSON responses for game validation modes
-    if (["validate_chain", "validate_sanctuary", "validate_time_zones", "validate_connect6", 
-         "validate_christ", "validate_controversy", "validate_dragon_defense", "validate_equation",
+    if (["validate_chain", "validate_sanctuary", "validate_time_zones", "validate_connect6",
+         "validate_christ", "validate_controversy", "validate_dragon_defense", "dragon_defense_hint", "validate_equation",
          "validate_witness", "validate_frame", "validate_chef_recipe", "generate_chef_verses",
-         "check_chef_recipe", "get_chef_model_answer"].includes(mode)) {
+         "check_chef_recipe", "get_chef_model_answer", "study_suggestion"].includes(mode)) {
       try {
         console.log(`=== ${mode.toUpperCase()} RESPONSE ===`);
         console.log("Raw content:", content);
