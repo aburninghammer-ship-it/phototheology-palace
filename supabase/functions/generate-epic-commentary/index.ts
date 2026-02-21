@@ -18,7 +18,7 @@ const VOICE_IDS: Record<string, string> = {
   epic: "fjnwTZkKtQOJaYzGLa6n",      // William - Deep Engaging Storyteller
   urban: "cgSgspJ2msm6clMCkdW9",     // Jessica - Warm expressive ethnic voice
   ancient: "onwK4e9ZLuTAKqWW03F9",    // Daniel - Measured authoritative
-  preacher: "N2lVS1w4EtoT3dr4eOWO",   // Callum - Passionate expressive
+  preacher: "nPczCjzI2devNBz1zQrb",   // Brian - Rich warm male narrator
   scholar: "ErXwobaYiN019PkySvjV",     // Antoni - Calm analytical
 };
 
