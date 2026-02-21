@@ -710,7 +710,7 @@ function App() {
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
                   {!isWorkspacePane && (
-                    <div className="fixed bottom-24 md:bottom-16 right-4 z-50 flex flex-col-reverse items-end gap-3">
+                    <div className="fixed bottom-24 md:bottom-16 left-4 z-50 flex flex-col-reverse items-start gap-3">
                       {/* flex-col-reverse: DOM order = bottom-most first, stacking upward */}
                       <AmbientMusicPlayer minimal />
                       <JeevesWidget />
