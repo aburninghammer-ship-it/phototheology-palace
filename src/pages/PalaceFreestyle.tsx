@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { useFreestyleMentor, type ExitCommand } from "@/hooks/useFreestyleMentor";
 import { cn } from "@/lib/utils";
-import ReactMarkdown from "react-markdown";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -312,16 +312,8 @@ export default function PalaceFreestyle() {
                               className="overflow-hidden"
                             >
                               <div className="px-4 pb-4 border-t border-slate-700/30">
-                                <div className="prose prose-invert prose-sm max-w-none mt-3
-                                  prose-headings:text-purple-200 prose-headings:font-bold
-                                  prose-h3:text-base prose-h3:uppercase prose-h3:tracking-wide prose-h3:text-indigo-300
-                                  prose-strong:text-purple-200
-                                  prose-p:text-slate-300 prose-p:leading-relaxed
-                                  prose-li:text-slate-300
-                                  prose-blockquote:border-l-purple-500 prose-blockquote:text-slate-400
-                                  prose-hr:border-indigo-500/20
-                                ">
-                                  <ReactMarkdown>{study.content}</ReactMarkdown>
+                                <div className="jeeves-response space-y-4 mt-3">
+                                  {formatJeevesResponse(study.content)}
                                 </div>
                                 {study.tags && study.tags.length > 0 && (
                                   <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-slate-700/30">
@@ -477,14 +469,14 @@ export default function PalaceFreestyle() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <Card className="border-purple-500/30 bg-card/60 backdrop-blur-sm overflow-hidden">
+              <Card variant="glass" className="border-purple-500/30 bg-purple-950/30 backdrop-blur-xl overflow-hidden shadow-lg shadow-purple-900/20">
                 {/* Meal Header */}
-                <div className="flex items-center gap-3 px-5 py-4 border-b border-purple-500/20 bg-purple-500/5">
-                  <div className="p-2 rounded-lg bg-purple-500/20">
-                    <ChefHat className="h-5 w-5 text-purple-400" />
+                <div className="flex items-center gap-3 px-5 py-4 border-b border-purple-500/20 bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/30 to-pink-500/30 border border-purple-400/20 shadow-sm shadow-purple-500/20">
+                    <ChefHat className="h-5 w-5 text-purple-300" />
                   </div>
                   <div>
-                    <h2 className="font-semibold text-purple-200 text-sm uppercase tracking-widest">The Meal</h2>
+                    <h2 className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-200 to-indigo-200 text-sm uppercase tracking-widest">The Meal</h2>
                     <p className="text-xs text-muted-foreground">
                       {isStreaming ? "Jeeves is writing..." : `Jeeves' full study — ${wordCount.toLocaleString()} words`}
                     </p>
@@ -493,8 +485,8 @@ export default function PalaceFreestyle() {
                     {isStreaming ? (
                       <div className="flex gap-1">
                         <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                        <span className="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
                     ) : (
                       <>
@@ -526,18 +518,10 @@ export default function PalaceFreestyle() {
                   </div>
                 </div>
 
-                {/* Meal Content */}
-                <div className="p-6">
-                  <div className="prose prose-invert prose-sm max-w-none
-                    prose-headings:text-purple-200 prose-headings:font-bold
-                    prose-h3:text-base prose-h3:uppercase prose-h3:tracking-wide prose-h3:text-indigo-300
-                    prose-strong:text-purple-200
-                    prose-p:text-slate-300 prose-p:leading-relaxed
-                    prose-li:text-slate-300
-                    prose-blockquote:border-l-purple-500 prose-blockquote:text-slate-400
-                    prose-hr:border-indigo-500/20
-                  ">
-                    <ReactMarkdown>{lastMeal.content}</ReactMarkdown>
+                {/* Meal Content — Glass sections */}
+                <div className="p-6 space-y-4">
+                  <div className="jeeves-response space-y-4">
+                    {formatJeevesResponse(lastMeal.content)}
                   </div>
 
                   {/* Tags */}
@@ -547,7 +531,7 @@ export default function PalaceFreestyle() {
                         <Badge
                           key={tag}
                           variant="outline"
-                          className="text-xs bg-purple-500/10 text-purple-300 border-purple-500/30"
+                          className="text-xs bg-gradient-to-r from-purple-500/15 to-pink-500/15 text-purple-300 border-purple-500/30 backdrop-blur-sm"
                         >
                           {tag.replace(/_/g, " ")}
                         </Badge>
@@ -605,9 +589,9 @@ export default function PalaceFreestyle() {
                       .slice(0, -1)
                       .reverse()
                       .map((msg, idx) => (
-                        <Card key={idx} className="border-slate-700/50 bg-slate-900/30 p-4">
+                        <Card key={idx} variant="glass" className="border-slate-700/50 bg-slate-900/30 p-4">
                           <div className="prose prose-invert prose-sm max-w-none text-slate-400 line-clamp-6">
-                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                            {formatJeevesResponse(msg.content)}
                           </div>
                         </Card>
                       ))}
