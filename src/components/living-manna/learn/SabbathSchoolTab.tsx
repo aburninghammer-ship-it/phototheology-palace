@@ -260,39 +260,110 @@ CRITICAL: The quarterly's content must appear first and complete. PT principles 
 
   const selectedDay = getSelectedDay();
 
-  // Render HTML content safely, cleaning up hidden sections
-  const renderContent = (html: string) => {
-    if (html.includes("<") && html.includes(">")) {
+  // Enhance HTML content with dynamic styling
+  const enhanceContent = (html: string): string => {
+    let enhanced = html
       // Remove hidden donation/EGW divs and trailing HRs
-      const cleaned = html
-        .replace(/<div style="display: none"[^>]*class="ss-donation-appeal"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, "")
-        .replace(/<hr\s*\/?>\s*$/i, "");
-      return (
-        <div
-          className="prose prose-base max-w-none dark:prose-invert leading-[1.85]
-            prose-headings:text-foreground prose-headings:font-serif prose-headings:tracking-tight
-            prose-h2:text-xl prose-h2:mt-6 prose-h2:mb-3
-            prose-h3:text-lg prose-h3:mt-5 prose-h3:mb-2
-            prose-p:text-foreground prose-p:mb-4 prose-p:text-[0.95rem]
-            prose-strong:text-primary prose-strong:font-semibold
-            prose-em:text-foreground/90
-            prose-blockquote:border-l-4 prose-blockquote:border-primary/40 prose-blockquote:bg-primary/5
-            prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
-            prose-blockquote:text-foreground/90 prose-blockquote:my-5
-            prose-a:text-primary prose-a:underline-offset-2 prose-a:decoration-primary/40 hover:prose-a:decoration-primary
-            prose-li:text-foreground prose-li:marker:text-primary/60
-            prose-ul:my-3 prose-ol:my-3
-            prose-code:font-sans prose-code:text-[0.95rem] prose-code:font-normal prose-code:bg-transparent prose-code:p-0 prose-code:before:content-none prose-code:after:content-none
-            prose-pre:font-sans prose-pre:text-[0.95rem] prose-pre:bg-transparent prose-pre:p-0 prose-pre:whitespace-pre-wrap
-            [&_code]:font-sans [&_code]:text-[0.95rem] [&_code]:font-normal [&_code]:bg-transparent
-            [&_pre]:font-sans [&_pre]:bg-transparent [&_pre]:whitespace-pre-wrap
-            [&_table]:w-full [&_table]:border-collapse [&_td]:p-2 [&_td]:border [&_td]:border-border/40
-            [&_img]:rounded-lg [&_img]:shadow-sm [&_img]:my-4"
-          dangerouslySetInnerHTML={{ __html: cleaned }}
-        />
+      .replace(/<div style="display: none"[^>]*class="ss-donation-appeal"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, "")
+      .replace(/<hr\s*\/?>\s*$/i, "")
+      // Style scripture references inline — wrap parenthetical refs in a styled span
+      .replace(
+        /\(([^)]*(?:Gen|Exod|Lev|Num|Deut|Josh|Judg|Ruth|1 Sam|2 Sam|1 Kings|2 Kings|1 Chron|2 Chron|Ezra|Neh|Esth|Job|Ps|Psa|Prov|Eccles|Song|Isa|Jer|Lam|Ezek|Dan|Hos|Joel|Amos|Obad|Jonah|Mic|Nah|Hab|Zeph|Hag|Zech|Mal|Matt|Mark|Luke|John|Acts|Rom|1 Cor|2 Cor|Gal|Eph|Phil|Col|1 Thess|2 Thess|1 Tim|2 Tim|Titus|Philem|Heb|James|1 Pet|2 Pet|1 John|2 John|3 John|Jude|Rev|NKJV|NIV|KJV|ESV|NLT|NASB)[^)]*)\)/gi,
+        '<span class="ss-scripture-ref">($1)</span>'
+      )
+      // Add a decorative first-letter to the first paragraph
+      .replace(
+        /^(<p[^>]*>)/i,
+        '$1<span class="ss-first-paragraph">'
+      );
+    
+    // Close the first-paragraph span at the end of first <p>
+    if (enhanced.includes('ss-first-paragraph')) {
+      enhanced = enhanced.replace(
+        /(<span class="ss-first-paragraph">)([\s\S]*?)(<\/p>)/i,
+        '$1$2</span>$3'
       );
     }
-    return <p className="text-[0.95rem] leading-[1.85] whitespace-pre-wrap text-foreground">{html}</p>;
+
+    return enhanced;
+  };
+
+  // Render HTML content safely with dynamic styling
+  const renderContent = (html: string) => {
+    if (html.includes("<") && html.includes(">")) {
+      const cleaned = enhanceContent(html);
+      return (
+        <>
+          <style>{`
+            .ss-lesson-content .ss-scripture-ref {
+              color: hsl(var(--primary));
+              font-weight: 500;
+              font-size: 0.85em;
+              letter-spacing: 0.01em;
+            }
+            .ss-lesson-content .ss-first-paragraph {
+              display: contents;
+            }
+            .ss-lesson-content > p:first-of-type::first-letter {
+              font-size: 2.8em;
+              font-weight: 700;
+              float: left;
+              line-height: 0.85;
+              margin-right: 0.08em;
+              margin-top: 0.05em;
+              color: hsl(var(--primary));
+              font-family: Georgia, 'Times New Roman', serif;
+            }
+            .ss-lesson-content > p {
+              text-indent: 0;
+              margin-bottom: 1.1em;
+            }
+            .ss-lesson-content > p + p {
+              text-indent: 1.5em;
+            }
+            .ss-lesson-content > p:first-of-type {
+              text-indent: 0 !important;
+            }
+            .ss-lesson-content blockquote {
+              position: relative;
+            }
+            .ss-lesson-content blockquote::before {
+              content: '"';
+              position: absolute;
+              top: -0.15em;
+              left: 0.15em;
+              font-size: 3em;
+              color: hsl(var(--primary) / 0.15);
+              font-family: Georgia, serif;
+              line-height: 1;
+            }
+          `}</style>
+          <div
+            className="ss-lesson-content prose prose-base max-w-none dark:prose-invert leading-[1.9]
+              prose-headings:text-foreground prose-headings:font-serif prose-headings:tracking-tight
+              prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-3 prose-h2:border-b prose-h2:border-primary/20 prose-h2:pb-2
+              prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-2
+              prose-p:text-foreground prose-p:text-[0.95rem]
+              prose-strong:text-primary prose-strong:font-semibold
+              prose-em:text-foreground/80
+              prose-blockquote:border-l-4 prose-blockquote:border-primary/40 prose-blockquote:bg-primary/5
+              prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-r-xl prose-blockquote:not-italic
+              prose-blockquote:text-foreground/90 prose-blockquote:my-6 prose-blockquote:shadow-sm
+              prose-a:text-primary prose-a:underline-offset-2 prose-a:decoration-primary/40 hover:prose-a:decoration-primary
+              prose-li:text-foreground prose-li:marker:text-primary/60
+              prose-ul:my-3 prose-ol:my-3
+              prose-code:font-sans prose-code:text-[0.95rem] prose-code:font-normal prose-code:bg-transparent prose-code:p-0 prose-code:before:content-none prose-code:after:content-none
+              prose-pre:font-sans prose-pre:text-[0.95rem] prose-pre:bg-transparent prose-pre:p-0 prose-pre:whitespace-pre-wrap
+              [&_code]:font-sans [&_code]:text-[0.95rem] [&_code]:font-normal [&_code]:bg-transparent
+              [&_pre]:font-sans [&_pre]:bg-transparent [&_pre]:whitespace-pre-wrap
+              [&_table]:w-full [&_table]:border-collapse [&_td]:p-2 [&_td]:border [&_td]:border-border/40
+              [&_img]:rounded-lg [&_img]:shadow-sm [&_img]:my-4"
+            dangerouslySetInnerHTML={{ __html: cleaned }}
+          />
+        </>
+      );
+    }
+    return <p className="text-[0.95rem] leading-[1.9] whitespace-pre-wrap text-foreground">{html}</p>;
   };
 
   return (
@@ -399,10 +470,14 @@ CRITICAL: The quarterly's content must appear first and complete. PT principles 
                 </div>
 
                 {/* Full quarterly lesson content */}
-                <div className="px-5 py-6 bg-gradient-to-b from-card to-muted/20 rounded-xl border border-border/60 shadow-sm">
+                <div className="relative px-6 py-8 bg-gradient-to-br from-card via-card to-muted/30 rounded-2xl border border-border/50 shadow-md overflow-hidden">
+                  {/* Decorative corner accents */}
+                  <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-primary/20 rounded-tl-2xl" />
+                  <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-primary/20 rounded-br-2xl" />
+                  
                   {loadingContent ? (
-                    <div className="flex flex-col items-center gap-3 text-muted-foreground py-8">
-                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                    <div className="flex flex-col items-center gap-3 text-muted-foreground py-12">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
                       <span className="text-sm font-medium">Loading quarterly content…</span>
                     </div>
                   ) : (
