@@ -1148,7 +1148,7 @@ serve(async (req) => {
     const modeVoiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
     const voiceIdLabel = ELEVENLABS_API_KEY ? `elevenlabs:${modeVoiceId}` : "onyx";
 
-    // Upsert on (book, chapter, mode) — unique constraint prevents duplicates
+    // Upsert on (book, chapter, commentary_mode) — unique constraint prevents duplicates
     const { data: record, error: insertError } = await supabaseAdmin
       .from("epic_commentaries")
       .upsert({
