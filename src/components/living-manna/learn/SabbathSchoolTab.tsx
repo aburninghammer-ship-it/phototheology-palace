@@ -9,7 +9,6 @@ import { Loader2, BookOpen, Calendar, Sparkles, Bot, Wand2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
-import { getQuarterlyLesson } from "@/services/quarterlyApi";
 import {
   Q1_2026_LESSONS,
   Q1_2026_TITLE,
@@ -100,21 +99,27 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
   const [fetchedDays, setFetchedDays] = useState<FetchedDay[]>([]);
   const [loadingContent, setLoadingContent] = useState(false);
 
-  // Fetch full lesson content from API when lesson changes
+  // Fetch full lesson content from edge function proxy (avoids CORS)
   useEffect(() => {
     const fetchFullContent = async () => {
       setLoadingContent(true);
       try {
-        // Determine the quarterly ID based on current date
         const now = new Date();
         const year = now.getFullYear();
         const quarter = Math.ceil((now.getMonth() + 1) / 3);
-        const quarterlyId = `${year}-${String(quarter).padStart(2, "0")}`;
+        const quarterId = `${year}-${String(quarter).padStart(2, "0")}`;
 
-        const result = await getQuarterlyLesson(quarterlyId, selectedLesson.id);
-        if (result?.days && result.days.length > 0) {
-          setFetchedDays(result.days);
+        const { data, error } = await supabase.functions.invoke("fetch-sabbath-school-lesson", {
+          body: { language: "en", quarterId, lessonId: selectedLesson.id },
+        });
+
+        if (error) {
+          console.warn("Edge function error:", error);
+          setFetchedDays([]);
+        } else if (data?.success && data.days?.length > 0) {
+          setFetchedDays(data.days);
         } else {
+          console.warn("No lesson content returned:", data?.error);
           setFetchedDays([]);
         }
       } catch (err) {
@@ -142,10 +147,13 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
   };
 
   // Get the full content for the active day — prefer fetched API content, fallback to local
+  // API returns 7 days: 01=Sabbath, 02=Sunday, 03=Monday...07=Friday
+  // UI shows 6 days: Sunday(0) through Friday(5)
+  // So UI dayIndex 0 (Sunday) = API index 1 (day "02"), etc.
   const getFullDayContent = (dayIndex: number): string => {
-    const fetched = fetchedDays[dayIndex];
+    const apiIndex = dayIndex + 1; // shift by 1 since API day 01 is Sabbath intro
+    const fetched = fetchedDays[apiIndex];
     if (fetched) {
-      // The API returns HTML content; strip tags for clean display or use as-is
       const apiContent = fetched.read || fetched.content || "";
       if (apiContent.length > 0) return apiContent;
     }
@@ -252,14 +260,20 @@ CRITICAL: The quarterly's content must appear first and complete. PT principles 
 
   const selectedDay = getSelectedDay();
 
-  // Render HTML content safely
+  // Render HTML content safely, cleaning up hidden sections
   const renderContent = (html: string) => {
-    // Check if it looks like HTML
     if (html.includes("<") && html.includes(">")) {
+      // Remove hidden donation/EGW divs
+      const cleaned = html
+        .replace(/<div style="display: none"[^>]*class="ss-donation-appeal"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, "")
+        .replace(/<hr\s*\/?>\s*$/i, "");
       return (
         <div
-          className="text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert"
-          dangerouslySetInnerHTML={{ __html: html }}
+          className="text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert
+            prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground
+            prose-blockquote:border-primary/30 prose-blockquote:bg-primary/5 prose-blockquote:px-4 prose-blockquote:py-2 prose-blockquote:rounded
+            prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-foreground prose-code:font-normal prose-code:before:content-none prose-code:after:content-none"
+          dangerouslySetInnerHTML={{ __html: cleaned }}
         />
       );
     }
