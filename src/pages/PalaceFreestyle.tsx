@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,13 @@ import {
   ArrowDown,
   BookmarkPlus,
   Loader2,
-  Check
+  Check,
+  Library,
+  Clock,
+  Star,
+  StarOff,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useFreestyleMentor, type ExitCommand } from "@/hooks/useFreestyleMentor";
 import { cn } from "@/lib/utils";
@@ -28,6 +34,8 @@ import ReactMarkdown from "react-markdown";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { format } from "date-fns";
 
 const EXIT_COMMANDS: { id: ExitCommand; label: string; icon: React.ElementType }[] = [
   { id: "stabilize", label: "Stabilize This", icon: Target },
@@ -44,25 +52,64 @@ const INGREDIENT_EXAMPLES = [
   "Exile always precedes clarity. Daniel, Joseph, Paul, even Jesus withdrawing. What is God teaching in the exile pattern?",
 ];
 
+interface SavedFreestyle {
+  id: string;
+  title: string;
+  content: string;
+  tags: string[];
+  is_favorite: boolean;
+  created_at: string;
+}
+
 export default function PalaceFreestyle() {
   const { messages, isLoading, sendMessage, clearMessages } = useFreestyleMentor();
+  const { user } = useAuth();
   const [ingredients, setIngredients] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mealRef = useRef<HTMLDivElement>(null);
 
+  // Saved freestyles state
+  const [savedStudies, setSavedStudies] = useState<SavedFreestyle[]>([]);
+  const [loadingSaved, setLoadingSaved] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [expandedStudy, setExpandedStudy] = useState<string | null>(null);
+
   // Last assistant message = the meal
   const lastMeal = [...messages].reverse().find(m => m.role === "assistant");
   const isStreaming = lastMeal?.streaming === true;
-  // Conversation continues after initial meal
   const hasConversation = messages.length > 0;
   const wordCount = lastMeal?.content ? lastMeal.content.trim().split(/\s+/).filter(Boolean).length : 0;
+
+  // Load saved freestyles
+  const loadSavedStudies = async () => {
+    if (!user) return;
+    setLoadingSaved(true);
+    try {
+      const { data, error } = await supabase
+        .from("user_studies")
+        .select("id, title, content, tags, is_favorite, created_at")
+        .eq("user_id", user.id)
+        .contains("tags", ["freestyle"])
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      setSavedStudies((data || []) as SavedFreestyle[]);
+    } catch {
+      console.error("Failed to load saved freestyles");
+    } finally {
+      setLoadingSaved(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) loadSavedStudies();
+  }, [user]);
 
   const handleCook = async () => {
     if (!ingredients.trim() || isLoading) return;
     await sendMessage(ingredients.trim());
-    // Scroll to meal
     setTimeout(() => mealRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
   };
 
@@ -82,8 +129,7 @@ export default function PalaceFreestyle() {
     if (!lastMeal?.content || saving) return;
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error("Please sign in to save"); return; }
+      if (!user) { toast.error("Please sign in to save"); setSaving(false); return; }
 
       const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       const title = `Freestyle: ${ingredients.trim().slice(0, 60)}${ingredients.trim().length > 60 ? '...' : ''}`;
@@ -94,17 +140,39 @@ export default function PalaceFreestyle() {
         title,
         content,
         tags: ["freestyle", ...(lastMeal.tags || [])],
-        category: "freestyle_study",
       });
 
       if (error) throw error;
-      toast.success("Saved to My Studies!");
+      toast.success("Saved to your Freestyle library!");
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+      // Refresh saved list
+      loadSavedStudies();
     } catch {
       toast.error("Failed to save");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const toggleFavorite = async (studyId: string, currentFav: boolean) => {
+    const { error } = await supabase
+      .from("user_studies")
+      .update({ is_favorite: !currentFav })
+      .eq("id", studyId);
+    if (!error) {
+      setSavedStudies(prev => prev.map(s => s.id === studyId ? { ...s, is_favorite: !currentFav } : s));
+    }
+  };
+
+  const deleteStudy = async (studyId: string) => {
+    const { error } = await supabase
+      .from("user_studies")
+      .delete()
+      .eq("id", studyId);
+    if (!error) {
+      setSavedStudies(prev => prev.filter(s => s.id !== studyId));
+      toast.success("Deleted");
     }
   };
 
@@ -138,6 +206,147 @@ export default function PalaceFreestyle() {
           <p className="text-sm text-muted-foreground mt-2 max-w-xl mx-auto">
             You bring the ingredients. Jeeves prepares the meal.
           </p>
+        </motion.div>
+
+        {/* SAVED LIBRARY TOGGLE */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="mb-6"
+        >
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowLibrary(!showLibrary);
+              if (!showLibrary) loadSavedStudies();
+            }}
+            className="w-full border-indigo-500/30 bg-slate-900/40 hover:bg-indigo-500/10 text-indigo-300 gap-2 h-11"
+          >
+            <Library className="h-4 w-4" />
+            My Saved Freestyles ({savedStudies.length})
+            {showLibrary ? <ChevronUp className="h-4 w-4 ml-auto" /> : <ChevronDown className="h-4 w-4 ml-auto" />}
+          </Button>
+
+          <AnimatePresence>
+            {showLibrary && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-3 space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+                  {loadingSaved ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-5 w-5 animate-spin text-indigo-400" />
+                    </div>
+                  ) : savedStudies.length === 0 ? (
+                    <Card className="border-slate-700/50 bg-slate-900/30 p-6 text-center">
+                      <p className="text-sm text-muted-foreground">No saved freestyles yet. Cook a meal and hit Save!</p>
+                    </Card>
+                  ) : (
+                    savedStudies.map((study) => (
+                      <Card
+                        key={study.id}
+                        className="border-slate-700/50 bg-slate-900/40 overflow-hidden"
+                      >
+                        <button
+                          onClick={() => setExpandedStudy(expandedStudy === study.id ? null : study.id)}
+                          className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-indigo-500/5 transition-colors"
+                        >
+                          <ChefHat className="h-4 w-4 text-purple-400 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-200 truncate">
+                              {study.title.replace(/^Freestyle:\s*/, '')}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <Clock className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-xs text-muted-foreground">
+                                {format(new Date(study.created_at), "MMM d, yyyy")}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(study.id, study.is_favorite);
+                              }}
+                            >
+                              {study.is_favorite ? (
+                                <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
+                              ) : (
+                                <StarOff className="h-3.5 w-3.5 text-muted-foreground" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteStudy(study.id);
+                              }}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                            {expandedStudy === study.id ? (
+                              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </div>
+                        </button>
+
+                        <AnimatePresence>
+                          {expandedStudy === study.id && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-4 pb-4 border-t border-slate-700/30">
+                                <div className="prose prose-invert prose-sm max-w-none mt-3
+                                  prose-headings:text-purple-200 prose-headings:font-bold
+                                  prose-h3:text-base prose-h3:uppercase prose-h3:tracking-wide prose-h3:text-indigo-300
+                                  prose-strong:text-purple-200
+                                  prose-p:text-slate-300 prose-p:leading-relaxed
+                                  prose-li:text-slate-300
+                                  prose-blockquote:border-l-purple-500 prose-blockquote:text-slate-400
+                                  prose-hr:border-indigo-500/20
+                                ">
+                                  <ReactMarkdown>{study.content}</ReactMarkdown>
+                                </div>
+                                {study.tags && study.tags.length > 0 && (
+                                  <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-slate-700/30">
+                                    {study.tags.map((tag) => (
+                                      <Badge
+                                        key={tag}
+                                        variant="outline"
+                                        className="text-xs bg-purple-500/10 text-purple-300 border-purple-500/30"
+                                      >
+                                        {tag.replace(/_/g, " ")}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* INGREDIENTS SECTION */}
@@ -347,7 +556,7 @@ export default function PalaceFreestyle() {
                   )}
                 </div>
 
-                {/* Exit-to-Precision Bar — only show when done streaming */}
+                {/* Exit-to-Precision Bar */}
                 {!isStreaming && (
                   <div className="px-5 py-3 border-t border-purple-500/20 bg-background/30">
                     <div className="flex items-center gap-2 flex-wrap">
