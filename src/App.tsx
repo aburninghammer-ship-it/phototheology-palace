@@ -34,6 +34,7 @@ import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
 import { JeevesWidget } from "@/components/JeevesWidget";
 import { ReginaldButler } from "@/components/ReginaldButler";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { DraggableWidgetStack } from "@/components/DraggableWidgetStack";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
 import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
@@ -710,12 +711,11 @@ function App() {
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
                   {!isWorkspacePane && (
-                    <div className="fixed bottom-24 md:bottom-16 left-4 z-50 flex flex-col-reverse items-start gap-3">
-                      {/* flex-col-reverse: DOM order = bottom-most first, stacking upward */}
+                    <DraggableWidgetStack>
                       <AmbientMusicPlayer minimal />
                       <JeevesWidget />
                       <ReginaldButler />
-                    </div>
+                    </DraggableWidgetStack>
                   )}
                 </div>
               </ChangeManagerProvider>
