@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect, useState, type ReactNode } from "react";
+import { useRef, useCallback, useEffect, type ReactNode } from "react";
 import { GripVertical } from "lucide-react";
 
 const STORAGE_KEY = "widget-stack-position";
@@ -17,51 +17,56 @@ function clamp(val: number, min: number, max: number) {
 
 export function DraggableWidgetStack({ children }: { children: ReactNode }) {
   const stackRef = useRef<HTMLDivElement>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
   const posRef = useRef(getInitialPosition());
-  const [, forceRender] = useState(0);
 
   const applyPos = useCallback(() => {
     if (stackRef.current) {
-      stackRef.current.style.left = `${posRef.current.x}px`;
-      stackRef.current.style.top = `${posRef.current.y}px`;
+      stackRef.current.style.transform = `translate(${posRef.current.x}px, ${posRef.current.y}px)`;
     }
   }, []);
 
-  // Apply initial position after mount
+  // Use native event listener on handle to avoid React re-render issues
   useEffect(() => {
     applyPos();
-  }, [applyPos]);
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    const handle = handleRef.current;
+    if (!handle) return;
 
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const origX = posRef.current.x;
-    const origY = posRef.current.y;
+    const onDown = (e: PointerEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    const onMove = (ev: PointerEvent) => {
-      const rect = stackRef.current?.getBoundingClientRect();
-      const w = rect?.width ?? 60;
-      const h = rect?.height ?? 60;
-      posRef.current = {
-        x: clamp(origX + (ev.clientX - startX), 0, window.innerWidth - w),
-        y: clamp(origY + (ev.clientY - startY), 0, window.innerHeight - h),
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const origX = posRef.current.x;
+      const origY = posRef.current.y;
+
+      const onMove = (ev: PointerEvent) => {
+        const rect = stackRef.current?.getBoundingClientRect();
+        const w = rect?.width ?? 60;
+        const h = rect?.height ?? 60;
+        posRef.current = {
+          x: clamp(origX + (ev.clientX - startX), 0, window.innerWidth - w),
+          y: clamp(origY + (ev.clientY - startY), 0, window.innerHeight - h),
+        };
+        applyPos();
       };
-      applyPos();
+
+      const onUp = () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(posRef.current));
+        } catch {}
+      };
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
     };
 
-    const onUp = () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(posRef.current));
-      } catch {}
-    };
-
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
+    handle.addEventListener("pointerdown", onDown);
+    return () => handle.removeEventListener("pointerdown", onDown);
   }, [applyPos]);
 
   // Keep in viewport on resize
@@ -87,15 +92,16 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
     <div
       ref={stackRef}
       className="fixed z-50 flex flex-col-reverse items-start gap-3"
-      style={{ left: posRef.current.x, top: posRef.current.y }}
+      style={{ left: 0, top: 0, willChange: "transform" }}
     >
       {/* Drag handle */}
       <div
-        onPointerDown={handlePointerDown}
-        className="cursor-grab active:cursor-grabbing p-1 rounded-md bg-muted/80 backdrop-blur-sm border border-border/50 hover:bg-muted touch-none select-none"
+        ref={handleRef}
+        className="cursor-grab active:cursor-grabbing p-1 rounded-md bg-muted/80 backdrop-blur-sm border border-border/50 hover:bg-muted select-none"
+        style={{ touchAction: "none" }}
         title="Drag to move"
       >
-        <GripVertical className="h-4 w-4 text-muted-foreground" />
+        <GripVertical className="h-4 w-4 text-muted-foreground pointer-events-none" />
       </div>
       {children}
     </div>
