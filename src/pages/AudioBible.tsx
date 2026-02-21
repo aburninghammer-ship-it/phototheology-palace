@@ -93,11 +93,11 @@ export default function AudioBible() {
   const [epicMode, setEpicMode] = useState<"epic" | "urban" | "ancient" | "preacher" | "scholar">("epic");
 
   const COMMENTARY_MODES = [
-    { id: "urban" as const, label: "Urban", subtitle: "Street-level theology", icon: Zap, color: "blue" },
-    { id: "ancient" as const, label: "Ancient", subtitle: "Scribe of ages", icon: BookText, color: "amber" },
-    { id: "preacher" as const, label: "Preacher", subtitle: "Pulpit power", icon: Crown, color: "purple" },
-    { id: "epic" as const, label: "Epic", subtitle: "Cinematic cosmos", icon: Film, color: "orange" },
-    { id: "scholar" as const, label: "Scholar", subtitle: "Research supreme", icon: Layers, color: "emerald" },
+    { id: "urban" as const, label: "Urban", subtitle: "Human condition", icon: Zap, color: "blue" },
+    { id: "ancient" as const, label: "Ancient", subtitle: "Covenant-historical", icon: BookText, color: "amber" },
+    { id: "preacher" as const, label: "Preacher", subtitle: "Redemptive-proclamation", icon: Crown, color: "purple" },
+    { id: "epic" as const, label: "Epic", subtitle: "Cosmic conflict", icon: Film, color: "orange" },
+    { id: "scholar" as const, label: "Scholar", subtitle: "Canonical-theological", icon: Layers, color: "emerald" },
   ] as const;
 
   const activeModeMeta = COMMENTARY_MODES.find(m => m.id === epicMode) || COMMENTARY_MODES[3];
