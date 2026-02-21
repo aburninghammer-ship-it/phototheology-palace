@@ -343,7 +343,7 @@ export default function AudioBible() {
       // Fetch cached commentary for this mode
       let { data, error } = await supabase
         .from("epic_commentaries")
-        .select("*")
+        .select("id, book, chapter, mode, status, audio_storage_path, commentary_text, version, voice_id, created_at, updated_at")
         .eq("book", book)
         .eq("chapter", chapter)
         .eq("mode", currentMode)
@@ -369,7 +369,7 @@ export default function AudioBible() {
         // Re-fetch the now-cached commentary
         const refetch = await supabase
           .from("epic_commentaries")
-          .select("*")
+          .select("id, book, chapter, mode, status, audio_storage_path, commentary_text, version, voice_id, created_at, updated_at")
           .eq("book", book)
           .eq("chapter", chapter)
           .eq("mode", currentMode)
