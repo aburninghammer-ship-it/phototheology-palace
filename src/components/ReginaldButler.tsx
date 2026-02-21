@@ -54,9 +54,11 @@ export const ReginaldButler = () => {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const recognitionRef = useRef<InstanceType<typeof window.SpeechRecognition> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dragConstraintsRef = useRef<HTMLDivElement>(null);
 
   // Fetch user name once
   useEffect(() => {
@@ -175,21 +177,30 @@ export const ReginaldButler = () => {
 
   return (
     <>
-      {/* Floating trigger button */}
+      {/* Invisible drag boundary — full viewport */}
+      <div ref={dragConstraintsRef} className="fixed inset-0 pointer-events-none z-[997]" />
+
+      {/* Floating draggable trigger button */}
       <AnimatePresence>
         {!open && (
           <motion.div
+            drag
+            dragMomentum={false}
+            dragConstraints={dragConstraintsRef}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setTimeout(() => setIsDragging(false), 100)}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-grab active:cursor-grabbing touch-none"
+            style={{ zIndex: 50 }}
           >
-            <span className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-full shadow-lg bg-amber-900/90 text-amber-100">
+            <span className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-full shadow-lg bg-amber-900/90 text-amber-100 pointer-events-none">
               Reginald
             </span>
             <Button
-              onClick={() => setOpen(true)}
+              onClick={() => { if (!isDragging) setOpen(true); }}
               className="h-11 w-11 rounded-full shadow-xl border-2 border-amber-500/40 p-0 flex items-center justify-center flex-shrink-0 overflow-hidden"
               style={{ background: "linear-gradient(135deg, #78350f, #92400e)" }}
               aria-label="Open Reginald the Palace Butler"
