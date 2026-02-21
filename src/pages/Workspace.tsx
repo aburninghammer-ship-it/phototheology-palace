@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { WorkspaceToolbar, type LayoutMode } from "@/components/workspace/WorkspaceToolbar";
 import { PaneHeader } from "@/components/workspace/PaneHeader";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 const STORAGE_KEY_LAYOUT = "workspace_layout";
 const STORAGE_KEY_PANES = "workspace_panes";
@@ -141,78 +142,80 @@ export default function Workspace() {
   const paneCount = getPaneCount(layout);
   const activePanes = panes.slice(0, paneCount);
 
-  // Count non-collapsed panes to determine grid sizing
-  const expandedCount = activePanes.filter((_, i) => !collapsedPanes.has(i)).length;
-
-  // Build dynamic grid template based on collapsed state
-  const getGridStyle = () => {
-    if (layout === "quad") {
-      // 2x2 grid — collapsed panes shrink their row/col
-      const colSizes = [0, 1].map(col => {
-        const topCollapsed = collapsedPanes.has(col);
-        const bottomCollapsed = collapsedPanes.has(col + 2);
-        return (topCollapsed && bottomCollapsed) ? "36px" : "1fr";
-      });
-      const rowSizes = [0, 1].map(row => {
-        const leftCollapsed = collapsedPanes.has(row * 2);
-        const rightCollapsed = collapsedPanes.has(row * 2 + 1);
-        return (leftCollapsed && rightCollapsed) ? "36px" : "1fr";
-      });
-      return {
-        gridTemplateColumns: colSizes.join(" "),
-        gridTemplateRows: rowSizes.join(" "),
-      };
-    }
-
-    // For half/thirds: single row, collapsed panes become narrow
-    const colSizes = activePanes.map((_, i) =>
-      collapsedPanes.has(i) ? "36px" : "1fr"
+  const renderPane = (panePath: string, index: number) => {
+    const isCollapsed = collapsedPanes.has(index);
+    return (
+      <div className="flex flex-col bg-background overflow-hidden h-full">
+        <PaneHeader
+          currentPath={panePath}
+          onSelectTab={(path) => handleSelectTab(index, path)}
+          showClose={activePanes.length > 1}
+          onClose={() => handleClosePane(index)}
+          collapsed={isCollapsed}
+          onToggleCollapse={() => handleToggleCollapse(index)}
+        />
+        {!isCollapsed && (
+          <iframe
+            src={buildIframeSrc(panePath)}
+            className="flex-1 w-full border-none"
+            title={`Workspace pane ${index + 1}`}
+          />
+        )}
+      </div>
     );
-    return {
-      gridTemplateColumns: colSizes.join(" "),
-      gridTemplateRows: "1fr",
-    };
   };
 
-  const gridBaseClass =
-    layout === "quad" ? "grid-cols-2 grid-rows-2" : "";
+  const renderPanels = () => {
+    if (layout === "quad") {
+      // 2x2: two rows, each with two resizable columns
+      return (
+        <ResizablePanelGroup direction="vertical" className="flex-1">
+          <ResizablePanel defaultSize={50} minSize={10}>
+            <ResizablePanelGroup direction="horizontal">
+              <ResizablePanel defaultSize={50} minSize={10}>
+                {renderPane(activePanes[0], 0)}
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={50} minSize={10}>
+                {renderPane(activePanes[1], 1)}
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize={50} minSize={10}>
+            <ResizablePanelGroup direction="horizontal">
+              <ResizablePanel defaultSize={50} minSize={10}>
+                {renderPane(activePanes[2], 2)}
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={50} minSize={10}>
+                {renderPane(activePanes[3], 3)}
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      );
+    }
+
+    // half or thirds: horizontal panels
+    return (
+      <ResizablePanelGroup direction="horizontal" className="flex-1">
+        {activePanes.map((panePath, index) => (
+          <Fragment key={`${index}-${panePath}`}>
+            {index > 0 && <ResizableHandle withHandle />}
+            <ResizablePanel defaultSize={100 / activePanes.length} minSize={10}>
+              {renderPane(panePath, index)}
+            </ResizablePanel>
+          </Fragment>
+        ))}
+      </ResizablePanelGroup>
+    );
+  };
 
   return (
     <div className="hidden lg:flex flex-col h-screen w-screen fixed inset-0 z-[100] bg-background">
       <WorkspaceToolbar layout={layout} onLayoutChange={handleLayoutChange} />
-
-      <div
-        className="grid flex-1 gap-px bg-border overflow-hidden"
-        style={getGridStyle()}
-      >
-        {activePanes.map((panePath, index) => {
-          const isCollapsed = collapsedPanes.has(index);
-          return (
-            <div
-              key={`${index}-${panePath}`}
-              className={`flex flex-col bg-background overflow-hidden transition-all duration-200 ${
-                isCollapsed ? "min-h-0" : "min-h-0"
-              }`}
-            >
-              <PaneHeader
-                currentPath={panePath}
-                onSelectTab={(path) => handleSelectTab(index, path)}
-                showClose={activePanes.length > 1}
-                onClose={() => handleClosePane(index)}
-                collapsed={isCollapsed}
-                onToggleCollapse={() => handleToggleCollapse(index)}
-              />
-              {!isCollapsed && (
-                <iframe
-                  src={buildIframeSrc(panePath)}
-                  className="flex-1 w-full border-none"
-                  title={`Workspace pane ${index + 1}`}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {renderPanels()}
 
       {/* Mobile fallback */}
       <div className="lg:hidden fixed inset-0 z-[100] bg-background flex items-center justify-center p-8">
