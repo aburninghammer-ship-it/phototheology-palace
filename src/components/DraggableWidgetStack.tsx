@@ -8,7 +8,7 @@ function getInitialPosition() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) return JSON.parse(saved) as { x: number; y: number };
   } catch {}
-  return { x: window.innerWidth - 80, y: window.innerHeight - 300 };
+  return { x: window.innerWidth - 100, y: window.innerHeight - 350 };
 }
 
 function clamp(val: number, min: number, max: number) {
@@ -47,8 +47,8 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
         const w = rect?.width ?? 60;
         const h = rect?.height ?? 60;
         posRef.current = {
-          x: clamp(origX + (ev.clientX - startX), 0, window.innerWidth - w),
-          y: clamp(origY + (ev.clientY - startY), 0, window.innerHeight - h),
+          x: clamp(origX + (ev.clientX - startX), 0, window.innerWidth - w - 16),
+          y: clamp(origY + (ev.clientY - startY), 0, window.innerHeight - h - 16),
         };
         applyPos();
       };
@@ -76,8 +76,8 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
       const w = rect?.width ?? 60;
       const h = rect?.height ?? 60;
       posRef.current = {
-        x: clamp(posRef.current.x, 0, window.innerWidth - w),
-        y: clamp(posRef.current.y, 0, window.innerHeight - h),
+        x: clamp(posRef.current.x, 0, window.innerWidth - w - 16),
+        y: clamp(posRef.current.y, 0, window.innerHeight - h - 16),
       };
       applyPos();
       try {
