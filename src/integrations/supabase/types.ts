@@ -9757,6 +9757,7 @@ export type Database = {
           daily_study_streak: number | null
           days_active: number | null
           display_name: string | null
+          email: string | null
           equations_streak: number | null
           first_meaningful_action_at: string | null
           first_win_achieved_at: string | null
@@ -9837,6 +9838,7 @@ export type Database = {
           daily_study_streak?: number | null
           days_active?: number | null
           display_name?: string | null
+          email?: string | null
           equations_streak?: number | null
           first_meaningful_action_at?: string | null
           first_win_achieved_at?: string | null
@@ -9917,6 +9919,7 @@ export type Database = {
           daily_study_streak?: number | null
           days_active?: number | null
           display_name?: string | null
+          email?: string | null
           equations_streak?: number | null
           first_meaningful_action_at?: string | null
           first_win_achieved_at?: string | null
