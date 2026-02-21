@@ -250,10 +250,10 @@ Return ONLY the JSON, no other text.`
       if (processedRequestsRef.current.has(fullMatch)) continue;
 
       // STRICT CHECK: Must start with an action word
-      const startsWithAction = /^(find|get|pull|insert|add|show|i need|give me|fetch|look up|lookup)/i.test(innerText);
+      const startsWithAction = /^(find|get|pull|insert|add|show|i need|give me|fetch|look up|lookup|define|hebrew|greek|what does|meaning of)/i.test(innerText);
 
-      // OR must contain explicit scripture words
-      const hasScriptureWord = /\b(verse|scripture|passage|bible text)\b/i.test(innerText);
+      // OR must contain explicit scripture words or language study words
+      const hasScriptureWord = /\b(verse|scripture|passage|bible text|hebrew|greek|strongs|strong's|definition|original word|original language)\b/i.test(innerText);
 
       // Only trigger if it's clearly a scripture request
       if (startsWithAction || hasScriptureWord) {
