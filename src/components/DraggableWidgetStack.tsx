@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, type ReactNode } from "react";
+import { useRef, useCallback, useEffect, useState, type ReactNode } from "react";
 import { GripVertical } from "lucide-react";
 
 const STORAGE_KEY = "widget-stack-position";
@@ -16,65 +16,78 @@ function clamp(val: number, min: number, max: number) {
 }
 
 export function DraggableWidgetStack({ children }: { children: ReactNode }) {
-  const [pos, setPos] = useState(getInitialPosition);
-  const dragging = useRef(false);
-  const offset = useRef({ x: 0, y: 0 });
   const stackRef = useRef<HTMLDivElement>(null);
+  const posRef = useRef(getInitialPosition());
+  const [, forceRender] = useState(0);
 
-  const persist = useCallback((p: { x: number; y: number }) => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch {}
+  const applyPos = useCallback(() => {
+    if (stackRef.current) {
+      stackRef.current.style.left = `${posRef.current.x}px`;
+      stackRef.current.style.top = `${posRef.current.y}px`;
+    }
   }, []);
 
+  // Apply initial position after mount
+  useEffect(() => {
+    applyPos();
+  }, [applyPos]);
+
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    dragging.current = true;
-    offset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
     e.preventDefault();
+    e.stopPropagation();
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const origX = posRef.current.x;
+    const origY = posRef.current.y;
 
     const onMove = (ev: PointerEvent) => {
-      if (!dragging.current) return;
       const rect = stackRef.current?.getBoundingClientRect();
       const w = rect?.width ?? 60;
       const h = rect?.height ?? 60;
-      const nx = clamp(ev.clientX - offset.current.x, 0, window.innerWidth - w);
-      const ny = clamp(ev.clientY - offset.current.y, 0, window.innerHeight - h);
-      setPos({ x: nx, y: ny });
+      posRef.current = {
+        x: clamp(origX + (ev.clientX - startX), 0, window.innerWidth - w),
+        y: clamp(origY + (ev.clientY - startY), 0, window.innerHeight - h),
+      };
+      applyPos();
     };
 
     const onUp = () => {
-      dragging.current = false;
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
-      setPos(p => { persist(p); return p; });
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(posRef.current));
+      } catch {}
     };
 
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
-  }, [pos, persist]);
+  }, [applyPos]);
 
   // Keep in viewport on resize
   useEffect(() => {
     const onResize = () => {
-      setPos(prev => {
-        const rect = stackRef.current?.getBoundingClientRect();
-        const w = rect?.width ?? 60;
-        const h = rect?.height ?? 60;
-        const clamped = {
-          x: clamp(prev.x, 0, window.innerWidth - w),
-          y: clamp(prev.y, 0, window.innerHeight - h),
-        };
-        persist(clamped);
-        return clamped;
-      });
+      const rect = stackRef.current?.getBoundingClientRect();
+      const w = rect?.width ?? 60;
+      const h = rect?.height ?? 60;
+      posRef.current = {
+        x: clamp(posRef.current.x, 0, window.innerWidth - w),
+        y: clamp(posRef.current.y, 0, window.innerHeight - h),
+      };
+      applyPos();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(posRef.current));
+      } catch {}
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [persist]);
+  }, [applyPos]);
 
   return (
     <div
       ref={stackRef}
       className="fixed z-50 flex flex-col-reverse items-start gap-3"
-      style={{ left: pos.x, top: pos.y }}
+      style={{ left: posRef.current.x, top: posRef.current.y }}
     >
       {/* Drag handle */}
       <div
