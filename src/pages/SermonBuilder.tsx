@@ -1281,6 +1281,9 @@ export default function SermonBuilder() {
                     currentSermonIdRef.current = newId;
                     setCurrentSermonId(newId);
                   }}
+                  isAutoSavingToDb={isAutoSaving}
+                  lastDbAutoSave={lastAutoSave}
+                  onTriggerDbSave={performAutoSave}
                 />
               )}
 

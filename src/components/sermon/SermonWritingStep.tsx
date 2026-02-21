@@ -36,9 +36,12 @@ interface SermonWritingStepProps {
   themePassage: string;
   sermonId?: string;
   onSermonCreated?: (newId: string) => void;
+  isAutoSavingToDb?: boolean;
+  lastDbAutoSave?: Date | null;
+  onTriggerDbSave?: () => void;
 }
 
-export function SermonWritingStep({ sermon, setSermon, themePassage, sermonId, onSermonCreated }: SermonWritingStepProps) {
+export function SermonWritingStep({ sermon, setSermon, themePassage, sermonId, onSermonCreated, isAutoSavingToDb, lastDbAutoSave, onTriggerDbSave }: SermonWritingStepProps) {
   const [suggestedVerses, setSuggestedVerses] = useState<SuggestedVerse[]>([]);
   const [loadingVerses, setLoadingVerses] = useState(false);
   const [showPanel, setShowPanel] = useState(true);
@@ -789,20 +792,20 @@ Return ONLY valid JSON, no other text.`
                     <Loader2 className="w-3 h-3 animate-spin" />
                     Fetching scripture...
                   </Badge>
-                ) : isSaving ? (
+                ) : isAutoSavingToDb || isSaving ? (
                   <Badge variant="outline" className="gap-1 text-xs">
                     <Save className="w-3 h-3 animate-pulse" />
-                    Saving...
+                    Saving to cloud...
                   </Badge>
-                ) : lastSaved ? (
+                ) : lastDbAutoSave || lastSaved ? (
                   <Badge variant="outline" className="gap-1 text-xs text-green-600 border-green-200">
                     <Check className="w-3 h-3" />
-                    Saved {lastSaved.toLocaleTimeString()}
+                    Saved {(lastDbAutoSave || lastSaved)?.toLocaleTimeString()}
                   </Badge>
                 ) : (
                   <Badge variant="outline" className="gap-1 text-xs">
                     <Save className="w-3 h-3" />
-                    Auto-saves every 15s
+                    Auto-saves continuously
                   </Badge>
                 )}
                 <span className="text-xs text-muted-foreground">
