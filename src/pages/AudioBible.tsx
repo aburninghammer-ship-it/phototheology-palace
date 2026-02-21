@@ -61,9 +61,12 @@ interface Theme {
   verse_count: number;
 }
 
+type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar";
+
 interface ChapterSelection {
   book: string;
   chapter: number;
+  mode?: EpicModeType;
 }
 
 type SelectionMode = "chapter" | "book" | "custom";
@@ -87,10 +90,10 @@ export default function AudioBible() {
   const [epicNowPlayingChapter, setEpicNowPlayingChapter] = useState(0);
   const epicQueueRef = useRef<ChapterSelection[]>([]);
   const epicQueueIndexRef = useRef(0);
-  const playEpicRef = useRef<(book: string, chapter: number) => Promise<void>>();
+  const playEpicRef = useRef<(book: string, chapter: number, mode?: EpicModeType) => Promise<void>>();
 
   // Commentary mode within Epic suite (urban, ancient, preacher, epic, scholar)
-  const [epicMode, setEpicMode] = useState<"epic" | "urban" | "ancient" | "preacher" | "scholar">("epic");
+  const [epicMode, setEpicMode] = useState<EpicModeType>("epic");
 
   const COMMENTARY_MODES = [
     { id: "urban" as const, label: "Urban", subtitle: "Human condition", icon: Zap, color: "blue" },
@@ -239,35 +242,38 @@ export default function AudioBible() {
     }
   };
 
-  // Add chapter to custom list
+  // Add chapter to custom list (with current mode)
   const addCustomChapter = () => {
     const exists = customChapters.some(
       (c) => c.book === customBook && c.chapter === customChapter
     );
     if (!exists) {
-      setCustomChapters([...customChapters, { book: customBook, chapter: customChapter }]);
+      const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
+      setCustomChapters([...customChapters, { book: customBook, chapter: customChapter, mode }]);
     }
   };
 
-  // Add chapter range to custom list
+  // Add chapter range to custom list (with current mode)
   const addChapterRange = () => {
     const newChapters: ChapterSelection[] = [];
+    const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
     for (let ch = rangeStartChapter; ch <= rangeEndChapter; ch++) {
       const exists = customChapters.some(
         (c) => c.book === customBook && c.chapter === ch
       );
       if (!exists) {
-        newChapters.push({ book: customBook, chapter: ch });
+        newChapters.push({ book: customBook, chapter: ch, mode });
       }
     }
     setCustomChapters([...customChapters, ...newChapters]);
   };
 
-  // Add book range to custom list
+  // Add book range to custom list (with current mode)
   const addBookRange = () => {
     const startIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeStartBook);
     const endIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeEndBook);
     const newChapters: ChapterSelection[] = [];
+    const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
     
     for (let bookIdx = startIdx; bookIdx <= endIdx; bookIdx++) {
       const book = BIBLE_BOOK_METADATA[bookIdx];
@@ -276,7 +282,7 @@ export default function AudioBible() {
           (c) => c.book === book.name && c.chapter === ch
         );
         if (!exists) {
-          newChapters.push({ book: book.name, chapter: ch });
+          newChapters.push({ book: book.name, chapter: ch, mode });
         }
       }
     }
@@ -326,15 +332,15 @@ export default function AudioBible() {
   };
 
   // Epic Mode handler — selects a specific commentary mode
-  const handleEpicModeSelect = useCallback((mode: "epic" | "urban" | "ancient" | "preacher" | "scholar" = "epic") => {
+  const handleEpicModeSelect = useCallback((mode: EpicModeType = "epic") => {
     setEpicMode(mode);
     setCommentarySource("epic");
     setIncludeCommentary(true);
   }, [setCommentarySource, setIncludeCommentary]);
 
-  // Play Epic commentary for a chapter
-  const handlePlayEpic = useCallback(async (book: string, chapter: number) => {
-    const currentMode = epicMode;
+  // Play Epic commentary for a chapter (optional mode override for per-item playlists)
+  const handlePlayEpic = useCallback(async (book: string, chapter: number, modeOverride?: EpicModeType) => {
+    const currentMode = modeOverride || epicMode;
     const modeName = COMMENTARY_MODES.find(m => m.id === currentMode)?.label || "Epic";
     setIsEpicLoading(true);
     setEpicNowPlayingBook(book);
@@ -424,12 +430,14 @@ export default function AudioBible() {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
       };
       audio.onended = () => {
-        // Auto-advance queue
+        // Auto-advance queue (with per-item mode switching)
         const queue = epicQueueRef.current;
         const nextIdx = epicQueueIndexRef.current + 1;
         if (queue.length > 1 && nextIdx < queue.length) {
           epicQueueIndexRef.current = nextIdx;
-          playEpicRef.current?.(queue[nextIdx].book, queue[nextIdx].chapter);
+          const nextItem = queue[nextIdx];
+          if (nextItem.mode) setEpicMode(nextItem.mode);
+          playEpicRef.current?.(nextItem.book, nextItem.chapter, nextItem.mode);
         } else {
           setIsEpicPlaying(false);
           setIsEpicPaused(false);
@@ -454,6 +462,11 @@ export default function AudioBible() {
       setIsEpicLoading(false);
     }
   }, [stop, volume, epicMode]);
+
+  // Keep playEpicRef in sync so onended/skip callbacks can call the latest version
+  useEffect(() => {
+    playEpicRef.current = handlePlayEpic;
+  }, [handlePlayEpic]);
 
   // Regenerate commentary (admin only) — forces new script + audio
   const handleRegenerateEpic = useCallback(async (book: string, chapter: number, customInstructions?: string) => {
@@ -727,13 +740,14 @@ export default function AudioBible() {
     }
   }, [stop, volume, epicMode]);
 
-  // Play epic commentary for a custom chapter queue
+  // Play epic commentary for a custom chapter queue (with per-item mode switching)
   const handlePlayEpicCustom = useCallback(async () => {
     if (customChapters.length === 0) return;
     epicQueueRef.current = customChapters;
     epicQueueIndexRef.current = 0;
     const first = customChapters[0];
-    handlePlayEpic(first.book, first.chapter);
+    if (first.mode) setEpicMode(first.mode);
+    handlePlayEpic(first.book, first.chapter, first.mode);
   }, [customChapters, handlePlayEpic]);
 
   // Play epic chapter-by-chapter for an entire book
@@ -748,7 +762,7 @@ export default function AudioBible() {
     handlePlayEpic(queue[0].book, queue[0].chapter);
   }, [handlePlayEpic]);
 
-  // Skip to next/previous in epic queue
+  // Skip to next/previous in epic queue (with per-item mode switching)
   const handleEpicSkipNext = useCallback(() => {
     const queue = epicQueueRef.current;
     const nextIdx = epicQueueIndexRef.current + 1;
@@ -758,7 +772,9 @@ export default function AudioBible() {
         epicAudioRef.current = null;
       }
       epicQueueIndexRef.current = nextIdx;
-      playEpicRef.current?.(queue[nextIdx].book, queue[nextIdx].chapter);
+      const nextItem = queue[nextIdx];
+      if (nextItem.mode) setEpicMode(nextItem.mode);
+      playEpicRef.current?.(nextItem.book, nextItem.chapter, nextItem.mode);
     }
   }, []);
 
@@ -771,7 +787,9 @@ export default function AudioBible() {
         epicAudioRef.current = null;
       }
       epicQueueIndexRef.current = prevIdx;
-      playEpicRef.current?.(queue[prevIdx].book, queue[prevIdx].chapter);
+      const prevItem = queue[prevIdx];
+      if (prevItem.mode) setEpicMode(prevItem.mode);
+      playEpicRef.current?.(prevItem.book, prevItem.chapter, prevItem.mode);
     }
   }, []);
 
@@ -1434,7 +1452,7 @@ export default function AudioBible() {
                         </TabsContent>
                       </Tabs>
 
-                      {/* Custom chapters list */}
+                      {/* Custom chapters list with per-item mode */}
                       {customChapters.length > 0 && (
                         <div className="space-y-2 pt-2 border-t">
                           <div className="flex items-center justify-between">
@@ -1448,21 +1466,53 @@ export default function AudioBible() {
                               {t('audioBible.clearAll')}
                             </Button>
                           </div>
-                          <ScrollArea className="max-h-32">
-                            <div className="flex flex-wrap gap-1.5">
-                              {customChapters.map((ch, i) => (
-                                <Badge key={i} variant="secondary" className="pr-1 text-xs">
-                                  {ch.book} {ch.chapter}
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-3 w-3 p-0 ml-1 hover:bg-destructive/20"
-                                    onClick={() => removeCustomChapter(i)}
-                                  >
-                                    <X className="h-2 w-2" />
-                                  </Button>
-                                </Badge>
-                              ))}
+                          <ScrollArea className="max-h-48">
+                            <div className="space-y-1">
+                              {customChapters.map((ch, i) => {
+                                const itemMode = ch.mode || epicMode;
+                                const modeMeta = COMMENTARY_MODES.find(m => m.id === itemMode);
+                                const modeColorMap: Record<string, string> = {
+                                  urban: "border-blue-500/30 text-blue-400",
+                                  ancient: "border-amber-500/30 text-amber-400",
+                                  preacher: "border-purple-500/30 text-purple-400",
+                                  epic: "border-orange-500/30 text-orange-400",
+                                  scholar: "border-emerald-500/30 text-emerald-400",
+                                };
+                                return (
+                                  <div key={i} className="flex items-center gap-1.5 text-xs">
+                                    <span className="font-medium min-w-[100px] truncate">{ch.book} {ch.chapter}</span>
+                                    {commentarySource === "epic" && (
+                                      <Select
+                                        value={ch.mode || epicMode}
+                                        onValueChange={(v) => {
+                                          const updated = [...customChapters];
+                                          updated[i] = { ...updated[i], mode: v as EpicModeType };
+                                          setCustomChapters(updated);
+                                        }}
+                                      >
+                                        <SelectTrigger className={`h-6 w-[90px] text-[10px] px-1.5 ${modeColorMap[itemMode] || ""}`}>
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {COMMENTARY_MODES.map((m) => (
+                                            <SelectItem key={m.id} value={m.id} className="text-xs">
+                                              {m.label}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    )}
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-5 w-5 p-0 ml-auto hover:bg-destructive/20"
+                                      onClick={() => removeCustomChapter(i)}
+                                    >
+                                      <X className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </ScrollArea>
                         </div>
