@@ -1645,18 +1645,21 @@ NON-NEGOTIABLE RULES:
 
 1) FORBIDDEN LANGUAGE: No sensory descriptions (dust, wind, smells, shimmering, crackling, glowing). No poetic filler ("symphony of creation," "cosmic silence," "corridors of eternity," "tapestry of divine purpose," "searing brilliance," "weight of eternity"). No atmosphere-setting. No mood-painting. If a sentence describes a scene that the Bible does not describe, delete it.
 
-2) EXPAND THROUGH SCRIPTURE, NOT VOCABULARY. When the user gives a verse, bring in 3-5 cross-references quoted in full (KJV) that deepen the THEME. The manuscript gets bigger because there is more Bible in it, not because there are more adjectives.
+2) EXPAND THROUGH SCRIPTURE, NOT VOCABULARY. For EVERY verse the user gives, bring in 3-5 cross-references quoted in full (KJV) that deepen the THEME. The manuscript gets bigger because there is more Bible in it, not because there are more adjectives. Be THOROUGH — do not rush past any verse. Each user-provided verse deserves its own substantial treatment: full quotation, deep explanation, cross-references, and theological unpacking.
 
-3) THEMATIC ESCALATION — how the sermon builds power:
+3) PRESERVE THE ORDER. The user's verses and points are listed in a deliberate sequence. You MUST follow that sequence exactly. Do not rearrange, regroup, or reorder the user's material. The first verse they listed comes first in the manuscript, the second comes second, and so on. Build the thematic escalation WITHIN the user's given order — find the rising stakes in the sequence they chose.
+
+4) THEMATIC ESCALATION — how the sermon builds power:
    - Each section reveals something the previous one did not
    - The theme tightens: general truth → specific cost → personal implication → unavoidable response
    - Stakes rise through theological logic, not through dramatic language
    - Example: "God loves" → "God pays" → "God bleeds" → "God commands because He paid" → "What will you do with what He bought?"
    That is escalation through theme. Not through words.
 
-4) Quote → Explain → Connect. That is the rhythm.
+5) Quote → Explain → Connect. That is the rhythm.
    - QUOTE the verse in full (KJV)
-   - EXPLAIN what it means and why it matters in the flow of the theme
+   - EXPLAIN what it means IN DEPTH — unpack the Hebrew/Greek where relevant, explain the historical context, draw out the theological weight. Do NOT give a single-sentence explanation and move on. Each verse deserves 2-4 paragraphs of thorough treatment.
+   - Bring in 3-5 CROSS-REFERENCES quoted in full (KJV) that reinforce or deepen the point
    - CONNECT it to the next verse with a short, plain transition
    - Repeat. The Bible carries the weight. You carry the logic.
 
@@ -1698,7 +1701,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "story": {
     "title": "A clear, preachable title",
     "tagline": "One line capturing the core theological idea",
-    "manuscript": "THE ENTIRE MANUSCRIPT. One continuous flowing sermon manuscript. No numbered sections. No headings. No scene breaks. Just one moving document from opening to closing appeal. Scripture quoted verbatim (KJV) in-line or as short blocks. Occasional **bold beat-lines** for pulpit emphasis. At least 2000-3000+ words. Paragraphs separated by double newlines.",
+    "manuscript": "THE ENTIRE MANUSCRIPT. One continuous flowing sermon manuscript. No numbered sections. No headings. No scene breaks. Just one moving document from opening to closing appeal. Scripture quoted verbatim (KJV) in-line or as short blocks. Occasional **bold beat-lines** for pulpit emphasis. At least 3000-5000+ words. Each user-provided verse gets 2-4 paragraphs of thorough treatment plus cross-references. Paragraphs separated by double newlines.",
     "versesUsed": ["ALL verse references used"]
   }
 }
@@ -1711,9 +1714,20 @@ QUALITY CHECK BEFORE RETURNING:
 5. Did I add at least 15+ cross-references quoted in full? → If not, add more.
 6. Could a pastor preach every sentence aloud without it sounding like a novel? → If not, simplify.
 7. Is the power coming from the THEME and SCRIPTURE, or from my word choices? → If from word choices, strip them back.
-8. **EVERY SINGLE VERSE the user provided in their input MUST appear in the manuscript — quoted in full (KJV), explained, and connected to the theme.** Do NOT skip, summarize, or omit any verse from the original input. If the user gave 20 verses, all 20 must be quoted and woven into the manuscript. You are ENCOURAGED to add additional supporting verses beyond what the user provided — more Scripture strengthens the manuscript — but the user's original verses are the non-negotiable foundation. Go back through the user's input and check off each verse. If any is missing, add it before returning.`;
+8. **EVERY SINGLE VERSE the user provided in their input MUST appear in the manuscript — quoted in full (KJV), explained, and connected to the theme.** Do NOT skip, summarize, or omit any verse from the original input. If the user gave 20 verses, all 20 must be quoted and woven into the manuscript. You are ENCOURAGED to add additional supporting verses beyond what the user provided — more Scripture strengthens the manuscript — but the user's original verses are the non-negotiable foundation. Go back through the user's input and check off each verse. If any is missing, add it before returning.
+9. **Did I preserve the user's original ORDER of verses and points?** → The manuscript must follow the same sequence the user provided. Do NOT rearrange, regroup, or reorder their material.
+10. **Is every verse treated THOROUGHLY?** → Each user-provided verse should have 2-4 paragraphs of explanation, not a single sentence. If any verse is treated superficially, expand it with deeper theological unpacking, Hebrew/Greek insights, and additional cross-references.`;
 
-      userPrompt = `Turn these sermon notes into one continuous preaching manuscript. CRITICAL: You MUST use EVERY SINGLE verse I have listed below — quote each one in full (KJV), explain it, and connect it to the theme. Do NOT skip or omit any verse from my input. You ARE encouraged to ADD more supporting verses beyond my list to strengthen the manuscript — but my verses are the mandatory foundation. Make the THEME come to life — not the words. Expand by adding MORE SCRIPTURE (quoted in full, KJV), not more adjectives. No sensory descriptions. No poetic filler. No atmosphere-setting. The sermon is epic because the theology escalates, not because the vocabulary is extravagant. Each section reveals something the previous one did not. Quote → Explain → Connect. Let the Bible carry the weight:\n\n${message}`;
+      userPrompt = `Turn these sermon notes into one continuous, EXTENSIVE preaching manuscript. CRITICAL RULES:
+1. You MUST use EVERY SINGLE verse I have listed below — quote each one in full (KJV), explain it thoroughly (2-4 paragraphs per verse), and connect it to the theme.
+2. PRESERVE MY ORDER — follow the exact sequence of my verses and points. Do NOT rearrange them.
+3. Be THOROUGH — do not rush past any verse. Unpack each one deeply with cross-references, Hebrew/Greek insights where relevant, and theological weight.
+4. You ARE encouraged to ADD more supporting verses beyond my list — but my verses are the mandatory foundation and their order is sacred.
+5. Make the THEME come to life — not the words. Expand by adding MORE SCRIPTURE (quoted in full, KJV), not more adjectives.
+6. No sensory descriptions. No poetic filler. No atmosphere-setting. Quote → Explain → Connect. Let the Bible carry the weight.
+
+Here are my notes:\n\n${message}`;
+
 
     } else if (mode === "analyze-followup") {
       // Follow-up conversation mode for thought analysis
