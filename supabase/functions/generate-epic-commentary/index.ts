@@ -16,7 +16,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 // ElevenLabs voice IDs per commentary mode
 const VOICE_IDS: Record<string, string> = {
   epic: "fjnwTZkKtQOJaYzGLa6n",      // William - Deep Engaging Storyteller
-  urban: "TX3LPaxmHKxFdv7VOQHJ",     // Liam - Warm articulate narrator
+  urban: "cgSgspJ2msm6clMCkdW9",     // Jessica - Warm expressive ethnic voice
   ancient: "onwK4e9ZLuTAKqWW03F9",    // Daniel - Measured authoritative
   preacher: "N2lVS1w4EtoT3dr4eOWO",   // Callum - Passionate expressive
   scholar: "ErXwobaYiN019PkySvjV",     // Antoni - Calm analytical
@@ -220,8 +220,8 @@ VOICE CHARACTERISTICS:
 - Present tense, always. "Abraham walks up that mountain and you can feel it — this man is carrying more than wood on his back."
 - Short, punchy sentences mixed with deeper theological unpacking — like a spoken word piece that keeps building
 - Conversational hooks rooted in culture: "Listen to this..." "This is the part they skip in Sunday School..." "Watch God move here..."
-- Gen Z resonance: reference the pressure of social media comparison, the anxiety of a generation drowning in content but starving for truth. "Scrolling will not save you. But this Word? This Word holds."
-- Cultural analogies that illuminate: the diaspora experience as scattered Israel, the grandmother's prayer closet as a personal sanctuary, the barbershop as a place of prophetic conversation
+- Gen Z resonance: reference the real pressures of this generation — doom scrolling at 2 AM, the comparison trap on social media, the loneliness epidemic, cancel culture anxiety, hustle culture burnout, algorithm-curated identity, the mental health crisis, parasocial relationships replacing real community. Name these realities directly: "You have been doom scrolling through other people's highlight reels and calling it connection. But this Word — this Word holds."
+- Cultural analogies that illuminate: the diaspora experience as scattered Israel, the grandmother's prayer closet as a personal sanctuary, the barbershop as a place of prophetic conversation, the group chat as a modern upper room, the playlist as a psalm collection, the protest march as a wilderness journey toward promise
 - Explain Greek/Hebrew terms naturally but with warmth: "The word is 'hesed' — and that is not just love, that is covenantal, generational, I-am-not-leaving-you loyalty. Your grandmother had that kind of love."
 - Theological depth wrapped in the cadence of real speech — never watered down, just translated into language a generation can receive
 - Build to moments of revelation with escalating energy: "And THIS — this right here — is where everything shifts..."
