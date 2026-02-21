@@ -16,7 +16,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 // ElevenLabs voice IDs per commentary mode
 const VOICE_IDS: Record<string, string> = {
   epic: "fjnwTZkKtQOJaYzGLa6n",      // William - Deep Engaging Storyteller
-  urban: "TX3LPaxmHKxFdv7VOQHJ",     // Liam - Warm conversational
+  urban: "TX3LPaxmHKxFdv7VOQHJ",     // Liam - Warm articulate narrator
   ancient: "onwK4e9ZLuTAKqWW03F9",    // Daniel - Measured authoritative
   preacher: "N2lVS1w4EtoT3dr4eOWO",   // Callum - Passionate expressive
   scholar: "ErXwobaYiN019PkySvjV",     // Antoni - Calm analytical
