@@ -179,6 +179,26 @@ export const BibleReader = () => {
     }
   }, [preferences.bible_translation, preferencesLoading, getDefaultTranslation, i18n.language]);
 
+  // Scroll to verse from URL query param after chapter loads
+  useEffect(() => {
+    if (!loading && chapterData) {
+      const params = new URLSearchParams(window.location.search);
+      const verseParam = params.get("verse");
+      if (verseParam) {
+        const verseNum = parseInt(verseParam);
+        if (!isNaN(verseNum)) {
+          setSelectedVerse(verseNum);
+          setTimeout(() => {
+            const el = document.getElementById(`verse-${verseNum}`);
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+          }, 300);
+        }
+      }
+    }
+  }, [loading, chapterData]);
+
   useEffect(() => {
     loadChapter();
     trackReading(book, chapter);

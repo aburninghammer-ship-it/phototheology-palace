@@ -296,6 +296,7 @@ export const VerseView = ({
   return (
     <>
       <div
+        id={`verse-${verse.verse}`}
         className={cn(
           "group cursor-pointer transition-all duration-300 p-3 rounded-lg",
           isAudioPlaying

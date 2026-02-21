@@ -131,6 +131,7 @@ export const StrongsVerseView = ({
   return (
     <>
       <div
+        id={`verse-${verse.verse}`}
         className={`group cursor-pointer transition-all duration-300 p-3 rounded-lg ${
           isAudioPlaying
             ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30 backdrop-blur-md"
