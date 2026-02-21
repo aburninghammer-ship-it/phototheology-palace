@@ -263,21 +263,32 @@ CRITICAL: The quarterly's content must appear first and complete. PT principles 
   // Render HTML content safely, cleaning up hidden sections
   const renderContent = (html: string) => {
     if (html.includes("<") && html.includes(">")) {
-      // Remove hidden donation/EGW divs
+      // Remove hidden donation/EGW divs and trailing HRs
       const cleaned = html
         .replace(/<div style="display: none"[^>]*class="ss-donation-appeal"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, "")
         .replace(/<hr\s*\/?>\s*$/i, "");
       return (
         <div
-          className="text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert
-            prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground
-            prose-blockquote:border-primary/30 prose-blockquote:bg-primary/5 prose-blockquote:px-4 prose-blockquote:py-2 prose-blockquote:rounded
-            prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-foreground prose-code:font-normal prose-code:before:content-none prose-code:after:content-none"
+          className="prose prose-base max-w-none dark:prose-invert leading-[1.85]
+            prose-headings:text-foreground prose-headings:font-serif prose-headings:tracking-tight
+            prose-h2:text-xl prose-h2:mt-6 prose-h2:mb-3
+            prose-h3:text-lg prose-h3:mt-5 prose-h3:mb-2
+            prose-p:text-foreground prose-p:mb-4 prose-p:text-[0.95rem]
+            prose-strong:text-primary prose-strong:font-semibold
+            prose-em:text-foreground/90
+            prose-blockquote:border-l-4 prose-blockquote:border-primary/40 prose-blockquote:bg-primary/5
+            prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
+            prose-blockquote:text-foreground/90 prose-blockquote:my-5
+            prose-a:text-primary prose-a:underline-offset-2 prose-a:decoration-primary/40 hover:prose-a:decoration-primary
+            prose-li:text-foreground prose-li:marker:text-primary/60
+            prose-ul:my-3 prose-ol:my-3
+            [&_table]:w-full [&_table]:border-collapse [&_td]:p-2 [&_td]:border [&_td]:border-border/40
+            [&_img]:rounded-lg [&_img]:shadow-sm [&_img]:my-4"
           dangerouslySetInnerHTML={{ __html: cleaned }}
         />
       );
     }
-    return <p className="text-sm leading-relaxed whitespace-pre-wrap">{html}</p>;
+    return <p className="text-[0.95rem] leading-[1.85] whitespace-pre-wrap text-foreground">{html}</p>;
   };
 
   return (
@@ -384,14 +395,16 @@ CRITICAL: The quarterly's content must appear first and complete. PT principles 
                 </div>
 
                 {/* Full quarterly lesson content */}
-                <div className="p-4 bg-card rounded-lg border border-border shadow-sm">
+                <div className="px-5 py-6 bg-gradient-to-b from-card to-muted/20 rounded-xl border border-border/60 shadow-sm">
                   {loadingContent ? (
-                    <div className="flex items-center gap-2 text-muted-foreground py-4">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="text-sm">Loading full quarterly content...</span>
+                    <div className="flex flex-col items-center gap-3 text-muted-foreground py-8">
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      <span className="text-sm font-medium">Loading quarterly content…</span>
                     </div>
                   ) : (
-                    renderContent(getFullDayContent(dayIndex))
+                    <ScrollArea className="max-h-[600px]">
+                      {renderContent(getFullDayContent(dayIndex))}
+                    </ScrollArea>
                   )}
                 </div>
 
