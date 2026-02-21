@@ -4935,6 +4935,7 @@ export type Database = {
           audio_storage_path: string | null
           book: string
           chapter: number
+          commentary_mode: string
           commentary_text: string
           created_at: string
           error_message: string | null
@@ -4950,6 +4951,7 @@ export type Database = {
           audio_storage_path?: string | null
           book: string
           chapter: number
+          commentary_mode?: string
           commentary_text: string
           created_at?: string
           error_message?: string | null
@@ -4965,6 +4967,7 @@ export type Database = {
           audio_storage_path?: string | null
           book?: string
           chapter?: number
+          commentary_mode?: string
           commentary_text?: string
           created_at?: string
           error_message?: string | null
