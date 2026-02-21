@@ -30,8 +30,8 @@ const Antechamber = () => {
     const success = await markPalaceEntered();
     
     if (success) {
-      // Navigate to first room experience
-      navigate('/palace/first-room');
+      // Navigate to the palace
+      navigate('/palace');
     } else {
       setIsEntering(false);
     }

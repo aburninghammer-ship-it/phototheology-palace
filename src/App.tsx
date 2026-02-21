@@ -286,7 +286,7 @@ const Workspace = lazy(() => import("./pages/Workspace"));
 // Gatehouse flow pages (Gatehouse is now imported at top as critical page)
 const Welcome = lazy(() => import("./pages/Welcome"));
 const Antechamber = lazy(() => import("./pages/Antechamber"));
-const FirstRoom = lazy(() => import("./pages/FirstRoom"));
+
 
 
 // Simple redirect component for /devotional -> /devotionals
@@ -423,7 +423,6 @@ function App() {
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/gatehouse" element={<Gatehouse />} />
             <Route path="/antechamber" element={<ProtectedRoute><Antechamber /></ProtectedRoute>} />
-            <Route path="/palace/first-room" element={<ProtectedRoute><FirstRoom /></ProtectedRoute>} />
             <Route path="/access" element={
               <ProtectedRoute>
                 <AccessCode />
