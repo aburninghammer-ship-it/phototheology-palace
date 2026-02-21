@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, BookOpen, Calendar, Sparkles, Bot, ChevronRight, Wand2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, BookOpen, Calendar, Sparkles, Bot, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
@@ -50,6 +51,9 @@ const PRINCIPLES = [
   "Gems (2-4 Text Combo)", "Parallels Comparison", "Fruit Test", "Three Angels' Messages"
 ];
 
+const DAY_LABELS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const DAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+
 interface SabbathSchoolTabProps {
   churchId: string;
 }
@@ -68,32 +72,39 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
     return found || Q1_2026_LESSONS[0];
   };
 
+  const getTodayDayName = (): string => {
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    return days[new Date().getDay()];
+  };
+
   const [selectedLesson, setSelectedLesson] = useState<QuarterlyLessonData>(getCurrentLesson);
-  const [selectedDay, setSelectedDay] = useState<QuarterlyDay | null>(null);
   const [selectedRoom, setSelectedRoom] = useState("");
   const [selectedPrinciple, setSelectedPrinciple] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [jeevesResponse, setJeevesResponse] = useState<string | null>(null);
   const [generatingStudy, setGeneratingStudy] = useState(false);
   const [dailyStudy, setDailyStudy] = useState<string | null>(null);
+  const [activeDay, setActiveDay] = useState<string>(() => {
+    const todayName = getTodayDayName();
+    // Default to today's day if it's a study day, otherwise Sunday
+    return DAY_LABELS.includes(todayName) ? todayName : "Sunday";
+  });
 
   const handleLessonChange = (lessonId: string) => {
     const lesson = Q1_2026_LESSONS.find((l) => l.id === lessonId);
     if (lesson) {
       setSelectedLesson(lesson);
-      setSelectedDay(null);
       setJeevesResponse(null);
       setDailyStudy(null);
     }
   };
 
-  const handleDaySelect = (day: QuarterlyDay) => {
-    setSelectedDay(day);
-    setJeevesResponse(null);
-    setDailyStudy(null);
+  const getSelectedDay = (): QuarterlyDay | undefined => {
+    return selectedLesson.days.find((d) => d.day === activeDay);
   };
 
   const handleGenerateDailyStudy = async () => {
+    const selectedDay = getSelectedDay();
     if (!selectedDay) return;
 
     setGeneratingStudy(true);
@@ -140,6 +151,7 @@ Keep the quarterly's actual teaching as the foundation. The PT framework should 
   };
 
   const handleAnalyze = async () => {
+    const selectedDay = getSelectedDay();
     if (!selectedDay) {
       toast({ title: "Select a day first", variant: "destructive" });
       return;
@@ -181,6 +193,8 @@ Keep the quarterly's actual teaching as the foundation. The PT framework should 
     end.setHours(23, 59, 59);
     return today >= start && today <= end;
   };
+
+  const selectedDay = getSelectedDay();
 
   return (
     <div className="space-y-4">
@@ -234,193 +248,167 @@ Keep the quarterly's actual teaching as the foundation. The PT framework should 
         </CardContent>
       </Card>
 
-      {/* Selected Lesson Overview */}
-      <Card>
+      {/* Memory Text (compact) */}
+      <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+        <p className="text-xs font-medium text-primary mb-1">Memory Text</p>
+        <p className="text-sm italic">"{selectedLesson.memoryText}"</p>
+        <p className="text-xs text-muted-foreground mt-1">&mdash; {selectedLesson.memoryRef}</p>
+      </div>
+
+      {/* Daily Study Tabs — the main content */}
+      <Card className="border-primary/20">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-serif">
-            Lesson {selectedLesson.num}: {selectedLesson.title}
+          <CardTitle className="text-base flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-primary" />
+            Daily Study — Lesson {selectedLesson.num}: {selectedLesson.title}
           </CardTitle>
           <CardDescription>{selectedLesson.startDate} – {selectedLesson.endDate}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
-            <p className="text-xs font-medium text-primary mb-1">Memory Text</p>
-            <p className="text-sm italic">"{selectedLesson.memoryText}"</p>
-            <p className="text-xs text-muted-foreground mt-1">&mdash; {selectedLesson.memoryRef}</p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1">Key Scriptures</p>
-            <div className="flex flex-wrap gap-1">
-              {selectedLesson.scriptures.map((s, i) => (
-                <Badge key={i} variant="outline" className="text-xs">{s}</Badge>
-              ))}
-            </div>
-          </div>
-          <p className="text-sm text-muted-foreground">{selectedLesson.sabbathIntro}</p>
-        </CardContent>
-      </Card>
-
-      {/* Daily Studies */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            Daily Study
-          </CardTitle>
-        </CardHeader>
         <CardContent>
-          <div className="space-y-2">
+          <Tabs value={activeDay} onValueChange={(v) => { setActiveDay(v); setDailyStudy(null); setJeevesResponse(null); }}>
+            <TabsList className="w-full flex-wrap h-auto gap-1 p-1 bg-muted/50">
+              {selectedLesson.days.map((day, i) => (
+                <TabsTrigger
+                  key={day.day}
+                  value={day.day}
+                  className="flex-1 min-w-[48px] text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <span className="hidden sm:inline">{day.day}</span>
+                  <span className="sm:hidden">{DAY_SHORT[i] || day.day.slice(0, 3)}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
             {selectedLesson.days.map((day) => (
-              <button
-                key={day.day}
-                onClick={() => handleDaySelect(day)}
-                className={`w-full text-left p-3 rounded-lg border transition-all ${
-                  selectedDay?.day === day.day
-                    ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                    : "border-border hover:border-primary/40 hover:bg-muted/50"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-primary">{day.day}</span>
-                      <span className="text-xs text-muted-foreground">{day.date}</span>
-                    </div>
-                    <p className="font-medium text-sm mt-0.5">{day.title}</p>
+              <TabsContent key={day.day} value={day.day} className="mt-4 space-y-4">
+                {/* Day header */}
+                <div>
+                  <h3 className="font-semibold text-lg">{day.title}</h3>
+                  <p className="text-xs text-muted-foreground">{day.date}</p>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {day.scriptures.map((s, i) => (
+                      <Badge key={i} variant="outline" className="text-xs">{s}</Badge>
+                    ))}
                   </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
-              </button>
+
+                {/* Quarterly lesson content for this day */}
+                <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">📖 Quarterly Lesson Content</p>
+                  <p className="text-sm leading-relaxed">{day.content}</p>
+                </div>
+
+                {/* Generate PT-Enhanced Study */}
+                <Button
+                  onClick={handleGenerateDailyStudy}
+                  disabled={generatingStudy}
+                  className="w-full gradient-palace text-white"
+                  size="lg"
+                >
+                  {generatingStudy ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Generating PT-Enhanced Study...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-4 w-4 mr-2" />
+                      Generate PT-Enhanced Daily Study
+                    </>
+                  )}
+                </Button>
+
+                {/* Generated Daily Study */}
+                {dailyStudy && (
+                  <ScrollArea className="h-[500px]">
+                    <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Wand2 className="h-5 w-5 text-primary" />
+                        <span className="font-semibold text-sm">PT-Enhanced Daily Study</span>
+                        <Badge variant="secondary" className="text-xs">{day.day}</Badge>
+                      </div>
+                      <div className="prose prose-sm max-w-none">
+                        {formatJeevesResponse(dailyStudy)}
+                      </div>
+                    </div>
+                  </ScrollArea>
+                )}
+
+                {/* Deep Dive section */}
+                <div className="border-t pt-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Bot className="h-5 w-5 text-primary" />
+                    <span className="font-medium text-sm">Deep Dive: Amplify with a Specific Room or Lens</span>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-medium mb-1 block">Palace Room</label>
+                      <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                        <SelectTrigger className="text-sm">
+                          <SelectValue placeholder="Choose a room..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ROOMS.map((room) => (
+                            <SelectItem key={room} value={room}>{room}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium mb-1 block">Principle Lens</label>
+                      <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
+                        <SelectTrigger className="text-sm">
+                          <SelectValue placeholder="Choose a lens..." />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {PRINCIPLES.map((p) => (
+                            <SelectItem key={p} value={p}>{p}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={handleAnalyze}
+                    disabled={analyzing || (!selectedRoom && !selectedPrinciple)}
+                    className="w-full gradient-royal text-white"
+                    size="sm"
+                  >
+                    {analyzing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Apply Specific Framework
+                      </>
+                    )}
+                  </Button>
+
+                  {jeevesResponse && (
+                    <ScrollArea className="h-[400px]">
+                      <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Sparkles className="h-5 w-5 text-primary" />
+                          <span className="font-semibold text-sm">Palace Analysis</span>
+                        </div>
+                        <div className="prose prose-sm max-w-none">
+                          {formatJeevesResponse(jeevesResponse)}
+                        </div>
+                      </div>
+                    </ScrollArea>
+                  )}
+                </div>
+              </TabsContent>
             ))}
-          </div>
+          </Tabs>
         </CardContent>
       </Card>
-
-      {/* Selected Day Content */}
-      {selectedDay && (
-        <Card className="border-primary/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">
-              {selectedDay.day}: {selectedDay.title}
-            </CardTitle>
-            <CardDescription>
-              {selectedDay.scriptures.join(", ")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm leading-relaxed">{selectedDay.content}</p>
-
-            {/* Generate Daily Study Button */}
-            <Button
-              onClick={handleGenerateDailyStudy}
-              disabled={generatingStudy}
-              className="w-full gradient-palace text-white"
-              size="lg"
-            >
-              {generatingStudy ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generating PT-Enhanced Daily Study...
-                </>
-              ) : (
-                <>
-                  <Wand2 className="h-4 w-4 mr-2" />
-                  Generate Daily Study with Palace Principles
-                </>
-              )}
-            </Button>
-
-            {/* Generated Daily Study */}
-            {dailyStudy && (
-              <ScrollArea className="h-[500px]">
-                <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Wand2 className="h-5 w-5 text-primary" />
-                    <span className="font-semibold text-sm">PT-Enhanced Daily Study</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {selectedDay.day}
-                    </Badge>
-                  </div>
-                  <div className="prose prose-sm max-w-none">
-                    {formatJeevesResponse(dailyStudy)}
-                  </div>
-                </div>
-              </ScrollArea>
-            )}
-
-            {/* Optional: Additional Palace Analysis Section */}
-            <div className="border-t pt-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <Bot className="h-5 w-5 text-primary" />
-                <span className="font-medium text-sm">Deep Dive: Amplify with a Specific Room or Lens</span>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-medium mb-1 block">Palace Room</label>
-                  <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                    <SelectTrigger className="text-sm">
-                      <SelectValue placeholder="Choose a room..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ROOMS.map((room) => (
-                        <SelectItem key={room} value={room}>{room}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium mb-1 block">Principle Lens</label>
-                  <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
-                    <SelectTrigger className="text-sm">
-                      <SelectValue placeholder="Choose a lens..." />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                      {PRINCIPLES.map((p) => (
-                        <SelectItem key={p} value={p}>{p}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <Button
-                onClick={handleAnalyze}
-                disabled={analyzing || (!selectedRoom && !selectedPrinciple)}
-                className="w-full gradient-royal text-white"
-                size="sm"
-              >
-                {analyzing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Apply Specific Framework
-                  </>
-                )}
-              </Button>
-
-              {jeevesResponse && (
-                <ScrollArea className="h-[400px]">
-                  <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Bot className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-sm">Jeeves Analysis</span>
-                    </div>
-                    <div className="prose prose-sm max-w-none">
-                      {formatJeevesResponse(jeevesResponse)}
-                    </div>
-                  </div>
-                </ScrollArea>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
