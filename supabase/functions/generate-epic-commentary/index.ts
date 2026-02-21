@@ -160,7 +160,34 @@ KEY STYLE ELEMENTS TO LOCK IN:
 - The listener must feel IMMERSED — as though they are standing in the dust of Sinai, in the garden at twilight, on the shore of the Red Sea. They are not reading about history. They are living it.
 `;
 
-// ── Mode-specific style guides ──
+// ── Mode-specific PALACE PRINCIPLE lenses (each mode foregrounds different PT floors) ──
+
+const URBAN_PALACE_LENS = `
+PALACE PRINCIPLE LENS — FREESTYLE & FIRE (Floors 3 + 7):
+
+This commentary is built on the FREESTYLE FLOOR and the FIRE ROOM. Your job is to make ancient Scripture collide with modern life so powerfully the listener can't unhear it.
+
+PRIMARY ANALYTICAL TOOLS:
+A. PERSONAL FREESTYLE (Floor 3 — PF): Every passage must land in the listener's real life. Not abstract theology — lived experience. "This isn't just about Israel in Egypt — this is about every job you stayed at too long because the paycheck felt safer than the promise."
+B. NATURE FREESTYLE (Floor 3 — NF): Use observations from the natural world to illuminate spiritual truth. "You ever watch a vine? It doesn't strain to grow. It just stays connected. That's John 15."
+C. VERSE GENETICS (Floor 3 — BF): Show how verses are siblings and cousins across Scripture. Spontaneous connections that feel like discoveries. "Watch — Psalm 23 and Revelation 7 are the same story, just different chapters of it."
+D. FIRE ROOM (Floor 7 — FRm): Don't just explain the text — make it burn. The emotional weight must land. "If you read Gethsemane and don't feel something break inside you, you haven't actually read it yet."
+E. SPEED ROOM (Floor 7 — SRm): Rapid-fire connections. Stack 3-4 links in quick succession to build momentum. "David → Joseph → Jesus → YOU. Same pattern. Betrayed, abandoned, exalted."
+F. THE "ME" DIMENSION: The primary interpretive dimension is personal application. Not "what did it mean to Israel" but "what does this mean for YOUR walk, YOUR struggle, YOUR worship."
+
+WHAT MAKES THIS DIFFERENT FROM EPIC:
+- Epic narrates from eternity looking down. You narrate from the street looking up.
+- Epic builds cinematic sweeps. You build conversational revelations.
+- Epic uses cross-biblical parallels for theological architecture. You use verse genetics for "I never saw that!" personal breakthroughs.
+- You prioritize the listener's LIFE over the listener's MIND. Truth must land in the gut, not just the head.
+
+TYPES OF CONNECTIONS TO PRIORITIZE:
+1. Life-to-Scripture bridges: Start with a real-world scenario, then show the Scripture speaking directly into it
+2. Verse-to-verse genetics: rapid spontaneous links across books
+3. Emotional gut-punches from the Fire Room: moments that silence the room
+4. Historical/Social freestyle (HF): current events, culture, technology as object lessons
+5. Nature analogies that illuminate without being forced
+`;
 
 const URBAN_STYLE_GUIDE = `
 STYLE — THIS IS THE MOST IMPORTANT INSTRUCTION:
@@ -185,6 +212,37 @@ WHAT THIS IS NOT:
 RHYTHM: Think of a brilliant teacher at a whiteboard who gets excited — they pace, they point, they pause for effect, then drop something that makes the whole room go silent.
 `;
 
+const ANCIENT_PALACE_LENS = `
+PALACE PRINCIPLE LENS — CYCLES, HEAVENS & SANCTUARY (Floors 5 + 6):
+
+This commentary is built on the THREE HEAVENS FLOOR and the VISION FLOOR. Your job is to place every passage within the vast architecture of covenant history, prophetic timelines, and sanctuary fulfillment.
+
+PRIMARY ANALYTICAL TOOLS:
+A. EIGHT CYCLES (Floor 6): Every passage belongs to a covenant cycle. Identify it explicitly and show the cycle's rhythm: Fall → Covenant → Sanctuary → Enemy → Restoration. Show how the same pattern echoes across @Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re.
+B. THREE HEAVENS / DAY OF THE LORD (Floor 6): Place the passage in its correct horizon:
+   - 1H (DoL¹/NE¹): Babylonian destruction → Cyrusic restoration
+   - 2H (DoL²/NE²): 70 AD → New Covenant heavenly order
+   - 3H (DoL³/NE³): Final cosmic judgment → literal new creation
+   Show how the passage pre-echoes or fulfills events in other horizons.
+C. SANCTUARY BLUEPRINT (Floor 5 — BL): Map the passage onto sanctuary furniture and services. Gate, Altar, Laver, Lampstand, Table, Incense, Veil, Ark — each represents phases of salvation and Christ's ministry.
+D. FEASTS (Floor 5): Connect to the seven feasts — Passover, Unleavened Bread, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles. Which feast does this passage correlate with?
+E. PROPHECY ROOM (Floor 5 — PR): Align with Daniel/Revelation prophetic timelines. Show how prophecies repeat and enlarge.
+F. JUICE ROOM (Floor 6 — JR): Squeeze every drop — run the passage through multiple principles simultaneously, extracting maximum meaning.
+
+WHAT MAKES THIS DIFFERENT FROM EPIC:
+- Epic narrates as a cosmic observer. You narrate as one who has personally walked through every covenant era.
+- Epic weaves parallels organically. You systematically place events on the map of redemption history.
+- Epic prioritizes cinematic drama. You prioritize historical-prophetic architecture.
+- You show WHERE things fit in the grand timeline — not just WHAT they mean.
+
+TYPES OF CONNECTIONS TO PRIORITIZE:
+1. Cycle-to-cycle echoes: Show how the same Fall→Covenant→Sanctuary→Enemy→Restoration pattern repeats across eras
+2. Heaven-to-heaven foreshadowing: How does a 1H event pre-echo 2H and 3H?
+3. Sanctuary furniture mapping: Every major element traced to its sanctuary counterpart
+4. Feast fulfillment chains: Passover → Cross → Marriage Supper
+5. Prophetic timeline anchoring: Where does this moment sit on Daniel's statue, beasts, or 2300-day timeline?
+`;
+
 const ANCIENT_STYLE_GUIDE = `
 STYLE — THIS IS THE MOST IMPORTANT INSTRUCTION:
 
@@ -205,6 +263,36 @@ WHAT THIS IS NOT:
 - No academic detachment — this is lived experience across millennia, not research.
 
 RHYTHM: Think of a voice narrating from within an ancient library, surrounded by scrolls, speaking with the certainty of one who has seen the end from the beginning.
+`;
+
+const PREACHER_PALACE_LENS = `
+PALACE PRINCIPLE LENS — CONCENTRATION & FRUIT (Floors 4 + 7):
+
+This commentary is built on the CONCENTRATION ROOM, the FRUIT ROOM, and the FIRE ROOM. Your job is to make Christ visible in every verse, test every interpretation by its spiritual fruit, and set hearts on fire.
+
+PRIMARY ANALYTICAL TOOLS:
+A. CONCENTRATION ROOM (Floor 4 — CR): Christ is the center of every text. Not a passing mention — the gravitational center. Every passage must explicitly name how Christ appears: as type, antitype, promise, fulfillment, prophet, priest, judge, or king. If Christ is not visible, dig deeper until He is.
+B. FRUIT ROOM (Floor 4 — FRt): Every interpretation must pass the fruit test: Does it produce love, joy, peace, patience, kindness, goodness, faith, meekness, temperance? If an interpretation breeds fear without hope, condemnation without invitation, or knowledge without transformation — it fails.
+C. THEME ROOM WALLS (Floor 4 — TRm): Anchor the passage on one of the great walls:
+   - Life of Christ Wall: How does this connect to Jesus' incarnation, ministry, death, resurrection?
+   - Great Controversy Wall: What does this reveal about the cosmic battle?
+   - Gospel Floor: Justification, sanctification, glorification — where does this passage speak?
+D. FIRE ROOM (Floor 7 — FRm): Plunge into the emotional weight. Gethsemane isn't theology — it's agony. The cross isn't doctrine — it's love bleeding. Make the listener feel what they're hearing.
+E. MEDITATION ROOM (Floor 7 — MR): Slow down at key moments. Let one phrase expand until it fills the room. "The LORD is my shepherd" — don't rush past it. Let it breathe until the listener rests in it.
+F. DIMENSIONS (Floor 4 — DR): Walk every major point through at least 3 dimensions: Christ (how does this reveal Jesus?), Me (how does this transform my life?), Church (how does this shape God's people?).
+
+WHAT MAKES THIS DIFFERENT FROM EPIC:
+- Epic narrates from eternity. You preach from the pulpit.
+- Epic builds intellectual revelation. You build toward heart transformation.
+- Epic uses parallels for theological architecture. You use them to break hearts open with the love of Christ.
+- You prioritize ENCOUNTER over INFORMATION. The listener should meet Jesus, not just learn about Him.
+
+TYPES OF CONNECTIONS TO PRIORITIZE:
+1. Every passage → Christ: The non-negotiable anchor. Name Him. Show Him. Exalt Him.
+2. Spiritual fruit test: Does this interpretation make you love God more or fear Him more? Adjust accordingly.
+3. Altar-call moments: Build toward invitations — not manipulative, but irresistible because the truth is beautiful.
+4. Cross connections: Every sacrifice, every lamb, every broken moment points to Calvary.
+5. Transformation testimonies: How has this truth changed lives? How should it change the listener's life right now?
 `;
 
 const PREACHER_STYLE_GUIDE = `
@@ -228,6 +316,38 @@ WHAT THIS IS NOT:
 - Not emotionalism without substance. Every cry of the heart is rooted in textual truth.
 
 RHYTHM: Think of a preacher who starts measured, builds through exposition, hits a revelation that makes the room gasp, then closes with an invitation that makes people weep.
+`;
+
+const SCHOLAR_PALACE_LENS = `
+PALACE PRINCIPLE LENS — INVESTIGATION & STRUCTURE (Floors 2 + 4):
+
+This commentary is built on the INVESTIGATION FLOOR and the NEXT LEVEL FLOOR. Your job is to deliver forensic-level textual analysis, linguistic precision, and systematic theological architecture.
+
+PRIMARY ANALYTICAL TOOLS:
+A. OBSERVATION ROOM (Floor 2 — OR): Log 20+ observations per passage before interpreting. Notice what casual readers miss: word repetitions, structural markers, narrative gaps, chiastic patterns, inclusios, keyword chains.
+B. DEF-COM ROOM (Floor 2 — DC): Greek and Hebrew definitions are your primary currency. Semantic ranges, cognates, and contextual usage. Not just "this word means X" but "this word appears 47 times in the OT, and in 31 of those occurrences it carries the connotation of..."
+C. SYMBOLS/TYPES ROOM (Floor 2 — ST): Build behavioral profiles of God's symbolic language. Track how symbols function across their full biblical range: lamb, rock, water, fire, wind, leaven, oil.
+D. QUESTIONS ROOM (Floor 2 — QR): Drive analysis through relentless questioning:
+   - Intratextual: Why this word? Why this structure? Why here in the narrative?
+   - Intertextual: Where else does this phrase/pattern appear? How do later authors reuse it?
+E. CONNECT 6 / GENRE (Floor 4 — C6): Classify the passage by genre and apply genre-appropriate interpretive rules. Identify source traditions, literary forms, and rhetorical strategies.
+F. DIMENSIONS ROOM (Floor 4 — DR): Walk every major point through all five dimensions: Literal, Christ, Me, Church, Heaven.
+G. PATTERNS ROOM (Floor 4 — PRm): Identify numerical patterns (3, 7, 12, 40), structural patterns (chiasm, inclusio, sandwich), and theological patterns (fall-exile-restoration, promise-fulfillment).
+H. PARALLELS ROOM (Floor 4 — P‖): Distinguish between types (objects pointing forward) and parallels (mirrored actions across time). Be precise about which you're identifying.
+
+WHAT MAKES THIS DIFFERENT FROM EPIC:
+- Epic narrates cinematically. You analyze systematically.
+- Epic builds dramatic tension. You build theological architecture.
+- Epic weaves parallels into flowing narration. You demonstrate them with linguistic and structural evidence.
+- You prioritize PRECISION over POETRY. Every claim is grounded in textual evidence.
+
+TYPES OF CONNECTIONS TO PRIORITIZE:
+1. Linguistic chains: Track key Hebrew/Greek terms across their full biblical range
+2. Structural analysis: Chiastic structures, inclusios, narrative framing devices
+3. Inner-biblical exegesis: How later biblical authors reinterpret earlier texts
+4. Genre-specific insights: What does the literary form tell us about authorial intent?
+5. Systematic theological synthesis: How does this passage fit within the larger doctrinal framework?
+6. Historical-cultural background: What would the original audience have understood?
 `;
 
 const SCHOLAR_STYLE_GUIDE = `
@@ -554,7 +674,7 @@ ${PRESENT_TENSE_ENFORCEMENT}
 
 ${THEOLOGICAL_GUARDRAILS}
 
-${PALACE_PRINCIPLES_INSTRUCTION}
+${URBAN_PALACE_LENS}
 
 EVERY CHAPTER IS A STANDALONE EXPERIENCE — set the stage with backstory woven naturally.
 
@@ -572,7 +692,7 @@ ${PRESENT_TENSE_ENFORCEMENT}
 
 ${THEOLOGICAL_GUARDRAILS}
 
-${PALACE_PRINCIPLES_INSTRUCTION}
+${URBAN_PALACE_LENS}
 
 TENSE — MANDATORY: Present tense throughout.
 
@@ -586,7 +706,7 @@ ${PRESENT_TENSE_ENFORCEMENT}
 
 ${THEOLOGICAL_GUARDRAILS}
 
-${PALACE_PRINCIPLES_INSTRUCTION}
+${ANCIENT_PALACE_LENS}
 
 EVERY CHAPTER IS A STANDALONE EXPERIENCE — set the stage with backstory woven naturally.
 
@@ -604,7 +724,7 @@ ${PRESENT_TENSE_ENFORCEMENT}
 
 ${THEOLOGICAL_GUARDRAILS}
 
-${PALACE_PRINCIPLES_INSTRUCTION}
+${ANCIENT_PALACE_LENS}
 
 TENSE — MANDATORY: Present tense throughout.
 
@@ -618,7 +738,7 @@ ${PRESENT_TENSE_ENFORCEMENT}
 
 ${THEOLOGICAL_GUARDRAILS}
 
-${PALACE_PRINCIPLES_INSTRUCTION}
+${PREACHER_PALACE_LENS}
 
 EVERY CHAPTER IS A STANDALONE EXPERIENCE — set the stage with backstory woven naturally.
 
@@ -636,7 +756,7 @@ ${PRESENT_TENSE_ENFORCEMENT}
 
 ${THEOLOGICAL_GUARDRAILS}
 
-${PALACE_PRINCIPLES_INSTRUCTION}
+${PREACHER_PALACE_LENS}
 
 TENSE — MANDATORY: Present tense throughout.
 
@@ -650,7 +770,7 @@ ${PRESENT_TENSE_ENFORCEMENT}
 
 ${THEOLOGICAL_GUARDRAILS}
 
-${PALACE_PRINCIPLES_INSTRUCTION}
+${SCHOLAR_PALACE_LENS}
 
 EVERY CHAPTER IS A STANDALONE EXPERIENCE — set the stage with backstory woven naturally.
 
@@ -668,7 +788,7 @@ ${PRESENT_TENSE_ENFORCEMENT}
 
 ${THEOLOGICAL_GUARDRAILS}
 
-${PALACE_PRINCIPLES_INSTRUCTION}
+${SCHOLAR_PALACE_LENS}
 
 TENSE — MANDATORY: Present tense throughout.
 
