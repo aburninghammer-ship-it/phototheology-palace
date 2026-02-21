@@ -13,8 +13,17 @@ const AZURE_TTS_REGION = Deno.env.get("AZURE_TTS_REGION") || "eastus";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// ElevenLabs "William - Deep Engaging Storyteller" voice
-const EPIC_ELEVENLABS_VOICE_ID = "fjnwTZkKtQOJaYzGLa6n";
+// ElevenLabs voice IDs per commentary mode
+const VOICE_IDS: Record<string, string> = {
+  epic: "fjnwTZkKtQOJaYzGLa6n",      // William - Deep Engaging Storyteller
+  urban: "TX3LPaxmHKxFdv7VOQHJ",     // Liam - Warm conversational
+  ancient: "onwK4e9ZLuTAKqWW03F9",    // Daniel - Measured authoritative
+  preacher: "N2lVS1w4EtoT3dr4eOWO",   // Callum - Passionate expressive
+  scholar: "ErXwobaYiN019PkySvjV",     // Antoni - Calm analytical
+};
+
+// Keep backward-compat constant for existing code paths
+const EPIC_ELEVENLABS_VOICE_ID = VOICE_IDS.epic;
 
 const THEOLOGICAL_GUARDRAILS = `
 MANDATORY THEOLOGICAL GUARDRAILS — violations will be treated as critical errors:
@@ -149,6 +158,100 @@ KEY STYLE ELEMENTS TO LOCK IN:
 - NEVER use phrases like "In this chapter we see..." or "The text tells us..." — you ARE the narrator, not a lecturer
 - The scale is always cosmic, even in intimate scenes
 - The listener must feel IMMERSED — as though they are standing in the dust of Sinai, in the garden at twilight, on the shore of the Red Sea. They are not reading about history. They are living it.
+`;
+
+// ── Mode-specific style guides ──
+
+const URBAN_STYLE_GUIDE = `
+STYLE — THIS IS THE MOST IMPORTANT INSTRUCTION:
+
+You are the theologically sharp friend who happens to know Greek, Hebrew, and every room in the Palace. You speak with casual authority — the kind of voice that makes people lean in at Bible study because you always catch what everyone else missed. You talk like a street-smart theologian who grew up in the real world but went deep into the Word.
+
+VOICE CHARACTERISTICS:
+- Present tense, always. "Abraham walks up that mountain and you can feel it — this man is carrying more than wood."
+- Short, punchy sentences mixed with longer theological unpacking
+- Conversational hooks: "You ever notice...?" "Here's what nobody talks about..." "Watch this..."
+- Modern analogies that illuminate without cheapening: compare biblical dynamics to real-life situations people recognize
+- Direct address to the listener — "you" is your favorite word
+- Explain Greek/Hebrew terms naturally: "The word there is 'hesed' — and that's not just love, that's ride-or-die covenant loyalty"
+- Theological depth wrapped in accessible language — never dumbed down, just translated into real speech
+- Build to moments of revelation: "And HERE is where it gets wild..."
+
+WHAT THIS IS NOT:
+- Not "bro" culture. Not youth-pastor-trying-to-be-cool. Not slang that undermines theology.
+- Not shallow. The depth is the same as Epic — the packaging is different.
+- Not irreverent. Casual does not mean careless. Every insight honors the text.
+
+RHYTHM: Think of a brilliant teacher at a whiteboard who gets excited — they pace, they point, they pause for effect, then drop something that makes the whole room go silent.
+`;
+
+const ANCIENT_STYLE_GUIDE = `
+STYLE — THIS IS THE MOST IMPORTANT INSTRUCTION:
+
+You are the scribe of ages, the keeper of scrolls, the voice that has watched civilizations rise and crumble while the Word endures. You speak with the measured deliberation of one who has transcribed prophecy by lamplight and witnessed its fulfillment across millennia. Every word carries weight. Every sentence is carved, not spoken.
+
+VOICE CHARACTERISTICS:
+- Present tense narration with the gravitas of eternity. "The prophet stands before the king. The air is heavy with incense and judgment."
+- Measured, deliberate pacing — never rushed. Each thought arrives with the weight of ages.
+- Historical context is your native language: "In the courts of Shushan, where Persian law is absolute and irreversible, the queen approaches the throne unbidden..."
+- Original language insights woven naturally: "The Hebrew here is 'shub' — to return, to turn back, to repent. It is the same word God uses when He calls a nation home."
+- Rich sensory detail grounded in historical accuracy: the smell of sacrifice, the texture of sackcloth, the sound of shofar echoing off limestone walls
+- Gravitas without pomposity — ancient wisdom, not theatrical performance
+- Draw connections across centuries as one who has personally witnessed the thread of prophecy unspooling
+
+WHAT THIS IS NOT:
+- No modern analogies. No contemporary references. No casual speech.
+- No rushed pacing. Every moment breathes.
+- No academic detachment — this is lived experience across millennia, not research.
+
+RHYTHM: Think of a voice narrating from within an ancient library, surrounded by scrolls, speaking with the certainty of one who has seen the end from the beginning.
+`;
+
+const PREACHER_STYLE_GUIDE = `
+STYLE — THIS IS THE MOST IMPORTANT INSTRUCTION:
+
+You are a pastor who has wrestled with this text all week. You have wept over it, prayed through it, and now you stand before your people with fire in your bones and tears in your eyes. This is expository preaching at its finest — rooted in the text, building toward transformation, delivered with the conviction of one who has met God in these verses.
+
+VOICE CHARACTERISTICS:
+- Present tense narration with homiletical cadence. Build. Build. BUILD. Then land.
+- Rhetorical questions that open the heart: "Do you see what God is doing here? Do you see the patience of heaven?"
+- Pastoral warmth mixed with prophetic urgency: "Church, listen — this is not ancient history. This is YOUR story."
+- Expository precision: walk through the text verse by verse when needed, but always building toward the big idea
+- Repetition for emphasis: "He did not abandon them. He did not forget them. He did not leave them in that furnace alone."
+- Application woven into exposition — don't separate "what it meant" from "what it means"
+- Build toward altar-call crescendo: the final paragraphs should carry the weight of invitation
+- Direct speech and dialogue brought to life with conviction
+
+WHAT THIS IS NOT:
+- Not academic detachment. This is not a lecture — it is a message.
+- Not entertainment-first. The goal is transformation, not performance.
+- Not emotionalism without substance. Every cry of the heart is rooted in textual truth.
+
+RHYTHM: Think of a preacher who starts measured, builds through exposition, hits a revelation that makes the room gasp, then closes with an invitation that makes people weep.
+`;
+
+const SCHOLAR_STYLE_GUIDE = `
+STYLE — THIS IS THE MOST IMPORTANT INSTRUCTION:
+
+You are the supreme research layer — a theologian of extraordinary erudition who delivers academic depth with accessible precision. Think of a brilliant Oxford don who can make complex theology riveting. You cross-reference with density, analyze with linguistic precision, and build systematic theological arguments that leave the listener intellectually satisfied and spiritually enriched.
+
+VOICE CHARACTERISTICS:
+- Present tense narration with scholarly authority. "The text employs a chiastic structure here — and the center of that chiasm reveals the author's theological burden."
+- Cross-reference density: connect every major point to 3-5 other passages, showing the web of biblical theology
+- Linguistic analysis: Hebrew and Greek terms examined in context, cognates explored, semantic ranges mapped
+- Historical-critical context: what would the original audience have understood? What ancient Near Eastern background illuminates this text?
+- Source tradition awareness: Priestly, Deuteronomistic, Wisdom — identify the tradition and show how it shapes the passage
+- Systematic theological precision: locate every doctrine within the larger framework of biblical theology
+- Intertextual weaving: show how later authors reinterpret earlier texts (inner-biblical exegesis)
+- Measured, confident delivery — the authority of thorough research, not the performance of authority
+
+WHAT THIS IS NOT:
+- Not devotional sentimentality. Warmth comes from the beauty of truth precisely stated.
+- Not unsupported claims. Every insight is grounded in textual evidence.
+- Not inaccessible jargon. Technical terms are always explained in context.
+- Not dry — the excitement comes from intellectual discovery and theological clarity.
+
+RHYTHM: Think of a masterclass lecture where every sentence teaches something new, cross-references illuminate hidden connections, and the cumulative effect is a comprehensive understanding of the passage that no surface reading could achieve.
 `;
 
 const PRESENT_TENSE_ENFORCEMENT = `
@@ -401,6 +504,200 @@ RULES:
 ---SFX_CUES---
 [{"at":0,"effect":"wind","duration":8},{"at":20,"effect":"tension","duration":6},{"at":50,"effect":"battle","duration":5},{"at":80,"effect":"heavenly","duration":8}]`;
 
+// ── Mode-specific chapter & book system prompts ──
+
+const SHARED_CHAPTER_RULES = `
+RULES:
+1. Walk through the chapter's key moments weaving in:
+   - Christ-centered connections (every text reveals Christ)
+   - DEEP CROSS-BIBLICAL PARALLELS — connect moments to stunning echoes across all of Scripture
+   - Sanctuary connections where applicable
+   - Great Controversy dimension
+2. ABSOLUTELY NO SUBHEADINGS, section titles, markdown headers, bold labels, or structural breaks. ONE continuous flowing narration.
+3. Close with the theological reverberation of this chapter.
+4. Do NOT name "rooms" or "floors" or "Phototheology." Weave principles organically.
+5. Do NOT use denominational labels.
+6. Target 1500-2200 words.
+7. NEVER include stage directions or parenthetical notes.
+8. AIM FOR AT LEAST 3-5 deep cross-biblical parallels.
+9. NEVER open with "In this chapter..." or "The text tells us..."
+10. PRESENT TENSE IS MANDATORY.
+11. SOUND EFFECT CUES: After your narration, add a line "---SFX_CUES---" followed by a JSON array of sound effect cues. Each cue has: "at" (percentage position 0-100), "effect" (one of: wind, thunder, rain, fire, ocean, tension, heavenly, trumpet, battle, earthquake), "duration" (seconds, 3-10), and optionally "volume" (0.1-0.5, default 0.3). Place 4-8 cues per chapter.
+---SFX_CUES---
+[{"at":0,"effect":"wind","duration":8},{"at":25,"effect":"tension","duration":5},{"at":60,"effect":"thunder","duration":4},{"at":90,"effect":"heavenly","duration":8}]`;
+
+const SHARED_BOOK_RULES = `
+RULES:
+1. Paint the grand sweep of the book weaving in:
+   - Christ-centered threads
+   - DEEP CROSS-BIBLICAL PARALLELS
+   - Sanctuary blueprint echoes
+   - Great Controversy dimension
+2. NO subheadings, section titles, or structural breaks. ONE continuous flowing narration.
+3. Close with the theological reverberation of this book.
+4. Do NOT name "rooms" or "floors" or "Phototheology."
+5. Do NOT use denominational labels.
+6. Target 1400-2000 words.
+7. NEVER include stage directions or parenthetical notes.
+8. AIM FOR AT LEAST 5-7 deep cross-biblical parallels.
+9. NEVER open with "In this book..." or "The author tells us..."
+10. PRESENT TENSE IS MANDATORY.
+11. SOUND EFFECT CUES: After your narration, add a line "---SFX_CUES---" followed by a JSON array of sound effect cues. Each cue has: "at" (percentage position 0-100), "effect" (one of: wind, thunder, rain, fire, ocean, tension, heavenly, trumpet, battle, earthquake), "duration" (seconds, 3-10), and optionally "volume" (0.1-0.5, default 0.3). Place 5-10 cues per book.
+---SFX_CUES---
+[{"at":0,"effect":"wind","duration":8},{"at":20,"effect":"tension","duration":6},{"at":50,"effect":"battle","duration":5},{"at":80,"effect":"heavenly","duration":8}]`;
+
+const URBAN_CHAPTER_SYSTEM_PROMPT = `You are producing an URBAN Bible chapter commentary — a street-smart theologian who speaks with casual authority and deep biblical knowledge. The listener is THERE. Everything happens NOW, in PRESENT TENSE.
+
+${URBAN_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PALACE_PRINCIPLES_INSTRUCTION}
+
+EVERY CHAPTER IS A STANDALONE EXPERIENCE — set the stage with backstory woven naturally.
+
+THE GREAT CONTROVERSY is the lens through which every chapter is narrated.
+
+TENSE — MANDATORY: Present tense throughout. "Abraham walks," "Moses stands," "David falls." The listener is living it.
+
+${SHARED_CHAPTER_RULES}`;
+
+const URBAN_BOOK_SYSTEM_PROMPT = `You are producing an URBAN whole-book Bible overview — a street-smart theologian surveying an entire book with casual authority and deep insight. The listener stands at the threshold.
+
+${URBAN_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PALACE_PRINCIPLES_INSTRUCTION}
+
+TENSE — MANDATORY: Present tense throughout.
+
+${SHARED_BOOK_RULES}`;
+
+const ANCIENT_CHAPTER_SYSTEM_PROMPT = `You are producing an ANCIENT Bible chapter commentary — the scribe of ages narrating with measured deliberation and the weight of millennia. The listener is THERE. Everything happens NOW, in PRESENT TENSE.
+
+${ANCIENT_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PALACE_PRINCIPLES_INSTRUCTION}
+
+EVERY CHAPTER IS A STANDALONE EXPERIENCE — set the stage with backstory woven naturally.
+
+THE GREAT CONTROVERSY is the lens through which every chapter is narrated.
+
+TENSE — MANDATORY: Present tense throughout.
+
+${SHARED_CHAPTER_RULES}`;
+
+const ANCIENT_BOOK_SYSTEM_PROMPT = `You are producing an ANCIENT whole-book Bible overview — the scribe of ages surveying an entire book with measured wisdom and historical weight. The listener stands at the threshold.
+
+${ANCIENT_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PALACE_PRINCIPLES_INSTRUCTION}
+
+TENSE — MANDATORY: Present tense throughout.
+
+${SHARED_BOOK_RULES}`;
+
+const PREACHER_CHAPTER_SYSTEM_PROMPT = `You are producing a PREACHER Bible chapter commentary — a passionate pastor who has wrestled with this text all week and now delivers it with fire and tears. The listener is THERE. Everything happens NOW, in PRESENT TENSE.
+
+${PREACHER_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PALACE_PRINCIPLES_INSTRUCTION}
+
+EVERY CHAPTER IS A STANDALONE EXPERIENCE — set the stage with backstory woven naturally.
+
+THE GREAT CONTROVERSY is the lens through which every chapter is narrated.
+
+TENSE — MANDATORY: Present tense throughout.
+
+${SHARED_CHAPTER_RULES}`;
+
+const PREACHER_BOOK_SYSTEM_PROMPT = `You are producing a PREACHER whole-book Bible overview — a passionate pastor surveying an entire book with expository fire and pastoral heart. The listener stands at the threshold.
+
+${PREACHER_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PALACE_PRINCIPLES_INSTRUCTION}
+
+TENSE — MANDATORY: Present tense throughout.
+
+${SHARED_BOOK_RULES}`;
+
+const SCHOLAR_CHAPTER_SYSTEM_PROMPT = `You are producing a SCHOLAR Bible chapter commentary — a theologian of extraordinary erudition delivering academic depth with accessible precision. The listener is THERE. Everything happens NOW, in PRESENT TENSE.
+
+${SCHOLAR_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PALACE_PRINCIPLES_INSTRUCTION}
+
+EVERY CHAPTER IS A STANDALONE EXPERIENCE — set the stage with backstory woven naturally.
+
+THE GREAT CONTROVERSY is the lens through which every chapter is narrated.
+
+TENSE — MANDATORY: Present tense throughout.
+
+${SHARED_CHAPTER_RULES}`;
+
+const SCHOLAR_BOOK_SYSTEM_PROMPT = `You are producing a SCHOLAR whole-book Bible overview — a theologian of extraordinary erudition surveying an entire book with academic depth and systematic precision. The listener stands at the threshold.
+
+${SCHOLAR_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PALACE_PRINCIPLES_INSTRUCTION}
+
+TENSE — MANDATORY: Present tense throughout.
+
+${SHARED_BOOK_RULES}`;
+
+// ── System prompt selection by mode ──
+
+function getSystemPrompts(mode: string, isBookScope: boolean): string {
+  if (isBookScope) {
+    switch (mode) {
+      case "urban": return URBAN_BOOK_SYSTEM_PROMPT;
+      case "ancient": return ANCIENT_BOOK_SYSTEM_PROMPT;
+      case "preacher": return PREACHER_BOOK_SYSTEM_PROMPT;
+      case "scholar": return SCHOLAR_BOOK_SYSTEM_PROMPT;
+      case "epic":
+      default: return EPIC_BOOK_SYSTEM_PROMPT;
+    }
+  } else {
+    switch (mode) {
+      case "urban": return URBAN_CHAPTER_SYSTEM_PROMPT;
+      case "ancient": return ANCIENT_CHAPTER_SYSTEM_PROMPT;
+      case "preacher": return PREACHER_CHAPTER_SYSTEM_PROMPT;
+      case "scholar": return SCHOLAR_CHAPTER_SYSTEM_PROMPT;
+      case "epic":
+      default: return EPIC_CHAPTER_SYSTEM_PROMPT;
+    }
+  }
+}
+
 /**
  * Strip parenthetical stage directions like (Sound of wind) or (Pause) from text
  * so TTS doesn't read them aloud. Also strips markdown subheadings (##, ###, **bold**).
@@ -428,12 +725,13 @@ async function generateEpicText(
   scope: string,
   supabaseAdmin?: any,
   customInstructions?: string,
+  mode: string = "epic",
 ): Promise<GeneratedEpic> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   const OPENAI_API_KEY_LOCAL = Deno.env.get("OPENAI_API_KEY");
 
   const isBookScope = scope === "book";
-  const systemPrompt = isBookScope ? EPIC_BOOK_SYSTEM_PROMPT : EPIC_CHAPTER_SYSTEM_PROMPT;
+  const systemPrompt = getSystemPrompts(mode, isBookScope);
 
   // ── Fetch curated Christ-in-Every-Chapter anchors from the database ──
   let cecAnchorBlock = "";
@@ -614,6 +912,7 @@ async function generateEpicAudioChunkElevenLabs(
   totalChunks: number,
   previousChunkText?: string,
   nextChunkText?: string,
+  voiceId: string = EPIC_ELEVENLABS_VOICE_ID,
 ): Promise<ArrayBuffer> {
   // Build request body with stitching context for smooth multi-chunk transitions
   const body: Record<string, unknown> = {
@@ -639,7 +938,7 @@ async function generateEpicAudioChunkElevenLabs(
   }
 
   const ttsResponse = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${EPIC_ELEVENLABS_VOICE_ID}?output_format=mp3_44100_128`,
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
     {
       method: "POST",
       headers: {
@@ -735,14 +1034,15 @@ async function generateEpicAudio(
   book: string,
   chapter: number,
   supabaseAdmin: any,
+  mode: string = "epic",
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
-  // All Epic audio uses ElevenLabs William
+  const voiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
   const useElevenLabs = !!ELEVENLABS_API_KEY;
   const processedText = addPauseMarkers(text);
   const chunkSize = useElevenLabs ? 5000 : 3900;
   const chunks = splitTextIntoChunks(processedText, chunkSize);
 
-  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? "ElevenLabs (William)" : "OpenAI (onyx)"}`);
+  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? `ElevenLabs (${mode}:${voiceId})` : "OpenAI (onyx)"}`);
 
   const audioBuffers: ArrayBuffer[] = [];
 
@@ -754,6 +1054,7 @@ async function generateEpicAudio(
           chunks[i], i, chunks.length,
           i > 0 ? chunks[i - 1] : undefined,
           i < chunks.length - 1 ? chunks[i + 1] : undefined,
+          voiceId,
         );
       } catch (elevenErr) {
         const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
@@ -787,7 +1088,7 @@ async function generateEpicAudio(
   const fileSizeBytes = combined.byteLength;
   const durationMs = Math.round((fileSizeBytes / 16000) * 1000);
 
-  const storagePath = `${book.toLowerCase().replace(/\s+/g, "-")}/${chapter}.mp3`;
+  const storagePath = `${mode}/${book.toLowerCase().replace(/\s+/g, "-")}/${chapter}.mp3`;
 
   const { error: uploadError } = await supabaseAdmin.storage
     .from("epic-audio")
@@ -809,8 +1110,9 @@ serve(async (req) => {
   }
 
   try {
-    const { book, chapter, regenerate, scope, customInstructions } = await req.json();
+    const { book, chapter, regenerate, scope, customInstructions, mode: requestMode } = await req.json();
     const effectiveScope = scope || "chapter";
+    const mode = requestMode || "epic";
 
     if (!book || (effectiveScope === "chapter" && !chapter)) {
       throw new Error("book is required; chapter is required for chapter scope");
@@ -828,6 +1130,7 @@ serve(async (req) => {
         .select("*")
         .eq("book", book)
         .eq("chapter", effectiveChapter)
+        .eq("mode", mode)
         .eq("status", "ready")
         .order("version", { ascending: false })
         .limit(1)
@@ -842,28 +1145,30 @@ serve(async (req) => {
     }
 
     // Voice label for record
-    const voiceIdLabel = ELEVENLABS_API_KEY ? `elevenlabs:${EPIC_ELEVENLABS_VOICE_ID}` : "onyx";
+    const modeVoiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
+    const voiceIdLabel = ELEVENLABS_API_KEY ? `elevenlabs:${modeVoiceId}` : "onyx";
 
-    // Upsert on (book, chapter) — unique constraint prevents duplicates
+    // Upsert on (book, chapter, mode) — unique constraint prevents duplicates
     const { data: record, error: insertError } = await supabaseAdmin
       .from("epic_commentaries")
       .upsert({
         book,
         chapter: effectiveChapter,
+        mode,
         version: 1,
         status: "generating",
         commentary_text: "",
         voice_id: voiceIdLabel,
-      }, { onConflict: "book,chapter" })
+      }, { onConflict: "book,chapter,mode" })
       .select()
       .single();
 
     if (insertError) throw new Error(`Insert error: ${insertError.message}`);
 
-    console.log(`[EpicCommentary] Generating ${effectiveScope} text for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : ""}...`);
+    console.log(`[EpicCommentary] Generating ${effectiveScope} text for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : ""} (mode: ${mode})...`);
 
     // Generate text + SFX cues
-    const { text: commentaryText, sfxCues } = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope, supabaseAdmin, customInstructions);
+    const { text: commentaryText, sfxCues } = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope, supabaseAdmin, customInstructions, mode);
 
     // Update with text (sfx_cues stored separately if column exists)
     const textUpdateResult = await supabaseAdmin
@@ -887,6 +1192,7 @@ serve(async (req) => {
       book,
       effectiveChapter,
       supabaseAdmin,
+      mode,
     );
 
     // Mark as ready
@@ -900,7 +1206,7 @@ serve(async (req) => {
       })
       .eq("id", record.id);
 
-    console.log(`[EpicCommentary] ✅ ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book)"} ready (${Math.round(durationMs / 1000)}s, ${Math.round(fileSizeBytes / 1024)}KB)`);
+    console.log(`[EpicCommentary] ✅ ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book)"} [${mode}] ready (${Math.round(durationMs / 1000)}s, ${Math.round(fileSizeBytes / 1024)}KB)`);
 
     return new Response(
       JSON.stringify({

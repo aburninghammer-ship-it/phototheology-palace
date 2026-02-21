@@ -89,6 +89,19 @@ export default function AudioBible() {
   const epicQueueIndexRef = useRef(0);
   const playEpicRef = useRef<(book: string, chapter: number) => Promise<void>>();
 
+  // Commentary mode within Epic suite (urban, ancient, preacher, epic, scholar)
+  const [epicMode, setEpicMode] = useState<"epic" | "urban" | "ancient" | "preacher" | "scholar">("epic");
+
+  const COMMENTARY_MODES = [
+    { id: "urban" as const, label: "Urban", subtitle: "Street-level theology", icon: Zap, color: "blue" },
+    { id: "ancient" as const, label: "Ancient", subtitle: "Scribe of ages", icon: BookText, color: "amber" },
+    { id: "preacher" as const, label: "Preacher", subtitle: "Pulpit power", icon: Crown, color: "purple" },
+    { id: "epic" as const, label: "Epic", subtitle: "Cinematic cosmos", icon: Film, color: "orange" },
+    { id: "scholar" as const, label: "Scholar", subtitle: "Research supreme", icon: Layers, color: "emerald" },
+  ] as const;
+
+  const activeModeMeta = COMMENTARY_MODES.find(m => m.id === epicMode) || COMMENTARY_MODES[3];
+
   // Audio Bible hook
   const {
     isPlaying,
@@ -312,24 +325,28 @@ export default function AudioBible() {
     }
   };
 
-  // Epic Mode handler
-  const handleEpicModeSelect = useCallback(() => {
+  // Epic Mode handler — selects a specific commentary mode
+  const handleEpicModeSelect = useCallback((mode: "epic" | "urban" | "ancient" | "preacher" | "scholar" = "epic") => {
+    setEpicMode(mode);
     setCommentarySource("epic");
     setIncludeCommentary(true);
   }, [setCommentarySource, setIncludeCommentary]);
 
   // Play Epic commentary for a chapter
   const handlePlayEpic = useCallback(async (book: string, chapter: number) => {
+    const currentMode = epicMode;
+    const modeName = COMMENTARY_MODES.find(m => m.id === currentMode)?.label || "Epic";
     setIsEpicLoading(true);
     setEpicNowPlayingBook(book);
     setEpicNowPlayingChapter(chapter);
     try {
-      // Fetch cached epic commentary (including SFX cues)
+      // Fetch cached commentary for this mode
       let { data, error } = await supabase
         .from("epic_commentaries")
         .select("*")
         .eq("book", book)
         .eq("chapter", chapter)
+        .eq("mode", currentMode)
         .eq("status", "ready")
         .order("version", { ascending: false })
         .limit(1)
@@ -339,10 +356,10 @@ export default function AudioBible() {
 
       // If not cached, generate on demand
       if (!data || !data.audio_storage_path) {
-        toast.info(`Generating Epic commentary for ${book} ${chapter}... This may take a moment.`);
+        toast.info(`Generating ${modeName} commentary for ${book} ${chapter}... This may take a moment.`);
 
         const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
-          body: { book, chapter },
+          body: { book, chapter, mode: currentMode },
         });
 
         if (genResponse.error || genResponse.data?.error) {
@@ -355,6 +372,7 @@ export default function AudioBible() {
           .select("*")
           .eq("book", book)
           .eq("chapter", chapter)
+          .eq("mode", currentMode)
           .eq("status", "ready")
           .order("version", { ascending: false })
           .limit(1)
@@ -364,7 +382,7 @@ export default function AudioBible() {
         data = refetch.data;
 
         if (!data || !data.audio_storage_path) {
-          toast.error("Epic commentary generation completed but audio not found.");
+          toast.error(`${modeName} commentary generation completed but audio not found.`);
           setIsEpicLoading(false);
           return;
         }
@@ -389,7 +407,7 @@ export default function AudioBible() {
         epicAudioRef.current = null;
       }
 
-      // Play the epic audio
+      // Play the audio
       const audio = new Audio(epicUrl);
       epicAudioRef.current = audio;
       audio.volume = volume;
@@ -398,7 +416,7 @@ export default function AudioBible() {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
       };
       audio.onended = () => {
-        // Auto-advance epic queue
+        // Auto-advance queue
         const queue = epicQueueRef.current;
         const nextIdx = epicQueueIndexRef.current + 1;
         if (queue.length > 1 && nextIdx < queue.length) {
@@ -413,7 +431,7 @@ export default function AudioBible() {
         }
       };
       audio.onerror = () => {
-        toast.error("Failed to play Epic commentary audio.");
+        toast.error(`Failed to play ${modeName} commentary audio.`);
         setIsEpicPlaying(false);
         setIsEpicPaused(false);
         setIsEpicLoading(false);
@@ -422,15 +440,17 @@ export default function AudioBible() {
 
       await audio.play();
     } catch (err: any) {
-      console.error("[Epic Mode] Error:", err);
+      console.error(`[${modeName} Mode] Error:`, err);
       const msg = err?.message || err?.error_description || String(err);
-      toast.error(`Epic commentary error: ${msg}`);
+      toast.error(`${modeName} commentary error: ${msg}`);
       setIsEpicLoading(false);
     }
-  }, [stop, volume]);
+  }, [stop, volume, epicMode]);
 
-  // Regenerate epic commentary (admin only) — forces new script + audio
+  // Regenerate commentary (admin only) — forces new script + audio
   const handleRegenerateEpic = useCallback(async (book: string, chapter: number, customInstructions?: string) => {
+    const currentMode = epicMode;
+    const modeName = COMMENTARY_MODES.find(m => m.id === currentMode)?.label || "Epic";
     // Check if already regenerated recently (within last 24h) — skip check if custom instructions provided
     if (!customInstructions) {
       const { data: existing } = await supabase
@@ -438,6 +458,7 @@ export default function AudioBible() {
         .select("updated_at, version")
         .eq("book", book)
         .eq("chapter", chapter)
+        .eq("mode", currentMode)
         .eq("status", "ready")
         .order("version", { ascending: false })
         .limit(1)
@@ -450,7 +471,7 @@ export default function AudioBible() {
           const timeAgo = hoursSince < 1
             ? `${Math.round(hoursSince * 60)} minutes ago`
             : `${Math.round(hoursSince)} hours ago`;
-          toast.warning(`${book} ${chapter} was already regenerated to the latest script ${timeAgo} (v${existing.version}). No need to regenerate again.`, {
+          toast.warning(`${book} ${chapter} [${modeName}] was already regenerated ${timeAgo} (v${existing.version}). No need to regenerate again.`, {
             duration: 6000,
           });
           return;
@@ -462,29 +483,29 @@ export default function AudioBible() {
     setEpicNowPlayingBook(book);
     setEpicNowPlayingChapter(chapter);
     try {
-      toast.info(`Regenerating Epic commentary for ${book} ${chapter}...${customInstructions ? ' (with custom instructions)' : ''} This may take 1-2 minutes.`);
+      toast.info(`Regenerating ${modeName} commentary for ${book} ${chapter}...${customInstructions ? ' (with custom instructions)' : ''} This may take 1-2 minutes.`);
 
       const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
-        body: { book, chapter, regenerate: true, ...(customInstructions ? { customInstructions } : {}) },
+        body: { book, chapter, regenerate: true, mode: currentMode, ...(customInstructions ? { customInstructions } : {}) },
       });
 
       if (genResponse.error || genResponse.data?.error) {
         throw new Error(genResponse.data?.error || genResponse.error?.message || "Regeneration failed");
       }
 
-      toast.success(`Regenerated ${book} ${chapter}! Now playing new version.`);
+      toast.success(`Regenerated ${modeName} ${book} ${chapter}! Now playing new version.`);
 
       // Play the freshly generated commentary
       epicQueueRef.current = [{ book, chapter }];
       epicQueueIndexRef.current = 0;
       await handlePlayEpic(book, chapter);
     } catch (err: any) {
-      console.error("[Epic Regenerate] Error:", err);
+      console.error(`[${modeName} Regenerate] Error:`, err);
       const msg = err?.message || String(err);
       toast.error(`Regeneration error: ${msg}`);
       setIsEpicLoading(false);
     }
-  }, [handlePlayEpic]);
+  }, [handlePlayEpic, epicMode]);
 
   // Regenerate all chapters in a book (admin only)
   const handleRegenerateBook = useCallback(async (book: string) => {
@@ -596,8 +617,10 @@ export default function AudioBible() {
     }
   }, []);
 
-  // Play Epic commentary for an entire book (overview)
+  // Play commentary for an entire book (overview)
   const handlePlayEpicBook = useCallback(async (book: string) => {
+    const currentMode = epicMode;
+    const modeName = COMMENTARY_MODES.find(m => m.id === currentMode)?.label || "Epic";
     setIsEpicLoading(true);
     setEpicNowPlayingBook(book);
     setEpicNowPlayingChapter(0);
@@ -605,12 +628,13 @@ export default function AudioBible() {
     epicQueueRef.current = [{ book, chapter: 0 }];
     epicQueueIndexRef.current = 0;
     try {
-      // Book-level epic uses chapter=0 as sentinel
+      // Book-level uses chapter=0 as sentinel
       let { data, error } = await supabase
         .from("epic_commentaries")
         .select("*")
         .eq("book", book)
         .eq("chapter", 0)
+        .eq("mode", currentMode)
         .eq("status", "ready")
         .order("version", { ascending: false })
         .limit(1)
@@ -619,10 +643,10 @@ export default function AudioBible() {
       if (error) throw error;
 
       if (!data || !data.audio_storage_path) {
-        toast.info(`Generating Epic overview for ${book}... This may take a moment.`);
-        
+        toast.info(`Generating ${modeName} overview for ${book}... This may take a moment.`);
+
         const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
-          body: { book, scope: "book" },
+          body: { book, scope: "book", mode: currentMode },
         });
 
         if (genResponse.error || genResponse.data?.error) {
@@ -634,6 +658,7 @@ export default function AudioBible() {
           .select("*")
           .eq("book", book)
           .eq("chapter", 0)
+          .eq("mode", currentMode)
           .eq("status", "ready")
           .order("version", { ascending: false })
           .limit(1)
@@ -643,7 +668,7 @@ export default function AudioBible() {
         data = refetch.data;
 
         if (!data || !data.audio_storage_path) {
-          toast.error("Epic overview generation completed but audio not found.");
+          toast.error(`${modeName} overview generation completed but audio not found.`);
           setIsEpicLoading(false);
           return;
         }
@@ -678,7 +703,7 @@ export default function AudioBible() {
         setIsEpicPlaying(false); setIsEpicPaused(false); epicAudioRef.current = null;
       };
       audio.onerror = () => {
-        toast.error("Failed to play Epic overview audio.");
+        toast.error(`Failed to play ${modeName} overview audio.`);
         setIsEpicPlaying(false);
         setIsEpicPaused(false);
         setIsEpicLoading(false);
@@ -687,12 +712,12 @@ export default function AudioBible() {
 
       await audio.play();
     } catch (err: any) {
-      console.error("[Epic Book Mode] Error:", err);
+      console.error(`[${modeName} Book Mode] Error:`, err);
       const msg = err?.message || err?.error_description || String(err);
-      toast.error(`Epic overview error: ${msg}`);
+      toast.error(`${modeName} overview error: ${msg}`);
       setIsEpicLoading(false);
     }
-  }, [stop, volume]);
+  }, [stop, volume, epicMode]);
 
   // Play epic commentary for a custom chapter queue
   const handlePlayEpicCustom = useCallback(async () => {
@@ -769,15 +794,15 @@ export default function AudioBible() {
             </div>
           </div>
 
-          {/* Epic Mode Now Playing Card */}
+          {/* Commentary Mode Now Playing Card */}
           {(isEpicPlaying || isEpicPaused || isEpicLoading) && (
             <Card className="mb-8 border-amber-500/30 bg-gradient-to-br from-amber-900/20 to-transparent">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <p className="text-sm text-amber-400/80">
-                      <Film className="h-4 w-4 inline mr-1" />
-                      Epic Cinematic Commentary
+                      {(() => { const Icon = activeModeMeta.icon; return <Icon className="h-4 w-4 inline mr-1" />; })()}
+                      {activeModeMeta.label} Commentary
                       {epicQueueRef.current.length > 1 && (
                         <span className="ml-2 opacity-70">
                           ({epicQueueIndexRef.current + 1} of {epicQueueRef.current.length})
@@ -909,8 +934,8 @@ export default function AudioBible() {
                     )}
                     {commentarySource === "epic" && (
                       <Badge variant="outline" className="text-xs px-2 py-0.5 border-amber-500/50 bg-amber-500/10 text-amber-300">
-                        <Film className="h-3 w-3 mr-1" />
-                        Epic Mode
+                        {(() => { const Icon = activeModeMeta.icon; return <Icon className="h-3 w-3 mr-1" />; })()}
+                        {activeModeMeta.label} Mode
                       </Badge>
                     )}
                     {commentaryOnly && (
@@ -925,7 +950,7 @@ export default function AudioBible() {
                           : commentarySource === "story-mode"
                           ? "Story Mode"
                           : commentarySource === "epic"
-                          ? "Epic Commentary"
+                          ? `${activeModeMeta.label} Commentary`
                           : t('audioBible.tierCommentary', { tier: commentaryTier })
                         : t('audioBible.scripture')}
                     </Badge>
@@ -1117,8 +1142,8 @@ export default function AudioBible() {
                             epicQueueIndexRef.current = 0;
                             handlePlayEpic(selectedBook, selectedChapter);
                           }} disabled={isEpicLoading}>
-                            {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
-                            Epic Mode: {selectedBook} {selectedChapter}
+                            {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : (() => { const Icon = activeModeMeta.icon; return <Icon className="h-5 w-5 mr-2" />; })()}
+                            {activeModeMeta.label}: {selectedBook} {selectedChapter}
                           </Button>
                           {isAdmin && (
                             <div className="space-y-1.5 w-full">
@@ -1190,12 +1215,12 @@ export default function AudioBible() {
                       {commentarySource === "epic" ? (
                         <div className="space-y-2 w-full">
                           <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => handlePlayEpicBookChapters(selectedBook)} disabled={isEpicLoading}>
-                            {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
-                            Epic All Chapters: {selectedBook}
+                            {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : (() => { const Icon = activeModeMeta.icon; return <Icon className="h-5 w-5 mr-2" />; })()}
+                            {activeModeMeta.label} All Chapters: {selectedBook}
                           </Button>
                           <Button size="lg" variant="outline" className="w-full border-amber-500/30 hover:bg-amber-500/10 text-amber-400" onClick={() => handlePlayEpicBook(selectedBook)} disabled={isEpicLoading}>
-                            {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
-                            Epic Overview: {selectedBook}
+                            {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : (() => { const Icon = activeModeMeta.icon; return <Icon className="h-5 w-5 mr-2" />; })()}
+                            {activeModeMeta.label} Overview: {selectedBook}
                           </Button>
                         </div>
                       ) : (
@@ -1442,8 +1467,8 @@ export default function AudioBible() {
                           onClick={handlePlayEpicCustom}
                           disabled={isEpicLoading || customChapters.length === 0}
                         >
-                          {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Film className="h-5 w-5 mr-2" />}
-                          Epic: {customChapters.length} Chapter{customChapters.length !== 1 ? "s" : ""}
+                          {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : (() => { const Icon = activeModeMeta.icon; return <Icon className="h-5 w-5 mr-2" />; })()}
+                          {activeModeMeta.label}: {customChapters.length} Chapter{customChapters.length !== 1 ? "s" : ""}
                         </Button>
                       ) : (
                         <Button
@@ -1558,30 +1583,41 @@ export default function AudioBible() {
                     </Button>
                   </div>
 
-                  {/* Epic Mode - Full Width Premium Button */}
-                  <Button
-                    variant={commentarySource === "epic" ? "default" : "outline"}
-                    className={`w-full h-auto py-3 px-3 flex items-center gap-3 text-left ${
-                      commentarySource === "epic"
-                        ? "bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 border-amber-500/50"
-                        : "border-amber-500/30 hover:border-amber-500/50"
-                    }`}
-                    onClick={() => handleEpicModeSelect()}
-                  >
-                    <Film className={`h-6 w-6 flex-shrink-0 ${commentarySource === "epic" ? "text-white" : "text-amber-400"}`} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className={`font-bold text-sm ${commentarySource === "epic" ? "text-white" : ""}`}>Epic Mode</span>
-                        <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-amber-500/20 border-amber-500/30 text-amber-300">
-                          <Crown className="h-2.5 w-2.5 mr-0.5" />
-                          Premium
-                        </Badge>
-                      </div>
-                      <span className={`text-[10px] leading-tight ${commentarySource === "epic" ? "text-white/80" : "opacity-70"}`}>
-                        Cinematic chapter experience
-                      </span>
+                  {/* Commentary Suite — 5 Modes */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Commentary Suite</span>
+                      <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-amber-500/20 border-amber-500/30 text-amber-300">
+                        <Crown className="h-2.5 w-2.5 mr-0.5" />
+                        Premium
+                      </Badge>
                     </div>
-                  </Button>
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {COMMENTARY_MODES.map((m) => {
+                        const Icon = m.icon;
+                        const isActive = commentarySource === "epic" && epicMode === m.id;
+                        const colorMap: Record<string, string> = {
+                          blue: isActive ? "bg-blue-600 hover:bg-blue-700 border-blue-500/50 text-white" : "border-blue-500/30 hover:border-blue-500/50 text-blue-400",
+                          amber: isActive ? "bg-amber-600 hover:bg-amber-700 border-amber-500/50 text-white" : "border-amber-500/30 hover:border-amber-500/50 text-amber-400",
+                          purple: isActive ? "bg-purple-600 hover:bg-purple-700 border-purple-500/50 text-white" : "border-purple-500/30 hover:border-purple-500/50 text-purple-400",
+                          orange: isActive ? "bg-gradient-to-b from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 border-amber-500/50 text-white" : "border-orange-500/30 hover:border-orange-500/50 text-orange-400",
+                          emerald: isActive ? "bg-emerald-600 hover:bg-emerald-700 border-emerald-500/50 text-white" : "border-emerald-500/30 hover:border-emerald-500/50 text-emerald-400",
+                        };
+                        return (
+                          <Button
+                            key={m.id}
+                            variant="outline"
+                            className={`h-auto py-2 px-1 flex-col gap-0.5 text-center ${colorMap[m.color]}`}
+                            onClick={() => handleEpicModeSelect(m.id)}
+                          >
+                            <Icon className={`h-4 w-4 ${isActive ? "text-white" : ""}`} />
+                            <span className={`text-[10px] font-semibold leading-tight ${isActive ? "text-white" : ""}`}>{m.label}</span>
+                            <span className={`text-[8px] leading-tight ${isActive ? "text-white/70" : "opacity-60"}`}>{m.subtitle}</span>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
                   {/* Commentary Options (only show if enabled) */}
                   {includeCommentary && (
