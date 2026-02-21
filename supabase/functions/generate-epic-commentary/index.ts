@@ -899,9 +899,40 @@ These anchors are non-negotiable. They have been drawn from careful typological 
     propheticFrameworkBlock = `\n\n${PROPHETIC_FRAMEWORK_MATTHEW}`;
   }
 
+  // Mode-specific user prompt framing so the AI doesn't default to "epic" voice
+  const modeFraming: Record<string, { adj: string; bookDesc: string; chapterDesc: string }> = {
+    epic: {
+      adj: "epic cinematic",
+      bookDesc: "a dramatic, sweeping narration that captures the grand arc of this book — its historical context, its place in redemption history, its major movements and themes — while revealing its deep theological significance and how it fits into the story of salvation from Genesis to Revelation.",
+      chapterDesc: "a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.",
+    },
+    urban: {
+      adj: "Urban Freestyle",
+      bookDesc: "a conversational, street-smart theological walkthrough of this book — making it land in real life. Use personal freestyle connections, verse genetics, and Fire Room gut-punches. The listener should feel like a brilliant friend is breaking down the whole book over coffee, connecting it to their daily struggles and triumphs.",
+      chapterDesc: "a conversational, street-smart theological commentary on this chapter. Make ancient Scripture collide with modern life. Use verse genetics to show surprising cross-biblical connections, personal freestyle to land truth in the listener's real experience, and Fire Room moments that silence the room.",
+    },
+    scholar: {
+      adj: "Scholar",
+      bookDesc: "a rigorous theological analysis of this book — examining its literary structure, original language insights, genre conventions, and systematic theological architecture. Cross-reference with density, analyze Hebrew/Greek terms with precision, and build a comprehensive scholarly understanding that leaves the listener intellectually satisfied and spiritually enriched.",
+      chapterDesc: "a rigorous theological commentary on this chapter. Deliver forensic-level textual analysis: chiastic structures, keyword chains, Greek/Hebrew semantic ranges, inner-biblical exegesis, and systematic theological synthesis. Every claim grounded in textual evidence.",
+    },
+    ancient: {
+      adj: "Ancient Scribe",
+      bookDesc: "a survey of this book through the lens of covenant history, prophetic cycles, and sanctuary fulfillment. Place every major movement within the Eight Cycles, identify its Three Heavens horizon, map its events onto sanctuary furniture, and show its feast-day correlations. Narrate as one who has watched civilizations rise and crumble while the Word endures.",
+      chapterDesc: "a commentary on this chapter through the lens of covenant cycles, sanctuary blueprint, and prophetic timelines. Identify the cycle (Fall→Covenant→Sanctuary→Enemy→Restoration), the Three Heavens horizon (1H/2H/3H), the sanctuary furniture mapping, and feast correlations. Narrate with the measured gravitas of ages.",
+    },
+    preacher: {
+      adj: "Preacher",
+      bookDesc: "a passionate expository overview of this book — as a pastor who has wrestled with it and now delivers it with fire and tears. Make Christ the gravitational center of every movement. Test every interpretation by its spiritual fruit. Build toward altar-call crescendo. The listener should encounter Jesus, not just learn about Him.",
+      chapterDesc: "a passionate expository commentary on this chapter. Make Christ visible in every verse — as type, antitype, prophet, priest, judge, or king. Use the Fruit Room test on every interpretation. Build from exposition to revelation to invitation. The listener should meet Jesus in this chapter.",
+    },
+  };
+
+  const framing = modeFraming[mode] || modeFraming.epic;
+
   const userPrompt = isBookScope
-    ? `Create an epic cinematic overview of the entire book of ${book}. This should be a dramatic, sweeping narration that captures the grand arc of this book — its historical context, its place in redemption history, its major movements and themes — while revealing its deep theological significance and how it fits into the story of salvation from Genesis to Revelation.${propheticFrameworkBlock}`
-    : `Create an epic cinematic commentary for ${book} chapter ${chapter}. This should be a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.${cecAnchorBlock}${propheticFrameworkBlock}${customInstructions ? `\n\nSPECIAL CONTENT INSTRUCTIONS FOR THIS REGENERATION (MUST BE FOLLOWED):\n${customInstructions}` : ""}`;
+    ? `Create a ${framing.adj} overview of the entire book of ${book}. ${framing.bookDesc}${propheticFrameworkBlock}`
+    : `Create a ${framing.adj} commentary for ${book} chapter ${chapter}. ${framing.chapterDesc}${cecAnchorBlock}${propheticFrameworkBlock}${customInstructions ? `\n\nSPECIAL CONTENT INSTRUCTIONS FOR THIS REGENERATION (MUST BE FOLLOWED):\n${customInstructions}` : ""}`;
 
   // Try Lovable AI gateway first, fall back to OpenAI directly
   const tryLovable = async () => {
