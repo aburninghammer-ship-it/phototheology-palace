@@ -28,26 +28,28 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     dragging.current = true;
     offset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
     e.preventDefault();
-  }, [pos]);
 
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!dragging.current) return;
-    const rect = stackRef.current?.getBoundingClientRect();
-    const w = rect?.width ?? 60;
-    const h = rect?.height ?? 60;
-    const nx = clamp(e.clientX - offset.current.x, 0, window.innerWidth - w);
-    const ny = clamp(e.clientY - offset.current.y, 0, window.innerHeight - h);
-    setPos({ x: nx, y: ny });
-  }, []);
+    const onMove = (ev: PointerEvent) => {
+      if (!dragging.current) return;
+      const rect = stackRef.current?.getBoundingClientRect();
+      const w = rect?.width ?? 60;
+      const h = rect?.height ?? 60;
+      const nx = clamp(ev.clientX - offset.current.x, 0, window.innerWidth - w);
+      const ny = clamp(ev.clientY - offset.current.y, 0, window.innerHeight - h);
+      setPos({ x: nx, y: ny });
+    };
 
-  const handlePointerUp = useCallback(() => {
-    if (dragging.current) {
+    const onUp = () => {
       dragging.current = false;
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
       setPos(p => { persist(p); return p; });
-    }
-  }, [persist]);
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }, [pos, persist]);
 
   // Keep in viewport on resize
   useEffect(() => {
@@ -77,8 +79,6 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
       {/* Drag handle */}
       <div
         onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
         className="cursor-grab active:cursor-grabbing p-1 rounded-md bg-muted/80 backdrop-blur-sm border border-border/50 hover:bg-muted touch-none select-none"
         title="Drag to move"
       >
