@@ -8,7 +8,7 @@ function getInitialPosition() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) return JSON.parse(saved) as { x: number; y: number };
   } catch {}
-  return { x: 16, y: window.innerHeight - 120 };
+  return { x: 16, y: window.innerHeight - 300 };
 }
 
 function clamp(val: number, min: number, max: number) {
@@ -91,7 +91,7 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
   return (
     <div
       ref={stackRef}
-      className="fixed z-50 flex flex-col-reverse items-start gap-3"
+      className="fixed z-50 flex flex-col items-start gap-3"
       style={{ left: 0, top: 0, willChange: "transform" }}
     >
       {/* Drag handle */}
