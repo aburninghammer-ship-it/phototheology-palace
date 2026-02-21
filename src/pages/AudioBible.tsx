@@ -388,16 +388,24 @@ export default function AudioBible() {
         }
       }
 
-      // Use signed URL to bypass CDN caching and always fetch latest audio
+      // Try signed URL first, fall back to public URL
+      let epicUrl: string;
       const { data: signedData, error: signedError } = await supabase.storage
         .from("epic-audio")
         .createSignedUrl(data.audio_storage_path, 3600);
 
       if (signedError || !signedData?.signedUrl) {
-        throw new Error(signedError?.message || "Could not get audio URL");
+        // Fallback to public URL since bucket is public
+        const { data: publicData } = supabase.storage
+          .from("epic-audio")
+          .getPublicUrl(data.audio_storage_path);
+        epicUrl = publicData?.publicUrl;
+        if (!epicUrl) {
+          throw new Error(signedError?.message || "Could not get audio URL");
+        }
+      } else {
+        epicUrl = signedData.signedUrl;
       }
-
-      const epicUrl = signedData.signedUrl;
       setEpicAudioUrl(epicUrl);
 
       // Stop any current playback
