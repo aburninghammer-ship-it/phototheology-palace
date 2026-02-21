@@ -148,8 +148,9 @@ export default function SermonBuilder() {
     contextId: editId || newSermonContextId,
   });
   // Handle new sermon flag - clear persisted state when starting fresh
+  // Also treat navigating without an editId as a new sermon (always start blank)
   useEffect(() => {
-    if (isNewSermon) {
+    if (isNewSermon || !editId) {
       // Clear persisted state directly from localStorage to avoid race conditions
       try {
         const stored = localStorage.getItem("pt_page_states");
@@ -166,15 +167,17 @@ export default function SermonBuilder() {
         console.warn("Failed to clear sermon state:", e);
       }
 
-      // Remove the ?new param from URL without causing navigation
-      setSearchParams({}, { replace: true });
+      if (isNewSermon) {
+        // Remove the ?new param from URL without causing navigation
+        setSearchParams({}, { replace: true });
+      }
       hasRestoredState.current = true; // Prevent any restoration
     }
-  }, [isNewSermon, setSearchParams]);
+  }, [isNewSermon, editId, setSearchParams]);
 
   useEffect(() => {
-    // Skip restoration if this is a new sermon or if already restored
-    if (isNewSermon || editId || hasRestoredState.current) {
+    // Skip restoration if there's no editId (new sermon) or already restored
+    if (!editId || hasRestoredState.current) {
       hasRestoredState.current = true;
       return;
     }
@@ -201,7 +204,7 @@ export default function SermonBuilder() {
     if (savedAiHelp) setAiHelp(savedAiHelp);
 
     hasRestoredState.current = true;
-  }, [editId, isNewSermon, getCustomState]);
+  }, [editId, getCustomState]);
 
   // Persist state changes (only for new sermons)
   useEffect(() => {
