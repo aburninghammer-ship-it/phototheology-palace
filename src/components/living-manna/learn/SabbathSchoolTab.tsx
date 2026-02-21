@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, BookOpen, Calendar, Sparkles, Bot, ChevronRight } from "lucide-react";
+import { Loader2, BookOpen, Calendar, Sparkles, Bot, ChevronRight, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
@@ -57,7 +57,6 @@ interface SabbathSchoolTabProps {
 export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
   const { toast } = useToast();
 
-  // Find the current week's lesson
   const getCurrentLesson = (): QuarterlyLessonData => {
     const today = new Date();
     const found = Q1_2026_LESSONS.find((l) => {
@@ -75,6 +74,8 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
   const [selectedPrinciple, setSelectedPrinciple] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [jeevesResponse, setJeevesResponse] = useState<string | null>(null);
+  const [generatingStudy, setGeneratingStudy] = useState(false);
+  const [dailyStudy, setDailyStudy] = useState<string | null>(null);
 
   const handleLessonChange = (lessonId: string) => {
     const lesson = Q1_2026_LESSONS.find((l) => l.id === lessonId);
@@ -82,12 +83,60 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
       setSelectedLesson(lesson);
       setSelectedDay(null);
       setJeevesResponse(null);
+      setDailyStudy(null);
     }
   };
 
   const handleDaySelect = (day: QuarterlyDay) => {
     setSelectedDay(day);
     setJeevesResponse(null);
+    setDailyStudy(null);
+  };
+
+  const handleGenerateDailyStudy = async () => {
+    if (!selectedDay) return;
+
+    setGeneratingStudy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "quarterly_analysis",
+          lessonTitle: `${selectedLesson.title} - ${selectedDay.day}: ${selectedDay.title}`,
+          dayTitle: selectedDay.title,
+          lessonContent: `QUARTERLY: ${Q1_2026_TITLE} - ${Q1_2026_SUBTITLE}\nQUARTER: ${Q1_2026_QUARTER}\n\nLESSON ${selectedLesson.num}: ${selectedLesson.title}\nDates: ${selectedLesson.startDate} to ${selectedLesson.endDate}\n\nMemory Text: "${selectedLesson.memoryText}" (${selectedLesson.memoryRef})\n\nSabbath Introduction:\n${selectedLesson.sabbathIntro}\n\nDAY: ${selectedDay.day} - ${selectedDay.title} (${selectedDay.date})\nScriptures: ${selectedDay.scriptures.join(", ")}\n\nLesson Content:\n${selectedDay.content}`,
+          bibleVerses: selectedDay.scriptures,
+          selectedRoom: "",
+          selectedPrinciple: "",
+          question: `Generate a complete daily study for this day of the Sabbath School lesson. Follow the quarterly's exact information and content closely, then enhance it with Phototheology Palace principles. Structure it as follows:
+
+1. OPENING SCRIPTURE & CONTEXT — Quote the key passage(s) for today (KJV) and set the historical/literary context from the quarterly lesson.
+
+2. LESSON CONTENT — Present the quarterly's teaching points for this day faithfully. Do not skip or replace the quarterly's content. Expand on it with deeper explanation.
+
+3. PHOTOTHEOLOGY ENHANCEMENT — Apply 2-3 relevant Palace Rooms to illuminate the text:
+   • Which rooms naturally connect to today's passage?
+   • What do the 5 Dimensions (Literal, Christ, Me, Church, Heaven) reveal?
+   • Any Sanctuary connections, Types/Symbols, or Cycle placements?
+
+4. CHRIST-CENTERED SYNTHESIS (Concentration Room) — How does today's study point to Christ? Trace the Christ-thread explicitly.
+
+5. DISCUSSION QUESTIONS — 3-4 questions progressing from observation to interpretation to application.
+
+6. PERSONAL APPLICATION & PRAYER — A practical challenge and prayer focus for the day.
+
+Keep the quarterly's actual teaching as the foundation. The PT framework should enhance, not replace, the lesson content.`,
+        },
+      });
+
+      if (error) throw error;
+      setDailyStudy(data?.content || JSON.stringify(data));
+      toast({ title: "Daily study generated!" });
+    } catch (err: any) {
+      console.error("Daily study generation error:", err);
+      toast({ title: "Generation failed", description: err.message, variant: "destructive" });
+    } finally {
+      setGeneratingStudy(false);
+    }
   };
 
   const handleAnalyze = async () => {
@@ -194,26 +243,19 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
           <CardDescription>{selectedLesson.startDate} – {selectedLesson.endDate}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {/* Memory Text */}
           <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
             <p className="text-xs font-medium text-primary mb-1">Memory Text</p>
             <p className="text-sm italic">"{selectedLesson.memoryText}"</p>
             <p className="text-xs text-muted-foreground mt-1">&mdash; {selectedLesson.memoryRef}</p>
           </div>
-
-          {/* Scriptures */}
           <div>
             <p className="text-xs font-medium text-muted-foreground mb-1">Key Scriptures</p>
             <div className="flex flex-wrap gap-1">
               {selectedLesson.scriptures.map((s, i) => (
-                <Badge key={i} variant="outline" className="text-xs">
-                  {s}
-                </Badge>
+                <Badge key={i} variant="outline" className="text-xs">{s}</Badge>
               ))}
             </div>
           </div>
-
-          {/* Sabbath Intro */}
           <p className="text-sm text-muted-foreground">{selectedLesson.sabbathIntro}</p>
         </CardContent>
       </Card>
@@ -268,11 +310,49 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
           <CardContent className="space-y-4">
             <p className="text-sm leading-relaxed">{selectedDay.content}</p>
 
-            {/* Palace Analysis Section */}
+            {/* Generate Daily Study Button */}
+            <Button
+              onClick={handleGenerateDailyStudy}
+              disabled={generatingStudy}
+              className="w-full gradient-palace text-white"
+              size="lg"
+            >
+              {generatingStudy ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generating PT-Enhanced Daily Study...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="h-4 w-4 mr-2" />
+                  Generate Daily Study with Palace Principles
+                </>
+              )}
+            </Button>
+
+            {/* Generated Daily Study */}
+            {dailyStudy && (
+              <ScrollArea className="h-[500px]">
+                <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Wand2 className="h-5 w-5 text-primary" />
+                    <span className="font-semibold text-sm">PT-Enhanced Daily Study</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {selectedDay.day}
+                    </Badge>
+                  </div>
+                  <div className="prose prose-sm max-w-none">
+                    {formatJeevesResponse(dailyStudy)}
+                  </div>
+                </div>
+              </ScrollArea>
+            )}
+
+            {/* Optional: Additional Palace Analysis Section */}
             <div className="border-t pt-4 space-y-3">
               <div className="flex items-center gap-2">
                 <Bot className="h-5 w-5 text-primary" />
-                <span className="font-medium text-sm">Amplify with Palace Principles</span>
+                <span className="font-medium text-sm">Deep Dive: Amplify with a Specific Room or Lens</span>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-3">
@@ -319,12 +399,11 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Apply Framework
+                    Apply Specific Framework
                   </>
                 )}
               </Button>
 
-              {/* Jeeves Response */}
               {jeevesResponse && (
                 <ScrollArea className="h-[400px]">
                   <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30">
