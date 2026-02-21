@@ -90,19 +90,14 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
 
   return (
     <div
-      ref={stackRef}
-      className="fixed z-50 flex flex-col items-start gap-3"
-      style={{ left: 0, top: 0, willChange: "transform" }}
+      ref={(el) => {
+        (stackRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+        (handleRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+      }}
+      className="fixed z-50 flex flex-col items-end gap-2 cursor-grab active:cursor-grabbing select-none"
+      style={{ left: 0, top: 0, willChange: "transform", touchAction: "none" }}
+      title="Drag to move"
     >
-      {/* Drag handle */}
-      <div
-        ref={handleRef}
-        className="cursor-grab active:cursor-grabbing p-1 rounded-md bg-muted/80 backdrop-blur-sm border border-border/50 hover:bg-muted select-none"
-        style={{ touchAction: "none" }}
-        title="Drag to move"
-      >
-        <GripVertical className="h-4 w-4 text-muted-foreground pointer-events-none" />
-      </div>
       {children}
     </div>
   );
