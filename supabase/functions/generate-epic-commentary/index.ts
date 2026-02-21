@@ -1130,7 +1130,7 @@ serve(async (req) => {
         .select("*")
         .eq("book", book)
         .eq("chapter", effectiveChapter)
-        .eq("mode", mode)
+        .eq("commentary_mode", mode)
         .eq("status", "ready")
         .order("version", { ascending: false })
         .limit(1)
@@ -1154,12 +1154,12 @@ serve(async (req) => {
       .upsert({
         book,
         chapter: effectiveChapter,
-        mode,
+        commentary_mode: mode,
         version: 1,
         status: "generating",
         commentary_text: "",
         voice_id: voiceIdLabel,
-      }, { onConflict: "book,chapter,mode" })
+      }, { onConflict: "book,chapter,commentary_mode" })
       .select()
       .single();
 
