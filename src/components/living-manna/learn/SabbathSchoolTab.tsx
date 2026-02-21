@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,6 +9,7 @@ import { Loader2, BookOpen, Calendar, Sparkles, Bot, Wand2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { getQuarterlyLesson } from "@/services/quarterlyApi";
 import {
   Q1_2026_LESSONS,
   Q1_2026_TITLE,
@@ -58,6 +59,14 @@ interface SabbathSchoolTabProps {
   churchId: string;
 }
 
+interface FetchedDay {
+  id: string;
+  title: string;
+  date: string;
+  content: string;
+  read: string;
+}
+
 export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
   const { toast } = useToast();
 
@@ -86,9 +95,38 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
   const [dailyStudy, setDailyStudy] = useState<string | null>(null);
   const [activeDay, setActiveDay] = useState<string>(() => {
     const todayName = getTodayDayName();
-    // Default to today's day if it's a study day, otherwise Sunday
     return DAY_LABELS.includes(todayName) ? todayName : "Sunday";
   });
+  const [fetchedDays, setFetchedDays] = useState<FetchedDay[]>([]);
+  const [loadingContent, setLoadingContent] = useState(false);
+
+  // Fetch full lesson content from API when lesson changes
+  useEffect(() => {
+    const fetchFullContent = async () => {
+      setLoadingContent(true);
+      try {
+        // Determine the quarterly ID based on current date
+        const now = new Date();
+        const year = now.getFullYear();
+        const quarter = Math.ceil((now.getMonth() + 1) / 3);
+        const quarterlyId = `${year}-${String(quarter).padStart(2, "0")}`;
+
+        const result = await getQuarterlyLesson(quarterlyId, selectedLesson.id);
+        if (result?.days && result.days.length > 0) {
+          setFetchedDays(result.days);
+        } else {
+          setFetchedDays([]);
+        }
+      } catch (err) {
+        console.warn("Could not fetch full quarterly content:", err);
+        setFetchedDays([]);
+      } finally {
+        setLoadingContent(false);
+      }
+    };
+
+    fetchFullContent();
+  }, [selectedLesson.id]);
 
   const handleLessonChange = (lessonId: string) => {
     const lesson = Q1_2026_LESSONS.find((l) => l.id === lessonId);
@@ -103,9 +141,24 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
     return selectedLesson.days.find((d) => d.day === activeDay);
   };
 
+  // Get the full content for the active day — prefer fetched API content, fallback to local
+  const getFullDayContent = (dayIndex: number): string => {
+    const fetched = fetchedDays[dayIndex];
+    if (fetched) {
+      // The API returns HTML content; strip tags for clean display or use as-is
+      const apiContent = fetched.read || fetched.content || "";
+      if (apiContent.length > 0) return apiContent;
+    }
+    // Fallback to local data
+    return selectedLesson.days[dayIndex]?.content || "";
+  };
+
   const handleGenerateDailyStudy = async () => {
     const selectedDay = getSelectedDay();
     if (!selectedDay) return;
+
+    const dayIndex = selectedLesson.days.findIndex((d) => d.day === activeDay);
+    const fullContent = getFullDayContent(dayIndex);
 
     setGeneratingStudy(true);
     try {
@@ -114,28 +167,28 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
           mode: "quarterly_analysis",
           lessonTitle: `${selectedLesson.title} - ${selectedDay.day}: ${selectedDay.title}`,
           dayTitle: selectedDay.title,
-          lessonContent: `QUARTERLY: ${Q1_2026_TITLE} - ${Q1_2026_SUBTITLE}\nQUARTER: ${Q1_2026_QUARTER}\n\nLESSON ${selectedLesson.num}: ${selectedLesson.title}\nDates: ${selectedLesson.startDate} to ${selectedLesson.endDate}\n\nMemory Text: "${selectedLesson.memoryText}" (${selectedLesson.memoryRef})\n\nSabbath Introduction:\n${selectedLesson.sabbathIntro}\n\nDAY: ${selectedDay.day} - ${selectedDay.title} (${selectedDay.date})\nScriptures: ${selectedDay.scriptures.join(", ")}\n\nLesson Content:\n${selectedDay.content}`,
+          lessonContent: `QUARTERLY: ${Q1_2026_TITLE} - ${Q1_2026_SUBTITLE}\nQUARTER: ${Q1_2026_QUARTER}\n\nLESSON ${selectedLesson.num}: ${selectedLesson.title}\nDates: ${selectedLesson.startDate} to ${selectedLesson.endDate}\n\nMemory Text: "${selectedLesson.memoryText}" (${selectedLesson.memoryRef})\n\nSabbath Introduction:\n${selectedLesson.sabbathIntro}\n\nDAY: ${selectedDay.day} - ${selectedDay.title} (${selectedDay.date})\nScriptures: ${selectedDay.scriptures.join(", ")}\n\nFull Lesson Content:\n${fullContent}`,
           bibleVerses: selectedDay.scriptures,
           selectedRoom: "",
           selectedPrinciple: "",
-          question: `Generate a complete daily study for this day of the Sabbath School lesson. Follow the quarterly's exact information and content closely, then enhance it with Phototheology Palace principles. Structure it as follows:
+          question: `Generate a complete daily study for this day of the Sabbath School lesson. You MUST reproduce the quarterly's actual content faithfully — quote it, present it, and preserve its exact teaching points. Then enhance with Phototheology Palace principles. Structure:
 
-1. OPENING SCRIPTURE & CONTEXT — Quote the key passage(s) for today (KJV) and set the historical/literary context from the quarterly lesson.
+1. DAY HEADER — Day name, date, title, and scripture references exactly as the quarterly shows.
 
-2. LESSON CONTENT — Present the quarterly's teaching points for this day faithfully. Do not skip or replace the quarterly's content. Expand on it with deeper explanation.
+2. QUARTERLY CONTENT (VERBATIM) — Present the quarterly's actual lesson text for this day faithfully. Do NOT paraphrase or skip any part. This is the foundation.
 
-3. PHOTOTHEOLOGY ENHANCEMENT — Apply 2-3 relevant Palace Rooms to illuminate the text:
-   • Which rooms naturally connect to today's passage?
-   • What do the 5 Dimensions (Literal, Christ, Me, Church, Heaven) reveal?
-   • Any Sanctuary connections, Types/Symbols, or Cycle placements?
+3. PHOTOTHEOLOGY ENHANCEMENT — After presenting the quarterly content, add a clearly labeled PT section:
+   • 2-3 relevant Palace Rooms that illuminate the text
+   • 5 Dimensions view (Literal, Christ, Me, Church, Heaven)
+   • Any Sanctuary, Type/Symbol, or Cycle connections
 
-4. CHRIST-CENTERED SYNTHESIS (Concentration Room) — How does today's study point to Christ? Trace the Christ-thread explicitly.
+4. CHRIST-CENTERED SYNTHESIS (Concentration Room) — Trace the Christ-thread through today's passage.
 
-5. DISCUSSION QUESTIONS — 3-4 questions progressing from observation to interpretation to application.
+5. DISCUSSION QUESTIONS — 3-4 questions from observation to application.
 
-6. PERSONAL APPLICATION & PRAYER — A practical challenge and prayer focus for the day.
+6. PERSONAL APPLICATION — A practical challenge for the day.
 
-Keep the quarterly's actual teaching as the foundation. The PT framework should enhance, not replace, the lesson content.`,
+CRITICAL: The quarterly's content must appear first and complete. PT principles enhance, never replace.`,
         },
       });
 
@@ -161,6 +214,9 @@ Keep the quarterly's actual teaching as the foundation. The PT framework should 
       return;
     }
 
+    const dayIndex = selectedLesson.days.findIndex((d) => d.day === activeDay);
+    const fullContent = getFullDayContent(dayIndex);
+
     setAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
@@ -168,7 +224,7 @@ Keep the quarterly's actual teaching as the foundation. The PT framework should 
           mode: "quarterly_analysis",
           lessonTitle: `${selectedLesson.title} - ${selectedDay.day}: ${selectedDay.title}`,
           dayTitle: selectedDay.title,
-          lessonContent: `Memory Text: "${selectedLesson.memoryText}" (${selectedLesson.memoryRef})\n\nScriptures: ${selectedDay.scriptures.join(", ")}\n\n${selectedDay.content}\n\nQuarter Theme: ${Q1_2026_TITLE} - ${Q1_2026_SUBTITLE}`,
+          lessonContent: `Memory Text: "${selectedLesson.memoryText}" (${selectedLesson.memoryRef})\n\nScriptures: ${selectedDay.scriptures.join(", ")}\n\n${fullContent}\n\nQuarter Theme: ${Q1_2026_TITLE} - ${Q1_2026_SUBTITLE}`,
           bibleVerses: selectedDay.scriptures,
           selectedRoom,
           selectedPrinciple,
@@ -195,6 +251,20 @@ Keep the quarterly's actual teaching as the foundation. The PT framework should 
   };
 
   const selectedDay = getSelectedDay();
+
+  // Render HTML content safely
+  const renderContent = (html: string) => {
+    // Check if it looks like HTML
+    if (html.includes("<") && html.includes(">")) {
+      return (
+        <div
+          className="text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      );
+    }
+    return <p className="text-sm leading-relaxed whitespace-pre-wrap">{html}</p>;
+  };
 
   return (
     <div className="space-y-4">
@@ -248,14 +318,14 @@ Keep the quarterly's actual teaching as the foundation. The PT framework should 
         </CardContent>
       </Card>
 
-      {/* Memory Text (compact) */}
+      {/* Memory Text */}
       <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
         <p className="text-xs font-medium text-primary mb-1">Memory Text</p>
         <p className="text-sm italic">"{selectedLesson.memoryText}"</p>
         <p className="text-xs text-muted-foreground mt-1">&mdash; {selectedLesson.memoryRef}</p>
       </div>
 
-      {/* Daily Study Tabs — the main content */}
+      {/* Daily Study Tabs */}
       <Card className="border-primary/20">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
@@ -279,26 +349,39 @@ Keep the quarterly's actual teaching as the foundation. The PT framework should 
               ))}
             </TabsList>
 
-            {selectedLesson.days.map((day) => (
+            {selectedLesson.days.map((day, dayIndex) => (
               <TabsContent key={day.day} value={day.day} className="mt-4 space-y-4">
-                {/* Day header */}
-                <div>
-                  <h3 className="font-semibold text-lg">{day.title}</h3>
-                  <p className="text-xs text-muted-foreground">{day.date}</p>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {day.scriptures.map((s, i) => (
-                      <Badge key={i} variant="outline" className="text-xs">{s}</Badge>
-                    ))}
+                {/* Day header — styled like the quarterly */}
+                <div className="flex items-start gap-3">
+                  <div className="bg-destructive text-destructive-foreground px-3 py-1.5 rounded font-bold text-sm uppercase tracking-wide shrink-0">
+                    {day.day}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground italic">{day.date}</p>
+                    <h3 className="font-semibold text-lg mt-0.5">{day.title}</h3>
                   </div>
                 </div>
 
-                {/* Quarterly lesson content for this day */}
-                <div className="p-4 bg-muted/30 rounded-lg border border-border">
-                  <p className="text-xs font-medium text-muted-foreground mb-2">📖 Quarterly Lesson Content</p>
-                  <p className="text-sm leading-relaxed">{day.content}</p>
+                {/* Scripture badges */}
+                <div className="flex flex-wrap gap-1">
+                  {day.scriptures.map((s, i) => (
+                    <Badge key={i} variant="outline" className="text-xs">{s}</Badge>
+                  ))}
                 </div>
 
-                {/* Generate PT-Enhanced Study */}
+                {/* Full quarterly lesson content */}
+                <div className="p-4 bg-card rounded-lg border border-border shadow-sm">
+                  {loadingContent ? (
+                    <div className="flex items-center gap-2 text-muted-foreground py-4">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span className="text-sm">Loading full quarterly content...</span>
+                    </div>
+                  ) : (
+                    renderContent(getFullDayContent(dayIndex))
+                  )}
+                </div>
+
+                {/* PT Enhancement Button */}
                 <Button
                   onClick={handleGenerateDailyStudy}
                   disabled={generatingStudy}
@@ -313,12 +396,12 @@ Keep the quarterly's actual teaching as the foundation. The PT framework should 
                   ) : (
                     <>
                       <Wand2 className="h-4 w-4 mr-2" />
-                      Generate PT-Enhanced Daily Study
+                      Enhance with Palace Principles
                     </>
                   )}
                 </Button>
 
-                {/* Generated Daily Study */}
+                {/* Generated PT-Enhanced Study */}
                 {dailyStudy && (
                   <ScrollArea className="h-[500px]">
                     <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30">
