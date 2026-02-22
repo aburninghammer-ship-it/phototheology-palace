@@ -69,7 +69,31 @@ interface ChapterSelection {
   mode?: EpicModeType;
 }
 
-type SelectionMode = "chapter" | "book" | "custom";
+type SelectionMode = "chapter" | "book" | "custom" | "stories";
+
+interface BiblicalStory {
+  id: string;
+  title: string;
+  book: string;
+  reference: string;
+  description: string;
+  icon: string;
+}
+
+const CURATED_STORIES: BiblicalStory[] = [
+  { id: "jonathan-armor-bearer", title: "Jonathan & His Armor Bearer", book: "1 Samuel", reference: "1 Samuel 14", description: "Two men against a garrison — faith that moves mountains", icon: "⚔️" },
+  { id: "david-goliath", title: "David & Goliath", book: "1 Samuel", reference: "1 Samuel 17", description: "A shepherd boy faces the giant with five stones and faith", icon: "🪨" },
+  { id: "garden-gethsemane", title: "The Garden of Gethsemane", book: "Matthew", reference: "Matthew 26:36-56", description: "Christ's agony and surrender before the cross", icon: "🌿" },
+  { id: "daniel-lions-den", title: "Daniel in the Lions' Den", book: "Daniel", reference: "Daniel 6", description: "Faithfulness under decree — the lions' mouths are shut", icon: "🦁" },
+  { id: "abraham-isaac-moriah", title: "Abraham & Isaac on Mount Moriah", book: "Genesis", reference: "Genesis 22", description: "The ultimate test of faith — God will provide Himself a lamb", icon: "🐑" },
+  { id: "elijah-mount-carmel", title: "Elijah on Mount Carmel", book: "1 Kings", reference: "1 Kings 18", description: "One prophet against 450 — fire falls from heaven", icon: "🔥" },
+  { id: "three-hebrews-furnace", title: "Three Hebrews in the Furnace", book: "Daniel", reference: "Daniel 3", description: "They would not bow — and a fourth figure walks in the fire", icon: "🔥" },
+  { id: "red-sea-crossing", title: "The Parting of the Red Sea", book: "Exodus", reference: "Exodus 14", description: "Trapped between Pharaoh and the deep — God makes a way", icon: "🌊" },
+  { id: "jacob-wrestles-angel", title: "Jacob Wrestles the Angel", book: "Genesis", reference: "Genesis 32:22-32", description: "A man broken becomes a prince — 'I will not let you go'", icon: "💪" },
+  { id: "joseph-sold-brothers", title: "Joseph Sold by His Brothers", book: "Genesis", reference: "Genesis 37", description: "A dreamer cast into a pit — the road to the palace begins", icon: "🕳️" },
+  { id: "road-to-emmaus", title: "The Road to Emmaus", book: "Luke", reference: "Luke 24:13-35", description: "Two disciples walk with the risen Christ unknowingly", icon: "🛤️" },
+  { id: "paul-shipwreck", title: "Paul's Shipwreck", book: "Acts", reference: "Acts 27", description: "Storm, shipwreck, and survival — God's promise holds", icon: "⛵" },
+];
 type CommentaryMode = "verse" | "chapter";
 
 export default function AudioBible() {
@@ -166,6 +190,7 @@ export default function AudioBible() {
   
   // Starting verse for chapter playback
   const [startVerse, setStartVerse] = useState(1);
+  const [selectedStory, setSelectedStory] = useState<string | null>(null);
 
   // Custom playlist add mode state
   const [customAddMode, setCustomAddMode] = useState<"single" | "chapter-range" | "book-range">("single");
@@ -1085,7 +1110,7 @@ export default function AudioBible() {
                 </CardHeader>
                 <CardContent>
                   <Tabs value={selectionMode} onValueChange={(v) => setSelectionMode(v as SelectionMode)}>
-                    <TabsList className="grid w-full grid-cols-3 mb-4">
+                    <TabsList className="grid w-full grid-cols-4 mb-4">
                       <TabsTrigger value="chapter">
                         <BookText className="h-4 w-4 mr-1" />
                         {t('audioBible.chapter')}
@@ -1097,6 +1122,10 @@ export default function AudioBible() {
                       <TabsTrigger value="custom">
                         <Layers className="h-4 w-4 mr-1" />
                         {t('audioBible.custom')}
+                      </TabsTrigger>
+                      <TabsTrigger value="stories">
+                        <Film className="h-4 w-4 mr-1" />
+                        Stories
                       </TabsTrigger>
                     </TabsList>
 
@@ -1539,6 +1568,91 @@ export default function AudioBible() {
                           {t('audioBible.playChapters', { count: customChapters.length })}
                         </Button>
                       )}
+                    </TabsContent>
+
+                    {/* Stories */}
+                    <TabsContent value="stories" className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        Immersive biblical stories told through Phototheology — choose a story and a voice.
+                      </p>
+                      <ScrollArea className="max-h-72">
+                        <div className="space-y-2">
+                          {CURATED_STORIES.map((story) => (
+                            <div
+                              key={story.id}
+                              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                                selectedStory === story.id
+                                  ? "border-primary bg-primary/10"
+                                  : "hover:bg-accent/50"
+                              }`}
+                              onClick={() => setSelectedStory(story.id)}
+                            >
+                              <span className="text-2xl">{story.icon}</span>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-medium text-sm">{story.title}</h4>
+                                <p className="text-xs text-muted-foreground truncate">{story.description}</p>
+                                <p className="text-[10px] text-muted-foreground/70">{story.reference}</p>
+                              </div>
+                              {selectedStory === story.id && (
+                                <Badge variant="secondary" className="text-[10px]">Selected</Badge>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+
+                      <Button
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+                        onClick={async () => {
+                          if (!selectedStory) return;
+                          const story = CURATED_STORIES.find(s => s.id === selectedStory);
+                          if (!story) return;
+                          setIsEpicLoading(true);
+                          try {
+                            const { data, error } = await supabase.functions.invoke('generate-epic-commentary', {
+                              body: {
+                                scope: "story",
+                                storyTitle: story.title,
+                                book: story.book,
+                                mode: epicMode,
+                              }
+                            });
+                            if (error) throw error;
+                            if (data?.audioUrl) {
+                              if (epicAudioRef.current) {
+                                epicAudioRef.current.pause();
+                              }
+                              const audio = new Audio(data.audioUrl);
+                              epicAudioRef.current = audio;
+                              setEpicAudioUrl(data.audioUrl);
+                              setEpicNowPlayingBook(story.title);
+                              setEpicNowPlayingChapter(0);
+                              setIsEpicPlaying(true);
+                              setIsEpicPaused(false);
+                              audio.play();
+                              audio.onended = () => {
+                                setIsEpicPlaying(false);
+                                setIsEpicPaused(false);
+                              };
+                              toast.success(`Now playing: ${story.title} (${activeModeMeta.label})`);
+                            } else if (data?.text) {
+                              toast.success("Story generated! Audio coming soon.");
+                            }
+                          } catch (err: any) {
+                            console.error('Story generation error:', err);
+                            toast.error("Failed to generate story: " + (err.message || "Unknown error"));
+                          } finally {
+                            setIsEpicLoading(false);
+                          }
+                        }}
+                        disabled={isEpicLoading || !selectedStory}
+                      >
+                        {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : (() => { const Icon = activeModeMeta.icon; return <Icon className="h-5 w-5 mr-2" />; })()}
+                        {selectedStory
+                          ? `${activeModeMeta.label}: ${CURATED_STORIES.find(s => s.id === selectedStory)?.title}`
+                          : "Select a Story"}
+                      </Button>
                     </TabsContent>
                   </Tabs>
                 </CardContent>
