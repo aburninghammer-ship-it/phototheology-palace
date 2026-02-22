@@ -2213,9 +2213,9 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             primarySourceUrl:
               "https://www.biblestudytools.com/commentaries/wesleys-explanatory-notes/revelation/revelation-13.html",
             contextNotes:
-              "John Wesley (1703\u20131791), founder of Methodism and one of the most influential Protestant leaders in history, applied the day-year principle in his widely-read Explanatory Notes. Wesley\u2019s adoption of this principle shows it was mainstream Protestant hermeneutics.",
+              "John Wesley (1703\u20131791), founder of Methodism, applied a modified day-year system following J.A. Bengel. On Rev. 12:6 he wrote: \u2018Twelve hundred and sixty days \u2014 So many prophetic days, which are not, as some have supposed, twelve hundred and sixty, but seven hundred and seventy-seven, common years.\u2019 Wesley dated the beast\u2019s rise to 1077 AD and identified the Papacy as the power of Rev. 13.",
             agreementScope:
-              "Wesley\u2019s use of the day-year principle is identical to SDA application; his specific historical identifications vary.",
+              "Wesley used a historicist framework treating prophetic days as longer time periods, though via Bengel\u2019s modified ratio rather than the standard 1:1 day-year. His anti-papal identification still supports the historicist method.",
             credibilityGrade: "A",
           },
           {
