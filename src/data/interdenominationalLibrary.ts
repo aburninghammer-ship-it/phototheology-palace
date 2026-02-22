@@ -3256,6 +3256,78 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "An authoritative secular Iranian studies encyclopedia confirming the same date SDAs use.",
             credibilityGrade: "A",
           },
+          {
+            id: "pd-1-parker-dubberstein",
+            author: "Richard A. Parker & Waldo H. Dubberstein",
+            tradition: "Academic / Secular (Brown University)",
+            workTitle:
+              "Babylonian Chronology: 626 B.C. \u2013 A.D. 75",
+            year: "1956",
+            locator: "Chronological tables of Persian kings",
+            quoteExcerpt:
+              "Parker and Dubberstein compiled the standard reference work for ancient Babylonian and Persian chronology from thousands of dated cuneiform tablets. The last tablet dated to Xerxes\u2019 reign falls in approximately December 465 BC, and the earliest tablet dated to Artaxerxes\u2019 reign is January 3, 464 BC \u2014 confirming the 465 BC accession and placing the 7th year at 458/457 BC.",
+            primarySourceUrl:
+              "https://oi.uchicago.edu/research/publications/saoc/saoc-24",
+            contextNotes:
+              "This Brown University Press publication is the standard reference used across all fields of ancient Near Eastern studies. It is entirely secular \u2014 produced by Egyptologist Parker and Assyriologist Dubberstein for academic chronological purposes, with no theological agenda.",
+            agreementScope:
+              "The definitive secular academic chronological reference independently confirming the date SDAs use.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-1-archer",
+            author: "Gleason L. Archer, Jr.",
+            tradition: "Evangelical (Trinity Evangelical Divinity School)",
+            workTitle:
+              "Encyclopedia of Bible Difficulties",
+            year: "1982",
+            locator: "pp. 289\u2013295, discussion of Daniel 9:24\u201327",
+            quoteExcerpt:
+              "\u201CAn earlier decree is found in connection with Ezra\u2019s group that returned to Jerusalem in 457, the seventh year of Artaxerxes I.\u201D Archer argues that if this 457 BC decree is taken as the terminus a quo, then 483 years (69 weeks) reach to the precise year of the appearance of Jesus as Messiah.",
+            primarySourceUrl:
+              "https://www.zondervan.com/p/encyclopedia-of-bible-difficulties/",
+            contextNotes:
+              "Gleason Archer (1916\u20132004) was Professor of Old Testament at Trinity Evangelical Divinity School, one of America\u2019s premier evangelical seminaries. He held a Harvard Law degree and a Ph.D. from Harvard\u2019s Department of Semitic Languages. His explicit endorsement of 457 BC as the starting point of the 70 weeks comes from a non-SDA evangelical scholar of the highest academic caliber.",
+            agreementScope:
+              "A Harvard-trained evangelical OT scholar explicitly using 457 BC as the starting point of Daniel 9 \u2014 the same date SDAs use.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-1-leon-wood",
+            author: "Leon J. Wood",
+            tradition: "Baptist (Grand Rapids Baptist Seminary)",
+            workTitle:
+              "A Commentary on Daniel",
+            year: "1973",
+            locator: "Commentary on Daniel 9:24\u201327",
+            quoteExcerpt:
+              "Wood argues that the three decrees of Cyrus, Darius, and Artaxerxes were complementary, with the third \u2014 Artaxerxes\u2019 decree to Ezra in 457 BC \u2014 being the most comprehensive, authorizing the restoration of Jerusalem\u2019s civil and judicial infrastructure. He favors 457 BC as the starting point of the 70 weeks.",
+            primarySourceUrl:
+              "https://www.zondervan.com/",
+            contextNotes:
+              "Leon Wood was a Baptist Old Testament scholar at Grand Rapids Baptist Seminary \u2014 completely independent of SDA influence. His endorsement of 457 BC as the starting point of the 70 weeks provides Baptist confirmation of the same date SDAs use.",
+            agreementScope:
+              "A Baptist seminary professor independently arriving at the same 457 BC starting date that SDAs use for Daniel 9.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-1-prideaux",
+            author: "Humphrey Prideaux",
+            tradition: "Anglican (Dean of Norwich)",
+            workTitle:
+              "The Old and New Testament Connected in the History of the Jews and Neighbouring Nations",
+            year: "1716\u20131718",
+            locator: "Chronological tables and discussion of Ezra\u2019s commission",
+            quoteExcerpt:
+              "Prideaux, in his widely-used two-volume historical work, traced the chronology of the Persian kings and identified the 7th year of Artaxerxes as 457 BC, connecting Ezra\u2019s commission to the prophetic framework of Daniel 9. His work went through over 20 editions and was a standard reference for two centuries.",
+            primarySourceUrl:
+              "https://archive.org/search?query=humphrey+prideaux+old+new+testament+connected",
+            contextNotes:
+              "Humphrey Prideaux (1648\u20131724) was Dean of Norwich Cathedral in the Church of England. His historical chronology was the standard English-language reference on biblical-period history for nearly 200 years. Published before the SDA movement existed, it independently uses the same 457 BC date.",
+            agreementScope:
+              "A pre-SDA Anglican Dean using 457 BC as the key chronological anchor for the Persian period \u2014 200+ years before SDA adoption.",
+            credibilityGrade: "A",
+          },
         ],
       },
       // ── 538 AD ──────────────────────────────────────────────────
@@ -3679,6 +3751,24 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "Newton\u2019s application of the day-year principle to Daniel\u2019s time prophecies demonstrates that the greatest scientific mind in history used the same hermeneutical method SDAs use. His private manuscripts show he continued making prophetic calculations throughout his life.",
             agreementScope:
               "Newton\u2019s day-year method is identical to the SDA approach; his specific dates differ but the principle is the same.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-5-adam-clarke",
+            author: "Adam Clarke",
+            tradition: "Methodist (Wesleyan)",
+            workTitle:
+              "Commentary on the Holy Bible",
+            year: "1810\u20131826",
+            locator: "Commentary on Daniel 8:14 and Daniel 8:26",
+            quoteExcerpt:
+              "\u201CThough literally it be two thousand three hundred evenings and mornings, yet I think the prophetic day should be understood here, as in other parts of this prophet, and must signify so many years.\u201D On Daniel 8:26: \u201CFor it shall be for many days. Not less than two thousand three hundred years!\u201D",
+            primarySourceUrl:
+              "https://www.studylight.org/commentaries/eng/acc/daniel-8.html",
+            contextNotes:
+              "Adam Clarke (1760\u20131832) was one of the most influential Bible commentators in the English-speaking world. His explicit application of the day-year principle to Daniel 8:14 \u2014 the very text SDAs use \u2014 demonstrates that this interpretation was mainstream Methodist theology, not an SDA invention. Clarke calculated differently from Miller (starting from 334 BC, ending c. 1966), but his endorsement of the 2300-day-as-years principle is unambiguous.",
+            agreementScope:
+              "A premier Methodist commentator explicitly interpreting the 2300 days of Daniel 8:14 as 2300 years \u2014 the same hermeneutical move SDAs make.",
             credibilityGrade: "A",
           },
         ],
