@@ -1606,7 +1606,7 @@ export default function AudioBible() {
                           </Badge>
                         ))}
                       </div>
-                      <ScrollArea className="max-h-72">
+                      <ScrollArea className="h-[60vh]">
                         <div className="space-y-2">
                           {CURATED_STORIES
                             .filter(s => storyCategory === "all" || s.category === storyCategory)
