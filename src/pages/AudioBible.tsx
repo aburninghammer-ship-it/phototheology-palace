@@ -43,6 +43,7 @@ import {
   Download,
   Zap,
   RefreshCw,
+  Heart,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFreeTier } from "@/hooks/useFreeTier";
@@ -77,7 +78,7 @@ interface ChapterSelection {
 type SelectionMode = "chapter" | "book" | "custom" | "stories";
 
 import { CURATED_STORIES, STORY_CATEGORIES, type BiblicalStory } from '@/data/curatedStories';
-type CommentaryMode = "verse" | "chapter";
+type CommentaryMode = "verse" | "chapter" | "passage";
 
 export default function AudioBible() {
   const { t } = useTranslation();
@@ -180,6 +181,7 @@ export default function AudioBible() {
   
   // Starting verse for chapter playback
   const [startVerse, setStartVerse] = useState(1);
+  const [endVerse, setEndVerse] = useState<number | null>(null);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [storyCategory, setStoryCategory] = useState("all");
   const [showImmersiveView, setShowImmersiveView] = useState(false);
@@ -206,9 +208,10 @@ export default function AudioBible() {
     if (verse) setStartVerse(parseInt(verse, 10));
   }, [searchParams]);
 
-  // Reset start verse when book or chapter changes
+  // Reset start/end verse when book or chapter changes
   useEffect(() => {
     setStartVerse(1);
+    setEndVerse(null);
   }, [selectedBook, selectedChapter]);
 
   const loadThemes = async () => {
@@ -222,14 +225,18 @@ export default function AudioBible() {
     return book?.chapters || 1;
   };
 
-  // Handle play for single chapter (starting from selected verse)
+  // Handle play for single chapter (starting from selected verse, with optional end verse)
   const handlePlayChapter = async () => {
     await unlock();
     const allVerses = await fetchChapterVerses(selectedBook, selectedChapter);
     if (allVerses.length > 0) {
-      const verses = startVerse > 1
-        ? allVerses.filter(v => v.verse >= startVerse)
-        : allVerses;
+      let verses = allVerses;
+      if (startVerse > 1) {
+        verses = verses.filter(v => v.verse >= startVerse);
+      }
+      if (endVerse !== null) {
+        verses = verses.filter(v => v.verse <= endVerse);
+      }
       if (verses.length > 0) {
         playChapter(selectedBook, selectedChapter, verses);
       }
@@ -1156,6 +1163,12 @@ export default function AudioBible() {
                         {activeModeMeta.label} Mode
                       </Badge>
                     )}
+                    {includeCommentary && commentarySource === "counselor" && (
+                      <Badge variant="outline" className="text-xs px-2 py-0.5 border-rose-500/50 text-rose-400">
+                        <Heart className="h-3 w-3 mr-1" />
+                        Counselor
+                      </Badge>
+                    )}
                     {commentaryOnly && (
                       <Badge variant="outline" className="text-xs px-2 py-0.5 border-violet-500/50 text-violet-400">
                         Commentary Only
@@ -1169,6 +1182,8 @@ export default function AudioBible() {
                           ? "Story Mode"
                           : commentarySource === "epic"
                           ? `${activeModeMeta.label} Commentary`
+                          : commentarySource === "counselor"
+                          ? "Counselor"
                           : t('audioBible.tierCommentary', { tier: commentaryTier })
                         : t('audioBible.scripture')}
                     </Badge>
@@ -1346,13 +1361,53 @@ export default function AudioBible() {
                             type="number"
                             min={1}
                             value={startVerse}
-                            onChange={(e) => setStartVerse(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                            onChange={(e) => {
+                              const val = Math.max(1, parseInt(e.target.value, 10) || 1);
+                              setStartVerse(val);
+                              if (endVerse !== null && endVerse < val) setEndVerse(null);
+                            }}
                             className="w-24"
                           />
-                          {startVerse > 1 && (
+                          {startVerse > 1 && endVerse === null && (
                             <span className="text-sm text-muted-foreground">
                               Playing from verse {startVerse} onward
                             </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* End at verse (optional — creates a passage range) */}
+                      <div className="space-y-2">
+                        <Label>End at verse <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min={startVerse}
+                            value={endVerse ?? ""}
+                            placeholder="—"
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              if (!raw) { setEndVerse(null); return; }
+                              const val = Math.max(startVerse, parseInt(raw, 10) || startVerse);
+                              setEndVerse(val);
+                              if (commentaryMode !== "passage") setCommentaryMode("passage");
+                            }}
+                            className="w-24"
+                          />
+                          {endVerse !== null && (
+                            <>
+                              <span className="text-sm text-muted-foreground">
+                                Playing verses {startVerse}–{endVerse}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={() => setEndVerse(null)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </>
                           )}
                         </div>
                       </div>
@@ -1405,7 +1460,9 @@ export default function AudioBible() {
                       ) : (
                         <Button size="lg" className="w-full" onClick={handlePlayChapter} disabled={isLoading}>
                           {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
-                          {startVerse > 1
+                          {endVerse !== null
+                            ? `Play ${selectedBook} ${selectedChapter}:${startVerse}-${endVerse}`
+                            : startVerse > 1
                             ? `Play ${selectedBook} ${selectedChapter} from verse ${startVerse}`
                             : t('audioBible.playBookChapter', { book: selectedBook, chapter: selectedChapter })}
                         </Button>
@@ -1995,7 +2052,7 @@ export default function AudioBible() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Listening Mode Grid */}
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <Button
                       variant={!includeCommentary && commentarySource !== "epic" ? "default" : "outline"}
                       className="h-auto py-3 px-2 flex-col gap-1 text-center"
@@ -2043,6 +2100,18 @@ export default function AudioBible() {
                       <Crown className="h-5 w-5 mb-0.5" />
                       <span className="font-semibold text-sm leading-tight">Mentor</span>
                       <span className="text-[10px] opacity-80 leading-tight">Preacher mode</span>
+                    </Button>
+                    <Button
+                      variant={includeCommentary && commentarySource === "counselor" ? "default" : "outline"}
+                      className="h-auto py-3 px-2 flex-col gap-1 text-center"
+                      onClick={() => {
+                        setIncludeCommentary(true);
+                        setCommentarySource("counselor");
+                      }}
+                    >
+                      <Heart className="h-5 w-5 mb-0.5" />
+                      <span className="font-semibold text-sm leading-tight">Counselor</span>
+                      <span className="text-[10px] opacity-80 leading-tight">Soul care</span>
                     </Button>
                   </div>
 
@@ -2110,10 +2179,10 @@ export default function AudioBible() {
                         </div>
                       </div>
 
-                      {/* Commentary Mode: Verse by Verse or Chapter Summary */}
+                      {/* Commentary Mode: Verse by Verse, Chapter Summary, or Passage */}
                       <div className="space-y-2">
                         <Label>{t('audioBible.commentaryStyle')}</Label>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                           <Button
                             variant={commentaryMode === "verse" ? "default" : "outline"}
                             size="sm"
@@ -2131,6 +2200,15 @@ export default function AudioBible() {
                           >
                             <span className="font-medium">{t('audioBible.chapterSummary')}</span>
                             <span className="text-xs opacity-80">{t('audioBible.afterWholeChapter')}</span>
+                          </Button>
+                          <Button
+                            variant={commentaryMode === "passage" ? "default" : "outline"}
+                            size="sm"
+                            className="h-auto py-2 flex-col"
+                            onClick={() => setCommentaryMode("passage")}
+                          >
+                            <span className="font-medium">Passage</span>
+                            <span className="text-xs opacity-80">One for range</span>
                           </Button>
                         </div>
                       </div>

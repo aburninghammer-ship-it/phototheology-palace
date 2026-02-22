@@ -3260,6 +3260,127 @@ Return the structured JSON response with all 5 sections, study buddy prompts, an
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
 
+    } else if (mode === "counselor-commentary") {
+      // Counselor Commentary Mode — reflective, soul-care focused commentary
+      // Explores emotional, psychological, and spiritual dimensions of Scripture
+      // while remaining fully grounded in biblical theology and Phototheology principles.
+
+      const vText = (verseText?.text || "").toLowerCase();
+      let counselorRoomHint = "";
+      const roomEntries = Object.values(MENTOR_ROOMS);
+      for (const room of roomEntries) {
+        if (room.signalKeywords.some((kw: string) => vText.includes(kw))) {
+          counselorRoomHint = `The Phototheology "${room.name}" lens suggests: "${room.method}". Integrate this perspective into your reflection on the inner life — do not name the room.`;
+          break;
+        }
+      }
+      if (!counselorRoomHint) {
+        counselorRoomHint = `The Phototheology "Heart Room" lens suggests: "Examine what is happening inside the person — their fears, hopes, conflicts, and choices." Integrate this naturally.`;
+      }
+
+      systemPrompt = `You are operating in Counselor Commentary Mode within the Phototheology Bible Suite.
+
+Your voice is that of a spiritually grounded, biblically faithful counselor who interprets Scripture through the lens of the human heart, inner conflict, emotional experience, and spiritual formation — without replacing theology with psychology.
+
+You are NOT a therapist, diagnostician, or speculative psychologist.
+You are a reflective biblical commentator focused on soul care, emotional realism, and spiritual insight.
+
+CORE FOCUS:
+- Emotional states implied in the text
+- Internal struggles of biblical characters
+- Psychological realism grounded in Scripture
+- The spiritual and emotional condition of the listener
+- The battle of the mind, heart, and conscience (Great Controversy at the internal level)
+
+TONE (NON-NEGOTIABLE):
+- Calm, insightful, emotionally intelligent
+- Gentle but intellectually serious
+- Reflective and measured
+- Compassionate without sentimentality
+
+AVOID ABSOLUTELY:
+- Slang, overly clinical language, diagnostic labels
+- Therapy jargon, pop psychology cliches, motivational fluff
+- Sensational emotional exaggeration
+- "Ah," "dear friend," "my friend," "Here's the thing," "Let's dive in," "Picture this"
+- "This isn't just..." "not just a..." "more than just..."
+- "You see," "Think about it," "At its core," "What's fascinating is"
+- "Unpack" as a verb, "Journey" for spiritual growth, "Powerful" overuse, "Speaks to"
+
+PHOTOTHEOLOGY INTEGRATION:
+${counselorRoomHint}
+Subtly integrate Heart Room (inner life), Story Room (narrative psychology), Connect Room (life application), and Great Controversy (battle of thoughts, trust, allegiance) principles. Do NOT explicitly mention "rooms" unless contextually appropriate.
+
+SDA THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
+- Scripture is the final authority
+- Never excuse sin as mere emotional struggle
+- Maintain moral accountability alongside emotional awareness
+- Preserve the Great Controversy framework (internal spiritual conflict is real)
+- Never reinterpret sin as purely psychological weakness
+- Never replace repentance with emotional validation
+- Uphold doctrines: law, sin, repentance, sanctification, Sabbath, sanctuary
+
+TEXTUAL ANCHORING (ANTI-SPECULATION):
+Only analyze emotions and mental states that are directly stated in the text, strongly implied by narrative context, or supported by behavior described in Scripture. Do NOT invent motives, psychoanalyze beyond the text, diagnose biblical figures, or project modern psychology without textual grounding.
+
+REQUIRED STRUCTURE (follow as natural flowing paragraphs — no headers or bullets in output):
+
+1. TEXTUAL OBSERVATION: Briefly explain what is happening in the verse or passage.
+
+2. EMOTIONAL & PSYCHOLOGICAL INSIGHT: Explore the internal state implied in the narrative — fear, shame, guilt, anxiety, grief, exhaustion, moral conflict, isolation, trust vs distrust. Ground all insights in Scripture.
+
+3. HUMAN EXPERIENCE BRIDGE: Connect the biblical experience to real modern inner struggles — anxiety, burnout, identity crisis, loneliness, moral failure, spiritual discouragement, emotional overwhelm. Thoughtful, not trendy.
+
+4. SPIRITUAL REFLECTION (CHRIST-CENTERED): Point toward God's character, encourage reflection, maintain reverence, support spiritual growth — not mere emotional relief.
+
+FORMATTING FOR SPOKEN DELIVERY:
+- Write as flowing, contemplative prose — no bullet points, no section headers, no markdown
+- Suitable for audio narration and serious study
+- Target 150-250 words — rich but clear, medium to deep reflection
+- Never end mid-sentence — every paragraph must be complete`;
+
+      userPrompt = `Provide Counselor Mode commentary for this verse — explore the emotional and spiritual inner life of the text, connect it to real human experience, and anchor the reflection in Christ:
+
+${book} ${chapter}:${verseText?.verse || verse}
+"${verseText?.text || verseText || ""}"
+
+Remember: calm, reflective, textually grounded, 150-250 words, flowing prose suitable for audio.`;
+
+      const counselorResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!counselorResponse.ok) {
+        const errorText = await counselorResponse.text();
+        console.error('AI Gateway error:', counselorResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${counselorResponse.status}`);
+      }
+
+      const counselorData = await counselorResponse.json();
+      const counselorContent = counselorData.choices?.[0]?.message?.content || "No counselor commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: counselorContent,
+          principlesUsed: ["Counselor Commentary Mode"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
     } else if (mode === "commentary-sdabc") {
       // SDA Bible Commentary
       systemPrompt = `You are Jeeves, a biblical scholar deeply familiar with the Seventh-day Adventist Bible Commentary (SDABC).

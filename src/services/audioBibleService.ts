@@ -14,7 +14,7 @@ import {
 
 export type CommentaryTier = "surface" | "intermediate" | "scholarly";
 
-export type CommentarySource = "standard" | "preacher-mentor" | "story-mode" | "epic";
+export type CommentarySource = "standard" | "preacher-mentor" | "story-mode" | "epic" | "counselor";
 
 export type OpenAIVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "nova" | "onyx" | "sage" | "shimmer";
 
@@ -379,6 +379,107 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
 }
 
 /**
+ * Generate Counselor Mode commentary for a verse
+ * Reflective, soul-care focused commentary exploring emotional, psychological,
+ * and spiritual dimensions of Scripture while remaining biblically grounded.
+ * Tries dedicated counselor-commentary mode first, falls back to verse-explanation,
+ * then to standard intermediate commentary.
+ */
+export async function generateCounselorCommentary(options: CommentaryOptions): Promise<CommentaryResult | null> {
+  const { book, chapter, verse, verseText, generateAudio = false, voice = "sage" } = options;
+
+  try {
+    const session = await supabase.auth.getSession();
+    const token = session.data.session?.access_token;
+    const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "";
+    const anonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "";
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      apikey: anonKey,
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    let commentaryText = "";
+
+    // Attempt 1: Dedicated counselor-commentary mode in Jeeves
+    try {
+      const counselorRes = await fetch(
+        `${supabaseUrl}/functions/v1/jeeves`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            mode: "counselor-commentary",
+            book,
+            chapter,
+            verseText: { verse, text: verseText },
+          }),
+        }
+      );
+
+      if (counselorRes.ok) {
+        const data = await counselorRes.json();
+        commentaryText = typeof data.content === "string"
+          ? data.content
+          : data.content?.reflection || "";
+      }
+    } catch (e) {
+      console.warn("[Counselor] Dedicated mode failed, trying verse-explanation:", e);
+    }
+
+    // Attempt 2: Fall back to verse-explanation mode
+    if (!commentaryText) {
+      console.log("[Counselor] Using verse-explanation fallback");
+      try {
+        const explainRes = await fetch(
+          `${supabaseUrl}/functions/v1/jeeves`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              mode: "verse-explanation",
+              book,
+              chapter,
+              verse,
+              verseText,
+            }),
+          }
+        );
+
+        if (explainRes.ok) {
+          const data = await explainRes.json();
+          commentaryText = typeof data.content === "string" ? data.content : "";
+        }
+      } catch (e) {
+        console.warn("[Counselor] Verse-explanation fallback failed:", e);
+      }
+    }
+
+    // Attempt 3: Standard intermediate commentary as last resort
+    if (!commentaryText) {
+      console.log("[Counselor] All Jeeves modes failed, using standard commentary");
+      return generateCommentary({ ...options, tier: "intermediate" });
+    }
+
+    // Generate audio if requested — default to "sage" voice for calm, measured tone
+    let audioUrl: string | null = null;
+    if (generateAudio && commentaryText) {
+      audioUrl = await generateTTSAudio({ text: commentaryText, voice });
+    }
+
+    return {
+      commentary: commentaryText,
+      audioUrl,
+      cached: false,
+    };
+  } catch (error) {
+    console.error("[Counselor Commentary] Error:", error);
+    return generateCommentary({ ...options, tier: "intermediate" });
+  }
+}
+
+/**
  * Chapter commentary options
  */
 interface ChapterCommentaryOptions {
@@ -420,6 +521,179 @@ export async function generateChapterCommentary(options: ChapterCommentaryOption
     };
   } catch (error) {
     console.error("[Chapter Commentary] Error:", error);
+    return null;
+  }
+}
+
+/**
+ * Passage commentary options
+ */
+interface PassageCommentaryOptions {
+  book: string;
+  chapter: number;
+  startVerse: number;
+  endVerse: number;
+  passageText?: string;
+  depth?: "surface" | "intermediate" | "depth";
+  generateAudio?: boolean;
+  voice?: OpenAIVoice;
+  commentarySource?: CommentarySource;
+}
+
+/**
+ * Generate passage-level commentary (one cohesive commentary for a verse range)
+ * Routes to the correct backend based on commentarySource.
+ */
+export async function generatePassageCommentary(options: PassageCommentaryOptions): Promise<CommentaryResult | null> {
+  const {
+    book, chapter, startVerse, endVerse, passageText,
+    depth = "surface", generateAudio = true, voice = "onyx",
+    commentarySource = "standard",
+  } = options;
+
+  try {
+    const session = await supabase.auth.getSession();
+    const token = session.data.session?.access_token;
+    const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "";
+    const anonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "";
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      apikey: anonKey,
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    // Route to the correct backend based on source
+    if (commentarySource === "preacher-mentor") {
+      try {
+        const res = await fetch(`${supabaseUrl}/functions/v1/jeeves`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            mode: "preacher-mentor-commentary",
+            book,
+            chapter,
+            verseText: { verse: `${startVerse}-${endVerse}`, text: passageText },
+            primary_room: "sr",
+            secondary_rooms: [],
+            genre: "narrative",
+            override_room: null,
+            isPassage: true,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const content = data.content;
+          let commentaryText = typeof content === "string" ? content
+            : content?.sections ? [content.sections.meaning, content.sections.cross_scripture, content.sections.palace_framing, content.sections.preaching_orientation].filter(Boolean).join("\n\n")
+            : typeof content === "string" ? content : JSON.stringify(content);
+          if (commentaryText) {
+            let audioUrl: string | null = null;
+            if (generateAudio) audioUrl = await generateTTSAudio({ text: commentaryText, voice });
+            return { commentary: commentaryText, audioUrl, cached: false };
+          }
+        }
+      } catch (e) {
+        console.warn("[Passage] Preacher-mentor failed, falling back to standard:", e);
+      }
+    }
+
+    if (commentarySource === "story-mode") {
+      try {
+        const res = await fetch(`${supabaseUrl}/functions/v1/jeeves`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            mode: "story-mode-commentary",
+            book,
+            chapter,
+            verseText: { verse: `${startVerse}-${endVerse}`, text: passageText },
+            isPassage: true,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const commentaryText = typeof data.content === "string" ? data.content : data.content?.narrative || "";
+          if (commentaryText) {
+            let audioUrl: string | null = null;
+            if (generateAudio) audioUrl = await generateTTSAudio({ text: commentaryText, voice });
+            return { commentary: commentaryText, audioUrl, cached: false };
+          }
+        }
+      } catch (e) {
+        console.warn("[Passage] Story-mode failed, falling back to standard:", e);
+      }
+    }
+
+    if (commentarySource === "epic") {
+      try {
+        const { data, error } = await supabase.functions.invoke("generate-epic-commentary", {
+          body: { book, chapter, scope: "passage", startVerse, endVerse, passageText },
+        });
+        if (!error && data?.commentary) {
+          let audioUrl = data.audioUrl || null;
+          if (!audioUrl && generateAudio) audioUrl = await generateTTSAudio({ text: data.commentary, voice });
+          return { commentary: data.commentary, audioUrl, cached: false };
+        }
+      } catch (e) {
+        console.warn("[Passage] Epic mode failed, falling back to standard:", e);
+      }
+    }
+
+    if (commentarySource === "counselor") {
+      try {
+        const res = await fetch(`${supabaseUrl}/functions/v1/jeeves`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            mode: "counselor-commentary",
+            book,
+            chapter,
+            verseText: { verse: `${startVerse}-${endVerse}`, text: passageText },
+            isPassage: true,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const commentaryText = typeof data.content === "string" ? data.content : data.content?.reflection || "";
+          if (commentaryText) {
+            let audioUrl: string | null = null;
+            if (generateAudio) audioUrl = await generateTTSAudio({ text: commentaryText, voice });
+            return { commentary: commentaryText, audioUrl, cached: false };
+          }
+        }
+      } catch (e) {
+        console.warn("[Passage] Counselor mode failed, falling back to standard:", e);
+      }
+    }
+
+    // Standard: call generate-chapter-commentary with isPassage flag
+    const { data, error } = await supabase.functions.invoke("generate-chapter-commentary", {
+      body: {
+        book,
+        chapter,
+        chapterText: passageText,
+        depth,
+        generateAudio,
+        voice,
+        isPassage: true,
+        startVerse,
+        endVerse,
+      },
+    });
+
+    if (error) {
+      console.error("[Passage Commentary] Error:", error);
+      return null;
+    }
+
+    return {
+      commentary: data?.commentary || "",
+      audioUrl: data?.audioUrl || null,
+      cached: data?.cached || false,
+    };
+  } catch (error) {
+    console.error("[Passage Commentary] Error:", error);
     return null;
   }
 }

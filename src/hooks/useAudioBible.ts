@@ -10,7 +10,9 @@ import {
   generateCommentary,
   generatePreacherMentorCommentary,
   generateStoryModeCommentary,
+  generateCounselorCommentary,
   generateChapterCommentary,
+  generatePassageCommentary,
   prefetchUpcomingCommentary,
   CommentaryTier,
   CommentarySource,
@@ -59,7 +61,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   const [commentaryTier, setCommentaryTier] = useState<CommentaryTier>(defaultTier);
   const [includeCommentary, setIncludeCommentary] = useState(true);
   const [commentaryOnly, setCommentaryOnly] = useState(false);
-  const [commentaryMode, setCommentaryMode] = useState<"verse" | "chapter">("verse");
+  const [commentaryMode, setCommentaryMode] = useState<"verse" | "chapter" | "passage">("verse");
   const [commentarySource, setCommentarySource] = useState<CommentarySource>("standard");
 
   // Playback tracking
@@ -185,6 +187,8 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         ? await generatePreacherMentorCommentary(opts)
         : source === "story-mode"
         ? await generateStoryModeCommentary(opts)
+        : source === "counselor"
+        ? await generateCounselorCommentary(opts)
         : await generateCommentary(opts);
 
       if (result && !isStoppedRef.current) {
@@ -251,6 +255,15 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
             })
           : source === "story-mode"
           ? generateStoryModeCommentary({
+              book: item.book,
+              chapter: item.chapter,
+              verse: verse.verse,
+              verseText: verse.text,
+              generateAudio: true,
+              voice: commentaryVoiceRef.current,
+            })
+          : source === "counselor"
+          ? generateCounselorCommentary({
               book: item.book,
               chapter: item.chapter,
               verse: verse.verse,
@@ -431,6 +444,87 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   }, []);
 
   /**
+   * Play passage-level commentary (one cohesive commentary for a verse range)
+   */
+  const playPassageCommentary = useCallback(async () => {
+    const item = currentItemRef.current;
+    if (!item || isStoppedRef.current) return;
+
+    setIsPlayingCommentary(true);
+    loadingRef.current = true;
+
+    try {
+      const firstVerse = item.verses[0]?.verse || 1;
+      const lastVerse = item.verses[item.verses.length - 1]?.verse || firstVerse;
+      console.log(`[useAudioBible] Playing passage commentary for ${item.book} ${item.chapter}:${firstVerse}-${lastVerse}`);
+
+      const passageText = item.verses.map(v => `${v.verse}. ${v.text}`).join('\n');
+
+      const depthMap: Record<CommentaryTier, "surface" | "intermediate" | "depth"> = {
+        surface: "surface",
+        intermediate: "intermediate",
+        scholarly: "depth"
+      };
+
+      const timeoutPromise = new Promise<null>((_, reject) => {
+        setTimeout(() => reject(new Error("Passage commentary generation timed out")), 60000);
+      });
+
+      const commentaryPromise = generatePassageCommentary({
+        book: item.book,
+        chapter: item.chapter,
+        startVerse: firstVerse,
+        endVerse: lastVerse,
+        passageText,
+        depth: depthMap[commentaryTierRef.current],
+        generateAudio: true,
+        voice: commentaryVoiceRef.current,
+        commentarySource: commentarySourceRef.current,
+      });
+
+      const result = await Promise.race([commentaryPromise, timeoutPromise]);
+
+      if (isStoppedRef.current || !result) {
+        console.log("[useAudioBible] Stopped or no passage commentary result");
+        loadingRef.current = false;
+        setIsPlayingCommentary(false);
+        return;
+      }
+
+      console.log(`[useAudioBible] Passage commentary received: ${result.commentary?.substring(0, 100)}...`);
+      setCurrentCommentary(result.commentary);
+
+      if (result.audioUrl) {
+        console.log("[useAudioBible] Playing passage commentary audio URL");
+        await audioEngine.play(result.audioUrl);
+      } else if (result.commentary) {
+        console.log("[useAudioBible] Generating TTS for passage commentary");
+        const audioUrl = await generateTTSAudio({ text: result.commentary, voice: commentaryVoiceRef.current });
+        if (audioUrl && !isStoppedRef.current) {
+          await audioEngine.play(audioUrl);
+        } else {
+          console.log("[useAudioBible] TTS failed, showing passage commentary text only");
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          if (!isStoppedRef.current) {
+            audioEngine.stop();
+          }
+        }
+      }
+    } catch (error) {
+      console.error("[useAudioBible] Passage commentary error:", error);
+      setCurrentCommentary("Passage commentary unavailable.");
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!isStoppedRef.current) {
+        setIsPlayingCommentary(false);
+        setCurrentCommentary("");
+        audioEngine.stop();
+      }
+    } finally {
+      loadingRef.current = false;
+    }
+  }, []);
+
+  /**
    * Play a specific verse
    */
   const playVerseAtIndex = useCallback(async (item: PlaybackItem, index: number) => {
@@ -461,8 +555,8 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         // Start playing verse audio
         await audioEngine.play(audioUrl);
 
-        // Pre-fetch commentary while verse plays (for mobile performance)
-        if (includeCommentaryRef.current && !commentaryOnlyRef.current) {
+        // Pre-fetch commentary while verse plays (for mobile performance, not for passage mode)
+        if (includeCommentaryRef.current && !commentaryOnlyRef.current && commentaryModeRef.current !== "passage") {
           prefetchCurrentCommentary().catch(console.error);
         }
       } else {
@@ -517,8 +611,8 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     setIsPlayingCommentary(false);
     setCurrentCommentary("");
 
-    // Prefetch commentary for upcoming verses in the background
-    if (includeCommentaryRef.current && item.verses.length > 1) {
+    // Prefetch commentary for upcoming verses in the background (not for passage mode)
+    if (includeCommentaryRef.current && commentaryModeRef.current !== "passage" && item.verses.length > 1) {
       prefetchUpcomingCommentary(
         item.book,
         item.chapter,
@@ -544,7 +638,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     console.log(`[useAudioBible] Playback ended. isPlayingCommentary: ${isPlayingCommentaryRef.current}, includeCommentary: ${includeCommentaryRef.current}, commentaryMode: ${commentaryModeRef.current}`);
 
     // If we just played a verse and verse-by-verse commentary is enabled, play verse commentary next
-    // Skip this if commentaryMode is "chapter" - we'll play chapter summary at the end instead
+    // Skip this if commentaryMode is "chapter" or "passage" - we'll play summary at the end instead
     if (!isPlayingCommentaryRef.current && includeCommentaryRef.current && !commentaryOnlyRef.current && commentaryModeRef.current === "verse") {
       console.log("[useAudioBible] Starting verse commentary playback");
       playCurrentVerseCommentary();
@@ -561,8 +655,8 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     if (nextIndex < item.verses.length) {
       setCurrentVerseIndexSync(nextIndex);
 
-      // Prefetch more commentary ahead when advancing verses
-      if (includeCommentaryRef.current && nextIndex + 2 < item.verses.length) {
+      // Prefetch more commentary ahead when advancing verses (not for passage mode)
+      if (includeCommentaryRef.current && commentaryModeRef.current !== "passage" && nextIndex + 2 < item.verses.length) {
         prefetchUpcomingCommentary(
           item.book,
           item.chapter,
@@ -575,10 +669,15 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
 
       playVerseAtIndex(item, nextIndex);
     } else {
-      // Chapter complete - check if we need to play chapter summary commentary
+      // Chapter complete - check if we need to play chapter/passage summary commentary
       if (includeCommentaryRef.current && commentaryModeRef.current === "chapter" && !isPlayingCommentaryRef.current) {
         console.log("[useAudioBible] Playing chapter summary commentary");
         playChapterCommentary();
+        return;
+      }
+      if (includeCommentaryRef.current && commentaryModeRef.current === "passage" && !isPlayingCommentaryRef.current) {
+        console.log("[useAudioBible] Playing passage commentary");
+        playPassageCommentary();
         return;
       }
       
@@ -594,7 +693,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         setAudioState("idle");
       }
     }
-  }, [playCurrentVerseCommentary, playVerseAtIndex, startPlayback, setCurrentVerseIndexSync]);
+  }, [playCurrentVerseCommentary, playPassageCommentary, playVerseAtIndex, startPlayback, setCurrentVerseIndexSync]);
 
   // Subscribe to audio engine events - use ref to always get latest handler
   const handlePlaybackEndedRef = useRef(handlePlaybackEnded);

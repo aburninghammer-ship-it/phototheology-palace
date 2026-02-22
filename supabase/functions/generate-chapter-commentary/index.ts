@@ -361,16 +361,19 @@ serve(async (req) => {
   }
 
   try {
-    const { 
-      book, 
-      chapter, 
-      chapterText, 
-      depth = "surface", 
-      userName, 
-      language = "en", 
+    const {
+      book,
+      chapter,
+      chapterText,
+      depth = "surface",
+      userName,
+      language = "en",
       userStudiesContext,
       generateAudio = true, // New param to request audio generation
-      voice = 'echo' // Default voice for commentary
+      voice = 'echo', // Default voice for commentary
+      isPassage = false, // Passage-level commentary for verse range
+      startVerse,
+      endVerse,
     } = await req.json();
 
     if (!book || !chapter) {
@@ -386,9 +389,10 @@ serve(async (req) => {
     
     // Skip cache if user has study context - personalized commentary should be fresh
     const hasUserStudies = userStudiesContext && userStudiesContext.length > 0;
-    
+
     // Check cache first (only for depth commentary which is most expensive, and only if no user studies)
-    if (supabaseUrl && supabaseServiceKey && depth === "depth" && !hasUserStudies) {
+    // Skip cache for passage commentaries (ranges are too varied to cache efficiently)
+    if (supabaseUrl && supabaseServiceKey && depth === "depth" && !hasUserStudies && !isPassage) {
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
       
       const { data: cached, error: cacheError } = await supabase
@@ -457,7 +461,17 @@ serve(async (req) => {
       propheticFrameworkSection = getPropheticFramework("MATTHEW");
     }
 
-    const userPrompt = depth === "depth"
+    const userPrompt = isPassage
+      ? `Provide a cohesive passage commentary for ${book} ${chapter}:${startVerse}-${endVerse}.
+
+${chapterText ? `Here is the passage text:\n${chapterText}\n\n` : ""}
+${userStudiesSection}${propheticFrameworkSection}
+Treat this passage as ONE unified narrative or argument. Provide a single, flowing commentary that covers the entire passage as a whole.
+Reference individual verses within the range where relevant (e.g., "In verse ${startVerse}..." or "By verse ${endVerse}...").
+Do NOT comment on verses outside the ${startVerse}-${endVerse} range.
+Keep it suitable for spoken audio delivery. ${depth === "depth" ? "Make it thorough enough for serious Bible students." : depth === "intermediate" ? "Provide a thorough analysis." : "Keep it concise but insightful."}
+${hasUserStudies ? "BUILD UPON the user's previous study insights where relevant—acknowledge and extend their discoveries." : ""}`
+      : depth === "depth"
       ? `The reader just finished ${book} chapter ${chapter}.
 
 ${chapterText ? `Here's the chapter content:\n${chapterText}\n\n` : ""}
@@ -556,8 +570,8 @@ ${hasUserStudies ? "BUILD UPON the user's previous study insights where relevant
 
     let audioUrl = null;
 
-    // Cache depth commentary for future use
-    if (supabaseUrl && supabaseServiceKey && depth === "depth") {
+    // Cache depth commentary for future use (skip for passage commentaries)
+    if (supabaseUrl && supabaseServiceKey && depth === "depth" && !isPassage) {
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
       
       const { error: insertError } = await supabase
