@@ -2119,7 +2119,7 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             year: "1544",
             locator: "Prophetic chronology sections",
             quoteExcerpt:
-              "Osiander applied the day-year principle to calculate the duration of the Antichrist\u2019s reign using Daniel 7:25 and Revelation 13:5, interpreting 1260 days as 1260 years.",
+              "Osiander conceived Daniel\u2019s numbers of 1290 and 1335 as year-days, combining them as 2625 years extending to the end, and fixed the end of the world at 1689.",
             primarySourceUrl:
               "https://archive.org/search?query=osiander+conjecturae+ultimis+temporibus",
             contextNotes:
@@ -2155,7 +2155,7 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             year: "1543",
             locator: "Commentary on Daniel 9:24\u201327",
             quoteExcerpt:
-              "Melanchthon interpreted the 70 weeks of Daniel 9 as 490 years using the day-year principle, and applied it to calculate the chronology from the Persian decree to the coming of Christ.",
+              "Melanchthon conceived Daniel\u2019s numbers of 1290 and 1335 to be year-days, combining them as 2625 years; he also calculated the 70 weeks of Daniel 9 as 490 years from the Persian decree to Christ.",
             primarySourceUrl:
               "https://archive.org/search?query=melanchthon+commentary+daniel",
             contextNotes:
@@ -2171,9 +2171,9 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             workTitle:
               "Observations upon the Prophecies of Daniel, and the Apocalypse of St. John",
             year: "1733",
-            locator: "Part I, chapters on the prophetic time periods",
+            locator: "Part II, Chapter 3",
             quoteExcerpt:
-              "\u201CA time for a Calendar year of 360 days, and a day for a solar year.\u201D",
+              "\u201CIn these Prophecies days are put for years.\u201D",
             primarySourceUrl:
               "https://www.gutenberg.org/files/16878/16878-h/16878-h.htm",
             contextNotes:
@@ -2191,7 +2191,7 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             year: "1754",
             locator: "Dissertations on Daniel 7 and Revelation 13",
             quoteExcerpt:
-              "Bishop Newton systematically applied the day-year principle to Daniel\u2019s time prophecies and the 1260 days of Revelation, calculating the papal period and identifying it with the little horn.",
+              "Bishop Newton interpreted the 1260 days as 1260 years of papal dominion, calculating from approximately 756 AD (the donation of Pepin) and anticipated that the Papacy would lose temporal power at the end of this period.",
             primarySourceUrl:
               "https://archive.org/details/dissertationson00newtgoog",
             contextNotes:
@@ -2245,7 +2245,7 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             year: "1627",
             locator: "Synchronistic tables and time-period analysis",
             quoteExcerpt:
-              "Mede\u2019s systematic framework explicitly applied the day-year principle, synchronizing the prophetic time periods of Revelation (1260 days, 42 months) as 1260 years and mapping them onto church history.",
+              "Mede interpreted the 1260 days as 1260 years, the locusts\u2019 150 days (Rev. 9) as 150 years of Saracen ravages (830\u2013980 AD), and the Euphratean horsemen\u2019s \u2018hour, day, month, and year\u2019 as 396 years (1057\u20131453 AD).",
             primarySourceUrl:
               "https://archive.org/details/worksofjosephmed00medeuoft",
             contextNotes:
