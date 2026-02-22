@@ -7287,6 +7287,54 @@ CRITICAL RULES:
 
       userPrompt = `Evaluate this disciple's defense and provide your 5-step coaching analysis. The disciple was defending the SDA position on "${defenseTopicName || 'this doctrine'}" against an opponent's attack. Be thorough, honest, and constructive.`;
 
+    } else if (mode === "defense-analyze-weapon") {
+      // Defense Mode: Analyze a disciple's written defense as a "weapon" — break down strengths, weaknesses, and forge it stronger
+      const userWeaponText = requestBody.message || requestBody.weaponText || "";
+      const topicName = requestBody.defenseTopicName || requestBody.topic || "General theology";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in WEAPON ANALYSIS mode. The disciple has written a theological defense or argument and wants you to analyze it as a "weapon" — evaluating its cutting edge, its weak points, and how to forge it stronger.
+
+THE PALACE METHOD ROOMS FOR ANALYSIS:
+${PALACE_SCHEMA}
+
+ANALYSIS FORMAT — Jeeves Weapon Analysis:
+
+🗡️ **WEAPON TYPE**: [Classify: Apologetic Sword / Prophetic Spear / Doctrinal Shield / Evangelistic Arrow / Pastoral Staff]
+
+⚔️ **CUTTING EDGE** (What's sharp and effective):
+- [2-3 strongest points in their argument]
+- Scripture usage strength
+- Logical flow assessment
+
+🔍 **WEAK POINTS** (Where the blade dulls):
+- [2-3 vulnerabilities an opponent could exploit]
+- Missing evidence or logic gaps
+- Unaddressed counterarguments
+
+🔥 **FORGE INSTRUCTIONS** (How to make it stronger):
+- Specific verses to add (KJV)
+- PT Palace rooms to activate (with codes)
+- Structural improvements
+- Anticipate and pre-empt counterattacks
+
+📊 **WEAPON RATING**: [1-10] / 10
+- Edge: [1-10] (How sharp is the argument?)
+- Balance: [1-10] (How well-structured?)
+- Reach: [1-10] (How broadly applicable?)
+
+RULES:
+- Use KJV Scripture ONLY
+- Reference PT Palace room codes (CR, DR, C6, BL, PRm, etc.)
+- Be encouraging but HONEST — don't inflate ratings
+- Give actionable, specific improvements
+- NEVER use the word "dear"`;
+
+      userPrompt = `Analyze this theological defense/argument as a spiritual weapon. The topic is "${topicName}". Here is the disciple's weapon:\n\n${userWeaponText}`;
+
     } else if (mode === "guesthouse_generate_prompt") {
       // GuestHouse: Generate a game prompt for live sessions
       const { gameType, verse: gameVerse, difficulty: gameDifficulty } = requestBody;
