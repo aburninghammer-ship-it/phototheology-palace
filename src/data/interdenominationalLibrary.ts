@@ -1373,33 +1373,33 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             author: "Martin Luther",
             tradition: "Lutheran (Reformer)",
             workTitle:
-              "Various writings on soul sleep",
-            year: "1520s\u20131530s",
-            locator: "Letter to Amsdorf (1522); Ecclesiastes commentary",
+              "An Exposition of Salomon\u2019s Booke, called Ecclesiastes or the Preacher",
+            year: "1573",
+            locator: "folio 151v",
             quoteExcerpt:
-              "\u201CWe shall sleep until He comes and knocks on the grave and says, \u2018Dr. Martin, get up.\u2019 Then I will arise in a moment and be happy with Him forever.\u201D",
+              "\u201CSalomon judgeth that the dead are sleepe, and feele nothing at all. For the dead lye there accompting neyther dayes nor years, but when they are awaked, they shall seeme to haue slept scarce one minute.\u201D",
             primarySourceUrl:
-              "https://www.lutherantheology.com/uploads/works/Luther-Intermediate-State.pdf",
+              "https://archive.org/search?query=luther+exposition+ecclesiastes+1573",
             contextNotes:
-              "Luther expressed soul-sleep sentiments in early writings, though later Lutheranism moved away from this. Documents that the Reformation had space for this view.",
+              "Martin Luther (1483\u20131546) explicitly taught that the dead \u2018feele nothing at all\u2019 and are unconscious until the resurrection. This is from his Ecclesiastes commentary. Later Lutheranism moved away from this position, but Luther himself taught soul sleep. His additional quote is also well-known: \u2018We shall sleep until He comes and knocks on the grave and says, Dr. Martin, get up. Then I will arise in a moment and be happy with Him forever.\u2019",
             agreementScope:
-              "Luther\u2019s early writings support sleep imagery; later Lutheran confessional theology diverges.",
-            credibilityGrade: "B",
+              "Luther, the father of the Reformation, taught soul sleep. This directly supports the SDA position and demonstrates it is not an SDA invention but a Reformation doctrine.",
+            credibilityGrade: "A",
           },
           {
             id: "sod-2-tyndale",
             author: "William Tyndale",
             tradition: "Anglican (proto-Reformation, Bible translator)",
             workTitle:
-              "An Answer to Sir Thomas More\u2019s Dialogue",
+              "An Answer to Sir Thomas More\u2019s Dialogue (Parker\u2019s 1850 reprint)",
             year: "1530",
-            locator: "Book IV, chapter IV",
+            locator: "Book IV, chapter IV, pp. 180\u2013181",
             quoteExcerpt:
-              "\u201CAnd ye, in putting them [departed souls] in heaven, hell, and purgatory, destroy the arguments wherewith Christ and Paul prove the resurrection\u2026 The true faith putteth the resurrection, and setteth the last day at hand; and moveth to long for it and to look for the coming of the Lord.\u201D",
+              "\u201CAnd ye, in putting them [the departed souls] in heaven, hell, and purgatory, destroy the arguments wherewith Christ and Paul prove the resurrection\u2026 And again, if the souls be in heaven, tell me why they be not in as good case as the angels be? And then what cause is there of the resurrection?\u201D",
             primarySourceUrl:
               "https://archive.org/details/answeruntosirtho00tynd",
             contextNotes:
-              "William Tyndale (c. 1494\u20131536), the father of the English Bible, explicitly rejected the idea of conscious souls in heaven or hell before the resurrection. He was martyred for his faith. His argument: putting souls immediately in heaven \u2018destroys the arguments\u2019 for the resurrection.",
+              "William Tyndale (1484\u20131536), the father of the English Bible, explicitly rejected the idea of conscious souls in heaven or hell before the resurrection. He was martyred for his faith. His argument is devastatingly logical: if souls are already in heaven, \u2018what cause is there of the resurrection?\u2019 Placing souls in heaven before the resurrection \u2018destroys the arguments\u2019 of Christ and Paul.",
             agreementScope:
               "Directly supports SDA position on soul sleep. Tyndale, the man who gave England the Bible in English, held this view.",
             credibilityGrade: "A",
