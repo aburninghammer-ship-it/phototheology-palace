@@ -3281,7 +3281,7 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             year: "533 AD (534 AD codified)",
             locator: "Novella 131, Title XIV",
             quoteExcerpt:
-              "\u201CThe holy pope of ancient Rome is the first of all the priests.\u201D (Blume translation, Novel 131, Chapter 2). Justinian\u2019s decree codified papal supremacy in Roman law; its exercise required the removal of Arian opposition in 538.",
+              "\u201CWe therefore decree that the most holy Pope of the elder Rome is the first of all the priesthood, and that the most blessed Archbishop of Constantinople, the new Rome, shall hold the second rank after the holy Apostolic chair of the elder Rome.\u201D (Blume translation, Novel 131, Chapter 2). Justinian\u2019s decree codified papal supremacy in Roman law; its exercise required the removal of Arian opposition in 538.",
             primarySourceUrl:
               "https://www.uwyo.edu/lawlib/blume-justinian/ajc-edition-2/novels/121-140/Novel%20131_Replacement.pdf",
             contextNotes:
@@ -3324,6 +3324,24 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "J.B. Bury (1861\u20131927) was Regius Professor of Modern History at Cambridge. His work is a standard reference for late Roman and early Byzantine history. He documents the same events SDAs mark as prophetically significant.",
             agreementScope:
               "Secular academic history confirming the events of 538; Bury assigns no prophetic significance.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-2-hodgkin",
+            author: "Thomas Hodgkin",
+            tradition: "Quaker / Secular historian",
+            workTitle:
+              "Italy and Her Invaders",
+            year: "1880\u20131899",
+            locator: "Vol. IV, The Ostrogothic Invasion; Vol. V, The Imperial Restoration",
+            quoteExcerpt:
+              "Hodgkin\u2019s magisterial eight-volume work documents in exhaustive detail Justinian\u2019s campaign against the Ostrogoths, the siege and relief of Rome in 537\u2013538, and the effective destruction of Arian political power in Italy. He describes how the withdrawal of the Gothic siege in March 538 left the Bishop of Rome free from Arian military domination for the first time in decades.",
+            primarySourceUrl:
+              "https://archive.org/details/italyherinvaders04hodguoft",
+            contextNotes:
+              "Thomas Hodgkin (1831\u20131913) was a Quaker banker-historian whose eight-volume Italy and Her Invaders is still considered one of the definitive English-language works on the barbarian invasions of Italy. His meticulous, non-polemical documentation of the events of 538 provides powerful independent confirmation.",
+            agreementScope:
+              "A Quaker historian documenting the same events SDAs identify as prophetically significant; Hodgkin assigns no prophetic meaning.",
             credibilityGrade: "A",
           },
         ],
@@ -3375,6 +3393,42 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "Standard secular encyclopedia reference confirming the significance of the Frankish\u2013Papal alliance. The events of 507\u2013508 are not disputed by any mainstream historian.",
             agreementScope:
               "Secular confirmation of the historical events; no prophetic interpretation attached.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-3-shanzer",
+            author: "Danuta Shanzer",
+            tradition: "Academic / Secular (University of Vienna)",
+            workTitle:
+              "Dating the Baptism of Clovis: The Bishop of Vienne vs the Bishop of Tours",
+            year: "1998",
+            locator: "Early Medieval Europe, 7.1, pp. 29\u201357",
+            quoteExcerpt:
+              "Shanzer argues from textual analysis of Avitus of Vienne\u2019s correspondence that Clovis\u2019s baptism may have taken place at Christmas 508 rather than the traditional date of 496. This academic debate places 508 as a pivotal year for Clovis\u2019s formal alliance with the Catholic Church.",
+            primarySourceUrl:
+              "https://doi.org/10.1111/1468-0254.00017",
+            contextNotes:
+              "Danuta Shanzer is a classical philologist at the University of Vienna. Her peer-reviewed argument that Clovis was baptized in 508 (not 496) would make 508 even more significant \u2014 the year of both his Catholic baptism and his recognition by Constantinople.",
+            agreementScope:
+              "Academic argument placing Clovis\u2019s Catholic baptism in 508; if correct, this strengthens the SDA emphasis on 508 as the pivotal year.",
+            credibilityGrade: "B",
+          },
+          {
+            id: "pd-3-mathisen",
+            author: "Ralph W. Mathisen",
+            tradition: "Academic / Secular (University of Illinois)",
+            workTitle:
+              "Clovis, Anastasius, and Political Status in 508 CE: The Frankish Aftermath of the Battle of Vouill\u00E9",
+            year: "2012",
+            locator: "In: The Battle of Vouill\u00E9, 507 CE (De Gruyter), pp. 79\u2013110",
+            quoteExcerpt:
+              "Mathisen documents that in 508, Clovis received an honorary consulship from Byzantine Emperor Anastasius \u2014 a formal recognition of Frankish legitimacy within the Roman political framework. Gregory of Tours records: \u2018From that day he was hailed as consul or Augustus.\u2019 This cemented the Frankish\u2013Roman\u2013Papal alliance.",
+            primarySourceUrl:
+              "https://doi.org/10.1515/9783110266689.79",
+            contextNotes:
+              "Ralph Mathisen is Professor of History and Classics at the University of Illinois. His chapter in this De Gruyter academic volume documents the political significance of 508 \u2014 Clovis\u2019s formal recognition by Constantinople after destroying Arian Visigothic power at Vouill\u00E9.",
+            agreementScope:
+              "Academic confirmation that 508 was a politically transformative year: the Franks were formally recognized as legitimate Roman allies and defenders of Catholic orthodoxy.",
             credibilityGrade: "A",
           },
         ],
@@ -3463,6 +3517,60 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "Adam Clarke (1760\u20131832) was a prominent Methodist theologian and commentator. Writing just 33 years after the event, he explicitly identified 1798 as the fulfillment of the 1260-year prophecy \u2014 the same interpretation SDAs hold.",
             agreementScope:
               "A non-SDA Methodist scholar making the same 1260-year/1798 calculation that SDAs use. Powerful precedent.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-4-trevor",
+            author: "George Trevor",
+            tradition: "Anglican (Canon of York)",
+            workTitle:
+              "Rome: From the Fall of the Western Empire",
+            year: "1868",
+            locator: "Chapter on the French Revolution and the Papacy",
+            quoteExcerpt:
+              "\u201CThe Papacy was extinct: not a vestige of its existence remained; and among all the Roman Catholic powers not a finger was stirred in its defence. The Eternal City had no longer prince or pontiff; its bishop was a dying captive in foreign lands; and the decree was already announced that no successor would be allowed in his place.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=george+trevor+rome+fall+western+empire",
+            contextNotes:
+              "George Trevor (1809\u20131888) was Canon of York Cathedral in the Church of England. Writing as an Anglican clergyman \u2014 neither Catholic nor SDA \u2014 his dramatic description of the papacy as \u2018extinct\u2019 in 1798 provides powerful third-party testimony to the magnitude of the blow.",
+            agreementScope:
+              "An Anglican canon describing the papacy as \u2018extinct\u2019 in 1798 \u2014 precisely the \u2018deadly wound\u2019 SDAs identify in Revelation 13:3.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-4-rickaby",
+            author: "Joseph Rickaby, S.J.",
+            tradition: "Roman Catholic (Jesuit)",
+            workTitle:
+              "The Modern Papacy (in Lectures on the History of Religions, Vol. III, Catholic Truth Society)",
+            year: "1910",
+            locator: "Lecture on the French Revolution and the Papacy",
+            quoteExcerpt:
+              "\u201CNo wonder that half Europe thought Napoleon\u2019s veto would be obeyed, and that with the Pope the Papacy was dead.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=joseph+rickaby+modern+papacy",
+            contextNotes:
+              "Joseph Rickaby, S.J. (1845\u20131932) was a Jesuit priest and philosopher. His admission that \u2018half Europe\u2019 thought the papacy was dead after 1798 comes from within the Catholic Church itself \u2014 a Jesuit acknowledging the severity of the blow. Published by the Catholic Truth Society.",
+            agreementScope:
+              "A Jesuit priest admitting that the papacy appeared dead in 1798; this Catholic self-testimony confirms the SDA identification of the \u2018deadly wound.\u2019",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-4-catholic-encyclopedia",
+            author: "Catholic Encyclopedia",
+            tradition: "Roman Catholic (official reference)",
+            workTitle:
+              "The Catholic Encyclopedia, article \u2018States of the Church\u2019",
+            year: "1913",
+            locator: "Section on the French Revolution",
+            quoteExcerpt:
+              "\u201CIn February, 1798, General Berthier, at the head of a French army, appeared before Rome\u2026 formed the rest of the States of the Church into the Roman Republic. Pius VI\u2026 was carried a prisoner into France, where he died.\u201D",
+            primarySourceUrl:
+              "https://www.newadvent.org/cathen/14257a.htm",
+            contextNotes:
+              "The Catholic Encyclopedia (1907\u20131914) is an official Catholic reference work with Nihil Obstat and Imprimatur. Its factual account of 1798 \u2014 Berthier\u2019s invasion, the formation of a republic on papal territory, and the Pope\u2019s imprisonment and death \u2014 provides Catholic self-documentation of the events SDAs identify as prophetically significant.",
+            agreementScope:
+              "An official Catholic encyclopedia documenting the very events SDAs identify as the \u2018deadly wound\u2019 of Revelation 13:3.",
             credibilityGrade: "A",
           },
         ],
