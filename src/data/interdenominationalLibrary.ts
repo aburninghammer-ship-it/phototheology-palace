@@ -355,6 +355,40 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "Affirms literal, visible return; Swiss Reformed do not share SDA prophetic specifics.",
             credibilityGrade: "A",
           },
+          {
+            id: "sc-1-spurgeon-return",
+            author: "Charles H. Spurgeon",
+            tradition: "Baptist (Reformed)",
+            workTitle: "Metropolitan Tabernacle Pulpit, sermon \u2018He Cometh with Clouds\u2019",
+            year: "1886",
+            locator: "Sermon No. 1889",
+            quoteExcerpt:
+              "\u201CJesus is coming. He is even now on the way\u2026 It is not merely that he will come, but that he is coming\u2026 I believe in the premillennial advent of Christ, the personal, the literal, the bodily coming of Christ before the millennium. I cannot read my Bible without perceiving that there will be a great personal appearing of Christ.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/metropolitantabe32spur",
+            contextNotes:
+              "Spurgeon, the \u2018Prince of Preachers,\u2019 was emphatic about a literal, personal, bodily, premillennial return of Christ. This aligns with SDA teaching on the Second Coming.",
+            agreementScope:
+              "Directly supports SDA belief in literal, personal, visible return. Spurgeon\u2019s premillennial view differs from SDA on millennium details.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sc-1-moody-return",
+            author: "D.L. Moody",
+            tradition: "Evangelical (non-denominational)",
+            workTitle: "The Second Coming of Christ",
+            year: "1877",
+            locator: "Opening pages",
+            quoteExcerpt:
+              "\u201CThe return of our Lord is mentioned 1,518 times in the Old and New Testaments\u2026 For every one prophecy concerning Christ\u2019s first coming, there are eight concerning the second\u2026 I can never lay my head on my pillow without thinking that perhaps before I awake the final morning may have dawned.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/secondcomingofch00mood",
+            contextNotes:
+              "Moody was deeply passionate about the Second Coming. His statistical observation (1,518 references, 8-to-1 ratio) demonstrates how central the doctrine is to Scripture.",
+            agreementScope:
+              "Supports SDA emphasis on the centrality and imminence of Christ\u2019s return.",
+            credibilityGrade: "A",
+          },
         ],
       },
     ],
@@ -438,6 +472,58 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "Affirms the law as ongoing guide; Calvin\u2019s Sabbath application differs from SDA.",
             credibilityGrade: "A",
           },
+          {
+            id: "law-1-calvin-matt517",
+            author: "John Calvin",
+            tradition: "Reformed",
+            workTitle:
+              "Commentary on a Harmony of the Evangelists, Vol. 1, trans. by William Pringle",
+            year: "1555 (1949 Eerdmans ed.)",
+            locator: "p. 277, comment on Matt. 5:17",
+            quoteExcerpt:
+              "\u201CWe must not imagine that the coming of Christ has freed us from the authority of the law: for it is the eternal rule of a devout and holy life, and must, therefore, be as unchangeable, as the justice of God, which it embraced, is constant and uniform.\u201D",
+            primarySourceUrl:
+              "https://www.ccel.org/ccel/calvin/calcom31.ix.xxvii.html",
+            contextNotes:
+              "Calvin commenting directly on Christ\u2019s words in Matthew 5:17 (\u2018I have not come to abolish the Law\u2019). Calvin explicitly calls the law \u2018unchangeable.\u2019",
+            agreementScope:
+              "Directly affirms the law\u2019s unchangeable nature; Calvin\u2019s broader system treats the Sabbath command differently than SDA.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "law-1-spurgeon-gospel",
+            author: "Charles H. Spurgeon",
+            tradition: "Baptist (Reformed)",
+            workTitle: "The Gospel of the Kingdom",
+            year: "1893",
+            locator: "Comment on Matt. 5:17\u201320, pp. 47\u201348",
+            quoteExcerpt:
+              "\u201CHe (Christ) took care to revise and reform the laws of men; but the law of God he established and confirmed\u2026 Our King has not come to abrogate the law, but to confirm and reassert it. His commands are eternal; and if any of the teachers of it should through error break his law, and teach that its least command is nullified, they will lose rank, and subside into the lowest place. The peerage of his kingdom is ordered according to obedience\u2026 The Lord Jesus does not set up a milder law, nor will he allow any one of his servants to presume to do so.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/gospelofkingdom00spur",
+            contextNotes:
+              "Spurgeon (1834\u20131892), the \u2018Prince of Preachers,\u2019 was the most famous Baptist preacher of the Victorian era. This is his commentary on the Sermon on the Mount \u2014 emphatic and unmistakable.",
+            agreementScope:
+              "Strongly affirms the law\u2019s perpetuity and Christ\u2019s confirmation of it; Spurgeon\u2019s Baptist tradition does not observe the seventh-day Sabbath.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "law-1-morgan-p23",
+            author: "G. Campbell Morgan",
+            tradition: "Congregationalist",
+            workTitle: "The Ten Commandments",
+            year: "1901",
+            locator: "p. 23",
+            quoteExcerpt:
+              "\u201CThere is a sense in which Christians are not \u2018free from the law.\u2019 It is only when grace enables men to keep the law, that they are free from it; just as a moral man who lives according to the laws of the country is free from arrest. God has not set aside law, but he has found a way by which man can fulfil law, and so be free from it.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/tencommandments00morg",
+            contextNotes:
+              "G. Campbell Morgan (1863\u20131945) was one of the most prominent Bible expositors of the early 20th century, pastor of Westminster Chapel in London. His analogy of the moral citizen being \u2018free from arrest\u2019 is a powerful illustration.",
+            agreementScope:
+              "Affirms Christians are not free from the moral law; Morgan does not advocate seventh-day Sabbath observance.",
+            credibilityGrade: "A",
+          },
         ],
       },
       {
@@ -482,6 +568,227 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "Luther\u2019s catechetical framework uses the Decalogue as the foundation for Christian ethics and instruction.",
             agreementScope:
               "Affirms Decalogue\u2019s central role in Christian ethics; Lutheran Sabbath application differs.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      {
+        id: "law-3",
+        title:
+          "The moral law is distinct from the ceremonial law and stands forever",
+        order: 3,
+        claimSummary:
+          "Protestant leaders distinguish the moral law (Ten Commandments) from the ceremonial law. Christ abolished the ceremonial; the moral law remains in force upon all mankind in all ages.",
+        bibleAnchors: [
+          "Matthew 5:17-18",
+          "Romans 3:31",
+          "Psalm 89:34",
+          "Psalm 111:7-8",
+        ],
+        witnesses: [
+          {
+            id: "law-3-wesley-moral-ceremonial",
+            author: "John Wesley",
+            tradition: "Methodist",
+            workTitle:
+              "Sermon 25, \u2018Upon Our Lord\u2019s Sermon on the Mount,\u2019 in Works, Vol. 5",
+            year: "1872 Zondervan reprint",
+            locator: "pp. 311\u2013312",
+            quoteExcerpt:
+              "\u201CThe Ritual or Ceremonial law, delivered by Moses to the children of Israel, containing all the injunctions and ordinances which related to the old sacrifices and service of the Temple, our Lord indeed did come to destroy\u2026 The moral law, contained in the Ten Commandments, and enforced by the Prophets, he did not take away\u2026 This is a law which never can be broken, which \u2018stands fast as the faithful witness in heaven.\u2019 The moral stands on an entirely different foundation from the ceremonial or ritual law, which was designed for a temporary restraint upon a disobedient and stiff-necked people; whereas this was from the beginning of the world, being \u2018written not on tables of stone,\u2019 but on the hearts of all the children of men, when they came out of the hands of the Creator\u2026 Every part of this law must remain in force upon all mankind, and in all ages; as not depending either on time or place, or any other circumstances liable to change, but on the nature of God, and the nature of man, and their unchangeable relation to each other.\u201D",
+            primarySourceUrl:
+              "https://www.umcmission.org/Find-Resources/John-Wesley-Sermons/Sermon-25-Upon-Our-Lords-Sermon-on-the-Mount-Discourse-5",
+            contextNotes:
+              "John Wesley (1703\u20131791), founder of Methodism and one of the most influential Protestant leaders in history. This sermon is a cornerstone text. Wesley explicitly distinguishes between the ceremonial law (abolished) and the moral law (eternal, binding on all mankind in all ages).",
+            agreementScope:
+              "Directly supports the SDA distinction between moral and ceremonial law. Wesley\u2019s Sabbath application differs, but the principle is identical to SDA teaching.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "law-3-moody-p14",
+            author: "D.L. Moody",
+            tradition: "Evangelical (non-denominational)",
+            workTitle: "Weighed and Wanting",
+            year: "1898",
+            locator: "p. 14",
+            quoteExcerpt:
+              "\u201CThe commandments did not originate with Moses, nor were they done away with when the Mosaic Law was fulfilled in Christ, and many of its ceremonies and regulations abolished. They are not discoveries that men made. They are from heaven, and indicate the nature and purpose of God Himself. \u2018The Decalogue is the most perfect code of laws existing. Its simplicity, comprehensiveness, ethical depths, and universal character stamp it as divine; and in its majestic simplicity, supplying the highest and best demands of the human heart, it may well be placed beside that other divine production, the Lord\u2019s Prayer.\u2019\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/weighedandwantin00mood",
+            contextNotes:
+              "D.L. Moody (1837\u20131899) was the most prominent American evangelist of the 19th century. Here he explicitly distinguishes the Ten Commandments from the ceremonial regulations and affirms their pre-Mosaic, divine origin.",
+            agreementScope:
+              "Directly supports SDA teaching that the moral law predates Moses and was not abolished with the ceremonial law.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      {
+        id: "law-4",
+        title:
+          "The Ten Commandments are still binding today",
+        order: 4,
+        claimSummary:
+          "Major Protestant evangelists and preachers explicitly state that the Ten Commandments remain binding, with a penalty attached to their violation.",
+        bibleAnchors: [
+          "Matthew 5:17-19",
+          "1 John 3:4",
+          "Romans 7:7",
+          "James 2:10-12",
+        ],
+        witnesses: [
+          {
+            id: "law-4-moody-p16",
+            author: "D.L. Moody",
+            tradition: "Evangelical (non-denominational)",
+            workTitle: "Weighed and Wanting",
+            year: "1898",
+            locator: "p. 16",
+            quoteExcerpt:
+              "\u201CThe people must be made to understand that the Ten Commandments are still binding, and that there is a penalty attached to their violation.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/weighedandwantin00mood",
+            contextNotes:
+              "Short, powerful, quotable. Moody leaves no ambiguity: the Ten Commandments are \u2018still binding\u2019 with \u2018a penalty.\u2019",
+            agreementScope:
+              "Directly supports SDA position on the binding nature of the Decalogue.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "law-4-moody-p15",
+            author: "D.L. Moody",
+            tradition: "Evangelical (non-denominational)",
+            workTitle: "Weighed and Wanting",
+            year: "1898",
+            locator: "p. 15",
+            quoteExcerpt:
+              "\u201CThe commandments of God given to Moses in the Mount at Horeb are as binding to-day as ever they have been since the time when they were proclaimed in the hearing of the people. The Jews said the law was not given in Palestine, (which belonged to Israel), but in the wilderness, because the law was for all nations. Jesus never condemned the law and the prophets, but He did condemn those who did not obey them. Because He gave new commandments it does not follow that He abolished the old. Christ\u2019s explanation of them made them all the more searching. In His Sermon on the Mount He carried the principles of the commandments beyond the mere letter. He unfolded them and showed that they embraced more, that they are positive as well as prohibitive.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/weighedandwantin00mood",
+            contextNotes:
+              "Moody argues: (1) the commandments are for all nations, not just Israel; (2) Jesus never condemned the law; (3) Christ deepened, not abolished, the commandments. All three points align with SDA teaching.",
+            agreementScope:
+              "Strongly supports SDA position. Moody\u2019s note that the law was given \u2018in the wilderness\u2019 for all nations is especially powerful for Sabbath discussions.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "law-4-graham-108",
+            author: "Billy Graham",
+            tradition: "Baptist (Southern Baptist / non-denominational evangelist)",
+            workTitle:
+              "Sermons on the Ten Commandments, quoted in George Burnham and Lee Fisher, Billy Graham and the New York Crusade",
+            year: "1957",
+            locator: "pp. 108\u2013109",
+            quoteExcerpt:
+              "\u201CLike Wesley, I find that I must preach the law and judgement before I can preach grace and love\u2026 The Ten Commandments\u2026 are the moral laws of God for the conduct of the people. Some think they have been revoked. That is not true. Christ taught the law. They are still in effect today. God has not changed. People have changed\u2026 Every person who ever lived, with the exception of Jesus Christ, has broken the Ten Commandments. Sin is a transgression of the law. The Bible says all have sinned and come short of the glory of God. The Ten Commandments are a mirror to show us how far short we fall in meeting God\u2019s standards. And the mirror of our shortcomings drives us to the Cross, where Christ paid the debt for sin.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=billy+graham+new+york+crusade+burnham",
+            contextNotes:
+              "Billy Graham (1918\u20132018), the most famous evangelist of the 20th century. Here he explicitly says the Ten Commandments \u2018have not been revoked\u2019 and \u2018are still in effect today.\u2019 He also defines sin as \u2018transgression of the law\u2019 (cf. 1 John 3:4).",
+            agreementScope:
+              "Directly supports SDA position on the law\u2019s perpetuity and its role as a mirror revealing sin. Graham\u2019s Sabbath observance differed from SDA.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "law-4-graham-191",
+            author: "Billy Graham",
+            tradition: "Baptist (Southern Baptist / non-denominational evangelist)",
+            workTitle:
+              "Sermon in Times Square, quoted in Burnham and Fisher, Billy Graham and the New York Crusade",
+            year: "1957",
+            locator: "p. 191",
+            quoteExcerpt:
+              "\u201CThis [the Ten Commandments] is God\u2019s moral law given through Moses. These commandments express the requirements of a righteous God. To transgress even one of these Commandments is sin, the result of which is eternal separation from God\u2026 I warn you tonight, there can be no peace until the Law is kept and there is no power within us to keep the Law. Human nature is bankrupt. That is why Christ came to give us a new nature.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=billy+graham+new+york+crusade+burnham",
+            contextNotes:
+              "From Graham\u2019s iconic Times Square crusade sermon. He calls the Ten Commandments \u2018God\u2019s moral law\u2019 and says transgressing even one is sin leading to separation from God.",
+            agreementScope:
+              "Directly supports SDA teaching on the law as God\u2019s moral standard and sin as its transgression.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      {
+        id: "law-5",
+        title:
+          "Those who teach against God\u2019s law betray Christ",
+        order: 5,
+        claimSummary:
+          "Protestant leaders strongly condemn antinomianism \u2014 the teaching that Christ abolished the law. Wesley calls it betrayal; Luther says abolishing the law abolishes sin itself.",
+        bibleAnchors: [
+          "Matthew 5:19",
+          "1 John 2:3-4",
+          "Romans 3:31",
+          "Romans 6:1-2",
+        ],
+        witnesses: [
+          {
+            id: "law-5-wesley-antinomian",
+            author: "John Wesley",
+            tradition: "Methodist",
+            workTitle:
+              "Sermon 25, \u2018Upon Our Lord\u2019s Sermon on the Mount,\u2019 in Works, Vol. 5",
+            year: "1872 Zondervan reprint",
+            locator: "pp. 317\u2013318",
+            quoteExcerpt:
+              "\u201CIn the highest rank of the enemies of the gospel of Christ, are they who openly and explicitly \u2018judge the law\u2019 itself, and \u2018speak evil of the law;\u2019 who teach men to break not one only, whether of the least, or of the greatest, but all the commandments at a stroke; who teach, without any cover, in so many words, \u2018What did our Lord do with the law? He abolished it. There is but one duty, which is that of believing.\u2019\u2026 The most surprising of all the circumstances that attend this strong delusion, is, that they who are given up to it, really believe that they honour Christ by overthrowing his law, and that they are magnifying his office, while they are destroying his doctrine. Yea, they honour him just as Judas did, when he said, \u2018Hail, Master,\u2019 and kissed him. And he may as justly say to every one of them, \u2018Betrayest thou the Son of Man with a kiss?\u2019 It is no other than betraying him with a kiss, to talk of his blood, and take away his crown; to set light by any part of his law, under pretence of advancing his gospel.\u201D",
+            primarySourceUrl:
+              "https://www.umcmission.org/Find-Resources/John-Wesley-Sermons/Sermon-25-Upon-Our-Lords-Sermon-on-the-Mount-Discourse-5",
+            contextNotes:
+              "One of the most powerful anti-antinomian statements in all of Protestant literature. Wesley compares those who abolish the law to Judas betraying Christ with a kiss. His passion is unmistakable.",
+            agreementScope:
+              "Directly parallels SDA warnings against antinomianism. Wesley\u2019s condemnation of \u2018abolishing the law\u2019 is as strong as any SDA preacher.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "law-5-luther-antinomians",
+            author: "Martin Luther",
+            tradition: "Lutheran (Reformer)",
+            workTitle:
+              "Wider die Antinomer (Against the Antinomians), secs. 6, 8, in S\u00E4mmtliche Schriften, Vol. 20",
+            year: "1539 (1890 Concordia ed.)",
+            locator: "cols. 1613\u20131614",
+            quoteExcerpt:
+              "\u201CI wonder exceedingly how it came to be imputed to me that I should reject the law or the ten commandments\u2026 Can anyone think that sin exists where there is no law? Whoever abrogates the law, must of necessity abrogate sin also.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/luthersworksamer55luth",
+            contextNotes:
+              "Luther himself, the great Reformer of \u2018sola fide,\u2019 forcefully denies that he ever rejected the Ten Commandments. His logic is airtight: no law = no sin. This powerfully refutes the claim that the Reformation abolished the Decalogue.",
+            agreementScope:
+              "Directly supports SDA position that grace does not abolish the law. Luther\u2019s own testimony against antinomianism is devastating to those who claim \u2018Luther freed us from the law.\u2019",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      {
+        id: "law-6",
+        title:
+          "Breaking any one commandment makes one guilty of all",
+        order: 6,
+        claimSummary:
+          "The indivisibility of the Decalogue means one cannot claim obedience to nine commandments while breaking the tenth. The law is a unity.",
+        bibleAnchors: [
+          "James 2:10-11",
+          "Matthew 5:19",
+          "Galatians 3:10",
+        ],
+        witnesses: [
+          {
+            id: "law-6-morgan-p11",
+            author: "G. Campbell Morgan",
+            tradition: "Congregationalist",
+            workTitle: "The Ten Commandments",
+            year: "1901",
+            locator: "p. 11",
+            quoteExcerpt:
+              "\u201CIn the Epistle of James is found a word of deep significance. \u2018Whosoever shall keep the whole law, and yet stumble in one point, he is become guilty of all,\u2019 (ii.10)\u2026 Herein lies the explanation of the apparent severity of James\u2019 utterance. Men are apt to think that if there be Ten Commandments, of which they obey nine, such obedience will be put to their credit, even though they break the tenth.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/tencommandments00morg",
+            contextNotes:
+              "Morgan\u2019s point is devastating for those who claim to keep \u2018most\u2019 of the Ten Commandments while ignoring the fourth (Sabbath). If one breaks any command, one is guilty of all.",
+            agreementScope:
+              "Directly supports SDA argument that the Decalogue is indivisible \u2014 you cannot pick and choose which commandments to obey.",
             credibilityGrade: "A",
           },
         ],
@@ -543,6 +850,23 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "The CCC explicitly acknowledges the Sabbath was Saturday and that Sunday replaced it. This is a high-value admission.",
             agreementScope:
               "Acknowledges the seventh-day origin; claims church authority to transfer. SDA contests the transfer authority.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-1-moody-sabbath",
+            author: "D.L. Moody",
+            tradition: "Evangelical (non-denominational)",
+            workTitle: "Weighed and Wanting",
+            year: "1898",
+            locator: "p. 47 (chapter on the Fourth Commandment)",
+            quoteExcerpt:
+              "\u201CI honestly believe that this commandment is just as binding to-day as it ever was. I have talked with men who have said that it has been abrogated, but they have never been able to point to any place in the Bible where God repealed it.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/weighedandwantin00mood",
+            contextNotes:
+              "Moody, the greatest American evangelist of his era, explicitly affirms the fourth commandment is \u2018just as binding today as it ever was\u2019 and says no one can show him where God repealed it. Though Moody kept Sunday, his logic supports the seventh day.",
+            agreementScope:
+              "Affirms the fourth commandment is binding; Moody applied it to Sunday, but his own argument about no repeal supports the seventh-day position.",
             credibilityGrade: "A",
           },
         ],
@@ -992,6 +1316,24 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "Luther\u2019s early writings support sleep imagery; later Lutheran confessional theology diverges.",
             credibilityGrade: "B",
           },
+          {
+            id: "sod-2-tyndale",
+            author: "William Tyndale",
+            tradition: "Anglican (proto-Reformation, Bible translator)",
+            workTitle:
+              "An Answer to Sir Thomas More\u2019s Dialogue",
+            year: "1530",
+            locator: "Book IV, chapter IV",
+            quoteExcerpt:
+              "\u201CAnd ye, in putting them [departed souls] in heaven, hell, and purgatory, destroy the arguments wherewith Christ and Paul prove the resurrection\u2026 The true faith putteth the resurrection, and setteth the last day at hand; and moveth to long for it and to look for the coming of the Lord.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/answeruntosirtho00tynd",
+            contextNotes:
+              "William Tyndale (c. 1494\u20131536), the father of the English Bible, explicitly rejected the idea of conscious souls in heaven or hell before the resurrection. He was martyred for his faith. His argument: putting souls immediately in heaven \u2018destroys the arguments\u2019 for the resurrection.",
+            agreementScope:
+              "Directly supports SDA position on soul sleep. Tyndale, the man who gave England the Bible in English, held this view.",
+            credibilityGrade: "A",
+          },
         ],
       },
     ],
@@ -1101,10 +1443,10 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
   // ═══════════════════════════════════════════════════════════════════
   {
     id: "papacy",
-    name: "Papacy / Antichrist (Reformation confessional witness)",
+    name: "Papacy / Antichrist (Reformation confessional witness + historical evidence)",
     order: 11,
     summary:
-      "Key Reformation confessional sources explicitly identify the papacy with Antichrist (historical Protestant view). This was the consensus Reformation position.",
+      "Reformation confessions identify the papacy as Antichrist. Catholic sources themselves document papal claims to divine authority, the 538\u20131798 AD church-state reign, and the change of God\u2019s law. Secular historians confirm the persecution record.",
     tags: ["Evidence", "DoctrineLibrary", "Papacy"],
     claims: [
       {
@@ -1185,6 +1527,207 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "Ussher (famous for the Ussher chronology) drafted these articles for the Church of Ireland. Article 80 is among the most explicit Anglican identifications of the papacy as Antichrist.",
             agreementScope:
               "Affirms identification; Irish Articles predated and influenced the Westminster Confession.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      {
+        id: "pap-2",
+        title:
+          "The Papacy claims to hold the place of God on earth",
+        order: 2,
+        claimSummary:
+          "Official papal encyclicals, Catholic publications, and ecclesiastical dictionaries explicitly claim the Pope holds the place of God, is \u2018Jesus Christ Himself,\u2019 and is \u2018as it were God.\u2019",
+        bibleAnchors: [
+          "2 Thessalonians 2:3-4",
+          "Daniel 7:25",
+          "Revelation 13:5-6",
+        ],
+        witnesses: [
+          {
+            id: "pap-2-leo-xiii",
+            author: "Pope Leo XIII",
+            tradition: "Roman Catholic (papal)",
+            workTitle: "Encyclical Letter (Praeclara Gratulationis Publicae)",
+            year: "1894",
+            locator: "June 20, 1894",
+            quoteExcerpt:
+              "\u201CWe hold upon this earth the place of God Almighty.\u201D",
+            primarySourceUrl:
+              "https://www.vatican.va/content/leo-xiii/en/encyclicals/documents/hf_l-xiii_enc_20061894_praeclara-gratulationis-publicae.html",
+            contextNotes:
+              "Pope Leo XIII\u2019s own words in an official encyclical. This is a primary Catholic source \u2014 the Pope himself claiming to hold \u2018the place of God Almighty\u2019 on earth. Compare 2 Thess. 2:4: \u2018he sits in the temple of God, showing himself that he is God.\u2019",
+            agreementScope:
+              "Primary source from the Vatican itself. The claim to hold God\u2019s place is exactly what 2 Thessalonians 2 describes.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pap-2-catholic-national",
+            author: "The Catholic National (periodical)",
+            tradition: "Roman Catholic",
+            workTitle: "The Catholic National",
+            year: "July 1895",
+            locator: "Article on the Pope",
+            quoteExcerpt:
+              "\u201CThe Pope is not only the representative of Jesus Christ, but he is Jesus Christ Himself, hidden under the veil of flesh.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=%22catholic+national%22+1895",
+            contextNotes:
+              "A Catholic periodical explicitly identifying the Pope as \u2018Jesus Christ Himself.\u2019 This goes beyond \u2018representative\u2019 to ontological identification.",
+            agreementScope:
+              "Directly fulfills the prophetic description of Antichrist (\u2018in place of Christ\u2019). The Greek anti can mean \u2018in place of.\u2019",
+            credibilityGrade: "B",
+          },
+          {
+            id: "pap-2-ferraris",
+            author: "Lucius Ferraris",
+            tradition: "Roman Catholic (ecclesiastical)",
+            workTitle:
+              "Prompta Bibliotheca (Ferraris\u2019 Ecclesiastical Dictionary), article \u2018Papa\u2019",
+            year: "1763",
+            locator: "Article: \u2018Papa\u2019 (Pope)",
+            quoteExcerpt:
+              "\u201CThe Pope is of so great dignity and so exalted that he is not a mere man, but as it were God, and the Vicar of God\u2026 Hence the Pope is crowned with a triple crown, as King of Heaven and of Earth, and of the lower regions.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/PromptaBibliothecaCanonica",
+            contextNotes:
+              "Ferraris\u2019 Prompta Bibliotheca is a standard Catholic ecclesiastical reference work. It was published with papal approval and describes the Pope as \u2018not a mere man, but as it were God.\u2019",
+            agreementScope:
+              "Catholic source describing the Pope in terms that directly parallel the prophetic description in 2 Thessalonians 2:3\u20134.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      {
+        id: "pap-3",
+        title:
+          "The Papacy rose to church-state power in 538 AD and received a \u2018deadly wound\u2019 in 1798 \u2014 exactly 1260 years",
+        order: 3,
+        claimSummary:
+          "Secular and church historians document that Justinian\u2019s decree established papal supremacy (effective 538 AD) and that Napoleon\u2019s general Berthier abolished papal government in 1798 \u2014 a span of exactly 1260 years.",
+        bibleAnchors: [
+          "Daniel 7:25",
+          "Revelation 13:5",
+          "Revelation 13:3",
+          "Revelation 13:10",
+        ],
+        witnesses: [
+          {
+            id: "pap-3-schaff-538",
+            author: "Philip Schaff",
+            tradition: "Reformed (church historian)",
+            workTitle: "History of the Christian Church, Vol. 3",
+            year: "1910",
+            locator: "p. 327",
+            quoteExcerpt:
+              "\u201CThe legally recognized supremacy of the Pope began in 538 AD when there went into effect a decree of Emperor Justinian, making the Bishop of Rome head over all the churches, the definer of doctrine and the corrector of heretics. Vigilius\u2026 ascended the papal chair (538 AD) under the military protection of Belisarius.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/historyofchristi03scha",
+            contextNotes:
+              "Philip Schaff (1819\u20131893) was one of the most respected church historians in Protestant scholarship. His multi-volume History of the Christian Church is a standard reference. He documents the 538 AD date precisely.",
+            agreementScope:
+              "Directly supports the SDA identification of 538 AD as the starting date of papal supremacy.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pap-3-americana-1798",
+            author: "Encyclopedia Americana",
+            tradition: "Secular reference",
+            workTitle: "Encyclopedia Americana",
+            year: "1941",
+            locator: "Article on the Papacy",
+            quoteExcerpt:
+              "\u201CIn 1798 he [Berthier] made his entrance into Rome, abolished the papal government and established a secular one.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/encyclopediaamer00unkn",
+            contextNotes:
+              "A secular encyclopedia documenting the 1798 event: Napoleon\u2019s general Berthier abolished the papal government. This is the \u2018deadly wound\u2019 of Revelation 13:3. From 538 to 1798 = exactly 1260 years (cf. Dan. 7:25, Rev. 13:5).",
+            agreementScope:
+              "Secular historical confirmation of the 1798 endpoint. The 1260-year span (538\u20131798) matches the prophetic time period exactly.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pap-3-three-horns",
+            author: "Historical record (multiple sources)",
+            tradition: "Secular / church history",
+            workTitle:
+              "Uprooting of the three Arian kingdoms",
+            year: "493\u2013538 AD",
+            locator: "Heruli (493), Vandals (534), Ostrogoths (538)",
+            quoteExcerpt:
+              "Catholic emperor Zeno arranged for the removal of the Heruli in 493. Catholic emperor Justinian defeated the Vandals in 534 AD, and rendered the Ostrogoths powerless by 538 AD. The three Arian tribes that opposed papal authority were \u2018plucked up by the roots\u2019 (Dan. 7:8).",
+            primarySourceUrl:
+              "https://archive.org/details/historyofchristi03scha",
+            contextNotes:
+              "The three horns \u2018plucked up by the roots\u2019 before the little horn (Dan. 7:8) correspond to the three Arian kingdoms removed by Catholic imperial power to clear the way for papal supremacy.",
+            agreementScope:
+              "Historical events matching the Daniel 7:8 prophecy of three horns uprooted before the little horn\u2019s rise.",
+            credibilityGrade: "B",
+          },
+        ],
+      },
+      {
+        id: "pap-4",
+        title:
+          "The Papacy has shed more innocent blood than any other institution in history",
+        order: 4,
+        claimSummary:
+          "Non-Catholic historians document the massive scale of papal persecution during the 1260-year reign, fulfilling the prophecy that the little horn would \u2018wear out the saints of the Most High.\u2019",
+        bibleAnchors: [
+          "Daniel 7:21",
+          "Daniel 7:25",
+          "Revelation 13:7",
+          "Revelation 17:6",
+        ],
+        witnesses: [
+          {
+            id: "pap-4-lecky",
+            author: "William Edward Hartpole Lecky",
+            tradition: "Secular (Irish historian / rationalist)",
+            workTitle:
+              "History of the Rise and Influence of the Spirit of Rationalism in Europe, Vol. 2",
+            year: "1865",
+            locator: "p. 32",
+            quoteExcerpt:
+              "\u201CThat the church of Rome has shed more innocent blood than any other institution that has ever existed among mankind, will be questioned by no Protestant who has a competent knowledge of history.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/historyofrisean02leckgoog",
+            contextNotes:
+              "W.E.H. Lecky (1838\u20131903) was a leading Irish historian and member of Parliament. He was not an SDA or even particularly religious \u2014 this is a secular historian\u2019s assessment. His work is widely cited in academic historiography.",
+            agreementScope:
+              "A secular historian confirming the scale of papal persecution. Directly supports Daniel 7:25 (\u2018wear out the saints\u2019) and Revelation 17:6 (\u2018drunk with the blood of the saints\u2019).",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      {
+        id: "pap-5",
+        title:
+          "The Papacy claims authority to change God\u2019s law, including times",
+        order: 5,
+        claimSummary:
+          "Catholic sources explicitly claim the Pope has power to change times and laws, fulfilling Daniel 7:25 (\u2018he shall think to change times and laws\u2019).",
+        bibleAnchors: [
+          "Daniel 7:25",
+          "Exodus 20:8-11",
+        ],
+        witnesses: [
+          {
+            id: "pap-5-decretal",
+            author: "Papal Decretals",
+            tradition: "Roman Catholic (canon law)",
+            workTitle:
+              "Decretal, de Translatic Episcop.",
+            year: "medieval (various compilations)",
+            locator: "Cap.",
+            quoteExcerpt:
+              "\u201CThe Pope has power to change times, to abrogate laws, and to dispense with all things, even the precepts of Christ.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/corjuriscanonici00unknuoft",
+            contextNotes:
+              "This claim from papal canon law is a direct fulfillment of Daniel 7:25: \u2018He shall think to change times and laws.\u2019 The Papacy claims the authority not merely to interpret but to \u2018change\u2019 and \u2018abrogate\u2019 divine precepts.",
+            agreementScope:
+              "Catholic canon law source claiming power to change times and laws \u2014 the exact language of Daniel 7:25.",
             credibilityGrade: "A",
           },
         ],
