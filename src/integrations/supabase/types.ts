@@ -3575,6 +3575,45 @@ export type Database = {
         }
         Relationships: []
       }
+      day_passes: {
+        Row: {
+          audio_plays_limit: number
+          audio_plays_used: number
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          pass_token: string
+          recipient_identifier: string | null
+          redeemed_at: string | null
+          status: string
+        }
+        Insert: {
+          audio_plays_limit?: number
+          audio_plays_used?: number
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          pass_token?: string
+          recipient_identifier?: string | null
+          redeemed_at?: string | null
+          status?: string
+        }
+        Update: {
+          audio_plays_limit?: number
+          audio_plays_used?: number
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          pass_token?: string
+          recipient_identifier?: string | null
+          redeemed_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       deck_studies: {
         Row: {
           cards_used: Json
@@ -6197,6 +6236,63 @@ export type Database = {
           name?: string | null
           started_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      gift_purchases: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          expires_at: string
+          gift_token: string
+          gifter_email: string
+          gifter_user_id: string
+          id: string
+          personal_message: string | null
+          plan_type: string
+          recipient_email: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          expires_at?: string
+          gift_token?: string
+          gifter_email: string
+          gifter_user_id: string
+          id?: string
+          personal_message?: string | null
+          plan_type: string
+          recipient_email: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          expires_at?: string
+          gift_token?: string
+          gifter_email?: string
+          gifter_user_id?: string
+          id?: string
+          personal_message?: string | null
+          plan_type?: string
+          recipient_email?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -17837,6 +17933,10 @@ export type Database = {
       }
       record_analytics_snapshot: { Args: never; Returns: undefined }
       redeem_access_code: { Args: { code_input: string }; Returns: Json }
+      redeem_day_pass: {
+        Args: { _recipient_id: string; _token: string }
+        Returns: Json
+      }
       search_encyclopedia_articles: {
         Args: { limit_count?: number; search_query: string }
         Returns: {
@@ -17851,6 +17951,7 @@ export type Database = {
       }
       track_share_click: { Args: { p_share_code: string }; Returns: undefined }
       update_mastery_streak: { Args: { p_user_id: string }; Returns: Json }
+      use_day_pass_audio: { Args: { _token: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "video_admin" | "owner"
