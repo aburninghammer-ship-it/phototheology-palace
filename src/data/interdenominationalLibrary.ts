@@ -2098,11 +2098,12 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             workTitle:
               "A Hundred Sermons upon the Apocalypse (In Apocalypsim conciones centum)",
             year: "1557",
-            locator: "Sermons on the prophetic time periods",
+            locator:
+              "Cited in Froom, Prophetic Faith of Our Fathers, Vol. 2, pp. 342\u2013343",
             quoteExcerpt:
-              "Bullinger applied the day-year principle to interpret the 1260 days of Revelation 11\u201312 as 1260 years of papal dominion, placing him squarely within the historicist day-year tradition.",
+              "Bullinger contends that the time of the beast is 1260 days, forty-two months, or three and a half times, contending that these are not literal but prophetic time.",
             primarySourceUrl:
-              "https://archive.org/search?query=bullinger+apocalypse+sermons",
+              "https://m.egwwritings.org/en/book/1579.2091",
             contextNotes:
               "Heinrich Bullinger (1504\u20131575) succeeded Zwingli as head of the Zurich Reformed Church. His 100 sermons on Revelation systematically applied the day-year principle to prophetic time periods.",
             agreementScope:
@@ -2172,7 +2173,7 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             year: "1733",
             locator: "Part I, chapters on the prophetic time periods",
             quoteExcerpt:
-              "\u201CIn the prophetick language, a day is put for a year\u2026 the 1260 days are 1260 years.\u201D",
+              "\u201CA time for a Calendar year of 360 days, and a day for a solar year.\u201D",
             primarySourceUrl:
               "https://www.gutenberg.org/files/16878/16878-h/16878-h.htm",
             contextNotes:
@@ -2208,9 +2209,9 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             year: "1755",
             locator: "Notes on Revelation 11\u201313 (time prophecies)",
             quoteExcerpt:
-              "Wesley adopted the day-year principle in his Revelation commentary, interpreting the prophetic time periods of 1260 days, 42 months, and \u2018time, times, and half a time\u2019 as representing 1260 literal years.",
+              "\u201CThe beast rose out of the sea in the year 1077. A little after, power was given him for forty-two months.\u201D (Notes on Revelation 13:5)",
             primarySourceUrl:
-              "https://www.ccel.org/ccel/wesley/notes.viii.html",
+              "https://www.biblestudytools.com/commentaries/wesleys-explanatory-notes/revelation/revelation-13.html",
             contextNotes:
               "John Wesley (1703\u20131791), founder of Methodism and one of the most influential Protestant leaders in history, applied the day-year principle in his widely-read Explanatory Notes. Wesley\u2019s adoption of this principle shows it was mainstream Protestant hermeneutics.",
             agreementScope:
