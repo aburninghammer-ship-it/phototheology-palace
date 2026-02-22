@@ -49,6 +49,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
+import { subscribeToMusicRequests } from "@/hooks/useCommentaryMusicSync";
 
 // Study Music Playlist - 10 tracks for Bible study and meditation
 const AMBIENT_TRACKS: Array<{
@@ -592,6 +593,22 @@ export function AmbientMusicPlayer({
     });
     return unsubscribe;
   }, []);
+
+  // Listen for commentary music requests (auto-start music when commentary plays)
+  useEffect(() => {
+    const unsubscribe = subscribeToMusicRequests((action) => {
+      if (action === 'start' && !isPlaying && audioRef.current) {
+        console.log('[AmbientMusic] Commentary requested music start');
+        setIsEnabled(true);
+        audioRef.current.play().then(() => {
+          setIsPlaying(true);
+        }).catch((err) => {
+          console.warn('[AmbientMusic] Could not auto-start music for commentary:', err);
+        });
+      }
+    });
+    return unsubscribe;
+  }, [isPlaying]);
 
   // Update loop setting - only update the loop property, onended is set once at init
   useEffect(() => {
@@ -1366,7 +1383,7 @@ export function AmbientMusicPlayer({
                     ))}
                   </SelectContent>
                 </Select>
-                
+
 
                 {/* Playlist Selection */}
                 <div className="border rounded-md p-2 bg-muted/30">

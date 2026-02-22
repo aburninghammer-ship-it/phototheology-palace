@@ -50,8 +50,9 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { ExportEpicAudioDialog } from "@/components/audio/ExportEpicAudioDialog";
 import { ImmersiveCommentaryView } from "@/components/audio/ImmersiveCommentaryView";
-import { Maximize2 } from "lucide-react";
-
+import { Maximize2, Music } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { requestMusicForCommentary, getAutoMusicEnabled, setAutoMusicEnabled, subscribeToAutoMusicToggle } from "@/hooks/useCommentaryMusicSync";
 
 interface Theme {
   id: string;
@@ -110,7 +111,13 @@ export default function AudioBible() {
   const epicQueueRef = useRef<ChapterSelection[]>([]);
   const epicQueueIndexRef = useRef(0);
   const playEpicRef = useRef<(book: string, chapter: number, mode?: EpicModeType) => Promise<void>>();
+  const [commentaryMusicEnabled, setCommentaryMusicEnabled] = useState(getAutoMusicEnabled);
 
+  // Sync toggle state with global setting
+  useEffect(() => {
+    const unsub = subscribeToAutoMusicToggle((enabled) => setCommentaryMusicEnabled(enabled));
+    return unsub;
+  }, []);
   // Commentary mode within Epic suite (urban, ancient, preacher, epic, scholar)
   const [epicMode, setEpicMode] = useState<EpicModeType>("epic");
 
@@ -449,6 +456,7 @@ export default function AudioBible() {
 
       audio.onplay = () => {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
+        requestMusicForCommentary('start');
       };
       audio.onended = () => {
         // Auto-advance queue (with per-item mode switching)
@@ -740,6 +748,7 @@ export default function AudioBible() {
 
       audio.onplay = () => {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
+        requestMusicForCommentary('start');
       };
       audio.onended = () => {
         setIsEpicPlaying(false); setIsEpicPaused(false); epicAudioRef.current = null;
@@ -958,6 +967,22 @@ export default function AudioBible() {
                           Immersive
                         </Button>
                       )}
+                    </div>
+                    {/* Music with commentary toggle */}
+                    <div className="flex items-center justify-center gap-3 mt-4 pt-3 border-t border-border/30">
+                      <Music className="h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="commentary-music" className="text-sm text-muted-foreground cursor-pointer">
+                        Background Music
+                      </Label>
+                      <Switch
+                        id="commentary-music"
+                        checked={commentaryMusicEnabled}
+                        onCheckedChange={(checked) => {
+                          setCommentaryMusicEnabled(checked);
+                          setAutoMusicEnabled(checked);
+                          if (checked) requestMusicForCommentary('start');
+                        }}
+                      />
                     </div>
                   </>
                 )}
