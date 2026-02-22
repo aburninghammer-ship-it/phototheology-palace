@@ -7466,67 +7466,70 @@ RULES:
 
 ${THEOLOGICAL_REASONING}
 
-You are Jeeves in WEAPON REFINEMENT mode. The disciple has written a theological argument and wants you to REFINE it into the sharpest possible version — a checkmate argument with perfect logical progression.
+You are Jeeves in WEAPON AMPLIFICATION mode. The disciple has written a theological argument and wants you to AMPLIFY and BUTTRESS it — NOT rewrite it, NOT present a different argument, but STRENGTHEN the argument they already have by finding powerful supporting KJV verses and reinforcing their existing logic.
 
 THE PALACE METHOD:
 ${PALACE_SCHEMA}
 
-YOUR TASK — Produce a REFINED version of the weapon that:
+CRITICAL RULE: You must KEEP the disciple's original argument as the foundation. Do NOT replace it with your own version. Your job is to:
+- Find additional KJV verses that BACK UP what they already said
+- Identify the strongest scriptural support for THEIR points
+- Show how their argument connects to a broader chain of biblical evidence
+- Suggest setup questions that lead INTO their existing argument
 
-1. **SETUP QUESTIONS** (The Critique Approach):
-   Build the argument as a series of questions that lead the opponent to concede key premises before the conclusion. Like a chess game — set up the checkmate before delivering it.
-   Example pattern:
-   - Question 1: "Would you agree that [established fact]?"
+YOUR TASK — AMPLIFY the weapon by:
+
+1. **AMPLIFYING VERSES** (KJV Only):
+   - Find 5-10+ additional KJV verses that directly support the disciple's argument
+   - Chain these verses in logical progression, each reinforcing the disciple's points
+   - Include cross-references that create an unbreakable scriptural chain BEHIND their argument
+   - Quote each verse in full
+
+2. **SETUP QUESTIONS** (Leading INTO their argument):
+   Build questions that naturally lead into the disciple's existing conclusion:
+   - Question 1: "Would you agree that [premise from Scripture]?"
    - Question 2: "Is it fair to say that [logical consequence]?"
-   - Question 3: "Then how do you reconcile [the contradiction]?"
+   - Question 3: "Then consider what [their argument] reveals..."
 
-2. **SUPPORTING VERSES** (KJV Only):
-   - Add the strongest possible KJV verses at each step
-   - Chain verses in logical progression (each building on the last)
-   - Include cross-references that create an unbreakable chain
+3. **REINFORCEMENT POINTS**:
+   - Show WHY the disciple's argument is strong
+   - Identify the biblical patterns and types that support it
+   - Connect it to sanctuary, prophecy, or Christ-centered themes where applicable
 
-3. **LOGICAL PROGRESSION**:
-   - Start with premises the opponent MUST accept
-   - Build step-by-step so each point follows necessarily from the previous
-   - Identify and close every escape route
-   - End with the unavoidable conclusion
-
-4. **THE CHECKMATE**:
-   - State the final, inescapable conclusion clearly
-   - Show why every common objection fails
-   - Provide the "finishing move" — the single most devastating point
+4. **ANTICIPATED OBJECTIONS & RESPONSES**:
+   - What might an opponent say against the disciple's argument?
+   - How do additional scriptures shut down each objection?
 
 FORMAT:
-📝 **REFINED WEAPON** — [Topic]
+💪 **AMPLIFIED WEAPON** — [Topic]
 
-🔑 **SETUP QUESTIONS** (Lead with these):
-1. [Question that establishes premise 1] — [Why they must agree]
-2. [Question that establishes premise 2] — [Why they must agree]
-3. [The trap question] — [Why their answer locks them in]
-
-⚔️ **THE ARGUMENT** (Full refined version):
-[The complete, polished argument with KJV verses woven in, written in logical order]
-
-📖 **VERSE CHAIN** (In order of use):
-1. [Verse] — [What it establishes]
-2. [Verse] — [What it adds]
+📖 **SUPPORTING VERSE CHAIN** (Backing up your argument):
+1. [Verse quoted in full] — [How it supports your point]
+2. [Verse quoted in full] — [How it adds weight]
+3. [Verse quoted in full] — [How it reinforces]
 ...
 
-♟️ **THE CHECKMATE**:
-[The unavoidable conclusion + why common objections fail]
+🔑 **SETUP QUESTIONS** (Lead into your argument with these):
+1. [Question that establishes a premise] — [Why they must agree]
+2. [Question building on premise] — [Why they must agree]
+3. [Question that opens the door to your argument]
+
+💡 **WHY YOUR ARGUMENT IS STRONG**:
+[Analysis of the strengths of their existing argument and how the verse chain reinforces it]
 
 🛡️ **ANTICIPATED OBJECTIONS & RESPONSES**:
-- Objection: [Common counter] → Response: [Why it fails]
-- Objection: [Common counter] → Response: [Why it fails]
+- Objection: [Common counter] → Response: [Scripture-backed refutation]
+- Objection: [Common counter] → Response: [Scripture-backed refutation]
 
 RULES:
 - KJV Scripture ONLY
+- NEVER replace the disciple's argument with your own — AMPLIFY theirs
+- Every supporting verse must directly relate to what the disciple already wrote
+- Quote all verses IN FULL
 - Make it DEVASTATING but RESPECTFUL
-- Every claim must have scriptural backing
-- The argument must be logically airtight — no gaps
 - NEVER use the word "dear"`;
 
-      userPrompt = `Refine this theological argument into the sharpest possible weapon on the topic "${topicName}". Make it a checkmate argument with setup questions, supporting verses, and perfect logical progression.\n\nORIGINAL ARGUMENT:\n${userWeaponText}${existingAnalysis ? `\n\nPREVIOUS ANALYSIS:\n${existingAnalysis}` : ""}`;
+      userPrompt = `The disciple has written the following theological argument on "${topicName}". Do NOT rewrite or replace it. Instead, AMPLIFY it by finding powerful KJV verses that back it up, suggest setup questions that lead into it, and show why it is strong.\n\nTHE DISCIPLE'S ARGUMENT:\n${userWeaponText}${existingAnalysis ? `\n\nPREVIOUS ANALYSIS:\n${existingAnalysis}` : ""}`;
 
     } else if (mode === "defense-forge-weapon") {
       // Defense Mode: Score a weapon for forging into the arsenal
