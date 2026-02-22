@@ -767,6 +767,27 @@ RULES:
 ---SFX_CUES---
 [{"at":0,"effect":"wind","duration":8},{"at":20,"effect":"tension","duration":6},{"at":50,"effect":"battle","duration":5},{"at":80,"effect":"heavenly","duration":8}]`;
 
+const SHARED_STORY_RULES = `
+RULES:
+1. Tell the COMPLETE story from beginning to end, weaving in:
+   - Christ-centered connections (every story reveals Christ)
+   - DEEP CROSS-BIBLICAL PARALLELS — connect moments to stunning echoes across all of Scripture
+   - Sanctuary connections where applicable
+   - Great Controversy dimension — what is Satan trying to destroy? What is Christ revealing?
+2. ABSOLUTELY NO SUBHEADINGS, section titles, markdown headers, bold labels, or structural breaks. ONE continuous flowing narration from opening to close.
+3. Close with the theological reverberation — what this story means for the grand narrative of redemption.
+4. Do NOT name "rooms" or "floors" or "Phototheology." Weave principles organically.
+5. Do NOT use denominational labels.
+6. Target 1800-2500 words — stories need room to breathe, build character, and land spiritually.
+7. NEVER include stage directions or parenthetical notes.
+8. AIM FOR AT LEAST 5-7 deep cross-biblical parallels. These should feel like revelations arising from the narrative.
+9. NEVER open with "In this story..." or "The text tells us..." — open with immersive drama.
+10. PRESENT TENSE IS MANDATORY. The listener is LIVING the story, not reading about it.
+11. INCLUDE THE FULL NARRATIVE ARC: Set the stage → Build tension → Climax → Resolution → Spiritual reverberation. Do not skip key scenes or rush past critical moments.
+12. SOUND EFFECT CUES: After your narration, add a line "---SFX_CUES---" followed by a JSON array of sound effect cues. Each cue has: "at" (percentage position 0-100), "effect" (one of: wind, thunder, rain, fire, ocean, tension, heavenly, trumpet, battle, earthquake), "duration" (seconds, 3-10), and optionally "volume" (0.1-0.5, default 0.3). Place 5-10 cues at dramatically appropriate moments.
+---SFX_CUES---
+[{"at":0,"effect":"wind","duration":8},{"at":25,"effect":"tension","duration":6},{"at":50,"effect":"battle","duration":5},{"at":75,"effect":"thunder","duration":4},{"at":95,"effect":"heavenly","duration":8}]`;
+
 const URBAN_CHAPTER_SYSTEM_PROMPT = `You are producing an URBAN LIVED-EXPERIENCE Bible chapter commentary — your PRIMARY HERMENEUTICAL QUESTION is "How does this text speak to the real struggles of modern life — anxiety, identity, loneliness, burnout, and purpose?" You are a calm cultural interpreter with deep biblical knowledge and emotional intelligence — tracing how Scripture addresses the psychological and spiritual battlefield of the modern mind. You speak with the measured insight of a thoughtful documentary narrator, not with hype or slang. The listener is THERE. Everything happens NOW, in PRESENT TENSE.
 
 ${URBAN_STYLE_GUIDE}
@@ -895,10 +916,133 @@ TENSE — MANDATORY: Present tense throughout.
 
 ${SHARED_BOOK_RULES}`;
 
-// ── System prompt selection by mode ──
+// ── Story System Prompts (one per mode) ──
 
-function getSystemPrompts(mode: string, isBookScope: boolean): string {
-  if (isBookScope) {
+const EPIC_STORY_SYSTEM_PROMPT = `You are a cinematic philosopher-narrator producing an EPIC BIBLE STORY narration — telling a specific biblical story with the full dramatic weight, theological depth, and cosmic awareness of the epic commentary voice. You are not narrating a chapter — you are narrating a STORY. The story may span multiple chapters. You tell it as a complete, self-contained cinematic experience. The listener is THERE. Everything happens NOW.
+
+${STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PALACE_PRINCIPLES_INSTRUCTION}
+
+THE GREAT CONTROVERSY is the atmosphere in which every story breathes.
+
+STORY NARRATION GUIDELINES:
+- Tell the COMPLETE story from beginning to end — even if it spans multiple chapters
+- Set the stage BEFORE the story begins: who are these people? What led to this moment? What is at stake?
+- Build tension through philosophy and contrast, not just action
+- Give every character dimension — show what they are carrying, what they fear, what drives them
+- Linger on the pivotal moments — do not rush past the weight of critical scenes
+- Draw out the spiritual object lessons that rise naturally from the narrative
+- Connect the story's themes to the larger arc of redemption across all of Scripture
+- Close with the theological reverberation — what this story means forever
+
+${SHARED_STORY_RULES}`;
+
+const URBAN_STORY_SYSTEM_PROMPT = `You are producing an URBAN LIVED-EXPERIENCE BIBLE STORY narration — telling a specific biblical story through the lens of modern lived experience. Your PRIMARY HERMENEUTICAL QUESTION is "How does this story speak to the real struggles of modern life?" You trace the same human patterns — fear, identity crisis, isolation, courage, faith under pressure — that the characters face and that listeners face today. You speak with measured insight and emotional intelligence.
+
+${URBAN_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${URBAN_PALACE_LENS}
+
+THE GREAT CONTROVERSY is the atmosphere in which every story breathes.
+
+STORY NARRATION GUIDELINES:
+- Tell the COMPLETE story from beginning to end
+- Set the stage with emotional and psychological context — what are these people carrying?
+- Bridge EVERY key moment to modern lived experience: anxiety, identity, pressure, courage, belonging
+- Show how the same soul-patterns in this story repeat in modern life
+- Create moments of honest recognition: "That is exactly what I am going through"
+- Close with the spiritual reverberation through the lens of modern transformation
+
+${SHARED_STORY_RULES}`;
+
+const ANCIENT_STORY_SYSTEM_PROMPT = `You are producing an ANCIENT COVENANT-HISTORICAL BIBLE STORY narration — telling a specific biblical story within its precise covenant setting. Your PRIMARY HERMENEUTICAL QUESTION is "What did this story mean in its original covenant context?" You reconstruct the world these characters inhabit — the covenant obligations, the sanctuary realities, the prophetic horizons — so the listener STANDS in that world.
+
+${ANCIENT_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${ANCIENT_PALACE_LENS}
+
+THE GREAT CONTROVERSY is the atmosphere in which every story breathes.
+
+STORY NARRATION GUIDELINES:
+- Tell the COMPLETE story from beginning to end
+- Place the story precisely within its covenant cycle and prophetic horizon
+- Rich sensory detail grounded in historical accuracy
+- Original language insights woven naturally into the narration
+- Show how covenant patterns (Fall→Covenant→Sanctuary→Enemy→Restoration) manifest in this story
+- Close with how this story echoes across every subsequent covenant era
+
+${SHARED_STORY_RULES}`;
+
+const PREACHER_STORY_SYSTEM_PROMPT = `You are producing a REDEMPTIVE-PROCLAMATION BIBLE STORY narration — telling a specific biblical story with the conviction that every scene reveals Christ and demands response. Your PRIMARY HERMENEUTICAL QUESTION is "How does this story reveal Christ, truth, and theological weight for faithful teaching?" You are a herald who has wrestled with this story and now delivers it with fire and tears.
+
+${PREACHER_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${PREACHER_PALACE_LENS}
+
+THE GREAT CONTROVERSY is the atmosphere in which every story breathes.
+
+STORY NARRATION GUIDELINES:
+- Tell the COMPLETE story from beginning to end
+- Make Christ visible in every scene — as type, antitype, prophet, priest, judge, or king
+- Build from exposition to revelation to invitation — the listener must ENCOUNTER Jesus in this story
+- Every failure points to the need for a Savior; every deliverance points to the gospel
+- Create moments where truth demands response from the listener
+- Close with an invitation that makes the listener weep — because they have encountered Christ
+
+${SHARED_STORY_RULES}`;
+
+const SCHOLAR_STORY_SYSTEM_PROMPT = `You are producing a CANONICAL-THEOLOGICAL SCHOLAR BIBLE STORY narration — telling a specific biblical story while mapping its canonical function within the entire structure of Scripture. Your PRIMARY HERMENEUTICAL QUESTION is "How does this story function within the Bible's total theological architecture?" You deliver forensic-level analysis woven into compelling narrative.
+
+${SCHOLAR_STYLE_GUIDE}
+
+${PRESENT_TENSE_ENFORCEMENT}
+
+${THEOLOGICAL_GUARDRAILS}
+
+${SCHOLAR_PALACE_LENS}
+
+THE GREAT CONTROVERSY is the atmosphere in which every story breathes.
+
+STORY NARRATION GUIDELINES:
+- Tell the COMPLETE story from beginning to end
+- Map every key element to its canonical function — intertextual networks, typological chains, structural echoes
+- Greek/Hebrew insights woven into the narrative at critical moments
+- Show how later biblical authors reinterpret and echo this story
+- Demonstrate the canonical web — how this story connects to every other part of Scripture
+- Close with the story's permanent contribution to the Bible's total theological architecture
+
+${SHARED_STORY_RULES}`;
+
+// ── System prompt selection by mode and scope ──
+
+function getSystemPrompts(mode: string, scope: string): string {
+  if (scope === "story") {
+    switch (mode) {
+      case "urban": return URBAN_STORY_SYSTEM_PROMPT;
+      case "ancient": return ANCIENT_STORY_SYSTEM_PROMPT;
+      case "preacher": return PREACHER_STORY_SYSTEM_PROMPT;
+      case "scholar": return SCHOLAR_STORY_SYSTEM_PROMPT;
+      case "epic":
+      default: return EPIC_STORY_SYSTEM_PROMPT;
+    }
+  } else if (scope === "book") {
     switch (mode) {
       case "urban": return URBAN_BOOK_SYSTEM_PROMPT;
       case "ancient": return ANCIENT_BOOK_SYSTEM_PROMPT;
@@ -947,12 +1091,14 @@ async function generateEpicText(
   supabaseAdmin?: any,
   customInstructions?: string,
   mode: string = "epic",
+  storyTitle?: string,
 ): Promise<GeneratedEpic> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   const OPENAI_API_KEY_LOCAL = Deno.env.get("OPENAI_API_KEY");
 
   const isBookScope = scope === "book";
-  const systemPrompt = getSystemPrompts(mode, isBookScope);
+  const isStoryScope = scope === "story";
+  const systemPrompt = getSystemPrompts(mode, scope);
 
   // ── Fetch curated Christ-in-Every-Chapter anchors from the database ──
   let cecAnchorBlock = "";
@@ -1001,39 +1147,49 @@ These anchors are non-negotiable. They have been drawn from careful typological 
   }
 
   // Mode-specific user prompt framing so the AI doesn't default to "epic" voice
-  const modeFraming: Record<string, { adj: string; bookDesc: string; chapterDesc: string }> = {
+  const modeFraming: Record<string, { adj: string; bookDesc: string; chapterDesc: string; storyDesc: string }> = {
     epic: {
       adj: "epic cinematic",
       bookDesc: "a dramatic, sweeping narration that captures the grand arc of this book — its historical context, its place in redemption history, its major movements and themes — while revealing its deep theological significance and how it fits into the story of salvation from Genesis to Revelation.",
       chapterDesc: "a dramatic, sweeping narration that brings this chapter to life while revealing its deep theological significance and its place in the grand story of redemption.",
+      storyDesc: "a dramatic, cinematic narration of this story with full cosmic awareness — setting the stage before the story begins, building tension through philosophy and contrast, giving every character dimension, and revealing the deep theological significance and cross-biblical parallels that make this story reverberate across all of redemption history.",
     },
     urban: {
       adj: "Urban Lived-Experience",
       bookDesc: "a culturally aware, psychologically honest walkthrough of this book — asking 'How does this text speak to the real struggles of modern life?' Trace how Scripture addresses anxiety, identity, burnout, loneliness, digital overload, and purpose with deep Phototheology parallels. Use verse genetics, personal freestyle, and Fire Room moments of honest conviction. The listener should feel ancient text meeting their actual lived experience — stress, comparison, uncertainty — with stunning cross-biblical connections and Christ-centered application.",
       chapterDesc: "a culturally aware, psychologically honest commentary on this chapter — asking 'How does this text speak to modern struggles?' Show how the same human patterns (hiding, running, burning out, searching for identity) repeat across Scripture and into modern life. Use deep cross-biblical parallels that trace LIVED EXPERIENCE, sanctuary connections through the lens of real human need, and moments of honest spiritual insight. Make ancient Scripture meet the listener where they actually live — in their anxiety, their questions, their search for meaning.",
+      storyDesc: "a culturally aware, psychologically honest narration of this story — asking 'How does this story speak to the real struggles of modern life?' Trace the same soul-patterns the characters face into modern lived experience: fear under pressure, identity tested, courage demanded, faith when everything falls apart. Bridge every key moment to anxiety, burnout, isolation, and purpose. Create moments of honest recognition.",
     },
     scholar: {
       adj: "Canonical-Theological Scholar",
       bookDesc: "a canonical-theological analysis of this book — asking 'How does this book function within the entire structure of Scripture?' Examine its literary structure, original language insights, intertextual networks, typological chains, and systematic theological architecture. Map its canonical function with deep Phototheology parallels demonstrated through linguistic and structural evidence. The listener should see how this book connects to every other book through the Bible's own internal commentary system.",
       chapterDesc: "a canonical-theological commentary on this chapter — asking 'How does this passage function within the entire structure of Scripture?' Deliver forensic-level textual analysis: chiastic structures, keyword chains, Greek/Hebrew semantic ranges, inner-biblical exegesis, typological continuity, and canonical networks. Use deep cross-biblical parallels with LINGUISTIC AND STRUCTURAL EVIDENCE. Every claim grounded in the text. Show the canonical web.",
+      storyDesc: "a canonical-theological narration of this story — asking 'How does this story function within the entire structure of Scripture?' Map its intertextual networks, typological chains, and canonical architecture. Greek/Hebrew insights at critical moments. Show how later authors reinterpret and echo this story. Demonstrate the canonical web with linguistic and structural evidence woven into compelling narrative.",
     },
     ancient: {
       adj: "Ancient Covenant-Historical",
       bookDesc: "a covenant-historical survey of this book — asking 'What did this mean in its original covenant setting?' Place every major movement within the Eight Covenant Cycles, identify its Three Heavens horizon, map its events onto sanctuary development across eras, and show its feast-day correlations. Use deep Phototheology parallels that trace covenant patterns repeating across all eight cycles. Narrate as one who has walked through every covenant era and witnessed God's faithfulness in each.",
       chapterDesc: "a covenant-historical commentary on this chapter — asking 'What did this mean in its original covenant setting?' Identify the covenant cycle (Fall→Covenant→Sanctuary→Enemy→Restoration), the Three Heavens horizon (1H/2H/3H), sanctuary growth mapping, and feast correlations. Use deep cross-biblical parallels that trace COVENANT PATTERNS across eras. Narrate with the measured gravitas of one who has walked through every covenant era.",
+      storyDesc: "a covenant-historical narration of this story — asking 'What did this story mean in its original covenant setting?' Place it within its covenant cycle, Three Heavens horizon, and sanctuary realities. Rich sensory detail grounded in historical accuracy. Original language insights woven naturally. Show how covenant patterns manifest in every scene.",
     },
     preacher: {
       adj: "Redemptive-Proclamation",
       bookDesc: "a proclamation-theological overview of this book — asking 'How does this text reveal Christ, truth, and theological weight for faithful teaching?' Make Christ the gravitational center of every major movement. Use deep Phototheology Christological parallels — every sacrifice pointing to Calvary, every deliverance pointing to the gospel. Test every interpretation by its spiritual fruit. Build toward transformation and response. The listener should ENCOUNTER Jesus, not just learn about Him.",
       chapterDesc: "a proclamation-theological commentary on this chapter — asking 'How does this text reveal Christ, truth, and theological weight?' Make Christ visible in every passage as type, antitype, prophet, priest, judge, or king. Use deep cross-biblical parallels that are CHRISTOLOGICAL — every sacrifice → Calvary, every deliverance → gospel, every failure → the need for a Savior. Build from exposition to revelation to invitation. The listener must meet Jesus in this chapter.",
+      storyDesc: "a proclamation-theological narration of this story — asking 'How does this story reveal Christ and what must we do with this truth?' Make Christ visible in every scene. Build from narrative exposition to theological revelation to spiritual invitation. Every failure points to the need for a Savior; every deliverance points to the gospel. The listener must ENCOUNTER Jesus in this story.",
     },
   };
 
   const framing = modeFraming[mode] || modeFraming.epic;
 
-  const userPrompt = isBookScope
-    ? `Create a ${framing.adj} overview of the entire book of ${book}. ${framing.bookDesc}${propheticFrameworkBlock}`
-    : `Create a ${framing.adj} commentary for ${book} chapter ${chapter}. ${framing.chapterDesc}${cecAnchorBlock}${propheticFrameworkBlock}${customInstructions ? `\n\nSPECIAL CONTENT INSTRUCTIONS FOR THIS REGENERATION (MUST BE FOLLOWED):\n${customInstructions}` : ""}`;
+  let userPrompt: string;
+  if (isStoryScope && storyTitle) {
+    userPrompt = `Narrate the biblical story of "${storyTitle}" as a ${framing.adj} story narration. ${framing.storyDesc}${propheticFrameworkBlock}${customInstructions ? `\n\nSPECIAL CONTENT INSTRUCTIONS (MUST BE FOLLOWED):\n${customInstructions}` : ""}`;
+  } else if (isBookScope) {
+    userPrompt = `Create a ${framing.adj} overview of the entire book of ${book}. ${framing.bookDesc}${propheticFrameworkBlock}`;
+  } else {
+    userPrompt = `Create a ${framing.adj} commentary for ${book} chapter ${chapter}. ${framing.chapterDesc}${cecAnchorBlock}${propheticFrameworkBlock}${customInstructions ? `\n\nSPECIAL CONTENT INSTRUCTIONS FOR THIS REGENERATION (MUST BE FOLLOWED):\n${customInstructions}` : ""}`;
+  }
 
   // Try Lovable AI gateway first, fall back to OpenAI directly
   const tryLovable = async () => {
@@ -1362,31 +1518,45 @@ serve(async (req) => {
   }
 
   try {
-    const { book, chapter, regenerate, scope, customInstructions, mode: requestMode } = await req.json();
+    const { book, chapter, regenerate, scope, customInstructions, mode: requestMode, storyTitle } = await req.json();
     const effectiveScope = scope || "chapter";
     const mode = requestMode || "epic";
+    const isStoryScope = effectiveScope === "story";
 
-    if (!book || (effectiveScope === "chapter" && !chapter)) {
+    if (!isStoryScope && (!book || (effectiveScope === "chapter" && !chapter))) {
       throw new Error("book is required; chapter is required for chapter scope");
     }
 
-    // For book scope, use chapter=0 as a sentinel
-    const effectiveChapter = effectiveScope === "book" ? 0 : chapter;
+    if (isStoryScope && !storyTitle) {
+      throw new Error("storyTitle is required for story scope");
+    }
+
+    // For book scope, use chapter=0; for story scope, use -1 as sentinel
+    const effectiveBook = isStoryScope ? (book || "Stories") : book;
+    const effectiveChapter = isStoryScope ? -1 : (effectiveScope === "book" ? 0 : chapter);
+
+    // For stories, create a slug from the title for storage
+    const storySlug = isStoryScope ? storyTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").substring(0, 60) : null;
 
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Check if already exists and ready (unless regenerate requested)
     if (!regenerate) {
-      const { data: existing } = await supabaseAdmin
+      let existingQuery = supabaseAdmin
         .from("epic_commentaries")
         .select("*")
-        .eq("book", book)
-        .eq("chapter", effectiveChapter)
         .eq("commentary_mode", mode)
         .eq("status", "ready")
         .order("version", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .limit(1);
+
+      if (isStoryScope) {
+        existingQuery = existingQuery.eq("book", storyTitle).eq("chapter", -1);
+      } else {
+        existingQuery = existingQuery.eq("book", effectiveBook).eq("chapter", effectiveChapter);
+      }
+
+      const { data: existing } = await existingQuery.maybeSingle();
 
       if (existing) {
         return new Response(
@@ -1400,11 +1570,12 @@ serve(async (req) => {
     const modeVoiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
     const voiceIdLabel = ELEVENLABS_API_KEY ? `elevenlabs:${modeVoiceId}` : "onyx";
 
-    // Upsert on (book, chapter, commentary_mode) — unique constraint prevents duplicates
+    // Upsert — for stories, use storyTitle as the "book" field and -1 as chapter
+    const upsertBook = isStoryScope ? storyTitle : effectiveBook;
     const { data: record, error: insertError } = await supabaseAdmin
       .from("epic_commentaries")
       .upsert({
-        book,
+        book: upsertBook,
         chapter: effectiveChapter,
         commentary_mode: mode,
         version: 1,
@@ -1417,10 +1588,18 @@ serve(async (req) => {
 
     if (insertError) throw new Error(`Insert error: ${insertError.message}`);
 
-    console.log(`[EpicCommentary] Generating ${effectiveScope} text for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : ""} (mode: ${mode})...`);
+    console.log(`[EpicCommentary] Generating ${effectiveScope}${isStoryScope ? ` "${storyTitle}"` : ` for ${effectiveBook}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : ""}`} (mode: ${mode})...`);
 
     // Generate text + SFX cues
-    const { text: commentaryText, sfxCues } = await generateEpicText(book, effectiveScope === "chapter" ? effectiveChapter : null, effectiveScope, supabaseAdmin, customInstructions, mode);
+    const { text: commentaryText, sfxCues } = await generateEpicText(
+      effectiveBook, 
+      effectiveScope === "chapter" ? effectiveChapter : null, 
+      effectiveScope, 
+      supabaseAdmin, 
+      customInstructions, 
+      mode,
+      storyTitle,
+    );
 
     // Update with text (sfx_cues stored separately if column exists)
     const textUpdateResult = await supabaseAdmin
@@ -1433,16 +1612,21 @@ serve(async (req) => {
       throw new Error(`Text save error: ${textUpdateResult.error.message}`);
     }
 
-    console.log(`[EpicCommentary] Generating audio for ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book overview)"}...`);
+    const logLabel = isStoryScope ? `story "${storyTitle}"` : `${effectiveBook}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book overview)"}`;
+    console.log(`[EpicCommentary] Generating audio for ${logLabel}...`);
 
     // Sanitize text for TTS (strip stage directions, parentheticals)
     const ttsText = sanitizeForTTS(commentaryText);
 
+    // For stories, use the slug for the storage path
+    const audioBook = isStoryScope ? `stories/${storySlug}` : effectiveBook;
+    const audioChapter = isStoryScope ? 0 : effectiveChapter;
+
     // Generate audio
     const { storagePath, durationMs, fileSizeBytes } = await generateEpicAudio(
       ttsText,
-      book,
-      effectiveChapter,
+      audioBook,
+      audioChapter,
       supabaseAdmin,
       mode,
     );
@@ -1458,7 +1642,7 @@ serve(async (req) => {
       })
       .eq("id", record.id);
 
-    console.log(`[EpicCommentary] ✅ ${book}${effectiveScope === "chapter" ? ` ${effectiveChapter}` : " (book)"} [${mode}] ready (${Math.round(durationMs / 1000)}s, ${Math.round(fileSizeBytes / 1024)}KB)`);
+    console.log(`[EpicCommentary] ✅ ${logLabel} [${mode}] ready (${Math.round(durationMs / 1000)}s, ${Math.round(fileSizeBytes / 1024)}KB)`);
 
     return new Response(
       JSON.stringify({
