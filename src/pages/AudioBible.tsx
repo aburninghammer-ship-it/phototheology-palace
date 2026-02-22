@@ -1643,39 +1643,102 @@ export default function AudioBible() {
                           if (!story) return;
                           setIsEpicLoading(true);
                           try {
-                            const { data, error } = await supabase.functions.invoke('generate-epic-commentary', {
+                            // 1) Check DB cache first
+                            const { data: cached } = await (supabase as any)
+                              .from('epic_commentaries')
+                              .select('id, audio_storage_path, commentary_text, status')
+                              .eq('book', story.title)
+                              .eq('chapter', -1)
+                              .eq('mode', epicMode)
+                              .maybeSingle();
+
+                            const playAudioFromPath = async (path: string) => {
+                              const { data: signed } = await supabase.storage
+                                .from('epic-audio')
+                                .createSignedUrl(path, 3600);
+                              if (signed?.signedUrl) {
+                                if (epicAudioRef.current) epicAudioRef.current.pause();
+                                const audio = new Audio(signed.signedUrl);
+                                epicAudioRef.current = audio;
+                                setEpicAudioUrl(signed.signedUrl);
+                                setEpicNowPlayingBook(story.title);
+                                setEpicNowPlayingChapter(0);
+                                setIsEpicPlaying(true);
+                                setIsEpicPaused(false);
+                                audio.play();
+                                audio.onended = () => { setIsEpicPlaying(false); setIsEpicPaused(false); };
+                                toast.success(`Now playing: ${story.title} (${activeModeMeta.label})`);
+                                return true;
+                              }
+                              return false;
+                            };
+
+                            // If cached with audio, play immediately
+                            if (cached?.audio_storage_path && cached?.status === 'ready') {
+                              const played = await playAudioFromPath(cached.audio_storage_path);
+                              if (played) { setIsEpicLoading(false); return; }
+                            }
+
+                            // 2) Trigger generation (fire-and-forget — may timeout, that's OK)
+                            toast.info(`Generating ${activeModeMeta.label} story for "${story.title}"... This may take 2-3 minutes.`);
+                            supabase.functions.invoke('generate-epic-commentary', {
                               body: {
                                 scope: "story",
                                 storyTitle: story.title,
                                 book: story.book,
                                 mode: epicMode,
                               }
-                            });
-                            if (error) throw error;
-                            if (data?.audioUrl) {
-                              if (epicAudioRef.current) {
-                                epicAudioRef.current.pause();
-                              }
-                              const audio = new Audio(data.audioUrl);
-                              epicAudioRef.current = audio;
-                              setEpicAudioUrl(data.audioUrl);
-                              setEpicNowPlayingBook(story.title);
-                              setEpicNowPlayingChapter(0);
-                              setIsEpicPlaying(true);
-                              setIsEpicPaused(false);
-                              audio.play();
-                              audio.onended = () => {
-                                setIsEpicPlaying(false);
+                            }).then(({ data }) => {
+                              // If we get a response with audioUrl, great — but we also poll below
+                              if (data?.audioUrl) {
+                                if (epicAudioRef.current) epicAudioRef.current.pause();
+                                const audio = new Audio(data.audioUrl);
+                                epicAudioRef.current = audio;
+                                setEpicAudioUrl(data.audioUrl);
+                                setEpicNowPlayingBook(story.title);
+                                setEpicNowPlayingChapter(0);
+                                setIsEpicPlaying(true);
                                 setIsEpicPaused(false);
-                              };
-                              toast.success(`Now playing: ${story.title} (${activeModeMeta.label})`);
-                            } else if (data?.text) {
-                              toast.success("Story generated! Audio coming soon.");
-                            }
+                                setIsEpicLoading(false);
+                                audio.play();
+                                audio.onended = () => { setIsEpicPlaying(false); setIsEpicPaused(false); };
+                                toast.success(`Now playing: ${story.title} (${activeModeMeta.label})`);
+                              }
+                            }).catch(() => { /* timeout is expected, polling handles it */ });
+
+                            // 3) Poll DB every 15s for up to 5 min
+                            let attempts = 0;
+                            const maxAttempts = 20;
+                            const pollInterval = 15000;
+                            const poll = async () => {
+                              attempts++;
+                              const { data: row } = await (supabase as any)
+                                .from('epic_commentaries')
+                                .select('audio_storage_path, status')
+                                .eq('book', story.title)
+                                .eq('chapter', -1)
+                                .eq('mode', epicMode)
+                                .eq('status', 'ready')
+                                .maybeSingle();
+
+                              if (row?.audio_storage_path) {
+                                const played = await playAudioFromPath(row.audio_storage_path);
+                                if (played) { setIsEpicLoading(false); return; }
+                              }
+
+                              if (attempts < maxAttempts) {
+                                setTimeout(poll, pollInterval);
+                              } else {
+                                setIsEpicLoading(false);
+                                toast.error("Story is still generating. Please try again in a minute.");
+                              }
+                            };
+                            // Start polling after a short initial delay
+                            setTimeout(poll, 20000);
+
                           } catch (err: any) {
                             console.error('Story generation error:', err);
                             toast.error("Failed to generate story: " + (err.message || "Unknown error"));
-                          } finally {
                             setIsEpicLoading(false);
                           }
                         }}
