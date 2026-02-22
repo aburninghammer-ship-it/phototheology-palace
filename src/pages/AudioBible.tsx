@@ -244,11 +244,11 @@ export default function AudioBible() {
 
   // Add chapter to custom list (with current mode)
   const addCustomChapter = () => {
+    const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
     const exists = customChapters.some(
-      (c) => c.book === customBook && c.chapter === customChapter
+      (c) => c.book === customBook && c.chapter === customChapter && c.mode === mode
     );
     if (!exists) {
-      const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
       setCustomChapters([...customChapters, { book: customBook, chapter: customChapter, mode }]);
     }
   };
@@ -259,7 +259,7 @@ export default function AudioBible() {
     const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
     for (let ch = rangeStartChapter; ch <= rangeEndChapter; ch++) {
       const exists = customChapters.some(
-        (c) => c.book === customBook && c.chapter === ch
+        (c) => c.book === customBook && c.chapter === ch && c.mode === mode
       );
       if (!exists) {
         newChapters.push({ book: customBook, chapter: ch, mode });
@@ -279,7 +279,7 @@ export default function AudioBible() {
       const book = BIBLE_BOOK_METADATA[bookIdx];
       for (let ch = 1; ch <= book.chapters; ch++) {
         const exists = customChapters.some(
-          (c) => c.book === book.name && c.chapter === ch
+          (c) => c.book === book.name && c.chapter === ch && c.mode === mode
         );
         if (!exists) {
           newChapters.push({ book: book.name, chapter: ch, mode });
