@@ -1477,7 +1477,7 @@ export function AmbientMusicPlayer({
                   </div>
                 </div>
 
-                {/* Mobile Volume Control - Preset Buttons */}
+                {/* Mobile Volume Control - Slider + Presets */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium flex items-center gap-2">
@@ -1488,12 +1488,29 @@ export function AmbientMusicPlayer({
                       {Math.round(volume * 100)}%
                     </span>
                   </div>
+                  <Slider
+                    value={[volume]}
+                    min={0}
+                    max={0.5}
+                    step={0.01}
+                    onValueChange={(value) => {
+                      const newVolume = value[0];
+                      setVolume(newVolume);
+                      if (newVolume > 0 && isMuted) setIsMuted(false);
+                      if (newVolume === 0) setIsMuted(true);
+                      if (audioRef.current) {
+                        audioRef.current.volume = newVolume * duckMultiplier;
+                      }
+                      localStorage.setItem("pt-music-volume-pct", Math.round(newVolume * 100).toString());
+                    }}
+                    className="w-full touch-manipulation"
+                  />
                   <div className="flex items-center gap-1">
                     <Button
                       variant={getCurrentPreset() === 'off' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('off')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       <VolumeX className="h-3 w-3 mr-1" />
                       Off
@@ -1502,7 +1519,7 @@ export function AmbientMusicPlayer({
                       variant={getCurrentPreset() === 'low' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('low')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       5%
                     </Button>
@@ -1510,7 +1527,7 @@ export function AmbientMusicPlayer({
                       variant={getCurrentPreset() === 'med' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('med')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       15%
                     </Button>
@@ -1518,7 +1535,7 @@ export function AmbientMusicPlayer({
                       variant={getCurrentPreset() === 'high' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('high')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       30%
                     </Button>

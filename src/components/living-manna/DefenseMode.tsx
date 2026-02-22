@@ -101,6 +101,33 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     message: string;
   } | null>(null);
 
+  // Refine weapon state
+  const [refineLoading, setRefineLoading] = useState(false);
+  const [refineResult, setRefineResult] = useState<string | null>(null);
+
+  const refineWeapon = async () => {
+    if (!weaponInput.trim()) return;
+    setRefineLoading(true);
+    setRefineResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-refine-weapon",
+          userArgument: weaponInput.trim(),
+          analysis: weaponAnalysis || "",
+          doctrineTopic: weaponTopic || undefined,
+        },
+      });
+      if (error) throw error;
+      const content = data?.content || "Unable to refine at this time.";
+      setRefineResult(content);
+    } catch {
+      setRefineResult("Failed to refine weapon. Please try again.");
+    } finally {
+      setRefineLoading(false);
+    }
+  };
+
   const forgeWeapon = async () => {
     if (!weaponInput.trim() || !weaponAnalysis) return;
     setForgeLoading(true);
@@ -119,7 +146,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       const content = data?.content || "";
       const scoreMatch = content.match(/(\d+)\s*\/\s*10/);
       const score = scoreMatch ? parseInt(scoreMatch[1]) : 5;
-      const passed = score >= 7;
+      const passed = score >= 8;
 
       if (passed) {
         const topicName = weaponTopic
@@ -666,20 +693,80 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                         Analyze Another
                       </Button>
                       {!forgeResult && (
-                        <Button
-                          size="sm"
-                          onClick={forgeWeapon}
-                          disabled={forgeLoading}
-                          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
-                        >
-                          {forgeLoading ? (
-                            <><Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> Forging...</>
-                          ) : (
-                            <><Swords className="h-3.5 w-3.5 mr-1" /> Forge This Weapon</>
-                          )}
-                        </Button>
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={refineWeapon}
+                            disabled={refineLoading}
+                            className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
+                          >
+                            {refineLoading ? (
+                              <><Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> Refining...</>
+                            ) : (
+                              <><Sparkles className="h-3.5 w-3.5 mr-1" /> Refine This Weapon</>
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={forgeWeapon}
+                            disabled={forgeLoading}
+                            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+                          >
+                            {forgeLoading ? (
+                              <><Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> Forging...</>
+                            ) : (
+                              <><Swords className="h-3.5 w-3.5 mr-1" /> Forge This Weapon</>
+                            )}
+                          </Button>
+                        </>
                       )}
                     </div>
+
+                    {/* Refine result */}
+                    {refineResult && (
+                      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
+                        <div className="p-3 rounded-lg bg-gradient-to-r from-amber-950/40 to-orange-950/30 border border-amber-500/40">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Sparkles className="h-5 w-5 text-amber-400" />
+                            <span className="text-sm font-bold text-amber-300">Jeeves — Refined Weapon</span>
+                            <QuickAudioButton
+                              text={refineResult}
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 ml-auto text-amber-400/60 hover:text-amber-400"
+                            />
+                          </div>
+                          <div className="text-xs whitespace-pre-wrap leading-relaxed text-foreground/90">
+                            {refineResult}
+                          </div>
+                          <div className="flex gap-2 mt-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                              onClick={() => {
+                                // Apply the refined version as the new weapon input
+                                setWeaponInput(prev => prev + "\n\n--- REFINED VERSION ---\n" + refineResult);
+                                setRefineResult(null);
+                                setWeaponAnalysis(null);
+                              }}
+                            >
+                              <ArrowRight className="h-3.5 w-3.5 mr-1" />
+                              Apply Refinement
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                              onClick={() => setRefineResult(null)}
+                            >
+                              <X className="h-3.5 w-3.5 mr-1" />
+                              Dismiss
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
 
                     {/* Forge result */}
                     {forgeResult && (
@@ -713,7 +800,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                               <Shield className="h-5 w-5 text-red-400" />
                               <div>
                                 <p className="text-sm font-bold text-red-300">Weapon Rejected — Needs More Work</p>
-                                <p className="text-xs text-red-400/80">Score: {forgeResult.score}/10 — Minimum 7/10 required</p>
+                                <p className="text-xs text-red-400/80">Score: {forgeResult.score}/10 — Minimum 8/10 required</p>
                               </div>
                               <Badge className="ml-auto bg-red-600 text-white text-xs">{forgeResult.score}/10</Badge>
                             </div>

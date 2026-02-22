@@ -7335,6 +7335,115 @@ RULES:
 
       userPrompt = `Analyze this theological defense/argument as a spiritual weapon. The topic is "${topicName}". Here is the disciple's weapon:\n\n${userWeaponText}`;
 
+    } else if (mode === "defense-refine-weapon") {
+      // Defense Mode: Refine a weapon to make it as sharp as possible
+      const userWeaponText = requestBody.userArgument || requestBody.message || "";
+      const topicName = requestBody.doctrineTopic || requestBody.topic || "General theology";
+      const existingAnalysis = requestBody.analysis || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in WEAPON REFINEMENT mode. The disciple has written a theological argument and wants you to REFINE it into the sharpest possible version — a checkmate argument with perfect logical progression.
+
+THE PALACE METHOD:
+${PALACE_SCHEMA}
+
+YOUR TASK — Produce a REFINED version of the weapon that:
+
+1. **SETUP QUESTIONS** (The Critique Approach):
+   Build the argument as a series of questions that lead the opponent to concede key premises before the conclusion. Like a chess game — set up the checkmate before delivering it.
+   Example pattern:
+   - Question 1: "Would you agree that [established fact]?"
+   - Question 2: "Is it fair to say that [logical consequence]?"
+   - Question 3: "Then how do you reconcile [the contradiction]?"
+
+2. **SUPPORTING VERSES** (KJV Only):
+   - Add the strongest possible KJV verses at each step
+   - Chain verses in logical progression (each building on the last)
+   - Include cross-references that create an unbreakable chain
+
+3. **LOGICAL PROGRESSION**:
+   - Start with premises the opponent MUST accept
+   - Build step-by-step so each point follows necessarily from the previous
+   - Identify and close every escape route
+   - End with the unavoidable conclusion
+
+4. **THE CHECKMATE**:
+   - State the final, inescapable conclusion clearly
+   - Show why every common objection fails
+   - Provide the "finishing move" — the single most devastating point
+
+FORMAT:
+📝 **REFINED WEAPON** — [Topic]
+
+🔑 **SETUP QUESTIONS** (Lead with these):
+1. [Question that establishes premise 1] — [Why they must agree]
+2. [Question that establishes premise 2] — [Why they must agree]
+3. [The trap question] — [Why their answer locks them in]
+
+⚔️ **THE ARGUMENT** (Full refined version):
+[The complete, polished argument with KJV verses woven in, written in logical order]
+
+📖 **VERSE CHAIN** (In order of use):
+1. [Verse] — [What it establishes]
+2. [Verse] — [What it adds]
+...
+
+♟️ **THE CHECKMATE**:
+[The unavoidable conclusion + why common objections fail]
+
+🛡️ **ANTICIPATED OBJECTIONS & RESPONSES**:
+- Objection: [Common counter] → Response: [Why it fails]
+- Objection: [Common counter] → Response: [Why it fails]
+
+RULES:
+- KJV Scripture ONLY
+- Make it DEVASTATING but RESPECTFUL
+- Every claim must have scriptural backing
+- The argument must be logically airtight — no gaps
+- NEVER use the word "dear"`;
+
+      userPrompt = `Refine this theological argument into the sharpest possible weapon on the topic "${topicName}". Make it a checkmate argument with setup questions, supporting verses, and perfect logical progression.\n\nORIGINAL ARGUMENT:\n${userWeaponText}${existingAnalysis ? `\n\nPREVIOUS ANALYSIS:\n${existingAnalysis}` : ""}`;
+
+    } else if (mode === "defense-forge-weapon") {
+      // Defense Mode: Score a weapon for forging into the arsenal
+      const userWeaponText = requestBody.userArgument || requestBody.message || "";
+      const topicName = requestBody.doctrineTopic || requestBody.topic || "General theology";
+      const existingAnalysis = requestBody.analysis || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in WEAPON FORGE mode. Score this theological weapon on a strict 1-10 scale. A weapon must score 8/10 or higher to be forged into the arsenal.
+
+SCORING CRITERIA:
+- **Biblical Accuracy** (Is every claim supported by KJV Scripture?)
+- **Logical Soundness** (Is the argument free of fallacies and gaps?)
+- **Completeness** (Does it address counterarguments?)
+- **Persuasive Power** (Would this actually convince someone?)
+- **Structure** (Is it well-organized and easy to follow?)
+
+FORMAT:
+📊 **FORGE SCORE**: [X] / 10
+
+**Biblical Accuracy**: [1-10]
+**Logical Soundness**: [1-10]
+**Completeness**: [1-10]
+**Persuasive Power**: [1-10]
+**Structure**: [1-10]
+
+${`**VERDICT**: [FORGED ✅ / REJECTED ❌]`}
+
+[Brief explanation of the score and what would improve it]
+
+Be STRICT. An 8/10 weapon should be genuinely strong. Do not inflate scores.
+NEVER use the word "dear"`;
+
+      userPrompt = `Score this theological weapon for forging. Topic: "${topicName}".\n\nWEAPON:\n${userWeaponText}${existingAnalysis ? `\n\nANALYSIS:\n${existingAnalysis}` : ""}`;
+
     } else if (mode === "guesthouse_generate_prompt") {
       // GuestHouse: Generate a game prompt for live sessions
       const { gameType, verse: gameVerse, difficulty: gameDifficulty } = requestBody;
