@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Video, Plus, Play, ExternalLink, Calendar, Trash2 } from "lucide-react";
+import { Video, Plus, Play, ExternalLink, Calendar, Trash2, KeyRound } from "lucide-react";
+import { StreamKeyVault } from "./StreamKeyVault";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
@@ -184,7 +185,9 @@ export function LivestreamManager({ churchId }: LivestreamManagerProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <StreamKeyVault churchId={churchId} />
+
       <Card variant="glass">
         <CardHeader>
           <div className="flex items-center justify-between">
