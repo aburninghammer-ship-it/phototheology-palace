@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
   Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
+  FlaskConical, Target,
 } from "lucide-react";
 import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,7 +40,7 @@ interface ChatMessage {
   score?: number;
 }
 
-type DefenseSubMode = "sparring" | "library";
+type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack";
 
 export function DefenseMode({ churchId }: DefenseModeProps) {
   const isMobile = useIsMobile();
@@ -67,6 +68,18 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   // Audio state
   const [audioMode, setAudioMode] = useState(false);
   const [autoSpeakId, setAutoSpeakId] = useState<string | null>(null);
+
+  // Analyze My Weapon state
+  const [weaponInput, setWeaponInput] = useState("");
+  const [weaponTopic, setWeaponTopic] = useState("");
+  const [weaponAnalysis, setWeaponAnalysis] = useState<string | null>(null);
+  const [weaponLoading, setWeaponLoading] = useState(false);
+
+  // Analyze This Attack state
+  const [attackInput, setAttackInput] = useState("");
+  const [attackTopic, setAttackTopic] = useState("");
+  const [attackAnalysis, setAttackAnalysis] = useState<string | null>(null);
+  const [attackLoading, setAttackLoading] = useState(false);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -172,6 +185,52 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       setIsAssistLoading(false);
     }
   }, [assistMode, selectedOpponent, selectedTopic, selectedTemperaments]);
+
+  // ─── Analyze My Weapon handler ────────────────────────────────
+  const analyzeWeapon = async () => {
+    if (weaponInput.trim().length < 50) return;
+    setWeaponLoading(true);
+    setWeaponAnalysis(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-analyze-weapon",
+          userArgument: weaponInput.trim(),
+          doctrineTopic: weaponTopic || undefined,
+        },
+      });
+      if (error) throw error;
+      setWeaponAnalysis(data?.content || "Analysis unavailable. Please try again.");
+    } catch (err) {
+      console.error("Weapon analysis error:", err);
+      setWeaponAnalysis("Failed to analyze. Please try again.");
+    } finally {
+      setWeaponLoading(false);
+    }
+  };
+
+  // ─── Analyze This Attack handler ─────────────────────────────
+  const analyzeAttack = async () => {
+    if (attackInput.trim().length < 50) return;
+    setAttackLoading(true);
+    setAttackAnalysis(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-analyze-attack",
+          criticArgument: attackInput.trim(),
+          doctrineTopic: attackTopic || undefined,
+        },
+      });
+      if (error) throw error;
+      setAttackAnalysis(data?.content || "Analysis unavailable. Please try again.");
+    } catch (err) {
+      console.error("Attack analysis error:", err);
+      setAttackAnalysis("Failed to analyze. Please try again.");
+    } finally {
+      setAttackLoading(false);
+    }
+  };
 
   const startSparring = async () => {
     if (!selectedOpponent || !selectedTopic) return;
@@ -354,35 +413,253 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </p>
         </div>
 
-        {/* Sub-mode Toggle: Sparring vs Library */}
-        <div className="flex items-center justify-center gap-2 p-1 rounded-lg bg-black/20 border border-border/50 max-w-md mx-auto">
-          <button
-            onClick={() => setSubMode("sparring")}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              subMode === "sparring"
-                ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-md"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Swords className="h-4 w-4" />
-            Sparring Arena
-          </button>
-          <button
-            onClick={() => setSubMode("library")}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              subMode === "library"
-                ? "bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-md"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <BookOpen className="h-4 w-4" />
-            3AM Library
-          </button>
-        </div>
+        {/* Sub-mode Toggle: 4 tabs */}
+        <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-2xl mx-auto`}>
+          {([
+            { id: "sparring" as const, label: "Sparring Arena", icon: Swords, gradient: "from-red-600 to-orange-600" },
+            { id: "library" as const, label: "3AM Library", icon: BookOpen, gradient: "from-amber-600 to-yellow-600" },
+            { id: "analyze-weapon" as const, label: "Analyze My Weapon", icon: FlaskConical, gradient: "from-blue-600 to-cyan-600" },
+            { id: "analyze-attack" as const, label: "Analyze This Attack", icon: Target, gradient: "from-purple-600 to-pink-600" },
+          ]).map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setSubMode(tab.id)}
+              className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all ${
+                subMode === tab.id
+                  ? `bg-gradient-to-r ${tab.gradient} text-white shadow-md`
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+              <span className={isMobile ? "text-xs" : ""}>{tab.label}</span>
+            </button>
+          ))}</div>
 
-        {/* Render Library or Sparring Setup */}
+        {/* Render based on sub-mode */}
         {subMode === "library" ? (
           <InterdenominationalLibrary />
+        ) : subMode === "analyze-weapon" ? (
+          /* ─── ANALYZE MY WEAPON TAB ─────────────────────────────── */
+          <div className="space-y-5">
+            <div className="text-center space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <FlaskConical className="h-5 w-5 text-cyan-400" />
+                <h3 className="text-lg font-bold">Analyze My Weapon</h3>
+              </div>
+              <p className="text-muted-foreground text-sm max-w-lg mx-auto">
+                Submit your argument or defense and let Jeeves analyze its strength, identify weaknesses, and show you how to make it even more powerful.
+              </p>
+            </div>
+
+            {/* Optional topic context */}
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">
+                Doctrine Topic (optional)
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {DEFENSE_TOPICS.map((topic) => (
+                  <Badge
+                    key={topic.id}
+                    variant={weaponTopic === topic.id ? "default" : "outline"}
+                    className={`cursor-pointer text-xs py-1 px-2.5 transition-all ${
+                      weaponTopic === topic.id
+                        ? "bg-cyan-600 text-white border-cyan-600"
+                        : "hover:bg-cyan-600/10"
+                    }`}
+                    onClick={() => setWeaponTopic(weaponTopic === topic.id ? "" : topic.id)}
+                  >
+                    {topic.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Argument input */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                Your Argument / Defense
+              </label>
+              <Textarea
+                placeholder="Paste or type your argument here... (minimum 50 characters)&#10;&#10;Example: 'The Sabbath was established at creation in Genesis 2:1-3, before any Jewish nation existed. God blessed and sanctified the seventh day for all humanity...'"
+                className="min-h-[160px] max-h-[300px] bg-background/50"
+                value={weaponInput}
+                onChange={(e) => setWeaponInput(e.target.value)}
+              />
+              <div className="flex items-center justify-between">
+                <span className={`text-xs ${weaponInput.trim().length >= 50 ? "text-green-500" : "text-muted-foreground"}`}>
+                  {weaponInput.trim().length}/50 min characters
+                </span>
+                <Button
+                  size="sm"
+                  disabled={weaponInput.trim().length < 50 || weaponLoading}
+                  onClick={analyzeWeapon}
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+                >
+                  {weaponLoading ? (
+                    <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Analyzing...</>
+                  ) : (
+                    <><FlaskConical className="h-4 w-4 mr-1" /> Analyze My Weapon</>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Analysis result */}
+            {weaponLoading && !weaponAnalysis && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Card variant="glass" className="border-cyan-500/30 bg-cyan-950/20">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <Loader2 className="h-5 w-5 animate-spin text-cyan-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-cyan-300">Jeeves is examining your weapon...</p>
+                      <p className="text-xs text-muted-foreground">Checking biblical accuracy, logical structure, rhetorical power, and persuasive force.</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+            {weaponAnalysis && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <Card variant="glass" className="border-cyan-500/30 bg-gradient-to-br from-cyan-950/30 to-blue-950/20">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-cyan-400" />
+                      <span className="text-sm font-bold text-cyan-300">Jeeves \u2014 Weapon Analysis</span>
+                      <QuickAudioButton
+                        text={weaponAnalysis}
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 ml-auto text-cyan-400/60 hover:text-cyan-400"
+                      />
+                    </div>
+                    <div className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">
+                      {weaponAnalysis}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setWeaponAnalysis(null); setWeaponInput(""); setWeaponTopic(""); }}
+                      className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                      Analyze Another
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </div>
+        ) : subMode === "analyze-attack" ? (
+          /* ─── ANALYZE THIS ATTACK TAB ───────────────────────────── */
+          <div className="space-y-5">
+            <div className="text-center space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <Target className="h-5 w-5 text-purple-400" />
+                <h3 className="text-lg font-bold">Analyze This Attack</h3>
+              </div>
+              <p className="text-muted-foreground text-sm max-w-lg mx-auto">
+                Submit an argument from a critic or challenger and let Jeeves expose the errors, logical fallacies, misquotations, and weaknesses \u2014 then arm you with a devastating counter.
+              </p>
+            </div>
+
+            {/* Optional topic context */}
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">
+                Doctrine Under Attack (optional)
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {DEFENSE_TOPICS.map((topic) => (
+                  <Badge
+                    key={topic.id}
+                    variant={attackTopic === topic.id ? "default" : "outline"}
+                    className={`cursor-pointer text-xs py-1 px-2.5 transition-all ${
+                      attackTopic === topic.id
+                        ? "bg-purple-600 text-white border-purple-600"
+                        : "hover:bg-purple-600/10"
+                    }`}
+                    onClick={() => setAttackTopic(attackTopic === topic.id ? "" : topic.id)}
+                  >
+                    {topic.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Critic's argument input */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                The Critic's Argument / Attack
+              </label>
+              <Textarea
+                placeholder="Paste or type the critic's argument here... (minimum 50 characters)&#10;&#10;Example: 'The Sabbath was only for Jews. Colossians 2:16 says not to let anyone judge you regarding sabbath days, proving it was nailed to the cross...'"
+                className="min-h-[160px] max-h-[300px] bg-background/50"
+                value={attackInput}
+                onChange={(e) => setAttackInput(e.target.value)}
+              />
+              <div className="flex items-center justify-between">
+                <span className={`text-xs ${attackInput.trim().length >= 50 ? "text-green-500" : "text-muted-foreground"}`}>
+                  {attackInput.trim().length}/50 min characters
+                </span>
+                <Button
+                  size="sm"
+                  disabled={attackInput.trim().length < 50 || attackLoading}
+                  onClick={analyzeAttack}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                >
+                  {attackLoading ? (
+                    <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Analyzing...</>
+                  ) : (
+                    <><Target className="h-4 w-4 mr-1" /> Analyze This Attack</>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Analysis result */}
+            {attackLoading && !attackAnalysis && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Card variant="glass" className="border-purple-500/30 bg-purple-950/20">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <Loader2 className="h-5 w-5 animate-spin text-purple-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-purple-300">Jeeves is dissecting this attack...</p>
+                      <p className="text-xs text-muted-foreground">Scanning for logical fallacies, scriptural misuse, historical errors, and rhetorical tricks.</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+            {attackAnalysis && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <Card variant="glass" className="border-purple-500/30 bg-gradient-to-br from-purple-950/30 to-pink-950/20">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-purple-400" />
+                      <span className="text-sm font-bold text-purple-300">Jeeves \u2014 Attack Dissection</span>
+                      <QuickAudioButton
+                        text={attackAnalysis}
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 ml-auto text-purple-400/60 hover:text-purple-400"
+                      />
+                    </div>
+                    <div className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">
+                      {attackAnalysis}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setAttackAnalysis(null); setAttackInput(""); setAttackTopic(""); }}
+                      className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                      Analyze Another
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </div>
         ) : (
         <>
 
