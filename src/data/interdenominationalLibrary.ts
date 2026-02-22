@@ -987,6 +987,163 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
           },
         ],
       },
+      {
+        id: "sab-3",
+        title:
+          "Historical evidence of Sabbath-keeping from the 1st through 5th centuries",
+        order: 3,
+        claimSummary:
+          "Non-SDA historians and scholars document continuous seventh-day Sabbath observance from the apostolic era through the 5th century, showing that Sunday observance was a later development, not an apostolic institution.",
+        bibleAnchors: [
+          "Isaiah 66:22-23",
+          "Revelation 12:17",
+          "John 14:15",
+          "Acts 13:42-44",
+          "Acts 17:2",
+          "Acts 18:4",
+        ],
+        witnesses: [
+          {
+            id: "sab-3-josephus",
+            author: "Flavius Josephus",
+            tradition: "Jewish historian (1st century)",
+            workTitle:
+              "Cited in M\u2019Clatchie, Notes and Queries on China and Japan (ed. Dennys)",
+            year: "c. 90 AD",
+            locator: "Vol. 4, Nos. 7, 8, p. 100",
+            quoteExcerpt:
+              "\u201CThere is not any city of the Grecians, nor any of the barbarians, nor any nation whatsoever, whither our custom of resting on the seventh day hath not come!\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=notes+queries+china+japan+dennys",
+            contextNotes:
+              "Josephus, writing in the 1st century, testified to the universal spread of Sabbath observance even among Gentile nations. This quote, preserved in M\u2019Clatchie\u2019s compilation, shows the seventh-day rest was globally recognized in the apostolic era.",
+            agreementScope:
+              "Establishes that Sabbath observance was a universally known practice in the 1st century, not a later Jewish-Christian peculiarity.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-3-eusebius",
+            author: "Eusebius of Caesarea",
+            tradition: "Early Church historian (4th century)",
+            workTitle: "Ecclesiastical History",
+            year: "c. 325 AD",
+            locator: "Book 3, Chapter 5",
+            quoteExcerpt:
+              "\u201CThen the spiritual seed of Abraham fled to Pella, on the other side of the Jordan, where they found a safe place of refuge, and could serve their Master and keep His Sabbath.\u201D",
+            primarySourceUrl:
+              "https://www.newadvent.org/fathers/250103.htm",
+            contextNotes:
+              "Eusebius records that the early Jewish Christians who fled Jerusalem before its destruction in 70 AD continued keeping the seventh-day Sabbath at Pella. This is from the \u2018Father of Church History\u2019 himself.",
+            agreementScope:
+              "Documents that the earliest Christians \u2014 those who personally knew the apostles \u2014 kept the seventh-day Sabbath as they fled Jerusalem.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-3-morer",
+            author: "Dr. T.H. Morer",
+            tradition: "Anglican (Church of England)",
+            workTitle: "Dialogues on the Lord\u2019s Day",
+            year: "1701",
+            locator: "p. 189, London",
+            quoteExcerpt:
+              "\u201CThe primitive Christians had a great veneration for the Sabbath, and spent the day in devotion and sermons. And it is not to be doubted but they derived this practice from the Apostles themselves, as appears by several scriptures to that purpose.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=morer+dialogues+lord+day+1701",
+            contextNotes:
+              "An Anglican clergyman acknowledges that the earliest Christians venerated the seventh-day Sabbath and derived this practice directly from the apostles. Published in 1701, this is a non-SDA historical admission.",
+            agreementScope:
+              "An Anglican source admitting that primitive Christianity was Sabbath-keeping, tracing the practice to the apostles themselves.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-3-gieseler",
+            author: "Johann Karl Ludwig Gieseler",
+            tradition: "Lutheran (German church historian)",
+            workTitle: "Church History",
+            year: "1857",
+            locator: "Vol. 1, Ch. 2, Par. 30, p. 93",
+            quoteExcerpt:
+              "\u201CThe Gentile Christians observed also the Sabbath.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=gieseler+church+history",
+            contextNotes:
+              "A respected 19th-century German Lutheran church historian plainly states that even Gentile (non-Jewish) Christians kept the seventh-day Sabbath in the 2nd century.",
+            agreementScope:
+              "A Lutheran historian\u2019s concise admission that Sabbath-keeping was not limited to Jewish Christians but was practiced by Gentile converts as well.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-3-taylor",
+            author: "Jeremy Taylor",
+            tradition: "Anglican (Church of England)",
+            workTitle: "The Whole Works of Jeremy Taylor",
+            year: "1660",
+            locator:
+              "Vol. IX, p. 416 (R. Heber\u2019s Edition, Vol. XII, p. 416)",
+            quoteExcerpt:
+              "\u201CThe primitive Christians did keep the Sabbath of the Jews; \u2026therefore the Christians, for a long time together, did keep their conventions upon the Sabbath, in which some portions of the law were read: and this continued until the time of the Laodicean council.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=jeremy+taylor+whole+works",
+            contextNotes:
+              "Jeremy Taylor (1613\u20131667), a major Anglican bishop and theologian, admits that Christians kept the seventh-day Sabbath from apostolic times until the Council of Laodicea (c. 364 AD), which formally decreed against Sabbath rest.",
+            agreementScope:
+              "A towering Anglican authority admitting continuous Sabbath observance from the apostles to the 4th century \u2014 contradicting the claim that Sunday replaced Sabbath from the resurrection onward.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-3-ley",
+            author: "John Ley",
+            tradition: "Puritan (Church of England)",
+            workTitle: "Sunday a Sabbath",
+            year: "1640",
+            locator: "p. 163, London",
+            quoteExcerpt:
+              "\u201CFrom the apostles\u2019 time until the council of Laodicea, which was about the year 364, the holy observation of the Jews Sabbath continued, as may be proved out of many authors: yea notwithstanding the decree of the council against it.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=john+ley+sunday+sabbath+1640",
+            contextNotes:
+              "A Puritan theologian, writing in 1640, confirms that the seventh-day Sabbath was observed continuously from apostolic times through the Council of Laodicea (364 AD), and even persisted after the council tried to suppress it.",
+            agreementScope:
+              "A non-SDA Puritan source confirming over three centuries of unbroken apostolic Sabbath observance, plus persistence beyond the council\u2019s decree.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-3-bingham",
+            author: "Joseph Bingham",
+            tradition: "Anglican (Church of England)",
+            workTitle: "Antiquities of the Christian Church",
+            year: "1708\u20131722",
+            locator:
+              "Vol. II, Book XX, Chap. 3, Sec. 1, 66.1137\u20131138",
+            quoteExcerpt:
+              "\u201CThe ancient Christians were very careful in the observation of Saturday, or the seventh day\u2026 It is plain that all of the Oriental churches, and the greatest part of the world, observed the Sabbath as festival\u2026 Athanasius likewise tells us that they held religious assemblies on the Sabbath, not because they were infected with Judaism, but to worship Jesus, the Lord of the Sabbath, Epiphanius says the same.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=bingham+antiquities+christian+church",
+            contextNotes:
+              "Bingham\u2019s monumental work on early church practices documents that the majority of Christianity \u2014 especially the Eastern churches \u2014 observed the seventh-day Sabbath as a day of worship. He cites Athanasius and Epiphanius as witnesses, noting the motive was to worship Christ, not mere Jewish legalism.",
+            agreementScope:
+              "An authoritative Anglican historian confirming that Sabbath observance was the majority practice in early Christianity, especially in the East, citing Church Fathers as witnesses.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-3-coleman",
+            author: "Lyman Coleman",
+            tradition: "Presbyterian",
+            workTitle: "Ancient Christianity Exemplified",
+            year: "1852",
+            locator: "Chap. 26, Sec. 2, p. 527",
+            quoteExcerpt:
+              "\u201CDown even to the 5th century the observance of the Jewish Sabbath was continued in the Christian Church.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=lyman+coleman+ancient+christianity+exemplified",
+            contextNotes:
+              "A Presbyterian scholar confirms that Sabbath observance persisted in the Christian church down to the 5th century \u2014 well past the point when Sunday-only advocates claim the change occurred.",
+            agreementScope:
+              "A Presbyterian admission that the Sabbath was not abandoned in the early church but persisted for nearly 500 years after Christ.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
     ],
   },
 
