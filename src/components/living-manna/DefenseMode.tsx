@@ -4,8 +4,9 @@ import {
   Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
   Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
   FlaskConical, Target, Save, Archive, Trash2, ChevronDown, ChevronUp,
-  Warehouse, ArrowLeft,
+  Warehouse, ArrowLeft, Users, Share2,
 } from "lucide-react";
+import { CommunityArmory } from "./CommunityArmory";
 import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,7 @@ interface ChatMessage {
   score?: number;
 }
 
-type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal";
+type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory";
 
 interface ArsenalWeapon {
   id: string;
@@ -560,13 +561,14 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         </div>
 
         {/* Sub-mode Toggle: 5 tabs */}
-        <div className={`grid ${isMobile ? "grid-cols-3" : "grid-cols-5"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-3xl mx-auto`}>
+        <div className={`grid ${isMobile ? "grid-cols-3" : "grid-cols-6"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-4xl mx-auto`}>
           {([
             { id: "sparring" as const, label: "Sparring Arena", icon: Swords, gradient: "from-red-600 to-orange-600" },
             { id: "library" as const, label: "3AM Library", icon: BookOpen, gradient: "from-amber-600 to-yellow-600" },
             { id: "analyze-weapon" as const, label: "Forge Weapon", icon: FlaskConical, gradient: "from-blue-600 to-cyan-600" },
             { id: "analyze-attack" as const, label: "Analyze Attack", icon: Target, gradient: "from-purple-600 to-pink-600" },
             { id: "arsenal" as const, label: `Arsenal${arsenal.length > 0 ? ` (${arsenal.length})` : ""}`, icon: Warehouse, gradient: "from-emerald-600 to-teal-600" },
+            { id: "community-armory" as const, label: "Community Armory", icon: Users, gradient: "from-amber-600 to-orange-600" },
           ]).map((tab) => (
             <button
               key={tab.id}
@@ -583,7 +585,9 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           ))}</div>
 
         {/* Render based on sub-mode */}
-        {subMode === "library" ? (
+        {subMode === "community-armory" ? (
+          <CommunityArmory onGoToForge={() => setSubMode("analyze-weapon")} />
+        ) : subMode === "library" ? (
           <InterdenominationalLibrary />
         ) : subMode === "analyze-weapon" ? (
           /* ─── ANALYZE MY WEAPON TAB ─────────────────────────────── */
@@ -792,6 +796,30 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                             >
                               <Warehouse className="h-3.5 w-3.5 mr-1" />
                               View Arsenal
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="mt-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
+                              onClick={async () => {
+                                const topicName = weaponTopic
+                                  ? DEFENSE_TOPICS.find((t) => t.id === weaponTopic)?.name || weaponTopic
+                                  : "General";
+                                const info = getWeaponInfo(topicName);
+                                try {
+                                  await supabase.from("community_armory").insert({
+                                    user_id: (await supabase.auth.getUser()).data.user?.id || "",
+                                    topic: topicName,
+                                    weapon_name: info.name,
+                                    weapon_emoji: info.emoji,
+                                    argument: weaponInput.trim(),
+                                    analysis: weaponAnalysis || "",
+                                    score: forgeResult?.score || 8,
+                                  });
+                                } catch {}
+                              }}
+                            >
+                              <Share2 className="h-3.5 w-3.5 mr-1" />
+                              Share to Community Armory
                             </Button>
                           </div>
                         ) : (

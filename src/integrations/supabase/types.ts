@@ -2901,6 +2901,80 @@ export type Database = {
           },
         ]
       }
+      community_armory: {
+        Row: {
+          analysis: string
+          argument: string
+          created_at: string
+          id: string
+          is_curated: boolean
+          likes: number
+          score: number
+          topic: string
+          updated_at: string
+          user_id: string
+          weapon_emoji: string
+          weapon_name: string
+        }
+        Insert: {
+          analysis: string
+          argument: string
+          created_at?: string
+          id?: string
+          is_curated?: boolean
+          likes?: number
+          score: number
+          topic: string
+          updated_at?: string
+          user_id: string
+          weapon_emoji?: string
+          weapon_name: string
+        }
+        Update: {
+          analysis?: string
+          argument?: string
+          created_at?: string
+          id?: string
+          is_curated?: boolean
+          likes?: number
+          score?: number
+          topic?: string
+          updated_at?: string
+          user_id?: string
+          weapon_emoji?: string
+          weapon_name?: string
+        }
+        Relationships: []
+      }
+      community_armory_likes: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+          weapon_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+          weapon_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+          weapon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_armory_likes_weapon_id_fkey"
+            columns: ["weapon_id"]
+            isOneToOne: false
+            referencedRelation: "community_armory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_challenge_responses: {
         Row: {
           created_at: string
