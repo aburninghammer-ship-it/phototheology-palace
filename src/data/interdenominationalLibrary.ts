@@ -2171,11 +2171,11 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             workTitle:
               "Observations upon the Prophecies of Daniel, and the Apocalypse of St. John",
             year: "1733",
-            locator: "Part II, Chapter 3",
+            locator: "Part I, Chapter VIII",
             quoteExcerpt:
-              "\u201CIn these Prophecies days are put for years.\u201D",
+              "\u201CTimes and laws were henceforward given into his hands, for a time times and half a time, or three times and an half; that is, for 1260 solar years, reckoning a time for a Calendar year of 360 days, and a day for a solar year.\u201D",
             primarySourceUrl:
-              "https://www.gutenberg.org/files/16878/16878-h/16878-h.htm",
+              "https://www.blueletterbible.org/Comm/newton_isaac/prophecies/daniel08.cfm",
             contextNotes:
               "Sir Isaac Newton (1643\u20131727), arguably the greatest scientist in history, spent more time studying Bible prophecy than physics. He explicitly stated the day-year principle and applied it throughout his prophetic calculations.",
             agreementScope:
@@ -3562,9 +3562,9 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             workTitle:
               "Observations upon the Prophecies of Daniel, and the Apocalypse of St. John",
             year: "1733",
-            locator: "Part II, Chapter 3; private manuscripts",
+            locator: "Part I, Ch. VIII; Part I, Ch. X; private manuscripts",
             quoteExcerpt:
-              "\u201CIn these Prophecies days are put for years.\u201D Newton applied this principle extensively. His private manuscripts (now at the National Library of Israel) project 2060 as a significant prophetic date, calculating from approximately 800 AD.",
+              "\u201C\u2026for 1260 solar years, reckoning a time for a Calendar year of 360 days, and a day for a solar year.\u201D Newton\u2019s private manuscripts (National Library of Israel) project 2060 as a significant prophetic date.",
             primarySourceUrl:
               "https://www.gutenberg.org/files/16878/16878-h/16878-h.htm",
             contextNotes:
