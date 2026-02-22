@@ -17546,6 +17546,7 @@ export type Database = {
         Returns: undefined
       }
       can_access_youth_member: { Args: { _group_id: string }; Returns: boolean }
+      cleanup_abandoned_signups: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_typing_indicators: { Args: never; Returns: undefined }
       create_challenge_share: {
