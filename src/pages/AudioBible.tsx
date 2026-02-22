@@ -1777,6 +1777,7 @@ export default function AudioBible() {
                                   preacher: "border-purple-500/30 text-purple-400",
                                   epic: "border-orange-500/30 text-orange-400",
                                   scholar: "border-emerald-500/30 text-emerald-400",
+                                  counselor: "border-rose-500/30 text-rose-400",
                                 };
                                 return (
                                   <div key={i} className="flex items-center gap-1.5 text-xs">
