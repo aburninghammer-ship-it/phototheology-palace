@@ -74,22 +74,7 @@ interface ChapterSelection {
 
 type SelectionMode = "chapter" | "book" | "custom" | "stories";
 
-interface BiblicalStory {
-  id: string;
-  title: string;
-  book: string;
-  reference: string;
-  description: string;
-  icon: string;
-}
-
-const CURATED_STORIES: BiblicalStory[] = [
-  { id: "jonathan-armor-bearer", title: "Jonathan & His Armor Bearer", book: "1 Samuel", reference: "1 Samuel 14", description: "Two men against a garrison — faith that moves mountains", icon: "⚔️" },
-  { id: "david-goliath", title: "David & Goliath", book: "1 Samuel", reference: "1 Samuel 17", description: "A shepherd boy faces the giant with five stones and faith", icon: "🪨" },
-  { id: "garden-gethsemane", title: "The Garden of Gethsemane", book: "Matthew", reference: "Matthew 26:36-56", description: "Christ's agony and surrender before the cross", icon: "🌿" },
-  { id: "daniel-lions-den", title: "Daniel in the Lions' Den", book: "Daniel", reference: "Daniel 6", description: "Faithfulness under decree — the lions' mouths are shut", icon: "🦁" },
-  { id: "abraham-isaac-moriah", title: "Abraham & Isaac on Mount Moriah", book: "Genesis", reference: "Genesis 22", description: "The ultimate test of faith — God will provide Himself a lamb", icon: "🐑" },
-];
+import { CURATED_STORIES, STORY_CATEGORIES, type BiblicalStory } from '@/data/curatedStories';
 type CommentaryMode = "verse" | "chapter";
 
 export default function AudioBible() {
@@ -193,6 +178,7 @@ export default function AudioBible() {
   // Starting verse for chapter playback
   const [startVerse, setStartVerse] = useState(1);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
+  const [storyCategory, setStoryCategory] = useState("all");
   const [showImmersiveView, setShowImmersiveView] = useState(false);
 
   // Custom playlist add mode state
@@ -1606,11 +1592,25 @@ export default function AudioBible() {
                     {/* Stories */}
                     <TabsContent value="stories" className="space-y-4">
                       <p className="text-sm text-muted-foreground">
-                        Immersive biblical stories told through Phototheology — choose a story and a voice.
+                        100 immersive biblical stories told through Phototheology — choose a story and a voice.
                       </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {STORY_CATEGORIES.map((cat) => (
+                          <Badge
+                            key={cat.id}
+                            variant={storyCategory === cat.id ? "default" : "outline"}
+                            className="cursor-pointer text-[10px] px-2 py-0.5"
+                            onClick={() => setStoryCategory(cat.id)}
+                          >
+                            {cat.label}
+                          </Badge>
+                        ))}
+                      </div>
                       <ScrollArea className="max-h-72">
                         <div className="space-y-2">
-                          {CURATED_STORIES.map((story) => (
+                          {CURATED_STORIES
+                            .filter(s => storyCategory === "all" || s.category === storyCategory)
+                            .map((story) => (
                             <div
                               key={story.id}
                               className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
