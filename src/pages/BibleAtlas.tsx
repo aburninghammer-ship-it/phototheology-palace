@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ResearchToolsNav } from "@/components/bible/research/ResearchToolsNav";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -83,6 +84,9 @@ const BibleAtlas = () => {
             <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
               <BookOpen className="h-4 w-4 mr-1" /> Back
             </Button>
+          </div>
+          <div className="mt-2 max-w-7xl mx-auto">
+            <ResearchToolsNav />
           </div>
 
           <div className="flex items-center gap-2 mt-3 max-w-7xl mx-auto flex-wrap">

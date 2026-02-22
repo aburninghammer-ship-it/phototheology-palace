@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ResearchToolsNav } from "@/components/bible/research/ResearchToolsNav";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -28,19 +29,29 @@ interface LexiconEntry {
 
 const BibleLexicon = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("q") || "");
   const [loading, setLoading] = useState(false);
   const [entry, setEntry] = useState<LexiconEntry | null>(null);
   const [activeTab, setActiveTab] = useState("definition");
 
-  const handleSearch = async () => {
-    if (!search.trim()) return;
+  // Auto-search if ?q= param present
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && q.trim()) {
+      setSearch(q);
+      handleSearchQuery(q);
+    }
+  }, [searchParams]);
+
+  const handleSearchQuery = async (query: string) => {
+    if (!query.trim()) return;
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("lexicon-lookup", {
-        body: { query: search.trim() },
+        body: { query: query.trim() },
       });
       if (error) throw error;
       setEntry(data);
@@ -51,6 +62,8 @@ const BibleLexicon = () => {
       setLoading(false);
     }
   };
+
+  const handleSearch = () => handleSearchQuery(search);
 
   const maxPercentage = entry ? Math.max(...entry.semanticRange.map(s => s.percentage)) : 100;
 
@@ -76,6 +89,9 @@ const BibleLexicon = () => {
             <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
               <BookOpen className="h-4 w-4 mr-1" /> Back
             </Button>
+          </div>
+          <div className="mt-2 max-w-4xl mx-auto">
+            <ResearchToolsNav />
           </div>
 
           {/* Search */}
