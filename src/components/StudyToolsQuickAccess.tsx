@@ -85,6 +85,36 @@ const studyTools = [
     gradient: "from-indigo-500 to-violet-500",
     badge: null,
     tip: "1000+ articles with cross-references"
+  },
+  {
+    id: "bible-timeline",
+    name: "Bible Timeline",
+    description: "Interactive chronological journey from Creation to Revelation",
+    icon: Search,
+    path: "/bible-timeline",
+    gradient: "from-amber-500 to-yellow-500",
+    badge: null,
+    tip: "Explore events across all 8 prophetic cycles"
+  },
+  {
+    id: "bible-atlas",
+    name: "Bible Atlas",
+    description: "Key biblical locations with scripture references and history",
+    icon: BookMarked,
+    path: "/bible-atlas",
+    gradient: "from-teal-500 to-cyan-500",
+    badge: null,
+    tip: "Explore cities, mountains, and regions of the Bible"
+  },
+  {
+    id: "bible-lexicon",
+    name: "Greek/Hebrew Lexicon",
+    description: "AI-powered word studies with semantic ranges and key verses",
+    icon: Languages,
+    path: "/bible-lexicon",
+    gradient: "from-blue-500 to-indigo-500",
+    badge: "AI",
+    tip: "Search by Strong's number, English, Hebrew, or Greek"
   }
 ];
 

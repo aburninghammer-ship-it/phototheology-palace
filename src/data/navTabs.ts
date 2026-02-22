@@ -328,6 +328,10 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
       glow: "rgba(16,185,129,0.5)"
     },
     dropdownItems: [
+      { to: "/interlinear", label: "Interlinear Bible" },
+      { to: "/bible-lexicon", label: "Greek/Hebrew Lexicon" },
+      { to: "/bible-timeline", label: "Bible Timeline" },
+      { to: "/bible-atlas", label: "Bible Atlas" },
       { to: "/flashcards", label: "Flashcards", icon: Layers },
       { to: "/daily-reading", label: "Daily Reading", icon: Calendar },
       { to: "/training-drills", label: "Training Drills", icon: Target },
