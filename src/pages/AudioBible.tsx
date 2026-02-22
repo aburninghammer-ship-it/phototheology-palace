@@ -49,6 +49,8 @@ import { useFreeTier } from "@/hooks/useFreeTier";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { ExportEpicAudioDialog } from "@/components/audio/ExportEpicAudioDialog";
+import { ImmersiveCommentaryView } from "@/components/audio/ImmersiveCommentaryView";
+import { Maximize2 } from "lucide-react";
 
 
 interface Theme {
@@ -184,6 +186,7 @@ export default function AudioBible() {
   // Starting verse for chapter playback
   const [startVerse, setStartVerse] = useState(1);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
+  const [showImmersiveView, setShowImmersiveView] = useState(false);
 
   // Custom playlist add mode state
   const [customAddMode, setCustomAddMode] = useState<"single" | "chapter-range" | "book-range">("single");
@@ -943,6 +946,18 @@ export default function AudioBible() {
                         <Download className="h-5 w-5 mr-2" />
                         Export
                       </Button>
+                      {epicNowPlayingChapter > 0 && (
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
+                          onClick={() => setShowImmersiveView(true)}
+                          disabled={!epicAudioUrl}
+                        >
+                          <Maximize2 className="h-5 w-5 mr-2" />
+                          Immersive
+                        </Button>
+                      )}
                     </div>
                   </>
                 )}
@@ -1970,6 +1985,29 @@ export default function AudioBible() {
         book={epicNowPlayingBook || selectedBook}
         chapter={epicNowPlayingChapter || selectedChapter}
         queue={epicQueueRef.current.map((q) => ({ book: q.book, chapter: q.chapter }))}
+      />
+      <ImmersiveCommentaryView
+        isOpen={showImmersiveView}
+        onClose={() => setShowImmersiveView(false)}
+        book={epicNowPlayingBook || selectedBook}
+        chapter={epicNowPlayingChapter || selectedChapter}
+        audioRef={epicAudioRef}
+        isPlaying={isEpicPlaying}
+        isPaused={isEpicPaused}
+        modeName={activeModeMeta.label}
+        onTogglePlayPause={() => {
+          if (epicAudioRef.current) {
+            if (isEpicPaused) {
+              epicAudioRef.current.play();
+              setIsEpicPaused(false);
+              setIsEpicPlaying(true);
+            } else {
+              epicAudioRef.current.pause();
+              setIsEpicPaused(true);
+              setIsEpicPlaying(false);
+            }
+          }
+        }}
       />
     </div>
   );
