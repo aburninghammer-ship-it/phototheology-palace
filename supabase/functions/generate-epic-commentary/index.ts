@@ -1559,8 +1559,16 @@ serve(async (req) => {
       const { data: existing } = await existingQuery.maybeSingle();
 
       if (existing) {
+        // Build audio URL if audio exists
+        let audioUrl = null;
+        if (existing.audio_storage_path) {
+          const { data: signedData } = await supabaseAdmin.storage
+            .from("epic-audio")
+            .createSignedUrl(existing.audio_storage_path, 3600);
+          audioUrl = signedData?.signedUrl || null;
+        }
         return new Response(
-          JSON.stringify({ status: "already_exists", id: existing.id }),
+          JSON.stringify({ status: "already_exists", id: existing.id, audioUrl, text: existing.commentary_text }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
