@@ -87,6 +87,8 @@ export const AMBIENT_TRACKS = [
   { id: "when-he-cometh", name: "When He Cometh", url: "/audio/when-he-cometh.mp3" },
   { id: "white-horse", name: "White Horse", url: "/audio/white-horse.mp3" },
   { id: "eternal-echoes", name: "Eternal Echoes", url: "/audio/eternal-echoes.mp3" },
+  { id: "passover1", name: "Passover", url: "/music/Passover1.mp3" },
+  { id: "warrior", name: "Warrior", url: "/music/Warrior.mp3" },
 ];
 
 interface ExportBibleAudioDialogProps {
