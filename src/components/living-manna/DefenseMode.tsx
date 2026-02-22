@@ -156,7 +156,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         const weapon: ArsenalWeapon = {
           id: crypto.randomUUID(),
           argument: weaponInput.trim(),
-          analysis: weaponAnalysis,
+          analysis: content || weaponAnalysis,
           topic: topicName,
           savedAt: new Date().toISOString(),
         };
@@ -174,7 +174,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       const weapon: ArsenalWeapon = {
         id: crypto.randomUUID(),
         argument: weaponInput.trim(),
-        analysis: weaponAnalysis,
+        analysis: weaponAnalysis || "Analysis unavailable — weapon saved directly.",
         topic: topicName,
         savedAt: new Date().toISOString(),
       };
