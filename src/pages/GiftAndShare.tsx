@@ -114,7 +114,7 @@ function GiftSuiteCard({ user }: { user: any }) {
             onClick={() => setPlanType("essential_annual")}
             className="flex-1"
           >
-            Annual — $99
+            Annual — $150
           </Button>
         </div>
 
@@ -146,7 +146,7 @@ function GiftSuiteCard({ user }: { user: any }) {
           {loading ? "Preparing..." : (
             <>
               <Gift className="h-4 w-4 mr-2" />
-              Send Gift — {planType === "essential_monthly" ? "$15" : "$99"}
+              Send Gift — {planType === "essential_monthly" ? "$15" : "$150"}
             </>
           )}
         </Button>
