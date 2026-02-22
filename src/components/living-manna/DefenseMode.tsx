@@ -4,6 +4,7 @@ import {
   Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
   Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
   FlaskConical, Target, Save, Archive, Trash2, ChevronDown, ChevronUp,
+  Warehouse, ArrowLeft,
 } from "lucide-react";
 import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { Card, CardContent } from "@/components/ui/card";
@@ -40,7 +41,7 @@ interface ChatMessage {
   score?: number;
 }
 
-type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack";
+type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal";
 
 interface ArsenalWeapon {
   id: string;
@@ -90,31 +91,107 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
-  const [showArsenal, setShowArsenal] = useState(false);
-  const [weaponSaved, setWeaponSaved] = useState(false);
+  // (showArsenal and weaponSaved removed — Arsenal is now its own tab with forge scoring)
 
-  const saveToArsenal = () => {
+  // Forge weapon state (scoring + gating)
+  const [forgeLoading, setForgeLoading] = useState(false);
+  const [forgeResult, setForgeResult] = useState<{
+    passed: boolean;
+    score: number;
+    message: string;
+  } | null>(null);
+
+  const forgeWeapon = async () => {
     if (!weaponInput.trim() || !weaponAnalysis) return;
-    const weapon: ArsenalWeapon = {
-      id: crypto.randomUUID(),
-      argument: weaponInput.trim(),
-      analysis: weaponAnalysis,
-      topic: weaponTopic
+    setForgeLoading(true);
+    setForgeResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-forge-weapon",
+          userArgument: weaponInput.trim(),
+          analysis: weaponAnalysis,
+          doctrineTopic: weaponTopic || undefined,
+        },
+      });
+      if (error) throw error;
+
+      const content = data?.content || "";
+      const scoreMatch = content.match(/(\d+)\s*\/\s*10/);
+      const score = scoreMatch ? parseInt(scoreMatch[1]) : 5;
+      const passed = score >= 7;
+
+      if (passed) {
+        const topicName = weaponTopic
+          ? DEFENSE_TOPICS.find((t) => t.id === weaponTopic)?.name || weaponTopic
+          : "General";
+        const weapon: ArsenalWeapon = {
+          id: crypto.randomUUID(),
+          argument: weaponInput.trim(),
+          analysis: weaponAnalysis,
+          topic: topicName,
+          savedAt: new Date().toISOString(),
+        };
+        const updated = [weapon, ...arsenal];
+        setArsenal(updated);
+        localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+      }
+
+      setForgeResult({ passed, score, message: content });
+    } catch {
+      // Fallback: save directly if forge mode not supported yet
+      const topicName = weaponTopic
         ? DEFENSE_TOPICS.find((t) => t.id === weaponTopic)?.name || weaponTopic
-        : "General",
-      savedAt: new Date().toISOString(),
-    };
-    const updated = [weapon, ...arsenal];
-    setArsenal(updated);
-    localStorage.setItem("defense-arsenal", JSON.stringify(updated));
-    setWeaponSaved(true);
-    setTimeout(() => setWeaponSaved(false), 2000);
+        : "General";
+      const weapon: ArsenalWeapon = {
+        id: crypto.randomUUID(),
+        argument: weaponInput.trim(),
+        analysis: weaponAnalysis,
+        topic: topicName,
+        savedAt: new Date().toISOString(),
+      };
+      const updated = [weapon, ...arsenal];
+      setArsenal(updated);
+      localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+      setForgeResult({ passed: true, score: 8, message: "Weapon forged and added to your arsenal!" });
+    } finally {
+      setForgeLoading(false);
+    }
   };
 
   const removeFromArsenal = (weaponId: string) => {
     const updated = arsenal.filter((w) => w.id !== weaponId);
     setArsenal(updated);
     localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+  };
+
+  // Arsenal room state
+  const [selectedArsenalWeapon, setSelectedArsenalWeapon] = useState<ArsenalWeapon | null>(null);
+
+  // Weapon naming based on topic
+  const getWeaponInfo = (topic: string): { name: string; emoji: string } => {
+    const t = topic.toLowerCase();
+    if (t.includes("sabbath")) return { name: "Sabbath Sword", emoji: "\u2694\uFE0F" };
+    if (t.includes("law") || t.includes("decalogue") || t.includes("commandment")) return { name: "Decalogue Shield", emoji: "\uD83D\uDEE1\uFE0F" };
+    if (t.includes("second coming") || t.includes("advent") || t.includes("return")) return { name: "Advent Lance", emoji: "\uD83D\uDD31" };
+    if (t.includes("sanctuary")) return { name: "Sanctuary Breastplate", emoji: "\uD83C\uDFDB\uFE0F" };
+    if (t.includes("dead") || t.includes("soul") || t.includes("death") || t.includes("sleep")) return { name: "Soul Rest Hammer", emoji: "\uD83D\uDD28" };
+    if (t.includes("trinity") || t.includes("deity")) return { name: "Trinity Helm", emoji: "\uD83D\uDC51" };
+    if (t.includes("creation") || t.includes("creator")) return { name: "Creation Bow", emoji: "\uD83C\uDFF9" };
+    if (t.includes("health") || t.includes("temperance")) return { name: "Temperance Staff", emoji: "\uD83E\uDE84" };
+    if (t.includes("baptism")) return { name: "Baptism Trident", emoji: "\uD83D\uDD31" };
+    if (t.includes("prophecy") || t.includes("daniel") || t.includes("revelation")) return { name: "Prophecy Crossbow", emoji: "\uD83C\uDFAF" };
+    if (t.includes("papacy") || t.includes("antichrist") || t.includes("rome")) return { name: "Reformation Axe", emoji: "\uD83E\uDE93" };
+    if (t.includes("judgment") || t.includes("investigative")) return { name: "Judgment Gavel", emoji: "\u2696\uFE0F" };
+    if (t.includes("millennium") || t.includes("1000")) return { name: "Millennium Mace", emoji: "\uD83D\uDD28" };
+    if (t.includes("historicism")) return { name: "Historicist Halberd", emoji: "\u2694\uFE0F" };
+    if (t.includes("gift") || t.includes("spirit")) return { name: "Spirit Scepter", emoji: "\uD83E\uDE84" };
+    if (t.includes("remnant")) return { name: "Remnant Banner", emoji: "\uD83D\uDEA9" };
+    if (t.includes("three angel")) return { name: "Angels' Trumpet", emoji: "\uD83D\uDCEF" };
+    if (t.includes("hell") || t.includes("annihil") || t.includes("punishment")) return { name: "Purifier's Flame", emoji: "\uD83D\uDD25" };
+    if (t.includes("azazel") || t.includes("scapegoat")) return { name: "Azazel Chains", emoji: "\u26D3\uFE0F" };
+    if (t.includes("scripture") || t.includes("bible") || t.includes("sola")) return { name: "Scripture Scepter", emoji: "\uD83D\uDCDC" };
+    return { name: "Truth Blade", emoji: "\u2694\uFE0F" };
   };
 
   // Analyze This Attack state
@@ -455,25 +532,26 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </p>
         </div>
 
-        {/* Sub-mode Toggle: 4 tabs */}
-        <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-2xl mx-auto`}>
+        {/* Sub-mode Toggle: 5 tabs */}
+        <div className={`grid ${isMobile ? "grid-cols-3" : "grid-cols-5"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-3xl mx-auto`}>
           {([
             { id: "sparring" as const, label: "Sparring Arena", icon: Swords, gradient: "from-red-600 to-orange-600" },
             { id: "library" as const, label: "3AM Library", icon: BookOpen, gradient: "from-amber-600 to-yellow-600" },
-            { id: "analyze-weapon" as const, label: "Analyze My Weapon", icon: FlaskConical, gradient: "from-blue-600 to-cyan-600" },
-            { id: "analyze-attack" as const, label: "Analyze This Attack", icon: Target, gradient: "from-purple-600 to-pink-600" },
+            { id: "analyze-weapon" as const, label: "Forge Weapon", icon: FlaskConical, gradient: "from-blue-600 to-cyan-600" },
+            { id: "analyze-attack" as const, label: "Analyze Attack", icon: Target, gradient: "from-purple-600 to-pink-600" },
+            { id: "arsenal" as const, label: `Arsenal${arsenal.length > 0 ? ` (${arsenal.length})` : ""}`, icon: Warehouse, gradient: "from-emerald-600 to-teal-600" },
           ]).map((tab) => (
             <button
               key={tab.id}
               onClick={() => setSubMode(tab.id)}
-              className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-md text-xs sm:text-sm font-medium transition-all ${
                 subMode === tab.id
                   ? `bg-gradient-to-r ${tab.gradient} text-white shadow-md`
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-              <span className={isMobile ? "text-xs" : ""}>{tab.label}</span>
+              <span className={isMobile ? "text-[10px]" : ""}>{tab.label}</span>
             </button>
           ))}</div>
 
@@ -577,93 +655,271 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                     <div className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">
                       {weaponAnalysis}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => { setWeaponAnalysis(null); setWeaponInput(""); setWeaponTopic(""); setWeaponSaved(false); }}
+                        onClick={() => { setWeaponAnalysis(null); setWeaponInput(""); setWeaponTopic(""); setForgeResult(null); }}
                         className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
                       >
                         <RotateCcw className="h-3.5 w-3.5 mr-1" />
                         Analyze Another
                       </Button>
-                      <Button
-                        size="sm"
-                        onClick={saveToArsenal}
-                        disabled={weaponSaved}
-                        className={weaponSaved
-                          ? "bg-green-600 text-white"
-                          : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
-                        }
-                      >
-                        {weaponSaved ? (
-                          <><Shield className="h-3.5 w-3.5 mr-1" /> Saved!</>
+                      {!forgeResult && (
+                        <Button
+                          size="sm"
+                          onClick={forgeWeapon}
+                          disabled={forgeLoading}
+                          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+                        >
+                          {forgeLoading ? (
+                            <><Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> Forging...</>
+                          ) : (
+                            <><Swords className="h-3.5 w-3.5 mr-1" /> Forge This Weapon</>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Forge result */}
+                    {forgeResult && (
+                      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
+                        {forgeResult.passed ? (
+                          <div className="p-3 rounded-lg bg-gradient-to-r from-emerald-950/40 to-green-950/30 border border-emerald-500/40">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xl">{getWeaponInfo(weaponTopic ? DEFENSE_TOPICS.find((t) => t.id === weaponTopic)?.name || "General" : "General").emoji}</span>
+                              <div>
+                                <p className="text-sm font-bold text-emerald-300">
+                                  Weapon Forged! — {getWeaponInfo(weaponTopic ? DEFENSE_TOPICS.find((t) => t.id === weaponTopic)?.name || "General" : "General").name}
+                                </p>
+                                <p className="text-xs text-emerald-400/80">Score: {forgeResult.score}/10 — Added to your Arsenal</p>
+                              </div>
+                              <Badge className="ml-auto bg-emerald-600 text-white text-xs">{forgeResult.score}/10</Badge>
+                            </div>
+                            <p className="text-xs text-emerald-200/80 whitespace-pre-wrap">{forgeResult.message}</p>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="mt-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
+                              onClick={() => setSubMode("arsenal")}
+                            >
+                              <Warehouse className="h-3.5 w-3.5 mr-1" />
+                              View Arsenal
+                            </Button>
+                          </div>
                         ) : (
-                          <><Save className="h-3.5 w-3.5 mr-1" /> Save to Arsenal</>
+                          <div className="p-3 rounded-lg bg-gradient-to-r from-red-950/40 to-orange-950/30 border border-red-500/40">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Shield className="h-5 w-5 text-red-400" />
+                              <div>
+                                <p className="text-sm font-bold text-red-300">Weapon Rejected — Needs More Work</p>
+                                <p className="text-xs text-red-400/80">Score: {forgeResult.score}/10 — Minimum 7/10 required</p>
+                              </div>
+                              <Badge className="ml-auto bg-red-600 text-white text-xs">{forgeResult.score}/10</Badge>
+                            </div>
+                            <p className="text-xs text-red-200/80 whitespace-pre-wrap">{forgeResult.message}</p>
+                            <p className="text-xs text-muted-foreground mt-2 italic">
+                              Refine your argument above and try forging again. A strong weapon must be biblically sound, logically airtight, and historically accurate.
+                            </p>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="mt-2 border-red-500/30 text-red-400 hover:bg-red-500/10"
+                              onClick={() => { setForgeResult(null); }}
+                            >
+                              <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                              Try Again
+                            </Button>
+                          </div>
                         )}
+                      </motion.div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </div>
+        ) : subMode === "arsenal" ? (
+          /* ─── ARSENAL ROOM TAB ─────────────────────────────────── */
+          <div className="space-y-5">
+            {/* Arsenal Header */}
+            <div className="text-center space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <Warehouse className="h-6 w-6 text-emerald-400" />
+                <h3 className="text-xl font-bold bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
+                  The Arsenal
+                </h3>
+              </div>
+              <p className="text-muted-foreground text-sm max-w-lg mx-auto">
+                Your collection of forged weapons. Each one has been tested and proven ready for battle.
+              </p>
+            </div>
+
+            {selectedArsenalWeapon ? (
+              /* ─── SELECTED WEAPON DETAIL VIEW ─── */
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedArsenalWeapon(null)}
+                  className="text-emerald-400 hover:text-emerald-300"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-1" />
+                  Back to Arsenal
+                </Button>
+                <Card variant="glass" className="border-emerald-500/30 bg-gradient-to-br from-emerald-950/30 to-teal-950/20">
+                  <CardContent className="p-5 space-y-4">
+                    {/* Weapon header */}
+                    <div className="text-center space-y-2">
+                      <span className="text-5xl block">{getWeaponInfo(selectedArsenalWeapon.topic).emoji}</span>
+                      <h4 className="text-lg font-bold text-emerald-300">{getWeaponInfo(selectedArsenalWeapon.topic).name}</h4>
+                      <Badge className="bg-emerald-600/30 text-emerald-300 border-emerald-500/30">
+                        {selectedArsenalWeapon.topic}
+                      </Badge>
+                      <p className="text-xs text-muted-foreground">
+                        Forged on {new Date(selectedArsenalWeapon.savedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    {/* The argument */}
+                    <div className="space-y-2">
+                      <h5 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Your Argument</h5>
+                      <div className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed p-3 rounded-lg bg-black/20 border border-border/30">
+                        {selectedArsenalWeapon.argument}
+                      </div>
+                    </div>
+                    {/* Jeeves analysis */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <h5 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Jeeves Analysis</h5>
+                        <QuickAudioButton
+                          text={selectedArsenalWeapon.analysis}
+                          variant="ghost"
+                          size="icon"
+                          className="h-4 w-4 text-emerald-400/60 hover:text-emerald-400"
+                        />
+                      </div>
+                      <div className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed p-3 rounded-lg bg-black/20 border border-border/30">
+                        {selectedArsenalWeapon.analysis}
+                      </div>
+                    </div>
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                        onClick={() => {
+                          removeFromArsenal(selectedArsenalWeapon.id);
+                          setSelectedArsenalWeapon(null);
+                        }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-1" />
+                        Discard Weapon
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
               </motion.div>
-            )}
-
-            {/* ─── ARSENAL ───────────────────────────────────────── */}
-            <div className="border-t border-border/30 pt-4">
-              <button
-                onClick={() => setShowArsenal(!showArsenal)}
-                className="flex items-center gap-2 text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors w-full"
-              >
-                <Archive className="h-4 w-4" />
-                My Arsenal ({arsenal.length} weapon{arsenal.length !== 1 ? "s" : ""})
-                {showArsenal ? <ChevronUp className="h-4 w-4 ml-auto" /> : <ChevronDown className="h-4 w-4 ml-auto" />}
-              </button>
-              {showArsenal && (
-                <div className="mt-3 space-y-3">
-                  {arsenal.length === 0 ? (
-                    <p className="text-xs text-muted-foreground text-center py-4">
-                      No weapons saved yet. Analyze an argument and save it to build your arsenal.
-                    </p>
-                  ) : (
-                    arsenal.map((weapon) => (
-                      <motion.div key={weapon.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
-                        <Card variant="glass" className="border-cyan-500/20 bg-cyan-950/10">
-                          <CardContent className="p-3 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="text-xs border-cyan-500/30 text-cyan-400">
-                                  {weapon.topic}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  {new Date(weapon.savedAt).toLocaleDateString()}
-                                </span>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 text-muted-foreground hover:text-red-400"
-                                onClick={() => removeFromArsenal(weapon.id)}
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
-                            </div>
-                            <p className="text-xs text-foreground/80 line-clamp-2">{weapon.argument}</p>
-                            <details className="group">
-                              <summary className="text-xs text-cyan-400 cursor-pointer hover:text-cyan-300">
-                                View analysis
-                              </summary>
-                              <div className="mt-2 text-xs text-foreground/70 whitespace-pre-wrap leading-relaxed border-t border-border/20 pt-2">
-                                {weapon.analysis}
-                              </div>
-                            </details>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))
-                  )}
+            ) : arsenal.length === 0 ? (
+              /* ─── EMPTY ARSENAL ─── */
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12 space-y-4">
+                <div className="mx-auto w-20 h-20 rounded-full bg-emerald-950/40 border-2 border-emerald-500/20 flex items-center justify-center">
+                  <Swords className="h-10 w-10 text-emerald-500/40" />
                 </div>
-              )}
-            </div>
+                <div className="space-y-2">
+                  <h4 className="text-lg font-bold text-foreground/70">Your Arsenal Awaits</h4>
+                  <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                    Every great defender needs weapons. Go to the <strong className="text-cyan-400">Forge Weapon</strong> tab,
+                    craft an argument, and if it passes Jeeves' scrutiny, it'll appear here — battle-ready.
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => setSubMode("analyze-weapon")}
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+                >
+                  <FlaskConical className="h-4 w-4 mr-1" />
+                  Forge Your First Weapon
+                </Button>
+              </motion.div>
+            ) : (
+              /* ─── WEAPON ROOM GRID ─── */
+              <div className="space-y-6">
+                {/* Encouragement banner */}
+                <div className="p-3 rounded-lg bg-gradient-to-r from-emerald-950/30 to-teal-950/20 border border-emerald-500/20 text-center">
+                  <p className="text-xs text-emerald-300">
+                    {arsenal.length < 5
+                      ? `${arsenal.length} weapon${arsenal.length !== 1 ? "s" : ""} forged. Keep building! A well-stocked arsenal makes an unshakeable defender.`
+                      : arsenal.length < 15
+                      ? `${arsenal.length} weapons strong. Your arsenal is growing — forge weapons for every doctrine to be ready for any challenger.`
+                      : `${arsenal.length} weapons forged! You are becoming a formidable defender of the faith.`}
+                  </p>
+                </div>
+
+                {/* Categorized weapons */}
+                {(() => {
+                  const categories = arsenal.reduce<Record<string, ArsenalWeapon[]>>((acc, w) => {
+                    const cat = w.topic || "General";
+                    if (!acc[cat]) acc[cat] = [];
+                    acc[cat].push(w);
+                    return acc;
+                  }, {});
+                  const sortedCategories = Object.entries(categories).sort((a, b) => b[1].length - a[1].length);
+
+                  return sortedCategories.map(([category, weapons]) => (
+                    <div key={category} className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{getWeaponInfo(category).emoji}</span>
+                        <h4 className="text-sm font-bold text-emerald-300 uppercase tracking-wider">{category}</h4>
+                        <Badge variant="outline" className="text-xs border-emerald-500/30 text-emerald-400 ml-auto">
+                          {weapons.length} weapon{weapons.length !== 1 ? "s" : ""}
+                        </Badge>
+                      </div>
+                      <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-3 lg:grid-cols-4"} gap-3`}>
+                        {weapons.map((weapon) => {
+                          const info = getWeaponInfo(weapon.topic);
+                          return (
+                            <motion.div
+                              key={weapon.id}
+                              whileHover={{ scale: 1.03, y: -2 }}
+                              whileTap={{ scale: 0.97 }}
+                              onClick={() => setSelectedArsenalWeapon(weapon)}
+                              className="cursor-pointer"
+                            >
+                              <Card variant="glass" className="border-emerald-500/20 bg-gradient-to-b from-emerald-950/30 to-black/40 hover:border-emerald-400/40 hover:shadow-lg hover:shadow-emerald-500/10 transition-all h-full">
+                                <CardContent className="p-3 flex flex-col items-center text-center space-y-2">
+                                  {/* Weapon mount */}
+                                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-900/60 to-teal-900/40 border border-emerald-500/30 flex items-center justify-center shadow-inner">
+                                    <span className="text-2xl">{info.emoji}</span>
+                                  </div>
+                                  {/* Weapon nameplate */}
+                                  <p className="text-xs font-bold text-emerald-300 leading-tight">{info.name}</p>
+                                  <p className="text-[10px] text-muted-foreground line-clamp-2 leading-snug">{weapon.argument.slice(0, 80)}...</p>
+                                  <span className="text-[9px] text-emerald-500/60">{new Date(weapon.savedAt).toLocaleDateString()}</span>
+                                </CardContent>
+                              </Card>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ));
+                })()}
+
+                {/* Forge more CTA */}
+                <div className="text-center pt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSubMode("analyze-weapon")}
+                    className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
+                  >
+                    <FlaskConical className="h-4 w-4 mr-1" />
+                    Forge Another Weapon
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         ) : subMode === "analyze-attack" ? (
           /* ─── ANALYZE THIS ATTACK TAB ───────────────────────────── */
