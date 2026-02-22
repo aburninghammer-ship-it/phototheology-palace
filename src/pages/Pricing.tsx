@@ -402,19 +402,31 @@ export default function Pricing() {
           </CardContent>
         </Card>
 
-        {/* Access Code Link */}
-        <div className="text-center mb-8">
+        {/* Access Code & Gift Links */}
+        <div className="text-center mb-8 space-y-3">
           <p className="text-sm text-muted-foreground mb-2">{t('pricing.accessCode.prompt')}</p>
-          <Button
-            asChild
-            variant="outline"
-            className="gap-2"
-          >
-            <Link to="/access">
-              <Gift className="h-4 w-4" />
-              {t('pricing.accessCode.redeem')}
-            </Link>
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button
+              asChild
+              variant="outline"
+              className="gap-2"
+            >
+              <Link to="/access">
+                <Gift className="h-4 w-4" />
+                {t('pricing.accessCode.redeem')}
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="gap-2 border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+            >
+              <Link to="/gift">
+                <Gift className="h-4 w-4" />
+                Gift the Suite or Share a Day Pass
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Church Plans CTA */}

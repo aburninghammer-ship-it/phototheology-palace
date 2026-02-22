@@ -57,6 +57,10 @@ const Pricing = lazy(() => import("./pages/Pricing"));
 const InteractiveDemo = lazy(() => import("./pages/InteractiveDemo"));
 const Comparison = lazy(() => import("./pages/Comparison"));
 const DonationPage = lazy(() => import("./pages/DonationPage"));
+const GiftAndShare = lazy(() => import("./pages/GiftAndShare"));
+const GiftSuccess = lazy(() => import("./pages/GiftSuccess"));
+const GiftRedeem = lazy(() => import("./pages/GiftRedeem"));
+const DayPassRedeem = lazy(() => import("./pages/DayPassRedeem"));
 
 // Lazy load all other pages
 const Palace = lazy(() => import("./pages/Palace"));
@@ -410,6 +414,10 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/gift" element={<GiftAndShare />} />
+            <Route path="/gift/success" element={<GiftSuccess />} />
+            <Route path="/gift/redeem/:token" element={<GiftRedeem />} />
+            <Route path="/day-pass/:token" element={<DayPassRedeem />} />
             <Route path="/donate" element={<DonationPage />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
             <Route path="/paths" element={<Paths />} />
