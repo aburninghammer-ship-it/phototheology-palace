@@ -2508,6 +2508,57 @@ export type Database = {
           },
         ]
       }
+      church_stream_platforms: {
+        Row: {
+          church_id: string
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          platform_name: string
+          rtmp_url: string
+          stream_key: string
+          updated_at: string
+        }
+        Insert: {
+          church_id: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          platform_name: string
+          rtmp_url?: string
+          stream_key?: string
+          updated_at?: string
+        }
+        Update: {
+          church_id?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          platform_name?: string
+          rtmp_url?: string
+          stream_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_stream_platforms_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "church_stream_platforms_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       church_survey_questions: {
         Row: {
           created_at: string | null
