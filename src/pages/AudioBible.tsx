@@ -1414,7 +1414,7 @@ export default function AudioBible() {
                         </div>
                       </div>
 
-                      {commentarySource === "epic" ? (
+                      {(commentarySource === "epic" || commentarySource === "counselor") ? (
                         <div className="space-y-2 w-full">
                           <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => {
                             epicQueueRef.current = [{ book: selectedBook, chapter: selectedChapter }];
