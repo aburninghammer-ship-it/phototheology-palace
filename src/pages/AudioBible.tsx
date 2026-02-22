@@ -65,7 +65,7 @@ interface Theme {
   verse_count: number;
 }
 
-type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar";
+type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar" | "counselor";
 
 interface ChapterSelection {
   book: string;
@@ -116,6 +116,7 @@ export default function AudioBible() {
     { id: "preacher" as const, label: "Preacher", subtitle: "Redemptive-proclamation", icon: Crown, color: "purple" },
     { id: "epic" as const, label: "Epic", subtitle: "Cosmic conflict", icon: Film, color: "orange" },
     { id: "scholar" as const, label: "Scholar", subtitle: "Canonical-theological", icon: Layers, color: "emerald" },
+    { id: "counselor" as const, label: "Counselor", subtitle: "Soul care", icon: Heart, color: "rose" },
   ] as const;
 
   const activeModeMeta = COMMENTARY_MODES.find(m => m.id === epicMode) || COMMENTARY_MODES[3];
@@ -386,7 +387,8 @@ export default function AudioBible() {
   // Epic Mode handler — selects a specific commentary mode
   const handleEpicModeSelect = useCallback((mode: EpicModeType = "epic") => {
     setEpicMode(mode);
-    setCommentarySource("epic");
+    // Counselor mode uses its own source; all others use "epic"
+    setCommentarySource(mode === "counselor" ? "counselor" : "epic");
     setIncludeCommentary(true);
   }, [setCommentarySource, setIncludeCommentary]);
 
@@ -2052,9 +2054,9 @@ export default function AudioBible() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Listening Mode Grid */}
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <Button
-                      variant={!includeCommentary && commentarySource !== "epic" ? "default" : "outline"}
+                      variant={!includeCommentary && commentarySource !== "epic" && commentarySource !== "counselor" ? "default" : "outline"}
                       className="h-auto py-3 px-2 flex-col gap-1 text-center"
                       onClick={() => {
                         setIncludeCommentary(false);
@@ -2101,21 +2103,9 @@ export default function AudioBible() {
                       <span className="font-semibold text-sm leading-tight">Mentor</span>
                       <span className="text-[10px] opacity-80 leading-tight">Preacher mode</span>
                     </Button>
-                    <Button
-                      variant={includeCommentary && commentarySource === "counselor" ? "default" : "outline"}
-                      className="h-auto py-3 px-2 flex-col gap-1 text-center"
-                      onClick={() => {
-                        setIncludeCommentary(true);
-                        setCommentarySource("counselor");
-                      }}
-                    >
-                      <Heart className="h-5 w-5 mb-0.5" />
-                      <span className="font-semibold text-sm leading-tight">Counselor</span>
-                      <span className="text-[10px] opacity-80 leading-tight">Soul care</span>
-                    </Button>
                   </div>
 
-                  {/* Commentary Suite — 5 Modes */}
+                  {/* Commentary Suite — 6 Modes */}
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Commentary Suite</span>
@@ -2124,16 +2114,19 @@ export default function AudioBible() {
                         Premium
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-5 gap-1.5">
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
                       {COMMENTARY_MODES.map((m) => {
                         const Icon = m.icon;
-                        const isActive = commentarySource === "epic" && epicMode === m.id;
+                        const isActive = m.id === "counselor"
+                          ? commentarySource === "counselor"
+                          : commentarySource === "epic" && epicMode === m.id;
                         const colorMap: Record<string, string> = {
                           blue: isActive ? "bg-blue-600 hover:bg-blue-700 border-blue-500/50 text-white" : "border-blue-500/30 hover:border-blue-500/50 text-blue-400",
                           amber: isActive ? "bg-amber-600 hover:bg-amber-700 border-amber-500/50 text-white" : "border-amber-500/30 hover:border-amber-500/50 text-amber-400",
                           purple: isActive ? "bg-purple-600 hover:bg-purple-700 border-purple-500/50 text-white" : "border-purple-500/30 hover:border-purple-500/50 text-purple-400",
                           orange: isActive ? "bg-gradient-to-b from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 border-amber-500/50 text-white" : "border-orange-500/30 hover:border-orange-500/50 text-orange-400",
                           emerald: isActive ? "bg-emerald-600 hover:bg-emerald-700 border-emerald-500/50 text-white" : "border-emerald-500/30 hover:border-emerald-500/50 text-emerald-400",
+                          rose: isActive ? "bg-rose-600 hover:bg-rose-700 border-rose-500/50 text-white" : "border-rose-500/30 hover:border-rose-500/50 text-rose-400",
                         };
                         return (
                           <Button
