@@ -42,13 +42,14 @@ import { ResearchParallelPanel } from "./research/ResearchParallelPanel";
 import { ResearchPTToolsPanel } from "./research/ResearchPTToolsPanel";
 import { ResearchVerseGeneticsPanel } from "./research/ResearchVerseGeneticsPanel";
 import { ResearchUserNotesPanel } from "./research/ResearchUserNotesPanel";
+import { InterlinearPanel } from "./research/InterlinearPanel";
 import { cn } from "@/lib/utils";
 
 interface ResearchModeLayoutProps {
   onExitResearchMode: () => void;
 }
 
-type CenterView = "single" | "parallel";
+type CenterView = "single" | "parallel" | "interlinear";
 type RightTab = "jeeves" | "principles" | "crossref" | "notes" | "palace" | "cycles" | "heavens" | "sanctuary" | "ascensions" | "genetics";
 
 export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutProps) => {
@@ -440,6 +441,22 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
               <Columns className="h-3 w-3 mr-1" />
               Parallel
             </Button>
+            <Button
+              variant={centerView === "interlinear" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setCenterView("interlinear")}
+              className={cn(
+                "h-7 text-xs transition-all",
+                centerView === "interlinear"
+                  ? "bg-gradient-to-r from-[hsl(38,80%,50%)] to-[hsl(32,70%,45%)] shadow-[0_0_12px_hsl(38,80%,50%/0.5)] text-white"
+                  : isDark
+                    ? "hover:bg-[hsl(38,40%,30%)/0.3] text-[hsl(38,50%,70%)]"
+                    : "hover:bg-amber-50 text-amber-700"
+              )}
+            >
+              <Languages className="h-3 w-3 mr-1" />
+              Interlinear
+            </Button>
           </div>
         </div>
 
@@ -586,6 +603,17 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                   onVerseSelect={setSelectedVerse}
                   loading={loading}
                   translation={translation}
+                  book={book}
+                  chapter={chapter}
+                />
+              </ScrollArea>
+            ) : centerView === "interlinear" ? (
+              <ScrollArea className="h-[calc(100%-2.5rem)]">
+                <InterlinearPanel
+                  verses={chapterData?.verses || []}
+                  selectedVerse={selectedVerse}
+                  onVerseSelect={setSelectedVerse}
+                  loading={loading}
                   book={book}
                   chapter={chapter}
                 />
