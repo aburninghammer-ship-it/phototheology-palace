@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter, BIBLE_BOOKS } from "@/types/bible";
 import { InterlinearPanel } from "@/components/bible/research/InterlinearPanel";
+import { ResearchToolsNav } from "@/components/bible/research/ResearchToolsNav";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -102,6 +103,7 @@ const InterlinearBible = () => {
               Normal View
             </Button>
           </div>
+          <ResearchToolsNav />
         </div>
 
         {/* Content */}

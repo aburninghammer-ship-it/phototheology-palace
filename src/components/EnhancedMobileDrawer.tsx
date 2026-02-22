@@ -132,6 +132,10 @@ const categoryConfig = {
     links: [
       { to: "/research-assistant", label: "Research Assistant", icon: "🎓" },
       { to: "/research-mode", label: "Research Mode", icon: "🔬" },
+      { to: "/interlinear", label: "Interlinear Bible", icon: "🔤" },
+      { to: "/bible-lexicon", label: "Lexicon", icon: "📖" },
+      { to: "/bible-timeline", label: "Bible Timeline", icon: "⏳" },
+      { to: "/bible-atlas", label: "Bible Atlas", icon: "🗺️" },
       { to: "/prophecy-watch", label: "Prophecy Watch", icon: "👁️" },
       { to: "/sermon-archive", label: "Sermon Archive", icon: "🎙️" },
       { to: "/content-library", label: "Content Library", icon: "📚" },

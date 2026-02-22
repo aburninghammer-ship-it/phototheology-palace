@@ -4,9 +4,10 @@ import { Verse } from "@/types/bible";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Languages, BookOpen, Info } from "lucide-react";
+import { Loader2, Languages, BookOpen, Info, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useNavigate } from "react-router-dom";
 import {
   Tooltip,
   TooltipContent,
@@ -42,6 +43,15 @@ interface InterlinearPanelProps {
 const interlinearCache = new Map<string, InterlinearData>();
 
 const InterlinearWordBlock = ({ word, isDark }: { word: InterlinearWord; isDark: boolean }) => {
+  const navigate = useNavigate();
+
+  const handleStrongsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (word.strongs) {
+      navigate(`/bible-lexicon?q=${encodeURIComponent(word.strongs)}`);
+    }
+  };
+
   return (
     <TooltipProvider delayDuration={200}>
       <Tooltip>
@@ -76,14 +86,18 @@ const InterlinearWordBlock = ({ word, isDark }: { word: InterlinearWord; isDark:
               {word.english}
             </span>
 
-            {/* Strong's number */}
-            <Badge variant="outline" className={cn(
-              "text-[9px] mt-1 h-4 px-1.5",
-              isDark
-                ? "border-[hsl(142,50%,40%)/0.4] text-[hsl(142,55%,60%)] bg-[hsl(142,40%,20%)/0.2]"
-                : "border-emerald-300 text-emerald-700 bg-emerald-50"
-            )}>
-              {word.strongs}
+            {/* Strong's number - clickable to Lexicon */}
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-[9px] mt-1 h-4 px-1.5 cursor-pointer hover:scale-110 transition-transform",
+                isDark
+                  ? "border-[hsl(142,50%,40%)/0.4] text-[hsl(142,55%,60%)] bg-[hsl(142,40%,20%)/0.2] hover:bg-[hsl(142,40%,25%)/0.4]"
+                  : "border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+              )}
+              onClick={handleStrongsClick}
+            >
+              {word.strongs} ↗
             </Badge>
           </div>
         </TooltipTrigger>
@@ -96,6 +110,10 @@ const InterlinearWordBlock = ({ word, isDark }: { word: InterlinearWord; isDark:
             <p className="text-xs"><span className="font-semibold">Strong's:</span> {word.strongs}</p>
             <p className="text-xs"><span className="font-semibold">Part of Speech:</span> {word.pos}</p>
             <p className="text-xs"><span className="font-semibold">Definition:</span> {word.definition}</p>
+            <p className="text-xs text-primary mt-1 flex items-center gap-1">
+              <ExternalLink className="h-3 w-3" />
+              Click Strong's badge to open Lexicon
+            </p>
           </div>
         </TooltipContent>
       </Tooltip>
@@ -127,7 +145,6 @@ const InterlinearVerse = ({
   useEffect(() => {
     if (!isSelected) return;
 
-    // Check cache first
     const cached = interlinearCache.get(cacheKey);
     if (cached) {
       setData(cached);
@@ -223,7 +240,6 @@ const InterlinearVerse = ({
                   interlinearCache.delete(cacheKey);
                   setData(null);
                   setError(null);
-                  // Re-trigger by toggling
                 }}
               >
                 Retry
@@ -298,7 +314,7 @@ export const InterlinearPanel = ({
       )}>
         <Info className={cn("h-4 w-4 mt-0.5 flex-shrink-0", isDark ? "text-[hsl(200,60%,60%)]" : "text-cyan-600")} />
         <p className={cn("text-xs", isDark ? "text-[hsl(200,50%,70%)]" : "text-cyan-700")}>
-          Click any verse to load its word-by-word interlinear analysis with original Hebrew/Greek, transliteration, Strong's numbers, and English glosses. Hover over words for definitions.
+          Click any verse to load its word-by-word interlinear analysis. Click a <strong>Strong's badge</strong> to open the Lexicon for that word.
         </p>
       </div>
 
