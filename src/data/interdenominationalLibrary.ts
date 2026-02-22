@@ -915,6 +915,76 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
               "Directly supports SDA position that Sunday observance lacks biblical mandate.",
             credibilityGrade: "A",
           },
+          {
+            id: "sab-2-catholic-world",
+            author: "Catholic World (periodical)",
+            tradition: "Roman Catholic",
+            workTitle: "Catholic World, March 1894 (Eastern Issue)",
+            year: "1894",
+            locator: "Article on the Church and pagan customs",
+            quoteExcerpt:
+              "\u201CThe Catholic Church took pagan philosophy and made it the buckler of faith against the heathen\u2026 She took the pagan Sunday and made it the Christian Sunday\u2026 There is in truth, something royal about the sun\u2026 hence the Church in these countries would seem to have said, \u2018Keep the old pagan name.\u2019\u2026 Thus pagan Sunday\u2026 became the Christian Sunday.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/catholicworld59telesuoft",
+            contextNotes:
+              "A Catholic periodical openly acknowledging that Sunday worship has pagan origins which the Church deliberately adopted and Christianized. The phrase \u2018pagan Sunday became the Christian Sunday\u2019 is a remarkable admission.",
+            agreementScope:
+              "Directly supports SDA argument that Sunday observance derives from pagan tradition adopted by the Catholic Church, not from Scripture.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-2-enright",
+            author: "Thomas Enright, C.SS.R.",
+            tradition: "Roman Catholic (Redemptorist)",
+            workTitle:
+              "Lecture at Redemptorist College, Kansas City, MO",
+            year: "1884",
+            locator: "February 18, 1884",
+            quoteExcerpt:
+              "\u201CProve to me from the Bible alone that I am bound to keep Sunday holy. There is no such law in the Bible. It is a law of the holy Catholic Church alone. The Bible says, \u2018Remember the Sabbath day to keep it holy.\u2019 The Catholic Church says, No. By my divine power I abolish the Sabbath day and command you to keep holy the first day of the week. And lo! The entire civilized world bows down in reverent obedience to the command of the Holy Catholic Church.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=enright+redemptorist+sabbath+sunday",
+            contextNotes:
+              "Thomas Enright was President of Redemptorist College in Kansas City, Missouri. His challenge is devastating: he dares Protestants to find Sunday in the Bible \u2014 and then openly declares that Sunday worship rests solely on the authority of the Catholic Church, not Scripture.",
+            agreementScope:
+              "One of the most direct Catholic challenges to Protestant Sunday-keepers. Directly supports SDA position that Sunday worship is a tradition of the Catholic Church, not a biblical command.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-2-smith-baltimore",
+            author: "Albert Smith, Chancellor of the Archdiocese of Baltimore",
+            tradition: "Roman Catholic",
+            workTitle:
+              "Letter replying for the Cardinal, Archdiocese of Baltimore",
+            year: "1920",
+            locator: "Letter dated February 10, 1920",
+            quoteExcerpt:
+              "\u201CIf Protestants would follow the Bible, they should worship God on the Sabbath Day. In keeping the Sunday they are following a law of the Catholic Church.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=albert+smith+archdiocese+baltimore+sabbath",
+            contextNotes:
+              "An official response from the Archdiocese of Baltimore \u2014 the premier Catholic diocese in America. The Chancellor states plainly that Bible-following Protestants should keep Saturday, and that Sunday observance follows Catholic law.",
+            agreementScope:
+              "Official Catholic diocesan admission that Sunday-keeping follows Catholic authority, not the Bible. Directly supports SDA Sabbath argument.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "sab-2-catholic-mirror",
+            author: "The Catholic Mirror (official organ of Cardinal Gibbons)",
+            tradition: "Roman Catholic",
+            workTitle: "The Catholic Mirror",
+            year: "1893",
+            locator: "December 13, 1893",
+            quoteExcerpt:
+              "\u201CReason and common sense demand the acceptance of one or the other of these alternatives: either Protestantism and the keeping holy of Saturday, or Catholicism and the keeping holy of Sunday. Compromise is impossible.\u201D",
+            primarySourceUrl:
+              "https://archive.org/search?query=catholic+mirror+1893+sabbath+sunday",
+            contextNotes:
+              "The Catholic Mirror was the official organ of Cardinal James Gibbons, Archbishop of Baltimore. In a series of articles in September\u2013December 1893, it challenged Protestants to choose: either follow the Bible (Saturday) or follow the Catholic Church (Sunday). This quote frames the issue as an either/or with no middle ground.",
+            agreementScope:
+              "Perhaps the most devastating Catholic admission: the choice is binary \u2014 Bible + Saturday, or Catholic tradition + Sunday. Directly supports the SDA Sabbath position.",
+            credibilityGrade: "A",
+          },
         ],
       },
     ],
