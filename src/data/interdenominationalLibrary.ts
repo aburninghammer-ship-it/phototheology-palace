@@ -3099,4 +3099,482 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
       },
     ],
   },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 21. PROPHETIC DATES (Key chronological anchors verified by secular history)
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    id: "prophetic_dates",
+    name: "Prophetic Dates (Key chronological anchors verified by history)",
+    order: 21,
+    summary:
+      "Non-SDA historians, archaeologists, and scholars independently confirm the key dates used in SDA prophetic chronology. These dates are not SDA inventions — they are established facts of secular and church history.",
+    tags: ["Evidence", "DoctrineLibrary", "PropheticDates"],
+    claims: [
+      // ── 457 BC ──────────────────────────────────────────────────
+      {
+        id: "pd-1",
+        title:
+          "457 BC is the historically verified date of Artaxerxes' decree to restore Jerusalem (Ezra 7)",
+        order: 1,
+        claimSummary:
+          "The 7th year of Artaxerxes I (457 BC) — the starting point of Daniel 9's 70-week and the 2300-day prophecies — is confirmed by four independent lines of evidence: Ptolemy's Canon, the Elephantine Papyri, Olympiad dating, and Babylonian cuneiform tablets.",
+        bibleAnchors: [
+          "Daniel 9:25",
+          "Ezra 7:7-8",
+          "Ezra 7:11-26",
+          "Daniel 8:14",
+        ],
+        witnesses: [
+          {
+            id: "pd-1-ptolemy",
+            author: "Claudius Ptolemy",
+            tradition: "Greco-Roman astronomer (secular)",
+            workTitle:
+              "Canon of Kings (Royal Canon / Canon Basileon)",
+            year: "c. 150 AD",
+            locator:
+              "Chronological tables of Persian kings",
+            quoteExcerpt:
+              "Ptolemy\u2019s Canon, a chronological table compiled from Babylonian astronomical records, places the accession of Artaxerxes I at 465 BC, making his 7th year 458/457 BC. This has been independently verified by modern astronomy.",
+            primarySourceUrl:
+              "https://en.wikipedia.org/wiki/Canon_of_Kings",
+            contextNotes:
+              "Ptolemy\u2019s Canon is the foundational chronological tool for ancient Near Eastern dating. It was compiled from Babylonian astronomical diaries that record eclipses and planetary positions, allowing modern astronomers to verify every date independently. The 465 BC accession of Artaxerxes I is secure.",
+            agreementScope:
+              "Secular astronomical chronology independently confirms the date SDAs use as the starting point of the 2300-day prophecy.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-1-elephantine",
+            author: "Elephantine Papyri (archaeological discovery)",
+            tradition: "Archaeological / Secular",
+            workTitle:
+              "Elephantine Papyri (discovered 1893\u20131907)",
+            year: "5th century BC (discovered 1893\u20131907)",
+            locator:
+              "Aramaic documents from the Jewish community at Elephantine, Egypt",
+            quoteExcerpt:
+              "The Elephantine Papyri, Aramaic documents from a Jewish military colony in Egypt, contain double-dated documents with both Egyptian and Persian regnal years, independently confirming the chronology of Artaxerxes I\u2019s reign and placing his 7th year at 457 BC.",
+            primarySourceUrl:
+              "https://en.wikipedia.org/wiki/Elephantine_papyri",
+            contextNotes:
+              "These papyri were discovered at Elephantine island near Aswan. The double-dating system (Egyptian + Persian) allows cross-verification of Persian royal chronology. They provide independent archaeological confirmation of the 457 BC date.",
+            agreementScope:
+              "Archaeological evidence confirming the same date SDAs use; discovered decades after SDA adoption of 457 BC.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-1-cuneiform",
+            author: "Babylonian cuneiform tablets (archaeological)",
+            tradition: "Archaeological / Secular",
+            workTitle:
+              "Babylonian astronomical diaries and business documents",
+            year: "5th century BC (excavated 19th\u201320th century)",
+            locator:
+              "British Museum and other collections",
+            quoteExcerpt:
+              "Cuneiform business tablets and astronomical diaries from Babylonia record transactions dated to specific regnal years of Artaxerxes I, independently confirming his accession in 465 BC and his 7th year as 458/457 BC.",
+            primarySourceUrl:
+              "https://www.britishmuseum.org/collection",
+            contextNotes:
+              "Tens of thousands of cuneiform tablets have been excavated from Mesopotamia. Business contracts dated to Artaxerxes I provide a third independent confirmation of the chronological framework that places his 7th year at 457 BC.",
+            agreementScope:
+              "Physical archaeological artifacts confirming the chronological anchor of SDA prophetic interpretation.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-1-thucydides",
+            author: "Thucydides / Olympiad dating",
+            tradition: "Classical Greek historian (secular)",
+            workTitle:
+              "History of the Peloponnesian War; cross-referenced with Olympiad chronology",
+            year: "c. 411 BC",
+            locator:
+              "Cross-dating of Persian events with Greek Olympiad years",
+            quoteExcerpt:
+              "Greek historians recorded Persian events (such as Xerxes\u2019 invasion of Greece in 480 BC) by Olympiad dating. Since Olympiad years are independently verifiable, they provide a fourth confirmation of Artaxerxes I\u2019s accession in 465 BC and thus his 7th year in 457 BC.",
+            primarySourceUrl:
+              "https://en.wikipedia.org/wiki/Olympiad",
+            contextNotes:
+              "The Olympiad dating system, anchored to the first Olympic Games in 776 BC, provides an independent Greek chronological framework. Persian events recorded by Greek historians can be cross-dated with Ptolemy\u2019s Canon and Babylonian records, creating a triple-verified chronology.",
+            agreementScope:
+              "A fourth line of evidence confirming 457 BC; the convergence of four independent chronological systems makes the date virtually certain.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-1-horn-wood",
+            author: "Siegfried H. Horn & Lynn H. Wood",
+            tradition: "Academic (Andrews University archaeologists)",
+            workTitle:
+              "The Chronology of Ezra 7",
+            year: "1953 (2nd ed. 1970)",
+            locator: "Full monograph",
+            quoteExcerpt:
+              "Horn and Wood demonstrated through meticulous analysis of Persian, Babylonian, and Egyptian source materials that the 7th year of Artaxerxes I corresponds to 457 BC using the fall-to-fall Jewish calendar reckoning, and that Ezra arrived in Jerusalem in the autumn of 457 BC.",
+            primarySourceUrl:
+              "https://www.andrews.edu/library/",
+            contextNotes:
+              "This academic monograph was specifically written to examine the 457 BC date using all available archaeological and historical evidence. Horn was one of the foremost SDA archaeologists, but his methodology and evidence have been acknowledged by non-SDA scholars.",
+            agreementScope:
+              "While the authors are SDA, their evidence base (Ptolemy\u2019s Canon, Elephantine Papyri, cuneiform tablets, Olympiad dating) is entirely non-SDA and independently verifiable.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-1-newton",
+            author: "Sir Isaac Newton",
+            tradition: "Early modern Protestant (historicist)",
+            workTitle:
+              "Observations upon the Prophecies of Daniel, and the Apocalypse of St. John",
+            year: "1733",
+            locator: "Part I, Chapter X: Of the Prophecy of the Seventy Weeks",
+            quoteExcerpt:
+              "Newton dated the 70 weeks from the 7th year of Artaxerxes Longimanus, \u2018when Ezra returned with a body of Jews from captivity and revived the Jewish worship by the King\u2019s commission.\u2019 He calculated 490 years from this date to the death of Christ.",
+            primarySourceUrl:
+              "https://www.newtonproject.ox.ac.uk/view/texts/normalized/THEM00204",
+            contextNotes:
+              "Isaac Newton independently chose the same starting date (457 BC, the 7th year of Artaxerxes I) that SDAs use for the 70-week prophecy. His analysis is preserved in the Newton Project at Oxford University.",
+            agreementScope:
+              "The greatest scientist in history used 457 BC as the starting point of the 70 weeks \u2014 the same date SDAs use for both the 70-week and 2300-day prophecies.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-1-iranica",
+            author: "Encyclop\u00E6dia Iranica",
+            tradition: "Academic / Secular (Iranian studies)",
+            workTitle:
+              "Encyclop\u00E6dia Iranica, article \u2018Artaxerxes I\u2019",
+            year: "modern edition",
+            locator: "Artaxerxes I article",
+            quoteExcerpt:
+              "The Encyclop\u00E6dia Iranica places Artaxerxes I\u2019s accession at \u2018year 284 of the Babylonian Nabonassar era (beginning in December, 465 B.C.)\u2019 \u2014 confirming the standard chronology that places his 7th year at 457 BC.",
+            primarySourceUrl:
+              "https://www.iranicaonline.org/articles/artaxerxes-i/",
+            contextNotes:
+              "The Encyclop\u00E6dia Iranica is the premier academic reference for Iranian/Persian studies, published by Columbia University. Their dating of Artaxerxes I independently confirms the SDA chronological anchor.",
+            agreementScope:
+              "An authoritative secular Iranian studies encyclopedia confirming the same date SDAs use.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      // ── 538 AD ──────────────────────────────────────────────────
+      {
+        id: "pd-2",
+        title:
+          "538 AD marks the effective beginning of papal political supremacy",
+        order: 2,
+        claimSummary:
+          "In 538 AD, the Ostrogothic siege of Rome was broken and the last major Arian political opposition to papal supremacy was removed, allowing the Bishop of Rome to exercise the political authority granted by Justinian\u2019s decree (533 AD). Non-SDA historians confirm these events.",
+        bibleAnchors: [
+          "Daniel 7:8",
+          "Daniel 7:20-25",
+          "Revelation 13:5",
+        ],
+        witnesses: [
+          {
+            id: "pd-2-justinian",
+            author: "Emperor Justinian I",
+            tradition: "Roman Empire / Secular",
+            workTitle:
+              "Codex Justinianus (Code of Justinian)",
+            year: "533 AD (534 AD codified)",
+            locator: "Novella 131, Title XIV",
+            quoteExcerpt:
+              "\u201CThe holy pope of ancient Rome is the first of all the priests.\u201D (Blume translation, Novel 131, Chapter 2). Justinian\u2019s decree codified papal supremacy in Roman law; its exercise required the removal of Arian opposition in 538.",
+            primarySourceUrl:
+              "https://www.uwyo.edu/lawlib/blume-justinian/ajc-edition-2/novels/121-140/Novel%20131_Replacement.pdf",
+            contextNotes:
+              "The Corpus Juris Civilis is one of the most important legal documents in Western history. Justinian\u2019s formal recognition of the Pope\u2019s supreme ecclesiastical authority is a matter of settled legal history, documented in every standard Byzantine history.",
+            agreementScope:
+              "The legal text is undisputed; its prophetic significance is the SDA interpretive layer.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-2-procopius",
+            author: "Procopius of Caesarea",
+            tradition: "Byzantine historian (secular)",
+            workTitle:
+              "History of the Wars (De Bellis)",
+            year: "c. 550 AD",
+            locator: "Book V\u2013VI (Gothic War)",
+            quoteExcerpt:
+              "Procopius, the official historian of Justinian\u2019s wars, records Belisarius\u2019s campaign against the Ostrogoths in Italy. In March 538 the Ostrogothic siege of Rome was broken and the Goths withdrew, effectively ending Arian military opposition to the papal see.",
+            primarySourceUrl:
+              "https://www.gutenberg.org/ebooks/16764",
+            contextNotes:
+              "Procopius is the primary contemporary source for the Gothic Wars. His account documents the military events of 538 that removed the last Arian political barrier to papal supremacy \u2014 the very events SDAs identify as the beginning of the 1260-year period.",
+            agreementScope:
+              "The historical events are undisputed; the prophetic significance is the SDA interpretive layer.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-2-bury",
+            author: "J.B. Bury",
+            tradition: "Secular academic (Cambridge historian)",
+            workTitle:
+              "History of the Later Roman Empire",
+            year: "1923",
+            locator: "Vol. 2, chapters on the Gothic War",
+            quoteExcerpt:
+              "Bury\u2019s authoritative history documents how the destruction of Ostrogothic power in Italy by Justinian\u2019s generals freed the papacy from Arian political control. The campaigns of 536\u2013538 were decisive in establishing Rome as the unchallenged center of Western Christendom.",
+            primarySourceUrl:
+              "https://archive.org/search?query=bury+later+roman+empire",
+            contextNotes:
+              "J.B. Bury (1861\u20131927) was Regius Professor of Modern History at Cambridge. His work is a standard reference for late Roman and early Byzantine history. He documents the same events SDAs mark as prophetically significant.",
+            agreementScope:
+              "Secular academic history confirming the events of 538; Bury assigns no prophetic significance.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      // ── 508 AD ──────────────────────────────────────────────────
+      {
+        id: "pd-3",
+        title:
+          "508 AD marks the decisive alliance between the Franks and the Papacy against Arian powers",
+        order: 3,
+        claimSummary:
+          "In 507\u2013508, Clovis I\u2019s defeat of the Arian Visigoths at the Battle of Vouill\u00E9 and his alliance with the papacy marked the beginning of the Frankish\u2013Papal political axis that would dominate medieval Europe. Non-SDA historians confirm these events.",
+        bibleAnchors: [
+          "Daniel 11:31",
+          "Daniel 12:11",
+        ],
+        witnesses: [
+          {
+            id: "pd-3-gregory-tours",
+            author: "Gregory of Tours",
+            tradition: "Frankish Catholic bishop / historian",
+            workTitle:
+              "Historia Francorum (History of the Franks)",
+            year: "c. 594 AD",
+            locator: "Book II, Chapters 30\u201343",
+            quoteExcerpt:
+              "Gregory of Tours records Clovis\u2019s conversion to Catholic Christianity (as distinct from Arian Christianity) and his defeat of the Arian Visigothic king Alaric II at the Battle of Vouill\u00E9 in 507. Clovis received the honorary consulship from the Byzantine Emperor Anastasius in 508, formally recognizing the Frankish\u2013Roman alliance.",
+            primarySourceUrl:
+              "https://www.gutenberg.org/ebooks/5765",
+            contextNotes:
+              "Gregory of Tours (538\u2013594) is the primary source for early Frankish history. His account documents the pivotal moment when the most powerful Western kingdom allied with Catholic Rome against the Arian barbarian powers.",
+            agreementScope:
+              "The historical events are well-established; the prophetic significance of 508 for Daniel 12:11 is the SDA interpretive contribution.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-3-encyclopedia",
+            author: "Encyclop\u00E6dia Britannica",
+            tradition: "Secular reference",
+            workTitle:
+              "Encyclop\u00E6dia Britannica, article \u2018Clovis I\u2019",
+            year: "modern edition",
+            locator: "Clovis I article",
+            quoteExcerpt:
+              "Clovis\u2019s conversion to Catholicism and his victory over the Arian Visigoths at Vouill\u00E9 (507) made the Frankish kingdom the primary military defender of the Catholic Church in the West. The alliance between the Franks and the papacy shaped European politics for centuries.",
+            primarySourceUrl:
+              "https://www.britannica.com/biography/Clovis-I",
+            contextNotes:
+              "Standard secular encyclopedia reference confirming the significance of the Frankish\u2013Papal alliance. The events of 507\u2013508 are not disputed by any mainstream historian.",
+            agreementScope:
+              "Secular confirmation of the historical events; no prophetic interpretation attached.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      // ── 1798 AD ─────────────────────────────────────────────────
+      {
+        id: "pd-4",
+        title:
+          "1798 marks the end of papal temporal sovereignty — the 'deadly wound'",
+        order: 4,
+        claimSummary:
+          "On February 10, 1798, French General Berthier entered Rome, took Pope Pius VI prisoner, and proclaimed the Roman Republic, ending 1260 years of papal temporal power. Non-SDA historians universally confirm these events.",
+        bibleAnchors: [
+          "Revelation 13:3",
+          "Revelation 13:10",
+          "Daniel 7:25-26",
+        ],
+        witnesses: [
+          {
+            id: "pd-4-duffy",
+            author: "Eamon Duffy",
+            tradition: "Roman Catholic (Cambridge historian)",
+            workTitle:
+              "Saints and Sinners: A History of the Popes",
+            year: "1997 (4th ed. 2014)",
+            locator: "Chapter on the French Revolution and the Papacy",
+            quoteExcerpt:
+              "Duffy, a Catholic historian, describes how French troops under General Berthier occupied Rome in February 1798, proclaimed a republic, and arrested Pope Pius VI. The Pope was taken prisoner to France, where he died in captivity at Valence in August 1799. Duffy calls it \u2018the most dramatic and humiliating episode in the entire history of the papacy.\u2019",
+            primarySourceUrl:
+              "https://yalebooks.yale.edu/book/9780300206128/saints-and-sinners/",
+            contextNotes:
+              "Eamon Duffy is Professor of the History of Christianity at Cambridge and a devout Catholic. His acknowledgment that 1798 was the most humiliating episode in papal history comes from a sympathetic Catholic pen, making it especially powerful testimony.",
+            agreementScope:
+              "A Catholic historian confirms the devastating impact of 1798 on papal power; the \u2018deadly wound\u2019 identification is the SDA prophetic layer.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-4-chadwick",
+            author: "Owen Chadwick",
+            tradition: "Anglican (Cambridge historian)",
+            workTitle:
+              "The Popes and European Revolution",
+            year: "1981",
+            locator: "Chapters on the French Revolution",
+            quoteExcerpt:
+              "Chadwick documents the arrest of Pius VI by Berthier on February 20, 1798 (seized February 10, removed February 20), the proclamation of the Roman Republic, and the effective end of the Papal States as a temporal power. He treats 1798 as a watershed moment in European history.",
+            primarySourceUrl:
+              "https://academic.oup.com/book/1558",
+            contextNotes:
+              "Owen Chadwick (1916\u20132015), Regius Professor of Modern History at Cambridge, is one of the most respected church historians of the 20th century. His detailed account of 1798 provides authoritative non-SDA confirmation.",
+            agreementScope:
+              "Authoritative Anglican historian confirming the events of 1798; no prophetic interpretation applied.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-4-britannica",
+            author: "Encyclop\u00E6dia Britannica",
+            tradition: "Secular reference",
+            workTitle:
+              "Encyclop\u00E6dia Britannica, article \u2018Pius VI\u2019",
+            year: "modern edition",
+            locator: "Pius VI article",
+            quoteExcerpt:
+              "In February 1798, French forces occupied Rome and proclaimed a republic. Pius VI was taken prisoner and removed from Rome. He died in French captivity at Valence on August 29, 1799. The temporal sovereignty of the papacy, which had endured for over a millennium, was effectively terminated.",
+            primarySourceUrl:
+              "https://www.britannica.com/biography/Pius-VI",
+            contextNotes:
+              "Standard secular encyclopedia reference confirming the events of 1798. The end of papal temporal power after more than 1,000 years is one of the best-documented events in European history.",
+            agreementScope:
+              "Secular encyclopedia confirming exactly what SDAs teach: papal temporal power lasting roughly 1260 years ended in 1798.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "pd-4-adam-clarke",
+            author: "Adam Clarke",
+            tradition: "Methodist",
+            workTitle:
+              "The Holy Bible\u2026 with a Commentary and Critical Notes",
+            year: "1831",
+            locator: "Commentary on Revelation 13:3",
+            quoteExcerpt:
+              "\u201COne thousand two hundred and sixty years\u2026 In 1798 the French republican army\u2026 entirely superseded the whole papal power.\u201D",
+            primarySourceUrl:
+              "https://www.studylight.org/commentaries/eng/acc/revelation-13.html",
+            contextNotes:
+              "Adam Clarke (1760\u20131832) was a prominent Methodist theologian and commentator. Writing just 33 years after the event, he explicitly identified 1798 as the fulfillment of the 1260-year prophecy \u2014 the same interpretation SDAs hold.",
+            agreementScope:
+              "A non-SDA Methodist scholar making the same 1260-year/1798 calculation that SDAs use. Powerful precedent.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+      // ── 1844 / October 22 ──────────────────────────────────────
+      {
+        id: "pd-5",
+        title:
+          "October 22, 1844 — the Day of Atonement in the Karaite Jewish calendar",
+        order: 5,
+        claimSummary:
+          "The date October 22, 1844 corresponds to the 10th of Tishri (Day of Atonement / Yom Kippur) in the Karaite Jewish calendar, which determines months by actual observation of the new moon crescent rather than calculation. The 2300 years from 457 BC terminate in autumn 1844.",
+        bibleAnchors: [
+          "Daniel 8:14",
+          "Leviticus 16:29-30",
+          "Leviticus 23:27",
+          "Daniel 9:24-25",
+        ],
+        witnesses: [
+          {
+            id: "pd-5-karaite",
+            author: "Karaite Jewish calendar tradition",
+            tradition: "Karaite Judaism",
+            workTitle:
+              "Karaite observational calendar, 1844",
+            year: "1844",
+            locator:
+              "New moon observation records, autumn 1844",
+            quoteExcerpt:
+              "The Karaite Jews, who determine their calendar by actual observation of the new moon crescent (as in biblical times) rather than by rabbinic calculation, placed the Day of Atonement (10th of Tishri) on October 22, 1844. The rabbinic (calculated) calendar placed it on September 23, 1844.",
+            primarySourceUrl:
+              "https://en.wikipedia.org/wiki/Karaite_Judaism",
+            contextNotes:
+              "The Karaite calendar is arguably more faithful to the original biblical method (observation-based) than the rabbinic calculated calendar introduced by Hillel II in 359 AD. Samuel Snow\u2019s \u2018true midnight cry\u2019 adopted the Karaite date, which placed the Day of Atonement about a month later than the rabbinic date.",
+            agreementScope:
+              "The Karaite calendar date is independently verifiable; the prophetic significance assigned to it is the SDA contribution.",
+            credibilityGrade: "B",
+          },
+          {
+            id: "pd-5-petri",
+            author: "Johann Philipp Petri",
+            tradition: "Lutheran",
+            workTitle:
+              "Prussian historicist writings on Daniel\u2019s time prophecies",
+            year: "c. 1768",
+            locator: "Prophetic chronology sections",
+            quoteExcerpt:
+              "Petri independently applied the day-year principle to the 2300 days of Daniel 8:14 and calculated their termination at 1847 \u2014 just three years from the date William Miller would later calculate (1844). This was decades before the Millerite movement.",
+            primarySourceUrl:
+              "https://archive.org/search?query=johann+petri+daniel+prophecy",
+            contextNotes:
+              "Petri\u2019s calculation demolishes the claim that the 2300-day/year interpretation was invented by William Miller. A non-SDA, pre-Millerite Lutheran scholar independently arrived at nearly the same date using the same hermeneutical method.",
+            agreementScope:
+              "Independent pre-Millerite confirmation of the 2300-day/year calculation; Petri\u2019s date (1847) is within 3 years of the SDA date (1844).",
+            credibilityGrade: "B",
+          },
+          {
+            id: "pd-5-hans-wood",
+            author: "Hans Wood",
+            tradition: "Anglican / Independent (Irish)",
+            workTitle:
+              "A Dissertation on the Principal Prophecies",
+            year: "1787",
+            locator: "Prophetic chronology analysis",
+            quoteExcerpt:
+              "Wood applied the day-year principle to Daniel 8:14 and calculated the 2300 day-years as ending around 1880, contributing to the pre-Millerite tradition of applying the day-year principle to Daniel\u2019s longest time prophecy.",
+            primarySourceUrl:
+              "https://archive.org/search?query=hans+wood+dissertation+prophecies",
+            contextNotes:
+              "Wood\u2019s 1787 calculation shows that applying the day-year principle to Daniel 8:14 was already an established practice before the Millerite movement. His ending date (c. 1880) differs from the SDA 1844, but the hermeneutical method is identical.",
+            agreementScope:
+              "Pre-Millerite day-year application to Daniel 8:14; supports the legitimacy of the method even where the specific date differs.",
+            credibilityGrade: "B",
+          },
+          {
+            id: "pd-5-beverley",
+            author: "Thomas Beverley",
+            tradition: "Nonconformist / Independent (English)",
+            workTitle:
+              "A Scripture-line of Time, Drawn in Brief from the Lapsed Creation, to the Restitution of All Things: Discours\u2019d at Large, Upon the 2300 Ev. Morn. Dan. 8.14",
+            year: "1684",
+            locator: "Full treatise on Daniel 8:14",
+            quoteExcerpt:
+              "\u201CThe Line of Time runs parallel with the Vision, therefore the Line of 2300 Evenings Mornings must reach from the Beginning of the Persian Monarchy to the Monarchy of Christ.\u201D",
+            primarySourceUrl:
+              "https://quod.lib.umich.edu/e/eebo2/A27623.0001.001/1:5.1?rgn=div2&view=fulltext",
+            contextNotes:
+              "Thomas Beverley (d. 1702) wrote an entire treatise dedicated to the 2300 days of Daniel 8:14, applying the day-year principle. Published in 1684 \u2014 nearly 150 years before William Miller \u2014 this is one of the earliest dedicated treatments of Daniel 8:14 as a year-day prophecy.",
+            agreementScope:
+              "A pre-Millerite English Nonconformist applying the day-year principle specifically to Daniel 8:14, 150 years before Miller. Powerful precedent.",
+            credibilityGrade: "B",
+          },
+          {
+            id: "pd-5-newton-isaac",
+            author: "Sir Isaac Newton",
+            tradition: "Early modern Protestant (historicist)",
+            workTitle:
+              "Observations upon the Prophecies of Daniel, and the Apocalypse of St. John",
+            year: "1733",
+            locator: "Part II, Chapter 3; private manuscripts",
+            quoteExcerpt:
+              "\u201CIn these Prophecies days are put for years.\u201D Newton applied this principle extensively. His private manuscripts (now at the National Library of Israel) project 2060 as a significant prophetic date, calculating from approximately 800 AD.",
+            primarySourceUrl:
+              "https://www.gutenberg.org/files/16878/16878-h/16878-h.htm",
+            contextNotes:
+              "Newton\u2019s application of the day-year principle to Daniel\u2019s time prophecies demonstrates that the greatest scientific mind in history used the same hermeneutical method SDAs use. His private manuscripts show he continued making prophetic calculations throughout his life.",
+            agreementScope:
+              "Newton\u2019s day-year method is identical to the SDA approach; his specific dates differ but the principle is the same.",
+            credibilityGrade: "A",
+          },
+        ],
+      },
+    ],
+  },
 ];
