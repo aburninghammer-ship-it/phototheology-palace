@@ -70,6 +70,8 @@ interface ChapterSelection {
   book: string;
   chapter: number;
   mode?: EpicModeType;
+  storyId?: string;
+  storyTitle?: string;
 }
 
 type SelectionMode = "chapter" | "book" | "custom" | "stories";
@@ -96,6 +98,7 @@ export default function AudioBible() {
   const epicQueueRef = useRef<ChapterSelection[]>([]);
   const epicQueueIndexRef = useRef(0);
   const playEpicRef = useRef<(book: string, chapter: number, mode?: EpicModeType) => Promise<void>>();
+  const playEpicStoryRef = useRef<(storyTitle: string, storyId: string, mode?: EpicModeType) => Promise<void>>();
   const [commentaryMusicEnabled, setCommentaryMusicEnabled] = useState(getAutoMusicEnabled);
 
   // Sync toggle state with global setting
@@ -260,10 +263,43 @@ export default function AudioBible() {
   const addCustomChapter = () => {
     const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
     const exists = customChapters.some(
-      (c) => c.book === customBook && c.chapter === customChapter && c.mode === mode
+      (c) => c.book === customBook && c.chapter === customChapter && c.mode === mode && !c.storyId
     );
     if (!exists) {
       setCustomChapters([...customChapters, { book: customBook, chapter: customChapter, mode }]);
+    }
+    // Auto-increment to next chapter for quick sequential adding
+    const maxCh = getChapterCount(customBook);
+    if (customChapter < maxCh) {
+      setCustomChapter(customChapter + 1);
+    }
+  };
+
+  // Add a story to the custom playlist
+  const addStoryToPlaylist = (storyId: string) => {
+    const story = CURATED_STORIES.find(s => s.id === storyId);
+    if (!story) return;
+    const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
+    // Allow up to 4 stories in a playlist
+    const storyCount = customChapters.filter(c => c.storyId).length;
+    if (storyCount >= 4) {
+      toast.error("Maximum 4 stories per playlist");
+      return;
+    }
+    const exists = customChapters.some(
+      (c) => c.storyId === storyId && c.mode === mode
+    );
+    if (!exists) {
+      setCustomChapters([...customChapters, {
+        book: story.title,
+        chapter: -1,
+        mode,
+        storyId: story.id,
+        storyTitle: story.title,
+      }]);
+      toast.success(`Added "${story.title}" to playlist`);
+    } else {
+      toast.info(`"${story.title}" (${mode || 'epic'}) is already in playlist`);
     }
   };
 
@@ -445,14 +481,18 @@ export default function AudioBible() {
         requestMusicForCommentary('start');
       };
       audio.onended = () => {
-        // Auto-advance queue (with per-item mode switching)
+        // Auto-advance queue (with per-item mode switching and story support)
         const queue = epicQueueRef.current;
         const nextIdx = epicQueueIndexRef.current + 1;
         if (queue.length > 1 && nextIdx < queue.length) {
           epicQueueIndexRef.current = nextIdx;
           const nextItem = queue[nextIdx];
           if (nextItem.mode) setEpicMode(nextItem.mode);
-          playEpicRef.current?.(nextItem.book, nextItem.chapter, nextItem.mode);
+          if (nextItem.storyId) {
+            playEpicStoryRef.current?.(nextItem.storyTitle || nextItem.book, nextItem.storyId, nextItem.mode);
+          } else {
+            playEpicRef.current?.(nextItem.book, nextItem.chapter, nextItem.mode);
+          }
         } else {
           setIsEpicPlaying(false);
           setIsEpicPaused(false);
@@ -478,10 +518,111 @@ export default function AudioBible() {
     }
   }, [stop, volume, epicMode]);
 
-  // Keep playEpicRef in sync so onended/skip callbacks can call the latest version
+  // Play a story from queue
+  const handlePlayEpicStory = useCallback(async (storyTitle: string, storyId: string, modeOverride?: EpicModeType) => {
+    const currentMode = modeOverride || epicMode;
+    const modeName = COMMENTARY_MODES.find(m => m.id === currentMode)?.label || "Epic";
+    setIsEpicLoading(true);
+    setEpicNowPlayingBook(storyTitle);
+    setEpicNowPlayingChapter(0);
+    try {
+      const story = CURATED_STORIES.find(s => s.id === storyId);
+      if (!story) throw new Error("Story not found");
+
+      // Check DB cache
+      const { data: cached } = await (supabase as any)
+        .from('epic_commentaries')
+        .select('id, audio_storage_path, commentary_text, status')
+        .eq('book', story.title)
+        .eq('chapter', -1)
+        .eq('mode', currentMode)
+        .maybeSingle();
+
+      const playStoryAudio = async (path: string) => {
+        const { data: signed } = await supabase.storage
+          .from('epic-audio')
+          .createSignedUrl(path, 3600);
+        if (!signed?.signedUrl) return false;
+
+        stop();
+        if (epicAudioRef.current) { epicAudioRef.current.pause(); epicAudioRef.current = null; }
+        const audio = new Audio(signed.signedUrl);
+        epicAudioRef.current = audio;
+        audio.volume = volume;
+        setEpicAudioUrl(signed.signedUrl);
+        setIsEpicPlaying(true);
+        setIsEpicPaused(false);
+        setIsEpicLoading(false);
+        audio.onplay = () => requestMusicForCommentary('start');
+        audio.onended = () => {
+          const queue = epicQueueRef.current;
+          const nextIdx = epicQueueIndexRef.current + 1;
+          if (queue.length > 1 && nextIdx < queue.length) {
+            epicQueueIndexRef.current = nextIdx;
+            const nextItem = queue[nextIdx];
+            if (nextItem.mode) setEpicMode(nextItem.mode);
+            if (nextItem.storyId) {
+              playEpicStoryRef.current?.(nextItem.storyTitle || nextItem.book, nextItem.storyId, nextItem.mode);
+            } else {
+              playEpicRef.current?.(nextItem.book, nextItem.chapter, nextItem.mode);
+            }
+          } else {
+            setIsEpicPlaying(false); setIsEpicPaused(false);
+            epicAudioRef.current = null; epicQueueRef.current = []; epicQueueIndexRef.current = 0;
+          }
+        };
+        audio.onerror = () => {
+          toast.error(`Failed to play ${modeName} story audio.`);
+          setIsEpicPlaying(false); setIsEpicPaused(false); setIsEpicLoading(false);
+        };
+        await audio.play();
+        toast.success(`Now playing: ${storyTitle} (${modeName})`);
+        return true;
+      };
+
+      if (cached?.audio_storage_path && cached?.status === 'ready') {
+        const played = await playStoryAudio(cached.audio_storage_path);
+        if (played) return;
+      }
+
+      // Generate
+      toast.info(`Generating ${modeName} story for "${storyTitle}"... This may take 2-3 minutes.`);
+      supabase.functions.invoke('generate-epic-commentary', {
+        body: { scope: "story", storyTitle: story.title, book: story.book, mode: currentMode },
+      }).catch(() => {});
+
+      // Poll
+      let attempts = 0;
+      const poll = async () => {
+        attempts++;
+        const { data: row } = await (supabase as any)
+          .from('epic_commentaries')
+          .select('audio_storage_path, status')
+          .eq('book', story.title)
+          .eq('chapter', -1)
+          .eq('mode', currentMode)
+          .eq('status', 'ready')
+          .maybeSingle();
+        if (row?.audio_storage_path) {
+          await playStoryAudio(row.audio_storage_path);
+          return;
+        }
+        if (attempts < 20) setTimeout(poll, 15000);
+        else { setIsEpicLoading(false); toast.error("Story still generating. Try again soon."); }
+      };
+      setTimeout(poll, 20000);
+    } catch (err: any) {
+      console.error('Story queue error:', err);
+      toast.error("Failed to play story: " + (err.message || "Unknown"));
+      setIsEpicLoading(false);
+    }
+  }, [stop, volume, epicMode]);
+
+  // Keep refs in sync so onended/skip callbacks can call the latest version
   useEffect(() => {
     playEpicRef.current = handlePlayEpic;
-  }, [handlePlayEpic]);
+    playEpicStoryRef.current = handlePlayEpicStory;
+  }, [handlePlayEpic, handlePlayEpicStory]);
 
   // Regenerate commentary (admin only) — forces new script + audio
   const handleRegenerateEpic = useCallback(async (book: string, chapter: number, customInstructions?: string) => {
@@ -756,15 +897,19 @@ export default function AudioBible() {
     }
   }, [stop, volume, epicMode]);
 
-  // Play epic commentary for a custom chapter queue (with per-item mode switching)
+  // Play epic commentary for a custom chapter/story queue (with per-item mode switching)
   const handlePlayEpicCustom = useCallback(async () => {
     if (customChapters.length === 0) return;
     epicQueueRef.current = customChapters;
     epicQueueIndexRef.current = 0;
     const first = customChapters[0];
     if (first.mode) setEpicMode(first.mode);
-    handlePlayEpic(first.book, first.chapter, first.mode);
-  }, [customChapters, handlePlayEpic]);
+    if (first.storyId) {
+      handlePlayEpicStory(first.storyTitle || first.book, first.storyId, first.mode);
+    } else {
+      handlePlayEpic(first.book, first.chapter, first.mode);
+    }
+  }, [customChapters, handlePlayEpic, handlePlayEpicStory]);
 
   // Play epic chapter-by-chapter for an entire book
   const handlePlayEpicBookChapters = useCallback(async (bookName: string) => {
@@ -790,7 +935,11 @@ export default function AudioBible() {
       epicQueueIndexRef.current = nextIdx;
       const nextItem = queue[nextIdx];
       if (nextItem.mode) setEpicMode(nextItem.mode);
-      playEpicRef.current?.(nextItem.book, nextItem.chapter, nextItem.mode);
+      if (nextItem.storyId) {
+        playEpicStoryRef.current?.(nextItem.storyTitle || nextItem.book, nextItem.storyId, nextItem.mode);
+      } else {
+        playEpicRef.current?.(nextItem.book, nextItem.chapter, nextItem.mode);
+      }
     }
   }, []);
 
@@ -805,7 +954,11 @@ export default function AudioBible() {
       epicQueueIndexRef.current = prevIdx;
       const prevItem = queue[prevIdx];
       if (prevItem.mode) setEpicMode(prevItem.mode);
-      playEpicRef.current?.(prevItem.book, prevItem.chapter, prevItem.mode);
+      if (prevItem.storyId) {
+        playEpicStoryRef.current?.(prevItem.storyTitle || prevItem.book, prevItem.storyId, prevItem.mode);
+      } else {
+        playEpicRef.current?.(prevItem.book, prevItem.chapter, prevItem.mode);
+      }
     }
   }, []);
 
@@ -1312,8 +1465,8 @@ export default function AudioBible() {
                       </p>
                       
                       {/* Add Mode Selector */}
-                      <Tabs value={customAddMode} onValueChange={(v) => setCustomAddMode(v as "single" | "chapter-range" | "book-range")} className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 h-auto">
+                      <Tabs value={customAddMode} onValueChange={(v) => setCustomAddMode(v as any)} className="w-full">
+                        <TabsList className="grid w-full grid-cols-4 h-auto">
                           <TabsTrigger value="single" className="text-xs py-2">
                             {t('audioBible.singleChapter')}
                           </TabsTrigger>
@@ -1322,6 +1475,9 @@ export default function AudioBible() {
                           </TabsTrigger>
                           <TabsTrigger value="book-range" className="text-xs py-2">
                             {t('audioBible.bookRange')}
+                          </TabsTrigger>
+                          <TabsTrigger value="add-story" className="text-xs py-2">
+                            📖 Story
                           </TabsTrigger>
                         </TabsList>
                         
@@ -1498,6 +1654,48 @@ export default function AudioBible() {
                             {t('audioBible.chaptersAcrossBooks', { chapters: getBookRangeChapterCount(), books: getBookRangeBookCount() })}
                           </p>
                         </TabsContent>
+                        {/* Story Add Mode */}
+                        <TabsContent value="add-story" className="mt-3 space-y-2">
+                          <p className="text-xs text-muted-foreground">Add up to 4 stories to your playlist (mix with chapters!)</p>
+                          <div className="flex flex-wrap gap-1">
+                            {STORY_CATEGORIES.map((cat) => (
+                              <Badge
+                                key={cat.id}
+                                variant={storyCategory === cat.id ? "default" : "outline"}
+                                className="cursor-pointer text-[10px] px-1.5 py-0"
+                                onClick={() => setStoryCategory(cat.id)}
+                              >
+                                {cat.label}
+                              </Badge>
+                            ))}
+                          </div>
+                          <ScrollArea className="h-40">
+                            <div className="space-y-1">
+                              {CURATED_STORIES
+                                .filter(s => storyCategory === "all" || s.category === storyCategory)
+                                .map((story) => {
+                                  const alreadyAdded = customChapters.some(c => c.storyId === story.id);
+                                  return (
+                                    <div
+                                      key={story.id}
+                                      className={`flex items-center gap-2 p-1.5 rounded border text-xs cursor-pointer transition-colors ${
+                                        alreadyAdded ? "opacity-50 border-primary/30" : "hover:bg-accent/50"
+                                      }`}
+                                      onClick={() => !alreadyAdded && addStoryToPlaylist(story.id)}
+                                    >
+                                      <span>{story.icon}</span>
+                                      <span className="flex-1 truncate font-medium">{story.title}</span>
+                                      {alreadyAdded ? (
+                                        <Badge variant="secondary" className="text-[9px] px-1">Added</Badge>
+                                      ) : (
+                                        <Plus className="h-3 w-3 text-muted-foreground" />
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                            </div>
+                          </ScrollArea>
+                        </TabsContent>
                       </Tabs>
 
                       {/* Custom chapters list with per-item mode */}
@@ -1528,7 +1726,9 @@ export default function AudioBible() {
                                 };
                                 return (
                                   <div key={i} className="flex items-center gap-1.5 text-xs">
-                                    <span className="font-medium min-w-[100px] truncate">{ch.book} {ch.chapter}</span>
+                                    <span className="font-medium min-w-[100px] truncate">
+                                      {ch.storyId ? `📖 ${ch.storyTitle || ch.book}` : `${ch.book} ${ch.chapter}`}
+                                    </span>
                                     {commentarySource === "epic" && (
                                       <Select
                                         value={ch.mode || epicMode}
@@ -1574,7 +1774,7 @@ export default function AudioBible() {
                           disabled={isEpicLoading || customChapters.length === 0}
                         >
                           {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : (() => { const Icon = activeModeMeta.icon; return <Icon className="h-5 w-5 mr-2" />; })()}
-                          {activeModeMeta.label}: {customChapters.length} Chapter{customChapters.length !== 1 ? "s" : ""}
+                          {activeModeMeta.label}: {customChapters.length} Item{customChapters.length !== 1 ? "s" : ""}
                         </Button>
                       ) : (
                         <Button
