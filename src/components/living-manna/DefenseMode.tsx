@@ -2,8 +2,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
-  Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles,
+  Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
 } from "lucide-react";
+import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,9 +39,14 @@ interface ChatMessage {
   score?: number;
 }
 
+type DefenseSubMode = "sparring" | "library";
+
 export function DefenseMode({ churchId }: DefenseModeProps) {
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Sub-mode: sparring arena vs 3AM library
+  const [subMode, setSubMode] = useState<DefenseSubMode>("sparring");
 
   // Setup state
   const [selectedOpponent, setSelectedOpponent] = useState<DefenseOpponent | null>(null);
@@ -348,6 +354,38 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </p>
         </div>
 
+        {/* Sub-mode Toggle: Sparring vs Library */}
+        <div className="flex items-center justify-center gap-2 p-1 rounded-lg bg-black/20 border border-border/50 max-w-md mx-auto">
+          <button
+            onClick={() => setSubMode("sparring")}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              subMode === "sparring"
+                ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-md"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Swords className="h-4 w-4" />
+            Sparring Arena
+          </button>
+          <button
+            onClick={() => setSubMode("library")}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              subMode === "library"
+                ? "bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-md"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <BookOpen className="h-4 w-4" />
+            3AM Library
+          </button>
+        </div>
+
+        {/* Render Library or Sparring Setup */}
+        {subMode === "library" ? (
+          <InterdenominationalLibrary />
+        ) : (
+        <>
+
         {/* Opponent Grid */}
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
@@ -531,6 +569,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           <Swords className="h-5 w-5 mr-2" />
           Begin Sparring
         </Button>
+        </>)}
       </div>
     );
   }
