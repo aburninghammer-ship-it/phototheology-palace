@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
   Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
-  FlaskConical, Target,
+  FlaskConical, Target, Save, Archive, Trash2, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,6 +42,14 @@ interface ChatMessage {
 
 type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack";
 
+interface ArsenalWeapon {
+  id: string;
+  argument: string;
+  analysis: string;
+  topic: string;
+  savedAt: string;
+}
+
 export function DefenseMode({ churchId }: DefenseModeProps) {
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -74,6 +82,40 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [weaponTopic, setWeaponTopic] = useState("");
   const [weaponAnalysis, setWeaponAnalysis] = useState<string | null>(null);
   const [weaponLoading, setWeaponLoading] = useState(false);
+
+  // Arsenal state (saved weapons)
+  const [arsenal, setArsenal] = useState<ArsenalWeapon[]>(() => {
+    try {
+      const saved = localStorage.getItem("defense-arsenal");
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  const [showArsenal, setShowArsenal] = useState(false);
+  const [weaponSaved, setWeaponSaved] = useState(false);
+
+  const saveToArsenal = () => {
+    if (!weaponInput.trim() || !weaponAnalysis) return;
+    const weapon: ArsenalWeapon = {
+      id: crypto.randomUUID(),
+      argument: weaponInput.trim(),
+      analysis: weaponAnalysis,
+      topic: weaponTopic
+        ? DEFENSE_TOPICS.find((t) => t.id === weaponTopic)?.name || weaponTopic
+        : "General",
+      savedAt: new Date().toISOString(),
+    };
+    const updated = [weapon, ...arsenal];
+    setArsenal(updated);
+    localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+    setWeaponSaved(true);
+    setTimeout(() => setWeaponSaved(false), 2000);
+  };
+
+  const removeFromArsenal = (weaponId: string) => {
+    const updated = arsenal.filter((w) => w.id !== weaponId);
+    setArsenal(updated);
+    localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+  };
 
   // Analyze This Attack state
   const [attackInput, setAttackInput] = useState("");
@@ -535,19 +577,93 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                     <div className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">
                       {weaponAnalysis}
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { setWeaponAnalysis(null); setWeaponInput(""); setWeaponTopic(""); }}
-                      className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-                    >
-                      <RotateCcw className="h-3.5 w-3.5 mr-1" />
-                      Analyze Another
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => { setWeaponAnalysis(null); setWeaponInput(""); setWeaponTopic(""); setWeaponSaved(false); }}
+                        className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                      >
+                        <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                        Analyze Another
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={saveToArsenal}
+                        disabled={weaponSaved}
+                        className={weaponSaved
+                          ? "bg-green-600 text-white"
+                          : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+                        }
+                      >
+                        {weaponSaved ? (
+                          <><Shield className="h-3.5 w-3.5 mr-1" /> Saved!</>
+                        ) : (
+                          <><Save className="h-3.5 w-3.5 mr-1" /> Save to Arsenal</>
+                        )}
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
             )}
+
+            {/* ─── ARSENAL ───────────────────────────────────────── */}
+            <div className="border-t border-border/30 pt-4">
+              <button
+                onClick={() => setShowArsenal(!showArsenal)}
+                className="flex items-center gap-2 text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors w-full"
+              >
+                <Archive className="h-4 w-4" />
+                My Arsenal ({arsenal.length} weapon{arsenal.length !== 1 ? "s" : ""})
+                {showArsenal ? <ChevronUp className="h-4 w-4 ml-auto" /> : <ChevronDown className="h-4 w-4 ml-auto" />}
+              </button>
+              {showArsenal && (
+                <div className="mt-3 space-y-3">
+                  {arsenal.length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      No weapons saved yet. Analyze an argument and save it to build your arsenal.
+                    </p>
+                  ) : (
+                    arsenal.map((weapon) => (
+                      <motion.div key={weapon.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
+                        <Card variant="glass" className="border-cyan-500/20 bg-cyan-950/10">
+                          <CardContent className="p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-xs border-cyan-500/30 text-cyan-400">
+                                  {weapon.topic}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(weapon.savedAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-muted-foreground hover:text-red-400"
+                                onClick={() => removeFromArsenal(weapon.id)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                            <p className="text-xs text-foreground/80 line-clamp-2">{weapon.argument}</p>
+                            <details className="group">
+                              <summary className="text-xs text-cyan-400 cursor-pointer hover:text-cyan-300">
+                                View analysis
+                              </summary>
+                              <div className="mt-2 text-xs text-foreground/70 whitespace-pre-wrap leading-relaxed border-t border-border/20 pt-2">
+                                {weapon.analysis}
+                              </div>
+                            </details>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         ) : subMode === "analyze-attack" ? (
           /* ─── ANALYZE THIS ATTACK TAB ───────────────────────────── */
