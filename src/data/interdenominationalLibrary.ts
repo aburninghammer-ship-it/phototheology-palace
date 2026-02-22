@@ -483,7 +483,7 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             quoteExcerpt:
               "\u201CWe must not imagine that the coming of Christ has freed us from the authority of the law: for it is the eternal rule of a devout and holy life, and must, therefore, be as unchangeable, as the justice of God, which it embraced, is constant and uniform.\u201D",
             primarySourceUrl:
-              "https://www.ccel.org/ccel/calvin/calcom31.ix.xxvii.html",
+              "https://www.ccel.org/ccel/calvin/calcom31.ix.xliii.html",
             contextNotes:
               "Calvin commenting directly on Christ\u2019s words in Matthew 5:17 (\u2018I have not come to abolish the Law\u2019). Calvin explicitly calls the law \u2018unchangeable.\u2019",
             agreementScope:
@@ -612,7 +612,7 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             year: "1898",
             locator: "p. 14",
             quoteExcerpt:
-              "\u201CThe commandments did not originate with Moses, nor were they done away with when the Mosaic Law was fulfilled in Christ, and many of its ceremonies and regulations abolished. They are not discoveries that men made. They are from heaven, and indicate the nature and purpose of God Himself. \u2018The Decalogue is the most perfect code of laws existing. Its simplicity, comprehensiveness, ethical depths, and universal character stamp it as divine; and in its majestic simplicity, supplying the highest and best demands of the human heart, it may well be placed beside that other divine production, the Lord\u2019s Prayer.\u2019\u201D",
+              "\u201CWe call it the \u2018Mosaic\u2019 Law, but it has been well said that the commandments did not originate with Moses, nor were they done away with when the Mosaic Law was fulfilled in Christ, and many of its ceremonies and regulations abolished. They are not discoveries that men made. They are from heaven, and indicate the nature and purpose of God Himself. \u2018The Decalogue is the most perfect code of laws existing. Its simplicity, comprehensiveness, ethical depths, and universal character stamp it as divine; and in its majestic simplicity, supplying the highest and best demands of the human heart, it may well be placed beside that other divine production, the Lord\u2019s Prayer.\u2019\u201D",
             primarySourceUrl:
               "https://archive.org/details/weighedandwantin00mood",
             contextNotes:
@@ -752,7 +752,7 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
             quoteExcerpt:
               "\u201CI wonder exceedingly how it came to be imputed to me that I should reject the law or the ten commandments\u2026 Can anyone think that sin exists where there is no law? Whoever abrogates the law, must of necessity abrogate sin also.\u201D",
             primarySourceUrl:
-              "https://archive.org/details/luthersworksamer55luth",
+              "https://archive.org/details/luthersworksamer47luth",
             contextNotes:
               "Luther himself, the great Reformer of \u2018sola fide,\u2019 forcefully denies that he ever rejected the Ten Commandments. His logic is airtight: no law = no sin. This powerfully refutes the claim that the Reformation abolished the Decalogue.",
             agreementScope:
