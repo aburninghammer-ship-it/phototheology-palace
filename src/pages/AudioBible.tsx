@@ -86,13 +86,6 @@ const CURATED_STORIES: BiblicalStory[] = [
   { id: "garden-gethsemane", title: "The Garden of Gethsemane", book: "Matthew", reference: "Matthew 26:36-56", description: "Christ's agony and surrender before the cross", icon: "🌿" },
   { id: "daniel-lions-den", title: "Daniel in the Lions' Den", book: "Daniel", reference: "Daniel 6", description: "Faithfulness under decree — the lions' mouths are shut", icon: "🦁" },
   { id: "abraham-isaac-moriah", title: "Abraham & Isaac on Mount Moriah", book: "Genesis", reference: "Genesis 22", description: "The ultimate test of faith — God will provide Himself a lamb", icon: "🐑" },
-  { id: "elijah-mount-carmel", title: "Elijah on Mount Carmel", book: "1 Kings", reference: "1 Kings 18", description: "One prophet against 450 — fire falls from heaven", icon: "🔥" },
-  { id: "three-hebrews-furnace", title: "Three Hebrews in the Furnace", book: "Daniel", reference: "Daniel 3", description: "They would not bow — and a fourth figure walks in the fire", icon: "🔥" },
-  { id: "red-sea-crossing", title: "The Parting of the Red Sea", book: "Exodus", reference: "Exodus 14", description: "Trapped between Pharaoh and the deep — God makes a way", icon: "🌊" },
-  { id: "jacob-wrestles-angel", title: "Jacob Wrestles the Angel", book: "Genesis", reference: "Genesis 32:22-32", description: "A man broken becomes a prince — 'I will not let you go'", icon: "💪" },
-  { id: "joseph-sold-brothers", title: "Joseph Sold by His Brothers", book: "Genesis", reference: "Genesis 37", description: "A dreamer cast into a pit — the road to the palace begins", icon: "🕳️" },
-  { id: "road-to-emmaus", title: "The Road to Emmaus", book: "Luke", reference: "Luke 24:13-35", description: "Two disciples walk with the risen Christ unknowingly", icon: "🛤️" },
-  { id: "paul-shipwreck", title: "Paul's Shipwreck", book: "Acts", reference: "Acts 27", description: "Storm, shipwreck, and survival — God's promise holds", icon: "⛵" },
 ];
 type CommentaryMode = "verse" | "chapter";
 
