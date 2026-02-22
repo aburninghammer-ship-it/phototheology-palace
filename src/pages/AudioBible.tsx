@@ -259,15 +259,10 @@ export default function AudioBible() {
     }
   };
 
-  // Add chapter to custom list (with current mode)
+  // Add chapter to custom list (with current mode) — duplicates allowed for different modes
   const addCustomChapter = () => {
     const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
-    const exists = customChapters.some(
-      (c) => c.book === customBook && c.chapter === customChapter && c.mode === mode && !c.storyId
-    );
-    if (!exists) {
-      setCustomChapters([...customChapters, { book: customBook, chapter: customChapter, mode }]);
-    }
+    setCustomChapters([...customChapters, { book: customBook, chapter: customChapter, mode }]);
     // Auto-increment to next chapter for quick sequential adding
     const maxCh = getChapterCount(customBook);
     if (customChapter < maxCh) {
