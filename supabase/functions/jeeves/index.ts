@@ -7289,7 +7289,7 @@ CRITICAL RULES:
 
     } else if (mode === "defense-analyze-weapon") {
       // Defense Mode: Analyze a disciple's written defense as a "weapon" — break down strengths, weaknesses, and forge it stronger
-      const userWeaponText = requestBody.message || requestBody.weaponText || "";
+      const userWeaponText = requestBody.userArgument || requestBody.message || requestBody.weaponText || "";
       const topicName = requestBody.defenseTopicName || requestBody.topic || "General theology";
 
       systemPrompt = `${MASTER_IDENTITY}
