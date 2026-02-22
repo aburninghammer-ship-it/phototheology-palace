@@ -1898,6 +1898,332 @@ export const DOCTRINE_TOPICS: DoctrineTopic[] = [
           },
         ],
       },
+      {
+        id: "hist-2",
+        title:
+          "The day-year principle was widely held by Reformation and post-Reformation scholars",
+        order: 2,
+        claimSummary:
+          "The prophetic day = literal year principle (Numbers 14:34; Ezekiel 4:6) was not an SDA invention. It was the standard Protestant hermeneutical tool for interpreting Daniel\u2019s time prophecies for centuries before Adventism existed.",
+        bibleAnchors: [
+          "Numbers 14:34",
+          "Ezekiel 4:6",
+          "Daniel 7:25",
+          "Daniel 8:14",
+          "Daniel 9:24-27",
+          "Revelation 11:3",
+          "Revelation 12:6",
+          "Revelation 13:5",
+        ],
+        witnesses: [
+          {
+            id: "hist-2-luther",
+            author: "Martin Luther",
+            tradition: "Lutheran (Reformer)",
+            workTitle:
+              "Supputatio annorum mundi (Chronological reckoning of the ages of the world)",
+            year: "1541",
+            locator: "Chronological tables and Daniel commentary",
+            quoteExcerpt:
+              "Luther applied the day-year principle to Daniel\u2019s prophecies in his chronological calculations, interpreting the 70 weeks of Daniel 9 as 490 literal years pointing to Christ\u2019s ministry.",
+            primarySourceUrl:
+              "https://archive.org/details/luthersworksamer35luth",
+            contextNotes:
+              "Martin Luther (1483\u20131546), the father of the Protestant Reformation, used the day-year principle as standard prophetic hermeneutic. His interpretation of Daniel 9\u2019s 70 weeks as 490 years is universally accepted even today.",
+            agreementScope:
+              "Luther\u2019s use of the day-year principle for Daniel 9 supports SDA hermeneutics; Luther did not apply it to Daniel 8:14 as SDAs do.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-bullinger",
+            author: "Heinrich Bullinger",
+            tradition: "Reformed (Swiss, Zurich)",
+            workTitle:
+              "A Hundred Sermons upon the Apocalypse (In Apocalypsim conciones centum)",
+            year: "1557",
+            locator: "Sermons on the prophetic time periods",
+            quoteExcerpt:
+              "Bullinger applied the day-year principle to interpret the 1260 days of Revelation 11\u201312 as 1260 years of papal dominion, placing him squarely within the historicist day-year tradition.",
+            primarySourceUrl:
+              "https://archive.org/search?query=bullinger+apocalypse+sermons",
+            contextNotes:
+              "Heinrich Bullinger (1504\u20131575) succeeded Zwingli as head of the Zurich Reformed Church. His 100 sermons on Revelation systematically applied the day-year principle to prophetic time periods.",
+            agreementScope:
+              "Supports day-year as standard Reformed hermeneutic; Bullinger\u2019s specific timeline identifications differ from SDA.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-osiander",
+            author: "Andreas Osiander",
+            tradition: "Lutheran (Reformer)",
+            workTitle:
+              "Conjecturae de ultimis temporibus (Conjectures on the Last Times)",
+            year: "1544",
+            locator: "Prophetic chronology sections",
+            quoteExcerpt:
+              "Osiander applied the day-year principle to calculate the duration of the Antichrist\u2019s reign using Daniel 7:25 and Revelation 13:5, interpreting 1260 days as 1260 years.",
+            primarySourceUrl:
+              "https://archive.org/search?query=osiander+conjecturae+ultimis+temporibus",
+            contextNotes:
+              "Andreas Osiander (1498\u20131552) was a prominent Lutheran Reformer in N\u00FCrnberg. His prophetic calculations using the day-year principle influenced subsequent Protestant eschatology.",
+            agreementScope:
+              "Confirms day-year as a Reformation-era hermeneutic; Osiander\u2019s specific calculations differ from SDA.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-napier",
+            author: "John Napier",
+            tradition: "Presbyterian (Scottish)",
+            workTitle:
+              "A Plaine Discovery of the Whole Revelation of Saint John",
+            year: "1593",
+            locator: "Propositions on prophetic time (opening sections)",
+            quoteExcerpt:
+              "\u201CIn propheticall dates of daies, weekes, and moneths, euerie common day is taken for a yeare.\u201D",
+            primarySourceUrl:
+              "https://archive.org/details/plainediscouerie00napi",
+            contextNotes:
+              "John Napier (1550\u20131617), the inventor of logarithms and one of the greatest mathematicians in history, wrote this systematic exposition of Revelation applying the day-year principle throughout. His mathematical precision lent credibility to prophetic chronology.",
+            agreementScope:
+              "Napier\u2019s explicit statement of the day-year rule is as clear as any SDA formulation. His mathematical mind saw it as self-evident from Scripture.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-melanchthon",
+            author: "Philip Melanchthon",
+            tradition: "Lutheran (Reformer)",
+            workTitle:
+              "Commentarius in Danielem (Commentary on Daniel)",
+            year: "1543",
+            locator: "Commentary on Daniel 9:24\u201327",
+            quoteExcerpt:
+              "Melanchthon interpreted the 70 weeks of Daniel 9 as 490 years using the day-year principle, and applied it to calculate the chronology from the Persian decree to the coming of Christ.",
+            primarySourceUrl:
+              "https://archive.org/search?query=melanchthon+commentary+daniel",
+            contextNotes:
+              "Philip Melanchthon (1497\u20131560), Luther\u2019s closest collaborator and the author of the Augsburg Confession, applied the day-year principle to Daniel\u2019s time prophecies in his Daniel commentary.",
+            agreementScope:
+              "Melanchthon\u2019s day-year usage for Daniel 9 is foundational; he did not extend it to 1844.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-newton-isaac",
+            author: "Sir Isaac Newton",
+            tradition: "Early modern Protestant (historicist)",
+            workTitle:
+              "Observations upon the Prophecies of Daniel, and the Apocalypse of St. John",
+            year: "1733",
+            locator: "Part I, chapters on the prophetic time periods",
+            quoteExcerpt:
+              "\u201CIn the prophetick language, a day is put for a year\u2026 the 1260 days are 1260 years.\u201D",
+            primarySourceUrl:
+              "https://www.gutenberg.org/files/16878/16878-h/16878-h.htm",
+            contextNotes:
+              "Sir Isaac Newton (1643\u20131727), arguably the greatest scientist in history, spent more time studying Bible prophecy than physics. He explicitly stated the day-year principle and applied it throughout his prophetic calculations.",
+            agreementScope:
+              "Newton\u2019s explicit day-year formulation supports SDA hermeneutics. Newton\u2019s own timeline calculations differ from SDA but the principle is identical.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-newton-thomas",
+            author: "Thomas Newton",
+            tradition: "Anglican (Bishop of Bristol)",
+            workTitle:
+              "Dissertations on the Prophecies, Which Have Remarkably Been Fulfilled",
+            year: "1754",
+            locator: "Dissertations on Daniel 7 and Revelation 13",
+            quoteExcerpt:
+              "Bishop Newton systematically applied the day-year principle to Daniel\u2019s time prophecies and the 1260 days of Revelation, calculating the papal period and identifying it with the little horn.",
+            primarySourceUrl:
+              "https://archive.org/details/dissertationson00newtgoog",
+            contextNotes:
+              "Thomas Newton (1704\u20131782), Bishop of Bristol, produced one of the most widely read prophecy commentaries of the 18th century. His Dissertations applied the day-year principle to identify the papal Antichrist and calculate its reign.",
+            agreementScope:
+              "Day-year applied to the same prophetic texts SDAs use; Bishop Newton\u2019s calculations differ on specifics.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-wesley",
+            author: "John Wesley",
+            tradition: "Methodist",
+            workTitle:
+              "Explanatory Notes upon the New Testament",
+            year: "1755",
+            locator: "Notes on Revelation 11\u201313 (time prophecies)",
+            quoteExcerpt:
+              "Wesley adopted the day-year principle in his Revelation commentary, interpreting the prophetic time periods of 1260 days, 42 months, and \u2018time, times, and half a time\u2019 as representing 1260 literal years.",
+            primarySourceUrl:
+              "https://www.ccel.org/ccel/wesley/notes.viii.html",
+            contextNotes:
+              "John Wesley (1703\u20131791), founder of Methodism and one of the most influential Protestant leaders in history, applied the day-year principle in his widely-read Explanatory Notes. Wesley\u2019s adoption of this principle shows it was mainstream Protestant hermeneutics.",
+            agreementScope:
+              "Wesley\u2019s use of the day-year principle is identical to SDA application; his specific historical identifications vary.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-james-i",
+            author: "King James I of England",
+            tradition: "Anglican (Royal, Reformed-leaning)",
+            workTitle:
+              "A Paraphrase upon the Revelation of the Apostle S. John",
+            year: "1588",
+            locator: "Commentary on prophetic time periods",
+            quoteExcerpt:
+              "King James applied the day-year principle to the 1260 days of Revelation, interpreting them as 1260 years and identifying the papal system as the Antichrist of prophecy.",
+            primarySourceUrl:
+              "https://archive.org/search?query=james+paraphrase+revelation+1588",
+            contextNotes:
+              "King James I (1566\u20131625), the very king who authorized the King James Bible, wrote a commentary on Revelation before ascending the English throne. He applied the day-year principle and identified the Pope as Antichrist \u2014 the same method and identification SDAs use.",
+            agreementScope:
+              "The king who gave us the KJV used the day-year principle and identified papal Antichrist. Powerful historical precedent for SDA hermeneutics.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-mede",
+            author: "Joseph Mede",
+            tradition: "Anglican (Cambridge scholar)",
+            workTitle:
+              "Clavis Apocalyptica (Key of the Revelation)",
+            year: "1627",
+            locator: "Synchronistic tables and time-period analysis",
+            quoteExcerpt:
+              "Mede\u2019s systematic framework explicitly applied the day-year principle, synchronizing the prophetic time periods of Revelation (1260 days, 42 months) as 1260 years and mapping them onto church history.",
+            primarySourceUrl:
+              "https://archive.org/details/worksofjosephmed00medeuoft",
+            contextNotes:
+              "Joseph Mede (1586\u20131638), Fellow of Christ\u2019s College Cambridge, was the father of systematic historicist interpretation. His Clavis Apocalyptica established the day-year principle as the standard tool for Protestant prophetic chronology.",
+            agreementScope:
+              "Mede\u2019s day-year application is the foundation that later historicists (including Adventists) built upon.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-goodwin",
+            author: "Thomas Goodwin",
+            tradition: "Puritan (Independent/Congregationalist)",
+            workTitle:
+              "An Exposition of the Revelation, in Works, Vol. 3",
+            year: "c. 1639 (published posthumously 1683)",
+            locator: "Exposition on Revelation 11\u201313",
+            quoteExcerpt:
+              "Goodwin applied the day-year principle to the prophetic time periods, interpreting the 1260 days as 1260 years and mapping the rise and fall of the papal Antichrist onto church history.",
+            primarySourceUrl:
+              "https://archive.org/search?query=thomas+goodwin+works+exposition+revelation",
+            contextNotes:
+              "Thomas Goodwin (1600\u20131680) was a leading Puritan theologian, president of Magdalen College Oxford under Cromwell, and advisor to Oliver Cromwell. His Revelation exposition used the day-year principle throughout.",
+            agreementScope:
+              "Puritan day-year usage confirms the principle was mainstream Reformed hermeneutics; Goodwin\u2019s specific dates differ from SDA.",
+            credibilityGrade: "A",
+          },
+          {
+            id: "hist-2-petri",
+            author: "Johann Petri",
+            tradition: "Lutheran",
+            workTitle:
+              "Prussian historicist writings on Daniel and Revelation",
+            year: "c. 1768",
+            locator: "Prophetic chronology sections",
+            quoteExcerpt:
+              "Petri applied the day-year principle and arrived at the date 1847 for the ending of the 2300 days of Daniel 8:14, remarkably close to the 1844 date that William Miller would later calculate independently.",
+            primarySourceUrl:
+              "https://archive.org/search?query=johann+petri+daniel+prophecy",
+            contextNotes:
+              "Johann Petri was a Prussian Lutheran who applied the day-year principle to Daniel 8:14 and arrived at a date near 1844 \u2014 decades before the Millerite movement. This demolishes the claim that the 2300-day/year calculation was invented by William Miller.",
+            agreementScope:
+              "A non-SDA, pre-Millerite scholar independently arriving near the 1844 date using the same day-year method. Powerful evidence that the calculation is not an SDA invention.",
+            credibilityGrade: "B",
+          },
+          {
+            id: "hist-2-helwig",
+            author: "Andreas Helwig",
+            tradition: "Lutheran",
+            workTitle:
+              "Antichristus Romanus (The Roman Antichrist)",
+            year: "1612",
+            locator: "Chronological calculations on Daniel and Revelation",
+            quoteExcerpt:
+              "Helwig applied the day-year principle to the prophetic time periods and is credited with being the first scholar to identify the Roman numeral value of the papal title \u2018Vicarius Filii Dei\u2019 as 666 (Revelation 13:18).",
+            primarySourceUrl:
+              "https://archive.org/search?query=helwig+antichristus+romanus",
+            contextNotes:
+              "Andreas Helwig (1572\u20131643) was a Lutheran theologian and professor. His identification of 666 with the papal title and his day-year calculations placed him firmly within the historicist prophetic tradition.",
+            agreementScope:
+              "Day-year principle applied by a Lutheran academic a century before SDA existed; the 666 calculation predates SDA use of it.",
+            credibilityGrade: "B",
+          },
+          {
+            id: "hist-2-valpy",
+            author: "Richard Valpy",
+            tradition: "Anglican",
+            workTitle:
+              "An Inquiry into the Nature and Extent of the Prophetic Time",
+            year: "1815",
+            locator: "Central thesis throughout",
+            quoteExcerpt:
+              "Valpy dedicated an entire treatise to defending the day-year principle as the correct hermeneutical key for interpreting prophetic time periods in Daniel and Revelation.",
+            primarySourceUrl:
+              "https://archive.org/search?query=valpy+prophetic+time",
+            contextNotes:
+              "Richard Valpy (1754\u20131836) was a prominent Anglican clergyman and headmaster of Reading School. His treatise specifically defending the day-year principle shows it was considered an established scholarly position worth formal academic defense.",
+            agreementScope:
+              "A dedicated academic defense of the very principle SDA uses; predates the Millerite movement.",
+            credibilityGrade: "B",
+          },
+          {
+            id: "hist-2-wood",
+            author: "Hans Wood",
+            tradition: "Anglican / Independent (Irish)",
+            workTitle:
+              "A Dissertation on the Principal Prophecies",
+            year: "1787",
+            locator: "Prophetic chronology analysis",
+            quoteExcerpt:
+              "Wood applied the day-year principle to Daniel 8:14 and calculated the 2300 days as ending around 1880, contributing to the growing pre-Millerite tradition of applying the day-year rule to Daniel\u2019s longest time prophecy.",
+            primarySourceUrl:
+              "https://archive.org/search?query=hans+wood+dissertation+prophecies",
+            contextNotes:
+              "Hans Wood\u2019s 1787 calculation is significant because it shows that the day-year interpretation of Daniel 8:14 was already being applied by non-SDA scholars before the Millerite movement began.",
+            agreementScope:
+              "Pre-Millerite application of day-year to Daniel 8:14; supports the legitimacy of the hermeneutical method even where the specific date differs.",
+            credibilityGrade: "B",
+          },
+          {
+            id: "hist-2-galloway",
+            author: "Joseph Galloway",
+            tradition: "Anglican (American loyalist)",
+            workTitle:
+              "Brief Commentaries upon Such Parts of the Revelation and Other Prophecies as Immediately Refer to the Present Times",
+            year: "1802",
+            locator: "Prophetic time period calculations",
+            quoteExcerpt:
+              "Galloway applied the day-year principle to the 1260 days and other prophetic time periods, mapping them onto the history of papal Rome and calculating dates for prophetic fulfillment in his own era.",
+            primarySourceUrl:
+              "https://archive.org/search?query=galloway+brief+commentaries+revelation",
+            contextNotes:
+              "Joseph Galloway (1731\u20131803), a prominent American loyalist who fled to London, published his prophetic commentary applying the day-year principle, adding to the growing chorus of pre-Millerite day-year interpreters.",
+            agreementScope:
+              "Another pre-Millerite voice using the day-year principle; Galloway\u2019s dates differ from SDA but the method is the same.",
+            credibilityGrade: "B",
+          },
+          {
+            id: "hist-2-whitby",
+            author: "Daniel Whitby",
+            tradition: "Anglican",
+            workTitle:
+              "A Paraphrase and Commentary on the New Testament",
+            year: "1703",
+            locator: "Notes on Revelation 11\u201313",
+            quoteExcerpt:
+              "Whitby applied the day-year principle to the prophetic time periods in Revelation, interpreting 1260 days as 1260 years in his widely-read Anglican commentary.",
+            primarySourceUrl:
+              "https://archive.org/search?query=whitby+paraphrase+commentary+new+testament",
+            contextNotes:
+              "Daniel Whitby (1638\u20131726) was an influential Anglican divine whose NT commentary was widely read. His use of the day-year principle demonstrates it was standard Anglican hermeneutics in the early 18th century.",
+            agreementScope:
+              "Standard Anglican day-year usage; Whitby\u2019s eschatological framework (postmillennialism) differs from SDA but the hermeneutical tool is identical.",
+            credibilityGrade: "B",
+          },
+        ],
+      },
     ],
   },
 
