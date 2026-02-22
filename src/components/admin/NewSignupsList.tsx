@@ -36,11 +36,13 @@ export function NewSignupsList() {
         startDate.setDate(startDate.getDate() - parseInt(timeRange));
       }
 
+      // Only show card-verified signups (exclude abandoned accounts with manual/free)
       const { data, error } = await supabase
         .from("profiles")
         .select("id, display_name, subscription_tier, subscription_status, payment_source, created_at")
         .gte("created_at", startDate.toISOString())
         .in("subscription_status", ["active", "trial", "trialing"])
+        .not("payment_source", "eq", "manual")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
