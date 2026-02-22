@@ -46,6 +46,7 @@ type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attac
 
 interface ArsenalWeapon {
   id: string;
+  name?: string;
   argument: string;
   analysis: string;
   topic: string;
@@ -191,6 +192,15 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     const updated = arsenal.filter((w) => w.id !== weaponId);
     setArsenal(updated);
     localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+  };
+
+  const renameWeapon = (weaponId: string, newName: string) => {
+    const updated = arsenal.map((w) => w.id === weaponId ? { ...w, name: newName } : w);
+    setArsenal(updated);
+    localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+    if (selectedArsenalWeapon?.id === weaponId) {
+      setSelectedArsenalWeapon({ ...selectedArsenalWeapon, name: newName });
+    }
   };
 
   // Arsenal room state
@@ -887,7 +897,19 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                     {/* Weapon header */}
                     <div className="text-center space-y-2">
                       <span className="text-5xl block">{getWeaponInfo(selectedArsenalWeapon.topic).emoji}</span>
-                      <h4 className="text-lg font-bold text-emerald-300">{getWeaponInfo(selectedArsenalWeapon.topic).name}</h4>
+                      <input
+                        type="text"
+                        defaultValue={selectedArsenalWeapon.name || getWeaponInfo(selectedArsenalWeapon.topic).name}
+                        onBlur={(e) => {
+                          const val = e.target.value.trim();
+                          if (val && val !== getWeaponInfo(selectedArsenalWeapon.topic).name) {
+                            renameWeapon(selectedArsenalWeapon.id, val);
+                          }
+                        }}
+                        onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+                        className="text-lg font-bold text-emerald-300 bg-transparent border-b border-dashed border-emerald-500/40 text-center w-full focus:outline-none focus:border-emerald-400 placeholder:text-emerald-500/50"
+                        title="Click to rename weapon"
+                      />
                       <Badge className="bg-emerald-600/30 text-emerald-300 border-emerald-500/30">
                         {selectedArsenalWeapon.topic}
                       </Badge>
@@ -1008,7 +1030,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                                     <span className="text-2xl">{info.emoji}</span>
                                   </div>
                                   {/* Weapon nameplate */}
-                                  <p className="text-xs font-bold text-emerald-300 leading-tight">{info.name}</p>
+                                  <p className="text-xs font-bold text-emerald-300 leading-tight">{weapon.name || info.name}</p>
                                   <p className="text-[10px] text-muted-foreground line-clamp-2 leading-snug">{weapon.argument.slice(0, 80)}...</p>
                                   <span className="text-[9px] text-emerald-500/60">{new Date(weapon.savedAt).toLocaleDateString()}</span>
                                 </CardContent>
