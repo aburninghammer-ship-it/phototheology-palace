@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const PLAN_PRICES = {
   essential_monthly: { priceId: "price_1SZNyiFGDAd3RU8I4JHYEsEi", amount: 1500, label: "Essential Monthly" },
-  essential_annual: { priceId: "price_1SZNyuFGDAd3RU8IjeGIvPEb", amount: 9900, label: "Essential Annual" },
+  essential_annual: { priceId: "price_1SZNyuFGDAd3RU8IjeGIvPEb", amount: 15000, label: "Essential Annual" },
 };
 
 serve(async (req) => {
