@@ -234,8 +234,8 @@ export const JeevesWidget = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="fixed bottom-20 right-3 md:bottom-6 md:right-5 z-[998] w-[min(92vw,22rem)] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border bg-background"
-            style={{ height: "min(480px, calc(100vh - 160px))" }}
+            className="fixed bottom-20 right-3 md:bottom-6 md:right-[22rem] z-[998] w-[min(92vw,24rem)] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border bg-background"
+            style={{ height: "min(600px, calc(100vh - 100px))" }}
           >
             {/* Header */}
             <div

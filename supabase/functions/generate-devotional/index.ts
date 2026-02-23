@@ -460,7 +460,7 @@ OUTPUT FORMAT - Return a JSON array of devotional days:
 
     // RAG corpus injection
     const ragResult = await getCorpusContext({
-      query: `${resolvedTheme || resolvedVerse || 'devotional spiritual growth'}`.slice(0, 4000),
+      query: `${theme || 'devotional spiritual growth'}`.slice(0, 4000),
       matchCount: 3,
       supabaseClient: supabase,
     });
