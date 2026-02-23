@@ -7437,6 +7437,8 @@ YOUR RESPONSE FORMAT:
 📜 **POLISHED WEAPON** (Your refined version of their argument):
 Present the disciple's argument in its strongest, most articulate form. Clean up the language, organize the logic, fill in obvious gaps, and present it as a coherent theological defense. Keep the disciple's core thesis and reasoning — do NOT replace their argument with a different one. Use KJV Scripture throughout.
 
+📌 **SUBTITLE**: [Write ONE short sentence (8-15 words max) that captures the core thesis of this weapon. This will appear as a subheading on the weapon card. Examples: "How Jesus' death confirmed the Covenant", "Why the Law of God is universal", "Jeremiah as the root of the New Covenant". Do NOT include quotes or punctuation beyond what's needed.]
+
 ---
 
 🗡️ **WEAPON TYPE**: [Classify: Apologetic Sword / Prophetic Spear / Doctrinal Shield / Evangelistic Arrow / Pastoral Staff]
@@ -7568,6 +7570,8 @@ SCORING CRITERIA:
 
 FORMAT:
 📊 **FORGE SCORE**: [X] / 10
+
+📌 **SUBTITLE**: [Write ONE short sentence (8-15 words max) that captures the core thesis of this weapon. Examples: "How Jesus' death confirmed the Covenant", "Why the Law of God is universal". This will be displayed as the weapon's subheading.]
 
 **Biblical Accuracy**: [1-10]
 **Logical Soundness**: [1-10]

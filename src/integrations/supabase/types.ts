@@ -2910,6 +2910,7 @@ export type Database = {
           is_curated: boolean
           likes: number
           score: number
+          subtitle: string | null
           topic: string
           updated_at: string
           user_id: string
@@ -2924,6 +2925,7 @@ export type Database = {
           is_curated?: boolean
           likes?: number
           score: number
+          subtitle?: string | null
           topic: string
           updated_at?: string
           user_id: string
@@ -2938,6 +2940,7 @@ export type Database = {
           is_curated?: boolean
           likes?: number
           score?: number
+          subtitle?: string | null
           topic?: string
           updated_at?: string
           user_id?: string
@@ -3664,6 +3667,7 @@ export type Database = {
           id: string
           name: string | null
           saved_at: string
+          subtitle: string | null
           topic: string
           user_id: string
         }
@@ -3674,6 +3678,7 @@ export type Database = {
           id?: string
           name?: string | null
           saved_at?: string
+          subtitle?: string | null
           topic?: string
           user_id: string
         }
@@ -3684,6 +3689,7 @@ export type Database = {
           id?: string
           name?: string | null
           saved_at?: string
+          subtitle?: string | null
           topic?: string
           user_id?: string
         }
