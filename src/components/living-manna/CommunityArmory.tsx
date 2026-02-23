@@ -345,12 +345,12 @@ export function CommunityArmory({ onGoToForge }: CommunityArmoryProps) {
             </Button>
           </div>
 
-          <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-3 lg:grid-cols-4"} gap-3`}>
+            <div className={`grid ${isMobile ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-2"} gap-4`}>
             {filtered.map((weapon) => (
               <motion.div
                 key={weapon.id}
-                whileHover={{ scale: 1.03, y: -2 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setSelectedWeapon(weapon)}
                 className="cursor-pointer"
               >
@@ -360,31 +360,59 @@ export function CommunityArmory({ onGoToForge }: CommunityArmoryProps) {
                     weapon.is_curated ? "ring-1 ring-purple-500/30" : ""
                   }`}
                 >
-                  <CardContent className="p-3 flex flex-col items-center text-center space-y-2">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-900/60 to-orange-900/40 border border-amber-500/30 flex items-center justify-center shadow-inner">
-                      <span className="text-2xl">{weapon.weapon_emoji}</span>
-                    </div>
-                    <p className="text-xs font-bold text-amber-300 leading-tight">{weapon.weapon_name}</p>
-                    <Badge variant="outline" className="text-[10px] border-amber-500/20 text-amber-400/80">
-                      {weapon.topic}
-                    </Badge>
-                    <p className="text-[10px] text-muted-foreground line-clamp-2 leading-snug">
-                      {weapon.argument.slice(0, 80)}...
-                    </p>
-                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-                      <span className="flex items-center gap-0.5">
-                        <Heart className={`h-3 w-3 ${weapon.user_liked ? "fill-red-400 text-red-400" : ""}`} />
+                  <CardContent className="p-4 space-y-3">
+                    {/* Header row */}
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-900/60 to-orange-900/40 border border-amber-500/30 flex items-center justify-center shadow-inner shrink-0">
+                        <span className="text-xl">{weapon.weapon_emoji}</span>
+                      </div>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <p className="text-sm font-bold text-amber-300 leading-tight">{weapon.weapon_name}</p>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <Badge variant="outline" className="text-[10px] border-amber-500/20 text-amber-400/80">
+                            {weapon.topic}
+                          </Badge>
+                          <Badge variant="outline" className="text-[10px] border-amber-500/20 text-amber-400/70">
+                            <Trophy className="h-2.5 w-2.5 mr-0.5" />{weapon.score}/10
+                          </Badge>
+                          {weapon.is_curated && (
+                            <Badge className="text-[9px] bg-purple-600/20 text-purple-300 border-purple-500/20">
+                              <Sparkles className="h-2.5 w-2.5 mr-0.5" />Curated
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleLike(weapon.id); }}
+                        disabled={!user || likingId === weapon.id}
+                        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-all shrink-0 ${
+                          weapon.user_liked
+                            ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                            : "bg-muted/20 text-muted-foreground hover:text-red-400 border border-border/30"
+                        }`}
+                      >
+                        <Heart className={`h-3 w-3 ${weapon.user_liked ? "fill-red-400" : ""}`} />
                         {weapon.likes}
-                      </span>
-                      <span className="flex items-center gap-0.5">
-                        <Trophy className="h-3 w-3" />{weapon.score}/10
-                      </span>
+                      </button>
                     </div>
-                    {weapon.is_curated && (
-                      <Badge className="text-[9px] bg-purple-600/20 text-purple-300 border-purple-500/20">
-                        <Sparkles className="h-2.5 w-2.5 mr-0.5" />Curated
-                      </Badge>
-                    )}
+
+                    {/* Argument preview */}
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-semibold text-amber-400/70 uppercase tracking-wider">The Argument</p>
+                      <p className="text-xs text-foreground/80 leading-relaxed line-clamp-4">
+                        {weapon.argument}
+                      </p>
+                    </div>
+
+                    {/* Analysis preview */}
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-semibold text-amber-400/70 uppercase tracking-wider">Jeeves Analysis</p>
+                      <p className="text-xs text-foreground/60 leading-relaxed line-clamp-3">
+                        {weapon.analysis}
+                      </p>
+                    </div>
+
+                    <p className="text-[10px] text-amber-400/60 text-right">Tap to read full weapon →</p>
                   </CardContent>
                 </Card>
               </motion.div>
