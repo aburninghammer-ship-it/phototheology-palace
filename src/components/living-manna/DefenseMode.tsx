@@ -89,6 +89,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [weaponInput, setWeaponInput] = useState("");
   const [weaponTarget, setWeaponTarget] = useState("");
   const [weaponTopic, setWeaponTopic] = useState("");
+  const [forgeAutoSaveRestored, setForgeAutoSaveRestored] = useState(false);
   const [weaponAnalysis, setWeaponAnalysis] = useState<string | null>(null);
   const [weaponLoading, setWeaponLoading] = useState(false);
 
@@ -334,6 +335,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           topic: topicName,
           savedAt: new Date().toISOString(),
         });
+        localStorage.removeItem(FORGE_AUTOSAVE_KEY);
       }
 
       setForgeResult({ passed, score, message: content });
@@ -514,6 +516,53 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     }
   }, [assistMode, selectedOpponent, selectedTopic, selectedTemperaments]);
 
+  // ─── Forge Auto-Save ──────────────────────────────────────────
+  const FORGE_AUTOSAVE_KEY = "forge_weapon_autosave";
+
+  // Restore on mount (once)
+  useEffect(() => {
+    if (forgeAutoSaveRestored) return;
+    try {
+      const raw = localStorage.getItem(FORGE_AUTOSAVE_KEY);
+      if (!raw) { setForgeAutoSaveRestored(true); return; }
+      const saved = JSON.parse(raw);
+      // Expire after 24 hours
+      if (saved.ts && Date.now() - saved.ts > 86400000) {
+        localStorage.removeItem(FORGE_AUTOSAVE_KEY);
+        setForgeAutoSaveRestored(true);
+        return;
+      }
+      if (saved.weaponInput) setWeaponInput(saved.weaponInput);
+      if (saved.weaponTarget) setWeaponTarget(saved.weaponTarget);
+      if (saved.weaponTopic) setWeaponTopic(saved.weaponTopic);
+      if (saved.weaponAnalysis) setWeaponAnalysis(saved.weaponAnalysis);
+      if (saved.refineResult) setRefineResult(saved.refineResult);
+      setForgeAutoSaveRestored(true);
+    } catch { setForgeAutoSaveRestored(true); }
+  }, [forgeAutoSaveRestored]);
+
+  // Auto-save whenever forge inputs change (debounced via effect)
+  const forgeAutoSaveTimer = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    if (!forgeAutoSaveRestored) return;
+    // Only save if there's meaningful content
+    const hasContent = weaponInput.trim().length > 0 || weaponTarget.trim().length > 0;
+    if (!hasContent) {
+      localStorage.removeItem(FORGE_AUTOSAVE_KEY);
+      return;
+    }
+    if (forgeAutoSaveTimer.current) clearTimeout(forgeAutoSaveTimer.current);
+    forgeAutoSaveTimer.current = setTimeout(() => {
+      try {
+        localStorage.setItem(FORGE_AUTOSAVE_KEY, JSON.stringify({
+          weaponInput, weaponTarget, weaponTopic,
+          weaponAnalysis, refineResult, ts: Date.now(),
+        }));
+      } catch { /* ignore quota */ }
+    }, 1500);
+    return () => { if (forgeAutoSaveTimer.current) clearTimeout(forgeAutoSaveTimer.current); };
+  }, [weaponInput, weaponTarget, weaponTopic, weaponAnalysis, refineResult, forgeAutoSaveRestored]);
+
   // ─── Forge New Weapon (reset all forge state) ──────────────────
   const forgeNewWeapon = () => {
     setWeaponInput("");
@@ -522,6 +571,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     setWeaponAnalysis(null);
     setForgeResult(null);
     setRefineResult(null);
+    localStorage.removeItem(FORGE_AUTOSAVE_KEY);
   };
 
   // ─── Analyze My Weapon handler ────────────────────────────────
@@ -792,6 +842,13 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
               <p className="text-muted-foreground text-sm max-w-lg mx-auto">
                 Submit your argument or defense and let Jeeves analyze its strength, identify weaknesses, and show you how to make it even more powerful.
               </p>
+              {/* Auto-save indicator */}
+              {(weaponInput.trim().length > 0 || weaponTarget.trim().length > 0) && !forgeResult?.passed && (
+                <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                  <Save className="h-3 w-3 text-emerald-500" />
+                  <span className="text-emerald-500/80">Draft auto-saved</span>
+                </div>
+              )}
             </div>
 
             {/* Optional topic context */}
