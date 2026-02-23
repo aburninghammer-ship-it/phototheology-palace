@@ -126,17 +126,28 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         const saved = localStorage.getItem("defense-arsenal");
         if (!saved) return;
         const local: ArsenalWeapon[] = JSON.parse(saved);
-        if (!local.length) return;
+        if (!local.length) {
+          localStorage.removeItem("defense-arsenal");
+          return;
+        }
+        // Use insert (not upsert) — generate fresh DB UUIDs, ignore client IDs
         const rows = local.map((w) => ({
           user_id: user.id,
           name: w.name || null,
           argument: w.argument,
           analysis: w.analysis,
-          topic: w.topic,
-          saved_at: w.savedAt,
+          topic: w.topic || "General",
+          saved_at: w.savedAt || new Date().toISOString(),
         }));
-        await (supabase as any).from("defense_arsenal").upsert(rows, { onConflict: "id", ignoreDuplicates: true });
+        const { error } = await (supabase as any).from("defense_arsenal").insert(rows);
+        if (error) {
+          console.error("Arsenal migration insert error:", error);
+          // Don't remove localStorage if migration failed
+          return;
+        }
+        // Only remove localStorage after successful migration
         localStorage.removeItem("defense-arsenal");
+        console.log(`[Arsenal] Migrated ${rows.length} weapons to database`);
       } catch (e) {
         console.error("Arsenal migration error:", e);
       }
