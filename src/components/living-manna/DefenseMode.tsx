@@ -317,8 +317,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       if (error) throw error;
 
       const content = data?.content || "";
-      // Extract the FORGE SCORE specifically, not sub-category scores like "Biblical Accuracy: 10/10"
-      const forgeScoreMatch = content.match(/FORGE\s*SCORE[:\s]*(\d+(?:\.\d+)?)\s*\/\s*10/i);
+      // Extract the overall score (FORGE SCORE or WEAPON RATING), not sub-category scores
+      const forgeScoreMatch = content.match(/(?:FORGE\s*SCORE|WEAPON\s*RATING)[:\s]*(\d+(?:\.\d+)?)\s*\/\s*10/i);
       const score = forgeScoreMatch ? Math.round(parseFloat(forgeScoreMatch[1])) : (() => {
         // Fallback: grab last X/10 pattern (the overall score tends to come after sub-scores)
         const allScores = [...content.matchAll(/(\d+(?:\.\d+)?)\s*\/\s*10/g)];
