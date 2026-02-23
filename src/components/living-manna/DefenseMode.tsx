@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
@@ -54,6 +55,7 @@ interface ArsenalWeapon {
 }
 
 export function DefenseMode({ churchId }: DefenseModeProps) {
+  const { user } = useAuth();
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -86,14 +88,61 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [weaponAnalysis, setWeaponAnalysis] = useState<string | null>(null);
   const [weaponLoading, setWeaponLoading] = useState(false);
 
-  // Arsenal state (saved weapons)
-  const [arsenal, setArsenal] = useState<ArsenalWeapon[]>(() => {
+  // Arsenal state (DB-backed for cross-device sync)
+  const [arsenal, setArsenal] = useState<ArsenalWeapon[]>([]);
+  const [arsenalLoading, setArsenalLoading] = useState(false);
+
+  // Load arsenal from DB
+  const loadArsenal = useCallback(async () => {
+    if (!user) return;
+    setArsenalLoading(true);
     try {
-      const saved = localStorage.getItem("defense-arsenal");
-      return saved ? JSON.parse(saved) : [];
-    } catch { return []; }
-  });
-  // (showArsenal and weaponSaved removed — Arsenal is now its own tab with forge scoring)
+      const { data, error } = await (supabase as any)
+        .from("defense_arsenal")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("saved_at", { ascending: false });
+      if (error) throw error;
+      setArsenal((data || []).map((w: any) => ({
+        id: w.id,
+        name: w.name,
+        argument: w.argument,
+        analysis: w.analysis,
+        topic: w.topic,
+        savedAt: w.saved_at,
+      })));
+    } catch (e) {
+      console.error("Failed to load arsenal:", e);
+    } finally {
+      setArsenalLoading(false);
+    }
+  }, [user]);
+
+  // Load arsenal + migrate localStorage weapons once
+  useEffect(() => {
+    const migrateLocalArsenal = async () => {
+      if (!user) return;
+      try {
+        const saved = localStorage.getItem("defense-arsenal");
+        if (!saved) return;
+        const local: ArsenalWeapon[] = JSON.parse(saved);
+        if (!local.length) return;
+        const rows = local.map((w) => ({
+          user_id: user.id,
+          name: w.name || null,
+          argument: w.argument,
+          analysis: w.analysis,
+          topic: w.topic,
+          saved_at: w.savedAt,
+        }));
+        await (supabase as any).from("defense_arsenal").upsert(rows, { onConflict: "id", ignoreDuplicates: true });
+        localStorage.removeItem("defense-arsenal");
+      } catch (e) {
+        console.error("Arsenal migration error:", e);
+      }
+    };
+    migrateLocalArsenal().then(() => loadArsenal());
+  }, [loadArsenal, user]);
 
   // Forge weapon state (scoring + gating)
   const [forgeLoading, setForgeLoading] = useState(false);
@@ -130,6 +179,23 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     }
   };
 
+  const saveWeaponToDB = async (weapon: Omit<ArsenalWeapon, "id">) => {
+    if (!user) return;
+    try {
+      await (supabase as any).from("defense_arsenal").insert({
+        user_id: user.id,
+        name: weapon.name || null,
+        argument: weapon.argument,
+        analysis: weapon.analysis,
+        topic: weapon.topic,
+        saved_at: weapon.savedAt,
+      });
+      loadArsenal();
+    } catch (e) {
+      console.error("Failed to save weapon:", e);
+    }
+  };
+
   const forgeWeapon = async () => {
     if (!weaponInput.trim() || !weaponAnalysis) return;
     setForgeLoading(true);
@@ -154,52 +220,49 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         const topicName = weaponTopic
           ? DEFENSE_TOPICS.find((t) => t.id === weaponTopic)?.name || weaponTopic
           : "General";
-        const weapon: ArsenalWeapon = {
-          id: crypto.randomUUID(),
+        await saveWeaponToDB({
           argument: weaponInput.trim(),
           analysis: content || weaponAnalysis,
           topic: topicName,
           savedAt: new Date().toISOString(),
-        };
-        const updated = [weapon, ...arsenal];
-        setArsenal(updated);
-        localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+        });
       }
 
       setForgeResult({ passed, score, message: content });
     } catch {
-      // Fallback: save directly if forge mode not supported yet
       const topicName = weaponTopic
         ? DEFENSE_TOPICS.find((t) => t.id === weaponTopic)?.name || weaponTopic
         : "General";
-      const weapon: ArsenalWeapon = {
-        id: crypto.randomUUID(),
+      await saveWeaponToDB({
         argument: weaponInput.trim(),
         analysis: weaponAnalysis || "Analysis unavailable — weapon saved directly.",
         topic: topicName,
         savedAt: new Date().toISOString(),
-      };
-      const updated = [weapon, ...arsenal];
-      setArsenal(updated);
-      localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+      });
       setForgeResult({ passed: true, score: 8, message: "Weapon forged and added to your arsenal!" });
     } finally {
       setForgeLoading(false);
     }
   };
 
-  const removeFromArsenal = (weaponId: string) => {
-    const updated = arsenal.filter((w) => w.id !== weaponId);
-    setArsenal(updated);
-    localStorage.setItem("defense-arsenal", JSON.stringify(updated));
+  const removeFromArsenal = async (weaponId: string) => {
+    try {
+      await (supabase as any).from("defense_arsenal").delete().eq("id", weaponId);
+      setArsenal((prev) => prev.filter((w) => w.id !== weaponId));
+    } catch (e) {
+      console.error("Failed to remove weapon:", e);
+    }
   };
 
-  const renameWeapon = (weaponId: string, newName: string) => {
-    const updated = arsenal.map((w) => w.id === weaponId ? { ...w, name: newName } : w);
-    setArsenal(updated);
-    localStorage.setItem("defense-arsenal", JSON.stringify(updated));
-    if (selectedArsenalWeapon?.id === weaponId) {
-      setSelectedArsenalWeapon({ ...selectedArsenalWeapon, name: newName });
+  const renameWeapon = async (weaponId: string, newName: string) => {
+    try {
+      await (supabase as any).from("defense_arsenal").update({ name: newName }).eq("id", weaponId);
+      setArsenal((prev) => prev.map((w) => w.id === weaponId ? { ...w, name: newName } : w));
+      if (selectedArsenalWeapon?.id === weaponId) {
+        setSelectedArsenalWeapon({ ...selectedArsenalWeapon, name: newName });
+      }
+    } catch (e) {
+      console.error("Failed to rename weapon:", e);
     }
   };
 

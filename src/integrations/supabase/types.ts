@@ -3656,6 +3656,39 @@ export type Database = {
         }
         Relationships: []
       }
+      defense_arsenal: {
+        Row: {
+          analysis: string
+          argument: string
+          created_at: string
+          id: string
+          name: string | null
+          saved_at: string
+          topic: string
+          user_id: string
+        }
+        Insert: {
+          analysis: string
+          argument: string
+          created_at?: string
+          id?: string
+          name?: string | null
+          saved_at?: string
+          topic?: string
+          user_id: string
+        }
+        Update: {
+          analysis?: string
+          argument?: string
+          created_at?: string
+          id?: string
+          name?: string | null
+          saved_at?: string
+          topic?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       devotional_days: {
         Row: {
           additional_content: Json | null
