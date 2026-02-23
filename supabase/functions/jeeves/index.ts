@@ -8176,10 +8176,10 @@ Return ONLY valid JSON.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: mode.startsWith("defense-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "research" ? 2048 : 4096),
+        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "research" ? 2048 : mode === "defense-analyze-weapon" ? 3000 : 4096),
       }),
     });
 
