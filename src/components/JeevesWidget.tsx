@@ -49,6 +49,7 @@ export const JeevesWidget = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
+  const [userContext, setUserContext] = useState<string | null>(null);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
@@ -58,7 +59,7 @@ export const JeevesWidget = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const dragConstraintsRef = useRef<HTMLDivElement>(null);
 
-  // Fetch user name
+  // Fetch user name and context snapshot
   useEffect(() => {
     if (!user) return;
     supabase
@@ -69,6 +70,12 @@ export const JeevesWidget = () => {
       .then(({ data }) => {
         if (data?.display_name) setUserName(data.display_name.split(" ")[0]);
       });
+    // Fetch user context for personalized Jeeves responses
+    supabase.functions.invoke("user-context-snapshot", {
+      body: { target: "jeeves" },
+    }).then(({ data }) => {
+      if (data?.promptBlock) setUserContext(data.promptBlock);
+    }).catch(() => { /* graceful fallback — Jeeves works without context */ });
   }, [user]);
 
   // Greeting on first open
@@ -115,6 +122,7 @@ export const JeevesWidget = () => {
             content: m.content,
           })),
           userName,
+          userContextBlock: userContext,
         },
       });
 
