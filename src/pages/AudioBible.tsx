@@ -155,6 +155,7 @@ export default function AudioBible() {
     setCommentarySource,
     unlock,
     playChapter,
+    queueChapters,
     pause,
     resume,
     stop,
@@ -247,11 +248,20 @@ export default function AudioBible() {
   // Handle play for whole book
   const handlePlayBook = async () => {
     await unlock();
+    const totalChapters = getChapterCount(selectedBook);
     // Start with chapter 1
     const verses = await fetchChapterVerses(selectedBook, 1);
     if (verses.length > 0) {
       playChapter(selectedBook, 1, verses);
-      // TODO: Queue remaining chapters
+      // Queue remaining chapters - fetch verses lazily via onChapterComplete
+      if (totalChapters > 1) {
+        const remaining: Array<{ book: string; chapter: number; verses: Array<{ verse: number; text: string }> }> = [];
+        for (let ch = 2; ch <= totalChapters; ch++) {
+          // Use empty verses as placeholder — they'll be fetched when the item starts
+          remaining.push({ book: selectedBook, chapter: ch, verses: [] });
+        }
+        queueChapters(remaining);
+      }
     }
   };
 
@@ -263,7 +273,15 @@ export default function AudioBible() {
     const verses = await fetchChapterVerses(first.book, first.chapter);
     if (verses.length > 0) {
       playChapter(first.book, first.chapter, verses);
-      // TODO: Queue remaining chapters
+      // Queue remaining chapters with empty verses (fetched on demand)
+      if (customChapters.length > 1) {
+        const remaining = customChapters.slice(1).map(c => ({
+          book: c.book,
+          chapter: c.chapter,
+          verses: [] as Array<{ verse: number; text: string }>,
+        }));
+        queueChapters(remaining);
+      }
     }
   };
 
@@ -381,6 +399,15 @@ export default function AudioBible() {
     const verses = await fetchChapterVerses(firstItem.book, firstItem.chapter);
     if (verses.length > 0) {
       playChapter(firstItem.book, firstItem.chapter, verses);
+      // Queue remaining series items
+      if (series.items.length > 1) {
+        const remaining = series.items.slice(1).map(item => ({
+          book: item.book,
+          chapter: item.chapter,
+          verses: [] as Array<{ verse: number; text: string }>,
+        }));
+        queueChapters(remaining);
+      }
     }
   };
 
