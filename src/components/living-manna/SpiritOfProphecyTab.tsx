@@ -8,8 +8,10 @@ import { Separator } from "@/components/ui/separator";
 import {
   BookOpen, Flame, Eye, Target, Layers, Brain, Gem, Film, Image as ImageIcon,
   ChevronRight, Loader2, Sparkles, BookMarked, Church, Crown, Sword, Shield,
-  Heart, Cross, Star, ArrowRight
+  Heart, Cross, Star, ArrowRight, MessageSquareMore, Send, X
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -437,7 +439,46 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
   const [loadingRoom, setLoadingRoom] = useState<string | null>(null);
   const [fullAnalysis, setFullAnalysis] = useState<string | null>(null);
   const [loadingFull, setLoadingFull] = useState(false);
+  const [expoundOpen, setExpoundOpen] = useState<string | null>(null);
+  const [expoundQuestion, setExpoundQuestion] = useState("");
+  const [expoundResponse, setExpoundResponse] = useState<string | null>(null);
+  const [expoundLoading, setExpoundLoading] = useState(false);
   const { toast } = useToast();
+
+  const handleExpound = async (roomCode: string) => {
+    if (!selectedBook || !selectedChapter) return;
+    const roomContent = analysisResults[roomCode];
+    if (!roomContent) return;
+
+    setExpoundLoading(true);
+    setExpoundResponse(null);
+
+    const room = PALACE_ROOMS.find(r => r.code === roomCode);
+    const question = expoundQuestion.trim() || "Expound further on this analysis. What deeper connections can be drawn?";
+
+    try {
+      const { data, error } = await supabase.functions.invoke("expound-gem", {
+        body: {
+          gemContent: `**${room?.name} (${roomCode}) Analysis of ${selectedBook.shortTitle} Ch. ${selectedChapter.number}: "${selectedChapter.title}"**\n\n${roomContent}`,
+          selectedText: null,
+          question,
+        },
+      });
+
+      if (error) throw error;
+      setExpoundResponse(data?.response || "No response generated.");
+      setExpoundQuestion("");
+    } catch (err) {
+      console.error("Expound error:", err);
+      toast({
+        title: "Expound Error",
+        description: "Could not generate deeper analysis. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setExpoundLoading(false);
+    }
+  };
 
   const analyzeWithRoom = async (roomCode: string) => {
     if (!selectedBook || !selectedChapter) return;
@@ -745,9 +786,20 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                 <p className="text-xs text-muted-foreground">{room.description}</p>
 
                 {hasResult ? (
-                  <div className="text-xs text-foreground/90 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border-t border-border/50 pt-2">
-                    {analysisResults[room.code]}
-                  </div>
+                  <>
+                    <div className="text-xs text-foreground/90 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border-t border-border/50 pt-2">
+                      {analysisResults[room.code]}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setExpoundOpen(room.code); setExpoundResponse(null); setExpoundQuestion(""); }}
+                      className="w-full gap-2 mt-2 border-primary/30 text-primary hover:bg-primary/10"
+                    >
+                      <MessageSquareMore className="h-3 w-3" />
+                      Expound This
+                    </Button>
+                  </>
                 ) : (
                   <Button
                     variant="outline"
@@ -769,6 +821,50 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
           );
         })}
       </div>
+
+      {/* Expound Dialog */}
+      <Dialog open={!!expoundOpen} onOpenChange={(open) => { if (!open) setExpoundOpen(null); }}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <MessageSquareMore className="h-5 w-5 text-primary" />
+              Expound — {PALACE_ROOMS.find(r => r.code === expoundOpen)?.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {expoundResponse && (
+              <div className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed bg-muted/30 rounded-lg p-4 border border-border/50">
+                {expoundResponse}
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <Textarea
+                placeholder="Ask Jeeves to go deeper... (or leave blank for a general expound)"
+                value={expoundQuestion}
+                onChange={(e) => setExpoundQuestion(e.target.value)}
+                className="text-sm min-h-[60px] resize-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (expoundOpen) handleExpound(expoundOpen);
+                  }
+                }}
+              />
+            </div>
+
+            <Button
+              onClick={() => expoundOpen && handleExpound(expoundOpen)}
+              disabled={expoundLoading}
+              className="w-full gap-2"
+            >
+              {expoundLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {expoundLoading ? "Jeeves is thinking..." : expoundResponse ? "Ask Another Question" : "Expound"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
