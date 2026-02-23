@@ -32,6 +32,21 @@ export function usePaymentGate() {
       try {
         console.log("[PaymentGate] Checking access for:", user.email);
 
+        // 0. Check if user is an admin/owner — always grant access
+        const { data: adminCheck } = await supabase
+          .from("admin_users")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (adminCheck) {
+          console.log("[PaymentGate] User is admin/owner — access granted");
+          setHasAccess(true);
+          hasCheckedRef.current = true;
+          setChecking(false);
+          return;
+        }
+
         // 1. Check profile for lifetime access, active subscription, or manual grant
         const { data: profile } = await supabase
           .from("profiles")
