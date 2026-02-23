@@ -2907,6 +2907,7 @@ export type Database = {
           argument: string
           created_at: string
           id: string
+          image_url: string | null
           is_curated: boolean
           likes: number
           score: number
@@ -2922,6 +2923,7 @@ export type Database = {
           argument: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_curated?: boolean
           likes?: number
           score: number
@@ -2937,6 +2939,7 @@ export type Database = {
           argument?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_curated?: boolean
           likes?: number
           score?: number
@@ -3665,6 +3668,7 @@ export type Database = {
           argument: string
           created_at: string
           id: string
+          image_url: string | null
           name: string | null
           saved_at: string
           subtitle: string | null
@@ -3676,6 +3680,7 @@ export type Database = {
           argument: string
           created_at?: string
           id?: string
+          image_url?: string | null
           name?: string | null
           saved_at?: string
           subtitle?: string | null
@@ -3687,6 +3692,7 @@ export type Database = {
           argument?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           name?: string | null
           saved_at?: string
           subtitle?: string | null
