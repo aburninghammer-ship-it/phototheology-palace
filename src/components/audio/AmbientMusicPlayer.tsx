@@ -613,8 +613,8 @@ export function AmbientMusicPlayer({
         isInitialMount.current = false;
         return;
       }
-      // Convert from 0-100 scale to 0-1.0 (no cap, full range)
-      const normalizedVolume = Math.min(newVolume, 100) / 100;
+      // Convert from 0-100 scale to 0-0.5 (capped to match slider max)
+      const normalizedVolume = Math.min(newVolume, 50) / 100;
       console.log('[AmbientMusic] Global volume update:', newVolume, '-> normalized:', normalizedVolume);
       setVolume(normalizedVolume);
     });
@@ -1525,12 +1525,16 @@ export function AmbientMusicPlayer({
                       setVolume(newVolume);
                       if (newVolume > 0 && isMuted) setIsMuted(false);
                       if (newVolume === 0) setIsMuted(true);
-                      if (audioRef.current) {
-                        audioRef.current.volume = newVolume * duckMultiplier;
+                      const effectiveVolume = newVolume * duckMultiplier;
+                      if (gainNodeRef.current) {
+                        gainNodeRef.current.gain.value = effectiveVolume;
+                      } else if (audioRef.current) {
+                        audioRef.current.volume = effectiveVolume;
                       }
                       localStorage.setItem("pt-music-volume-pct", Math.round(newVolume * 100).toString());
                     }}
-                    className="w-full touch-manipulation"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    className="w-full touch-manipulation [&_[role=slider]]:h-6 [&_[role=slider]]:w-6"
                   />
                   <div className="flex items-center gap-1">
                     <Button
