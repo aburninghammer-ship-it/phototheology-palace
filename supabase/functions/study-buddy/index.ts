@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
 import { QUALITY_TESTS, OUTPUT_TYPES, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -186,7 +187,16 @@ serve(async (req) => {
     if (context) {
       userMessage += `BIBLE CONTEXT:\n${context}\n\n`;
     }
-    
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: (notes || context || '').slice(0, 4000),
+      matchCount: 3,
+    });
+    if (ragResult.chunkCount > 0) {
+      userMessage += `TEACHING CONTEXT:\n${ragResult.corpusContext}\n\n`;
+    }
+
     userMessage += `USER'S STUDY NOTES:\n\`\`\`\n${notes}\n\`\`\``;
 
     if (mode) {

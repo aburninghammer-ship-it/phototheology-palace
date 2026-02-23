@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2?target=deno";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -1271,6 +1272,15 @@ These anchors are non-negotiable. They have been drawn from careful typological 
     userPrompt = `Create a ${framing.adj} overview of the entire book of ${book}. ${framing.bookDesc}${propheticFrameworkBlock}`;
   } else {
     userPrompt = `Create a ${framing.adj} commentary for ${book} chapter ${chapter}. ${framing.chapterDesc}${cecAnchorBlock}${propheticFrameworkBlock}${customInstructions ? `\n\nSPECIAL CONTENT INSTRUCTIONS FOR THIS REGENERATION (MUST BE FOLLOWED):\n${customInstructions}` : ""}`;
+  }
+
+  // RAG corpus injection
+  const ragResult = await getCorpusContext({
+    query: `${book} chapter ${chapter}`,
+    matchCount: 3,
+  });
+  if (ragResult.chunkCount > 0) {
+    userPrompt += ragResult.corpusContext;
   }
 
   // Try Lovable AI gateway first, fall back to OpenAI directly

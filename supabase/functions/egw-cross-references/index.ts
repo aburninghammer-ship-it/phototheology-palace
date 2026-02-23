@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,7 +26,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
-    const systemPrompt = `You are a Bible scholar specializing in connecting Ellen G. White's writings to Scripture. Given a passage from her writings, identify the most relevant Bible verses (KJV) that directly relate to, support, or are referenced by the passage.
+    let systemPrompt = `You are a Bible scholar specializing in connecting Ellen G. White's writings to Scripture. Given a passage from her writings, identify the most relevant Bible verses (KJV) that directly relate to, support, or are referenced by the passage.
 
 Return a JSON array of 3-8 cross-references. Each should have:
 - reference: The Bible reference (e.g., "John 3:16")
@@ -45,6 +46,15 @@ Return ONLY a valid JSON array. No markdown, no explanation.`;
 "${paragraph}"
 
 Return JSON array like: [{"reference": "John 3:16", "text": "For God so loved...", "connection": "EGW echoes this theme of..."}]`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `Ellen White ${bookTitle || ''} ${chapterTitle || ''} ${paragraph.slice(0, 500)}`.slice(0, 4000),
+      matchCount: 2,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

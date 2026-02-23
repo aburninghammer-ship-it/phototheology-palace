@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -91,7 +92,7 @@ PROHIBITED:
 - Address ${churchName} with quiet pastoral care
 `;
 
-    const systemPrompt = `You are Living Manna, following the Phototheology (PT) method. ${mannaRules}
+    let systemPrompt = `You are Living Manna, following the Phototheology (PT) method. ${mannaRules}
 
 ═══════════════════════════════════════════════════════════════
 ⚠️ CRITICAL GUARDRAIL: THREE HEAVENS DEFINITION ⚠️
@@ -161,6 +162,15 @@ OUTPUT FORMAT (JSON) - SINGLE PORTION:
   "prayerFocus": "2-3 line prayer for ${churchName}, quiet and grounded"
 }
 `}`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `${theme} ${ptRoom} devotional`,
+      matchCount: 2,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     // Add date for uniqueness
     const today = new Date();

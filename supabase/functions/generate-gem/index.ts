@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -294,7 +295,7 @@ serve(async (req) => {
       ? `\n\nPASSAGE FOCUS: The user wants a gem that involves or connects to ${passage}. At least one of the verses MUST be from this passage or directly related to it.`
       : '';
 
-    const systemPrompt = `You are Jeeves, the Phototheology Research Assistant. Your task is to produce a ${styleConfig.name}—a short, powerful, mind-opening insight that reveals a hidden connection between seemingly unrelated Bible verses.
+    let systemPrompt = `You are Jeeves, the Phototheology Research Assistant. Your task is to produce a ${styleConfig.name}—a short, powerful, mind-opening insight that reveals a hidden connection between seemingly unrelated Bible verses.
 
 ${styleConfig.instructions}
 
@@ -354,6 +355,16 @@ A ${depth === 'quick' ? '3-4' : depth === 'study' ? '5-6' : '6-8'} sentence para
 FORMATTING: Use emojis sparingly (📖 ✨ 💎). NO markdown bold/italic. Clean, readable format.
 
 Unique seed: ${uniqueSeed}`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: passage || 'Bible gem insight hidden connection',
+      matchCount: 2,
+      supabaseClient: supabase,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     const userPrompt = `Produce a ${styleConfig.name} at ${depthConfig.name} depth. ${passage ? `Focus on ${passage}.` : 'Select unusual verse combinations.'} Follow the Gem structure exactly. Make it deep, elegant, unexpected, and revelation-like. Seed: ${uniqueSeed}`;
 

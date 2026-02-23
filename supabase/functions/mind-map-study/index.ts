@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.3.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { PALACE_SYSTEM_PROMPT, THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
 import { QUALITY_TESTS, OUTPUT_TYPES, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -125,6 +126,13 @@ serve(async (req) => {
     };
     const modeInstruction = modeInstructions[mode] || modeInstructions.scholar;
 
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: truncatedText.slice(0, 4000),
+      matchCount: 2,
+    });
+    const ragSection = ragResult.chunkCount > 0 ? ragResult.corpusContext : '';
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -136,7 +144,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: STUDY_SYSTEM_PROMPT + "\n\n" + modeInstruction,
+            content: STUDY_SYSTEM_PROMPT + "\n\n" + modeInstruction + ragSection,
           },
           {
             role: "user",

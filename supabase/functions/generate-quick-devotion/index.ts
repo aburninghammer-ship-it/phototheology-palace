@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -121,7 +122,7 @@ WRITING STYLE: YOUTH-FOCUSED
 
     console.log(`Generating devotion - theme: ${theme}, depth: ${depth}, style: ${writingStyle}`);
 
-    const systemPrompt = `You are a master of biblical theology writing PERSONALIZED devotionals that are:
+    let systemPrompt = `You are a master of biblical theology writing PERSONALIZED devotionals that are:
 - Theologically rich and structurally intelligent
 - Never sentimental or emotionally vague
 - Revealing unexpected connections between passages
@@ -150,6 +151,15 @@ QUALITY CONTROL:
 - Could this exist on a generic devotional app? If yes, write something more personal.
 - Does it rely on vague encouragement? If yes, make it more specific.
 - It must feel discovered rather than manufactured.`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: theme.slice(0, 4000),
+      matchCount: 2,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     const userPrompt = `Write a SUBSTANTIVE ${selectedDepth.paragraphs} paragraph devotional on the theme: "${theme}"
 ${personalizationContext}

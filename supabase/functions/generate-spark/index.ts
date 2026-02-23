@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -96,7 +97,7 @@ async function generateSpark(
     ? `\n⚠️ AVOID REPETITION - The user has recently seen these spark titles:\n${recentTitles.map(t => `- "${t}"`).join('\n')}\nGenerate something FRESH and DIFFERENT. Do NOT repeat similar themes, angles, or connections.`
     : '';
 
-  const systemPrompt = `You are Jeeves, a Phototheology discovery engine. Your task is to generate ONE high-quality "Discovery Spark" based on the user's study content.
+  let systemPrompt = `You are Jeeves, a Phototheology discovery engine. Your task is to generate ONE high-quality "Discovery Spark" based on the user's study content.
 
 ⚠️ THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
 - AZAZEL = SATAN, NOT CHRIST (Leviticus 16 scapegoat = Satan)
@@ -144,6 +145,15 @@ OUTPUT FORMAT (JSON only, no markdown):
 ${content}
 
 Generate ONE discovery spark that would genuinely deepen their understanding${triggerType === 'output' ? ' and celebrate their work' : ''}.`;
+
+  // RAG corpus injection
+  const ragResult = await getCorpusContext({
+    query: content.slice(0, 4000),
+    matchCount: 2,
+  });
+  if (ragResult.chunkCount > 0) {
+    systemPrompt += ragResult.corpusContext;
+  }
 
   console.log('Generating spark for', surface, 'context...');
 

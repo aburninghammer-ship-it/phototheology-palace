@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -442,11 +443,20 @@ serve(async (req) => {
     }
 
     // Build user studies section if provided
-    const userStudiesSection = userStudiesContext 
+    const userStudiesSection = userStudiesContext
       ? `\n\n${userStudiesContext}\n`
       : "";
 
-    const systemPrompt = getSystemPrompt(depth as CommentaryDepth, userName, language as SupportedLanguage);
+    let systemPrompt = getSystemPrompt(depth as CommentaryDepth, userName, language as SupportedLanguage);
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `${book} chapter ${chapter}`,
+      matchCount: 3,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
     const maxTokens = getMaxTokens(depth as CommentaryDepth);
 
     // ── Inject book-specific prophetic framework for Daniel, Revelation, Matthew ──

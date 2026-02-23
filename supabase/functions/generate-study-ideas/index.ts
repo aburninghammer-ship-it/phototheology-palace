@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,7 +28,7 @@ serve(async (req) => {
       throw new Error("ANTHROPIC_API_KEY not configured");
     }
 
-    const systemPrompt = `You are Jeeves, a Phototheology study idea generator. Your task is to generate 8 unique, compelling study ideas based on the user's input (a word, verse, or theme).
+    let systemPrompt = `You are Jeeves, a Phototheology study idea generator. Your task is to generate 8 unique, compelling study ideas based on the user's input (a word, verse, or theme).
 
 ⚠️ THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
 - AZAZEL = SATAN, NOT CHRIST (Leviticus 16 scapegoat = Satan)
@@ -90,6 +91,15 @@ ROOM ID REFERENCE:
     const userPrompt = `Generate 8 Phototheology study ideas based on this input: "${input}"
 
 The ideas should explore different angles, different Bible sections, and different Palace Rooms. Make them compelling and thought-provoking.`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: input.slice(0, 4000),
+      matchCount: 2,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     console.log("Generating study ideas for input:", input);
 

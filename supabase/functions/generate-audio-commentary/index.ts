@@ -7,6 +7,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -173,6 +174,12 @@ serve(async (req) => {
     // Build tier-specific prompt
     const tierInstructions = getTierInstructions(tier);
 
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `${book} ${chapter}:${verse} ${verseText}`,
+      matchCount: 3,
+    });
+
     const systemPrompt = `You are a deeply insightful Bible commentator trained in PhotoTheology principles.
 Your commentary should feel like sitting with a wise teacher who simply sees Scripture deeply.
 
@@ -187,7 +194,7 @@ STYLE GUIDELINES:
 - Let insights flow naturally as a skilled teacher would share them
 - Be warm and conversational, not academic or dry
 - Connect to the reader's spiritual journey when appropriate
-- For prophetic books (Daniel, Revelation), use the Daniel/Revelation in 7 Days framework`;
+- For prophetic books (Daniel, Revelation), use the Daniel/Revelation in 7 Days framework${ragResult.chunkCount > 0 ? ragResult.corpusContext : ''}`;
 
     const userPrompt = `Generate ${tier} level commentary for:
 

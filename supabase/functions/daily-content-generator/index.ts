@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,6 +30,14 @@ serve(async (req) => {
 
     console.log('Generating content for:', tomorrow.toISOString());
 
+    // RAG corpus injection (single call, reused for both challenge and hunt)
+    const ragResult = await getCorpusContext({
+      query: 'Phototheology Bible study memory palace sanctuary',
+      matchCount: 2,
+      supabaseClient: supabase,
+    });
+    const ragSection = ragResult.chunkCount > 0 ? ragResult.corpusContext : '';
+
     // Generate Daily Challenge
     const challengePrompt = `Create a Phototheology-based daily Bible study challenge that helps users memorize scripture using the 8-floor memory palace method (Foundation, Wisdom, Kingdom, Law, Grace, Prophecy, Glory, New Creation).
 
@@ -55,7 +64,10 @@ Format your response as JSON:
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
-        messages: [{ role: 'user', content: challengePrompt }],
+        messages: [
+          ...(ragSection ? [{ role: 'system', content: ragSection }] : []),
+          { role: 'user', content: challengePrompt },
+        ],
       }),
     });
 
@@ -210,7 +222,10 @@ Return JSON format:
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
-        messages: [{ role: 'user', content: huntPrompt }],
+        messages: [
+          ...(ragSection ? [{ role: 'system', content: ragSection }] : []),
+          { role: 'user', content: huntPrompt },
+        ],
       }),
     });
 

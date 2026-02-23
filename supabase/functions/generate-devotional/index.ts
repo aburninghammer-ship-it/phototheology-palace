@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.0";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -400,7 +401,7 @@ ${issueGuidance?.actionSteps?.map(a => `   - ${a}`).join("\n") || "   - Provide 
     }
 
     // Master Phototheology Devotional System Prompt - essay-style flowing paragraphs
-    const systemPrompt = `You are Jeeves, the Phototheology devotional writer. Write devotionals that are theologically rich, contemplative, and structurally intelligent.
+    let systemPrompt = `You are Jeeves, the Phototheology devotional writer. Write devotionals that are theologically rich, contemplative, and structurally intelligent.
 
 ${CADE_SAFETY_PROMPT}
 
@@ -456,6 +457,16 @@ OUTPUT FORMAT - Return a JSON array of devotional days:
   "devotional_text": "The full 3-5 paragraph essay-style devotional (500-750 words). Flowing prose with Scripture woven naturally into the text. NO section headers. NO bullet points. Just continuous, contemplative reading.",
   "memory_hook": "One-line quotable insight or 'strike line' that pierces the heart"
 }`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `${resolvedTheme || resolvedVerse || 'devotional spiritual growth'}`.slice(0, 4000),
+      matchCount: 3,
+      supabaseClient: supabase,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     const forPersonNote = capitalizedName
       ? isChildDevotional

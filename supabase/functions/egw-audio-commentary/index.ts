@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.0";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -51,7 +52,7 @@ serve(async (req) => {
 
     const isChapterMode = mode !== 'paragraph';
 
-    const systemPrompt = `You are a Phototheology Bible commentator. Your task is to create an audio-ready biblical commentary that buttresses and illuminates Ellen White's writings using ONLY the King James Bible and Phototheology Palace principles.
+    let systemPrompt = `You are a Phototheology Bible commentator. Your task is to create an audio-ready biblical commentary that buttresses and illuminates Ellen White's writings using ONLY the King James Bible and Phototheology Palace principles.
 
 VOICE & STYLE:
 - Write as if narrating to a listener — warm, reverent, clear, conversational
@@ -97,6 +98,16 @@ Return a JSON array of 6-10 commentary strings. Each string is one complete sect
 ${chapterContext}
 
 Return a JSON array of 2-4 commentary strings (150-250 words each).`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `Ellen White ${bookTitle} ${chapterTitle} ${chapterNumber}`.slice(0, 4000),
+      matchCount: 3,
+      supabaseClient: supabase,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",

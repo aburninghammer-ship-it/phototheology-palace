@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -42,7 +43,7 @@ serve(async (req) => {
 
     console.log(`User ${userId || 'anonymous'} requesting expound on: "${selectedText?.substring(0, 50)}..."`);
 
-    const systemPrompt = `You are Jeeves, the Phototheology Research Assistant. The user has been given a Gem (a short, powerful insight revealing hidden connections in Scripture) and wants you to expound further on a specific part.
+    let systemPrompt = `You are Jeeves, the Phototheology Research Assistant. The user has been given a Gem (a short, powerful insight revealing hidden connections in Scripture) and wants you to expound further on a specific part.
 
 YOUR ROLE:
 - You are a scholarly, reverent, and insightful Bible teacher
@@ -69,6 +70,16 @@ DO NOT:
 - Be preachy or condescending
 - Give generic Sunday School answers
 - Overload with too many points - focus on depth over breadth`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `${selectedText || question || 'Bible gem insight'}`.slice(0, 4000),
+      matchCount: 2,
+      supabaseClient: supabase,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     const userPrompt = `Here is the Gem the user received:
 

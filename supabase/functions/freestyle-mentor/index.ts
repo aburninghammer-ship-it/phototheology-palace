@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -203,6 +204,16 @@ serve(async (req) => {
     }
     if (exitCommand) {
       systemPrompt += `\n\nEXIT COMMAND ACTIVE: "${exitCommand}". Snap into precision mode.`;
+    }
+
+    // RAG corpus injection
+    const lastUserMsg = messages?.length > 0 ? messages[messages.length - 1]?.content || '' : '';
+    const ragResult = await getCorpusContext({
+      query: lastUserMsg.slice(0, 4000),
+      matchCount: 2,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
     }
 
     const apiMessages = [

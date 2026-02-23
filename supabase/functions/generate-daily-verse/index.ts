@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -364,6 +365,14 @@ Return ONLY valid JSON in this format:
   ]
 }`;
 
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: 'daily verse Phototheology insight',
+      matchCount: 2,
+      supabaseClient: supabase,
+    });
+    const ragSection = ragResult.chunkCount > 0 ? ragResult.corpusContext : '';
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -373,7 +382,7 @@ Return ONLY valid JSON in this format:
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: 'You are a Phototheology Master. Return ONLY valid JSON, no markdown or extra text.' },
+          { role: 'system', content: 'You are a Phototheology Master. Return ONLY valid JSON, no markdown or extra text.' + ragSection },
           { role: 'user', content: prompt }
         ],
       }),

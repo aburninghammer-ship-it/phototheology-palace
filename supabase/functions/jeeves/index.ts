@@ -1,5 +1,5 @@
-// Jeeves Edge Function v2.6 - Prophecy Watch Mode + Research Verification Engine
-// Last updated: 2026-01-18
+// Jeeves Edge Function v2.7 - RAG Corpus Integration + Prophecy Watch Mode + Research Verification Engine
+// Last updated: 2026-02-23
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import {
@@ -28,6 +28,8 @@ import {
   ROOM_CODES as MENTOR_ROOM_CODES,
   isValidRoomCode as isValidMentorRoom,
 } from './canonical-rooms.ts';
+
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -2950,6 +2952,16 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
 • Briefly expound on each quote's relevance
 • If truly no commentary exists, clearly state it—don't force generic quotes`;
 
+      // RAG corpus injection for SOP commentary (early-return mode)
+      const sopRag = await getCorpusContext({
+        query: `Ellen White Spirit of Prophecy ${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 3,
+        supabaseClient: supabase,
+      });
+      if (sopRag.chunkCount > 0) {
+        systemPrompt += sopRag.corpusContext;
+      }
+
       const sopResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
         {
@@ -3026,6 +3038,16 @@ ${book} ${chapter}:${verseText?.verse || verse}
 "${verseText?.text || verseText || ""}"
 
 Remember: present tense, plain language, simple yet deep, 80-130 words total.`;
+
+      // RAG corpus injection for story-mode commentary (early-return mode)
+      const storyRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText?.verse || verse} ${verseText?.text || ''}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (storyRag.chunkCount > 0) {
+        systemPrompt += storyRag.corpusContext;
+      }
 
       const storyResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -3171,6 +3193,16 @@ Genre: ${mentorGenre || 'narrative'}
 ${mentorOverrideRoom ? `Note: User has overridden the AI-detected primary lens. The meaning section should remain exegetically neutral; only the Palace Framing section should reflect the override lens.` : ''}
 
 Return the structured JSON response with all 5 sections, study buddy prompts, and compliance report.`;
+
+      // RAG corpus injection for preacher-mentor commentary (early-return mode)
+      const mentorRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (mentorRag.chunkCount > 0) {
+        systemPrompt += mentorRag.corpusContext;
+      }
 
       const mentorResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -3346,6 +3378,16 @@ ${book} ${chapter}:${verseText?.verse || verse}
 
 Remember: calm, reflective, textually grounded, 150-250 words, flowing prose suitable for audio.`;
 
+      // RAG corpus injection for counselor commentary (early-return mode)
+      const counselorRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText?.verse || verse} ${verseText?.text || ''}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (counselorRag.chunkCount > 0) {
+        systemPrompt += counselorRag.corpusContext;
+      }
+
       const counselorResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
         {
@@ -3436,6 +3478,16 @@ Verse text: "${verseText.text}"
 • Maintain SDA theological perspective
 • Do NOT fabricate specific volume/page citations`;
 
+      // RAG corpus injection for SDABC commentary (early-return mode)
+      const sdabcRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (sdabcRag.chunkCount > 0) {
+        systemPrompt += sdabcRag.corpusContext;
+      }
+
       const sdabcResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
         {
@@ -3524,7 +3576,19 @@ Verse text: "${verseText.text}"
 • Show the historicist method in action
 • Connect to parallel prophecies in Daniel/Revelation
 • Note: Smith wrote in the late 1800s, so some historical references reflect that era`;
-      } else {
+      }
+
+      // RAG corpus injection for Uriah Smith commentary (early-return mode)
+      const smithRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (smithRag.chunkCount > 0) {
+        systemPrompt += smithRag.corpusContext;
+      }
+
+      if (!isDanielOrRevelation) {
         userPrompt = `The user is requesting Uriah Smith's commentary on ${book} ${chapter}:${verseText.verse}.
 
 Note: Uriah Smith's "Daniel and the Revelation" specifically covers only the books of Daniel and Revelation.
@@ -3635,6 +3699,16 @@ Verse text: "${verseText.text}"
 • Connect to the Three Angels' Messages when appropriate
 • Show the historicist prophetic framework
 • Focus on themes Andrews emphasized: sanctuary, Sabbath, prophecy, the Advent hope`;
+
+      // RAG corpus injection for J.N. Andrews commentary (early-return mode)
+      const andrewsRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (andrewsRag.chunkCount > 0) {
+        systemPrompt += andrewsRag.corpusContext;
+      }
 
       const andrewsResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -8188,6 +8262,43 @@ FORMAT: Use clear markdown with headers, bullet points, and bold for emphasis. S
         JSON.stringify({ error: "Unable to process your request. Please try again.", content: `I wasn't able to generate a response for this mode. Please try again or switch to a different study mode.` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // ============================================================
+    // RAG CORPUS RETRIEVAL — Inject Pastor Ivor Myers' teaching context
+    // Authority Hierarchy: Scripture (Tier 1) > Core Method (Tier 2) > Corpus (Tier 3) > Supporting Sources (Tier 4)
+    // The corpus provides VOICE and applied theology, NOT doctrinal authority.
+    // Uses exclusion set: ~80 modes get corpus context, ~20 game/validation modes excluded.
+    // ============================================================
+    const RAG_EXCLUDED_MODES = new Set([
+      "help", "grade", "grade-drill-answer",
+      "validate_chain", "validate_sanctuary", "validate_time_zones",
+      "validate_connect6", "validate_christ", "validate_controversy",
+      "validate_dragon_defense", "validate_equation", "validate_witness",
+      "validate_frame", "validate_room_game", "validate_chef_recipe",
+      "chain-chess", "chain-chess-feedback",
+      "chain-chess-v2-opening", "chain-chess-v2-judge", "chain-chess-v2-response",
+      "chain-chess-v3-opening", "chain-chess-v3-judge", "chain-chess-v3-response",
+      "equations-challenge", "solve-equation",
+      "generate-drills", "generate-chart", "generate-image", "generate-flashcards",
+      "guesthouse_generate_prompt", "guesthouse_grade_response",
+      "guesthouse_group_insight", "guesthouse_suggest_event",
+      "guesthouse_create_custom_challenge", "guesthouse_grade_custom_challenge",
+      "check-commentary-availability", "check_chef_recipe",
+      "get_chef_model_answer", "generate_chef_verses",
+      "strongs-lookup", "translate-verse",
+    ]);
+
+    if (!RAG_EXCLUDED_MODES.has(mode)) {
+      const ragResult = await getCorpusContext({
+        query: userPrompt.slice(0, 4000),
+        matchCount: 3,
+        mode,
+        supabaseClient: supabase,
+      });
+      if (ragResult.chunkCount > 0) {
+        systemPrompt += ragResult.corpusContext;
+      }
     }
 
     // Build messages array — for research quick mode, pass conversation history as real message turns

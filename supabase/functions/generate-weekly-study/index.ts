@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -41,7 +42,13 @@ Respond ONLY with valid JSON in this exact format:
   "seeker_friendly_framing": "string (how to present this to guests/seekers in an accessible way)"
 }`;
 
-    const userPrompt = `Generate a Central Study Packet from this sermon:
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `${sermonTitle || ''} ${sermonText.substring(0, 3000)}`.slice(0, 4000),
+      matchCount: 2,
+    });
+
+    let userPrompt = `Generate a Central Study Packet from this sermon:
 
 SERMON TITLE: ${sermonTitle || "Untitled Sermon"}
 WEEK: ${weekStart || "TBD"} to ${weekEnd || "TBD"}
@@ -50,6 +57,10 @@ SERMON CONTENT:
 ${sermonText.substring(0, 12000)}
 
 Create a Christ-centered, Phototheology-informed weekly study that captures the core message and makes it actionable for small groups.`;
+
+    if (ragResult.chunkCount > 0) {
+      userPrompt += ragResult.corpusContext;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

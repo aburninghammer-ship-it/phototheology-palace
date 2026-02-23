@@ -1,0 +1,3595 @@
+1
+00:00:00,560 --> 00:00:03,590
+
+Hey guys, Pastor Myers here and um I'm
+
+2
+00:00:03,590 --> 00:00:03,600
+Hey guys, Pastor Myers here and um I'm
+ 
+
+3
+00:00:03,600 --> 00:00:06,070
+Hey guys, Pastor Myers here and um I'm
+going to be taking uh some time to
+
+4
+00:00:06,070 --> 00:00:06,080
+going to be taking uh some time to
+ 
+
+5
+00:00:06,080 --> 00:00:08,870
+going to be taking uh some time to
+create some short videos on how to use
+
+6
+00:00:08,870 --> 00:00:08,880
+create some short videos on how to use
+ 
+
+7
+00:00:08,880 --> 00:00:12,470
+create some short videos on how to use
+the photo theology GPT.
+
+8
+00:00:12,470 --> 00:00:12,480
+the photo theology GPT.
+ 
+
+9
+00:00:12,480 --> 00:00:14,230
+the photo theology GPT.
+Now, there are so many different
+
+10
+00:00:14,230 --> 00:00:14,240
+Now, there are so many different
+ 
+
+11
+00:00:14,240 --> 00:00:16,230
+Now, there are so many different
+features to this that it's going to take
+
+12
+00:00:16,230 --> 00:00:16,240
+features to this that it's going to take
+ 
+
+13
+00:00:16,240 --> 00:00:18,950
+features to this that it's going to take
+me a bunch of videos to actually do this
+
+14
+00:00:18,950 --> 00:00:18,960
+me a bunch of videos to actually do this
+ 
+
+15
+00:00:18,960 --> 00:00:20,390
+me a bunch of videos to actually do this
+and show you everything this thing can
+
+16
+00:00:20,390 --> 00:00:20,400
+and show you everything this thing can
+ 
+
+17
+00:00:20,400 --> 00:00:23,189
+and show you everything this thing can
+do. Um so, these are going to be short,
+
+18
+00:00:23,189 --> 00:00:23,199
+do. Um so, these are going to be short,
+ 
+
+19
+00:00:23,199 --> 00:00:25,509
+do. Um so, these are going to be short,
+you know, 5 to 10 minute videos. And
+
+20
+00:00:25,509 --> 00:00:25,519
+you know, 5 to 10 minute videos. And
+ 
+
+21
+00:00:25,519 --> 00:00:28,310
+you know, 5 to 10 minute videos. And
+today I'm going to show you the photo
+
+22
+00:00:28,310 --> 00:00:28,320
+today I'm going to show you the photo
+ 
+
+23
+00:00:28,320 --> 00:00:31,429
+today I'm going to show you the photo
+theology commentary. Yes, you heard that
+
+24
+00:00:31,429 --> 00:00:31,439
+theology commentary. Yes, you heard that
+ 
+
+25
+00:00:31,439 --> 00:00:34,870
+theology commentary. Yes, you heard that
+right, the photo theology commentary. So
+
+26
+00:00:34,870 --> 00:00:34,880
+right, the photo theology commentary. So
+ 
+
+27
+00:00:34,880 --> 00:00:36,709
+right, the photo theology commentary. So
+I'm going to go ahead and share my
+
+28
+00:00:36,709 --> 00:00:36,719
+I'm going to go ahead and share my
+ 
+
+29
+00:00:36,719 --> 00:00:38,069
+I'm going to go ahead and share my
+screen. I'm going to be up in the
+
+30
+00:00:38,069 --> 00:00:38,079
+screen. I'm going to be up in the
+ 
+
+31
+00:00:38,079 --> 00:00:39,670
+screen. I'm going to be up in the
+corner. Uh you're not going to, you
+
+32
+00:00:39,670 --> 00:00:39,680
+corner. Uh you're not going to, you
+ 
+
+33
+00:00:39,680 --> 00:00:42,310
+corner. Uh you're not going to, you
+know, see we're going to focus on the
+
+34
+00:00:42,310 --> 00:00:42,320
+know, see we're going to focus on the
+ 
+
+35
+00:00:42,320 --> 00:00:44,150
+know, see we're going to focus on the
+GPT and I want you to check this out,
+
+36
+00:00:44,150 --> 00:00:44,160
+GPT and I want you to check this out,
+ 
+
+37
+00:00:44,160 --> 00:00:46,869
+GPT and I want you to check this out,
+guys. So let me share my screen.
+
+38
+00:00:46,869 --> 00:00:46,879
+guys. So let me share my screen.
+ 
+
+39
+00:00:46,879 --> 00:00:53,110
+guys. So let me share my screen.
+Um and you will see here the photoology
+
+40
+00:00:53,110 --> 00:00:53,120
+Um and you will see here the photoology
+ 
+
+41
+00:00:53,120 --> 00:00:55,510
+Um and you will see here the photoology
+app. So, it's photoology
+
+42
+00:00:55,510 --> 00:00:55,520
+app. So, it's photoology
+ 
+
+43
+00:00:55,520 --> 00:00:59,430
+app. So, it's photoology
+GPT. All right. And uh let me go ahead.
+
+44
+00:00:59,430 --> 00:00:59,440
+GPT. All right. And uh let me go ahead.
+ 
+
+45
+00:00:59,440 --> 00:01:02,229
+GPT. All right. And uh let me go ahead.
+I'm going to go ahead and click uh on
+
+46
+00:01:02,229 --> 00:01:02,239
+I'm going to go ahead and click uh on
+ 
+
+47
+00:01:02,239 --> 00:01:05,429
+I'm going to go ahead and click uh on
+that first photoology right there. Uh
+
+48
+00:01:05,429 --> 00:01:05,439
+that first photoology right there. Uh
+ 
+
+49
+00:01:05,439 --> 00:01:08,630
+that first photoology right there. Uh
+and it's going to take me into the GPT.
+
+50
+00:01:08,630 --> 00:01:08,640
+and it's going to take me into the GPT.
+ 
+
+51
+00:01:08,640 --> 00:01:10,390
+and it's going to take me into the GPT.
+And I'm just going to go ahead and type
+
+52
+00:01:10,390 --> 00:01:10,400
+And I'm just going to go ahead and type
+ 
+
+53
+00:01:10,400 --> 00:01:14,310
+And I'm just going to go ahead and type
+in hello.
+
+54
+00:01:14,310 --> 00:01:14,320
+
+ 
+
+55
+00:01:14,320 --> 00:01:15,750
+
+And uh what it's going to do is it's
+
+56
+00:01:15,750 --> 00:01:15,760
+And uh what it's going to do is it's
+ 
+
+57
+00:01:15,760 --> 00:01:17,510
+And uh what it's going to do is it's
+going to respond and give me several
+
+58
+00:01:17,510 --> 00:01:17,520
+going to respond and give me several
+ 
+
+59
+00:01:17,520 --> 00:01:19,749
+going to respond and give me several
+options, right? And the option that
+
+60
+00:01:19,749 --> 00:01:19,759
+options, right? And the option that
+ 
+
+61
+00:01:19,759 --> 00:01:22,710
+options, right? And the option that
+we're looking for is the commentary
+
+62
+00:01:22,710 --> 00:01:22,720
+we're looking for is the commentary
+ 
+
+63
+00:01:22,720 --> 00:01:25,990
+we're looking for is the commentary
+mode. So, as you can see, I'm not going
+
+64
+00:01:25,990 --> 00:01:26,000
+mode. So, as you can see, I'm not going
+ 
+
+65
+00:01:26,000 --> 00:01:29,190
+mode. So, as you can see, I'm not going
+to read all of this, but would you like
+
+66
+00:01:29,190 --> 00:01:29,200
+to read all of this, but would you like
+ 
+
+67
+00:01:29,200 --> 00:01:30,550
+to read all of this, but would you like
+what would you like to do today? Choose
+
+68
+00:01:30,550 --> 00:01:30,560
+what would you like to do today? Choose
+ 
+
+69
+00:01:30,560 --> 00:01:33,190
+what would you like to do today? Choose
+a mode like commentary. And that's what
+
+70
+00:01:33,190 --> 00:01:33,200
+a mode like commentary. And that's what
+ 
+
+71
+00:01:33,200 --> 00:01:34,630
+a mode like commentary. And that's what
+I'm going to choose. I'm going to choose
+
+72
+00:01:34,630 --> 00:01:34,640
+I'm going to choose. I'm going to choose
+ 
+
+73
+00:01:34,640 --> 00:01:37,510
+I'm going to choose. I'm going to choose
+the commentary
+
+74
+00:01:37,510 --> 00:01:37,520
+the commentary
+ 
+
+75
+00:01:37,520 --> 00:01:42,950
+the commentary
+commentary mode. Right?
+
+76
+00:01:42,950 --> 00:01:42,960
+commentary mode. Right?
+ 
+
+77
+00:01:42,960 --> 00:01:45,510
+commentary mode. Right?
+So,
+
+78
+00:01:45,510 --> 00:01:45,520
+So,
+ 
+
+79
+00:01:45,520 --> 00:01:46,870
+So,
+what it's going to do is it's going to
+
+80
+00:01:46,870 --> 00:01:46,880
+what it's going to do is it's going to
+ 
+
+81
+00:01:46,880 --> 00:01:48,630
+what it's going to do is it's going to
+give me three options.
+
+82
+00:01:48,630 --> 00:01:48,640
+give me three options.
+ 
+
+83
+00:01:48,640 --> 00:01:51,510
+give me three options.
+Option one is the palace mode.
+
+84
+00:01:51,510 --> 00:01:51,520
+Option one is the palace mode.
+ 
+
+85
+00:01:51,520 --> 00:01:54,069
+Option one is the palace mode.
+Option two is the room mode. And option
+
+86
+00:01:54,069 --> 00:01:54,079
+Option two is the room mode. And option
+ 
+
+87
+00:01:54,079 --> 00:01:57,030
+Option two is the room mode. And option
+three is the principal mode. So, we're
+
+88
+00:01:57,030 --> 00:01:57,040
+three is the principal mode. So, we're
+ 
+
+89
+00:01:57,040 --> 00:01:58,950
+three is the principal mode. So, we're
+just going to deal with the palace mode
+
+90
+00:01:58,950 --> 00:01:58,960
+just going to deal with the palace mode
+ 
+
+91
+00:01:58,960 --> 00:02:00,550
+just going to deal with the palace mode
+first. Okay? And what the palace mode
+
+92
+00:02:00,550 --> 00:02:00,560
+first. Okay? And what the palace mode
+ 
+
+93
+00:02:00,560 --> 00:02:05,109
+first. Okay? And what the palace mode
+is, palace mode does is it'll take one
+
+94
+00:02:05,109 --> 00:02:05,119
+is, palace mode does is it'll take one
+ 
+
+95
+00:02:05,119 --> 00:02:06,870
+is, palace mode does is it'll take one
+verse, whatever verse you give it that
+
+96
+00:02:06,870 --> 00:02:06,880
+verse, whatever verse you give it that
+ 
+
+97
+00:02:06,880 --> 00:02:09,430
+verse, whatever verse you give it that
+you want to uh you want a commentary on,
+
+98
+00:02:09,430 --> 00:02:09,440
+you want to uh you want a commentary on,
+ 
+
+99
+00:02:09,440 --> 00:02:12,550
+you want to uh you want a commentary on,
+and it's going to run that verse through
+
+100
+00:02:12,550 --> 00:02:12,560
+and it's going to run that verse through
+ 
+
+101
+00:02:12,560 --> 00:02:16,949
+and it's going to run that verse through
+every room of the photo theology palace.
+
+102
+00:02:16,949 --> 00:02:16,959
+every room of the photo theology palace.
+ 
+
+103
+00:02:16,959 --> 00:02:19,830
+every room of the photo theology palace.
+every room. There are 38 rooms in a
+
+104
+00:02:19,830 --> 00:02:19,840
+every room. There are 38 rooms in a
+ 
+
+105
+00:02:19,840 --> 00:02:21,589
+every room. There are 38 rooms in a
+photo theology palace. One room I'm
+
+106
+00:02:21,589 --> 00:02:21,599
+photo theology palace. One room I'm
+ 
+
+107
+00:02:21,599 --> 00:02:23,589
+photo theology palace. One room I'm
+about to add, there's 37 that you see
+
+108
+00:02:23,589 --> 00:02:23,599
+about to add, there's 37 that you see
+ 
+
+109
+00:02:23,599 --> 00:02:26,390
+about to add, there's 37 that you see
+right now, but I just want to give you
+
+110
+00:02:26,390 --> 00:02:26,400
+right now, but I just want to give you
+ 
+
+111
+00:02:26,400 --> 00:02:29,910
+right now, but I just want to give you
+an example. So, let me type in palace
+
+112
+00:02:29,910 --> 00:02:29,920
+an example. So, let me type in palace
+ 
+
+113
+00:02:29,920 --> 00:02:31,430
+an example. So, let me type in palace
+mode.
+
+114
+00:02:31,430 --> 00:02:31,440
+mode.
+ 
+
+115
+00:02:31,440 --> 00:02:35,190
+mode.
+And um and then it's going to ask me uh
+
+116
+00:02:35,190 --> 00:02:35,200
+And um and then it's going to ask me uh
+ 
+
+117
+00:02:35,200 --> 00:02:39,430
+And um and then it's going to ask me uh
+what verse I want to commentary on.
+
+118
+00:02:39,430 --> 00:02:39,440
+what verse I want to commentary on.
+ 
+
+119
+00:02:39,440 --> 00:02:43,350
+what verse I want to commentary on.
+So, let's let it load.
+
+120
+00:02:43,350 --> 00:02:43,360
+
+ 
+
+121
+00:02:43,360 --> 00:02:45,270
+
+And um here you're going to see it's
+
+122
+00:02:45,270 --> 00:02:45,280
+And um here you're going to see it's
+ 
+
+123
+00:02:45,280 --> 00:02:47,190
+And um here you're going to see it's
+going to ask me what level and what
+
+124
+00:02:47,190 --> 00:02:47,200
+going to ask me what level and what
+ 
+
+125
+00:02:47,200 --> 00:02:49,670
+going to ask me what level and what
+language. So I've chosen pro mode. You
+
+126
+00:02:49,670 --> 00:02:49,680
+language. So I've chosen pro mode. You
+ 
+
+127
+00:02:49,680 --> 00:02:52,309
+language. So I've chosen pro mode. You
+can put in if you use this, it'll give
+
+128
+00:02:52,309 --> 00:02:52,319
+can put in if you use this, it'll give
+ 
+
+129
+00:02:52,319 --> 00:02:54,470
+can put in if you use this, it'll give
+you an option between basic mode,
+
+130
+00:02:54,470 --> 00:02:54,480
+you an option between basic mode,
+ 
+
+131
+00:02:54,480 --> 00:02:57,430
+you an option between basic mode,
+intermediate, advanced, and pro. So I'm
+
+132
+00:02:57,430 --> 00:02:57,440
+intermediate, advanced, and pro. So I'm
+ 
+
+133
+00:02:57,440 --> 00:03:01,030
+intermediate, advanced, and pro. So I'm
+putting in pro. And um now it's going to
+
+134
+00:03:01,030 --> 00:03:01,040
+putting in pro. And um now it's going to
+ 
+
+135
+00:03:01,040 --> 00:03:02,790
+putting in pro. And um now it's going to
+ask me for a verse. So what I'm going to
+
+136
+00:03:02,790 --> 00:03:02,800
+ask me for a verse. So what I'm going to
+ 
+
+137
+00:03:02,800 --> 00:03:05,270
+ask me for a verse. So what I'm going to
+do is I'm going to give it Genesis
+
+138
+00:03:05,270 --> 00:03:05,280
+do is I'm going to give it Genesis
+ 
+
+139
+00:03:05,280 --> 00:03:07,509
+do is I'm going to give it Genesis
+chapter 3:15.
+
+140
+00:03:07,509 --> 00:03:07,519
+chapter 3:15.
+ 
+
+141
+00:03:07,519 --> 00:03:11,190
+chapter 3:15.
+And what this is going to do
+
+142
+00:03:11,190 --> 00:03:11,200
+And what this is going to do
+ 
+
+143
+00:03:11,200 --> 00:03:14,869
+And what this is going to do
+is it's going to funnel Genesis 3:15
+
+144
+00:03:14,869 --> 00:03:14,879
+is it's going to funnel Genesis 3:15
+ 
+
+145
+00:03:14,879 --> 00:03:19,350
+is it's going to funnel Genesis 3:15
+through every room of the palace.
+
+146
+00:03:19,350 --> 00:03:19,360
+through every room of the palace.
+ 
+
+147
+00:03:19,360 --> 00:03:20,550
+through every room of the palace.
+And then it's going to come back and
+
+148
+00:03:20,550 --> 00:03:20,560
+And then it's going to come back and
+ 
+
+149
+00:03:20,560 --> 00:03:24,309
+And then it's going to come back and
+give me a response, a commentary on this
+
+150
+00:03:24,309 --> 00:03:24,319
+give me a response, a commentary on this
+ 
+
+151
+00:03:24,319 --> 00:03:27,110
+give me a response, a commentary on this
+one verse
+
+152
+00:03:27,110 --> 00:03:27,120
+one verse
+ 
+
+153
+00:03:27,120 --> 00:03:28,869
+one verse
+through every room of the palace. It's
+
+154
+00:03:28,869 --> 00:03:28,879
+through every room of the palace. It's
+ 
+
+155
+00:03:28,879 --> 00:03:30,070
+through every room of the palace. It's
+going to kind of go through and then
+
+156
+00:03:30,070 --> 00:03:30,080
+going to kind of go through and then
+ 
+
+157
+00:03:30,080 --> 00:03:32,390
+going to kind of go through and then
+bring it all together. So this is all
+
+158
+00:03:32,390 --> 00:03:32,400
+bring it all together. So this is all
+ 
+
+159
+00:03:32,400 --> 00:03:33,830
+bring it all together. So this is all
+one verse, guys. Now, I'm not going to
+
+160
+00:03:33,830 --> 00:03:33,840
+one verse, guys. Now, I'm not going to
+ 
+
+161
+00:03:33,840 --> 00:03:35,589
+one verse, guys. Now, I'm not going to
+read this whole thing, but let me just
+
+162
+00:03:35,589 --> 00:03:35,599
+read this whole thing, but let me just
+ 
+
+163
+00:03:35,599 --> 00:03:37,509
+read this whole thing, but let me just
+give you the synthesis. So, you can see
+
+164
+00:03:37,509 --> 00:03:37,519
+give you the synthesis. So, you can see
+ 
+
+165
+00:03:37,519 --> 00:03:39,030
+give you the synthesis. So, you can see
+that it's taking you through. It's
+
+166
+00:03:39,030 --> 00:03:39,040
+that it's taking you through. It's
+ 
+
+167
+00:03:39,040 --> 00:03:41,190
+that it's taking you through. It's
+showing you several of the rooms. It's
+
+168
+00:03:41,190 --> 00:03:41,200
+showing you several of the rooms. It's
+ 
+
+169
+00:03:41,200 --> 00:03:43,190
+showing you several of the rooms. It's
+going through all the rooms. Okay? It's
+
+170
+00:03:43,190 --> 00:03:43,200
+going through all the rooms. Okay? It's
+ 
+
+171
+00:03:43,200 --> 00:03:46,630
+going through all the rooms. Okay? It's
+going to go through all the rooms, but
+
+172
+00:03:46,630 --> 00:03:46,640
+going to go through all the rooms, but
+ 
+
+173
+00:03:46,640 --> 00:03:47,830
+going to go through all the rooms, but
+uh I'm just going to give you the
+
+174
+00:03:47,830 --> 00:03:47,840
+uh I'm just going to give you the
+ 
+
+175
+00:03:47,840 --> 00:03:49,910
+uh I'm just going to give you the
+synthesis, the synthesis. And it says
+
+176
+00:03:49,910 --> 00:03:49,920
+synthesis, the synthesis. And it says
+ 
+
+177
+00:03:49,920 --> 00:03:52,630
+synthesis, the synthesis. And it says
+here, Genesis 3:15 stands as the Bible's
+
+178
+00:03:52,630 --> 00:03:52,640
+here, Genesis 3:15 stands as the Bible's
+ 
+
+179
+00:03:52,640 --> 00:03:55,190
+here, Genesis 3:15 stands as the Bible's
+foundational gospel declaration,
+
+180
+00:03:55,190 --> 00:03:55,200
+foundational gospel declaration,
+ 
+
+181
+00:03:55,200 --> 00:03:56,949
+foundational gospel declaration,
+igniting the great controversy with a
+
+182
+00:03:56,949 --> 00:03:56,959
+igniting the great controversy with a
+ 
+
+183
+00:03:56,959 --> 00:03:59,110
+igniting the great controversy with a
+promise of divine intervention that
+
+184
+00:03:59,110 --> 00:03:59,120
+promise of divine intervention that
+ 
+
+185
+00:03:59,120 --> 00:04:00,550
+promise of divine intervention that
+threads through every room of the
+
+186
+00:04:00,550 --> 00:04:00,560
+threads through every room of the
+ 
+
+187
+00:04:00,560 --> 00:04:02,630
+threads through every room of the
+palace, revealing Christ as the ultimate
+
+188
+00:04:02,630 --> 00:04:02,640
+palace, revealing Christ as the ultimate
+ 
+
+189
+00:04:02,640 --> 00:04:05,509
+palace, revealing Christ as the ultimate
+seed who resolves humanity's fall. In
+
+190
+00:04:05,509 --> 00:04:05,519
+seed who resolves humanity's fall. In
+ 
+
+191
+00:04:05,519 --> 00:04:07,429
+seed who resolves humanity's fall. In
+the observation room, we see the raw
+
+192
+00:04:07,429 --> 00:04:07,439
+the observation room, we see the raw
+ 
+
+193
+00:04:07,439 --> 00:04:09,750
+the observation room, we see the raw
+structure. God's word to the serpent
+
+194
+00:04:09,750 --> 00:04:09,760
+structure. God's word to the serpent
+ 
+
+195
+00:04:09,760 --> 00:04:11,830
+structure. God's word to the serpent
+pivot. The God's words to the servant
+
+196
+00:04:11,830 --> 00:04:11,840
+pivot. The God's words to the servant
+ 
+
+197
+00:04:11,840 --> 00:04:13,670
+pivot. The God's words to the servant
+pivot from immediate curse to forward
+
+198
+00:04:13,670 --> 00:04:13,680
+pivot from immediate curse to forward
+ 
+
+199
+00:04:13,680 --> 00:04:16,469
+pivot from immediate curse to forward
+hope, imposing enmity not as mere
+
+200
+00:04:16,469 --> 00:04:16,479
+hope, imposing enmity not as mere
+ 
+
+201
+00:04:16,479 --> 00:04:18,469
+hope, imposing enmity not as mere
+strife, but as a protective barrier
+
+202
+00:04:18,469 --> 00:04:18,479
+strife, but as a protective barrier
+ 
+
+203
+00:04:18,479 --> 00:04:20,949
+strife, but as a protective barrier
+against total surrender to evil. This
+
+204
+00:04:20,949 --> 00:04:20,959
+against total surrender to evil. This
+ 
+
+205
+00:04:20,959 --> 00:04:23,270
+against total surrender to evil. This
+lexical depth in the def the this
+
+206
+00:04:23,270 --> 00:04:23,280
+lexical depth in the def the this
+ 
+
+207
+00:04:23,280 --> 00:04:25,670
+lexical depth in the def the this
+lexical depth in the def room clarified
+
+208
+00:04:25,670 --> 00:04:25,680
+lexical depth in the def room clarified
+ 
+
+209
+00:04:25,680 --> 00:04:29,350
+lexical depth in the def room clarified
+seed as the multifaceted literal in
+
+210
+00:04:29,350 --> 00:04:29,360
+seed as the multifaceted literal in
+ 
+
+211
+00:04:29,360 --> 00:04:32,390
+seed as the multifaceted literal in
+Christ's virgin's birth from Eve's line
+
+212
+00:04:32,390 --> 00:04:32,400
+Christ's virgin's birth from Eve's line
+ 
+
+213
+00:04:32,400 --> 00:04:34,629
+Christ's virgin's birth from Eve's line
+collective in the church as Abraham's
+
+214
+00:04:34,629 --> 00:04:34,639
+collective in the church as Abraham's
+ 
+
+215
+00:04:34,639 --> 00:04:37,430
+collective in the church as Abraham's
+spiritual heirs echoing Paul's use in
+
+216
+00:04:37,430 --> 00:04:37,440
+spiritual heirs echoing Paul's use in
+ 
+
+217
+00:04:37,440 --> 00:04:39,670
+spiritual heirs echoing Paul's use in
+Romans and Galatians to affirm believers
+
+218
+00:04:39,670 --> 00:04:39,680
+Romans and Galatians to affirm believers
+ 
+
+219
+00:04:39,680 --> 00:04:42,469
+Romans and Galatians to affirm believers
+inclusion through faith and it goes on
+
+220
+00:04:42,469 --> 00:04:42,479
+inclusion through faith and it goes on
+ 
+
+221
+00:04:42,479 --> 00:04:49,110
+inclusion through faith and it goes on
+this is all commentary on one verse okay
+
+222
+00:04:49,110 --> 00:04:49,120
+this is all commentary on one verse okay
+ 
+
+223
+00:04:49,120 --> 00:04:50,629
+this is all commentary on one verse okay
+So
+
+224
+00:04:50,629 --> 00:04:50,639
+So
+ 
+
+225
+00:04:50,639 --> 00:04:52,150
+So
+I'm going to scroll down now and I'm
+
+226
+00:04:52,150 --> 00:04:52,160
+I'm going to scroll down now and I'm
+ 
+
+227
+00:04:52,160 --> 00:04:54,310
+I'm going to scroll down now and I'm
+going to I'm going to ask to change the
+
+228
+00:04:54,310 --> 00:04:54,320
+going to I'm going to ask to change the
+ 
+
+229
+00:04:54,320 --> 00:04:56,469
+going to I'm going to ask to change the
+mode. So now what I'm going to say is
+
+230
+00:04:56,469 --> 00:04:56,479
+mode. So now what I'm going to say is
+ 
+
+231
+00:04:56,479 --> 00:05:00,150
+mode. So now what I'm going to say is
+I'm going to say let's let's
+
+232
+00:05:00,150 --> 00:05:00,160
+I'm going to say let's let's
+ 
+
+233
+00:05:00,160 --> 00:05:03,030
+I'm going to say let's let's
+change to and by the way you can see
+
+234
+00:05:03,030 --> 00:05:03,040
+change to and by the way you can see
+ 
+
+235
+00:05:03,040 --> 00:05:07,189
+change to and by the way you can see
+that there are options here right um you
+
+236
+00:05:07,189 --> 00:05:07,199
+that there are options here right um you
+ 
+
+237
+00:05:07,199 --> 00:05:09,830
+that there are options here right um you
+can actually ask hey take this one
+
+238
+00:05:09,830 --> 00:05:09,840
+can actually ask hey take this one
+ 
+
+239
+00:05:09,840 --> 00:05:12,950
+can actually ask hey take this one
+sentence or this one paragraph and
+
+240
+00:05:12,950 --> 00:05:12,960
+sentence or this one paragraph and
+ 
+
+241
+00:05:12,960 --> 00:05:14,950
+sentence or this one paragraph and
+expand on this thought or take this one
+
+242
+00:05:14,950 --> 00:05:14,960
+expand on this thought or take this one
+ 
+
+243
+00:05:14,960 --> 00:05:17,350
+expand on this thought or take this one
+room and expand on this room but I'm
+
+244
+00:05:17,350 --> 00:05:17,360
+room and expand on this room but I'm
+ 
+
+245
+00:05:17,360 --> 00:05:22,950
+room and expand on this room but I'm
+going to say let's change to room mode.
+
+246
+00:05:22,950 --> 00:05:22,960
+going to say let's change to room mode.
+ 
+
+247
+00:05:22,960 --> 00:05:25,749
+going to say let's change to room mode.
+So now we've moved from palace mode
+
+248
+00:05:25,749 --> 00:05:25,759
+So now we've moved from palace mode
+ 
+
+249
+00:05:25,759 --> 00:05:29,029
+So now we've moved from palace mode
+where it takes the text through every uh
+
+250
+00:05:29,029 --> 00:05:29,039
+where it takes the text through every uh
+ 
+
+251
+00:05:29,039 --> 00:05:31,430
+where it takes the text through every uh
+room in the palace and now we're going
+
+252
+00:05:31,430 --> 00:05:31,440
+room in the palace and now we're going
+ 
+
+253
+00:05:31,440 --> 00:05:34,310
+room in the palace and now we're going
+to room mode. And in room mode, it's
+
+254
+00:05:34,310 --> 00:05:34,320
+to room mode. And in room mode, it's
+ 
+
+255
+00:05:34,320 --> 00:05:36,629
+to room mode. And in room mode, it's
+going to ask me what room do I want to
+
+256
+00:05:36,629 --> 00:05:36,639
+going to ask me what room do I want to
+ 
+
+257
+00:05:36,639 --> 00:05:38,950
+going to ask me what room do I want to
+go through first. In other words, let's
+
+258
+00:05:38,950 --> 00:05:38,960
+go through first. In other words, let's
+ 
+
+259
+00:05:38,960 --> 00:05:41,350
+go through first. In other words, let's
+analyze this verse again, but I now want
+
+260
+00:05:41,350 --> 00:05:41,360
+analyze this verse again, but I now want
+ 
+
+261
+00:05:41,360 --> 00:05:43,110
+analyze this verse again, but I now want
+to take it through, let's say, the theme
+
+262
+00:05:43,110 --> 00:05:43,120
+to take it through, let's say, the theme
+ 
+
+263
+00:05:43,120 --> 00:05:46,790
+to take it through, let's say, the theme
+room. So, in the theme room,
+
+264
+00:05:46,790 --> 00:05:46,800
+room. So, in the theme room,
+ 
+
+265
+00:05:46,800 --> 00:05:52,710
+room. So, in the theme room,
+um the theme room is it's set up as uh
+
+266
+00:05:52,710 --> 00:05:52,720
+um the theme room is it's set up as uh
+ 
+
+267
+00:05:52,720 --> 00:05:55,909
+um the theme room is it's set up as uh
+the heaven ceiling, the gospel floor,
+
+268
+00:05:55,909 --> 00:05:55,919
+the heaven ceiling, the gospel floor,
+ 
+
+269
+00:05:55,919 --> 00:05:57,990
+the heaven ceiling, the gospel floor,
+the life of Christ wall, the great
+
+270
+00:05:57,990 --> 00:05:58,000
+the life of Christ wall, the great
+ 
+
+271
+00:05:58,000 --> 00:06:00,550
+the life of Christ wall, the great
+controversy wall, the time prophecy
+
+272
+00:06:00,550 --> 00:06:00,560
+controversy wall, the time prophecy
+ 
+
+273
+00:06:00,560 --> 00:06:06,469
+controversy wall, the time prophecy
+wall, and the um the
+
+274
+00:06:06,469 --> 00:06:06,479
+wall, and the um the
+ 
+
+275
+00:06:06,479 --> 00:06:08,710
+wall, and the um the
+uh sanctuary wall. So, I think I got all
+
+276
+00:06:08,710 --> 00:06:08,720
+uh sanctuary wall. So, I think I got all
+ 
+
+277
+00:06:08,720 --> 00:06:11,189
+uh sanctuary wall. So, I think I got all
+those four. sanctuary, life of Christ,
+
+278
+00:06:11,189 --> 00:06:11,199
+those four. sanctuary, life of Christ,
+ 
+
+279
+00:06:11,199 --> 00:06:13,830
+those four. sanctuary, life of Christ,
+great controversy, and time prophecy
+
+280
+00:06:13,830 --> 00:06:13,840
+great controversy, and time prophecy
+ 
+
+281
+00:06:13,840 --> 00:06:16,950
+great controversy, and time prophecy
+wall. And what it's going to do is it's
+
+282
+00:06:16,950 --> 00:06:16,960
+wall. And what it's going to do is it's
+ 
+
+283
+00:06:16,960 --> 00:06:20,070
+wall. And what it's going to do is it's
+going to look at that text within the
+
+284
+00:06:20,070 --> 00:06:20,080
+going to look at that text within the
+ 
+
+285
+00:06:20,080 --> 00:06:22,710
+going to look at that text within the
+context of all of those themes. So, I'm
+
+286
+00:06:22,710 --> 00:06:22,720
+context of all of those themes. So, I'm
+ 
+
+287
+00:06:22,720 --> 00:06:24,870
+context of all of those themes. So, I'm
+going to go ahead and push theme room
+
+288
+00:06:24,870 --> 00:06:24,880
+going to go ahead and push theme room
+ 
+
+289
+00:06:24,880 --> 00:06:33,909
+going to go ahead and push theme room
+and let's see what it does.
+
+290
+00:06:33,909 --> 00:06:33,919
+
+ 
+
+291
+00:06:33,919 --> 00:06:36,950
+
+All right. So now you can see it is now
+
+292
+00:06:36,950 --> 00:06:36,960
+All right. So now you can see it is now
+ 
+
+293
+00:06:36,960 --> 00:06:39,350
+All right. So now you can see it is now
+commenting on this verse against the
+
+294
+00:06:39,350 --> 00:06:39,360
+commenting on this verse against the
+ 
+
+295
+00:06:39,360 --> 00:06:42,230
+commenting on this verse against the
+backdrop of all of these themes. So for
+
+296
+00:06:42,230 --> 00:06:42,240
+backdrop of all of these themes. So for
+ 
+
+297
+00:06:42,240 --> 00:06:43,749
+backdrop of all of these themes. So for
+example, let's just take the time
+
+298
+00:06:43,749 --> 00:06:43,759
+example, let's just take the time
+ 
+
+299
+00:06:43,759 --> 00:06:46,629
+example, let's just take the time
+prophecy wall. This seed promise
+
+300
+00:06:46,629 --> 00:06:46,639
+prophecy wall. This seed promise
+ 
+
+301
+00:06:46,639 --> 00:06:49,670
+prophecy wall. This seed promise
+initiates timelines like the 2300 days
+
+302
+00:06:49,670 --> 00:06:49,680
+initiates timelines like the 2300 days
+ 
+
+303
+00:06:49,680 --> 00:06:53,110
+initiates timelines like the 2300 days
+from Eden to 1844 in 1844's
+
+304
+00:06:53,110 --> 00:06:53,120
+from Eden to 1844 in 1844's
+ 
+
+305
+00:06:53,120 --> 00:06:54,710
+from Eden to 1844 in 1844's
+investigative judgment where enmity
+
+306
+00:06:54,710 --> 00:06:54,720
+investigative judgment where enmity
+ 
+
+307
+00:06:54,720 --> 00:06:56,550
+investigative judgment where enmity
+culminates in judgment on all evil
+
+308
+00:06:56,550 --> 00:06:56,560
+culminates in judgment on all evil
+ 
+
+309
+00:06:56,560 --> 00:06:59,350
+culminates in judgment on all evil
+powers. So wow. Never thought about
+
+310
+00:06:59,350 --> 00:06:59,360
+powers. So wow. Never thought about
+ 
+
+311
+00:06:59,360 --> 00:07:01,830
+powers. So wow. Never thought about
+connecting Genesis Genesis 3:15 with the
+
+312
+00:07:01,830 --> 00:07:01,840
+connecting Genesis Genesis 3:15 with the
+ 
+
+313
+00:07:01,840 --> 00:07:03,909
+connecting Genesis Genesis 3:15 with the
+2300 day prophecy before. Man, that
+
+314
+00:07:03,909 --> 00:07:03,919
+2300 day prophecy before. Man, that
+ 
+
+315
+00:07:03,919 --> 00:07:05,430
+2300 day prophecy before. Man, that
+might be a whole Bible study. That might
+
+316
+00:07:05,430 --> 00:07:05,440
+might be a whole Bible study. That might
+ 
+
+317
+00:07:05,440 --> 00:07:07,749
+might be a whole Bible study. That might
+be a whole sermon, right? There's a
+
+318
+00:07:07,749 --> 00:07:07,759
+be a whole sermon, right? There's a
+ 
+
+319
+00:07:07,759 --> 00:07:09,670
+be a whole sermon, right? There's a
+sanctuary wall. Enmity ties to
+
+320
+00:07:09,670 --> 00:07:09,680
+sanctuary wall. Enmity ties to
+ 
+
+321
+00:07:09,680 --> 00:07:12,150
+sanctuary wall. Enmity ties to
+atonement's blueprint. Christ as a true
+
+322
+00:07:12,150 --> 00:07:12,160
+atonement's blueprint. Christ as a true
+ 
+
+323
+00:07:12,160 --> 00:07:14,550
+atonement's blueprint. Christ as a true
+sacrifice, bearing sin's penalty, while
+
+324
+00:07:14,550 --> 00:07:14,560
+sacrifice, bearing sin's penalty, while
+ 
+
+325
+00:07:14,560 --> 00:07:16,550
+sacrifice, bearing sin's penalty, while
+the scapegoat, Satan, bears final
+
+326
+00:07:16,550 --> 00:07:16,560
+the scapegoat, Satan, bears final
+ 
+
+327
+00:07:16,560 --> 00:07:18,309
+the scapegoat, Satan, bears final
+accountability, resolving the
+
+328
+00:07:18,309 --> 00:07:18,319
+accountability, resolving the
+ 
+
+329
+00:07:18,319 --> 00:07:20,390
+accountability, resolving the
+controversy in heaven's cleansing. Hm.
+
+330
+00:07:20,390 --> 00:07:20,400
+controversy in heaven's cleansing. Hm.
+ 
+
+331
+00:07:20,400 --> 00:07:23,749
+controversy in heaven's cleansing. Hm.
+Never thought to connect Genesis 3:15
+
+332
+00:07:23,749 --> 00:07:23,759
+Never thought to connect Genesis 3:15
+ 
+
+333
+00:07:23,759 --> 00:07:26,950
+Never thought to connect Genesis 3:15
+with the Day of Atonement with the
+
+334
+00:07:26,950 --> 00:07:26,960
+with the Day of Atonement with the
+ 
+
+335
+00:07:26,960 --> 00:07:29,909
+with the Day of Atonement with the
+scapegoat and the Lord's goal. Wow.
+
+336
+00:07:29,909 --> 00:07:29,919
+scapegoat and the Lord's goal. Wow.
+ 
+
+337
+00:07:29,919 --> 00:07:31,270
+scapegoat and the Lord's goal. Wow.
+Never thought about that. Well, let me
+
+338
+00:07:31,270 --> 00:07:31,280
+Never thought about that. Well, let me
+ 
+
+339
+00:07:31,280 --> 00:07:33,589
+Never thought about that. Well, let me
+let me do a study on that. So, again,
+
+340
+00:07:33,589 --> 00:07:33,599
+let me do a study on that. So, again,
+ 
+
+341
+00:07:33,599 --> 00:07:35,990
+let me do a study on that. So, again,
+you can see that's just one room. After
+
+342
+00:07:35,990 --> 00:07:36,000
+you can see that's just one room. After
+ 
+
+343
+00:07:36,000 --> 00:07:37,189
+you can see that's just one room. After
+we're done with that room, we can say,
+
+344
+00:07:37,189 --> 00:07:37,199
+we're done with that room, we can say,
+ 
+
+345
+00:07:37,199 --> 00:07:38,870
+we're done with that room, we can say,
+"All right, let's go another room. Let's
+
+346
+00:07:38,870 --> 00:07:38,880
+"All right, let's go another room. Let's
+ 
+
+347
+00:07:38,880 --> 00:07:43,350
+"All right, let's go another room. Let's
+go to uh let's go to the dimensions
+
+348
+00:07:43,350 --> 00:07:43,360
+go to uh let's go to the dimensions
+ 
+
+349
+00:07:43,360 --> 00:07:44,870
+go to uh let's go to the dimensions
+room." Now, remember, in the dimensions
+
+350
+00:07:44,870 --> 00:07:44,880
+room." Now, remember, in the dimensions
+ 
+
+351
+00:07:44,880 --> 00:07:46,469
+room." Now, remember, in the dimensions
+room, there are five dimensions, right?
+
+352
+00:07:46,469 --> 00:07:46,479
+room, there are five dimensions, right?
+ 
+
+353
+00:07:46,479 --> 00:07:49,029
+room, there are five dimensions, right?
+There's a literal dimension, there's the
+
+354
+00:07:49,029 --> 00:07:49,039
+There's a literal dimension, there's the
+ 
+
+355
+00:07:49,039 --> 00:07:50,790
+There's a literal dimension, there's the
+Christ dimension, there's the me
+
+356
+00:07:50,790 --> 00:07:50,800
+Christ dimension, there's the me
+ 
+
+357
+00:07:50,800 --> 00:07:52,790
+Christ dimension, there's the me
+dimension, there's the church dimension,
+
+358
+00:07:52,790 --> 00:07:52,800
+dimension, there's the church dimension,
+ 
+
+359
+00:07:52,800 --> 00:07:54,710
+dimension, there's the church dimension,
+and then there's the heaven dimension.
+
+360
+00:07:54,710 --> 00:07:54,720
+and then there's the heaven dimension.
+ 
+
+361
+00:07:54,720 --> 00:07:57,909
+and then there's the heaven dimension.
+Let's have this commentary
+
+362
+00:07:57,909 --> 00:07:57,919
+Let's have this commentary
+ 
+
+363
+00:07:57,919 --> 00:08:00,230
+Let's have this commentary
+uh this verse
+
+364
+00:08:00,230 --> 00:08:00,240
+uh this verse
+ 
+
+365
+00:08:00,240 --> 00:08:02,070
+uh this verse
+go through the the dimensions room and
+
+366
+00:08:02,070 --> 00:08:02,080
+go through the the dimensions room and
+ 
+
+367
+00:08:02,080 --> 00:08:04,790
+go through the the dimensions room and
+let's see what it gives us. And now you
+
+368
+00:08:04,790 --> 00:08:04,800
+let's see what it gives us. And now you
+ 
+
+369
+00:08:04,800 --> 00:08:08,869
+let's see what it gives us. And now you
+can see it is giving us Genesis 3:15 in
+
+370
+00:08:08,869 --> 00:08:08,879
+can see it is giving us Genesis 3:15 in
+ 
+
+371
+00:08:08,879 --> 00:08:13,029
+can see it is giving us Genesis 3:15 in
+five different dimensions.
+
+372
+00:08:13,029 --> 00:08:13,039
+five different dimensions.
+ 
+
+373
+00:08:13,039 --> 00:08:15,350
+five different dimensions.
+Five different dimensions. And let's
+
+374
+00:08:15,350 --> 00:08:15,360
+Five different dimensions. And let's
+ 
+
+375
+00:08:15,360 --> 00:08:18,070
+Five different dimensions. And let's
+just look at dimension five. Ultimately,
+
+376
+00:08:18,070 --> 00:08:18,080
+just look at dimension five. Ultimately,
+ 
+
+377
+00:08:18,080 --> 00:08:20,790
+just look at dimension five. Ultimately,
+enmity enmity resolves in the third
+
+378
+00:08:20,790 --> 00:08:20,800
+enmity enmity resolves in the third
+ 
+
+379
+00:08:20,800 --> 00:08:22,790
+enmity enmity resolves in the third
+heaven's new creation where Satan's
+
+380
+00:08:22,790 --> 00:08:22,800
+heaven's new creation where Satan's
+ 
+
+381
+00:08:22,800 --> 00:08:25,670
+heaven's new creation where Satan's
+defeat is final. Revelation 20:10. And
+
+382
+00:08:25,670 --> 00:08:25,680
+defeat is final. Revelation 20:10. And
+ 
+
+383
+00:08:25,680 --> 00:08:27,589
+defeat is final. Revelation 20:10. And
+the faithful seed dwell eternally with
+
+384
+00:08:27,589 --> 00:08:27,599
+the faithful seed dwell eternally with
+ 
+
+385
+00:08:27,599 --> 00:08:30,309
+the faithful seed dwell eternally with
+God. Revelation 21:3 and 4. It reveals
+
+386
+00:08:30,309 --> 00:08:30,319
+God. Revelation 21:3 and 4. It reveals
+ 
+
+387
+00:08:30,319 --> 00:08:33,110
+God. Revelation 21:3 and 4. It reveals
+God's character. Love that implants o
+
+388
+00:08:33,110 --> 00:08:33,120
+God's character. Love that implants o
+ 
+
+389
+00:08:33,120 --> 00:08:36,870
+God's character. Love that implants o
+love that implants opposition to evil.
+
+390
+00:08:36,870 --> 00:08:36,880
+love that implants opposition to evil.
+ 
+
+391
+00:08:36,880 --> 00:08:40,469
+love that implants opposition to evil.
+Transcending time into reflexive mastery
+
+392
+00:08:40,469 --> 00:08:40,479
+Transcending time into reflexive mastery
+ 
+
+393
+00:08:40,479 --> 00:08:44,630
+Transcending time into reflexive mastery
+of truth. Okay. So that's the five
+
+394
+00:08:44,630 --> 00:08:44,640
+of truth. Okay. So that's the five
+ 
+
+395
+00:08:44,640 --> 00:08:46,790
+of truth. Okay. So that's the five
+dimensions. Now we can go to another
+
+396
+00:08:46,790 --> 00:08:46,800
+dimensions. Now we can go to another
+ 
+
+397
+00:08:46,800 --> 00:08:49,670
+dimensions. Now we can go to another
+room and you get the idea. You can go
+
+398
+00:08:49,670 --> 00:08:49,680
+room and you get the idea. You can go
+ 
+
+399
+00:08:49,680 --> 00:08:52,710
+room and you get the idea. You can go
+room by room
+
+400
+00:08:52,710 --> 00:08:52,720
+room by room
+ 
+
+401
+00:08:52,720 --> 00:08:54,710
+room by room
+through 38 different rooms saying, "Give
+
+402
+00:08:54,710 --> 00:08:54,720
+through 38 different rooms saying, "Give
+ 
+
+403
+00:08:54,720 --> 00:08:57,030
+through 38 different rooms saying, "Give
+me commentary on this. Expound on it. Go
+
+404
+00:08:57,030 --> 00:08:57,040
+me commentary on this. Expound on it. Go
+ 
+
+405
+00:08:57,040 --> 00:08:59,509
+me commentary on this. Expound on it. Go
+deeper." Now, I'm gonna I'm gonna switch
+
+406
+00:08:59,509 --> 00:08:59,519
+deeper." Now, I'm gonna I'm gonna switch
+ 
+
+407
+00:08:59,519 --> 00:09:02,710
+deeper." Now, I'm gonna I'm gonna switch
+one more time. I'm going to switch to
+
+408
+00:09:02,710 --> 00:09:02,720
+one more time. I'm going to switch to
+ 
+
+409
+00:09:02,720 --> 00:09:07,110
+one more time. I'm going to switch to
+principal mode. Principal mode.
+
+410
+00:09:07,110 --> 00:09:07,120
+principal mode. Principal mode.
+ 
+
+411
+00:09:07,120 --> 00:09:10,949
+principal mode. Principal mode.
+So, what is the principal mode?
+
+412
+00:09:10,949 --> 00:09:10,959
+So, what is the principal mode?
+ 
+
+413
+00:09:10,959 --> 00:09:13,990
+So, what is the principal mode?
+in the principal mode what you can now
+
+414
+00:09:13,990 --> 00:09:14,000
+in the principal mode what you can now
+ 
+
+415
+00:09:14,000 --> 00:09:17,509
+in the principal mode what you can now
+do
+
+416
+00:09:17,509 --> 00:09:17,519
+
+ 
+
+417
+00:09:17,519 --> 00:09:19,750
+
+watch this
+
+418
+00:09:19,750 --> 00:09:19,760
+watch this
+ 
+
+419
+00:09:19,760 --> 00:09:22,150
+watch this
+so remember in each room right like we
+
+420
+00:09:22,150 --> 00:09:22,160
+so remember in each room right like we
+ 
+
+421
+00:09:22,160 --> 00:09:23,910
+so remember in each room right like we
+said there's in the five dimensions room
+
+422
+00:09:23,910 --> 00:09:23,920
+said there's in the five dimensions room
+ 
+
+423
+00:09:23,920 --> 00:09:25,269
+said there's in the five dimensions room
+in the dimensions room there's five
+
+424
+00:09:25,269 --> 00:09:25,279
+in the dimensions room there's five
+ 
+
+425
+00:09:25,279 --> 00:09:26,550
+in the dimensions room there's five
+dimensions so each one of those
+
+426
+00:09:26,550 --> 00:09:26,560
+dimensions so each one of those
+ 
+
+427
+00:09:26,560 --> 00:09:28,710
+dimensions so each one of those
+dimensions represents a principle you
+
+428
+00:09:28,710 --> 00:09:28,720
+dimensions represents a principle you
+ 
+
+429
+00:09:28,720 --> 00:09:32,710
+dimensions represents a principle you
+can say hey photo theology GPT I want
+
+430
+00:09:32,710 --> 00:09:32,720
+can say hey photo theology GPT I want
+ 
+
+431
+00:09:32,720 --> 00:09:35,190
+can say hey photo theology GPT I want
+you to give me commentary on this verse
+
+432
+00:09:35,190 --> 00:09:35,200
+you to give me commentary on this verse
+ 
+
+433
+00:09:35,200 --> 00:09:41,110
+you to give me commentary on this verse
+using let's say the fourth dimension
+
+434
+00:09:41,110 --> 00:09:41,120
+
+ 
+
+435
+00:09:41,120 --> 00:09:45,590
+
+Let's say uh the no let's say the noic
+
+436
+00:09:45,590 --> 00:09:45,600
+Let's say uh the no let's say the noic
+ 
+
+437
+00:09:45,600 --> 00:09:48,949
+Let's say uh the no let's say the noic
+cycle.
+
+438
+00:09:48,949 --> 00:09:48,959
+
+ 
+
+439
+00:09:48,959 --> 00:09:51,670
+
+Let's say the great no no let's say the
+
+440
+00:09:51,670 --> 00:09:51,680
+Let's say the great no no let's say the
+ 
+
+441
+00:09:51,680 --> 00:09:55,350
+Let's say the great no no let's say the
+sanctuary wall.
+
+442
+00:09:55,350 --> 00:09:55,360
+
+ 
+
+443
+00:09:55,360 --> 00:09:58,949
+
+Um let's add in there
+
+444
+00:09:58,949 --> 00:09:58,959
+Um let's add in there
+ 
+
+445
+00:09:58,959 --> 00:10:01,430
+Um let's add in there
+um
+
+446
+00:10:01,430 --> 00:10:01,440
+um
+ 
+
+447
+00:10:01,440 --> 00:10:04,310
+um
+the 400year prophecy.
+
+448
+00:10:04,310 --> 00:10:04,320
+the 400year prophecy.
+ 
+
+449
+00:10:04,320 --> 00:10:06,470
+the 400year prophecy.
+Children of Israel in captivity for 400
+
+450
+00:10:06,470 --> 00:10:06,480
+Children of Israel in captivity for 400
+ 
+
+451
+00:10:06,480 --> 00:10:08,630
+Children of Israel in captivity for 400
+years. So, I'm using a symbol here,
+
+452
+00:10:08,630 --> 00:10:08,640
+years. So, I'm using a symbol here,
+ 
+
+453
+00:10:08,640 --> 00:10:10,630
+years. So, I'm using a symbol here,
+you'll know, and I'll explain that
+
+454
+00:10:10,630 --> 00:10:10,640
+you'll know, and I'll explain that
+ 
+
+455
+00:10:10,640 --> 00:10:12,230
+you'll know, and I'll explain that
+symbol another time. Each one of these
+
+456
+00:10:12,230 --> 00:10:12,240
+symbol another time. Each one of these
+ 
+
+457
+00:10:12,240 --> 00:10:15,190
+symbol another time. Each one of these
+principles has a symbol connected to it.
+
+458
+00:10:15,190 --> 00:10:15,200
+principles has a symbol connected to it.
+ 
+
+459
+00:10:15,200 --> 00:10:16,870
+principles has a symbol connected to it.
+So, that one of the things you can do,
+
+460
+00:10:16,870 --> 00:10:16,880
+So, that one of the things you can do,
+ 
+
+461
+00:10:16,880 --> 00:10:18,949
+So, that one of the things you can do,
+in fact, the equation mode, and I'll
+
+462
+00:10:18,949 --> 00:10:18,959
+in fact, the equation mode, and I'll
+ 
+
+463
+00:10:18,959 --> 00:10:21,430
+in fact, the equation mode, and I'll
+talk about that another time. Um, I'll
+
+464
+00:10:21,430 --> 00:10:21,440
+talk about that another time. Um, I'll
+ 
+
+465
+00:10:21,440 --> 00:10:23,030
+talk about that another time. Um, I'll
+make another video on that. The equation
+
+466
+00:10:23,030 --> 00:10:23,040
+make another video on that. The equation
+ 
+
+467
+00:10:23,040 --> 00:10:25,190
+make another video on that. The equation
+mode is where you're actually looking at
+
+468
+00:10:25,190 --> 00:10:25,200
+mode is where you're actually looking at
+ 
+
+469
+00:10:25,200 --> 00:10:27,430
+mode is where you're actually looking at
+the Bible through what looks like
+
+470
+00:10:27,430 --> 00:10:27,440
+the Bible through what looks like
+ 
+
+471
+00:10:27,440 --> 00:10:30,470
+the Bible through what looks like
+mathematical equations. And the GPT will
+
+472
+00:10:30,470 --> 00:10:30,480
+mathematical equations. And the GPT will
+ 
+
+473
+00:10:30,480 --> 00:10:32,790
+mathematical equations. And the GPT will
+give you an equation. Here's a story.
+
+474
+00:10:32,790 --> 00:10:32,800
+give you an equation. Here's a story.
+ 
+
+475
+00:10:32,800 --> 00:10:34,870
+give you an equation. Here's a story.
+And apply these symbols to that story.
+
+476
+00:10:34,870 --> 00:10:34,880
+And apply these symbols to that story.
+ 
+
+477
+00:10:34,880 --> 00:10:37,990
+And apply these symbols to that story.
+It's an equation, a problem that you get
+
+478
+00:10:37,990 --> 00:10:38,000
+It's an equation, a problem that you get
+ 
+
+479
+00:10:38,000 --> 00:10:40,710
+It's an equation, a problem that you get
+to work out. I'll talk about that
+
+480
+00:10:40,710 --> 00:10:40,720
+to work out. I'll talk about that
+ 
+
+481
+00:10:40,720 --> 00:10:44,069
+to work out. I'll talk about that
+another time. Okay, so we're going at uh
+
+482
+00:10:44,069 --> 00:10:44,079
+another time. Okay, so we're going at uh
+ 
+
+483
+00:10:44,079 --> 00:10:46,310
+another time. Okay, so we're going at uh
+the the 400year prophecy of the children
+
+484
+00:10:46,310 --> 00:10:46,320
+the the 400year prophecy of the children
+ 
+
+485
+00:10:46,320 --> 00:10:48,550
+the the 400year prophecy of the children
+of Israel in Egyptian captivity. And
+
+486
+00:10:48,550 --> 00:10:48,560
+of Israel in Egyptian captivity. And
+ 
+
+487
+00:10:48,560 --> 00:10:53,990
+of Israel in Egyptian captivity. And
+let's add one more. Let's go um
+
+488
+00:10:53,990 --> 00:10:54,000
+let's add one more. Let's go um
+ 
+
+489
+00:10:54,000 --> 00:10:56,790
+let's add one more. Let's go um
+let's say
+
+490
+00:10:56,790 --> 00:10:56,800
+let's say
+ 
+
+491
+00:10:56,800 --> 00:11:00,069
+let's say
+let's say in fact I'm not going to use
+
+492
+00:11:00,069 --> 00:11:00,079
+let's say in fact I'm not going to use
+ 
+
+493
+00:11:00,079 --> 00:11:04,870
+let's say in fact I'm not going to use
+this. I'm going to say uh the feast
+
+494
+00:11:04,870 --> 00:11:04,880
+this. I'm going to say uh the feast
+ 
+
+495
+00:11:04,880 --> 00:11:06,870
+this. I'm going to say uh the feast
+of
+
+496
+00:11:06,870 --> 00:11:06,880
+of
+ 
+
+497
+00:11:06,880 --> 00:11:11,670
+of
+tabernacles.
+
+498
+00:11:11,670 --> 00:11:11,680
+
+ 
+
+499
+00:11:11,680 --> 00:11:14,949
+
+That's one of the principles. Uh the
+
+500
+00:11:14,949 --> 00:11:14,959
+That's one of the principles. Uh the
+ 
+
+501
+00:11:14,959 --> 00:11:17,509
+That's one of the principles. Uh the
+feast room. How do I look at this verse
+
+502
+00:11:17,509 --> 00:11:17,519
+feast room. How do I look at this verse
+ 
+
+503
+00:11:17,519 --> 00:11:20,470
+feast room. How do I look at this verse
+in light of all seven feasts? Or how do
+
+504
+00:11:20,470 --> 00:11:20,480
+in light of all seven feasts? Or how do
+ 
+
+505
+00:11:20,480 --> 00:11:22,949
+in light of all seven feasts? Or how do
+I look at this verse in light of one
+
+506
+00:11:22,949 --> 00:11:22,959
+I look at this verse in light of one
+ 
+
+507
+00:11:22,959 --> 00:11:24,310
+I look at this verse in light of one
+particular feast? So, we're going to
+
+508
+00:11:24,310 --> 00:11:24,320
+particular feast? So, we're going to
+ 
+
+509
+00:11:24,320 --> 00:11:25,509
+particular feast? So, we're going to
+choose a feast of t feast of
+
+510
+00:11:25,509 --> 00:11:25,519
+choose a feast of t feast of
+ 
+
+511
+00:11:25,519 --> 00:11:28,150
+choose a feast of t feast of
+tabernacles. Let's hit enter and let's
+
+512
+00:11:28,150 --> 00:11:28,160
+tabernacles. Let's hit enter and let's
+ 
+
+513
+00:11:28,160 --> 00:11:39,990
+tabernacles. Let's hit enter and let's
+see what it does.
+
+514
+00:11:39,990 --> 00:11:40,000
+
+ 
+
+515
+00:11:40,000 --> 00:11:43,030
+
+All right. So, here we go.
+
+516
+00:11:43,030 --> 00:11:43,040
+All right. So, here we go.
+ 
+
+517
+00:11:43,040 --> 00:11:45,269
+All right. So, here we go.
+So, now what it does, it takes Genesis
+
+518
+00:11:45,269 --> 00:11:45,279
+So, now what it does, it takes Genesis
+ 
+
+519
+00:11:45,279 --> 00:11:47,670
+So, now what it does, it takes Genesis
+3:15 and it's now applying fourth
+
+520
+00:11:47,670 --> 00:11:47,680
+3:15 and it's now applying fourth
+ 
+
+521
+00:11:47,680 --> 00:11:49,190
+3:15 and it's now applying fourth
+dimension, meaning how does it relate to
+
+522
+00:11:49,190 --> 00:11:49,200
+dimension, meaning how does it relate to
+ 
+
+523
+00:11:49,200 --> 00:11:52,630
+dimension, meaning how does it relate to
+the church? The noeic cycle, meaning uh
+
+524
+00:11:52,630 --> 00:11:52,640
+the church? The noeic cycle, meaning uh
+ 
+
+525
+00:11:52,640 --> 00:11:55,269
+the church? The noeic cycle, meaning uh
+what from the story of Noah or the the
+
+526
+00:11:55,269 --> 00:11:55,279
+what from the story of Noah or the the
+ 
+
+527
+00:11:55,279 --> 00:11:58,870
+what from the story of Noah or the the
+the gospel cycle of Noah. I don't have
+
+528
+00:11:58,870 --> 00:11:58,880
+the gospel cycle of Noah. I don't have
+ 
+
+529
+00:11:58,880 --> 00:12:00,710
+the gospel cycle of Noah. I don't have
+time to get into that right now. It's
+
+530
+00:12:00,710 --> 00:12:00,720
+time to get into that right now. It's
+ 
+
+531
+00:12:00,720 --> 00:12:02,150
+time to get into that right now. It's
+part of the fourth theology principle.
+
+532
+00:12:02,150 --> 00:12:02,160
+part of the fourth theology principle.
+ 
+
+533
+00:12:02,160 --> 00:12:03,509
+part of the fourth theology principle.
+There are eight cycles. There's the
+
+534
+00:12:03,509 --> 00:12:03,519
+There are eight cycles. There's the
+ 
+
+535
+00:12:03,519 --> 00:12:06,230
+There are eight cycles. There's the
+Adamic cycle. There's a noic cycle.
+
+536
+00:12:06,230 --> 00:12:06,240
+Adamic cycle. There's a noic cycle.
+ 
+
+537
+00:12:06,240 --> 00:12:09,750
+Adamic cycle. There's a noic cycle.
+There's the um the the mosaic cycle. So,
+
+538
+00:12:09,750 --> 00:12:09,760
+There's the um the the mosaic cycle. So,
+ 
+
+539
+00:12:09,760 --> 00:12:12,150
+There's the um the the mosaic cycle. So,
+this is a noic cycle. It's going to take
+
+540
+00:12:12,150 --> 00:12:12,160
+this is a noic cycle. It's going to take
+ 
+
+541
+00:12:12,160 --> 00:12:13,670
+this is a noic cycle. It's going to take
+something from the noic cycle. It's
+
+542
+00:12:13,670 --> 00:12:13,680
+something from the noic cycle. It's
+ 
+
+543
+00:12:13,680 --> 00:12:17,269
+something from the noic cycle. It's
+going to use the sanctuary room. It's
+
+544
+00:12:17,269 --> 00:12:17,279
+going to use the sanctuary room. It's
+ 
+
+545
+00:12:17,279 --> 00:12:19,670
+going to use the sanctuary room. It's
+going to and I could have actually said
+
+546
+00:12:19,670 --> 00:12:19,680
+going to and I could have actually said
+ 
+
+547
+00:12:19,680 --> 00:12:23,509
+going to and I could have actually said
+in the sanctuary room um use the altar
+
+548
+00:12:23,509 --> 00:12:23,519
+in the sanctuary room um use the altar
+ 
+
+549
+00:12:23,519 --> 00:12:26,310
+in the sanctuary room um use the altar
+of sacrifice specifically or the uh
+
+550
+00:12:26,310 --> 00:12:26,320
+of sacrifice specifically or the uh
+ 
+
+551
+00:12:26,320 --> 00:12:28,629
+of sacrifice specifically or the uh
+seven branch candlesticks specifically,
+
+552
+00:12:28,629 --> 00:12:28,639
+seven branch candlesticks specifically,
+ 
+
+553
+00:12:28,639 --> 00:12:30,230
+seven branch candlesticks specifically,
+but I didn't do that. I'm just giving
+
+554
+00:12:30,230 --> 00:12:30,240
+but I didn't do that. I'm just giving
+ 
+
+555
+00:12:30,240 --> 00:12:33,030
+but I didn't do that. I'm just giving
+you an idea of how this works. Take the
+
+556
+00:12:33,030 --> 00:12:33,040
+you an idea of how this works. Take the
+ 
+
+557
+00:12:33,040 --> 00:12:36,069
+you an idea of how this works. Take the
+400year prophecy and the feast of
+
+558
+00:12:36,069 --> 00:12:36,079
+400year prophecy and the feast of
+ 
+
+559
+00:12:36,079 --> 00:12:38,470
+400year prophecy and the feast of
+tabernacles. And here's what it says.
+
+560
+00:12:38,470 --> 00:12:38,480
+tabernacles. And here's what it says.
+ 
+
+561
+00:12:38,480 --> 00:12:40,310
+tabernacles. And here's what it says.
+Applying these specified principles to
+
+562
+00:12:40,310 --> 00:12:40,320
+Applying these specified principles to
+ 
+
+563
+00:12:40,320 --> 00:12:43,350
+Applying these specified principles to
+Genesis 3:15 reveals the verse as a
+
+564
+00:12:43,350 --> 00:12:43,360
+Genesis 3:15 reveals the verse as a
+ 
+
+565
+00:12:43,360 --> 00:12:45,990
+Genesis 3:15 reveals the verse as a
+prophetic seed planted in Eden soil
+
+566
+00:12:45,990 --> 00:12:46,000
+prophetic seed planted in Eden soil
+ 
+
+567
+00:12:46,000 --> 00:12:47,990
+prophetic seed planted in Eden soil
+unfolding across time, sanctuary
+
+568
+00:12:47,990 --> 00:12:48,000
+unfolding across time, sanctuary
+ 
+
+569
+00:12:48,000 --> 00:12:49,990
+unfolding across time, sanctuary
+patterns, and redemptive cycles
+
+570
+00:12:49,990 --> 00:12:50,000
+patterns, and redemptive cycles
+ 
+
+571
+00:12:50,000 --> 00:12:52,150
+patterns, and redemptive cycles
+ultimately dwelling with God. The fourth
+
+572
+00:12:52,150 --> 00:12:52,160
+ultimately dwelling with God. The fourth
+ 
+
+573
+00:12:52,160 --> 00:12:53,670
+ultimately dwelling with God. The fourth
+dimension principle as a prophetic
+
+574
+00:12:53,670 --> 00:12:53,680
+dimension principle as a prophetic
+ 
+
+575
+00:12:53,680 --> 00:12:55,910
+dimension principle as a prophetic
+timeline layer in the dimensions room
+
+576
+00:12:55,910 --> 00:12:55,920
+timeline layer in the dimensions room
+ 
+
+577
+00:12:55,920 --> 00:12:58,949
+timeline layer in the dimensions room
+frames enmity as a historic arc. God
+
+578
+00:12:58,949 --> 00:12:58,959
+frames enmity as a historic arc. God
+ 
+
+579
+00:12:58,959 --> 00:13:01,430
+frames enmity as a historic arc. God
+imposes or God's imposed opposition
+
+580
+00:13:01,430 --> 00:13:01,440
+imposes or God's imposed opposition
+ 
+
+581
+00:13:01,440 --> 00:13:03,910
+imposes or God's imposed opposition
+traces cannonwide through the woman's
+
+582
+00:13:03,910 --> 00:13:03,920
+traces cannonwide through the woman's
+ 
+
+583
+00:13:03,920 --> 00:13:07,670
+traces cannonwide through the woman's
+seed from immediate postfall conflict
+
+584
+00:13:07,670 --> 00:13:07,680
+seed from immediate postfall conflict
+ 
+
+585
+00:13:07,680 --> 00:13:10,150
+seed from immediate postfall conflict
+to the church's endurance and
+
+586
+00:13:10,150 --> 00:13:10,160
+to the church's endurance and
+ 
+
+587
+00:13:10,160 --> 00:13:13,509
+to the church's endurance and
+persecution. Daniel 7:25 culminating in
+
+588
+00:13:13,509 --> 00:13:13,519
+persecution. Daniel 7:25 culminating in
+ 
+
+589
+00:13:13,519 --> 00:13:15,509
+persecution. Daniel 7:25 culminating in
+the judgment that crushes Satan's head.
+
+590
+00:13:15,509 --> 00:13:15,519
+the judgment that crushes Satan's head.
+ 
+
+591
+00:13:15,519 --> 00:13:17,990
+the judgment that crushes Satan's head.
+Revelation 20:10. Now remember the
+
+592
+00:13:17,990 --> 00:13:18,000
+Revelation 20:10. Now remember the
+ 
+
+593
+00:13:18,000 --> 00:13:20,710
+Revelation 20:10. Now remember the
+fourth dimension is going to be how does
+
+594
+00:13:20,710 --> 00:13:20,720
+fourth dimension is going to be how does
+ 
+
+595
+00:13:20,720 --> 00:13:23,030
+fourth dimension is going to be how does
+this relate to the church particularly
+
+596
+00:13:23,030 --> 00:13:23,040
+this relate to the church particularly
+ 
+
+597
+00:13:23,040 --> 00:13:24,710
+this relate to the church particularly
+at the end of time. And that's what you
+
+598
+00:13:24,710 --> 00:13:24,720
+at the end of time. And that's what you
+ 
+
+599
+00:13:24,720 --> 00:13:27,110
+at the end of time. And that's what you
+just saw there, right? And we can read
+
+600
+00:13:27,110 --> 00:13:27,120
+just saw there, right? And we can read
+ 
+
+601
+00:13:27,120 --> 00:13:28,949
+just saw there, right? And we can read
+on. is going to talk about the noic
+
+602
+00:13:28,949 --> 00:13:28,959
+on. is going to talk about the noic
+ 
+
+603
+00:13:28,959 --> 00:13:31,110
+on. is going to talk about the noic
+cycle. The noeic cycle from the cycles
+
+604
+00:13:31,110 --> 00:13:31,120
+cycle. The noeic cycle from the cycles
+ 
+
+605
+00:13:31,120 --> 00:13:35,509
+cycle. The noeic cycle from the cycles
+room extends this enmity in uh enmity
+
+606
+00:13:35,509 --> 00:13:35,519
+room extends this enmity in uh enmity
+ 
+
+607
+00:13:35,519 --> 00:13:38,710
+room extends this enmity in uh enmity
+extends this enmity initiates the adamic
+
+608
+00:13:38,710 --> 00:13:38,720
+extends this enmity initiates the adamic
+ 
+
+609
+00:13:38,720 --> 00:13:41,110
+extends this enmity initiates the adamic
+fall ripples into Noah's era where
+
+610
+00:13:41,110 --> 00:13:41,120
+fall ripples into Noah's era where
+ 
+
+611
+00:13:41,120 --> 00:13:43,110
+fall ripples into Noah's era where
+violence fills the earth. Revelation 6
+
+612
+00:13:43,110 --> 00:13:43,120
+violence fills the earth. Revelation 6
+ 
+
+613
+00:13:43,120 --> 00:13:46,550
+violence fills the earth. Revelation 6
+vers I'm sorry Genesis 6 verse 5-11 as
+
+614
+00:13:46,550 --> 00:13:46,560
+vers I'm sorry Genesis 6 verse 5-11 as
+ 
+
+615
+00:13:46,560 --> 00:13:49,829
+vers I'm sorry Genesis 6 verse 5-11 as
+the serpent seed multiplies evil. So now
+
+616
+00:13:49,829 --> 00:13:49,839
+the serpent seed multiplies evil. So now
+ 
+
+617
+00:13:49,839 --> 00:13:51,350
+the serpent seed multiplies evil. So now
+what it's just done is taken Genesis
+
+618
+00:13:51,350 --> 00:13:51,360
+what it's just done is taken Genesis
+ 
+
+619
+00:13:51,360 --> 00:13:55,110
+what it's just done is taken Genesis
+3:15 and applied it to the Noic cycle
+
+620
+00:13:55,110 --> 00:13:55,120
+3:15 and applied it to the Noic cycle
+ 
+
+621
+00:13:55,120 --> 00:13:58,150
+3:15 and applied it to the Noic cycle
+highlighting that
+
+622
+00:13:58,150 --> 00:13:58,160
+highlighting that
+ 
+
+623
+00:13:58,160 --> 00:14:01,110
+highlighting that
+the whole world seemed to become Satan's
+
+624
+00:14:01,110 --> 00:14:01,120
+the whole world seemed to become Satan's
+ 
+
+625
+00:14:01,120 --> 00:14:03,350
+the whole world seemed to become Satan's
+seed at this time with the exception of
+
+626
+00:14:03,350 --> 00:14:03,360
+seed at this time with the exception of
+ 
+
+627
+00:14:03,360 --> 00:14:05,269
+seed at this time with the exception of
+Noah,
+
+628
+00:14:05,269 --> 00:14:05,279
+Noah,
+ 
+
+629
+00:14:05,279 --> 00:14:07,590
+Noah,
+right? And his family.
+
+630
+00:14:07,590 --> 00:14:07,600
+right? And his family.
+ 
+
+631
+00:14:07,600 --> 00:14:14,550
+right? And his family.
+So you can see here that the the the
+
+632
+00:14:14,550 --> 00:14:14,560
+
+ 
+
+633
+00:14:14,560 --> 00:14:17,509
+
+variations of this commentary are
+
+634
+00:14:17,509 --> 00:14:17,519
+variations of this commentary are
+ 
+
+635
+00:14:17,519 --> 00:14:20,710
+variations of this commentary are
+endless. They're endless.
+
+636
+00:14:20,710 --> 00:14:20,720
+endless. They're endless.
+ 
+
+637
+00:14:20,720 --> 00:14:22,230
+endless. They're endless.
+I'm going to go back to the palace room.
+
+638
+00:14:22,230 --> 00:14:22,240
+I'm going to go back to the palace room.
+ 
+
+639
+00:14:22,240 --> 00:14:24,069
+I'm going to go back to the palace room.
+I'm going to show you one more thing.
+
+640
+00:14:24,069 --> 00:14:24,079
+I'm going to show you one more thing.
+ 
+
+641
+00:14:24,079 --> 00:14:29,670
+I'm going to show you one more thing.
+Let's go back to the palace mode, but
+
+642
+00:14:29,670 --> 00:14:29,680
+Let's go back to the palace mode, but
+ 
+
+643
+00:14:29,680 --> 00:14:35,590
+Let's go back to the palace mode, but
+this time choose a different path. So
+
+644
+00:14:35,590 --> 00:14:35,600
+this time choose a different path. So
+ 
+
+645
+00:14:35,600 --> 00:14:37,590
+this time choose a different path. So
+now what it's going to do is it's going
+
+646
+00:14:37,590 --> 00:14:37,600
+now what it's going to do is it's going
+ 
+
+647
+00:14:37,600 --> 00:14:39,189
+now what it's going to do is it's going
+to go back through the palace mode
+
+648
+00:14:39,189 --> 00:14:39,199
+to go back through the palace mode
+ 
+
+649
+00:14:39,199 --> 00:14:42,629
+to go back through the palace mode
+again, all 38 rooms, but this time it's
+
+650
+00:14:42,629 --> 00:14:42,639
+again, all 38 rooms, but this time it's
+ 
+
+651
+00:14:42,639 --> 00:14:44,389
+again, all 38 rooms, but this time it's
+going to choose a different path. In
+
+652
+00:14:44,389 --> 00:14:44,399
+going to choose a different path. In
+ 
+
+653
+00:14:44,399 --> 00:14:48,150
+going to choose a different path. In
+other words, the first time it went
+
+654
+00:14:48,150 --> 00:14:48,160
+other words, the first time it went
+ 
+
+655
+00:14:48,160 --> 00:14:49,910
+other words, the first time it went
+through the palace and it may have
+
+656
+00:14:49,910 --> 00:14:49,920
+through the palace and it may have
+ 
+
+657
+00:14:49,920 --> 00:14:52,870
+through the palace and it may have
+chosen the 1260year prophecy out of the
+
+658
+00:14:52,870 --> 00:14:52,880
+chosen the 1260year prophecy out of the
+ 
+
+659
+00:14:52,880 --> 00:14:54,790
+chosen the 1260year prophecy out of the
+time zone, out of the time prophecies
+
+660
+00:14:54,790 --> 00:14:54,800
+time zone, out of the time prophecies
+ 
+
+661
+00:14:54,800 --> 00:14:57,110
+time zone, out of the time prophecies
+room, right? Out of the time prophecy
+
+662
+00:14:57,110 --> 00:14:57,120
+room, right? Out of the time prophecy
+ 
+
+663
+00:14:57,120 --> 00:15:00,230
+room, right? Out of the time prophecy
+wall, it may have chosen
+
+664
+00:15:00,230 --> 00:15:00,240
+wall, it may have chosen
+ 
+
+665
+00:15:00,240 --> 00:15:03,189
+wall, it may have chosen
+um the noic cycle out of all eight
+
+666
+00:15:03,189 --> 00:15:03,199
+um the noic cycle out of all eight
+ 
+
+667
+00:15:03,199 --> 00:15:05,030
+um the noic cycle out of all eight
+cycles.
+
+668
+00:15:05,030 --> 00:15:05,040
+cycles.
+ 
+
+669
+00:15:05,040 --> 00:15:07,189
+cycles.
+So in every room that it goes into, it
+
+670
+00:15:07,189 --> 00:15:07,199
+So in every room that it goes into, it
+ 
+
+671
+00:15:07,199 --> 00:15:09,189
+So in every room that it goes into, it
+has the option of choosing one of the
+
+672
+00:15:09,189 --> 00:15:09,199
+has the option of choosing one of the
+ 
+
+673
+00:15:09,199 --> 00:15:11,350
+has the option of choosing one of the
+principles in that room. So now it's
+
+674
+00:15:11,350 --> 00:15:11,360
+principles in that room. So now it's
+ 
+
+675
+00:15:11,360 --> 00:15:13,030
+principles in that room. So now it's
+going to go back and it's going to
+
+676
+00:15:13,030 --> 00:15:13,040
+going to go back and it's going to
+ 
+
+677
+00:15:13,040 --> 00:15:14,710
+going to go back and it's going to
+choose
+
+678
+00:15:14,710 --> 00:15:14,720
+choose
+ 
+
+679
+00:15:14,720 --> 00:15:17,430
+choose
+diff a different path meaning different
+
+680
+00:15:17,430 --> 00:15:17,440
+diff a different path meaning different
+ 
+
+681
+00:15:17,440 --> 00:15:18,949
+diff a different path meaning different
+principles
+
+682
+00:15:18,949 --> 00:15:18,959
+principles
+ 
+
+683
+00:15:18,959 --> 00:15:21,350
+principles
+within the same room
+
+684
+00:15:21,350 --> 00:15:21,360
+within the same room
+ 
+
+685
+00:15:21,360 --> 00:15:26,150
+within the same room
+to produce a totally new commentary.
+
+686
+00:15:26,150 --> 00:15:26,160
+to produce a totally new commentary.
+ 
+
+687
+00:15:26,160 --> 00:15:28,069
+to produce a totally new commentary.
+So you guys when I say that this
+
+688
+00:15:28,069 --> 00:15:28,079
+So you guys when I say that this
+ 
+
+689
+00:15:28,079 --> 00:15:31,829
+So you guys when I say that this
+commentary is dynamic
+
+690
+00:15:31,829 --> 00:15:31,839
+commentary is dynamic
+ 
+
+691
+00:15:31,839 --> 00:15:36,230
+commentary is dynamic
+I mean it is dynamic. Let me show you
+
+692
+00:15:36,230 --> 00:15:36,240
+I mean it is dynamic. Let me show you
+ 
+
+693
+00:15:36,240 --> 00:15:38,310
+I mean it is dynamic. Let me show you
+again. I'm just going to scroll all the
+
+694
+00:15:38,310 --> 00:15:38,320
+again. I'm just going to scroll all the
+ 
+
+695
+00:15:38,320 --> 00:15:40,629
+again. I'm just going to scroll all the
+way up you guys. And here's what I want
+
+696
+00:15:40,629 --> 00:15:40,639
+way up you guys. And here's what I want
+ 
+
+697
+00:15:40,639 --> 00:15:42,870
+way up you guys. And here's what I want
+you to see.
+
+698
+00:15:42,870 --> 00:15:42,880
+you to see.
+ 
+
+699
+00:15:42,880 --> 00:15:44,949
+you to see.
+All of this
+
+700
+00:15:44,949 --> 00:15:44,959
+All of this
+ 
+
+701
+00:15:44,959 --> 00:15:48,550
+All of this
+starting from starting from
+
+702
+00:15:48,550 --> 00:15:48,560
+starting from starting from
+ 
+
+703
+00:15:48,560 --> 00:16:13,350
+starting from starting from
+right here. Right here. All of this
+
+704
+00:16:13,350 --> 00:16:13,360
+
+ 
+
+705
+00:16:13,360 --> 00:16:18,790
+
+All of this
+
+706
+00:16:18,790 --> 00:16:18,800
+
+ 
+
+707
+00:16:18,800 --> 00:16:21,269
+
+is commentary
+
+708
+00:16:21,269 --> 00:16:21,279
+is commentary
+ 
+
+709
+00:16:21,279 --> 00:16:27,189
+is commentary
+on one verse.
+
+710
+00:16:27,189 --> 00:16:27,199
+
+ 
+
+711
+00:16:27,199 --> 00:16:29,829
+
+All right, y'all.
+
+712
+00:16:29,829 --> 00:16:29,839
+All right, y'all.
+ 
+
+713
+00:16:29,839 --> 00:16:37,670
+All right, y'all.
+Photo theology.
+
+714
+00:16:37,670 --> 00:16:37,680
+
+ 
+
+715
+00:16:37,680 --> 00:16:42,230
+
+photo theology gpt.com.
+
+716
+00:16:42,230 --> 00:16:42,240
+photo theology gpt.com.
+ 
+
+717
+00:16:42,240 --> 00:16:44,150
+photo theology gpt.com.
+Check it out.
+
+718
+00:16:44,150 --> 00:16:44,160
+Check it out.
+ 
+
+719
+00:16:44,160 --> 00:16:47,360
+Check it out.
+Peace you guys.
+
