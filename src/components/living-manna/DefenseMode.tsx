@@ -317,8 +317,13 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       if (error) throw error;
 
       const content = data?.content || "";
-      const scoreMatch = content.match(/(\d+)\s*\/\s*10/);
-      const score = scoreMatch ? parseInt(scoreMatch[1]) : 5;
+      // Extract the FORGE SCORE specifically, not sub-category scores like "Biblical Accuracy: 10/10"
+      const forgeScoreMatch = content.match(/FORGE\s*SCORE[:\s]*(\d+(?:\.\d+)?)\s*\/\s*10/i);
+      const score = forgeScoreMatch ? Math.round(parseFloat(forgeScoreMatch[1])) : (() => {
+        // Fallback: grab last X/10 pattern (the overall score tends to come after sub-scores)
+        const allScores = [...content.matchAll(/(\d+(?:\.\d+)?)\s*\/\s*10/g)];
+        return allScores.length > 0 ? Math.round(parseFloat(allScores[0][1])) : 5;
+      })();
       const passed = score >= 8;
 
       // Parse subtitle from AI response
