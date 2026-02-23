@@ -32,7 +32,7 @@ serve(async (req) => {
       .select("paragraphs")
       .eq("book_id", bookId)
       .eq("chapter_number", chapterNumber)
-      .single();
+      .maybeSingle();
 
     if (cached?.paragraphs && Array.isArray(cached.paragraphs) && cached.paragraphs.length > 0) {
       return new Response(
@@ -41,10 +41,10 @@ serve(async (req) => {
       );
     }
 
-    // Generate chapter text using AI
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY not configured");
+    // Generate chapter text using Lovable AI Gateway
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY not configured");
     }
 
     const prompt = `You are a faithful reproducer of Ellen G. White's writings. Reproduce the FULL text of the chapter below as accurately as possible from your training data. These works are in the public domain.
@@ -63,30 +63,46 @@ INSTRUCTIONS:
 
 Return ONLY a valid JSON array like: ["First paragraph text...", "Second paragraph text...", ...]`;
 
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    const response = await fetch(
+      "https://ai.gateway.lovable.dev/v1/chat/completions",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 65536,
-            responseMimeType: "application/json",
-          },
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: "You are a faithful reproducer of Ellen G. White's public domain writings. Return only valid JSON arrays of paragraph strings." },
+            { role: "user", content: prompt },
+          ],
         }),
       }
     );
 
-    if (!geminiResponse.ok) {
-      const errText = await geminiResponse.text();
-      console.error("Gemini error:", errText);
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("AI gateway error:", response.status, errText);
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "AI credits exhausted. Please add funds." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
       throw new Error("Failed to generate chapter text");
     }
 
-    const geminiData = await geminiResponse.json();
-    const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const data = await response.json();
+    const rawText = data?.choices?.[0]?.message?.content;
 
     if (!rawText) {
       throw new Error("No content returned from AI");
@@ -94,7 +110,12 @@ Return ONLY a valid JSON array like: ["First paragraph text...", "Second paragra
 
     let paragraphs: string[];
     try {
-      paragraphs = JSON.parse(rawText);
+      // Clean markdown code blocks if present
+      let cleanText = rawText.trim();
+      if (cleanText.startsWith("```")) {
+        cleanText = cleanText.replace(/```json?\n?/g, "").replace(/```$/g, "").trim();
+      }
+      paragraphs = JSON.parse(cleanText);
       if (!Array.isArray(paragraphs)) throw new Error("Not an array");
       // Filter out empty strings
       paragraphs = paragraphs.filter((p: string) => typeof p === "string" && p.trim().length > 0);
