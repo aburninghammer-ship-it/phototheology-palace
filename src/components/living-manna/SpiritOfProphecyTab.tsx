@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
 import {
   BookOpen, Flame, Eye, Target, Layers, Brain, Gem, Film, Image as ImageIcon,
   ChevronRight, Loader2, Sparkles, BookMarked, Church, Crown, Sword, Shield,
   Heart, Cross, Star, ArrowRight, MessageSquareMore, Send, X, BookText, Telescope,
-  Link2, ExternalLink
+  Link2, ExternalLink, Headphones, Play, Pause, Square, SkipForward, SkipBack,
+  Volume2, RefreshCw
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -449,7 +451,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
   // Reader state
   const [chapterParagraphs, setChapterParagraphs] = useState<string[]>([]);
   const [loadingChapter, setLoadingChapter] = useState(false);
-  const [chapterTab, setChapterTab] = useState<"read" | "analyze">("read");
+  const [chapterTab, setChapterTab] = useState<"read" | "analyze" | "listen">("read");
   const [selectedParagraph, setSelectedParagraph] = useState<string | null>(null);
   const [paragraphAnalysis, setParagraphAnalysis] = useState<string | null>(null);
   const [analyzingParagraph, setAnalyzingParagraph] = useState(false);
@@ -459,8 +461,124 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
   const [crossRefs, setCrossRefs] = useState<Record<number, { reference: string; text: string; connection: string }[]>>({});
   const [loadingCrossRef, setLoadingCrossRef] = useState<number | null>(null);
   const [expandedCrossRef, setExpandedCrossRef] = useState<number | null>(null);
+
+  // Audio commentary state
+  const [commentarySections, setCommentarySections] = useState<string[]>([]);
+  const [loadingCommentary, setLoadingCommentary] = useState(false);
+  const [commentaryPlaying, setCommentaryPlaying] = useState(false);
+  const [currentSection, setCurrentSection] = useState(0);
+  const [ttsRate, setTtsRate] = useState(1);
+  const [ttsVoice, setTtsVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [availableTtsVoices, setAvailableTtsVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const commentaryPlayingRef = useRef(false);
+  const keepAliveRef = useRef<number | null>(null);
+
+  // Load TTS voices
+  useState(() => {
+    const loadVoices = () => {
+      const voices = speechSynthesis.getVoices();
+      const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+      setAvailableTtsVoices(englishVoices);
+      if (!ttsVoice && englishVoices.length > 0) {
+        const preferred = englishVoices.find(v =>
+          v.name.includes('Google') || v.name.includes('Microsoft') || v.name.includes('Samantha') || v.name.includes('Daniel')
+        ) || englishVoices[0];
+        setTtsVoice(preferred);
+      }
+    };
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+  });
   
   const { toast } = useToast();
+
+  // Generate audio commentary
+  const generateCommentary = useCallback(async () => {
+    if (!selectedBook || !selectedChapter) return;
+    setLoadingCommentary(true);
+    setCommentarySections([]);
+    try {
+      const { data, error } = await supabase.functions.invoke("egw-audio-commentary", {
+        body: {
+          bookId: selectedBook.id,
+          bookTitle: selectedBook.title,
+          chapterNumber: selectedChapter.number,
+          chapterTitle: selectedChapter.title,
+          paragraphs: chapterParagraphs,
+          mode: "chapter",
+        },
+      });
+      if (error) throw error;
+      setCommentarySections(data?.commentary || []);
+    } catch (err) {
+      console.error("Commentary generation error:", err);
+      toast({
+        title: "Commentary Error",
+        description: "Could not generate audio commentary. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingCommentary(false);
+    }
+  }, [selectedBook, selectedChapter, chapterParagraphs, toast]);
+
+  // TTS playback functions
+  const speakSection = useCallback((sectionIdx: number) => {
+    if (!commentarySections[sectionIdx]) return;
+    speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(commentarySections[sectionIdx]);
+    utterance.rate = ttsRate;
+    utterance.pitch = 1;
+    utterance.lang = 'en-US';
+    if (ttsVoice) utterance.voice = ttsVoice;
+
+    utterance.onstart = () => setCurrentSection(sectionIdx);
+    utterance.onend = () => {
+      if (commentaryPlayingRef.current && sectionIdx < commentarySections.length - 1) {
+        setTimeout(() => {
+          if (commentaryPlayingRef.current) speakSection(sectionIdx + 1);
+        }, 500);
+      } else if (sectionIdx >= commentarySections.length - 1) {
+        setCommentaryPlaying(false);
+        commentaryPlayingRef.current = false;
+      }
+    };
+    utterance.onerror = () => {
+      setCommentaryPlaying(false);
+      commentaryPlayingRef.current = false;
+    };
+
+    speechSynthesis.speak(utterance);
+  }, [commentarySections, ttsRate, ttsVoice]);
+
+  const playCommentary = useCallback((startIdx?: number) => {
+    setCommentaryPlaying(true);
+    commentaryPlayingRef.current = true;
+    speakSection(startIdx ?? currentSection);
+    // Keep alive for mobile
+    if (keepAliveRef.current) clearInterval(keepAliveRef.current);
+    keepAliveRef.current = window.setInterval(() => {
+      if (commentaryPlayingRef.current && speechSynthesis.speaking && speechSynthesis.paused) {
+        speechSynthesis.resume();
+      }
+    }, 5000);
+  }, [currentSection, speakSection]);
+
+  const pauseCommentary = useCallback(() => {
+    speechSynthesis.pause();
+    setCommentaryPlaying(false);
+    commentaryPlayingRef.current = false;
+    if (keepAliveRef.current) { clearInterval(keepAliveRef.current); keepAliveRef.current = null; }
+  }, []);
+
+  const stopCommentary = useCallback(() => {
+    speechSynthesis.cancel();
+    setCommentaryPlaying(false);
+    commentaryPlayingRef.current = false;
+    setCurrentSection(0);
+    if (keepAliveRef.current) { clearInterval(keepAliveRef.current); keepAliveRef.current = null; }
+  }, []);
 
   // Fetch chapter text
   const fetchChapterText = async (book: EGWBook, chapter: EGWChapter) => {
@@ -834,11 +952,11 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
-        <Button variant="ghost" size="sm" onClick={() => { setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); setCrossRefs({}); setExpandedCrossRef(null); }}>
+        <Button variant="ghost" size="sm" onClick={() => { stopCommentary(); setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); setCrossRefs({}); setExpandedCrossRef(null); setCommentarySections([]); }}>
           ← Chapters
         </Button>
         <span className="text-muted-foreground">|</span>
-        <Button variant="ghost" size="sm" onClick={() => { setSelectedBook(null); setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); setCrossRefs({}); setExpandedCrossRef(null); }}>
+        <Button variant="ghost" size="sm" onClick={() => { stopCommentary(); setSelectedBook(null); setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); setCrossRefs({}); setExpandedCrossRef(null); setCommentarySections([]); }}>
           ← Library
         </Button>
       </div>
@@ -860,15 +978,19 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
       </Card>
 
       {/* Read / Analyze Tabs */}
-      <Tabs value={chapterTab} onValueChange={(v) => setChapterTab(v as "read" | "analyze")}>
-        <TabsList className="w-full grid grid-cols-2">
+      <Tabs value={chapterTab} onValueChange={(v) => setChapterTab(v as "read" | "analyze" | "listen")}>
+        <TabsList className="w-full grid grid-cols-3">
           <TabsTrigger value="read" className="gap-2">
             <BookText className="h-4 w-4" />
-            Read Chapter
+            Read
+          </TabsTrigger>
+          <TabsTrigger value="listen" className="gap-2">
+            <Headphones className="h-4 w-4" />
+            Listen
           </TabsTrigger>
           <TabsTrigger value="analyze" className="gap-2">
             <Telescope className="h-4 w-4" />
-            Palace Analysis
+            Analyze
           </TabsTrigger>
         </TabsList>
 
@@ -1015,6 +1137,254 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                       <div className="text-center pt-8 pb-4">
                         <div className="mx-auto w-24 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-3" />
                         <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground/30">End of Chapter</p>
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </TabsContent>
+
+        {/* ─── LISTEN TAB ─────────────────────────────────────────── */}
+        <TabsContent value="listen" className="mt-4 space-y-4">
+          {/* Commentary not yet generated */}
+          {commentarySections.length === 0 && !loadingCommentary && (
+            <Card variant="glass" className="border-primary/10">
+              <CardContent className="py-12 flex flex-col items-center justify-center gap-5">
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-primary/15 blur-2xl animate-pulse" />
+                  <div className="relative p-5 rounded-2xl bg-primary/10 border border-primary/20">
+                    <Headphones className="h-10 w-10 text-primary" />
+                  </div>
+                </div>
+                <div className="text-center space-y-2">
+                  <h3 className="font-bold text-foreground text-lg">Audio Commentary</h3>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    Jeeves will create a Bible-only audio commentary for this chapter, buttressing Ellen White's insights 
+                    with KJV Scripture and Phototheology Palace principles.
+                  </p>
+                </div>
+                <Button 
+                  onClick={generateCommentary} 
+                  className="gap-2 px-6" 
+                  size="lg"
+                  disabled={chapterParagraphs.length === 0}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Generate Audio Commentary
+                </Button>
+                {chapterParagraphs.length === 0 && (
+                  <p className="text-xs text-muted-foreground/60">Load the chapter text in the "Read" tab first</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Loading */}
+          {loadingCommentary && (
+            <Card variant="glass">
+              <CardContent className="py-16 flex flex-col items-center justify-center gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+                  <Loader2 className="h-10 w-10 animate-spin text-primary relative" />
+                </div>
+                <p className="text-sm font-medium text-foreground/80">Generating Bible commentary...</p>
+                <p className="text-xs text-muted-foreground/60">Weaving KJV Scripture with Palace principles</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Commentary loaded — Player */}
+          {commentarySections.length > 0 && !loadingCommentary && (
+            <>
+              {/* Player controls */}
+              <Card variant="glass" className="border-primary/20 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-primary/[0.02] pointer-events-none" />
+                <CardContent className="p-5 space-y-4 relative">
+                  {/* Now playing */}
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+                      <Volume2 className={`h-5 w-5 text-primary ${commentaryPlaying ? 'animate-pulse' : ''}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground uppercase tracking-[0.15em]">
+                        {commentaryPlaying ? "Now Playing" : "Ready to Play"}
+                      </p>
+                      <p className="text-sm font-bold text-foreground truncate">
+                        Section {currentSection + 1} of {commentarySections.length}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="text-[10px] shrink-0">
+                      {commentarySections.length} sections
+                    </Badge>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="flex items-center gap-2">
+                    {commentarySections.map((_, idx) => (
+                      <button
+                        key={idx}
+                        className={`flex-1 h-1.5 rounded-full transition-all cursor-pointer hover:h-2.5 ${
+                          idx === currentSection
+                            ? 'bg-primary shadow-lg shadow-primary/30'
+                            : idx < currentSection
+                            ? 'bg-primary/40'
+                            : 'bg-muted/30'
+                        }`}
+                        onClick={() => {
+                          setCurrentSection(idx);
+                          if (commentaryPlayingRef.current) {
+                            speechSynthesis.cancel();
+                            speakSection(idx);
+                          }
+                        }}
+                        title={`Section ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Transport controls */}
+                  <div className="flex items-center justify-center gap-3">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-full"
+                      disabled={currentSection === 0}
+                      onClick={() => {
+                        const prev = Math.max(0, currentSection - 1);
+                        setCurrentSection(prev);
+                        if (commentaryPlayingRef.current) { speechSynthesis.cancel(); speakSection(prev); }
+                      }}
+                    >
+                      <SkipBack className="h-4 w-4" />
+                    </Button>
+
+                    {commentaryPlaying ? (
+                      <Button
+                        size="icon"
+                        className="h-14 w-14 rounded-full shadow-lg shadow-primary/30"
+                        onClick={pauseCommentary}
+                      >
+                        <Pause className="h-6 w-6" />
+                      </Button>
+                    ) : (
+                      <Button
+                        size="icon"
+                        className="h-14 w-14 rounded-full shadow-lg shadow-primary/30"
+                        onClick={() => playCommentary(currentSection)}
+                      >
+                        <Play className="h-6 w-6 ml-0.5" />
+                      </Button>
+                    )}
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-full"
+                      disabled={currentSection >= commentarySections.length - 1}
+                      onClick={() => {
+                        const next = Math.min(commentarySections.length - 1, currentSection + 1);
+                        setCurrentSection(next);
+                        if (commentaryPlayingRef.current) { speechSynthesis.cancel(); speakSection(next); }
+                      }}
+                    >
+                      <SkipForward className="h-4 w-4" />
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-full text-destructive hover:text-destructive"
+                      onClick={stopCommentary}
+                    >
+                      <Square className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {/* Speed control */}
+                  <div className="flex items-center gap-3 pt-2 border-t border-border/20">
+                    <span className="text-xs text-muted-foreground w-12">Speed</span>
+                    <Slider
+                      value={[ttsRate]}
+                      onValueChange={([val]) => {
+                        setTtsRate(val);
+                        if (commentaryPlayingRef.current) {
+                          speechSynthesis.cancel();
+                          setTimeout(() => speakSection(currentSection), 100);
+                        }
+                      }}
+                      min={0.5}
+                      max={2}
+                      step={0.1}
+                      className="flex-1"
+                    />
+                    <span className="text-xs font-mono text-foreground/70 w-10 text-right">{ttsRate.toFixed(1)}×</span>
+                  </div>
+
+                  {/* Regenerate */}
+                  <div className="flex justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 text-xs border-primary/20 text-primary hover:bg-primary/10"
+                      onClick={() => {
+                        stopCommentary();
+                        setCommentarySections([]);
+                        generateCommentary();
+                      }}
+                    >
+                      <RefreshCw className="h-3 w-3" />
+                      Regenerate Commentary
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Commentary text sections */}
+              <Card variant="glass" className="border-primary/10">
+                <CardContent className="p-0">
+                  <ScrollArea className="h-[50vh]">
+                    <div className="px-6 sm:px-8 py-6 space-y-0">
+                      <div className="text-center mb-6 pb-4 border-b border-border/30">
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-1">Bible Commentary</p>
+                        <h3 className="text-lg font-serif font-bold text-foreground/90">
+                          {selectedBook?.shortTitle} Ch. {selectedChapter?.number}: {selectedChapter?.title}
+                        </h3>
+                        <p className="text-[10px] text-muted-foreground/40 mt-1">KJV Scripture • Phototheology Palace</p>
+                      </div>
+
+                      {commentarySections.map((section, idx) => (
+                        <div
+                          key={idx}
+                          className={`relative px-4 py-4 rounded-xl transition-all duration-300 cursor-pointer mb-2 ${
+                            idx === currentSection
+                              ? 'bg-primary/10 border border-primary/30 shadow-lg shadow-primary/5'
+                              : 'border border-transparent hover:bg-white/[0.03] hover:border-white/10'
+                          }`}
+                          onClick={() => {
+                            setCurrentSection(idx);
+                            if (commentaryPlayingRef.current) {
+                              speechSynthesis.cancel();
+                              speakSection(idx);
+                            }
+                          }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className="text-[10px] font-mono text-primary/50 mt-1 shrink-0">{idx + 1}</span>
+                            <p className="text-[15px] sm:text-base leading-[1.85] text-foreground/85 font-serif">
+                              {section}
+                            </p>
+                          </div>
+                          {idx === currentSection && commentaryPlaying && (
+                            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary rounded-full animate-pulse" />
+                          )}
+                        </div>
+                      ))}
+
+                      <div className="text-center pt-6 pb-2">
+                        <div className="mx-auto w-24 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-3" />
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground/30">End of Commentary</p>
                       </div>
                     </div>
                   </ScrollArea>
