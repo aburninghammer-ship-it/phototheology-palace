@@ -8,7 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import {
   BookOpen, Flame, Eye, Target, Layers, Brain, Gem, Film, Image as ImageIcon,
   ChevronRight, Loader2, Sparkles, BookMarked, Church, Crown, Sword, Shield,
-  Heart, Cross, Star, ArrowRight, MessageSquareMore, Send, X, BookText, Telescope
+  Heart, Cross, Star, ArrowRight, MessageSquareMore, Send, X, BookText, Telescope,
+  Link2, ExternalLink
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -453,6 +454,11 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
   const [paragraphAnalysis, setParagraphAnalysis] = useState<string | null>(null);
   const [analyzingParagraph, setAnalyzingParagraph] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<string>("CR");
+
+  // Cross-reference state
+  const [crossRefs, setCrossRefs] = useState<Record<number, { reference: string; text: string; connection: string }[]>>({});
+  const [loadingCrossRef, setLoadingCrossRef] = useState<number | null>(null);
+  const [expandedCrossRef, setExpandedCrossRef] = useState<number | null>(null);
   
   const { toast } = useToast();
 
@@ -480,6 +486,37 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
       });
     } finally {
       setLoadingChapter(false);
+    }
+  };
+
+  // Fetch cross-references for a paragraph
+  const fetchCrossReferences = async (paragraphIdx: number, text: string) => {
+    if (crossRefs[paragraphIdx]) {
+      // Toggle visibility
+      setExpandedCrossRef(expandedCrossRef === paragraphIdx ? null : paragraphIdx);
+      return;
+    }
+    setLoadingCrossRef(paragraphIdx);
+    setExpandedCrossRef(paragraphIdx);
+    try {
+      const { data, error } = await supabase.functions.invoke("egw-cross-references", {
+        body: {
+          paragraph: text,
+          bookTitle: selectedBook?.title || "",
+          chapterTitle: selectedChapter?.title || "",
+        },
+      });
+      if (error) throw error;
+      setCrossRefs(prev => ({ ...prev, [paragraphIdx]: data?.references || [] }));
+    } catch (err) {
+      console.error("Cross-reference error:", err);
+      toast({
+        title: "Cross-Reference Error",
+        description: "Could not load Bible cross-references.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingCrossRef(null);
     }
   };
 
@@ -770,6 +807,8 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                   setFullAnalysis(null);
                   setChapterParagraphs([]);
                   setChapterTab("read");
+                  setCrossRefs({});
+                  setExpandedCrossRef(null);
                   fetchChapterText(selectedBook, chapter);
                 }}
               >
@@ -795,11 +834,11 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
-        <Button variant="ghost" size="sm" onClick={() => { setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); }}>
+        <Button variant="ghost" size="sm" onClick={() => { setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); setCrossRefs({}); setExpandedCrossRef(null); }}>
           ← Chapters
         </Button>
         <span className="text-muted-foreground">|</span>
-        <Button variant="ghost" size="sm" onClick={() => { setSelectedBook(null); setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); }}>
+        <Button variant="ghost" size="sm" onClick={() => { setSelectedBook(null); setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); setCrossRefs({}); setExpandedCrossRef(null); }}>
           ← Library
         </Button>
       </div>
@@ -857,32 +896,73 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
             <>
               <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2 border border-border/50">
                 <Telescope className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>Click any paragraph to analyze it through a Palace room</span>
+                <span>Click any paragraph to analyze through a Palace room, or tap the 📖 icon for Bible cross-references</span>
               </div>
 
               <ScrollArea className="h-[65vh]">
                 <div className="space-y-1 pr-4">
                   {chapterParagraphs.map((paragraph, idx) => (
-                    <div
-                      key={idx}
-                      className={`group relative px-4 py-3 rounded-lg cursor-pointer transition-all text-sm leading-relaxed text-foreground/90 hover:bg-primary/5 hover:border-primary/20 border border-transparent ${
-                        selectedParagraph === paragraph ? 'bg-primary/10 border-primary/30 ring-1 ring-primary/20' : ''
-                      }`}
-                      onClick={() => {
-                        setSelectedParagraph(paragraph);
-                        setParagraphAnalysis(null);
-                      }}
-                    >
-                      <span className="absolute left-0 top-3 text-[10px] text-muted-foreground/40 font-mono w-4 text-right">
-                        {idx + 1}
-                      </span>
-                      <p className="pl-2">{paragraph}</p>
-                      <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Badge variant="outline" className="text-[9px] bg-background/80 backdrop-blur-sm">
-                          <Telescope className="h-2.5 w-2.5 mr-1" />
-                          Analyze
-                        </Badge>
+                    <div key={idx} className="space-y-0">
+                      <div
+                        className={`group relative px-4 py-3 rounded-lg cursor-pointer transition-all text-sm leading-relaxed text-foreground/90 hover:bg-primary/5 hover:border-primary/20 border border-transparent ${
+                          selectedParagraph === paragraph ? 'bg-primary/10 border-primary/30 ring-1 ring-primary/20' : ''
+                        }`}
+                        onClick={() => {
+                          setSelectedParagraph(paragraph);
+                          setParagraphAnalysis(null);
+                        }}
+                      >
+                        <span className="absolute left-0 top-3 text-[10px] text-muted-foreground/40 font-mono w-4 text-right">
+                          {idx + 1}
+                        </span>
+                        <p className="pl-2">{paragraph}</p>
+                        <div className="absolute right-2 top-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              fetchCrossReferences(idx, paragraph);
+                            }}
+                            title="Bible Cross-References"
+                          >
+                            {loadingCrossRef === idx ? (
+                              <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                            ) : (
+                              <Link2 className="h-2.5 w-2.5" />
+                            )}
+                            Cross-Ref
+                          </button>
+                          <Badge variant="outline" className="text-[9px] bg-background/80 backdrop-blur-sm">
+                            <Telescope className="h-2.5 w-2.5 mr-1" />
+                            Analyze
+                          </Badge>
+                        </div>
                       </div>
+
+                      {/* Cross-references panel */}
+                      {expandedCrossRef === idx && crossRefs[idx] && (
+                        <div className="ml-6 mr-2 mb-2 p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-semibold text-amber-400 flex items-center gap-1.5">
+                              <Link2 className="h-3 w-3" />
+                              Bible Cross-References ({crossRefs[idx].length})
+                            </p>
+                            <button
+                              className="text-muted-foreground hover:text-foreground"
+                              onClick={() => setExpandedCrossRef(null)}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                          {crossRefs[idx].map((ref, refIdx) => (
+                            <div key={refIdx} className="pl-3 border-l-2 border-amber-500/30 space-y-0.5">
+                              <p className="text-xs font-bold text-primary">{ref.reference}</p>
+                              <p className="text-xs text-foreground/80 italic">"{ref.text}"</p>
+                              <p className="text-[10px] text-muted-foreground">{ref.connection}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
