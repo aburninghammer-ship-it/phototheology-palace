@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.76.0';
 import { Resend } from "https://esm.sh/resend@4.0.0";
-import Twilio from "https://esm.sh/twilio@4.23.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,10 +12,38 @@ const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
 const twilioAuthToken = Deno.env.get('TWILIO_AUTH_TOKEN');
 const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
 
-// Initialize Twilio client if credentials are available
-const twilioClient = twilioAccountSid && twilioAuthToken
-  ? Twilio(twilioAccountSid, twilioAuthToken)
-  : null;
+// Check if Twilio is configured (no SDK import - use REST API directly)
+const twilioConfigured = !!(twilioAccountSid && twilioAuthToken && twilioPhoneNumber);
+
+/**
+ * Send SMS via Twilio REST API (no SDK needed)
+ */
+async function sendTwilioSMS(to: string, body: string): Promise<{ sid: string; status: string }> {
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+  const auth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
+  
+  const params = new URLSearchParams();
+  params.append('To', to);
+  params.append('From', twilioPhoneNumber!);
+  params.append('Body', body);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params.toString(),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Twilio API error ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+  return { sid: data.sid, status: data.status };
+}
 
 /**
  * Check if it's the right hour to send SMS to a recipient based on their timezone
@@ -465,7 +492,7 @@ serve(async (req) => {
         `;
 
         const { error: emailError } = await resend.emails.send({
-          from: "Phototheology Devotionals <noreply@livingmanna.church>",
+          from: "Phototheology Devotionals <support@thephototheologyapp.com>",
           to: userEmail,
           subject: `📖 Day ${currentDayNumber}: ${dayContent.title} - ${plan.title}`,
           html: emailHtml,
@@ -501,7 +528,7 @@ serve(async (req) => {
         }
 
         // Send SMS to opted-in recipients
-        if (twilioClient) {
+        if (twilioConfigured) {
           try {
             // Get profiles with SMS enabled for this plan (include timezone)
             const { data: profilesWithSMS } = await supabase
@@ -519,8 +546,6 @@ serve(async (req) => {
               .eq('is_active', true)
               .is('opted_out_at', null);
 
-            // Combine all SMS recipients and filter by timezone
-            // Only include recipients where it's currently their preferred send hour (default 8am)
             const allSMSRecipients = [
               ...(profilesWithSMS || []).map(p => ({ ...p, recipientType: 'profile' as const })),
               ...(smsRecipients || []).map(r => ({ ...r, recipientType: 'standalone' as const }))
@@ -541,13 +566,8 @@ serve(async (req) => {
                 const fullPhone = `${recipient.phone_country_code || '+1'}${recipient.phone_number.replace(/\D/g, '')}`;
                 const smsBody = generateSMSMessage(dayContent, plan.id, currentDayNumber, recipient.name);
 
-                const message = await twilioClient.messages.create({
-                  body: smsBody,
-                  from: twilioPhoneNumber,
-                  to: fullPhone,
-                });
+                const message = await sendTwilioSMS(fullPhone, smsBody);
 
-                // Log successful send
                 await supabase.from('sms_send_log').insert({
                   user_id: plan.user_id,
                   recipient_type: recipient.recipientType,
@@ -560,7 +580,6 @@ serve(async (req) => {
                   status: message.status,
                 });
 
-                // Update recipient's SMS tracking
                 if (recipient.recipientType === 'profile') {
                   await supabase
                     .from('devotional_profiles')
@@ -585,7 +604,6 @@ serve(async (req) => {
               } catch (smsError: any) {
                 console.error(`SMS error for ${recipient.name}:`, smsError.message);
 
-                // Log failed send
                 await supabase.from('sms_send_log').insert({
                   user_id: plan.user_id,
                   recipient_type: recipient.recipientType,
