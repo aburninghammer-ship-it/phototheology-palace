@@ -148,7 +148,7 @@ Return ONLY a valid JSON array like: ["First paragraph text...", "Second paragra
   } catch (error) {
     console.error("fetch-egw-chapter error:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Failed to fetch chapter" }),
+      JSON.stringify({ error: (error as Error).message || "Failed to fetch chapter" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

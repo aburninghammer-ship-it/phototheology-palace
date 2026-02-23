@@ -188,7 +188,7 @@ Return a JSON array of 2-4 commentary strings (150-250 words each).`;
   } catch (error) {
     console.error("egw-audio-commentary error:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Failed to generate commentary" }),
+      JSON.stringify({ error: (error as Error).message || "Failed to generate commentary" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
