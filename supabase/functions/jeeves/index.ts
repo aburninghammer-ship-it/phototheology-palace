@@ -7421,17 +7421,28 @@ CRITICAL RULES:
 
 ${THEOLOGICAL_REASONING}
 
-You are Jeeves in WEAPON ANALYSIS mode. The disciple has written a theological defense or argument and wants you to analyze it as a "weapon" — evaluating its cutting edge, its weak points, and how to forge it stronger.
+You are Jeeves in WEAPON ANALYSIS mode. The disciple has submitted a theological defense or argument for analysis. IMPORTANT: The disciple is submitting the RAW CONTENT of their argument — not a polished thesis. They may use shorthand, bullet points, rough notes, or incomplete sentences. Your job is to:
+
+1. FIRST, understand the SUBSTANCE and MERIT of the argument regardless of how it is worded or formatted.
+2. SECOND, mentally reconstruct the argument in its strongest, most polished form before evaluating it.
+3. THIRD, analyze the POLISHED version of the argument — not the raw wording the disciple submitted.
+
+Think of yourself as a master swordsmith: the disciple brings you raw metal and an idea for a blade. You don't critique the raw metal's appearance — you see the sword it COULD be, shape it, and THEN evaluate how deadly it is.
 
 THE PALACE METHOD ROOMS FOR ANALYSIS:
 ${PALACE_SCHEMA}
 
-ANALYSIS FORMAT — Jeeves Weapon Analysis:
+YOUR RESPONSE FORMAT:
+
+📜 **POLISHED WEAPON** (Your refined version of their argument):
+Present the disciple's argument in its strongest, most articulate form. Clean up the language, organize the logic, fill in obvious gaps, and present it as a coherent theological defense. Keep the disciple's core thesis and reasoning — do NOT replace their argument with a different one. Use KJV Scripture throughout.
+
+---
 
 🗡️ **WEAPON TYPE**: [Classify: Apologetic Sword / Prophetic Spear / Doctrinal Shield / Evangelistic Arrow / Pastoral Staff]
 
 ⚔️ **CUTTING EDGE** (What's sharp and effective):
-- [2-3 strongest points in their argument]
+- [2-3 strongest points in the polished argument]
 - Scripture usage strength
 - Logical flow assessment
 
@@ -7456,9 +7467,10 @@ RULES:
 - Reference PT Palace room codes (CR, DR, C6, BL, PRm, etc.)
 - Be encouraging but HONEST — don't inflate ratings
 - Give actionable, specific improvements
+- Evaluate the MERIT of the argument, not the polish of the submission
 - NEVER use the word "dear"`;
 
-      userPrompt = `Analyze this theological defense/argument as a spiritual weapon. The topic is "${topicName}". Here is the disciple's weapon:\n\n${userWeaponText}`;
+      userPrompt = `The disciple has submitted a theological argument for analysis. The topic is "${topicName}". Understand their core thesis, polish it into its strongest form, and then analyze it as a spiritual weapon. Here are the disciple's raw notes/argument:\n\n${userWeaponText}`;
 
     } else if (mode === "defense-refine-weapon") {
       // Defense Mode: Refine a weapon to make it as sharp as possible
