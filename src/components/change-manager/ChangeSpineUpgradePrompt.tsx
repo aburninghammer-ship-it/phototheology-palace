@@ -15,8 +15,8 @@ interface ChangeSpineUpgradePromptProps {
 
 /**
  * Upgrade prompt that escalates based on trial days remaining.
- * - 7+ days: Minimal/hidden
- * - 4-7 days: Subtle banner
+ * - 10+ days: Minimal/hidden
+ * - 4-10 days: Subtle banner
  * - 1-3 days: Prominent banner with urgency
  * - 0 days: Full modal-like urgency
  */
