@@ -53,6 +53,7 @@ interface ArsenalWeapon {
   analysis: string;
   topic: string;
   savedAt: string;
+  imageUrl?: string;
 }
 
 export function DefenseMode({ churchId }: DefenseModeProps) {
@@ -112,6 +113,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         analysis: w.analysis,
         topic: w.topic,
         savedAt: w.saved_at,
+        imageUrl: w.image_url,
       })));
     } catch (e) {
       console.error("Failed to load arsenal:", e);
@@ -192,9 +194,29 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     }
   };
 
+  const generateWeaponImage = async (weaponName: string): Promise<string | null> => {
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-visual-anchor", {
+        body: {
+          prompt: `A single dramatic weapon called "${weaponName}" floating against a dark background. The weapon should match its name literally — if it's a claw, show an iron claw; if it's a sword, show a glowing sword; if it's a shield, show a divine shield. Epic fantasy art style, dramatic lighting, no text, no watermarks. Single weapon only, centered composition.`,
+          style: "epic",
+        },
+      });
+      if (error) throw error;
+      return data?.image || null;
+    } catch (e) {
+      console.error("Failed to generate weapon image:", e);
+      return null;
+    }
+  };
+
   const saveWeaponToDB = async (weapon: Omit<ArsenalWeapon, "id">) => {
     if (!user) return;
     try {
+      // Generate weapon image in background
+      const weaponName = weapon.name || getWeaponInfo(weapon.topic).name;
+      const imageUrl = await generateWeaponImage(weaponName);
+
       await (supabase as any).from("defense_arsenal").insert({
         user_id: user.id,
         name: weapon.name || null,
@@ -203,10 +225,50 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         analysis: weapon.analysis,
         topic: weapon.topic,
         saved_at: weapon.savedAt,
+        image_url: imageUrl,
       });
       loadArsenal();
     } catch (e) {
       console.error("Failed to save weapon:", e);
+    }
+  };
+
+  // Sharpen a saved weapon further
+  const [sharpenLoading, setSharpenLoading] = useState(false);
+  const [sharpenResult, setSharpenResult] = useState<string | null>(null);
+
+  const sharpenWeapon = async (weapon: ArsenalWeapon) => {
+    setSharpenLoading(true);
+    setSharpenResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-refine-weapon",
+          userArgument: weapon.argument,
+          analysis: weapon.analysis,
+          doctrineTopic: weapon.topic || undefined,
+        },
+      });
+      if (error) throw error;
+      setSharpenResult(data?.content || "Unable to sharpen at this time.");
+    } catch {
+      setSharpenResult("Failed to sharpen weapon. Please try again.");
+    } finally {
+      setSharpenLoading(false);
+    }
+  };
+
+  const applySharpenToWeapon = async (weapon: ArsenalWeapon, newArgument: string) => {
+    try {
+      await (supabase as any).from("defense_arsenal").update({
+        argument: newArgument,
+        analysis: weapon.analysis,
+      }).eq("id", weapon.id);
+      setSharpenResult(null);
+      setSelectedArsenalWeapon({ ...weapon, argument: newArgument });
+      loadArsenal();
+    } catch (e) {
+      console.error("Failed to apply sharpening:", e);
     }
   };
 
@@ -968,7 +1030,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSelectedArsenalWeapon(null)}
+                  onClick={() => { setSelectedArsenalWeapon(null); setSharpenResult(null); }}
                   className="text-emerald-400 hover:text-emerald-300"
                 >
                   <ArrowLeft className="h-4 w-4 mr-1" />
@@ -978,7 +1040,14 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                   <CardContent className="p-5 space-y-4">
                     {/* Weapon header */}
                     <div className="text-center space-y-2">
-                      <span className="text-5xl block">{getWeaponInfo(selectedArsenalWeapon.topic).emoji}</span>
+                      {/* Weapon image or emoji */}
+                      {selectedArsenalWeapon.imageUrl ? (
+                        <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-emerald-500/40 mx-auto shadow-lg shadow-emerald-500/10">
+                          <img src={selectedArsenalWeapon.imageUrl} alt={selectedArsenalWeapon.name || getWeaponInfo(selectedArsenalWeapon.topic).name} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <span className="text-5xl block">{getWeaponInfo(selectedArsenalWeapon.topic).emoji}</span>
+                      )}
                       <input
                         type="text"
                         defaultValue={selectedArsenalWeapon.name || getWeaponInfo(selectedArsenalWeapon.topic).name}
@@ -992,6 +1061,9 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                         className="text-lg font-bold text-emerald-300 bg-transparent border-b border-dashed border-emerald-500/40 text-center w-full focus:outline-none focus:border-emerald-400 placeholder:text-emerald-500/50"
                         title="Click to rename weapon"
                       />
+                      {selectedArsenalWeapon.subtitle && (
+                        <p className="text-xs text-emerald-400/70 italic">{selectedArsenalWeapon.subtitle}</p>
+                      )}
                       <Badge className="bg-emerald-600/30 text-emerald-300 border-emerald-500/30">
                         {selectedArsenalWeapon.topic}
                       </Badge>
@@ -1021,8 +1093,62 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                         {selectedArsenalWeapon.analysis}
                       </div>
                     </div>
+
+                    {/* Sharpen result */}
+                    {sharpenResult && (
+                      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
+                        <div className="p-3 rounded-lg bg-gradient-to-r from-amber-950/40 to-orange-950/30 border border-amber-500/40">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Sparkles className="h-5 w-5 text-amber-400" />
+                            <span className="text-sm font-bold text-amber-300">Jeeves — Sharpened Weapon</span>
+                            <QuickAudioButton
+                              text={sharpenResult}
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 ml-auto text-amber-400/60 hover:text-amber-400"
+                            />
+                          </div>
+                          <div className="text-xs whitespace-pre-wrap leading-relaxed text-foreground/90">
+                            {sharpenResult}
+                          </div>
+                          <div className="flex gap-2 mt-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                              onClick={() => applySharpenToWeapon(selectedArsenalWeapon, sharpenResult || "")}
+                            >
+                              <ArrowRight className="h-3.5 w-3.5 mr-1" />
+                              Apply Sharpening
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                              onClick={() => setSharpenResult(null)}
+                            >
+                              <X className="h-3.5 w-3.5 mr-1" />
+                              Dismiss
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
                     {/* Actions */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Button
+                        size="sm"
+                        onClick={() => sharpenWeapon(selectedArsenalWeapon)}
+                        disabled={sharpenLoading}
+                        className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
+                      >
+                        {sharpenLoading ? (
+                          <><Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> Sharpening...</>
+                        ) : (
+                          <><Sparkles className="h-3.5 w-3.5 mr-1" /> Sharpen Further</>
+                        )}
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
@@ -1030,6 +1156,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                         onClick={() => {
                           removeFromArsenal(selectedArsenalWeapon.id);
                           setSelectedArsenalWeapon(null);
+                          setSharpenResult(null);
                         }}
                       >
                         <Trash2 className="h-3.5 w-3.5 mr-1" />
@@ -1107,10 +1234,16 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                             >
                               <Card variant="glass" className="border-emerald-500/20 bg-gradient-to-b from-emerald-950/30 to-black/40 hover:border-emerald-400/40 hover:shadow-lg hover:shadow-emerald-500/10 transition-all h-full">
                                 <CardContent className="p-3 flex flex-col items-center text-center space-y-2">
-                                  {/* Weapon mount */}
-                                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-900/60 to-teal-900/40 border border-emerald-500/30 flex items-center justify-center shadow-inner">
-                                    <span className="text-2xl">{info.emoji}</span>
-                                  </div>
+                                  {/* Weapon mount — image or emoji */}
+                                  {weapon.imageUrl ? (
+                                    <div className="w-14 h-14 rounded-full overflow-hidden border border-emerald-500/30 shadow-inner">
+                                      <img src={weapon.imageUrl} alt={weapon.name || info.name} className="w-full h-full object-cover" />
+                                    </div>
+                                  ) : (
+                                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-900/60 to-teal-900/40 border border-emerald-500/30 flex items-center justify-center shadow-inner">
+                                      <span className="text-2xl">{info.emoji}</span>
+                                    </div>
+                                  )}
                                   {/* Weapon nameplate */}
                                   <p className="text-xs font-bold text-emerald-300 leading-tight">{weapon.name || info.name}</p>
                                   {weapon.subtitle && (
