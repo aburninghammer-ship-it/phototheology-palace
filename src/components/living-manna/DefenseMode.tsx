@@ -1246,10 +1246,9 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                                   )}
                                   {/* Weapon nameplate */}
                                   <p className="text-xs font-bold text-emerald-300 leading-tight">{weapon.name || info.name}</p>
-                                  {weapon.subtitle && (
-                                    <p className="text-[10px] text-emerald-400/70 italic leading-snug">{weapon.subtitle}</p>
-                                  )}
-                                  <p className="text-[10px] text-muted-foreground line-clamp-2 leading-snug">{weapon.argument.slice(0, 80)}...</p>
+                                  <p className="text-[10px] text-emerald-400/70 italic leading-snug line-clamp-2">
+                                    {weapon.subtitle || weapon.argument.slice(0, 60)}
+                                  </p>
                                   <span className="text-[9px] text-emerald-500/60">{new Date(weapon.savedAt).toLocaleDateString()}</span>
                                 </CardContent>
                               </Card>
