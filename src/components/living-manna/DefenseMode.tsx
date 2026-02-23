@@ -833,8 +833,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                               variant="outline"
                               className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
                               onClick={() => {
-                                // Apply the refined version as the new weapon input
-                                setWeaponInput(prev => prev + "\n\n--- REFINED VERSION ---\n" + refineResult);
+                                // Replace weapon input with ONLY the refined version
+                                setWeaponInput(refineResult || "");
                                 setRefineResult(null);
                                 setWeaponAnalysis(null);
                               }}
