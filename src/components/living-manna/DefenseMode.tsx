@@ -48,6 +48,7 @@ type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attac
 interface ArsenalWeapon {
   id: string;
   name?: string;
+  subtitle?: string;
   argument: string;
   analysis: string;
   topic: string;
@@ -106,6 +107,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       setArsenal((data || []).map((w: any) => ({
         id: w.id,
         name: w.name,
+        subtitle: w.subtitle,
         argument: w.argument,
         analysis: w.analysis,
         topic: w.topic,
@@ -196,6 +198,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       await (supabase as any).from("defense_arsenal").insert({
         user_id: user.id,
         name: weapon.name || null,
+        subtitle: weapon.subtitle || null,
         argument: weapon.argument,
         analysis: weapon.analysis,
         topic: weapon.topic,
@@ -227,6 +230,10 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       const score = scoreMatch ? parseInt(scoreMatch[1]) : 5;
       const passed = score >= 8;
 
+      // Parse subtitle from AI response
+      const subtitleMatch = content.match(/📌\s*\*?\*?SUBTITLE\*?\*?:?\s*(.+)/i);
+      const subtitle = subtitleMatch ? subtitleMatch[1].replace(/\*+/g, '').trim() : undefined;
+
       if (passed) {
         const topicName = weaponTopic
           ? DEFENSE_TOPICS.find((t) => t.id === weaponTopic)?.name || weaponTopic
@@ -234,6 +241,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         await saveWeaponToDB({
           argument: weaponInput.trim(),
           analysis: content || weaponAnalysis,
+          subtitle,
           topic: topicName,
           savedAt: new Date().toISOString(),
         });
@@ -1105,6 +1113,9 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                                   </div>
                                   {/* Weapon nameplate */}
                                   <p className="text-xs font-bold text-emerald-300 leading-tight">{weapon.name || info.name}</p>
+                                  {weapon.subtitle && (
+                                    <p className="text-[10px] text-emerald-400/70 italic leading-snug">{weapon.subtitle}</p>
+                                  )}
                                   <p className="text-[10px] text-muted-foreground line-clamp-2 leading-snug">{weapon.argument.slice(0, 80)}...</p>
                                   <span className="text-[9px] text-emerald-500/60">{new Date(weapon.savedAt).toLocaleDateString()}</span>
                                 </CardContent>
