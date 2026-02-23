@@ -20,6 +20,7 @@ import { YouthSpace } from "@/components/living-manna/YouthSpace";
 import { PersonalDevotionalDiary } from "@/components/living-manna/PersonalDevotionalDiary";
 import { ExploitsHub } from "@/components/living-manna/ExploitsHub";
 import { DefenseMode } from "@/components/living-manna/DefenseMode";
+import { SpiritOfProphecyTab } from "@/components/living-manna/SpiritOfProphecyTab";
 import { ChurchAdminTab } from "@/components/living-manna/ChurchAdminTab";
 import { ServeTab } from "@/components/living-manna/ServeTab";
 import { GivingTab } from "@/components/living-manna/GivingTab";
@@ -371,6 +372,10 @@ export default function LivingManna() {
                     <Shield className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Defense</span>
                   </TabsTrigger>
+                  <TabsTrigger value="egw" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <BookMarked className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">EGW</span>
+                  </TabsTrigger>
                   {(isChurchAdmin || memberRole === 'leader') && (
                     <TabsTrigger value="admin" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                       <Settings className="h-4 w-4" />
@@ -434,6 +439,10 @@ export default function LivingManna() {
 
               <TabsContent value="defense">
                 <DefenseMode churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="egw">
+                <SpiritOfProphecyTab churchId={effectiveChurchId!} />
               </TabsContent>
 
               {(isChurchAdmin || memberRole === 'leader') && (
