@@ -15794,14 +15794,19 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          app_font_size: string | null
           bible_font_size: string | null
           bible_translation: string | null
           has_seen_mode_selector: boolean | null
           id: string
+          language: string | null
+          music_volume: number | null
           nav_tab_order: string[] | null
           navigation_style: string | null
+          onboarding_completed: boolean | null
           pinned_nav_tabs: string[] | null
           reading_mode: string | null
+          recent_pages: Json | null
           study_buddy_theme: string | null
           suite_mode: string | null
           theme_preference: string | null
@@ -15809,14 +15814,19 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          app_font_size?: string | null
           bible_font_size?: string | null
           bible_translation?: string | null
           has_seen_mode_selector?: boolean | null
           id?: string
+          language?: string | null
+          music_volume?: number | null
           nav_tab_order?: string[] | null
           navigation_style?: string | null
+          onboarding_completed?: boolean | null
           pinned_nav_tabs?: string[] | null
           reading_mode?: string | null
+          recent_pages?: Json | null
           study_buddy_theme?: string | null
           suite_mode?: string | null
           theme_preference?: string | null
@@ -15824,14 +15834,19 @@ export type Database = {
           user_id: string
         }
         Update: {
+          app_font_size?: string | null
           bible_font_size?: string | null
           bible_translation?: string | null
           has_seen_mode_selector?: boolean | null
           id?: string
+          language?: string | null
+          music_volume?: number | null
           nav_tab_order?: string[] | null
           navigation_style?: string | null
+          onboarding_completed?: boolean | null
           pinned_nav_tabs?: string[] | null
           reading_mode?: string | null
+          recent_pages?: Json | null
           study_buddy_theme?: string | null
           suite_mode?: string | null
           theme_preference?: string | null

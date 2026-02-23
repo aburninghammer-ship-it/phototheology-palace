@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 interface RecentPage {
   path: string;
@@ -54,80 +55,40 @@ const routeTitles: Record<string, string> = {
 };
 
 const getPageTitle = (path: string): string => {
-  // Check exact match first
   if (routeTitles[path]) return routeTitles[path];
   
-  // Check if it's a Bible chapter path
   if (path.startsWith("/bible/")) {
     const parts = path.split("/");
-    if (parts.length >= 4) {
-      return `${parts[2]} ${parts[3]}`;
-    }
+    if (parts.length >= 4) return `${parts[2]} ${parts[3]}`;
     return "Bible Reader";
   }
   
-  // Check for My Studies paths with UUID
-  if (path.startsWith("/my-studies/") && path.length > 13) {
-    return "Study";
-  }
+  if (path.startsWith("/my-studies/") && path.length > 13) return "Study";
   
-  // Check for Series paths with UUID
-  if (path.startsWith("/series/") && path.includes("/lesson/")) {
-    return "Series Lesson";
-  }
-  if (path.startsWith("/series/") && path.includes("/present")) {
-    return "Series Presenter";
-  }
-  if (path.startsWith("/series/") && path.length > 8) {
-    return "Bible Study Series";
-  }
+  if (path.startsWith("/series/") && path.includes("/lesson/")) return "Series Lesson";
+  if (path.startsWith("/series/") && path.includes("/present")) return "Series Presenter";
+  if (path.startsWith("/series/") && path.length > 8) return "Bible Study Series";
   
-  // Check for Escape Room and Treasure Hunt dynamic routes
-  if (path.startsWith("/escape-room/play/")) {
-    return "Escape Room";
-  }
-  if (path.startsWith("/treasure-hunt/")) {
-    return "Treasure Hunt";
-  }
-  if (path.startsWith("/live-study/") && path.length > 12) {
-    return "Live Study";
-  }
+  if (path.startsWith("/escape-room/play/")) return "Escape Room";
+  if (path.startsWith("/treasure-hunt/")) return "Treasure Hunt";
+  if (path.startsWith("/live-study/") && path.length > 12) return "Live Study";
   
-  // Check for admin paths
   if (path.startsWith("/admin/")) {
     const segment = path.split("/")[2] || "";
     return `Admin: ${segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ")}`;
   }
   
-  // Check for devotional plan paths
-  if (path.startsWith("/devotional-plans/")) {
-    return "Devotional Plan";
-  }
+  if (path.startsWith("/devotional-plans/")) return "Devotional Plan";
+  if (path.startsWith("/reading-plans/")) return "Reading Plan";
+  if (path.startsWith("/church/")) return "Church";
   
-  // Check for reading plan paths
-  if (path.startsWith("/reading-plans/")) {
-    return "Reading Plan";
-  }
-  
-  // Check for church paths
-  if (path.startsWith("/church/")) {
-    return "Church";
-  }
-  
-  // Default to formatted path - capitalize and format nicely
   const lastSegment = path.split("/").filter(Boolean).pop() || "";
-  
-  // Check if it looks like a UUID (contains multiple hyphens and hexadecimal characters)
   if (lastSegment.match(/^[a-f0-9-]{36}$/i)) {
-    // Try to get title from parent path
     const parentPath = "/" + path.split("/").filter(Boolean).slice(0, -1).join("/");
-    if (routeTitles[parentPath]) {
-      return routeTitles[parentPath];
-    }
+    if (routeTitles[parentPath]) return routeTitles[parentPath];
     return "Page";
   }
   
-  // Format the segment nicely
   return lastSegment
     .replace(/-/g, " ")
     .split(" ")
@@ -137,6 +98,9 @@ const getPageTitle = (path: string): string => {
 
 export const useRecentPages = () => {
   const location = useLocation();
+  const { updatePreference } = useUserPreferences();
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  
   const [recentPages, setRecentPages] = useState<RecentPage[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -147,7 +111,6 @@ export const useRecentPages = () => {
   });
 
   useEffect(() => {
-    // Skip certain paths
     if (location.pathname === "/auth" || location.pathname === "/404") return;
 
     const newPage: RecentPage = {
@@ -157,10 +120,7 @@ export const useRecentPages = () => {
     };
 
     setRecentPages((prev) => {
-      // Remove duplicate if exists
       const filtered = prev.filter((p) => p.path !== newPage.path);
-      
-      // Add new page at the beginning
       const updated = [newPage, ...filtered].slice(0, MAX_RECENT_PAGES);
       
       // Save to localStorage
@@ -170,6 +130,12 @@ export const useRecentPages = () => {
         console.error("Failed to save recent pages:", e);
       }
       
+      // Debounced sync to database (every 30 seconds max)
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+      syncTimerRef.current = setTimeout(() => {
+        updatePreference("recent_pages", updated);
+      }, 30000);
+      
       return updated;
     });
   }, [location.pathname]);
@@ -177,6 +143,7 @@ export const useRecentPages = () => {
   const clearRecentPages = () => {
     setRecentPages([]);
     localStorage.removeItem(STORAGE_KEY);
+    updatePreference("recent_pages", []);
   };
 
   return { recentPages, clearRecentPages };

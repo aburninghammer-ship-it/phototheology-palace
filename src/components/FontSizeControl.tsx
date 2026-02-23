@@ -6,17 +6,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 const FONT_SIZE_KEY = "app-font-size";
 const FONT_SIZES = ["small", "medium", "large", "x-large"] as const;
 type FontSize = typeof FONT_SIZES[number];
-
-const FONT_SIZE_CLASSES: Record<FontSize, string> = {
-  small: "text-sm",
-  medium: "text-base",
-  large: "text-lg",
-  "x-large": "text-xl",
-};
 
 const FONT_SIZE_SCALES: Record<FontSize, number> = {
   small: 0.875,
@@ -26,10 +20,24 @@ const FONT_SIZE_SCALES: Record<FontSize, number> = {
 };
 
 export const FontSizeControl = () => {
+  const { preferences, updatePreference } = useUserPreferences();
+  
   const [fontSize, setFontSize] = useState<FontSize>(() => {
+    // Prefer synced preference, fall back to localStorage
     const saved = localStorage.getItem(FONT_SIZE_KEY);
     return (saved as FontSize) || "medium";
   });
+
+  // Sync from DB preferences when they load
+  useEffect(() => {
+    if (preferences.app_font_size && preferences.app_font_size !== fontSize) {
+      const localSaved = localStorage.getItem(FONT_SIZE_KEY);
+      // If no local override, use DB value
+      if (!localSaved || localSaved === 'medium') {
+        setFontSize(preferences.app_font_size);
+      }
+    }
+  }, [preferences.app_font_size]);
 
   useEffect(() => {
     localStorage.setItem(FONT_SIZE_KEY, fontSize);
@@ -40,18 +48,19 @@ export const FontSizeControl = () => {
     document.documentElement.setAttribute("data-font-size", fontSize);
   }, [fontSize]);
 
+  const changeFontSize = (newSize: FontSize) => {
+    setFontSize(newSize);
+    updatePreference("app_font_size", newSize);
+  };
+
   const currentIndex = FONT_SIZES.indexOf(fontSize);
 
   const decrease = () => {
-    if (currentIndex > 0) {
-      setFontSize(FONT_SIZES[currentIndex - 1]);
-    }
+    if (currentIndex > 0) changeFontSize(FONT_SIZES[currentIndex - 1]);
   };
 
   const increase = () => {
-    if (currentIndex < FONT_SIZES.length - 1) {
-      setFontSize(FONT_SIZES[currentIndex + 1]);
-    }
+    if (currentIndex < FONT_SIZES.length - 1) changeFontSize(FONT_SIZES[currentIndex + 1]);
   };
 
   return (
