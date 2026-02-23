@@ -36,11 +36,11 @@ interface Message {
 }
 
 const QUICK_QUESTIONS = [
+  "What should I try next?",
   "What does this tab do?",
   "Give me a tour of the Palace",
   "Where are my saved studies?",
   "What room should I start with?",
-  "How do games work?",
   "Something isn't working",
 ];
 
@@ -51,6 +51,7 @@ export const ReginaldButler = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
+  const [userContext, setUserContext] = useState<string | null>(null);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
@@ -60,7 +61,7 @@ export const ReginaldButler = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const dragConstraintsRef = useRef<HTMLDivElement>(null);
 
-  // Fetch user name once
+  // Fetch user name and context snapshot
   useEffect(() => {
     if (!user) return;
     supabase
@@ -71,6 +72,12 @@ export const ReginaldButler = () => {
       .then(({ data }) => {
         if (data?.display_name) setUserName(data.display_name.split(" ")[0]);
       });
+    // Fetch user context for personalized Reginald suggestions
+    supabase.functions.invoke("user-context-snapshot", {
+      body: { target: "reginald" },
+    }).then(({ data }) => {
+      if (data?.promptBlock) setUserContext(data.promptBlock);
+    }).catch(() => { /* graceful fallback */ });
   }, [user]);
 
   // Greeting on first open
@@ -113,6 +120,7 @@ export const ReginaldButler = () => {
         body: {
           messages: updatedMessages.map((m) => ({ role: m.role, content: m.content })),
           userName,
+          userContextBlock: userContext,
         },
       });
 
