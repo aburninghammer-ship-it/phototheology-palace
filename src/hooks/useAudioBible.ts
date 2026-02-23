@@ -14,11 +14,14 @@ import {
   generateChapterCommentary,
   generatePassageCommentary,
   prefetchUpcomingCommentary,
+  fetchChapterVerses,
   CommentaryTier,
   CommentarySource,
   OpenAIVoice,
   OPENAI_VOICES,
 } from "@/services/audioBibleService";
+
+
 
 interface Verse {
   verse: number;
@@ -600,16 +603,47 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   /**
    * Start playback for an item
    */
-  const startPlayback = useCallback((item: PlaybackItem) => {
+  const startPlayback = useCallback(async (item: PlaybackItem) => {
     currentItemRef.current = item;
     isStoppedRef.current = false;
 
     setCurrentBook(item.book);
     setCurrentChapter(item.chapter);
-    setCurrentVerseIndexSync(0); // Use sync version to ensure ref is updated before playback
-    setTotalVerses(item.verses.length);
     setIsPlayingCommentary(false);
     setCurrentCommentary("");
+
+    // If verses are empty (queued item), fetch them on demand
+    if (item.verses.length === 0) {
+      setAudioState("loading");
+      try {
+        const verses = await fetchChapterVerses(item.book, item.chapter);
+        if (isStoppedRef.current) return;
+        if (verses.length === 0) {
+          console.warn(`[useAudioBible] No verses found for ${item.book} ${item.chapter}, skipping`);
+          // Skip to next queued item
+          if (playbackQueueRef.current.length > 0) {
+            const nextItem = playbackQueueRef.current.shift()!;
+            startPlayback(nextItem);
+          } else {
+            setAudioState("idle");
+          }
+          return;
+        }
+        item.verses = verses;
+      } catch (err) {
+        console.error("[useAudioBible] Failed to fetch verses for queued chapter:", err);
+        if (playbackQueueRef.current.length > 0) {
+          const nextItem = playbackQueueRef.current.shift()!;
+          startPlayback(nextItem);
+        } else {
+          setAudioState("idle");
+        }
+        return;
+      }
+    }
+
+    setCurrentVerseIndexSync(0);
+    setTotalVerses(item.verses.length);
 
     // Prefetch commentary for upcoming verses in the background (not for passage mode)
     if (includeCommentaryRef.current && commentaryModeRef.current !== "passage" && item.verses.length > 1) {
@@ -619,7 +653,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         0,
         item.verses,
         commentaryTierRef.current,
-        3 // Prefetch next 3 verses
+        3
       ).catch(console.error);
     }
 

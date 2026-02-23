@@ -173,6 +173,9 @@ export function AmbientMusicPlayer({
   const isMobile = useIsMobile();
   
   const [isPlaying, setIsPlaying] = useState(false);
+  const isPlayingRef = useRef(false);
+  // Keep ref in sync for use in event handlers (avoids stale closures)
+  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   const [volume, setVolume] = useState(() => {
     const saved = localStorage.getItem("pt-music-volume-pct");
     if (saved) {
@@ -463,6 +466,29 @@ export function AmbientMusicPlayer({
         // loopMode === "one" is handled by audio.loop = true (browser handles it)
       };
       
+      // Handle unexpected pauses (browser/system interruptions)
+      // This fires when the browser pauses audio due to resource competition,
+      // tab switching, or mobile OS audio session changes
+      audioRef.current.onpause = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        
+        // Only try to resume if we think we should still be playing
+        // and the track hasn't naturally ended
+        if (isPlayingRef.current && !audio.ended && audio.currentTime > 0) {
+          console.log('[AmbientMusic] Unexpected pause detected, scheduling resume...');
+          // Small delay to avoid fighting with the browser
+          setTimeout(() => {
+            if (audioRef.current && isPlayingRef.current && audioRef.current.paused && !audioRef.current.ended) {
+              console.log('[AmbientMusic] Resuming after unexpected pause');
+              audioRef.current.play().catch((err) => {
+                console.warn('[AmbientMusic] Could not resume after pause:', err);
+              });
+            }
+          }, 300);
+        }
+      };
+      
       // Handle errors
       audioRef.current.onerror = (e) => {
         console.error('[AmbientMusic] Audio error:', e);
@@ -479,6 +505,7 @@ export function AmbientMusicPlayer({
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.onended = null;
+        audioRef.current.onpause = null;
         audioRef.current.onerror = null;
         audioRef.current = null;
       }
@@ -530,7 +557,7 @@ export function AmbientMusicPlayer({
       }
     };
 
-    const interval = setInterval(keepAlive, 5000);
+    const interval = setInterval(keepAlive, 2000);
     return () => clearInterval(interval);
   }, [isPlaying]);
 
