@@ -7,6 +7,7 @@ import {
   FlaskConical, Target, Save, Archive, Trash2, ChevronDown, ChevronUp,
   Warehouse, ArrowLeft, Users, Share2,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { CommunityArmory } from "./CommunityArmory";
 import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { Card, CardContent } from "@/components/ui/card";
@@ -860,8 +861,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                         className="h-5 w-5 ml-auto text-cyan-400/60 hover:text-cyan-400"
                       />
                     </div>
-                    <div className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">
-                      {weaponAnalysis}
+                    <div className="prose prose-sm prose-invert max-w-none leading-relaxed text-foreground/90 [&_strong]:text-cyan-300 [&_h2]:text-cyan-300 [&_h3]:text-cyan-300 [&_hr]:border-cyan-500/20 [&_li]:marker:text-cyan-400 [&_code]:text-cyan-300 [&_code]:bg-cyan-950/40 [&_blockquote]:border-l-cyan-500/40 [&_blockquote]:text-cyan-200/80">
+                      <ReactMarkdown>{weaponAnalysis}</ReactMarkdown>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Button
@@ -917,8 +918,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                               className="h-5 w-5 ml-auto text-amber-400/60 hover:text-amber-400"
                             />
                           </div>
-                          <div className="text-xs whitespace-pre-wrap leading-relaxed text-foreground/90">
-                            {refineResult}
+                          <div className="prose prose-xs prose-invert max-w-none leading-relaxed text-foreground/90 [&_strong]:text-amber-300 [&_h2]:text-amber-300 [&_h3]:text-amber-300 [&_hr]:border-amber-500/20 [&_li]:marker:text-amber-400 [&_blockquote]:border-l-amber-500/40">
+                            <ReactMarkdown>{refineResult}</ReactMarkdown>
                           </div>
                           <div className="flex gap-2 mt-2">
                             <Button
@@ -964,7 +965,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                               </div>
                               <Badge className="ml-auto bg-emerald-600 text-white text-xs">{forgeResult.score}/10</Badge>
                             </div>
-                            <p className="text-xs text-emerald-200/80 whitespace-pre-wrap">{forgeResult.message}</p>
+                            <div className="prose prose-xs prose-invert max-w-none text-emerald-200/80 [&_strong]:text-emerald-300 [&_hr]:border-emerald-500/20 [&_li]:marker:text-emerald-400"><ReactMarkdown>{forgeResult.message}</ReactMarkdown></div>
                             <Button
                               size="sm"
                               variant="outline"
@@ -1009,7 +1010,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                               </div>
                               <Badge className="ml-auto bg-red-600 text-white text-xs">{forgeResult.score}/10</Badge>
                             </div>
-                            <p className="text-xs text-red-200/80 whitespace-pre-wrap">{forgeResult.message}</p>
+                            <div className="prose prose-xs prose-invert max-w-none text-red-200/80 [&_strong]:text-red-300 [&_hr]:border-red-500/20 [&_li]:marker:text-red-400"><ReactMarkdown>{forgeResult.message}</ReactMarkdown></div>
                             <p className="text-xs text-muted-foreground mt-2 italic">
                               Refine your argument above and try forging again. A strong weapon must be biblically sound, logically airtight, and historically accurate.
                             </p>
@@ -1097,8 +1098,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                     {/* The argument */}
                     <div className="space-y-2">
                       <h5 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Your Argument</h5>
-                      <div className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed p-3 rounded-lg bg-black/20 border border-border/30">
-                        {selectedArsenalWeapon.argument}
+                      <div className="prose prose-sm prose-invert max-w-none leading-relaxed p-3 rounded-lg bg-black/20 border border-border/30 [&_strong]:text-emerald-300">
+                        <ReactMarkdown>{selectedArsenalWeapon.argument}</ReactMarkdown>
                       </div>
                     </div>
                     {/* Jeeves analysis */}
@@ -1112,8 +1113,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                           className="h-4 w-4 text-emerald-400/60 hover:text-emerald-400"
                         />
                       </div>
-                      <div className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed p-3 rounded-lg bg-black/20 border border-border/30">
-                        {selectedArsenalWeapon.analysis}
+                      <div className="prose prose-sm prose-invert max-w-none leading-relaxed p-3 rounded-lg bg-black/20 border border-border/30 [&_strong]:text-emerald-300 [&_h2]:text-emerald-300 [&_h3]:text-emerald-300 [&_hr]:border-emerald-500/20 [&_li]:marker:text-emerald-400 [&_blockquote]:border-l-emerald-500/40">
+                        <ReactMarkdown>{selectedArsenalWeapon.analysis}</ReactMarkdown>
                       </div>
                     </div>
 
@@ -1131,8 +1132,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                               className="h-5 w-5 ml-auto text-amber-400/60 hover:text-amber-400"
                             />
                           </div>
-                          <div className="text-xs whitespace-pre-wrap leading-relaxed text-foreground/90">
-                            {sharpenResult}
+                          <div className="prose prose-xs prose-invert max-w-none leading-relaxed text-foreground/90 [&_strong]:text-amber-300 [&_h2]:text-amber-300 [&_h3]:text-amber-300 [&_hr]:border-amber-500/20 [&_li]:marker:text-amber-400 [&_blockquote]:border-l-amber-500/40">
+                            <ReactMarkdown>{sharpenResult}</ReactMarkdown>
                           </div>
                           <div className="flex gap-2 mt-2">
                             <Button
