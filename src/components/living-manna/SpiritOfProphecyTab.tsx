@@ -8,12 +8,13 @@ import { Separator } from "@/components/ui/separator";
 import {
   BookOpen, Flame, Eye, Target, Layers, Brain, Gem, Film, Image as ImageIcon,
   ChevronRight, Loader2, Sparkles, BookMarked, Church, Crown, Sword, Shield,
-  Heart, Cross, Star, ArrowRight, MessageSquareMore, Send, X
+  Heart, Cross, Star, ArrowRight, MessageSquareMore, Send, X, BookText, Telescope
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { StyledMarkdown } from "@/components/ui/styled-markdown";
 
 // ─── EGW Book Library ───────────────────────────────────────────────
 interface EGWBook {
@@ -443,7 +444,83 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
   const [expoundQuestion, setExpoundQuestion] = useState("");
   const [expoundResponse, setExpoundResponse] = useState<string | null>(null);
   const [expoundLoading, setExpoundLoading] = useState(false);
+  
+  // Reader state
+  const [chapterParagraphs, setChapterParagraphs] = useState<string[]>([]);
+  const [loadingChapter, setLoadingChapter] = useState(false);
+  const [chapterTab, setChapterTab] = useState<"read" | "analyze">("read");
+  const [selectedParagraph, setSelectedParagraph] = useState<string | null>(null);
+  const [paragraphAnalysis, setParagraphAnalysis] = useState<string | null>(null);
+  const [analyzingParagraph, setAnalyzingParagraph] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<string>("CR");
+  
   const { toast } = useToast();
+
+  // Fetch chapter text
+  const fetchChapterText = async (book: EGWBook, chapter: EGWChapter) => {
+    setLoadingChapter(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("fetch-egw-chapter", {
+        body: {
+          bookId: book.id,
+          chapterNumber: chapter.number,
+          chapterTitle: chapter.title,
+          bookTitle: book.title,
+        },
+      });
+
+      if (error) throw error;
+      setChapterParagraphs(data?.paragraphs || []);
+    } catch (err) {
+      console.error("Fetch chapter error:", err);
+      toast({
+        title: "Error Loading Chapter",
+        description: "Could not load chapter text. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingChapter(false);
+    }
+  };
+
+  // Analyze a selected paragraph through Palace
+  const analyzeParagraphWithPalace = async (text: string, roomCode: string) => {
+    if (!selectedBook || !selectedChapter) return;
+    setAnalyzingParagraph(true);
+    setParagraphAnalysis(null);
+
+    const room = PALACE_ROOMS.find(r => r.code === roomCode);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "egw_palace_analysis",
+          message: `Analyze the following passage from "${selectedBook.title}", Chapter ${selectedChapter.number}: "${selectedChapter.title}" through the Phototheology ${room?.name} (${roomCode}).
+
+**Selected Passage:**
+"${text}"
+
+${room?.description}
+
+Apply this Palace room lens specifically to the selected passage. Be theological, Christ-centered, and insightful. Connect to Scripture. Keep it focused (200-400 words).`,
+          context: `book:${selectedBook.id},chapter:${selectedChapter.number},room:${roomCode},passage_analysis:true`,
+        },
+      });
+
+      if (error) throw error;
+      const result = typeof data === 'string' ? data : data?.response || data?.content || JSON.stringify(data);
+      setParagraphAnalysis(result);
+    } catch (err) {
+      console.error("Paragraph analysis error:", err);
+      toast({
+        title: "Analysis Error",
+        description: "Could not analyze this passage. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setAnalyzingParagraph(false);
+    }
+  };
 
   const handleExpound = async (roomCode: string) => {
     if (!selectedBook || !selectedChapter) return;
@@ -568,10 +645,10 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                 <BookMarked className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-xl">Spirit of Prophecy — Palace Analysis</CardTitle>
+                <CardTitle className="text-xl">Spirit of Prophecy — Library & Palace Analysis</CardTitle>
                 <CardDescription>
-                  Explore Ellen White's writings through Phototheology Palace rooms. 
-                  Every chapter analyzed with Christ-centered, sanctuary-anchored lenses.
+                  Read and explore Ellen White's writings through Phototheology Palace rooms. 
+                  Select any sentence to analyze it through the Palace.
                 </CardDescription>
               </div>
             </div>
@@ -691,6 +768,9 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                   setSelectedChapter(chapter);
                   setAnalysisResults({});
                   setFullAnalysis(null);
+                  setChapterParagraphs([]);
+                  setChapterTab("read");
+                  fetchChapterText(selectedBook, chapter);
                 }}
               >
                 <CardContent className="p-3 flex items-center gap-3">
@@ -710,16 +790,16 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
     );
   }
 
-  // ─── Palace Analysis View ─────────────────────────────────────────
+  // ─── Chapter View (Read + Analyze Tabs) ───────────────────────────
   const BookIcon = selectedBook.icon;
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
-        <Button variant="ghost" size="sm" onClick={() => { setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); }}>
+        <Button variant="ghost" size="sm" onClick={() => { setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); }}>
           ← Chapters
         </Button>
         <span className="text-muted-foreground">|</span>
-        <Button variant="ghost" size="sm" onClick={() => { setSelectedBook(null); setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); }}>
+        <Button variant="ghost" size="sm" onClick={() => { setSelectedBook(null); setSelectedChapter(null); setAnalysisResults({}); setFullAnalysis(null); setChapterParagraphs([]); setSelectedParagraph(null); setParagraphAnalysis(null); }}>
           ← Library
         </Button>
       </div>
@@ -736,6 +816,84 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
               </CardTitle>
               <CardDescription>{selectedBook.title}</CardDescription>
             </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Read / Analyze Tabs */}
+      <Tabs value={chapterTab} onValueChange={(v) => setChapterTab(v as "read" | "analyze")}>
+        <TabsList className="w-full grid grid-cols-2">
+          <TabsTrigger value="read" className="gap-2">
+            <BookText className="h-4 w-4" />
+            Read Chapter
+          </TabsTrigger>
+          <TabsTrigger value="analyze" className="gap-2">
+            <Telescope className="h-4 w-4" />
+            Palace Analysis
+          </TabsTrigger>
+        </TabsList>
+
+        {/* ─── READ TAB ───────────────────────────────────────────── */}
+        <TabsContent value="read" className="mt-4 space-y-4">
+          {loadingChapter ? (
+            <Card variant="glass">
+              <CardContent className="py-12 flex flex-col items-center justify-center gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">Loading chapter text...</p>
+                <p className="text-xs text-muted-foreground/70">First load may take a moment</p>
+              </CardContent>
+            </Card>
+          ) : chapterParagraphs.length === 0 ? (
+            <Card variant="glass">
+              <CardContent className="py-12 flex flex-col items-center justify-center gap-3">
+                <BookOpen className="h-8 w-8 text-muted-foreground/50" />
+                <p className="text-sm text-muted-foreground">No chapter text available</p>
+                <Button size="sm" onClick={() => fetchChapterText(selectedBook, selectedChapter)}>
+                  Retry Loading
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2 border border-border/50">
+                <Telescope className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span>Click any paragraph to analyze it through a Palace room</span>
+              </div>
+
+              <ScrollArea className="h-[65vh]">
+                <div className="space-y-1 pr-4">
+                  {chapterParagraphs.map((paragraph, idx) => (
+                    <div
+                      key={idx}
+                      className={`group relative px-4 py-3 rounded-lg cursor-pointer transition-all text-sm leading-relaxed text-foreground/90 hover:bg-primary/5 hover:border-primary/20 border border-transparent ${
+                        selectedParagraph === paragraph ? 'bg-primary/10 border-primary/30 ring-1 ring-primary/20' : ''
+                      }`}
+                      onClick={() => {
+                        setSelectedParagraph(paragraph);
+                        setParagraphAnalysis(null);
+                      }}
+                    >
+                      <span className="absolute left-0 top-3 text-[10px] text-muted-foreground/40 font-mono w-4 text-right">
+                        {idx + 1}
+                      </span>
+                      <p className="pl-2">{paragraph}</p>
+                      <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Badge variant="outline" className="text-[9px] bg-background/80 backdrop-blur-sm">
+                          <Telescope className="h-2.5 w-2.5 mr-1" />
+                          Analyze
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </>
+          )}
+        </TabsContent>
+
+        {/* ─── ANALYZE TAB ────────────────────────────────────────── */}
+        <TabsContent value="analyze" className="mt-4 space-y-4">
+          <div className="flex justify-end">
             <Button
               onClick={generateFullAnalysis}
               disabled={loadingFull}
@@ -746,83 +904,153 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
               Full Palace Walkthrough
             </Button>
           </div>
-        </CardHeader>
-      </Card>
 
-      {/* Full Analysis */}
-      {fullAnalysis && (
-        <Card variant="glass" className="border-primary/30">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              Full Palace Walkthrough
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap text-sm leading-relaxed">
-              {fullAnalysis}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Room-by-Room Analysis */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {PALACE_ROOMS.map(room => {
-          const Icon = room.icon;
-          const hasResult = analysisResults[room.code];
-          const isLoading = loadingRoom === room.code;
-
-          return (
-            <Card key={room.code} variant="glass" className={`transition-all ${hasResult ? 'border-primary/30' : ''}`}>
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Icon className={`h-4 w-4 ${room.color}`} />
-                    <span className="text-sm font-bold text-foreground">{room.name}</span>
-                    <Badge variant="outline" className="text-[10px]">{room.code}</Badge>
-                  </div>
+          {/* Full Analysis */}
+          {fullAnalysis && (
+            <Card variant="glass" className="border-primary/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  Full Palace Walkthrough
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap text-sm leading-relaxed">
+                  {fullAnalysis}
                 </div>
-                <p className="text-xs text-muted-foreground">{room.description}</p>
-
-                {hasResult ? (
-                  <>
-                    <div className="text-xs text-foreground/90 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border-t border-border/50 pt-2">
-                      {analysisResults[room.code]}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { setExpoundOpen(room.code); setExpoundResponse(null); setExpoundQuestion(""); }}
-                      className="w-full gap-2 mt-2 border-primary/30 text-primary hover:bg-primary/10"
-                    >
-                      <MessageSquareMore className="h-3 w-3" />
-                      Expound This
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => analyzeWithRoom(room.code)}
-                    disabled={isLoading}
-                    className="w-full gap-2"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <ArrowRight className="h-3 w-3" />
-                    )}
-                    Analyze with {room.code}
-                  </Button>
-                )}
               </CardContent>
             </Card>
-          );
-        })}
-      </div>
+          )}
 
-      {/* Expound Dialog */}
+          {/* Room-by-Room Analysis */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {PALACE_ROOMS.map(room => {
+              const Icon = room.icon;
+              const hasResult = analysisResults[room.code];
+              const isLoading = loadingRoom === room.code;
+
+              return (
+                <Card key={room.code} variant="glass" className={`transition-all ${hasResult ? 'border-primary/30' : ''}`}>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Icon className={`h-4 w-4 ${room.color}`} />
+                        <span className="text-sm font-bold text-foreground">{room.name}</span>
+                        <Badge variant="outline" className="text-[10px]">{room.code}</Badge>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{room.description}</p>
+
+                    {hasResult ? (
+                      <>
+                        <div className="text-xs text-foreground/90 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border-t border-border/50 pt-2">
+                          {analysisResults[room.code]}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => { setExpoundOpen(room.code); setExpoundResponse(null); setExpoundQuestion(""); }}
+                          className="w-full gap-2 mt-2 border-primary/30 text-primary hover:bg-primary/10"
+                        >
+                          <MessageSquareMore className="h-3 w-3" />
+                          Expound This
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => analyzeWithRoom(room.code)}
+                        disabled={isLoading}
+                        className="w-full gap-2"
+                      >
+                        {isLoading ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <ArrowRight className="h-3 w-3" />
+                        )}
+                        Analyze with {room.code}
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* ─── Paragraph Analysis Dialog ──────────────────────────────── */}
+      <Dialog open={!!selectedParagraph} onOpenChange={(open) => { if (!open) { setSelectedParagraph(null); setParagraphAnalysis(null); } }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <Telescope className="h-5 w-5 text-primary" />
+              Palace Analysis — Selected Passage
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Selected text */}
+            <div className="text-sm italic text-foreground/80 bg-muted/30 rounded-lg p-4 border border-border/50 max-h-40 overflow-y-auto">
+              "{selectedParagraph}"
+            </div>
+
+            {/* Room selector */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Choose a Palace Room</p>
+              <div className="flex flex-wrap gap-1.5">
+                {PALACE_ROOMS.map(room => {
+                  const Icon = room.icon;
+                  return (
+                    <Button
+                      key={room.code}
+                      variant={selectedRoom === room.code ? "default" : "outline"}
+                      size="sm"
+                      className="gap-1.5 text-xs h-8"
+                      onClick={() => { setSelectedRoom(room.code); setParagraphAnalysis(null); }}
+                    >
+                      <Icon className={`h-3 w-3 ${selectedRoom === room.code ? '' : room.color}`} />
+                      {room.code}
+                    </Button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {PALACE_ROOMS.find(r => r.code === selectedRoom)?.name} — {PALACE_ROOMS.find(r => r.code === selectedRoom)?.description}
+              </p>
+            </div>
+
+            {/* Analysis result */}
+            {paragraphAnalysis && (
+              <div className="text-sm text-foreground/90 leading-relaxed bg-muted/20 rounded-lg p-4 border border-border/50">
+                <StyledMarkdown content={paragraphAnalysis} />
+              </div>
+            )}
+
+            {/* Analyze button */}
+            <Button
+              onClick={() => selectedParagraph && analyzeParagraphWithPalace(selectedParagraph, selectedRoom)}
+              disabled={analyzingParagraph}
+              className="w-full gap-2"
+            >
+              {analyzingParagraph ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Analyzing through {selectedRoom}...
+                </>
+              ) : (
+                <>
+                  <Telescope className="h-4 w-4" />
+                  {paragraphAnalysis ? "Re-Analyze" : "Analyze"} with {PALACE_ROOMS.find(r => r.code === selectedRoom)?.name}
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Expound Dialog ─────────────────────────────────────────── */}
       <Dialog open={!!expoundOpen} onOpenChange={(open) => { if (!open) setExpoundOpen(null); }}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>

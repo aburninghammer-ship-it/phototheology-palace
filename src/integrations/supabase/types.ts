@@ -4835,6 +4835,36 @@ export type Database = {
         }
         Relationships: []
       }
+      egw_chapter_cache: {
+        Row: {
+          book_id: string
+          chapter_number: number
+          chapter_title: string
+          created_at: string
+          id: string
+          paragraphs: Json
+          updated_at: string
+        }
+        Insert: {
+          book_id: string
+          chapter_number: number
+          chapter_title: string
+          created_at?: string
+          id?: string
+          paragraphs?: Json
+          updated_at?: string
+        }
+        Update: {
+          book_id?: string
+          chapter_number?: number
+          chapter_title?: string
+          created_at?: string
+          id?: string
+          paragraphs?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_campaign_logs: {
         Row: {
           campaign_name: string
