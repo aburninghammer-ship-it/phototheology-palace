@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { useEventTracking } from "@/hooks/useEventTracking";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { motion, AnimatePresence } from "framer-motion";
 
 // COMPRESSED ONBOARDING: 2 steps max (assessment → first win)
@@ -49,6 +50,7 @@ export default function Onboarding() {
   const { user } = useAuth();
   const { toast } = useToast();
   const { trackOnboardingStep, trackEvent } = useEventTracking();
+  const { updatePreference } = useUserPreferences();
 
   useEffect(() => {
     trackEvent({ eventType: "onboarding_started" });
@@ -81,6 +83,7 @@ export default function Onboarding() {
       }
       
       localStorage.setItem("onboarding_completed", "true");
+      updatePreference("onboarding_completed", true);
       
       toast({
         title: t('onboarding.letsGo'),
@@ -97,6 +100,7 @@ export default function Onboarding() {
 
   const handleSkip = () => {
     localStorage.setItem("onboarding_completed", "true");
+    updatePreference("onboarding_completed", true);
     navigate("/palace");
   };
 

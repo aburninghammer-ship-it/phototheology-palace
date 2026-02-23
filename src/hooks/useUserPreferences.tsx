@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
-import { getCurrentLanguage } from "@/i18n";
+import { getCurrentLanguage, syncLanguageFromDB } from "@/i18n";
+import { registerVolumeSyncCallback, applyVolumeFromDB } from "./useMusicVolumeControl";
 
 // Map app language to default Bible translation
 const getDefaultBibleTranslation = (): string => {
@@ -48,12 +49,18 @@ interface UserPreferences {
   theme_preference: "light" | "dark" | "system";
   navigation_style: "simplified" | "full";
   preferred_reading_experience: "audio" | "read-along" | "auto";
-  read_along_speed: number; // Words per minute
-  study_buddy_theme: "dark" | "light"; // Study Buddy page theme
-  suite_mode: "guest_house" | "full_suite"; // Guest House (simplified) or Full Suite
-  has_seen_mode_selector: boolean; // Whether user has seen the mode selection modal
-  pinned_nav_tabs: string[]; // Array of tab IDs that are pinned (shown first)
-  nav_tab_order: string[]; // Custom order of remaining tabs
+  read_along_speed: number;
+  study_buddy_theme: "dark" | "light";
+  suite_mode: "guest_house" | "full_suite";
+  has_seen_mode_selector: boolean;
+  pinned_nav_tabs: string[];
+  nav_tab_order: string[];
+  // Cross-device sync fields
+  language: string;
+  app_font_size: "small" | "medium" | "large" | "x-large";
+  music_volume: number;
+  onboarding_completed: boolean;
+  recent_pages: Array<{ path: string; title: string; timestamp: number }>;
 }
 
 const defaultPreferences: UserPreferences = {
@@ -67,8 +74,13 @@ const defaultPreferences: UserPreferences = {
   study_buddy_theme: "dark",
   suite_mode: "full_suite",
   has_seen_mode_selector: false,
-  pinned_nav_tabs: [], // No pinned tabs by default
-  nav_tab_order: [], // Use default order
+  pinned_nav_tabs: [],
+  nav_tab_order: [],
+  language: "en",
+  app_font_size: "medium",
+  music_volume: 80,
+  onboarding_completed: false,
+  recent_pages: [],
 };
 
 interface UserPreferencesContextValue {
@@ -131,7 +143,7 @@ export const UserPreferencesProvider = ({
             ? localNavPrefs.order
             : ((data as any).nav_tab_order as string[]) ?? defaultPreferences.nav_tab_order;
 
-          setPreferences({
+          const loadedPrefs: UserPreferences = {
             bible_font_size: (data.bible_font_size as any) ?? defaultPreferences.bible_font_size,
             bible_translation: data.bible_translation ?? defaultPreferences.bible_translation,
             reading_mode: (data.reading_mode as any) ?? defaultPreferences.reading_mode,
@@ -144,7 +156,31 @@ export const UserPreferencesProvider = ({
             has_seen_mode_selector: ((data as any).has_seen_mode_selector as any) ?? defaultPreferences.has_seen_mode_selector,
             pinned_nav_tabs: pinnedTabs,
             nav_tab_order: tabOrder,
-          });
+            // Cross-device sync fields from DB
+            language: ((data as any).language as string) ?? localStorage.getItem('pt-language') ?? defaultPreferences.language,
+            app_font_size: ((data as any).app_font_size as any) ?? localStorage.getItem('app-font-size') ?? defaultPreferences.app_font_size,
+            music_volume: ((data as any).music_volume as number) ?? defaultPreferences.music_volume,
+            onboarding_completed: ((data as any).onboarding_completed as boolean) ?? localStorage.getItem('onboarding_completed') === 'true',
+            recent_pages: ((data as any).recent_pages as any[]) ?? defaultPreferences.recent_pages,
+          };
+
+          setPreferences(loadedPrefs);
+
+          // Apply synced settings to local systems for cross-device sync
+          syncLanguageFromDB(loadedPrefs.language);
+          if (loadedPrefs.app_font_size) {
+            localStorage.setItem('app-font-size', loadedPrefs.app_font_size);
+          }
+          applyVolumeFromDB(loadedPrefs.music_volume);
+          if (loadedPrefs.onboarding_completed) {
+            localStorage.setItem('onboarding_completed', 'true');
+          }
+          if (loadedPrefs.recent_pages && loadedPrefs.recent_pages.length > 0) {
+            const localRecent = localStorage.getItem('phototheology_recent_pages');
+            if (!localRecent || JSON.parse(localRecent).length === 0) {
+              localStorage.setItem('phototheology_recent_pages', JSON.stringify(loadedPrefs.recent_pages));
+            }
+          }
         } else {
           // Create default preferences in the backend and use local defaults
           await supabase.from("user_preferences").insert({
@@ -192,6 +228,12 @@ export const UserPreferencesProvider = ({
             has_seen_mode_selector: next.has_seen_mode_selector,
             pinned_nav_tabs: next.pinned_nav_tabs,
             nav_tab_order: next.nav_tab_order,
+            // Cross-device sync fields
+            language: next.language,
+            app_font_size: next.app_font_size,
+            music_volume: next.music_volume,
+            onboarding_completed: next.onboarding_completed,
+            recent_pages: next.recent_pages,
             updated_at: new Date().toISOString(),
           },
           {
@@ -207,17 +249,23 @@ export const UserPreferencesProvider = ({
     }
   };
 
-  const updatePreference = <K extends keyof UserPreferences>(
+  const updatePreference = useCallback(<K extends keyof UserPreferences>(
     key: K,
     value: UserPreferences[K]
   ) => {
     setPreferences((prev) => {
       const next = { ...prev, [key]: value };
-      // Fire-and-forget persistence; state updates immediately for responsive UI
       void persistPreferences(next);
       return next;
     });
-  };
+  }, [user]);
+
+  // Register music volume sync callback
+  useEffect(() => {
+    registerVolumeSyncCallback((volume: number) => {
+      updatePreference("music_volume", volume);
+    });
+  }, [updatePreference]);
 
   return (
     <UserPreferencesContext.Provider

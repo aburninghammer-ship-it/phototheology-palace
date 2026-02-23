@@ -56,4 +56,17 @@ export const setLanguage = (lang: string) => {
   localStorage.setItem('pt-language', lang);
 };
 
+/**
+ * Sync language from database preferences (called after preferences load)
+ * Only applies if no local override exists
+ */
+export const syncLanguageFromDB = (dbLanguage: string) => {
+  if (dbLanguage && dbLanguage !== 'en') {
+    const currentLocal = localStorage.getItem('pt-language');
+    if (!currentLocal || currentLocal === 'en') {
+      setLanguage(dbLanguage);
+    }
+  }
+};
+
 export default i18n;
