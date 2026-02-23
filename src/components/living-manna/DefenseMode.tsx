@@ -159,6 +159,29 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     migrateLocalArsenal().then(() => loadArsenal());
   }, [loadArsenal, user]);
 
+  // Auto-generate images for weapons that don't have one yet
+  useEffect(() => {
+    if (!arsenal.length) return;
+    const weaponsWithoutImages = arsenal.filter(w => !w.imageUrl);
+    if (!weaponsWithoutImages.length) return;
+
+    const generateMissing = async () => {
+      for (const weapon of weaponsWithoutImages) {
+        const weaponName = weapon.name || getWeaponInfo(weapon.topic).name;
+        const imageUrl = await generateWeaponImage(weaponName);
+        if (imageUrl) {
+          await (supabase as any)
+            .from("defense_arsenal")
+            .update({ image_url: imageUrl })
+            .eq("id", weapon.id);
+        }
+      }
+      loadArsenal(); // Reload to show new images
+    };
+    generateMissing();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [arsenal.length]);
+
   // Forge weapon state (scoring + gating)
   const [forgeLoading, setForgeLoading] = useState(false);
   const [forgeResult, setForgeResult] = useState<{
