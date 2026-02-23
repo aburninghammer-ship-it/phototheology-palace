@@ -5,6 +5,7 @@ import { Crown, X, Clock, Sparkles } from 'lucide-react';
 import { useChangeSpine, shouldEscalateUpgrade } from '@/hooks/useChangeSpine';
 import { useAuth } from '@/hooks/useAuth';
 import { useChurchMembership } from '@/hooks/useChurchMembership';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -26,6 +27,7 @@ export const ChangeSpineUpgradePrompt = ({ className }: ChangeSpineUpgradePrompt
   const changeSpine = useChangeSpine();
   const { trialDaysRemaining, isPaid, isLoading, isNewUser, hasAchievedFirstWin } = changeSpine;
   const { isMember: isChurchMember, isLoading: churchLoading } = useChurchMembership();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   
   const [dismissed, setDismissed] = useState(false);
 
@@ -43,13 +45,13 @@ export const ChangeSpineUpgradePrompt = ({ className }: ChangeSpineUpgradePrompt
     return null;
   }
 
-  // CRITICAL: Never show upgrade prompts to church members
-  if (isChurchMember) {
+  // CRITICAL: Never show upgrade prompts to church members or admins
+  if (isChurchMember || isAdmin) {
     return null;
   }
 
   // Don't show if paid, loading, or dismissed
-  if (isLoading || churchLoading || isPaid || dismissed) {
+  if (isLoading || churchLoading || adminLoading || isPaid || dismissed) {
     return null;
   }
 
