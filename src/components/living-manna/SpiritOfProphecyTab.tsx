@@ -436,10 +436,10 @@ const EGW_BOOKS: EGWBook[] = [
 
 // ─── Component ──────────────────────────────────────────────────────
 interface SpiritOfProphecyTabProps {
-  churchId: string;
+  churchId?: string;
 }
 
-export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
+export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {}) {
   const [selectedBook, setSelectedBook] = useState<EGWBook | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<EGWChapter | null>(null);
   const [analysisResults, setAnalysisResults] = useState<Record<string, string>>({});
