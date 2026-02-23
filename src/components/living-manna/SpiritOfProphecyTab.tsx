@@ -15,9 +15,12 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { StyledMarkdown } from "@/components/ui/styled-markdown";
+import { useTextToSpeechEnhanced, OPENAI_VOICES } from "@/hooks/useTextToSpeechEnhanced";
+import type { VoiceId } from "@/hooks/useTextToSpeechEnhanced";
 
 // ─── EGW Book Library ───────────────────────────────────────────────
 interface EGWBook {
@@ -465,30 +468,43 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
   // Audio commentary state
   const [commentarySections, setCommentarySections] = useState<string[]>([]);
   const [loadingCommentary, setLoadingCommentary] = useState(false);
-  const [commentaryPlaying, setCommentaryPlaying] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
-  const [ttsRate, setTtsRate] = useState(1);
-  const [ttsVoice, setTtsVoice] = useState<SpeechSynthesisVoice | null>(null);
-  const [availableTtsVoices, setAvailableTtsVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const commentaryPlayingRef = useRef(false);
-  const keepAliveRef = useRef<number | null>(null);
+  const currentSectionRef = useRef(0);
+  const commentarySectionsRef = useRef<string[]>([]);
+  const autoAdvancingRef = useRef(false);
+  const ttsSpeakRef = useRef<((text: string) => Promise<void>) | null>(null);
 
-  // Load TTS voices
-  useState(() => {
-    const loadVoices = () => {
-      const voices = speechSynthesis.getVoices();
-      const englishVoices = voices.filter(v => v.lang.startsWith('en'));
-      setAvailableTtsVoices(englishVoices);
-      if (!ttsVoice && englishVoices.length > 0) {
-        const preferred = englishVoices.find(v =>
-          v.name.includes('Google') || v.name.includes('Microsoft') || v.name.includes('Samantha') || v.name.includes('Daniel')
-        ) || englishVoices[0];
-        setTtsVoice(preferred);
+  // Keep refs synced
+  const updateCurrentSection = useCallback((idx: number) => {
+    currentSectionRef.current = idx;
+    setCurrentSection(idx);
+  }, []);
+
+  // OpenAI TTS hook
+  const {
+    speak: ttsSpeak,
+    stop: ttsStop,
+    isLoading: ttsLoading,
+    isPlaying: commentaryPlaying,
+    selectedVoice: egwVoice,
+    setSelectedVoice: setEgwVoice,
+  } = useTextToSpeechEnhanced({
+    defaultVoice: 'onyx',
+    onEnd: () => {
+      const idx = currentSectionRef.current;
+      const sections = commentarySectionsRef.current;
+      if (autoAdvancingRef.current && idx < sections.length - 1) {
+        const nextIdx = idx + 1;
+        updateCurrentSection(nextIdx);
+        ttsSpeakRef.current?.(sections[nextIdx]);
+      } else {
+        autoAdvancingRef.current = false;
       }
-    };
-    loadVoices();
-    speechSynthesis.onvoiceschanged = loadVoices;
+    },
   });
+
+  // Keep speak ref updated
+  ttsSpeakRef.current = ttsSpeak;
   
   const { toast } = useToast();
 
@@ -497,6 +513,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
     if (!selectedBook || !selectedChapter) return;
     setLoadingCommentary(true);
     setCommentarySections([]);
+    commentarySectionsRef.current = [];
     try {
       const { data, error } = await supabase.functions.invoke("egw-audio-commentary", {
         body: {
@@ -509,7 +526,9 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
         },
       });
       if (error) throw error;
-      setCommentarySections(data?.commentary || []);
+      const sections = data?.commentary || [];
+      setCommentarySections(sections);
+      commentarySectionsRef.current = sections;
     } catch (err) {
       console.error("Commentary generation error:", err);
       toast({
@@ -522,63 +541,20 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps) {
     }
   }, [selectedBook, selectedChapter, chapterParagraphs, toast]);
 
-  // TTS playback functions
-  const speakSection = useCallback((sectionIdx: number) => {
-    if (!commentarySections[sectionIdx]) return;
-    speechSynthesis.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(commentarySections[sectionIdx]);
-    utterance.rate = ttsRate;
-    utterance.pitch = 1;
-    utterance.lang = 'en-US';
-    if (ttsVoice) utterance.voice = ttsVoice;
-
-    utterance.onstart = () => setCurrentSection(sectionIdx);
-    utterance.onend = () => {
-      if (commentaryPlayingRef.current && sectionIdx < commentarySections.length - 1) {
-        setTimeout(() => {
-          if (commentaryPlayingRef.current) speakSection(sectionIdx + 1);
-        }, 500);
-      } else if (sectionIdx >= commentarySections.length - 1) {
-        setCommentaryPlaying(false);
-        commentaryPlayingRef.current = false;
-      }
-    };
-    utterance.onerror = () => {
-      setCommentaryPlaying(false);
-      commentaryPlayingRef.current = false;
-    };
-
-    speechSynthesis.speak(utterance);
-  }, [commentarySections, ttsRate, ttsVoice]);
-
   const playCommentary = useCallback((startIdx?: number) => {
-    setCommentaryPlaying(true);
-    commentaryPlayingRef.current = true;
-    speakSection(startIdx ?? currentSection);
-    // Keep alive for mobile
-    if (keepAliveRef.current) clearInterval(keepAliveRef.current);
-    keepAliveRef.current = window.setInterval(() => {
-      if (commentaryPlayingRef.current && speechSynthesis.speaking && speechSynthesis.paused) {
-        speechSynthesis.resume();
-      }
-    }, 5000);
-  }, [currentSection, speakSection]);
-
-  const pauseCommentary = useCallback(() => {
-    speechSynthesis.pause();
-    setCommentaryPlaying(false);
-    commentaryPlayingRef.current = false;
-    if (keepAliveRef.current) { clearInterval(keepAliveRef.current); keepAliveRef.current = null; }
-  }, []);
+    const idx = startIdx ?? currentSectionRef.current;
+    updateCurrentSection(idx);
+    autoAdvancingRef.current = true;
+    if (commentarySectionsRef.current[idx]) {
+      ttsSpeak(commentarySectionsRef.current[idx]);
+    }
+  }, [ttsSpeak, updateCurrentSection]);
 
   const stopCommentary = useCallback(() => {
-    speechSynthesis.cancel();
-    setCommentaryPlaying(false);
-    commentaryPlayingRef.current = false;
-    setCurrentSection(0);
-    if (keepAliveRef.current) { clearInterval(keepAliveRef.current); keepAliveRef.current = null; }
-  }, []);
+    ttsStop();
+    autoAdvancingRef.current = false;
+    updateCurrentSection(0);
+  }, [ttsStop, updateCurrentSection]);
 
   // Fetch chapter text
   const fetchChapterText = async (book: EGWBook, chapter: EGWChapter) => {
@@ -1233,10 +1209,10 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                             : 'bg-muted/30'
                         }`}
                         onClick={() => {
-                          setCurrentSection(idx);
-                          if (commentaryPlayingRef.current) {
-                            speechSynthesis.cancel();
-                            speakSection(idx);
+                          updateCurrentSection(idx);
+                          if (commentaryPlaying) {
+                            ttsStop();
+                            setTimeout(() => playCommentary(idx), 100);
                           }
                         }}
                         title={`Section ${idx + 1}`}
@@ -1253,8 +1229,8 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                       disabled={currentSection === 0}
                       onClick={() => {
                         const prev = Math.max(0, currentSection - 1);
-                        setCurrentSection(prev);
-                        if (commentaryPlayingRef.current) { speechSynthesis.cancel(); speakSection(prev); }
+                        ttsStop();
+                        setTimeout(() => playCommentary(prev), 100);
                       }}
                     >
                       <SkipBack className="h-4 w-4" />
@@ -1264,7 +1240,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                       <Button
                         size="icon"
                         className="h-14 w-14 rounded-full shadow-lg shadow-primary/30"
-                        onClick={pauseCommentary}
+                        onClick={() => { ttsStop(); autoAdvancingRef.current = false; }}
                       >
                         <Pause className="h-6 w-6" />
                       </Button>
@@ -1285,8 +1261,8 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                       disabled={currentSection >= commentarySections.length - 1}
                       onClick={() => {
                         const next = Math.min(commentarySections.length - 1, currentSection + 1);
-                        setCurrentSection(next);
-                        if (commentaryPlayingRef.current) { speechSynthesis.cancel(); speakSection(next); }
+                        ttsStop();
+                        setTimeout(() => playCommentary(next), 100);
                       }}
                     >
                       <SkipForward className="h-4 w-4" />
@@ -1302,24 +1278,21 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                     </Button>
                   </div>
 
-                  {/* Speed control */}
+                  {/* Voice selector */}
                   <div className="flex items-center gap-3 pt-2 border-t border-border/20">
-                    <span className="text-xs text-muted-foreground w-12">Speed</span>
-                    <Slider
-                      value={[ttsRate]}
-                      onValueChange={([val]) => {
-                        setTtsRate(val);
-                        if (commentaryPlayingRef.current) {
-                          speechSynthesis.cancel();
-                          setTimeout(() => speakSection(currentSection), 100);
-                        }
-                      }}
-                      min={0.5}
-                      max={2}
-                      step={0.1}
-                      className="flex-1"
-                    />
-                    <span className="text-xs font-mono text-foreground/70 w-10 text-right">{ttsRate.toFixed(1)}×</span>
+                    <span className="text-xs text-muted-foreground w-12">Voice</span>
+                    <Select value={egwVoice} onValueChange={(v) => setEgwVoice(v as VoiceId)}>
+                      <SelectTrigger className="flex-1 h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {OPENAI_VOICES.map((voice) => (
+                          <SelectItem key={voice.id} value={voice.id} className="text-xs">
+                            {voice.name} — {voice.description}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Regenerate */}
@@ -1363,10 +1336,10 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                               : 'border border-transparent hover:bg-white/[0.03] hover:border-white/10'
                           }`}
                           onClick={() => {
-                            setCurrentSection(idx);
-                            if (commentaryPlayingRef.current) {
-                              speechSynthesis.cancel();
-                              speakSection(idx);
+                            updateCurrentSection(idx);
+                            if (commentaryPlaying) {
+                              ttsStop();
+                              setTimeout(() => playCommentary(idx), 100);
                             }
                           }}
                         >
