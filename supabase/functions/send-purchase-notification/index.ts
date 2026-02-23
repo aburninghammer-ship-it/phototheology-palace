@@ -161,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <strong style="color: #ef6c00;">⏳ Trial Status</strong>
                 </td>
                 <td style="padding: 12px 0; border-bottom: 1px solid #dee2e6; text-align: right; color: #ef6c00;">
-                  7-Day Trial${formattedTrialEnd ? ` (ends ${formattedTrialEnd})` : ''}
+                  30-Day Trial${formattedTrialEnd ? ` (ends ${formattedTrialEnd})` : ''}
                 </td>
               </tr>
               ` : ''}

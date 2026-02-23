@@ -224,14 +224,16 @@ export function EmailCampaignManager() {
         ]
       },
       trial: {
-        title: "7-Day Trial Guidance (6 Emails)",
+        title: "30-Day Trial Guidance (8 Emails)",
         emails: [
-          { day: "Day 0", subject: "Welcome to Your 7-Day Orientation", preview: "Orientation begins — learn how to study here" },
-          { day: "Day 2", subject: "Your First Sessions Matter Most", preview: "Foundation is being laid — Story Room, 24FPS" },
-          { day: "Day 4", subject: "Integration Time", preview: "Rooms start connecting — try Daily Challenge" },
-          { day: "Day 5", subject: "You May Feel the Stretch", preview: "Discomfort is normal — slow down" },
-          { day: "Day 6", subject: "What Changes After You Subscribe", preview: "Continuity, not completion — full access details" },
-          { day: "Day 7", subject: "Continue Your Training", preview: "Trial ends — invitation to extend" },
+          { day: "Day 0", subject: "Welcome to Your 30-Day Orientation", preview: "Orientation begins — learn how to study here" },
+          { day: "Day 3", subject: "Your First Sessions Matter Most", preview: "Foundation is being laid — Story Room, 24FPS" },
+          { day: "Day 7", subject: "Week 1 Complete!", preview: "Rooms start connecting — try Daily Challenge" },
+          { day: "Day 14", subject: "Halfway Through — You're Building", preview: "Integration exercise — see how rooms connect" },
+          { day: "Day 21", subject: "Three Weeks In — The Palace is Taking Shape", preview: "Depth is forming — try Freestyle Floor" },
+          { day: "Day 25", subject: "You May Feel the Stretch", preview: "Discomfort is normal — slow down" },
+          { day: "Day 28", subject: "What Changes After You Subscribe", preview: "Continuity, not completion — full access details" },
+          { day: "Day 30", subject: "Continue Your Training", preview: "Trial ends — invitation to extend" },
         ]
       },
       engagement: {
@@ -305,7 +307,7 @@ export function EmailCampaignManager() {
               <p className="font-medium text-sm">Eligible Recipients</p>
               <p className="text-xs text-muted-foreground">
                 {campaignType === 'winback' && "Users who tried but didn't subscribe"}
-                {campaignType === 'trial' && "Users currently in 7-day trial"}
+                {campaignType === 'trial' && "Users currently in 30-day trial"}
                 {campaignType === 'engagement' && "Active paid subscribers"}
               </p>
             </div>
@@ -474,7 +476,7 @@ export function EmailCampaignManager() {
           'trial',
           trialCount,
           trialLoading,
-          "Guide trial users through their 7-day orientation"
+          "Guide trial users through their 30-day orientation"
         )}
 
         {renderCampaignCard(

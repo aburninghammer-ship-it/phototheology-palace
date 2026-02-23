@@ -189,7 +189,7 @@ export function WinBackCampaign() {
         <div className="border rounded-lg overflow-hidden">
           <div className="bg-muted px-4 py-2 text-sm font-medium">Email Preview</div>
           <div className="p-4 bg-slate-900 text-slate-100 text-sm">
-            <p className="text-amber-400 font-bold mb-2">🏛️ Your 7-Day Quick-Start Path</p>
+            <p className="text-amber-400 font-bold mb-2">🏛️ Your 30-Day Quick-Start Path</p>
             <ul className="space-y-1 text-xs text-slate-300">
               <li>Day 1: Complete the 24FPS Tour</li>
               <li>Day 2: Try the Genesis High Rise Challenge</li>

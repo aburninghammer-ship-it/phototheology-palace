@@ -358,7 +358,7 @@ export function TeachableEmailCampaign() {
               className="w-full justify-start border-amber-500/30 hover:bg-amber-500/10"
               onClick={() => {
                 setFilter("all");
-                setSubject("The Phototheology App is Here — Try It Free for 7 Days 🏰");
+                setSubject("The Phototheology App is Here — Try It Free for 30 Days 🏰");
                 setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
   <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
     <h1 style="color: #d4af37; font-size: 28px; margin: 0;">The Palace is Now Open</h1>
@@ -372,7 +372,7 @@ export function TeachableEmailCampaign() {
     
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">This isn't just another Bible app. It's the living architecture of the Palace method—8 Floors, dozens of Rooms, and a complete system that transforms how you read, remember, and live Scripture.</p>
     
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">For the next <strong style="color: #d4af37;">7 days</strong>, you can explore it all—completely free:</p>
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">For the next <strong style="color: #d4af37;">30 days</strong>, you can explore it all—completely free:</p>
     
     <ul style="font-size: 16px; line-height: 2; color: #c0c0c0; padding-left: 20px;">
       <li>🏛️ Walk through the Palace floors and discover each Room</li>
@@ -383,7 +383,7 @@ export function TeachableEmailCampaign() {
     </ul>
     
     <div style="text-align: center; padding: 30px 0;">
-      <a href="https://phototheology.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start Your 7-Day Free Trial →</a>
+      <a href="https://phototheology.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start Your 30-Day Free Trial →</a>
     </div>
     
     <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 20px 0;">
@@ -402,7 +402,7 @@ export function TeachableEmailCampaign() {
 </div>`);
               }}
             >
-              📧 7-Day Trial + Master Class Free Access
+              📧 30-Day Trial + Master Class Free Access
             </Button>
           </div>
 
@@ -551,11 +551,11 @@ export function TeachableEmailCampaign() {
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">This isn't another Bible app. This is the <strong style="color: #d4af37;">system</strong> — the Palace Method made interactive, searchable, and daily.</p>
 
     <div style="background: rgba(100, 160, 255, 0.08); border: 1px solid rgba(100, 160, 255, 0.3); border-radius: 8px; padding: 18px; margin: 25px 0;">
-      <p style="font-size: 15px; line-height: 1.8; color: #c0c0c0; margin: 0;"><strong style="color: #a0c4ff;">Plans start at just $9/month</strong> — and your first 7 days are completely free. No commitment, cancel anytime.</p>
+      <p style="font-size: 15px; line-height: 1.8; color: #c0c0c0; margin: 0;"><strong style="color: #a0c4ff;">Plans start at just $9/month</strong> — and your first 30 days are completely free. No commitment, cancel anytime.</p>
     </div>
 
     <div style="text-align: center; padding: 30px 0;">
-      <a href="https://phototheology-palace.lovable.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start My 7-Day Free Trial →</a>
+      <a href="https://phototheology-palace.lovable.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start My 30-Day Free Trial →</a>
     </div>
 
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">You've already started the journey. The Palace is just the next room.</p>
