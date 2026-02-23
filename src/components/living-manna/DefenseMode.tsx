@@ -812,7 +812,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             { id: "analyze-attack" as const, label: "Analyze Attack", icon: Target, gradient: "from-purple-600 to-pink-600" },
             { id: "arsenal" as const, label: `Arsenal${arsenal.length > 0 ? ` (${arsenal.length})` : ""}`, icon: Warehouse, gradient: "from-emerald-600 to-teal-600" },
             { id: "community-armory" as const, label: "Community Armory", icon: Users, gradient: "from-amber-600 to-orange-600" },
-            { id: "checkmate" as const, label: "Checkmate", icon: Crown, gradient: "from-amber-600 to-red-600" },
+            
           ]).map((tab) => (
             <button
               key={tab.id}
