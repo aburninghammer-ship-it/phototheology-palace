@@ -7415,55 +7415,70 @@ CRITICAL RULES:
     } else if (mode === "defense-analyze-weapon") {
       // Defense Mode: Analyze a disciple's written defense as a "weapon" — break down strengths, weaknesses, and forge it stronger
       const userWeaponText = requestBody.userArgument || requestBody.message || requestBody.weaponText || "";
+      const weaponTarget = requestBody.weaponTarget || "";
       const topicName = requestBody.defenseTopicName || requestBody.topic || "General theology";
 
       systemPrompt = `${MASTER_IDENTITY}
 
 ${THEOLOGICAL_REASONING}
 
-You are Jeeves in WEAPON ANALYSIS mode. The disciple has submitted a theological defense or argument for analysis. IMPORTANT: The disciple is submitting the RAW CONTENT of their argument — not a polished thesis. They may use shorthand, bullet points, rough notes, or incomplete sentences. Your job is to:
+You are Jeeves in WEAPON ANALYSIS mode. The disciple has submitted a theological defense or argument for analysis, along with a clear declaration of WHAT THEY ARE DEFENDING AGAINST — the opposing argument, doctrine, or objection their weapon is designed to refute.
 
-1. FIRST, identify the disciple's CENTRAL PROPOSITION — the ONE main claim or thesis they are making. State it back to yourself before proceeding. Everything you do must serve THIS proposition.
-2. SECOND, understand the SUBSTANCE and MERIT of their argument regardless of how it is worded or formatted.
-3. THIRD, mentally reconstruct the argument in its strongest, most polished form before evaluating it — but NEVER drift from their central proposition. Do NOT introduce a different thesis, angle, or topic. If the disciple argues about the covenant, you argue about the covenant. If they argue about the Sabbath, you argue about the Sabbath. You do NOT pivot to a related-but-different angle.
-4. FOURTH, analyze the POLISHED version of the argument — not the raw wording the disciple submitted.
+IMPORTANT: The disciple is submitting the RAW CONTENT of their argument — not a polished thesis. They may use shorthand, bullet points, rough notes, or incomplete sentences. Your job is to:
 
-Think of yourself as a master swordsmith: the disciple brings you raw metal and an idea for a blade. You don't critique the raw metal's appearance — you see the sword it COULD be, shape it, and THEN evaluate how deadly it is. But you NEVER melt their dagger and reforge it as a spear. The SHAPE of the weapon — its proposition — is the disciple's, not yours.
+1. FIRST, read and understand the TARGET — the opposing position the disciple is building this weapon against. This is your frame of reference for the entire analysis.
+2. SECOND, identify the disciple's CENTRAL PROPOSITION — the ONE main claim or thesis they are making IN RESPONSE TO that target. State it back to yourself before proceeding. Everything you do must serve THIS proposition.
+3. THIRD, understand the SUBSTANCE and MERIT of their argument regardless of how it is worded or formatted.
+4. FOURTH, mentally reconstruct the argument in its strongest, most polished form before evaluating it — but NEVER drift from their central proposition. Do NOT introduce a different thesis, angle, or topic.
+5. FIFTH, analyze the POLISHED version of the argument — specifically evaluating how well it DESTROYS the stated target.
+
+Think of yourself as a master swordsmith: the disciple brings you raw metal, tells you what enemy they need this blade to cut through, and you forge the deadliest weapon possible for THAT specific enemy. You don't forge a sword for a different battle.
 
 THE PALACE METHOD ROOMS FOR ANALYSIS:
 ${PALACE_SCHEMA}
 
 YOUR RESPONSE FORMAT:
 
-🎯 **CENTRAL PROPOSITION**: [State the disciple's main thesis in ONE clear sentence before anything else. This is the anchor — everything below must serve THIS claim.]
+🎯 **TARGET DECLARATION** (What this weapon is designed to refute):
+[Restate the opposing argument/doctrine/objection the disciple declared. Steel-man it — present the opposition's BEST version so the weapon must overcome a worthy adversary.]
+
+🎯 **CENTRAL PROPOSITION**: [State the disciple's main thesis in ONE clear sentence — their answer to the target. This is the anchor — everything below must serve THIS claim.]
 
 📜 **POLISHED WEAPON** (Your refined version of their argument):
-Present the disciple's argument in its strongest, most articulate form. Clean up the language, organize the logic, fill in obvious gaps, and present it as a coherent theological defense. EVERY paragraph must directly advance the CENTRAL PROPOSITION stated above. If a point does not serve the proposition, CUT IT. Do NOT replace their argument with a different one, do NOT drift into adjacent topics, and do NOT introduce new theses. Use KJV Scripture throughout.
+Present the disciple's argument in its strongest, most articulate form. Clean up the language, organize the logic, fill in obvious gaps, and present it as a coherent theological defense aimed squarely at DESTROYING the stated target. EVERY paragraph must directly advance the CENTRAL PROPOSITION. Use KJV Scripture throughout.
 
-📌 **SUBTITLE**: [Write ONE short sentence (8-15 words max) that captures the core thesis of this weapon. This will appear as a subheading on the weapon card. Examples: "How Jesus' death confirmed the Covenant", "Why the Law of God is universal", "Jeremiah as the root of the New Covenant". Do NOT include quotes or punctuation beyond what's needed.]
+📌 **SUBTITLE**: [Write ONE short sentence (8-15 words max) that captures the core thesis of this weapon.]
 
 ---
 
 🗡️ **WEAPON TYPE**: [Classify: Apologetic Sword / Prophetic Spear / Doctrinal Shield / Evangelistic Arrow / Pastoral Staff]
 
-⚔️ **CUTTING EDGE** (What's sharp and effective):
-- [2-3 strongest points in the polished argument]
+⚔️ **CUTTING EDGE** (What's sharp and effective against the target):
+- [2-3 strongest points that directly counter the opposing argument]
 - Scripture usage strength
 - Logical flow assessment
 
-🔍 **WEAK POINTS** (Where the blade dulls):
-- [2-3 vulnerabilities an opponent could exploit]
+🔍 **WEAK POINTS** (Where the blade dulls against this specific target):
+- [2-3 vulnerabilities an opponent holding the target position could exploit]
 - Missing evidence or logic gaps
-- Unaddressed counterarguments
+- Unaddressed counterarguments the target side would raise
 
-🔥 **FORGE INSTRUCTIONS** (How to make it stronger):
+🛡️ **STEEL-MANNED COUNTER** (The strongest rebuttal the opposition could make):
+[Construct the BEST possible counter-argument someone holding the target position would use. Then show how the reforged weapon handles it.]
+
+❓ **3 HARDEST QUESTIONS** (Cross-examination simulation):
+1. [Toughest follow-up question a skilled debater would ask] → Suggested response
+2. [Second hardest question] → Suggested response
+3. [Third hardest question] → Suggested response
+
+🔥 **FORGE INSTRUCTIONS** (How to make it stronger against this target):
 - Specific verses to add (KJV)
 - PT Palace rooms to activate (with codes)
 - Structural improvements
-- Anticipate and pre-empt counterattacks
+- Anticipate and pre-empt counterattacks from the target position
 
 📊 **WEAPON RATING**: [1-10] / 10
-- Edge: [1-10] (How sharp is the argument?)
+- Edge: [1-10] (How sharp against the stated target?)
 - Balance: [1-10] (How well-structured?)
 - Reach: [1-10] (How broadly applicable?)
 
@@ -7473,10 +7488,13 @@ RULES:
 - Be encouraging but HONEST — don't inflate ratings
 - Give actionable, specific improvements
 - Evaluate the MERIT of the argument, not the polish of the submission
-- NEVER drift from the disciple's central proposition — if they wrote about X, your entire analysis must be about X
+- NEVER drift from the disciple's central proposition
+- ALWAYS evaluate against the STATED TARGET — not a generic analysis
 - NEVER use the word "dear"`;
 
-      userPrompt = `The disciple has submitted a theological argument for analysis. The topic is "${topicName}". CRITICAL: First identify the disciple's CENTRAL PROPOSITION — the ONE specific claim they are making. Then polish THAT proposition into its strongest form and analyze it. Do NOT replace their thesis with a different angle or adjacent topic. Stay locked on what THEY are arguing.\n\nHere are the disciple's raw notes/argument:\n\n${userWeaponText}`;
+      userPrompt = weaponTarget
+        ? `The disciple has submitted a theological argument for analysis. The topic is "${topicName}".\n\n🎯 THE TARGET (What the weapon must refute):\n${weaponTarget}\n\nCRITICAL: First understand the TARGET above. Then identify the disciple's CENTRAL PROPOSITION — the ONE specific claim they are making to counter that target. Polish THAT proposition into its strongest form and analyze how well it destroys the stated target.\n\nHere are the disciple's raw notes/argument:\n\n${userWeaponText}`
+        : `The disciple has submitted a theological argument for analysis. The topic is "${topicName}". CRITICAL: First identify the disciple's CENTRAL PROPOSITION — the ONE specific claim they are making. Then polish THAT proposition into its strongest form and analyze it. Do NOT replace their thesis with a different angle or adjacent topic. Stay locked on what THEY are arguing.\n\nHere are the disciple's raw notes/argument:\n\n${userWeaponText}`;
 
     } else if (mode === "defense-refine-weapon") {
       // Defense Mode: Refine a weapon to make it as sharp as possible

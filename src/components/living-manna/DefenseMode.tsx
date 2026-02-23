@@ -87,6 +87,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
   // Analyze My Weapon state
   const [weaponInput, setWeaponInput] = useState("");
+  const [weaponTarget, setWeaponTarget] = useState("");
   const [weaponTopic, setWeaponTopic] = useState("");
   const [weaponAnalysis, setWeaponAnalysis] = useState<string | null>(null);
   const [weaponLoading, setWeaponLoading] = useState(false);
@@ -204,6 +205,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         body: {
           mode: "defense-refine-weapon",
           userArgument: weaponInput.trim(),
+          weaponTarget: weaponTarget.trim() || undefined,
           analysis: weaponAnalysis || "",
           doctrineTopic: weaponTopic || undefined,
         },
@@ -305,6 +307,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         body: {
           mode: "defense-forge-weapon",
           userArgument: weaponInput.trim(),
+          weaponTarget: weaponTarget.trim() || undefined,
           analysis: weaponAnalysis,
           doctrineTopic: weaponTopic || undefined,
         },
@@ -511,9 +514,19 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     }
   }, [assistMode, selectedOpponent, selectedTopic, selectedTemperaments]);
 
+  // ─── Forge New Weapon (reset all forge state) ──────────────────
+  const forgeNewWeapon = () => {
+    setWeaponInput("");
+    setWeaponTarget("");
+    setWeaponTopic("");
+    setWeaponAnalysis(null);
+    setForgeResult(null);
+    setRefineResult(null);
+  };
+
   // ─── Analyze My Weapon handler ────────────────────────────────
   const analyzeWeapon = async () => {
-    if (weaponInput.trim().length < 50) return;
+    if (weaponInput.trim().length < 50 || weaponTarget.trim().length < 20) return;
     setWeaponLoading(true);
     setWeaponAnalysis(null);
     try {
@@ -521,6 +534,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         body: {
           mode: "defense-analyze-weapon",
           userArgument: weaponInput.trim(),
+          weaponTarget: weaponTarget.trim(),
           doctrineTopic: weaponTopic || undefined,
         },
       });
@@ -803,10 +817,27 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
               </div>
             </div>
 
+            {/* What is this weapon defending against? (REQUIRED) */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                <Target className="h-3.5 w-3.5 inline mr-1 text-red-400" />
+                What Is This Weapon Defending Against? <span className="text-red-400">*</span>
+              </label>
+              <Textarea
+                placeholder="Describe the opposing argument, doctrine, or objection you're building this weapon to refute... (minimum 20 characters)&#10;&#10;Example: 'The claim that the Sabbath was only for Jews and was abolished at the cross...'"
+                className="min-h-[100px] max-h-[200px] bg-background/50 border-red-500/20 focus:border-red-500/40"
+                value={weaponTarget}
+                onChange={(e) => setWeaponTarget(e.target.value)}
+              />
+              <span className={`text-xs ${weaponTarget.trim().length >= 20 ? "text-green-500" : "text-muted-foreground"}`}>
+                {weaponTarget.trim().length}/20 min characters
+              </span>
+            </div>
+
             {/* Argument input */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                Your Argument / Defense
+                Your Argument / Defense <span className="text-red-400">*</span>
               </label>
               <Textarea
                 placeholder="Paste or type your argument here... (minimum 50 characters)&#10;&#10;Example: 'The Sabbath was established at creation in Genesis 2:1-3, before any Jewish nation existed. God blessed and sanctified the seventh day for all humanity...'"
@@ -820,7 +851,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                 </span>
                 <Button
                   size="sm"
-                  disabled={weaponInput.trim().length < 50 || weaponLoading}
+                  disabled={weaponInput.trim().length < 50 || weaponTarget.trim().length < 20 || weaponLoading}
                   onClick={analyzeWeapon}
                   className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
                 >
@@ -868,11 +899,11 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => { setWeaponAnalysis(null); setWeaponInput(""); setWeaponTopic(""); setForgeResult(null); }}
+                        onClick={forgeNewWeapon}
                         className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
                       >
                         <RotateCcw className="h-3.5 w-3.5 mr-1" />
-                        Analyze Another
+                        Forge New Weapon
                       </Button>
                       {!forgeResult && (
                         <>
