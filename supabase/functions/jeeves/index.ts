@@ -8176,10 +8176,10 @@ Return ONLY valid JSON.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: mode.startsWith("defense-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
+        model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" ? "google/gemini-2.5-flash" : mode.startsWith("defense-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "research" ? 2048 : mode === "defense-analyze-weapon" ? 3000 : 4096),
+        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "research" ? 2048 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
       }),
     });
 
