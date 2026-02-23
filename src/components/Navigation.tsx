@@ -551,6 +551,13 @@ export const Navigation = () => {
                     <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">{t('navTabs.libraries', 'Libraries')}</span>
                   </Link>
                   <Link
+                    to="/cota-series"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20 ${isActiveTab('/cota-series') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
+                  >
+                    <Crown className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">COTA Series</span>
+                  </Link>
+                  <Link
                     to="/games" 
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-fuchsia-500/10 to-pink-500/10 border border-fuchsia-500/20 hover:from-fuchsia-500/20 hover:to-pink-500/20 ${isActiveTab('/games') ? 'shadow-[0_0_12px_2px_rgba(217,70,239,0.5)] border-fuchsia-400/60' : ''}`}
                   >
