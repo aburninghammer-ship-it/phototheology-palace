@@ -876,97 +876,150 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
         <TabsContent value="read" className="mt-4 space-y-4">
           {loadingChapter ? (
             <Card variant="glass">
-              <CardContent className="py-12 flex flex-col items-center justify-center gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground">Loading chapter text...</p>
-                <p className="text-xs text-muted-foreground/70">First load may take a moment</p>
+              <CardContent className="py-16 flex flex-col items-center justify-center gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+                  <Loader2 className="h-10 w-10 animate-spin text-primary relative" />
+                </div>
+                <p className="text-sm font-medium text-foreground/80">Loading chapter text...</p>
+                <p className="text-xs text-muted-foreground/60">First load may take a moment</p>
               </CardContent>
             </Card>
           ) : chapterParagraphs.length === 0 ? (
             <Card variant="glass">
-              <CardContent className="py-12 flex flex-col items-center justify-center gap-3">
-                <BookOpen className="h-8 w-8 text-muted-foreground/50" />
+              <CardContent className="py-16 flex flex-col items-center justify-center gap-4">
+                <BookOpen className="h-10 w-10 text-muted-foreground/30" />
                 <p className="text-sm text-muted-foreground">No chapter text available</p>
-                <Button size="sm" onClick={() => fetchChapterText(selectedBook, selectedChapter)}>
+                <Button size="sm" variant="outline" onClick={() => fetchChapterText(selectedBook, selectedChapter)} className="gap-2">
+                  <ArrowRight className="h-3 w-3" />
                   Retry Loading
                 </Button>
               </CardContent>
             </Card>
           ) : (
             <>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2 border border-border/50">
-                <Telescope className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>Click any paragraph to analyze through a Palace room, or tap the 📖 icon for Bible cross-references</span>
+              {/* Elegant instruction banner */}
+              <div className="glass-card rounded-xl px-4 py-3 flex items-center gap-3 border border-primary/20">
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <Telescope className="h-4 w-4 text-primary" />
+                </div>
+                <p className="text-xs text-foreground/70">
+                  <span className="text-primary font-medium">Tap any paragraph</span> to analyze through a Palace room • 
+                  <span className="text-amber-400 font-medium"> Cross-Ref</span> reveals Scripture connections
+                </p>
               </div>
 
-              <ScrollArea className="h-[65vh]">
-                <div className="space-y-1 pr-4">
-                  {chapterParagraphs.map((paragraph, idx) => (
-                    <div key={idx} className="space-y-0">
-                      <div
-                        className={`group relative px-4 py-3 rounded-lg cursor-pointer transition-all text-sm leading-relaxed text-foreground/90 hover:bg-primary/5 hover:border-primary/20 border border-transparent ${
-                          selectedParagraph === paragraph ? 'bg-primary/10 border-primary/30 ring-1 ring-primary/20' : ''
-                        }`}
-                        onClick={() => {
-                          setSelectedParagraph(paragraph);
-                          setParagraphAnalysis(null);
-                        }}
-                      >
-                        <span className="absolute left-0 top-3 text-[10px] text-muted-foreground/40 font-mono w-4 text-right">
-                          {idx + 1}
-                        </span>
-                        <p className="pl-2">{paragraph}</p>
-                        <div className="absolute right-2 top-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              fetchCrossReferences(idx, paragraph);
-                            }}
-                            title="Bible Cross-References"
-                          >
-                            {loadingCrossRef === idx ? (
-                              <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                            ) : (
-                              <Link2 className="h-2.5 w-2.5" />
-                            )}
-                            Cross-Ref
-                          </button>
-                          <Badge variant="outline" className="text-[9px] bg-background/80 backdrop-blur-sm">
-                            <Telescope className="h-2.5 w-2.5 mr-1" />
-                            Analyze
-                          </Badge>
-                        </div>
+              {/* Reader container with book styling */}
+              <Card variant="glass" className="border-primary/10 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.02] via-transparent to-primary/[0.02] pointer-events-none" />
+                <CardContent className="p-0">
+                  <ScrollArea className="h-[65vh]">
+                    <div className="px-6 sm:px-10 py-8 space-y-0">
+                      {/* Chapter title in reader */}
+                      <div className="text-center mb-8 pb-6 border-b border-border/30">
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-2">{selectedBook.shortTitle} • Chapter {selectedChapter.number}</p>
+                        <h2 className="text-xl sm:text-2xl font-serif font-bold text-foreground/90 tracking-tight">{selectedChapter.title}</h2>
+                        <div className="mt-3 mx-auto w-16 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
                       </div>
 
-                      {/* Cross-references panel */}
-                      {expandedCrossRef === idx && crossRefs[idx] && (
-                        <div className="ml-6 mr-2 mb-2 p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                          <div className="flex items-center justify-between">
-                            <p className="text-xs font-semibold text-amber-400 flex items-center gap-1.5">
-                              <Link2 className="h-3 w-3" />
-                              Bible Cross-References ({crossRefs[idx].length})
-                            </p>
-                            <button
-                              className="text-muted-foreground hover:text-foreground"
-                              onClick={() => setExpandedCrossRef(null)}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </div>
-                          {crossRefs[idx].map((ref, refIdx) => (
-                            <div key={refIdx} className="pl-3 border-l-2 border-amber-500/30 space-y-0.5">
-                              <p className="text-xs font-bold text-primary">{ref.reference}</p>
-                              <p className="text-xs text-foreground/80 italic">"{ref.text}"</p>
-                              <p className="text-[10px] text-muted-foreground">{ref.connection}</p>
+                      {chapterParagraphs.map((paragraph, idx) => (
+                        <div key={idx} className="group/para">
+                          <div
+                            className={`relative px-4 sm:px-5 py-3.5 rounded-xl cursor-pointer transition-all duration-300 
+                              ${selectedParagraph === paragraph
+                                ? 'bg-primary/10 border border-primary/30 shadow-lg shadow-primary/5 ring-1 ring-primary/10'
+                                : 'border border-transparent hover:bg-white/[0.03] hover:border-white/10 hover:shadow-md hover:shadow-black/5'
+                              }`}
+                            onClick={() => {
+                              setSelectedParagraph(paragraph);
+                              setParagraphAnalysis(null);
+                            }}
+                          >
+                            {/* Paragraph number */}
+                            <span className="absolute -left-1 sm:left-0 top-4 text-[9px] text-muted-foreground/25 font-mono tabular-nums select-none">
+                              {idx + 1}
+                            </span>
+
+                            {/* Drop cap for first paragraph */}
+                            {idx === 0 ? (
+                              <p className="text-[15px] sm:text-base leading-[1.85] text-foreground/85 font-serif first-letter:text-4xl first-letter:font-bold first-letter:text-primary first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:leading-none">
+                                {paragraph}
+                              </p>
+                            ) : (
+                              <p className="text-[15px] sm:text-base leading-[1.85] text-foreground/85 font-serif indent-6">
+                                {paragraph}
+                              </p>
+                            )}
+
+                            {/* Hover action buttons */}
+                            <div className="absolute right-1.5 top-1.5 flex items-center gap-1.5 opacity-0 group-hover/para:opacity-100 transition-all duration-200">
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-amber-500/30 text-amber-400 hover:border-amber-500/50 hover:shadow-amber-500/10 hover:shadow-lg transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  fetchCrossReferences(idx, paragraph);
+                                }}
+                                title="Bible Cross-References"
+                              >
+                                {loadingCrossRef === idx ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  <Link2 className="h-3 w-3" />
+                                )}
+                                Cross-Ref
+                              </button>
+                              <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-primary/30 text-primary">
+                                <Telescope className="h-3 w-3" />
+                                Analyze
+                              </span>
                             </div>
-                          ))}
+                          </div>
+
+                          {/* Cross-references panel - elegant glass */}
+                          {expandedCrossRef === idx && crossRefs[idx] && (
+                            <div className="mx-4 sm:mx-8 my-2 p-4 rounded-xl glass-card border-amber-500/20 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-bold text-amber-400 flex items-center gap-2">
+                                  <div className="p-1 rounded-md bg-amber-500/10">
+                                    <Link2 className="h-3 w-3" />
+                                  </div>
+                                  Bible Cross-References ({crossRefs[idx].length})
+                                </p>
+                                <button
+                                  className="p-1 rounded-md hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
+                                  onClick={() => setExpandedCrossRef(null)}
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                              <div className="grid gap-2">
+                                {crossRefs[idx].map((ref, refIdx) => (
+                                  <div key={refIdx} className="pl-3 border-l-2 border-amber-500/30 hover:border-amber-400/60 transition-colors space-y-1 py-1">
+                                    <p className="text-xs font-bold text-primary tracking-wide">{ref.reference}</p>
+                                    <p className="text-xs text-foreground/75 italic font-serif leading-relaxed">"{ref.text}"</p>
+                                    <p className="text-[10px] text-muted-foreground/80 leading-relaxed">{ref.connection}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Subtle divider between paragraphs */}
+                          {idx < chapterParagraphs.length - 1 && (
+                            <div className="mx-auto w-8 h-px bg-border/20 my-1" />
+                          )}
                         </div>
-                      )}
+                      ))}
+
+                      {/* End of chapter ornament */}
+                      <div className="text-center pt-8 pb-4">
+                        <div className="mx-auto w-24 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-3" />
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground/30">End of Chapter</p>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </ScrollArea>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
             </>
           )}
         </TabsContent>
@@ -1062,23 +1115,27 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
 
       {/* ─── Paragraph Analysis Dialog ──────────────────────────────── */}
       <Dialog open={!!selectedParagraph} onOpenChange={(open) => { if (!open) { setSelectedParagraph(null); setParagraphAnalysis(null); } }}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent variant="glass" className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
-              <Telescope className="h-5 w-5 text-primary" />
+              <div className="p-1.5 rounded-lg bg-primary/10 border border-primary/20">
+                <Telescope className="h-4 w-4 text-primary" />
+              </div>
               Palace Analysis — Selected Passage
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Selected text */}
-            <div className="text-sm italic text-foreground/80 bg-muted/30 rounded-lg p-4 border border-border/50 max-h-40 overflow-y-auto">
-              "{selectedParagraph}"
+            {/* Selected text with book styling */}
+            <div className="text-sm italic text-foreground/80 font-serif leading-[1.85] glass-card rounded-xl p-5 border border-primary/10 max-h-40 overflow-y-auto">
+              <span className="text-primary/50 text-lg mr-1">"</span>
+              {selectedParagraph}
+              <span className="text-primary/50 text-lg ml-1">"</span>
             </div>
 
             {/* Room selector */}
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Choose a Palace Room</p>
+            <div className="space-y-2.5">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Choose a Palace Room</p>
               <div className="flex flex-wrap gap-1.5">
                 {PALACE_ROOMS.map(room => {
                   const Icon = room.icon;
@@ -1087,7 +1144,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                       key={room.code}
                       variant={selectedRoom === room.code ? "default" : "outline"}
                       size="sm"
-                      className="gap-1.5 text-xs h-8"
+                      className={`gap-1.5 text-xs h-8 ${selectedRoom === room.code ? 'shadow-lg shadow-primary/20' : 'hover:border-primary/30'}`}
                       onClick={() => { setSelectedRoom(room.code); setParagraphAnalysis(null); }}
                     >
                       <Icon className={`h-3 w-3 ${selectedRoom === room.code ? '' : room.color}`} />
@@ -1096,43 +1153,72 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                   );
                 })}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                <span className={`${PALACE_ROOMS.find(r => r.code === selectedRoom)?.color}`}>●</span>
                 {PALACE_ROOMS.find(r => r.code === selectedRoom)?.name} — {PALACE_ROOMS.find(r => r.code === selectedRoom)?.description}
               </p>
             </div>
 
             {/* Analysis result */}
             {paragraphAnalysis && (
-              <div className="text-sm text-foreground/90 leading-relaxed bg-muted/20 rounded-lg p-4 border border-border/50">
-                <StyledMarkdown content={paragraphAnalysis} />
+              <div className="glass-card rounded-xl p-5 border border-primary/15 space-y-3">
+                <div className="flex items-center gap-2 text-xs text-primary font-semibold">
+                  {(() => { const R = PALACE_ROOMS.find(r => r.code === selectedRoom); return R ? <R.icon className="h-3.5 w-3.5" /> : null; })()}
+                  {PALACE_ROOMS.find(r => r.code === selectedRoom)?.name} Analysis
+                </div>
+                <div className="text-sm text-foreground/90 leading-relaxed">
+                  <StyledMarkdown content={paragraphAnalysis} />
+                </div>
               </div>
             )}
 
-            {/* Analyze button */}
-            <Button
-              onClick={() => selectedParagraph && analyzeParagraphWithPalace(selectedParagraph, selectedRoom)}
-              disabled={analyzingParagraph}
-              className="w-full gap-2"
-            >
-              {analyzingParagraph ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Analyzing through {selectedRoom}...
-                </>
-              ) : (
-                <>
-                  <Telescope className="h-4 w-4" />
-                  {paragraphAnalysis ? "Re-Analyze" : "Analyze"} with {PALACE_ROOMS.find(r => r.code === selectedRoom)?.name}
-                </>
+            {/* Action buttons */}
+            <div className="flex gap-2">
+              <Button
+                onClick={() => selectedParagraph && analyzeParagraphWithPalace(selectedParagraph, selectedRoom)}
+                disabled={analyzingParagraph}
+                className="flex-1 gap-2"
+              >
+                {analyzingParagraph ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Telescope className="h-4 w-4" />
+                    {paragraphAnalysis ? "Re-Analyze" : "Analyze"} with {PALACE_ROOMS.find(r => r.code === selectedRoom)?.name}
+                  </>
+                )}
+              </Button>
+              {paragraphAnalysis && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (!selectedParagraph) return;
+                    // Pick a random different room
+                    const otherRooms = PALACE_ROOMS.filter(r => r.code !== selectedRoom);
+                    const randomRoom = otherRooms[Math.floor(Math.random() * otherRooms.length)];
+                    setSelectedRoom(randomRoom.code);
+                    setParagraphAnalysis(null);
+                    analyzeParagraphWithPalace(selectedParagraph, randomRoom.code);
+                  }}
+                  disabled={analyzingParagraph}
+                  className="gap-2 border-primary/30 text-primary hover:bg-primary/10"
+                  title="Analyze with a randomly selected Palace room"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Regenerate
+                </Button>
               )}
-            </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* ─── Expound Dialog ─────────────────────────────────────────── */}
       <Dialog open={!!expoundOpen} onOpenChange={(open) => { if (!open) setExpoundOpen(null); }}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogContent variant="glass" className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
               <MessageSquareMore className="h-5 w-5 text-primary" />
