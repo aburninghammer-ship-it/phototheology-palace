@@ -33,7 +33,7 @@ import {
   getTeamLevel,
 } from "@/data/forgeDefendConfig";
 
-type HubView = "overview" | "draft" | "battle" | "battle-setup" | "leaderboard" | "prep";
+type HubView = "overview" | "draft" | "battle" | "battle-setup" | "leaderboard" | "prep" | "team" | "drill" | "debrief";
 
 interface ForgeDefendHubProps {
   churchId: string;
@@ -80,6 +80,14 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const [battleSetupMode, setBattleSetupMode] = useState<"offense" | "defense">("defense");
   const [battleSetupOpponent, setBattleSetupOpponent] = useState<"user" | "jeeves">("user");
   const [battleSetupOpponentId, setBattleSetupOpponentId] = useState<string | null>(null);
+
+  // Team analytics state
+  const [teamAnalytics, setTeamAnalytics] = useState<any>(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+
+  // Drill state
+  const [drillActive, setDrillActive] = useState(false);
+  const [drillMessages, setDrillMessages] = useState<{ role: string; content: string }[]>([]);
 
   // Load church members for selection
   useEffect(() => {
@@ -173,6 +181,45 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
       console.error("Season creation error:", e);
     } finally {
       setCreateLoading(false);
+    }
+  };
+
+  // ── LOAD TEAM ANALYTICS ─────────────────────────────
+  const loadTeamAnalytics = async () => {
+    if (!myTeam || teamMembers.length === 0) return;
+
+    setLoadingAnalytics(true);
+    try {
+      const userIds = teamMembers.map((m) => m.user_id);
+      const analyses = await analyzeBatchUsers(userIds);
+
+      // Calculate team strengths and weaknesses
+      const teamTopicStrengths: Record<string, number> = {};
+      const topicKeys = Object.keys(analyses[0]?.topicStrengths || {});
+
+      topicKeys.forEach((topic) => {
+        const avg = analyses.reduce((sum, a) => sum + (a.topicStrengths[topic as keyof typeof a.topicStrengths] || 0), 0) / analyses.length;
+        teamTopicStrengths[topic] = Math.round(avg);
+      });
+
+      // Find top 3 strengths and bottom 3 weaknesses
+      const sortedTopics = Object.entries(teamTopicStrengths).sort(([, a], [, b]) => b - a);
+      const topStrengths = sortedTopics.slice(0, 3);
+      const bottomWeaknesses = sortedTopics.slice(-3).reverse();
+
+      setTeamAnalytics({
+        members: analyses,
+        teamTopicStrengths,
+        topStrengths,
+        bottomWeaknesses,
+        avgOverallScore: Math.round(analyses.reduce((sum, a) => sum + a.overallScore, 0) / analyses.length),
+        avgBibleStudyHours: analyses.reduce((sum, a) => sum + a.activityMetrics.bibleStudyHours, 0) / analyses.length,
+        avgQuizScore: analyses.reduce((sum, a) => sum + a.activityMetrics.quizScoreAvg, 0) / analyses.length,
+      });
+    } catch (error) {
+      console.error("Error loading team analytics:", error);
+    } finally {
+      setLoadingAnalytics(false);
     }
   };
 
@@ -564,6 +611,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   // ── VIEW NAVIGATION ──────────────────────────────────
   const navItems = [
     { id: "overview" as const, label: "Overview", icon: Shield },
+    { id: "team" as const, label: "Team", icon: Users },
     { id: "battle" as const, label: "Battle", icon: Swords },
     { id: "leaderboard" as const, label: "Rankings", icon: Trophy },
     { id: "prep" as const, label: "Prep", icon: BookOpen },
@@ -791,6 +839,192 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               </div>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* ═══ TEAM ANALYTICS VIEW ═══ */}
+      {view === "team" && (
+        <div className="space-y-4">
+          <Button variant="ghost" size="sm" onClick={() => setView("overview")}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back
+          </Button>
+
+          {!myTeam ? (
+            <Card className="bg-black/20 border-amber-500/30">
+              <CardContent className="p-4 text-center">
+                <p className="text-amber-300">You're not on a team yet. Join the draft!</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Team Overview */}
+              <Card className="bg-black/20 border-violet-500/30">
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-violet-300 flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Team Analytics
+                    </h3>
+                    <Button
+                      size="sm"
+                      onClick={loadTeamAnalytics}
+                      disabled={loadingAnalytics}
+                      variant="outline"
+                    >
+                      {loadingAnalytics ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                      Analyze
+                    </Button>
+                  </div>
+                  {!teamAnalytics ? (
+                    <p className="text-sm text-muted-foreground">Click Analyze to view team strengths and weaknesses</p>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="p-2 bg-violet-500/10 rounded border border-violet-500/30">
+                          <div className="text-2xl font-bold text-violet-300">{teamAnalytics.avgOverallScore}</div>
+                          <div className="text-[10px] text-muted-foreground">Team Score</div>
+                        </div>
+                        <div className="p-2 bg-blue-500/10 rounded border border-blue-500/30">
+                          <div className="text-2xl font-bold text-blue-300">{teamAnalytics.avgBibleStudyHours.toFixed(1)}h</div>
+                          <div className="text-[10px] text-muted-foreground">Avg Study</div>
+                        </div>
+                        <div className="p-2 bg-green-500/10 rounded border border-green-500/30">
+                          <div className="text-2xl font-bold text-green-300">{teamAnalytics.avgQuizScore.toFixed(0)}%</div>
+                          <div className="text-[10px] text-muted-foreground">Quiz Avg</div>
+                        </div>
+                      </div>
+
+                      {/* Team Strengths */}
+                      <div className="p-3 bg-green-500/5 rounded-lg border border-green-500/20">
+                        <h4 className="text-sm font-semibold text-green-300 mb-2 flex items-center gap-1.5">
+                          <Star className="h-3 w-3" /> Team Strengths
+                        </h4>
+                        <div className="space-y-1.5">
+                          {teamAnalytics.topStrengths.map(([topic, score]: [string, number]) => (
+                            <div key={topic} className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground capitalize">{topic.replace(/([A-Z])/g, ' $1')}</span>
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 bg-black/30 rounded-full h-1.5">
+                                  <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${score}%` }} />
+                                </div>
+                                <span className="text-green-400 font-medium w-8 text-right">{score}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Team Weaknesses */}
+                      <div className="p-3 bg-red-500/5 rounded-lg border border-red-500/20">
+                        <h4 className="text-sm font-semibold text-red-300 mb-2 flex items-center gap-1.5">
+                          <AlertTriangle className="h-3 w-3" /> Areas to Improve
+                        </h4>
+                        <div className="space-y-1.5">
+                          {teamAnalytics.bottomWeaknesses.map(([topic, score]: [string, number]) => (
+                            <div key={topic} className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground capitalize">{topic.replace(/([A-Z])/g, ' $1')}</span>
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 bg-black/30 rounded-full h-1.5">
+                                  <div className="bg-red-500 h-1.5 rounded-full" style={{ width: `${score}%` }} />
+                                </div>
+                                <span className="text-red-400 font-medium w-8 text-right">{score}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-xs text-amber-300 mt-2">💡 Focus drill sessions on these topics</p>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Member Profiles */}
+              <Card className="bg-black/20 border-blue-500/30">
+                <CardContent className="p-4 space-y-3">
+                  <h4 className="font-semibold text-blue-300 flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Squad Members ({teamMembers.length})
+                  </h4>
+                  <div className="space-y-2">
+                    {teamAnalytics?.members.map((member: any) => (
+                      <div key={member.userId} className="p-3 bg-black/30 rounded-lg border border-blue-500/20">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-lg font-bold text-white">
+                              {member.displayName[0]}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm text-white">{member.displayName}</div>
+                              <div className="text-xs text-muted-foreground">{member.strengthDescription}</div>
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {member.overallScore} pts
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1.5 text-[10px]">
+                          <div className="text-center p-1.5 bg-black/30 rounded">
+                            <div className="text-blue-300 font-medium">{member.activityMetrics.bibleStudyHours.toFixed(1)}h</div>
+                            <div className="text-muted-foreground">Study</div>
+                          </div>
+                          <div className="text-center p-1.5 bg-black/30 rounded">
+                            <div className="text-green-300 font-medium">{member.activityMetrics.quizScoreAvg}%</div>
+                            <div className="text-muted-foreground">Quiz</div>
+                          </div>
+                          <div className="text-center p-1.5 bg-black/30 rounded">
+                            <div className="text-amber-300 font-medium">{member.activityMetrics.defenseWinRate}%</div>
+                            <div className="text-muted-foreground">Win Rate</div>
+                          </div>
+                        </div>
+                      </div>
+                    )) || teamMembers.map((member) => (
+                      <div key={member.id} className="p-3 bg-black/30 rounded-lg border border-blue-500/20">
+                        <div className="flex items-center gap-2">
+                          {member.is_captain && <Crown className="h-3 w-3 text-yellow-400" />}
+                          <span className="text-sm text-white">{member.display_name}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Drill Recommendations */}
+              {teamAnalytics && (
+                <Card className="bg-black/20 border-purple-500/30">
+                  <CardContent className="p-4 space-y-3">
+                    <h4 className="font-semibold text-purple-300 flex items-center gap-2">
+                      <Zap className="h-4 w-4" />
+                      Recommended Training Drills
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Based on team analysis, focus on these practice areas:
+                    </p>
+                    <div className="space-y-2">
+                      {teamAnalytics.bottomWeaknesses.map(([topic]: [string, number]) => (
+                        <Button
+                          key={topic}
+                          onClick={() => {
+                            setView("drill");
+                            // TODO: Start drill with this topic
+                          }}
+                          variant="outline"
+                          className="w-full justify-between text-xs h-auto py-3"
+                        >
+                          <div className="text-left">
+                            <div className="font-medium capitalize">{topic.replace(/([A-Z])/g, ' $1')} Drill</div>
+                            <div className="text-muted-foreground text-[10px]">10-15 min • Jeeves coaches</div>
+                          </div>
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
         </div>
       )}
 
