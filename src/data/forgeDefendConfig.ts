@@ -35,19 +35,19 @@ export const DIFFICULTY_TIERS: DifficultyTier[] = [
     weeks: [1, 2],
     tier: "foundational",
     label: "Foundational",
-    topics: ["sabbath", "state-of-dead", "hellfire", "law-gospel", "diet", "second-coming"],
+    topics: ["sabbath", "state-of-dead", "hellfire", "law-gospel", "diet", "second-coming", "new-covenant", "millennium"],
   },
   {
     weeks: [3, 4],
     tier: "advanced",
     label: "Advanced Theological",
-    topics: ["sanctuary-1844", "trinity", "little-horn", "prophecy", "rapture", "tongues", "antichrist"],
+    topics: ["sanctuary-1844", "trinity", "little-horn", "prophecy", "rapture", "tongues", "antichrist", "investigative-judgment", "scapegoat"],
   },
   {
     weeks: [5, 6],
     tier: "elite",
     label: "Elite Endgame",
-    topics: ["remnant", "preterism", "futurism", "israel-identity", "antiochus-epiphanes", "three-angels"],
+    topics: ["remnant", "preterism", "futurism", "israel-identity", "antiochus-epiphanes", "three-angels", "mark-of-the-beast"],
   },
 ];
 
