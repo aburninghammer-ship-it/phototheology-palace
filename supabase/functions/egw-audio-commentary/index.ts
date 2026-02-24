@@ -13,7 +13,17 @@ serve(async (req) => {
   }
 
   try {
-    const { bookId, bookTitle, chapterNumber, chapterTitle, paragraphs, mode } = await req.json();
+    const {
+      bookId,
+      bookTitle,
+      chapterNumber,
+      chapterTitle,
+      paragraphs,
+      mode,
+      commentaryMode = "Epic",
+      commentaryLength = "Medium",
+      commentaryLevel = "Intermediate"
+    } = await req.json();
 
     if (!bookId || !chapterNumber || !chapterTitle || !bookTitle) {
       return new Response(
@@ -26,8 +36,8 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Check cache
-    const cacheKey = `${bookId}_ch${chapterNumber}_${mode || 'chapter'}`;
+    // Check cache (include mode, length, and level in cache key)
+    const cacheKey = `${bookId}_ch${chapterNumber}_${mode || 'chapter'}_${commentaryMode}_${commentaryLength}_${commentaryLevel}`;
     const { data: cached } = await supabase
       .from("egw_chapter_cache")
       .select("paragraphs")
@@ -52,52 +62,100 @@ serve(async (req) => {
 
     const isChapterMode = mode !== 'paragraph';
 
-    let systemPrompt = `You are a Phototheology Bible commentator. Your task is to create an audio-ready biblical commentary that buttresses and illuminates Ellen White's writings using ONLY the King James Bible and Phototheology Palace principles.
+    // COTA Audio Commentary Master Prompt (Jeeves)
+    let systemPrompt = `ROLE
+You are "Jeeves," the Phototheology Suite's audio commentary engine for Ellen G. White's Conflict of the Ages (COTA) series.
+Your job is to produce faithful, Scripture-saturated, Adventist-guardrailed audio commentary on an EGW paragraph (or short paragraph cluster).
+You do NOT replace Ellen White. You do NOT speculate beyond what the paragraph supports. You do NOT preach at the listener.
+You DO: clarify meaning, connect Scripture, apply Phototheology (PT) principles, and (when relevant) provide apologetics-ready framing.
 
-VOICE & STYLE:
-- Write as if narrating to a listener — warm, reverent, clear, conversational
-- Use present tense for theological truths ("Christ stands as...", "The sanctuary reveals...")
-- Address the listener directly ("Notice how...", "Consider this...")
-- No bullet points, no headers — pure flowing prose suitable for text-to-speech
-- Each section should be 150-300 words
+NON-NEGOTIABLE GUARDRAILS
+1) SCRIPTURE FIRST. Ellen White is a faithful witness; Scripture is the final authority.
+2) SDA HISTORICIST FRAME. Keep Great Controversy / sanctuary / three angels' messages / law & gospel harmony consistent with SDA doctrine.
+3) NO FABRICATION. Never invent EGW quotes, historical facts, or verse content. If unsure, speak conditionally and label uncertainty.
+4) NO "NEW DOCTRINE." Do not introduce doctrines not supported by Scripture/EGW paragraph context.
+5) NO CHEATING SERMONS. Preacher Mode may suggest "preaching angles" and "tensions," but must not generate a full sermon outline or manuscript.
+6) RESPECTFUL TONE. No mocking, no partisan politics, no sensationalism.
+7) AUDIO FRIENDLY. Short sentences, clear transitions, no dense citations in the spoken flow.
 
-THEOLOGICAL FRAMEWORK (Phototheology Palace):
-- Concentration Room (CR): Every passage must reveal Christ
-- Dimensions Room (DR): Literal → Christ → Me → Church → Heaven
-- Blue Room (BL): Sanctuary connections and typology
-- Patterns Room (PRm): Recurring divine motifs across Scripture
-- Three Heavens: Place in DoL¹/NE¹, DoL²/NE², or DoL³/NE³ framework
-- Cycles: Map to @Ad → @Re cycle where applicable
-- Fruit Room (FRt): Practical Christlike application
+OUTPUT FORMAT
+Return a JSON array of commentary strings. Each string is one complete audio section (150-300 words).
+Use simple transitions between sections: "Paragraph Focus", "Scripture Frame", "PT Lens", "So What?"
+No bullet points, no headers within the text — pure flowing prose suitable for text-to-speech.
 
-RULES:
-1. ONLY use KJV Bible texts — quote them directly with references
-2. Each commentary section must cite at least 3-5 KJV verses
-3. Connect EGW insights to their Biblical roots
-4. Apply at least 3 different Palace rooms per section
-5. Maintain SDA doctrinal guardrails
-6. Keep Christ as the absolute center
-7. Return ONLY a valid JSON array of commentary strings — each string is one section ready for TTS`;
+CORE WORKFLOW (DO THIS EVERY TIME)
+A) PARAPHRASE THE PARAGRAPH - Give a one-sentence "Paragraph Focus" summary in plain language, faithful to EGW.
+B) SCRIPTURE FRAME - Choose 1-3 KJV Scripture anchors that match the paragraph theme. Say "Scripture echoes this in…"
+C) PT LENS (LIGHTWEIGHT BUT REAL) - Apply 2-4 PT principles/rooms appropriate to the paragraph: Story Room, Dimensions Room, War Room, Sanctuary Room, Time-Zone Room, Character Room, Mirror Room
+D) APPLICATION ("SO WHAT?") - Provide 2-3 actionable reflections: belief, habit, decision, or watch-out. Keep it pastoral, not moralistic.
+
+AUTO MODE (SMART MODE SELECTION)
+Choose the best commentary approach based on paragraph type:
+- Narrative / conflict / persecution / crisis => Epic (Great Controversy Lens)
+- Heavy history / dates / institutions / church-state => Scholar (Historical-Theological Lens)
+- Motives / fear / compromise / discipleship drift => Counselor (Psychological & Spiritual Formation Lens)
+- OT typology / sanctuary / prophets / covenant => Ancient (Biblical-Prophetic Continuity Lens)
+- Strong doctrinal claim likely attacked => Defense (Apologetics & Objections Lens)
+
+PT PRINCIPLE MENU (SELECT 2-4 THAT FIT):
+- Story Room: What is happening? Who is acting? What is the turning point?
+- Dimensions Room: Literal → Christ → Me → Church → Heaven
+- War Room: Tactics of deception vs tactics of truth
+- Sanctuary Room: altar/laver/bread/lamp/incense/ark/atonement motifs
+- Time-Zone Room: past fulfillment / present principle / future implication
+- Character Room: virtues/vices formed by choices under pressure
+- Mirror Room: self-examination questions
+
+QUALITY CHECK (SILENT)
+- Did I stay faithful to EGW paragraph meaning?
+- Did I keep SDA guardrails intact?
+- Did I avoid invented facts?
+- Did I make it audio-friendly?
+- Did I apply PT principles concretely?`;
 
     const userPrompt = isChapterMode
-      ? `Create a comprehensive audio commentary for this entire EGW chapter. Divide your commentary into 6-10 flowing sections that walk through the chapter sequentially, buttressing each major theme with KJV Scripture and Palace principles.
+      ? `Create audio commentary for this entire EGW chapter. Divide into 6-10 flowing sections that walk through the chapter sequentially.
 
-**Book:** ${bookTitle}
-**Chapter ${chapterNumber}:** "${chapterTitle}"
+INPUTS:
+- BOOK: ${bookTitle}
+- CHAPTER: ${chapterNumber} - "${chapterTitle}"
+- USER_MODE: ${commentaryMode}
+- USER_LEVEL: ${commentaryLevel}
+- LENGTH_TARGET: ${commentaryLength}
 
-**Chapter Content:**
+CHAPTER CONTENT:
 ${chapterContext}
 
-Return a JSON array of 6-10 commentary strings. Each string is one complete section of the audio commentary (150-300 words each). Walk through the chapter paragraph by paragraph, weaving in KJV texts and Palace analysis as you go.`
-      : `Create a focused audio commentary for the following EGW paragraph. Buttress every key claim with KJV Scripture and analyze through Palace rooms.
+Return a JSON array of 6-10 commentary strings. Each string is one complete section (150-300 words).
+Follow the CORE WORKFLOW for each major theme/paragraph cluster:
+1. Paragraph Focus (summary)
+2. Scripture Frame (KJV verses)
+3. PT Lens (2-4 principles)
+4. So What? (application)
 
-**Book:** ${bookTitle}
-**Chapter ${chapterNumber}:** "${chapterTitle}"
+${commentaryMode === "Auto"
+  ? "Walk through the chapter sequentially, using Auto mode to adapt your approach to each paragraph's content."
+  : `Apply the ${commentaryMode} mode lens throughout the entire commentary.`
+}`
+      : `Create focused audio commentary for this EGW paragraph.
 
-**Paragraph:**
+INPUTS:
+- BOOK: ${bookTitle}
+- CHAPTER: ${chapterNumber} - "${chapterTitle}"
+- PARAGRAPH: See below
+- USER_MODE: ${commentaryMode}
+- USER_LEVEL: ${commentaryLevel}
+- LENGTH_TARGET: ${commentaryLength}
+
+PARAGRAPH:
 ${chapterContext}
 
-Return a JSON array of 2-4 commentary strings (150-250 words each).`;
+Return a JSON array of 2-4 commentary strings (150-250 words each).
+Follow the CORE WORKFLOW:
+1. Paragraph Focus
+2. Scripture Frame
+3. PT Lens
+4. So What?`;
 
     // RAG corpus injection
     const ragResult = await getCorpusContext({

@@ -478,6 +478,11 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   const autoAdvancingRef = useRef(false);
   const ttsSpeakRef = useRef<((text: string) => Promise<void>) | null>(null);
 
+  // Commentary configuration (Jeeves Master Prompt settings)
+  const [commentaryMode, setCommentaryMode] = useState<"Epic" | "Scholar" | "Counselor" | "Ancient" | "Preacher" | "Defense" | "Auto">("Epic");
+  const [commentaryLength, setCommentaryLength] = useState<"Short" | "Medium" | "Long">("Medium");
+  const [commentaryLevel, setCommentaryLevel] = useState<"Beginner" | "Intermediate" | "Advanced">("Intermediate");
+
   // Keep refs synced
   const updateCurrentSection = useCallback((idx: number) => {
     currentSectionRef.current = idx;
@@ -534,6 +539,9 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
           chapterTitle: selectedChapter.title,
           paragraphs: chapterParagraphs,
           mode: "chapter",
+          commentaryMode,
+          commentaryLength,
+          commentaryLevel,
         },
       });
       if (error) throw error;
@@ -550,7 +558,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
     } finally {
       setLoadingCommentary(false);
     }
-  }, [selectedBook, selectedChapter, chapterParagraphs, toast]);
+  }, [selectedBook, selectedChapter, chapterParagraphs, commentaryMode, commentaryLength, commentaryLevel, toast]);
 
   const playCommentary = useCallback((startIdx?: number) => {
     const idx = startIdx ?? currentSectionRef.current;
@@ -1212,13 +1220,78 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                 <div className="text-center space-y-2">
                   <h3 className="font-bold text-foreground text-lg">Audio Commentary</h3>
                   <p className="text-sm text-muted-foreground max-w-md">
-                    Jeeves will create a Bible-only audio commentary for this chapter, buttressing Ellen White's insights 
-                    with KJV Scripture and Phototheology Palace principles.
+                    Jeeves will create an Epic audio commentary for this chapter, experiencing the cosmic conflict while buttressing Ellen White's insights with KJV Scripture and Phototheology Palace principles.
                   </p>
                 </div>
-                <Button 
-                  onClick={generateCommentary} 
-                  className="gap-2 px-6" 
+
+                {/* Commentary Configuration */}
+                <div className="w-full max-w-2xl space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* Mode Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">Commentary Mode</label>
+                      <Select value={commentaryMode} onValueChange={(v) => setCommentaryMode(v as any)}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Epic">⚔️ Epic — Great Controversy Lens</SelectItem>
+                          <SelectItem value="Scholar">📚 Scholar — Historical-Theological</SelectItem>
+                          <SelectItem value="Counselor">💭 Counselor — Spiritual Formation</SelectItem>
+                          <SelectItem value="Ancient">🕎 Ancient — Biblical-Prophetic</SelectItem>
+                          <SelectItem value="Preacher">🎤 Preacher — Homiletic Sparks</SelectItem>
+                          <SelectItem value="Defense">🛡️ Defense — Apologetics</SelectItem>
+                          <SelectItem value="Auto">🤖 Auto — Smart Selection</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Length Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">Length Target</label>
+                      <Select value={commentaryLength} onValueChange={(v) => setCommentaryLength(v as any)}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Short">⚡ Short — 45-70s per section</SelectItem>
+                          <SelectItem value="Medium">📖 Medium — 2-4 min total</SelectItem>
+                          <SelectItem value="Long">📚 Long — 5-8 min total</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Level Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">User Level</label>
+                      <Select value={commentaryLevel} onValueChange={(v) => setCommentaryLevel(v as any)}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Beginner">🌱 Beginner</SelectItem>
+                          <SelectItem value="Intermediate">📈 Intermediate</SelectItem>
+                          <SelectItem value="Advanced">🎓 Advanced</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Mode description */}
+                  <div className="text-xs text-muted-foreground/70 text-center px-4">
+                    {commentaryMode === "Epic" && "Experience the cosmic conflict — truth vs deception, Christ vs Satan"}
+                    {commentaryMode === "Scholar" && "Intellectually clear, historically grounded theological analysis"}
+                    {commentaryMode === "Counselor" && "Spiritual formation, motives, emotional patterns, and healing"}
+                    {commentaryMode === "Ancient" && "OT patterns, sanctuary, covenant, typology, prophetic continuity"}
+                    {commentaryMode === "Preacher" && "Sermon fuel: Big Idea, tension/resolution, application questions"}
+                    {commentaryMode === "Defense" && "Apologetics-ready: objections, biblical answers, steelman rebuttals"}
+                    {commentaryMode === "Auto" && "AI selects the best mode based on paragraph content"}
+                  </div>
+                </div>
+
+                <Button
+                  onClick={generateCommentary}
+                  className="gap-2 px-6"
                   size="lg"
                   disabled={chapterParagraphs.length === 0}
                 >
