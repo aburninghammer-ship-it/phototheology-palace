@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +44,7 @@ interface PrincipleCode {
 }
 
 export default function EquationsChallenge() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
@@ -92,7 +94,7 @@ export default function EquationsChallenge() {
         setTimeRemaining(prev => {
           if (prev <= 1) {
             setTimerActive(false);
-            toast.error("Time's up!");
+            toast.error(t('challenges.timesUp'));
             return 0;
           }
           return prev - 1;
@@ -130,7 +132,7 @@ export default function EquationsChallenge() {
       
       if (error) {
         console.error("Error loading principles:", error);
-        toast.error("Failed to load principles");
+        toast.error(t('challenges.failedToLoadPrinciples'));
         setAvailablePrinciples([]);
       } else {
         setAvailablePrinciples(data || []);
@@ -154,7 +156,7 @@ export default function EquationsChallenge() {
 
   const buildEquationFromPrinciples = () => {
     if (selectedPrinciples.length === 0) {
-      toast.error("Please select at least one principle");
+      toast.error(t('challenges.selectAtLeastOnePrinciple'));
       return;
     }
     
@@ -180,7 +182,7 @@ export default function EquationsChallenge() {
     const explanation = explanationParts.join(", ") + ". Together, these principles illuminate the verse by revealing Christ through multi-dimensional study—observing the text closely, discovering prophetic and typological connections, and situating the passage within the sanctuary pattern and redemptive cycles.";
     setCustomExplanation(explanation);
     
-    toast.success(`Equation and explanation generated!`);
+    toast.success(t('challenges.equationGenerated'));
   };
 
   const generateEquation = async () => {
@@ -231,7 +233,7 @@ export default function EquationsChallenge() {
       }
     } catch (error) {
       console.error("Error generating equation:", error);
-      toast.error("Failed to generate a valid equation. Please try again.");
+      toast.error(t('challenges.failedToGenerateEquation'));
     } finally {
       setLoading(false);
     }
@@ -265,10 +267,10 @@ export default function EquationsChallenge() {
       if (error) throw error;
 
       setJeevesSolution(data.solution);
-      toast.success("Jeeves has solved the equation!");
+      toast.success(t('challenges.jeevesSolvedEquation'));
     } catch (error) {
       console.error("Error getting Jeeves' solution:", error);
-      toast.error("Failed to get Jeeves' solution");
+      toast.error(t('challenges.failedToGetSolution'));
     } finally {
       setJeevesLoading(false);
     }
@@ -293,7 +295,7 @@ export default function EquationsChallenge() {
           explanation: data.explanation
         });
         setMode("solve");
-        toast.success("Loaded shared challenge!");
+        toast.success(t('challenges.loadedSharedChallenge'));
         
         // Increment solve count
         await supabase
@@ -303,18 +305,18 @@ export default function EquationsChallenge() {
       }
     } catch (error) {
       console.error("Error loading shared challenge:", error);
-      toast.error("Failed to load shared challenge");
+      toast.error(t('challenges.failedToLoadSharedChallenge'));
     }
   };
 
   const createCustomChallenge = async () => {
     if (!customTitle || !customVerse || !customEquation || !customExplanation) {
-      toast.error("Please fill in all fields (Title, Verse, Equation, and Explanation)");
+      toast.error(t('challenges.fillAllFields'));
       return;
     }
 
     if (!user) {
-      toast.error("Please sign in to create challenges");
+      toast.error(t('challenges.signInToCreate'));
       return;
     }
 
@@ -355,10 +357,10 @@ export default function EquationsChallenge() {
       setShareCode(shareCode);
       setShareDialogOpen(true);
       
-      toast.success("Challenge created successfully!");
+      toast.success(t('challenges.challengeCreated'));
     } catch (error) {
       console.error("Error creating challenge:", error);
-      toast.error("Failed to create challenge");
+      toast.error(t('challenges.failedToCreateChallenge'));
     } finally {
       setLoading(false);
     }
@@ -368,10 +370,10 @@ export default function EquationsChallenge() {
     try {
       await navigator.clipboard.writeText(shareLink);
       setCopied(true);
-      toast.success("Link copied to clipboard!");
+      toast.success(t('challenges.linkCopied'));
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      toast.error("Failed to copy link");
+      toast.error(t('challenges.failedToCopyLink'));
     }
   };
 
@@ -386,7 +388,7 @@ export default function EquationsChallenge() {
 
   const shareEquationToCommunity = async () => {
     if (!user || !currentEquation) {
-      toast.error("Please sign in to share");
+      toast.error(t('challenges.signInToShare'));
       return;
     }
 
@@ -478,10 +480,10 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
         }
       });
 
-      toast.success("Equation shared to community! All online users notified.");
+      toast.success(t('challenges.equationSharedToCommunity'));
     } catch (error) {
       console.error("Error sharing to community:", error);
-      toast.error("Failed to share to community");
+      toast.error(t('challenges.failedToShareToCommunity'));
     } finally {
       setSharingToCommunity(false);
     }
@@ -495,10 +497,10 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
         <div className="text-center space-y-4 mb-8">
           <div className="flex items-center justify-center gap-3">
             <Calculator className="h-12 w-12 text-primary" />
-            <h1 className="text-5xl font-bold">Equations Challenge</h1>
+            <h1 className="text-5xl font-bold">{t('challenges.equationsChallengeTitle')}</h1>
           </div>
           <p className="text-xl text-muted-foreground">
-            Decode biblical equations using palace principles and symbols
+            {t('challenges.equationsChallengeSubtitle')}
           </p>
         </div>
 
@@ -507,12 +509,12 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
           <CardContent className="flex items-center justify-between py-4">
             <div className="flex items-center gap-2">
               <Trophy className="h-5 w-5 text-yellow-500" />
-              <span className="font-semibold">Score: {score}</span>
+              <span className="font-semibold">{t('challenges.score', { score })}</span>
             </div>
             <div className="flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
               <span className="text-sm text-muted-foreground">
-                Difficulty: <span className="capitalize">{difficulty}</span>
+                {t('challenges.difficultyLabel')}: <span className="capitalize">{difficulty}</span>
               </span>
             </div>
           </CardContent>
@@ -520,12 +522,12 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
           <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Principle Codes Reference</CardTitle>
-            <CardDescription>Approved symbols used in Phototheology equations</CardDescription>
+            <CardTitle>{t('challenges.principleCodesReference')}</CardTitle>
+            <CardDescription>{t('challenges.approvedSymbols')}</CardDescription>
           </CardHeader>
           <CardContent>
             {principlesLoading ? (
-              <div className="text-center py-8">Loading principles...</div>
+              <div className="text-center py-8">{t('challenges.loadingPrinciples')}</div>
             ) : (
               <div className="space-y-4">
                 {[
@@ -566,7 +568,7 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                 })}
                 
                 <div className="mt-4 p-3 bg-muted rounded-lg">
-                  <h4 className="font-semibold mb-1 text-sm">Example Equations:</h4>
+                  <h4 className="font-semibold mb-1 text-sm">{t('challenges.exampleEquations')}</h4>
                   <p className="text-sm text-muted-foreground font-mono mb-2">
                     FE-PA + SAN-ALT + SAN-ARK → CR + GR = DoL³/NE³
                   </p>
@@ -590,11 +592,11 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="solve">
               <Calculator className="h-4 w-4 mr-2" />
-              Solve Challenges
+              {t('challenges.solveChallenges')}
             </TabsTrigger>
             <TabsTrigger value="create">
               <Plus className="h-4 w-4 mr-2" />
-              Create Challenge
+              {t('challenges.createChallenge')}
             </TabsTrigger>
           </TabsList>
 
@@ -602,8 +604,8 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
             {/* Difficulty Selection */}
             <Card>
               <CardHeader>
-                <CardTitle>Select Difficulty</CardTitle>
-                <CardDescription>Choose your challenge level</CardDescription>
+                <CardTitle>{t('challenges.selectDifficulty')}</CardTitle>
+                <CardDescription>{t('challenges.chooseChallengeLevel')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -627,8 +629,8 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                   <div className="flex items-center gap-3">
                     <Clock className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">Enable Timer</p>
-                      <p className="text-xs text-muted-foreground">5 minute countdown per challenge</p>
+                      <p className="font-medium">{t('challenges.enableTimer')}</p>
+                      <p className="text-xs text-muted-foreground">{t('challenges.timerDescription')}</p>
                     </div>
                   </div>
                   <Label className="flex items-center gap-2 cursor-pointer">
@@ -654,10 +656,10 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
               <CardContent className="py-12 text-center space-y-4">
                 <Calculator className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-lg text-muted-foreground mb-6">
-                  Ready to solve an equation? Click below to start!
+                  {t('challenges.readyToSolve')}
                 </p>
                 <Button onClick={generateEquation} disabled={loading} size="lg">
-                  {loading ? "Generating..." : "Generate New Equation"}
+                  {loading ? t('challenges.generating') : t('challenges.generateNewEquation')}
                 </Button>
                 
                 {/* Share to Community Button - Disabled State */}
@@ -668,10 +670,10 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                   disabled={true}
                 >
                   <Share2 className="h-4 w-4 mr-2" />
-                  Share to Community - Get Help Solving This!
+                  {t('challenges.shareToCommunity')}
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  Generate an equation first to share with the community
+                  {t('challenges.generateFirstToShare')}
                 </p>
               </CardContent>
             </Card>
@@ -679,7 +681,7 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>Current Challenge</span>
+                  <span>{t('challenges.currentChallenge')}</span>
                   <div className="flex items-center gap-2">
                     {timerEnabled && (
                       <Badge 
@@ -697,7 +699,7 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                       disabled={loading}
                     >
                       <RefreshCw className="h-4 w-4 mr-2" />
-                      Regenerate
+                      {t('challenges.regenerate')}
                     </Button>
                     {currentEquation && (
                       <>
@@ -746,7 +748,7 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
               <div className="p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-500/20">
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
                   <span className="text-xl">🔑</span>
-                  Symbols in this equation:
+                  {t('challenges.symbolsInEquation')}
                   <span className="text-xl">🔓</span>
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -764,11 +766,11 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <span className="text-2xl">💡</span>
-                    Understanding This Challenge
+                    {t('challenges.understandingChallenge')}
                     <span className="text-2xl">📚</span>
                   </CardTitle>
                   <CardDescription>
-                    New to Phototheology? Here's what these principles mean and how to solve the equation!
+                    {t('challenges.understandingChallengeDescription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -790,12 +792,12 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                 {sharingToCommunity ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sharing...
+                    {t('challenges.sharing')}
                   </>
                 ) : (
                   <>
                     <Share2 className="h-4 w-4 mr-2" />
-                    Share to Community - Get Help Solving This!
+                    {t('challenges.shareToCommunity')}
                   </>
                 )}
               </Button>
@@ -805,18 +807,18 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium mb-2 block">
-                      Your interpretation:
+                      {t('challenges.yourInterpretation')}
                     </label>
                     <Input
                       value={userAnswer}
                       onChange={(e) => setUserAnswer(e.target.value)}
-                      placeholder="Type your answer here..."
+                      placeholder={t('challenges.typeAnswerPlaceholder')}
                       className="w-full"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <Button onClick={checkAnswer} className="w-full" size="lg">
-                      Submit Answer
+                      {t('common.submitAnswer')}
                     </Button>
                     <Button 
                       onClick={challengeJeeves} 
@@ -826,7 +828,7 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                       disabled={jeevesLoading}
                     >
                       <Sparkles className="h-4 w-4 mr-2" />
-                      {jeevesLoading ? "Asking Jeeves..." : "Challenge Jeeves"}
+                      {jeevesLoading ? t('challenges.askingJeeves') : t('challenges.challengeJeeves')}
                     </Button>
                   </div>
                   
@@ -836,7 +838,7 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                       <CardContent className="pt-6 space-y-4">
                         <div className="flex items-center gap-2">
                           <Sparkles className="h-5 w-5 text-primary" />
-                          <h3 className="font-bold text-lg">Jeeves' Solution:</h3>
+                          <h3 className="font-bold text-lg">{t('challenges.jeevesSolution')}</h3>
                         </div>
                         <p className="whitespace-pre-wrap">{jeevesSolution}</p>
                         
@@ -859,10 +861,10 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                 {showResult && (
                   <Card className="border-green-500 bg-green-50 dark:bg-green-900/20">
                     <CardContent className="pt-6 space-y-4">
-                      <h3 className="font-bold text-lg">Jeeves' Explanation:</h3>
+                      <h3 className="font-bold text-lg">{t('challenges.jeevesExplanation')}</h3>
                       <p className="whitespace-pre-wrap">{currentEquation.explanation}</p>
                       <Button onClick={generateEquation} className="w-full">
-                        Next Equation
+                        {t('challenges.nextEquation')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -875,15 +877,15 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
           <TabsContent value="create" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Create Your Own Challenge</CardTitle>
+                <CardTitle>{t('challenges.createYourOwnChallenge')}</CardTitle>
                 <CardDescription>
-                  Build a custom equation challenge to share with others
+                  {t('challenges.buildCustomChallenge')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Challenge Title */}
                 <div>
-                  <Label htmlFor="title">Challenge Title</Label>
+                  <Label htmlFor="title">{t('challenges.challengeTitle')}</Label>
                   <Input
                     id="title"
                     value={customTitle}
@@ -894,7 +896,7 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
                 {/* Difficulty Selection */}
                 <div>
-                  <Label className="text-base font-semibold mb-3 block">Difficulty</Label>
+                  <Label className="text-base font-semibold mb-3 block">{t('challenges.difficultyLabel')}</Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {(Object.keys(difficultyInfo) as Difficulty[]).map((diff) => (
                       <Button
@@ -912,10 +914,10 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                 {/* Principle Selection */}
                 <div>
                   <Label className="text-base font-semibold mb-3 block">
-                    Select Principles ({selectedPrinciples.length} selected)
+                    {t('challenges.selectPrinciples', { count: selectedPrinciples.length })}
                   </Label>
                   {principlesLoading ? (
-                    <div className="text-center py-4">Loading principles...</div>
+                    <div className="text-center py-4">{t('challenges.loadingPrinciples')}</div>
                   ) : (
                     <div className="space-y-4 max-h-96 overflow-y-auto p-4 border rounded-lg">
                       {[
@@ -976,18 +978,18 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                     className="w-full"
                   >
                     <Calculator className="h-4 w-4 mr-2" />
-                    Build Equation from Selected ({selectedPrinciples.length} principles)
+                    {t('challenges.buildEquation', { count: selectedPrinciples.length })}
                   </Button>
                 )}
                 
                 <p className="text-sm text-muted-foreground text-center">
-                  Select principles above to auto-build, or type your equation manually below
+                  {t('challenges.selectPrinciplesHint')}
                 </p>
 
                 {/* Challenge Details */}
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="verse">Verse Reference</Label>
+                    <Label htmlFor="verse">{t('challenges.verseReference')}</Label>
                     <Input
                       id="verse"
                       value={customVerse}
@@ -997,7 +999,7 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                   </div>
 
                   <div>
-                    <Label htmlFor="equation">Equation</Label>
+                    <Label htmlFor="equation">{t('challenges.equation')}</Label>
                     <Input
                       id="equation"
                       value={customEquation}
@@ -1008,12 +1010,12 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                   </div>
 
                   <div>
-                    <Label htmlFor="explanation">Explanation / Solution</Label>
+                    <Label htmlFor="explanation">{t('challenges.explanationSolution')}</Label>
                     <Textarea
                       id="explanation"
                       value={customExplanation}
                       onChange={(e) => setCustomExplanation(e.target.value)}
-                      placeholder="Explain how the principles connect to the verse..."
+                      placeholder={t('challenges.explanationPlaceholder')}
                       className="min-h-32"
                     />
                   </div>
@@ -1028,14 +1030,14 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                     disabled={loading}
                   >
                     <Share2 className="h-4 w-4 mr-2" />
-                    {loading ? "Creating..." : "Create & Share Challenge"}
+                    {loading ? t('common.creating') : t('challenges.createAndShare')}
                   </Button>
                   <Button 
                     onClick={resetCreateForm}
                     variant="outline"
                     size="lg"
                   >
-                    Reset
+                    {t('common.reset')}
                   </Button>
                 </div>
 
@@ -1044,7 +1046,7 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                   <Button
                     onClick={async () => {
                       if (!user) {
-                        toast.error("Please sign in to share");
+                        toast.error(t('challenges.signInToShare'));
                         return;
                       }
 
@@ -1082,10 +1084,10 @@ Can you help solve this equation? Share your interpretation and insights!
                           });
 
                         if (postError) throw postError;
-                        toast.success("Custom challenge shared to community!");
+                        toast.success(t('challenges.customChallengeShared'));
                       } catch (error) {
                         console.error("Error sharing to community:", error);
-                        toast.error("Failed to share to community");
+                        toast.error(t('challenges.failedToShareToCommunity'));
                       } finally {
                         setSharingToCommunity(false);
                       }
@@ -1097,12 +1099,12 @@ Can you help solve this equation? Share your interpretation and insights!
                     {sharingToCommunity ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Sharing...
+                        {t('challenges.sharing')}
                       </>
                     ) : (
                       <>
                         <Share2 className="h-4 w-4 mr-2" />
-                        Share to Community - Get Help Solving This!
+                        {t('challenges.shareToCommunity')}
                       </>
                     )}
                   </Button>
@@ -1116,14 +1118,14 @@ Can you help solve this equation? Share your interpretation and insights!
         <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Challenge Created Successfully! 🎉</DialogTitle>
+              <DialogTitle>{t('challenges.challengeCreatedTitle')}</DialogTitle>
               <DialogDescription>
-                Share this link with others to challenge them
+                {t('challenges.shareLinkDescription')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="p-4 bg-muted rounded-lg space-y-2">
-                <p className="text-sm font-semibold">Share Code:</p>
+                <p className="text-sm font-semibold">{t('challenges.shareCode')}</p>
                 <p className="text-2xl font-mono font-bold text-primary">{shareCode}</p>
               </div>
               
@@ -1135,7 +1137,7 @@ Can you help solve this equation? Share your interpretation and insights!
               </div>
               
               <p className="text-xs text-muted-foreground">
-                Anyone with this link can attempt your challenge. They don't need to solve it before you share!
+                {t('challenges.shareHint')}
               </p>
             </div>
           </DialogContent>

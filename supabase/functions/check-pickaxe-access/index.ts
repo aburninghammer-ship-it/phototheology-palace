@@ -42,16 +42,30 @@ serve(async (req) => {
     console.log(`Checking Pickaxe access for: ${user.email}`);
 
     // Check if this email has a Pickaxe paid subscription
-    const { data: pickaxeConnection, error: pickaxeError } = await supabase
-      .from("pickaxe_connections")
-      .select("*")
-      .eq("pickaxe_email", user.email.toLowerCase())
-      .eq("is_paid_user", true)
-      .maybeSingle();
+    let pickaxeConnection = null;
+    try {
+      const { data, error: pickaxeError } = await supabase
+        .from("pickaxe_connections")
+        .select("*")
+        .eq("pickaxe_email", user.email.toLowerCase())
+        .eq("is_paid_user", true)
+        .maybeSingle();
 
-    if (pickaxeError) {
-      console.error("Error checking pickaxe connection:", pickaxeError);
-      throw new Error("Failed to check Pickaxe status");
+      if (pickaxeError) {
+        console.error("Error checking pickaxe connection:", pickaxeError);
+        // Return gracefully instead of throwing - treat as no access
+        return new Response(
+          JSON.stringify({ hasPremiumAccess: false, error: "db_timeout" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      pickaxeConnection = data;
+    } catch (dbError) {
+      console.error("DB connection error:", dbError);
+      return new Response(
+        JSON.stringify({ hasPremiumAccess: false, error: "db_timeout" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     if (!pickaxeConnection) {

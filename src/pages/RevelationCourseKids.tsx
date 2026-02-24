@@ -6,10 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookOpen, Star, Sparkles, ArrowRight, ArrowLeft } from "lucide-react";
 import { kidsRevelationLessons } from "@/data/revelationCourseData";
+import { useTranslation } from "react-i18next";
 
 const RevelationCourseKids = () => {
   const [currentLesson, setCurrentLesson] = useState(1);
   const [completedLessons, setCompletedLessons] = useState<number[]>([]);
+  const { t } = useTranslation();
 
   const lesson = kidsRevelationLessons.find(l => l.id === currentLesson);
 
@@ -31,9 +33,9 @@ const RevelationCourseKids = () => {
           <div className="text-center space-y-2">
             <h1 className="text-5xl font-bold flex items-center justify-center gap-2 text-primary">
               <BookOpen className="h-10 w-10" />
-              Revelation for Kids! 🌟
+              {t('courses.revelationKids.pageTitle')}
             </h1>
-            <p className="text-xl text-muted-foreground">Jesus' Amazing Prophecy Adventure</p>
+            <p className="text-xl text-muted-foreground">{t('courses.revelationKids.subtitle')}</p>
             <div className="flex items-center justify-center gap-2">
               {[...Array(completedLessons.length)].map((_, i) => (
                 <Star key={i} className="h-5 w-5 text-yellow-500 fill-yellow-500" />
@@ -46,7 +48,7 @@ const RevelationCourseKids = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-3xl text-primary">
-                    Lesson {lesson.id}
+                    {t('courses.revelationKids.lessonLabel', { id: lesson.id })}
                   </CardTitle>
                   <CardDescription className="text-xl mt-2 font-semibold">
                     {lesson.title}
@@ -54,7 +56,7 @@ const RevelationCourseKids = () => {
                 </div>
                 <Badge variant="secondary" className="text-lg px-4 py-2">
                   <Sparkles className="mr-2 h-5 w-5" />
-                  {completedLessons.length} Stars!
+                  {t('courses.revelationKids.starsCount', { count: completedLessons.length })}
                 </Badge>
               </div>
             </CardHeader>
@@ -65,7 +67,7 @@ const RevelationCourseKids = () => {
                   <div className="p-6 bg-primary/10 rounded-2xl border-4 border-primary/30">
                     <div className="flex items-center gap-2 mb-3">
                       <BookOpen className="h-6 w-6 text-primary" />
-                      <h3 className="font-bold text-xl text-primary">Bible Verse</h3>
+                      <h3 className="font-bold text-xl text-primary">{t('courses.revelationKids.bibleVerse')}</h3>
                     </div>
                     <p className="text-lg font-semibold italic">{lesson.bibleVerse}</p>
                   </div>
@@ -73,7 +75,7 @@ const RevelationCourseKids = () => {
                   {/* Story */}
                   <div className="space-y-3">
                     <h3 className="font-bold text-2xl text-primary flex items-center gap-2">
-                      📖 The Story
+                      {t('courses.revelationKids.theStory')}
                     </h3>
                     <p className="text-lg leading-relaxed">{lesson.story}</p>
                   </div>
@@ -81,7 +83,7 @@ const RevelationCourseKids = () => {
                   {/* Question */}
                   <div className="p-6 bg-accent/20 rounded-2xl border-2 border-accent">
                     <h3 className="font-bold text-xl text-primary mb-3 flex items-center gap-2">
-                      🤔 Think About It
+                      {t('courses.revelationKids.thinkAboutIt')}
                     </h3>
                     <p className="text-lg">{lesson.question}</p>
                   </div>
@@ -89,7 +91,7 @@ const RevelationCourseKids = () => {
                   {/* Activity */}
                   <div className="p-6 bg-green-50 dark:bg-green-900/20 rounded-2xl border-2 border-green-500">
                     <h3 className="font-bold text-xl text-green-700 dark:text-green-400 mb-3 flex items-center gap-2">
-                      🎨 Fun Activity
+                      {t('common.funActivity')}
                     </h3>
                     <p className="text-lg">{lesson.activity}</p>
                   </div>
@@ -105,12 +107,12 @@ const RevelationCourseKids = () => {
                       {completedLessons.includes(currentLesson) ? (
                         <>
                           <Star className="mr-2 h-5 w-5 fill-current" />
-                          Got My Star! ⭐
+                          {t('courses.revelationKids.gotMyStar')}
                         </>
                       ) : (
                         <>
                           <Star className="mr-2 h-5 w-5" />
-                          I Finished This Lesson!
+                          {t('courses.revelationKids.finishedLesson')}
                         </>
                       )}
                     </Button>
@@ -130,11 +132,11 @@ const RevelationCourseKids = () => {
               className="text-lg"
             >
               <ArrowLeft className="mr-2 h-5 w-5" />
-              Previous
+              {t('common.previous')}
             </Button>
-            
+
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Lesson {currentLesson} of {kidsRevelationLessons.length}</p>
+              <p className="text-sm text-muted-foreground">{t('courses.revelationKids.lessonOfTotal', { current: currentLesson, total: kidsRevelationLessons.length })}</p>
             </div>
 
             <Button
@@ -143,7 +145,7 @@ const RevelationCourseKids = () => {
               disabled={currentLesson === kidsRevelationLessons.length}
               className="text-lg"
             >
-              Next
+              {t('common.next')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>

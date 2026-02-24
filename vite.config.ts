@@ -5,12 +5,14 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
-// PWA Cache Version: 2024-12-29-v2 (force update for game badges and libraries)
+// PWA Cache Version: 2026-02-07-v1 (force rebuild)
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
   },
+  // Reduce build output noise (helps surface the actual error in CI logs)
+  logLevel: "warn",
   plugins: [
     react(),
     mode === "development" && componentTagger(),
@@ -38,8 +40,25 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
+        // ⚠️  Precache only the index page and main JS/CSS.
+        // Large images will be cached at runtime instead.
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MiB
+        globPatterns: ['**/*.{js,css,html,woff,woff2}'],
         navigateFallback: '/index.html',
+        // Runtime caching for everything else
         runtimeCaching: [
+          {
+            // Images: cache at runtime, not precache
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30
+              }
+            }
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -68,17 +87,6 @@ export default defineConfig(({ mode }) => ({
             options: {
               cacheName: 'static-resources'
             }
-          },
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30
-              }
-            }
           }
         ]
       }
@@ -106,6 +114,8 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     cssCodeSplit: true,
+    // Avoid spending time computing gzip sizes during CI publish builds.
+    reportCompressedSize: false,
     rollupOptions: {
       output: {
         chunkFileNames: 'assets/js/[name]-[hash].js',

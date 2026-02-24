@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -6,9 +7,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Trophy, 
-  Loader2, 
+import {
+  Trophy,
+  Loader2,
   PlayCircle,
   CheckCircle2,
   Clock,
@@ -17,15 +18,17 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { SocialShareButton } from "@/components/SocialShareButton";
 
 export default function PrincipleCardsGame() {
+  const { t } = useTranslation();
   const { gameId } = useParams();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+  const { translatedFloors } = useTranslatedPalaceData();
+
   const [game, setGame] = useState<any>(null);
   const [players, setPlayers] = useState<any[]>([]);
   const [currentRound, setCurrentRound] = useState<any>(null);
@@ -34,7 +37,7 @@ export default function PrincipleCardsGame() {
   const [submitting, setSubmitting] = useState(false);
 
   // Get all principles from palace data
-  const allPrinciples = palaceFloors.flatMap(floor => 
+  const allPrinciples = translatedFloors.flatMap(floor => 
     floor.rooms.map(room => ({
       principle: room.name,
       tag: room.tag,
@@ -146,13 +149,13 @@ export default function PrincipleCardsGame() {
       await createNewRound(1);
 
       toast({
-        title: "Game Started!",
-        description: "Good luck!"
+        title: t('principles.gameStarted'),
+        description: t('principles.goodLuck')
       });
     } catch (error: any) {
       console.error("Error starting game:", error);
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive"
       });
@@ -219,13 +222,13 @@ export default function PrincipleCardsGame() {
 
       setResponse("");
       toast({
-        title: "Correct!",
-        description: "You won this round!"
+        title: t('principles.correct'),
+        description: t('principles.wonRound')
       });
     } catch (error: any) {
       console.error("Error submitting response:", error);
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive"
       });
@@ -268,9 +271,9 @@ export default function PrincipleCardsGame() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Principle Cards Game</h1>
+            <h1 className="text-3xl font-bold">{t('principles.gameTitle')}</h1>
             <p className="text-muted-foreground">
-              Round {game?.current_round || 1} of {game?.total_rounds || 10}
+              {t('principles.roundOf', { current: game?.current_round || 1, total: game?.total_rounds || 10 })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -278,8 +281,8 @@ export default function PrincipleCardsGame() {
               {game?.status}
             </Badge>
             <SocialShareButton
-              title="Join my Principle Cards game!"
-              description="Playing a fun multiplayer Bible principle matching game"
+              title={t('principles.shareGameTitle')}
+              description={t('principles.shareGameDescription')}
               url={window.location.href}
               variant="button"
               size="icon"
@@ -291,7 +294,7 @@ export default function PrincipleCardsGame() {
           {/* Players Sidebar */}
           <div className="lg:col-span-1">
             <Card className="p-4">
-              <h3 className="font-semibold mb-4">Players ({players.length}/{game?.max_players})</h3>
+              <h3 className="font-semibold mb-4">{t('principles.playersLabel', { current: players.length, max: game?.max_players })}</h3>
               <div className="space-y-3">
                 {players.map((player) => (
                   <div key={player.id} className="flex items-center gap-3">
@@ -306,12 +309,12 @@ export default function PrincipleCardsGame() {
                         {player.profiles?.display_name || "Player"}
                         {player.user_id === game?.host_user_id && (
                           <Badge variant="secondary" className="ml-2 text-xs">
-                            Host
+                            {t('principles.host')}
                           </Badge>
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {player.score} points • {player.cards_won} cards
+                        {t('principles.playerStats', { points: player.score, cards: player.cards_won })}
                       </div>
                     </div>
                   </div>
@@ -325,14 +328,14 @@ export default function PrincipleCardsGame() {
             {game?.status === "waiting" && (
               <Card className="p-8 text-center">
                 <Clock className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">Waiting for Players</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('principles.waitingForPlayersTitle')}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Game will start when the host is ready
+                  {t('principles.waitingForPlayersDescription')}
                 </p>
                 {user?.id === game.host_user_id && players.length >= 2 && (
                   <Button onClick={startGame} size="lg">
                     <PlayCircle className="w-5 h-5 mr-2" />
-                    Start Game
+                    {t('principles.startGame')}
                   </Button>
                 )}
               </Card>
@@ -344,13 +347,13 @@ export default function PrincipleCardsGame() {
                 <Card className="p-6 bg-gradient-to-br from-primary/10 to-secondary/10">
                   <div className="text-center mb-4">
                     <Badge className="mb-2">{currentRound.card_principle}</Badge>
-                    <h3 className="text-2xl font-bold">Principle Card</h3>
+                    <h3 className="text-2xl font-bold">{t('principles.principleCard')}</h3>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
                     {currentRound.card_description}
                   </p>
                   <div className="p-4 bg-background/50 rounded-lg">
-                    <p className="font-medium">Scenario:</p>
+                    <p className="font-medium">{t('principles.scenario')}:</p>
                     <p className="text-sm">{currentRound.scenario_text}</p>
                   </div>
                 </Card>
@@ -358,14 +361,14 @@ export default function PrincipleCardsGame() {
                 {/* Response Area */}
                 {!currentRound.completed_at ? (
                   <Card className="p-6">
-                    <h4 className="font-semibold mb-3">Your Response</h4>
+                    <h4 className="font-semibold mb-3">{t('principles.yourResponse')}</h4>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Explain how this principle applies to the scenario
+                      {t('principles.explainPrinciple')}
                     </p>
                     <Textarea
                       value={response}
                       onChange={(e) => setResponse(e.target.value)}
-                      placeholder="Type your response here..."
+                      placeholder={t('principles.typeResponsePlaceholder')}
                       rows={4}
                       className="mb-4"
                     />
@@ -377,12 +380,12 @@ export default function PrincipleCardsGame() {
                       {submitting ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Submitting...
+                          {t('common.submitting')}
                         </>
                       ) : (
                         <>
                           <CheckCircle2 className="w-4 h-4 mr-2" />
-                          Submit Response
+                          {t('principles.submitResponse')}
                         </>
                       )}
                     </Button>
@@ -390,9 +393,9 @@ export default function PrincipleCardsGame() {
                 ) : (
                   <Card className="p-6 text-center">
                     <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-green-500" />
-                    <p className="font-medium">Round Complete!</p>
+                    <p className="font-medium">{t('principles.roundComplete')}</p>
                     <p className="text-sm text-muted-foreground">
-                      Waiting for next round...
+                      {t('principles.waitingForNextRound')}
                     </p>
                   </Card>
                 )}
@@ -402,12 +405,12 @@ export default function PrincipleCardsGame() {
             {game?.status === "completed" && (
               <Card className="p-8 text-center">
                 <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-                <h3 className="text-2xl font-bold mb-2">Game Over!</h3>
+                <h3 className="text-2xl font-bold mb-2">{t('principles.gameOver')}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Winner: {players.find(p => p.user_id === game.winner_id)?.profiles?.display_name}
+                  {t('principles.winner', { name: players.find(p => p.user_id === game.winner_id)?.profiles?.display_name })}
                 </p>
                 <Button onClick={() => navigate("/games/principle-cards")}>
-                  Back to Lobby
+                  {t('principles.backToLobby')}
                 </Button>
               </Card>
             )}

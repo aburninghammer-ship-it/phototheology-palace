@@ -46,9 +46,9 @@ const DAILY_TIPS: DailyTip[] = [
   { type: "didYouKnow", title: "Bible Insight", message: "The word 'fear' appears 365 times in the Bible — one for each day!", action: "Explore", link: "/encyclopedia", icon: <Lightbulb className="h-5 w-5" /> },
 
   // Gems
-  { type: "gem", title: "Powerful Gem", message: "The Passover lamb points directly to Christ's crucifixion — same day, same hour.", action: "See Gem", link: "/palace/floor/1/room/gr", icon: <Sparkles className="h-5 w-5" /> },
-  { type: "gem", title: "Hidden Treasure", message: "Babel scattered languages; Pentecost reunited them through the Spirit!", action: "View Gem", link: "/palace/floor/1/room/gr", icon: <Sparkles className="h-5 w-5" /> },
-  { type: "gem", title: "Today's Gem", message: "Christ is the true Ark — salvation through Him alone, one door, one refuge.", action: "Discover", link: "/palace/floor/1/room/gr", icon: <Sparkles className="h-5 w-5" /> },
+  { type: "gem", title: "Powerful Gem", message: "The Passover lamb points directly to Christ's crucifixion — same day, same hour.", action: "See Gem", link: "/give-me-a-gem", icon: <Sparkles className="h-5 w-5" /> },
+  { type: "gem", title: "Hidden Treasure", message: "Babel scattered languages; Pentecost reunited them through the Spirit!", action: "View Gem", link: "/give-me-a-gem", icon: <Sparkles className="h-5 w-5" /> },
+  { type: "gem", title: "Today's Gem", message: "Christ is the true Ark — salvation through Him alone, one door, one refuge.", action: "Discover", link: "/give-me-a-gem", icon: <Sparkles className="h-5 w-5" /> },
 
   // Feature highlights
   { type: "didYouKnow", title: "Try Jeeves!", message: "Ask Jeeves any Bible question! Your AI study partner uses Phototheology principles.", action: "Ask Now", link: "/jeeves", icon: <Lightbulb className="h-5 w-5" /> },

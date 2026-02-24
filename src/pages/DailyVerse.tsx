@@ -6,10 +6,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Book, Sparkles, CheckCircle2, Calendar, Share2, Archive, ChevronLeft, ChevronRight } from "lucide-react";
+import { Book, Sparkles, CheckCircle2, Calendar, Share2, Archive, ChevronLeft, ChevronRight, Bookmark, BookmarkCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { Navigation } from "@/components/Navigation";
@@ -38,6 +39,7 @@ interface DailyVerse {
 }
 
 export default function DailyVerse() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
   const queryClient = useQueryClient();
@@ -81,6 +83,45 @@ export default function DailyVerse() {
       return !!data;
     },
     enabled: !!todayVerse && !!user,
+  });
+
+  const { data: isSaved, refetch: refetchSaved } = useQuery({
+    queryKey: ['verse-saved', todayVerse?.id, user?.id],
+    queryFn: async () => {
+      if (!todayVerse || !user) return false;
+      const { data } = await supabase
+        .from('saved_daily_verses' as any)
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('verse_id', todayVerse.id)
+        .single();
+      return !!data;
+    },
+    enabled: !!todayVerse && !!user,
+  });
+
+  const saveVerseMutation = useMutation({
+    mutationFn: async () => {
+      if (!todayVerse || !user) return;
+      if (isSaved) {
+        const { error } = await supabase
+          .from('saved_daily_verses' as any)
+          .delete()
+          .eq('user_id', user.id)
+          .eq('verse_id', todayVerse.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('saved_daily_verses' as any)
+          .insert({ user_id: user.id, verse_id: todayVerse.id });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      refetchSaved();
+      queryClient.invalidateQueries({ queryKey: ['saved-daily-verses'] });
+      toast.success(isSaved ? 'Verse removed from saved' : 'Verse saved to your Library!');
+    },
   });
 
   // Archive queries
@@ -131,7 +172,7 @@ export default function DailyVerse() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['verse-reading'] });
-      toast.success("Marked as read! Keep up the daily practice.");
+      toast.success(t('dailyVerse.markedAsRead'));
     },
   });
 
@@ -154,7 +195,7 @@ export default function DailyVerse() {
       setShareData(data);
     } catch (error) {
       console.error('Error generating share content:', error);
-      toast.error("Share generation failed. Please try again later.");
+      toast.error(t('dailyVerse.shareGenerationFailed'));
       setShareDialogOpen(false);
     } finally {
       setIsGeneratingShare(false);
@@ -163,7 +204,7 @@ export default function DailyVerse() {
 
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard!");
+    toast.success(t('common.copiedToClipboard'));
   };
 
   const shareToFacebook = () => {
@@ -229,18 +270,18 @@ export default function DailyVerse() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Book className="h-5 w-5" />
-            Palace Principles
+            {t('dailyVerse.palacePrinciples')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h4 className="font-semibold mb-2 text-sm">Principle Revealed (Verse Category)</h4>
+            <h4 className="font-semibold mb-2 text-sm">{t('dailyVerse.principleRevealed')}</h4>
             <Badge variant="secondary" className="text-lg px-4 py-2">
-              {verse.breakdown?.verse_genre || 'Loading...'}
+              {verse.breakdown?.verse_genre || t('common.loading')}
             </Badge>
           </div>
           <div>
-            <h4 className="font-semibold mb-2 text-sm">7 Principles Applied</h4>
+            <h4 className="font-semibold mb-2 text-sm">{t('dailyVerse.principlesApplied')}</h4>
             <div className="flex flex-wrap gap-2">
               {verse.breakdown?.breakdown?.map((item, idx) => (
                 <Badge key={`applied-${idx}`} variant="outline">
@@ -279,15 +320,15 @@ export default function DailyVerse() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-semibold mb-2 text-sm text-primary">Application</h4>
+                  <h4 className="font-semibold mb-2 text-sm text-primary">{t('dailyVerse.application')}</h4>
                   <p className="text-sm leading-relaxed">{item.application}</p>
                 </div>
                 <div className="bg-accent/10 p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2 text-sm text-primary">Key Insight</h4>
+                  <h4 className="font-semibold mb-2 text-sm text-primary">{t('dailyVerse.keyInsight')}</h4>
                   <p className="text-sm">{item.key_insight}</p>
                 </div>
                 <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                  <h4 className="font-semibold mb-2 text-sm text-primary">Practical Takeaway</h4>
+                  <h4 className="font-semibold mb-2 text-sm text-primary">{t('dailyVerse.practicalTakeaway')}</h4>
                   <p className="text-sm">{item.practical_takeaway}</p>
                 </div>
               </CardContent>
@@ -302,7 +343,7 @@ export default function DailyVerse() {
       <div className="min-h-screen gradient-dreamy">
         <SimplifiedNav />
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <div className="text-center py-20">Loading today's verse...</div>
+          <div className="text-center py-20">{t('dailyVerse.loadingTodaysVerse')}</div>
         </div>
       </div>
     );
@@ -316,8 +357,8 @@ export default function DailyVerse() {
           <Card>
             <CardContent className="text-center py-12">
               <Book className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-lg mb-4">No verse available for today yet.</p>
-              <p className="text-sm text-muted-foreground">Check back later!</p>
+              <p className="text-lg mb-4">{t('dailyVerse.noVerseAvailable')}</p>
+              <p className="text-sm text-muted-foreground">{t('dailyVerse.checkBackLater')}</p>
             </CardContent>
           </Card>
         </div>
@@ -361,11 +402,11 @@ export default function DailyVerse() {
           <div>
             <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
               <Sparkles className="h-8 w-8 text-primary" />
-              Verse of the Day
+              {t('dailyVerse.verseOfTheDay')}
             </h1>
             <p className="text-foreground/80 font-medium flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              {new Date(todayVerse.date).toLocaleDateString('en-US', { 
+              {new Date(todayVerse.date + 'T12:00:00').toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
@@ -380,19 +421,19 @@ export default function DailyVerse() {
                 disabled={markAsReadMutation.isPending}
               >
                 <CheckCircle2 className="mr-2 h-4 w-4" />
-                Mark as Read
+                {t('dailyVerse.markAsRead')}
               </Button>
             )}
             {user && hasRead && (
               <Badge variant="secondary" className="text-sm">
                 <CheckCircle2 className="mr-2 h-4 w-4" />
-                Completed Today
+                {t('dailyVerse.completedToday')}
               </Badge>
             )}
             <Button
               onClick={async () => {
                 try {
-                  toast.info("Refreshing principles for today's verse...");
+                  toast.info(t('dailyVerse.refreshingPrinciples'));
                   const { error } = await supabase.functions.invoke('generate-daily-verse', {
                     body: {
                       force: true,
@@ -401,20 +442,34 @@ export default function DailyVerse() {
                   });
                   if (error) throw error;
                   await refetch();
-                  toast.success("Updated principles for today's verse.");
+                  toast.success(t('dailyVerse.updatedPrinciples'));
                 } catch (err) {
                   console.error('Error refreshing daily verse principles:', err);
-                  toast.error("Could not refresh principles. Please try again.");
+                  toast.error(t('dailyVerse.refreshFailed'));
                 }
               }}
               variant="outline"
             >
               <Sparkles className="mr-2 h-4 w-4" />
-              Refresh Principles
+              {t('dailyVerse.refreshPrinciples')}
             </Button>
+            {user && (
+              <Button
+                onClick={() => saveVerseMutation.mutate()}
+                disabled={saveVerseMutation.isPending}
+                variant={isSaved ? "secondary" : "outline"}
+              >
+                {isSaved ? (
+                  <BookmarkCheck className="mr-2 h-4 w-4 text-primary" />
+                ) : (
+                  <Bookmark className="mr-2 h-4 w-4" />
+                )}
+                {isSaved ? 'Saved' : 'Save'}
+              </Button>
+            )}
             <Button onClick={handleShare} variant="outline">
               <Share2 className="mr-2 h-4 w-4" />
-              Share
+              {t('common.share')}
             </Button>
           </div>
         </div>
@@ -424,12 +479,12 @@ export default function DailyVerse() {
           <Card className="border-primary bg-gradient-to-r from-primary/10 to-accent/10">
             <CardContent className="py-6">
               <div className="text-center space-y-4">
-                <h3 className="text-xl font-semibold">Get Your Daily Verse Every Day</h3>
+                <h3 className="text-xl font-semibold">{t('dailyVerse.signUpTitle')}</h3>
                 <p className="text-muted-foreground">
-                  Sign up to track your progress, mark verses as read, and unlock the full Phototheology experience with 7 unique perspectives on every verse.
+                  {t('dailyVerse.signUpDescription')}
                 </p>
                 <Button asChild size="lg" className="mt-2">
-                  <a href="/auth">Sign Up Free</a>
+                  <a href="/auth">{t('dailyVerse.signUpFree')}</a>
                 </Button>
               </div>
             </CardContent>
@@ -441,11 +496,11 @@ export default function DailyVerse() {
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="today" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
-              Today's Verse
+              {t('dailyVerse.todaysVerse')}
             </TabsTrigger>
             <TabsTrigger value="archive" className="flex items-center gap-2">
               <Archive className="h-4 w-4" />
-              Archive
+              {t('dailyVerse.archive')}
             </TabsTrigger>
           </TabsList>
 
@@ -462,7 +517,7 @@ export default function DailyVerse() {
                   className="mb-4"
                 >
                   <ChevronLeft className="mr-2 h-4 w-4" />
-                  Back to Archive
+                  {t('dailyVerse.backToArchive')}
                 </Button>
                 <p className="text-sm text-muted-foreground mb-4">
                   {new Date(selectedArchiveVerse.date).toLocaleDateString('en-US', {
@@ -474,7 +529,7 @@ export default function DailyVerse() {
                   {isVerseRead(selectedArchiveVerse.id) && (
                     <Badge variant="secondary" className="ml-2">
                       <CheckCircle2 className="mr-1 h-3 w-3" />
-                      Read
+                      {t('dailyVerse.read')}
                     </Badge>
                   )}
                 </p>
@@ -486,7 +541,7 @@ export default function DailyVerse() {
                 <div className="flex items-center justify-between">
                   <Button variant="outline" onClick={goToPreviousMonth}>
                     <ChevronLeft className="mr-2 h-4 w-4" />
-                    Previous
+                    {t('common.previous')}
                   </Button>
                   <h3 className="text-lg font-semibold">
                     {archiveMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -496,13 +551,13 @@ export default function DailyVerse() {
                     onClick={goToNextMonth}
                     disabled={archiveMonth.getFullYear() === new Date().getFullYear() && archiveMonth.getMonth() === new Date().getMonth()}
                   >
-                    Next
+                    {t('common.next')}
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
 
                 {archiveLoading ? (
-                  <div className="text-center py-12">Loading archive...</div>
+                  <div className="text-center py-12">{t('dailyVerse.loadingArchive')}</div>
                 ) : archiveVerses && archiveVerses.length > 0 ? (
                   <div className="grid gap-3">
                     {archiveVerses.map((verse) => (
@@ -525,7 +580,7 @@ export default function DailyVerse() {
                                 {isVerseRead(verse.id) && (
                                   <Badge variant="secondary" className="text-xs">
                                     <CheckCircle2 className="mr-1 h-3 w-3" />
-                                    Read
+                                    {t('dailyVerse.read')}
                                   </Badge>
                                 )}
                               </div>
@@ -544,8 +599,8 @@ export default function DailyVerse() {
                   <Card>
                     <CardContent className="text-center py-12">
                       <Archive className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground">No verses found for this month.</p>
-                      <p className="text-sm text-muted-foreground mt-2">Try navigating to a different month.</p>
+                      <p className="text-muted-foreground">{t('dailyVerse.noVersesForMonth')}</p>
+                      <p className="text-sm text-muted-foreground mt-2">{t('dailyVerse.tryDifferentMonth')}</p>
                     </CardContent>
                   </Card>
                 )}
@@ -558,14 +613,14 @@ export default function DailyVerse() {
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Share Daily Verse</DialogTitle>
+            <DialogTitle>{t('dailyVerse.shareDailyVerse')}</DialogTitle>
           </DialogHeader>
           
           {isGeneratingShare ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="text-muted-foreground">Generating shareable content...</p>
+                <p className="text-muted-foreground">{t('dailyVerse.generatingShareContent')}</p>
               </div>
             </div>
           ) : shareData ? (
@@ -581,7 +636,7 @@ export default function DailyVerse() {
 
               {/* Share Text */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Share Text</label>
+                <label className="text-sm font-medium">{t('dailyVerse.shareText')}</label>
                 <div className="p-4 bg-muted rounded-lg">
                   <p className="text-sm">{shareData.summary}</p>
                   <p className="text-sm text-primary mt-2">{shareData.appUrl}</p>
@@ -592,7 +647,7 @@ export default function DailyVerse() {
                   size="sm"
                   className="w-full"
                 >
-                  Copy Text
+                  {t('dailyVerse.copyText')}
                 </Button>
               </div>
 

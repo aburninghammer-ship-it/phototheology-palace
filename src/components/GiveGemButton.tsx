@@ -1,11 +1,13 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sparkles, Loader2, X, Save, Check } from "lucide-react";
+import { Sparkles, Loader2, X, Save, Check, Moon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useGemLimit } from "@/hooks/useGemLimit";
 
 export const GiveGemButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,8 +17,27 @@ export const GiveGemButton = () => {
   const [gem, setGem] = useState<{ title: string; content: string } | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation();
+  const { isSabbath, canCreateGem, getLimitMessage, gemsRemaining } = useGemLimit();
 
   const handleGenerateGem = async () => {
+    // Check Sabbath or limit before calling the API
+    if (isSabbath) {
+      toast({
+        title: "Sabbath Rest 🌙",
+        description: getLimitMessage(),
+      });
+      return;
+    }
+
+    if (!canCreateGem) {
+      toast({
+        title: "Daily Limit Reached",
+        description: getLimitMessage(),
+      });
+      return;
+    }
+
     setIsGenerating(true);
     setGem(null);
     setIsSaved(false);
@@ -29,10 +50,10 @@ export const GiveGemButton = () => {
         throw error;
       }
 
-      // Check if limit was reached
+      // Check if limit was reached (shouldn't happen since we check first, but just in case)
       if (data?.limit_reached) {
         toast({
-          title: "Daily Limit Reached",
+          title: data?.is_sabbath ? "Sabbath Rest 🌙" : "Daily Limit Reached",
           description: data.error || "You've discovered all your gems for today. Return tomorrow!",
           variant: "default"
         });
@@ -133,7 +154,7 @@ export const GiveGemButton = () => {
         ) : (
           <>
             <Sparkles className="h-5 w-5 mr-2 group-hover:animate-pulse" />
-            Give Me A Gem
+            {t('suite.giveGem', 'Give Me A Gem')}
           </>
         )}
       </Button>

@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@14.21.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4?target=deno";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,26 +12,40 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SUBSCRIBER-STATS] ${step}${detailsStr}`);
 };
 
-// Price ID to tier and product name mapping - ONLY CURRENT APP PRODUCTS
-const priceToInfo: Record<string, { tier: string; name: string; price: number }> = {
+// Price ID to tier mapping - used for tier classification
+// Product names will be fetched from Stripe directly for accurate display
+const priceToTierMap: Record<string, { tier: string; monthlyPrice: number }> = {
   // ========== CURRENT SUBSCRIPTION PRODUCTS ==========
-  'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', name: 'Essential Monthly ($9/mo)', price: 9 },
-  'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', name: 'Essential Annual ($90/yr)', price: 90 },
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', name: 'Premium Monthly ($15/mo)', price: 15 },
-  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', name: 'Premium Annual ($150/yr)', price: 150 },
-  
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', monthlyPrice: 9 },
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', monthlyPrice: 7.5 }, // $90/12
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', monthlyPrice: 15 },
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', monthlyPrice: 12.5 }, // $150/12
+
   // ========== STUDENT ==========
-  'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', name: 'Student Discount ($4.99/mo)', price: 4.99 },
-  
-  // ========== LEGACY SUBSCRIPTIONS (still active in Stripe) ==========
-  'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'premium', name: 'Phototheology App ($15/mo)', price: 15 },
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'essential', name: 'Phototheology App Lite ($9/mo)', price: 9 },
-  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': { tier: 'premium', name: 'PT Level 1 ($10/mo)', price: 10 },
-  
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', monthlyPrice: 4.99 },
+
+  // ========== LEGACY PHOTOTHEOLOGY APP SUBSCRIPTIONS ==========
+  'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'premium', monthlyPrice: 15 },
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'essential', monthlyPrice: 9 },
+
   // ========== CHURCH TIERS ==========
-  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': { tier: 'church', name: 'Small Church 10-50 ($199/mo)', price: 199 },
-  'price_1SNFDxFGDAd3RU8IrvW3c5eS': { tier: 'church', name: 'Tier 1: 50 Seats ($399/mo)', price: 399 },
-  'price_1SNFFMFGDAd3RU8IoasLs7ag': { tier: 'church', name: 'Tier 2: 150 Seats ($899/mo)', price: 899 },
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': { tier: 'church', monthlyPrice: 199 },
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': { tier: 'church', monthlyPrice: 399 },
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': { tier: 'church', monthlyPrice: 899 },
+};
+
+// Legacy compatibility object
+const priceToInfo: Record<string, { tier: string; name: string; price: number }> = {
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', name: 'Essential Monthly', price: 9 },
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', name: 'Essential Annual', price: 90 },
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', name: 'Premium Monthly', price: 15 },
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', name: 'Premium Annual', price: 150 },
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', name: 'Student Discount', price: 4.99 },
+  'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'premium', name: 'Phototheology App', price: 15 },
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'essential', name: 'Phototheology App Lite', price: 9 },
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': { tier: 'church', name: 'Small Church', price: 199 },
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': { tier: 'church', name: 'Tier 1: 50 Seats', price: 399 },
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': { tier: 'church', name: 'Tier 2: 150 Seats', price: 899 },
 };
 
 // For backward compatibility
@@ -41,9 +55,14 @@ const priceToTier: Record<string, string> = Object.fromEntries(
 
 const appPriceIds = Object.keys(priceToInfo);
 
+// Only these tiers count as Phototheology app subscription tiers in the database.
+// (Prevents old/incorrect records synced from unrelated Stripe products from inflating counts.)
+const appStripeTiers = new Set(['essential', 'premium', 'student', 'church']);
+
 // Helper to fetch all Stripe subscriptions with pagination
+// Now fetches ALL subscriptions (not filtered by price ID) to show full Stripe picture
 async function fetchAllStripeSubscriptions(
-  stripe: Stripe, 
+  stripe: Stripe,
   status: 'active' | 'trialing' | 'canceled'
 ): Promise<Stripe.Subscription[]> {
   const allSubscriptions: Stripe.Subscription[] = [];
@@ -59,14 +78,9 @@ async function fetchAllStripeSubscriptions(
     if (startingAfter) params.starting_after = startingAfter;
 
     const batch = await stripe.subscriptions.list(params);
-    
-    // Filter to only our app's subscriptions
-    const appSubs = batch.data.filter((sub: any) => {
-      const priceId = sub.items.data[0]?.price?.id;
-      return appPriceIds.includes(priceId);
-    });
-    
-    allSubscriptions.push(...appSubs);
+
+    // Include ALL subscriptions - no filtering by price ID
+    allSubscriptions.push(...batch.data);
     hasMore = batch.has_more;
     if (batch.data.length > 0) {
       startingAfter = batch.data[batch.data.length - 1].id;
@@ -74,6 +88,28 @@ async function fetchAllStripeSubscriptions(
   }
 
   return allSubscriptions;
+}
+
+// Helper to get product name - fetches from Stripe if needed
+async function getProductName(
+  stripe: Stripe,
+  productId: string | Stripe.Product,
+  productCache: Map<string, string>
+): Promise<string> {
+  if (typeof productId === 'object' && productId.name) {
+    return productId.name;
+  }
+  const id = typeof productId === 'string' ? productId : productId.id;
+  if (productCache.has(id)) {
+    return productCache.get(id)!;
+  }
+  try {
+    const product = await stripe.products.retrieve(id);
+    productCache.set(id, product.name);
+    return product.name;
+  } catch {
+    return 'Unknown Product';
+  }
 }
 
 serve(async (req) => {
@@ -108,12 +144,13 @@ serve(async (req) => {
       throw new Error("Invalid authorization");
     }
 
-    // Check if user is admin
+    // Check if user is admin (using user_roles table)
     const { data: adminCheck } = await supabase
-      .from("admin_users")
-      .select("user_id")
+      .from("user_roles")
+      .select("role")
       .eq("user_id", user.id)
-      .single();
+      .eq("role", "admin")
+      .maybeSingle();
 
     if (!adminCheck) {
       throw new Error("Admin access required");
@@ -147,7 +184,7 @@ serve(async (req) => {
     const dbStats = {
       total_users: profileCount || 0,
       active_trials: activeDbTrials,
-      by_tier: { free: 0, essential: 0, premium: 0, student: 0, patron: 0, null: 0 },
+      by_tier: { free: 0, essential: 0, premium: 0, student: 0, church: 0, patron: 0, null: 0 },
       by_status: { none: 0, trial: 0, active: 0, cancelled: 0, expired: 0, null: 0 },
       by_payment_source: { stripe: 0, patreon: 0, manual: 0, promotional: 0, lifetime: 0, null: 0 },
       lifetime_access: 0,
@@ -165,8 +202,13 @@ serve(async (req) => {
         dbStats.by_status[status as keyof typeof dbStats.by_status]++;
       }
 
-      // Count as stripe only if it has a stripe subscription ID and payment_source is stripe
-      if (sub.payment_source === 'stripe' && sub.stripe_subscription_id && sub.is_recurring) {
+      // Count as stripe ONLY if it looks like a Phototheology recurring subscription.
+      // (Avoid counting unrelated Stripe products or legacy bad sync rows.)
+      const isStripeRecurring = sub.payment_source === 'stripe' && sub.stripe_subscription_id && sub.is_recurring;
+      const isAppTier = typeof sub.subscription_tier === 'string' && appStripeTiers.has(sub.subscription_tier);
+      const isActiveOrTrial = sub.subscription_status === 'active' || sub.subscription_status === 'trial';
+
+      if (isStripeRecurring && isAppTier && isActiveOrTrial) {
         dbStats.by_payment_source.stripe++;
         dbStats.stripe_linked_count++;
       } else if (sub.payment_source === 'patreon') {
@@ -209,75 +251,95 @@ serve(async (req) => {
       canceled_subscriptions: 0,
       by_tier: { essential: 0, premium: 0, student: 0, church: 0, unknown: 0 },
       by_product: {} as Record<string, { active: number; trialing: number }>,
-      total_mrr_cents: 0,
+      active_mrr_cents: 0,      // MRR from active subscriptions only
+      trialing_mrr_cents: 0,    // MRR from trialing subscriptions (card on file)
+      total_mrr_cents: 0,       // Combined (active + trialing)
       error: null as string | null,
       unlinked_count: 0,
     };
 
+    logStep("Stripe key check", { hasKey: !!stripeKey, keyPrefix: stripeKey?.substring(0, 10) });
+
     if (stripeKey) {
       try {
-        const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+        const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
         logStep("Fetching Stripe subscriptions with pagination");
+
+        // Product name cache to avoid repeated API calls
+        const productCache = new Map<string, string>();
 
         // Get ALL active subscriptions with pagination
         const activeSubscriptions = await fetchAllStripeSubscriptions(stripe, 'active');
         stripeStats.active_subscriptions = activeSubscriptions.length;
 
-        // Count by tier, by product name, and calculate MRR
-        activeSubscriptions.forEach((sub: any) => {
+        // Count by tier, by product name (from Stripe), and calculate MRR
+        for (const sub of activeSubscriptions) {
           const priceId = sub.items.data[0]?.price?.id;
-          const info = priceToInfo[priceId];
-          const tier = info?.tier || 'unknown';
-          const productName = info?.name || `Unknown (${priceId?.slice(-8) || 'no-id'})`;
-          
+          const priceObj = sub.items.data[0]?.price;
+          const productId = priceObj?.product;
+
+          // Get product name - use cache or fetch from Stripe
+          let productName = 'Unknown';
+          if (productId) {
+            productName = await getProductName(stripe, productId, productCache);
+          } else if (priceToInfo[priceId]) {
+            productName = priceToInfo[priceId].name;
+          }
+
+          // Get tier from our mapping
+          const tierInfo = priceToTierMap[priceId];
+          const tier = tierInfo?.tier || 'unknown';
+
           if (tier in stripeStats.by_tier) {
             stripeStats.by_tier[tier as keyof typeof stripeStats.by_tier]++;
           }
-          
-          // Track by product name
+
+          // Track by product name (from Stripe)
           if (!stripeStats.by_product[productName]) {
             stripeStats.by_product[productName] = { active: 0, trialing: 0 };
           }
           stripeStats.by_product[productName].active++;
-          
-          // Calculate MRR - only for ACTIVE subscriptions (not trialing)
-          // Use the mapped price if available, otherwise fall back to Stripe's unit_amount
-          const mappedInfo = priceToInfo[priceId];
-          const interval = sub.items.data[0]?.price?.recurring?.interval;
-          
-          if (mappedInfo) {
-            // Use our mapped price (already in dollars)
-            if (interval === 'year') {
-              stripeStats.total_mrr_cents += Math.round((mappedInfo.price * 100) / 12);
-            } else {
-              stripeStats.total_mrr_cents += Math.round(mappedInfo.price * 100);
-            }
-          } else {
-            // Fallback to Stripe's unit_amount
-            const amount = sub.items.data[0]?.price?.unit_amount || 0;
-            if (interval === 'year') {
-              stripeStats.total_mrr_cents += Math.round(amount / 12);
-            } else {
-              stripeStats.total_mrr_cents += amount;
-            }
-          }
-        });
+
+          // Calculate MRR from Stripe's unit_amount (active subs)
+          const amount = priceObj?.unit_amount || 0;
+          const interval = priceObj?.recurring?.interval;
+          const monthlyAmount = interval === 'year' ? Math.round(amount / 12) : amount;
+
+          stripeStats.active_mrr_cents += monthlyAmount;
+          stripeStats.total_mrr_cents += monthlyAmount;
+        }
 
         // Get ALL trialing subscriptions with pagination
         const trialingSubscriptions = await fetchAllStripeSubscriptions(stripe, 'trialing');
         stripeStats.trialing_subscriptions = trialingSubscriptions.length;
         
-        // Count trialing by product name
-        trialingSubscriptions.forEach((sub: any) => {
+        // Count trialing by product name AND include in MRR (card verified, will convert)
+        for (const sub of trialingSubscriptions) {
           const priceId = sub.items.data[0]?.price?.id;
-          const info = priceToInfo[priceId];
-          const productName = info?.name || `Unknown (${priceId?.slice(-8) || 'no-id'})`;
-          
+          const priceObj = sub.items.data[0]?.price;
+          const productId = priceObj?.product;
+
+          // Get product name - use cache or fetch from Stripe
+          let productName = 'Unknown';
+          if (productId) {
+            productName = await getProductName(stripe, productId, productCache);
+          } else if (priceToInfo[priceId]) {
+            productName = priceToInfo[priceId].name;
+          }
+
           if (!stripeStats.by_product[productName]) {
             stripeStats.by_product[productName] = { active: 0, trialing: 0 };
           }
           stripeStats.by_product[productName].trialing++;
-        });
+
+          // Calculate trialing MRR (cards on file, will convert after 7 days)
+          const amount = priceObj?.unit_amount || 0;
+          const interval = priceObj?.recurring?.interval;
+          const monthlyAmount = interval === 'year' ? Math.round(amount / 12) : amount;
+
+          stripeStats.trialing_mrr_cents += monthlyAmount;
+          stripeStats.total_mrr_cents += monthlyAmount;
+        }
 
         // Get canceled subscriptions with pagination
         const canceledSubscriptions = await fetchAllStripeSubscriptions(stripe, 'canceled');
@@ -304,7 +366,17 @@ serve(async (req) => {
       total_trialing: stripeStats.trialing_subscriptions,
       total_lifetime: dbStats.lifetime_access,
       total_with_access: stripeStats.active_subscriptions + patreonStats.active_patrons + dbStats.lifetime_access,
-      monthly_recurring_revenue: `$${(stripeStats.total_mrr_cents / 100).toFixed(2)}`,
+      // Current MRR - from active paying subscriptions only
+      current_mrr: `$${(stripeStats.active_mrr_cents / 100).toFixed(2)}`,
+      current_mrr_cents: stripeStats.active_mrr_cents,
+      // Projected MRR - includes trialing users with cards on file
+      projected_mrr: `$${(stripeStats.total_mrr_cents / 100).toFixed(2)}`,
+      projected_mrr_cents: stripeStats.total_mrr_cents,
+      // Trialing MRR - amount from users in trial period
+      trialing_mrr: `$${(stripeStats.trialing_mrr_cents / 100).toFixed(2)}`,
+      trialing_mrr_cents: stripeStats.trialing_mrr_cents,
+      // Legacy field for backward compatibility
+      monthly_recurring_revenue: `$${(stripeStats.active_mrr_cents / 100).toFixed(2)}`,
       stripe_unlinked_subscriptions: stripeStats.unlinked_count,
     };
 
@@ -318,6 +390,11 @@ serve(async (req) => {
           database: dbStats,
           recent_signups_30d: recentSignups,
           generated_at: new Date().toISOString(),
+        },
+        debug: {
+          hasStripeKey: !!stripeKey,
+          stripeKeyPrefix: stripeKey ? stripeKey.substring(0, 7) + '...' : 'NOT SET',
+          stripeError: stripeStats.error,
         },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

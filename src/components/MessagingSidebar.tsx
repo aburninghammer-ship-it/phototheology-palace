@@ -96,6 +96,7 @@ export const MessagingSidebar = () => {
         if (isMobile) {
           console.log('📬 MessagingSidebar: Using setOpenMobile(true) for mobile');
           setOpenMobile(true);
+          setMobileShowChat(true); // Show chat view directly on mobile
         } else {
           console.log('📬 MessagingSidebar: Using setOpen(true) for desktop');
           if (setOpen) {
@@ -108,6 +109,7 @@ export const MessagingSidebar = () => {
         setTimeout(() => {
           if (isMobile) {
             setOpenMobile(true);
+            setMobileShowChat(true);
           } else if (setOpen) {
             setOpen(true);
           }
@@ -123,6 +125,7 @@ export const MessagingSidebar = () => {
           setActiveConversationId(convId);
           if (isMobile) {
             setOpenMobile(true);
+            setMobileShowChat(true); // Show chat view directly on mobile
           } else if (setOpen) {
             setOpen(true);
           }

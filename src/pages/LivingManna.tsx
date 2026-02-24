@@ -7,7 +7,9 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio, Shield, Globe } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { useTheme } from "next-themes";
 import { SmallGroupsHub } from "@/components/living-manna/SmallGroupsHub";
 import { MemberHome } from "@/components/living-manna/MemberHome";
@@ -17,7 +19,14 @@ import { GrowTab } from "@/components/living-manna/GrowTab";
 import { YouthSpace } from "@/components/living-manna/YouthSpace";
 import { PersonalDevotionalDiary } from "@/components/living-manna/PersonalDevotionalDiary";
 import { ExploitsHub } from "@/components/living-manna/ExploitsHub";
+import { DefenseMode } from "@/components/living-manna/DefenseMode";
+import { SpiritOfProphecyTab } from "@/components/living-manna/SpiritOfProphecyTab";
 import { ChurchAdminTab } from "@/components/living-manna/ChurchAdminTab";
+import { ServeTab } from "@/components/living-manna/ServeTab";
+import { GivingTab } from "@/components/living-manna/GivingTab";
+import { LibraryTab } from "@/components/living-manna/LibraryTab";
+import { LMLiveTab } from "@/components/living-manna/LMLiveTab";
+import { LiveMembersStrip } from "@/components/living-manna/LiveMembersStrip";
 import { BaptismTrack } from "@/components/living-manna/baptism-track/BaptismTrack";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -28,10 +37,20 @@ export default function LivingManna() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [churchName, setChurchName] = useState<string>("Living Manna Online Church");
+  const [churchLogoUrl, setChurchLogoUrl] = useState<string | null>(null);
+  const [churchWebsiteUrl, setChurchWebsiteUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'home');
+
+  // Sync tab state when URL search params change (e.g. from internal navigate calls)
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   // Get church ID from URL or from membership
   const urlChurchId = searchParams.get('church');
@@ -64,12 +83,14 @@ export default function LivingManna() {
     try {
       const { data } = await supabase
         .from('churches')
-        .select('name, branded_name')
+        .select('name, branded_name, logo_url')
         .eq('id', churchId)
         .single();
 
       if (data) {
         setChurchName(data.branded_name || data.name || "Living Manna Online Church");
+        setChurchLogoUrl(data.logo_url || null);
+        setChurchWebsiteUrl(null);
       }
     } catch (error) {
       console.error('Error loading church info:', error);
@@ -165,7 +186,11 @@ export default function LivingManna() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div className="flex items-center gap-2 flex-1 justify-center">
-                <Flame className="h-5 w-5 text-primary" />
+                {churchLogoUrl ? (
+                  <img src={churchLogoUrl} alt="" className="h-6 w-6 rounded-sm object-contain" />
+                ) : (
+                  <Flame className="h-5 w-5 text-primary" />
+                )}
                 <h1 className="text-lg font-bold truncate">{churchName}</h1>
               </div>
               <div className="flex items-center gap-1">
@@ -179,6 +204,16 @@ export default function LivingManna() {
                     <Users className="h-5 w-5" />
                   </Button>
                 )}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-9 w-9">
+                      <Globe className="h-5 w-5" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48 p-2" align="end">
+                    <LanguageSelector showLabel={false} />
+                  </PopoverContent>
+                </Popover>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -189,6 +224,11 @@ export default function LivingManna() {
                 </Button>
               </div>
             </div>
+            {effectiveChurchId && (
+              <div className="mt-2 px-1">
+                <LiveMembersStrip churchId={effectiveChurchId} />
+              </div>
+            )}
           </div>
         )}
 
@@ -198,12 +238,35 @@ export default function LivingManna() {
             <Card variant="glass" className="mb-6 p-4 md:p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Flame className="h-8 w-8 text-primary" />
+                  {churchLogoUrl ? (
+                    <img src={churchLogoUrl} alt="" className="h-10 w-10 rounded-md object-contain" />
+                  ) : (
+                    <Flame className="h-8 w-8 text-primary" />
+                  )}
                   <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground">{churchName}</h1>
                     <p className="text-sm text-muted-foreground">
                       Your discipleship home
+                      {churchWebsiteUrl && (
+                        <>
+                          {' · '}
+                          <a
+                            href={churchWebsiteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline inline-flex items-center gap-1"
+                          >
+                            Visit Website
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </>
+                      )}
                     </p>
+                    {effectiveChurchId && (
+                      <div className="mt-1.5">
+                        <LiveMembersStrip churchId={effectiveChurchId} />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -225,6 +288,16 @@ export default function LivingManna() {
                       Admin
                     </Button>
                   )}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="icon">
+                        <Globe className="h-5 w-5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48 p-2" align="end">
+                      <LanguageSelector showLabel={false} />
+                    </PopoverContent>
+                  </Popover>
                   <Button
                     variant="outline"
                     size="icon"
@@ -242,7 +315,7 @@ export default function LivingManna() {
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 md:space-y-6">
               {/* Mobile Tab List - Scrollable */}
               <div className="overflow-x-auto -mx-3 px-3 md:mx-0 md:px-0">
-                <TabsList className="bg-card/50 backdrop-blur inline-flex md:grid md:grid-cols-8 w-auto md:w-full h-auto gap-1 p-1 border border-border/50 rounded-lg min-w-max md:min-w-0">
+                <TabsList className="bg-card/50 backdrop-blur inline-flex md:flex md:flex-wrap w-auto md:w-full h-auto gap-1 p-1 border border-border/50 rounded-lg min-w-max md:min-w-0">
                   <TabsTrigger value="home" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <Home className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Home</span>
@@ -254,6 +327,10 @@ export default function LivingManna() {
                   <TabsTrigger value="groups" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <Users className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Groups</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="live" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Radio className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Live</span>
                   </TabsTrigger>
                   <TabsTrigger value="learn" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <BookOpen className="h-4 w-4" />
@@ -275,9 +352,29 @@ export default function LivingManna() {
                     <Sparkles className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Youth</span>
                   </TabsTrigger>
+                  <TabsTrigger value="serve" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <HeartHandshake className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Serve</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="giving" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <DollarSign className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Giving</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="library" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Library className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Library</span>
+                  </TabsTrigger>
                   <TabsTrigger value="grow" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <Sprout className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Grow</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="defense" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Shield className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Defense</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="egw" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <BookMarked className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">EGW</span>
                   </TabsTrigger>
                   {(isChurchAdmin || memberRole === 'leader') && (
                     <TabsTrigger value="admin" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
@@ -300,6 +397,10 @@ export default function LivingManna() {
                 <SmallGroupsHub churchId={effectiveChurchId!} />
               </TabsContent>
 
+              <TabsContent value="live">
+                <LMLiveTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
               <TabsContent value="learn">
                 <LearnTab churchId={effectiveChurchId!} />
               </TabsContent>
@@ -320,8 +421,28 @@ export default function LivingManna() {
                 <YouthSpace churchId={effectiveChurchId!} />
               </TabsContent>
 
+              <TabsContent value="serve">
+                <ServeTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="giving">
+                <GivingTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="library">
+                <LibraryTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
               <TabsContent value="grow">
                 <GrowTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="defense">
+                <DefenseMode churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="egw">
+                <SpiritOfProphecyTab churchId={effectiveChurchId!} />
               </TabsContent>
 
               {(isChurchAdmin || memberRole === 'leader') && (

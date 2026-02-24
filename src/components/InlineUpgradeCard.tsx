@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Crown, Sparkles, ArrowRight, Zap, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
 
 interface InlineUpgradeCardProps {
   feature: string;
@@ -24,6 +25,10 @@ export const InlineUpgradeCard = ({
   className = "",
 }: InlineUpgradeCardProps) => {
   const navigate = useNavigate();
+  const { isMember: isChurchMember } = useChurchMembership();
+
+  // CRITICAL: Never show upgrade cards to church members
+  if (isChurchMember) return null;
 
   const getLimitText = () => {
     if (!limitType || currentUsage === undefined || maxUsage === undefined) return null;

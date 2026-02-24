@@ -197,6 +197,7 @@ Generate ONLY day ${dayNumber} as a JSON object via tool call.`;
           },
         ],
         tool_choice: { type: "function", function: { name: "create_devotional_day" } },
+        max_tokens: 8192,
       }),
     });
 

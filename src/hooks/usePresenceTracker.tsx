@@ -42,8 +42,8 @@ export const usePresenceTracker = () => {
     // Update immediately on mount
     updatePresence();
 
-    // Update every 20 seconds for responsive presence tracking
-    intervalRef.current = setInterval(updatePresence, 20000);
+    // Update every 2 minutes to reduce database writes while maintaining presence accuracy
+    intervalRef.current = setInterval(updatePresence, 120000);
 
     // Also update on visibility change (when user returns to tab)
     const handleVisibilityChange = () => {

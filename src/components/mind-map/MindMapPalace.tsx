@@ -16,6 +16,7 @@ import type { AnalysisMode, AnyNodeData, MindMapFilters, ExplorationBreadcrumb, 
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ChevronRight, Home, MessageCircle } from 'lucide-react';
+import { resolveBibleReference } from './utils/bibleReferenceResolver';
 
 interface MindMapPalaceProps {
   initialText?: string;
@@ -64,19 +65,30 @@ export default function MindMapPalace({
   }, [navigate]);
 
   // Hooks
-  const { nodes, edges, populateWithAnalysis, reset } = useMindMapScaffold(sourceText, mode);
+  const { nodes, edges, populateWithAnalysis, reset, toggleRoomExpand, expandedRooms } = useMindMapScaffold(sourceText, mode);
   const { generate, state: generationState, reset: resetGeneration } = useMindMapGeneration();
   const { saveMap, isSaving } = useMindMapStorage();
 
   // Handle text generation
   const handleGenerate = useCallback(async (text: string, selectedMode: AnalysisMode, method: GenerationMethod) => {
-    setSourceText(text);
+    // Resolve Bible reference if user just entered a location
+    let resolvedText = text;
+    const { isReference, resolvedText: fetchedText, reference } = await resolveBibleReference(text);
+    
+    if (isReference && fetchedText !== text) {
+      resolvedText = fetchedText;
+      toast.info(`Fetched: ${reference?.book} ${reference?.chapter}:${reference?.verseStart}${reference?.verseEnd ? '-' + reference.verseEnd : ''}`, {
+        icon: '📖',
+      });
+    }
+    
+    setSourceText(resolvedText);
     setMode(selectedMode);
     setStudyMethod(method);
     setGeneratedStudy(null); // Reset study when generating new
 
     // Update breadcrumbs
-    const preview = text.length > 30 ? text.substring(0, 30) + '...' : text;
+    const preview = resolvedText.length > 30 ? resolvedText.substring(0, 30) + '...' : resolvedText;
     const crumbId = Date.now().toString();
     setBreadcrumbs((prev) => [
       ...prev,
@@ -84,67 +96,32 @@ export default function MindMapPalace({
     ]);
 
     if (method === 'jeeves-study') {
-      // Full study generation mode
-      setIsGeneratingStudy(true);
-      try {
-        const { data, error } = await supabase.functions.invoke('mind-map-study', {
-          body: { text, mode: selectedMode },
-        });
+      // Full study mind map mode - Jeeves populates the entire mind map automatically
+      reset(resolvedText, selectedMode);
+      const analysis = await generate(resolvedText, selectedMode, true);
 
-        if (error) throw error;
-
-        setGeneratedStudy(data as GeneratedStudy);
-        toast.success('Jeeves has generated your full study!');
-      } catch (err) {
-        console.error('Study generation error:', err);
-        // Generate a mock study for development
-        const mockStudy: GeneratedStudy = {
-          title: 'Study: ' + preview,
-          introduction: 'This study explores the depths of your seed text through the Phototheology framework.',
-          sections: [
-            {
-              title: 'Key Observations',
-              content: 'The text presents several foundational elements that connect to the Palace framework.',
-              palaceConnections: ['Floor 2: Investigation', 'Observation Room'],
-              scriptures: ['Psalm 119:18'],
-            },
-            {
-              title: 'Christ-Centered Insights',
-              content: 'Every passage points to Christ. This text reveals His redemptive work through...',
-              palaceConnections: ['Floor 4: Next Level', 'Christ Every Chapter'],
-              scriptures: ['Colossians 1:16-17'],
-            },
-            {
-              title: 'Sanctuary Connections',
-              content: 'The sanctuary typology illuminates the deeper meaning...',
-              palaceConnections: ['Sanctuary', 'Altar of Burnt Offering'],
-              scriptures: ['Hebrews 9:11-12'],
-            },
-          ],
-          applicationPoints: [
-            'Meditate on how this passage reveals Christ',
-            'Consider the sanctuary imagery and its fulfillment',
-            'Apply these insights to your daily walk',
-          ],
-          closingPrayer: 'Lord, open our eyes to see the wonders in Your Word. Help us apply these truths to our lives. In Jesus\' name, Amen.',
-          relatedPassages: ['John 5:39', 'Luke 24:27', 'Hebrews 10:1'],
-        };
-        setGeneratedStudy(mockStudy);
-        toast.info('Using preview study (edge function not available)');
-      } finally {
-        setIsGeneratingStudy(false);
+      if (analysis) {
+        setCurrentAnalysis(analysis);
+        populateWithAnalysis(analysis);
+        toast.success('Jeeves has populated the entire mind map for you!');
+      } else {
+        // Use mock analysis for development
+        const mockAnalysis = generateMockAnalysis(resolvedText, selectedMode);
+        setCurrentAnalysis(mockAnalysis);
+        populateWithAnalysis(mockAnalysis);
+        toast.info('Using preview mind map (edge function not available)');
       }
     } else if (method === 'manual') {
       // Manual study mode - show all rooms as empty scaffold for user to explore
-      reset(text, selectedMode);
+      reset(resolvedText, selectedMode);
       const emptyScaffold = generateEmptyScaffold();
       setCurrentAnalysis(emptyScaffold);
       populateWithAnalysis(emptyScaffold);
       toast.success('Palace scaffold ready! Explore all rooms and add your own insights.');
     } else {
       // Jeeves AI mode - generate analysis (map to palace)
-      reset(text, selectedMode);
-      const analysis = await generate(text, selectedMode);
+      reset(resolvedText, selectedMode);
+      const analysis = await generate(resolvedText, selectedMode);
 
       if (analysis) {
         setCurrentAnalysis(analysis);
@@ -152,7 +129,7 @@ export default function MindMapPalace({
         toast.success('Jeeves has mapped your text to the Palace!');
       } else {
         // Use mock analysis for development
-        const mockAnalysis = generateMockAnalysis(text, selectedMode);
+        const mockAnalysis = generateMockAnalysis(resolvedText, selectedMode);
         setCurrentAnalysis(mockAnalysis);
         populateWithAnalysis(mockAnalysis);
         toast.info('Using preview analysis (edge function not available)');
@@ -164,10 +141,16 @@ export default function MindMapPalace({
   const handleNodeClick = useCallback((nodeId: string, nodeData: AnyNodeData) => {
     setSelectedNodeData(nodeData);
     setSidebarOpen(true);
-  }, []);
+
+    // If clicking a room with sub-principles, toggle its expansion
+    if (nodeData.type === 'room') {
+      const roomData = nodeData as import('./types').RoomNodeData;
+      toggleRoomExpand(roomData.roomId);
+    }
+  }, [toggleRoomExpand]);
 
   // Handle make seed - creates a nested map by saving current state to history
-  const handleMakeSeed = useCallback((content: string, label?: string) => {
+  const handleMakeSeed = useCallback(async (content: string, label?: string) => {
     if (onMakeSeed) {
       onMakeSeed(content);
       return;
@@ -206,12 +189,18 @@ export default function MindMapPalace({
 
     // Generate new map from the seed content
     setSidebarOpen(false);
-    handleGenerate(content, mode, studyMethod);
-
-    toast.success('Creating nested map from seed...', {
+    
+    toast.info('Growing new map from seed...', {
       icon: '🌱',
       description: `Exploring: ${preview}`,
     });
+
+    try {
+      await handleGenerate(content, mode, studyMethod);
+    } catch (err) {
+      console.error('Failed to generate nested map:', err);
+      toast.error('Failed to generate nested map. Please try again.');
+    }
   }, [mode, sourceText, currentAnalysis, nodes, edges, breadcrumbs, handleGenerate, onMakeSeed, studyMethod]);
 
   // Navigate back in history
@@ -273,6 +262,7 @@ export default function MindMapPalace({
       nodes,
       edges,
       analysis: currentAnalysis,
+      notes: nodeNotes,
     });
 
     if (saved) {
@@ -346,6 +336,7 @@ export default function MindMapPalace({
   if (hasContent) {
     return (
       <MindMapProvider
+        initialSeedText={sourceText}
         onMakeSeedExternal={handleMakeSeed}
         onNavigateBack={() => {
           if (mapHistory.length > 0) {
@@ -383,6 +374,8 @@ export default function MindMapPalace({
               showMinimap={showMinimap}
               showControls={true}
               className="absolute inset-0"
+              nodeNotes={nodeNotes}
+              onNotesChange={(nodeId, notes) => setNodeNotes(prev => ({ ...prev, [nodeId]: notes }))}
             />
           )}
 

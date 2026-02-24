@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +60,7 @@ const initialGameState: GameState = {
 
 export default function PrincipleSprint() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const pathActivityId = searchParams.get('pathActivityId') || undefined;
   const { user } = useAuth();
@@ -130,7 +132,7 @@ export default function PrincipleSprint() {
   }, [gameStarted, gameOver, currentQuestion]);
 
   const handleTimeout = () => {
-    toast.error("Time's up!");
+    toast.error(t('games.common.timesUp'));
     setCombo(0);
     if (currentQuestion < SAMPLE_QUESTIONS.length - 1) {
       setCurrentQuestion((prev) => prev + 1);
@@ -161,10 +163,10 @@ export default function PrincipleSprint() {
       const points = 100 + timeBonus + comboBonus;
       setScore((prev) => prev + points);
       setCombo((prev) => prev + 1);
-      toast.success(`+${points} points! ${combo > 0 ? `${combo + 1}x combo!` : ""}`);
+      toast.success(t('games.principleSprint.pointsCombo', { points, combo: combo > 0 ? `${combo + 1}x` : '' }));
     } else {
       setCombo(0);
-      toast.error("Incorrect! Keep practicing!");
+      toast.error(t('games.principleSprint.incorrect'));
     }
 
     if (currentQuestion < SAMPLE_QUESTIONS.length - 1) {
@@ -212,7 +214,7 @@ export default function PrincipleSprint() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-6 flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+        <div className="animate-pulse text-muted-foreground">{t('common.loading')}</div>
       </div>
     );
   }
@@ -222,7 +224,7 @@ export default function PrincipleSprint() {
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-6">
         <Button variant="ghost" onClick={() => navigate("/games")} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Games
+          {t('games.common.backToGames')}
         </Button>
 
         <div className="max-w-2xl mx-auto">
@@ -230,45 +232,45 @@ export default function PrincipleSprint() {
             <div className="flex justify-center">
               <Zap className="h-16 w-16 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold">Principle Sprint</h1>
+            <h1 className="text-4xl font-bold">{t('games.principleSprint.title')}</h1>
             <p className="text-muted-foreground text-lg">
-              Identify Phototheology principles from Bible verses as quickly as possible!
+              {t('games.principleSprint.description')}
             </p>
             
             {hasExistingSession && session && (
               <Card className="p-4 bg-primary/10 border-primary/20">
-                <p className="text-sm text-muted-foreground mb-2">You have an unfinished game!</p>
+                <p className="text-sm text-muted-foreground mb-2">{t('games.principleSprint.unfinishedGame')}</p>
                 <div className="flex items-center justify-center gap-4 text-sm mb-3">
-                  <span>Question {session.gameState.currentQuestion + 1}/{SAMPLE_QUESTIONS.length}</span>
+                  <span>{t('games.common.questionOf', { current: session.gameState.currentQuestion + 1, total: SAMPLE_QUESTIONS.length })}</span>
                   <span>•</span>
-                  <span>Score: {session.gameState.score}</span>
+                  <span>{t('games.common.scoreValue', { score: session.gameState.score })}</span>
                 </div>
                 <div className="flex gap-3">
                   <Button onClick={handleResumeGame} className="flex-1">
                     <Play className="mr-2 h-4 w-4" />
-                    Continue
+                    {t('games.principleSprint.continue')}
                   </Button>
                   <Button variant="outline" onClick={handleStartNewGame} className="flex-1">
                     <RotateCcw className="mr-2 h-4 w-4" />
-                    Start Fresh
+                    {t('games.principleSprint.startFresh')}
                   </Button>
                 </div>
               </Card>
             )}
             
             <div className="space-y-2 text-left">
-              <h3 className="font-semibold">How to Play:</h3>
+              <h3 className="font-semibold">{t('games.common.howToPlay')}</h3>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>Select ALL correct PT principles for each verse</li>
-                <li>You have 10 seconds per verse</li>
-                <li>Build combos for consecutive correct answers</li>
-                <li>Time bonus: +10 points per second remaining</li>
+                <li>{t('games.principleSprint.rule1')}</li>
+                <li>{t('games.principleSprint.rule2')}</li>
+                <li>{t('games.principleSprint.rule3')}</li>
+                <li>{t('games.principleSprint.rule4')}</li>
               </ul>
             </div>
             
             {!hasExistingSession && (
               <Button size="lg" onClick={handleStartNewGame} className="w-full">
-                Start Game
+                {t('games.common.startGame')}
               </Button>
             )}
           </Card>
@@ -283,15 +285,15 @@ export default function PrincipleSprint() {
         <div className="max-w-2xl mx-auto">
           <Card className="p-8 text-center space-y-6">
             <Trophy className="h-16 w-16 text-primary mx-auto" />
-            <h1 className="text-4xl font-bold">Game Complete!</h1>
+            <h1 className="text-4xl font-bold">{t('games.common.gameComplete')}</h1>
             <div className="text-6xl font-bold text-primary">{score}</div>
-            <p className="text-muted-foreground">Final Score</p>
+            <p className="text-muted-foreground">{t('games.common.finalScore')}</p>
             <div className="flex gap-4">
               <Button onClick={handleStartNewGame} className="flex-1">
-                Play Again
+                {t('games.common.playAgain')}
               </Button>
               <Button variant="outline" onClick={() => navigate("/games")} className="flex-1">
-                Back to Games
+                {t('games.common.backToGames')}
               </Button>
             </div>
           </Card>
@@ -309,22 +311,22 @@ export default function PrincipleSprint() {
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate("/games")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Exit
+            {t('games.common.exit')}
           </Button>
           <div className="flex items-center gap-4">
             {combo > 0 && (
               <Badge variant="default" className="text-lg">
-                {combo}x Combo! 🔥
+                {t('games.common.combo', { count: combo })}
               </Badge>
             )}
-            <div className="text-2xl font-bold">Score: {score}</div>
+            <div className="text-2xl font-bold">{t('games.common.scoreValue', { score })}</div>
           </div>
         </div>
 
         <Card className="p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Question {currentQuestion + 1} of {SAMPLE_QUESTIONS.length}
+              {t('games.common.questionOf', { current: currentQuestion + 1, total: SAMPLE_QUESTIONS.length })}
             </div>
             <div className={`text-2xl font-bold ${timeLeft <= 3 ? "text-destructive" : ""}`}>
               {timeLeft}s
@@ -340,7 +342,7 @@ export default function PrincipleSprint() {
           </div>
 
           <div className="space-y-3">
-            <p className="font-semibold">Select ALL correct PT principles:</p>
+            <p className="font-semibold">{t('games.principleSprint.selectPrinciples')}</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {question.options.map((option) => (
                 <Button
@@ -361,7 +363,7 @@ export default function PrincipleSprint() {
             disabled={selectedPrinciples.length === 0}
             className="w-full"
           >
-            Submit Answer
+            {t('games.common.submitAnswer')}
           </Button>
         </Card>
       </div>

@@ -121,10 +121,29 @@ export function ChurchEvents({ churchId }: ChurchEventsProps) {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (newEvent) => {
       queryClient.invalidateQueries({ queryKey: ["church-events", churchId] });
       setIsCreateOpen(false);
       toast({ title: "Event created", description: "Your event has been scheduled." });
+
+      // Send email notifications to church members (fire-and-forget)
+      if (newEvent?.id) {
+        supabase.functions.invoke('send-church-notification-email', {
+          body: {
+            churchId,
+            notificationType: 'event',
+            referenceId: newEvent.id,
+            title: newEvent.title,
+            message: newEvent.description || 'A new event has been scheduled.',
+            eventDate: newEvent.event_date,
+            eventLocation: newEvent.location,
+          }
+        }).then(res => {
+          if (res.data?.sent > 0) {
+            toast({ title: "Emails sent", description: `Notified ${res.data.sent} members by email.` });
+          }
+        }).catch(err => console.error('Email notification error:', err));
+      }
     },
     onError: (error) => {
       toast({ title: "Error", description: "Failed to create event.", variant: "destructive" });

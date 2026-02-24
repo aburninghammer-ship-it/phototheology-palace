@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,6 +30,14 @@ serve(async (req) => {
 
     console.log('Generating content for:', tomorrow.toISOString());
 
+    // RAG corpus injection (single call, reused for both challenge and hunt)
+    const ragResult = await getCorpusContext({
+      query: 'Phototheology Bible study memory palace sanctuary',
+      matchCount: 2,
+      supabaseClient: supabase,
+    });
+    const ragSection = ragResult.chunkCount > 0 ? ragResult.corpusContext : '';
+
     // Generate Daily Challenge
     const challengePrompt = `Create a Phototheology-based daily Bible study challenge that helps users memorize scripture using the 8-floor memory palace method (Foundation, Wisdom, Kingdom, Law, Grace, Prophecy, Glory, New Creation).
 
@@ -55,7 +64,10 @@ Format your response as JSON:
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
-        messages: [{ role: 'user', content: challengePrompt }],
+        messages: [
+          ...(ragSection ? [{ role: 'system', content: ragSection }] : []),
+          { role: 'user', content: challengePrompt },
+        ],
       }),
     });
 
@@ -64,7 +76,11 @@ Format your response as JSON:
     }
 
     const challengeData = await challengeResponse.json();
-    const challengeContent = JSON.parse(challengeData.choices[0].message.content);
+    const rawChallengeContent = challengeData.choices[0].message.content;
+    // Extract JSON from markdown code blocks if present
+    const challengeJsonMatch = rawChallengeContent.match(/```(?:json)?\s*([\s\S]*?)```/);
+    const challengeJsonStr = challengeJsonMatch ? challengeJsonMatch[1].trim() : rawChallengeContent.trim();
+    const challengeContent = JSON.parse(challengeJsonStr);
 
     // Insert challenge
     const { error: challengeError } = await supabase
@@ -206,7 +222,10 @@ Return JSON format:
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
-        messages: [{ role: 'user', content: huntPrompt }],
+        messages: [
+          ...(ragSection ? [{ role: 'system', content: ragSection }] : []),
+          { role: 'user', content: huntPrompt },
+        ],
       }),
     });
 
@@ -215,7 +234,11 @@ Return JSON format:
     }
 
     const huntData = await huntResponse.json();
-    const huntContent = JSON.parse(huntData.choices[0].message.content);
+    const rawHuntContent = huntData.choices[0].message.content;
+    // Extract JSON from markdown code blocks if present
+    const huntJsonMatch = rawHuntContent.match(/```(?:json)?\s*([\s\S]*?)```/);
+    const huntJsonStr = huntJsonMatch ? huntJsonMatch[1].trim() : rawHuntContent.trim();
+    const huntContent = JSON.parse(huntJsonStr);
 
     // Calculate expiration (24 hours from tomorrow start)
     const expiration = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);

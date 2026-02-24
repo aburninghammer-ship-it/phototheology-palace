@@ -35,9 +35,13 @@ interface SermonWritingStepProps {
   setSermon: (sermon: any) => void;
   themePassage: string;
   sermonId?: string;
+  onSermonCreated?: (newId: string) => void;
+  isAutoSavingToDb?: boolean;
+  lastDbAutoSave?: Date | null;
+  onTriggerDbSave?: () => void;
 }
 
-export function SermonWritingStep({ sermon, setSermon, themePassage, sermonId }: SermonWritingStepProps) {
+export function SermonWritingStep({ sermon, setSermon, themePassage, sermonId, onSermonCreated, isAutoSavingToDb, lastDbAutoSave, onTriggerDbSave }: SermonWritingStepProps) {
   const [suggestedVerses, setSuggestedVerses] = useState<SuggestedVerse[]>([]);
   const [loadingVerses, setLoadingVerses] = useState(false);
   const [showPanel, setShowPanel] = useState(true);
@@ -249,10 +253,10 @@ Return ONLY the JSON, no other text.`
       if (processedRequestsRef.current.has(fullMatch)) continue;
 
       // STRICT CHECK: Must start with an action word
-      const startsWithAction = /^(find|get|pull|insert|add|show|i need|give me|fetch|look up|lookup)/i.test(innerText);
+      const startsWithAction = /^(find|get|pull|insert|add|show|i need|give me|fetch|look up|lookup|define|hebrew|greek|what does|meaning of)/i.test(innerText);
 
-      // OR must contain explicit scripture words
-      const hasScriptureWord = /\b(verse|scripture|passage|bible text)\b/i.test(innerText);
+      // OR must contain explicit scripture words or language study words
+      const hasScriptureWord = /\b(verse|scripture|passage|bible text|hebrew|greek|strongs|strong's|definition|original word|original language)\b/i.test(innerText);
 
       // Only trigger if it's clearly a scripture request
       if (startsWithAction || hasScriptureWord) {
@@ -788,20 +792,20 @@ Return ONLY valid JSON, no other text.`
                     <Loader2 className="w-3 h-3 animate-spin" />
                     Fetching scripture...
                   </Badge>
-                ) : isSaving ? (
+                ) : isAutoSavingToDb || isSaving ? (
                   <Badge variant="outline" className="gap-1 text-xs">
                     <Save className="w-3 h-3 animate-pulse" />
-                    Saving...
+                    Saving to cloud...
                   </Badge>
-                ) : lastSaved ? (
+                ) : lastDbAutoSave || lastSaved ? (
                   <Badge variant="outline" className="gap-1 text-xs text-green-600 border-green-200">
                     <Check className="w-3 h-3" />
-                    Saved {lastSaved.toLocaleTimeString()}
+                    Saved {(lastDbAutoSave || lastSaved)?.toLocaleTimeString()}
                   </Badge>
                 ) : (
                   <Badge variant="outline" className="gap-1 text-xs">
                     <Save className="w-3 h-3" />
-                    Auto-saves every 15s
+                    Auto-saves continuously
                   </Badge>
                 )}
                 <span className="text-xs text-muted-foreground">
@@ -813,6 +817,77 @@ Return ONLY valid JSON, no other text.`
 
           {activeTab === "write" && (
             <div className="flex items-center gap-2">
+              {/* Manual Save Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  setIsSaving(true);
+                  try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) {
+                      toast.error("You must be logged in to save");
+                      return;
+                    }
+
+                    if (sermonId) {
+                      // Update existing sermon
+                      const { error } = await supabase
+                        .from('sermons')
+                        .update({ 
+                          title: sermon.title || "Untitled Sermon",
+                          theme_passage: sermon.theme_passage,
+                          sermon_style: sermon.sermon_style,
+                          smooth_stones: sermon.smooth_stones,
+                          bridges: sermon.bridges,
+                          movie_structure: sermon.movie_structure,
+                          full_sermon: sermon.full_sermon, 
+                          updated_at: new Date().toISOString() 
+                        })
+                        .eq('id', sermonId);
+                      if (error) throw error;
+                    } else {
+                      // Create new sermon if user skipped steps
+                      const { data, error } = await supabase
+                        .from('sermons')
+                        .insert({
+                          user_id: user.id,
+                          title: sermon.title || "Untitled Sermon",
+                          theme_passage: sermon.theme_passage,
+                          sermon_style: sermon.sermon_style,
+                          smooth_stones: sermon.smooth_stones,
+                          bridges: sermon.bridges,
+                          movie_structure: sermon.movie_structure,
+                          full_sermon: sermon.full_sermon,
+                          current_step: 5,
+                          status: "in_progress",
+                        })
+                        .select('id')
+                        .single();
+                      if (error) throw error;
+                      if (data?.id) {
+                        // Update URL so future saves update instead of insert
+                        window.history.replaceState({}, '', `/sermon-builder?id=${data.id}`);
+                        onSermonCreated?.(data.id);
+                      }
+                    }
+                    lastSavedContentRef.current = sermon.full_sermon;
+                    setLastSaved(new Date());
+                    toast.success("Sermon saved!");
+                  } catch (err) {
+                    console.error("Manual save failed:", err);
+                    toast.error("Failed to save sermon");
+                  } finally {
+                    setIsSaving(false);
+                  }
+                }}
+                className="gap-2"
+                disabled={isSaving}
+              >
+                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                <span className="hidden sm:inline">Save</span>
+              </Button>
+
               {/* Block Mode Toggle */}
               <Button
                 variant={blockMode ? "default" : "outline"}

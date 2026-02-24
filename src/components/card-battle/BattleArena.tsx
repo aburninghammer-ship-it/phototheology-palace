@@ -396,8 +396,9 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         });
         await loadPlayers();
         await loadMoves();
-        
-        // In user vs jeeves, user must manually trigger Jeeves' turn - no auto-play
+
+        // Switch to Jeeves' turn after user plays successfully
+        setIsUserTurn(false);
       }
 
     } catch (error: any) {
@@ -458,8 +459,9 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         setShowJudgmentFeedback(false);
         await loadPlayers();
         await loadMoves();
-        
-        // User must manually trigger Jeeves' turn - no auto-play
+
+        // Switch to Jeeves' turn after user's challenge is upheld
+        setIsUserTurn(false);
       } else {
         toast({
           title: '❌ Challenge Denied',
@@ -593,12 +595,16 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
           title: `🤖 ${jeevesPlayer.display_name} Played Successfully!`,
           description: `Card: ${randomCard} | Points: ${data.judgment.totalPoints}`,
         });
+        // Switch back to user's turn after Jeeves plays successfully
+        setIsUserTurn(true);
       } else {
         toast({
           title: `🤖 ${jeevesPlayer.display_name}'s Move Rejected`,
           description: `Card: ${randomCard} was rejected!`,
           variant: "destructive",
         });
+        // Even if Jeeves' move was rejected, switch to user's turn
+        setIsUserTurn(true);
       }
     } catch (error: any) {
       console.error('❌ Error with Jeeves play:', error);
@@ -607,6 +613,8 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         description: error.message || "Failed to process Jeeves' turn",
         variant: "destructive",
       });
+      // Even on error, switch back to user's turn so they're not stuck
+      setIsUserTurn(true);
     } finally {
       console.log('✅ Jeeves turn complete');
       setIsSubmitting(false);

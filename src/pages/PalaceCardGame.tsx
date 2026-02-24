@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Trophy, RotateCcw, CheckCircle, X } from "lucide-react";
@@ -155,6 +156,7 @@ const DISTRACTOR_VERSES = [
 ];
 
 export default function PalaceCardGame() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [cards, setCards] = useState<VerseCard[]>([]);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
@@ -262,11 +264,11 @@ export default function PalaceCardGame() {
     // Check if both are parallel cards
     if (card1.isParallel && card2.isParallel && card1.parallelId === card2.parallelId) {
       // Correct match!
-      toast.success("Excellent! You found the parallel verses!");
+      toast.success(t('cardGame.matchCorrect'));
       setShowExplanation(true);
     } else {
       // Wrong match
-      toast.error("These verses don't parallel each other. Keep looking!");
+      toast.error(t('cardGame.matchIncorrect'));
       setTimeout(() => {
         setSelectedCards([]);
         setCards(cards.map(c => ({ ...c, isSelected: false })));
@@ -297,21 +299,21 @@ export default function PalaceCardGame() {
         <Card className="max-w-2xl w-full p-12 text-center bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-amber-500/50">
           <Trophy className="w-24 h-24 mx-auto mb-6 text-amber-400" />
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
-            Victory!
+            {t('cardGame.victory')}
           </h1>
           <p className="text-xl text-slate-300 mb-4">
-            You've completed {roundsCompleted} rounds of parallel matching!
+            {t('cardGame.completedRounds', { count: roundsCompleted })}
           </p>
           <p className="text-slate-400 mb-8">
-            You successfully identified biblical parallels across Scripture, discovering how events echo through God's redemptive plan.
+            {t('cardGame.victoryDescription')}
           </p>
           <div className="flex gap-4 justify-center">
             <Button onClick={resetGame} className="gradient-palace text-white">
               <RotateCcw className="w-4 h-4 mr-2" />
-              Play Again
+              {t('cardGame.playAgain')}
             </Button>
             <Button onClick={() => navigate("/games")} variant="outline">
-              Back to Games
+              {t('cardGame.backToGames')}
             </Button>
           </div>
         </Card>
@@ -332,14 +334,14 @@ export default function PalaceCardGame() {
               className="gap-2 text-white/80 hover:text-white hover:bg-white/10"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back
+              {t('common.back')}
             </Button>
             <div className="text-center">
               <h1 className="text-4xl font-bold mb-1 bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
-                PARALLELS MATCH
+                {t('cardGame.title')}
               </h1>
               <p className="text-sm text-amber-200/80">
-                Find the 2 Verses That Parallel Each Other
+                {t('cardGame.subtitle')}
               </p>
             </div>
             <Button
@@ -349,7 +351,7 @@ export default function PalaceCardGame() {
               className="gap-2 border-amber-500/50 text-amber-200 hover:bg-amber-500/20"
             >
               <RotateCcw className="w-4 h-4" />
-              New Game
+              {t('cardGame.newGame')}
             </Button>
           </div>
         </div>
@@ -359,11 +361,11 @@ export default function PalaceCardGame() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-center gap-8 mb-8">
           <div className="text-center">
-            <p className="text-sm text-slate-400 mb-1">Round</p>
+            <p className="text-sm text-slate-400 mb-1">{t('cardGame.round')}</p>
             <p className="text-3xl font-bold text-amber-400">{roundsCompleted + 1} / 5</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-slate-400 mb-1">Selected</p>
+            <p className="text-sm text-slate-400 mb-1">{t('cardGame.selected')}</p>
             <p className="text-3xl font-bold text-blue-400">{selectedCards.length} / 2</p>
           </div>
         </div>
@@ -371,7 +373,7 @@ export default function PalaceCardGame() {
         {/* Instructions */}
         <div className="max-w-3xl mx-auto mb-8 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
           <p className="text-center text-slate-300">
-            Click cards to flip and read the verses. Select the 2 cards that contain parallel passages.
+            {t('cardGame.instructions')}
           </p>
         </div>
 
@@ -381,13 +383,13 @@ export default function PalaceCardGame() {
             <div className="flex items-start gap-4 mb-4">
               <CheckCircle className="w-8 h-8 text-green-400 flex-shrink-0" />
               <div>
-                <h3 className="text-xl font-bold text-green-300 mb-2">Parallel Discovered!</h3>
+                <h3 className="text-xl font-bold text-green-300 mb-2">{t('cardGame.parallelDiscovered')}</h3>
                 <p className="text-slate-300 leading-relaxed">{currentParallelPair.parallelExplanation}</p>
               </div>
             </div>
             <div className="flex justify-center mt-6">
               <Button onClick={handleNextRound} className="gradient-palace text-white">
-                Continue to Next Round
+                {t('cardGame.continueNextRound')}
               </Button>
             </div>
           </Card>
@@ -418,7 +420,7 @@ export default function PalaceCardGame() {
                   <p className="text-xl font-bold text-white text-center mb-2">
                     {card.reference}
                   </p>
-                  <p className="text-xs text-white/60">Click to read verse</p>
+                  <p className="text-xs text-white/60">{t('cardGame.clickToRead')}</p>
                 </div>
 
                 {/* Back - Verse Text */}
@@ -442,10 +444,10 @@ export default function PalaceCardGame() {
                     {card.isSelected ? (
                       <>
                         <CheckCircle className="w-4 h-4 mr-2" />
-                        Selected
+                        {t('cardGame.selectedLabel')}
                       </>
                     ) : (
-                      'Select This Verse'
+                      t('cardGame.selectThisVerse')
                     )}
                   </Button>
                 </div>

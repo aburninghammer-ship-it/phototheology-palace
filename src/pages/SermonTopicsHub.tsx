@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ const CATEGORIES = [
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 export default function SermonTopicsHub() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [topics, setTopics] = useState<SermonTopic[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,11 +150,10 @@ export default function SermonTopicsHub() {
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl font-serif font-bold bg-gradient-palace bg-clip-text text-transparent mb-4">
-              Sermon Topics
+              {t('sermon.topics.title')}
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Discover PhotoTheology Sermon Starters organized by topic.
-              Each topic includes 8-floor scaffolds to guide your sermon preparation.
+              {t('sermon.topics.description')}
             </p>
 
             {/* Search */}
@@ -160,7 +161,7 @@ export default function SermonTopicsHub() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search topics, tags, or scriptures..."
+                placeholder={t('sermon.topics.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -178,7 +179,7 @@ export default function SermonTopicsHub() {
         <section className="mb-12">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Browse by Category
+            {t('sermon.topics.browseByCategory')}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {CATEGORIES.map((cat) => {
@@ -217,7 +218,7 @@ export default function SermonTopicsHub() {
           <section className="mb-12">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-amber-500" />
-              Featured Topics
+              {t('sermon.topics.featuredTopics')}
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {featuredTopics.map((topic, i) => (
@@ -237,7 +238,7 @@ export default function SermonTopicsHub() {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                          {topic.summary || "Explore sermon starters for this topic."}
+                          {topic.summary || t('sermon.topics.defaultSummary')}
                         </p>
                         <div className="flex flex-wrap gap-1">
                           {topic.tags.slice(0, 3).map((tag) => (
@@ -257,7 +258,7 @@ export default function SermonTopicsHub() {
 
         {/* A-Z Index */}
         <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">A-Z Index</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('sermon.topics.azIndex')}</h2>
           <div className="flex flex-wrap gap-1 mb-6">
             {ALPHABET.map((letter) => {
               const hasTopics = topicsByLetter[letter]?.length > 0;
@@ -281,7 +282,7 @@ export default function SermonTopicsHub() {
             })}
             {(selectedCategory || selectedLetter || searchQuery) && (
               <Button variant="ghost" size="sm" onClick={clearFilters} className="ml-2">
-                Clear filters
+                {t('sermon.topics.clearFilters')}
               </Button>
             )}
           </div>
@@ -298,10 +299,10 @@ export default function SermonTopicsHub() {
           ) : filteredTopics.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground mb-4">
-                No topics found matching your criteria.
+                {t('sermon.topics.noTopicsFound')}
               </p>
               <Button variant="outline" onClick={clearFilters}>
-                Clear filters
+                {t('sermon.topics.clearFilters')}
               </Button>
             </div>
           ) : (
@@ -352,7 +353,7 @@ export default function SermonTopicsHub() {
         {/* Stats */}
         {!loading && (
           <div className="mt-8 text-center text-sm text-muted-foreground">
-            Showing {filteredTopics.length} of {topics.length} topics
+            {t('sermon.topics.showingCount', { showing: filteredTopics.length, total: topics.length })}
           </div>
         )}
       </div>

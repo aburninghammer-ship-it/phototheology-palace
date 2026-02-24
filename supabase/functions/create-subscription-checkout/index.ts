@@ -38,6 +38,8 @@ const PLAN_TIERS = {
 };
 
 // Send notification email directly
+// DISABLED: Only email on completed checkouts, not started checkouts
+// Completed checkout emails are sent via stripe-webhook when checkout.session.completed fires
 async function sendPurchaseNotification(
   userEmail: string,
   userName: string,
@@ -46,6 +48,10 @@ async function sendPurchaseNotification(
   billing: string,
   stripeCustomerId?: string,
 ) {
+  // Skip checkout started emails - only send on completed checkouts via stripe-webhook
+  logStep("Skipping checkout started notification - will notify on completion instead");
+  return;
+
   const resendKey = Deno.env.get("RESEND_API_KEY");
   if (!resendKey) {
     logStep("RESEND_API_KEY not set, skipping notification");

@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,8 @@ import {
   Flame,
   ScrollText,
   Building2,
-  Clock
+  Clock,
+  Search,
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 
@@ -97,6 +99,9 @@ export function StudyPreviewCard({
   onEdit,
   variant = "default"
 }: StudyPreviewCardProps) {
+  const navigate = useNavigate();
+  const isResearchStudy = study.tags?.includes("research") || study.tags?.includes("jeeves");
+
   const contentPreview = study.content
     .replace(/<[^>]*>/g, "") // Remove HTML tags
     .replace(/#+\s/g, "") // Remove markdown headers
@@ -112,7 +117,7 @@ export function StudyPreviewCard({
   if (variant === "featured") {
     return (
       <Card className="bg-gradient-to-br from-primary/5 via-background to-accent/5 border-primary/30 hover:shadow-xl transition-all cursor-pointer group">
-        <CardHeader onClick={() => onEdit(study.id)} className="pb-3">
+        <CardHeader onClick={() => isResearchStudy ? navigate(`/research?resume=${study.id}`) : onEdit(study.id)} className="pb-3">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
@@ -124,6 +129,12 @@ export function StudyPreviewCard({
                   <Clock className="w-3 h-3" />
                   {formatDistanceToNow(new Date(study.updated_at), { addSuffix: true })}
                 </Badge>
+                {isResearchStudy && (
+                  <Badge variant="outline" className="text-xs gap-1 text-emerald-600 border-emerald-500/40">
+                    <Search className="w-3 h-3" />
+                    Research
+                  </Badge>
+                )}
               </div>
               <CardTitle className="text-2xl mb-1 line-clamp-2 group-hover:text-primary transition-colors">
                 {study.title}
@@ -149,7 +160,7 @@ export function StudyPreviewCard({
             </Button>
           </div>
         </CardHeader>
-        <CardContent onClick={() => onEdit(study.id)}>
+        <CardContent onClick={() => isResearchStudy ? navigate(`/research?resume=${study.id}`) : onEdit(study.id)}>
           {contentPreview && (
             <p className="text-muted-foreground line-clamp-3 mb-4">
               {contentPreview}...
@@ -180,16 +191,29 @@ export function StudyPreviewCard({
           )}
 
           <div className="flex items-center justify-between pt-4 border-t gap-2">
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(study.id);
-              }}
-              className="gap-2 flex-1"
-            >
-              <Edit className="w-4 h-4" />
-              Continue Study
-            </Button>
+            {isResearchStudy ? (
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/research?resume=${study.id}`);
+                }}
+                className="gap-2 flex-1"
+              >
+                <Search className="w-4 h-4" />
+                Continue Research
+              </Button>
+            ) : (
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(study.id);
+                }}
+                className="gap-2 flex-1"
+              >
+                <Edit className="w-4 h-4" />
+                Continue Study
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -209,7 +233,7 @@ export function StudyPreviewCard({
 
   return (
     <Card className="hover:shadow-lg transition-all cursor-pointer group h-full flex flex-col">
-      <CardHeader onClick={() => onEdit(study.id)} className="pb-2 flex-shrink-0">
+      <CardHeader onClick={() => isResearchStudy ? navigate(`/research?resume=${study.id}`) : onEdit(study.id)} className="pb-2 flex-shrink-0">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
@@ -217,6 +241,11 @@ export function StudyPreviewCard({
                 {studyType.icon}
               </span>
               <span className="text-xs text-muted-foreground">{studyType.type}</span>
+              {isResearchStudy && (
+                <span className="text-xs text-emerald-600 font-medium flex items-center gap-0.5">
+                  <Search className="w-3 h-3" /> Research
+                </span>
+              )}
             </div>
             <CardTitle className="text-lg mb-1 line-clamp-2 group-hover:text-primary transition-colors">
               {study.title}
@@ -243,7 +272,7 @@ export function StudyPreviewCard({
           </Button>
         </div>
       </CardHeader>
-      <CardContent onClick={() => onEdit(study.id)} className="flex-1 flex flex-col">
+      <CardContent onClick={() => isResearchStudy ? navigate(`/research?resume=${study.id}`) : onEdit(study.id)} className="flex-1 flex flex-col">
         {contentPreview && (
           <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
             {contentPreview}...
@@ -282,17 +311,31 @@ export function StudyPreviewCard({
         )}
 
         <div className="flex items-center justify-between pt-3 border-t mt-auto gap-1">
-          <Button
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(study.id);
-            }}
-            className="gap-1.5 text-xs h-8"
-          >
-            <Edit className="w-3.5 h-3.5" />
-            Resume Study
-          </Button>
+          {isResearchStudy ? (
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/research?resume=${study.id}`);
+              }}
+              className="gap-1.5 text-xs h-8"
+            >
+              <Search className="w-3.5 h-3.5" />
+              Continue Research
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(study.id);
+              }}
+              className="gap-1.5 text-xs h-8"
+            >
+              <Edit className="w-3.5 h-3.5" />
+              Resume Study
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="sm"

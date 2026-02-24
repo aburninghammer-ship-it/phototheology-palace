@@ -13,6 +13,7 @@ import { SubscriptionMismatches } from "@/components/admin/SubscriptionMismatche
 import { BulkEmailSender } from "@/components/admin/BulkEmailSender";
 import { ImageBibleGenerator } from "@/components/admin/ImageBibleGenerator";
 import { PatreonOutreach } from "@/components/admin/PatreonOutreach";
+import { PatreonManualLink } from "@/components/admin/PatreonManualLink";
 import { PickaxeImport } from "@/components/admin/PickaxeImport";
 import { PickaxeEmailCampaign } from "@/components/admin/PickaxeEmailCampaign";
 import { TeachableEmailCampaign } from "@/components/admin/TeachableEmailCampaign";
@@ -21,6 +22,9 @@ import { SubscriptionAnalyticsChart } from "@/components/admin/SubscriptionAnaly
 import { AdminUserManagement } from "@/components/admin/AdminUserManagement";
 import { EmailCampaignHistory } from "@/components/admin/EmailCampaignHistory";
 import { RecentSubscribers } from "@/components/admin/RecentSubscribers";
+import { NewSignupsList } from "@/components/admin/NewSignupsList";
+import { DonationStats } from "@/components/admin/DonationStats";
+import { SubscriptionDatabase } from "@/components/admin/SubscriptionDatabase";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -77,12 +81,30 @@ interface SubscriptionStats {
     total_lifetime: number;
     total_with_access: number;
     monthly_recurring_revenue: string;
+    current_mrr?: string;
+    current_mrr_cents?: number;
+    projected_mrr?: string;
+    projected_mrr_cents?: number;
+    trialing_mrr?: string;
+    trialing_mrr_cents?: number;
+    stripe_unlinked_subscriptions?: number;
   };
   stripe: StripeStats;
   patreon: PatreonStats;
   database: DatabaseStats;
   recent_signups_30d: number;
   generated_at: string;
+}
+
+interface ChurchSubscriptionDetail {
+  id: string;
+  name: string;
+  branded_name: string | null;
+  tier: string;
+  max_seats: number;
+  subscription_status: string;
+  member_count: number;
+  monthly_amount: number; // in dollars
 }
 
 interface ChurchStats {
@@ -92,6 +114,8 @@ interface ChurchStats {
     tier2: number;
     tier3: number;
   };
+  churches: ChurchSubscriptionDetail[];
+  totalChurchMRR: number;
 }
 
 interface PdfStats {
@@ -273,21 +297,63 @@ export default function AdminSubscriptions() {
           .select("tier, max_seats, subscription_status")
           .eq("subscription_status", "active");
 
+        // Church tier pricing map
+        const tierPricing: Record<string, number> = {
+          tier1: 49,
+          tier2: 1000,
+          tier3: 149,
+        };
+
+        // Fetch individual church details with member counts
+        const { data: churchRows } = await supabase
+          .from("churches")
+          .select("id, name, branded_name, tier, max_seats, subscription_status")
+          .eq("subscription_status", "active");
+
+        const churchDetails: ChurchSubscriptionDetail[] = [];
+        if (churchRows) {
+          for (const c of churchRows) {
+            const { count } = await supabase
+              .from("church_members")
+              .select("*", { count: "exact", head: true })
+              .eq("church_id", c.id);
+            churchDetails.push({
+              id: c.id,
+              name: c.name,
+              branded_name: c.branded_name,
+              tier: c.tier as string,
+              max_seats: c.max_seats,
+              subscription_status: c.subscription_status as string,
+              member_count: count || 0,
+              monthly_amount: tierPricing[c.tier as string] || 0,
+            });
+          }
+        }
+
+        // Sort: Living Manna first, then by amount descending
+        churchDetails.sort((a, b) => {
+          if (a.name === "Living Manna") return -1;
+          if (b.name === "Living Manna") return 1;
+          return b.monthly_amount - a.monthly_amount;
+        });
+
         const churchSeats = {
           tier1:
-            churches?.filter((c) => c.tier === "tier1").reduce((sum, c) => sum + c.max_seats, 0) ||
+            churchRows?.filter((c) => c.tier === "tier1").reduce((sum, c) => sum + c.max_seats, 0) ||
             0,
           tier2:
-            churches?.filter((c) => c.tier === "tier2").reduce((sum, c) => sum + c.max_seats, 0) ||
+            churchRows?.filter((c) => c.tier === "tier2").reduce((sum, c) => sum + c.max_seats, 0) ||
             0,
           tier3:
-            churches?.filter((c) => c.tier === "tier3").reduce((sum, c) => sum + c.max_seats, 0) ||
+            churchRows?.filter((c) => c.tier === "tier3").reduce((sum, c) => sum + c.max_seats, 0) ||
             0,
         };
 
         setChurchStats({
-          totalChurches: churches?.length || 0,
+          totalChurches: churchRows?.length || 0,
           churchSeats,
+          churches: churchDetails,
+          totalChurchMRR: churchDetails.reduce((sum, c) => sum + c.monthly_amount, 0),
         });
 
         // Get Teachable users count and details
@@ -485,6 +551,17 @@ export default function AdminSubscriptions() {
               <span className="text-xs ml-2">• Refreshed {secondsSinceRefresh}s ago</span>
             )}
           </p>
+          {/* Debug info for Stripe issues */}
+          {stats.stripe?.error && (
+            <p className="text-sm text-red-500 mt-1 font-mono bg-red-500/10 px-2 py-1 rounded">
+              Stripe Error: {stats.stripe.error}
+            </p>
+          )}
+          {(stats as any).debug && (
+            <p className="text-xs text-amber-500 mt-1 font-mono">
+              Debug: hasStripeKey={String((stats as any).debug?.hasStripeKey)} | keyPrefix={(stats as any).debug?.stripeKeyPrefix}
+            </p>
+          )}
           <p className="text-xs text-amber-600 mt-1">
             ⚠️ Note: New Stripe subscriptions sync when users log in or when you click "Sync Stripe Subscriptions"
           </p>
@@ -588,7 +665,7 @@ export default function AdminSubscriptions() {
                 <CardDescription>Currently in trial period</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold text-blue-600">{stats.database.active_trials || 0}</div>
+                <div className="text-4xl font-bold text-blue-600">{stats.stripe.trialing_subscriptions || 0}</div>
               </CardContent>
             </Card>
 
@@ -635,18 +712,46 @@ export default function AdminSubscriptions() {
             </Card>
           </div>
 
-          {/* MRR Card - Full Width */}
-          <Card className="border-primary/50 bg-primary/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Monthly Recurring Revenue (MRR)</CardTitle>
-              <CardDescription>From Stripe subscriptions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold text-primary">{stats.summary.monthly_recurring_revenue}</div>
-            </CardContent>
-          </Card>
+          {/* MRR Cards - Current vs Projected */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="border-green-500/50 bg-green-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Current MRR</CardTitle>
+                <CardDescription>From {stats.stripe.active_subscriptions} active paying subscribers</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-green-600">
+                  {stats.summary.current_mrr || stats.summary.monthly_recurring_revenue}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Revenue you're collecting right now
+                </p>
+              </CardContent>
+            </Card>
 
-          {/* Recent Subscribers */}
+            <Card className="border-blue-500/50 bg-blue-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Projected MRR</CardTitle>
+                <CardDescription>Includes {stats.stripe.trialing_subscriptions} trialing users with cards</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-blue-600">
+                  {stats.summary.projected_mrr || stats.summary.monthly_recurring_revenue}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  +{stats.summary.trialing_mrr || '$0.00'} from trials (cards on file, converts in 7 days)
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Donations Section */}
+          <DonationStats />
+
+          {/* New Signups - Prominently displayed */}
+          <NewSignupsList />
+
+          {/* Recent Paid Subscribers */}
           <RecentSubscribers />
 
           {/* Data Sync Status */}
@@ -780,30 +885,36 @@ export default function AdminSubscriptions() {
           <div className="grid gap-6 md:grid-cols-2">
 
             {/* Church Subscriptions */}
-            <Card>
+            <Card className="md:col-span-2">
               <CardHeader>
-                <CardTitle>Church Subscriptions</CardTitle>
-                <CardDescription>Active church accounts and seats</CardDescription>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Church Subscriptions</span>
+                  <Badge variant="outline" className="text-lg font-bold">
+                    ${churchStats?.totalChurchMRR?.toLocaleString() || 0}/mo
+                  </Badge>
+                </CardTitle>
+                <CardDescription>
+                  {churchStats?.totalChurches || 0} active church{(churchStats?.totalChurches || 0) !== 1 ? 'es' : ''} • {churchStats?.churches?.reduce((s, c) => s + c.member_count, 0) || 0} total members
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Total Churches</span>
-                  <span className="text-2xl font-bold">{churchStats?.totalChurches || 0}</span>
-                </div>
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tier 1 Seats (30)</span>
-                    <span className="font-medium">{churchStats?.churchSeats.tier1 || 0}</span>
+              <CardContent className="space-y-3">
+                {churchStats?.churches?.map((church) => (
+                  <div key={church.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                    <div>
+                      <div className="font-semibold">{church.branded_name || church.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {church.member_count} member{church.member_count !== 1 ? 's' : ''} • {church.tier === 'tier1' ? 'Community' : church.tier === 'tier2' ? 'Leadership' : 'Enterprise'} Plan • {church.max_seats} max seats
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-green-600">${church.monthly_amount.toLocaleString()}</div>
+                      <div className="text-xs text-muted-foreground">per month</div>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tier 2 Seats (100)</span>
-                    <span className="font-medium">{churchStats?.churchSeats.tier2 || 0}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tier 3 Seats (Unlimited)</span>
-                    <span className="font-medium">{churchStats?.churchSeats.tier3 || 0}</span>
-                  </div>
-                </div>
+                ))}
+                {(!churchStats?.churches || churchStats.churches.length === 0) && (
+                  <p className="text-sm text-muted-foreground text-center py-4">No active church subscriptions</p>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -837,8 +948,9 @@ export default function AdminSubscriptions() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="analytics">
+        <TabsContent value="analytics" className="space-y-6">
           <SubscriptionAnalyticsChart />
+          <SubscriptionDatabase />
         </TabsContent>
 
         <TabsContent value="mismatches">
@@ -862,7 +974,8 @@ export default function AdminSubscriptions() {
           <ImageBibleGenerator />
         </TabsContent>
 
-        <TabsContent value="patreon">
+        <TabsContent value="patreon" className="space-y-6">
+          <PatreonManualLink />
           <PatreonOutreach />
         </TabsContent>
 

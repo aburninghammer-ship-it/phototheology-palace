@@ -5,13 +5,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { usePalaceAI } from "@/hooks/usePalaceAI";
 import { useState } from "react";
 import { Target, Sparkles, Clock, CheckCircle, Lightbulb } from "lucide-react";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 
 export const PersonalizedDrills = () => {
   const { drills, drillsLoading, generateDrills, isGeneratingDrills } = usePalaceAI();
+  const { translatedFloors } = useTranslatedPalaceData();
   const [selectedRoom, setSelectedRoom] = useState<string>("");
 
-  const allRooms = palaceFloors.flatMap(floor => 
+  const allRooms = translatedFloors.flatMap(floor =>
     floor.rooms.map(room => ({ id: room.tag, name: room.name }))
   );
 

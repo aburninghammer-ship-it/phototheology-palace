@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -30,6 +31,9 @@ import {
   Heart,
   Headphones,
   Network,
+  Image,
+  Lightbulb,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Separator } from "@/components/ui/separator";
@@ -37,6 +41,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecentPages } from "@/hooks/useRecentPages";
 import { usePageBookmarks } from "@/hooks/usePageBookmarks";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { SuiteModeToggle } from "@/components/SuiteModeToggle";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +53,7 @@ const categoryConfig = {
     links: [
       { to: "/bible", label: "PT Study Bible", icon: "📖" },
       { to: "/study-buddy", label: "Study Buddy", icon: "🧠" },
+      { to: "/study-ideas", label: "Study Ideas", icon: "💡" },
       { to: "/mind-map", label: "Mind Map Palace", icon: "🗺️" },
       { to: "/audio-bible", label: "Audio Bible", icon: "🎧" },
       { to: "/bible-image-library", label: "PT Image Bible", icon: "🎨" },
@@ -60,7 +67,7 @@ const categoryConfig = {
       { to: "/notes", label: "Notes", icon: "📒" },
       { to: "/libraries", label: "My Libraries", icon: "📚" },
       { to: "/sessions", label: "Study Sessions", icon: "📋" },
-      { to: "/palace/floor/1/room/gr", label: "Produce a Gem", icon: "💎" },
+      { to: "/give-me-a-gem", label: "Give Me A Gem", icon: "💎" },
       { to: "/memory", label: "Memory Palace", icon: "🧠" },
       { to: "/verse-memory-hall", label: "Verse Memory Hall (Legacy)", icon: "📚" },
       { to: "/quarterly-study", label: "Lesson Study", icon: "📅" },
@@ -123,7 +130,12 @@ const categoryConfig = {
     title: "Research",
     icon: Zap,
     links: [
+      { to: "/research-assistant", label: "Research Assistant", icon: "🎓" },
       { to: "/research-mode", label: "Research Mode", icon: "🔬" },
+      { to: "/interlinear", label: "Interlinear Bible", icon: "🔤" },
+      { to: "/bible-lexicon", label: "Lexicon", icon: "📖" },
+      { to: "/bible-timeline", label: "Bible Timeline", icon: "⏳" },
+      { to: "/bible-atlas", label: "Bible Atlas", icon: "🗺️" },
       { to: "/prophecy-watch", label: "Prophecy Watch", icon: "👁️" },
       { to: "/sermon-archive", label: "Sermon Archive", icon: "🎙️" },
       { to: "/content-library", label: "Content Library", icon: "📚" },
@@ -164,6 +176,9 @@ const categoryConfig = {
       { to: "/sermon-simmer", label: "Simmer Mode", icon: "🔥" },
       { to: "/sermon-powerpoint", label: "PowerPoint Generator", icon: "📊" },
       { to: "/sermon-archive", label: "My Sermons", icon: "📁" },
+      { to: "/sources", label: "Source Library", icon: "📂" },
+      { to: "/infographics", label: "Infographic Generator", icon: "🖼️" },
+      { to: "/study-series", label: "Study Series Generator ⭐", icon: "📚" },
     ],
   },
 };
@@ -181,7 +196,18 @@ const simplifiedQuickLinks = [
   { to: "/mind-map", label: "Mind Map", icon: Network, color: "from-indigo-500/10 to-blue-500/5", borderColor: "border-indigo-500/20", iconColor: "text-indigo-500" },
 ];
 
+// Guest House quick links - warm amber theme for the 6 essential tabs
+const guestHouseQuickLinks = [
+  { to: "/palace", label: "Palace", icon: Building2, color: "from-amber-600/20 to-orange-600/10", borderColor: "border-amber-600/40", iconColor: "text-amber-700" },
+  { to: "/devotionals", label: "Devotionals", icon: Heart, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/bible", label: "Bible", icon: BookOpen, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/study-buddy", label: "Study Buddy", icon: Brain, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/games", label: "Games", icon: Gamepad2, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/daily-challenges", label: "Challenges", icon: Trophy, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+];
+
 export const EnhancedMobileDrawer = () => {
+  const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const location = useLocation();
   const { recentPages, clearRecentPages } = useRecentPages();
@@ -191,6 +217,7 @@ export const EnhancedMobileDrawer = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   const isSimplified = preferences.navigation_style === "simplified";
+  const isGuestHouseMode = preferences.suite_mode === "guest_house";
 
   const handleLinkClick = () => {
     setOpen(false);
@@ -234,7 +261,7 @@ export const EnhancedMobileDrawer = () => {
               </span>
             </Link>
             <DrawerClose asChild>
-              <Button variant="ghost" size="sm" className="h-9 px-3">Close</Button>
+              <Button variant="ghost" size="sm" className="h-9 px-3">{t('common.close')}</Button>
             </DrawerClose>
           </DrawerTitle>
         </DrawerHeader>
@@ -246,7 +273,7 @@ export const EnhancedMobileDrawer = () => {
               <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50 border border-border/50">
                 <div className="flex items-center gap-2">
                   <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Navigation Mode</span>
+                  <span className="text-sm font-medium">{t('nav.navigationMode')}</span>
                 </div>
                 <div className="flex gap-1">
                   <Button
@@ -255,7 +282,7 @@ export const EnhancedMobileDrawer = () => {
                     className="h-7 text-xs px-3"
                     onClick={() => updatePreference("navigation_style", "full")}
                   >
-                    Full
+                    {t('nav.full')}
                   </Button>
                   <Button
                     variant={isSimplified ? "default" : "outline"}
@@ -263,13 +290,38 @@ export const EnhancedMobileDrawer = () => {
                     className="h-7 text-xs px-3"
                     onClick={() => updatePreference("navigation_style", "simplified")}
                   >
-                    Simple
+                    {t('nav.simple')}
                   </Button>
                 </div>
               </div>
 
-              {/* Quick Actions Grid - Changes based on navigation style */}
-              {isSimplified ? (
+              {/* Quick Actions Grid - Changes based on navigation style and suite mode */}
+              {isGuestHouseMode ? (
+                /* Guest House Mode - Warm amber theme with 6 essential tabs */
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 px-1">
+                    <Home className="h-4 w-4 text-amber-600" />
+                    <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">{t('nav.guestHouse')}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {guestHouseQuickLinks.map((link) => (
+                      <Link
+                        key={link.to}
+                        to={link.to}
+                        onClick={handleLinkClick}
+                        className={cn(
+                          "flex flex-col items-center justify-center p-4 rounded-xl bg-gradient-to-br border active:scale-95 transition-transform",
+                          link.color,
+                          link.borderColor
+                        )}
+                      >
+                        <link.icon className={cn("h-6 w-6 mb-1.5", link.iconColor)} />
+                        <span className="text-[11px] font-medium text-center text-amber-800 dark:text-amber-200">{t('navLinks.' + link.to.replace(/^\//, '').replace(/[-/]/g, '_'), { defaultValue: link.label })}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : isSimplified ? (
                 /* Simplified Navigation - Larger grid with core features */
                 <div className="grid grid-cols-4 gap-3">
                   {simplifiedQuickLinks.map((link) => (
@@ -284,7 +336,7 @@ export const EnhancedMobileDrawer = () => {
                       )}
                     >
                       <link.icon className={cn("h-6 w-6 mb-1.5", link.iconColor)} />
-                      <span className="text-[11px] font-medium text-center">{link.label}</span>
+                      <span className="text-[11px] font-medium text-center">{t('navLinks.' + link.to.replace(/^\//, '').replace(/[-/]/g, '_'), { defaultValue: link.label })}</span>
                     </Link>
                   ))}
                 </div>
@@ -297,7 +349,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 active:scale-95 transition-transform"
                   >
                     <Home className="h-5 w-5 text-primary mb-1" />
-                    <span className="text-[10px] font-medium text-center">Home</span>
+                    <span className="text-[10px] font-medium text-center">{t('nav.home')}</span>
                   </Link>
                   <Link
                     to="/palace"
@@ -305,7 +357,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 active:scale-95 transition-transform"
                   >
                     <Building2 className="h-5 w-5 text-amber-500 mb-1" />
-                    <span className="text-[10px] font-medium text-center">Palace</span>
+                    <span className="text-[10px] font-medium text-center">{t('nav.palace')}</span>
                   </Link>
                   <Link
                     to="/bible"
@@ -313,7 +365,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 active:scale-95 transition-transform"
                   >
                     <BookOpen className="h-5 w-5 text-blue-500 mb-1" />
-                    <span className="text-[10px] font-medium text-center">Bible</span>
+                    <span className="text-[10px] font-medium text-center">{t('nav.bible')}</span>
                   </Link>
                   <Link
                     to="/games"
@@ -321,7 +373,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-fuchsia-500/10 to-pink-500/5 border border-fuchsia-500/20 active:scale-95 transition-transform"
                   >
                     <Gamepad2 className="h-5 w-5 text-fuchsia-500 mb-1" />
-                    <span className="text-[10px] font-medium text-center">Games</span>
+                    <span className="text-[10px] font-medium text-center">{t('nav.games')}</span>
                   </Link>
                 </div>
               )}
@@ -334,7 +386,7 @@ export const EnhancedMobileDrawer = () => {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <h3 className="text-sm font-semibold text-foreground">Recently Visited</h3>
+                        <h3 className="text-sm font-semibold text-foreground">{t('nav.recentlyVisited')}</h3>
                       </div>
                       <Button
                         variant="ghost"
@@ -395,7 +447,7 @@ export const EnhancedMobileDrawer = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                      <h3 className="text-sm font-semibold text-foreground">Bookmarks</h3>
+                      <h3 className="text-sm font-semibold text-foreground">{t('bible.bookmarks')}</h3>
                     </div>
                     <div className="space-y-1">
                       {bookmarks.map((bookmark) => (
@@ -433,10 +485,10 @@ export const EnhancedMobileDrawer = () => {
                 </>
               )}
 
-              {/* Categorized Navigation - Only show in Full mode */}
-              {!isSimplified && (
+              {/* Categorized Navigation - Only show in Full mode (not simplified, not Guest House) */}
+              {!isSimplified && !isGuestHouseMode && (
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Browse All Features</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">{t('nav.browseAllFeatures')}</p>
                 {Object.entries(categoryConfig).map(([key, category]) => {
                   const isExpanded = expandedCategories.has(key);
                   return (
@@ -447,7 +499,7 @@ export const EnhancedMobileDrawer = () => {
                       >
                         <div className="flex items-center gap-2">
                           <category.icon className="h-5 w-5 text-primary" />
-                          <span className="font-medium">{category.title}</span>
+                          <span className="font-medium">{t('navCategories.' + key, { defaultValue: category.title })}</span>
                         </div>
                         <svg
                           className={cn(
@@ -476,7 +528,7 @@ export const EnhancedMobileDrawer = () => {
                               )}
                             >
                               <span className="text-base">{link.icon}</span>
-                              <span className="text-sm font-medium flex-1">{link.label}</span>
+                              <span className="text-sm font-medium flex-1">{t('navLinks.' + link.to.replace(/^\//, '').replace(/[-/]/g, '_'), { defaultValue: link.label })}</span>
                               <button
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -506,7 +558,7 @@ export const EnhancedMobileDrawer = () => {
 
               {/* Account Section */}
               <div className="space-y-2 pb-28">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Account</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">{t('nav.account')}</p>
                 <div className="rounded-xl border border-border/50 overflow-hidden">
                   <Link
                     to="/profile"
@@ -514,23 +566,31 @@ export const EnhancedMobileDrawer = () => {
                     className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors border-b border-border/30"
                   >
                     <User className="h-5 w-5 text-primary" />
-                    <span className="font-medium">My Profile</span>
+                    <span className="font-medium">{t('nav.myProfile')}</span>
                   </Link>
+                  {/* Suite Mode Toggle */}
+                  <div className="px-4 py-3 border-b border-border/30">
+                    <SuiteModeToggle variant="menu-item" />
+                  </div>
+                  {/* Language Selector */}
+                  <div className="px-4 py-3 border-b border-border/30">
+                    <LanguageSelector showLabel={false} />
+                  </div>
                   <Link
                     to="/pricing"
                     onClick={handleLinkClick}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors border-b border-border/30"
                   >
                     <CreditCard className="h-5 w-5 text-emerald-500" />
-                    <span className="font-medium">Pricing & Plans</span>
+                    <span className="font-medium">{t('nav.pricingPlans')}</span>
                   </Link>
                   <Link
                     to="/manage-subscription"
                     onClick={handleLinkClick}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors border-b border-border/30"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-primary/10 active:bg-primary/20 transition-colors border-b border-border/30"
                   >
-                    <CreditCard className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-muted-foreground">Manage Subscription</span>
+                    <Settings className="h-5 w-5 text-primary" />
+                    <span className="font-medium text-foreground">{t('nav.manageSubscription')}</span>
                   </Link>
                   <button
                     onClick={() => {
@@ -540,7 +600,7 @@ export const EnhancedMobileDrawer = () => {
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-destructive/10 active:bg-destructive/20 transition-colors text-destructive"
                   >
                     <LogOut className="h-5 w-5" />
-                    <span className="font-medium">Sign Out</span>
+                    <span className="font-medium">{t('nav.signOut')}</span>
                   </button>
                 </div>
               </div>
@@ -548,9 +608,9 @@ export const EnhancedMobileDrawer = () => {
           ) : (
             <div className="py-8 space-y-4">
               <div className="text-center">
-                <h3 className="font-serif text-lg font-semibold mb-2">Get Started</h3>
+                <h3 className="font-serif text-lg font-semibold mb-2">{t('nav.getStarted')}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Begin your Phototheology journey
+                  {t('nav.beginJourney')}
                 </p>
               </div>
               
@@ -560,7 +620,7 @@ export const EnhancedMobileDrawer = () => {
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full"
               >
                 <BookOpen className="h-4 w-4" />
-                Take a Tour
+                {t('nav.takeTour')}
               </Link>
               <Link
                 to="/auth"
@@ -568,7 +628,7 @@ export const EnhancedMobileDrawer = () => {
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 w-full gradient-palace text-white"
               >
                 <Sparkles className="h-4 w-4" />
-                Get Started Free
+                {t('nav.getStartedFree')}
               </Link>
               <Link
                 to="/pricing"
@@ -576,8 +636,11 @@ export const EnhancedMobileDrawer = () => {
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full"
               >
                 <CreditCard className="h-4 w-4" />
-                View Pricing
+                {t('nav.viewPricing')}
               </Link>
+              <div className="pt-4">
+                <LanguageSelector showLabel={false} />
+              </div>
             </div>
           )}
         </ScrollArea>

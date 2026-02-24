@@ -29,7 +29,7 @@ const FloorNode = memo(({ data, selected, id }: FloorNodeProps) => {
       className={`
         relative rounded-2xl overflow-hidden cursor-pointer
         transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl
-        ${selected ? 'ring-4 ring-white ring-offset-4 ring-offset-background' : ''}
+        ${selected ? 'ring-4 ring-white ring-offset-4 ring-offset-background animate-magnify-pulse' : ''}
         w-[280px]
       `}
     >

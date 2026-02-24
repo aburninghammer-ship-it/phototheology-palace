@@ -7,6 +7,85 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Twilio configuration
+const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
+const twilioAuthToken = Deno.env.get('TWILIO_AUTH_TOKEN');
+const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
+
+// Check if Twilio is configured (no SDK import - use REST API directly)
+const twilioConfigured = !!(twilioAccountSid && twilioAuthToken && twilioPhoneNumber);
+
+/**
+ * Send SMS via Twilio REST API (no SDK needed)
+ */
+async function sendTwilioSMS(to: string, body: string): Promise<{ sid: string; status: string }> {
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+  const auth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
+  
+  const params = new URLSearchParams();
+  params.append('To', to);
+  params.append('From', twilioPhoneNumber!);
+  params.append('Body', body);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params.toString(),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Twilio API error ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+  return { sid: data.sid, status: data.status };
+}
+
+/**
+ * Check if it's the right hour to send SMS to a recipient based on their timezone
+ * Returns true if the current hour in recipient's timezone matches their preferred send hour
+ */
+function shouldSendNow(timezone: string = 'America/New_York', preferredHour: number = 8): boolean {
+  try {
+    // Get current hour in recipient's timezone
+    const now = new Date();
+    const options: Intl.DateTimeFormatOptions = {
+      hour: 'numeric',
+      hour12: false,
+      timeZone: timezone,
+    };
+    const currentHour = parseInt(new Intl.DateTimeFormat('en-US', options).format(now), 10);
+    return currentHour === preferredHour;
+  } catch (e) {
+    // If timezone is invalid, default to always send (fallback behavior)
+    console.warn(`Invalid timezone "${timezone}", defaulting to send`);
+    return true;
+  }
+}
+
+/**
+ * Generate SMS message for a devotional (must fit in ~160 chars)
+ */
+function generateSMSMessage(
+  dayContent: { title: string; scripture_reference: string },
+  planId: string,
+  dayNumber: number,
+  recipientName?: string
+): string {
+  const name = recipientName ? `${recipientName}: ` : "";
+  const title = dayContent.title.length > 35 ? dayContent.title.substring(0, 32) + "..." : dayContent.title;
+  const scripture = dayContent.scripture_reference.length > 20
+    ? dayContent.scripture_reference.substring(0, 17) + "..."
+    : dayContent.scripture_reference;
+
+  // Format: "Name: Day N - Title | Scripture\nlink"
+  return `${name}Day ${dayNumber}: ${title}\n${scripture}\nphototheology.app/d/${planId}`;
+}
+
 /**
  * Generate a single devotional day on-demand
  */
@@ -89,10 +168,20 @@ Write 500-750 words of flowing, contemplative prose that:
 - Moves from observation → tension → illumination → call
 - Ends with stillness or resolve, not hype`;
 
-    const userPrompt = `Create day ${dayNumber} of a ${plan.duration}-day devotional on the theme: "${plan.theme}"
+    // Add date for uniqueness
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    const userPrompt = `Create day ${dayNumber} of a ${plan.duration}-day devotional on the theme: "${plan.theme}" for ${dateStr}.
 ${forPersonNote}${issueNote}
 
-Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on the journey so far while offering fresh insight.`;
+Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on the journey so far while offering FRESH insight.
+
+CRITICAL REQUIREMENTS:
+- Create a UNIQUE title (not generic like "Walking in Faith" or "Trust and Obey")
+- Include at least ONE specific biblical example, story, or character to illustrate your point
+- Paint vivid scenes from Scripture - don't just quote verses, tell the story
+- The lesson must be DIFFERENT from typical devotional themes - find a fresh angle`;
 
     console.log(`Generating day ${dayNumber} for plan ${planId}...`);
 
@@ -123,7 +212,7 @@ Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on t
                       type: "object",
                       properties: {
                         day_number: { type: "integer" },
-                        title: { type: "string", description: "Evocative title (3-6 words)" },
+                        title: { type: "string", description: "UNIQUE evocative title (3-6 words) - avoid generic phrases like 'Walking in Faith', 'Trust in Him', etc. Be specific to THIS day's insight" },
                         scripture_reference: { type: "string", description: "Primary passage reference" },
                         devotional_text: { type: "string", description: "3-5 paragraph essay-style devotional (500-750 words). NO headers. NO bullet points." },
                         memory_hook: { type: "string", description: "One-line quotable insight" },
@@ -254,6 +343,7 @@ serve(async (req) => {
 
     let emailsSent = 0;
     let notificationsCreated = 0;
+    let smsSent = 0;
 
     for (const plan of activePlans || []) {
       try {
@@ -371,23 +461,38 @@ serve(async (req) => {
               ` : ''}
               
               <div style="text-align: center; margin-top: 30px;">
-                <a href="https://phototheology.app/devotionals/${plan.id}" 
+                <a href="https://phototheology.app/devotionals/${plan.id}"
                    style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
                   📚 Continue Reading & Journal
                 </a>
               </div>
+
+              <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                <p style="color: #a78bfa; font-size: 14px; margin: 0 0 12px 0; font-weight: bold;">✨ Explore the Bible Study Suite</p>
+                <p style="color: #a1a1aa; font-size: 13px; margin: 0 0 15px 0; line-height: 1.6;">
+                  Deepen your understanding with visual memory tools, Hebrew/Greek word studies,
+                  commentary insights, and more. Share these devotionals with friends!
+                </p>
+                <a href="https://phototheology.app/bible-study"
+                   style="display: inline-block; background: rgba(139, 92, 246, 0.2); color: #a78bfa; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 13px; border: 1px solid rgba(139, 92, 246, 0.3);">
+                  🔍 Explore Bible Study Suite →
+                </a>
+              </div>
             </div>
-            
+
             <div style="background: rgba(255,255,255,0.05); padding: 20px; text-align: center;">
               <p style="margin: 0; color: #a1a1aa; font-size: 12px;">
                 Phototheology - Master Scripture Through Visual Memory
+              </p>
+              <p style="margin: 8px 0 0 0; color: #71717a; font-size: 11px;">
+                <a href="https://phototheology.app/devotionals" style="color: #71717a;">Send devotionals to a friend</a>
               </p>
             </div>
           </div>
         `;
 
         const { error: emailError } = await resend.emails.send({
-          from: "Phototheology Devotionals <noreply@livingmanna.church>",
+          from: "Phototheology Devotionals <support@thephototheologyapp.com>",
           to: userEmail,
           subject: `📖 Day ${currentDayNumber}: ${dayContent.title} - ${plan.title}`,
           html: emailHtml,
@@ -422,18 +527,113 @@ serve(async (req) => {
           notificationsCreated++;
         }
 
+        // Send SMS to opted-in recipients
+        if (twilioConfigured) {
+          try {
+            // Get profiles with SMS enabled for this plan (include timezone)
+            const { data: profilesWithSMS } = await supabase
+              .from('devotional_profiles')
+              .select('id, name, phone_number, phone_country_code, timezone, preferred_send_hour')
+              .eq('active_plan_id', plan.id)
+              .eq('sms_opt_in', true)
+              .not('phone_number', 'is', null);
+
+            // Get standalone SMS recipients for this plan (include timezone)
+            const { data: smsRecipients } = await supabase
+              .from('sms_devotional_recipients')
+              .select('id, name, phone_number, phone_country_code, timezone, preferred_send_hour')
+              .eq('plan_id', plan.id)
+              .eq('is_active', true)
+              .is('opted_out_at', null);
+
+            const allSMSRecipients = [
+              ...(profilesWithSMS || []).map(p => ({ ...p, recipientType: 'profile' as const })),
+              ...(smsRecipients || []).map(r => ({ ...r, recipientType: 'standalone' as const }))
+            ].filter(recipient => {
+              const tz = recipient.timezone || 'America/New_York';
+              const hour = recipient.preferred_send_hour ?? 8;
+              const send = shouldSendNow(tz, hour);
+              if (!send) {
+                console.log(`Skipping ${recipient.name} - not ${hour}:00 in ${tz} yet`);
+              }
+              return send;
+            });
+
+            console.log(`Found ${allSMSRecipients.length} SMS recipients for plan ${plan.id}`);
+
+            for (const recipient of allSMSRecipients) {
+              try {
+                const fullPhone = `${recipient.phone_country_code || '+1'}${recipient.phone_number.replace(/\D/g, '')}`;
+                const smsBody = generateSMSMessage(dayContent, plan.id, currentDayNumber, recipient.name);
+
+                const message = await sendTwilioSMS(fullPhone, smsBody);
+
+                await supabase.from('sms_send_log').insert({
+                  user_id: plan.user_id,
+                  recipient_type: recipient.recipientType,
+                  recipient_id: recipient.id,
+                  phone_number: fullPhone,
+                  plan_id: plan.id,
+                  day_number: currentDayNumber,
+                  message_body: smsBody,
+                  twilio_sid: message.sid,
+                  status: message.status,
+                });
+
+                if (recipient.recipientType === 'profile') {
+                  await supabase
+                    .from('devotional_profiles')
+                    .update({
+                      last_sms_sent_at: new Date().toISOString(),
+                      total_sms_sent: (await supabase.from('devotional_profiles').select('total_sms_sent').eq('id', recipient.id).single()).data?.total_sms_sent + 1 || 1
+                    })
+                    .eq('id', recipient.id);
+                } else {
+                  await supabase
+                    .from('sms_devotional_recipients')
+                    .update({
+                      last_sms_sent_at: new Date().toISOString(),
+                      total_sms_sent: (await supabase.from('sms_devotional_recipients').select('total_sms_sent').eq('id', recipient.id).single()).data?.total_sms_sent + 1 || 1,
+                      last_delivery_status: message.status
+                    })
+                    .eq('id', recipient.id);
+                }
+
+                smsSent++;
+                console.log(`SMS sent to ${recipient.name} at ${fullPhone}`);
+              } catch (smsError: any) {
+                console.error(`SMS error for ${recipient.name}:`, smsError.message);
+
+                await supabase.from('sms_send_log').insert({
+                  user_id: plan.user_id,
+                  recipient_type: recipient.recipientType,
+                  recipient_id: recipient.id,
+                  phone_number: `${recipient.phone_country_code || '+1'}${recipient.phone_number}`,
+                  plan_id: plan.id,
+                  day_number: currentDayNumber,
+                  status: 'failed',
+                  error_message: smsError.message,
+                });
+              }
+            }
+          } catch (smsBlockError: any) {
+            console.error(`Error in SMS block for plan ${plan.id}:`, smsBlockError.message);
+          }
+        }
+
       } catch (planError) {
         console.error(`Error processing plan ${plan.id}:`, planError);
       }
     }
 
-    console.log(`Completed: ${emailsSent} emails sent, ${notificationsCreated} notifications created`);
+    console.log(`Completed: ${emailsSent} emails, ${notificationsCreated} notifications, ${smsSent} SMS sent`);
 
     return new Response(
       JSON.stringify({
         success: true,
         emailsSent,
         notificationsCreated,
+        smsSent,
         plansProcessed: activePlans?.length || 0,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

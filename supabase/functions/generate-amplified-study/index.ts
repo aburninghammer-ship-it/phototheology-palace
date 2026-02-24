@@ -206,7 +206,8 @@ Generate a comprehensive, Christ-centered study that expands on each point while
           { role: "user", content: userPrompt },
         ],
         temperature: 0.7,
-        max_tokens: 8000,
+        max_tokens: 16000,
+        response_format: { type: "json_object" },
       }),
     });
 
@@ -266,7 +267,7 @@ Generate a comprehensive, Christ-centered study that expands on each point while
       // Remove trailing commas before } or ]
       jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
       // Remove any control characters
-      jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, ' ');
+      jsonStr = jsonStr.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ' ');
       
       console.log("Cleaned JSON starts with:", jsonStr.substring(0, 80));
       
@@ -289,27 +290,54 @@ Generate a comprehensive, Christ-centered study that expands on each point while
       console.log("Raw content first 1000 chars:", content.substring(0, 1000));
       console.log("Raw content last 500 chars:", content.substring(content.length - 500));
       
-      // Attempt a more aggressive extraction
+      // Attempt a more aggressive extraction - try to fix truncated JSON
       try {
         // Find JSON by looking for studyTitle pattern
         const studyTitleMatch = content.match(/\{\s*"studyTitle"\s*:\s*"[^"]+"/);
         if (studyTitleMatch) {
           const startIndex = content.indexOf(studyTitleMatch[0]);
+          let extracted = content.substring(startIndex);
+          
+          // Try to close any unclosed brackets/braces to make valid JSON
           let braceCount = 0;
-          let endIndex = startIndex;
-          for (let i = startIndex; i < content.length; i++) {
-            if (content[i] === '{') braceCount++;
-            if (content[i] === '}') braceCount--;
-            if (braceCount === 0 && content[i] === '}') {
-              endIndex = i + 1;
-              break;
+          let bracketCount = 0;
+          let inString = false;
+          let lastValidIndex = 0;
+          
+          for (let i = 0; i < extracted.length; i++) {
+            const char = extracted[i];
+            const prevChar = i > 0 ? extracted[i-1] : '';
+            
+            if (char === '"' && prevChar !== '\\') {
+              inString = !inString;
+            }
+            
+            if (!inString) {
+              if (char === '{') braceCount++;
+              if (char === '}') {
+                braceCount--;
+                if (braceCount >= 0) lastValidIndex = i;
+              }
+              if (char === '[') bracketCount++;
+              if (char === ']') {
+                bracketCount--;
+                if (bracketCount >= 0) lastValidIndex = i;
+              }
             }
           }
-          if (endIndex > startIndex) {
-            const extractedJson = content.substring(startIndex, endIndex);
-            studyData = JSON.parse(extractedJson);
-            console.log("Recovery successful! Parsed study with", Object.keys(studyData).length, "fields");
-          }
+          
+          // Take content up to last valid closing, then close remaining
+          let fixedJson = extracted.substring(0, lastValidIndex + 1);
+          
+          // Close any remaining open structures
+          while (bracketCount > 0) { fixedJson += ']'; bracketCount--; }
+          while (braceCount > 0) { fixedJson += '}'; braceCount--; }
+          
+          // Clean up trailing commas before closing brackets
+          fixedJson = fixedJson.replace(/,(\s*[}\]])/g, '$1');
+          
+          studyData = JSON.parse(fixedJson);
+          console.log("Recovery successful! Parsed study with", Object.keys(studyData).length, "fields");
         }
       } catch (recoveryError) {
         console.error("Recovery parse also failed:", recoveryError);
@@ -318,8 +346,8 @@ Generate a comprehensive, Christ-centered study that expands on each point while
           rawContent: content, 
           parseError: true, 
           doctrinalWarnings,
-          studyTitle: "Generated Study (Parsing Error)",
-          overview: "The AI generated content but it couldn't be automatically formatted. The raw content is shown below."
+          studyTitle: sermonTitle || "Generated Study",
+          overview: "The AI generated content but it couldn't be automatically formatted. Please review the raw content below and try again with a shorter sermon transcript."
         };
       }
     }

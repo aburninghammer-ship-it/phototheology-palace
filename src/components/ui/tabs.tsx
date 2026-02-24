@@ -15,31 +15,47 @@ const TabsList = React.forwardRef<
   const [showLeftArrow, setShowLeftArrow] = React.useState(false);
   const [showRightArrow, setShowRightArrow] = React.useState(false);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const rafRef = React.useRef<number | null>(null);
 
   const checkScroll = React.useCallback(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
+    // Cancel any pending RAF to avoid stacking updates
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
     
-    setShowLeftArrow(container.scrollLeft > 0);
-    setShowRightArrow(
-      container.scrollLeft < container.scrollWidth - container.clientWidth - 1
-    );
+    rafRef.current = requestAnimationFrame(() => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      
+      const canScrollLeft = container.scrollLeft > 1;
+      const canScrollRight = container.scrollLeft < container.scrollWidth - container.clientWidth - 1;
+      
+      setShowLeftArrow(prev => prev !== canScrollLeft ? canScrollLeft : prev);
+      setShowRightArrow(prev => prev !== canScrollRight ? canScrollRight : prev);
+    });
   }, []);
 
   React.useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
+    // Initial check
     checkScroll();
     
-    const resizeObserver = new ResizeObserver(checkScroll);
+    // Use passive listeners for better scroll performance
+    const handleScroll = () => checkScroll();
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Check on resize with ResizeObserver
+    const resizeObserver = new ResizeObserver(() => checkScroll());
     resizeObserver.observe(container);
-
-    container.addEventListener('scroll', checkScroll);
     
     return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
       resizeObserver.disconnect();
-      container.removeEventListener('scroll', checkScroll);
+      container.removeEventListener('scroll', handleScroll);
     };
   }, [checkScroll]);
 

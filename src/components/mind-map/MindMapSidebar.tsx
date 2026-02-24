@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, BookOpen, Lightbulb, Eye, ChevronRight, Sprout, ExternalLink, StickyNote, Save, MessageCircle, Target } from 'lucide-react';
 import type { AnyNodeData, PrincipleData } from './types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSparks } from '@/hooks/useSparks';
+import { SparkContainer } from '@/components/sparks';
+import { useAuth } from '@/hooks/useAuth';
+import { ScriptureRef } from './ScripturePopup';
 
 interface MindMapSidebarProps {
   isOpen: boolean;
@@ -35,11 +39,57 @@ export default function MindMapSidebar({
   onNotesChange,
 }: MindMapSidebarProps) {
   const [activeTab, setActiveTab] = useState<'details' | 'notes'>('details');
+  const { user } = useAuth();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Compute nodeId at top level (before hooks that depend on it)
+  const nodeId = selectedNode ? getNodeId(selectedNode) : 'none';
+  const currentNotes = nodeNotes[nodeId] || '';
+
+  // Sparks integration for notes
+  const {
+    sparks,
+    generateSpark,
+    openSpark,
+    saveSpark,
+    dismissSpark,
+    exploreSpark,
+    generating: sparkGenerating
+  } = useSparks({
+    surface: 'notes',
+    contextType: 'note_block',
+    contextId: `mindmap-${nodeId}`,
+    maxSparks: 3,
+    debounceMs: 60000
+  });
+
+  // Trigger spark generation after user pauses typing for 8 seconds
+  const handleNotesChange = (value: string) => {
+    onNotesChange?.(nodeId, value);
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Set new timeout for spark generation (8 second pause)
+    if (user && value.length >= 100) {
+      typingTimeoutRef.current = setTimeout(() => {
+        generateSpark(value);
+      }, 8000);
+    }
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!selectedNode) return null;
-
-  const nodeId = getNodeId(selectedNode);
-  const currentNotes = nodeNotes[nodeId] || '';
 
   return (
     <AnimatePresence>
@@ -85,7 +135,7 @@ export default function MindMapSidebar({
             >
               <StickyNote className="w-4 h-4" />
               Notes
-              {currentNotes && <span className="w-2 h-2 rounded-full bg-green-400" />}
+              {currentNotes && <span className="w-2 h-2 rounded-full bg-accent" />}
             </button>
           </div>
 
@@ -103,9 +153,31 @@ export default function MindMapSidebar({
                     Add personal insights, questions, or reflections about this section.
                   </p>
                 </div>
+                
+                {/* Sparks section - shows when user has been writing */}
+                {sparks.length > 0 && (
+                  <div className="mb-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-xs font-medium text-amber-400">Discovery Sparks</span>
+                      {sparkGenerating && (
+                        <span className="text-xs text-muted-foreground animate-pulse">generating...</span>
+                      )}
+                    </div>
+                    <SparkContainer
+                      sparks={sparks}
+                      onOpen={openSpark}
+                      onSave={saveSpark}
+                      onDismiss={dismissSpark}
+                      onExplore={exploreSpark}
+                      maxDisplay={3}
+                    />
+                  </div>
+                )}
+
                 <textarea
                   value={currentNotes}
-                  onChange={(e) => onNotesChange?.(nodeId, e.target.value)}
+                  onChange={(e) => handleNotesChange(e.target.value)}
                   placeholder="Write your notes here...
 
 • What stood out to you?
@@ -117,7 +189,7 @@ export default function MindMapSidebar({
                              resize-none min-h-[200px]"
                 />
                 {currentNotes && (
-                  <div className="mt-3 flex items-center gap-2 text-xs text-green-400">
+                  <div className="mt-3 flex items-center gap-2 text-xs text-accent">
                     <Save className="w-3.5 h-3.5" />
                     <span>Notes auto-saved</span>
                   </div>
@@ -359,16 +431,11 @@ function PrincipleCard({ principle, onMakeSeed, expanded = false }: PrincipleCar
         </div>
       )}
 
-      {/* Scriptures */}
+      {/* Scriptures - Clickable to show verse */}
       {principle.scriptures && principle.scriptures.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {principle.scriptures.map((ref, i) => (
-            <span
-              key={i}
-              className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400"
-            >
-              {ref}
-            </span>
+            <ScriptureRef key={i} reference={ref} />
           ))}
         </div>
       )}

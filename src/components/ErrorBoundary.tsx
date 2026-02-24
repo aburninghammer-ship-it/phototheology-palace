@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { AlertTriangle } from "lucide-react";
+import i18n from "@/i18n";
 
 interface Props {
   children: ReactNode;
@@ -26,8 +27,20 @@ export class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
     
-    // Here you could send to error tracking service
-    // trackError(error, errorInfo);
+    // Auto-reload on stale chunk errors (happens after deploys)
+    if (
+      error.message?.includes("Failed to fetch dynamically imported module") ||
+      error.message?.includes("Importing a module script failed")
+    ) {
+      const lastReload = sessionStorage.getItem("chunk_error_reload");
+      const now = Date.now();
+      // Only auto-reload once per 30s to avoid infinite loops
+      if (!lastReload || now - Number(lastReload) > 30000) {
+        sessionStorage.setItem("chunk_error_reload", String(now));
+        window.location.reload();
+        return;
+      }
+    }
   }
 
   private handleReset = () => {
@@ -47,10 +60,10 @@ export class ErrorBoundary extends Component<Props, State> {
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <AlertTriangle className="h-6 w-6 text-destructive" />
-                <CardTitle>Something went wrong</CardTitle>
+                <CardTitle>{i18n.t('errors.somethingWentWrong')}</CardTitle>
               </div>
               <CardDescription>
-                We're sorry, but something unexpected happened.
+                {i18n.t('errors.unexpectedError')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -61,21 +74,21 @@ export class ErrorBoundary extends Component<Props, State> {
                   </p>
                 </div>
               )}
-              
+
               <div className="flex gap-2">
                 <Button onClick={this.handleReset} className="flex-1">
-                  Return to Dashboard
+                  {i18n.t('errors.returnToDashboard')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => window.location.reload()}
                 >
-                  Reload Page
+                  {i18n.t('errors.reloadPage')}
                 </Button>
               </div>
 
               <p className="text-xs text-muted-foreground text-center">
-                If this problem persists, please contact support with the error message above.
+                {i18n.t('errors.persistsContactSupport')}
               </p>
             </CardContent>
           </Card>

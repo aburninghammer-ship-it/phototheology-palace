@@ -126,7 +126,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Explore the New PhotoTheology
             </a>
           </div>
@@ -178,7 +178,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/palace" style="display: inline-block; background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/palace" style="display: inline-block; background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Take the Palace Tour
             </a>
           </div>
@@ -235,7 +235,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/chat" style="display: inline-block; background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/chat" style="display: inline-block; background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Chat with Jeeves Now
             </a>
           </div>
@@ -285,7 +285,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/challenges" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #f39c12 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/challenges" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #f39c12 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Start Today's Challenge
             </a>
           </div>
@@ -331,7 +331,7 @@ const WIN_BACK_EMAILS = [
           </div>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/study" style="display: inline-block; background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Start Collecting Gems
             </a>
           </div>
@@ -390,7 +390,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/palace" style="display: inline-block; background: linear-gradient(90deg, #3498db 0%, #2980b9 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/palace" style="display: inline-block; background: linear-gradient(90deg, #3498db 0%, #2980b9 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Explore the Vision Floor
             </a>
           </div>
@@ -447,7 +447,7 @@ const WIN_BACK_EMAILS = [
           </div>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); color: #1a1a2e; padding: 18px 48px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+            <a href="https://phototheologybible.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); color: #1a1a2e; padding: 18px 48px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
               Return to PhotoTheology
             </a>
           </div>
@@ -496,7 +496,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Begin Your Orientation
           </a>
         </div>
@@ -532,7 +532,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Continue Your Training
           </a>
         </div>
@@ -568,7 +568,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/challenges" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/challenges" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Try Today's Challenge
           </a>
         </div>
@@ -608,7 +608,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Stay With the Structure
           </a>
         </div>
@@ -647,7 +647,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             View Subscription Options
           </a>
         </div>
@@ -684,7 +684,7 @@ const TRIAL_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Extend Your Study
           </a>
         </div>
@@ -724,7 +724,7 @@ const ENGAGEMENT_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Return to the Structure
           </a>
         </div>
@@ -760,7 +760,7 @@ const ENGAGEMENT_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Continue Where You Are
           </a>
         </div>
@@ -796,7 +796,7 @@ const ENGAGEMENT_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Slow Down and Integrate
           </a>
         </div>
@@ -840,7 +840,7 @@ const ENGAGEMENT_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Prepare for Your Next Level
           </a>
         </div>
@@ -853,7 +853,290 @@ const ENGAGEMENT_EMAILS = [
   }
 ];
 
-type CampaignType = 'winback' | 'trial' | 'engagement' | 'login_reminder';
+// Conversion Campaign for Non-Paying Users (5-email sequence)
+const CONVERSION_EMAILS = [
+  {
+    day: 0,
+    subject: "💎 What PhotoTheology Users Are Discovering",
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); padding: 4px;"></div>
+        
+        <div style="padding: 32px;">
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 8px; text-align: center;">
+            Real Stories from Real Learners
+          </h1>
+          <p style="text-align: center; color: #4ecdc4; font-size: 16px; margin-bottom: 24px;">
+            What happens when you commit to the method
+          </p>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            We noticed you've explored PhotoTheology but haven't started your full journey yet. Here's what others are experiencing:
+          </p>
+          
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border-left: 4px solid #f5d742;">
+            <p style="color: #f5d742; font-size: 14px; margin: 0 0 12px 0;">⭐ MEMBER TESTIMONIAL</p>
+            <p style="color: #e5e5e5; line-height: 1.8; margin: 0; font-style: italic;">
+              "I've studied the Bible for 30 years, but PhotoTheology taught me HOW to study. The Palace system gave me a structure I never knew I was missing. Now I find Christ in every chapter — not because I'm told to, but because I see Him."
+            </p>
+            <p style="color: #4ecdc4; margin: 12px 0 0 0; font-weight: bold;">— Pastor Marcus, Georgia</p>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border-left: 4px solid #4ecdc4;">
+            <p style="color: #4ecdc4; font-size: 14px; margin: 0 0 12px 0;">⭐ MEMBER TESTIMONIAL</p>
+            <p style="color: #e5e5e5; line-height: 1.8; margin: 0; font-style: italic;">
+              "Jeeves isn't just an AI — it's like having a study partner who knows the entire Bible and is always patient. I ask questions I'd be embarrassed to ask anyone else."
+            </p>
+            <p style="color: #ff6b6b; margin: 12px 0 0 0; font-weight: bold;">— Sarah, Tennessee</p>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #a0a0a0; font-style: italic; text-align: center;">
+            Your 7-day trial includes full access to everything. No charge until day 8.
+          </p>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+              Start Your Free Trial
+            </a>
+          </div>
+        </div>
+        
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
+      </div>
+    `
+  },
+  {
+    day: 2,
+    subject: "🏰 Why 800+ Believers Chose the Palace Method",
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); padding: 4px;"></div>
+        
+        <div style="padding: 32px;">
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 24px; text-align: center;">
+            The 8-Floor Palace System
+          </h1>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Most Bible apps give you content. PhotoTheology gives you a <strong style="color: #f5d742;">method</strong>.
+          </p>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            The Palace is an 8-floor system of interpretation, where each floor builds on the one below:
+          </p>
+          
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <table style="width: 100%; color: #e5e5e5; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #3a3a5e;">
+                  <span style="color: #f5d742; font-weight: bold;">Floor 1–2:</span> Memory & Investigation
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #3a3a5e;">
+                  <span style="color: #4ecdc4; font-weight: bold;">Floor 3:</span> Freestyle Connections
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #3a3a5e;">
+                  <span style="color: #ff6b6b; font-weight: bold;">Floor 4–5:</span> Christ-Centered Depth & Prophecy
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #3a3a5e;">
+                  <span style="color: #f5d742; font-weight: bold;">Floor 6:</span> Cosmic Context & Cycles
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0;">
+                  <span style="color: #4ecdc4; font-weight: bold;">Floor 7–8:</span> Transformation & Mastery
+                </td>
+              </tr>
+            </table>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            By the time you reach Floor 8, you don't need the rooms anymore — the method has become <strong style="color: #4ecdc4;">reflexive thought</strong>.
+          </p>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+              Explore the Palace — Free for 7 Days
+            </a>
+          </div>
+        </div>
+        
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
+      </div>
+    `
+  },
+  {
+    day: 4,
+    subject: "🤖 Meet Jeeves — Your AI Study Partner",
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); padding: 4px;"></div>
+        
+        <div style="padding: 32px;">
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 24px; text-align: center;">
+            🤖 Jeeves: AI That Speaks PhotoTheology
+          </h1>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Jeeves isn't ChatGPT with a Bible skin. He's trained on the entire PhotoTheology system — the Palace, the Cycles, the Heavens, the Rooms.
+          </p>
+          
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border: 2px solid #ff6b6b;">
+            <p style="color: #ff6b6b; font-weight: bold; margin: 0 0 16px 0;">Ask Jeeves anything:</p>
+            <ul style="margin: 0; padding-left: 20px; color: #e5e5e5; line-height: 2;">
+              <li>"Where is Christ in Genesis 38?"</li>
+              <li>"What cycle does Daniel 7 belong to?"</li>
+              <li>"Help me understand the Types Room"</li>
+              <li>"Grade my interpretation of John 3"</li>
+              <li>"Generate a Gem from Psalm 22"</li>
+            </ul>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Jeeves is available in <strong style="color: #f5d742;">every room</strong> of the Palace. He guides, teaches, grades, and helps you think Phototheologically.
+          </p>
+          
+          <p style="line-height: 1.8; color: #a0a0a0; font-style: italic;">
+            Imagine having a study partner available 24/7 who never gets tired of your questions.
+          </p>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); color: #fff; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+              Try Jeeves Free for 7 Days
+            </a>
+          </div>
+        </div>
+        
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
+      </div>
+    `
+  },
+  {
+    day: 6,
+    subject: "📊 Your Bible Study: Before vs. After",
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #f5d742 0%, #4ecdc4 100%); padding: 4px;"></div>
+        
+        <div style="padding: 32px;">
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 24px; text-align: center;">
+            The Difference is Clear
+          </h1>
+          
+          <div style="display: flex; gap: 16px; margin: 24px 0;">
+            <div style="flex: 1; background: rgba(239, 68, 68, 0.1); border-radius: 12px; padding: 20px; border: 2px solid #ef4444;">
+              <p style="color: #ef4444; font-weight: bold; margin: 0 0 12px 0;">❌ WITHOUT PHOTOTHEOLOGY</p>
+              <ul style="margin: 0; padding-left: 18px; color: #e5e5e5; line-height: 1.8; font-size: 14px;">
+                <li>Random reading, no structure</li>
+                <li>Struggling to see Christ in hard texts</li>
+                <li>Forgetting what you read</li>
+                <li>Stuck at surface meaning</li>
+                <li>Dependent on commentaries</li>
+              </ul>
+            </div>
+            <div style="flex: 1; background: rgba(34, 197, 94, 0.1); border-radius: 12px; padding: 20px; border: 2px solid #22c55e;">
+              <p style="color: #22c55e; font-weight: bold; margin: 0 0 12px 0;">✅ WITH PHOTOTHEOLOGY</p>
+              <ul style="margin: 0; padding-left: 18px; color: #e5e5e5; line-height: 1.8; font-size: 14px;">
+                <li>8-floor guided system</li>
+                <li>Christ visible in EVERY chapter</li>
+                <li>Visual memory techniques</li>
+                <li>Depth + prophecy + application</li>
+                <li>Independent interpreter</li>
+              </ul>
+            </div>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5; text-align: center;">
+            PhotoTheology doesn't just teach you the Bible — it teaches you <strong style="color: #f5d742;">how to study it for the rest of your life</strong>.
+          </p>
+          
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 20px; margin: 24px 0; text-align: center;">
+            <p style="color: #4ecdc4; font-size: 24px; font-weight: bold; margin: 0;">Starting at just $9/month</p>
+            <p style="color: #a0a0a0; margin: 8px 0 0 0;">Less than a cup of coffee per week</p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #4ecdc4 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+              Start Your Transformation
+            </a>
+          </div>
+        </div>
+        
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
+      </div>
+    `
+  },
+  {
+    day: 8,
+    subject: "⏰ Final Invitation: Join the PhotoTheology Community",
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); padding: 4px;"></div>
+        
+        <div style="padding: 32px;">
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 8px; text-align: center;">
+            ⏰ One Final Invitation
+          </h1>
+          <p style="text-align: center; color: #4ecdc4; font-size: 16px; margin-bottom: 24px;">
+            The Palace doors are open
+          </p>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Over the past week, we've shared what makes PhotoTheology different:
+          </p>
+          
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <ul style="margin: 0; padding-left: 20px; color: #e5e5e5; line-height: 2.2;">
+              <li>✅ <strong style="color: #f5d742;">Real testimonials</strong> from believers who transformed their study</li>
+              <li>✅ <strong style="color: #4ecdc4;">The 8-Floor Palace</strong> — a complete system of interpretation</li>
+              <li>✅ <strong style="color: #ff6b6b;">Jeeves AI</strong> — your always-available study partner</li>
+              <li>✅ <strong style="color: #f5d742;">Before/After</strong> — what structured study looks like</li>
+            </ul>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Now it's your turn. The 7-day free trial gives you <strong style="color: #f5d742;">full access</strong> to everything — no restrictions, no charge until day 8.
+          </p>
+          
+          <div style="background: rgba(245, 215, 66, 0.1); border: 2px solid #f5d742; border-radius: 12px; padding: 20px; margin: 24px 0; text-align: center;">
+            <p style="color: #f5d742; font-size: 18px; font-weight: bold; margin: 0 0 8px 0;">🎁 Special Offer</p>
+            <p style="color: #e5e5e5; margin: 0;">Start today and your first 7 days are completely free.</p>
+            <p style="color: #a0a0a0; margin: 8px 0 0 0; font-size: 14px;">Cancel anytime before day 8 — no questions asked.</p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 20px 48px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 20px;">
+              Start Your Free Trial Now
+            </a>
+          </div>
+          
+          <p style="line-height: 1.8; color: #a0a0a0; font-style: italic; text-align: center; margin-top: 24px;">
+            This is the last email in our conversion series. If you have questions, just reply — we're here to help.
+          </p>
+        </div>
+        
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
+      </div>
+    `
+  }
+];
+
+type CampaignType = 'winback' | 'trial' | 'engagement' | 'login_reminder' | 'conversion';
 
 // Login Reminder Email for Stripe subscribers who haven't created accounts
 const LOGIN_REMINDER_EMAIL = {
@@ -889,7 +1172,7 @@ const LOGIN_REMINDER_EMAIL = {
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/signup" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+          <a href="https://phototheologybible.com/signup" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
             Create Your Account Now
           </a>
         </div>
@@ -960,7 +1243,7 @@ serve(async (req) => {
     logStep("Request parsed", { campaignType, testMode, forceSend });
 
     // Resend requires a verified sending domain for production sends.
-    // Use a verified domain sender (default: support@thephototheologyapp.com).
+    // Use thephototheologyapp.com which is the verified Resend domain.
     const defaultFromAddress = "PhotoTheology <support@thephototheologyapp.com>";
     const customFromEmail = Deno.env.get("RESEND_FROM_EMAIL");
     const fromAddress = customFromEmail
@@ -981,6 +1264,8 @@ serve(async (req) => {
         emailTemplates = [TRIAL_EMAILS[dayOverride || 0]];
       } else if (campaignType === 'login_reminder') {
         emailTemplates = [LOGIN_REMINDER_EMAIL];
+      } else if (campaignType === 'conversion') {
+        emailTemplates = [CONVERSION_EMAILS[dayOverride || 0]];
       } else {
         emailTemplates = [ENGAGEMENT_EMAILS[dayOverride || 0]];
       }
@@ -1267,6 +1552,144 @@ serve(async (req) => {
         }));
         
         emailTemplates = [LOGIN_REMINDER_EMAIL];
+      } else if (campaignType === 'conversion') {
+        // Conversion Campaign: Target users who registered but never subscribed/started trial
+        // These are "free" users with no payment source
+        logStep("Conversion campaign: fetching non-paying users");
+        
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        
+        // Get all non-paying users:
+        // - subscription_status is null, 'none', 'pending', or 'expired'
+        // - no lifetime access
+        // - account created at least 3 days ago (give them time to convert on their own)
+        let allNonPayingUsers: any[] = [];
+        let profilePage = 0;
+        const profilePageSize = 1000;
+        
+        while (true) {
+          const { data: batch, error: batchError } = await supabaseClient
+            .from('profiles')
+            .select('id, created_at')
+            .or('subscription_status.is.null,subscription_status.eq.none,subscription_status.eq.pending,subscription_status.eq.expired,subscription_status.eq.trial_expired')
+            .eq('has_lifetime_access', false)
+            .lt('created_at', threeDaysAgo.toISOString())
+            .range(profilePage * profilePageSize, (profilePage + 1) * profilePageSize - 1);
+          
+          if (batchError) {
+            logStep("Error fetching profiles batch", { error: batchError.message, page: profilePage });
+            break;
+          }
+          if (!batch || batch.length === 0) break;
+          
+          allNonPayingUsers = [...allNonPayingUsers, ...batch];
+          if (batch.length < profilePageSize) break;
+          profilePage++;
+        }
+        
+        logStep("Non-paying users found", { count: allNonPayingUsers.length });
+        
+        if (allNonPayingUsers.length > 0) {
+          // Get emails from auth.users
+          const userIds = allNonPayingUsers.map(u => u.id);
+          const userEmailMap = await mapUserIdsToEmails(supabaseClient, userIds);
+          
+          // Calculate which email to send based on when they signed up
+          const now = new Date();
+          
+          let recentUserIds = new Set<string>();
+          if (!forceSend) {
+            // Check who has already received a conversion email in the last 30 days
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            
+            const { data: recentEmails } = await supabaseClient
+              .from('email_logs')
+              .select('user_id, day_number')
+              .eq('campaign_type', 'conversion')
+              .gte('sent_at', thirtyDaysAgo.toISOString());
+            
+            recentUserIds = new Set(recentEmails?.map(e => e.user_id) || []);
+          }
+          
+          // Build recipient list with day numbers based on account age
+          for (const user of allNonPayingUsers) {
+            if (!userEmailMap.has(user.id)) continue;
+            if (!forceSend && recentUserIds.has(user.id)) continue;
+            
+            const createdAt = new Date(user.created_at);
+            const daysSinceCreation = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+            
+            // Map days since creation to conversion email schedule:
+            // 3-4 days old → Email 1 (day 0)
+            // 5-6 days old → Email 2 (day 2) 
+            // 7-8 days old → Email 3 (day 4)
+            // 9-10 days old → Email 4 (day 6)
+            // 11+ days old → Email 5 (day 8) - final
+            let emailDay = 0;
+            if (daysSinceCreation >= 11) emailDay = 8;
+            else if (daysSinceCreation >= 9) emailDay = 6;
+            else if (daysSinceCreation >= 7) emailDay = 4;
+            else if (daysSinceCreation >= 5) emailDay = 2;
+            else emailDay = 0;
+            
+            const emailForDay = CONVERSION_EMAILS.find(e => e.day === emailDay);
+            
+            if (emailForDay) {
+              // Check if this specific day's email was already sent to this user
+              const { data: alreadySent } = await supabaseClient
+                .from('email_logs')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('campaign_type', 'conversion')
+                .eq('day_number', emailDay)
+                .maybeSingle();
+              
+              if (!alreadySent) {
+                recipients.push({
+                  email: userEmailMap.get(user.id)!,
+                  userId: user.id,
+                  dayNumber: emailDay
+                });
+              }
+            }
+          }
+          
+          logStep("Conversion recipients mapped", {
+            totalNonPaying: allNonPayingUsers.length,
+            emailsFound: userEmailMap.size,
+            afterFilters: recipients.length,
+            forceSend: !!forceSend
+          });
+        }
+        
+        // Use the first template as default (individual emails are matched by dayNumber)
+        emailTemplates = [CONVERSION_EMAILS[0]];
+      }
+    }
+
+    // Exclude church members from trial/winback/conversion campaigns
+    // Church members have full access through their church and should never receive upgrade emails
+    if (['trial', 'winback', 'conversion'].includes(campaignType) && recipients.length > 0) {
+      const { data: activeChurches } = await supabaseClient
+        .from('churches')
+        .select('id')
+        .eq('subscription_status', 'active');
+
+      if (activeChurches && activeChurches.length > 0) {
+        const { data: churchMembers } = await supabaseClient
+          .from('church_members')
+          .select('user_id')
+          .in('church_id', activeChurches.map(c => c.id));
+
+        const churchMemberIds = new Set((churchMembers || []).map(m => m.user_id));
+        const beforeCount = recipients.length;
+        recipients = recipients.filter(r => !churchMemberIds.has(r.userId));
+        logStep("Church members excluded from campaign", {
+          churchMembers: churchMemberIds.size,
+          removed: beforeCount - recipients.length
+        });
       }
     }
 
@@ -1290,6 +1713,9 @@ serve(async (req) => {
     const getTemplateForRecipient = (recipient: Recipient) => {
       if (campaignType === 'trial' && recipient.dayNumber !== undefined) {
         return TRIAL_EMAILS.find(e => e.day === recipient.dayNumber);
+      }
+      if (campaignType === 'conversion' && recipient.dayNumber !== undefined) {
+        return CONVERSION_EMAILS.find(e => e.day === recipient.dayNumber);
       }
       return emailTemplates[0];
     };
@@ -1412,36 +1838,6 @@ serve(async (req) => {
           }
         }
 
-        // Send progress notification after each batch
-        const currentSent = results.filter(r => r.success).length;
-        const currentFailed = results.filter(r => !r.success).length;
-        const progress = Math.round((batchNumber / totalBatches) * 100);
-
-        await sendAdminNotification(
-          resendApiKey,
-          adminEmail,
-          `📧 ${campaignType.toUpperCase()} Campaign - Batch ${batchNumber}/${totalBatches} (${progress}%)`,
-          `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
-              <h2 style="color: #3b82f6; margin-bottom: 16px;">📨 Batch ${batchNumber} Complete</h2>
-              
-              <div style="background: white; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                <p style="margin: 4px 0;"><strong>Campaign:</strong> ${campaignType}</p>
-                <p style="margin: 4px 0;"><strong>Email Subject:</strong> ${group.template.subject}</p>
-                <p style="margin: 4px 0;"><strong>Batch:</strong> ${batchNumber} of ${totalBatches}</p>
-                <p style="margin: 4px 0;"><strong>Recipients this batch:</strong> ${batchRecipients.length}</p>
-              </div>
-              
-              <div style="background: white; padding: 16px; border-radius: 8px;">
-                <h3 style="margin-top: 0;">Running Totals</h3>
-                <p style="margin: 4px 0; color: #22c55e;">✅ Sent: ${currentSent}</p>
-                <p style="margin: 4px 0; color: #ef4444;">❌ Failed: ${currentFailed}</p>
-                <p style="margin: 4px 0;">📊 Progress: ${progress}%</p>
-              </div>
-            </div>
-          `
-        );
-
         // small delay between all requests
         await new Promise(resolve => setTimeout(resolve, MIN_DELAY_BETWEEN_REQUESTS_MS));
       }
@@ -1457,63 +1853,112 @@ serve(async (req) => {
     logStep("Campaign complete", { sent, failed });
 
     // Send final campaign completion summary
+    const durationLabel = durationMinutes > 0 ? `${durationMinutes} min` : `${Math.round(durationMs / 1000)} sec`;
+    const successRate = recipients.length > 0 ? Math.round((sent / recipients.length) * 100) : 100;
+    const campaignLabel = campaignType.toUpperCase().replace(/_/g, ' ');
+
     await sendAdminNotification(
       resendApiKey,
       adminEmail,
-      `🎉 ${campaignType.toUpperCase()} Campaign Complete - ${sent} Emails Sent`,
-      `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
-          <h1 style="color: #f5d742; text-align: center; margin-bottom: 24px;">🎉 Campaign Complete!</h1>
-          
-          <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-            <h2 style="color: #4ecdc4; margin-top: 0;">Campaign Summary</h2>
-            <table style="width: 100%; color: #e5e5e5;">
-              <tr>
-                <td style="padding: 8px 0;"><strong>Campaign Type:</strong></td>
-                <td style="padding: 8px 0;">${campaignType.toUpperCase()}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0;"><strong>Started:</strong></td>
-                <td style="padding: 8px 0;">${campaignStartTime.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0;"><strong>Completed:</strong></td>
-                <td style="padding: 8px 0;">${campaignEndTime.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0;"><strong>Duration:</strong></td>
-                <td style="padding: 8px 0;">${durationMinutes > 0 ? durationMinutes + ' minutes' : Math.round(durationMs / 1000) + ' seconds'}</td>
-              </tr>
-            </table>
-          </div>
-          
-          <div style="display: flex; gap: 16px; margin-bottom: 20px;">
-            <div style="flex: 1; background: rgba(34, 197, 94, 0.2); padding: 16px; border-radius: 8px; text-align: center;">
-              <p style="font-size: 36px; font-weight: bold; color: #22c55e; margin: 0;">${sent}</p>
-              <p style="color: #22c55e; margin: 4px 0 0 0;">Emails Sent</p>
-            </div>
-            <div style="flex: 1; background: rgba(239, 68, 68, 0.2); padding: 16px; border-radius: 8px; text-align: center;">
-              <p style="font-size: 36px; font-weight: bold; color: #ef4444; margin: 0;">${failed}</p>
-              <p style="color: #ef4444; margin: 4px 0 0 0;">Failed</p>
-            </div>
-          </div>
-          
-          <div style="background: rgba(255,255,255,0.1); padding: 16px; border-radius: 8px;">
-            <p style="color: #a0a0a0; margin: 0; text-align: center;">
-              ${success ? '✅ All emails sent successfully!' : `⚠️ ${failed} emails failed to send. Check the email logs for details.`}
-            </p>
-          </div>
-          
-          ${failed > 0 ? `
-            <div style="background: rgba(239, 68, 68, 0.1); padding: 16px; border-radius: 8px; margin-top: 16px;">
-              <h3 style="color: #ef4444; margin-top: 0;">Failed Emails (first 10):</h3>
-              <ul style="color: #e5e5e5; margin: 0; padding-left: 20px;">
-                ${results.filter(r => !r.success).slice(0, 10).map(r => `<li>${r.email}: ${r.error || 'Unknown error'}</li>`).join('')}
-              </ul>
-            </div>
-          ` : ''}
+      `🎉 ${campaignLabel} Campaign Complete — ${sent.toLocaleString()} Emails Sent`,
+      `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0; padding:0; background:#0f0f1a; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f1a; padding: 40px 16px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%;">
+
+      <!-- Top accent bar -->
+      <tr><td style="background: linear-gradient(90deg, #f5d742, #ff6b6b, #4ecdc4, #a855f7); height: 5px; border-radius: 8px 8px 0 0;"></td></tr>
+
+      <!-- Header -->
+      <tr><td style="background: linear-gradient(160deg, #1a1a3e 0%, #12122a 100%); padding: 48px 40px 36px; text-align: center; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06);">
+        <div style="font-size: 52px; line-height: 1; margin-bottom: 16px;">🎉</div>
+        <h1 style="margin: 0 0 8px; font-size: 32px; font-weight: 800; color: #f5d742; letter-spacing: -0.5px;">Campaign Complete!</h1>
+        <p style="margin: 0; font-size: 16px; color: #8b8baa;">${campaignLabel} · ${campaignEndTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      </td></tr>
+
+      <!-- Stats row -->
+      <tr><td style="background: #12122a; padding: 0 40px; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06);">
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: -24px 0 0;">
+          <tr>
+            <td width="48%" style="padding: 0 8px 0 0;">
+              <div style="background: linear-gradient(135deg, #064e3b, #065f46); border: 1px solid #10b981; border-radius: 16px; padding: 28px 20px; text-align: center;">
+                <div style="font-size: 48px; font-weight: 900; color: #34d399; letter-spacing: -2px; line-height: 1;">${sent.toLocaleString()}</div>
+                <div style="font-size: 13px; font-weight: 600; color: #6ee7b7; letter-spacing: 1px; text-transform: uppercase; margin-top: 6px;">✓ Delivered</div>
+              </div>
+            </td>
+            <td width="4%"></td>
+            <td width="48%" style="padding: 0 0 0 8px;">
+              <div style="background: ${failed > 0 ? 'linear-gradient(135deg, #450a0a, #7f1d1d)' : 'linear-gradient(135deg, #1e1b4b, #312e81)'}; border: 1px solid ${failed > 0 ? '#ef4444' : '#6366f1'}; border-radius: 16px; padding: 28px 20px; text-align: center;">
+                <div style="font-size: 48px; font-weight: 900; color: ${failed > 0 ? '#f87171' : '#a5b4fc'}; letter-spacing: -2px; line-height: 1;">${failed.toLocaleString()}</div>
+                <div style="font-size: 13px; font-weight: 600; color: ${failed > 0 ? '#fca5a5' : '#c7d2fe'}; letter-spacing: 1px; text-transform: uppercase; margin-top: 6px;">${failed > 0 ? '✗ Failed' : '✓ No Errors'}</div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+
+      <!-- Details card -->
+      <tr><td style="background: #12122a; padding: 32px 40px; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06);">
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px 28px;">
+          <h2 style="margin: 0 0 20px; font-size: 13px; font-weight: 700; color: #4ecdc4; letter-spacing: 2px; text-transform: uppercase;">📊 Campaign Details</h2>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px; width: 40%;">Campaign Type</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e5e5f0; font-size: 14px; font-weight: 600;">${campaignLabel}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px;">Total Recipients</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e5e5f0; font-size: 14px; font-weight: 600;">${recipients.length.toLocaleString()}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px;">Success Rate</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px; font-weight: 700; color: ${successRate === 100 ? '#34d399' : successRate > 90 ? '#fbbf24' : '#f87171'};">${successRate}%</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px;">Started</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e5e5f0; font-size: 14px;">${campaignStartTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #6b7280; font-size: 14px;">Completed</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e5e5f0; font-size: 14px;">${campaignEndTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Duration</td>
+              <td style="padding: 10px 0; color: #e5e5f0; font-size: 14px; font-weight: 600;">⚡ ${durationLabel}</td>
+            </tr>
+          </table>
         </div>
-      `
+      </td></tr>
+
+      <!-- Status banner -->
+      <tr><td style="background: #12122a; padding: 0 40px 40px; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06);">
+        <div style="background: ${success ? 'linear-gradient(135deg, #064e3b, #065f46)' : 'linear-gradient(135deg, #450a0a, #7f1d1d)'}; border: 1px solid ${success ? '#10b981' : '#ef4444'}; border-radius: 12px; padding: 18px 24px; text-align: center;">
+          <span style="font-size: 15px; font-weight: 700; color: ${success ? '#34d399' : '#f87171'};">
+            ${success ? '✅ All emails delivered successfully — great send!' : `⚠️ ${failed} email${failed !== 1 ? 's' : ''} failed. Review logs for details.`}
+          </span>
+        </div>
+        ${failed > 0 ? `
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 20px 24px; margin-top: 16px;">
+          <h3 style="margin: 0 0 12px; font-size: 13px; font-weight: 700; color: #f87171; text-transform: uppercase; letter-spacing: 1px;">Failed Recipients (first 10)</h3>
+          <ul style="margin: 0; padding-left: 20px; color: #fca5a5; font-size: 13px; line-height: 1.8;">
+            ${results.filter(r => !r.success).slice(0, 10).map(r => `<li>${r.email}: ${r.error || 'Unknown error'}</li>`).join('')}
+          </ul>
+        </div>` : ''}
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="background: #0c0c1d; border: 1px solid rgba(255,255,255,0.06); border-top: none; border-radius: 0 0 8px 8px; padding: 24px 40px; text-align: center;">
+        <p style="margin: 0; font-size: 12px; color: #4b4b6b;">PhotoTheology Admin · Campaign Report · ${campaignEndTime.getFullYear()}</p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`
     );
 
     return new Response(

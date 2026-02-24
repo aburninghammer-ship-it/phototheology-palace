@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -73,6 +74,7 @@ const createInitialBoard = (): (CheckerPiece | null)[][] => {
 };
 
 export default function PhototheologyCheckers() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -176,7 +178,7 @@ export default function PhototheologyCheckers() {
       } else if (piece?.color === currentPlayer) {
         const jumpsAvailable = checkForJumps(currentPlayer, board);
         if (jumpsAvailable.length > 0 && !jumpsAvailable.some(p => p.row === row && p.col === col)) {
-          toast.error("You must jump if a jump is available!");
+          toast.error(t('games.checkers.mustJump'));
           return;
         }
         setSelectedPiece({ row, col });
@@ -189,7 +191,7 @@ export default function PhototheologyCheckers() {
     } else if (piece?.color === currentPlayer) {
       const jumpsAvailable = checkForJumps(currentPlayer, board);
       if (jumpsAvailable.length > 0 && !jumpsAvailable.some(p => p.row === row && p.col === col)) {
-        toast.error("You must jump if a jump is available!");
+        toast.error(t('games.checkers.mustJump'));
         return;
       }
       setSelectedPiece({ row, col });
@@ -205,7 +207,7 @@ export default function PhototheologyCheckers() {
     // Check for king promotion
     if ((piece.color === 'red' && to.row === 0) || (piece.color === 'black' && to.row === 7)) {
       piece.isKing = true;
-      toast.success("Crowned! Your piece is now a King!");
+      toast.success(t('games.checkers.crowned'));
     }
 
     // Remove captured piece
@@ -235,7 +237,7 @@ export default function PhototheologyCheckers() {
         setMustJump(to);
         setSelectedPiece(to);
         setValidMoves(jumps);
-        toast.info("Multi-jump available! Continue jumping.");
+        toast.info(t('games.checkers.multiJumpAvailable'));
         return;
       }
     }
@@ -260,10 +262,10 @@ export default function PhototheologyCheckers() {
     setShowQuestion(false);
 
     if (isCorrect) {
-      toast.success("Correct! Capture successful!");
+      toast.success(t('games.common.correctCapture'));
       executeMove(pendingCapture.from, pendingCapture.to, pendingCapture.captured);
     } else {
-      toast.error(`Incorrect! The answer was: ${currentQuestion.answer}`);
+      toast.error(t('games.common.incorrectAnswer', { answer: currentQuestion.answer }));
       // Failed capture - lose turn
       setSelectedPiece(null);
       setValidMoves([]);
@@ -377,16 +379,16 @@ export default function PhototheologyCheckers() {
         <div className="flex justify-between items-center mb-6">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-3xl font-bold text-red-400 flex items-center gap-2" style={{ fontFamily: "'Cinzel', serif" }}>
             <CircleDot className="h-8 w-8" />
-            PHOTOTHEOLOGY CHECKERS
+            {t('games.checkers.title')}
           </h1>
           {gameMode && (
             <Button variant="outline" onClick={resetGame} className="border-red-500/50">
               <RotateCcw className="h-4 w-4 mr-2" />
-              New Game
+              {t('games.common.newGame')}
             </Button>
           )}
         </div>
@@ -396,9 +398,9 @@ export default function PhototheologyCheckers() {
           <div className="max-w-md mx-auto">
             <Card className="bg-black/40 border-red-500/50">
               <CardHeader>
-                <CardTitle className="text-red-400 text-center">Select Game Mode</CardTitle>
+                <CardTitle className="text-red-400 text-center">{t('games.common.selectGameMode')}</CardTitle>
                 <CardDescription className="text-center text-red-200/80">
-                  Answer Bible questions to capture pieces!
+                  {t('games.common.answerBibleQuestions')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -408,8 +410,8 @@ export default function PhototheologyCheckers() {
                 >
                   <Users className="h-6 w-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-bold">Local 2-Player</div>
-                    <div className="text-xs opacity-80">Pass and play with a friend</div>
+                    <div className="font-bold">{t('games.common.local2Player')}</div>
+                    <div className="text-xs opacity-80">{t('games.common.passAndPlay')}</div>
                   </div>
                 </Button>
                 <Button
@@ -418,8 +420,8 @@ export default function PhototheologyCheckers() {
                 >
                   <Swords className="h-6 w-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-bold">vs Computer</div>
-                    <div className="text-xs opacity-80">Play against the AI</div>
+                    <div className="font-bold">{t('games.common.vsComputer')}</div>
+                    <div className="text-xs opacity-80">{t('games.common.playAgainstAI')}</div>
                   </div>
                 </Button>
               </CardContent>
@@ -433,13 +435,13 @@ export default function PhototheologyCheckers() {
             {/* Score */}
             <div className="flex items-center gap-8">
               <Badge className="px-4 py-2 bg-red-600 text-lg">
-                Red: {12 - capturedRed} remaining
+                {t('games.checkers.redRemaining', { count: 12 - capturedRed })}
               </Badge>
               <Badge className={`px-4 py-2 text-lg ${currentPlayer === 'red' ? 'bg-red-600 ring-2 ring-yellow-400' : 'bg-gray-800'}`}>
-                {currentPlayer === 'red' ? "Red's Turn" : "Black's Turn"}
+                {currentPlayer === 'red' ? t('games.checkers.redTurn') : t('games.checkers.blackTurn')}
               </Badge>
               <Badge className="px-4 py-2 bg-gray-800 text-lg">
-                Black: {12 - capturedBlack} remaining
+                {t('games.checkers.blackRemaining', { count: 12 - capturedBlack })}
               </Badge>
             </div>
 
@@ -490,7 +492,7 @@ export default function PhototheologyCheckers() {
 
             {mustJump && (
               <Badge className="bg-yellow-600 animate-pulse">
-                Multi-jump available! Continue jumping.
+                {t('games.checkers.multiJumpAvailable')}
               </Badge>
             )}
           </div>
@@ -502,10 +504,10 @@ export default function PhototheologyCheckers() {
             <DialogHeader>
               <DialogTitle className="text-red-200 flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                Bible Challenge!
+                {t('games.common.bibleChallenge')}
               </DialogTitle>
               <DialogDescription className="text-red-100">
-                Answer correctly to capture the piece
+                {t('games.common.answerToCapture')}
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
@@ -532,20 +534,20 @@ export default function PhototheologyCheckers() {
             <DialogHeader>
               <DialogTitle className="text-3xl text-center text-red-200">
                 <Trophy className="h-12 w-12 mx-auto mb-2 text-yellow-400" />
-                Game Over!
+                {t('games.common.gameOver')}
               </DialogTitle>
             </DialogHeader>
             <div className="py-6 text-center">
               <p className="text-2xl text-white">
-                {winner === 'red' ? "Red" : "Black"} Wins!
+                {t('games.common.playerWins', { player: winner === 'red' ? t('games.checkers.red') : t('games.checkers.black') })}
               </p>
             </div>
             <DialogFooter className="flex gap-2">
               <Button onClick={resetGame} className="flex-1 bg-red-600 hover:bg-red-700">
-                Play Again
+                {t('games.common.playAgain')}
               </Button>
               <Button onClick={() => navigate("/games")} variant="outline" className="flex-1 border-red-400">
-                Back to Games
+                {t('common.backToGames')}
               </Button>
             </DialogFooter>
           </DialogContent>

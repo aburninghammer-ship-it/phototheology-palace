@@ -11,13 +11,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
-type EmailFilter = 'all' | 'active' | 'not_paid' | 'paid_only';
+type EmailFilter = 'all' | 'active' | 'not_paid' | 'paid_only' | 'teachable_not_signed_up';
 
 const FILTER_DESCRIPTIONS: Record<EmailFilter, string> = {
   all: "All registered users in the system",
   active: "Users who have been active recently",
   not_paid: "Users who have NOT subscribed or paid yet",
   paid_only: "Only paid subscribers (Stripe, Patreon, or Lifetime)",
+  teachable_not_signed_up: "Teachable members (Power of the Lamb buyers) who have NOT yet created a Suite account — ~8,670 people",
 };
 
 export function BulkEmailSender() {
@@ -128,6 +129,7 @@ export function BulkEmailSender() {
                 <SelectItem value="active">Active Users</SelectItem>
                 <SelectItem value="not_paid">Not Yet Paid</SelectItem>
                 <SelectItem value="paid_only">Paid Subscribers Only</SelectItem>
+                <SelectItem value="teachable_not_signed_up">📚 Teachable Members (Not Yet in Suite)</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">

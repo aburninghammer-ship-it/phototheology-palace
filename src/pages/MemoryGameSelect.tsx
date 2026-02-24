@@ -1,34 +1,36 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Puzzle, Type, Shuffle } from "lucide-react";
 
 export default function MemoryGameSelect() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const games = [
     {
       id: "word-order",
-      title: "Word Order Challenge",
-      description: "Rearrange scrambled words to rebuild the verse correctly",
+      title: t('memory.game.select.wordOrderTitle'),
+      description: t('memory.game.select.wordOrderDesc'),
       icon: Shuffle,
-      difficulty: "Medium",
+      difficulty: t('memory.game.select.difficultyMedium'),
       color: "from-blue-500/20 to-purple-500/20"
     },
     {
       id: "fill-blank",
-      title: "Fill in the Blanks",
-      description: "Complete missing words in verses from memory",
+      title: t('memory.game.select.fillBlankTitle'),
+      description: t('memory.game.select.fillBlankDesc'),
       icon: Type,
-      difficulty: "Easy",
+      difficulty: t('memory.game.select.difficultyEasy'),
       color: "from-green-500/20 to-emerald-500/20"
     },
     {
       id: "first-letter",
-      title: "First Letter Hints",
-      description: "Recall verses using only first-letter hints",
+      title: t('memory.game.select.firstLetterTitle'),
+      description: t('memory.game.select.firstLetterDesc'),
       icon: Puzzle,
-      difficulty: "Hard",
+      difficulty: t('memory.game.select.difficultyHard'),
       color: "from-orange-500/20 to-red-500/20"
     }
   ];
@@ -42,14 +44,14 @@ export default function MemoryGameSelect() {
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Memory
+          {t('memory.game.backToMemory')}
         </Button>
 
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Memory Games</h1>
+            <h1 className="text-3xl font-bold mb-2">{t('memory.game.select.title')}</h1>
             <p className="text-muted-foreground">
-              Practice your memory verses through interactive games
+              {t('memory.game.select.subtitle')}
             </p>
           </div>
 
@@ -74,7 +76,7 @@ export default function MemoryGameSelect() {
                 </CardHeader>
                 <CardContent>
                   <Button className="w-full">
-                    Play Game
+                    {t('memory.game.select.playGame')}
                   </Button>
                 </CardContent>
               </Card>

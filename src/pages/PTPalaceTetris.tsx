@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ValidBlock {
   text: string;
@@ -56,6 +57,7 @@ type GameState = 'menu' | 'playing' | 'gameOver';
 type GameMode = 'single' | 'palace';
 
 const PTPalaceTetris: React.FC = () => {
+  const { t } = useTranslation();
   const [gameState, setGameState] = useState<GameState>('menu');
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
   const [score, setScore] = useState(0);
@@ -1367,41 +1369,41 @@ const PTPalaceTetris: React.FC = () => {
   const renderMenu = () => (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-4 pb-24">
       <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-2">🏛️ PT PALACE TETRIS</h1>
-        <p className="text-center text-gray-400 mb-2">Master All 38 Rooms</p>
+        <h1 className="text-3xl font-bold text-center mb-2">{t('games.tetris.title')}</h1>
+        <p className="text-center text-gray-400 mb-2">{t('games.tetris.masterAllRooms')}</p>
 
         {highScore > 0 && (
-          <div className="text-center text-amber-400 mb-4">🏆 High Score: {highScore}</div>
+          <div className="text-center text-amber-400 mb-4">{t('games.tetris.highScore', { score: highScore })}</div>
         )}
 
         <div className="bg-gray-800 rounded-xl p-4 mb-6">
-          <h2 className="font-bold text-lg mb-3">🎮 How to Play:</h2>
+          <h2 className="font-bold text-lg mb-3">{t('games.tetris.howToPlay')}</h2>
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3 p-2 bg-blue-900/30 rounded-lg border border-blue-700/50">
               <span className="text-2xl">🧠</span>
               <div>
-                <div className="font-bold text-blue-400">READ EACH BLOCK CAREFULLY</div>
-                <div className="text-gray-300 text-xs">Decide if it matches what the room wants you to "CATCH"</div>
+                <div className="font-bold text-blue-400">{t('games.tetris.readBlockCarefully')}</div>
+                <div className="text-gray-300 text-xs">{t('games.tetris.decideIfMatch')}</div>
               </div>
             </div>
             <div className="flex items-start gap-3 p-2 bg-green-900/30 rounded-lg border border-green-700/50">
               <span className="text-2xl">✅</span>
               <div>
-                <div className="font-bold text-green-400">TAP blocks that FIT the room's rule</div>
-                <div className="text-gray-300 text-xs">+10 points for correct catches, bonus blocks give +25</div>
+                <div className="font-bold text-green-400">{t('games.tetris.tapBlocksFit')}</div>
+                <div className="text-gray-300 text-xs">{t('games.tetris.pointsForCatches')}</div>
               </div>
             </div>
             <div className="flex items-start gap-3 p-2 bg-red-900/30 rounded-lg border border-red-700/50">
               <span className="text-2xl">❌</span>
               <div>
-                <div className="font-bold text-red-400">LET TRAPS FALL - don't tap them!</div>
-                <div className="text-gray-300 text-xs">Tapping a trap loses a life. Traps are wrong approaches (interpretations when you need facts, etc.)</div>
+                <div className="font-bold text-red-400">{t('games.tetris.letTrapsFall')}</div>
+                <div className="text-gray-300 text-xs">{t('games.tetris.trapsLoseLife')}</div>
               </div>
             </div>
           </div>
           <div className="mt-4 p-3 bg-amber-900/30 rounded-lg border border-amber-700/50">
             <div className="text-xs text-amber-400 mb-2">⚠️ <strong>THE CHALLENGE:</strong></div>
-            <div className="text-xs text-gray-300">All blocks look the same! You must READ the content and THINK about whether it matches the room's CATCH rule or is something to AVOID.</div>
+            <div className="text-xs text-gray-300">{t('games.tetris.challengeDesc')}</div>
           </div>
         </div>
 
@@ -1413,12 +1415,12 @@ const PTPalaceTetris: React.FC = () => {
           <div className="flex items-center gap-3 mb-2">
             <span className="text-3xl">🏛️</span>
             <div>
-              <div className="font-bold text-lg">FULL PALACE MODE</div>
-              <div className="text-xs opacity-80">All 38 rooms — ultimate mastery!</div>
+              <div className="font-bold text-lg">{t('games.tetris.fullPalaceMode')}</div>
+              <div className="text-xs opacity-80">{t('games.tetris.fullPalaceModeDesc')}</div>
             </div>
           </div>
           <div className="text-sm opacity-90">
-            Rooms cycle every 10 blocks. Master every principle in Phototheology!
+            {t('games.tetris.roomsCycleDesc')}
           </div>
         </button>
 
@@ -1452,7 +1454,7 @@ const PTPalaceTetris: React.FC = () => {
               onClick={() => setSelectedFloor(null)}
               className="text-gray-400 text-sm mb-2"
             >
-              ← Back to Floors
+              {t('games.tetris.backToFloors')}
             </button>
 
             <div className={`p-3 rounded-lg bg-gradient-to-r ${floorColors[selectedFloor]} mb-4`}>
@@ -1497,7 +1499,7 @@ const PTPalaceTetris: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-2 px-2">
           <button onClick={() => setGameState('menu')} className="text-gray-400 hover:text-white text-sm">
-            ✕ Exit
+            {t('games.tetris.exit')}
           </button>
           <div className="text-center">
             {gameMode === 'palace' ? (
@@ -1522,11 +1524,11 @@ const PTPalaceTetris: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="bg-green-500/30 rounded p-2 border border-green-400/50">
-              <div className="font-bold text-green-300">✅ CATCH:</div>
+              <div className="font-bold text-green-300">{t('games.tetris.catch')}:</div>
               <div className="opacity-90">{room?.catch}</div>
             </div>
             <div className="bg-red-500/30 rounded p-2 border border-red-400/50">
-              <div className="font-bold text-red-300">❌ AVOID:</div>
+              <div className="font-bold text-red-300">{t('games.tetris.avoid')}:</div>
               <div className="opacity-90">{room?.avoid}</div>
             </div>
           </div>
@@ -1585,7 +1587,7 @@ const PTPalaceTetris: React.FC = () => {
 
           {fallingBlocks.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
-              Blocks incoming...
+              {t('games.tetris.blocksIncoming')}
             </div>
           )}
         </div>
@@ -1611,7 +1613,7 @@ const PTPalaceTetris: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-4 flex items-center justify-center">
         <div className="max-w-md mx-auto text-center">
           <div className="text-6xl mb-4">{lives > 0 ? '🏆' : '💔'}</div>
-          <h2 className="text-2xl font-bold mb-2">GAME OVER</h2>
+          <h2 className="text-2xl font-bold mb-2">{t('games.tetris.gameOver')}</h2>
           <div className="text-gray-400 mb-6">
             {gameMode === 'palace' ? '🏛️ Full Palace Mode' : room?.name}
           </div>
@@ -1620,16 +1622,16 @@ const PTPalaceTetris: React.FC = () => {
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <div className="text-4xl font-bold text-amber-400">{score}</div>
-                <div className="text-xs text-gray-400">SCORE</div>
+                <div className="text-xs text-gray-400">{t('games.tetris.score')}</div>
               </div>
               <div>
                 <div className="text-4xl font-bold text-orange-400">{bestStreak}</div>
-                <div className="text-xs text-gray-400">BEST STREAK</div>
+                <div className="text-xs text-gray-400">{t('games.tetris.bestStreak')}</div>
               </div>
             </div>
 
             {score >= highScore && score > 0 && (
-              <div className="mt-4 text-green-400 font-bold">🏆 NEW HIGH SCORE!</div>
+              <div className="mt-4 text-green-400 font-bold">{t('games.tetris.newHighScore')}</div>
             )}
           </div>
 
@@ -1642,13 +1644,13 @@ const PTPalaceTetris: React.FC = () => {
                   : `bg-gradient-to-r ${room?.color}`
               }`}
             >
-              Play Again
+              {t('games.playAgain')}
             </button>
             <button
               onClick={() => setGameState('menu')}
               className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg"
             >
-              Menu
+              {t('games.tetris.menu')}
             </button>
           </div>
         </div>

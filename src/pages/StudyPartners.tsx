@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ interface DiscoverableUser {
 }
 
 export default function StudyPartners() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -81,16 +83,16 @@ export default function StudyPartners() {
       console.error("Error updating preference:", error);
       setLookingForPartner(!checked);
       toast({
-        title: "Error",
-        description: "Failed to update preference",
+        title: t('studyPartners.error'),
+        description: t('studyPartners.failedToUpdatePreference'),
         variant: "destructive",
       });
     } else {
       toast({
-        title: checked ? "You're now discoverable!" : "Discovery turned off",
-        description: checked 
-          ? "Other users looking for partners can now find you" 
-          : "You won't appear in partner discovery",
+        title: checked ? t('studyPartners.nowDiscoverable') : t('studyPartners.discoveryOff'),
+        description: checked
+          ? t('studyPartners.othersCanFindYou')
+          : t('studyPartners.wontAppear'),
       });
     }
   };
@@ -152,7 +154,7 @@ export default function StudyPartners() {
       if (error) {
         if (error.code === "23505") {
           toast({
-            title: "Request already sent",
+            title: t('studyPartners.requestAlreadySent'),
             variant: "destructive",
           });
         } else {
@@ -162,10 +164,10 @@ export default function StudyPartners() {
       }
 
       setPendingRequestIds(prev => new Set([...prev, targetUserId]));
-      
+
       toast({
-        title: "Request sent!",
-        description: `Study partner request sent to ${displayName}`,
+        title: t('studyPartners.requestSent'),
+        description: t('studyPartners.requestSentTo', { name: displayName }),
       });
     } catch (error) {
       console.error("Error sending request:", error);
@@ -266,8 +268,8 @@ export default function StudyPartners() {
 
       if (userError || !targetUser) {
         toast({
-          title: "User not found",
-          description: "No user with that username exists",
+          title: t('studyPartners.userNotFound'),
+          description: t('studyPartners.noUserWithUsername'),
           variant: "destructive",
         });
         return;
@@ -275,7 +277,7 @@ export default function StudyPartners() {
 
       if (targetUser.id === user.id) {
         toast({
-          title: "Cannot add yourself",
+          title: t('studyPartners.cannotAddYourself'),
           variant: "destructive",
         });
         return;
@@ -290,7 +292,7 @@ export default function StudyPartners() {
       if (error) {
         if (error.code === "23505") {
           toast({
-            title: "Request already sent",
+            title: t('studyPartners.requestAlreadySent'),
             variant: "destructive",
           });
         } else {
@@ -300,8 +302,8 @@ export default function StudyPartners() {
       }
 
       toast({
-        title: "Request sent!",
-        description: `Study partner request sent to ${searchUsername}`,
+        title: t('studyPartners.requestSent'),
+        description: t('studyPartners.requestSentTo', { name: searchUsername }),
       });
 
       setSearchUsername("");
@@ -323,7 +325,7 @@ export default function StudyPartners() {
       if (error) throw error;
 
       toast({
-        title: "Request accepted!",
+        title: t('studyPartners.requestAccepted'),
       });
 
       loadPartners();
@@ -343,7 +345,7 @@ export default function StudyPartners() {
       if (error) throw error;
 
       toast({
-        title: "Request declined",
+        title: t('studyPartners.requestDeclined'),
       });
 
       loadPartners();
@@ -359,10 +361,10 @@ export default function StudyPartners() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
             <Users className="h-8 w-8" />
-            Study Partners
+            {t('studyPartners.pageTitle')}
           </h1>
           <p className="text-foreground/80">
-            Connect with others to learn together
+            {t('studyPartners.pageSubtitle')}
           </p>
         </div>
 
@@ -373,10 +375,10 @@ export default function StudyPartners() {
               <div className="space-y-1">
                 <Label htmlFor="looking-toggle" className="text-base font-medium flex items-center gap-2">
                   <Eye className="h-4 w-4" />
-                  Looking for a Study Partner
+                  {t('studyPartners.lookingForPartner')}
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  When enabled, other users can discover you and send partner requests
+                  {t('studyPartners.lookingForPartnerDesc')}
                 </p>
               </div>
               <Switch
@@ -393,10 +395,10 @@ export default function StudyPartners() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Discover Partners
+              {t('studyPartners.discoverPartners')}
             </CardTitle>
             <CardDescription>
-              Users who are looking for study partners
+              {t('studyPartners.discoverPartnersDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -406,7 +408,7 @@ export default function StudyPartners() {
               </div>
             ) : discoverableUsers.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                No users currently looking for partners. Check back later!
+                {t('studyPartners.noUsersLooking')}
               </p>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
@@ -418,18 +420,18 @@ export default function StudyPartners() {
                     <div>
                       <p className="font-medium">{discoveredUser.display_name}</p>
                       <p className="text-sm text-muted-foreground">
-                        @{discoveredUser.username} • {discoveredUser.points || 0} pts
+                        @{discoveredUser.username} • {t('studyPartners.nPoints', { count: discoveredUser.points || 0 })}
                       </p>
                     </div>
                     {pendingRequestIds.has(discoveredUser.id) ? (
-                      <Badge variant="secondary">Pending</Badge>
+                      <Badge variant="secondary">{t('studyPartners.pending')}</Badge>
                     ) : (
                       <Button
                         size="sm"
                         onClick={() => sendRequestToUser(discoveredUser.id, discoveredUser.display_name)}
                       >
                         <UserPlus className="h-4 w-4 mr-1" />
-                        Connect
+                        {t('studyPartners.connect')}
                       </Button>
                     )}
                   </div>
@@ -442,15 +444,15 @@ export default function StudyPartners() {
         {/* Add Partner by Username */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Search by Username</CardTitle>
-            <CardDescription>Know someone's username? Search directly</CardDescription>
+            <CardTitle>{t('studyPartners.searchByUsername')}</CardTitle>
+            <CardDescription>{t('studyPartners.searchByUsernameDesc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Input
-                    placeholder="Search by username or display name..."
+                    placeholder={t('studyPartners.searchPlaceholder')}
                     value={searchUsername}
                     onChange={(e) => {
                       setSearchUsername(e.target.value);
@@ -464,7 +466,7 @@ export default function StudyPartners() {
                 </div>
                 <Button onClick={sendRequest} disabled={!searchUsername.trim()}>
                   <UserPlus className="h-4 w-4 mr-2" />
-                  Send Request
+                  {t('studyPartners.sendRequest')}
                 </Button>
               </div>
               
@@ -498,7 +500,7 @@ export default function StudyPartners() {
         {requests.length > 0 && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Pending Requests</CardTitle>
+              <CardTitle>{t('studyPartners.pendingRequests')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {requests.map((request) => (
@@ -538,12 +540,12 @@ export default function StudyPartners() {
         {/* My Partners */}
         <Card>
           <CardHeader>
-            <CardTitle>My Study Partners ({partners.length})</CardTitle>
+            <CardTitle>{t('studyPartners.myStudyPartners', { count: partners.length })}</CardTitle>
           </CardHeader>
           <CardContent>
             {partners.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                No study partners yet. Discover partners above or search by username!
+                {t('studyPartners.noPartnersYet')}
               </p>
             ) : (
               <div className="space-y-3">
@@ -558,10 +560,10 @@ export default function StudyPartners() {
                       </p>
                       <p className="text-sm text-muted-foreground">
                         @{partner.partner_profile?.username} •{" "}
-                        {partner.partner_profile?.points} points
+                        {t('studyPartners.nPoints', { count: partner.partner_profile?.points || 0 })}
                       </p>
                     </div>
-                    <Badge variant="secondary">Active</Badge>
+                    <Badge variant="secondary">{t('studyPartners.active')}</Badge>
                   </div>
                 ))}
               </div>

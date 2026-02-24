@@ -11,8 +11,8 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SYNC-PATREON-MEMBERS] ${step}${detailsStr}`);
 };
 
-// Minimum pledge for access: $15/month = 1500 cents (but we check for $20 for Master Class equivalent)
-const MINIMUM_PLEDGE_CENTS = 2000;
+// Minimum pledge for premium access: $15/month = 1500 cents
+const MINIMUM_PLEDGE_CENTS = 1500;
 
 // Helper to send welcome email for new patrons
 async function sendWelcomeEmail(email: string, name: string, pledgeAmount: number) {

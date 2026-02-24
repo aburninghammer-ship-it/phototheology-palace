@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -42,6 +43,7 @@ const WINNING_LINES = [
 ];
 
 export default function PhototheologyTicTacToe() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -83,10 +85,10 @@ export default function PhototheologyTicTacToe() {
     setShowQuestion(false);
 
     if (isCorrect) {
-      toast.success("Correct!");
+      toast.success(t('games.common.correct'));
       executeMove(pendingMove);
     } else {
-      toast.error(`Incorrect! The answer was: ${currentQuestion.answer}`);
+      toast.error(t('games.common.incorrectAnswer', { answer: currentQuestion.answer }));
       // Wrong answer - lose turn
       setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
 
@@ -210,16 +212,16 @@ export default function PhototheologyTicTacToe() {
         <div className="flex justify-between items-center mb-6">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-3xl font-bold text-purple-400 flex items-center gap-2" style={{ fontFamily: "'Cinzel', serif" }}>
             <Grid3X3 className="h-8 w-8" />
-            PHOTOTHEOLOGY TIC-TAC-TOE
+            {t('games.ticTacToe.title')}
           </h1>
           {gameMode && (
             <Button variant="outline" onClick={resetScore} className="border-purple-500/50">
               <RotateCcw className="h-4 w-4 mr-2" />
-              Reset All
+              {t('games.common.resetAll')}
             </Button>
           )}
         </div>
@@ -229,9 +231,9 @@ export default function PhototheologyTicTacToe() {
           <div className="max-w-md mx-auto">
             <Card className="bg-black/40 border-purple-500/50">
               <CardHeader>
-                <CardTitle className="text-purple-400 text-center">Select Game Mode</CardTitle>
+                <CardTitle className="text-purple-400 text-center">{t('games.common.selectGameMode')}</CardTitle>
                 <CardDescription className="text-center text-purple-200/80">
-                  Answer Bible questions to place your mark!
+                  {t('games.ticTacToe.answerToPlace')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -241,8 +243,8 @@ export default function PhototheologyTicTacToe() {
                 >
                   <Users className="h-6 w-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-bold">Local 2-Player</div>
-                    <div className="text-xs opacity-80">Take turns with a friend</div>
+                    <div className="font-bold">{t('games.common.local2Player')}</div>
+                    <div className="text-xs opacity-80">{t('games.common.takeTurns')}</div>
                   </div>
                 </Button>
                 <Button
@@ -251,8 +253,8 @@ export default function PhototheologyTicTacToe() {
                 >
                   <Swords className="h-6 w-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-bold">vs Computer</div>
-                    <div className="text-xs opacity-80">Play against the AI</div>
+                    <div className="font-bold">{t('games.common.vsComputer')}</div>
+                    <div className="text-xs opacity-80">{t('games.common.playAgainstAI')}</div>
                   </div>
                 </Button>
               </CardContent>
@@ -266,17 +268,17 @@ export default function PhototheologyTicTacToe() {
             {/* Score */}
             <div className="flex items-center gap-8">
               <Badge className="px-4 py-2 bg-blue-600 text-lg flex items-center gap-2">
-                <X className="h-4 w-4" /> Player X: {xWins}
+                <X className="h-4 w-4" /> {t('games.ticTacToe.playerX')}: {xWins}
               </Badge>
               <Badge className={`px-4 py-2 text-lg ${
                 winner ? (winner === 'X' ? 'bg-blue-600' : 'bg-pink-600') :
                 isDraw ? 'bg-gray-600' :
                 (currentPlayer === 'X' ? 'bg-blue-600 ring-2 ring-yellow-400' : 'bg-pink-600 ring-2 ring-yellow-400')
               }`}>
-                {winner ? `${winner} Wins!` : isDraw ? "It's a Draw!" : `${currentPlayer}'s Turn`}
+                {winner ? t('games.common.playerWins', { player: winner }) : isDraw ? t('games.common.draw') : t('games.common.playerTurn', { player: currentPlayer })}
               </Badge>
               <Badge className="px-4 py-2 bg-pink-600 text-lg flex items-center gap-2">
-                <Circle className="h-4 w-4" /> Player O: {oWins}
+                <Circle className="h-4 w-4" /> {t('games.ticTacToe.playerO')}: {oWins}
               </Badge>
             </div>
 
@@ -325,7 +327,7 @@ export default function PhototheologyTicTacToe() {
               >
                 <Button onClick={resetGame} className="bg-purple-600 hover:bg-purple-700">
                   <RotateCcw className="h-4 w-4 mr-2" />
-                  Play Again
+                  {t('games.common.playAgain')}
                 </Button>
               </motion.div>
             )}
@@ -338,10 +340,10 @@ export default function PhototheologyTicTacToe() {
             <DialogHeader>
               <DialogTitle className="text-purple-200 flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                Bible Challenge!
+                {t('games.common.bibleChallenge')}
               </DialogTitle>
               <DialogDescription className="text-purple-100">
-                Answer correctly to place your {currentPlayer}
+                {t('games.ticTacToe.answerToPlaceMark', { player: currentPlayer })}
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">

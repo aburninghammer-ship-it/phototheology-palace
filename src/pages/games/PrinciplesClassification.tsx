@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -167,6 +168,7 @@ const generateQuestions = (): PrincipleQuestion[] => {
 };
 
 export default function PrinciplesClassification() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -236,13 +238,13 @@ export default function PrinciplesClassification() {
       setScore(prev => prev + points);
       setStreak(prev => prev + 1);
       setBestStreak(prev => Math.max(prev, streak + 1));
-      toast.success(`+${points} points! Streak: ${streak + 1}`);
+      toast.success(t('games.principles.pointsEarned', { points, streak: streak + 1 }));
     } else {
       setStreak(0);
       if (answer === null) {
-        toast.error("Time's up!");
+        toast.error(t('games.principles.timesUp'));
       } else {
-        toast.error("Incorrect!");
+        toast.error(t('games.common.incorrect'));
       }
     }
   };
@@ -292,11 +294,11 @@ export default function PrinciplesClassification() {
         <div className="flex justify-between items-center mb-6">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-2xl sm:text-3xl font-bold text-emerald-400 flex items-center gap-2" style={{ fontFamily: "'Cinzel', serif" }}>
             <Layers className="h-8 w-8" />
-            PRINCIPLES & ROOMS
+            {t('games.principles.title')}
           </h1>
           {gameStarted && !gameComplete && (
             <Badge className="px-4 py-2 bg-emerald-600 text-lg">
@@ -311,20 +313,20 @@ export default function PrinciplesClassification() {
           <div className="max-w-xl mx-auto">
             <Card className="bg-black/40 border-emerald-500/50">
               <CardHeader>
-                <CardTitle className="text-emerald-400 text-center">Learn Phototheology</CardTitle>
+                <CardTitle className="text-emerald-400 text-center">{t('games.principles.learnPhototheology')}</CardTitle>
                 <CardDescription className="text-center text-emerald-200/80">
-                  Master the principles, rooms, and connection types
+                  {t('games.principles.masterDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-emerald-200">Select Category</label>
+                  <label className="text-sm font-medium text-emerald-200">{t('games.principles.selectCategory')}</label>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { key: 'all', label: 'All Categories', icon: <Sparkles className="h-5 w-5" /> },
-                      { key: 'principles', label: 'PT Principles', icon: <Layers className="h-5 w-5" /> },
-                      { key: 'rooms', label: 'Palace Rooms', icon: <Home className="h-5 w-5" /> },
-                      { key: 'connections', label: 'Connection Types', icon: <Building2 className="h-5 w-5" /> },
+                      { key: 'all', label: t('games.principles.allCategories'), icon: <Sparkles className="h-5 w-5" /> },
+                      { key: 'principles', label: t('games.principles.ptPrinciples'), icon: <Layers className="h-5 w-5" /> },
+                      { key: 'rooms', label: t('games.principles.palaceRooms'), icon: <Home className="h-5 w-5" /> },
+                      { key: 'connections', label: t('games.principles.connectionTypes'), icon: <Building2 className="h-5 w-5" /> },
                     ].map(cat => (
                       <Button
                         key={cat.key}
@@ -344,12 +346,12 @@ export default function PrinciplesClassification() {
                   className="w-full bg-emerald-600 hover:bg-emerald-700"
                   size="lg"
                 >
-                  Start Learning
+                  {t('games.principles.startLearning')}
                 </Button>
 
                 {/* Quick Reference */}
                 <div className="pt-4 border-t border-emerald-500/30">
-                  <p className="text-sm text-emerald-300 mb-3">Quick Reference:</p>
+                  <p className="text-sm text-emerald-300 mb-3">{t('games.principles.quickReference')}:</p>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     {Object.entries(PT_PRINCIPLES).slice(0, 6).map(([key, principle]) => (
                       <div key={key} className="bg-emerald-900/30 p-2 rounded">
@@ -369,7 +371,7 @@ export default function PrinciplesClassification() {
             {/* Progress */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm text-emerald-300">
-                <span>Question {currentIndex + 1} of {questions.length}</span>
+                <span>{t('games.principles.questionOf', { current: currentIndex + 1, total: questions.length })}</span>
                 <span className="flex items-center gap-2">
                   <Timer className={`h-4 w-4 ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : ''}`} />
                   {timeLeft}s
@@ -381,13 +383,13 @@ export default function PrinciplesClassification() {
             {/* Stats */}
             <div className="flex justify-center gap-4">
               <Badge className="bg-emerald-600">
-                <Star className="h-3 w-3 mr-1" /> Score: {score}
+                <Star className="h-3 w-3 mr-1" /> {t('games.common.score')}: {score}
               </Badge>
               <Badge className={`${streak > 0 ? 'bg-orange-500' : 'bg-gray-600'}`}>
-                🔥 Streak: {streak}
+                {t('games.common.streak')}: {streak}
               </Badge>
               <Badge variant="outline" className="border-emerald-500">
-                Best: {bestStreak}
+                {t('games.common.best')}: {bestStreak}
               </Badge>
             </div>
 
@@ -447,7 +449,7 @@ export default function PrinciplesClassification() {
                       className="bg-emerald-900/50 p-4 rounded-lg border border-emerald-500/30"
                     >
                       <p className="text-sm text-emerald-200">
-                        <strong>Explanation:</strong> {currentQuestion.explanation}
+                        <strong>{t('games.principles.explanation')}:</strong> {currentQuestion.explanation}
                       </p>
                     </motion.div>
                   )}
@@ -455,7 +457,7 @@ export default function PrinciplesClassification() {
 
                 {answered && (
                   <Button onClick={nextQuestion} className="w-full bg-emerald-600 hover:bg-emerald-700">
-                    {currentIndex + 1 >= questions.length ? 'See Results' : 'Next Question'}
+                    {currentIndex + 1 >= questions.length ? t('games.principles.seeResults') : t('games.principles.nextQuestion')}
                   </Button>
                 )}
               </CardContent>
@@ -469,21 +471,21 @@ export default function PrinciplesClassification() {
             <Card className="bg-black/40 border-emerald-500/50">
               <CardHeader className="text-center">
                 <Trophy className="h-16 w-16 text-yellow-400 mx-auto mb-4" />
-                <CardTitle className="text-3xl text-emerald-400">Game Complete!</CardTitle>
+                <CardTitle className="text-3xl text-emerald-400">{t('games.common.gameComplete')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6 text-center">
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-emerald-900/30 p-4 rounded-lg">
                     <p className="text-3xl font-bold text-emerald-400">{score}</p>
-                    <p className="text-sm text-emerald-200">Score</p>
+                    <p className="text-sm text-emerald-200">{t('games.common.score')}</p>
                   </div>
                   <div className="bg-emerald-900/30 p-4 rounded-lg">
                     <p className="text-3xl font-bold text-orange-400">{bestStreak}</p>
-                    <p className="text-sm text-emerald-200">Best Streak</p>
+                    <p className="text-sm text-emerald-200">{t('games.common.bestStreak')}</p>
                   </div>
                   <div className="bg-emerald-900/30 p-4 rounded-lg">
                     <p className="text-3xl font-bold text-blue-400">{questions.length}</p>
-                    <p className="text-sm text-emerald-200">Questions</p>
+                    <p className="text-sm text-emerald-200">{t('games.principles.questions')}</p>
                   </div>
                 </div>
 
@@ -493,14 +495,14 @@ export default function PrinciplesClassification() {
                     className="flex-1 bg-emerald-600 hover:bg-emerald-700"
                   >
                     <RotateCcw className="h-4 w-4 mr-2" />
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                   <Button
                     onClick={() => setGameStarted(false)}
                     variant="outline"
                     className="flex-1 border-emerald-500"
                   >
-                    Change Category
+                    {t('games.principles.changeCategory')}
                   </Button>
                 </div>
 
@@ -509,7 +511,7 @@ export default function PrinciplesClassification() {
                   variant="ghost"
                   className="w-full text-emerald-300"
                 >
-                  Back to Games
+                  {t('common.backToGames')}
                 </Button>
               </CardContent>
             </Card>

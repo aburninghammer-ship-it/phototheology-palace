@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -132,6 +133,7 @@ const LEVEL_CONFIG = {
 };
 
 export default function SermonTopicDetail() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -203,7 +205,7 @@ export default function SermonTopicDetail() {
 
       if (error) throw error;
 
-      toast.success("Sermon starter generated!");
+      toast.success(t('sermon.topicDetail.starterGenerated'));
 
       // Refresh starters
       const { data: newStarters } = await supabase
@@ -217,7 +219,7 @@ export default function SermonTopicDetail() {
       }
     } catch (err) {
       console.error("Generation error:", err);
-      toast.error("Failed to generate starter. Please try again.");
+      toast.error(t('sermon.topicDetail.generateError'));
     } finally {
       setGenerating(false);
       setSelectedLevel(null);
@@ -227,7 +229,7 @@ export default function SermonTopicDetail() {
   // Export starter to Sermon Builder
   const handleExportToSermonBuilder = async (starter: SermonStarter) => {
     if (!user || !topic) {
-      toast.error("Please log in to export to Sermon Builder");
+      toast.error(t('sermon.topicDetail.loginToExport'));
       return;
     }
 
@@ -285,11 +287,11 @@ export default function SermonTopicDetail() {
 
       if (error) throw error;
 
-      toast.success("Exported to Sermon Builder!");
+      toast.success(t('sermon.topicDetail.exportedSuccess'));
       navigate(`/sermon-builder?id=${data.id}`);
     } catch (err) {
       console.error("Export error:", err);
-      toast.error("Failed to export. Please try again.");
+      toast.error(t('sermon.topicDetail.exportError'));
     } finally {
       setExporting(false);
     }
@@ -298,7 +300,7 @@ export default function SermonTopicDetail() {
   const renderFloorContent = (starter: SermonStarter, floorKey: string, floorNum: number) => {
     const floors = starter.floors as StarterFloors;
     const floor = floors[floorKey as keyof StarterFloors];
-    if (!floor) return <p className="text-muted-foreground italic">Content not available for this floor.</p>;
+    if (!floor) return <p className="text-muted-foreground italic">{t('sermon.topicDetail.floorNotAvailable')}</p>;
 
     switch (floorNum) {
       case 1:
@@ -310,7 +312,7 @@ export default function SermonTopicDetail() {
             )}
             {f1?.keyWords && f1.keyWords.length > 0 && (
               <div>
-                <h4 className="font-medium mb-2">Key Words to Circle:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.keyWordsToCircle')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {f1.keyWords.map((word, i) => (
                     <Badge key={i} className="bg-primary/10 text-primary">{word}</Badge>
@@ -320,7 +322,7 @@ export default function SermonTopicDetail() {
             )}
             {f1?.observationQuestions && f1.observationQuestions.length > 0 && (
               <div>
-                <h4 className="font-medium mb-2">Observation Questions:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.observationQuestions')}</h4>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   {f1.observationQuestions.map((q, i) => (
                     <li key={i}>{q}</li>
@@ -330,7 +332,7 @@ export default function SermonTopicDetail() {
             )}
             {f1?.historicalNotes && (
               <div>
-                <h4 className="font-medium mb-2">Historical Notes:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.historicalNotes')}</h4>
                 <p className="text-muted-foreground">{f1.historicalNotes}</p>
               </div>
             )}
@@ -350,14 +352,14 @@ export default function SermonTopicDetail() {
                     <p className="text-sm text-muted-foreground">{sym.definition}</p>
                     {sym.crossRefs.length > 0 && (
                       <p className="text-xs text-primary mt-1">
-                        Cross-refs: {sym.crossRefs.join(", ")}
+                        {t('sermon.topicDetail.crossRefs')}: {sym.crossRefs.join(", ")}
                       </p>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground italic">No dominant symbols present in this passage.</p>
+              <p className="text-muted-foreground italic">{t('sermon.topicDetail.noSymbols')}</p>
             )}
           </div>
         );
@@ -369,24 +371,24 @@ export default function SermonTopicDetail() {
             {f3?.roomUsed && <Badge variant="outline">{f3.roomUsed}</Badge>}
             {f3?.article && (
               <div>
-                <h4 className="font-medium mb-2">Sanctuary Article:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.sanctuaryArticle')}</h4>
                 <p className="text-muted-foreground">{f3.article}</p>
               </div>
             )}
             {f3?.connection && (
               <div>
-                <h4 className="font-medium mb-2">Connection:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.connection')}</h4>
                 <p className="text-muted-foreground">{f3.connection}</p>
               </div>
             )}
             {f3?.explanation && (
               <div>
-                <h4 className="font-medium mb-2">Explanation:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.explanation')}</h4>
                 <p className="text-muted-foreground">{f3.explanation}</p>
               </div>
             )}
             {!f3?.article && !f3?.connection && (
-              <p className="text-muted-foreground italic">No direct sanctuary connection identified.</p>
+              <p className="text-muted-foreground italic">{t('sermon.topicDetail.noSanctuaryConnection')}</p>
             )}
           </div>
         );
@@ -401,10 +403,10 @@ export default function SermonTopicDetail() {
                 {f4.stories.map((story, i) => (
                   <div key={i} className="p-3 bg-muted/50 rounded-lg">
                     <h4 className="font-medium">{story.reference}</h4>
-                    <p className="text-sm text-muted-foreground"><strong>Parallels:</strong> {story.parallels}</p>
-                    <p className="text-sm text-muted-foreground"><strong>Contrasts:</strong> {story.contrasts}</p>
+                    <p className="text-sm text-muted-foreground"><strong>{t('sermon.topicDetail.parallels')}:</strong> {story.parallels}</p>
+                    <p className="text-sm text-muted-foreground"><strong>{t('sermon.topicDetail.contrasts')}:</strong> {story.contrasts}</p>
                     {story.caution && (
-                      <p className="text-xs text-amber-600 mt-1">Caution: {story.caution}</p>
+                      <p className="text-xs text-amber-600 mt-1">{t('sermon.topicDetail.caution')}: {story.caution}</p>
                     )}
                   </div>
                 ))}
@@ -439,7 +441,7 @@ export default function SermonTopicDetail() {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground italic">No direct prophetic connections identified.</p>
+              <p className="text-muted-foreground italic">{t('sermon.topicDetail.noPropheticConnections')}</p>
             )}
           </div>
         );
@@ -451,7 +453,7 @@ export default function SermonTopicDetail() {
             {f6?.roomUsed && <Badge variant="outline">{f6.roomUsed}</Badge>}
             {f6?.guidedQuestions && f6.guidedQuestions.length > 0 && (
               <div>
-                <h4 className="font-medium mb-2">Guided Questions:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.guidedQuestions')}</h4>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   {f6.guidedQuestions.map((q, i) => (
                     <li key={i}>{q}</li>
@@ -461,13 +463,13 @@ export default function SermonTopicDetail() {
             )}
             {f6?.christPresence && (
               <div>
-                <h4 className="font-medium mb-2">Christ's Presence:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.christPresence')}</h4>
                 <p className="text-muted-foreground">{f6.christPresence}</p>
               </div>
             )}
             {f6?.ntReferences && f6.ntReferences.length > 0 && (
               <div>
-                <h4 className="font-medium mb-2">NT References:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.ntReferences')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {f6.ntReferences.map((ref, i) => (
                     <Badge key={i} variant="secondary">{ref}</Badge>
@@ -508,7 +510,7 @@ export default function SermonTopicDetail() {
             {f8?.roomUsed && <Badge variant="outline">{f8.roomUsed}</Badge>}
             {f8?.responseMovements && f8.responseMovements.length > 0 && (
               <div>
-                <h4 className="font-medium mb-2">Response Movements:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.responseMovements')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {f8.responseMovements.map((resp, i) => (
                     <Badge key={i} className="bg-rose-100 text-rose-700">{resp}</Badge>
@@ -518,7 +520,7 @@ export default function SermonTopicDetail() {
             )}
             {f8?.songThemes && f8.songThemes.length > 0 && (
               <div>
-                <h4 className="font-medium mb-2">Song Themes:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.songThemes')}</h4>
                 <ul className="list-disc list-inside text-muted-foreground">
                   {f8.songThemes.map((theme, i) => (
                     <li key={i}>{theme}</li>
@@ -528,13 +530,13 @@ export default function SermonTopicDetail() {
             )}
             {f8?.prayerFocus && (
               <div>
-                <h4 className="font-medium mb-2">Prayer Focus:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.prayerFocus')}</h4>
                 <p className="text-muted-foreground">{f8.prayerFocus}</p>
               </div>
             )}
             {f8?.callToAction && (
               <div>
-                <h4 className="font-medium mb-2">Call to Action:</h4>
+                <h4 className="font-medium mb-2">{t('sermon.topicDetail.callToAction')}</h4>
                 <p className="text-muted-foreground">{f8.callToAction}</p>
               </div>
             )}
@@ -564,14 +566,14 @@ export default function SermonTopicDetail() {
   if (!topic) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Topic Not Found</h1>
+        <h1 className="text-2xl font-bold mb-4">{t('sermon.topicDetail.notFoundTitle')}</h1>
         <p className="text-muted-foreground mb-6">
-          The sermon topic you're looking for doesn't exist.
+          {t('sermon.topicDetail.notFoundDescription')}
         </p>
         <Link to="/sermon-topics">
           <Button>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Topics
+            {t('sermon.topicDetail.backToTopics')}
           </Button>
         </Link>
       </div>
@@ -588,7 +590,7 @@ export default function SermonTopicDetail() {
             className="inline-flex items-center text-muted-foreground hover:text-primary mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Topics
+            {t('sermon.topicDetail.backToTopics')}
           </Link>
 
           <div className="max-w-3xl">
@@ -600,7 +602,7 @@ export default function SermonTopicDetail() {
               )}
             </div>
             <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">
-              Sermons on {topic.title}
+              {t('sermon.topicDetail.sermonsOn', { topic: topic.title })}
             </h1>
             {topic.summary && (
               <p className="text-lg text-muted-foreground mb-6">{topic.summary}</p>
@@ -635,7 +637,7 @@ export default function SermonTopicDetail() {
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-primary" />
-            PhotoTheology Sermon Starters
+            {t('sermon.topicDetail.sermonStarters')}
           </h2>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -667,10 +669,10 @@ export default function SermonTopicDetail() {
                       <CardTitle>{level}</CardTitle>
                       <CardDescription>
                         {level === "Beginner"
-                          ? "More guiding questions, step-by-step structure"
+                          ? t('sermon.topicDetail.beginnerDescription')
                           : level === "Intermediate"
-                          ? "Balanced guidance with room for exploration"
-                          : "Dense prompts for PT-fluent pastors"}
+                          ? t('sermon.topicDetail.intermediateDescription')
+                          : t('sermon.topicDetail.masterDescription')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -678,7 +680,7 @@ export default function SermonTopicDetail() {
                         <div>
                           <p className="text-sm font-medium mb-2">{starter.starter_title}</p>
                           <Badge variant="outline" className="text-xs">
-                            {starter.room_refs.length} rooms referenced
+                            {t('sermon.topicDetail.roomsReferenced', { count: starter.room_refs.length })}
                           </Badge>
                         </div>
                       ) : (
@@ -694,12 +696,12 @@ export default function SermonTopicDetail() {
                           {generating && selectedLevel === level ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Generating...
+                              {t('sermon.topicDetail.generating')}
                             </>
                           ) : (
                             <>
                               <Wand2 className="mr-2 h-4 w-4" />
-                              Generate Starter
+                              {t('sermon.topicDetail.generateStarter')}
                             </>
                           )}
                         </Button>
@@ -728,7 +730,7 @@ export default function SermonTopicDetail() {
                       <div className="flex items-center justify-between">
                         <div>
                           <Badge className={`bg-gradient-to-r ${LEVEL_CONFIG[starter.level].color} text-white mb-2`}>
-                            {starter.level} Level
+                            {t('sermon.topicDetail.levelLabel', { level: starter.level })}
                           </Badge>
                           <CardTitle className="text-2xl">{starter.starter_title}</CardTitle>
                         </div>
@@ -740,12 +742,12 @@ export default function SermonTopicDetail() {
                           {exporting ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Exporting...
+                              {t('sermon.topicDetail.exporting')}
                             </>
                           ) : (
                             <>
                               <Send className="mr-2 h-4 w-4" />
-                              Send to Sermon Builder
+                              {t('sermon.topicDetail.sendToBuilder')}
                             </>
                           )}
                         </Button>
@@ -765,7 +767,7 @@ export default function SermonTopicDetail() {
                                     <Icon className="h-5 w-5 text-white" />
                                   </div>
                                   <div className="text-left">
-                                    <span className="font-semibold">Floor {floor.num}</span>
+                                    <span className="font-semibold">{t('sermon.topicDetail.floor', { num: floor.num })}</span>
                                     <span className="text-muted-foreground ml-2">
                                       {floor.name}
                                     </span>
@@ -790,20 +792,20 @@ export default function SermonTopicDetail() {
           <Card className="text-center py-12">
             <CardContent>
               <Sparkles className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Starters Yet</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('sermon.topicDetail.noStartersTitle')}</h3>
               <p className="text-muted-foreground mb-6">
-                Be the first to generate a PhotoTheology sermon starter for this topic.
+                {t('sermon.topicDetail.noStartersDescription')}
               </p>
               <Button onClick={() => handleGenerateStarter("Beginner")} disabled={generating}>
                 {generating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
+                    {t('sermon.topicDetail.generating')}
                   </>
                 ) : (
                   <>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Generate Beginner Starter
+                    {t('sermon.topicDetail.generateBeginnerStarter')}
                   </>
                 )}
               </Button>

@@ -32,17 +32,18 @@ serve(async (req) => {
     const now = new Date();
     const today = now.toISOString().split('T')[0];
 
-    // Calculate target dates for reminders
-    const day7Target = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const day2Target = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    // Calculate target dates for reminders (30-day trial)
+    const day15Target = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const day3Target = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const day0Target = today;
 
-    logStep("Checking for trials expiring on dates", { day7Target, day2Target, day0Target });
+    logStep("Checking for trials expiring on dates", { day15Target, day3Target, day0Target });
 
     // First, get users who should be EXCLUDED from trial reminders:
     // 1. Users with lifetime access in profiles
     // 2. Users with active Patreon connections ($15+/month)
     // 3. Users with payment_source = 'patreon' and active status in profiles
+    // 4. Users with active church membership (Living Manna, etc.)
 
     const { data: lifetimeUsers } = await supabase
       .from('profiles')
@@ -67,31 +68,43 @@ serve(async (req) => {
     const patreonProfileUserIds = new Set((patreonProfileUsers || []).map(u => u.id));
     logStep("Users with Patreon in profile", { count: patreonProfileUserIds.size });
 
+    // 4. Users with active church membership (Living Manna, etc.)
+    const { data: churchMembers } = await supabase
+      .from('church_members')
+      .select('user_id, church_id')
+      .in('church_id',
+        (await supabase
+          .from('churches')
+          .select('id')
+          .eq('subscription_status', 'active')
+        ).data?.map(c => c.id) || []
+      );
+    const churchMemberUserIds = new Set((churchMembers || []).map(u => u.user_id));
+    logStep("Users with church membership", { count: churchMemberUserIds.size });
+
     // Combine all excluded users
-    const excludedUserIds = new Set([...lifetimeUserIds, ...patreonUserIds, ...patreonProfileUserIds]);
+    const excludedUserIds = new Set([...lifetimeUserIds, ...patreonUserIds, ...patreonProfileUserIds, ...churchMemberUserIds]);
     logStep("Total excluded users", { count: excludedUserIds.size });
 
-    // Get trials expiring in 7 days (Day 7 reminder - halfway through)
-    // IMPORTANT: Also check that user doesn't have an active paid subscription
-    // This prevents sending trial reminders to users who have already converted
-    const { data: day7Trials } = await supabase
+    // Get trials expiring in 15 days (Day 15 reminder - halfway through)
+    const { data: day15Trials } = await supabase
       .from('user_subscriptions')
       .select('user_id, trial_ends_at, stripe_subscription_id')
       .eq('subscription_status', 'trial')
       .eq('has_lifetime_access', false)
-      .gte('trial_ends_at', `${day7Target}T00:00:00`)
-      .lt('trial_ends_at', `${day7Target}T23:59:59`);
+      .gte('trial_ends_at', `${day15Target}T00:00:00`)
+      .lt('trial_ends_at', `${day15Target}T23:59:59`);
 
-    // Get trials expiring in 2 days (Day 12 reminder - urgent)
-    const { data: day2Trials } = await supabase
+    // Get trials expiring in 3 days (Day 27 reminder - urgent)
+    const { data: day3Trials } = await supabase
       .from('user_subscriptions')
       .select('user_id, trial_ends_at, stripe_subscription_id')
       .eq('subscription_status', 'trial')
       .eq('has_lifetime_access', false)
-      .gte('trial_ends_at', `${day2Target}T00:00:00`)
-      .lt('trial_ends_at', `${day2Target}T23:59:59`);
+      .gte('trial_ends_at', `${day3Target}T00:00:00`)
+      .lt('trial_ends_at', `${day3Target}T23:59:59`);
 
-    // Get trials expiring today (Day 14 reminder - last chance)
+    // Get trials expiring today (Day 30 reminder - last chance)
     const { data: day0Trials } = await supabase
       .from('user_subscriptions')
       .select('user_id, trial_ends_at, stripe_subscription_id')
@@ -102,16 +115,16 @@ serve(async (req) => {
 
     // Filter out excluded users (lifetime, Patreon, etc.)
     const allTrialsRaw = [
-      ...(day7Trials || []).map(t => ({ ...t, reminderType: 'day7' })),
-      ...(day2Trials || []).map(t => ({ ...t, reminderType: 'day2' })),
+      ...(day15Trials || []).map(t => ({ ...t, reminderType: 'day15' })),
+      ...(day3Trials || []).map(t => ({ ...t, reminderType: 'day3' })),
       ...(day0Trials || []).map(t => ({ ...t, reminderType: 'day0' })),
     ];
 
     const allTrials = allTrialsRaw.filter(t => !excludedUserIds.has(t.user_id));
 
     logStep("Found trials to remind", {
-      day7Raw: day7Trials?.length || 0,
-      day2Raw: day2Trials?.length || 0,
+      day15Raw: day15Trials?.length || 0,
+      day3Raw: day3Trials?.length || 0,
       day0Raw: day0Trials?.length || 0,
       totalRaw: allTrialsRaw.length,
       afterExclusions: allTrials.length,
@@ -188,15 +201,15 @@ serve(async (req) => {
       let urgency: string;
 
       switch (trial.reminderType) {
-        case 'day7':
+        case 'day15':
           subject = "⏳ Your Phototheology trial is halfway through!";
-          heading = "You're halfway through your trial";
-          message = "You've been exploring the Palace for a week now. Have you discovered the Concentration Room? Tried the 24FPS challenge? There's so much more waiting for you.";
+          heading = "You're halfway through your 30-day trial";
+          message = "You've been exploring the Palace for two weeks now. Have you discovered the Concentration Room? Tried the 24FPS challenge? There's so much more waiting for you.";
           urgency = "";
           break;
-        case 'day2':
-          subject = "⚠️ Only 2 days left on your Phototheology trial!";
-          heading = "Your trial ends in 2 days";
+        case 'day3':
+          subject = "⚠️ Only 3 days left on your Phototheology trial!";
+          heading = "Your trial ends in 3 days";
           message = "Don't lose access to Jeeves, the daily challenges, and all 8 floors of the Palace. Upgrade now to keep your progress and unlock premium features.";
           urgency = "🔥 Act now to lock in your access";
           break;

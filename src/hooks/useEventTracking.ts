@@ -196,6 +196,63 @@ export function useEventTracking() {
     [trackEvent]
   );
 
+  // === CHECKOUT FUNNEL TRACKING ===
+
+  // Track when account is created (before checkout)
+  const trackAccountCreated = useCallback(
+    (method: 'email' | 'google' | 'social', details?: Record<string, unknown>) => {
+      trackEvent({
+        eventType: "checkout_funnel_account_created",
+        eventData: { signup_method: method, ...details },
+      });
+    },
+    [trackEvent]
+  );
+
+  // Track when user is redirected to Stripe checkout
+  const trackCheckoutRedirect = useCallback(
+    (plan: string, billing: string) => {
+      trackEvent({
+        eventType: "checkout_funnel_redirect_to_stripe",
+        eventData: { plan, billing, timestamp: new Date().toISOString() },
+      });
+    },
+    [trackEvent]
+  );
+
+  // Track when user abandons checkout (comes back without completing)
+  const trackCheckoutAbandoned = useCallback(
+    (reason?: string) => {
+      trackEvent({
+        eventType: "checkout_funnel_abandoned",
+        eventData: { reason: reason || 'user_cancelled', timestamp: new Date().toISOString() },
+      });
+    },
+    [trackEvent]
+  );
+
+  // Track when checkout is completed successfully
+  const trackCheckoutCompleted = useCallback(
+    (plan: string, billing: string, trialDays?: number) => {
+      trackEvent({
+        eventType: "checkout_funnel_completed",
+        eventData: { plan, billing, trial_days: trialDays, timestamp: new Date().toISOString() },
+      });
+    },
+    [trackEvent]
+  );
+
+  // Track external membership detected (Patreon/Teachable/Pickaxe)
+  const trackExternalMembershipDetected = useCallback(
+    (source: 'patreon' | 'teachable' | 'pickaxe') => {
+      trackEvent({
+        eventType: "checkout_funnel_external_membership",
+        eventData: { source, timestamp: new Date().toISOString() },
+      });
+    },
+    [trackEvent]
+  );
+
   return {
     trackEvent,
     trackButtonClick,
@@ -214,5 +271,11 @@ export function useEventTracking() {
     trackUpgradeClick,
     trackPurchaseCompleted,
     trackValueMoment,
+    // Checkout funnel tracking
+    trackAccountCreated,
+    trackCheckoutRedirect,
+    trackCheckoutAbandoned,
+    trackCheckoutCompleted,
+    trackExternalMembershipDetected,
   };
 }

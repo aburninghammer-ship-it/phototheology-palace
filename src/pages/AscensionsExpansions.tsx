@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -79,6 +80,8 @@ const EXPANSIONS = [
 ];
 
 export default function AscensionsExpansions() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -89,11 +92,11 @@ export default function AscensionsExpansions() {
           <div className="container mx-auto max-w-6xl text-center">
             <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 mb-6">
               <Layers className="h-6 w-6" />
-              <span className="font-semibold">Phototheology Framework</span>
+              <span className="font-semibold">{t('palace.ascensions.framework')}</span>
             </div>
-            <h1 className="text-5xl font-bold mb-4">Ascensions & Expansions</h1>
+            <h1 className="text-5xl font-bold mb-4">{t('palace.ascensions.title')}</h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto">
-              The staircase and stretching of Phototheology. Learn to climb from text to cosmos and stretch study in every direction.
+              {t('palace.ascensions.subtitle')}
             </p>
           </div>
         </div>
@@ -104,16 +107,15 @@ export default function AscensionsExpansions() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-2xl">
                 <BookOpen className="h-6 w-6 text-primary" />
-                Understanding the Framework
+                {t('palace.ascensions.understandingFramework')}
               </CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg dark:prose-invert max-w-none">
               <p>
-                <strong>Ascensions</strong> are the vertical staircase — climbing from the smallest parts of a text to its cosmic stage. 
-                <strong> Expansions</strong> describe how study stretches outward, filling the whole palace in every direction.
+                {t('palace.ascensions.introP1')}
               </p>
               <p>
-                Together, they ensure that no text is studied in isolation. Every verse has an address (Ascension) and every study grows in all directions (Expansion).
+                {t('palace.ascensions.introP2')}
               </p>
             </CardContent>
           </Card>
@@ -125,8 +127,8 @@ export default function AscensionsExpansions() {
                 <TrendingUp className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold">The Five Ascensions</h2>
-                <p className="text-muted-foreground">Climb from text to cosmos</p>
+                <h2 className="text-3xl font-bold">{t('palace.ascensions.fiveAscensions')}</h2>
+                <p className="text-muted-foreground">{t('palace.ascensions.climbFromText')}</p>
               </div>
             </div>
 
@@ -155,7 +157,7 @@ export default function AscensionsExpansions() {
                   <CardContent className="pt-0 pl-20">
                     <p className="text-sm text-muted-foreground mb-3">{asc.description}</p>
                     <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
-                      <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">Example:</span>
+                      <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">{t('palace.ascensions.example')}:</span>
                       <p className="text-sm mt-1">{asc.example}</p>
                     </div>
                   </CardContent>
@@ -171,8 +173,8 @@ export default function AscensionsExpansions() {
                 <Maximize className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold">The Four Expansions</h2>
-                <p className="text-muted-foreground">Stretch study in all directions</p>
+                <h2 className="text-3xl font-bold">{t('palace.ascensions.fourExpansions')}</h2>
+                <p className="text-muted-foreground">{t('palace.ascensions.stretchStudy')}</p>
               </div>
             </div>
 
@@ -208,7 +210,7 @@ export default function AscensionsExpansions() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-2xl">
                 <Sparkles className="h-6 w-6 text-primary" />
-                How They Work Together
+                {t('palace.ascensions.howTheyWorkTogether')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -216,24 +218,24 @@ export default function AscensionsExpansions() {
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <h4 className="font-bold mb-2 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-amber-600" />
-                    Static Ascension
+                    {t('palace.ascensions.staticAscension')}
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    The anchored address system. Every verse has a "home" in its text, chapter, book, cycle, and heaven. This keeps you from error.
+                    {t('palace.ascensions.staticAscensionDesc')}
                   </p>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <h4 className="font-bold mb-2 flex items-center gap-2">
                     <Brain className="h-4 w-4 text-purple-600" />
-                    Dynamic Ascension
+                    {t('palace.ascensions.dynamicAscension')}
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    The playground mode. Let verses travel across chapters, books, cycles, and heavens to spark creative, Spirit-led insight.
+                    {t('palace.ascensions.dynamicAscensionDesc')}
                   </p>
                 </div>
               </div>
               <p className="text-sm text-center text-muted-foreground italic pt-4 border-t">
-                Together, they train you like a musician who first masters the sheet music (static) and then learns to improvise (dynamic).
+                {t('palace.ascensions.togetherQuote')}
               </p>
             </CardContent>
           </Card>
@@ -243,19 +245,19 @@ export default function AscensionsExpansions() {
             <Link to="/bible-reference">
               <Button variant="outline" className="gap-2">
                 <Building2 className="h-4 w-4" />
-                View Full Codebook
+                {t('palace.ascensions.viewFullCodebook')}
               </Button>
             </Link>
             <Link to="/palace">
               <Button variant="outline" className="gap-2">
                 <Crown className="h-4 w-4" />
-                Explore the Palace
+                {t('palace.ascensions.exploreThePalace')}
               </Button>
             </Link>
             <Link to="/palace-explorer">
               <Button variant="outline" className="gap-2">
                 <Layers className="h-4 w-4" />
-                Palace Explorer
+                {t('palace.ascensions.palaceExplorer')}
               </Button>
             </Link>
           </div>

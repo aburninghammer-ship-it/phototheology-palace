@@ -1,5 +1,5 @@
-// Jeeves Edge Function v2.6 - Prophecy Watch Mode + Research Verification Engine
-// Last updated: 2026-01-18
+// Jeeves Edge Function v2.7 - RAG Corpus Integration + Prophecy Watch Mode + Research Verification Engine
+// Last updated: 2026-02-23
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import {
@@ -19,8 +19,17 @@ import {
   FORMATTING_REQUIREMENTS,
   CLOSING_BEHAVIOR,
   MASTER_PATTERNS,
-  SERMON_KNOWLEDGE_BANK
+  SERMON_KNOWLEDGE_BANK,
+  SCRIPTURE_CITATION_PROTOCOL
 } from './palace-schema.ts';
+
+import {
+  CANONICAL_ROOMS as MENTOR_ROOMS,
+  ROOM_CODES as MENTOR_ROOM_CODES,
+  isValidRoomCode as isValidMentorRoom,
+} from './canonical-rooms.ts';
+
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -247,6 +256,7 @@ serve(async (req) => {
       // Commentary properties
       classicCommentary,
       activeDimensions,
+      commentaryDepth,
       // User identification
       userName,
       // Card deck properties
@@ -266,7 +276,21 @@ serve(async (req) => {
       // Floor level for study questions
       floorLevel,
       messages,
-      chatMessages
+      chatMessages,
+      // Defense Mode properties
+      opponent,
+      defenseTopicId,
+      opponentWorldview,
+      opponentStyle,
+      opponentTargets,
+      opponentEndPrompt,
+      opponentSteelmanRules,
+      phase,
+      conversationHistory,
+      opponentAttack,
+      discipleResponse,
+      defenseTopicName,
+      isSignatureTopic
     } = requestBody;
     
     // Handle both message formats
@@ -609,6 +633,8 @@ You're warm, personable, and genuinely excited about studying Scripture together
 
 ${pathTeachingStyle}
 
+      ${SCRIPTURE_CITATION_PROTOCOL}
+
       ${THEOLOGICAL_REASONING}
 
       ${FIVE_MASTERMIND_COUNCIL}
@@ -724,6 +750,8 @@ FIRST, explain what ${roomTag} (${roomName}) means in 2-3 sentences. THEN, provi
     } else if (mode === "grade") {
       // Card Deck Grade Mode - evaluate student's application
       const textTypeLabel = textType === "story" ? "story" : "verse";
+      const difficultyLevel = requestBody.difficultyLevel || "normal";
+      const masterChallengeText = requestBody.masterChallenge || null;
       
       // Special handling for Room 66 (R66)
       if (roomId === "r66" || roomTag === "R66") {
@@ -758,10 +786,25 @@ Provide warm, insightful feedback that affirms the books and connections they id
 
       } else {
         // Original grade mode logic for other rooms
+        const masterModeInstructions = difficultyLevel === "master" && masterChallengeText ? `
+
+**⚡ MASTER MODE EVALUATION:**
+This student is playing in MASTER mode with a SPECIFIC constraint assigned by Jeeves.
+
+**The Master Challenge was:** ${masterChallengeText}
+
+**ADDITIONAL EVALUATION CRITERIA FOR MASTER MODE:**
+• Did they address the SPECIFIC constraint given? (This is critical!)
+• Did they make the exact connection assigned, not a different one?
+• Is the specific parable/prophecy/element correctly identified and applied?
+
+If they ignored the specific constraint and made a different connection, gently redirect them to the assigned challenge while still affirming any good insights they shared.
+` : "";
+
         systemPrompt = `You are Jeeves, a warm and insightful teacher evaluating how well students APPLY Phototheology principles to biblical texts.
 
 **TASK:** Evaluate this student's application of ${roomTag} (${roomName}) to their ${textTypeLabel}.
-
+${masterModeInstructions}
 **EVALUATION CRITERIA:**
 • Did they actually APPLY the principle (not just identify or categorize)?
 • Is the application biblically sound and relevant?
@@ -785,15 +828,64 @@ Provide warm, insightful feedback that affirms the books and connections they id
 
 ${PALACE_SCHEMA}`;
 
+        const masterChallengeSection = difficultyLevel === "master" && masterChallengeText ? `
+
+**MASTER CHALLENGE ASSIGNED:** ${masterChallengeText}
+
+(Grade whether they addressed this specific assignment!)` : "";
+
         userPrompt = `Evaluate this application of ${roomTag} (${roomName}):
 
 ${textTypeLabel === "verse" ? "Verse:" : "Story:"} ${verseText}
+${masterChallengeSection}
 
 Student's Application:
 ${userAnswer}
 
 Provide warm, honest feedback. If their answer is strong, affirm it and build on it. If it's weak or misses the principle, gently explain why and guide them toward the correct application with a concrete example.`;
       }
+
+    } else if (mode === "master_challenge") {
+      // Master Mode - Generate specific constraints for the card challenge
+      const textTypeLabel = textType === "story" ? "story" : "verse";
+      const cardQuestion = requestBody.cardQuestion || "";
+
+      systemPrompt = `You are Jeeves, crafting a SPECIFIC, CONSTRAINED challenge for Master-level Bible study.
+
+**YOUR TASK:** Given a Phototheology principle card and a Bible passage, generate a SPECIFIC challenge that removes the student's freedom to choose. YOU pick the exact element they must work with.
+
+**EXAMPLES OF WHAT YOU SHOULD DO:**
+
+• If the card is "Connect 6 - Parable": DON'T say "connect to a parable." DO say "Connect this verse to the Parable of the Prodigal Son (Luke 15:11-32). Show how both texts illuminate each other."
+
+• If the card is "Connect 6 - Prophecy": DON'T say "connect to a prophecy." DO say "Connect this passage to Isaiah 53 (the Suffering Servant). How do these texts speak to each other?"
+
+• If the card is "Time Zone - Earth-Future": DON'T say "apply through end-time lens." DO say "Interpret this text as if you're living during the final 7 years before Christ's return. What would this mean during the time of Jacob's trouble?"
+
+• If the card is "Blue Room - Lampstand": DON'T say "connect to the lampstand." DO say "Show how this verse connects specifically to the seven golden lampstands in Revelation 1:12-20 and what Jesus says about them."
+
+• If the card is "Fruit Room - Gentleness": DON'T say "find gentleness." DO say "Compare this passage with Moses striking the rock (Numbers 20:1-13). How does gentleness versus harsh reaction change outcomes?"
+
+• If the card is "Dimensions - 4D (Ecclesiological)": DON'T say "apply to the church." DO say "Explain how this text applies specifically to the early church in Corinth dealing with division (1 Corinthians 1:10-17)."
+
+**FORMATTING:**
+- Be SPECIFIC - name exact passages, parables, prophecies, characters, events
+- Be CHALLENGING but fair - the connection should be possible but not obvious
+- Keep it to 2-3 sentences max
+- Don't explain why - just give the assignment
+- Sound confident and direct: "Your challenge: Connect this to..." or "Apply this passage specifically to..."
+
+${PALACE_SCHEMA}`;
+
+      userPrompt = `Generate a MASTER-LEVEL specific challenge for:
+
+**Card:** ${roomTag} (${roomName})
+**Card's General Question:** ${cardQuestion}
+**${textTypeLabel === "verse" ? "Verse" : "Story"}:** ${verseText}
+
+Your task: Pick a SPECIFIC biblical element (exact parable, specific prophecy, particular character, named event, etc.) that the student MUST use to complete this challenge. Remove their freedom to choose - YOU assign the specific connection they must make.
+
+Give only the specific assignment - no explanations. Be direct: "Your challenge: [specific task]"`;
 
     } else if (mode === "strongs-lookup") {
       // Strong's lookup temporarily disabled due to package configuration
@@ -1540,6 +1632,104 @@ CRITICAL: Return ONLY the JSON object. No markdown code blocks. No explanatory t
    - Type-antitype precision
 
 Your goal: Provide the kind of rigorous, loving, Christ-centered biblical scholarship that would help this student grow into a skilled handler of the Word of Truth.`;
+
+    } else if (mode === "polish-story") {
+      // POLISH MODE: Scripture-First Cinematic Manuscript
+      systemPrompt = `You are Jeeves, operating in POLISH MODE — Scripture-First Thematic Manuscript.
+
+TASK:
+Turn the user's sermon notes into ONE continuous preaching manuscript. "Cinematic" means THEMATIC — the theme escalates, the stakes deepen, the theology builds pressure. NOT visual aesthetics, NOT extravagant vocabulary, NOT sensory atmosphere.
+
+THE CORE PRINCIPLE:
+Make the THEME come to life, not the words. The theme grows by revealing more of what God did, what it cost, what it means, and what it demands. Every paragraph should make the listener feel the weight of the idea — not through adjectives, but through the relentless logic of Scripture piling up.
+
+NON-NEGOTIABLE RULES:
+
+1) FORBIDDEN LANGUAGE: No sensory descriptions (dust, wind, smells, shimmering, crackling, glowing). No poetic filler ("symphony of creation," "cosmic silence," "corridors of eternity," "tapestry of divine purpose," "searing brilliance," "weight of eternity"). No atmosphere-setting. No mood-painting. If a sentence describes a scene that the Bible does not describe, delete it.
+
+2) EXPAND THROUGH SCRIPTURE, NOT VOCABULARY. For EVERY verse the user gives, bring in 3-5 cross-references quoted in full (KJV) that deepen the THEME. The manuscript gets bigger because there is more Bible in it, not because there are more adjectives. Be THOROUGH — do not rush past any verse. Each user-provided verse deserves its own substantial treatment: full quotation, deep explanation, cross-references, and theological unpacking.
+
+3) PRESERVE THE ORDER. The user's verses and points are listed in a deliberate sequence. You MUST follow that sequence exactly. Do not rearrange, regroup, or reorder the user's material. The first verse they listed comes first in the manuscript, the second comes second, and so on. Build the thematic escalation WITHIN the user's given order — find the rising stakes in the sequence they chose.
+
+4) THEMATIC ESCALATION — how the sermon builds power:
+   - Each section reveals something the previous one did not
+   - The theme tightens: general truth → specific cost → personal implication → unavoidable response
+   - Stakes rise through theological logic, not through dramatic language
+   - Example: "God loves" → "God pays" → "God bleeds" → "God commands because He paid" → "What will you do with what He bought?"
+   That is escalation through theme. Not through words.
+
+5) Quote → Explain → Connect. That is the rhythm.
+   - QUOTE the verse in full (KJV)
+   - EXPLAIN what it means IN DEPTH — unpack the Hebrew/Greek where relevant, explain the historical context, draw out the theological weight. Do NOT give a single-sentence explanation and move on. Each verse deserves 2-4 paragraphs of thorough treatment.
+   - Bring in 3-5 CROSS-REFERENCES quoted in full (KJV) that reinforce or deepen the point
+   - CONNECT it to the next verse with a short, plain transition
+   - Repeat. The Bible carries the weight. You carry the logic.
+
+5) Do NOT summarize verses. QUOTE them fully, then explain their theological contribution to the theme.
+
+6) Transitions must be SHORT, PLAIN, and LOGICAL:
+   GOOD: "But love on a throne is one thing. Love that leaves the throne is another."
+   GOOD: "Now place that parable next to Philippians 2."
+   GOOD: "That is not a dramatic line. It's a receipt."
+   BAD: "Meanwhile, in the corridors of eternity..."
+   BAD: "And so the cosmic drama unfolds in breathtaking fashion..."
+   BAD: "The air itself seemed to tremble with anticipation..."
+
+7) When the Ten Commandments appear, quote each one (KJV) and explain how it protects what God purchased. Each commandment = a guardrail around the pearl.
+
+8) Tone: reverent, pastoral, plain-spoken. A preacher at a pulpit, not a novelist at a desk. Every sentence must be speakable aloud. If it sounds written, rewrite it until it sounds spoken.
+
+9) Bold beat-lines (**like this**) mark moments where the theme LANDS — where the logic arrives at its conclusion and the listener needs to feel the weight. These are structural, not decorative.
+
+10) The manuscript is one continuous flow. No numbered sections. No headings. No scene breaks. Opening statement → Scripture builds → Theme escalates → Closing appeal.
+
+WHAT MAKES IT EPIC:
+The sermon is epic because the THEOLOGY is epic, not the vocabulary. When Scripture reveals that the God of Ezekiel 1 liquidated heaven's privileges to buy a fallen world, and then placed ten guardrails around what He purchased, and then promised to come back for it — that is epic. You do not need to dress it up. You need to let it breathe.
+
+THEOLOGICAL ENRICHMENT:
+Weave these naturally — NEVER name them:
+- Types: lambs, blood, altars, water, fire → all pointing to Christ
+- Parallels: mirrored actions across time (Babel/Pentecost, Exodus/Calvary)
+- Patterns: recurring numbers (3, 7, 40), deliverer stories, covenant renewals
+- Sanctuary: altar, laver, lampstand, showbread, incense, ark
+- Christ must be visible in every section
+- Cross-Testament connections emerge through thematic logic, not forced insertion
+
+ALL Scripture must be KJV.
+
+OUTPUT FORMAT:
+Return ONLY valid JSON (no markdown, no code blocks):
+{
+  "story": {
+    "title": "A clear, preachable title",
+    "tagline": "One line capturing the core theological idea",
+    "manuscript": "THE ENTIRE MANUSCRIPT. One continuous flowing sermon manuscript. No numbered sections. No headings. No scene breaks. Just one moving document from opening to closing appeal. Scripture quoted verbatim (KJV) in-line or as short blocks. Occasional **bold beat-lines** for pulpit emphasis. At least 3000-5000+ words. Each user-provided verse gets 2-4 paragraphs of thorough treatment plus cross-references. Paragraphs separated by double newlines.",
+    "versesUsed": ["ALL verse references used"]
+  }
+}
+
+QUALITY CHECK BEFORE RETURNING:
+1. Did I add any sensory description not from the Bible text? → Delete it.
+2. Did I use any grand poetic filler or atmosphere-setting? → Rewrite in plain language.
+3. Is every paragraph either QUOTING scripture, EXPLAINING scripture, or TRANSITIONING to the next scripture? → If any paragraph just sets mood or paints a scene, delete it.
+4. Does the THEME escalate — does each section reveal something the previous one did not? → If two sections say the same thing with different words, merge them.
+5. Did I add at least 15+ cross-references quoted in full? → If not, add more.
+6. Could a pastor preach every sentence aloud without it sounding like a novel? → If not, simplify.
+7. Is the power coming from the THEME and SCRIPTURE, or from my word choices? → If from word choices, strip them back.
+8. **EVERY SINGLE VERSE the user provided in their input MUST appear in the manuscript — quoted in full (KJV), explained, and connected to the theme.** Do NOT skip, summarize, or omit any verse from the original input. If the user gave 20 verses, all 20 must be quoted and woven into the manuscript. You are ENCOURAGED to add additional supporting verses beyond what the user provided — more Scripture strengthens the manuscript — but the user's original verses are the non-negotiable foundation. Go back through the user's input and check off each verse. If any is missing, add it before returning.
+9. **Did I preserve the user's original ORDER of verses and points?** → The manuscript must follow the same sequence the user provided. Do NOT rearrange, regroup, or reorder their material.
+10. **Is every verse treated THOROUGHLY?** → Each user-provided verse should have 2-4 paragraphs of explanation, not a single sentence. If any verse is treated superficially, expand it with deeper theological unpacking, Hebrew/Greek insights, and additional cross-references.`;
+
+      userPrompt = `Turn these sermon notes into one continuous, EXTENSIVE preaching manuscript. CRITICAL RULES:
+1. You MUST use EVERY SINGLE verse I have listed below — quote each one in full (KJV), explain it thoroughly (2-4 paragraphs per verse), and connect it to the theme.
+2. PRESERVE MY ORDER — follow the exact sequence of my verses and points. Do NOT rearrange them.
+3. Be THOROUGH — do not rush past any verse. Unpack each one deeply with cross-references, Hebrew/Greek insights where relevant, and theological weight.
+4. You ARE encouraged to ADD more supporting verses beyond my list — but my verses are the mandatory foundation and their order is sacred.
+5. Make the THEME come to life — not the words. Expand by adding MORE SCRIPTURE (quoted in full, KJV), not more adjectives.
+6. No sensory descriptions. No poetic filler. No atmosphere-setting. Quote → Explain → Connect. Let the Bible carry the weight.
+
+Here are my notes:\n\n${message}`;
+
 
     } else if (mode === "analyze-followup") {
       // Follow-up conversation mode for thought analysis
@@ -2308,8 +2498,68 @@ ${vRef}: "${vText}"
 
 Give a clear, helpful explanation that covers the meaning, context, and significance.`;
 
+    } else if (mode === "raw-commentary") {
+      // Raw Commentary - Plain meaning without Palace framework filters
+      const rawVRef = `${book} ${chapter}:${verseText?.verse || ""}`;
+      const rawVText = verseText?.text || "";
+
+      systemPrompt = `You are Jeeves, a warm and knowledgeable Bible scholar providing thoughtful verse commentary.
+
+Your commentary should explore:
+1. The plain meaning of the text - what it's literally saying
+2. Historical and cultural context - the setting, audience, and circumstances
+3. Literary context - how it fits within the chapter and book
+4. Key words or phrases worth noting (include Greek/Hebrew when insightful)
+5. Cross-references to other relevant passages
+6. The theological significance and timeless truths
+7. Practical application for modern readers
+
+FORMATTING REQUIREMENTS:
+- Write in flowing, conversational paragraphs
+- Use clear section breaks between major points
+- Keep the tone warm, scholarly, and accessible
+- Use emojis sparingly for visual interest (📖 ✨ 🔍 💡)
+- Total response should be 300-500 words
+- Do NOT use asterisks or markdown formatting
+- Do NOT mention "Palace", "rooms", "dimensions", "cycles", or any Phototheology framework
+- Focus purely on the text's meaning without specialized interpretive frameworks`;
+
+      userPrompt = `Please provide a thoughtful commentary on this verse:
+
+${rawVRef}: "${rawVText}"
+
+Give a rich, insightful exploration of this text's meaning, context, and significance for modern readers.`;
+
     } else if (mode === "commentary-revealed") {
+      // Commentary depth instructions
+      const depthInstructions = commentaryDepth === "surface"
+        ? `
+DEPTH LEVEL: SURFACE (Quick Overview)
+- Keep the analysis brief and accessible (150-250 words total)
+- Focus on 1-2 key themes or insights
+- Use simple language anyone can understand
+- Skip technical details like Greek/Hebrew
+- Provide a clear, memorable takeaway`
+        : commentaryDepth === "depth"
+        ? `
+DEPTH LEVEL: DEEP ANALYSIS (Comprehensive Study)
+- Provide thorough, scholarly analysis (500-800 words)
+- Include Greek/Hebrew word studies where relevant
+- Reference multiple cross-references and parallel passages
+- Explore historical and cultural context
+- Discuss theological implications and connections
+- Include relevant typology and symbolism
+- Provide practical application insights`
+        : `
+DEPTH LEVEL: INTERMEDIATE (Balanced Analysis)
+- Provide a balanced analysis (300-450 words)
+- Include key contextual information
+- Reference 2-3 relevant cross-references
+- Mention significant Greek/Hebrew terms when impactful
+- Balance scholarly insight with accessibility`;
+
       systemPrompt = `You are Jeeves, a theologian analyzing Bible verses to identify which principles and dimensions are REVEALED or PRESENT in the text itself.
+${depthInstructions}
 Focus on discovering what's already there, not applying external frameworks.
 
 CRITICAL FORMATTING REQUIREMENTS (FOLLOW ALL OF THESE):
@@ -2379,7 +2629,32 @@ Write one profound insight (2–3 sentences) that ties everything together.
 At the very end, on a new line, append: PRINCIPLES_REVEALED: [list of room codes you used]`;
 
     } else if (mode === "commentary-applied") {
-      systemPrompt = `You are Jeeves, a master Phototheology analyst providing DEEP, SUBSTANTIVE Bible commentary by APPLYING specific analytical lenses to verses.
+      // Commentary depth instructions for applied mode
+      const appliedDepthInstructions = commentaryDepth === "surface"
+        ? `
+DEPTH LEVEL: SURFACE (Quick Overview)
+- Keep each room analysis brief (40-60 words)
+- Focus on the single most important insight from each lens
+- Skip Greek/Hebrew unless essential
+- Total response: 150-300 words`
+        : commentaryDepth === "depth"
+        ? `
+DEPTH LEVEL: DEEP ANALYSIS (Comprehensive Study)
+- Each room analysis should be 120-180 words of substantive content
+- ALWAYS include Greek/Hebrew word studies
+- Provide 3+ cross-references per room
+- Explore typological connections
+- Include historical/cultural context
+- Total response: 600-1000 words`
+        : `
+DEPTH LEVEL: INTERMEDIATE (Balanced Analysis)
+- Each room analysis should be 80-120 words
+- Include key Greek/Hebrew when impactful
+- Provide 1-2 cross-references per room
+- Total response: 350-550 words`;
+
+      systemPrompt = `You are Jeeves, a master Phototheology analyst providing Bible commentary by APPLYING specific analytical lenses to verses.
+${appliedDepthInstructions}
 
 Your analysis must be SCHOLARLY and APPLIED—not surface-level descriptions of what each room does. Instead, you must DEMONSTRATE each room's methodology by actually applying it to the specific verse text.
 
@@ -2388,7 +2663,7 @@ CRITICAL ANALYSIS REQUIREMENTS:
 2. SHOW the room's methodology in action—don't just describe it
 3. EXTRACT insights that are UNIQUE to that lens (what would be missed without it?)
 4. CONNECT to cross-references, Greek/Hebrew, and typology where relevant
-5. Each room analysis should be 80-120 words of substantive content
+5. Adjust depth based on the DEPTH LEVEL instructions above
 
 EXAMPLES OF DEPTH EXPECTED:
 
@@ -2677,6 +2952,16 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
 • Briefly expound on each quote's relevance
 • If truly no commentary exists, clearly state it—don't force generic quotes`;
 
+      // RAG corpus injection for SOP commentary (early-return mode)
+      const sopRag = await getCorpusContext({
+        query: `Ellen White Spirit of Prophecy ${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 3,
+        supabaseClient: supabase,
+      });
+      if (sopRag.chunkCount > 0) {
+        systemPrompt += sopRag.corpusContext;
+      }
+
       const sopResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
         {
@@ -2705,13 +2990,761 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
       const sopContent = sopData.choices?.[0]?.message?.content || "No SOP commentary generated.";
 
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           content: sopContent,
           principlesUsed: ["Spirit of Prophecy (SOP)"]
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-    
+
+    } else if (mode === "story-mode-commentary") {
+      // Story Mode Commentary — simple yet deep narrative explanation with Palace devotional insight
+      // Detect a relevant Palace room for this verse based on signal keywords
+      const vText = (verseText?.text || "").toLowerCase();
+      let storyRoomHint = "";
+      const roomEntries = Object.values(MENTOR_ROOMS);
+      for (const room of roomEntries) {
+        if (room.signalKeywords.some((kw: string) => vText.includes(kw))) {
+          storyRoomHint = `The Phototheology Palace "${room.name}" lens suggests: "${room.method}". Weave this perspective naturally into your devotional thought — don't name the room, just apply the idea.`;
+          break;
+        }
+      }
+      if (!storyRoomHint) {
+        storyRoomHint = `The Phototheology Palace "Story Room" lens suggests: "Recall the narrative sequence as a vivid mental movie." Weave this perspective naturally into your devotional thought.`;
+      }
+
+      systemPrompt = `You are a warm, friendly Bible guide explaining Scripture to someone who may be new to faith. Your job is to make the text come alive AND leave the listener with something to carry in their heart.
+
+YOUR VOICE: Like a wise older friend who loves God and loves people. Simple words, real depth. You don't talk down — you invite up.
+
+STRUCTURE (follow this exactly):
+1. SET THE SCENE (1-2 sentences): Who's here? What's happening? Use present tense to make it vivid.
+2. THE MEANING (2-3 sentences): What is this verse really saying? Unpack it simply but don't be shallow. Get to the heart of what God is communicating.
+3. DEVOTIONAL THOUGHT (1-2 sentences): A personal, warm takeaway that connects this ancient text to the listener's real life today. ${storyRoomHint}
+
+RULES:
+- Total length: 80-130 words. This will be read aloud as audio commentary.
+- Use simple, everyday language. No theological jargon. No Greek/Hebrew terms.
+- Write in present tense: "Jesus turns to them..." not "Jesus turned to them..."
+- The devotional thought should feel like a gentle nudge, not a sermon. Think "here's something beautiful to sit with" not "here's what you should do."
+- Do NOT use bullet points, numbered lists, or section headers in your output.
+- Do NOT use phrases like "In this verse..." or "The Bible says..." — just flow naturally.
+- Do NOT name Phototheology rooms or methods explicitly. Just apply the insight naturally.
+- Be reverent but never stiff. Warm but never shallow.`;
+
+      userPrompt = `Guide me through this verse — set the scene, explain the meaning simply but deeply, and leave me with a devotional thought to carry with me:
+
+${book} ${chapter}:${verseText?.verse || verse}
+"${verseText?.text || verseText || ""}"
+
+Remember: present tense, plain language, simple yet deep, 80-130 words total.`;
+
+      // RAG corpus injection for story-mode commentary (early-return mode)
+      const storyRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText?.verse || verse} ${verseText?.text || ''}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (storyRag.chunkCount > 0) {
+        systemPrompt += storyRag.corpusContext;
+      }
+
+      const storyResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!storyResponse.ok) {
+        const errorText = await storyResponse.text();
+        console.error('AI Gateway error:', storyResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${storyResponse.status}`);
+      }
+
+      const storyData = await storyResponse.json();
+      const storyContent = storyData.choices?.[0]?.message?.content || "No story commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: storyContent,
+          principlesUsed: ["Story Mode Commentary"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
+    } else if (mode === "preacher-mentor-commentary") {
+      // Preacher Mentor Commentary Engine v1
+      // Uses canonical rooms imported at top of file (static import)
+
+      const {
+        primary_room: mentorPrimaryRoom,
+        secondary_rooms: mentorSecondaryRooms,
+        genre: mentorGenre,
+        override_room: mentorOverrideRoom,
+      } = requestBody;
+
+      const effectivePrimary = mentorOverrideRoom || mentorPrimaryRoom || 'sr';
+      const primaryRoomData = MENTOR_ROOMS[effectivePrimary] || MENTOR_ROOMS['sr'];
+      const secondaryRoomNames = (mentorSecondaryRooms || [])
+        .filter((code: string) => isValidMentorRoom(code))
+        .map((code: string) => MENTOR_ROOMS[code]?.name || code);
+
+      // Word count targets by genre
+      const wordCountTargets: Record<string, { min: number; max: number }> = {
+        narrative: { min: 260, max: 350 },
+        epistle: { min: 320, max: 420 },
+        prophecy: { min: 380, max: 500 },
+        poetry: { min: 280, max: 360 },
+        wisdom: { min: 300, max: 400 },
+        law: { min: 300, max: 400 },
+        gospel: { min: 280, max: 380 },
+        apocalyptic: { min: 380, max: 500 },
+        doctrinal: { min: 400, max: 520 },
+      };
+      const target = wordCountTargets[mentorGenre] || wordCountTargets['narrative'];
+
+      // Banned sermon phrases
+      const SERMON_BAN_LIST = [
+        "three points", "sermon outline", "illustration", "in conclusion",
+        "let me illustrate", "point one", "point two", "point three",
+        "firstly", "secondly", "thirdly", "my brothers and sisters",
+        "let us pray", "amen", "turn with me to", "open your bibles",
+        "sermon", "homily", "pulpit", "congregation",
+      ];
+
+      // Build valid room codes list for the prompt
+      const validRoomsList = MENTOR_ROOM_CODES.map((code: string) => {
+        const r = MENTOR_ROOMS[code];
+        return `${code.toUpperCase()}: ${r.name}`;
+      }).join(', ');
+
+      systemPrompt = `You are a Preacher Mentor — a scholarly-pastoral Bible study companion. You produce structured, exegesis-first commentary that helps preachers deeply understand a passage BEFORE they ever step into a pulpit.
+
+CRITICAL IDENTITY RULES:
+- You are NOT preaching. You are mentoring a preacher in their study.
+- Your tone is scholarly yet warm, reverent yet accessible — like a seminary professor who genuinely cares about the student.
+- You NEVER produce sermon content. No outlines, no illustrations, no "three points", no rhetorical flourishes.
+
+MANDATORY SECTION ORDER (you must produce exactly these 5 sections in this exact order):
+
+1. MEANING — Exegetical analysis of what the text means in its original context. Historical background, literary context, authorial intent. This is the foundation.
+
+2. LANGUAGE INSIGHT — Identify up to 2 key Hebrew/Greek terms. For each provide:
+   - "original": the word in original language
+   - "transliteration": romanized form
+   - "pronunciation": phonetic guide
+   - "language": "Hebrew" or "Greek"
+   - "definition": core meaning
+   - "interpretiveImpact": how this word shapes understanding of the passage
+   Return as JSON array under "language_insight" key.
+
+3. CROSS-SCRIPTURE — 3-5 cross-references from both testaments that illuminate the passage. For each, give the reference and a 1-sentence explanation of the connection.
+
+4. PALACE FRAMING — Read the passage through the lens of the ${primaryRoomData.name} (${effectivePrimary.toUpperCase()}) room: "${primaryRoomData.method}". ${secondaryRoomNames.length > 0 ? `Also touch on secondary lenses: ${secondaryRoomNames.join(', ')}.` : ''} Connect the exegetical findings to the Palace methodology. Use ONLY these canonical room codes: ${validRoomsList}. NEVER invent room names or codes.
+
+5. PREACHING ORIENTATION — A brief, non-sermonic paragraph that orients the preacher toward the passage's kerygmatic weight. What is the core proclamation? What must the congregation hear? Do NOT write the sermon — just point the direction.
+
+HARD BANS — Your output must NEVER contain any of these phrases: ${SERMON_BAN_LIST.join(', ')}
+
+WORD COUNT: Target ${target.min}-${target.max} words total across all sections.
+
+GENRE CONTEXT: This passage is classified as "${mentorGenre}". Adjust depth accordingly.
+
+OUTPUT FORMAT: Return ONLY valid JSON with this schema:
+{
+  "sections": {
+    "meaning": "<string>",
+    "language_insight": [{"original": "", "transliteration": "", "pronunciation": "", "language": "", "definition": "", "interpretiveImpact": ""}],
+    "cross_scripture": "<string>",
+    "palace_framing": "<string>",
+    "preaching_orientation": "<string>"
+  },
+  "study_buddy_prompts": ["<prompt1>", "<prompt2>", ...],
+  "compliance_report": {
+    "sermon_check_passed": <boolean>,
+    "room_validation_passed": <boolean>,
+    "word_count": <integer>,
+    "banned_phrases_found": [],
+    "invalid_rooms_found": []
+  }
+}
+
+For study_buddy_prompts: Generate 3-6 lens-aware guided questions. The primary room (${primaryRoomData.name}) should contribute 2-3 questions based on its methodology. Each secondary room contributes 1 question. Questions must be specific to this passage, not generic devotional questions.`;
+
+      userPrompt = `Generate Preacher Mentor Commentary for:
+
+Passage: ${book} ${chapter}:${verseText.verse}
+Text: "${verseText.text}"
+Primary Room: ${effectivePrimary.toUpperCase()} — ${primaryRoomData.name}
+Secondary Rooms: ${(mentorSecondaryRooms || []).map((c: string) => c.toUpperCase()).join(', ') || 'None'}
+Genre: ${mentorGenre || 'narrative'}
+${mentorOverrideRoom ? `Note: User has overridden the AI-detected primary lens. The meaning section should remain exegetically neutral; only the Palace Framing section should reflect the override lens.` : ''}
+
+Return the structured JSON response with all 5 sections, study buddy prompts, and compliance report.`;
+
+      // RAG corpus injection for preacher-mentor commentary (early-return mode)
+      const mentorRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (mentorRag.chunkCount > 0) {
+        systemPrompt += mentorRag.corpusContext;
+      }
+
+      const mentorResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!mentorResponse.ok) {
+        const errorText = await mentorResponse.text();
+        console.error('AI Gateway error:', mentorResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${mentorResponse.status}`);
+      }
+
+      const mentorData = await mentorResponse.json();
+      let mentorRawContent = mentorData.choices?.[0]?.message?.content || "{}";
+
+      // Strip markdown code fences if present
+      mentorRawContent = mentorRawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+      let mentorParsed;
+      try {
+        mentorParsed = JSON.parse(mentorRawContent);
+      } catch (e) {
+        console.error("Failed to parse mentor response:", mentorRawContent);
+        // Fallback: wrap raw content as meaning section
+        mentorParsed = {
+          sections: {
+            meaning: mentorRawContent,
+            language_insight: [],
+            cross_scripture: "",
+            palace_framing: "",
+            preaching_orientation: "",
+          },
+          study_buddy_prompts: [],
+          compliance_report: {
+            sermon_check_passed: false,
+            room_validation_passed: false,
+            word_count: 0,
+            banned_phrases_found: ["parse_error"],
+            invalid_rooms_found: [],
+          },
+        };
+      }
+
+      // Post-process compliance: check for banned phrases in output
+      const allText = JSON.stringify(mentorParsed.sections || {}).toLowerCase();
+      const foundBanned = SERMON_BAN_LIST.filter(phrase => allText.includes(phrase.toLowerCase()));
+      const compliance = mentorParsed.compliance_report || {};
+      compliance.sermon_check_passed = foundBanned.length === 0;
+      compliance.banned_phrases_found = foundBanned;
+
+      // Validate room codes mentioned in palace_framing
+      const framingText = (mentorParsed.sections?.palace_framing || '').toLowerCase();
+      const mentionedCodes = MENTOR_ROOM_CODES.filter((code: string) =>
+        framingText.includes(code.toLowerCase()) || framingText.includes(code.toUpperCase())
+      );
+      const invalidMentioned: string[] = [];
+      // Check for any capitalized abbreviations that aren't valid
+      const abbrevPattern = /\b[A-Z]{2,4}\b/g;
+      const matches = (mentorParsed.sections?.palace_framing || '').match(abbrevPattern) || [];
+      for (const m of matches) {
+        if (!isValidMentorRoom(m.toLowerCase()) && !['THE', 'AND', 'FOR', 'NOT', 'BUT', 'NOR', 'YET'].includes(m)) {
+          invalidMentioned.push(m);
+        }
+      }
+      compliance.room_validation_passed = invalidMentioned.length === 0;
+      compliance.invalid_rooms_found = invalidMentioned;
+      mentorParsed.compliance_report = compliance;
+
+      return new Response(
+        JSON.stringify({
+          content: mentorParsed,
+          principlesUsed: ["Preacher Mentor Commentary v1"],
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
+    } else if (mode === "counselor-commentary") {
+      // Counselor Commentary Mode — reflective, soul-care focused commentary
+      // Explores emotional, psychological, and spiritual dimensions of Scripture
+      // while remaining fully grounded in biblical theology and Phototheology principles.
+
+      const vText = (verseText?.text || "").toLowerCase();
+      let counselorRoomHint = "";
+      const roomEntries = Object.values(MENTOR_ROOMS);
+      for (const room of roomEntries) {
+        if (room.signalKeywords.some((kw: string) => vText.includes(kw))) {
+          counselorRoomHint = `The Phototheology "${room.name}" lens suggests: "${room.method}". Integrate this perspective into your reflection on the inner life — do not name the room.`;
+          break;
+        }
+      }
+      if (!counselorRoomHint) {
+        counselorRoomHint = `The Phototheology "Heart Room" lens suggests: "Examine what is happening inside the person — their fears, hopes, conflicts, and choices." Integrate this naturally.`;
+      }
+
+      systemPrompt = `You are operating in Counselor Commentary Mode within the Phototheology Bible Suite.
+
+Your voice is that of a spiritually grounded, biblically faithful counselor who interprets Scripture through the lens of the human heart, inner conflict, emotional experience, and spiritual formation — without replacing theology with psychology.
+
+You are NOT a therapist, diagnostician, or speculative psychologist.
+You are a reflective biblical commentator focused on soul care, emotional realism, and spiritual insight.
+
+CORE FOCUS:
+- Emotional states implied in the text
+- Internal struggles of biblical characters
+- Psychological realism grounded in Scripture
+- The spiritual and emotional condition of the listener
+- The battle of the mind, heart, and conscience (Great Controversy at the internal level)
+
+TONE (NON-NEGOTIABLE):
+- Calm, insightful, emotionally intelligent
+- Gentle but intellectually serious
+- Reflective and measured
+- Compassionate without sentimentality
+
+AVOID ABSOLUTELY:
+- Slang, overly clinical language, diagnostic labels
+- Therapy jargon, pop psychology cliches, motivational fluff
+- Sensational emotional exaggeration
+- "Ah," "dear friend," "my friend," "Here's the thing," "Let's dive in," "Picture this"
+- "This isn't just..." "not just a..." "more than just..."
+- "You see," "Think about it," "At its core," "What's fascinating is"
+- "Unpack" as a verb, "Journey" for spiritual growth, "Powerful" overuse, "Speaks to"
+
+PHOTOTHEOLOGY INTEGRATION:
+${counselorRoomHint}
+Subtly integrate Heart Room (inner life), Story Room (narrative psychology), Connect Room (life application), and Great Controversy (battle of thoughts, trust, allegiance) principles. Do NOT explicitly mention "rooms" unless contextually appropriate.
+
+SDA THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
+- Scripture is the final authority
+- Never excuse sin as mere emotional struggle
+- Maintain moral accountability alongside emotional awareness
+- Preserve the Great Controversy framework (internal spiritual conflict is real)
+- Never reinterpret sin as purely psychological weakness
+- Never replace repentance with emotional validation
+- Uphold doctrines: law, sin, repentance, sanctification, Sabbath, sanctuary
+
+TEXTUAL ANCHORING (ANTI-SPECULATION):
+Only analyze emotions and mental states that are directly stated in the text, strongly implied by narrative context, or supported by behavior described in Scripture. Do NOT invent motives, psychoanalyze beyond the text, diagnose biblical figures, or project modern psychology without textual grounding.
+
+REQUIRED STRUCTURE (follow as natural flowing paragraphs — no headers or bullets in output):
+
+1. TEXTUAL OBSERVATION: Briefly explain what is happening in the verse or passage.
+
+2. EMOTIONAL & PSYCHOLOGICAL INSIGHT: Explore the internal state implied in the narrative — fear, shame, guilt, anxiety, grief, exhaustion, moral conflict, isolation, trust vs distrust. Ground all insights in Scripture.
+
+3. HUMAN EXPERIENCE BRIDGE: Connect the biblical experience to real modern inner struggles — anxiety, burnout, identity crisis, loneliness, moral failure, spiritual discouragement, emotional overwhelm. Thoughtful, not trendy.
+
+4. SPIRITUAL REFLECTION (CHRIST-CENTERED): Point toward God's character, encourage reflection, maintain reverence, support spiritual growth — not mere emotional relief.
+
+FORMATTING FOR SPOKEN DELIVERY:
+- Write as flowing, contemplative prose — no bullet points, no section headers, no markdown
+- Suitable for audio narration and serious study
+- Target 150-250 words — rich but clear, medium to deep reflection
+- Never end mid-sentence — every paragraph must be complete`;
+
+      userPrompt = `Provide Counselor Mode commentary for this verse — explore the emotional and spiritual inner life of the text, connect it to real human experience, and anchor the reflection in Christ:
+
+${book} ${chapter}:${verseText?.verse || verse}
+"${verseText?.text || verseText || ""}"
+
+Remember: calm, reflective, textually grounded, 150-250 words, flowing prose suitable for audio.`;
+
+      // RAG corpus injection for counselor commentary (early-return mode)
+      const counselorRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText?.verse || verse} ${verseText?.text || ''}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (counselorRag.chunkCount > 0) {
+        systemPrompt += counselorRag.corpusContext;
+      }
+
+      const counselorResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!counselorResponse.ok) {
+        const errorText = await counselorResponse.text();
+        console.error('AI Gateway error:', counselorResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${counselorResponse.status}`);
+      }
+
+      const counselorData = await counselorResponse.json();
+      const counselorContent = counselorData.choices?.[0]?.message?.content || "No counselor commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: counselorContent,
+          principlesUsed: ["Counselor Commentary Mode"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
+    } else if (mode === "commentary-sdabc") {
+      // SDA Bible Commentary
+      systemPrompt = `You are Jeeves, a biblical scholar deeply familiar with the Seventh-day Adventist Bible Commentary (SDABC).
+
+**CRITICAL TASK:**
+Provide SDA Bible Commentary-style exposition on ${book} ${chapter}:${verseText.verse}.
+
+**ABOUT THE SDA BIBLE COMMENTARY:**
+The SDABC is a 7-volume verse-by-verse commentary produced by the Seventh-day Adventist Church, known for:
+- Scholarly yet accessible exposition
+- Historical-grammatical interpretation
+- Attention to Hebrew/Greek word meanings
+- Cross-references to other Scripture
+- Connection to the Great Controversy theme
+- Sanctuary typology when relevant
+- Prophetic interpretation aligned with historicist method
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Format in clear paragraphs (2-4 sentences each)
+- Separate each paragraph with a blank line
+- Use emojis for visual clarity (📖 💡 ✨ 🔍 ⚓)
+- Include word studies when relevant
+- Reference parallel passages
+- Connect to broader biblical themes
+- Show Christ-centered interpretation
+
+${PALACE_SCHEMA}`;
+
+      userPrompt = `Provide SDA Bible Commentary-style exposition on ${book} ${chapter}:${verseText.verse}
+
+Verse text: "${verseText.text}"
+
+**MANDATORY FORMAT:**
+
+📖 **SDA Bible Commentary**
+
+**Textual Analysis:**
+[2-3 paragraphs analyzing the verse's meaning, including any relevant Hebrew/Greek insights, historical context, and immediate literary context]
+
+**Cross-References:**
+[List 3-5 key parallel passages with brief explanations of their connection]
+
+**Theological Significance:**
+[1-2 paragraphs on the verse's theological importance, including any connection to the Great Controversy theme, sanctuary typology, or prophetic significance]
+
+✨ **Application:**
+[1 paragraph on practical spiritual application]
+
+**CRITICAL RULES:**
+• Write in the scholarly yet accessible style of the SDABC
+• Include word studies where the original language illuminates meaning
+• Connect to the broader narrative of Scripture
+• Maintain SDA theological perspective
+• Do NOT fabricate specific volume/page citations`;
+
+      // RAG corpus injection for SDABC commentary (early-return mode)
+      const sdabcRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (sdabcRag.chunkCount > 0) {
+        systemPrompt += sdabcRag.corpusContext;
+      }
+
+      const sdabcResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!sdabcResponse.ok) {
+        const errorText = await sdabcResponse.text();
+        console.error('AI Gateway error:', sdabcResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${sdabcResponse.status}`);
+      }
+
+      const sdabcData = await sdabcResponse.json();
+      const sdabcContent = sdabcData.choices?.[0]?.message?.content || "No SDABC commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: sdabcContent,
+          principlesUsed: ["SDA Bible Commentary"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
+    } else if (mode === "commentary-uriah-smith") {
+      // Uriah Smith's Daniel and Revelation
+      const isDanielOrRevelation = book.toLowerCase() === "daniel" || book.toLowerCase() === "revelation";
+
+      systemPrompt = `You are Jeeves, a biblical scholar deeply familiar with Uriah Smith's classic work "Daniel and the Revelation" (1897).
+
+**ABOUT URIAH SMITH:**
+Uriah Smith (1832-1903) was a prominent Seventh-day Adventist theologian and editor. His book "Daniel and the Revelation" is a verse-by-verse exposition of these prophetic books using the historicist method of prophetic interpretation.
+
+**KEY CHARACTERISTICS OF SMITH'S WORK:**
+- Historicist interpretation (prophecies fulfilled through history)
+- Detailed identification of prophetic symbols with historical entities
+- Year-day principle application
+- Connection of Daniel and Revelation's parallel prophecies
+- Focus on end-time events and the Second Coming
+- Clear, systematic exposition
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Format in clear paragraphs (2-4 sentences each)
+- Use emojis for visual clarity (📜 🔮 ⚔️ 👑 🕊️)
+- Present Smith's interpretations faithfully
+- Include historical identifications he makes
+- Show prophetic timelines when relevant
+
+${PALACE_SCHEMA}`;
+
+      if (isDanielOrRevelation) {
+        userPrompt = `Provide Uriah Smith's exposition on ${book} ${chapter}:${verseText.verse} from "Daniel and the Revelation"
+
+Verse text: "${verseText.text}"
+
+**MANDATORY FORMAT:**
+
+📜 **Uriah Smith - Daniel and the Revelation**
+
+**Smith's Exposition:**
+[2-3 paragraphs presenting Smith's interpretation of this verse, including his identification of symbols and historical fulfillments]
+
+**Historical Identifications:**
+[List the specific historical entities/events Smith identifies with the prophetic symbols in this passage]
+
+**Prophetic Timeline:**
+[If applicable, show where this fits in Smith's understanding of prophetic chronology]
+
+🔮 **End-Time Significance:**
+[Smith's understanding of how this relates to last-day events]
+
+**CRITICAL RULES:**
+• Present Smith's actual interpretations faithfully
+• Include his historical identifications (beasts = kingdoms, horns = powers, etc.)
+• Show the historicist method in action
+• Connect to parallel prophecies in Daniel/Revelation
+• Note: Smith wrote in the late 1800s, so some historical references reflect that era`;
+      }
+
+      // RAG corpus injection for Uriah Smith commentary (early-return mode)
+      const smithRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (smithRag.chunkCount > 0) {
+        systemPrompt += smithRag.corpusContext;
+      }
+
+      if (!isDanielOrRevelation) {
+        userPrompt = `The user is requesting Uriah Smith's commentary on ${book} ${chapter}:${verseText.verse}.
+
+Note: Uriah Smith's "Daniel and the Revelation" specifically covers only the books of Daniel and Revelation.
+
+**Please respond:**
+
+📜 **Uriah Smith - Daniel and the Revelation**
+
+This commentary specifically covers the prophetic books of **Daniel** and **Revelation** only.
+
+${book} ${chapter}:${verseText.verse} is not within the scope of Smith's work.
+
+💡 **Suggestion:** For this verse, consider using:
+- SDA Bible Commentary (comprehensive verse-by-verse)
+- Spirit of Prophecy (Ellen White's writings)
+- Other classic commentaries available
+
+If you're studying prophetic themes that connect to Daniel or Revelation, Smith's work would be an excellent companion resource for those specific books.`;
+      }
+
+      const smithResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!smithResponse.ok) {
+        const errorText = await smithResponse.text();
+        console.error('AI Gateway error:', smithResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${smithResponse.status}`);
+      }
+
+      const smithData = await smithResponse.json();
+      const smithContent = smithData.choices?.[0]?.message?.content || "No Uriah Smith commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: smithContent,
+          principlesUsed: ["Uriah Smith - Daniel and the Revelation"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
+    } else if (mode === "commentary-jn-andrews") {
+      // J.N. Andrews Prophecy Commentary
+      systemPrompt = `You are Jeeves, a biblical scholar deeply familiar with the prophetic writings of J.N. Andrews.
+
+**ABOUT J.N. ANDREWS:**
+John Nevins Andrews (1829-1883) was a pioneering Seventh-day Adventist theologian, the first SDA missionary, and a meticulous Bible student. His key works include:
+- "The Sanctuary and the Twenty-Three Hundred Days" (on Daniel 8:14)
+- "The Three Messages of Revelation 14"
+- "History of the Sabbath and First Day of the Week"
+- Various articles on prophetic interpretation
+
+**KEY CHARACTERISTICS OF ANDREWS' WORK:**
+- Precise, scholarly approach
+- Detailed historical research
+- Focus on the sanctuary doctrine
+- Three Angels' Messages exposition
+- Sabbath truth in prophecy
+- Careful textual analysis
+- Historicist prophetic interpretation
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Format in clear paragraphs (2-4 sentences each)
+- Use emojis for visual clarity (📚 ⛪ 🕯️ 📖 ✝️)
+- Present Andrews' theological insights
+- Include sanctuary connections when relevant
+- Show prophetic significance
+
+${PALACE_SCHEMA}`;
+
+      userPrompt = `Provide J.N. Andrews-style prophetic exposition on ${book} ${chapter}:${verseText.verse}
+
+Verse text: "${verseText.text}"
+
+**MANDATORY FORMAT:**
+
+📚 **J.N. Andrews - Prophetic Exposition**
+
+**Andrews' Analysis:**
+[2-3 paragraphs presenting how Andrews would interpret this verse, drawing from his theological framework and writing style]
+
+**Sanctuary Connection:**
+[If applicable, how this verse connects to sanctuary typology - a central theme in Andrews' work]
+
+**Prophetic Significance:**
+[Andrews' understanding of prophetic implications, especially relating to the Three Angels' Messages or end-time events]
+
+⛪ **Practical Application:**
+[How Andrews would apply this truth to Christian life and witness]
+
+**CRITICAL RULES:**
+• Write in Andrews' precise, scholarly style
+• Emphasize sanctuary typology where relevant
+• Connect to the Three Angels' Messages when appropriate
+• Show the historicist prophetic framework
+• Focus on themes Andrews emphasized: sanctuary, Sabbath, prophecy, the Advent hope`;
+
+      // RAG corpus injection for J.N. Andrews commentary (early-return mode)
+      const andrewsRag = await getCorpusContext({
+        query: `${book} ${chapter}:${verseText.verse} ${verseText.text}`.slice(0, 4000),
+        matchCount: 2,
+        supabaseClient: supabase,
+      });
+      if (andrewsRag.chunkCount > 0) {
+        systemPrompt += andrewsRag.corpusContext;
+      }
+
+      const andrewsResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!andrewsResponse.ok) {
+        const errorText = await andrewsResponse.text();
+        console.error('AI Gateway error:', andrewsResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${andrewsResponse.status}`);
+      }
+
+      const andrewsData = await andrewsResponse.json();
+      const andrewsContent = andrewsData.choices?.[0]?.message?.content || "No J.N. Andrews commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: andrewsContent,
+          principlesUsed: ["J.N. Andrews - Prophetic Exposition"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
     } else if (mode === "check-commentary-availability") {
       // Check which classic commentaries have content for this verse
       const commentaryUrls: Record<string, { name: string; searchUrl: string }> = {
@@ -2794,11 +3827,19 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
         if (result) availableCommentaries.push(result);
       });
 
-      // Always include SOP as available
+      // Always include SDA commentaries as available (AI-generated)
       availableCommentaries.push('sop');
+      availableCommentaries.push('sdabc');
+      availableCommentaries.push('jn-andrews');
+
+      // Uriah Smith only available for Daniel and Revelation
+      const bookLower = book.toLowerCase();
+      if (bookLower === 'daniel' || bookLower === 'revelation') {
+        availableCommentaries.push('uriah-smith');
+      }
 
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           available: availableCommentaries,
           book,
           chapter,
@@ -2809,99 +3850,198 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
 
     } else if (mode === "commentary-classic") {
       // Map commentators to their StudyLight.org URLs
-      const commentaryUrls: Record<string, { name: string; searchUrl: string }> = {
-        "clarke": { 
+      const commentaryUrls: Record<string, { name: string; searchUrl: string; code: string }> = {
+        "clarke": {
           name: "Adam Clarke's Commentary",
+          code: "acc",
           searchUrl: `https://www.studylight.org/commentaries/eng/acc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "barnes": { 
+        "barnes": {
           name: "Barnes' Notes on the Bible",
+          code: "bnb",
           searchUrl: `https://www.studylight.org/commentaries/eng/bnb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "gill": { 
+        "gill": {
           name: "Gill's Exposition of the Bible",
+          code: "geb",
           searchUrl: `https://www.studylight.org/commentaries/eng/geb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "henry": { 
+        "henry": {
           name: "Matthew Henry's Concise Commentary",
+          code: "mhm",
           searchUrl: `https://www.studylight.org/commentaries/eng/mhm/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "jfb": { 
+        "jfb": {
           name: "Jamieson-Fausset-Brown Bible Commentary",
+          code: "jfb",
           searchUrl: `https://www.studylight.org/commentaries/eng/jfb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "keil-delitzsch": { 
+        "keil-delitzsch": {
           name: "Keil and Delitzsch Biblical Commentary",
+          code: "kdo",
           searchUrl: `https://www.studylight.org/commentaries/eng/kdo/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "wesley": { 
+        "wesley": {
           name: "Wesley's Explanatory Notes",
+          code: "wen",
           searchUrl: `https://www.studylight.org/commentaries/eng/wen/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "pulpit": { 
+        "pulpit": {
           name: "Pulpit Commentary",
+          code: "tpc",
           searchUrl: `https://www.studylight.org/commentaries/eng/tpc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "cambridge": { 
+        "cambridge": {
           name: "Cambridge Bible for Schools and Colleges",
+          code: "cbb",
           searchUrl: `https://www.studylight.org/commentaries/eng/cbb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "ellicott": { 
+        "ellicott": {
           name: "Ellicott's Commentary for English Readers",
+          code: "ebc",
           searchUrl: `https://www.studylight.org/commentaries/eng/ebc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "benson": { 
+        "benson": {
           name: "Benson Commentary",
+          code: "rbc",
           searchUrl: `https://www.studylight.org/commentaries/eng/rbc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "sop": { 
+        "sop": {
           name: "Spirit of Prophecy",
+          code: "sop",
           searchUrl: "" // SOP handled separately above
         },
       };
 
       const selectedCommentary = commentaryUrls[classicCommentary] || commentaryUrls["clarke"];
-      
+
+      // Function to extract text from HTML, preserving structure
+      const extractTextFromHtml = (html: string): string => {
+        // Remove script and style tags first
+        let text = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+        text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+        // Convert <br> to newlines
+        text = text.replace(/<br\s*\/?>/gi, '\n');
+        // Convert </p> and </div> to double newlines for paragraph separation
+        text = text.replace(/<\/p>/gi, '\n\n');
+        text = text.replace(/<\/div>/gi, '\n');
+        // Remove all remaining HTML tags
+        text = text.replace(/<[^>]+>/g, '');
+        // Decode HTML entities
+        text = text.replace(/&nbsp;/g, ' ');
+        text = text.replace(/&amp;/g, '&');
+        text = text.replace(/&lt;/g, '<');
+        text = text.replace(/&gt;/g, '>');
+        text = text.replace(/&quot;/g, '"');
+        text = text.replace(/&#39;/g, "'");
+        text = text.replace(/&mdash;/g, '—');
+        text = text.replace(/&ndash;/g, '–');
+        text = text.replace(/&ldquo;/g, '"');
+        text = text.replace(/&rdquo;/g, '"');
+        text = text.replace(/&lsquo;/g, "'");
+        text = text.replace(/&rsquo;/g, "'");
+        text = text.replace(/&#\d+;/g, (match) => {
+          const code = parseInt(match.replace(/&#|;/g, ''));
+          return String.fromCharCode(code);
+        });
+        // Normalize whitespace
+        text = text.replace(/\n\s*\n\s*\n+/g, '\n\n');
+        text = text.replace(/[ \t]+/g, ' ');
+        return text.trim();
+      };
+
+      // Function to find verse section in StudyLight HTML
+      const findVerseCommentary = (html: string, verseNum: number): string | null => {
+        // StudyLight uses various patterns for verse sections
+        // Pattern 1: Look for anchor links like <a name="verse-17">
+        // Pattern 2: Look for headings like <h3>Verse 17</h3> or <b>Verse 17.</b>
+        // Pattern 3: Look for sections with id like id="verse-17"
+
+        const verseNumStr = String(verseNum);
+
+        // Try to find verse section using various patterns
+        const patterns = [
+          // Pattern: <a name="verse-XX"> to next <a name="verse-YY">
+          new RegExp(`<a[^>]*name=["']verse-${verseNumStr}["'][^>]*>([\\s\\S]*?)(?=<a[^>]*name=["']verse-|$)`, 'i'),
+          // Pattern: id="verse-XX" sections
+          new RegExp(`id=["']verse-${verseNumStr}["'][^>]*>([\\s\\S]*?)(?=id=["']verse-|$)`, 'i'),
+          // Pattern: <h3>Verse XX</h3> or similar headings
+          new RegExp(`<h[1-6][^>]*>\\s*(?:Verse\\s+)?${verseNumStr}[.:]?\\s*</h[1-6]>([\\s\\S]*?)(?=<h[1-6][^>]*>\\s*(?:Verse\\s+)?\\d+|$)`, 'i'),
+          // Pattern: <b>Verse XX.</b> or <strong>XX.</strong>
+          new RegExp(`<(?:b|strong)[^>]*>\\s*(?:Verse\\s+)?${verseNumStr}[.:]?\\s*</(?:b|strong)>([\\s\\S]*?)(?=<(?:b|strong)[^>]*>\\s*(?:Verse\\s+)?\\d+[.:]?\\s*</(?:b|strong)>|$)`, 'i'),
+          // Pattern: entry-body div for specific verse
+          new RegExp(`data-verse=["']${verseNumStr}["'][^>]*>([\\s\\S]*?)</div>`, 'i'),
+          // Pattern: Commentary section with verse number at start (JFB style with verse number in text)
+          new RegExp(`(?:^|[\\n])\\s*${verseNumStr}[.:\\s]+([^\\n]+(?:[\\n](?!\\d+[.:]\\s)[^\\n]*)*)`, 'm'),
+        ];
+
+        for (const pattern of patterns) {
+          const match = html.match(pattern);
+          if (match && match[1]) {
+            const extracted = extractTextFromHtml(match[1]);
+            if (extracted.length > 20) { // Must have substantial content
+              return extracted;
+            }
+          }
+        }
+
+        return null;
+      };
+
       // Fetch the actual webpage
       let webpageContent = "";
+      let extractedCommentary: string | null = null;
+
       try {
         const webResponse = await fetch(selectedCommentary.searchUrl, {
           method: 'GET',
-          headers: { 'User-Agent': 'Mozilla/5.0' }
+          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
         });
-        
+
         if (webResponse.ok) {
           webpageContent = await webResponse.text();
+          // Try to directly extract the verse commentary
+          extractedCommentary = findVerseCommentary(webpageContent, verseText.verse);
         }
       } catch (error) {
         console.error('Error fetching webpage:', error);
       }
 
-      // Use AI to extract and format the commentary from the web page
-      systemPrompt = `You are a biblical scholar extracting commentary text from a classic Bible commentary webpage.
+      // If we successfully extracted commentary directly, return it
+      if (extractedCommentary && extractedCommentary.length > 50) {
+        return new Response(
+          JSON.stringify({
+            content: extractedCommentary,
+            principlesUsed: [selectedCommentary.name]
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
-Your task is to:
-1. Find the commentary text for ${book} ${chapter}:${verseText.verse} from the provided webpage content
-2. Extract ONLY the actual words written by the original commentator - do not paraphrase or generate new text
-3. Format it cleanly for reading, preserving the original author's voice and style
+      // Fallback: Use AI to extract, but with STRICT verbatim extraction instructions
+      systemPrompt = `You are a text extraction tool. Your ONLY job is to find and copy text VERBATIM from the provided HTML.
 
-CRITICAL FORMATTING REQUIREMENTS:
-- Do NOT use any markdown formatting (no bold, italics, headings)
-- Do NOT use asterisks (*) anywhere
-- Write in clear paragraphs with blank lines between them
-- Use the bullet character "•" for any lists
-- If the webpage doesn't contain commentary for this specific verse, say "Commentary not available for this verse"
-- ONLY extract and present what the original commentator actually wrote
+CRITICAL RULES:
+1. DO NOT paraphrase, summarize, interpret, or reword anything
+2. DO NOT add your own commentary, analysis, or explanations
+3. COPY THE EXACT TEXT as written by the original commentator
+4. If you cannot find commentary for the specific verse, say ONLY: "Commentary not available for verse ${verseText.verse}"
+5. Preserve the original punctuation, capitalization, and formatting
+6. Include the entire commentary for the verse, not just a summary
 
-Present the actual historical commentary text, preserving the original author's words and perspective.`;
+You are a photocopier, not a writer. Copy the text exactly as it appears.`;
 
-      userPrompt = `Here is the HTML content from ${selectedCommentary.name} for ${book} ${chapter}:
+      userPrompt = `Find and COPY VERBATIM the commentary for ${book} ${chapter}:${verseText.verse} from this ${selectedCommentary.name} HTML:
 
-${webpageContent.slice(0, 50000)}
+${webpageContent.slice(0, 60000)}
 
-Extract the commentary specifically for verse ${verseText.verse}. The verse text is: "${verseText.text}"
+The verse text is: "${verseText.text}"
 
-Find and present the original commentator's words for this specific verse. If you cannot find specific commentary for verse ${verseText.verse}, state clearly that commentary is not available.`;
+INSTRUCTIONS:
+1. Locate the section for verse ${verseText.verse}
+2. Copy the EXACT words from that section - do not rewrite or paraphrase
+3. The output should be a direct quote from the original commentary
+4. If the verse section contains verse numbers or formatting markers, include them as they appear`;
 
       const classicResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -2917,6 +4057,7 @@ Find and present the original commentator's words for this specific verse. If yo
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt },
             ],
+            temperature: 0, // Use temperature 0 for more deterministic, literal extraction
           }),
         }
       );
@@ -2928,13 +4069,13 @@ Find and present the original commentator's words for this specific verse. If yo
       }
 
       const classicData = await classicResponse.json();
-      let classicContent = classicData.choices?.[0]?.message?.content || "No commentary generated.";
-      
+      let classicContent = classicData.choices?.[0]?.message?.content || "Commentary not available for this verse.";
+
       // Clean control characters
       classicContent = classicContent.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
 
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           content: classicContent,
           principlesUsed: [selectedCommentary.name]
         }),
@@ -4045,28 +5186,11 @@ They chose to exercise these fruits: ${selectedFruits}
 Provide brief (2-3 sentences) feedback on their choice. If correct, affirm and explain why these fruits work together. If incorrect, gently explain what fruits would be more effective and why.`;
     
     } else if (mode === "research") {
-      systemPrompt = `You are Jeeves, ${greeting}'s personal biblical research assistant providing comprehensive, scholarly analysis.
+      // Use caller-supplied system instructions if provided, otherwise minimal default
+      const callerInstructions = requestBody.systemInstructions;
+      systemPrompt = callerInstructions || `You are Jeeves, ${greeting}'s personal biblical research assistant. Answer exactly what is asked — nothing more. Be concise and direct.`;
 
-**PERSONALIZATION:**
-- Use ${greeting}'s name naturally throughout your response (2-3 times) to maintain connection
-- Use warm, engaging phrases like "Hey ${greeting}", "${greeting}, this is fascinating", "I think you'll find this interesting, ${greeting}"
-- NEVER use overly formal phrases like "My dear student", "My dear Sir", "My dear friend", "Ah sir"
-- Keep tone warm and conversational even while being scholarly
-
-Include citations, cross-references, historical context, and theological perspectives.`;
-
-      userPrompt = `Provide deep research for ${greeting} on: "${query}"
-
-Structure your research:
-1. Overview (2-3 paragraphs introducing the topic)
-2. Biblical Foundation (examine key passages with cross-references)
-3. Historical Context (cultural and historical background)
-4. Theological Perspectives (different scholarly viewpoints)
-5. Practical Applications (how this applies today)
-6. Key Insights (3-5 major takeaways)
-7. Further Study (suggest related topics and passages)
-
-Include verse citations, cross-references, and scholarly depth. Make it comprehensive but accessible. Use ${greeting}'s name 2-3 times naturally.`;
+      userPrompt = query || question || message || "";
     
     } else if (mode === "sermon-setup") {
       systemPrompt = `You are Jeeves, a sermon preparation assistant. Help preachers organize their thoughts and structure powerful messages.
@@ -4312,9 +5436,18 @@ Find and return the exact Scripture they're looking for. If unclear, ask for cla
 
 RULES:
 - Answer immediately, no greetings
-- Give specific Scripture references
+- Give specific Scripture references (KJV)
 - Keep responses brief but helpful
 - Include verse text when citing Scripture
+- When asked about Hebrew or Greek words, provide:
+  1. The original Hebrew/Greek word
+  2. Transliteration (how to pronounce it)
+  3. Strong's number (H#### for Hebrew, G#### for Greek)
+  4. Clear definition and semantic range
+  5. How it impacts the meaning of the passage
+  6. Other places the same word appears in Scripture
+- When a user types a verse reference (e.g. "John 3:16"), auto-populate the full KJV text
+- When a user asks to "insert", "add", or "pull" a verse, provide the full KJV text formatted as a blockquote
 
 CONTEXT: ${sermonTitle ? `"${sermonTitle}"` : 'Sermon'}${sermonThemePassage ? ` on ${sermonThemePassage}` : ''}`;
 
@@ -4617,6 +5750,52 @@ Player's defense: ${defense}
 
 Does this defense biblically answer the attack? Does it use the cards effectively?
 Return JSON: { "survived": true/false, "feedback": "brief comment" }`;
+
+    } else if (mode === "dragon_defense_hint") {
+      // EscapeTheDragon hint - give the player a clue without giving the full answer
+      systemPrompt = `You are Jeeves, a theological mentor. Give a brief, helpful hint to guide the player's defense without giving away the full answer. Be encouraging but not too specific.`;
+      userPrompt = `The dragon is attacking with: "${attack}"
+The player has these defense cards available: ${cards.join(', ')}
+
+Card meanings:
+- Ep: Epistles Prophecy (prophetic teachings in NT letters)
+- Ef: Epistles Faith (faith and doctrine from NT letters)
+- |GC: Great Controversy (cosmic conflict between Christ and Satan)
+- |TP: Time Prophecy (Daniel/Revelation prophetic timelines)
+- |S: Sanctuary (Hebrew sanctuary system pointing to Christ)
+- ⚖: Judgment (God's righteous judgment and justice)
+- ALTAR: Altar (sacrifice of Christ on the cross)
+- LAMP: Lampstand (light of truth, witness, Holy Spirit)
+- ARK: Ark of Covenant (God's law, mercy seat, His presence)
+
+Give a 1-2 sentence hint about which cards might be most relevant and a brief clue about the biblical principle to use. Do NOT give the full defense — just a nudge in the right direction.
+Return JSON: { "hint": "your hint here" }`;
+
+    } else if (mode === "study_suggestion") {
+      // Weekly Study interactive suggestion - explore a discussion question deeper
+      const suggestionAction = requestBody.suggestion_action || requestBody.action || "expound";
+      const studyTitle = requestBody.study_title || lessonTitle || "Weekly Study";
+      const keyPassages = requestBody.key_passages || bibleVerses || [];
+      const targetQuestion = requestBody.question || question || "";
+
+      const actionInstructions: Record<string, string> = {
+        expound: "Go deeper into this question. Unpack the theological layers, historical context, and spiritual significance. Draw out insights the reader may have missed.",
+        apply_principle: "Apply a Palace principle to this question. Show how a specific principle from the Phototheology Palace (e.g., Christ in All Scripture, Repeat and Enlarge, Sanctuary Pattern) illuminates this question in a fresh way.",
+        explore_passage: "Dive deeply into the scripture reference connected to this question. Provide word study insights, cross-references, and contextual background that enriches understanding.",
+        connect_theme: "Find related themes across Scripture. Show how this question connects to a broader biblical theme, tracing the thread through Old and New Testaments.",
+      };
+
+      systemPrompt = `You are Jeeves, a Christ-centered theological study assistant for the Phototheology Palace. You help believers go deeper into Bible study through scholarly yet accessible insights. Always center your response on Christ and practical application.`;
+      userPrompt = `Study: "${studyTitle}"
+Key Passages: ${Array.isArray(keyPassages) ? keyPassages.join(', ') : keyPassages}
+Discussion Question: "${targetQuestion}"
+
+Action requested: ${suggestionAction}
+${actionInstructions[suggestionAction] || actionInstructions.expound}
+
+Provide a focused, rich response (3-5 paragraphs). Include specific scripture references. End with a practical application point.
+
+Return JSON: { "content": "your response here", "scriptures": ["Ref 1", "Ref 2"], "relatedTheme": "brief theme name" }`;
 
     } else if (mode === "validate_equation") {
       // EquationBuilder game validation - properties already destructured from requestBody
@@ -4960,12 +6139,15 @@ Return JSON: { "approved": true/false, "rating": 1-5, "feedback": "brief comment
 
     } else if (mode === "qa") {
       // Q&A mode for "Ask Jeeves" in rooms - properties already destructured from requestBody
-      const { conversationHistory } = requestBody;
+      const { conversationHistory, userContextBlock } = requestBody;
+      
+      // Inject user context block if available (from user-context-snapshot)
+      const personalizedContext = userContextBlock ? `\n${userContextBlock}\n` : '';
       
       systemPrompt = `You are Jeeves, ${greeting}'s enthusiastic study partner helping them understand Scripture with clarity and depth through Phototheology.
 
 ${THEOLOGICAL_REASONING}
-
+${personalizedContext}
 **YOUR APPROACH:**
 - LISTEN CAREFULLY to what ${greeting} is actually asking - respond DIRECTLY to their specific question
 - If they correct you or clarify, ACKNOWLEDGE the correction and adjust your answer accordingly
@@ -4976,6 +6158,7 @@ ${THEOLOGICAL_REASONING}
 - NEVER give generic responses when the user is asking about specific content from their study
 - NEVER deflect with "that's a great question" when they're correcting you or asking for specifics
 - If you don't know something specific from their study, ASK for clarification rather than guessing
+- When you have user profile data, REFERENCE their recent studies, gems, and progress naturally — show you know and remember them
 
 **CRITICAL - RESPONDING TO FOLLOW-UPS:**
 - When the user says "NO" or corrects you, IMMEDIATELY acknowledge and adjust
@@ -5013,11 +6196,22 @@ If they said "NO" or corrected you, acknowledge and adjust your answer.
 
 Be helpful, specific, and direct. Avoid generic theological overviews when they want specific answers.`;
     } else if (mode === "research") {
-      // Research mode - HIGH-PRECISION HISTORICAL & THEOLOGICAL VERIFICATION ENGINE
-      const { conversationHistory } = requestBody;
+      // Research mode - supports both concise (widget) and deep (full research) responses
+      const { conversationHistory, systemInstructions } = requestBody;
+      const isQuickMode = !!systemInstructions;
 
       console.log('Research mode activated for question:', question);
+      console.log('Quick mode (systemInstructions provided):', isQuickMode);
 
+      if (isQuickMode) {
+        // CONCISE MODE — used by Research Assistant widget
+        // Respects the frontend systemInstructions for direct, concise answers
+        // CONCISE MODE: Keep prompt lean to avoid timeouts. PALACE_SCHEMA omitted here.
+        systemPrompt = `You are Jeeves, a Bible research assistant in Phototheology Palace.
+
+${systemInstructions}`;
+      } else {
+        // DEEP RESEARCH MODE — used by Research Mode page for scholarly briefs
       systemPrompt = `You are operating as Jeeves, ${greeting}'s HIGH-PRECISION HISTORICAL AND THEOLOGICAL RESEARCH ENGINE for long-form analysis intended for publication, teaching, and documentary use.
 
 Your task is to produce a rigorously sourced, fact-checked, and internally coherent research brief on the assigned topic.
@@ -5132,6 +6326,7 @@ Assume this material may be:
 
 If you encounter weak evidence, say so explicitly.
 Proceed with disciplined scholarship.`;
+      } // end deep research mode else
 
       const contextSection = context ? `
 
@@ -5147,7 +6342,15 @@ ${conversationHistory.map((msg: any) => `${msg.role === 'user' ? 'Student' : 'Je
 
 Build upon previous scholarly discussion while maintaining verification standards for any new claims.` : '';
 
-      userPrompt = `Research Question: "${question}"${contextSection}${historySection}
+      if (isQuickMode) {
+        // CONCISE user prompt — just ask the question, let systemInstructions control format
+        // For quick mode, conversation history is passed as real message turns (see researchMessages below)
+        userPrompt = `${question}${contextSection}
+
+Answer directly and concisely. Quote verses in full when listing them. End with 2-3 suggested follow-up questions.`;
+      } else {
+        // DEEP RESEARCH user prompt — full scholarly brief structure
+        userPrompt = `Research Question: "${question}"${contextSection}${historySection}
 
 Provide a comprehensive, rigorously sourced research brief with this REQUIRED structure:
 
@@ -5243,6 +6446,7 @@ List key sources referenced:
 • For complex topics: 1500-2500 words
 • Show your epistemic humility when evidence is thin
 ────────────────────────────────`;
+      }
     } else if (mode === "prophecy-watch") {
       // ═══════════════════════════════════════════════════════════════════════
       // PROPHECY WATCH MODE — v1.1
@@ -6074,6 +7278,751 @@ ${category === "people" ? `**PEOPLE:**
 
 
       userPrompt = `Please provide comprehensive encyclopedia information about: ${query}`;
+
+    } else if (mode === "defense-assist") {
+      // Defense Mode: Jeeves coaches the disciple IN REAL TIME before they respond
+      const { opponentAttack: assistAttack, defenseTopicName: assistTopic, opponentName, opponentPersonality } = requestBody;
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+You are Jeeves, acting as a LIVE CORNER COACH during a theological sparring match. A disciple is about to respond to an opponent's challenge. Your job is to give them IMMEDIATE, REAL-TIME coaching BEFORE they respond.
+
+CRITICAL PERSONA: You are in their CORNER. You are on their side. You are the wise coach whispering strategy before they step back into the ring. Be warm, direct, encouraging, and sharp.
+
+YOUR COACHING MUST COVER:
+1. FALLACY RADAR — Identify every logical fallacy, ad hominem, rhetorical sleight-of-hand, emotional manipulation, or cheap shot in the opponent's argument. Name them precisely (e.g., "That's a classic straw man — they're not actually engaging what we believe about the Sabbath").
+
+2. BLIND SPOTS — What weaknesses does the opponent have in their argument that the disciple can exploit? What did they overreach on? What assumptions did they smuggle in unexamined?
+
+3. COUNTER-STRATEGY — Give 2-3 specific counter-moves. Not generic advice — precise tactical guidance. "Hit them with Exodus 20:8-11 and ask them why Paul would quote a commandment that was abolished." That level of specificity.
+
+4. COMPOSURE COACHING — If the opponent was rude, dismissive, condescending, or aggressive, address it directly. Remind the disciple that losing their cool = losing the argument in the eyes of any observer. "They're being condescending to rattle you — that's a sign they're on weaker ground than they sound. Stay ice-calm. The fruit of the Spirit is your weapon too: love, patience, gentleness. A composed, gracious response to rudeness is more powerful than a sharp comeback."
+
+5. THE HEART — Remind them: winning the argument means nothing if the heart isn't won. Theological accuracy + genuine love is the combination that changes lives. Apologetics without compassion is just combat.
+
+TONE: Think of a wise, warm mentor leaning in close before the disciple steps back into the ring. Confident, sharp, focused, encouraging. Not preachy — practical. Never talk down to them.
+
+FORMAT:
+🎯 FALLACIES & TACTICS: [Identify every rhetorical trick the opponent used]
+🔍 THEIR BLIND SPOTS: [Where the argument has holes]
+⚔️ YOUR COUNTER-MOVES: [2-3 specific tactical suggestions with scripture]
+🧘 STAY COMPOSED: [Emotional/composure coaching, especially if they were aggressive/rude]
+❤️ WIN THE HEART: [Brief reminder about the human being you're speaking to]
+
+Keep it punchy, practical, and encouraging. Max 300 words. You're in a coaching huddle, not a lecture hall.`;
+
+      userPrompt = `OPPONENT (${opponentName || 'The Challenger'}): "${assistAttack}"
+
+Topic: ${assistTopic || 'Theology'}
+${opponentPersonality ? `Opponent's personality style: ${opponentPersonality}` : ''}
+
+Coach me on how to respond to this attack. Be specific, tactical, and help me stay composed.`;
+
+    } else if (mode === "defense-sparring") {
+      // Defense Mode: AI opponent attacks an SDA doctrine
+      const temperamentInstruction = requestBody.temperament
+        ? (() => {
+            const t = requestBody.temperament as string[];
+            const traits = [];
+            if (t.includes('rude')) traits.push('You may be bluntly rude, dismissive, and even condescending when the argument calls for it. Do not hold back — real challengers often are.');
+            if (t.includes('angry')) traits.push('Carry a tone of genuine frustration or moral outrage. You find this topic infuriating and it shows.');
+            if (t.includes('condescending')) traits.push('Speak as though the disciple is intellectually beneath you. Use phrases that subtly signal you think they cannot possibly match your reasoning.');
+            if (t.includes('dismissive')) traits.push('Treat the disciple\'s anticipated responses as beneath serious engagement. Pre-dismiss common arguments before they can even make them.');
+            if (t.includes('brilliant')) traits.push('Display exceptional intellectual firepower. Use advanced philosophical, historical, and linguistic arguments. Reference scholars by name. Leave no rhetorical stone unturned.');
+            if (t.includes('haughty')) traits.push('Maintain an air of superiority. You consider this debate something of a courtesy — you do not expect the disciple to offer anything you haven\'t already considered and dismissed.');
+            if (t.includes('polite')) traits.push('Remain entirely civil and gracious throughout. Deadly serious and relentless in argument, but never rude. The most dangerous kind of opponent: the one who dismantles you with a smile.');
+            if (t.includes('respectful')) traits.push('Genuinely respect the disciple and show it — but do not soften your argument. Disagree firmly and honestly while treating them as an intellectual equal.');
+            if (t.includes('aggressive')) traits.push('Press relentlessly, interrupt reasoning mid-flow, pile on questions before the previous one is answered, and create pressure through sheer argumentative force.');
+            return traits.length > 0 ? `\nTEMPERAMENT DIRECTIVES (MUST FOLLOW):\n${traits.map(t => `- ${t}`).join('\n')}` : '';
+          })()
+        : '';
+
+      const difficultyInstruction = difficulty === 'advanced'
+        ? 'Present the ABSOLUTE STRONGEST version of your argument. Use counter-exegesis, scholarly sources, original language arguments, and pre-refute anticipated responses. Leave no easy escape routes.'
+        : difficulty === 'intermediate'
+        ? 'Present 2-3 connected arguments that build on each other. Include follow-up questions and challenge weak reasoning. Use scholarly sources and historical arguments.'
+        : 'Present ONE clear argument at a time. Use a conversational, approachable tone. Stay focused on the single most common challenge.';
+
+      const conversationBlock = phase === 'follow-up' && conversationHistory
+        ? `\n\nCONVERSATION SO FAR:\n${conversationHistory}\n\nCRITICAL: Review the disciple's previous response. Identify weak points, unaddressed arguments, or logical gaps. Press HARDER on those weaknesses. Escalate your challenge. Do NOT repeat the same argument — build on it or pivot to a stronger angle.`
+        : '';
+
+      systemPrompt = `You are roleplaying as a theological debater with the following worldview and identity. Stay FULLY in character at all times.
+${temperamentInstruction}
+
+WORLDVIEW:
+${opponentWorldview}
+
+ARGUMENT STYLE:
+${opponentStyle}
+
+ATTACK TARGETS (doctrines you challenge):
+${(opponentTargets || []).map((t: string) => `- ${t}`).join('\n')}
+
+STEELMAN RULES:
+${opponentSteelmanRules || 'Present the strongest possible version of your arguments. No strawmen, no mockery. Genuine intellectual debate.'}
+
+DIFFICULTY LEVEL: ${difficulty || 'intermediate'}
+${difficultyInstruction}
+
+TOPIC FOCUS: ${defenseTopicName || 'General theology'}
+${isSignatureTopic ? 'MODE: SIGNATURE TOPIC — You are arguing IN FAVOR of your own belief/position. This is YOUR home turf.' : 'MODE: ATTACK — You are challenging the Seventh-day Adventist position on this topic.'}
+
+YOUR TASK:
+${isSignatureTopic
+  ? `Present the STRONGEST POSSIBLE CASE FOR your own position on this topic. This is YOUR signature belief — the hill you would die on. Build your affirmative case using your best scriptures, logic, historical evidence, and theological reasoning. Make it so compelling that the disciple must work hard to refute it. You are not merely attacking SDA doctrine here — you are BUILDING YOUR OWN CASE and daring the disciple to tear it down.`
+  : `Present a compelling theological challenge against the Seventh-day Adventist position on this topic. Stay in character as someone who genuinely holds this worldview. Make your argument tight, specific, and hard to dismiss.`}
+
+RULES:
+- Stay in character. Do NOT break character or acknowledge you are an AI.
+- Do NOT present the SDA counter-argument yourself.
+- Do NOT be rude or mocking — this is iron sharpening iron.
+- End your challenge with your signature prompt.
+- Keep your challenge to 2-4 paragraphs maximum.
+${conversationBlock}
+
+SIGNATURE CLOSING LINE: "${opponentEndPrompt || 'Defend this from Scripture.'}"`;
+
+      userPrompt = phase === 'follow-up'
+        ? `Continue the debate. The disciple has responded. Review their response in the conversation history and press harder on weak points or pivot to a new angle of attack on ${defenseTopicName || 'this topic'}.`
+        : isSignatureTopic
+        ? `Present your strongest affirmative case FOR your position on: ${defenseTopicName || 'this doctrine'}. This is YOUR home turf — build the most compelling argument you can and challenge the disciple to dismantle it.`
+        : `Present your opening challenge against the Seventh-day Adventist position on: ${defenseTopicName || 'this doctrine'}. Make it specific, scholarly, and hard to dismiss.`;
+
+    } else if (mode === "defense-coach") {
+      // Defense Mode: Jeeves coaches the disciple's response
+
+      // Anti-cheat: require a real response
+      if (!discipleResponse || discipleResponse.trim().length < 30) {
+        return new Response(
+          JSON.stringify({
+            content: "Defense Mode requires YOUR attempt first. Write at least a few sentences defending the truth before requesting coaching. This is how iron sharpens iron — you must engage your own mind before receiving a model answer.",
+            score: 0
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in DEFENSE COACH mode. A disciple has been sparring with an AI theological opponent and has submitted their defense. Your job is to evaluate their response and coach them to a stronger defense.
+
+THE PALACE METHOD ROOMS FOR ANALYSIS:
+${PALACE_SCHEMA}
+
+OPPONENT'S ATTACK:
+${opponentAttack}
+
+DISCIPLE'S RESPONSE:
+${discipleResponse}
+
+TOPIC: ${defenseTopicName || 'General theology'}
+
+YOUR 5-STEP COACHING EVALUATION:
+
+1. LOGIC ASSESSMENT (Score 1-10):
+   - Evaluate the reasoning structure
+   - Identify any logical fallacies in the disciple's response
+   - Check if they actually addressed the opponent's specific arguments
+   - Note if they created strawmen or dodged the real challenge
+
+2. SCRIPTURE USAGE (Score 1-10):
+   - Are the verses cited accurately and in context?
+   - Do the verses actually support their argument?
+   - Are there better verses they missed?
+   - Did they handle the opponent's proof-texts?
+
+3. PT ROOM ANALYSIS (Score 1-10):
+   - Which PT Palace rooms apply to this defense?
+   - Investigation Room: Did they dig into the original language or historical context?
+   - Context Room: Did they consider the broader biblical narrative?
+   - Connect-6: Did they identify genre and use appropriate hermeneutics?
+   - Dimensions Room: Did they apply the verse across multiple dimensions (literal, Christ, personal, church, heaven)?
+   - Freestyle: Creative connections or applications?
+
+4. SDA DOCTRINAL REFINEMENT (Score 1-10):
+   - Sanctuary typology: Did they connect to the heavenly sanctuary ministry?
+   - Prophetic framework: Did they use the historicist method?
+   - Three Angels' Messages relevance?
+   - Spirit of Prophecy alignment (without relying on it as primary proof)?
+
+5. MODEL DEFENSE:
+   ONLY AFTER providing the coaching above, give a complete Scripture-rich model defense that:
+   - Addresses every point the opponent raised
+   - Uses KJV Scripture with full verse citations
+   - Applies PT Palace room methods
+   - Connects to sanctuary typology where relevant
+   - Is stronger and more comprehensive than the disciple's attempt
+   - Shows how a master defender would handle this challenge
+
+FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
+---
+LOGIC ASSESSMENT: [X]/10
+[Your analysis]
+
+SCRIPTURE USAGE: [X]/10
+[Your analysis]
+
+PT ROOM ANALYSIS: [X]/10
+[Your analysis]
+
+SDA DOCTRINAL REFINEMENT: [X]/10
+[Your analysis]
+
+TOTAL SCORE: [sum]/40
+
+MODEL DEFENSE:
+[Your complete model defense]
+---
+
+CRITICAL RULES:
+- Be encouraging but HONEST. Do not inflate scores.
+- Use KJV Scripture ONLY.
+- Reference specific PT Palace rooms by their codes (IR, CR, DR, C6, BL, etc.).
+- The model defense must be SIGNIFICANTLY better than the disciple's attempt.
+- NEVER use the word "dear" in any form.`;
+
+      userPrompt = `Evaluate this disciple's defense and provide your 5-step coaching analysis. The disciple was defending the SDA position on "${defenseTopicName || 'this doctrine'}" against an opponent's attack. Be thorough, honest, and constructive.`;
+
+    } else if (mode === "defense-analyze-weapon") {
+      // Defense Mode: Analyze a disciple's written defense as a "weapon" — break down strengths, weaknesses, and forge it stronger
+      const userWeaponText = requestBody.userArgument || requestBody.message || requestBody.weaponText || "";
+      const weaponTarget = requestBody.weaponTarget || "";
+      const topicName = requestBody.defenseTopicName || requestBody.topic || "General theology";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in WEAPON ANALYSIS mode. The disciple has submitted a theological defense or argument for analysis, along with a clear declaration of WHAT THEY ARE DEFENDING AGAINST — the opposing argument, doctrine, or objection their weapon is designed to refute.
+
+IMPORTANT: The disciple is submitting the RAW CONTENT of their argument — not a polished thesis. They may use shorthand, bullet points, rough notes, or incomplete sentences. Your job is to:
+
+1. FIRST, read and understand the TARGET — the opposing position the disciple is building this weapon against. This is your frame of reference for the entire analysis.
+2. SECOND, identify the disciple's CENTRAL PROPOSITION — the ONE main claim or thesis they are making IN RESPONSE TO that target. State it back to yourself before proceeding. Everything you do must serve THIS proposition.
+3. THIRD, understand the SUBSTANCE and MERIT of their argument regardless of how it is worded or formatted.
+4. FOURTH, mentally reconstruct the argument in its strongest, most polished form before evaluating it — but NEVER drift from their central proposition. Do NOT introduce a different thesis, angle, or topic.
+5. FIFTH, analyze the POLISHED version of the argument — specifically evaluating how well it DESTROYS the stated target.
+
+Think of yourself as a master swordsmith: the disciple brings you raw metal, tells you what enemy they need this blade to cut through, and you forge the deadliest weapon possible for THAT specific enemy. You don't forge a sword for a different battle.
+
+THE PALACE METHOD ROOMS FOR ANALYSIS:
+${PALACE_SCHEMA}
+
+YOUR RESPONSE FORMAT:
+
+🎯 **TARGET DECLARATION** (What this weapon is designed to refute):
+[Restate the opposing argument/doctrine/objection the disciple declared. Steel-man it — present the opposition's BEST version so the weapon must overcome a worthy adversary.]
+
+🎯 **CENTRAL PROPOSITION**: [State the disciple's main thesis in ONE clear sentence — their answer to the target. This is the anchor — everything below must serve THIS claim.]
+
+📜 **POLISHED WEAPON** (Your refined version of their argument):
+Present the disciple's argument in its strongest, most articulate form. Clean up the language, organize the logic, fill in obvious gaps, and present it as a coherent theological defense aimed squarely at DESTROYING the stated target. EVERY paragraph must directly advance the CENTRAL PROPOSITION. Use KJV Scripture throughout.
+
+📌 **SUBTITLE**: [Write ONE short sentence (8-15 words max) that captures the core thesis of this weapon.]
+
+---
+
+🗡️ **WEAPON TYPE**: [Classify: Apologetic Sword / Prophetic Spear / Doctrinal Shield / Evangelistic Arrow / Pastoral Staff]
+
+⚔️ **CUTTING EDGE** (What's sharp and effective against the target):
+- [2-3 strongest points that directly counter the opposing argument]
+- Scripture usage strength
+- Logical flow assessment
+
+🔍 **WEAK POINTS** (Where the blade dulls against this specific target):
+- [2-3 vulnerabilities an opponent holding the target position could exploit]
+- Missing evidence or logic gaps
+- Unaddressed counterarguments the target side would raise
+
+🛡️ **STEEL-MANNED COUNTER** (The strongest rebuttal the opposition could make):
+[Construct the BEST possible counter-argument someone holding the target position would use. Then show how the reforged weapon handles it.]
+
+❓ **3 HARDEST QUESTIONS** (Cross-examination simulation):
+1. [Toughest follow-up question a skilled debater would ask] → Suggested response
+2. [Second hardest question] → Suggested response
+3. [Third hardest question] → Suggested response
+
+🔥 **FORGE INSTRUCTIONS** (How to make it stronger against this target):
+- Specific verses to add (KJV)
+- PT Palace rooms to activate (with codes)
+- Structural improvements
+- Anticipate and pre-empt counterattacks from the target position
+
+📊 **WEAPON RATING**: [1-10] / 10
+- Edge: [1-10] (How sharp against the stated target?)
+- Balance: [1-10] (How well-structured?)
+- Reach: [1-10] (How broadly applicable?)
+
+RULES:
+- Use KJV Scripture ONLY
+- Reference PT Palace room codes (CR, DR, C6, BL, PRm, etc.)
+- Be encouraging but HONEST — don't inflate ratings
+- Give actionable, specific improvements
+- Evaluate the MERIT of the argument, not the polish of the submission
+- NEVER drift from the disciple's central proposition
+- ALWAYS evaluate against the STATED TARGET — not a generic analysis
+- NEVER use the word "dear"`;
+
+      userPrompt = weaponTarget
+        ? `The disciple has submitted a theological argument for analysis. The topic is "${topicName}".\n\n🎯 THE TARGET (What the weapon must refute):\n${weaponTarget}\n\nCRITICAL: First understand the TARGET above. Then identify the disciple's CENTRAL PROPOSITION — the ONE specific claim they are making to counter that target. Polish THAT proposition into its strongest form and analyze how well it destroys the stated target.\n\nHere are the disciple's raw notes/argument:\n\n${userWeaponText}`
+        : `The disciple has submitted a theological argument for analysis. The topic is "${topicName}". CRITICAL: First identify the disciple's CENTRAL PROPOSITION — the ONE specific claim they are making. Then polish THAT proposition into its strongest form and analyze it. Do NOT replace their thesis with a different angle or adjacent topic. Stay locked on what THEY are arguing.\n\nHere are the disciple's raw notes/argument:\n\n${userWeaponText}`;
+
+    } else if (mode === "defense-refine-weapon") {
+      // Defense Mode: Refine a weapon to make it as sharp as possible
+      const userWeaponText = requestBody.userArgument || requestBody.message || "";
+      const topicName = requestBody.doctrineTopic || requestBody.topic || "General theology";
+      const existingAnalysis = requestBody.analysis || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in WEAPON AMPLIFICATION mode. The disciple has written a theological argument and wants you to AMPLIFY and BUTTRESS it — NOT rewrite it, NOT present a different argument, but STRENGTHEN the argument they already have by finding powerful supporting KJV verses and reinforcing their existing logic.
+
+THE PALACE METHOD:
+${PALACE_SCHEMA}
+
+CRITICAL RULE: You must KEEP the disciple's original argument as the foundation. Do NOT replace it with your own version. Your job is to:
+- Find additional KJV verses that BACK UP what they already said
+- Identify the strongest scriptural support for THEIR points
+- Show how their argument connects to a broader chain of biblical evidence
+- Suggest setup questions that lead INTO their existing argument
+
+YOUR TASK — AMPLIFY the weapon by:
+
+1. **AMPLIFYING VERSES** (KJV Only):
+   - Find 5-10+ additional KJV verses that directly support the disciple's argument
+   - Chain these verses in logical progression, each reinforcing the disciple's points
+   - Include cross-references that create an unbreakable scriptural chain BEHIND their argument
+   - Quote each verse in full
+
+2. **SETUP QUESTIONS** (Leading INTO their argument):
+   Build questions that naturally lead into the disciple's existing conclusion:
+   - Question 1: "Would you agree that [premise from Scripture]?"
+   - Question 2: "Is it fair to say that [logical consequence]?"
+   - Question 3: "Then consider what [their argument] reveals..."
+
+3. **REINFORCEMENT POINTS**:
+   - Show WHY the disciple's argument is strong
+   - Identify the biblical patterns and types that support it
+   - Connect it to sanctuary, prophecy, or Christ-centered themes where applicable
+
+4. **ANTICIPATED OBJECTIONS & RESPONSES**:
+   - What might an opponent say against the disciple's argument?
+   - How do additional scriptures shut down each objection?
+
+FORMAT:
+💪 **AMPLIFIED WEAPON** — [Topic]
+
+📖 **SUPPORTING VERSE CHAIN** (Backing up your argument):
+1. [Verse quoted in full] — [How it supports your point]
+2. [Verse quoted in full] — [How it adds weight]
+3. [Verse quoted in full] — [How it reinforces]
+...
+
+🔑 **SETUP QUESTIONS** (Lead into your argument with these):
+1. [Question that establishes a premise] — [Why they must agree]
+2. [Question building on premise] — [Why they must agree]
+3. [Question that opens the door to your argument]
+
+💡 **WHY YOUR ARGUMENT IS STRONG**:
+[Analysis of the strengths of their existing argument and how the verse chain reinforces it]
+
+🛡️ **ANTICIPATED OBJECTIONS & RESPONSES**:
+- Objection: [Common counter] → Response: [Scripture-backed refutation]
+- Objection: [Common counter] → Response: [Scripture-backed refutation]
+
+RULES:
+- KJV Scripture ONLY
+- NEVER replace the disciple's argument with your own — AMPLIFY theirs
+- Every supporting verse must directly relate to what the disciple already wrote
+- Quote all verses IN FULL
+- Make it DEVASTATING but RESPECTFUL
+- NEVER use the word "dear"`;
+
+      userPrompt = `The disciple has written the following theological argument on "${topicName}". Do NOT rewrite or replace it. Instead, AMPLIFY it by finding powerful KJV verses that back it up, suggest setup questions that lead into it, and show why it is strong.\n\nTHE DISCIPLE'S ARGUMENT:\n${userWeaponText}${existingAnalysis ? `\n\nPREVIOUS ANALYSIS:\n${existingAnalysis}` : ""}`;
+
+    } else if (mode === "defense-forge-weapon") {
+      // Defense Mode: Score a weapon for forging into the arsenal
+      const userWeaponText = requestBody.userArgument || requestBody.message || "";
+      const topicName = requestBody.doctrineTopic || requestBody.topic || "General theology";
+      const existingAnalysis = requestBody.analysis || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in WEAPON FORGE mode. Score this theological weapon on a strict 1-10 scale. A weapon must score 8/10 or higher to be forged into the arsenal.
+
+SCORING CRITERIA:
+- **Biblical Accuracy** (Is every claim supported by KJV Scripture?)
+- **Logical Soundness** (Is the argument free of fallacies and gaps?)
+- **Completeness** (Does it address counterarguments?)
+- **Persuasive Power** (Would this actually convince someone?)
+- **Structure** (Is it well-organized and easy to follow?)
+
+FORMAT:
+📊 **FORGE SCORE**: [X] / 10
+
+📌 **SUBTITLE**: [Write ONE short sentence (8-15 words max) that captures the core thesis of this weapon. Examples: "How Jesus' death confirmed the Covenant", "Why the Law of God is universal". This will be displayed as the weapon's subheading.]
+
+**Biblical Accuracy**: [1-10]
+**Logical Soundness**: [1-10]
+**Completeness**: [1-10]
+**Persuasive Power**: [1-10]
+**Structure**: [1-10]
+
+${`**VERDICT**: [FORGED ✅ / REJECTED ❌]`}
+
+[Brief explanation of the score and what would improve it]
+
+Be STRICT. An 8/10 weapon should be genuinely strong. Do not inflate scores.
+NEVER use the word "dear"`;
+
+      userPrompt = `Score this theological weapon for forging. Topic: "${topicName}".\n\nWEAPON:\n${userWeaponText}${existingAnalysis ? `\n\nANALYSIS:\n${existingAnalysis}` : ""}`;
+
+    } else if (mode === "defense-checkmate") {
+      // Defense Mode: Generate a 3-4 move checkmate question sequence
+      const thesisText = requestBody.thesis || requestBody.message || "";
+      const targetText = requestBody.target || "";
+      const topicName = requestBody.doctrineTopic || "General theology";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in CHECKMATE MODE. Your job is to design a 3–4 move QUESTION SEQUENCE that logically forces an opponent to accept a biblical conclusion they would otherwise resist.
+
+## THE CHECKMATE PRINCIPLE
+
+This works like chess: you set up a position where the opponent has no escape. The key insight is that **Move 1 must be the most unthreatening question — but it is actually the most important.** Once the opponent answers Move 1 honestly, they have committed to a premise from which there is NO turning back. The trap is set.
+
+Each subsequent move tightens the logical space until the final move forces the obvious, inescapable conclusion.
+
+## STRUCTURE
+
+Design 3-4 moves (questions). Each move can include MULTIPLE supporting KJV verses.
+
+- **Move 1 — THE TRAP**: The most innocent, agreeable question. Something no reasonable person would refuse. But this question secretly establishes the critical premise that will doom their position. The opponent should feel comfortable answering. They should not see where this is going.
+
+- **Move 2 (and optionally Move 3) — THE TIGHTENER(S)**: Follow-up questions that build on what they already conceded. These narrow the logical space. The opponent starts to feel the pressure but cannot retreat without contradicting themselves.
+
+- **Final Move — CHECKMATE**: The question that makes the conclusion unavoidable. The opponent must either (a) accept the truth, or (b) openly contradict what they already agreed to — which destroys their credibility.
+
+## OUTPUT FORMAT
+
+You MUST respond with a JSON block wrapped in \`\`\`json ... \`\`\` containing:
+
+\`\`\`json
+{
+  "thesis": "The position being defended",
+  "strategyNote": "A 1-2 sentence explanation of the overall trap logic — why Move 1 is the key",
+  "moves": [
+    {
+      "id": "move-1",
+      "moveNumber": 1,
+      "question": "The actual question to ask the opponent",
+      "verses": ["Genesis 2:2-3", "Exodus 20:11"],
+      "purpose": "THE TRAP — Establishes that [X premise] which the opponent cannot deny"
+    },
+    {
+      "id": "move-2",
+      "moveNumber": 2,
+      "question": "The follow-up question",
+      "verses": ["Mark 2:27"],
+      "purpose": "THE TIGHTENER — Forces them to acknowledge [Y] given their answer to Move 1"
+    },
+    {
+      "id": "move-3",
+      "moveNumber": 3,
+      "question": "The checkmate question",
+      "verses": ["Hebrews 4:9-10", "Isaiah 66:22-23"],
+      "purpose": "CHECKMATE — They must now accept [conclusion] or contradict Move 1"
+    }
+  ],
+  "explanation": "A detailed markdown explanation of HOW this checkmate works step by step. Explain why Move 1 is the linchpin. Show what happens if the opponent tries to escape at each stage. Explain the logical inevitability."
+}
+\`\`\`
+
+## RULES
+- Use KJV for all verse references
+- Each move can have 1-4 verses
+- Move 1 MUST be something almost anyone would agree with
+- The final move must create an inescapable logical conclusion
+- The explanation should be detailed and teach the user HOW to deploy this sequence
+- NEVER use the word "dear"`;
+
+      userPrompt = `Design a checkmate question sequence for this thesis:\n\nTHESIS: ${thesisText}${targetText ? `\n\nOPPOSING POSITION: ${targetText}` : ""}\n\nTOPIC: ${topicName}`;
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // FORGE & DEFEND — Team-Based 6-Week Challenge Modes
+    // ═══════════════════════════════════════════════════════════════════════
+
+    } else if (mode === "forge-defend-draft") {
+      // Forge & Defend: AI-powered team draft ceremony
+      const participants = requestBody.participants || [];
+      const teamSize = requestBody.teamSize || 3;
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in FORGE & DEFEND DRAFT MODE. You are conducting a sacred draft ceremony for the Forge & Defend challenge — a 6-week team-based apologetics competition.
+
+## YOUR TASK
+Analyze each participant's strengths and create BALANCED teams of ${teamSize} members each. Consider:
+- Theological knowledge areas (which topics they're strongest in)
+- Arsenal weapon count and quality
+- Past defense sparring performance
+- Complementary skill distribution (each team should cover different doctrine areas)
+
+## DRAFT PRINCIPLES
+1. NO STACKING — distribute strong defenders evenly
+2. COMPLEMENTARY COVERAGE — each team should have members covering different topic areas
+3. CHEMISTRY — pair analytical minds with passionate communicators when possible
+4. EVERY TEAM VIABLE — no team should feel hopeless against their assigned AI enemy squad
+
+## OUTPUT FORMAT
+Respond with a JSON block wrapped in \`\`\`json ... \`\`\`:
+
+\`\`\`json
+{
+  "teams": [
+    {
+      "teamName": "Creative biblical team name",
+      "teamMotto": "Short inspiring motto",
+      "teamEmoji": "single emoji",
+      "teamColor": "tailwind color class (e.g. violet-600)",
+      "members": [
+        {
+          "userId": "user-id-here",
+          "displayName": "Name",
+          "role": "captain or warrior",
+          "draftReason": "Why this person was placed on this team"
+        }
+      ]
+    }
+  ],
+  "draftNarrative": "A dramatic 2-3 paragraph narrative of the draft ceremony, written in Jeeves' voice, explaining the strategic reasoning behind each team composition."
+}
+\`\`\`
+
+## RULES
+- First member listed on each team is the captain (strongest overall or best leader)
+- Team names should be biblically inspired and warrior-themed
+- Mottos should be from scripture (KJV) or inspired by it
+- NEVER use the word "dear"`;
+
+      userPrompt = `Conduct the Forge & Defend draft ceremony for these ${participants.length} participants:\n\n${JSON.stringify(participants, null, 2)}\n\nCreate balanced teams of ${teamSize} members each.`;
+
+    } else if (mode === "forge-defend-team-sparring") {
+      // Forge & Defend: Team-based sparring with round rotation
+      const teamName = requestBody.teamName || "Team";
+      const teamMembers = requestBody.teamMembers || [];
+      const currentSpeaker = requestBody.currentSpeaker || "";
+      const roundRotation = requestBody.roundRotation || 1;
+      const weaponsAvailable = requestBody.weaponsAvailable || [];
+      const isSignature = requestBody.isSignatureTopic || false;
+
+      const temperamentInstruction = requestBody.temperament
+        ? (() => {
+            const t = requestBody.temperament as string[];
+            const traits: string[] = [];
+            if (t.includes('rude')) traits.push('Be blunt, cutting, and openly disrespectful toward the team.');
+            if (t.includes('angry')) traits.push('Show genuine frustration and moral outrage at the team position.');
+            if (t.includes('condescending')) traits.push('Speak as though no one on the team can match your reasoning.');
+            if (t.includes('dismissive')) traits.push('Pre-dismiss answers before the team makes them.');
+            if (t.includes('brilliant')) traits.push('Deploy advanced scholarly firepower, cite experts by name.');
+            if (t.includes('haughty')) traits.push('Carry an air of intellectual superiority over the entire team.');
+            if (t.includes('polite')) traits.push('Be civil and gracious — but lethal in argumentation.');
+            if (t.includes('respectful')) traits.push('Treat the team as worthy opponents, disagree honestly.');
+            if (t.includes('aggressive')) traits.push('Apply relentless pressure, pile questions rapidly on all members.');
+            return traits.length > 0 ? `\nTEMPERAMENT DIRECTIVES (MUST FOLLOW):\n${traits.map(t => `- ${t}`).join('\n')}` : '';
+          })()
+        : '';
+
+      const difficultyInstruction = difficulty === 'advanced'
+        ? 'Present the ABSOLUTE STRONGEST version of your argument. Use scholarly sources, original languages, and counter-exegesis. Leave NO escape routes.'
+        : difficulty === 'intermediate'
+        ? 'Present 2-3 connected arguments with follow-up challenges. Anticipate common defenses and preemptively counter them.'
+        : 'Present ONE clear argument at a time. Be firm but not overwhelming. This team is learning.';
+
+      const weaponContext = weaponsAvailable.length > 0
+        ? `\n\nNOTE: This team has the following weapons in their arsenal that they may deploy: ${weaponsAvailable.map((w: any) => w.name || w.topic).join(', ')}. Be prepared for these arguments.`
+        : '';
+
+      const conversationBlock = phase === 'follow-up' && conversationHistory
+        ? `\n\nCONVERSATION SO FAR:\n${conversationHistory}\n\nCRITICAL: The previous round was answered by a different team member. Now ${currentSpeaker} is responding. Adjust your attack to challenge this specific respondent while building on the ongoing argument thread.`
+        : '';
+
+      systemPrompt = `You are roleplaying as a theological debater challenging Team "${teamName}" in the Forge & Defend challenge.
+${temperamentInstruction}
+WORLDVIEW:
+${opponentWorldview}
+ARGUMENT STYLE:
+${opponentStyle}
+
+DIFFICULTY: ${difficultyInstruction}
+
+TEAM CONTEXT: You are debating a team of ${teamMembers.length} members who rotate responses. Current speaker: ${currentSpeaker}. Round ${roundRotation} of the battle.
+
+${isSignature ? `This is YOUR HOME TURF TOPIC. You are arguing FOR your own position with maximum conviction.` : `You are attacking the SDA/biblical position on this topic.`}
+${weaponContext}
+${conversationBlock}
+
+RULES:
+- Address the TEAM collectively but direct pointed questions at the current speaker
+- Reference previous team members' responses if applicable to show you're tracking the whole team
+- Keep attacks focused and theologically rigorous
+- Use KJV scripture references
+- Maximum 200 words per attack
+- NEVER use the word "dear"
+- NEVER break character`;
+
+      userPrompt = phase === 'follow-up'
+        ? `Continue the debate. The team's previous response was:\n\n"${discipleResponse}"\n\nLaunch your next attack against Team "${teamName}". Current defender: ${currentSpeaker}.`
+        : `Launch your opening attack against Team "${teamName}" on the topic of ${defenseTopicName}. Direct your challenge at ${currentSpeaker} who will respond first.`;
+
+    } else if (mode === "forge-defend-team-coach") {
+      // Forge & Defend: Team evaluation with anti-carry assessment
+      const teamName = requestBody.teamName || "Team";
+      const teamResponses = requestBody.teamResponses || [];
+      const participationStats = requestBody.participationStats || [];
+      const weaponsUsed = requestBody.weaponsUsed || [];
+      const battleType = requestBody.battleType || "standard";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in FORGE & DEFEND TEAM COACH MODE. You are evaluating a team's collective performance in a Forge & Defend battle.
+
+## EVALUATION CRITERIA
+
+### 1. THEOLOGICAL ACCURACY (1-10)
+- Were the team's responses biblically sound?
+- Did they use scripture correctly (KJV)?
+- Were their arguments logically coherent?
+
+### 2. TEAM COORDINATION (1-10)
+- Did team members build on each other's arguments?
+- Was there strategic weapon deployment?
+- Did they cover different angles effectively?
+
+### 3. WEAPON DEPLOYMENT (1-10)
+- Were forged weapons used effectively?
+- Did weapon usage strengthen the overall defense?
+- ${weaponsUsed.length === 0 ? 'NOTE: No weapons were deployed — this is a penalty area.' : `Weapons deployed: ${weaponsUsed.length}`}
+
+### 4. PARTICIPATION BALANCE (Assessment)
+Review speaking distribution:
+${participationStats.map((p: any) => `- ${p.name}: ${p.speakingPct}% of speaking time`).join('\n')}
+- Flag if any member >60% (CARRYING)
+- Flag if any member <15% (ABSENT/SILENT)
+
+## OUTPUT FORMAT
+Respond with a JSON block:
+\`\`\`json
+{
+  "overallScore": 7,
+  "theologicalScore": 8,
+  "coordinationScore": 6,
+  "weaponScore": 7,
+  "participationBalanced": true,
+  "carryingMembers": [],
+  "silentMembers": [],
+  "battleSummary": "Dramatic narrative summary of the battle in Jeeves' voice (3-4 sentences)",
+  "strengthHighlights": ["What the team did well"],
+  "improvementAreas": ["Where the team can grow"],
+  "modelDefense": "What the IDEAL team response would have looked like (brief)",
+  "pointsAwarded": {
+    "roundScores": [7, 6, 8],
+    "battleWon": true,
+    "weaponBonus": 15,
+    "participationBonus": 50,
+    "carryPenalty": 0,
+    "totalPoints": 265
+  }
+}
+\`\`\`
+
+## RULES
+- Score the TEAM, not individuals
+- Be encouraging but honest
+- ${battleType === 'boss' ? 'This is a BOSS BATTLE — scoring should reflect the higher difficulty and epic stakes.' : 'Standard battle scoring.'}
+- NEVER use the word "dear"`;
+
+      userPrompt = `Evaluate Team "${teamName}"'s performance in this ${battleType} battle.\n\nTEAM RESPONSES:\n${teamResponses.map((r: any, i: number) => `Round ${i + 1} (${r.memberName}): "${r.response}"`).join('\n\n')}\n\nOPPONENT ATTACKS:\n${teamResponses.map((r: any, i: number) => `Round ${i + 1}: "${r.opponentAttack}"`).join('\n\n')}\n\nWEAPONS USED: ${weaponsUsed.length > 0 ? weaponsUsed.map((w: any) => w.name).join(', ') : 'None'}`;
+
+    } else if (mode === "forge-defend-boss-battle") {
+      // Forge & Defend: Week 6 Boss Battle — 3 AI opponents attack simultaneously
+      const teamName = requestBody.teamName || "Team";
+      const teamMembers = requestBody.teamMembers || [];
+      const enemySquad = requestBody.enemySquad || [];
+      const currentSpeaker = requestBody.currentSpeaker || "";
+      const roundNumber = requestBody.roundNumber || 1;
+      const weaponsAvailable = requestBody.weaponsAvailable || [];
+
+      const enemyProfiles = enemySquad.map((e: any) => `${e.name} (${e.emoji}): ${e.worldview?.substring(0, 200) || e.id}`).join('\n\n');
+
+      const conversationBlock = phase === 'follow-up' && conversationHistory
+        ? `\n\nBATTLE HISTORY:\n${conversationHistory}\n\nCRITICAL: Build on the conversation. Reference what other opponents have argued. Coordinate the multi-pronged assault.`
+        : '';
+
+      systemPrompt = `You are narrating and generating attacks for a BOSS BATTLE in the Forge & Defend challenge. Three AI opponents attack Team "${teamName}" SIMULTANEOUSLY with coordinated theological arguments.
+
+## THE ENEMY SQUAD
+${enemyProfiles}
+
+## BOSS BATTLE RULES
+1. ALL THREE opponents attack in a coordinated strategy
+2. Each opponent attacks from their unique worldview but they REFERENCE each other's arguments
+3. The attacks should be multi-pronged — forcing the team to defend on multiple fronts simultaneously
+4. One opponent sets the trap, another applies pressure, the third delivers the killing blow
+5. This is EPIC — the culmination of 6 weeks of training
+
+## COORDINATION STRATEGY
+- Opponent 1: Opens with the foundational challenge (sets the premise)
+- Opponent 2: Builds on Opponent 1's challenge from a different angle (tightens the noose)
+- Opponent 3: Delivers the combined knockout argument that leverages both previous attacks
+
+## CURRENT STATE
+- Round: ${roundNumber}
+- Team members: ${teamMembers.map((m: any) => m.displayName || m.name).join(', ')}
+- Current defender: ${currentSpeaker}
+- Team weapons available: ${weaponsAvailable.length > 0 ? weaponsAvailable.map((w: any) => w.name || w.topic).join(', ') : 'None'}
+${conversationBlock}
+
+## OUTPUT FORMAT
+Respond with dramatic narration followed by the coordinated attack. Format:
+
+**[BOSS BATTLE — Round ${roundNumber}]**
+
+*[Dramatic narration of the opponents conferring and launching their coordinated assault]*
+
+**${enemySquad[0]?.name || 'Opponent 1'}:** [Their attack — 100 words max]
+
+**${enemySquad[1]?.name || 'Opponent 2'}:** [Their attack building on the first — 100 words max]
+
+**${enemySquad[2]?.name || 'Opponent 3'}:** [The combined knockout — 100 words max]
+
+*[Challenge to ${currentSpeaker}: What's your defense?]*
+
+## RULES
+- Use KJV scripture references
+- Make attacks interconnected and strategically coordinated
+- This should feel EPIC and climactic
+- Maximum combined 400 words
+- NEVER use the word "dear"
+- NEVER break character for any opponent`;
+
+      userPrompt = phase === 'follow-up'
+        ? `The team's response from ${currentSpeaker} was:\n\n"${discipleResponse}"\n\nLaunch the next coordinated assault. The opponents should adapt based on the team's defense and intensify their strategy.`
+        : `Launch the opening BOSS BATTLE assault against Team "${teamName}" on the topic of ${defenseTopicName}. All three opponents coordinate their attack. Direct the challenge at ${currentSpeaker} who defends first.`;
+
     } else if (mode === "guesthouse_generate_prompt") {
       // GuestHouse: Generate a game prompt for live sessions
       const { gameType, verse: gameVerse, difficulty: gameDifficulty } = requestBody;
@@ -6620,7 +8569,97 @@ Remember: You MUST include an entry for ALL 66 books. The books in order are:
 ${BIBLE_BOOKS.join(', ')}
 
 Return ONLY valid JSON.`;
+    } else if (mode === "egw_palace_analysis") {
+      // Ellen G. White Palace Analysis - Analyze Spirit of Prophecy writings through PT rooms
+      systemPrompt = `You are Jeeves, ${greeting}'s Phototheology mentor specializing in the writings of Ellen G. White. You analyze chapters from the Conflict of the Ages series, Steps to Christ, and Christ's Object Lessons through the lens of the Phototheology Palace.
+
+${PALACE_SCHEMA}
+
+CRITICAL RULES:
+- Use ONLY valid Palace room codes and principles
+- Every analysis MUST be Christ-centered (Concentration Room CR)
+- Connect EGW insights back to Scripture — she is a lesser light pointing to the greater light
+- Use the specific Palace room requested to frame your analysis
+- Be thorough, warm, and reverent
+- Include specific quotes or references from the chapter when possible
+- Show how EGW's writing illuminates the biblical principle being studied
+- ${greeting ? `Address ${greeting} by name naturally 1-2 times` : ''}
+- NEVER use "dear" in any form
+
+FORMAT: Use clear markdown with headers, bullet points, and bold for emphasis. Structure your response with:
+1. A brief chapter context (2-3 sentences)
+2. The Palace room analysis (main body)
+3. A Christ-centered gem or takeaway`;
+
+      userPrompt = message || "Please analyze this chapter through the Phototheology Palace.";
     }
+
+    // Guard: if no prompt was set for this mode, return a helpful error instead of sending empty content
+    if (!systemPrompt || !userPrompt) {
+      console.error(`No prompt generated for mode: ${mode}`);
+      return new Response(
+        JSON.stringify({ error: "Unable to process your request. Please try again.", content: `I wasn't able to generate a response for this mode. Please try again or switch to a different study mode.` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ============================================================
+    // RAG CORPUS RETRIEVAL — Inject Pastor Ivor Myers' teaching context
+    // Authority Hierarchy: Scripture (Tier 1) > Core Method (Tier 2) > Corpus (Tier 3) > Supporting Sources (Tier 4)
+    // The corpus provides VOICE and applied theology, NOT doctrinal authority.
+    // Uses exclusion set: ~80 modes get corpus context, ~20 game/validation modes excluded.
+    // ============================================================
+    const RAG_EXCLUDED_MODES = new Set([
+      "help", "grade", "grade-drill-answer",
+      "validate_chain", "validate_sanctuary", "validate_time_zones",
+      "validate_connect6", "validate_christ", "validate_controversy",
+      "validate_dragon_defense", "validate_equation", "validate_witness",
+      "validate_frame", "validate_room_game", "validate_chef_recipe",
+      "chain-chess", "chain-chess-feedback",
+      "chain-chess-v2-opening", "chain-chess-v2-judge", "chain-chess-v2-response",
+      "chain-chess-v3-opening", "chain-chess-v3-judge", "chain-chess-v3-response",
+      "equations-challenge", "solve-equation",
+      "generate-drills", "generate-chart", "generate-image", "generate-flashcards",
+      "guesthouse_generate_prompt", "guesthouse_grade_response",
+      "guesthouse_group_insight", "guesthouse_suggest_event",
+      "guesthouse_create_custom_challenge", "guesthouse_grade_custom_challenge",
+      "forge-defend-draft", "forge-defend-team-coach",
+      "check-commentary-availability", "check_chef_recipe",
+      "get_chef_model_answer", "generate_chef_verses",
+      "strongs-lookup", "translate-verse",
+    ]);
+
+    if (!RAG_EXCLUDED_MODES.has(mode)) {
+      const ragResult = await getCorpusContext({
+        query: userPrompt.slice(0, 4000),
+        matchCount: 3,
+        mode,
+        supabaseClient: supabase,
+      });
+      if (ragResult.chunkCount > 0) {
+        systemPrompt += ragResult.corpusContext;
+      }
+    }
+
+    // Build messages array — for research quick mode, pass conversation history as real message turns
+    // so the AI maintains full conversational context instead of receiving history as embedded text.
+    let finalMessages: Array<{ role: string; content: string }> = [
+      { role: "system", content: systemPrompt },
+    ];
+
+    if (mode === "research" && requestBody.systemInstructions && requestBody.conversationHistory && Array.isArray(requestBody.conversationHistory) && requestBody.conversationHistory.length > 0) {
+      // Inject prior turns as real multi-turn messages so the AI has genuine conversational context
+      requestBody.conversationHistory.forEach((msg: any) => {
+        finalMessages.push({ role: msg.role === "assistant" ? "assistant" : "user", content: msg.content });
+      });
+      // Add the current question as the final user turn
+      finalMessages.push({ role: "user", content: userPrompt });
+    } else {
+      finalMessages.push({ role: "user", content: userPrompt });
+    }
+
+    // Use lower temperature for research mode to improve reliability and reduce timeouts
+    const modelTemperature = (mode === "research") ? 0.4 : 0.9;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -6629,12 +8668,10 @@ Return ONLY valid JSON.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.9, // High temperature for variety
+        model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" ? "google/gemini-2.5-flash" : mode.startsWith("defense-") || mode.startsWith("forge-defend-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
+        messages: finalMessages,
+        temperature: modelTemperature,
+        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
       }),
     });
 
@@ -7404,10 +9441,10 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     }
 
     // Parse JSON responses for game validation modes
-    if (["validate_chain", "validate_sanctuary", "validate_time_zones", "validate_connect6", 
-         "validate_christ", "validate_controversy", "validate_dragon_defense", "validate_equation",
+    if (["validate_chain", "validate_sanctuary", "validate_time_zones", "validate_connect6",
+         "validate_christ", "validate_controversy", "validate_dragon_defense", "dragon_defense_hint", "validate_equation",
          "validate_witness", "validate_frame", "validate_chef_recipe", "generate_chef_verses",
-         "check_chef_recipe", "get_chef_model_answer"].includes(mode)) {
+         "check_chef_recipe", "get_chef_model_answer", "study_suggestion"].includes(mode)) {
       try {
         console.log(`=== ${mode.toUpperCase()} RESPONSE ===`);
         console.log("Raw content:", content);
@@ -7441,7 +9478,13 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
 
     // Extract principles used from commentary mode
     let responseData: any = { content };
-    
+
+    // Defense coach mode: extract score from response
+    if (mode === "defense-coach") {
+      const scoreMatch = content.match(/TOTAL SCORE:\s*(\d+)\s*\/\s*40/i);
+      responseData.score = scoreMatch ? parseInt(scoreMatch[1], 10) : 0;
+    }
+
     // Add map/chart image for encyclopedia maps or charts mode
     if (mode === "encyclopedia" && (category === "maps" || category === "charts") && mapImageUrl) {
       responseData.mapImageUrl = mapImageUrl;
@@ -7696,6 +9739,40 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
               },
               furtherStudy: [],
               encouragement: "Your notes were received! We just had a technical hiccup processing the analysis. Please try again - your insights deserve a proper evaluation!"
+            }
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Handle polish-story mode - parse JSON and return structured story
+    if (mode === "polish-story") {
+      let cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+      try {
+        const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          const story = parsed.story || parsed;
+          return new Response(
+            JSON.stringify({ story }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        } else {
+          throw new Error("No JSON found in polish-story response");
+        }
+      } catch (parseError) {
+        console.error("Error parsing polish-story JSON:", parseError);
+        console.error("Raw content:", cleanContent.substring(0, 2000));
+        return new Response(
+          JSON.stringify({
+            error: "Story parsing failed - please try again",
+            story: {
+              title: "Manuscript Error",
+              tagline: "Something went wrong — please try again",
+              manuscript: "We encountered a technical issue while crafting your manuscript. Please try submitting again.",
+              versesUsed: []
             }
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }

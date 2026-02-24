@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +23,7 @@ import { MemoryTemplateCategories } from "@/components/memory/MemoryTemplateCate
 
 export default function Memory() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("learn");
@@ -30,7 +32,7 @@ export default function Memory() {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast.error("Please sign in to access Memory features");
+        toast.error(t('memory.signInRequired'));
         navigate("/auth");
         return;
       }
@@ -60,7 +62,7 @@ export default function Memory() {
             className="absolute left-0 top-0 gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="relative">
@@ -68,16 +70,16 @@ export default function Memory() {
               <div className="absolute inset-0 bg-primary/30 blur-xl animate-pulse" />
             </div>
             <h1 className="text-5xl font-bold bg-gradient-to-r from-palace-purple via-palace-pink to-palace-blue bg-clip-text text-transparent animate-gradient">
-              Memory Palace
+              {t('memory.title')}
             </h1>
             <Sparkles className="h-8 w-8 text-palace-yellow animate-pulse" />
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
-            Master Bible verses through visual memory techniques and PT principles
+            {t('memory.subtitle')}
           </p>
           
           <div className="flex justify-center mb-4">
-            <HowItWorksDialog title="How to Use Memory Palace" steps={memoryPalaceSteps} />
+            <HowItWorksDialog title={t('memory.howToUse')} steps={memoryPalaceSteps} />
           </div>
           
           {/* START MEMORIZING CTA */}
@@ -88,7 +90,7 @@ export default function Memory() {
               className="gap-2 bg-gradient-to-r from-palace-purple via-palace-pink to-palace-blue hover:opacity-90 shadow-lg text-lg px-8"
             >
               <Play className="h-5 w-5" />
-              Start Memorizing
+              {t('memory.startMemorizing')}
             </Button>
             <Button 
               size="lg" 
@@ -97,7 +99,7 @@ export default function Memory() {
               className="gap-2"
             >
               <Gamepad2 className="h-5 w-5" />
-              Practice Games
+              {t('memory.practiceGames')}
             </Button>
             <Button 
               size="lg" 
@@ -106,7 +108,7 @@ export default function Memory() {
               className="gap-2"
             >
               <Target className="h-5 w-5" />
-              Practice Drills
+              {t('memory.practiceDrills')}
             </Button>
           </div>
         </div>
@@ -116,23 +118,23 @@ export default function Memory() {
           <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-5 bg-muted/50 backdrop-blur">
             <TabsTrigger value="learn" className="gap-1">
               <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">Learn</span>
+              <span className="hidden sm:inline">{t('memory.tabs.learn')}</span>
             </TabsTrigger>
             <TabsTrigger value="drills" className="gap-1">
               <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">Drills</span>
+              <span className="hidden sm:inline">{t('memory.tabs.drills')}</span>
             </TabsTrigger>
             <TabsTrigger value="templates" className="gap-1">
               <Book className="h-4 w-4" />
-              <span className="hidden sm:inline">Templates</span>
+              <span className="hidden sm:inline">{t('memory.tabs.templates')}</span>
             </TabsTrigger>
             <TabsTrigger value="my-lists" className="gap-1">
               <Brain className="h-4 w-4" />
-              <span className="hidden sm:inline">My Lists</span>
+              <span className="hidden sm:inline">{t('memory.tabs.myLists')}</span>
             </TabsTrigger>
             <TabsTrigger value="community" className="gap-1">
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Community</span>
+              <span className="hidden sm:inline">{t('memory.tabs.community')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -153,7 +155,7 @@ export default function Memory() {
                       <Book className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Verses Memorized</p>
+                      <p className="text-sm text-muted-foreground">{t('memory.stats.versesMemorized')}</p>
                       <p className="text-3xl font-bold bg-gradient-to-r from-palace-purple to-palace-blue bg-clip-text text-transparent">0</p>
                     </div>
                   </div>
@@ -168,8 +170,8 @@ export default function Memory() {
                       <Trophy className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Current Streak</p>
-                      <p className="text-3xl font-bold bg-gradient-to-r from-palace-pink to-palace-purple bg-clip-text text-transparent">0 days</p>
+                      <p className="text-sm text-muted-foreground">{t('memory.stats.currentStreak')}</p>
+                      <p className="text-3xl font-bold bg-gradient-to-r from-palace-pink to-palace-purple bg-clip-text text-transparent">{t('memory.stats.days', { count: 0 })}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -183,7 +185,7 @@ export default function Memory() {
                       <Users className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Active Lists</p>
+                      <p className="text-sm text-muted-foreground">{t('memory.stats.activeLists')}</p>
                       <p className="text-3xl font-bold bg-gradient-to-r from-palace-blue to-palace-teal bg-clip-text text-transparent">0</p>
                     </div>
                   </div>
@@ -219,7 +221,7 @@ export default function Memory() {
                 className="gap-2 bg-gradient-to-r from-palace-purple via-palace-pink to-palace-blue hover:opacity-90 shadow-purple"
               >
                 <Plus className="h-4 w-4" />
-                Create Custom List
+                {t('memory.createCustomList')}
               </Button>
             </div>
             <MyMemoryLists userId={userId} />
@@ -231,14 +233,14 @@ export default function Memory() {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
-                  Discover Public Lists
+                  {t('memory.discoverPublicLists')}
                 </h3>
                 <PublicMemoryLists userId={userId} />
               </div>
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Users className="w-5 h-5 text-primary" />
-                  Team Memorization
+                  {t('memory.teamMemorization')}
                 </h3>
                 <CollaborativeMemoryLists userId={userId} />
               </div>

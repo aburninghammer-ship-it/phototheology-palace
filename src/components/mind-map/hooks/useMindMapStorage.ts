@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import type { SavedMindMap, AnalysisMode, AIMapAnalysis, MindMapData } from '../types';
 import { Node, Edge } from 'reactflow';
 
@@ -23,6 +24,7 @@ interface SaveMapParams {
   edges: Edge[];
   analysis: AIMapAnalysis;
   parentMapId?: string;
+  notes?: Record<string, string>; // User notes keyed by node ID
 }
 
 // Type for the database record shape
@@ -75,22 +77,22 @@ export function useMindMapStorage(): UseMindMapStorageReturn {
         nodes: params.nodes,
         edges: params.edges,
         analysis: params.analysis,
+        notes: params.notes || {},
       };
 
-      // Use raw query since mind_maps table may not be in generated types yet
       const { data, error } = await supabase
-        .from('mind_maps' as 'user_growth_journal')
-        .insert({
+        .from('mind_maps')
+        .insert([{
           user_id: user.id,
           name: params.name,
           source_text: params.sourceText,
           source_type: params.sourceType || 'custom',
-          source_reference: params.sourceReference,
+          source_reference: params.sourceReference || null,
           mode: params.mode,
-          map_data: mapData,
-          analysis_summary: params.analysis.overallTheme,
-          parent_map_id: params.parentMapId,
-        } as never)
+          map_data: JSON.parse(JSON.stringify(mapData)) as Json,
+          analysis_summary: params.analysis.overallTheme || null,
+          parent_map_id: params.parentMapId || null,
+        }])
         .select()
         .single();
 
@@ -117,7 +119,7 @@ export function useMindMapStorage(): UseMindMapStorageReturn {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('mind_maps' as 'user_growth_journal')
+        .from('mind_maps')
         .select('*')
         .eq('id', id)
         .single();
@@ -144,7 +146,7 @@ export function useMindMapStorage(): UseMindMapStorageReturn {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('mind_maps' as 'user_growth_journal')
+        .from('mind_maps')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
@@ -170,7 +172,7 @@ export function useMindMapStorage(): UseMindMapStorageReturn {
 
     try {
       const { error } = await supabase
-        .from('mind_maps' as 'user_growth_journal')
+        .from('mind_maps')
         .delete()
         .eq('id', id)
         .eq('user_id', user.id);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams, Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { Verse } from "@/types/bible";
 import { highlightSearchTerm } from "@/lib/highlightSearchTerm";
 
 const BibleSearch = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const searchMode = searchParams.get("mode") || "reference";
@@ -76,30 +78,32 @@ const BibleSearch = () => {
           <Button variant="ghost" asChild className="mb-6">
             <Link to="/bible">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Bible
+              {t('bibleSearch.backToBible', 'Back to Bible')}
             </Link>
           </Button>
 
           <div className="mb-8">
             <h1 className="font-serif text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
-              Bible Search
+              {t('bibleSearch.title', 'Bible Search')}
             </h1>
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-lg text-muted-foreground">
-                Searching for: <span className="font-semibold">{query}</span>
+                {t('bibleSearch.searchingFor', 'Searching for:')} <span className="font-semibold">{query}</span>
               </p>
               {searchMode === "word" && (
                 <Badge variant="outline">
-                  {searchScope === "all" && "All Bible (66 books)"}
-                  {searchScope === "ot" && "Old Testament (39 books)"}
-                  {searchScope === "nt" && "New Testament (27 books)"}
+                  {searchScope === "all" && t('bibleSearch.scopeAll', 'All Bible (66 books)')}
+                  {searchScope === "ot" && t('bibleSearch.scopeOT', 'Old Testament (39 books)')}
+                  {searchScope === "nt" && t('bibleSearch.scopeNT', 'New Testament (27 books)')}
                 </Badge>
               )}
             </div>
             {results.length > 0 && (
               <p className="text-sm text-muted-foreground mt-2">
-                Found {totalResults > results.length ? `~${totalResults}` : results.length} {results.length === 1 ? "verse" : "verses"}
-                {results.length < totalResults && ` (showing ${results.length})`}
+                {results.length === 1
+                  ? t('bibleSearch.foundVerse', { defaultValue: 'Found {{count}} verse', count: totalResults > results.length ? totalResults : results.length })
+                  : t('bibleSearch.foundVerses', { defaultValue: 'Found {{count}} verses', count: totalResults > results.length ? totalResults : results.length })}
+                {results.length < totalResults && t('bibleSearch.showing', ' (showing {{count}})', { count: results.length })}
               </p>
             )}
           </div>
@@ -114,23 +118,23 @@ const BibleSearch = () => {
               }}
             >
               <TabsList className="grid w-full grid-cols-2 mb-4">
-                <TabsTrigger value="reference">Verse Reference</TabsTrigger>
-                <TabsTrigger value="word">Word Search</TabsTrigger>
+                <TabsTrigger value="reference">{t('bibleSearch.verseReference', 'Verse Reference')}</TabsTrigger>
+                <TabsTrigger value="word">{t('bibleSearch.wordSearch', 'Word Search')}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="reference" className="space-y-4">
                 <div className="text-sm text-muted-foreground">
-                  Search by reference (e.g., "John 3:16", "Genesis 1", "Psalms 23:1-6")
+                  {t('bibleSearch.referenceHint', 'Search by reference (e.g., "John 3:16", "Genesis 1", "Psalms 23:1-6")')}
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="word" className="space-y-4">
                 <div className="text-sm text-muted-foreground mb-4">
-                  Search for words or phrases across the entire Bible
+                  {t('bibleSearch.wordHint', 'Search for words or phrases across the entire Bible')}
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Search Scope</Label>
+                  <Label>{t('bibleSearch.searchScope', 'Search Scope')}</Label>
                   <Select
                     value={searchScope}
                     onValueChange={(value) => {
@@ -142,9 +146,9 @@ const BibleSearch = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Bible (66 books)</SelectItem>
-                      <SelectItem value="ot">Old Testament (39 books)</SelectItem>
-                      <SelectItem value="nt">New Testament (27 books)</SelectItem>
+                      <SelectItem value="all">{t('bibleSearch.scopeAll', 'All Bible (66 books)')}</SelectItem>
+                      <SelectItem value="ot">{t('bibleSearch.scopeOT', 'Old Testament (39 books)')}</SelectItem>
+                      <SelectItem value="nt">{t('bibleSearch.scopeNT', 'New Testament (27 books)')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -186,10 +190,10 @@ const BibleSearch = () => {
                     {loadingMore ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Loading more...
+                        {t('bibleSearch.loadingMore', 'Loading more...')}
                       </>
                     ) : (
-                      "Load More Results"
+                      t('bibleSearch.loadMoreResults', 'Load More Results')
                     )}
                   </Button>
                 </div>
@@ -198,9 +202,12 @@ const BibleSearch = () => {
           ) : (
             <Card className="p-12 text-center">
               <p className="text-muted-foreground">
-                {searchMode === "word" 
-                  ? `No results found for "${query}" in the ${searchScope === "all" ? "entire Bible" : searchScope === "ot" ? "Old Testament" : "New Testament"}. Try a different search term.`
-                  : `No results found for "${query}". Try searching for a specific verse reference like "John 3:16" or a book and chapter like "Genesis 1".`
+                {searchMode === "word"
+                  ? t('bibleSearch.noWordResults', 'No results found for "{{query}}" in the {{scope}}. Try a different search term.', {
+                      query,
+                      scope: searchScope === "all" ? t('bibleSearch.entireBible', 'entire Bible') : searchScope === "ot" ? t('bibleSearch.oldTestament', 'Old Testament') : t('bibleSearch.newTestament', 'New Testament')
+                    })
+                  : t('bibleSearch.noRefResults', 'No results found for "{{query}}". Try searching for a specific verse reference like "John 3:16" or a book and chapter like "Genesis 1".', { query })
                 }
               </p>
             </Card>

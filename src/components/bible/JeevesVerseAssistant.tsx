@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Bot, Sparkles, Send, Loader2, X, Copy, BookmarkPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { palaceFloors } from "@/data/palaceData";
+
 import { JeevesResponseValidator } from "./JeevesResponseValidator";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 

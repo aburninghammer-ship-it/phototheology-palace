@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Save, CreditCard } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Church {
   id: string;
@@ -25,6 +26,7 @@ interface ChurchOverviewProps {
 }
 
 export function ChurchOverview({ church, usedSeats, onUpdate }: ChurchOverviewProps) {
+  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [contactPerson, setContactPerson] = useState(church.contact_person || "");
   const [contactPhone, setContactPhone] = useState(church.contact_phone || "");
@@ -132,7 +134,10 @@ export function ChurchOverview({ church, usedSeats, onUpdate }: ChurchOverviewPr
             </div>
           </div>
 
-          <Button className="w-full gap-2" variant="outline">
+          <Button
+            className="w-full gap-2"
+            onClick={() => navigate("/church-signup")}
+          >
             <CreditCard className="h-4 w-4" />
             Manage Billing
           </Button>

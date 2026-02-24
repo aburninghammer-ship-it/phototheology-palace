@@ -2,8 +2,10 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Image } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const PhototheologyGPT = () => {
+  const { t } = useTranslation();
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [loadError, setLoadError] = useState(false);
 
@@ -45,38 +47,38 @@ const PhototheologyGPT = () => {
               <div className="text-center space-y-2">
                 <h1 className="text-3xl md:text-5xl font-bold flex items-center justify-center gap-2 text-primary">
                   <Image className="h-8 w-8 md:h-10 md:w-10" />
-                  Phototheology GPT
+                  {t('gpt.phototheology.title')}
                 </h1>
-                <p className="text-lg md:text-xl text-muted-foreground">AI-Powered Biblical Image Analysis & Study</p>
+                <p className="text-lg md:text-xl text-muted-foreground">{t('gpt.phototheology.subtitle')}</p>
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                   <Sparkles className="h-4 w-4" />
-                  <span>Discover deeper meanings through visual theology</span>
+                  <span>{t('gpt.phototheology.tagline')}</span>
                 </div>
               </div>
     
               <Card className="border-2 border-primary/20">
                 <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
-                  <CardTitle className="text-2xl">Chat with Phototheology GPT</CardTitle>
+                  <CardTitle className="text-2xl">{t('gpt.phototheology.chatTitle')}</CardTitle>
               <CardDescription className="text-base">
-                Explore the intersection of photography, art, and theology. Upload images, ask about biblical symbolism, or dive into visual representations of Scripture.
+                {t('gpt.phototheology.chatDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-2 md:p-6">
               {loadError ? (
                 <div className="flex flex-col items-center justify-center gap-4" style={{ minHeight: '600px' }}>
-                  <p className="text-destructive font-semibold">Failed to load Phototheology GPT</p>
-                  <p className="text-muted-foreground text-sm">Please refresh the page to try again</p>
-                  <button 
-                    onClick={() => window.location.reload()} 
+                  <p className="text-destructive font-semibold">{t('gpt.phototheology.loadFailed')}</p>
+                  <p className="text-muted-foreground text-sm">{t('gpt.common.refreshPrompt')}</p>
+                  <button
+                    onClick={() => window.location.reload()}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                   >
-                    Refresh Page
+                    {t('gpt.common.refreshPage')}
                   </button>
                 </div>
               ) : !scriptLoaded ? (
                 <div className="flex flex-col items-center justify-center gap-4" style={{ minHeight: '600px' }}>
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                  <p className="text-muted-foreground">Loading Phototheology GPT...</p>
+                  <p className="text-muted-foreground">{t('gpt.phototheology.loading')}</p>
                 </div>
               ) : null}
               <div 

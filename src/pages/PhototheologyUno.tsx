@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -215,6 +216,7 @@ const PhototheologyUno = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [gameState, setGameState] = useState<GameState>({
     mode: "easy",
@@ -342,12 +344,12 @@ const PhototheologyUno = () => {
     }
 
     toast({
-      title: `${mode === "classic" ? "Classic" : "Easy"} Mode Started!`,
+      title: t('games.uno.modeStarted', { mode: mode === "classic" ? t('games.uno.classicMode') : t('games.uno.easyMode') }),
       description: playMode === "local"
-        ? `${numPlayers} local players. Pass the device after each turn!`
+        ? t('games.uno.localPlayersDesc', { count: numPlayers })
         : playMode === "online"
-        ? `Room code: ${roomCode}. Share with friends!`
-        : `${numPlayers} players. First to empty their hand wins!`,
+        ? t('games.uno.onlinePlayersDesc', { code: roomCode })
+        : t('games.uno.soloPlayersDesc', { count: numPlayers }),
     });
   };
 
@@ -602,7 +604,7 @@ Return ONLY valid JSON:
 
       if (aiPlayer.hand.length === 0) {
         // AI wins
-        toast({ title: "AI Wins!", description: `${aiPlayer.name} emptied their hand!` });
+        toast({ title: t('games.uno.aiWins'), description: t('games.uno.emptiedHand', { name: aiPlayer.name }) });
         newState.gamePhase = "roundEnd";
         return newState;
       }
@@ -671,7 +673,7 @@ Return ONLY valid JSON:
             ),
             discardPile: [...prev.discardPile, card],
           }));
-          toast({ title: "New Anchor!", description: "A new Anchor Card has been drawn!" });
+          toast({ title: t('games.uno.newAnchor'), description: t('games.uno.newAnchorDesc') });
         }
         break;
     }
@@ -719,15 +721,15 @@ Return ONLY valid JSON:
     try {
       // In a full implementation, this would send an email or push notification
       toast({
-        title: "Invite Sent!",
-        description: `Invitation sent to ${inviteEmail} with room code ${gameState.roomCode}`,
+        title: t('games.uno.inviteSent'),
+        description: t('games.uno.inviteSentDesc', { email: inviteEmail, code: gameState.roomCode }),
       });
       setInviteEmail("");
       setShowInviteDialog(false);
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to send invite",
+        title: t('common.error'),
+        description: t('games.uno.failedToSendInvite'),
         variant: "destructive",
       });
     }
@@ -738,8 +740,8 @@ Return ONLY valid JSON:
     if (gameState.roomCode) {
       navigator.clipboard.writeText(gameState.roomCode);
       toast({
-        title: "Copied!",
-        description: "Room code copied to clipboard",
+        title: t('common.copied'),
+        description: t('games.uno.roomCodeCopied'),
       });
     }
   };
@@ -778,7 +780,7 @@ Return ONLY valid JSON:
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 py-8 text-center">
-          <p>Please sign in to play.</p>
+          <p>{t('games.pleaseSignIn')}</p>
         </div>
       </div>
     );
@@ -792,7 +794,7 @@ Return ONLY valid JSON:
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={() => navigate("/games")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Games
+            {t('games.backToGames')}
           </Button>
           <div className="flex gap-2">
             {gameState.roomCode && (
@@ -805,41 +807,41 @@ Return ONLY valid JSON:
               <DialogTrigger asChild>
                 <Button variant="outline">
                   <HelpCircle className="mr-2 h-4 w-4" />
-                  Rules
+                  {t('games.rules')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Phototheology Uno Rules</DialogTitle>
-                  <DialogDescription>The Biblical Connections Game</DialogDescription>
+                  <DialogTitle>{t('games.uno.rulesTitle')}</DialogTitle>
+                  <DialogDescription>{t('games.uno.rulesSubtitle')}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 text-sm">
                   <div>
-                    <h4 className="font-semibold mb-1">Objective</h4>
-                    <p>Be the first to empty your hand by drawing meaningful connections between your cards and the Anchor Text. Jeeves (AI) judges each connection.</p>
+                    <h4 className="font-semibold mb-1">{t('games.uno.objective')}</h4>
+                    <p>{t('games.uno.objectiveDesc')}</p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">Play Modes</h4>
+                    <h4 className="font-semibold mb-1">{t('games.uno.playModes')}</h4>
                     <ul className="list-disc pl-5 space-y-1">
-                      <li><strong>Solo:</strong> Play against AI opponents</li>
-                      <li><strong>Local:</strong> Pass and play with friends on the same device</li>
-                      <li><strong>Online:</strong> Invite friends to play remotely</li>
+                      <li><strong>{t('games.uno.solo')}:</strong> {t('games.uno.soloDesc')}</li>
+                      <li><strong>{t('games.uno.local')}:</strong> {t('games.uno.localDesc')}</li>
+                      <li><strong>{t('games.uno.online')}:</strong> {t('games.uno.onlineDesc')}</li>
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">Valid Connection Types</h4>
+                    <h4 className="font-semibold mb-1">{t('games.uno.validConnectionTypes')}</h4>
                     <ul className="list-disc pl-5 space-y-1">
-                      <li><strong>Typological:</strong> OT foreshadowing NT fulfillment</li>
-                      <li><strong>Thematic:</strong> Shared theological themes</li>
-                      <li><strong>Contrast:</strong> Meaningful opposition</li>
-                      <li><strong>Parallel:</strong> Similar narrative structures</li>
-                      <li><strong>Interpretive:</strong> One passage explains another</li>
-                      <li><strong>Ethical:</strong> Shared moral teaching</li>
+                      <li><strong>{t('games.uno.typological')}:</strong> {t('games.uno.typologicalDesc')}</li>
+                      <li><strong>{t('games.uno.thematic')}:</strong> {t('games.uno.thematicDesc')}</li>
+                      <li><strong>{t('games.uno.contrast')}:</strong> {t('games.uno.contrastDesc')}</li>
+                      <li><strong>{t('games.uno.parallel')}:</strong> {t('games.uno.parallelDesc')}</li>
+                      <li><strong>{t('games.uno.interpretive')}:</strong> {t('games.uno.interpretiveDesc')}</li>
+                      <li><strong>{t('games.uno.ethical')}:</strong> {t('games.uno.ethicalDesc')}</li>
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">Winning</h4>
-                    <p>First to discard all cards shouts "Sola Scriptura!" and wins the round. Win 3 rounds to win the match!</p>
+                    <h4 className="font-semibold mb-1">{t('games.uno.winning')}</h4>
+                    <p>{t('games.uno.winningDesc')}</p>
                   </div>
                 </div>
               </DialogContent>
@@ -850,9 +852,9 @@ Return ONLY valid JSON:
         {/* Game Title */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">
-            Phototheology Uno
+            {t('games.uno.title')}
           </h1>
-          <p className="text-muted-foreground mt-2">The Biblical Connections Game</p>
+          <p className="text-muted-foreground mt-2">{t('games.uno.rulesSubtitle')}</p>
         </div>
 
         {/* Pass Device Alert for Local Multiplayer */}
@@ -860,7 +862,7 @@ Return ONLY valid JSON:
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle className="text-center text-2xl">
-                Pass the Device!
+                {t('games.uno.passTheDevice')}
               </AlertDialogTitle>
               <AlertDialogDescription className="text-center text-lg py-4">
                 <div
@@ -869,15 +871,15 @@ Return ONLY valid JSON:
                 >
                   {nextPlayerName.charAt(0)}
                 </div>
-                <span className="font-bold text-xl">{nextPlayerName}</span>, it's your turn!
+                <span className="font-bold text-xl">{nextPlayerName}</span>{t('games.uno.itsYourTurn')}
                 <br />
-                <span className="text-sm">Make sure only you can see the screen.</span>
+                <span className="text-sm">{t('games.uno.onlyYouCanSee')}</span>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="justify-center">
               <AlertDialogAction onClick={startPlayerTurn} className="min-w-[150px]">
                 <Eye className="mr-2 h-4 w-4" />
-                Show My Cards
+                {t('games.uno.showMyCards')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -892,13 +894,13 @@ Return ONLY valid JSON:
           >
             <Card className="border-2 border-primary/20">
               <CardHeader className="text-center">
-                <CardTitle>Start New Game</CardTitle>
-                <CardDescription>Choose your play mode, game mode, and players</CardDescription>
+                <CardTitle>{t('games.uno.startNewGame')}</CardTitle>
+                <CardDescription>{t('games.uno.chooseSettings')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Play Mode Selection */}
                 <div>
-                  <Label className="text-base font-semibold mb-3 block">Play Mode</Label>
+                  <Label className="text-base font-semibold mb-3 block">{t('games.uno.playMode')}</Label>
                   <div className="grid grid-cols-3 gap-2">
                     <Button
                       variant={gameState.playMode === "solo" ? "default" : "outline"}
@@ -906,8 +908,8 @@ Return ONLY valid JSON:
                       onClick={() => setGameState(prev => ({ ...prev, playMode: "solo" }))}
                     >
                       <Monitor className="h-6 w-6 mb-1" />
-                      <span className="text-xs">Solo</span>
-                      <span className="text-[10px] text-muted-foreground">vs AI</span>
+                      <span className="text-xs">{t('games.uno.solo')}</span>
+                      <span className="text-[10px] text-muted-foreground">{t('games.uno.vsAi')}</span>
                     </Button>
                     <Button
                       variant={gameState.playMode === "local" ? "default" : "outline"}
@@ -915,8 +917,8 @@ Return ONLY valid JSON:
                       onClick={() => setGameState(prev => ({ ...prev, playMode: "local" }))}
                     >
                       <Users className="h-6 w-6 mb-1" />
-                      <span className="text-xs">Local</span>
-                      <span className="text-[10px] text-muted-foreground">Same Device</span>
+                      <span className="text-xs">{t('games.uno.local')}</span>
+                      <span className="text-[10px] text-muted-foreground">{t('games.uno.sameDevice')}</span>
                     </Button>
                     <Button
                       variant={gameState.playMode === "online" ? "default" : "outline"}
@@ -924,28 +926,28 @@ Return ONLY valid JSON:
                       onClick={() => setGameState(prev => ({ ...prev, playMode: "online" }))}
                     >
                       <Wifi className="h-6 w-6 mb-1" />
-                      <span className="text-xs">Online</span>
-                      <span className="text-[10px] text-muted-foreground">Invite Friends</span>
+                      <span className="text-xs">{t('games.uno.online')}</span>
+                      <span className="text-[10px] text-muted-foreground">{t('games.uno.inviteFriends')}</span>
                     </Button>
                   </div>
                 </div>
 
                 {/* Game Mode Selection */}
                 <div>
-                  <Label className="text-base font-semibold mb-3 block">Game Mode</Label>
+                  <Label className="text-base font-semibold mb-3 block">{t('games.uno.gameMode')}</Label>
                   <Tabs defaultValue="easy" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="easy">Easy Mode</TabsTrigger>
-                      <TabsTrigger value="classic">Classic Mode</TabsTrigger>
+                      <TabsTrigger value="easy">{t('games.uno.easyMode')}</TabsTrigger>
+                      <TabsTrigger value="classic">{t('games.uno.classicMode')}</TabsTrigger>
                     </TabsList>
                     <TabsContent value="easy" className="mt-4">
                       <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
                         <div className="flex items-center gap-2 mb-2">
                           <Sparkles className="h-5 w-5 text-green-600" />
-                          <span className="font-semibold text-green-700 dark:text-green-400">Easy Mode</span>
+                          <span className="font-semibold text-green-700 dark:text-green-400">{t('games.uno.easyMode')}</span>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Choose from multiple-choice connection options. Great for beginners!
+                          {t('games.uno.easyModeDesc')}
                         </p>
                       </div>
                     </TabsContent>
@@ -953,10 +955,10 @@ Return ONLY valid JSON:
                       <div className="p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
                         <div className="flex items-center gap-2 mb-2">
                           <BookOpen className="h-5 w-5 text-purple-600" />
-                          <span className="font-semibold text-purple-700 dark:text-purple-400">Classic Mode</span>
+                          <span className="font-semibold text-purple-700 dark:text-purple-400">{t('games.uno.classicMode')}</span>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Explain your own connections. Best for deeper study!
+                          {t('games.uno.classicModeDesc')}
                         </p>
                       </div>
                     </TabsContent>
@@ -965,7 +967,7 @@ Return ONLY valid JSON:
 
                 {/* Player Count */}
                 <div>
-                  <Label className="text-base font-semibold mb-3 block">Number of Players</Label>
+                  <Label className="text-base font-semibold mb-3 block">{t('games.uno.numberOfPlayers')}</Label>
                   <div className="flex gap-2">
                     {[2, 3, 4].map(num => (
                       <Button
@@ -984,7 +986,7 @@ Return ONLY valid JSON:
                 {/* Player Names for Local Mode */}
                 {gameState.playMode === "local" && (
                   <div className="space-y-3">
-                    <Label className="text-base font-semibold block">Player Names</Label>
+                    <Label className="text-base font-semibold block">{t('games.uno.playerNames')}</Label>
                     {Array.from({ length: playerCount }).map((_, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <div
@@ -1015,14 +1017,14 @@ Return ONLY valid JSON:
                     onClick={() => startGame("easy", gameState.playMode, playerCount)}
                   >
                     <Sparkles className="mr-2 h-5 w-5" />
-                    Easy Mode
+                    {t('games.uno.easyMode')}
                   </Button>
                   <Button
                     className="flex-1 h-12"
                     onClick={() => startGame("classic", gameState.playMode, playerCount)}
                   >
                     <BookOpen className="mr-2 h-5 w-5" />
-                    Classic Mode
+                    {t('games.uno.classicMode')}
                   </Button>
                 </div>
               </CardContent>
@@ -1038,25 +1040,25 @@ Return ONLY valid JSON:
               <div className="flex justify-center gap-3">
                 <Button variant="outline" onClick={copyRoomCode}>
                   <Copy className="mr-2 h-4 w-4" />
-                  Copy Code: {gameState.roomCode}
+                  {t('games.uno.copyCode')}: {gameState.roomCode}
                 </Button>
                 <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
                   <DialogTrigger asChild>
                     <Button>
                       <UserPlus className="mr-2 h-4 w-4" />
-                      Invite Player
+                      {t('games.uno.invitePlayer')}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Invite a Player</DialogTitle>
+                      <DialogTitle>{t('games.uno.inviteAPlayer')}</DialogTitle>
                       <DialogDescription>
-                        Send an invitation with the room code
+                        {t('games.uno.sendInvitation')}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 pt-4">
                       <div>
-                        <Label>Room Code</Label>
+                        <Label>{t('games.uno.roomCode')}</Label>
                         <div className="flex items-center gap-2 mt-1">
                           <Input value={gameState.roomCode} readOnly />
                           <Button variant="outline" onClick={copyRoomCode}>
@@ -1065,7 +1067,7 @@ Return ONLY valid JSON:
                         </div>
                       </div>
                       <div>
-                        <Label>Invite by Email</Label>
+                        <Label>{t('games.uno.inviteByEmail')}</Label>
                         <Input
                           type="email"
                           placeholder="friend@example.com"
@@ -1076,7 +1078,7 @@ Return ONLY valid JSON:
                       </div>
                       <Button className="w-full" onClick={sendInvite}>
                         <Share2 className="mr-2 h-4 w-4" />
-                        Send Invite
+                        {t('games.uno.sendInvite')}
                       </Button>
                     </div>
                   </DialogContent>
@@ -1105,8 +1107,8 @@ Return ONLY valid JSON:
                       {player.isAI && <Badge variant="outline" className="text-[10px]">AI</Badge>}
                     </div>
                     <div className="flex items-center gap-2 text-sm mt-1">
-                      <Badge variant="secondary">{player.hand.length} cards</Badge>
-                      <Badge variant="outline">{gameState.roundsWon[idx]} wins</Badge>
+                      <Badge variant="secondary">{t('games.uno.cardsCount', { count: player.hand.length })}</Badge>
+                      <Badge variant="outline">{t('games.uno.winsCount', { count: gameState.roundsWon[idx] })}</Badge>
                     </div>
                   </div>
                 </Card>
@@ -1121,7 +1123,7 @@ Return ONLY valid JSON:
             >
               <Card className="border-2 border-amber-500/50 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30">
                 <CardHeader className="text-center pb-2">
-                  <Badge className="w-fit mx-auto mb-2 bg-amber-500">Anchor Card</Badge>
+                  <Badge className="w-fit mx-auto mb-2 bg-amber-500">{t('games.uno.anchorCard')}</Badge>
                   <CardTitle className="text-xl">{gameState.anchorCard?.title}</CardTitle>
                   <CardDescription className="font-mono">{gameState.anchorCard?.reference}</CardDescription>
                 </CardHeader>
@@ -1143,10 +1145,10 @@ Return ONLY valid JSON:
                   className="text-base px-4 py-1"
                   style={{ backgroundColor: currentPlayer?.color }}
                 >
-                  {gameState.playMode === "local" ? `${currentPlayer?.name}'s Turn` : "Your Turn"} - {
-                    gameState.turnPhase === "selectCard" ? "Select a Card" :
-                    gameState.turnPhase === "makeConnection" ? "Make Your Connection" :
-                    "Awaiting Ruling..."
+                  {gameState.playMode === "local" ? t('games.uno.playersTurn', { name: currentPlayer?.name }) : t('games.uno.yourTurn')} - {
+                    gameState.turnPhase === "selectCard" ? t('games.uno.selectACard') :
+                    gameState.turnPhase === "makeConnection" ? t('games.uno.makeYourConnection') :
+                    t('games.uno.awaitingRuling')
                   }
                 </Badge>
               </div>
@@ -1157,7 +1159,7 @@ Return ONLY valid JSON:
               <div className="space-y-4">
                 <div className="flex items-center justify-center gap-2">
                   <h3 className="text-lg font-semibold">
-                    {gameState.playMode === "local" ? `${currentPlayer.name}'s Hand` : "Your Hand"}
+                    {gameState.playMode === "local" ? t('games.uno.playersHand', { name: currentPlayer.name }) : t('games.uno.yourHand')}
                   </h3>
                   {gameState.playMode === "local" && (
                     <Button
@@ -1166,7 +1168,7 @@ Return ONLY valid JSON:
                       onClick={() => setGameState(prev => ({ ...prev, showCurrentHand: false }))}
                     >
                       <EyeOff className="h-4 w-4 mr-1" />
-                      Hide
+                      {t('games.uno.hide')}
                     </Button>
                   )}
                 </div>
@@ -1226,17 +1228,17 @@ Return ONLY valid JSON:
                 <Card className="border-2 border-primary/30">
                   <CardHeader>
                     <CardTitle className="text-lg">
-                      Connect: {gameState.selectedCard.title}
+                      {t('games.uno.connect')}: {gameState.selectedCard.title}
                     </CardTitle>
                     <CardDescription>
-                      How does this connect to the Anchor Card?
+                      {t('games.uno.howDoesThisConnect')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {gameState.mode === "classic" ? (
                       <div className="space-y-3">
                         <Textarea
-                          placeholder="Explain your connection in 1-3 sentences. Be specific about the theological link..."
+                          placeholder={t('games.uno.explainConnectionPlaceholder')}
                           value={gameState.connectionText}
                           onChange={(e) => setGameState(prev => ({ ...prev, connectionText: e.target.value }))}
                           className="min-h-[100px]"
@@ -1251,7 +1253,7 @@ Return ONLY valid JSON:
                           ) : (
                             <Check className="mr-2 h-4 w-4" />
                           )}
-                          Submit Connection
+                          {t('games.uno.submitConnection')}
                         </Button>
                       </div>
                     ) : (
@@ -1259,7 +1261,7 @@ Return ONLY valid JSON:
                         {isLoading ? (
                           <div className="text-center py-8">
                             <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-                            <p className="text-sm text-muted-foreground mt-2">Jeeves is generating options...</p>
+                            <p className="text-sm text-muted-foreground mt-2">{t('games.uno.jeevesGenerating')}</p>
                           </div>
                         ) : (
                           <>
@@ -1281,14 +1283,14 @@ Return ONLY valid JSON:
                                 <RadioGroupItem value="D" id="D" className="mt-1" />
                                 <Label htmlFor="D" className="flex-1 cursor-pointer">
                                   <span className="font-semibold">D.</span>{" "}
-                                  <span className="text-muted-foreground">None of these — I see a different connection</span>
+                                  <span className="text-muted-foreground">{t('games.uno.noneOfThese')}</span>
                                 </Label>
                               </div>
                             </RadioGroup>
 
                             {gameState.selectedOption === "D" && (
                               <Textarea
-                                placeholder="Explain your own connection..."
+                                placeholder={t('games.uno.explainOwnConnection')}
                                 value={gameState.connectionText}
                                 onChange={(e) => setGameState(prev => ({ ...prev, connectionText: e.target.value }))}
                                 className="min-h-[80px]"
@@ -1301,7 +1303,7 @@ Return ONLY valid JSON:
                               disabled={!gameState.selectedOption || (gameState.selectedOption === "D" && gameState.connectionText.length < 20)}
                             >
                               <Check className="mr-2 h-4 w-4" />
-                              Submit Answer
+                              {t('games.uno.submitAnswer')}
                             </Button>
                           </>
                         )}
@@ -1320,7 +1322,7 @@ Return ONLY valid JSON:
                         easyModeOptions: [],
                       }))}
                     >
-                      Choose Different Card
+                      {t('games.uno.chooseDifferentCard')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -1344,16 +1346,16 @@ Return ONLY valid JSON:
                       )}
                     </div>
                     <h3 className={`text-2xl font-bold mb-2 ${gameState.jeevesRuling.approved ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"}`}>
-                      {gameState.jeevesRuling.approved ? "APPROVED!" : "DENIED"}
+                      {gameState.jeevesRuling.approved ? t('games.uno.approved') : t('games.uno.denied')}
                     </h3>
                     <p className="text-muted-foreground mb-4">{gameState.jeevesRuling.reasoning}</p>
                     <p className="text-sm">
                       {gameState.jeevesRuling.approved
-                        ? "Card discarded! Moving to next player..."
-                        : "Draw a card from the pile!"}
+                        ? t('games.uno.cardDiscarded')
+                        : t('games.uno.drawACard')}
                     </p>
                     <Button className="mt-4" onClick={processRuling}>
-                      Continue
+                      {t('common.continue')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -1365,7 +1367,7 @@ Return ONLY valid JSON:
               <div className="text-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-2" />
                 <p className="text-muted-foreground">
-                  {currentPlayer.name} is thinking...
+                  {t('games.uno.isThinking', { name: currentPlayer.name })}
                 </p>
               </div>
             )}
@@ -1382,7 +1384,7 @@ Return ONLY valid JSON:
             <Card className="border-2 border-primary">
               <CardContent className="p-8">
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <h2 className="text-2xl font-bold mb-4">Round Complete!</h2>
+                <h2 className="text-2xl font-bold mb-4">{t('games.uno.roundComplete')}</h2>
                 <div className="space-y-2 mb-6">
                   {gameState.players.map((player, idx) => (
                     <div key={player.id} className="flex justify-between items-center">
@@ -1394,14 +1396,14 @@ Return ONLY valid JSON:
                         <span>{player.name}</span>
                       </div>
                       <Badge variant={gameState.roundsWon[idx] > 0 ? "default" : "outline"}>
-                        {gameState.roundsWon[idx]} wins
+                        {t('games.uno.winsCount', { count: gameState.roundsWon[idx] })}
                       </Badge>
                     </div>
                   ))}
                 </div>
                 <Button className="w-full" onClick={startNewRound}>
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Start Next Round
+                  {t('games.uno.startNextRound')}
                 </Button>
               </CardContent>
             </Card>
@@ -1418,9 +1420,9 @@ Return ONLY valid JSON:
             <Card className="border-2 border-yellow-500 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/30 dark:to-amber-950/30">
               <CardContent className="p-8">
                 <div className="text-6xl mb-4">🏆</div>
-                <h2 className="text-3xl font-bold mb-2">Sola Scriptura!</h2>
+                <h2 className="text-3xl font-bold mb-2">{t('games.uno.solaScriptura')}</h2>
                 <p className="text-xl text-muted-foreground mb-6">
-                  {gameState.players[gameState.roundsWon.indexOf(Math.max(...gameState.roundsWon))]?.name} wins the match!
+                  {t('games.uno.winsTheMatch', { name: gameState.players[gameState.roundsWon.indexOf(Math.max(...gameState.roundsWon))]?.name })}
                 </p>
                 <div className="space-y-2 mb-6">
                   {gameState.players.map((player, idx) => (
@@ -1433,18 +1435,18 @@ Return ONLY valid JSON:
                         <span className="font-semibold">{player.name}</span>
                       </div>
                       <div className="flex gap-2">
-                        <Badge>{player.score} pts</Badge>
-                        <Badge variant="outline">{gameState.roundsWon[idx]} wins</Badge>
+                        <Badge>{t('games.uno.pts', { score: player.score })}</Badge>
+                        <Badge variant="outline">{t('games.uno.winsCount', { count: gameState.roundsWon[idx] })}</Badge>
                       </div>
                     </div>
                   ))}
                 </div>
                 <div className="flex gap-3">
                   <Button variant="outline" className="flex-1" onClick={() => navigate("/games")}>
-                    Back to Games
+                    {t('games.backToGames')}
                   </Button>
                   <Button className="flex-1" onClick={() => setGameState(prev => ({ ...prev, gamePhase: "setup" }))}>
-                    Play Again
+                    {t('games.playAgain')}
                   </Button>
                 </div>
               </CardContent>

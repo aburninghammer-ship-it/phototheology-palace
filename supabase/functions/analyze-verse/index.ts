@@ -2,6 +2,40 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
+// Canonical room code → full name mapping to prevent AI hallucinating wrong names
+const CANONICAL_ROOMS: Record<string, string> = {
+  "SR": "Story Room", "IR": "Imagination Room", "24FPS": "24 Frames Per Second", "24F": "24 Frames Per Second",
+  "BR": "Bible Rendered", "TR": "Translation Room", "GR": "Gems Room",
+  "OR": "Observation Room", "DC": "Def-Com Room", "ST": "Symbols/Types Room",
+  "QR": "Questions Room", "QA": "Q&A Chains Room",
+  "NF": "Nature Freestyle", "PF": "Personal Freestyle", "BF": "Bible Freestyle",
+  "HF": "History Freestyle", "LR": "Listening Room",
+  "CR": "Concentration Room", "DR": "Dimensions Room", "C6": "Connect-6 Room",
+  "TRm": "Theme Room", "TZ": "Time Zone Room", "PRm": "Patterns Room",
+  "P||": "Parallels Room", "P‖": "Parallels Room", "FRt": "Fruit Room",
+  "CEC": "Christ in Every Chapter", "R66": "Room 66",
+  "BL": "Blue/Sanctuary Room", "PR": "Prophecy Room", "3A": "Three Angels Room",
+  "FE": "Feasts Room", "MATH": "Mathematics Room",
+  "123H": "Three Heavens Room", "1H": "First Heaven", "2H": "Second Heaven", "3H": "Third Heaven",
+  "JR": "Juice Room",
+  "FRm": "Fire Room", "MR": "Meditation Room", "SRm": "Speed Room",
+};
+
+// Extract room code from AI output like "CEC (Christ-Exposed Covenant)" → "CEC"
+function extractRoomCode(roomStr: string): string | null {
+  const match = roomStr.match(/^([A-Za-z0-9@‖|]+)/);
+  return match ? match[1] : null;
+}
+
+// Normalize a room string to use canonical name
+function normalizeRoomName(roomStr: string): string {
+  const code = extractRoomCode(roomStr);
+  if (code && CANONICAL_ROOMS[code]) {
+    return `${code} (${CANONICAL_ROOMS[code]})`;
+  }
+  return roomStr; // Return as-is if not recognized
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -329,12 +363,20 @@ ANALYSIS REQUIREMENTS:
     
     const analysis = JSON.parse(toolCall.function.arguments);
 
+    // Normalize room names to prevent AI hallucinations
+    const normalizedRoomsUsed = (analysis.roomsUsed || []).map(normalizeRoomName);
+
+    const normalizedRoomAnalysis: Record<string, string> = {};
+    for (const [key, value] of Object.entries(analysis.roomAnalysis || {})) {
+      normalizedRoomAnalysis[normalizeRoomName(key)] = value as string;
+    }
+
     return new Response(
       JSON.stringify({
         verseId: `${book}-${chapter}-${verse}`,
-        roomsUsed: analysis.roomsUsed || [],
+        roomsUsed: normalizedRoomsUsed,
         floorsCovered: analysis.floorsCovered || [],
-        roomAnalysis: analysis.roomAnalysis || {},
+        roomAnalysis: normalizedRoomAnalysis,
         principles: {
           dimensions: analysis.dimensions || [],
           cycles: analysis.cycles || [],

@@ -115,7 +115,7 @@ serve(async (req) => {
        return null;
      };
 
-     const appBaseUrl = (getBaseUrlFromRequest(req) || Deno.env.get('PUBLIC_APP_URL') || 'https://thephototheologyapp.com').replace(/\/$/, '');
+     const appBaseUrl = (getBaseUrlFromRequest(req) || Deno.env.get('PUBLIC_APP_URL') || 'https://phototheologybible.com').replace(/\/$/, '');
      const joinLink = `${appBaseUrl}/join-church?code=${invitationCode}`;
     const expiresDate = new Date(expiresAt).toLocaleDateString('en-US', {
       weekday: 'long',

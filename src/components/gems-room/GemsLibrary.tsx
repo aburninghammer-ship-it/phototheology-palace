@@ -12,8 +12,10 @@ import {
   Sparkles,
   Gem,
   Cross,
-  Link2
+  Link2,
+  Share2
 } from "lucide-react";
+import { QuickShareButton } from "@/components/social/QuickShareButton";
 import {
   gemsLibrary,
   getGemsByCategory,
@@ -101,11 +103,18 @@ export function GemsLibrary({ onClose }: GemsLibraryProps) {
     return (
       <Card className="h-full">
         <CardHeader className="pb-4">
-          <Button variant="ghost" size="sm" onClick={handleBack} className="w-fit mb-2">
-            <ChevronRight className="h-4 w-4 rotate-180 mr-1" />
-            Back to Gems
-          </Button>
-          <CardTitle className="text-xl">{selectedGem.title}</CardTitle>
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" size="sm" onClick={handleBack} className="w-fit">
+              <ChevronRight className="h-4 w-4 rotate-180 mr-1" />
+              Back to Gems
+            </Button>
+            <QuickShareButton
+              title={`💎 Biblical Gem: ${selectedGem.title}`}
+              content={`${selectedGem.insight}\n\n📖 ${selectedGem.oldTestament.book} ${selectedGem.oldTestament.chapter}:${selectedGem.oldTestament.verses}${selectedGem.newTestament ? ` ↔ ${selectedGem.newTestament.book} ${selectedGem.newTestament.chapter}:${selectedGem.newTestament.verses}` : ''}`}
+              type="gem"
+            />
+          </div>
+          <CardTitle className="text-xl mt-2">{selectedGem.title}</CardTitle>
           <CardDescription className="flex items-center gap-2 flex-wrap">
             <Badge variant="outline">
               {categoryInfo[selectedGem.category]?.icon} {categoryInfo[selectedGem.category]?.name}

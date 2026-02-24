@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -42,6 +43,7 @@ const ROWS = 6;
 const COLS = 7;
 
 export default function PhototheologyConnectFour() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -107,7 +109,7 @@ export default function PhototheologyConnectFour() {
 
     const row = findLowestRow(board, col);
     if (row === -1) {
-      toast.error("Column is full!");
+      toast.error(t('games.connectFour.columnFull'));
       return;
     }
 
@@ -124,10 +126,10 @@ export default function PhototheologyConnectFour() {
     setShowQuestion(false);
 
     if (isCorrect) {
-      toast.success("Correct!");
+      toast.success(t('games.common.correct'));
       executeDrop(pendingColumn);
     } else {
-      toast.error(`Incorrect! The answer was: ${currentQuestion.answer}`);
+      toast.error(t('games.common.incorrectAnswer', { answer: currentQuestion.answer }));
       // Wrong answer - lose turn
       const nextPlayer = currentPlayer === 'red' ? 'yellow' : 'red';
       setCurrentPlayer(nextPlayer);
@@ -269,16 +271,16 @@ export default function PhototheologyConnectFour() {
         <div className="flex justify-between items-center mb-6">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-3xl font-bold text-blue-400 flex items-center gap-2" style={{ fontFamily: "'Cinzel', serif" }}>
             <CircleDot className="h-8 w-8" />
-            PHOTOTHEOLOGY CONNECT FOUR
+            {t('games.connectFour.title')}
           </h1>
           {gameMode && (
             <Button variant="outline" onClick={resetScore} className="border-blue-500/50">
               <RotateCcw className="h-4 w-4 mr-2" />
-              Reset All
+              {t('games.common.resetAll')}
             </Button>
           )}
         </div>
@@ -288,9 +290,9 @@ export default function PhototheologyConnectFour() {
           <div className="max-w-md mx-auto">
             <Card className="bg-black/40 border-blue-500/50">
               <CardHeader>
-                <CardTitle className="text-blue-400 text-center">Select Game Mode</CardTitle>
+                <CardTitle className="text-blue-400 text-center">{t('games.common.selectGameMode')}</CardTitle>
                 <CardDescription className="text-center text-blue-200/80">
-                  Answer Bible questions to drop your disc!
+                  {t('games.connectFour.answerToDrop')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -300,8 +302,8 @@ export default function PhototheologyConnectFour() {
                 >
                   <Users className="h-6 w-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-bold">Local 2-Player</div>
-                    <div className="text-xs opacity-80">Take turns with a friend</div>
+                    <div className="font-bold">{t('games.common.local2Player')}</div>
+                    <div className="text-xs opacity-80">{t('games.common.takeTurns')}</div>
                   </div>
                 </Button>
                 <Button
@@ -310,8 +312,8 @@ export default function PhototheologyConnectFour() {
                 >
                   <Swords className="h-6 w-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-bold">vs Computer</div>
-                    <div className="text-xs opacity-80">Play against the AI</div>
+                    <div className="font-bold">{t('games.common.vsComputer')}</div>
+                    <div className="text-xs opacity-80">{t('games.common.playAgainstAI')}</div>
                   </div>
                 </Button>
               </CardContent>
@@ -325,17 +327,17 @@ export default function PhototheologyConnectFour() {
             {/* Score */}
             <div className="flex items-center gap-8">
               <Badge className="px-4 py-2 bg-red-600 text-lg">
-                Red: {redWins}
+                {t('games.connectFour.red')}: {redWins}
               </Badge>
               <Badge className={`px-4 py-2 text-lg ${
                 winner ? (winner === 'red' ? 'bg-red-600' : 'bg-yellow-600') :
                 isDraw ? 'bg-gray-600' :
                 (currentPlayer === 'red' ? 'bg-red-600 ring-2 ring-white' : 'bg-yellow-600 ring-2 ring-white')
               }`}>
-                {winner ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} Wins!` : isDraw ? "It's a Draw!" : `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}'s Turn`}
+                {winner ? t('games.common.playerWins', { player: winner === 'red' ? t('games.connectFour.red') : t('games.connectFour.yellow') }) : isDraw ? t('games.common.draw') : t('games.common.playerTurn', { player: currentPlayer === 'red' ? t('games.connectFour.red') : t('games.connectFour.yellow') })}
               </Badge>
               <Badge className="px-4 py-2 bg-yellow-600 text-lg">
-                Yellow: {yellowWins}
+                {t('games.connectFour.yellow')}: {yellowWins}
               </Badge>
             </div>
 
@@ -403,7 +405,7 @@ export default function PhototheologyConnectFour() {
               >
                 <Button onClick={resetGame} className="bg-blue-600 hover:bg-blue-700">
                   <RotateCcw className="h-4 w-4 mr-2" />
-                  Play Again
+                  {t('games.common.playAgain')}
                 </Button>
               </motion.div>
             )}
@@ -416,10 +418,10 @@ export default function PhototheologyConnectFour() {
             <DialogHeader>
               <DialogTitle className="text-blue-200 flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                Bible Challenge!
+                {t('games.common.bibleChallenge')}
               </DialogTitle>
               <DialogDescription className="text-blue-100">
-                Answer correctly to drop your disc
+                {t('games.connectFour.answerToDropDisc')}
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">

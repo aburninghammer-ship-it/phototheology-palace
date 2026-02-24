@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, Clock } from "lucide-react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 
 export function UserCountBadge() {
+  const { t } = useTranslation();
   const [activeCount, setActiveCount] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
@@ -87,7 +89,7 @@ export function UserCountBadge() {
             </span>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              Active This Hour
+              {t('userCount.activeThisHour')}
             </span>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,7 @@ interface Puzzle {
 }
 
 const PrinciplePuzzle = () => {
+  const { t } = useTranslation();
   const { mode } = useParams<{ mode?: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -88,16 +90,16 @@ const PrinciplePuzzle = () => {
       const points = 10;
       setScore(score + points);
       toast({
-        title: "Perfect! 🎉",
-        description: `+${points} points`,
+        title: t('principles.perfect'),
+        description: t('principles.plusPoints', { points }),
       });
     } else {
       const correctCount = selectedPrinciples.filter(p => puzzle.correctPrinciples.includes(p)).length;
       const points = correctCount * 3;
       setScore(score + points);
       toast({
-        title: "Partial Credit",
-        description: `You got ${correctCount} correct. +${points} points`,
+        title: t('principles.partialCredit'),
+        description: t('principles.partialCreditDescription', { correctCount, points }),
         variant: "default",
       });
     }
@@ -142,28 +144,28 @@ const PrinciplePuzzle = () => {
             <Card className="text-center">
               <CardHeader>
                 <div className="text-6xl mb-4">🏆</div>
-                <CardTitle className="text-3xl">Well Done!</CardTitle>
+                <CardTitle className="text-3xl">{t('principles.wellDone')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="p-6 bg-primary/10 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Final Score</p>
+                  <p className="text-sm text-muted-foreground">{t('principles.finalScore')}</p>
                   <p className="text-4xl font-bold">{score}</p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    out of {puzzles.length * 10} possible
+                    {t('principles.outOfPossible', { total: puzzles.length * 10 })}
                   </p>
                 </div>
                 
                 <p className="text-muted-foreground">
-                  You've demonstrated great understanding of Palace principles and how they connect to Scripture!
+                  {t('principles.puzzleCompletionMessage')}
                 </p>
 
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => window.location.reload()} size="lg">
-                    Play Again
+                    {t('principles.playAgain')}
                   </Button>
                   <Button onClick={() => navigate("/games")} variant="outline" size="lg">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('principles.backToGames')}
                   </Button>
                 </div>
               </CardContent>
@@ -184,7 +186,7 @@ const PrinciplePuzzle = () => {
           <div className="flex items-center justify-between">
             <Button onClick={() => navigate("/games")} variant="ghost">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Exit Game
+              {t('principles.exitGame')}
             </Button>
             <Badge variant="outline" className="text-lg px-4 py-2">
               <Trophy className="mr-2 h-4 w-4" />
@@ -198,20 +200,20 @@ const PrinciplePuzzle = () => {
                 <div className="flex items-center gap-2">
                   <Target className="h-5 w-5" />
                   <span className="font-semibold">
-                    Puzzle {currentPuzzle + 1} of {puzzles.length}
+                    {t('principles.puzzleOf', { current: currentPuzzle + 1, total: puzzles.length })}
                   </span>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="p-6 bg-primary/5 rounded-lg space-y-2">
-                <p className="text-sm text-muted-foreground">Identify the Palace principles in this verse:</p>
+                <p className="text-sm text-muted-foreground">{t('principles.identifyPrinciples')}</p>
                 <p className="text-lg font-medium leading-relaxed">&ldquo;{puzzle.verse}&rdquo;</p>
                 <p className="text-sm text-muted-foreground text-right">— {puzzle.reference}</p>
               </div>
 
               <div className="space-y-3">
-                <p className="font-medium">Select all principles that apply:</p>
+                <p className="font-medium">{t('principles.selectAllPrinciples')}</p>
                 {puzzle.allOptions.map((option) => {
                   const isSelected = selectedPrinciples.includes(option);
                   const isCorrect = puzzle.correctPrinciples.includes(option);
@@ -250,16 +252,16 @@ const PrinciplePuzzle = () => {
                   className="w-full"
                   size="lg"
                 >
-                  Submit Answer
+                  {t('common.submitAnswer')}
                 </Button>
               ) : (
                 <div className="space-y-4">
                   <div className="p-4 bg-muted rounded-lg">
-                    <p className="text-sm font-medium mb-2">Explanation:</p>
+                    <p className="text-sm font-medium mb-2">{t('principles.explanation')}:</p>
                     <p className="text-sm text-muted-foreground">{puzzle.explanation}</p>
                   </div>
                   <Button onClick={nextPuzzle} className="w-full" size="lg">
-                    {currentPuzzle < puzzles.length - 1 ? "Next Puzzle" : "See Results"}
+                    {currentPuzzle < puzzles.length - 1 ? t('principles.nextPuzzle') : t('principles.seeResults')}
                   </Button>
                 </div>
               )}

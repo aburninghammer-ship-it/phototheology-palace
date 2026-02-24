@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -102,6 +103,7 @@ const createInitialBoard = (): (ChessPiece | null)[][] => {
 };
 
 export default function PhototheologyChess() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -343,10 +345,10 @@ export default function PhototheologyChess() {
     setShowQuestion(false);
 
     if (isCorrect) {
-      toast.success("Correct! Capture successful!");
+      toast.success(t('games.common.correctCapture'));
       executeMove(pendingCapture.from, pendingCapture.to, pendingCapture.capturedPiece);
     } else {
-      toast.error(`Incorrect! The answer was: ${currentQuestion.answer}`);
+      toast.error(t('games.common.incorrectAnswer', { answer: currentQuestion.answer }));
       // Move without capture - piece goes back
       setSelectedPiece(null);
       setValidMoves([]);
@@ -447,16 +449,16 @@ export default function PhototheologyChess() {
         <div className="flex justify-between items-center mb-6">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-3xl font-bold text-amber-400 flex items-center gap-2" style={{ fontFamily: "'Cinzel', serif" }}>
             <Crown className="h-8 w-8" />
-            PHOTOTHEOLOGY CHESS
+            {t('games.chess.title')}
           </h1>
           {gameMode && (
             <Button variant="outline" onClick={resetGame} className="border-amber-500/50">
               <RotateCcw className="h-4 w-4 mr-2" />
-              New Game
+              {t('games.common.newGame')}
             </Button>
           )}
         </div>
@@ -466,9 +468,9 @@ export default function PhototheologyChess() {
           <div className="max-w-md mx-auto">
             <Card className="bg-black/40 border-amber-500/50">
               <CardHeader>
-                <CardTitle className="text-amber-400 text-center">Select Game Mode</CardTitle>
+                <CardTitle className="text-amber-400 text-center">{t('games.common.selectGameMode')}</CardTitle>
                 <CardDescription className="text-center text-amber-200/80">
-                  Answer Bible questions to capture pieces!
+                  {t('games.common.answerBibleQuestions')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -478,8 +480,8 @@ export default function PhototheologyChess() {
                 >
                   <Users className="h-6 w-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-bold">Local 2-Player</div>
-                    <div className="text-xs opacity-80">Pass and play with a friend</div>
+                    <div className="font-bold">{t('games.common.local2Player')}</div>
+                    <div className="text-xs opacity-80">{t('games.common.passAndPlay')}</div>
                   </div>
                 </Button>
                 <Button
@@ -488,8 +490,8 @@ export default function PhototheologyChess() {
                 >
                   <Swords className="h-6 w-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-bold">vs Computer</div>
-                    <div className="text-xs opacity-80">Play against the AI</div>
+                    <div className="font-bold">{t('games.common.vsComputer')}</div>
+                    <div className="text-xs opacity-80">{t('games.common.playAgainstAI')}</div>
                   </div>
                 </Button>
               </CardContent>
@@ -502,7 +504,7 @@ export default function PhototheologyChess() {
           <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
             {/* Captured pieces - Black */}
             <Card className="bg-black/40 border-amber-500/50 p-4 min-w-[120px]">
-              <p className="text-amber-400 text-sm mb-2">Captured by White:</p>
+              <p className="text-amber-400 text-sm mb-2">{t('games.chess.capturedByWhite')}:</p>
               <div className="flex flex-wrap gap-1">
                 {capturedBlack.map((piece, i) => (
                   <span key={i} className="text-2xl">{PIECE_SYMBOLS[piece.type][piece.color]}</span>
@@ -519,8 +521,8 @@ export default function PhototheologyChess() {
                     currentPlayer === 'white' ? 'bg-white text-black' : 'bg-gray-800 text-white'
                   }`}
                 >
-                  {isCheck && <span className="text-red-500 mr-2">CHECK!</span>}
-                  {gameMode === 'ai' && currentPlayer === 'black' ? 'AI Thinking...' : `${playerNames[currentPlayer]}'s Turn`}
+                  {isCheck && <span className="text-red-500 mr-2">{t('games.chess.check')}</span>}
+                  {gameMode === 'ai' && currentPlayer === 'black' ? t('games.chess.aiThinking') : t('games.chess.playerTurn', { player: playerNames[currentPlayer] })}
                 </Badge>
               </div>
 
@@ -561,7 +563,7 @@ export default function PhototheologyChess() {
 
             {/* Captured pieces - White */}
             <Card className="bg-black/40 border-amber-500/50 p-4 min-w-[120px]">
-              <p className="text-amber-400 text-sm mb-2">Captured by Black:</p>
+              <p className="text-amber-400 text-sm mb-2">{t('games.chess.capturedByBlack')}:</p>
               <div className="flex flex-wrap gap-1">
                 {capturedWhite.map((piece, i) => (
                   <span key={i} className="text-2xl">{PIECE_SYMBOLS[piece.type][piece.color]}</span>
@@ -577,10 +579,10 @@ export default function PhototheologyChess() {
             <DialogHeader>
               <DialogTitle className="text-amber-200 flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                Bible Challenge!
+                {t('games.common.bibleChallenge')}
               </DialogTitle>
               <DialogDescription className="text-amber-100">
-                Answer correctly to capture the piece
+                {t('games.common.answerToCapture')}
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
@@ -607,20 +609,20 @@ export default function PhototheologyChess() {
             <DialogHeader>
               <DialogTitle className="text-3xl text-center text-amber-200">
                 <Trophy className="h-12 w-12 mx-auto mb-2 text-yellow-400" />
-                Game Over!
+                {t('games.common.gameOver')}
               </DialogTitle>
             </DialogHeader>
             <div className="py-6 text-center">
               <p className="text-2xl text-white">
-                {winner === 'white' ? playerNames.white : playerNames.black} Wins!
+                {t('games.common.playerWins', { player: winner === 'white' ? playerNames.white : playerNames.black })}
               </p>
             </div>
             <DialogFooter className="flex gap-2">
               <Button onClick={resetGame} className="flex-1 bg-amber-600 hover:bg-amber-700">
-                Play Again
+                {t('games.common.playAgain')}
               </Button>
               <Button onClick={() => navigate("/games")} variant="outline" className="flex-1 border-amber-400">
-                Back to Games
+                {t('common.backToGames')}
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -31,7 +31,10 @@ import { LiveDemoNotification } from "@/components/live/LiveDemoNotification";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
+import { JeevesWidget } from "@/components/JeevesWidget";
+import { ReginaldButler } from "@/components/ReginaldButler";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { DraggableWidgetStack } from "@/components/DraggableWidgetStack";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
 import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
@@ -54,6 +57,10 @@ const Pricing = lazy(() => import("./pages/Pricing"));
 const InteractiveDemo = lazy(() => import("./pages/InteractiveDemo"));
 const Comparison = lazy(() => import("./pages/Comparison"));
 const DonationPage = lazy(() => import("./pages/DonationPage"));
+const GiftAndShare = lazy(() => import("./pages/GiftAndShare"));
+const GiftSuccess = lazy(() => import("./pages/GiftSuccess"));
+const GiftRedeem = lazy(() => import("./pages/GiftRedeem"));
+const DayPassRedeem = lazy(() => import("./pages/DayPassRedeem"));
 
 // Lazy load all other pages
 const Palace = lazy(() => import("./pages/Palace"));
@@ -70,6 +77,8 @@ const DailyVerse = lazy(() => import("./pages/DailyVerse"));
 const GrowthJournal = lazy(() => import("./pages/GrowthJournal"));
 const EquationsChallenge = lazy(() => import("./pages/EquationsChallenge"));
 const Games = lazy(() => import("./pages/Games"));
+const PTScrabble = lazy(() => import("./pages/PTScrabble"));
+const GroupStudySession = lazy(() => import("./pages/GroupStudySession"));
 const ChainChess = lazy(() => import("./pages/ChainChess"));
 const ConcentrationGame = lazy(() => import("./pages/ConcentrationGame"));
 const PalaceCardGame = lazy(() => import("./pages/PalaceCardGame"));
@@ -93,6 +102,11 @@ const Feedback = lazy(() => import("./pages/Feedback"));
 const CultureControversy = lazy(() => import("./pages/CultureControversy"));
 const ProphecyWatch = lazy(() => import("./pages/ProphecyWatch"));
 const ResearchMode = lazy(() => import("./pages/ResearchMode"));
+const InterlinearBible = lazy(() => import("./pages/InterlinearBible"));
+const BibleTimeline = lazy(() => import("./pages/BibleTimeline"));
+const BibleAtlas = lazy(() => import("./pages/BibleAtlas"));
+const BibleLexicon = lazy(() => import("./pages/BibleLexicon"));
+const ResearchAssistant = lazy(() => import("./pages/ResearchAssistant"));
 const BibleImageLibrary = lazy(() => import("./pages/BibleImageLibrary"));
 const SermonBuilder = lazy(() => import("./pages/SermonBuilder"));
 const SermonSimmer = lazy(() => import("./pages/SermonSimmer"));
@@ -226,6 +240,11 @@ const VideoTraining = lazy(() => import("./pages/VideoTraining"));
 const MyStudies = lazy(() => import("./pages/MyStudies"));
 const StudyEditor = lazy(() => import("./pages/StudyEditor"));
 const StudyBuddy = lazy(() => import("./pages/StudyBuddy"));
+const StudyIdeaLibrary = lazy(() => import("./pages/StudyIdeaLibrary"));
+const GiveMeAGem = lazy(() => import("./pages/GiveMeAGem"));
+const SourceLibrary = lazy(() => import("./pages/SourceLibrary"));
+const InfographicGenerator = lazy(() => import("./pages/InfographicGenerator"));
+const StudySeriesGenerator = lazy(() => import("./pages/StudySeriesGenerator"));
 const MasteryDashboard = lazy(() => import("./pages/MasteryDashboard"));
 const FloorMastery = lazy(() => import("./pages/FloorMastery"));
 const FloorDetailPage = lazy(() => import("./pages/FloorDetail"));
@@ -236,6 +255,7 @@ const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const COTASeries = lazy(() => import("./pages/COTASeries"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 const PatreonCallback = lazy(() => import("./pages/PatreonCallback"));
 const PalaceExplorer = lazy(() => import("./pages/PalaceExplorer"));
@@ -243,6 +263,7 @@ const CardDeck = lazy(() => import("./pages/CardDeck"));
 const PTMultiplayerLobby = lazy(() => import("./pages/PTMultiplayerLobby"));
 const PTMultiplayerGame = lazy(() => import("./pages/PTMultiplayerGame"));
 const AnalyzeThoughts = lazy(() => import("./pages/AnalyzeThoughts"));
+const Polish = lazy(() => import("./pages/Polish"));
 const SparksLibrary = lazy(() => import("./pages/SparksLibrary"));
 const Libraries = lazy(() => import("./pages/Libraries"));
 const PalaceFreestyle = lazy(() => import("./pages/PalaceFreestyle"));
@@ -267,21 +288,15 @@ const Sessions = lazy(() => import("./pages/Sessions"));
 const Notes = lazy(() => import("./pages/Notes"));
 const DonationSuccess = lazy(() => import("./pages/DonationSuccess"));
 const LiveDemo = lazy(() => import("./pages/LiveDemo"));
+const PublicChat = lazy(() => import("./pages/PublicChat"));
+const Schedule = lazy(() => import("./pages/Schedule"));
+const Workspace = lazy(() => import("./pages/Workspace"));
 
 // Gatehouse flow pages (Gatehouse is now imported at top as critical page)
 const Welcome = lazy(() => import("./pages/Welcome"));
 const Antechamber = lazy(() => import("./pages/Antechamber"));
-const FirstRoom = lazy(() => import("./pages/FirstRoom"));
 
-// GuestHouse pages (public)
-const GuestHouseLanding = lazy(() => import("./pages/guesthouse/GuestHouseLanding"));
-const GuestHouseEvent = lazy(() => import("./pages/guesthouse/GuestHouseEvent"));
-const GuestHouseLobby = lazy(() => import("./pages/guesthouse/GuestHouseLobby"));
-const GuestHousePlay = lazy(() => import("./pages/guesthouse/GuestHousePlay"));
-const GuestHouseAssembly = lazy(() => import("./pages/guesthouse/GuestHouseAssembly"));
-const GuestHouseHost = lazy(() => import("./pages/guesthouse/GuestHouseHost"));
-const GuestHouseHostLive = lazy(() => import("./pages/guesthouse/GuestHouseHostLive"));
-const GuestHouseGuestLive = lazy(() => import("./pages/guesthouse/GuestHouseGuestLive"));
+
 
 // Simple redirect component for /devotional -> /devotionals
 const DevotionalRedirect = () => {
@@ -306,13 +321,16 @@ const queryClient = new QueryClient({
   },
 });
 
+// Detect workspace iframe panes — computed once at module load
+const isWorkspacePane = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('workspace');
+
 function App() {
   // Capture UTM parameters on app load for ad attribution
   useUTMCapture();
-  
-  // Skip splash for returning users (localStorage check)
+
+  // Skip splash for returning users (localStorage check) or workspace panes
   const isReturningUser = typeof window !== 'undefined' && localStorage.getItem('hasVisited') === 'true';
-  const [showSplash, setShowSplash] = useState(!isReturningUser);
+  const [showSplash, setShowSplash] = useState(!isReturningUser && !isWorkspacePane);
   
   // Mark user as visited after first splash
   const handleSplashComplete = () => {
@@ -350,6 +368,7 @@ function App() {
                     <SidebarProvider defaultOpen={false}>
                     <ChangeManagerProvider>
                       <div className="min-h-screen flex flex-col w-full pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+                        {!isWorkspacePane && <>
                         <DonationBanner />
                         <FontSizeControl />
                         <AnnouncementBanner />
@@ -362,17 +381,15 @@ function App() {
                         <ExitIntentPopup />
                         {/* Session Mode Prompt Dialog */}
                         <SessionPromptDialog />
-                        {/* Floating Ambient Music Player - higher z-index to avoid being blocked by popups */}
-                        <div className="fixed bottom-32 sm:bottom-28 right-4 z-[60]">
-                          <AmbientMusicPlayer minimal />
-                        </div>
+                        {/* Floating Ambient Music Player - moved into widget stack */}
                         {/* Change Manager Guided Path Checklist */}
                         <GuidedPathChecklist />
+                        </>}
                         <div className="flex flex-1 w-full">
                           <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden pb-mobile-nav">
                           <Suspense fallback={<LoadingScreen />}>
-                            <KeepAliveRoutes maxCached={20}>
+                            <KeepAliveRoutes maxCached={20} excludePaths={["/auth", "/auth/callback", "/guesthouse"]}>
                             <Routes>
             <Route path="/" element={<Gatehouse />} />
             <Route path="/landing" element={<Index />} />
@@ -398,6 +415,10 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/gift" element={<GiftAndShare />} />
+            <Route path="/gift/success" element={<GiftSuccess />} />
+            <Route path="/gift/redeem/:token" element={<GiftRedeem />} />
+            <Route path="/day-pass/:token" element={<DayPassRedeem />} />
             <Route path="/donate" element={<DonationPage />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
             <Route path="/paths" element={<Paths />} />
@@ -415,7 +436,6 @@ function App() {
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/gatehouse" element={<Gatehouse />} />
             <Route path="/antechamber" element={<ProtectedRoute><Antechamber /></ProtectedRoute>} />
-            <Route path="/palace/first-room" element={<ProtectedRoute><FirstRoom /></ProtectedRoute>} />
             <Route path="/access" element={
               <ProtectedRoute>
                 <AccessCode />
@@ -432,10 +452,11 @@ function App() {
             <Route path="/palace/floor/:floorNumber/room/:roomId" element={<ProtectedRoute><RoomDetail /></ProtectedRoute>} />
             <Route path="/card-deck" element={<ProtectedRoute><CardDeck /></ProtectedRoute>} />
             <Route path="/jeeves" element={<ProtectedRoute><CardDeck /></ProtectedRoute>} />
-            <Route path="/gems-room" element={<Navigate to="/palace/floor/1/room/gr" replace />} />
+            <Route path="/gems-room" element={<Navigate to="/give-me-a-gem" replace />} />
             <Route path="/pt-multiplayer" element={<ProtectedRoute><PTMultiplayerLobby /></ProtectedRoute>} />
             <Route path="/pt-multiplayer/:gameId" element={<ProtectedRoute><PTMultiplayerGame /></ProtectedRoute>} />
             <Route path="/analyze-thoughts" element={<ProtectedRoute><AnalyzeThoughts /></ProtectedRoute>} />
+            <Route path="/polish" element={<ProtectedRoute><Polish /></ProtectedRoute>} />
             <Route path="/sparks" element={<ProtectedRoute><SparksLibrary /></ProtectedRoute>} />
             <Route path="/libraries" element={<ProtectedRoute><Libraries /></ProtectedRoute>} />
             <Route path="/palace/freestyle" element={<ProtectedRoute><PalaceFreestyle /></ProtectedRoute>} />
@@ -474,6 +495,8 @@ function App() {
             <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
+            <Route path="/pt-scrabble" element={<ProtectedRoute><PTScrabble /></ProtectedRoute>} />
+            <Route path="/group-study" element={<ProtectedRoute><GroupStudySession /></ProtectedRoute>} />
             <Route path="/games/chef-challenge" element={<ProtectedRoute><ChefChallenge /></ProtectedRoute>} />
             <Route path="/games/chain-war" element={<ProtectedRoute><ChainWar /></ProtectedRoute>} />
             <Route path="/games/sanctuary-run" element={<ProtectedRoute><SanctuaryRun /></ProtectedRoute>} />
@@ -538,6 +561,12 @@ function App() {
           <Route path="/culture-controversy" element={<ProtectedRoute><CultureControversy /></ProtectedRoute>} />
           <Route path="/prophecy-watch" element={<ProtectedRoute><ProphecyWatch /></ProtectedRoute>} />
           <Route path="/research-mode" element={<ProtectedRoute><ResearchMode /></ProtectedRoute>} />
+          <Route path="/interlinear" element={<ProtectedRoute><InterlinearBible /></ProtectedRoute>} />
+          <Route path="/interlinear/:book/:chapter" element={<ProtectedRoute><InterlinearBible /></ProtectedRoute>} />
+          <Route path="/bible-timeline" element={<ProtectedRoute><BibleTimeline /></ProtectedRoute>} />
+          <Route path="/bible-atlas" element={<ProtectedRoute><BibleAtlas /></ProtectedRoute>} />
+          <Route path="/bible-lexicon" element={<ProtectedRoute><BibleLexicon /></ProtectedRoute>} />
+          <Route path="/research-assistant" element={<ProtectedRoute><ResearchAssistant /></ProtectedRoute>} />
             <Route path="/bible-image-library" element={<ProtectedRoute><BibleImageLibrary /></ProtectedRoute>} />
           <Route path="/sermon-builder" element={<ProtectedRoute><SermonBuilder /></ProtectedRoute>} />
           <Route path="/sermon-simmer" element={<ProtectedRoute><SermonSimmer /></ProtectedRoute>} />
@@ -565,7 +594,8 @@ function App() {
           <Route path="/phototheology-course" element={<ProtectedRoute><PhototheologyCourse /></ProtectedRoute>} />
           <Route path="/daniel-course" element={<ProtectedRoute><DanielCourse /></ProtectedRoute>} />
           <Route path="/revelation-course" element={<ProtectedRoute><RevelationCourse /></ProtectedRoute>} />
-          <Route path="/revelation-course/kids" element={<ProtectedRoute><RevelationCourseKids /></ProtectedRoute>} />
+           <Route path="/revelation-course/kids" element={<ProtectedRoute><RevelationCourseKids /></ProtectedRoute>} />
+           <Route path="/cota-series" element={<ProtectedRoute><COTASeries /></ProtectedRoute>} />
           <Route path="/kidgpt" element={<ProtectedRoute><KidGPT /></ProtectedRoute>} />
           <Route path="/kid-gpt" element={<ProtectedRoute><KidGPT /></ProtectedRoute>} />
           <Route path="/pt-kids-games" element={<ProtectedRoute><PTKidsGames /></ProtectedRoute>} />
@@ -578,6 +608,11 @@ function App() {
           <Route path="/apologetics-gpt" element={<ProtectedRoute><ApologeticsGPT /></ProtectedRoute>} />
           <Route path="/quarterly-study" element={<ProtectedRoute><QuarterlyStudy /></ProtectedRoute>} />
           <Route path="/study-buddy" element={<ProtectedRoute><StudyBuddy /></ProtectedRoute>} />
+          <Route path="/study-ideas" element={<ProtectedRoute><StudyIdeaLibrary /></ProtectedRoute>} />
+          <Route path="/give-me-a-gem" element={<ProtectedRoute><GiveMeAGem /></ProtectedRoute>} />
+          <Route path="/sources" element={<ProtectedRoute><SourceLibrary /></ProtectedRoute>} />
+          <Route path="/infographics" element={<ProtectedRoute><InfographicGenerator /></ProtectedRoute>} />
+          <Route path="/study-series" element={<ProtectedRoute><StudySeriesGenerator /></ProtectedRoute>} />
            <Route path="/bible-study-series" element={<ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute>} />
            <Route path="/devotionals" element={<ProtectedRoute><Devotionals /></ProtectedRoute>} />
            <Route path="/devotionals/:planId" element={<ProtectedRoute><DevotionalView /></ProtectedRoute>} />
@@ -668,19 +703,23 @@ function App() {
                 <LiveDemo />
               </ProtectedRoute>
             } />
-            
-            {/* GuestHouse Routes (Public - No Auth Required) */}
-            <Route path="/guesthouse" element={<GuestHouseLanding />} />
-            <Route path="/guesthouse/event/:eventId" element={<GuestHouseEvent />} />
-            <Route path="/guesthouse/lobby/:eventId" element={<GuestHouseLobby />} />
-            <Route path="/guesthouse/play/:eventId" element={<GuestHousePlay />} />
-            <Route path="/guesthouse/live/:eventId" element={<GuestHouseGuestLive />} />
-            <Route path="/guesthouse/assembly/:eventId" element={<GuestHouseAssembly />} />
-            
-            {/* GuestHouse Host Routes (Auth Required) */}
-            <Route path="/guesthouse/host" element={<ProtectedRoute><GuestHouseHost /></ProtectedRoute>} />
-            <Route path="/guesthouse/host/live/:eventId" element={<ProtectedRoute><GuestHouseHostLive /></ProtectedRoute>} />
-            
+            <Route path="/public-chat" element={
+              <ProtectedRoute>
+                <PublicChat />
+              </ProtectedRoute>
+            } />
+            <Route path="/schedule" element={
+              <ProtectedRoute>
+                <Schedule />
+              </ProtectedRoute>
+            } />
+            <Route path="/workspace" element={
+              <ProtectedRoute>
+                <Workspace />
+              </ProtectedRoute>
+            } />
+
+
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                     </Routes>
@@ -688,7 +727,14 @@ function App() {
                     </Suspense>
                   </main>
                   </div>
-                  <MobileBottomNav />
+                  {!isWorkspacePane && <MobileBottomNav />}
+                  {!isWorkspacePane && (
+                    <DraggableWidgetStack>
+                      <AmbientMusicPlayer minimal />
+                      <JeevesWidget />
+                      <ReginaldButler />
+                    </DraggableWidgetStack>
+                  )}
                 </div>
               </ChangeManagerProvider>
               </SidebarProvider>

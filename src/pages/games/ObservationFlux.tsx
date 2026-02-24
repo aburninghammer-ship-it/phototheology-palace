@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -59,6 +60,7 @@ interface ObservationEntry {
 }
 
 const ObservationFlux = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -225,16 +227,16 @@ const ObservationFlux = () => {
       setCaughtDecoys(prev => prev + 1);
       setScore(prev => prev + 20);
       toast({
-        title: "Decoy Caught!",
-        description: `"${block.text}" is NOT in the verse! +20 points`,
+        title: t('games.observationFlux.decoyCaught'),
+        description: t('games.observationFlux.decoyCaughtDesc', { verb: block.text }),
       });
     } else {
       // Incorrectly clicked a real verb - penalty!
       setWrongClicks(prev => prev + 1);
       setScore(prev => Math.max(0, prev - 10));
       toast({
-        title: "That's a Real Verb!",
-        description: `"${block.text}" IS in the verse. -10 points`,
+        title: t('games.observationFlux.realVerb'),
+        description: t('games.observationFlux.realVerbDesc', { verb: block.text }),
         variant: "destructive",
       });
     }
@@ -281,7 +283,7 @@ const ObservationFlux = () => {
       // Show toast for penalties
       if (!result.valid) {
         toast({
-          title: result.type === "hard_penalty" ? "Interpretation Detected" : "Rephrase Needed",
+          title: result.type === "hard_penalty" ? t('games.observationFlux.interpretationDetected') : t('games.observationFlux.rephraseNeeded'),
           description: result.feedback,
           variant: "destructive",
         });
@@ -415,7 +417,7 @@ const ObservationFlux = () => {
               onClick={() => navigate("/games")}
               className="mb-4"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Games
+              <ArrowLeft className="mr-2 h-4 w-4" /> {t('common.backToGames')}
             </Button>
 
             <Card className="overflow-hidden">
@@ -423,9 +425,9 @@ const ObservationFlux = () => {
                 <div className="flex items-center gap-3">
                   <Eye className="h-8 w-8" />
                   <div>
-                    <CardTitle className="text-2xl">Observation Flux</CardTitle>
+                    <CardTitle className="text-2xl">{t('games.observationFlux.title')}</CardTitle>
                     <CardDescription className="text-blue-100">
-                      Floor 2: Observation Room (OR)
+                      {t('games.observationFlux.subtitle')}
                     </CardDescription>
                   </div>
                 </div>
@@ -435,40 +437,40 @@ const ObservationFlux = () => {
                 {/* Rule Display */}
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-center">
                   <p className="text-lg font-semibold text-blue-800 dark:text-blue-200">
-                    "Observe only. Do not interpret."
+                    {t('games.observationFlux.rule')}
                   </p>
                 </div>
 
                 {/* How to Play */}
                 <div className="space-y-3">
-                  <h3 className="font-semibold text-lg">How to Play</h3>
+                  <h3 className="font-semibold text-lg">{t('games.common.howToPlay')}</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
                     <li className="flex gap-2">
                       <Zap className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                      Verb blocks fall - some are REAL verbs, some are DECOYS (fake verbs not in the verse)
+                      {t('games.observationFlux.instructions.verbBlocks')}
                     </li>
                     <li className="flex gap-2">
                       <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                      <strong>TAP/CLICK decoys to catch them!</strong> +20 pts for catching fakes, -10 for wrong clicks
+                      <strong>{t('games.observationFlux.instructions.tapDecoys')}</strong>
                     </li>
                     <li className="flex gap-2">
                       <Eye className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                      Type observations about what you see - counts, agents, sequences
+                      {t('games.observationFlux.instructions.typeObservations')}
                     </li>
                     <li className="flex gap-2">
                       <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      Valid: "Five verbs appear" or "All actions are by one character"
+                      {t('games.observationFlux.instructions.validExample')}
                     </li>
                     <li className="flex gap-2">
                       <XCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-                      Invalid: "The father forgave" or "This represents grace"
+                      {t('games.observationFlux.instructions.invalidExample')}
                     </li>
                   </ul>
                 </div>
 
                 {/* Difficulty Selection */}
                 <div className="space-y-3">
-                  <h3 className="font-semibold text-lg">Select Difficulty</h3>
+                  <h3 className="font-semibold text-lg">{t('games.observationFlux.selectDifficulty')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {DIFFICULTIES.map((diff) => (
                       <Button
@@ -483,9 +485,9 @@ const ObservationFlux = () => {
                       >
                         <span className="font-semibold">{diff.name}</span>
                         <span className="text-xs text-muted-foreground">
-                          {diff.id === "beginner" && "Slow speed, colors + decoys"}
-                          {diff.id === "intermediate" && "Medium speed, decoys only"}
-                          {diff.id === "master" && "Fast + fading, all decoys"}
+                          {diff.id === "beginner" && t('games.observationFlux.beginnerDesc')}
+                          {diff.id === "intermediate" && t('games.observationFlux.intermediateDesc')}
+                          {diff.id === "master" && t('games.observationFlux.masterDesc')}
                         </span>
                       </Button>
                     ))}
@@ -524,45 +526,45 @@ const ObservationFlux = () => {
               <Card>
                 <CardHeader className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-center">
                   <Trophy className="h-12 w-12 mx-auto mb-2" />
-                  <CardTitle className="text-2xl">Pack Complete!</CardTitle>
+                  <CardTitle className="text-2xl">{t('games.observationFlux.packComplete')}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 space-y-4 text-center">
                   <div className="text-4xl font-bold text-primary">{score}</div>
-                  <p className="text-muted-foreground">Total Points</p>
+                  <p className="text-muted-foreground">{t('games.observationFlux.totalPoints')}</p>
 
                   <div className="grid grid-cols-2 gap-4 py-4">
                     <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
                       <div className="text-2xl font-bold text-green-600">
                         {observations.filter(o => o.result.valid).length}
                       </div>
-                      <p className="text-sm text-muted-foreground">Valid Observations</p>
+                      <p className="text-sm text-muted-foreground">{t('games.observationFlux.validObservations')}</p>
                     </div>
                     <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
                       <div className="text-2xl font-bold text-amber-600">
                         {caughtDecoys}
                       </div>
-                      <p className="text-sm text-muted-foreground">Decoys Caught</p>
+                      <p className="text-sm text-muted-foreground">{t('games.observationFlux.decoysCaught')}</p>
                     </div>
                     <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
                       <div className="text-2xl font-bold text-red-600">
                         {observations.filter(o => !o.result.valid).length}
                       </div>
-                      <p className="text-sm text-muted-foreground">Interpretations Caught</p>
+                      <p className="text-sm text-muted-foreground">{t('games.observationFlux.interpretationsCaught')}</p>
                     </div>
                     <div className="bg-gray-50 dark:bg-gray-900/20 rounded-lg p-3">
                       <div className="text-2xl font-bold text-gray-600">
                         {wrongClicks}
                       </div>
-                      <p className="text-sm text-muted-foreground">Wrong Clicks</p>
+                      <p className="text-sm text-muted-foreground">{t('games.observationFlux.wrongClicks')}</p>
                     </div>
                   </div>
 
                   <div className="flex gap-3 justify-center">
                     <Button onClick={restartGame} variant="outline">
-                      <RotateCcw className="mr-2 h-4 w-4" /> Play Again
+                      <RotateCcw className="mr-2 h-4 w-4" /> {t('games.common.playAgain')}
                     </Button>
                     <Button onClick={() => navigate("/games")}>
-                      Back to Games
+                      {t('common.backToGames')}
                     </Button>
                   </div>
                 </CardContent>
@@ -592,7 +594,7 @@ const ObservationFlux = () => {
             <Card>
               <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-center">
                 <CheckCircle className="h-10 w-10 mx-auto mb-2" />
-                <CardTitle>Level {currentLevelIndex + 1} Complete!</CardTitle>
+                <CardTitle>{t('games.observationFlux.levelComplete', { level: currentLevelIndex + 1 })}</CardTitle>
                 <CardDescription className="text-green-100">
                   {currentLevel?.reference}
                 </CardDescription>
@@ -600,12 +602,12 @@ const ObservationFlux = () => {
               <CardContent className="p-6 space-y-4">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">{score}</div>
-                  <p className="text-muted-foreground">Current Score</p>
+                  <p className="text-muted-foreground">{t('games.observationFlux.currentScore')}</p>
                 </div>
 
                 {/* Show expected observations */}
                 <div className="bg-muted/50 rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">Key Observations to Notice:</h4>
+                  <h4 className="font-semibold mb-2">{t('games.observationFlux.keyObservations')}:</h4>
                   <ul className="space-y-1 text-sm">
                     {currentLevel?.expectedObservations.map((obs, i) => (
                       <li key={i} className="flex gap-2">
@@ -618,7 +620,7 @@ const ObservationFlux = () => {
 
                 <div className="flex justify-center">
                   <Button onClick={nextLevel} size="lg">
-                    Next Level <ChevronRight className="ml-2 h-4 w-4" />
+                    {t('games.observationFlux.nextLevel')} <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>
@@ -659,7 +661,7 @@ const ObservationFlux = () => {
         {/* OR Rule Reminder */}
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-2 mb-4 text-center">
           <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-            Observe only. Do not interpret.
+            {t('games.observationFlux.rule')}
           </span>
         </div>
 
@@ -708,9 +710,9 @@ const ObservationFlux = () => {
                   <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
                     <div className="text-center">
                       <Pause className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-lg font-medium">Paused</p>
+                      <p className="text-lg font-medium">{t('games.common.paused')}</p>
                       <Button onClick={togglePause} className="mt-4">
-                        <Play className="mr-2 h-4 w-4" /> Resume
+                        <Play className="mr-2 h-4 w-4" /> {t('games.common.resume')}
                       </Button>
                     </div>
                   </div>
@@ -737,12 +739,12 @@ const ObservationFlux = () => {
               <CardHeader className="py-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Eye className="h-4 w-4" />
-                  Observation Console
+                  {t('games.observationFlux.observationConsole')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Textarea
-                  placeholder="Type your observation and press Enter...&#10;&#10;Examples:&#10;• Five action verbs appear&#10;• All actions are by one character&#10;• Physical movement precedes contact"
+                  placeholder={t('games.observationFlux.inputPlaceholder')}
                   value={inputText}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
@@ -754,7 +756,7 @@ const ObservationFlux = () => {
                   disabled={!inputText.trim() || gameState === "paused"}
                   className="w-full"
                 >
-                  Submit Observation
+                  {t('games.observationFlux.submitObservation')}
                 </Button>
               </CardContent>
             </Card>
@@ -763,13 +765,13 @@ const ObservationFlux = () => {
             <Card className="max-h-[35vh] overflow-y-auto">
               <CardHeader className="py-3 sticky top-0 bg-background z-10">
                 <CardTitle className="text-base">
-                  Observations ({observations.length})
+                  {t('games.observationFlux.observations', { count: observations.length })}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {observations.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    No observations yet. Watch the verbs and describe what you see!
+                    {t('games.observationFlux.noObservations')}
                   </p>
                 ) : (
                   observations.map((obs, i) => (
@@ -811,25 +813,25 @@ const ObservationFlux = () => {
                 <div className="text-lg font-bold text-green-600">
                   {observations.filter(o => o.result.valid).length}
                 </div>
-                <p className="text-xs text-muted-foreground">Valid</p>
+                <p className="text-xs text-muted-foreground">{t('games.observationFlux.valid')}</p>
               </Card>
               <Card className="p-3 text-center">
                 <div className="text-lg font-bold text-amber-600">
                   {caughtDecoys}
                 </div>
-                <p className="text-xs text-muted-foreground">Caught</p>
+                <p className="text-xs text-muted-foreground">{t('games.observationFlux.caught')}</p>
               </Card>
               <Card className="p-3 text-center">
                 <div className="text-lg font-bold text-red-600">
                   {wrongClicks}
                 </div>
-                <p className="text-xs text-muted-foreground">Wrong</p>
+                <p className="text-xs text-muted-foreground">{t('games.observationFlux.wrong')}</p>
               </Card>
               <Card className="p-3 text-center">
                 <div className="text-lg font-bold text-gray-600">
                   {missedVerbs}
                 </div>
-                <p className="text-xs text-muted-foreground">Missed</p>
+                <p className="text-xs text-muted-foreground">{t('games.observationFlux.missed')}</p>
               </Card>
             </div>
           </div>

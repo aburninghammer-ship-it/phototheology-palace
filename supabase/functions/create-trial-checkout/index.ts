@@ -233,8 +233,8 @@ serve(async (req) => {
           tier: tier,
         },
       },
-      success_url: `${origin}/pricing?trial=success`,
-      cancel_url: `${origin}/pricing?trial=cancelled`,
+      success_url: `${origin}/gatehouse?trial=success`,
+      cancel_url: `${origin}/auth?trial=cancelled`,
       metadata: {
         user_id: user.id,
         plan: plan,
@@ -245,10 +245,7 @@ serve(async (req) => {
     });
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url, priceId, tier });
-
-    // Send notification email immediately when trial checkout starts
-    const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Unknown';
-    await sendTrialNotification(user.email, userName, amount, tier, billing, customerId);
+    // NOTE: Notification is NOT sent here - it's sent by stripe-webhook after payment success
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

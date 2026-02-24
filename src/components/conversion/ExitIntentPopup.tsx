@@ -5,6 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Gift, BookOpen, Sparkles, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+const DISMISS_COUNT_KEY = "exitIntentDismissCount";
+const ACCEPTED_KEY = "exitIntentAccepted";
+const SESSION_SHOWN_KEY = "exitIntentShownThisSession";
+const MAX_DISMISSALS = 3;
+
 export const ExitIntentPopup = () => {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -12,14 +17,21 @@ export const ExitIntentPopup = () => {
   const [hasShown, setHasShown] = useState(false);
 
   useEffect(() => {
-    // Check if already shown this session
-    if (sessionStorage.getItem("exitIntentShown")) return;
+    // Don't show if user already accepted the offer
+    if (localStorage.getItem(ACCEPTED_KEY)) return;
+
+    // Don't show if already dismissed 3+ times
+    const dismissCount = parseInt(localStorage.getItem(DISMISS_COUNT_KEY) || "0", 10);
+    if (dismissCount >= MAX_DISMISSALS) return;
+
+    // Don't show if already shown this session
+    if (sessionStorage.getItem(SESSION_SHOWN_KEY)) return;
 
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY < 10 && !hasShown) {
         setOpen(true);
         setHasShown(true);
-        sessionStorage.setItem("exitIntentShown", "true");
+        sessionStorage.setItem(SESSION_SHOWN_KEY, "true");
       }
     };
 
@@ -27,10 +39,22 @@ export const ExitIntentPopup = () => {
     return () => document.removeEventListener("mouseleave", handleMouseLeave);
   }, [hasShown]);
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      // Increment dismiss count
+      const dismissCount = parseInt(localStorage.getItem(DISMISS_COUNT_KEY) || "0", 10);
+      localStorage.setItem(DISMISS_COUNT_KEY, String(dismissCount + 1));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    
+
+    // Mark as accepted permanently
+    localStorage.setItem(ACCEPTED_KEY, "true");
+
     // Trigger the PDF download
     const link = document.createElement('a');
     link.href = '/guides/phototheology-starter-guide.pdf';
@@ -38,7 +62,7 @@ export const ExitIntentPopup = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     toast({
       title: "Download Started!",
       description: "Your free Phototheology starter guide is downloading now.",
@@ -47,10 +71,10 @@ export const ExitIntentPopup = () => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <button
-          onClick={() => setOpen(false)}
+          onClick={() => handleOpenChange(false)}
           className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100"
         >
           <X className="h-4 w-4" />

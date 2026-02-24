@@ -17,6 +17,7 @@ import {
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useTranslation } from "react-i18next";
 
 interface PathRoomExercisesProps {
   roomId: string;
@@ -25,6 +26,7 @@ interface PathRoomExercisesProps {
 }
 
 export function PathRoomExercises({ roomId, roomName, floorNumber }: PathRoomExercisesProps) {
+  const { t } = useTranslation();
   const { activePath, isLoading } = usePath();
   const [completedExercises, setCompletedExercises] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(true);
@@ -71,6 +73,13 @@ export function PathRoomExercises({ roomId, roomName, floorNumber }: PathRoomExe
     challenge: "bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30",
   };
 
+  const typeLabels: Record<string, string> = {
+    drill: t('pathExercises.typeDrill'),
+    reflection: t('pathExercises.typeReflection'),
+    practice: t('pathExercises.typePractice'),
+    challenge: t('pathExercises.typeChallenge'),
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -101,13 +110,13 @@ export function PathRoomExercises({ roomId, roomName, floorNumber }: PathRoomExe
                   </div>
                   <div>
                     <CardTitle className="flex items-center gap-2 text-lg">
-                      {pathData.icon} Path Exercises
+                      {pathData.icon} {t('pathExercises.title')}
                       <Badge variant="secondary" className="ml-2">
-                        {exercises.length} exercises
+                        {t('pathExercises.exerciseCount', { count: exercises.length })}
                       </Badge>
                     </CardTitle>
                     <CardDescription>
-                      Complete these {pathData.name} exercises in this room
+                      {t('pathExercises.completeThese', { pathName: pathData.name })}
                     </CardDescription>
                   </div>
                 </div>
@@ -138,6 +147,7 @@ export function PathRoomExercises({ roomId, roomName, floorNumber }: PathRoomExe
                     onToggle={() => toggleExercise(exercise.id)}
                     pathColor={pathData.color}
                     typeColors={typeColors}
+                    typeLabels={typeLabels}
                   />
                 ))}
               </AnimatePresence>
@@ -150,10 +160,10 @@ export function PathRoomExercises({ roomId, roomName, floorNumber }: PathRoomExe
                 >
                   <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
                   <p className="font-medium text-green-700 dark:text-green-300">
-                    All exercises complete! 🎉
+                    {t('pathExercises.allComplete')} 🎉
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Return to your path training to continue
+                    {t('pathExercises.returnToPath')}
                   </p>
                 </motion.div>
               )}
@@ -172,6 +182,7 @@ interface ExerciseItemProps {
   onToggle: () => void;
   pathColor: string;
   typeColors: Record<string, string>;
+  typeLabels: Record<string, string>;
 }
 
 function ExerciseItem({ 
@@ -180,8 +191,10 @@ function ExerciseItem({
   isCompleted, 
   onToggle, 
   pathColor,
-  typeColors 
+  typeColors,
+  typeLabels
 }: ExerciseItemProps) {
+  const { t } = useTranslation();
   const [showInstructions, setShowInstructions] = useState(false);
 
   return (
@@ -210,15 +223,15 @@ function ExerciseItem({
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <span className="text-xl">{exercise.icon}</span>
             <span className={`font-semibold ${isCompleted ? "line-through text-muted-foreground" : ""}`}>
-              {exercise.title}
+              {t(`exercises.${exercise.id}.title`, exercise.title)}
             </span>
             <Badge variant="outline" className={typeColors[exercise.type]}>
-              {exercise.type}
+              {typeLabels[exercise.type] || exercise.type}
             </Badge>
           </div>
           
           <p className="text-sm text-muted-foreground mb-2">
-            {exercise.description}
+            {t(`exercises.${exercise.id}.description`, exercise.description)}
           </p>
           
           <div className="flex items-center gap-4">
@@ -233,7 +246,7 @@ function ExerciseItem({
               className="h-6 px-2 text-xs"
               onClick={() => setShowInstructions(!showInstructions)}
             >
-              {showInstructions ? "Hide" : "Show"} instructions
+              {showInstructions ? t('pathExercises.hideInstructions') : t('pathExercises.showInstructions')}
               <ArrowRight className={`ml-1 h-3 w-3 transition-transform ${showInstructions ? "rotate-90" : ""}`} />
             </Button>
           </div>
@@ -246,12 +259,12 @@ function ExerciseItem({
                 exit={{ opacity: 0, height: 0 }}
                 className="mt-3 p-3 rounded-lg bg-muted/50 border border-border"
               >
-                <p className="text-xs font-medium mb-2 text-muted-foreground">Instructions:</p>
+                <p className="text-xs font-medium mb-2 text-muted-foreground">{t('pathExercises.instructions')}:</p>
                 <ol className="text-sm space-y-1.5">
                   {exercise.instructions.map((instruction, i) => (
                     <li key={i} className="flex gap-2">
                       <span className="text-primary font-medium shrink-0">{i + 1}.</span>
-                      <span>{instruction}</span>
+                      <span>{t(`exercises.${exercise.id}.instructions.${i}`, instruction)}</span>
                     </li>
                   ))}
                 </ol>

@@ -24,8 +24,10 @@ import { SocialMediaConnect } from "@/components/SocialMediaConnect";
 import { PatreonConnect } from "@/components/PatreonConnect";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { TeachableVerification } from "@/components/settings/TeachableVerification";
+import { useTranslation } from "react-i18next";
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { tier } = useFreeTier();
   const { completions } = usePath();
@@ -39,15 +41,15 @@ export default function Profile() {
   const getTierDisplay = () => {
     switch (tier) {
       case "premium":
-        return { label: "Premium", icon: Crown, color: "text-yellow-600", bg: "bg-yellow-500/20 border-yellow-500/30" };
+        return { label: t('profile.tier.premium'), icon: Crown, color: "text-yellow-600", bg: "bg-yellow-500/20 border-yellow-500/30" };
       case "essential":
-        return { label: "Essential", icon: Zap, color: "text-blue-600", bg: "bg-blue-500/20 border-blue-500/30" };
+        return { label: t('profile.tier.essential'), icon: Zap, color: "text-blue-600", bg: "bg-blue-500/20 border-blue-500/30" };
       case "student":
-        return { label: "Student", icon: Crown, color: "text-purple-600", bg: "bg-purple-500/20 border-purple-500/30" };
+        return { label: t('profile.tier.student'), icon: Crown, color: "text-purple-600", bg: "bg-purple-500/20 border-purple-500/30" };
       case "trial":
-        return { label: "Trial", icon: Zap, color: "text-green-600", bg: "bg-green-500/20 border-green-500/30" };
+        return { label: t('profile.tier.trial'), icon: Zap, color: "text-green-600", bg: "bg-green-500/20 border-green-500/30" };
       default:
-        return { label: "Free", icon: UserIcon, color: "text-muted-foreground", bg: "bg-muted/50 border-muted" };
+        return { label: t('profile.tier.free'), icon: UserIcon, color: "text-muted-foreground", bg: "bg-muted/50 border-muted" };
     }
   };
 
@@ -85,7 +87,7 @@ export default function Profile() {
       setDisplayName(data?.display_name || "");
     } catch (error) {
       console.error("Error loading profile:", error);
-      toast.error("Failed to load profile");
+      toast.error(t('profile.toasts.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -100,14 +102,14 @@ export default function Profile() {
 
     // Validate file size (5MB max)
     if (file.size > 5242880) {
-      toast.error("File size must be less than 5MB");
+      toast.error(t('profile.toasts.fileTooLarge'));
       return;
     }
 
     // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!validTypes.includes(file.type)) {
-      toast.error("Only JPG, PNG, WEBP, and GIF images are allowed");
+      toast.error(t('profile.toasts.invalidFileType'));
       return;
     }
 
@@ -144,11 +146,11 @@ export default function Profile() {
 
       if (updateError) throw updateError;
 
-      toast.success("Avatar uploaded successfully!");
+      toast.success(t('profile.toasts.avatarUploaded'));
       loadProfile();
     } catch (error) {
       console.error("Error uploading avatar:", error);
-      toast.error("Failed to upload avatar");
+      toast.error(t('profile.toasts.avatarFailed'));
     } finally {
       setUploading(false);
     }
@@ -170,11 +172,11 @@ export default function Profile() {
 
       if (error) throw error;
 
-      toast.success("Profile updated successfully!");
+      toast.success(t('profile.toasts.profileUpdated'));
       loadProfile();
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("Failed to update profile");
+      toast.error(t('profile.toasts.updateFailed'));
     }
   };
 
@@ -183,7 +185,7 @@ export default function Profile() {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
         <Navigation />
         <div className="container mx-auto px-4 pt-24 pb-12">
-          <div className="text-center">Loading...</div>
+          <div className="text-center">{t('common.loading')}</div>
         </div>
       </div>
     );
@@ -196,9 +198,9 @@ export default function Profile() {
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-palace bg-clip-text text-transparent mb-2">
-            My Profile
+            {t('profile.title')}
           </h1>
-          <p className="text-muted-foreground">Manage your Phototheology account</p>
+          <p className="text-muted-foreground">{t('profile.subtitle')}</p>
         </div>
 
         <div className="grid gap-6">
@@ -252,7 +254,7 @@ export default function Profile() {
                     {user?.email}
                   </CardDescription>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Click avatar to upload new picture
+                    {t('profile.clickAvatarToUpload')}
                   </p>
                 </div>
               </div>
@@ -262,16 +264,16 @@ export default function Profile() {
                 <div className="p-4 rounded-lg bg-muted/50">
                   <Trophy className="h-6 w-6 mx-auto mb-2 text-yellow-500" />
                   <div className="text-2xl font-bold">{profile?.points || 0}</div>
-                  <div className="text-sm text-muted-foreground">Points</div>
+                  <div className="text-sm text-muted-foreground">{t('profile.stats.points')}</div>
                 </div>
                 <div className="p-4 rounded-lg bg-muted/50">
                   <Star className="h-6 w-6 mx-auto mb-2 text-primary" />
-                  <div className="text-2xl font-bold">Level {profile?.level || 1}</div>
-                  <div className="text-sm text-muted-foreground">Current Level</div>
+                  <div className="text-2xl font-bold">{t('profile.stats.level', { level: profile?.level || 1 })}</div>
+                  <div className="text-sm text-muted-foreground">{t('profile.stats.currentLevel')}</div>
                 </div>
                 <div className="p-4 rounded-lg bg-muted/50">
                   <Calendar className="h-6 w-6 mx-auto mb-2 text-blue-500" />
-                  <div className="text-sm font-medium">Member Since</div>
+                  <div className="text-sm font-medium">{t('profile.stats.memberSince')}</div>
                   <div className="text-xs text-muted-foreground">
                     {new Date(profile?.created_at).toLocaleDateString()}
                   </div>
@@ -285,59 +287,59 @@ export default function Profile() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Edit Profile
+                {t('profile.editProfile.title')}
               </CardTitle>
-              <CardDescription>Update your display information</CardDescription>
+              <CardDescription>{t('profile.editProfile.description')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="displayName">Display Name</Label>
+                <Label htmlFor="displayName">{t('profile.editProfile.displayName')}</Label>
                 <Input
                   id="displayName"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Enter your display name"
+                  placeholder={t('profile.editProfile.displayNamePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
+                <Label htmlFor="bio">{t('profile.editProfile.bio')}</Label>
                 <Textarea
                   id="bio"
                   value={profile?.bio || ""}
                   onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                  placeholder="Tell us about yourself..."
+                  placeholder={t('profile.editProfile.bioPlaceholder')}
                   rows={3}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="location">{t('profile.editProfile.location')}</Label>
                 <Input
                   id="location"
                   value={profile?.location || ""}
                   onChange={(e) => setProfile({ ...profile, location: e.target.value })}
-                  placeholder="City, Country"
+                  placeholder={t('profile.editProfile.locationPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="website">Website</Label>
+                <Label htmlFor="website">{t('profile.editProfile.website')}</Label>
                 <Input
                   id="website"
                   type="url"
                   value={profile?.website || ""}
                   onChange={(e) => setProfile({ ...profile, website: e.target.value })}
-                  placeholder="https://yourwebsite.com"
+                  placeholder={t('profile.editProfile.websitePlaceholder')}
                 />
               </div>
               <Separator />
               <div className="space-y-2">
-                <Label>Email</Label>
+                <Label>{t('profile.editProfile.email')}</Label>
                 <Input value={user?.email || ""} disabled />
                 <p className="text-xs text-muted-foreground">
-                  Email cannot be changed from this page
+                  {t('profile.editProfile.emailNote')}
                 </p>
               </div>
               <Button onClick={updateProfile} className="w-full gradient-palace">
-                Save Changes
+                {t('profile.editProfile.saveChanges')}
               </Button>
             </CardContent>
           </Card>
@@ -351,9 +353,9 @@ export default function Profile() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Trophy className="h-5 w-5 text-yellow-500" />
-                  Path Certificates
+                  {t('profile.pathCertificates.title')}
                 </CardTitle>
-                <CardDescription>Your completed learning paths</CardDescription>
+                <CardDescription>{t('profile.pathCertificates.description')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <PathCertificatesGallery 
@@ -367,8 +369,8 @@ export default function Profile() {
           {/* Language & Preferences */}
           <Card className="glass-card">
             <CardHeader>
-              <CardTitle>Language & Preferences</CardTitle>
-              <CardDescription>Choose your preferred language for the app and commentary</CardDescription>
+              <CardTitle>{t('profile.language.title')}</CardTitle>
+              <CardDescription>{t('profile.language.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <LanguageSelector />
@@ -393,8 +395,8 @@ export default function Profile() {
           {isOwner && (
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle>Announcements</CardTitle>
-                <CardDescription>Send announcements to all users</CardDescription>
+                <CardTitle>{t('profile.announcements.title')}</CardTitle>
+                <CardDescription>{t('profile.announcements.description')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <AnnouncementManager />

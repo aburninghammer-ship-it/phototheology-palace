@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -119,6 +120,7 @@ const FINAL_JEOPARDY_CLUES = [
 
 export default function PhototheologyJeopardy() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   // Game state
@@ -183,7 +185,7 @@ export default function PhototheologyJeopardy() {
   // Start game with players
   const startGame = () => {
     if (players.length === 0) {
-      toast.error("Please add at least one player");
+      toast.error(t('games.jeopardy.addAtLeastOnePlayer'));
       return;
     }
     initializeGame();
@@ -193,7 +195,7 @@ export default function PhototheologyJeopardy() {
   // Add player
   const addPlayer = (name: string) => {
     if (players.length >= 6) {
-      toast.error("Maximum 6 players");
+      toast.error(t('games.jeopardy.maxPlayers'));
       return;
     }
     const newPlayer: Player = {
@@ -233,7 +235,7 @@ export default function PhototheologyJeopardy() {
   // Handle daily double wager
   const handleDailyDoubleWager = () => {
     if (dailyDoubleWager < 5 || dailyDoubleWager > Math.max(players[currentPlayerIndex]?.score || 100, 1000)) {
-      toast.error("Invalid wager amount");
+      toast.error(t('games.jeopardy.invalidWager'));
       return;
     }
     setShowDailyDouble(false);
@@ -357,10 +359,10 @@ export default function PhototheologyJeopardy() {
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-4xl font-bold text-yellow-400" style={{ fontFamily: "'Cinzel', serif" }}>
-            PHOTOTHEOLOGY JEOPARDY
+            {t('games.jeopardy.title')}
           </h1>
           {gamePhase !== "setup" && (
             <div className="flex items-center gap-4">
@@ -384,16 +386,16 @@ export default function PhototheologyJeopardy() {
               <CardHeader>
                 <CardTitle className="text-yellow-400 flex items-center gap-2">
                   <Star className="h-6 w-6" />
-                  Game Setup
+                  {t('games.jeopardy.gameSetup')}
                 </CardTitle>
                 <CardDescription className="text-blue-200">
-                  Choose your game mode and add players
+                  {t('games.jeopardy.chooseMode')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Game Mode Selection */}
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-yellow-200">Game Mode</label>
+                  <label className="text-sm font-medium text-yellow-200">{t('games.jeopardy.gameMode')}</label>
                   <div className="grid grid-cols-2 gap-4">
                     <Button
                       variant={gameMode === "classic" ? "default" : "outline"}
@@ -402,8 +404,8 @@ export default function PhototheologyJeopardy() {
                     >
                       <div className="text-center">
                         <Sparkles className="h-6 w-6 mx-auto mb-2" />
-                        <div className="font-bold">Classic Mode</div>
-                        <div className="text-xs opacity-80">Type your own answers</div>
+                        <div className="font-bold">{t('games.jeopardy.classicMode')}</div>
+                        <div className="text-xs opacity-80">{t('games.jeopardy.classicModeDesc')}</div>
                       </div>
                     </Button>
                     <Button
@@ -413,8 +415,8 @@ export default function PhototheologyJeopardy() {
                     >
                       <div className="text-center">
                         <Check className="h-6 w-6 mx-auto mb-2" />
-                        <div className="font-bold">Easy Mode</div>
-                        <div className="text-xs opacity-80">Multiple choice</div>
+                        <div className="font-bold">{t('games.jeopardy.easyMode')}</div>
+                        <div className="text-xs opacity-80">{t('games.jeopardy.easyModeDesc')}</div>
                       </div>
                     </Button>
                   </div>
@@ -424,7 +426,7 @@ export default function PhototheologyJeopardy() {
                 <div className="space-y-3">
                   <label className="text-sm font-medium text-yellow-200 flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    Players ({players.length}/6)
+                    {t('games.jeopardy.players')} ({players.length}/6)
                   </label>
 
                   {players.map((player, idx) => (
@@ -451,7 +453,7 @@ export default function PhototheologyJeopardy() {
                     <div className="flex gap-2">
                       <Input
                         id="newPlayerName"
-                        placeholder="Enter player name"
+                        placeholder={t('games.jeopardy.enterPlayerName')}
                         className="bg-black/40 border-yellow-500/30"
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
@@ -469,7 +471,7 @@ export default function PhototheologyJeopardy() {
                         }}
                         className="border-yellow-500/50"
                       >
-                        Add
+                        {t('games.jeopardy.add')}
                       </Button>
                     </div>
                   )}
@@ -481,7 +483,7 @@ export default function PhototheologyJeopardy() {
                   className="w-full bg-yellow-600 hover:bg-yellow-700 text-black font-bold"
                   size="lg"
                 >
-                  Start Game
+                  {t('games.jeopardy.startGame')}
                 </Button>
               </CardContent>
             </Card>
@@ -498,7 +500,7 @@ export default function PhototheologyJeopardy() {
                 style={{ backgroundColor: currentPlayer?.color }}
               >
                 <User className="h-4 w-4 mr-2 inline" />
-                {currentPlayer?.name}'s Turn
+                {t('games.jeopardy.playerTurn', { name: currentPlayer?.name })}
               </Badge>
             </div>
 
@@ -551,7 +553,7 @@ export default function PhototheologyJeopardy() {
                 onClick={() => setGamePhase("final")}
                 className="border-yellow-500/50"
               >
-                Skip to Final Jeopardy
+                {t('games.jeopardy.skipToFinal')}
               </Button>
             </div>
           </div>
@@ -563,16 +565,16 @@ export default function PhototheologyJeopardy() {
             <DialogHeader>
               <DialogTitle className="text-3xl text-center text-white flex items-center justify-center gap-2">
                 <Zap className="h-8 w-8" />
-                DAILY DOUBLE!
+                {t('games.jeopardy.dailyDouble')}
                 <Zap className="h-8 w-8" />
               </DialogTitle>
               <DialogDescription className="text-center text-yellow-100">
-                {currentPlayer?.name}, how much do you want to wager?
+                {t('games.jeopardy.howMuchWager', { name: currentPlayer?.name })}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="text-center text-white">
-                <span className="text-sm">Your Score: </span>
+                <span className="text-sm">{t('games.jeopardy.yourScore')}: </span>
                 <span className="text-2xl font-bold">{currentPlayer?.score || 0}</span>
               </div>
               <Input
@@ -601,7 +603,7 @@ export default function PhototheologyJeopardy() {
                 onClick={handleDailyDoubleWager}
                 className="w-full bg-white text-yellow-700 font-bold hover:bg-yellow-100"
               >
-                Lock In Wager
+                {t('games.jeopardy.lockInWager')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -616,7 +618,7 @@ export default function PhototheologyJeopardy() {
                   {selectedCategory}
                 </Badge>
                 <Badge className="bg-yellow-600 text-black">
-                  {selectedClue?.isDailyDouble ? `Wager: ${dailyDoubleWager}` : `${selectedClue?.points} pts`}
+                  {selectedClue?.isDailyDouble ? `${t('games.jeopardy.wager')}: ${dailyDoubleWager}` : `${selectedClue?.points} ${t('games.common.pts')}`}
                 </Badge>
               </div>
               {!showAnswer && (
@@ -652,7 +654,7 @@ export default function PhototheologyJeopardy() {
                   <Textarea
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
-                    placeholder="What is..."
+                    placeholder={t('games.jeopardy.whatIs')}
                     className="bg-blue-950 border-blue-400 text-white text-lg"
                   />
                 )}
@@ -662,7 +664,7 @@ export default function PhototheologyJeopardy() {
                     onClick={() => handleAnswerSubmit(null)}
                     className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-black font-bold"
                   >
-                    Submit Answer
+                    {t('games.jeopardy.submitAnswer')}
                   </Button>
                 </div>
               </div>
@@ -672,11 +674,11 @@ export default function PhototheologyJeopardy() {
                   <div className="flex items-center justify-center gap-2 mb-2">
                     {isCorrect ? <Check className="h-6 w-6" /> : <X className="h-6 w-6" />}
                     <span className="text-xl font-bold">
-                      {isCorrect ? 'Correct!' : 'Incorrect!'}
+                      {isCorrect ? t('games.common.correct') + '!' : t('games.common.incorrect') + '!'}
                     </span>
                   </div>
                   <p className="text-lg">
-                    The answer: <span className="font-bold">{selectedClue?.correctAnswer}</span>
+                    {t('games.jeopardy.theAnswer')}: <span className="font-bold">{selectedClue?.correctAnswer}</span>
                   </p>
                 </div>
 
@@ -687,20 +689,20 @@ export default function PhototheologyJeopardy() {
                       className="flex-1 bg-green-600 hover:bg-green-700"
                     >
                       <Check className="mr-2 h-4 w-4" />
-                      Correct
+                      {t('games.common.correct')}
                     </Button>
                     <Button
                       onClick={() => handleAnswerSubmit(false)}
                       className="flex-1 bg-red-600 hover:bg-red-700"
                     >
                       <X className="mr-2 h-4 w-4" />
-                      Incorrect
+                      {t('games.common.incorrect')}
                     </Button>
                   </div>
                 )}
 
                 <Button onClick={closeClueDialog} className="w-full" variant="outline">
-                  Continue
+                  {t('games.common.continue')}
                 </Button>
               </div>
             )}
@@ -713,17 +715,17 @@ export default function PhototheologyJeopardy() {
             <Card className="bg-black/40 border-yellow-500/50">
               <CardHeader className="text-center">
                 <CardTitle className="text-3xl text-yellow-400">
-                  FINAL JEOPARDY
+                  {t('games.jeopardy.finalJeopardy')}
                 </CardTitle>
                 <CardDescription className="text-xl text-blue-200">
-                  Category: {finalJeopardy.category}
+                  {t('games.jeopardy.category')}: {finalJeopardy.category}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Wager Phase */}
                 {Object.keys(finalWagers).length < players.length && (
                   <div className="space-y-4">
-                    <p className="text-center text-white">Each player, enter your wager:</p>
+                    <p className="text-center text-white">{t('games.jeopardy.eachPlayerEnterWager')}</p>
                     {players.map(player => (
                       <div key={player.id} className="flex items-center gap-4">
                         <Badge style={{ backgroundColor: player.color }} className="text-white px-3 py-1">
@@ -731,7 +733,7 @@ export default function PhototheologyJeopardy() {
                         </Badge>
                         <Input
                           type="number"
-                          placeholder="Wager"
+                          placeholder={t('games.jeopardy.wager')}
                           min={0}
                           max={Math.max(0, player.score)}
                           className="bg-black/40 border-yellow-500/30"
@@ -743,7 +745,7 @@ export default function PhototheologyJeopardy() {
                           disabled={finalWagers[player.id] !== undefined}
                           className="bg-yellow-600"
                         >
-                          Lock
+                          {t('games.jeopardy.lock')}
                         </Button>
                       </div>
                     ))}
@@ -763,10 +765,10 @@ export default function PhototheologyJeopardy() {
                       {players.map(player => (
                         <div key={player.id} className="space-y-2">
                           <Badge style={{ backgroundColor: player.color }} className="text-white">
-                            {player.name} (Wager: {finalWagers[player.id]})
+                            {player.name} ({t('games.jeopardy.wager')}: {finalWagers[player.id]})
                           </Badge>
                           <Textarea
-                            placeholder="What is..."
+                            placeholder={t('games.jeopardy.whatIs')}
                             className="bg-black/40 border-yellow-500/30"
                             onChange={(e) => handleFinalAnswer(player.id, e.target.value)}
                           />
@@ -779,7 +781,7 @@ export default function PhototheologyJeopardy() {
                       className="w-full bg-yellow-600 hover:bg-yellow-700 text-black font-bold"
                       disabled={Object.keys(finalAnswers).length < players.length}
                     >
-                      Reveal Results
+                      {t('games.jeopardy.revealResults')}
                     </Button>
                   </>
                 )}
@@ -793,9 +795,9 @@ export default function PhototheologyJeopardy() {
           <div className="max-w-3xl mx-auto space-y-6">
             <Card className="bg-black/40 border-yellow-500/50">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl text-yellow-400">Final Jeopardy Results</CardTitle>
+                <CardTitle className="text-2xl text-yellow-400">{t('games.jeopardy.finalJeopardyResults')}</CardTitle>
                 <CardDescription className="text-blue-200">
-                  Correct Answer: <span className="text-yellow-400 font-bold">{finalJeopardy.answer}</span>
+                  {t('games.jeopardy.correctAnswer')}: <span className="text-yellow-400 font-bold">{finalJeopardy.answer}</span>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -805,9 +807,9 @@ export default function PhototheologyJeopardy() {
                       <Badge style={{ backgroundColor: player.color }} className="text-white">
                         {player.name}
                       </Badge>
-                      <span className="text-yellow-400">Wager: {finalWagers[player.id]}</span>
+                      <span className="text-yellow-400">{t('games.jeopardy.wager')}: {finalWagers[player.id]}</span>
                     </div>
-                    <p className="text-white mb-3">Answer: "{finalAnswers[player.id]}"</p>
+                    <p className="text-white mb-3">{t('games.jeopardy.answer')}: "{finalAnswers[player.id]}"</p>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
@@ -816,7 +818,7 @@ export default function PhototheologyJeopardy() {
                           judgeFinalAnswers({ [player.id]: true });
                         }}
                       >
-                        <Check className="h-4 w-4 mr-1" /> Correct
+                        <Check className="h-4 w-4 mr-1" /> {t('games.common.correct')}
                       </Button>
                       <Button
                         size="sm"
@@ -825,7 +827,7 @@ export default function PhototheologyJeopardy() {
                           judgeFinalAnswers({ [player.id]: false });
                         }}
                       >
-                        <X className="h-4 w-4 mr-1" /> Incorrect
+                        <X className="h-4 w-4 mr-1" /> {t('games.common.incorrect')}
                       </Button>
                     </div>
                   </div>
@@ -840,7 +842,7 @@ export default function PhototheologyJeopardy() {
                   variant="outline"
                   className="w-full border-yellow-500/50"
                 >
-                  Skip Judging - End Game
+                  {t('games.jeopardy.skipJudgingEndGame')}
                 </Button>
               </CardContent>
             </Card>
@@ -853,7 +855,7 @@ export default function PhototheologyJeopardy() {
             <Card className="bg-black/40 border-yellow-500/50">
               <CardHeader className="text-center">
                 <Trophy className="h-16 w-16 text-yellow-400 mx-auto mb-4" />
-                <CardTitle className="text-3xl text-yellow-400">Game Over!</CardTitle>
+                <CardTitle className="text-3xl text-yellow-400">{t('games.common.gameOver')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-3">
@@ -888,14 +890,14 @@ export default function PhototheologyJeopardy() {
                     }}
                     className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-black"
                   >
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                   <Button
                     onClick={() => navigate("/games")}
                     variant="outline"
                     className="flex-1 border-yellow-500/50"
                   >
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                 </div>
               </CardContent>

@@ -1,4 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
+import { QUALITY_TESTS, OUTPUT_TYPES, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -143,7 +146,14 @@ GUARDRAILS
 - Never invent new rooms or codes
 - Every interpretation must pass the Fruit test (Gal 5:22-23)
 - Static ascension keeps grounding; dynamic ascension allows exploration
-- Types = objects pointing forward; Parallels = mirrored actions across time`;
+- Types = objects pointing forward; Parallels = mirrored actions across time
+
+QUALITY TESTS (apply to every response):
+${QUALITY_TESTS.map(t => `• ${t.name} (${t.room}): ${t.question}`).join('\n')}
+
+${GOLDEN_RULE}
+
+${THEOLOGICAL_GUARDRAILS}`;
 
 interface StudyBuddyRequest {
   notes: string;
@@ -177,7 +187,16 @@ serve(async (req) => {
     if (context) {
       userMessage += `BIBLE CONTEXT:\n${context}\n\n`;
     }
-    
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: (notes || context || '').slice(0, 4000),
+      matchCount: 3,
+    });
+    if (ragResult.chunkCount > 0) {
+      userMessage += `TEACHING CONTEXT:\n${ragResult.corpusContext}\n\n`;
+    }
+
     userMessage += `USER'S STUDY NOTES:\n\`\`\`\n${notes}\n\`\`\``;
 
     if (mode) {

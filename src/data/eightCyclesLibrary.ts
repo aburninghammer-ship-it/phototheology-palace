@@ -626,7 +626,7 @@ export const covenantCycles: CovenantCycle[] = [
         description: "Jesus ministers for 3.5 years, proclaiming the kingdom, healing, teaching. He is rejected, crucified, and rises. He commissions disciples and ascends. The foundation is laid for the next cycle—the Spirit's outpouring.",
         keyEvent: "Jesus's ministry; Crucifixion; Resurrection; Ascension; Great Commission",
         verse: "Mark 1:14-15; 1 Corinthians 15:3-4; Matthew 28:18-20; Acts 1:8",
-        symbolism: "Crucifixion = ultimate Passover. Resurrection = ultimate Firstfruits. Ascension = high priest entering the true Most Holy Place. The temple of His body destroyed and rebuilt in three days."
+        symbolism: "Crucifixion = ultimate Passover. Resurrection = ultimate Firstfruits. Ascension = high priest entering the Holy Place (first apartment) to begin His intercessory ministry. In 1844 He entered the Most Holy Place (second apartment) for the investigative judgment. The temple of His body destroyed and rebuilt in three days."
       }
     ],
     keyFigures: [

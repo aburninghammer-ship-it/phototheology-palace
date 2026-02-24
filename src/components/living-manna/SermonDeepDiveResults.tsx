@@ -30,13 +30,13 @@ import {
   Clock,
   ExternalLink,
   Bookmark,
-  Share2,
   Columns,
   Square,
 } from "lucide-react";
 import { SermonDeepDiveData, SermonSegment, SermonInsight } from "@/hooks/useSermonDeepDive";
 import { useSermonDeepDive } from "@/hooks/useSermonDeepDive";
 import { SermonStudyPlan } from "./SermonStudyPlan";
+import { ShareSermonButton } from "./ShareSermonButton";
 
 type TabValue = "map" | "scriptures" | "insights" | "questions";
 
@@ -532,10 +532,13 @@ export function SermonDeepDiveResults({ data, onBack }: SermonDeepDiveResultsPro
                     </>
                   )}
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
-                </Button>
+                <ShareSermonButton
+                  title={sermon.title}
+                  speaker={sermon.speaker}
+                  summary={segments[0]?.summary}
+                  youtubeUrl={sermon.source_url}
+                  thumbnailUrl={sermon.thumbnail_url}
+                />
               </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,10 +19,10 @@ import { QuickNotes } from "@/components/notes/QuickNotes";
 import { CommunityHighlight } from "@/components/dashboard/CommunityHighlight";
 import { QuickAIPrompt } from "@/components/dashboard/QuickAIPrompt";
 import { Brain, Building2, Headphones, Calendar, Volume2 } from "lucide-react";
-import { 
-  BookOpen, 
-  Flame, 
-  Trophy, 
+import {
+  BookOpen,
+  Flame,
+  Trophy,
   Target,
   TrendingUp,
   Clock,
@@ -40,6 +41,7 @@ import { IdentityLoopWidget } from "@/components/IdentityLoopWidget";
 import { StudyToolsQuickAccess } from "@/components/StudyToolsQuickAccess";
 import { FeatureHighlights } from "@/components/FeatureHighlights";
 import { SermonForgeWidget } from "@/components/dashboard/SermonForgeWidget";
+import { ResearchAssistantWidget } from "@/components/dashboard/ResearchAssistantWidget";
 import { WeeklyChallengeWidget, WinnerBanner } from "@/components/weekly-challenge";
 
 interface DashboardStats {
@@ -54,67 +56,67 @@ interface DashboardStats {
 
 const featuredContent = [
   {
-    day: 1, // Monday
-    title: "Chain Chess",
-    description: "Master typological connections by linking Bible verses in this strategic game",
+    day: 1,
+    titleKey: "dashboard.chainChess",
+    descriptionKey: "dashboard.chainChessDesc",
     path: "/chain-chess",
     icon: Target,
     gradient: "gradient-ocean",
-    reason: "Perfect for building pattern recognition skills"
+    reasonKey: "dashboard.chainChessReason"
   },
   {
-    day: 2, // Tuesday
-    title: "Treasure Hunt",
-    description: "Solve clues and discover hidden biblical principles in this timed adventure",
+    day: 2,
+    titleKey: "dashboard.treasureHunt",
+    descriptionKey: "dashboard.treasureHuntDesc",
     path: "/treasure-hunt",
     icon: Sparkles,
     gradient: "gradient-palace",
-    reason: "Great for applied learning and time management"
+    reasonKey: "dashboard.treasureHuntReason"
   },
   {
-    day: 3, // Wednesday
-    title: "Daniel & Revelation GPT",
-    description: "Chat with AI trained on Daniel & Revelation to deepen your understanding",
+    day: 3,
+    titleKey: "dashboard.danielRevGpt",
+    descriptionKey: "dashboard.danielRevGptDesc",
     path: "/daniel-revelation-gpt",
     icon: Brain,
     gradient: "gradient-dreamy",
-    reason: "Ideal for answering specific questions"
+    reasonKey: "dashboard.danielRevGptReason"
   },
   {
-    day: 4, // Thursday
-    title: "Memory Palace",
-    description: "Explore the 3D visual journey through Bible typology and sanctuary principles",
+    day: 4,
+    titleKey: "dashboard.memoryPalace",
+    descriptionKey: "dashboard.memoryPalaceDesc",
     path: "/palace",
     icon: Building2,
     gradient: "gradient-ocean",
-    reason: "Best for visual learners and comprehensive overview"
+    reasonKey: "dashboard.memoryPalaceReason"
   },
   {
-    day: 5, // Friday
-    title: "Escape Rooms",
-    description: "Race against the clock to solve principle-based Bible puzzles",
+    day: 5,
+    titleKey: "dashboard.escapeRooms",
+    descriptionKey: "dashboard.escapeRoomsDesc",
     path: "/escape-room",
     icon: Clock,
     gradient: "gradient-palace",
-    reason: "Excellent for competitive learners"
+    reasonKey: "dashboard.escapeRoomsReason"
   },
   {
-    day: 6, // Saturday
-    title: "Community & Study Partners",
-    description: "Connect with fellow students, share insights, and grow together",
+    day: 6,
+    titleKey: "dashboard.communityPartners",
+    descriptionKey: "dashboard.communityPartnersDesc",
     path: "/community",
     icon: Users,
     gradient: "gradient-dreamy",
-    reason: "Perfect for collaborative learning"
+    reasonKey: "dashboard.communityPartnersReason"
   },
   {
-    day: 0, // Sunday
-    title: "Revelation Course",
-    description: "Follow our structured course for deep, comprehensive Bible study",
+    day: 0,
+    titleKey: "dashboard.revelationCourse",
+    descriptionKey: "dashboard.revelationCourseDesc",
     path: "/revelation-course",
     icon: BookOpen,
     gradient: "gradient-ocean",
-    reason: "Ideal for systematic, thorough learning"
+    reasonKey: "dashboard.revelationCourseReason"
   },
 ];
 
@@ -124,6 +126,7 @@ const getFeaturedToday = () => {
 };
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { getRecentReading } = useReadingHistory();
@@ -190,7 +193,6 @@ export default function Dashboard() {
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
       <JeevesWelcomeModal />
       <div className="container mx-auto px-3 md:px-4 py-4 md:py-8 pb-32 md:pb-8 max-w-7xl">
-        {/* Mobile-optimized header */}
         <div className="mb-6 md:mb-8 flex items-center gap-3 md:gap-4">
           <img
             src="/pwa-192x192.png"
@@ -198,34 +200,32 @@ export default function Dashboard() {
             className="h-12 w-12 md:h-14 md:w-14 rounded-xl shadow-lg shadow-primary/20"
           />
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">Welcome back!</h1>
-            <p className="text-sm md:text-base text-foreground/80">Here's your learning progress</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">{t('dashboard.welcomeBack')}</h1>
+            <p className="text-sm md:text-base text-foreground/80">{t('dashboard.learningProgress')}</p>
           </div>
         </div>
 
-        {/* Identity Loop - Prominent Stats */}
         <div className="mb-8">
           <IdentityLoopWidget />
         </div>
-        {/* Path Selection Banner (opt-in for existing users) */}
         <PathBanner />
 
-        {/* Path Dashboard Widget */}
         <div className="mb-8">
           <PathDashboardWidget />
         </div>
 
-        {/* Feature Highlights - Onboarding for new users */}
         <div className="mb-8">
           <FeatureHighlights />
         </div>
 
-        {/* Study Tools Quick Access */}
         <div className="mb-8">
           <StudyToolsQuickAccess />
         </div>
 
-        {/* Featured Today */}
+        <div className="mb-8">
+          <ResearchAssistantWidget />
+        </div>
+
         <Card className={`mb-8 ${featured.gradient} border-0 text-white overflow-hidden relative`}>
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
           <CardHeader className="relative z-10">
@@ -235,8 +235,8 @@ export default function Dashboard() {
                   <Star className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-2xl text-white mb-1">Featured Today</CardTitle>
-                  <CardDescription className="text-white/80">{featured.reason}</CardDescription>
+                  <CardTitle className="text-2xl text-white mb-1">{t('dashboard.featuredToday')}</CardTitle>
+                  <CardDescription className="text-white/80">{t(featured.reasonKey)}</CardDescription>
                 </div>
               </div>
               <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm">
@@ -245,52 +245,50 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <h3 className="text-xl font-bold text-white mb-2">{featured.title}</h3>
-            <p className="text-white/90 mb-4">{featured.description}</p>
-            <Button 
+            <h3 className="text-xl font-bold text-white mb-2">{t(featured.titleKey)}</h3>
+            <p className="text-white/90 mb-4">{t(featured.descriptionKey)}</p>
+            <Button
               onClick={() => navigate(featured.path)}
               variant="secondary"
               size="lg"
               className="bg-white text-primary hover:bg-white/90 font-semibold"
             >
-              Try it now
+              {t('dashboard.tryItNow')}
               <ChevronRight className="ml-2 h-5 w-5" />
             </Button>
           </CardContent>
         </Card>
 
-        {/* Weekly Winner Banner (if there's a recent winner) */}
         <div className="mb-6">
           <WinnerBanner />
         </div>
 
-        {/* Main Stats Grid - Mobile Optimized with 2x2 layout */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
           <Card variant="glass">
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-3 md:p-6">
-              <CardTitle className="text-xs md:text-sm font-medium">Daily Streak</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium">{t('dashboard.dailyStreak')}</CardTitle>
               <Flame className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent className="pt-0 p-3 md:p-6 md:pt-0">
               <div className="text-2xl md:text-3xl font-bold">{stats.dailyStreak}</div>
-              <p className="text-[10px] md:text-xs text-muted-foreground mt-1">days in a row</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-1">{t('dashboard.daysInARow')}</p>
             </CardContent>
           </Card>
 
           <Card variant="glass">
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-3 md:p-6">
-              <CardTitle className="text-xs md:text-sm font-medium">Total Points</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium">{t('dashboard.totalPoints')}</CardTitle>
               <Trophy className="h-4 w-4 text-yellow-500" />
             </CardHeader>
             <CardContent className="pt-0 p-3 md:p-6 md:pt-0">
               <div className="text-2xl md:text-3xl font-bold">{stats.totalPoints}</div>
-              <p className="text-[10px] md:text-xs text-muted-foreground mt-1">{pointsToNextLevel} to lvl {stats.level + 1}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-1">{pointsToNextLevel} {t('dashboard.toLevel')} {stats.level + 1}</p>
             </CardContent>
           </Card>
 
           <Card variant="glass">
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-3 md:p-6">
-              <CardTitle className="text-xs md:text-sm font-medium">Level</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium">{t('dashboard.level')}</CardTitle>
               <Award className="h-4 w-4 text-purple-500" />
             </CardHeader>
             <CardContent className="pt-0 p-3 md:p-6 md:pt-0">
@@ -301,46 +299,44 @@ export default function Dashboard() {
 
           <Card variant="glass">
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-3 md:p-6">
-              <CardTitle className="text-xs md:text-sm font-medium">Chess Streak</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium">{t('dashboard.chessStreak')}</CardTitle>
               <Target className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent className="pt-0 p-3 md:p-6 md:pt-0">
               <div className="text-2xl md:text-3xl font-bold">{stats.chesStreak}</div>
-              <p className="text-[10px] md:text-xs text-muted-foreground mt-1">wins in a row</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-1">{t('dashboard.winsInARow')}</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Palace Progress & Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <PalaceProgressDashboard />
-          
+
           <div className="space-y-6">
             <Card variant="glass">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Play className="h-5 w-5" />
-                  Continue Learning
+                  {t('dashboard.continueLearning')}
                 </CardTitle>
-                <CardDescription>Pick up where you left off</CardDescription>
+                <CardDescription>{t('dashboard.pickUpWhereLeftOff')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {/* Mobile-prominent Analyze My Thoughts */}
                 <Button
                   variant="outline"
                   className="w-full justify-start bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border-yellow-500/30 hover:from-yellow-500/20 hover:to-amber-500/20 md:hidden"
                   onClick={() => navigate("/analyze-thoughts")}
                 >
                   <Lightbulb className="mr-2 h-4 w-4 text-yellow-500" />
-                  <span className="font-semibold text-yellow-700 dark:text-yellow-400">Analyze My Thoughts</span>
+                  <span className="font-semibold text-yellow-700 dark:text-yellow-400">{t('dashboard.analyzeMyThoughts')}</span>
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start"
                   onClick={() => navigate("/palace")}
                 >
                   <BookOpen className="mr-2 h-4 w-4" />
-                  Explore Memory Palace
+                  {t('dashboard.explorePalace')}
                 </Button>
                 <Button
                   variant="outline"
@@ -348,7 +344,7 @@ export default function Dashboard() {
                   onClick={() => navigate("/bible")}
                 >
                   <BookOpen className="mr-2 h-4 w-4" />
-                  Read Bible
+                  {t('dashboard.readBible')}
                 </Button>
                 <Button
                   variant="outline"
@@ -356,7 +352,7 @@ export default function Dashboard() {
                   onClick={() => navigate("/audio-bible")}
                 >
                   <Volume2 className="mr-2 h-4 w-4 text-primary" />
-                  Audio Bible
+                  {t('dashboard.audioBible')}
                 </Button>
                 <Button
                   variant="outline"
@@ -364,72 +360,65 @@ export default function Dashboard() {
                   onClick={() => navigate("/quarterly-study")}
                 >
                   <Calendar className="mr-2 h-4 w-4 text-primary" />
-                  Lesson Study with Jeeves
+                  {t('dashboard.lessonStudy')}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start"
                   onClick={() => navigate("/revelation-course")}
                 >
                   <BookOpen className="mr-2 h-4 w-4" />
-                  Continue Revelation Course
+                  {t('dashboard.continueRevelation')}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start"
                   onClick={() => navigate("/certificates")}
                 >
                   <Award className="mr-2 h-4 w-4" />
-                  My Certificates
+                  {t('dashboard.myCertificates')}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start"
                   onClick={() => navigate("/study-partners")}
                 >
                   <Users className="mr-2 h-4 w-4" />
-                  Study Partners
+                  {t('dashboard.studyPartners')}
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Quick AI Prompt - Surface Jeeves */}
             <QuickAIPrompt />
 
-            {/* Weekly Study Challenge */}
             <WeeklyChallengeWidget />
 
-            {/* Sermon Forge - Quick sermon starter generation */}
             <SermonForgeWidget />
 
-            {/* Community Highlight - Surface trending posts */}
             <CommunityHighlight />
 
-            {/* Quick Notes - Offline Available */}
             <QuickNotes compact />
 
             <SpacedRepetitionReview />
           </div>
         </div>
 
-        {/* Gamification Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <XPSystem />
           <BadgeSystem />
           <WeeklyLeaderboard />
         </div>
 
-        {/* Recent Reading */}
         <Card variant="glass">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <History className="h-5 w-5" />
-                Recent Reading
+                {t('dashboard.recentReading')}
               </CardTitle>
               <Button variant="ghost" size="sm" onClick={() => navigate("/my-progress")}>
                 <BarChart3 className="h-4 w-4 mr-1" />
-                View Analytics
+                {t('dashboard.viewAnalytics')}
               </Button>
             </div>
           </CardHeader>
@@ -450,7 +439,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="text-sm text-muted-foreground text-center py-8">
-                Start reading to see your history here
+                {t('dashboard.startReadingHistory')}
               </div>
             )}
           </CardContent>

@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,6 +51,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { StudySimmerWrapper } from "@/components/simmer/StudySimmerWrapper";
 import { formatDistanceToNow, format } from "date-fns";
+import { getCardById, SparkCard } from "@/data/studyIdeasLibrary";
+import { SelectableText } from "@/components/ui/selectable-text";
+import { useGeneratedSparkCards, GeneratedSparkCard } from "@/hooks/useGeneratedSparkCards";
+import { VoiceInputButton } from "@/components/ui/VoiceInputButton";
+import { QuickShareButton } from "@/components/social/QuickShareButton";
 
 // Types for Jeeves analysis
 interface Spark {
@@ -231,6 +238,7 @@ function parseVerseReference(text: string): ParsedReference | null {
 }
 
 export default function StudyBuddy() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
@@ -281,6 +289,17 @@ export default function StudyBuddy() {
   const processedRefsRef = useRef<Set<string>>(new Set());
   const versePopulateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Bible search state
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<{ book: string; chapter: number; verse: number; text: string }[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Generated Spark Cards
+  const { cards: sparkCards, loading: sparkCardsLoading, getTodaysCards } = useGeneratedSparkCards(7);
+  const [selectedSparkCard, setSelectedSparkCard] = useState<GeneratedSparkCard | null>(null);
+
   // Keep analysisHistoryRef in sync with state (for closures)
   useEffect(() => {
     analysisHistoryRef.current = analysisHistory;
@@ -304,6 +323,61 @@ export default function StudyBuddy() {
     isInitialMount.current = false;
   }, []); // Empty deps - only run on mount
 
+  // Handle Spark Card or Generated Idea from Study Idea Library
+  useEffect(() => {
+    const sourceType = searchParams.get("source");
+    const cardId = searchParams.get("cardId");
+    const ideaParam = searchParams.get("idea");
+
+    if (sourceType === "spark-card" && cardId) {
+      const card = getCardById(cardId);
+      if (card) {
+        // Pre-fill notes with the card's prompts
+        const promptsText = `## ${card.title}\n\n**Observe:** ${card.prompts.observe}\n\n**Connect:** ${card.prompts.connect}\n\n**Discover:** ${card.prompts.discover}\n\n---\n\n`;
+        setNotes(promptsText);
+        // Prevent Jeeves from auto-analyzing preloaded content - wait for user to type
+        lastAnalyzedNotes.current = promptsText;
+        setSessionTitle(card.title);
+
+        // Navigate Bible to first verse anchor
+        if (card.verseAnchors.length > 0) {
+          const ref = parseVerseReference(card.verseAnchors[0]);
+          if (ref) {
+            setSelectedBook(ref.book);
+            setSelectedChapter(ref.chapter);
+          }
+        }
+
+        toast.success(t('studyBuddy.loadedStartExploring', { title: card.title }));
+      }
+    } else if (sourceType === "generated-idea" && ideaParam) {
+      try {
+        const idea = JSON.parse(decodeURIComponent(ideaParam));
+        if (idea && idea.title) {
+          // Pre-fill notes with the generated idea's prompts
+          const promptsText = `## ${idea.title}\n\n**Observe:** ${idea.observePrompt}\n\n**Connect:** ${idea.connectPrompt}\n\n**Discover:** ${idea.discoverPrompt}\n\n---\n\n`;
+          setNotes(promptsText);
+          // Prevent Jeeves from auto-analyzing preloaded content - wait for user to type
+          lastAnalyzedNotes.current = promptsText;
+          setSessionTitle(idea.title);
+
+          // Navigate Bible to first verse
+          if (idea.verses && idea.verses.length > 0) {
+            const ref = parseVerseReference(idea.verses[0]);
+            if (ref) {
+              setSelectedBook(ref.book);
+              setSelectedChapter(ref.chapter);
+            }
+          }
+
+          toast.success(t('studyBuddy.loadedStartExploring', { title: idea.title }));
+        }
+      } catch (e) {
+        console.error("Failed to parse generated idea:", e);
+      }
+    }
+  }, [searchParams]);
+
   // Fetch and populate verse text when user types a reference
   const populateVerseReference = useCallback(async (ref: ParsedReference) => {
     const refKey = `${ref.book}:${ref.chapter}:${ref.verseStart}${ref.verseEnd ? `-${ref.verseEnd}` : ''}`;
@@ -313,7 +387,9 @@ export default function StudyBuddy() {
     processedRefsRef.current.add(refKey);
 
     try {
-      const chapter = await fetchChapter(ref.book, ref.chapter, "kjv");
+      const lang = i18n.language?.slice(0, 2);
+      const bibleTranslation = lang === "es" ? "rvr1960" : lang === "fr" ? "lsg" : lang === "de" ? "luther" : "kjv";
+      const chapter = await fetchChapter(ref.book, ref.chapter, bibleTranslation as any);
       const verses = chapter.verses.filter(v =>
         v.verse >= ref.verseStart && v.verse <= (ref.verseEnd || ref.verseStart)
       );
@@ -345,7 +421,7 @@ export default function StudyBuddy() {
         return prev + formattedVerse;
       });
 
-      toast.success(`Loaded ${ref.book} ${ref.chapter}:${ref.verseStart}${ref.verseEnd ? `-${ref.verseEnd}` : ''}`);
+      toast.success(t('studyBuddy.loadedVerse', { reference: `${ref.book} ${ref.chapter}:${ref.verseStart}${ref.verseEnd ? `-${ref.verseEnd}` : ''}` }));
     } catch (error) {
       console.error("Error loading verse:", error);
       // Remove from processed so user can try again
@@ -417,11 +493,12 @@ export default function StudyBuddy() {
         if (data) {
           setSessionTitle(data.title || "");
           // Load context from jeeves_context if available
-          const ctx = data.jeeves_context as { book?: string; chapter?: number; notes?: string } | null;
+          const ctx = data.jeeves_context as { book?: string; chapter?: number; notes?: string; analysis?: JeevesAnalysis } | null;
           if (ctx) {
             if (ctx.book) setSelectedBook(ctx.book);
             if (ctx.chapter) setSelectedChapter(ctx.chapter);
             if (ctx.notes) setNotes(ctx.notes);
+            if (ctx.analysis) setAnalysis(ctx.analysis);
           }
         }
       } catch (err) {
@@ -453,7 +530,7 @@ export default function StudyBuddy() {
       setSavedSessions((data || []) as SavedSession[]);
     } catch (err) {
       console.error("Error loading saved sessions:", err);
-      toast.error("Failed to load saved sessions");
+      toast.error(t('studyBuddy.failedToLoadSessions'));
     } finally {
       setLoadingSessions(false);
     }
@@ -469,10 +546,10 @@ export default function StudyBuddy() {
 
       if (error) throw error;
       setSavedSessions(prev => prev.filter(s => s.id !== sessionToDelete));
-      toast.success("Session deleted");
+      toast.success(t('studyBuddy.sessionDeleted'));
     } catch (err) {
       console.error("Error deleting session:", err);
-      toast.error("Failed to delete session");
+      toast.error(t('studyBuddy.failedToDeleteSession'));
     } finally {
       setSessionToDelete(null);
       setDeleteDialogOpen(false);
@@ -480,21 +557,41 @@ export default function StudyBuddy() {
   };
 
   const handleResumeSession = (session: SavedSession) => {
+    console.log("[StudyBuddy] Resuming session:", session.id, session.title);
+    
     // Load the session data
     setCurrentSessionId(session.id);
     setSessionTitle(session.title || "");
 
     const ctx = session.jeeves_context as { book?: string; chapter?: number; notes?: string; analysis?: JeevesAnalysis } | null;
+    console.log("[StudyBuddy] Session context:", ctx);
+    
     if (ctx) {
-      if (ctx.book) setSelectedBook(ctx.book);
-      if (ctx.chapter) setSelectedChapter(ctx.chapter);
-      if (ctx.notes) setNotes(ctx.notes);
-      if (ctx.analysis) setAnalysis(ctx.analysis);
+      // Set book and chapter first - this triggers verse loading via useEffect
+      if (ctx.book) {
+        console.log("[StudyBuddy] Setting book:", ctx.book);
+        setSelectedBook(ctx.book);
+      }
+      if (ctx.chapter) {
+        console.log("[StudyBuddy] Setting chapter:", ctx.chapter);
+        setSelectedChapter(ctx.chapter);
+      }
+      // Then set notes and analysis
+      if (ctx.notes) {
+        console.log("[StudyBuddy] Setting notes:", ctx.notes.length, "chars");
+        setNotes(ctx.notes);
+      }
+      if (ctx.analysis) {
+        console.log("[StudyBuddy] Setting analysis");
+        setAnalysis(ctx.analysis);
+      }
+    } else {
+      console.warn("[StudyBuddy] No jeeves_context found in session");
     }
 
     // Switch to study tab
     setActiveTab("study");
-    toast.success("Session loaded!");
+    toast.success(t('studyBuddy.sessionLoaded'));
   };
 
   // Load verses when book/chapter changes
@@ -547,7 +644,9 @@ export default function StudyBuddy() {
   const loadVerses = async () => {
     setLoadingVerses(true);
     try {
-      const chapter = await fetchChapter(selectedBook, selectedChapter, "kjv");
+      const lang = i18n.language?.slice(0, 2);
+      const bibleTranslation = lang === "es" ? "rvr1960" : lang === "fr" ? "lsg" : lang === "de" ? "luther" : "kjv";
+      const chapter = await fetchChapter(selectedBook, selectedChapter, bibleTranslation);
       setVerses(chapter.verses.map(v => ({ verse: v.verse, text: v.text })));
     } catch (error) {
       console.error("Error loading verses:", error);
@@ -555,6 +654,65 @@ export default function StudyBuddy() {
     } finally {
       setLoadingVerses(false);
     }
+  };
+
+  // Bible search function
+  const searchBible = useCallback(async (query: string) => {
+    if (!query.trim() || query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("search-bible", {
+        body: { query: query.trim(), limit: 50 }
+      });
+
+      if (error) throw error;
+
+      if (data?.results) {
+        setSearchResults(data.results);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error: any) {
+      console.error("Bible search error:", error);
+      toast.error(t('studyBuddy.searchFailed'));
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Debounced search
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchQuery.trim().length >= 2) {
+      searchTimeoutRef.current = setTimeout(() => {
+        searchBible(searchQuery);
+      }, 500);
+    } else {
+      setSearchResults([]);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery, searchBible]);
+
+  const navigateToSearchResult = (result: { book: string; chapter: number; verse: number; text: string }) => {
+    setSelectedBook(result.book);
+    setSelectedChapter(result.chapter);
+    setShowSearch(false);
+    setSearchQuery("");
+    setSearchResults([]);
+    toast.success(t('studyBuddy.navigatedTo', { reference: `${result.book} ${result.chapter}:${result.verse}` }));
   };
 
   // Check if notes contain a question
@@ -598,7 +756,7 @@ export default function StudyBuddy() {
       }
     } catch (error: any) {
       console.error("Jeeves analysis error:", error);
-      toast.error("Jeeves couldn't analyze - try again");
+      toast.error(t('studyBuddy.analysisError'));
     } finally {
       setJeevesLoading(false);
     }
@@ -633,53 +791,89 @@ export default function StudyBuddy() {
   const addVerseToNotes = (verse: number, text: string) => {
     const reference = `${selectedBook} ${selectedChapter}:${verse}`;
     setNotes(prev => prev + (prev ? "\n\n" : "") + `[${reference}] ${text}`);
-    toast.success(`Added ${reference} to notes`);
+    toast.success(t('studyBuddy.addedToNotes', { reference }));
   };
 
   // Explore a spark, source, or suggestion by adding its explore prompt to notes
   const exploreItem = (explorePrompt: string, label: string) => {
     setNotes(prev => prev + (prev ? "\n\n" : "") + `--- Exploring: ${label} ---\n${explorePrompt}`);
-    toast.success(`Added "${label}" to explore — Jeeves will respond!`);
+    toast.success(t('studyBuddy.addedToExplore', { label }));
   };
+
+  const [isSavingSession, setIsSavingSession] = useState(false);
 
   const saveSession = async () => {
     if (!notes.trim()) {
-      toast.error("No notes to save");
+      toast.error(t('studyBuddy.noNotesToSave'));
       return;
     }
 
+    if (!user?.id) {
+      toast.error(t('studyBuddy.signInToSave'));
+      return;
+    }
+
+    setIsSavingSession(true);
+
     try {
+      const contextData = JSON.parse(JSON.stringify({
+        book: selectedBook,
+        chapter: selectedChapter,
+        notes: notes,
+        analysis: analysis,
+      }));
+
       // Create or update session
       if (currentSessionId) {
         // Update existing session
-        const { error } = await supabase.from("study_sessions").update({
+        const { data, error } = await supabase.from("study_sessions").update({
           title: sessionTitle || `${selectedBook} ${selectedChapter} Study - ${new Date().toLocaleDateString()}`,
           description: notes.substring(0, 200),
-          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes, analysis })),
+          jeeves_context: contextData,
           has_jeeves_history: !!analysis,
-        }).eq("id", currentSessionId);
+          updated_at: new Date().toISOString(),
+        }).eq("id", currentSessionId).eq("user_id", user.id).select().single();
 
-        if (error) throw error;
-        toast.success("Session updated!");
+        if (error) {
+          console.error("Update error:", error);
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error("Session not found or you don't have permission to update it");
+        }
+
+        console.log("[StudyBuddy] Session updated:", data.id, "Notes length:", notes.length);
+        toast.success(t('studyBuddy.sessionSaved'));
       } else {
         // Create new session
         const { data: newSession, error } = await supabase.from("study_sessions").insert([{
-          user_id: user?.id!,
+          user_id: user.id,
           title: sessionTitle || `${selectedBook} ${selectedChapter} Study - ${new Date().toLocaleDateString()}`,
           description: notes.substring(0, 200),
-          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes, analysis })),
-          tabs_data: JSON.parse(JSON.stringify([])),
+          jeeves_context: contextData,
+          tabs_data: [],
           has_jeeves_history: !!analysis,
         }]).select().single();
 
-        if (error) throw error;
-        
-        setCurrentSessionId(newSession?.id || null);
-        toast.success("Session saved!");
+        if (error) {
+          console.error("Insert error:", error);
+          throw error;
+        }
+
+        if (!newSession) {
+          throw new Error("Failed to create session");
+        }
+
+        console.log("[StudyBuddy] New session created:", newSession.id, "Notes length:", notes.length);
+        setCurrentSessionId(newSession.id);
+        toast.success(t('studyBuddy.sessionSaved'));
       }
     } catch (error: any) {
       console.error("Save error:", error);
       toast.error(error.message || "Failed to save session");
+    } finally {
+      setIsSavingSession(false);
     }
   };
 
@@ -709,7 +903,7 @@ export default function StudyBuddy() {
     setSessionTitle("");
     processedRefsRef.current.clear(); // Reset processed verse references
     setCurrentSessionId(null);
-    toast.success("Session cleared");
+    toast.success(t('studyBuddy.sessionCleared'));
   };
 
   if (authLoading) {
@@ -788,8 +982,8 @@ export default function StudyBuddy() {
               <Brain className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className={`text-2xl font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Study Buddy</h1>
-              <p className={`text-sm ${isLightTheme ? "text-orange-700" : "text-orange-200"}`}>Bible · Notes · Jeeves</p>
+              <h1 className={`text-2xl font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>{t('studyBuddy.title')}</h1>
+              <p className={`text-sm ${isLightTheme ? "text-orange-700" : "text-orange-200"}`}>{t('studyBuddy.subtitle')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -816,7 +1010,7 @@ export default function StudyBuddy() {
               }`}
             >
               <Sparkles className="w-4 h-4 mr-1" />
-              New Session
+              {t('studyBuddy.newSession')}
             </Button>
             <Button 
               size="sm" 
@@ -826,18 +1020,24 @@ export default function StudyBuddy() {
               }`}
             >
               <Flame className="w-4 h-4 mr-1" />
-              New Sermon
+              {t('studyBuddy.newSermon')}
             </Button>
-            <Input
-              placeholder="Session title..."
-              value={sessionTitle}
-              onChange={(e) => setSessionTitle(e.target.value)}
-              className={`w-40 h-9 text-sm ${
-                isLightTheme 
-                  ? "bg-white/80 border-orange-300 text-gray-900 placeholder:text-orange-400" 
-                  : "bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
-              }`}
-            />
+            <div className="relative">
+              <Input
+                placeholder={t('studyBuddy.sessionTitlePlaceholder')}
+                value={sessionTitle}
+                onChange={(e) => setSessionTitle(e.target.value)}
+                className={`w-40 h-9 text-sm pr-8 ${
+                  isLightTheme
+                    ? "bg-white/80 border-orange-300 text-gray-900 placeholder:text-orange-400"
+                    : "bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
+                }`}
+              />
+              <VoiceInputButton
+                onTranscript={(text) => setSessionTitle(prev => prev + (prev ? ' ' : '') + text)}
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+              />
+            </div>
             <Button 
               variant="outline" 
               size="sm" 
@@ -850,13 +1050,23 @@ export default function StudyBuddy() {
             >
               <Trash2 className="w-4 h-4" />
             </Button>
-            <Button 
-              size="sm" 
-              onClick={saveSession} 
-              className="bg-orange-500 hover:bg-orange-600 text-white"
+            <Button
+              size="sm"
+              onClick={saveSession}
+              disabled={isSavingSession || !notes.trim()}
+              className="bg-orange-500 hover:bg-orange-600 text-white disabled:opacity-50"
             >
-              <Save className="w-4 h-4 mr-1" />
-              Save
+              {isSavingSession ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  {t('studyBuddy.saving')}
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-1" />
+                  {t('studyBuddy.save')}
+                </>
+              )}
             </Button>
           </div>
         </motion.div>
@@ -877,7 +1087,7 @@ export default function StudyBuddy() {
               }`}
             >
               <Brain className="w-4 h-4 mr-2" />
-              Study
+              {t('studyBuddy.study')}
             </TabsTrigger>
             <TabsTrigger
               value="simmer"
@@ -886,7 +1096,7 @@ export default function StudyBuddy() {
               }`}
             >
               <Flame className="w-4 h-4 mr-2" />
-              Simmer
+              {t('studyBuddy.simmer')}
             </TabsTrigger>
             <TabsTrigger
               value="saved"
@@ -895,7 +1105,7 @@ export default function StudyBuddy() {
               }`}
             >
               <FolderOpen className="w-4 h-4 mr-2" />
-              Saved
+              {t('studyBuddy.saved')}
               {savedSessions.length > 0 && (
                 <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
                   {savedSessions.length}
@@ -920,117 +1130,243 @@ export default function StudyBuddy() {
               <div className={`p-4 border-b flex-shrink-0 ${
                 isLightTheme ? "border-orange-200" : "border-orange-500/20"
               }`}>
-                <div className="flex items-center gap-2 mb-3">
-                  <Book className={`w-5 h-5 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
-                  <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Bible</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Select value={selectedBook} onValueChange={(v) => { setSelectedBook(v); setSelectedChapter(1); }}>
-                    <SelectTrigger className={`flex-1 h-9 text-sm ${
-                      isLightTheme 
-                        ? "bg-white border-orange-300 text-gray-900" 
-                        : "bg-black/30 border-orange-500/30 text-white"
-                    }`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className={`max-h-60 ${
-                      isLightTheme 
-                        ? "bg-white border-orange-200" 
-                        : "bg-amber-950 border-orange-500/30"
-                    }`}>
-                      {BIBLE_BOOK_METADATA.map(book => (
-                        <SelectItem key={book.name} value={book.name} className={
-                          isLightTheme 
-                            ? "text-gray-900 hover:bg-orange-100" 
-                            : "text-white hover:bg-orange-500/20"
-                        }>{book.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={selectedChapter.toString()} onValueChange={(v) => setSelectedChapter(parseInt(v))}>
-                    <SelectTrigger className={`w-20 h-9 text-sm ${
-                      isLightTheme 
-                        ? "bg-white border-orange-300 text-gray-900" 
-                        : "bg-black/30 border-orange-500/30 text-white"
-                    }`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className={`max-h-60 ${
-                      isLightTheme 
-                        ? "bg-white border-orange-200" 
-                        : "bg-amber-950 border-orange-500/30"
-                    }`}>
-                      {Array.from({ length: getChapterCount() }, (_, i) => (
-                        <SelectItem key={i + 1} value={(i + 1).toString()} className={
-                          isLightTheme 
-                            ? "text-gray-900 hover:bg-orange-100" 
-                            : "text-white hover:bg-orange-500/20"
-                        }>{i + 1}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center justify-between mt-3">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => navigateChapter('prev')}
-                    className={isLightTheme 
-                      ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900" 
-                      : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
-                    }
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Book className={`w-5 h-5 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
+                    <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>{t('studyBuddy.bible')}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowSearch(!showSearch);
+                      if (showSearch) {
+                        setSearchQuery("");
+                        setSearchResults([]);
+                      }
+                    }}
+                    className={`h-8 px-2 ${
+                      showSearch
+                        ? isLightTheme
+                          ? "bg-orange-200 text-orange-800"
+                          : "bg-orange-500/30 text-orange-200"
+                        : isLightTheme
+                          ? "text-orange-700 hover:bg-orange-100"
+                          : "text-orange-200 hover:bg-orange-500/20"
+                    }`}
                   >
-                    <ChevronLeft className="w-4 h-4" />
-                    Prev
-                  </Button>
-                  <span className={`text-sm ${isLightTheme ? "text-orange-700" : "text-orange-200"}`}>{selectedBook} {selectedChapter}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => navigateChapter('next')}
-                    className={isLightTheme 
-                      ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900" 
-                      : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
-                    }
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
+                    <Search className="w-4 h-4" />
                   </Button>
                 </div>
+
+                {/* Search Input */}
+                <AnimatePresence>
+                  {showSearch && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden mb-3"
+                    >
+                      <div className="relative">
+                        <Input
+                          placeholder={t('studyBuddy.searchPlaceholder')}
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className={`pr-8 h-9 text-sm ${
+                            isLightTheme
+                              ? "bg-white border-orange-300 text-gray-900 placeholder:text-orange-400"
+                              : "bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
+                          }`}
+                        />
+                        {isSearching && (
+                          <Loader2 className={`absolute right-2 top-2 w-4 h-4 animate-spin ${
+                            isLightTheme ? "text-orange-600" : "text-orange-400"
+                          }`} />
+                        )}
+                      </div>
+                      <p className={`text-xs mt-1 ${isLightTheme ? "text-orange-600/60" : "text-orange-200/50"}`}>
+                        {t('studyBuddy.searchExamples')}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {!showSearch && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <Select value={selectedBook} onValueChange={(v) => { setSelectedBook(v); setSelectedChapter(1); }}>
+                        <SelectTrigger className={`flex-1 h-9 text-sm ${
+                          isLightTheme
+                            ? "bg-white border-orange-300 text-gray-900"
+                            : "bg-black/30 border-orange-500/30 text-white"
+                        }`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className={`max-h-60 ${
+                          isLightTheme
+                            ? "bg-white border-orange-200"
+                            : "bg-amber-950 border-orange-500/30"
+                        }`}>
+                          {BIBLE_BOOK_METADATA.map(book => (
+                            <SelectItem key={book.name} value={book.name} className={
+                              isLightTheme
+                                ? "text-gray-900 hover:bg-orange-100"
+                                : "text-white hover:bg-orange-500/20"
+                            }>{book.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={selectedChapter.toString()} onValueChange={(v) => setSelectedChapter(parseInt(v))}>
+                        <SelectTrigger className={`w-20 h-9 text-sm ${
+                          isLightTheme
+                            ? "bg-white border-orange-300 text-gray-900"
+                            : "bg-black/30 border-orange-500/30 text-white"
+                        }`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className={`max-h-60 ${
+                          isLightTheme
+                            ? "bg-white border-orange-200"
+                            : "bg-amber-950 border-orange-500/30"
+                        }`}>
+                          {Array.from({ length: getChapterCount() }, (_, i) => (
+                            <SelectItem key={i + 1} value={(i + 1).toString()} className={
+                              isLightTheme
+                                ? "text-gray-900 hover:bg-orange-100"
+                                : "text-white hover:bg-orange-500/20"
+                            }>{i + 1}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center justify-between mt-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigateChapter('prev')}
+                        className={isLightTheme
+                          ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900"
+                          : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
+                        }
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        {t('studyBuddy.prev')}
+                      </Button>
+                      <span className={`text-sm ${isLightTheme ? "text-orange-700" : "text-orange-200"}`}>{selectedBook} {selectedChapter}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigateChapter('next')}
+                        className={isLightTheme
+                          ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900"
+                          : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
+                        }
+                      >
+                        {t('studyBuddy.next')}
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* Verses */}
+              {/* Verses / Search Results */}
               <ScrollArea className="flex-1">
                 <div className="p-4 space-y-2">
-                  {loadingVerses ? (
-                    <div className="flex justify-center py-8">
-                      <Loader2 className={`w-6 h-6 animate-spin ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
+                  {showSearch && searchQuery.trim().length >= 2 ? (
+                    // Search Results
+                    isSearching ? (
+                      <div className="flex justify-center py-8">
+                        <Loader2 className={`w-6 h-6 animate-spin ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
+                      </div>
+                    ) : searchResults.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Search className={`w-8 h-8 mx-auto mb-2 ${isLightTheme ? "text-orange-400/50" : "text-orange-500/30"}`} />
+                        <p className={`text-sm ${isLightTheme ? "text-orange-600/60" : "text-orange-200/60"}`}>
+                          {t('studyBuddy.noResultsFor', { query: searchQuery })}
+                        </p>
+                        <p className={`text-xs mt-1 ${isLightTheme ? "text-orange-500/50" : "text-orange-200/40"}`}>
+                          {t('studyBuddy.tryDifferentKeywords')}
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <p className={`text-xs mb-3 ${isLightTheme ? "text-orange-700" : "text-orange-200/70"}`}>
+                          {t('studyBuddy.foundResults', { count: searchResults.length })}
+                        </p>
+                        {searchResults.map((result, idx) => (
+                          <motion.div
+                            key={`${result.book}-${result.chapter}-${result.verse}-${idx}`}
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.03 }}
+                            whileHover={{ scale: 1.01 }}
+                            onClick={() => navigateToSearchResult(result)}
+                            className={`p-3 rounded-lg border border-transparent cursor-pointer transition-all group ${
+                              isLightTheme
+                                ? "bg-amber-100/60 hover:bg-amber-100 hover:border-amber-300/60"
+                                : "bg-amber-500/5 hover:bg-amber-500/15 hover:border-amber-500/30"
+                            }`}
+                          >
+                            <div className={`text-xs font-semibold mb-1 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`}>
+                              {result.book} {result.chapter}:{result.verse}
+                            </div>
+                            <p className={`text-sm leading-relaxed ${isLightTheme ? "text-gray-800" : "text-orange-100"}`}>
+                              {result.text.length > 150 ? result.text.substring(0, 150) + "..." : result.text}
+                            </p>
+                            <span className={`text-xs mt-1 block opacity-0 group-hover:opacity-100 transition-opacity ${
+                              isLightTheme ? "text-orange-500" : "text-orange-200/50"
+                            }`}>
+                              {t('studyBuddy.clickToGoToVerse')}
+                            </span>
+                          </motion.div>
+                        ))}
+                      </>
+                    )
+                  ) : showSearch ? (
+                    // Search mode but no query yet
+                    <div className="text-center py-8">
+                      <Search className={`w-8 h-8 mx-auto mb-2 ${isLightTheme ? "text-orange-400/50" : "text-orange-500/30"}`} />
+                      <p className={`text-sm ${isLightTheme ? "text-orange-600/60" : "text-orange-200/60"}`}>
+                        {t('studyBuddy.typeToSearch')}
+                      </p>
+                      <p className={`text-xs mt-2 ${isLightTheme ? "text-orange-500/50" : "text-orange-200/40"}`}>
+                        {t('studyBuddy.searchHint')}
+                      </p>
                     </div>
-                  ) : verses.length === 0 ? (
-                    <p className={`text-center text-sm py-8 ${isLightTheme ? "text-orange-600/60" : "text-orange-200/60"}`}>
-                      No verses found
-                    </p>
                   ) : (
-                    verses.map((v) => (
-                      <motion.div
-                        key={v.verse}
-                        whileHover={{ scale: 1.01 }}
-                        onClick={() => addVerseToNotes(v.verse, v.text)}
-                        className={`p-3 rounded-lg border border-transparent cursor-pointer transition-all group ${
-                          isLightTheme 
-                            ? "bg-amber-100/60 hover:bg-amber-100 hover:border-amber-300/60" 
-                            : "bg-amber-500/5 hover:bg-amber-500/15 hover:border-amber-500/30"
-                        }`}
-                      >
-                        <span className={`font-bold text-sm mr-2 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`}>{v.verse}</span>
-                        <span className={`text-sm leading-relaxed ${isLightTheme ? "text-gray-800" : "text-orange-100"}`}>{v.text}</span>
-                        <span className={`text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity ${
-                          isLightTheme ? "text-orange-500" : "text-orange-200/50"
-                        }`}>
-                          (click to add)
-                        </span>
-                      </motion.div>
-                    ))
+                    // Normal verse display
+                    loadingVerses ? (
+                      <div className="flex justify-center py-8">
+                        <Loader2 className={`w-6 h-6 animate-spin ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
+                      </div>
+                    ) : verses.length === 0 ? (
+                      <p className={`text-center text-sm py-8 ${isLightTheme ? "text-orange-600/60" : "text-orange-200/60"}`}>
+                        {t('studyBuddy.noVersesFound')}
+                      </p>
+                    ) : (
+                      verses.map((v) => (
+                        <motion.div
+                          key={v.verse}
+                          whileHover={{ scale: 1.01 }}
+                          onClick={() => addVerseToNotes(v.verse, v.text)}
+                          className={`p-3 rounded-lg border border-transparent cursor-pointer transition-all group ${
+                            isLightTheme
+                              ? "bg-amber-100/60 hover:bg-amber-100 hover:border-amber-300/60"
+                              : "bg-amber-500/5 hover:bg-amber-500/15 hover:border-amber-500/30"
+                          }`}
+                        >
+                          <span className={`font-bold text-sm mr-2 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`}>{v.verse}</span>
+                          <span className={`text-sm leading-relaxed ${isLightTheme ? "text-gray-800" : "text-orange-100"}`}>{v.text}</span>
+                          <span className={`text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity ${
+                            isLightTheme ? "text-orange-500" : "text-orange-200/50"
+                          }`}>
+                            {t('studyBuddy.clickToAdd')}
+                          </span>
+                        </motion.div>
+                      ))
+                    )
                   )}
                 </div>
               </ScrollArea>
@@ -1055,26 +1391,28 @@ export default function StudyBuddy() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <StickyNote className={`w-5 h-5 ${isLightTheme ? "text-teal-600" : "text-emerald-400"}`} />
-                    <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Notes</span>
+                    <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>{t('studyBuddy.notes')}</span>
                   </div>
                   {jeevesLoading && (
                     <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
                   )}
                 </div>
-                <p className={`text-xs mt-1 ${isLightTheme ? "text-teal-700/70" : "text-emerald-200/60"}`}>Write notes or ask questions — Jeeves will auto-respond</p>
+                <p className={`text-xs mt-1 ${isLightTheme ? "text-teal-700/70" : "text-emerald-200/60"}`}>{t('studyBuddy.notesHint')}</p>
               </div>
-              <div className="flex-1 p-4">
+              <div className="flex-1 p-4 relative">
                 <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Write freely here. Click verses to add them.
-
-Jeeves sees your notes and will spark connections, suggest PT rooms, source claims, and help you think Phototheologically."
-                  className={`h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent ${
-                    isLightTheme 
-                      ? "text-gray-800 placeholder:text-teal-600/50" 
+                  placeholder={t('studyBuddy.notesPlaceholder')}
+                  className={`h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent pr-10 ${
+                    isLightTheme
+                      ? "text-gray-800 placeholder:text-teal-600/50"
                       : "text-emerald-100 placeholder:text-emerald-200/40"
                   }`}
+                />
+                <VoiceInputButton
+                  onTranscript={(text) => setNotes(prev => prev + (prev ? ' ' : '') + text)}
+                  className="absolute right-6 top-6"
                 />
               </div>
             </Card>
@@ -1095,21 +1433,80 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Brain className={`w-5 h-5 ${isLightTheme ? "text-purple-600" : "text-violet-400"}`} />
-                    <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Jeeves</span>
+                    <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>{t('studyBuddy.jeeves')}</span>
                   </div>
                   {jeevesLoading && (
                     <div className={`flex items-center gap-2 ${isLightTheme ? "text-violet-600" : "text-violet-300"}`}>
                       <Eye className="w-4 h-4 animate-pulse" />
-                      <span className="text-xs">Reading...</span>
+                      <span className="text-xs">{t('studyBuddy.reading')}</span>
                     </div>
                   )}
                 </div>
                 <p className={`text-xs mt-1 ${isLightTheme ? "text-purple-700/70" : "text-violet-200/60"}`}>
                   {notes.trim().length < 15
-                    ? "Start typing in Notes — Jeeves will respond as you write"
-                    : "Watching your notes and sparking connections..."}
+                    ? t('studyBuddy.jeevesWaiting')
+                    : t('studyBuddy.jeevesWatching')}
                 </p>
               </div>
+
+              {/* Generated Spark Cards - Compact horizontal display */}
+              {sparkCards.length > 0 && (
+                <div className={`px-3 py-2 border-b flex-shrink-0 ${
+                  isLightTheme ? "border-purple-200/60 bg-amber-50/50" : "border-violet-500/20 bg-amber-900/10"
+                }`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Flame className={`w-3.5 h-3.5 ${isLightTheme ? "text-amber-600" : "text-amber-400"}`} />
+                    <span className={`text-[10px] font-semibold uppercase tracking-wider ${
+                      isLightTheme ? "text-amber-700" : "text-amber-300"
+                    }`}>
+                      {t('studyBuddy.sparks')}
+                    </span>
+                  </div>
+                  <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+                    {sparkCards.slice(0, 5).map((card) => (
+                      <button
+                        key={card.id}
+                        onClick={() => {
+                          const promptsText = `## ${card.title}\n\n**Observe:** ${card.prompts.observe}\n\n**Connect:** ${card.prompts.connect}\n\n**Discover:** ${card.prompts.discover}\n\n---\n\n`;
+                          setNotes(promptsText);
+                          lastAnalyzedNotes.current = promptsText;
+                          setSessionTitle(card.title);
+                          if (card.verse_anchors.length > 0) {
+                            const ref = parseVerseReference(card.verse_anchors[0]);
+                            if (ref) {
+                              setSelectedBook(ref.book);
+                              setSelectedChapter(ref.chapter);
+                            }
+                          }
+                          toast.success(t('studyBuddy.loadedCard', { title: card.title }));
+                        }}
+                        className={`flex-shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all hover:scale-105 ${
+                          isLightTheme
+                            ? "bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-200/80"
+                            : "bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 border border-amber-500/30"
+                        }`}
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3" />
+                          <span className="max-w-[120px] truncate">{card.title}</span>
+                        </span>
+                      </button>
+                    ))}
+                    {sparkCards.length > 5 && (
+                      <button
+                        onClick={() => navigate("/study-idea-library")}
+                        className={`flex-shrink-0 px-2 py-1.5 rounded-lg text-[10px] transition-all ${
+                          isLightTheme
+                            ? "text-purple-600 hover:text-purple-800 hover:bg-purple-100"
+                            : "text-violet-300 hover:text-violet-100 hover:bg-violet-500/20"
+                        }`}
+                      >
+                        {t('studyBuddy.moreCards', { count: sparkCards.length - 5 })}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Real-time Analysis Display */}
               <ScrollArea className="flex-1">
@@ -1119,10 +1516,10 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                     <div className="text-center py-8">
                       <Brain className={`w-12 h-12 mx-auto mb-3 ${isLightTheme ? "text-purple-400/50" : "text-violet-500/30"}`} />
                       <p className={`text-sm ${isLightTheme ? "text-purple-700/70" : "text-violet-200/60"}`}>
-                        Jeeves is watching your notes
+                        {t('studyBuddy.jeevesIsWatching')}
                       </p>
                       <p className={`text-xs mt-2 ${isLightTheme ? "text-purple-600/60" : "text-violet-200/40"}`}>
-                        Start typing and he'll spark connections, suggest rooms, and apply PT principles automatically
+                        {t('studyBuddy.jeevesPlaceholderHint')}
                       </p>
                     </div>
                   ) : (
@@ -1154,7 +1551,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                         >
                           <div className={`flex items-center gap-2 ${isLightTheme ? "text-green-600" : "text-green-400"}`}>
                             <BookOpen className="w-4 h-4" />
-                            <span className="text-xs font-semibold uppercase tracking-wider">Verses That Back You Up</span>
+                            <span className="text-xs font-semibold uppercase tracking-wider">{t('studyBuddy.versesBackYouUp')}</span>
                           </div>
                           {analysis.supportingVerses.map((sv, idx) => (
                             <motion.div
@@ -1169,7 +1566,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                               }`}
                             >
                               <div className={`text-xs mb-1 italic ${isLightTheme ? "text-green-700/70" : "text-green-200/60"}`}>
-                                Your thought: "{sv.thought}"
+                                {t('studyBuddy.yourThought')}: "{sv.thought}"
                               </div>
                               <div className={`font-semibold text-sm ${isLightTheme ? "text-green-800" : "text-green-300"}`}>
                                 📖 {sv.verse}
@@ -1195,7 +1592,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                         >
                           <div className="flex items-center gap-2 text-amber-400">
                             <Lightbulb className="w-4 h-4" />
-                            <span className="text-xs font-semibold uppercase tracking-wider">Sparks</span>
+                            <span className="text-xs font-semibold uppercase tracking-wider">{t('studyBuddy.sparksLabel')}</span>
                           </div>
                           {analysis.sparks.map((spark, idx) => (
                             <motion.div
@@ -1218,12 +1615,17 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                       </Badge>
                                     )}
                                   </div>
-                                  <p className="text-sm text-amber-100">{spark.insight}</p>
-                                  {spark.verses && spark.verses.length > 0 && (
-                                    <p className="text-xs text-amber-200/60 mt-1">
-                                      {spark.verses.join(", ")}
-                                    </p>
-                                  )}
+                                  <SelectableText
+                                    onAddToNotes={(text) => setNotes(prev => prev + (prev ? "\n\n" : "") + text)}
+                                    sourceLabel={t('studyBuddy.sparkSource', { type: spark.type })}
+                                  >
+                                    <p className="text-sm text-amber-100 cursor-text">{spark.insight}</p>
+                                    {spark.verses && spark.verses.length > 0 && (
+                                      <p className="text-xs text-amber-200/60 mt-1">
+                                        {spark.verses.join(", ")}
+                                      </p>
+                                    )}
+                                  </SelectableText>
                                   {spark.explorePrompt && (
                                     <Button
                                       size="sm"
@@ -1232,7 +1634,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                       className="mt-2 h-7 text-xs text-amber-300 hover:text-amber-100 hover:bg-amber-500/20 gap-1 px-2"
                                     >
                                       <Search className="w-3 h-3" />
-                                      Explore
+                                      {t('studyBuddy.explore')}
                                     </Button>
                                   )}
                                 </div>
@@ -1252,7 +1654,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                         >
                           <div className="flex items-center gap-2 text-blue-400">
                             <BookOpen className="w-4 h-4" />
-                            <span className="text-xs font-semibold uppercase tracking-wider">Sources</span>
+                            <span className="text-xs font-semibold uppercase tracking-wider">{t('studyBuddy.sourcesLabel')}</span>
                           </div>
                           {analysis.sources.map((source, idx) => (
                             <motion.div
@@ -1278,7 +1680,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                               </div>
                               <p className="text-sm text-blue-100">"{source.claim}"</p>
                               <p className="text-xs text-blue-200/60 mt-1">
-                                Anchor: {source.anchor}
+                                {t('studyBuddy.anchor')}: {source.anchor}
                               </p>
                               {source.suggestion && (
                                 <p className="text-xs text-blue-300 mt-1 italic">
@@ -1311,7 +1713,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                         >
                           <div className="flex items-center gap-2 text-emerald-400">
                             <Target className="w-4 h-4" />
-                            <span className="text-xs font-semibold uppercase tracking-wider">PT Rooms</span>
+                            <span className="text-xs font-semibold uppercase tracking-wider">{t('studyBuddy.ptRooms')}</span>
                           </div>
                           {analysis.roomSuggestions.map((room, idx) => (
                             <motion.div
@@ -1331,7 +1733,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                               <p className="text-xs text-emerald-200/80 mt-1">{room.why}</p>
                               {room.exercise && (
                                 <p className="text-xs text-emerald-300 mt-2 p-2 bg-emerald-500/10 rounded">
-                                  Try: {room.exercise}
+                                  {t('studyBuddy.try')}: {room.exercise}
                                 </p>
                               )}
                               {room.explorePrompt && (
@@ -1361,7 +1763,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                           <div className="flex items-center gap-2 mb-2">
                             <Crosshair className="w-4 h-4 text-rose-400" />
                             <span className="text-xs font-semibold uppercase tracking-wider text-rose-400">
-                              Christ Connection
+                              {t('studyBuddy.christConnection')}
                             </span>
                             <Badge 
                               variant="outline" 
@@ -1371,7 +1773,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                   : 'border-orange-500/30 text-orange-300'
                               }`}
                             >
-                              {analysis.christConnection.present ? 'Found' : 'Needs Focus'}
+                              {analysis.christConnection.present ? t('studyBuddy.found') : t('studyBuddy.needsFocus')}
                             </Badge>
                           </div>
                           {analysis.christConnection.suggestion && (
@@ -1401,7 +1803,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <span className="text-xs font-semibold uppercase tracking-wider text-purple-400">
-                              Cycle & Heaven
+                              {t('studyBuddy.cycleAndHeaven')}
                             </span>
                           </div>
                           <div className="flex gap-2 mb-2">
@@ -1443,13 +1845,31 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <span className="text-xs font-semibold uppercase tracking-wider text-violet-300">
-                              Next Step
+                              {t('studyBuddy.nextStep')}
                             </span>
                           </div>
                           <p className="text-sm font-medium text-violet-100">{analysis.nextStep.focus}</p>
                           <p className="text-sm text-violet-200 mt-2 italic">
                             "{analysis.nextStep.question}"
                           </p>
+                        </motion.div>
+                      )}
+
+                      {/* Share Button - show when there's meaningful analysis */}
+                      {analysis?.overallResponse && (
+                        <motion.div
+                          key="share"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex justify-center pt-2"
+                        >
+                          <QuickShareButton
+                            title={`📚 Study Buddy Insight: ${sessionTitle || 'Bible Study'}`}
+                            content={`${analysis.overallResponse.slice(0, 200)}${analysis.overallResponse.length > 200 ? '...' : ''}\n\n${analysis.sparks?.length ? `💡 ${analysis.sparks.length} sparks discovered` : ''}`}
+                            type="insight"
+                            variant="outline"
+                            size="sm"
+                          />
                         </motion.div>
                       )}
 
@@ -1460,7 +1880,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                           className="flex items-center gap-2 text-violet-200/60 p-3"
                         >
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span className="text-sm">Jeeves is analyzing...</span>
+                          <span className="text-sm">{t('studyBuddy.jeevesAnalyzing')}</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1481,7 +1901,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                 onExportToNotes={(content) => {
                   setNotes(prev => prev + (prev ? "\n\n---\n\n" : "") + content);
                   setActiveTab("study");
-                  toast.success("Exported to Notes!");
+                  toast.success(t('studyBuddy.exportedToNotes'));
                 }}
               />
             </div>
@@ -1503,10 +1923,10 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <FolderOpen className={`w-12 h-12 mb-4 ${isLightTheme ? "text-blue-400" : "text-blue-500/50"}`} />
                     <h3 className={`text-lg font-medium mb-2 ${isLightTheme ? "text-gray-900" : "text-white"}`}>
-                      No saved sessions
+                      {t('studyBuddy.noSavedSessions')}
                     </h3>
                     <p className={`max-w-sm ${isLightTheme ? "text-blue-700/70" : "text-blue-200/60"}`}>
-                      Write notes in the Study tab and click Save to see your sessions here.
+                      {t('studyBuddy.noSavedSessionsHint')}
                     </p>
                   </div>
                 </Card>
@@ -1534,11 +1954,11 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                       ? "bg-blue-100 text-blue-700 border-blue-300"
                                       : "bg-blue-500/10 text-blue-300 border-blue-500/30"
                                   }`}>
-                                    Study Buddy
+                                    {t('studyBuddy.title')}
                                   </Badge>
                                 </div>
                                 <h3 className={`font-semibold truncate ${isLightTheme ? "text-gray-900" : "text-white"}`}>
-                                  {session.title || "Untitled Session"}
+                                  {session.title || t('studyBuddy.untitledSession')}
                                 </h3>
                                 <div className={`flex items-center gap-1 mt-1 text-xs ${
                                   isLightTheme ? "text-blue-700/70" : "text-blue-200/60"
@@ -1558,7 +1978,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                 }>
                                   <DropdownMenuItem onClick={() => handleResumeSession(session)}>
                                     <Play className="w-4 h-4 mr-2" />
-                                    Resume
+                                    {t('studyBuddy.resume')}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem
@@ -1569,7 +1989,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                     className="text-destructive focus:text-destructive"
                                   >
                                     <Trash2 className="w-4 h-4 mr-2" />
-                                    Delete
+                                    {t('studyBuddy.delete')}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -1610,7 +2030,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                               className="w-full bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white"
                             >
                               <Play className="w-4 h-4 mr-1" />
-                              Resume Session
+                              {t('studyBuddy.resumeSession')}
                             </Button>
                           </div>
                         </Card>
@@ -1627,20 +2047,20 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent className={isLightTheme ? "" : "bg-slate-900 border-slate-700"}>
             <AlertDialogHeader>
-              <AlertDialogTitle className={isLightTheme ? "" : "text-white"}>Delete Session</AlertDialogTitle>
+              <AlertDialogTitle className={isLightTheme ? "" : "text-white"}>{t('studyBuddy.deleteSessionTitle')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete this session? This action cannot be undone.
+                {t('studyBuddy.deleteSessionDescription')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className={isLightTheme ? "" : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"}>
-                Cancel
+                {t('studyBuddy.cancel')}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteSession}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                Delete
+                {t('studyBuddy.delete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

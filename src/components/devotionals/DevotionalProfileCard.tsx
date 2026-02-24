@@ -103,7 +103,7 @@ export function DevotionalProfileCard({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100">
+              <Button variant="ghost" size="icon" className="opacity-100 md:opacity-0 md:group-hover:opacity-100">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

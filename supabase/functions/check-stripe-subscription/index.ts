@@ -12,19 +12,27 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-STRIPE-SUB] ${step}${detailsStr}`);
 };
 
-// Price ID to tier mapping
+// Price ID to tier mapping - PHOTOTHEOLOGY APP ONLY
 const priceToTier: Record<string, string> = {
-  // Monthly prices
-  'price_1SKn0VFGDAd3RU8Io19mT9No': 'essential',
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'premium',
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium',
-  // Legacy prices
-  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': 'premium',
-  'price_1ONjHsFGDAd3RU8IsHMybTX6': 'premium',
-  // Student prices
-  'price_1SKWM6FGDAd3RU8IcmNNhmKO': 'student',
-  'price_1SKWMLFGDAd3RU8IBXO8pKxd': 'student',
+  // Current subscriptions (2026)
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential',      // Essential Monthly $9
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential',      // Essential Annual $90
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium',        // Premium Monthly $15
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium',        // Premium Annual $150
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': 'student',        // Student Monthly $4.99
+  // Legacy Phototheology App subscriptions
+  'price_1SKn0VFGDAd3RU8Io19mT9No': 'premium',        // Legacy Premium $15/mo
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'essential',      // Legacy Essential $9/mo
+  // Even older legacy prices (for full coverage)
+  'price_1SJJhAFGDAd3RU8IH8B7ejdt': 'premium',        // Old Premium $15/mo
+  // Church tiers
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': 'church',         // Church Basic $199/mo
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': 'church',         // Church Standard $399/mo
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': 'church',         // Church Premium $899/mo
 };
+
+// Only these price IDs count as Phototheology subscriptions.
+const appPriceIds = new Set(Object.keys(priceToTier));
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -94,8 +102,20 @@ serve(async (req) => {
     });
 
     const allSubs = [...subscriptions.data, ...trialingSubscriptions.data];
+
+    // Filter to ONLY this app's subscriptions (ignore any other Stripe products, incl. SamCart/external)
+    const appSubs = allSubs
+      .filter((sub: any) => {
+        const items = sub?.items?.data || [];
+        return items.some((item: any) => {
+          const priceId = item?.price?.id;
+          return typeof priceId === 'string' && appPriceIds.has(priceId);
+        });
+      })
+      // Prefer the subscription that lasts the longest (more stable if there are multiple)
+      .sort((a: any, b: any) => (b?.current_period_end || 0) - (a?.current_period_end || 0));
     
-    if (allSubs.length === 0) {
+    if (appSubs.length === 0) {
       logStep("No active/trialing subscriptions found");
       return new Response(JSON.stringify({ 
         subscribed: false,
@@ -109,11 +129,29 @@ serve(async (req) => {
     }
 
     // Get the most recent active subscription
-    const subscription = allSubs[0];
+    const subscription = appSubs[0];
     const periodEnd = subscription.current_period_end;
     const subscriptionEnd = periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
-    const priceId = subscription.items.data[0]?.price?.id;
-    const tier = priceToTier[priceId] || 'premium'; // Default to premium if unknown price
+
+    const priceId = (subscription.items.data || [])
+      .map((item: any) => item?.price?.id)
+      .find((id: any) => typeof id === 'string' && appPriceIds.has(id));
+
+    // Safety: if we somehow have a subscription but no recognized app price, treat as not subscribed.
+    if (!priceId) {
+      logStep("Subscription found but no Phototheology price ID matched", { subscriptionId: subscription.id });
+      return new Response(JSON.stringify({
+        subscribed: false,
+        tier: null,
+        subscription_end: null,
+        source: 'stripe_direct'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    const tier = priceToTier[priceId];
     
     logStep("Active subscription found", { 
       subscriptionId: subscription.id, 

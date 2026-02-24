@@ -1,10 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame, MoreHorizontal, Crown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { QuickAudioButton } from "@/components/audio";
 import { VerseView } from "./VerseView";
@@ -32,6 +40,8 @@ import { ThemeCrossReference } from "./ThemeCrossReference";
 import { ThemeVerseSearch } from "./ThemeVerseSearch";
 import { MemoryToolsPanel } from "./MemoryToolsPanel";
 import { StudyModeSelector } from "./StudyModeSelector";
+import { PreacherMentorCard } from "./PreacherMentorCard";
+import { ChapterImage } from "./ChapterImage";
 
 import { DimensionFilter } from "./DimensionFilter";
 import { ReadingStreakBadge } from "./ReadingStreakBadge";
@@ -56,7 +66,7 @@ export const BibleReader = () => {
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [activeDimensions, setActiveDimensions] = useState<string[]>(["1D", "2D", "3D", "4D", "5D"]);
-  const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics">("advanced");
+  const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics" | "preacher-mentor">("advanced");
   const [sermonIdeasMode, setSermonIdeasMode] = useState(false);
   
   const toggleDimension = (dimension: string) => {
@@ -80,6 +90,8 @@ export const BibleReader = () => {
     setShowCommentary: setCommentaryMode,
     showAI: jeevesMode,
     setShowAI: setJeevesMode,
+    showPreacherMentor: preacherMentorMode,
+    setShowPreacherMentor: setPreacherMentorMode,
   } = useBibleState(book, chapterParam);
   
   const { trackReading } = useReadingHistory();
@@ -104,7 +116,19 @@ export const BibleReader = () => {
   } = useVerseNotes(book, chapter);
   const { logReading } = useReadingStreak();
   
-  const [translation, setTranslation] = useState<Translation>("kjv");
+  const { i18n, t } = useTranslation();
+  
+  // Map app language to default Bible translation
+  const getDefaultTranslation = useCallback((): Translation => {
+    const lang = i18n.language?.slice(0, 2);
+    if (lang === "es") return "rvr1960";
+    if (lang === "fr") return "lsg";
+    if (lang === "de") return "luther";
+    if (lang === "pt") return "almeida";
+    return "kjv";
+  }, [i18n.language]);
+  
+  const [translation, setTranslation] = useState<Translation>(getDefaultTranslation);
   const jeevesRef = useRef<HTMLDivElement>(null);
   const sparkTriggerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -140,15 +164,41 @@ export const BibleReader = () => {
   }, [generateSpark, sparkPreferences?.intensity, book, chapter]);
 
   useEffect(() => {
-    // Get translation from URL parameter or use preference
+    // Get translation from URL parameter, or use language-based default for non-English locales
     const params = new URLSearchParams(window.location.search);
     const urlTranslation = params.get("t");
+    const lang = i18n.language?.slice(0, 2);
     if (urlTranslation) {
       setTranslation(urlTranslation as Translation);
-    } else if (!preferencesLoading) {
+    } else if (lang && lang !== "en") {
+      // Non-English locale: always use the language-matched Bible translation
+      setTranslation(getDefaultTranslation());
+    } else if (!preferencesLoading && preferences.bible_translation) {
       setTranslation(preferences.bible_translation as Translation);
+    } else {
+      setTranslation(getDefaultTranslation());
     }
-  }, [preferences.bible_translation, preferencesLoading]);
+  }, [preferences.bible_translation, preferencesLoading, getDefaultTranslation, i18n.language]);
+
+  // Scroll to verse from URL query param after chapter loads
+  useEffect(() => {
+    if (!loading && chapterData) {
+      const params = new URLSearchParams(window.location.search);
+      const verseParam = params.get("verse");
+      if (verseParam) {
+        const verseNum = parseInt(verseParam);
+        if (!isNaN(verseNum)) {
+          setSelectedVerse(verseNum);
+          setTimeout(() => {
+            const el = document.getElementById(`verse-${verseNum}`);
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+          }, 300);
+        }
+      }
+    }
+  }, [loading, chapterData]);
 
   useEffect(() => {
     loadChapter();
@@ -226,13 +276,13 @@ export const BibleReader = () => {
         <div className="space-y-4">
           <BookOpen className="h-12 w-12 mx-auto text-muted-foreground" />
           <div>
-            <h3 className="text-lg font-semibold mb-2">Failed to load chapter</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('bible.failedToLoad')}</h3>
             <p className="text-muted-foreground mb-4">
-              {error || "Unable to load the chapter. Please try again."}
+              {error || t('bible.unableToLoad')}
             </p>
           </div>
           <RetryButton onRetry={loadChapter}>
-            Try Again
+            {t('bible.tryAgain')}
           </RetryButton>
         </div>
       </Card>
@@ -256,7 +306,7 @@ export const BibleReader = () => {
                 {book} {chapter}
               </h1>
               <p className="text-muted-foreground mt-1">
-                {chapterData.verses.length} verses
+                {chapterData.verses.length} {t('bible.verses').toLowerCase()}
               </p>
             </div>
 
@@ -281,7 +331,7 @@ export const BibleReader = () => {
                 className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
               >
                 <Bookmark className="h-4 w-4 mr-2" />
-                {isBookmarked(book, chapter) ? "Bookmarked" : "Bookmark"}
+                {isBookmarked(book, chapter) ? t('bible.bookmarked') : t('bible.bookmark')}
               </Button>
               <Button
                 variant="outline"
@@ -291,7 +341,7 @@ export const BibleReader = () => {
                 className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
+                {t('bible.previous')}
               </Button>
               <Button
                 variant="outline"
@@ -299,7 +349,7 @@ export const BibleReader = () => {
                 onClick={() => navigateChapter("next")}
                 className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
               >
-                Next
+                {t('bible.next')}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -336,66 +386,24 @@ export const BibleReader = () => {
           )}
         </div>
 
-      {/* Audio Controls */}
+      {/* Compact Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
+        {/* Study Mode Selector */}
+        <StudyModeSelector activeMode={studyMode} onModeChange={setStudyMode} />
+
+        <div className="h-6 w-px bg-border" />
+
+        {/* Audio */}
         <QuickAudioButton
           text={chapterData.verses.map(v => `Verse ${v.verse}. ${v.text}`).join(' ')}
           variant="outline"
           size="sm"
           className="gap-2"
         />
-      </div>
 
-      {/* Mode Toggles */}
-      <div className="flex gap-2 flex-wrap">
-        <Button
-          variant={strongsMode ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setStrongsMode(!strongsMode);
-            setPrincipleMode(false);
-            setChainReferenceMode(false);
-            setCommentaryMode(false);
-            setJeevesMode(false);
-          }}
-          className={strongsMode ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg" : ""}
-        >
-          <Sparkles className="h-4 w-4 mr-2" />
-          Strong's Numbers
-        </Button>
-        <Button
-          variant={principleMode ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setPrincipleMode(!principleMode);
-            setStrongsMode(false);
-            setChainReferenceMode(false);
-            setCommentaryMode(false);
-            setJeevesMode(false);
-            setSelectedVerses([]);
-            setSelectedVerse(null);
-          }}
-          className={principleMode ? "gradient-palace" : ""}
-        >
-          <BookOpen className="h-4 w-4 mr-2" />
-          Principle Mode {selectedVerses.length > 0 && `(${selectedVerses.length})`}
-        </Button>
-        <Button
-          variant={chainReferenceMode ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setChainReferenceMode(!chainReferenceMode);
-            setStrongsMode(false);
-            setPrincipleMode(false);
-            setCommentaryMode(false);
-            setJeevesMode(false);
-            setHighlightedVerses([]);
-          }}
-          className={chainReferenceMode ? "gradient-palace" : ""}
-        >
-          <Link2 className="h-4 w-4 mr-2" />
-          Links
-        </Button>
+        <div className="h-6 w-px bg-border" />
+
+        {/* Primary Actions */}
         <Button
           variant={commentaryMode ? "default" : "outline"}
           size="sm"
@@ -408,7 +416,7 @@ export const BibleReader = () => {
           className={commentaryMode ? "gradient-ocean" : ""}
         >
           <MessageSquare className="h-4 w-4 mr-2" />
-          Commentary
+          {t('bible.study')}
         </Button>
         <Button
           variant={jeevesMode ? "default" : "outline"}
@@ -419,8 +427,7 @@ export const BibleReader = () => {
             setStrongsMode(false);
             setPrincipleMode(false);
             setChainReferenceMode(false);
-            
-            // Scroll to Jeeves section when opening
+
             if (newJeevesMode) {
               setTimeout(() => {
                 jeevesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -430,37 +437,113 @@ export const BibleReader = () => {
           className={jeevesMode ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg" : ""}
         >
           <Bot className="h-4 w-4 mr-2" />
-          Ask Jeeves
+          {t('bible.askJeeves')}
         </Button>
-        {selectedVerse && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setImportDialogOpen(true)}
-            className="gradient-palace"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Import to Lesson
-          </Button>
-        )}
-        {selectedVerse && (
-          <Button
-            variant={sermonIdeasMode ? "default" : "outline"}
-            size="sm"
-            onClick={() => {
-              setSermonIdeasMode(!sermonIdeasMode);
+        <Button
+          variant={preacherMentorMode ? "default" : "outline"}
+          size="sm"
+          onClick={() => {
+            const newMode = !preacherMentorMode;
+            setPreacherMentorMode(newMode);
+            if (newMode) {
               setStrongsMode(false);
               setPrincipleMode(false);
               setChainReferenceMode(false);
               setCommentaryMode(false);
               setJeevesMode(false);
-            }}
-            className={sermonIdeasMode ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg" : ""}
-          >
-            <Flame className="h-4 w-4 mr-2" />
-            Sermon Ideas
-          </Button>
-        )}
+              setSermonIdeasMode(false);
+            }
+          }}
+          className={preacherMentorMode ? "bg-gradient-to-r from-amber-600 to-orange-500 text-white shadow-lg" : ""}
+        >
+          <Crown className="h-4 w-4 mr-2" />
+          Mentor
+        </Button>
+
+        {/* More Tools Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <MoreHorizontal className="h-4 w-4 mr-2" />
+              {t('bible.more')}
+              {(strongsMode || principleMode || chainReferenceMode || sermonIdeasMode) && (
+                <span className="ml-1 h-2 w-2 rounded-full bg-primary" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem
+              onClick={() => {
+                setStrongsMode(!strongsMode);
+                setPrincipleMode(false);
+                setChainReferenceMode(false);
+                setCommentaryMode(false);
+                setJeevesMode(false);
+              }}
+              className={strongsMode ? "bg-amber-100 dark:bg-amber-900/30" : ""}
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              {t('bible.strongsNumbers')}
+              {strongsMode && <Check className="h-4 w-4 ml-auto" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setPrincipleMode(!principleMode);
+                setStrongsMode(false);
+                setChainReferenceMode(false);
+                setCommentaryMode(false);
+                setJeevesMode(false);
+                setSelectedVerses([]);
+                setSelectedVerse(null);
+              }}
+              className={principleMode ? "bg-purple-100 dark:bg-purple-900/30" : ""}
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              {t('bible.principleMode')}
+              {principleMode && <Check className="h-4 w-4 ml-auto" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setChainReferenceMode(!chainReferenceMode);
+                setStrongsMode(false);
+                setPrincipleMode(false);
+                setCommentaryMode(false);
+                setJeevesMode(false);
+                setHighlightedVerses([]);
+              }}
+              className={chainReferenceMode ? "bg-blue-100 dark:bg-blue-900/30" : ""}
+            >
+              <Link2 className="h-4 w-4 mr-2" />
+              {t('bible.crossReferencesMode')}
+              {chainReferenceMode && <Check className="h-4 w-4 ml-auto" />}
+            </DropdownMenuItem>
+
+            {selectedVerse && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setImportDialogOpen(true)}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  {t('bible.importToLesson')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSermonIdeasMode(!sermonIdeasMode);
+                    setStrongsMode(false);
+                    setPrincipleMode(false);
+                    setChainReferenceMode(false);
+                    setCommentaryMode(false);
+                    setJeevesMode(false);
+                  }}
+                  className={sermonIdeasMode ? "bg-orange-100 dark:bg-orange-900/30" : ""}
+                >
+                  <Flame className="h-4 w-4 mr-2" />
+                  {t('bible.sermonIdeas')}
+                  {sermonIdeasMode && <Check className="h-4 w-4 ml-auto" />}
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <ImportPassageDialog
@@ -473,11 +556,29 @@ export const BibleReader = () => {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Reading Pane */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Study Mode */}
-          <StudyModeSelector activeMode={studyMode} onModeChange={setStudyMode} />
-          
-          <Card variant="glass" className={`p-6 shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
-            <div className={`space-y-4 ${fontSizeClass}`}>
+          <Card variant="glass" className={`shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
+            {/* Sticky Book Title Header */}
+            <div className="sticky top-0 z-20 bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 backdrop-blur-xl border-b border-primary/30 px-6 py-4 rounded-t-xl shadow-sm mx-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20">
+                  <BookOpen className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">
+                  {book} <span className="text-muted-foreground font-normal">· {t('bible.chapterLabel', { chapter })}</span>
+                </h2>
+              </div>
+            </div>
+
+            {/* Auto-Generated Chapter Image */}
+            <div className="px-6 pt-6">
+              <ChapterImage
+                book={book}
+                chapter={chapter}
+                chapterText={chapterData.verses.map(v => v.text).join(' ')}
+              />
+            </div>
+
+            <div className={`space-y-4 p-6 ${fontSizeClass}`}>
               {strongsMode ? (
                 chapterData.verses.map((verse) => (
                   <StrongsVerseView
@@ -527,12 +628,21 @@ export const BibleReader = () => {
           </Card>
           
           {/* Bottom Navigation */}
-          <div className="flex justify-center pt-4">
+          <div className="flex justify-center gap-3 pt-4">
+            <Button
+              onClick={() => navigateChapter("prev")}
+              disabled={chapter <= 1}
+              variant="outline"
+              className="shadow-lg hover:shadow-xl transition-all"
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              {t('bible.previousChapter')}
+            </Button>
             <Button
               onClick={() => navigateChapter("next")}
               className="gradient-palace text-white shadow-lg hover:shadow-xl transition-all"
             >
-              Next Chapter
+              {t('bible.nextChapter')}
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
@@ -540,7 +650,15 @@ export const BibleReader = () => {
 
         {/* Right Panel - Dynamic based on mode - Floating/Sticky */}
         <div className="lg:col-span-1 space-y-4 lg:space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto" ref={jeevesRef}>
-          {chainReferenceMode ? (
+          {preacherMentorMode && selectedVerse ? (
+            <PreacherMentorCard
+              book={book}
+              chapter={chapter}
+              verse={selectedVerse}
+              verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+              onClose={() => setPreacherMentorMode(false)}
+            />
+          ) : chainReferenceMode ? (
             <div className="space-y-6">
               <PTChainReferenceBox initialVerse={selectedVerse ? `${book} ${chapter}:${selectedVerse}` : `${book} ${chapter}`} />
               <ChainReferencePanel
@@ -658,12 +776,14 @@ export const BibleReader = () => {
               <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary/50" />
               <p className="text-sm">
                 {strongsMode
-                  ? "Click on words with ✨ for AI Hebrew/Greek analysis, or click Strong's numbers for definitions"
+                  ? t('bible.selectVerseStrongs')
                   : principleMode
-                  ? "Select one or more verses to analyze with Phototheology principles"
+                  ? t('bible.selectVersePrinciple')
+                  : preacherMentorMode
+                  ? "Select a verse for Preacher Mentor analysis"
                   : (jeevesMode || commentaryMode)
-                  ? "Select a verse to interact with AI commentary and ask questions"
-                  : "Select a verse to view principles, cross-references, and commentary"}
+                  ? t('bible.selectVerseAI')
+                  : t('bible.selectVerseDefault')}
               </p>
             </Card>
           )}

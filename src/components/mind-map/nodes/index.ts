@@ -5,8 +5,9 @@ import SanctuaryNode from './SanctuaryNode';
 import SanctuaryZoneNode from './SanctuaryZoneNode';
 import SanctuaryElementNode from './SanctuaryElementNode';
 import PrincipleNode from './PrincipleNode';
+import SubPrincipleNode from './SubPrincipleNode';
 
-export { RootNode, FloorNode, RoomNode, SanctuaryNode, SanctuaryZoneNode, SanctuaryElementNode, PrincipleNode };
+export { RootNode, FloorNode, RoomNode, SanctuaryNode, SanctuaryZoneNode, SanctuaryElementNode, PrincipleNode, SubPrincipleNode };
 
 // Node type mapping for React Flow
 export const nodeTypes = {
@@ -17,4 +18,5 @@ export const nodeTypes = {
   sanctuaryZoneNode: SanctuaryZoneNode,
   sanctuaryElementNode: SanctuaryElementNode,
   principleNode: PrincipleNode,
+  subPrincipleNode: SubPrincipleNode,
 };

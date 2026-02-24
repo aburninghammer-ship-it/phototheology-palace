@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -148,8 +149,9 @@ const AppTour = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="App Tour" description="Take a guided tour of the Phototheology Bible Learning Suite. Explore the 8-floor Palace, AI tools, games, and community features." />
       <Navigation />
-      
+
       <div className="container mx-auto px-4 py-12 max-w-6xl">
         {/* Header with glass effect */}
         <motion.div 

@@ -10,9 +10,9 @@ export interface AnalyticsSnapshot {
   tier_essential: number;
   tier_premium: number;
   tier_student: number;
+  tier_church: number;
   mrr_cents: number;
   patreon_active: number;
-  teachable_count: number;
   pickaxe_count: number;
   lifetime_access: number;
   total_users: number;

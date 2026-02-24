@@ -173,14 +173,29 @@ serve(async (req) => {
 
         // Only grant premium access if active patron AND meets $15/month minimum
         if (isActivePatron && meetsMinimumPledge) {
-          await supabase
-            .from("profiles")
-            .update({
+          // Update user_subscriptions table (where subscription data now lives)
+          const { error: subError } = await supabase
+            .from("user_subscriptions")
+            .upsert({
+              user_id: userId,
               subscription_tier: "premium",
               subscription_status: "active",
+              payment_source: "patreon",
               updated_at: new Date().toISOString()
-            })
-            .eq("id", userId);
+            }, { onConflict: "user_id" });
+
+          if (subError) {
+            console.error("Failed to update user_subscriptions:", subError);
+            // Fallback: try updating profiles table for backwards compatibility
+            await supabase
+              .from("profiles")
+              .update({
+                subscription_tier: "premium",
+                subscription_status: "active",
+                updated_at: new Date().toISOString()
+              })
+              .eq("id", userId);
+          }
           console.log("Granted premium access to user:", userId, "- pledge:", entitledCents, "cents");
         } else if (isActivePatron && !meetsMinimumPledge) {
           console.log("User is patron but below $15/month minimum:", userId, "- pledge:", entitledCents, "cents");

@@ -49,6 +49,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
+import { subscribeToMusicRequests } from "@/hooks/useCommentaryMusicSync";
 
 // Study Music Playlist - 10 tracks for Bible study and meditation
 const AMBIENT_TRACKS: Array<{
@@ -139,6 +140,14 @@ const AMBIENT_TRACKS: Array<{
     mood: "contemplative, ambient, eternal",
     url: "/audio/eternal-echoes.mp3",
   },
+  {
+    id: "moon-of-the-still-waters",
+    name: "Moon Of The Still Waters",
+    description: "Calm lunar meditation soundscape",
+    category: "study-music",
+    mood: "calm, meditative, serene",
+    url: "/music/Moon_Of_The_Still_Waters.mp3",
+  },
 ];
 
 interface AmbientMusicPlayerProps {
@@ -164,6 +173,9 @@ export function AmbientMusicPlayer({
   const isMobile = useIsMobile();
   
   const [isPlaying, setIsPlaying] = useState(false);
+  const isPlayingRef = useRef(false);
+  // Keep ref in sync for use in event handlers (avoids stale closures)
+  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   const [volume, setVolume] = useState(() => {
     const saved = localStorage.getItem("pt-music-volume-pct");
     if (saved) {
@@ -392,24 +404,43 @@ export function AmbientMusicPlayer({
       setCurrentTrackId(nextTrackToPlay.id);
       
       const audio = audioRef.current;
-      audio.src = nextTrackToPlay.url;
-      audio.load();
       
-      // Play after a short delay to ensure src is set
-      setTimeout(() => {
-        if (audioRef.current) {
-          audioRef.current.play()
-            .then(() => {
-              console.log('[AmbientMusic] Next track started successfully:', nextTrackToPlay.name);
-              setIsPlaying(true);
-            })
-            .catch((err) => {
-              console.error('[AmbientMusic] Failed to play next track:', err);
-              // Try again with next track after a delay
-              setTimeout(() => playNextTrackFromState(), 500);
-            });
-        }
-      }, 150);
+      // For same-track replay (single track in "all" mode), reset currentTime
+      // instead of just setting src, to ensure proper restart
+      const isSameTrack = audio.src.endsWith(nextTrackToPlay.url) || audio.src === nextTrackToPlay.url;
+      
+      if (isSameTrack) {
+        // Same track - just restart from beginning
+        audio.currentTime = 0;
+        audio.play()
+          .then(() => {
+            console.log('[AmbientMusic] Same track restarted:', nextTrackToPlay.name);
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.error('[AmbientMusic] Failed to restart track:', err);
+          });
+      } else {
+        // Different track - load new source
+        audio.src = nextTrackToPlay.url;
+        audio.load();
+        
+        // Play after a short delay to ensure src is set
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.play()
+              .then(() => {
+                console.log('[AmbientMusic] Next track started successfully:', nextTrackToPlay.name);
+                setIsPlaying(true);
+              })
+              .catch((err) => {
+                console.error('[AmbientMusic] Failed to play next track:', err);
+                // Try again with next track after a delay
+                setTimeout(() => playNextTrackFromState(), 500);
+              });
+          }
+        }, 150);
+      }
     }
   }, []);
 
@@ -435,6 +466,29 @@ export function AmbientMusicPlayer({
         // loopMode === "one" is handled by audio.loop = true (browser handles it)
       };
       
+      // Handle unexpected pauses (browser/system interruptions)
+      // This fires when the browser pauses audio due to resource competition,
+      // tab switching, or mobile OS audio session changes
+      audioRef.current.onpause = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        
+        // Only try to resume if we think we should still be playing
+        // and the track hasn't naturally ended
+        if (isPlayingRef.current && !audio.ended && audio.currentTime > 0) {
+          console.log('[AmbientMusic] Unexpected pause detected, scheduling resume...');
+          // Small delay to avoid fighting with the browser
+          setTimeout(() => {
+            if (audioRef.current && isPlayingRef.current && audioRef.current.paused && !audioRef.current.ended) {
+              console.log('[AmbientMusic] Resuming after unexpected pause');
+              audioRef.current.play().catch((err) => {
+                console.warn('[AmbientMusic] Could not resume after pause:', err);
+              });
+            }
+          }, 300);
+        }
+      };
+      
       // Handle errors
       audioRef.current.onerror = (e) => {
         console.error('[AmbientMusic] Audio error:', e);
@@ -451,6 +505,7 @@ export function AmbientMusicPlayer({
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.onended = null;
+        audioRef.current.onpause = null;
         audioRef.current.onerror = null;
         audioRef.current = null;
       }
@@ -502,15 +557,20 @@ export function AmbientMusicPlayer({
       }
     };
 
-    const interval = setInterval(keepAlive, 5000);
+    const interval = setInterval(keepAlive, 2000);
     return () => clearInterval(interval);
   }, [isPlaying]);
 
   // Update audio source when track changes - only reset src if URL actually changed
   useEffect(() => {
     if (audioRef.current && currentTrack) {
-      // Only change src if it's actually different to prevent restart
-      if (audioRef.current.src !== currentTrack.url) {
+      // Compare using resolved URLs to prevent unnecessary reloads
+      // audioRef.current.src is always absolute, currentTrack.url may be relative
+      const currentSrc = audioRef.current.src;
+      const trackUrl = currentTrack.url;
+      const isSameSrc = currentSrc.endsWith(trackUrl) || currentSrc === trackUrl;
+      
+      if (!isSameSrc) {
         const wasPlaying = isPlaying;
         audioRef.current.src = currentTrack.url;
         audioRef.current.volume = isMuted ? 0 : volume * duckMultiplier;
@@ -553,13 +613,29 @@ export function AmbientMusicPlayer({
         isInitialMount.current = false;
         return;
       }
-      // Convert from 0-100 scale to 0-1.0 (no cap, full range)
-      const normalizedVolume = Math.min(newVolume, 100) / 100;
+      // Convert from 0-100 scale to 0-0.5 (capped to match slider max)
+      const normalizedVolume = Math.min(newVolume, 50) / 100;
       console.log('[AmbientMusic] Global volume update:', newVolume, '-> normalized:', normalizedVolume);
       setVolume(normalizedVolume);
     });
     return unsubscribe;
   }, []);
+
+  // Listen for commentary music requests (auto-start music when commentary plays)
+  useEffect(() => {
+    const unsubscribe = subscribeToMusicRequests((action) => {
+      if (action === 'start' && !isPlaying && audioRef.current) {
+        console.log('[AmbientMusic] Commentary requested music start');
+        setIsEnabled(true);
+        audioRef.current.play().then(() => {
+          setIsPlaying(true);
+        }).catch((err) => {
+          console.warn('[AmbientMusic] Could not auto-start music for commentary:', err);
+        });
+      }
+    });
+    return unsubscribe;
+  }, [isPlaying]);
 
   // Update loop setting - only update the loop property, onended is set once at init
   useEffect(() => {
@@ -889,17 +965,21 @@ export function AmbientMusicPlayer({
       <Popover open={showControls} onOpenChange={setShowControls}>
         <PopoverTrigger asChild>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             className={cn(
-              "relative",
-              isPlaying && "text-primary",
+              "relative h-11 w-11 rounded-full border-2 border-primary/50 bg-primary/15 hover:bg-primary/25 text-primary shadow-lg shadow-primary/25 transition-all duration-300",
+              isPlaying && "border-primary bg-primary/25 shadow-xl shadow-primary/40 ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
+              !isPlaying && "animate-[pulse_3s_ease-in-out_infinite]",
               className
             )}
           >
-            <Music className="h-5 w-5" />
+            <Music className="h-6 w-6" />
             {isPlaying && (
-              <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full animate-pulse" />
+              <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full animate-ping" />
+            )}
+            {!isPlaying && (
+              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 bg-primary/70 rounded-full" />
             )}
           </Button>
         </PopoverTrigger>
@@ -1330,7 +1410,7 @@ export function AmbientMusicPlayer({
                     ))}
                   </SelectContent>
                 </Select>
-                
+
 
                 {/* Playlist Selection */}
                 <div className="border rounded-md p-2 bg-muted/30">
@@ -1424,7 +1504,7 @@ export function AmbientMusicPlayer({
                   </div>
                 </div>
 
-                {/* Mobile Volume Control - Preset Buttons */}
+                {/* Mobile Volume Control - Slider + Presets */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium flex items-center gap-2">
@@ -1435,12 +1515,33 @@ export function AmbientMusicPlayer({
                       {Math.round(volume * 100)}%
                     </span>
                   </div>
+                  <Slider
+                    value={[volume]}
+                    min={0}
+                    max={0.5}
+                    step={0.01}
+                    onValueChange={(value) => {
+                      const newVolume = value[0];
+                      setVolume(newVolume);
+                      if (newVolume > 0 && isMuted) setIsMuted(false);
+                      if (newVolume === 0) setIsMuted(true);
+                      const effectiveVolume = newVolume * duckMultiplier;
+                      if (gainNodeRef.current) {
+                        gainNodeRef.current.gain.value = effectiveVolume;
+                      } else if (audioRef.current) {
+                        audioRef.current.volume = effectiveVolume;
+                      }
+                      localStorage.setItem("pt-music-volume-pct", Math.round(newVolume * 100).toString());
+                    }}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    className="w-full touch-manipulation [&_[role=slider]]:h-6 [&_[role=slider]]:w-6"
+                  />
                   <div className="flex items-center gap-1">
                     <Button
                       variant={getCurrentPreset() === 'off' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('off')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       <VolumeX className="h-3 w-3 mr-1" />
                       Off
@@ -1449,7 +1550,7 @@ export function AmbientMusicPlayer({
                       variant={getCurrentPreset() === 'low' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('low')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       5%
                     </Button>
@@ -1457,7 +1558,7 @@ export function AmbientMusicPlayer({
                       variant={getCurrentPreset() === 'med' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('med')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       15%
                     </Button>
@@ -1465,7 +1566,7 @@ export function AmbientMusicPlayer({
                       variant={getCurrentPreset() === 'high' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setVolumePreset('high')}
-                      className="h-8 flex-1 text-xs"
+                      className="h-7 flex-1 text-xs"
                     >
                       30%
                     </Button>

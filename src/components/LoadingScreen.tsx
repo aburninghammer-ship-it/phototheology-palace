@@ -2,6 +2,7 @@ import { Loader2 } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { Skeleton } from "./ui/skeleton";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface LoadingScreenProps {
   message?: string;
@@ -9,11 +10,13 @@ interface LoadingScreenProps {
   variant?: "default" | "skeleton";
 }
 
-export const LoadingScreen = ({ 
-  message = "Loading...", 
+export const LoadingScreen = ({
+  message,
   progress,
-  variant = "default" 
+  variant = "default"
 }: LoadingScreenProps) => {
+  const { t } = useTranslation();
+  const displayMessage = message ?? t('common.loading');
   if (variant === "skeleton") {
     return (
       <div className="min-h-screen bg-background p-8">
@@ -83,15 +86,15 @@ export const LoadingScreen = ({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 1 }}
           >
-            "Knowledge shall be increased"
+            {t('loadingScreen.knowledgeIncreased')}
           </motion.p>
-          <motion.span 
+          <motion.span
             className="text-sm text-muted-foreground block mt-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.5 }}
           >
-            — Daniel 12:4
+            — {t('loadingScreen.danielRef')}
           </motion.span>
         </motion.div>
 
@@ -102,7 +105,7 @@ export const LoadingScreen = ({
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4, duration: 0.5 }}
         >
-          {message}
+          {displayMessage}
         </motion.p>
 
         {progress !== undefined && (

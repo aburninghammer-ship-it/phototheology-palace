@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { 
-  Users, 
-  PlayCircle, 
-  Trophy, 
+import {
+  Users,
+  PlayCircle,
+  Trophy,
   Loader2,
   Plus,
   Share2
@@ -32,6 +33,7 @@ interface Game {
 }
 
 export default function PrincipleCards() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -131,15 +133,15 @@ export default function PrincipleCards() {
       if (playerError) throw playerError;
 
       toast({
-        title: "Game Created!",
-        description: "Waiting for players to join..."
+        title: t('principles.gameCreated'),
+        description: t('principles.waitingForPlayers')
       });
 
       navigate(`/games/principle-cards/game/${game.id}`);
     } catch (error: any) {
       console.error("Error creating game:", error);
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive"
       });
@@ -162,15 +164,15 @@ export default function PrincipleCards() {
       if (error) throw error;
 
       toast({
-        title: "Joined Game!",
-        description: "Get ready to play!"
+        title: t('principles.joinedGame'),
+        description: t('principles.getReadyToPlay')
       });
 
       navigate(`/games/principle-cards/game/${gameId}`);
     } catch (error: any) {
       console.error("Error joining game:", error);
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive"
       });
@@ -186,19 +188,19 @@ export default function PrincipleCards() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl font-bold mb-2">Principle Cards</h1>
+              <h1 className="text-4xl font-bold mb-2">{t('principles.title')}</h1>
               <p className="text-muted-foreground">
-                Multiplayer game where principles become cards - match them to scenarios!
+                {t('principles.subtitle')}
               </p>
             </div>
             <Button onClick={() => navigate("/games/principle-cards/tournaments")} variant="outline" size="lg">
               <Trophy className="w-5 h-5 mr-2" />
-              Tournaments
+              {t('principles.tournaments')}
             </Button>
           </div>
           <SocialShareButton
-            title="Join me in Principle Cards!"
-            description="A fun multiplayer game where biblical principles become cards. Test your knowledge and compete with friends!"
+            title={t('principles.shareTitle')}
+            description={t('principles.shareDescription')}
             url={window.location.origin + "/games/principle-cards"}
             variant="dropdown"
             size="sm"
@@ -209,12 +211,12 @@ export default function PrincipleCards() {
         <Card className="p-6 mb-8">
           <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
             <Plus className="w-6 h-6" />
-            Create New Game
+            {t('principles.createNewGame')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">
-                Max Players
+                {t('principles.maxPlayers')}
               </label>
               <Input
                 type="number"
@@ -226,7 +228,7 @@ export default function PrincipleCards() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">
-                Total Rounds
+                {t('principles.totalRounds')}
               </label>
               <Input
                 type="number"
@@ -245,12 +247,12 @@ export default function PrincipleCards() {
                 {creating ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
+                    {t('common.creating')}
                   </>
                 ) : (
                   <>
                     <PlayCircle className="w-4 h-4 mr-2" />
-                    Create Game
+                    {t('principles.createGame')}
                   </>
                 )}
               </Button>
@@ -260,7 +262,7 @@ export default function PrincipleCards() {
 
         {/* Active Games */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Active Games</h2>
+          <h2 className="text-2xl font-semibold mb-4">{t('principles.activeGames')}</h2>
           
           {loading ? (
             <div className="text-center py-12">
@@ -270,7 +272,7 @@ export default function PrincipleCards() {
             <Card className="p-12 text-center">
               <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
               <p className="text-muted-foreground">
-                No active games. Create one to get started!
+                {t('principles.noActiveGames')}
               </p>
             </Card>
           ) : (
@@ -283,7 +285,7 @@ export default function PrincipleCards() {
                         {game.host_display_name}'s Game
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Room: {game.room_id.toUpperCase()}
+                        {t('principles.room')}: {game.room_id.toUpperCase()}
                       </p>
                     </div>
                     <Badge variant={game.status === "waiting" ? "secondary" : "default"}>
@@ -294,10 +296,10 @@ export default function PrincipleCards() {
                   <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Users className="w-4 h-4" />
-                      {game.player_count}/{game.max_players} Players
+                      {t('principles.playersCount', { current: game.player_count, max: game.max_players })}
                     </span>
                     <span>
-                      {game.total_rounds} Rounds
+                      {t('principles.roundsCount', { count: game.total_rounds })}
                     </span>
                   </div>
 
@@ -308,7 +310,7 @@ export default function PrincipleCards() {
                         className="flex-1"
                       >
                         <PlayCircle className="w-4 h-4 mr-2" />
-                        Join Game
+                        {t('principles.joinGame')}
                       </Button>
                     )}
                     <Button
@@ -316,7 +318,7 @@ export default function PrincipleCards() {
                       variant="outline"
                       className="flex-1"
                     >
-                      View Game
+                      {t('principles.viewGame')}
                     </Button>
                   </div>
                 </Card>
@@ -327,22 +329,22 @@ export default function PrincipleCards() {
 
         {/* How to Play */}
         <Card className="mt-8 p-6">
-          <h3 className="text-xl font-semibold mb-4">How to Play</h3>
+          <h3 className="text-xl font-semibold mb-4">{t('principles.howToPlay')}</h3>
           <div className="space-y-3 text-sm text-muted-foreground">
             <p>
-              <strong>1. Create or Join:</strong> Start a new game or join an existing one
+              <strong>{t('principles.step1Title')}</strong> {t('principles.step1Description')}
             </p>
             <p>
-              <strong>2. Draw Cards:</strong> Each round, a new principle card is revealed
+              <strong>{t('principles.step2Title')}</strong> {t('principles.step2Description')}
             </p>
             <p>
-              <strong>3. Match Scenario:</strong> First player to correctly apply the principle to the scenario wins the round
+              <strong>{t('principles.step3Title')}</strong> {t('principles.step3Description')}
             </p>
             <p>
-              <strong>4. Score Points:</strong> Win rounds to earn points and cards
+              <strong>{t('principles.step4Title')}</strong> {t('principles.step4Description')}
             </p>
             <p>
-              <strong>5. Win the Game:</strong> Player with the most points after all rounds wins!
+              <strong>{t('principles.step5Title')}</strong> {t('principles.step5Description')}
             </p>
           </div>
         </Card>

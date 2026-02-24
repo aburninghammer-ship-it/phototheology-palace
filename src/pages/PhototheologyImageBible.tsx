@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ interface FlashcardProps {
 }
 
 function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode = false, dynamicImageUrl, hideReference = false }: FlashcardProps) {
+  const { t } = useTranslation();
   const isLarge = size === "large";
   const hasImage = !!(dynamicImageUrl || chapter.imageUrl);
 
@@ -93,13 +95,13 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
               )}
               <div className="absolute bottom-4 right-4">
                 <span className="text-xs text-muted-foreground bg-white/80 dark:bg-black/60 dark:text-white/70 px-2 py-1 rounded">
-                  Tap to see theme
+                  {t('imageBible.tapToSeeTheme')}
                 </span>
               </div>
               {memoryTestMode && (
                 <div className="absolute top-4 left-0 right-0 text-center">
                   <p className="text-white text-lg bg-black/70 px-4 py-2 rounded-full inline-block font-semibold">
-                    What is happening in this chapter?
+                    {t('imageBible.whatIsHappening')}
                   </p>
                 </div>
               )}
@@ -114,9 +116,9 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
                   {chapter.book} {chapter.chapter}
                 </Badge>
               )}
-              <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
+              <p className="text-white/70 text-sm mt-2">{t('imageBible.tapToSeeTheme')}</p>
               {memoryTestMode && (
-                <p className="text-white text-lg mt-4 font-semibold">What is happening in this chapter?</p>
+                <p className="text-white text-lg mt-4 font-semibold">{t('imageBible.whatIsHappening')}</p>
               )}
             </div>
           )}
@@ -154,7 +156,7 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
             </div>
           </div>
 
-          <p className="text-white/70 text-sm mt-3 text-center">Tap to see image</p>
+          <p className="text-white/70 text-sm mt-3 text-center">{t('imageBible.tapToSeeImage')}</p>
         </div>
       </motion.div>
     </div>
@@ -196,6 +198,7 @@ interface TestSession {
 }
 
 export default function PhototheologyImageBible() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
@@ -386,11 +389,11 @@ export default function PhototheologyImageBible() {
         <div className="flex items-center justify-between p-4 border-b border-white/10">
           <Button variant="ghost" onClick={() => setIsFullscreen(false)} className="text-white">
             <Minimize2 className="h-5 w-5 mr-2" />
-            Exit Fullscreen
+            {t('imageBible.exitFullscreen')}
           </Button>
           <div className="flex items-center gap-4">
             <div className="text-white text-lg font-medium">
-              {memoryTestMode ? "Memory Test Mode" : `${currentChapter.book} ${currentChapter.chapter} - ${currentChapter.theme}`}
+              {memoryTestMode ? t('imageBible.memoryTestMode') : `${currentChapter.book} ${currentChapter.chapter} - ${currentChapter.theme}`}
             </div>
             <Button
               variant={memoryTestMode ? "default" : "outline"}
@@ -399,7 +402,7 @@ export default function PhototheologyImageBible() {
               className={memoryTestMode ? "bg-purple-600 hover:bg-purple-700" : "border-white/20 text-white hover:bg-white/10"}
             >
               {memoryTestMode ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
-              {memoryTestMode ? "Show Labels" : "Memory Test"}
+              {memoryTestMode ? t('imageBible.showLabels') : t('imageBible.memoryTest')}
             </Button>
           </div>
           <div className="text-white/60">
@@ -429,7 +432,7 @@ export default function PhototheologyImageBible() {
             className="border-white/20 text-white hover:bg-white/10"
           >
             <ChevronLeft className="h-6 w-6 mr-2" />
-            Previous
+            {t('imageBible.previous')}
           </Button>
           <Button
             onClick={() => setIsFlipped(!isFlipped)}
@@ -438,7 +441,7 @@ export default function PhototheologyImageBible() {
             className="border-white/20 text-white hover:bg-white/10"
           >
             <RotateCcw className="h-5 w-5 mr-2" />
-            Flip Card
+            {t('imageBible.flipCard')}
           </Button>
           <Button
             onClick={goToNext}
@@ -447,7 +450,7 @@ export default function PhototheologyImageBible() {
             size="lg"
             className="border-white/20 text-white hover:bg-white/10"
           >
-            Next
+            {t('imageBible.next')}
             <ChevronRight className="h-6 w-6 ml-2" />
           </Button>
         </div>
@@ -464,20 +467,20 @@ export default function PhototheologyImageBible() {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-5 w-5 mr-2" />
-              Back
+              {t('imageBible.back')}
             </Button>
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
                 <Sparkles className="h-8 w-8 text-purple-600" />
-                Phototheology Image Bible
+                {t('imageBible.title')}
               </h1>
               <p className="text-muted-foreground mt-1">
-                Every chapter visualized as a memory device
+                {t('imageBible.subtitle')}
               </p>
             </div>
           </div>
           <Badge variant="outline" className="text-lg px-4 py-2">
-            {totalChapters} Chapters
+            {t('imageBible.chaptersCount', { count: totalChapters })}
           </Badge>
         </div>
 
@@ -486,19 +489,19 @@ export default function PhototheologyImageBible() {
           <TabsList className="grid w-full max-w-lg grid-cols-4">
             <TabsTrigger value="browse" className="flex items-center gap-2">
               <Layers className="h-4 w-4" />
-              Browse
+              {t('imageBible.browse')}
             </TabsTrigger>
             <TabsTrigger value="study" className="flex items-center gap-2">
               <Eye className="h-4 w-4" />
-              Study
+              {t('imageBible.study')}
             </TabsTrigger>
             <TabsTrigger value="grid" className="flex items-center gap-2">
               <Grid3X3 className="h-4 w-4" />
-              At a Glance
+              {t('imageBible.atAGlance')}
             </TabsTrigger>
             <TabsTrigger value="test" className="flex items-center gap-2">
               <Target className="h-4 w-4" />
-              Test
+              {t('imageBible.test')}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -510,7 +513,7 @@ export default function PhototheologyImageBible() {
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search themes, summaries, verses..."
+                placeholder={t('imageBible.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -521,7 +524,7 @@ export default function PhototheologyImageBible() {
             {searchResults.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Search Results ({searchResults.length})</CardTitle>
+                  <CardTitle className="text-lg">{t('imageBible.searchResults', { count: searchResults.length })}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -535,7 +538,7 @@ export default function PhototheologyImageBible() {
                   </div>
                   {searchResults.length > 12 && (
                     <p className="text-sm text-muted-foreground mt-3 text-center">
-                      +{searchResults.length - 12} more results
+                      {t('imageBible.moreResults', { count: searchResults.length - 12 })}
                     </p>
                   )}
                 </CardContent>
@@ -553,9 +556,9 @@ export default function PhototheologyImageBible() {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <Badge variant={book.testament === "OT" ? "secondary" : "default"}>
-                        {book.testament === "OT" ? "Old Testament" : "New Testament"}
+                        {book.testament === "OT" ? t('imageBible.oldTestament') : t('imageBible.newTestament')}
                       </Badge>
-                      <Badge variant="outline">{book.totalChapters} chapters</Badge>
+                      <Badge variant="outline">{t('imageBible.chaptersCount', { count: book.totalChapters })}</Badge>
                     </div>
                     <CardTitle className="text-2xl flex items-center gap-3">
                       <BookOpen className="h-6 w-6 text-primary" />
@@ -588,7 +591,7 @@ export default function PhototheologyImageBible() {
                     </div>
                     <Button className="w-full" variant="outline">
                       <Eye className="h-4 w-4 mr-2" />
-                      Study This Book
+                      {t('imageBible.studyThisBook')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -600,11 +603,11 @@ export default function PhototheologyImageBible() {
               <CardContent className="py-8 text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Sparkles className="h-6 w-6 text-green-600" />
-                  <h3 className="text-xl font-bold text-green-700 dark:text-green-400">Complete 66-Book Bible!</h3>
+                  <h3 className="text-xl font-bold text-green-700 dark:text-green-400">{t('imageBible.completeBible')}</h3>
                   <Sparkles className="h-6 w-6 text-green-600" />
                 </div>
                 <p className="text-muted-foreground">
-                  All 1,189 chapters from Genesis to Revelation with unique visual memory icons.
+                  {t('imageBible.completeBibleDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -617,13 +620,13 @@ export default function PhototheologyImageBible() {
             <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 flex items-center justify-center">
               <BookOpen className="h-16 w-16 text-purple-400" />
             </div>
-            <h2 className="text-2xl font-bold mb-3">Select a Book to Study</h2>
+            <h2 className="text-2xl font-bold mb-3">{t('imageBible.selectBookToStudy')}</h2>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Choose a book from the Browse tab, or click any chapter in the At a Glance view to start studying flashcards.
+              {t('imageBible.selectBookDescription')}
             </p>
             <Button onClick={() => setViewMode("browse")} variant="default" size="lg">
               <Layers className="h-5 w-5 mr-2" />
-              Browse Books
+              {t('imageBible.browseBooks')}
             </Button>
           </div>
         )}
@@ -634,7 +637,7 @@ export default function PhototheologyImageBible() {
             <div className="flex items-center justify-between">
               <Button variant="outline" onClick={exitStudyMode}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Books
+                {t('imageBible.backToBooks')}
               </Button>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-lg">
@@ -649,12 +652,12 @@ export default function PhototheologyImageBible() {
                   onClick={() => setMemoryTestMode(!memoryTestMode)}
                 >
                   {memoryTestMode ? <Eye className="h-4 w-4 mr-1" /> : <EyeOff className="h-4 w-4 mr-1" />}
-                  {memoryTestMode ? "Show" : "Test"}
+                  {memoryTestMode ? t('imageBible.show') : t('imageBible.test')}
                 </Button>
               </div>
               <Button variant="outline" onClick={() => setIsFullscreen(true)}>
                 <Maximize2 className="h-4 w-4 mr-2" />
-                Fullscreen
+                {t('imageBible.fullscreen')}
               </Button>
             </div>
 
@@ -679,7 +682,7 @@ export default function PhototheologyImageBible() {
                 size="lg"
               >
                 <ChevronLeft className="h-5 w-5 mr-2" />
-                Previous
+                {t('imageBible.previous')}
               </Button>
               <Button
                 onClick={() => setIsFlipped(!isFlipped)}
@@ -687,7 +690,7 @@ export default function PhototheologyImageBible() {
                 size="lg"
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
-                Flip Card
+                {t('imageBible.flipCard')}
               </Button>
               <Button
                 onClick={goToNext}
@@ -695,7 +698,7 @@ export default function PhototheologyImageBible() {
                 variant="outline"
                 size="lg"
               >
-                Next
+                {t('imageBible.next')}
                 <ChevronRight className="h-5 w-5 ml-2" />
               </Button>
             </div>
@@ -703,7 +706,7 @@ export default function PhototheologyImageBible() {
             {/* Chapter Quick Select */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Jump to Chapter</CardTitle>
+                <CardTitle className="text-lg">{t('imageBible.jumpToChapter')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-24">
@@ -736,7 +739,7 @@ export default function PhototheologyImageBible() {
               <div key={book.name}>
                 <div className="flex items-center gap-3 mb-4">
                   <h2 className="text-2xl font-bold">{book.name}</h2>
-                  <Badge variant="outline">{book.totalChapters} chapters</Badge>
+                  <Badge variant="outline">{t('imageBible.chaptersCount', { count: book.totalChapters })}</Badge>
                 </div>
                 <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
                   {book.chapters.map((chapter) => {
@@ -792,32 +795,32 @@ export default function PhototheologyImageBible() {
                   <CardHeader>
                     <CardTitle className="text-2xl flex items-center gap-3">
                       <Target className="h-7 w-7 text-primary" />
-                      Test Your Memory
+                      {t('imageBible.testYourMemory')}
                     </CardTitle>
                     <CardDescription>
-                      Select books and chapters to create a custom flashcard test. See the image or icon, then recall the chapter!
+                      {t('imageBible.testDescription')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {/* Quick Selection Buttons */}
                     <div className="flex flex-wrap gap-2">
                       <Button variant="outline" size="sm" onClick={selectAllBooks}>
-                        Select All
+                        {t('imageBible.selectAll')}
                       </Button>
                       <Button variant="outline" size="sm" onClick={selectOTBooks}>
-                        Old Testament
+                        {t('imageBible.oldTestament')}
                       </Button>
                       <Button variant="outline" size="sm" onClick={selectNTBooks}>
-                        New Testament
+                        {t('imageBible.newTestament')}
                       </Button>
                       <Button variant="outline" size="sm" onClick={clearBookSelection}>
-                        Clear All
+                        {t('imageBible.clearAll')}
                       </Button>
                     </div>
 
                     {/* Book Selection Grid */}
                     <div>
-                      <h4 className="font-semibold mb-3">Select Books:</h4>
+                      <h4 className="font-semibold mb-3">{t('imageBible.selectBooks')}</h4>
                       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
                         {imageBibleBooks.map((book) => (
                           <div
@@ -844,10 +847,10 @@ export default function PhototheologyImageBible() {
 
                     {/* Chapter Range */}
                     <div>
-                      <h4 className="font-semibold mb-3">Chapter Range (optional):</h4>
+                      <h4 className="font-semibold mb-3">{t('imageBible.chapterRangeOptional')}</h4>
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">From:</span>
+                          <span className="text-sm text-muted-foreground">{t('imageBible.from')}</span>
                           <Input
                             type="number"
                             min={1}
@@ -858,7 +861,7 @@ export default function PhototheologyImageBible() {
                           />
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">To:</span>
+                          <span className="text-sm text-muted-foreground">{t('imageBible.to')}</span>
                           <Input
                             type="number"
                             min={1}
@@ -870,7 +873,7 @@ export default function PhototheologyImageBible() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2">
-                        Limits which chapter numbers are included from each selected book.
+                        {t('imageBible.chapterRangeHelp')}
                       </p>
                     </div>
 
@@ -878,9 +881,9 @@ export default function PhototheologyImageBible() {
                     <div className="p-4 rounded-lg bg-muted/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium">Test Summary</p>
+                          <p className="font-medium">{t('imageBible.testSummary')}</p>
                           <p className="text-sm text-muted-foreground">
-                            {selectedBooksForTest.length} books selected • {testChaptersCount} total chapters
+                            {t('imageBible.testSummaryDetail', { books: selectedBooksForTest.length, chapters: testChaptersCount })}
                           </p>
                         </div>
                         <div className="flex gap-2">
@@ -890,7 +893,7 @@ export default function PhototheologyImageBible() {
                             className="gap-2"
                           >
                             <Shuffle className="h-4 w-4" />
-                            Start Shuffled
+                            {t('imageBible.startShuffled')}
                           </Button>
                           <Button
                             onClick={() => startTest(false)}
@@ -899,7 +902,7 @@ export default function PhototheologyImageBible() {
                             className="gap-2"
                           >
                             <Play className="h-4 w-4" />
-                            Start In Order
+                            {t('imageBible.startInOrder')}
                           </Button>
                         </div>
                       </div>
@@ -912,13 +915,13 @@ export default function PhototheologyImageBible() {
                   <CardContent className="pt-6">
                     <h4 className="font-semibold mb-2 flex items-center gap-2">
                       <Brain className="h-5 w-5 text-amber-600" />
-                      Test Tips
+                      {t('imageBible.testTips')}
                     </h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>Look at the image/icons and try to recall the book and chapter</li>
-                      <li>Tap the card to reveal the answer</li>
-                      <li>Mark yourself correct or incorrect to track your progress</li>
-                      <li>Review your results at the end to see areas for improvement</li>
+                      <li>{t('imageBible.testTip1')}</li>
+                      <li>{t('imageBible.testTip2')}</li>
+                      <li>{t('imageBible.testTip3')}</li>
+                      <li>{t('imageBible.testTip4')}</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -944,7 +947,7 @@ export default function PhototheologyImageBible() {
                         </div>
                       </div>
                       <Button variant="outline" size="sm" onClick={resetTest}>
-                        End Test
+                        {t('imageBible.endTest')}
                       </Button>
                     </div>
                     <Progress
@@ -976,7 +979,7 @@ export default function PhototheologyImageBible() {
                   {!testIsFlipped ? (
                     <Button onClick={() => setTestIsFlipped(true)} size="lg" className="px-8">
                       <RotateCcw className="h-5 w-5 mr-2" />
-                      Reveal Answer
+                      {t('imageBible.revealAnswer')}
                     </Button>
                   ) : (
                     <>
@@ -987,7 +990,7 @@ export default function PhototheologyImageBible() {
                         className="border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
                         <XCircle className="h-5 w-5 mr-2" />
-                        Incorrect
+                        {t('imageBible.incorrect')}
                       </Button>
                       <Button
                         onClick={() => markTestAnswer(true)}
@@ -995,7 +998,7 @@ export default function PhototheologyImageBible() {
                         className="bg-green-600 hover:bg-green-700"
                       >
                         <CheckCircle2 className="h-5 w-5 mr-2" />
-                        Correct
+                        {t('imageBible.correct')}
                       </Button>
                     </>
                   )}
@@ -1009,30 +1012,30 @@ export default function PhototheologyImageBible() {
                 <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
                   <CardContent className="py-8 text-center">
                     <Trophy className="h-16 w-16 mx-auto mb-4 text-amber-500" />
-                    <h2 className="text-3xl font-bold mb-2">Test Complete!</h2>
+                    <h2 className="text-3xl font-bold mb-2">{t('imageBible.testComplete')}</h2>
                     <div className="flex items-center justify-center gap-6 mt-4">
                       <div className="text-center">
                         <div className="text-4xl font-bold text-green-600">{testSession.correct}</div>
-                        <div className="text-sm text-muted-foreground">Correct</div>
+                        <div className="text-sm text-muted-foreground">{t('imageBible.correct')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-4xl font-bold text-red-600">{testSession.incorrect}</div>
-                        <div className="text-sm text-muted-foreground">Incorrect</div>
+                        <div className="text-sm text-muted-foreground">{t('imageBible.incorrect')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-4xl font-bold text-primary">
                           {Math.round((testSession.correct / testSession.chapters.length) * 100)}%
                         </div>
-                        <div className="text-sm text-muted-foreground">Score</div>
+                        <div className="text-sm text-muted-foreground">{t('imageBible.score')}</div>
                       </div>
                     </div>
                     <div className="flex items-center justify-center gap-4 mt-6">
                       <Button onClick={resetTest} variant="outline" size="lg">
-                        New Test
+                        {t('imageBible.newTest')}
                       </Button>
                       <Button onClick={() => startTest(true)} size="lg">
                         <RotateCcw className="h-4 w-4 mr-2" />
-                        Retry Same Test
+                        {t('imageBible.retrySameTest')}
                       </Button>
                     </div>
                   </CardContent>
@@ -1044,7 +1047,7 @@ export default function PhototheologyImageBible() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <BarChart3 className="h-5 w-5" />
-                        Review Missed Questions
+                        {t('imageBible.reviewMissedQuestions')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -1089,13 +1092,13 @@ export default function PhototheologyImageBible() {
             <CardContent className="pt-6">
               <h4 className="font-semibold mb-2 flex items-center gap-2">
                 <Brain className="h-5 w-5 text-blue-500" />
-                Memory Tips
+                {t('imageBible.memoryTips')}
               </h4>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>Each chapter has a unique visual icon - no two chapters look alike!</li>
-                <li>Study the icon first, then flip to learn the theme and summary</li>
-                <li>Use the "At a Glance" view to quickly scan entire books</li>
-                <li>Use "Test" mode to quiz yourself on chapter recognition</li>
+                <li>{t('imageBible.memoryTip1')}</li>
+                <li>{t('imageBible.memoryTip2')}</li>
+                <li>{t('imageBible.memoryTip3')}</li>
+                <li>{t('imageBible.memoryTip4')}</li>
               </ul>
             </CardContent>
           </Card>

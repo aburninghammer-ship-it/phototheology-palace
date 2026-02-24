@@ -12,24 +12,24 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SYNC-STRIPE-SUBSCRIPTIONS] ${step}${detailsStr}`);
 };
 
-// Price ID to tier mapping
+// Price ID to tier mapping - PHOTOTHEOLOGY APP ONLY (excludes SamCart/external)
 const priceToTier: Record<string, string> = {
-  // Essential tier
-  'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential', // Essential monthly
-  'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential', // Essential annual
-  'price_1SKn0VFGDAd3RU8Io19mT9No': 'essential', // Legacy essential monthly
-  // Premium tier
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium', // Premium monthly
-  'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium', // Premium annual
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'premium', // Legacy premium annual
-  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': 'premium', // Older premium
-  'price_1ONjHsFGDAd3RU8IsHMybTX6': 'premium', // Legacy premium
-  // Student tier
-  'price_1SKWM6FGDAd3RU8IcmNNhmKO': 'student',
-  'price_1SKWMLFGDAd3RU8IBXO8pKxd': 'student',
+  // Current subscriptions
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential',
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential',
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium',
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium',
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': 'student',
+  // Legacy Phototheology App subscriptions
+  'price_1SKn0VFGDAd3RU8Io19mT9No': 'premium',
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'essential',
+  // Church tiers
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': 'church',
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': 'church',
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': 'church',
 };
 
-const appPriceIds = Object.keys(priceToTier);
+const appPriceIds = new Set(Object.keys(priceToTier));
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -113,8 +113,11 @@ serve(async (req) => {
       
       // Filter to only our app's subscriptions
       const appSubs = batch.data.filter((sub: any) => {
-        const priceId = sub.items.data[0]?.price?.id;
-        return appPriceIds.includes(priceId);
+        const items = sub?.items?.data || [];
+        return items.some((item: any) => {
+          const priceId = item?.price?.id;
+          return typeof priceId === 'string' && appPriceIds.has(priceId);
+        });
       });
       
       allStripeSubscriptions.push(...appSubs);
@@ -139,8 +142,11 @@ serve(async (req) => {
       
       // Filter to only our app's subscriptions
       const appSubs = batch.data.filter((sub: any) => {
-        const priceId = sub.items.data[0]?.price?.id;
-        return appPriceIds.includes(priceId);
+        const items = sub?.items?.data || [];
+        return items.some((item: any) => {
+          const priceId = item?.price?.id;
+          return typeof priceId === 'string' && appPriceIds.has(priceId);
+        });
       });
       
       allStripeSubscriptions.push(...appSubs);
@@ -227,8 +233,21 @@ serve(async (req) => {
         }
 
         // Determine tier from price
-        const priceId = sub.items.data[0]?.price?.id;
-        const tier = priceToTier[priceId || ""] || "premium";
+        const priceId = (sub.items.data || [])
+          .map((item: any) => item?.price?.id)
+          .find((id: any) => typeof id === 'string' && appPriceIds.has(id));
+
+        if (!priceId) {
+          // Shouldn't happen due to earlier filtering, but keep safe.
+          logStep("Skipping subscription without Phototheology price", { subscriptionId: sub.id });
+          continue;
+        }
+
+        const tier = priceToTier[priceId];
+        if (!tier) {
+          logStep("Skipping subscription with unmapped Phototheology price", { subscriptionId: sub.id, priceId });
+          continue;
+        }
         const isTrialing = sub.status === "trialing";
 
         // Safely create renewal date

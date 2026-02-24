@@ -157,6 +157,12 @@ const PRINCIPLE_OPTIONS = [
 ];
 
 const COMMENTARY_OPTIONS = [
+  // SDA Commentaries
+  { value: "sop", label: "Spirit of Prophecy (EGW)" },
+  { value: "sdabc", label: "SDA Bible Commentary" },
+  { value: "uriah-smith", label: "Uriah Smith (Daniel & Revelation)" },
+  { value: "jn-andrews", label: "J.N. Andrews (Prophecy)" },
+  // Classic Commentaries
   { value: "clarke", label: "Adam Clarke's Commentary" },
   { value: "barnes", label: "Albert Barnes' Notes" },
   { value: "gill", label: "John Gill's Exposition" },
@@ -168,13 +174,36 @@ const COMMENTARY_OPTIONS = [
   { value: "cambridge", label: "Cambridge Bible for Schools" },
   { value: "ellicott", label: "Ellicott's Commentary" },
   { value: "benson", label: "Benson Commentary" },
-  { value: "sop", label: "Spirit of Prophecy (SOP)" },
 ];
 
 const WORD_LENGTH_OPTIONS = [
   { value: "short", label: "Short (~250 words)", maxWords: 250 },
   { value: "medium", label: "Medium (~450 words)", maxWords: 450 },
   { value: "long", label: "Long (~650 words)", maxWords: 650 },
+];
+
+const COMMENTARY_DEPTH_OPTIONS = [
+  {
+    value: "surface",
+    label: "Surface",
+    description: "Quick overview - key themes and basic meaning",
+    icon: "📖",
+    color: "bg-blue-500"
+  },
+  {
+    value: "intermediate",
+    label: "Intermediate",
+    description: "Balanced analysis with context and application",
+    icon: "📚",
+    color: "bg-purple-500"
+  },
+  {
+    value: "depth",
+    label: "Deep Analysis",
+    description: "Comprehensive study with Greek/Hebrew, cross-references, and theological depth",
+    icon: "🔬",
+    color: "bg-amber-500"
+  },
 ];
 
 interface CommentaryPanelProps {
@@ -198,6 +227,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   const [activeDimensions, setActiveDimensions] = useState<string[]>(["2D"]); // Default to Christ dimension
   const [deepPalaceLength, setDeepPalaceLength] = useState<string>("medium");
   const [showHiddenStructure, setShowHiddenStructure] = useState(false);
+  const [commentaryDepth, setCommentaryDepth] = useState<"surface" | "intermediate" | "depth">("intermediate");
   const { toast } = useToast();
 
   // Check which commentaries are available for this specific verse
@@ -232,8 +262,9 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         setAvailableCommentaries(data.available || []);
       } catch (error) {
         console.error("[Commentary] Error checking commentary availability:", error);
-        // Default to all if check fails - don't block the user
-        setAvailableCommentaries(COMMENTARY_OPTIONS.map(c => c.value));
+        // If check fails, show empty array - don't show misleading checkmarks
+        // Users can still try any commentary, it just won't have a ✓ indicator
+        setAvailableCommentaries([]);
       } finally {
         setCheckingAvailability(false);
       }
@@ -277,7 +308,14 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         mode = "deep-palace-commentary";
       }
       if (useClassicCommentary) {
-        mode = selectedCommentary === "sop" ? "commentary-sop" : "commentary-classic";
+        // SDA commentaries have their own modes
+        const sdaCommentaryModes: Record<string, string> = {
+          "sop": "commentary-sop",
+          "sdabc": "commentary-sdabc",
+          "uriah-smith": "commentary-uriah-smith",
+          "jn-andrews": "commentary-jn-andrews",
+        };
+        mode = sdaCommentaryModes[selectedCommentary] || "commentary-classic";
       }
 
       const lengthConfig = WORD_LENGTH_OPTIONS.find(l => l.value === deepPalaceLength);
@@ -298,7 +336,9 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
             selectedPrinciples: (analysisMode === "applied" && !refresh && !useClassicCommentary)
               ? selectedPrinciples.map(id => PRINCIPLE_OPTIONS.find(p => p.id === id)?.label)
               : undefined,
-            classicCommentary: useClassicCommentary && selectedCommentary !== "sop" ? selectedCommentary : undefined,
+            classicCommentary: useClassicCommentary && !["sop", "sdabc", "uriah-smith", "jn-andrews"].includes(selectedCommentary) ? selectedCommentary : undefined,
+            // Commentary depth level
+            commentaryDepth,
             // Deep Palace specific options
             maxWords: analysisMode === "deep-palace" ? lengthConfig?.maxWords : undefined,
             showHiddenStructure: analysisMode === "deep-palace" ? showHiddenStructure : undefined,
@@ -336,6 +376,31 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
     } catch (error: any) {
       console.error("[Commentary] Error:", error);
 
+      // Try fallback: Load from pre-generated database cache
+      try {
+        console.log("[Commentary] Trying database fallback...");
+        const { data: cachedCommentary } = await supabase
+          .from("bible_commentaries")
+          .select("commentary_text")
+          .eq("book", book)
+          .eq("chapter", chapter)
+          .eq("verse", verse)
+          .maybeSingle();
+
+        if (cachedCommentary?.commentary_text) {
+          console.log("[Commentary] Found cached commentary in database");
+          setCommentary(cachedCommentary.commentary_text);
+          setUsedPrinciples([]);
+          toast({
+            title: "Loaded Cached Commentary",
+            description: "Using pre-generated commentary (AI service temporarily unavailable)",
+          });
+          return;
+        }
+      } catch (cacheError) {
+        console.error("[Commentary] Database fallback also failed:", cacheError);
+      }
+
       // Provide more helpful error messages
       let errorMessage = "Failed to generate commentary";
       if (error.message?.includes("timeout") || error.message?.includes("timed out")) {
@@ -344,6 +409,8 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         errorMessage = "Too many requests - please wait a moment and try again.";
       } else if (error.message?.includes("network") || error.message?.includes("fetch")) {
         errorMessage = "Network error - please check your connection.";
+      } else if (error.message?.includes("Edge Function")) {
+        errorMessage = "AI service temporarily unavailable. Please try again in a few minutes.";
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -371,11 +438,9 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
               {book} {chapter}:{verse}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-white/10">
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-white/10">
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       </CardHeader>
 
@@ -430,11 +495,41 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mb-3">
-              {analysisMode === "revealed" 
-                ? "Identify which principles and dimensions are revealed in this text" 
+              {analysisMode === "revealed"
+                ? "Identify which principles and dimensions are revealed in this text"
                 : analysisMode === "applied"
                 ? "Select principles to apply to this verse, or let AI randomly select"
                 : "Full Palace Commentary using 16+ principles (single verse only)"}
+            </p>
+          </div>
+
+          {/* Commentary Depth Level */}
+          <div className="p-3 rounded-lg bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border">
+            <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-500" />
+              Commentary Depth
+            </h4>
+            <div className="grid grid-cols-3 gap-2">
+              {COMMENTARY_DEPTH_OPTIONS.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={commentaryDepth === option.value ? "default" : "outline"}
+                  onClick={() => {
+                    setCommentaryDepth(option.value as "surface" | "intermediate" | "depth");
+                    setCommentary(null);
+                  }}
+                  className={`h-auto py-2 flex flex-col items-center gap-1 ${
+                    commentaryDepth === option.value ? option.color + " text-white" : ""
+                  }`}
+                  size="sm"
+                >
+                  <span className="text-lg">{option.icon}</span>
+                  <span className="text-xs font-medium">{option.label}</span>
+                </Button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              {COMMENTARY_DEPTH_OPTIONS.find(o => o.value === commentaryDepth)?.description}
             </p>
           </div>
 
@@ -613,7 +708,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   </div>
                 )}
               </div>
-              
+
               <div className="space-y-6">
                 {parseRoomInsights(commentary).map((room, idx) => (
                   <RoomInsightChat

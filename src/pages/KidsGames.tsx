@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Sparkles } from "lucide-react";
 const KidsGames = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const youngKidsGames = [
     { id: "palace_explorer", name: "🏰 Palace Explorer", description: "Go on an adventure through the 9 rooms! Meet friendly characters and learn what makes each room special.", icon: "🗺️" },
@@ -81,27 +83,27 @@ const KidsGames = () => {
             <div className="inline-flex items-center gap-3">
               <Sparkles className="h-12 w-12 text-purple-500 animate-pulse" />
               <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Kids Games
+                {t('kids.title')}
               </h1>
               <Sparkles className="h-12 w-12 text-blue-500 animate-pulse" />
             </div>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Fun games to learn about the Bible and the Memory Palace! Choose your age group to get started. 🎮
+              {t('kids.subtitle')}
             </p>
             <Button 
               onClick={() => navigate("/pt-kids-games")}
               className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
               size="lg"
             >
-              ✨ Try PT Kids Zone - Visual Palace Games! ✨
+              {t('kids.tryPtKidsZone')}
             </Button>
           </div>
 
           <Tabs defaultValue="6-9" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="6-9">Ages 6-9</TabsTrigger>
-              <TabsTrigger value="10-12">Ages 10-12</TabsTrigger>
-              <TabsTrigger value="13-15">Ages 13-15</TabsTrigger>
+              <TabsTrigger value="6-9">{t('kids.ages6to9')}</TabsTrigger>
+              <TabsTrigger value="10-12">{t('kids.ages10to12')}</TabsTrigger>
+              <TabsTrigger value="13-15">{t('kids.ages13to15')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="6-9" className="space-y-4">
@@ -115,7 +117,7 @@ const KidsGames = () => {
                     </CardHeader>
                     <CardContent>
                       <Button onClick={() => navigate(`/kids-games/${game.id}`)} className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-                        Play Now! 🎮
+                        {t('kids.playNow')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -134,7 +136,7 @@ const KidsGames = () => {
                     </CardHeader>
                     <CardContent>
                       <Button onClick={() => navigate(`/kids-games/${game.id}`)} className="w-full bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600">
-                        Play Now! 🎯
+                        {t('kids.playNow')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -153,7 +155,7 @@ const KidsGames = () => {
                     </CardHeader>
                     <CardContent>
                       <Button onClick={() => navigate(`/kids-games/${game.id}`)} className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600">
-                        Play Now! 🚀
+                        {t('kids.playNow')}
                       </Button>
                     </CardContent>
                   </Card>

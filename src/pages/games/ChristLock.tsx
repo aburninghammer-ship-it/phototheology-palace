@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,6 +42,7 @@ const RANDOM_VERSES = [
 
 export default function ChristLock() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [currentCard, setCurrentCard] = useState<typeof CHRIST_CARDS[0] | null>(null);
   const [currentVerse, setCurrentVerse] = useState("");
@@ -79,7 +81,7 @@ export default function ChristLock() {
 
   const handleSubmit = async () => {
     if (!answer.trim()) {
-      toast.error("Write your answer first");
+      toast.error(t('games.christLock.errorWriteAnswer'));
       return;
     }
 
@@ -102,20 +104,20 @@ export default function ChristLock() {
       if (hitChrist) {
         const newScore = score + 1;
         setScore(newScore);
-        toast.success(`Christ revealed! ${feedback}`);
+        toast.success(t('games.christLock.christRevealed', { feedback }));
         
         if (newScore >= targetScore) {
           setGameWon(true);
-          toast.success("🏆 You've collected all Christ-focus cards!");
+          toast.success(t('games.christLock.allCollected'));
         } else {
           startRound();
         }
       } else {
-        toast.error(`Missed the mark: ${feedback}`);
+        toast.error(t('games.christLock.missedMark', { feedback }));
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to validate");
+      toast.error(t('games.common.errorValidation'));
     } finally {
       setIsSubmitting(false);
     }
@@ -130,18 +132,18 @@ export default function ChristLock() {
             <Card className="bg-black/40 border-amber-500/50 text-center">
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl text-amber-300">Christ Lock Complete!</CardTitle>
+                <CardTitle className="text-3xl text-amber-300">{t('games.christLock.complete')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-4xl font-bold text-amber-400">{score} / {targetScore}</div>
-                <p className="text-amber-200/80">You've mastered seeing Christ in every text!</p>
+                <p className="text-amber-200/80">{t('games.christLock.completeMessage')}</p>
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => window.location.reload()} variant="outline">
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -159,15 +161,15 @@ export default function ChristLock() {
         <Card className="max-w-md bg-black/40 border-amber-500/50">
           <CardHeader>
             <CardTitle className="text-center text-3xl text-amber-300">
-              ✝️ CHRIST LOCK
+              {t('games.christLock.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-amber-100/80">
-              See Christ in every text - His character, mission, authority, or role in salvation
+              {t('games.christLock.description')}
             </p>
             <Button onClick={startRound} className="w-full">
-              Draw Card
+              {t('games.christLock.drawCard')}
             </Button>
           </CardContent>
         </Card>
@@ -182,16 +184,16 @@ export default function ChristLock() {
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-4xl font-bold text-amber-400" style={{ fontFamily: "'Cinzel', serif" }}>
-            ✝️ CHRIST LOCK
+            {t('games.christLock.title')}
           </h1>
           <div className="text-right">
             <div className="text-amber-400 text-3xl font-bold">
               {score} / {targetScore}
             </div>
-            <div className="text-amber-200/60 text-sm">COLLECTED</div>
+            <div className="text-amber-200/60 text-sm">{t('games.christLock.collected')}</div>
           </div>
         </div>
 
@@ -200,7 +202,7 @@ export default function ChristLock() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-amber-300">
                 <Crown className="w-6 h-6" />
-                Your Christ Card: {currentCard.code}
+                {t('games.christLock.yourChristCard', { code: currentCard.code })}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -208,7 +210,7 @@ export default function ChristLock() {
                 {currentCard.name}
               </div>
               <div className="bg-amber-500/20 rounded-lg p-4 border border-amber-500/30">
-                <div className="text-sm text-amber-200/60 mb-2">Your Verse:</div>
+                <div className="text-sm text-amber-200/60 mb-2">{t('games.christLock.yourVerse')}</div>
                 <div className="text-lg font-serif text-amber-100">
                   {currentVerse}
                 </div>
@@ -218,21 +220,21 @@ export default function ChristLock() {
 
           <Card className="bg-black/40 border-amber-500/50">
             <CardHeader>
-              <CardTitle className="text-amber-300">How Does This Verse Reveal Jesus?</CardTitle>
+              <CardTitle className="text-amber-300">{t('games.christLock.howRevealJesus')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Write one tight paragraph showing how this verse reveals Christ - His character, mission, authority, or role in salvation..."
+                placeholder={t('games.christLock.answerPlaceholder')}
                 className="bg-black/60 border-amber-500/30 text-white min-h-40"
               />
               <div className="flex gap-2">
                 <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
-                  {isSubmitting ? "Validating..." : "Submit Answer"}
+                  {isSubmitting ? t('games.common.validating') : t('games.common.submitAnswer')}
                 </Button>
                 <Button onClick={startRound} variant="outline">
-                  New Card
+                  {t('games.christLock.newCard')}
                 </Button>
               </div>
             </CardContent>
@@ -241,7 +243,7 @@ export default function ChristLock() {
           <Card className="bg-black/40 border-amber-500/50">
             <CardContent className="pt-6">
               <p className="text-amber-100/60 text-sm">
-                Goal: Collect all {targetScore} Christ-focus cards by finding Christ in random verses
+                {t('games.christLock.goal', { target: targetScore })}
               </p>
             </CardContent>
           </Card>

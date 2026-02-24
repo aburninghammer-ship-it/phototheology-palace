@@ -12,22 +12,25 @@ const logStep = (step: string, details?: any) => {
   console.log(`[FIX-SUBSCRIPTION-MISMATCH] ${step}${detailsStr}`);
 };
 
-// Price ID to tier mapping
+// Price ID to tier mapping - PHOTOTHEOLOGY APP ONLY
 const priceToTier: Record<string, string> = {
-  // Essential tier
+  // Current subscriptions
   'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential',
   'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential',
-  'price_1SKn0VFGDAd3RU8Io19mT9No': 'essential',
-  // Premium tier
   'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium',
   'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium',
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'premium',
-  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': 'premium',
-  'price_1ONjHsFGDAd3RU8IsHMybTX6': 'premium',
-  // Student tier
-  'price_1SKWM6FGDAd3RU8IcmNNhmKO': 'student',
-  'price_1SKWMLFGDAd3RU8IBXO8pKxd': 'student',
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': 'student',
+  // Legacy Phototheology App subscriptions
+  'price_1SKn0VFGDAd3RU8Io19mT9No': 'premium',
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'essential',
+  // Church tiers
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': 'church',
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': 'church',
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': 'church',
 };
+
+// Only these price IDs count as Phototheology subscriptions.
+const appPriceIds = new Set(Object.keys(priceToTier));
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -127,38 +130,66 @@ serve(async (req) => {
       stripeCustomerId = customers.data[0].id;
       logStep("Found Stripe customer", { customerId: stripeCustomerId });
 
-      // Check for active/trialing subscriptions
+      // Check for active/trialing subscriptions (filter to Phototheology price IDs)
       const activeSubscriptions = await stripe.subscriptions.list({
         customer: stripeCustomerId,
         status: "active",
-        limit: 1,
+        limit: 10,
+        expand: ["data.items.data.price"],
       });
 
       const trialingSubscriptions = await stripe.subscriptions.list({
         customer: stripeCustomerId,
         status: "trialing",
-        limit: 1,
+        limit: 10,
+        expand: ["data.items.data.price"],
       });
 
-      const activeSub = activeSubscriptions.data[0] || trialingSubscriptions.data[0];
+      const candidates = [...activeSubscriptions.data, ...trialingSubscriptions.data];
+      const appCandidates = candidates
+        .filter((sub: any) => {
+          const items = sub?.items?.data || [];
+          return items.some((item: any) => {
+            const priceId = item?.price?.id;
+            return typeof priceId === "string" && appPriceIds.has(priceId);
+          });
+        })
+        .sort((a: any, b: any) => (b?.current_period_end || 0) - (a?.current_period_end || 0));
+
+      const activeSub = appCandidates[0];
 
       if (activeSub) {
         stripeSubscriptionId = activeSub.id;
         subscriptionStatus = activeSub.status === "trialing" ? "trial" : "active";
         isRecurring = true;
 
-        const priceId = activeSub.items.data[0]?.price?.id;
-        subscriptionTier = priceToTier[priceId || ""] || "premium";
+        const priceId = (activeSub.items.data || [])
+          .map((item: any) => item?.price?.id)
+          .find((id: any) => typeof id === "string" && appPriceIds.has(id));
 
-        if (activeSub.current_period_end) {
+        if (!priceId) {
+          // Not a Phototheology subscription; treat as no valid subscription for this app.
+          stripeSubscriptionId = null;
+          subscriptionStatus = "free";
+          subscriptionTier = null;
+          subscriptionRenewalDate = null;
+          isRecurring = false;
+          logStep("Subscription found but not a Phototheology price", { subscriptionId: activeSub.id });
+        } else {
+          subscriptionTier = priceToTier[priceId];
+        }
+
+        if (stripeSubscriptionId && activeSub.current_period_end) {
           subscriptionRenewalDate = new Date(activeSub.current_period_end * 1000).toISOString();
         }
 
-        logStep("Found active subscription", { 
-          subscriptionId: stripeSubscriptionId, 
-          status: subscriptionStatus,
-          tier: subscriptionTier 
-        });
+        if (stripeSubscriptionId) {
+          logStep("Found Phototheology subscription", {
+            subscriptionId: stripeSubscriptionId,
+            status: subscriptionStatus,
+            tier: subscriptionTier,
+          });
+        }
       } else {
         logStep("No active subscription found in Stripe");
       }
@@ -172,7 +203,7 @@ serve(async (req) => {
       stripe_customer_id: stripeCustomerId,
       stripe_subscription_id: stripeSubscriptionId,
       payment_source: stripeSubscriptionId ? "stripe" : null,
-      is_recurring: isRecurring,
+      is_recurring: !!stripeSubscriptionId && isRecurring,
     };
 
     // If user has no Stripe subscription and no lifetime access, reset to free
@@ -212,18 +243,28 @@ serve(async (req) => {
       });
     }
 
-    // Also update profiles table
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({
-        subscription_status: updateData.subscription_status || subscriptionStatus,
-        subscription_tier: updateData.subscription_tier || subscriptionTier,
-        payment_source: stripeSubscriptionId ? "stripe" : null,
-      })
-      .eq("id", user_id);
+    // Also update profiles table, but only when we have explicit values to write.
+    // (Avoid accidentally overwriting lifetime/church users to "free".)
+    const profileUpdate: Record<string, any> = {
+      payment_source: stripeSubscriptionId ? "stripe" : null,
+    };
 
-    if (profileError) {
-      logStep("Warning: Failed to update profiles", { error: profileError });
+    if (updateData.subscription_status !== undefined) {
+      profileUpdate.subscription_status = updateData.subscription_status;
+    }
+    if (updateData.subscription_tier !== undefined) {
+      profileUpdate.subscription_tier = updateData.subscription_tier;
+    }
+
+    if (Object.keys(profileUpdate).length > 0) {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update(profileUpdate)
+        .eq("id", user_id);
+
+      if (profileError) {
+        logStep("Warning: Failed to update profiles", { error: profileError });
+      }
     }
 
     logStep("Successfully fixed subscription", updateData);

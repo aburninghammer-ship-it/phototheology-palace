@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Send, Users, AlertTriangle, GraduationCap } from "lucide-react";
+import { Loader2, Send, Users, AlertTriangle, GraduationCap, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
-type TeachableFilter = 'all' | 'master_class_active' | 'master_class_inactive' | 'free_signup' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
+type TeachableFilter = 'all' | 'master_class_active' | 'master_class_inactive' | 'free_signup' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying' | 'not_suite_subscribers';
 
 const FILTER_DESCRIPTIONS: Record<TeachableFilter, string> = {
   all: "All Teachable users (free signups + Master Class)",
@@ -22,7 +22,14 @@ const FILTER_DESCRIPTIONS: Record<TeachableFilter, string> = {
   unlinked: "Users who haven't connected to the app yet",
   premium_paying: "Students paying $15+ per month (premium access)",
   not_paying: "Users not currently paying anything",
+  not_suite_subscribers: "Teachable members (all) who are NOT active Suite subscribers — perfect for conversion campaigns",
 };
+
+interface CampaignStats {
+  sent: number;
+  failed: number;
+  lastSent: string | null;
+}
 
 export function TeachableEmailCampaign() {
   const { toast } = useToast();
@@ -32,12 +39,44 @@ export function TeachableEmailCampaign() {
   const [testMode, setTestMode] = useState(true);
   const [testEmail, setTestEmail] = useState("");
   const [sending, setSending] = useState(false);
+  const [campaignStats, setCampaignStats] = useState<CampaignStats | null>(null);
   const [lastResult, setLastResult] = useState<{
     success: boolean;
     sent: number;
     total: number;
     message: string;
   } | null>(null);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const { data: sent } = await supabase
+        .from("email_campaign_logs")
+        .select("sent_at")
+        .eq("email_type", "teachable")
+        .eq("status", "sent")
+        .order("sent_at", { ascending: false })
+        .limit(1);
+
+      const { count: sentCount } = await supabase
+        .from("email_campaign_logs")
+        .select("*", { count: "exact", head: true })
+        .eq("email_type", "teachable")
+        .eq("status", "sent");
+
+      const { count: failedCount } = await supabase
+        .from("email_campaign_logs")
+        .select("*", { count: "exact", head: true })
+        .eq("email_type", "teachable")
+        .eq("status", "failed");
+
+      setCampaignStats({
+        sent: sentCount || 0,
+        failed: failedCount || 0,
+        lastSent: sent?.[0]?.sent_at || null,
+      });
+    };
+    loadStats();
+  }, []);
 
   const handleSend = async () => {
     if (!subject.trim() || !content.trim()) {
@@ -111,6 +150,52 @@ export function TeachableEmailCampaign() {
 
   return (
     <div className="space-y-6">
+      {/* Campaign Status Banner */}
+      {campaignStats && (
+        <Card className="border-border bg-muted/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Teachable Campaign History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                <div>
+                  <p className="text-2xl font-bold">{campaignStats.sent.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Successfully Sent</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <XCircle className="h-4 w-4 text-destructive shrink-0" />
+                <div>
+                  <p className="text-2xl font-bold text-destructive">{campaignStats.failed.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Failed (rate limit — now fixed)</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div>
+                  <p className="text-sm font-medium">
+                    {campaignStats.lastSent
+                      ? new Date(campaignStats.lastSent).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                      : "Never"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Last Sent</p>
+                </div>
+              </div>
+            </div>
+            {campaignStats.failed > 100 && (
+              <div className="mt-3 flex items-start gap-2 p-2 rounded-md bg-amber-500/10 border border-amber-500/30">
+                <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  Previous campaign hit Resend's rate limit (2 req/sec). The system now uses batch sending (100 emails/request) — re-sending will reach all {campaignStats.failed.toLocaleString()} missed students.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="border-orange-500/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -134,6 +219,7 @@ export function TeachableEmailCampaign() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Teachable Users</SelectItem>
+                <SelectItem value="not_suite_subscribers">🎯 NOT Suite Subscribers (Teachable + Patreon — not paying on Suite)</SelectItem>
                 <SelectItem value="master_class_active">🎓 Master Class Students (Active, $20/mo)</SelectItem>
                 <SelectItem value="master_class_inactive">📚 Former Master Class (Cancelled/Expired)</SelectItem>
                 <SelectItem value="free_signup">🆓 Free Signups (Never Enrolled in Master Class)</SelectItem>
@@ -272,7 +358,7 @@ export function TeachableEmailCampaign() {
               className="w-full justify-start border-amber-500/30 hover:bg-amber-500/10"
               onClick={() => {
                 setFilter("all");
-                setSubject("The Phototheology App is Here — Try It Free for 7 Days 🏰");
+                setSubject("The Phototheology App is Here — Try It Free for 30 Days 🏰");
                 setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
   <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
     <h1 style="color: #d4af37; font-size: 28px; margin: 0;">The Palace is Now Open</h1>
@@ -286,7 +372,7 @@ export function TeachableEmailCampaign() {
     
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">This isn't just another Bible app. It's the living architecture of the Palace method—8 Floors, dozens of Rooms, and a complete system that transforms how you read, remember, and live Scripture.</p>
     
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">For the next <strong style="color: #d4af37;">7 days</strong>, you can explore it all—completely free:</p>
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">For the next <strong style="color: #d4af37;">30 days</strong>, you can explore it all—completely free:</p>
     
     <ul style="font-size: 16px; line-height: 2; color: #c0c0c0; padding-left: 20px;">
       <li>🏛️ Walk through the Palace floors and discover each Room</li>
@@ -297,7 +383,7 @@ export function TeachableEmailCampaign() {
     </ul>
     
     <div style="text-align: center; padding: 30px 0;">
-      <a href="https://phototheology.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start Your 7-Day Free Trial →</a>
+      <a href="https://phototheology.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start Your 30-Day Free Trial →</a>
     </div>
     
     <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 20px 0;">
@@ -316,7 +402,7 @@ export function TeachableEmailCampaign() {
 </div>`);
               }}
             >
-              📧 7-Day Trial + Master Class Free Access
+              📧 30-Day Trial + Master Class Free Access
             </Button>
           </div>
 
@@ -421,7 +507,74 @@ export function TeachableEmailCampaign() {
 
           <hr className="border-muted" />
 
-          {/* Upsell Templates for Free Users */}
+          {/* Conversion Campaign: Teachable non-Suite-subscribers */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-blue-500 flex items-center gap-2">
+              🎯 Conversion Campaign — Teachable Non-Suite-Subscribers
+            </h4>
+            <p className="text-xs text-muted-foreground">
+              Targets all Teachable (and Patreon) members who are NOT currently paying subscribers on the Suite. Excludes active/lifetime users.
+            </p>
+
+            <Button
+              variant="outline"
+              className="w-full justify-start border-blue-500/30 hover:bg-blue-500/10"
+              onClick={() => {
+                setFilter("not_suite_subscribers");
+                setSubject("You're Already in the Family — Now Step Into the Palace 🏰");
+                setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
+  <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
+    <h1 style="color: #d4af37; font-size: 28px; margin: 0;">The Palace Is Open for You</h1>
+    <p style="color: #a0a0a0; font-style: italic; margin-top: 10px;">See Christ in Every Chapter — Now in an App</p>
+  </div>
+
+  <div style="padding: 30px 20px;">
+    <p style="font-size: 18px; line-height: 1.8; color: #e8e8e8;">Dear Friend,</p>
+
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">You've already shown you care about going deeper into Scripture. Whether through the Teachable courses or the Phototheology community, you're part of this family.</p>
+
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">Now I want to introduce you to something I've poured everything into: <strong style="color: #d4af37;">The Phototheology Bible Study Suite</strong> — the full Palace method, living inside an app.</p>
+
+    <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 25px 0;">
+      <h3 style="color: #d4af37; margin: 0 0 15px 0;">🏰 What's Inside the Suite</h3>
+      <ul style="font-size: 15px; line-height: 2; color: #c0c0c0; padding-left: 20px; margin: 0;">
+        <li>🤖 <strong>Jeeves</strong> — Your AI study companion trained entirely in the Palace method</li>
+        <li>🏛️ <strong>8 Floors of the Palace</strong> — Interactive study rooms for every level</li>
+        <li>📖 <strong>Full KJV Bible</strong> — Commentary, audio, and verse mapping</li>
+        <li>🔥 <strong>Daily Challenges &amp; Streaks</strong> — Build a real study habit</li>
+        <li>💎 <strong>Gem Collection</strong> — Store your best insights forever</li>
+        <li>👥 <strong>Community</strong> — Study alongside fellow Palace explorers worldwide</li>
+        <li>📊 <strong>Progress Tracking</strong> — Know exactly where you are on every Floor</li>
+      </ul>
+    </div>
+
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">This isn't another Bible app. This is the <strong style="color: #d4af37;">system</strong> — the Palace Method made interactive, searchable, and daily.</p>
+
+    <div style="background: rgba(100, 160, 255, 0.08); border: 1px solid rgba(100, 160, 255, 0.3); border-radius: 8px; padding: 18px; margin: 25px 0;">
+      <p style="font-size: 15px; line-height: 1.8; color: #c0c0c0; margin: 0;"><strong style="color: #a0c4ff;">Plans start at just $9/month</strong> — and your first 30 days are completely free. No commitment, cancel anytime.</p>
+    </div>
+
+    <div style="text-align: center; padding: 30px 0;">
+      <a href="https://phototheology-palace.lovable.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start My 30-Day Free Trial →</a>
+    </div>
+
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">You've already started the journey. The Palace is just the next room.</p>
+
+    <p style="font-size: 16px; line-height: 1.8; color: #e8e8e8; margin-top: 30px;">Blessings,<br><strong style="color: #d4af37;">Pastor Ivor Myers</strong></p>
+  </div>
+
+  <div style="text-align: center; padding: 20px; border-top: 1px solid #333; color: #666; font-size: 12px;">
+    <p>You're receiving this because you're part of the Phototheology community on Teachable or Patreon.</p>
+    <p>To unsubscribe, reply "unsubscribe" to this email.</p>
+  </div>
+</div>`);
+              }}
+            >
+              🎯 "Step Into the Palace" — Teachable Non-Subscribers Conversion
+            </Button>
+          </div>
+
+          <hr className="border-muted" />
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-green-600">💰 Upsell Templates (Free → Master Class)</h4>
             

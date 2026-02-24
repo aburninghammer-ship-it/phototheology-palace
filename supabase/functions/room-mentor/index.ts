@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
@@ -50,7 +51,7 @@ serve(async (req) => {
     const greeting = userName || userFirstName || "there";
 
     // Build mentor system prompt based on mastery level
-    const mentorPrompt = `You are Jeeves, ${greeting}'s training partner in **sparring mode** for the ${roomName} room.
+    let mentorPrompt = `You are Jeeves, ${greeting}'s training partner in **sparring mode** for the ${roomName} room.
 
 ⚠️ THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
 - AZAZEL = SATAN, NOT CHRIST: Leviticus 16 scapegoat represents SATAN. NEVER identify it as Jesus.
@@ -81,6 +82,17 @@ CRITICAL: NEVER use markdown formatting characters like # or * in your responses
 
 Room: ${roomName} (${roomId})
 Current Level: ${masteryLevel}/5`;
+
+    // RAG corpus injection
+    const lastUserMsg = messages?.length > 0 ? messages[messages.length - 1]?.content || '' : roomName;
+    const ragResult = await getCorpusContext({
+      query: `${roomName} ${lastUserMsg}`.slice(0, 4000),
+      matchCount: 2,
+      supabaseClient: supabase,
+    });
+    if (ragResult.chunkCount > 0) {
+      mentorPrompt += ragResult.corpusContext;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

@@ -28,6 +28,7 @@ interface ChurchPost {
     avatar_url: string | null;
   };
   comment_count?: number;
+  like_count?: number;
 }
 
 interface ChurchCommunityProps {
@@ -53,6 +54,7 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
   const [newCategory, setNewCategory] = useState("general");
   const [creating, setCreating] = useState(false);
   const [liking, setLiking] = useState<string | null>(null);
+  const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadPosts();
@@ -71,7 +73,35 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
         .limit(50);
 
       if (error) throw error;
-      setPosts((data as ChurchPost[]) || []);
+      const postsData = (data as ChurchPost[]) || [];
+
+      // Fetch like counts for all posts
+      if (postsData.length > 0) {
+        const postIds = postsData.map(p => p.id);
+        const { data: likeCounts } = await supabase
+          .from('church_community_post_likes' as any)
+          .select('post_id')
+          .in('post_id', postIds);
+
+        // Count likes per post
+        const countMap: Record<string, number> = {};
+        ((likeCounts as any[]) || []).forEach((row: any) => {
+          countMap[row.post_id] = (countMap[row.post_id] || 0) + 1;
+        });
+        postsData.forEach(p => { p.like_count = countMap[p.id] || 0; });
+
+        // Fetch current user's likes
+        if (user) {
+          const { data: myLikes } = await supabase
+            .from('church_community_post_likes' as any)
+            .select('post_id')
+            .eq('user_id', user.id)
+            .in('post_id', postIds);
+          setLikedPostIds(new Set(((myLikes as any[]) || []).map((l: any) => l.post_id)));
+        }
+      }
+
+      setPosts(postsData);
     } catch (error) {
       console.error('Error loading posts:', error);
       toast.error("Failed to load community posts");
@@ -115,23 +145,38 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
   };
 
   const handleLike = async (postId: string) => {
+    if (!user) return;
     setLiking(postId);
+    const alreadyLiked = likedPostIds.has(postId);
+
     try {
-      const post = posts.find(p => p.id === postId);
-      if (!post) return;
+      if (alreadyLiked) {
+        // Remove like
+        const { error } = await supabase
+          .from('church_community_post_likes' as any)
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+        if (error) throw error;
 
-      const { error } = await supabase
-        .from('church_community_posts')
-        .update({ likes: (post.likes || 0) + 1 })
-        .eq('id', postId);
+        setLikedPostIds(prev => { const next = new Set(prev); next.delete(postId); return next; });
+        setPosts(prev => prev.map(p =>
+          p.id === postId ? { ...p, like_count: Math.max((p.like_count || 0) - 1, 0) } : p
+        ));
+      } else {
+        // Add like
+        const { error } = await supabase
+          .from('church_community_post_likes' as any)
+          .insert({ post_id: postId, user_id: user.id });
+        if (error) throw error;
 
-      if (error) throw error;
-
-      setPosts(prev => prev.map(p => 
-        p.id === postId ? { ...p, likes: (p.likes || 0) + 1 } : p
-      ));
+        setLikedPostIds(prev => new Set(prev).add(postId));
+        setPosts(prev => prev.map(p =>
+          p.id === postId ? { ...p, like_count: (p.like_count || 0) + 1 } : p
+        ));
+      }
     } catch (error) {
-      console.error('Error liking post:', error);
+      console.error('Error toggling like:', error);
     } finally {
       setLiking(null);
     }
@@ -180,7 +225,7 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
                   New Post
                 </Button>
               </DialogTrigger>
-              <DialogContent className="glass-card">
+              <DialogContent className="bg-card border border-border shadow-xl max-h-[85vh] overflow-y-auto z-[100]">
                 <DialogHeader>
                   <DialogTitle>Share with your Church</DialogTitle>
                 </DialogHeader>
@@ -268,15 +313,15 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
                     <h3 className="font-semibold text-foreground mt-2">{post.title}</h3>
                     <p className="text-foreground/80 mt-1 whitespace-pre-wrap">{post.content}</p>
                     <div className="flex items-center gap-4 mt-3">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="gap-1 text-foreground/60 hover:text-primary"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={`gap-1 hover:text-red-500 ${likedPostIds.has(post.id) ? 'text-red-500' : 'text-foreground/60'}`}
                         onClick={() => handleLike(post.id)}
                         disabled={liking === post.id}
                       >
-                        <Heart className={`h-4 w-4 ${liking === post.id ? 'animate-pulse' : ''}`} />
-                        {post.likes || 0}
+                        <Heart className={`h-4 w-4 ${likedPostIds.has(post.id) ? 'fill-current' : ''} ${liking === post.id ? 'animate-pulse' : ''}`} />
+                        {post.like_count || 0}
                       </Button>
                       <Button variant="ghost" size="sm" className="gap-1 text-foreground/60 hover:text-primary">
                         <MessageSquare className="h-4 w-4" />

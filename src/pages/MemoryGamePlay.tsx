@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 export default function MemoryGamePlay() {
   const { listId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [list, setList] = useState<any>(null);
   const [verses, setVerses] = useState<any[]>([]);
@@ -48,7 +50,7 @@ export default function MemoryGamePlay() {
       setUndiscoveredCount(undiscovered);
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Failed to load list");
+      toast.error(t('memory.game.failedToLoadList'));
       navigate("/memory");
     } finally {
       setLoading(false);
@@ -70,18 +72,18 @@ export default function MemoryGamePlay() {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>No Verses Yet</CardTitle>
+            <CardTitle>{t('memory.game.noVersesYet')}</CardTitle>
             <CardDescription>
-              This list doesn't have any verses. Add some verses to start playing!
+              {t('memory.game.noVersesDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => navigate("/memory")}>
-                Back to Memory
+                {t('memory.game.backToMemory')}
               </Button>
               <Button onClick={() => navigate(`/memory/list/${listId}`)}>
-                Add Verses
+                {t('memory.game.addVerses')}
               </Button>
             </div>
           </CardContent>
@@ -100,7 +102,7 @@ export default function MemoryGamePlay() {
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Memory
+          {t('memory.game.backToMemory')}
         </Button>
 
         <div className="text-center mb-8">
@@ -111,7 +113,7 @@ export default function MemoryGamePlay() {
           {undiscoveredCount > 0 && (
             <Badge variant="secondary" className="bg-primary/10 text-primary">
               <Sparkles className="h-3 w-3 mr-1" />
-              {undiscoveredCount} PT insights to discover
+              {t('memory.game.ptInsightsToDiscover', { count: undiscoveredCount })}
             </Badge>
           )}
         </div>
@@ -125,14 +127,14 @@ export default function MemoryGamePlay() {
                   <Brain className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <CardTitle>First Letter</CardTitle>
-                  <CardDescription>Fill in words from first letters</CardDescription>
+                  <CardTitle>{t('memory.game.firstLetter')}</CardTitle>
+                  <CardDescription>{t('memory.game.firstLetterDesc')}</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                See the first letter of each word and type the complete verse
+                {t('memory.game.firstLetterFullDesc')}
               </p>
             </CardContent>
           </Card>
@@ -144,10 +146,10 @@ export default function MemoryGamePlay() {
                 <div className="p-3 bg-blue-500/20 rounded-lg">
                   <Gamepad2 className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-lg">Fill the Blanks</h3>
+                <h3 className="font-semibold text-lg">{t('memory.game.fillBlanks')}</h3>
               </div>
               <p className="text-sm text-muted-foreground">
-                Complete missing words in each verse
+                {t('memory.game.fillBlanksDesc')}
               </p>
             </CardContent>
           </Card>
@@ -159,10 +161,10 @@ export default function MemoryGamePlay() {
                 <div className="p-3 bg-indigo-500/20 rounded-lg">
                   <Home className="h-6 w-6 text-indigo-600" />
                 </div>
-                <h3 className="font-semibold text-lg">Memory Palace</h3>
+                <h3 className="font-semibold text-lg">{t('memory.game.memoryPalace')}</h3>
               </div>
               <p className="text-sm text-muted-foreground">
-                Build & practice with location associations
+                {t('memory.game.memoryPalaceDesc')}
               </p>
             </CardContent>
           </Card>
@@ -175,14 +177,14 @@ export default function MemoryGamePlay() {
                   <Shuffle className="h-6 w-6 text-blue-500" />
                 </div>
                 <div>
-                  <CardTitle>Rearrange</CardTitle>
-                  <CardDescription>Put words in correct order</CardDescription>
+                  <CardTitle>{t('memory.game.rearrange')}</CardTitle>
+                  <CardDescription>{t('memory.game.rearrangeDesc')}</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Drag and drop words to arrange them in the correct order
+                {t('memory.game.rearrangeFullDesc')}
               </p>
             </CardContent>
           </Card>
@@ -195,14 +197,14 @@ export default function MemoryGamePlay() {
                   <Gamepad2 className="h-6 w-6 text-green-500" />
                 </div>
                 <div>
-                  <CardTitle>Type First Letters</CardTitle>
-                  <CardDescription>Final mastery test</CardDescription>
+                  <CardTitle>{t('memory.game.typeFirstLetters')}</CardTitle>
+                  <CardDescription>{t('memory.game.finalMasteryTest')}</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Type only the first letter of each word without hints
+                {t('memory.game.typeFirstLettersDesc')}
               </p>
             </CardContent>
           </Card>

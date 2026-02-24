@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
 export default function PrincipleTournaments() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -100,15 +102,15 @@ export default function PrincipleTournaments() {
       if (error) throw error;
 
       toast({
-        title: "Tournament Created!",
-        description: "Players can now register for your tournament.",
+        title: t('principles.tournamentCreated'),
+        description: t('principles.tournamentCreatedDescription'),
       });
 
       setCreateOpen(false);
       navigate(`/games/principle-cards/tournament/${data.id}`);
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -129,14 +131,14 @@ export default function PrincipleTournaments() {
       if (error) throw error;
 
       toast({
-        title: "Joined Tournament!",
-        description: "Good luck in the competition!",
+        title: t('principles.joinedTournament'),
+        description: t('principles.goodLuckCompetition'),
       });
 
       navigate(`/games/principle-cards/tournament/${tournamentId}`);
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -163,46 +165,46 @@ export default function PrincipleTournaments() {
       <div className="container mx-auto px-4 py-8 pt-24 max-w-7xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Principle Card Tournaments</h1>
+            <h1 className="text-4xl font-bold mb-2">{t('principles.tournamentsTitle')}</h1>
             <p className="text-muted-foreground">
-              Compete in brackets, win prizes, and climb the leaderboard
+              {t('principles.tournamentsSubtitle')}
             </p>
           </div>
           <Dialog open={createOpen} onOpenChange={setCreateOpen}>
             <DialogTrigger asChild>
               <Button size="lg">
                 <Plus className="w-5 h-5 mr-2" />
-                Create Tournament
+                {t('principles.createTournament')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Create New Tournament</DialogTitle>
+                <DialogTitle>{t('principles.createNewTournament')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label>Tournament Title</Label>
+                  <Label>{t('principles.tournamentTitle')}</Label>
                   <Input
                     value={formData.title}
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    placeholder="Winter Championship 2025"
+                    placeholder={t('principles.tournamentTitlePlaceholder')}
                   />
                 </div>
                 <div>
-                  <Label>Description</Label>
+                  <Label>{t('common.description')}</Label>
                   <Textarea
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Describe your tournament..."
+                    placeholder={t('principles.tournamentDescriptionPlaceholder')}
                     rows={3}
                   />
                 </div>
                 <div>
-                  <Label>Max Participants (must be power of 2)</Label>
+                  <Label>{t('principles.maxParticipants')}</Label>
                   <select
                     className="w-full p-2 border rounded-md"
                     value={formData.max_participants}
@@ -213,15 +215,15 @@ export default function PrincipleTournaments() {
                       })
                     }
                   >
-                    <option value={4}>4 players (2 rounds)</option>
-                    <option value={8}>8 players (3 rounds)</option>
-                    <option value={16}>16 players (4 rounds)</option>
-                    <option value={32}>32 players (5 rounds)</option>
+                    <option value={4}>{t('principles.playersRounds', { players: 4, rounds: 2 })}</option>
+                    <option value={8}>{t('principles.playersRounds', { players: 8, rounds: 3 })}</option>
+                    <option value={16}>{t('principles.playersRounds', { players: 16, rounds: 4 })}</option>
+                    <option value={32}>{t('principles.playersRounds', { players: 32, rounds: 5 })}</option>
                   </select>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Registration Ends</Label>
+                    <Label>{t('principles.registrationEnds')}</Label>
                     <Input
                       type="datetime-local"
                       value={formData.registration_ends_at}
@@ -234,7 +236,7 @@ export default function PrincipleTournaments() {
                     />
                   </div>
                   <div>
-                    <Label>Tournament Starts</Label>
+                    <Label>{t('principles.tournamentStarts')}</Label>
                     <Input
                       type="datetime-local"
                       value={formData.starts_at}
@@ -245,7 +247,7 @@ export default function PrincipleTournaments() {
                   </div>
                 </div>
                 <Button onClick={createTournament} className="w-full">
-                  Create Tournament
+                  {t('principles.createTournament')}
                 </Button>
               </div>
             </DialogContent>
@@ -253,7 +255,7 @@ export default function PrincipleTournaments() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12">Loading tournaments...</div>
+          <div className="text-center py-12">{t('principles.loadingTournaments')}</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tournaments.map((tournament) => (
@@ -277,12 +279,12 @@ export default function PrincipleTournaments() {
                     <Users className="w-4 h-4" />
                     <span>
                       {tournament.participants[0]?.count || 0}/{tournament.max_participants}{" "}
-                      players
+                      {t('principles.players')}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Trophy className="w-4 h-4" />
-                    <span>{tournament.total_rounds} rounds</span>
+                    <span>{t('principles.roundsCount', { count: tournament.total_rounds })}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="w-4 h-4" />
@@ -299,7 +301,7 @@ export default function PrincipleTournaments() {
                       className="w-full"
                       variant="default"
                     >
-                      Join Tournament
+                      {t('principles.joinTournament')}
                     </Button>
                   )}
                   <Button
@@ -309,7 +311,7 @@ export default function PrincipleTournaments() {
                     className="w-full"
                     variant="outline"
                   >
-                    View Details
+                    {t('common.viewDetails')}
                   </Button>
                 </div>
               </Card>
@@ -320,13 +322,13 @@ export default function PrincipleTournaments() {
         {!loading && tournaments.length === 0 && (
           <Card className="p-12 text-center">
             <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">No Tournaments Yet</h3>
+            <h3 className="text-xl font-semibold mb-2">{t('principles.noTournamentsYet')}</h3>
             <p className="text-muted-foreground mb-4">
-              Be the first to create a tournament!
+              {t('principles.beFirstTournament')}
             </p>
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Create Tournament
+              {t('principles.createTournament')}
             </Button>
           </Card>
         )}

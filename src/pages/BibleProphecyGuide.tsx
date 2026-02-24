@@ -18,30 +18,32 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
+import { useTranslation } from 'react-i18next';
 
 export default function BibleProphecyGuide() {
+  const { t } = useTranslation();
   const paymentLinks = useTrackedPaymentLinks();
   const STRIPE_LINK = paymentLinks.genesis6Days;
-  
+
   const whatYouGet = [
     {
-      title: "6-Day Guided Study",
-      description: "One creation day per day, mapped to Christ's redemptive pattern",
+      title: t('prophecyGuide.sixDayGuidedStudy'),
+      description: t('prophecyGuide.sixDayGuidedStudyDesc'),
       icon: Clock,
     },
     {
-      title: "Christ-Centered Framework",
-      description: "See how Genesis 1 points to Jesus through structured observation",
+      title: t('prophecyGuide.christCenteredFramework'),
+      description: t('prophecyGuide.christCenteredFrameworkDesc'),
       icon: Target,
     },
     {
-      title: "Practical Exercises",
-      description: "Daily exercises that train your eye to see Scripture differently",
+      title: t('prophecyGuide.practicalExercises'),
+      description: t('prophecyGuide.practicalExercisesDesc'),
       icon: Eye,
     },
     {
-      title: "Cross-Reference Maps",
-      description: "Connections that unlock Genesis across the entire Bible",
+      title: t('prophecyGuide.crossReferenceMaps'),
+      description: t('prophecyGuide.crossReferenceMapsDesc'),
       icon: Compass,
     },
   ];
@@ -67,21 +69,21 @@ export default function BibleProphecyGuide() {
           >
             <Badge variant="outline" className="text-accent border-accent/30 px-4 py-1.5">
               <BookOpen className="w-4 h-4 mr-2" />
-              The 24FPS Memory Palace Method
+              {t('prophecyGuide.badgeMethod')}
             </Badge>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               <span className="bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent">
-                Genesis in 6 Days
+                {t('prophecyGuide.heroTitle')}
               </span>
               <br />
               <span className="text-2xl md:text-3xl lg:text-4xl text-foreground/90">
-                See Every Chapter of Genesis Clearly
+                {t('prophecyGuide.heroSubtitle')}
               </span>
             </h1>
 
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              <strong className="text-foreground">Learn Genesis as one continuous story.</strong> Turn Genesis into unforgettable images using a structured Genesis study system.
+              <strong className="text-foreground">{t('prophecyGuide.heroBoldText')}</strong> {t('prophecyGuide.heroDescription')}
             </p>
 
             <div className="pt-6 flex flex-col items-center gap-4">
@@ -91,12 +93,12 @@ export default function BibleProphecyGuide() {
                 className="text-lg px-8 py-6 h-auto shadow-lg shadow-accent/25 bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90"
               >
                 <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer">
-                  Get the Guide - $9
+                  {t('prophecyGuide.getTheGuide')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </a>
               </Button>
               <p className="text-sm text-muted-foreground">
-                Instant PDF download • No subscription required
+                {t('prophecyGuide.instantPdfNoSub')}
               </p>
             </div>
           </motion.div>
@@ -109,7 +111,7 @@ export default function BibleProphecyGuide() {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-bold">
-                The Problem with How We Read Genesis
+                {t('prophecyGuide.problemTitle')}
               </h2>
             </div>
 
@@ -118,20 +120,20 @@ export default function BibleProphecyGuide() {
                 <CardContent className="p-6 space-y-4">
                   <h3 className="font-semibold text-lg flex items-center gap-2">
                     <X className="w-5 h-5 text-destructive" />
-                    What Most Readers Experience
+                    {t('prophecyGuide.whatMostReadersExperience')}
                   </h3>
                   <ul className="space-y-3 text-muted-foreground text-sm">
                     <li className="flex items-start gap-2">
                       <X className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
-                      Reading creation as isolated history, disconnected from Christ
+                      {t('prophecyGuide.problemIsolatedHistory')}
                     </li>
                     <li className="flex items-start gap-2">
                       <X className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
-                      Missing the typological structure hidden in the days
+                      {t('prophecyGuide.problemMissingTypology')}
                     </li>
                     <li className="flex items-start gap-2">
                       <X className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
-                      No framework for connecting Genesis to the rest of Scripture
+                      {t('prophecyGuide.problemNoFramework')}
                     </li>
                   </ul>
                 </CardContent>
@@ -141,20 +143,20 @@ export default function BibleProphecyGuide() {
                 <CardContent className="p-6 space-y-4">
                   <h3 className="font-semibold text-lg flex items-center gap-2">
                     <Check className="w-5 h-5 text-primary" />
-                    What This Guide Provides
+                    {t('prophecyGuide.whatThisGuideProvides')}
                   </h3>
                   <ul className="space-y-3 text-muted-foreground text-sm">
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                      Learn Genesis as one continuous story
+                      {t('prophecyGuide.provideContinuousStory')}
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                      Turn Genesis into unforgettable images
+                      {t('prophecyGuide.provideUnforgettableImages')}
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                      A structured Genesis study system with Christ-centered connections
+                      {t('prophecyGuide.provideStructuredSystem')}
                     </li>
                   </ul>
                 </CardContent>
@@ -169,9 +171,9 @@ export default function BibleProphecyGuide() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
-              <Badge variant="secondary" className="mb-4">What's Inside</Badge>
+              <Badge variant="secondary" className="mb-4">{t('prophecyGuide.whatsInside')}</Badge>
               <h2 className="text-3xl md:text-4xl font-bold">
-                Your 6-Day Genesis Journey
+                {t('prophecyGuide.yourSixDayJourney')}
               </h2>
             </div>
 
@@ -210,19 +212,17 @@ export default function BibleProphecyGuide() {
           <div className="max-w-3xl mx-auto text-center">
             <Badge variant="outline" className="mb-4">
               <Sparkles className="w-3 h-3 mr-2" />
-              Sample Insight
+              {t('prophecyGuide.sampleInsight')}
             </Badge>
-            
+
             <Card className="border-accent/20 bg-gradient-to-br from-accent/5 to-primary/5 p-8">
-              <h3 className="text-xl font-semibold mb-4">Day 1: Light Before Sun</h3>
+              <h3 className="text-xl font-semibold mb-4">{t('prophecyGuide.day1Title')}</h3>
               <p className="text-muted-foreground leading-relaxed">
-                God creates light on Day 1, but the sun doesn't appear until Day 4. 
-                Most readers stumble here. But through the Phototheology lens, you see:
+                {t('prophecyGuide.day1Intro')}
                 <br /><br />
-                <strong className="text-foreground">"In him was life; and the life was the light of men." (John 1:4)</strong>
+                <strong className="text-foreground">{t('prophecyGuide.day1Verse')}</strong>
                 <br /><br />
-                Christ is the uncreated Light. The sun is merely a physical manifestation 
-                of what already existed in Him. Genesis 1 isn't just about origins—it's about identity.
+                {t('prophecyGuide.day1Conclusion')}
               </p>
             </Card>
           </div>
@@ -245,15 +245,15 @@ export default function BibleProphecyGuide() {
                   <BookOpen className="w-8 h-8 text-accent" />
                 </div>
                 
-                <h2 className="text-2xl font-bold">Genesis in 6 Days</h2>
+                <h2 className="text-2xl font-bold">{t('prophecyGuide.heroTitle')}</h2>
                 <p className="text-muted-foreground">
-                  See every chapter clearly. Learn Genesis as one continuous story.
+                  {t('prophecyGuide.ctaDescription')}
                 </p>
 
                 <div className="py-4">
-                  <p className="text-5xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">$9</p>
+                  <p className="text-5xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">{t('prophecyGuide.price')}</p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Instant PDF download
+                    {t('prophecyGuide.instantPdf')}
                   </p>
                 </div>
 
@@ -264,12 +264,12 @@ export default function BibleProphecyGuide() {
                 >
                   <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer">
                     <BookOpen className="w-5 h-5 mr-2" />
-                    Get the Guide Now
+                    {t('prophecyGuide.getTheGuideNow')}
                   </a>
                 </Button>
 
                 <p className="text-xs text-muted-foreground">
-                  One-time purchase • No subscription • Immediate access
+                  {t('prophecyGuide.oneTimePurchase')}
                 </p>
               </CardContent>
             </Card>
@@ -283,15 +283,13 @@ export default function BibleProphecyGuide() {
           <div className="max-w-2xl mx-auto text-center space-y-4">
             <Badge variant="outline" className="text-muted-foreground">
               <Layers className="w-3 h-3 mr-2" />
-              After Genesis
+              {t('prophecyGuide.afterGenesis')}
             </Badge>
             <h3 className="text-xl font-semibold">
-              This is One Chapter of a Larger System
+              {t('prophecyGuide.oneChapterTitle')}
             </h3>
             <p className="text-muted-foreground text-sm">
-              Genesis in 6 Days teaches you one pattern. The full Phototheology system 
-              maps <strong className="text-foreground">all 66 books</strong> of Scripture. 
-              After your purchase, you'll learn how to access the complete Palace training.
+              {t('prophecyGuide.oneChapterDescription')}
             </p>
           </div>
         </div>

@@ -45,3 +45,5 @@ export { ChurchSurveys } from "./ChurchSurveys";
 export { PushNotificationSettings } from "./PushNotificationSettings";
 export { StudyEngagementAnalytics } from "./StudyEngagementAnalytics";
 export { ChurchAdminTab } from "./ChurchAdminTab";
+export { DefenseMode } from "./DefenseMode";
+export { SpiritOfProphecyTab } from "./SpiritOfProphecyTab";

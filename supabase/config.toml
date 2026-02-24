@@ -270,3 +270,27 @@ verify_jwt = false
 
 [functions.mind-map-study]
 verify_jwt = false
+
+[functions.sms-webhook]
+verify_jwt = false
+
+[functions.sms-send-devotionals]
+verify_jwt = false
+
+[functions.batch-generate-devotional-days]
+verify_jwt = false
+
+[functions.generate-infographic]
+verify_jwt = false
+
+[functions.generate-study-series]
+verify_jwt = false
+
+[functions.generate-daily-cards]
+verify_jwt = false
+
+[functions.generate-epic-commentary]
+verify_jwt = false
+
+[functions.batch-generate-epic]
+verify_jwt = true

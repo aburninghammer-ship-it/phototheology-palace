@@ -6,11 +6,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  UserPlus, 
-  UserMinus, 
-  MapPin, 
-  Globe, 
+import {
+  UserPlus,
+  UserMinus,
+  MapPin,
+  Globe,
   Calendar,
   Trophy,
   Flame,
@@ -24,6 +24,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFollow } from "@/hooks/useFollow";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface UserProfile {
   id: string;
@@ -41,6 +42,7 @@ interface UserProfile {
 }
 
 export default function UserProfile() {
+  const { t } = useTranslation();
   const { userId } = useParams<{ userId: string }>();
   const { user: currentUser } = useAuth();
   const { toast } = useToast();
@@ -82,8 +84,8 @@ export default function UserProfile() {
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast({
-        title: "Error",
-        description: "Failed to load user profile",
+        title: t('common.error'),
+        description: t('userProfile.toasts.loadFailed'),
         variant: "destructive",
       });
     } finally {
@@ -164,7 +166,7 @@ export default function UserProfile() {
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 py-24 text-center">
-          <h1 className="text-2xl font-bold">User not found</h1>
+          <h1 className="text-2xl font-bold">{t('userProfile.notFound')}</h1>
         </div>
       </div>
     );
@@ -220,7 +222,7 @@ export default function UserProfile() {
                     )}
                     <span className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      Joined {format(new Date(profile.created_at), "MMMM yyyy")}
+                      {t('userProfile.joined', { date: format(new Date(profile.created_at), "MMMM yyyy") })}
                     </span>
                   </div>
                 </div>
@@ -235,12 +237,12 @@ export default function UserProfile() {
                     {isFollowing ? (
                       <>
                         <UserMinus className="w-4 h-4" />
-                        Unfollow
+                        {t('userProfile.unfollow')}
                       </>
                     ) : (
                       <>
                         <UserPlus className="w-4 h-4" />
-                        Follow
+                        {t('userProfile.follow')}
                       </>
                     )}
                   </Button>
@@ -248,7 +250,7 @@ export default function UserProfile() {
                 
                 {isOwnProfile && (
                   <Button asChild variant="outline">
-                    <Link to="/profile">Edit Profile</Link>
+                    <Link to="/profile">{t('userProfile.editProfile')}</Link>
                   </Button>
                 )}
               </div>
@@ -257,25 +259,25 @@ export default function UserProfile() {
               <div className="flex flex-wrap gap-6">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">{followersCount}</div>
-                  <div className="text-sm text-muted-foreground">Followers</div>
+                  <div className="text-sm text-muted-foreground">{t('userProfile.stats.followers')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">{followingCount}</div>
-                  <div className="text-sm text-muted-foreground">Following</div>
+                  <div className="text-sm text-muted-foreground">{t('userProfile.stats.following')}</div>
                 </div>
                 <div className="text-center flex flex-col items-center">
                   <div className="flex items-center gap-1">
                     <Trophy className="w-5 h-5 text-amber-500" />
                     <span className="text-2xl font-bold">{profile.points}</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">Points</div>
+                  <div className="text-sm text-muted-foreground">{t('userProfile.stats.points')}</div>
                 </div>
                 <div className="text-center flex flex-col items-center">
                   <div className="flex items-center gap-1">
                     <Flame className="w-5 h-5 text-orange-500" />
                     <span className="text-2xl font-bold">{profile.daily_study_streak}</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">Day Streak</div>
+                  <div className="text-sm text-muted-foreground">{t('userProfile.stats.dayStreak')}</div>
                 </div>
               </div>
             </div>
@@ -285,15 +287,15 @@ export default function UserProfile() {
         {/* Content Tabs */}
         <Tabs defaultValue="challenges" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="challenges">Challenges</TabsTrigger>
-            <TabsTrigger value="posts">Posts</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
+            <TabsTrigger value="challenges">{t('userProfile.tabs.challenges')}</TabsTrigger>
+            <TabsTrigger value="posts">{t('userProfile.tabs.posts')}</TabsTrigger>
+            <TabsTrigger value="achievements">{t('userProfile.tabs.achievements')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="challenges" className="space-y-4">
             {sharedChallenges.length === 0 ? (
               <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No shared challenges yet</p>
+                <p className="text-muted-foreground">{t('userProfile.noChallenges')}</p>
               </Card>
             ) : (
               sharedChallenges.map((challenge) => (
@@ -307,13 +309,13 @@ export default function UserProfile() {
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">{challenge.difficulty}</Badge>
                         <span className="text-sm text-muted-foreground">
-                          {challenge.solve_count} solves
+                          {t('userProfile.solves', { count: challenge.solve_count })}
                         </span>
                       </div>
                     </div>
                     <Button asChild variant="outline" size="sm">
                       <Link to={`/equations?code=${challenge.share_code}`}>
-                        Try Challenge
+                        {t('userProfile.tryChallenge')}
                       </Link>
                     </Button>
                   </div>
@@ -325,7 +327,7 @@ export default function UserProfile() {
           <TabsContent value="posts" className="space-y-4">
             {posts.length === 0 ? (
               <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No posts yet</p>
+                <p className="text-muted-foreground">{t('userProfile.noPosts')}</p>
               </Card>
             ) : (
               posts.map((post) => (
@@ -350,7 +352,7 @@ export default function UserProfile() {
             <Card className="p-6 mb-4 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold mb-1">Mastery Progress</h3>
+                  <h3 className="text-lg font-semibold mb-1">{t('userProfile.masteryProgress')}</h3>
                   <p className="text-sm text-muted-foreground">
                     {profile.master_title ? `${profile.master_title.charAt(0).toUpperCase() + profile.master_title.slice(1)} Master` : 'Apprentice'} - Floor {profile.current_floor}
                   </p>
@@ -366,7 +368,7 @@ export default function UserProfile() {
 
             {achievements.length === 0 ? (
               <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No achievements unlocked yet</p>
+                <p className="text-muted-foreground">{t('userProfile.noAchievements')}</p>
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

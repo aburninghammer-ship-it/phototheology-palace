@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -337,6 +338,7 @@ function Palace3DScene({ locations, currentIndex, visitedRooms, showVerse }: Pal
 export default function MemoryPalace3D() {
   const { listId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [locations, setLocations] = useState<PalaceLocation[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showVerse, setShowVerse] = useState(false);
@@ -363,13 +365,13 @@ export default function MemoryPalace3D() {
       .order("order_index");
 
     if (error) {
-      toast.error("Failed to load memory palace");
+      toast.error(t('games.memoryPalace.failedToLoad'));
       navigate("/memory");
       return;
     }
 
     if (!data || data.length === 0) {
-      toast.error("No memory palace found. Build one first!");
+      toast.error(t('games.memoryPalace.noPalaceFound'));
       navigate(`/memory/palace-builder/${listId}`);
       return;
     }
@@ -389,7 +391,7 @@ export default function MemoryPalace3D() {
       // All rooms visited
       setVisitedRooms(prev => new Set([...prev, currentIndex]));
       setCompleted(true);
-      toast.success("Palace Walk Complete!");
+      toast.success(t('games.memoryPalace.walkComplete'));
     }
   };
 
@@ -410,7 +412,7 @@ export default function MemoryPalace3D() {
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center text-white">
           <Sparkles className="h-12 w-12 mx-auto mb-4 animate-pulse text-purple-400" />
-          <p className="text-lg">Loading your memory palace...</p>
+          <p className="text-lg">{t('games.memoryPalace.loading')}</p>
         </div>
       </div>
     );
@@ -422,15 +424,15 @@ export default function MemoryPalace3D() {
         <Card className="max-w-md w-full bg-slate-800/90 border-purple-500/30 text-white">
           <CardContent className="pt-6 space-y-6 text-center">
             <div className="text-6xl">🏛️</div>
-            <h2 className="text-2xl font-bold text-purple-300">Palace Walk Complete!</h2>
+            <h2 className="text-2xl font-bold text-purple-300">{t('games.memoryPalace.walkComplete')}</h2>
             <p className="text-gray-300">
-              You've walked through all {locations.length} locations in your memory palace.
+              {t('games.memoryPalace.walkedThroughAll', { count: locations.length })}
             </p>
 
             <div className="bg-purple-900/50 rounded-lg p-4">
               <div className="flex items-center justify-center gap-2 text-yellow-400">
                 <Trophy className="h-5 w-5" />
-                <span className="font-bold">{locations.length} / {locations.length} rooms visited</span>
+                <span className="font-bold">{t('games.memoryPalace.roomsVisited', { visited: locations.length, total: locations.length })}</span>
               </div>
             </div>
 
@@ -441,7 +443,7 @@ export default function MemoryPalace3D() {
                 className="flex-1 border-white/30 text-white hover:bg-white/10"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Lists
+                {t('games.memoryPalace.backToLists')}
               </Button>
               <Button
                 onClick={() => {
@@ -452,7 +454,7 @@ export default function MemoryPalace3D() {
                 }}
                 className="flex-1 bg-purple-600 hover:bg-purple-700"
               >
-                Walk Again
+                {t('games.memoryPalace.walkAgain')}
               </Button>
             </div>
           </CardContent>
@@ -493,7 +495,7 @@ export default function MemoryPalace3D() {
             onClick={() => navigate("/memory")}
             className="text-white hover:bg-white/10"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" /> Exit Palace
+            <ArrowLeft className="h-4 w-4 mr-2" /> {t('games.memoryPalace.exitPalace')}
           </Button>
 
           <div className="flex items-center gap-4">
@@ -501,7 +503,7 @@ export default function MemoryPalace3D() {
               <Home className="h-3 w-3 mr-1" /> {currentIndex + 1} / {locations.length}
             </Badge>
             <Badge variant="outline" className="text-green-400 border-green-400/30">
-              <Trophy className="h-3 w-3 mr-1" /> {visitedRooms.size} visited
+              <Trophy className="h-3 w-3 mr-1" /> {t('games.memoryPalace.visitedCount', { count: visitedRooms.size })}
             </Badge>
           </div>
         </div>
@@ -514,25 +516,25 @@ export default function MemoryPalace3D() {
             {/* Location header */}
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-purple-300 uppercase tracking-wide">Current Location</p>
+                <p className="text-xs text-purple-300 uppercase tracking-wide">{t('games.memoryPalace.currentLocation')}</p>
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-purple-400" />
                   {currentLocation.location_name}
                 </h3>
               </div>
-              <Badge className="bg-purple-600">Room {currentIndex + 1}</Badge>
+              <Badge className="bg-purple-600">{t('games.memoryPalace.roomNumber', { number: currentIndex + 1 })}</Badge>
             </div>
 
             {/* Visualization */}
             <div className="bg-purple-900/30 rounded-lg p-3 border border-purple-500/20">
-              <p className="text-xs text-purple-300 mb-1">Your Visualization:</p>
+              <p className="text-xs text-purple-300 mb-1">{t('games.memoryPalace.yourVisualization')}:</p>
               <p className="text-sm text-gray-200">{currentLocation.visualization}</p>
             </div>
 
             {/* Verse reveal section */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-purple-300">The Verse:</p>
+                <p className="text-xs text-purple-300">{t('games.memoryPalace.theVerse')}:</p>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -542,12 +544,12 @@ export default function MemoryPalace3D() {
                   {showVerse ? (
                     <>
                       <EyeOff className="mr-2 h-4 w-4" />
-                      Hide
+                      {t('games.memoryPalace.hide')}
                     </>
                   ) : (
                     <>
                       <Eye className="mr-2 h-4 w-4" />
-                      Reveal
+                      {t('games.memoryPalace.reveal')}
                     </>
                   )}
                 </Button>
@@ -561,7 +563,7 @@ export default function MemoryPalace3D() {
               ) : (
                 <div className="bg-gray-800/50 rounded-lg p-4 border-2 border-dashed border-gray-600/50">
                   <p className="text-center text-sm text-gray-400">
-                    Recall the verse from your visualization, then reveal to check
+                    {t('games.memoryPalace.recallVerse')}
                   </p>
                 </div>
               )}
@@ -576,7 +578,7 @@ export default function MemoryPalace3D() {
                 className="flex-1 border-white/30 text-white hover:bg-white/10 disabled:opacity-30"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Previous
+                {t('games.common.previous')}
               </Button>
               <Button
                 onClick={handleNext}
@@ -584,12 +586,12 @@ export default function MemoryPalace3D() {
               >
                 {currentIndex < locations.length - 1 ? (
                   <>
-                    Next Room
+                    {t('games.memoryPalace.nextRoom')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 ) : (
                   <>
-                    Complete Walk
+                    {t('games.memoryPalace.completeWalk')}
                     <Trophy className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -625,7 +627,7 @@ export default function MemoryPalace3D() {
       {/* Controls help */}
       <div className="absolute bottom-4 left-4 z-10 hidden md:block">
         <Card className="bg-black/50 border-white/10 text-white/70 text-xs p-2">
-          <p>Drag to rotate • Scroll to zoom</p>
+          <p>{t('games.memoryPalace.controlsHelp')}</p>
         </Card>
       </div>
     </div>

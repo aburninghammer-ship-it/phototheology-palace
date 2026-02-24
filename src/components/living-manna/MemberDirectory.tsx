@@ -6,10 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Users, MapPin, Mail, UserPlus, Loader2 } from "lucide-react";
+import { Search, Users, MapPin, Mail, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useDirectMessagesContext } from "@/contexts/DirectMessagesContext";
 import { useAuth } from "@/hooks/useAuth";
+import { FollowButton } from "./connect/FollowButton";
+import { MemberProfileView } from "./profile/MemberProfileView";
+import { useChurchActiveUsers } from "@/hooks/useChurchActiveUsers";
 
 interface Member {
   id: string;
@@ -37,9 +40,12 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [messagingUserId, setMessagingUserId] = useState<string | null>(null);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const { startConversation, setActiveConversationId } = useDirectMessagesContext();
+  const { liveMembers } = useChurchActiveUsers(churchId);
+  const liveUserIds = new Set(liveMembers.map((m) => m.id));
 
   const handleMessage = async (memberId: string) => {
     if (!memberId || memberId === user?.id) return;
@@ -47,11 +53,16 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
     setMessagingUserId(memberId);
     try {
       const conversationId = await startConversation(memberId);
-      setActiveConversationId(conversationId);
-      toast({
-        title: "Chat opened",
-        description: "You can now message this member",
-      });
+      if (conversationId) {
+        setActiveConversationId(conversationId);
+        window.dispatchEvent(new CustomEvent('open-chat-sidebar', {
+          detail: { conversationId, userId: memberId }
+        }));
+        toast({
+          title: "Chat opened",
+          description: "You can now message this member",
+        });
+      }
     } catch (error: any) {
       console.error('Error starting conversation:', error);
       toast({
@@ -68,7 +79,7 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
     loadMembers();
   }, [churchId]);
 
-  const loadMembers = async () => {
+  const loadMembers = async (attempt = 0) => {
     try {
       // First get church members
       const { data: membersData, error: membersError } = await supabase
@@ -104,6 +115,12 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
 
       setMembers(mergedMembers as any);
     } catch (error: any) {
+      // Retry up to 2 times on network errors
+      if (attempt < 2 && error?.message?.includes("Failed to fetch")) {
+        console.warn(`[MemberDirectory] Retry attempt ${attempt + 1}`);
+        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        return loadMembers(attempt + 1);
+      }
       toast({
         title: "Error loading members",
         description: error.message,
@@ -114,13 +131,19 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
     }
   };
 
-  const filteredMembers = members.filter((member) => {
-    const name = member.profiles?.display_name || member.profiles?.username || "";
-    const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.profiles?.bio?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = !selectedRole || member.role === selectedRole;
-    return matchesSearch && matchesRole;
-  });
+  const filteredMembers = members
+    .filter((member) => {
+      const name = member.profiles?.display_name || member.profiles?.username || "";
+      const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        member.profiles?.bio?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRole = !selectedRole || member.role === selectedRole;
+      return matchesSearch && matchesRole;
+    })
+    .sort((a, b) => {
+      const aOnline = liveUserIds.has(a.user_id) ? 1 : 0;
+      const bOnline = liveUserIds.has(b.user_id) ? 1 : 0;
+      return bOnline - aOnline;
+    });
 
   const roles = ["admin", "leader", "member"];
   const roleColors: Record<string, string> = {
@@ -138,6 +161,17 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
           </div>
         </CardContent>
       </Card>
+    );
+  }
+
+  // Show member profile when a card is clicked
+  if (selectedMemberId) {
+    return (
+      <MemberProfileView
+        userId={selectedMemberId}
+        churchId={churchId}
+        onBack={() => setSelectedMemberId(null)}
+      />
     );
   }
 
@@ -191,15 +225,20 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
           <ScrollArea className="h-[500px]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredMembers.map((member) => (
-                <Card key={member.id} className="hover:shadow-md transition-shadow">
+                <Card key={member.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setSelectedMemberId(member.user_id)}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
-                      <Avatar className="h-12 w-12 border-2 border-primary/20">
-                        <AvatarImage src={member.profiles?.avatar_url || undefined} />
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          {(member.profiles?.display_name || member.profiles?.username || "?")[0]?.toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="relative shrink-0">
+                        <Avatar className="h-12 w-12 border-2 border-primary/20">
+                          <AvatarImage src={member.profiles?.avatar_url || undefined} />
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            {(member.profiles?.display_name || member.profiles?.username || "?")[0]?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        {liveUserIds.has(member.user_id) && (
+                          <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-background" />
+                        )}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <h4 className="font-medium truncate">
@@ -236,7 +275,7 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
                         variant="outline"
                         size="sm"
                         className="flex-1 text-xs"
-                        onClick={() => handleMessage(member.user_id)}
+                        onClick={(e) => { e.stopPropagation(); handleMessage(member.user_id); }}
                         disabled={messagingUserId === member.user_id || member.user_id === user?.id}
                       >
                         {messagingUserId === member.user_id ? (
@@ -246,10 +285,12 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
                         )}
                         {member.user_id === user?.id ? "You" : "Message"}
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-xs">
-                        <UserPlus className="h-3 w-3 mr-1" />
-                        Follow
-                      </Button>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <FollowButton
+                          targetUserId={member.user_id}
+                          isCurrentUser={member.user_id === user?.id}
+                        />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

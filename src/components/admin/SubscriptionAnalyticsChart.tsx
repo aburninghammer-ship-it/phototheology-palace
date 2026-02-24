@@ -9,39 +9,42 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface AnalyticsSnapshot {
   snapshot_date: string;
-  active_subscriptions: number;
-  trialing_subscriptions: number;
-  canceled_subscriptions: number;
+  stripe_active: number;
+  stripe_trialing: number;
+  stripe_cancelled: number;
   total_users: number;
   lifetime_access: number;
-  active_patrons: number;
-  pickaxe_paid: number;
+  patreon_active: number;
+  pickaxe_count: number;
   mrr_cents: number;
-  essential_count: number;
-  premium_count: number;
-  student_count: number;
-  church_count: number;
+  tier_essential: number;
+  tier_premium: number;
+  tier_student: number;
+  tier_church: number;
 }
 
-type TimeRange = '7d' | '30d' | '90d' | 'all';
+type TimeRange = '7d' | '30d' | '90d' | 'all' | 'jan18';
 
 export function SubscriptionAnalyticsChart() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [recording, setRecording] = useState(false);
   const [snapshots, setSnapshots] = useState<AnalyticsSnapshot[]>([]);
-  const [timeRange, setTimeRange] = useState<TimeRange>('30d');
+  const [timeRange, setTimeRange] = useState<TimeRange>('jan18');
 
   const loadSnapshots = async () => {
     setLoading(true);
     try {
-      let query = supabase
-        .from("subscription_analytics_snapshots")
+      // Use analytics_snapshots table which has complete historical data
+      let query = (supabase as any)
+        .from("analytics_snapshots")
         .select("*")
         .order("snapshot_date", { ascending: true });
 
       // Apply time filter
-      if (timeRange !== 'all') {
+      if (timeRange === 'jan18') {
+        query = query.gte("snapshot_date", "2026-01-18");
+      } else if (timeRange !== 'all') {
         const daysAgo = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - daysAgo);
@@ -51,7 +54,7 @@ export function SubscriptionAnalyticsChart() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setSnapshots(data || []);
+      setSnapshots((data as AnalyticsSnapshot[]) || []);
     } catch (error: any) {
       console.error("Error loading snapshots:", error);
       toast({
@@ -104,17 +107,17 @@ export function SubscriptionAnalyticsChart() {
   const chartData = snapshots.map((s) => ({
     date: new Date(s.snapshot_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     fullDate: s.snapshot_date,
-    active: s.active_subscriptions,
-    trialing: s.trialing_subscriptions,
-    patrons: s.active_patrons,
-    pickaxe: s.pickaxe_paid,
+    active: s.stripe_active,
+    trialing: s.stripe_trialing,
+    patrons: s.patreon_active,
+    pickaxe: s.pickaxe_count,
     lifetime: s.lifetime_access,
     mrr: s.mrr_cents / 100,
-    total: s.active_subscriptions + s.active_patrons + s.lifetime_access,
+    total: s.stripe_active + s.patreon_active + s.lifetime_access,
     users: s.total_users,
-    essential: s.essential_count,
-    premium: s.premium_count,
-    student: s.student_count,
+    essential: s.tier_essential,
+    premium: s.tier_premium,
+    student: s.tier_student,
   }));
 
   // Calculate growth
@@ -151,6 +154,7 @@ export function SubscriptionAnalyticsChart() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="jan18">Since Jan 18</SelectItem>
               <SelectItem value="7d">Last 7 days</SelectItem>
               <SelectItem value="30d">Last 30 days</SelectItem>
               <SelectItem value="90d">Last 90 days</SelectItem>

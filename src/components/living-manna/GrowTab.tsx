@@ -1,6 +1,6 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sprout, Shield, Video, Calendar, Bell, BarChart3, TrendingUp, Droplets } from "lucide-react";
+import { Sprout, Shield, Video, Calendar, Bell, BarChart3, TrendingUp, Droplets, MapPin } from "lucide-react";
 import { LeaderOnboarding } from "./LeaderOnboarding";
 import { SermonHub } from "./SermonHub";
 import { ChurchEvents } from "./ChurchEvents";
@@ -8,6 +8,7 @@ import { PushNotificationSettings } from "./PushNotificationSettings";
 import { StudyEngagementAnalytics } from "./StudyEngagementAnalytics";
 import { ContentPerformanceAnalytics } from "./ContentPerformanceAnalytics";
 import { BaptismTrack } from "./baptism-track/BaptismTrack";
+import { ServiceCheckIn } from "./grow/ServiceCheckIn";
 
 interface GrowTabProps {
   churchId: string;
@@ -58,6 +59,10 @@ export function GrowTab({ churchId }: GrowTabProps) {
             <Bell className="h-4 w-4" />
             Notifications
           </TabsTrigger>
+          <TabsTrigger value="checkin" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <MapPin className="h-4 w-4" />
+            Check-In
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="baptism">
@@ -86,6 +91,10 @@ export function GrowTab({ churchId }: GrowTabProps) {
 
         <TabsContent value="notifications">
           <PushNotificationSettings />
+        </TabsContent>
+
+        <TabsContent value="checkin">
+          <ServiceCheckIn churchId={churchId} />
         </TabsContent>
       </Tabs>
     </div>

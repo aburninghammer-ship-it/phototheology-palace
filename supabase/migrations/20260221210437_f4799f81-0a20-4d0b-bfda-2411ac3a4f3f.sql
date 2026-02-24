@@ -1,0 +1,1 @@
+ALTER TYPE public.ministry_role ADD VALUE IF NOT EXISTS 'personal_ministry_admin';

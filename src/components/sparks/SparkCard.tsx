@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Bookmark, Search, Flame, Sparkles, Lightbulb, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
+import { X, Bookmark, Search, Flame, Sparkles, Lightbulb, ChevronDown, ChevronUp, BookOpen, Plus, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import type { Spark } from '@/hooks/useSparks';
 
 interface SparkCardProps {
@@ -13,6 +14,7 @@ interface SparkCardProps {
   onExplore: () => void;
   onSave: () => void;
   onDismiss: () => void;
+  onAddToNotes?: (text: string) => void;
 }
 
 const sparkTypeConfig = {
@@ -47,23 +49,88 @@ export function SparkCard({
   onClose,
   onExplore,
   onSave,
-  onDismiss
+  onDismiss,
+  onAddToNotes
 }: SparkCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedText, setSelectedText] = useState('');
+  const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const config = sparkTypeConfig[spark.spark_type];
   const Icon = config.icon;
 
   // Check if insight is long enough to need expansion
   const needsExpansion = spark.insight && spark.insight.length > 200;
 
+  // Handle text selection
+  const handleMouseUp = useCallback(() => {
+    const selection = window.getSelection();
+    const text = selection?.toString().trim();
+
+    if (text && text.length > 5) {
+      setSelectedText(text);
+
+      // Get selection position for popup
+      const range = selection?.getRangeAt(0);
+      if (range && cardRef.current) {
+        const rect = range.getBoundingClientRect();
+        const cardRect = cardRef.current.getBoundingClientRect();
+        setSelectionPosition({
+          x: rect.left - cardRect.left + rect.width / 2,
+          y: rect.top - cardRect.top - 10
+        });
+      }
+    } else {
+      setSelectedText('');
+      setSelectionPosition(null);
+    }
+  }, []);
+
+  // Clear selection when clicking elsewhere
+  const handleClickOutside = useCallback((e: MouseEvent) => {
+    if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+      setSelectedText('');
+      setSelectionPosition(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [handleClickOutside]);
+
+  // Add selected text to notes
+  const handleAddToNotes = () => {
+    if (selectedText && onAddToNotes) {
+      onAddToNotes(`"${selectedText}" — ${spark.title}`);
+      toast.success('Added to notes!');
+      setSelectedText('');
+      setSelectionPosition(null);
+      window.getSelection()?.removeAllRanges();
+    }
+  };
+
+  // Copy selected text to clipboard
+  const handleCopy = () => {
+    if (selectedText) {
+      navigator.clipboard.writeText(selectedText);
+      toast.success('Copied to clipboard!');
+      setSelectedText('');
+      setSelectionPosition(null);
+      window.getSelection()?.removeAllRanges();
+    }
+  };
+
   return (
     <AnimatePresence>
       <motion.div
+        ref={cardRef}
         initial={{ opacity: 0, y: 10, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -10, scale: 0.95 }}
         transition={{ duration: 0.25, ease: "easeOut" }}
         className="relative"
+        onMouseUp={handleMouseUp}
       >
         {/* Outer glow */}
         <div className={cn(
@@ -71,11 +138,49 @@ export function SparkCard({
           `bg-gradient-to-br ${config.gradient}`
         )} />
         
+        {/* Selection popup */}
+        <AnimatePresence>
+          {selectedText && selectionPosition && (
+            <motion.div
+              initial={{ opacity: 0, y: 5, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 5, scale: 0.9 }}
+              className="absolute z-50 flex gap-1 p-1 rounded-lg bg-background/95 backdrop-blur-sm border border-white/20 shadow-xl"
+              style={{
+                left: selectionPosition.x,
+                top: selectionPosition.y,
+                transform: 'translate(-50%, -100%)'
+              }}
+            >
+              {onAddToNotes && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs gap-1 hover:bg-primary/20 hover:text-primary"
+                  onClick={handleAddToNotes}
+                >
+                  <Plus size={12} />
+                  Notes
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 px-2 text-xs gap-1 hover:bg-muted"
+                onClick={handleCopy}
+              >
+                <Copy size={12} />
+                Copy
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Glass card */}
         <div className={cn(
           'relative w-[calc(100vw-2rem)] max-w-sm rounded-xl overflow-hidden',
           'backdrop-blur-xl bg-background/70',
-          'border-2 shadow-xl',
+          'border-2 shadow-xl select-text',
           config.borderColor,
           config.glowColor
         )}>

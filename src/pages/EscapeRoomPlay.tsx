@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,6 +60,7 @@ export default function EscapeRoomPlay() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [room, setRoom] = useState<EscapeRoom | null>(null);
   const [puzzles, setPuzzles] = useState<Puzzle[]>([]);
@@ -141,7 +143,7 @@ export default function EscapeRoomPlay() {
     resumeGame();
     setGameStarted(true);
     setShowResumeDialog(false);
-    toast.success("Welcome back! Your progress has been restored.");
+    toast.success(t('escapeRoom.play.welcomeBack'));
   }, [resumeGame]);
 
   // Handle start new game
@@ -179,7 +181,7 @@ export default function EscapeRoomPlay() {
       .single();
 
     if (roomError || !roomData) {
-      toast.error("Escape room not found");
+      toast.error(t('escapeRoom.play.roomNotFound'));
       navigate('/escape-room');
       return;
     }
@@ -206,7 +208,7 @@ export default function EscapeRoomPlay() {
     // Check for repeated principle
     let penaltyScore = 0;
     if (usedPrinciples.includes(principleUsed) && currentPuzzleIndex > 0) {
-      toast.error("Cannot reuse the same principle back-to-back (−1 pt penalty)");
+      toast.error(t('escapeRoom.play.principleReuse'));
       penaltyScore = 1;
     }
 
@@ -294,7 +296,7 @@ export default function EscapeRoomPlay() {
       }];
       const newUsedPrinciples = [...usedPrinciples, principleUsed];
 
-      toast.success(isCorrect ? `Perfect! +${pointsEarned} pts` : `Partial credit: +${pointsEarned} pts`);
+      toast.success(isCorrect ? t('escapeRoom.play.perfect', { points: pointsEarned }) : t('escapeRoom.play.partialCredit', { points: pointsEarned }));
 
       // Move to next puzzle or finish
       if (currentPuzzleIndex < puzzles.length - 1) {
@@ -313,7 +315,7 @@ export default function EscapeRoomPlay() {
           };
           setGameState(newState);
           saveSession(newState, newScore, currentPuzzleIndex + 1);
-          toast.info(`Moving to Puzzle ${nextPuzzleNumber}...`, { duration: 3000 });
+          toast.info(t('escapeRoom.play.movingToPuzzle', { number: nextPuzzleNumber }), { duration: 3000 });
         }, 1000);
       } else {
         // Update final state before finishing
@@ -327,7 +329,7 @@ export default function EscapeRoomPlay() {
       }
     } catch (error) {
       console.error('Error submitting solution:', error);
-      toast.error("Failed to submit solution");
+      toast.error(t('escapeRoom.play.failedSubmit'));
     } finally {
       setIsSubmitting(false);
     }
@@ -335,7 +337,7 @@ export default function EscapeRoomPlay() {
 
   const requestHint = () => {
     if (!room || hintsUsed >= room.max_hints) {
-      toast.error("No hints remaining");
+      toast.error(t('escapeRoom.play.noHints'));
       return;
     }
 
@@ -348,7 +350,7 @@ export default function EscapeRoomPlay() {
       showHint: true,
     }));
     saveSession({ hintsUsed: newHintsUsed, score: newScore, showHint: true }, newScore);
-    toast.info("Hint revealed (−2 pts)");
+    toast.info(t('escapeRoom.play.hintRevealed'));
   };
 
   const finishAttempt = async (completed: boolean, finalScore?: number) => {
@@ -369,7 +371,7 @@ export default function EscapeRoomPlay() {
     // Mark the game session as completed
     await completeGame(scoreToSave);
 
-    toast.success(completed ? "Escape room completed!" : "Time's up!");
+    toast.success(completed ? t('escapeRoom.play.completed') : t('escapeRoom.play.timesUp'));
     navigate('/escape-room');
   };
 
@@ -391,7 +393,7 @@ export default function EscapeRoomPlay() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading escape room...</p>
+          <p>{t('escapeRoom.play.loading')}</p>
         </div>
       </div>
     );
@@ -408,25 +410,25 @@ export default function EscapeRoomPlay() {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Play className="w-5 h-5 text-primary" />
-                  Resume Escape Room?
+                  {t('escapeRoom.play.resumeTitle')}
                 </DialogTitle>
                 <DialogDescription>
-                  You have an ongoing escape room session for "{room.title}".
+                  {t('escapeRoom.play.ongoingSession', { title: room.title })}
                   <div className="mt-3 p-3 bg-accent/10 rounded-lg space-y-1 text-sm">
-                    <p><strong>Progress:</strong> Puzzle {gameState.currentPuzzleIndex + 1} of {puzzles.length}</p>
-                    <p><strong>Score:</strong> {gameState.score} pts</p>
-                    <p><strong>Time:</strong> {Math.floor(gameState.timeElapsed / 60)}:{(gameState.timeElapsed % 60).toString().padStart(2, '0')}</p>
+                    <p><strong>{t('escapeRoom.play.progress')}:</strong> {t('escapeRoom.play.puzzleOf', { current: gameState.currentPuzzleIndex + 1, total: puzzles.length })}</p>
+                    <p><strong>{t('common.score')}:</strong> {gameState.score} {t('common.pts')}</p>
+                    <p><strong>{t('common.time')}:</strong> {Math.floor(gameState.timeElapsed / 60)}:{(gameState.timeElapsed % 60).toString().padStart(2, '0')}</p>
                   </div>
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter className="flex gap-2 sm:gap-0">
                 <Button variant="outline" onClick={handleStartNewGame} className="flex items-center gap-2">
                   <RotateCcw className="w-4 h-4" />
-                  Start Over
+                  {t('common.startOver')}
                 </Button>
                 <Button onClick={handleResumeGame} className="flex items-center gap-2">
                   <Play className="w-4 h-4" />
-                  Resume
+                  {t('common.resume')}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -446,16 +448,16 @@ export default function EscapeRoomPlay() {
             <CardHeader>
               <CardTitle>{room.title}</CardTitle>
               <CardDescription>
-                {puzzles.length} puzzles · {room.time_limit_minutes} minutes · {room.max_hints} hints available
+                {t('escapeRoom.play.startDescription', { puzzles: puzzles.length, minutes: room.time_limit_minutes, hints: room.max_hints })}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Your progress will be automatically saved. You can leave and resume anytime.
+                {t('escapeRoom.play.autoSaveNote')}
               </p>
               <Button onClick={handleStartNewGame} className="w-full" size="lg">
                 <Play className="w-4 h-4 mr-2" />
-                Begin Escape Room
+                {t('escapeRoom.play.beginEscapeRoom')}
               </Button>
             </CardContent>
           </Card>
@@ -487,11 +489,11 @@ export default function EscapeRoomPlay() {
             </div>
             <div className="flex items-center gap-2">
               <Trophy className="w-4 h-4" />
-              <span>{score} pts</span>
+              <span>{t('common.scorePts', { score })}</span>
             </div>
             <div className="flex items-center gap-2">
               <HelpCircle className="w-4 h-4" />
-              <span>{hintsUsed}/{room.max_hints} used</span>
+              <span>{t('escapeRoom.play.hintsUsed', { used: hintsUsed, max: room.max_hints })}</span>
             </div>
           </div>
           <Progress value={progress} className="mt-4" />
@@ -505,12 +507,12 @@ export default function EscapeRoomPlay() {
                 <CardTitle className="flex items-center gap-2">
                   {currentPuzzle.floor_number && (
                     <span className="text-sm font-normal text-muted-foreground">
-                      Floor {currentPuzzle.floor_number}
+                      {t('escapeRoom.play.floor', { number: currentPuzzle.floor_number })}
                     </span>
                   )}
-                  <span className="text-2xl font-bold text-primary">Puzzle {currentPuzzle.puzzle_number}</span>
+                  <span className="text-2xl font-bold text-primary">{t('escapeRoom.play.puzzleNumber', { number: currentPuzzle.puzzle_number })}</span>
                   <span className="text-sm font-normal text-muted-foreground">
-                    of {puzzles.length}
+                    {t('escapeRoom.play.ofTotal', { total: puzzles.length })}
                   </span>
                   <span className="text-xs font-normal text-muted-foreground px-2 py-1 bg-accent/10 rounded">
                     {currentPuzzle.room_tag}
@@ -522,17 +524,17 @@ export default function EscapeRoomPlay() {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-primary">
-                  {currentPuzzle.points_perfect} pts
+                  {t('common.scorePts', { score: currentPuzzle.points_perfect })}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Partial: {currentPuzzle.points_partial}
+                  {t('escapeRoom.play.partial', { points: currentPuzzle.points_partial })}
                 </div>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="font-semibold mb-2">Challenge:</h3>
+              <h3 className="font-semibold mb-2">{t('escapeRoom.play.challenge')}:</h3>
               <p className="text-muted-foreground">{currentPuzzle.prompt}</p>
             </div>
 
@@ -540,7 +542,7 @@ export default function EscapeRoomPlay() {
               <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
                 <h3 className="font-semibold text-accent mb-2 flex items-center gap-2">
                   <Zap className="w-4 h-4" />
-                  Hint:
+                  {t('escapeRoom.play.hint')}:
                 </h3>
                 <p className="text-sm">{currentPuzzle.typology_notes}</p>
               </div>
@@ -548,7 +550,7 @@ export default function EscapeRoomPlay() {
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="verses">KJV Verses (one per line)</Label>
+                <Label htmlFor="verses">{t('escapeRoom.play.kjvVersesLabel')}</Label>
                 <Textarea
                   id="verses"
                   value={submittedVerses}
@@ -560,23 +562,23 @@ export default function EscapeRoomPlay() {
               </div>
 
               <div>
-                <Label htmlFor="justification">Palace Room Justification (1-2 sentences)</Label>
+                <Label htmlFor="justification">{t('escapeRoom.play.justificationLabel')}</Label>
                 <Textarea
                   id="justification"
                   value={roomJustification}
                   onChange={(e) => updateRoomJustification(e.target.value)}
-                  placeholder="Explain which room(s) you used and how..."
+                  placeholder={t('escapeRoom.play.justificationPlaceholder')}
                   rows={2}
                 />
               </div>
 
               <div>
-                <Label htmlFor="principle">Principle Used</Label>
+                <Label htmlFor="principle">{t('escapeRoom.play.principleUsedLabel')}</Label>
                 <Input
                   id="principle"
                   value={principleUsed}
                   onChange={(e) => updatePrincipleUsed(e.target.value)}
-                  placeholder="e.g., Typology, Parallels, Sanctuary"
+                  placeholder={t('escapeRoom.play.principlePlaceholder')}
                   className="text-sm"
                 />
               </div>
@@ -589,7 +591,7 @@ export default function EscapeRoomPlay() {
                 className="flex-1"
                 size="lg"
               >
-                {isSubmitting ? "Submitting..." : "Submit Solution"}
+                {isSubmitting ? t('common.submitting') : t('escapeRoom.play.submitSolution')}
               </Button>
               <Button
                 onClick={requestHint}
@@ -597,7 +599,7 @@ export default function EscapeRoomPlay() {
                 disabled={showHint || hintsUsed >= room.max_hints}
               >
                 <HelpCircle className="w-4 h-4 mr-2" />
-                Hint (−2 pts)
+                {t('escapeRoom.play.hintButton')}
               </Button>
             </div>
           </CardContent>
@@ -607,7 +609,7 @@ export default function EscapeRoomPlay() {
         {solutions.length > 0 && (
           <Card className="border-accent/20">
             <CardHeader>
-              <CardTitle className="text-lg">Progress</CardTitle>
+              <CardTitle className="text-lg">{t('escapeRoom.play.progress')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -619,9 +621,9 @@ export default function EscapeRoomPlay() {
                       ) : (
                         <XCircle className="w-4 h-4 text-orange-500" />
                       )}
-                      <span>Puzzle {sol.puzzle_number}</span>
+                      <span>{t('escapeRoom.play.puzzleNumber', { number: sol.puzzle_number })}</span>
                     </div>
-                    <span className="text-muted-foreground">+{sol.points_earned} pts</span>
+                    <span className="text-muted-foreground">{t('escapeRoom.play.plusPts', { points: sol.points_earned })}</span>
                   </div>
                 ))}
               </div>

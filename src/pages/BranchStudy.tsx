@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ interface StudyState {
 }
 
 export default function BranchStudy() {
+  const { t } = useTranslation();
   const [verseReference, setVerseReference] = useState("");
   const [userInput, setUserInput] = useState("");
   const [studyState, setStudyState] = useState<StudyState>({
@@ -47,8 +49,8 @@ export default function BranchStudy() {
   const startStudy = async () => {
     if (!verseReference.trim()) {
       toast({
-        title: "Verse Required",
-        description: "Please enter a verse reference to begin",
+        title: t('branchStudy.verseRequired'),
+        description: t('branchStudy.pleaseEnterVerse'),
         variant: "destructive",
       });
       return;
@@ -72,8 +74,8 @@ export default function BranchStudy() {
       if (data?.error && data?.invalidPrinciples) {
         console.log("🔄 Hallucination detected on start, auto-retrying...");
         toast({
-          title: "Regenerating response",
-          description: "Jeeves made an error. Trying again...",
+          title: t('branchStudy.regeneratingResponse'),
+          description: t('branchStudy.jeevesError'),
         });
         
         // Auto-retry once
@@ -121,7 +123,7 @@ export default function BranchStudy() {
         level: studyState.level,
       });
     } catch (error: any) {
-      handleError(error, { title: "Failed to Start Study", showToast: true });
+      handleError(error, { title: t('branchStudy.failedToStart'), showToast: true });
     } finally {
       setLoading(false);
     }
@@ -165,8 +167,8 @@ export default function BranchStudy() {
       if (data?.error && data?.invalidPrinciples) {
         console.log("🔄 Hallucination detected, auto-retrying...");
         toast({
-          title: "Regenerating response",
-          description: "Jeeves made an error. Trying again...",
+          title: t('branchStudy.regeneratingResponse'),
+          description: t('branchStudy.jeevesError'),
         });
         
         // Auto-retry once
@@ -217,7 +219,7 @@ export default function BranchStudy() {
         usedRooms: data.usedRooms || prev.usedRooms,
       }));
     } catch (error: any) {
-      handleError(error, { title: "Failed to Continue Study", showToast: true });
+      handleError(error, { title: t('branchStudy.failedToContinue'), showToast: true });
     } finally {
       setLoading(false);
     }
@@ -272,7 +274,7 @@ export default function BranchStudy() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-6 w-6" />
-              BranchStudy
+              {t('branchStudy.pageTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -280,10 +282,10 @@ export default function BranchStudy() {
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Enter a verse reference or story name
+                    {t('branchStudy.enterVerseLabel')}
                   </label>
                   <Input
-                    placeholder="e.g., John 3:16 or Parable of the Sower"
+                    placeholder={t('branchStudy.versePlaceholder')}
                     value={verseReference}
                     onChange={(e) => setVerseReference(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && !loading && startStudy()}
@@ -301,16 +303,16 @@ export default function BranchStudy() {
                   />
                   <Label htmlFor="study-mode" className="cursor-pointer">
                     <div>
-                      <div className="font-medium">Jeeves-Led Study Mode</div>
+                      <div className="font-medium">{t('branchStudy.jeevesLedMode')}</div>
                       <div className="text-xs text-muted-foreground">
-                        Jeeves does most of the studying and shares insights with you
+                        {t('branchStudy.jeevesLedModeDesc')}
                       </div>
                     </div>
                   </Label>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Difficulty Level</Label>
+                  <Label className="text-sm font-medium">{t('branchStudy.difficultyLevel')}</Label>
                   <div className="grid grid-cols-4 gap-2">
                     {(['easy', 'intermediate', 'pro', 'master'] as const).map((lvl) => (
                       <Button
@@ -326,18 +328,19 @@ export default function BranchStudy() {
                     ))}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {studyState.level === 'easy' && 'Verses follow the general theme'}
-                    {studyState.level === 'intermediate' && 'Verses require some thought to connect'}
-                    {studyState.level === 'pro' && 'Tangentially related verses'}
-                    {studyState.level === 'master' && 'Seemingly random verses'}
+                    {studyState.level === 'easy' && t('branchStudy.levelEasyDesc')}
+                    {studyState.level === 'intermediate' && t('branchStudy.levelIntermediateDesc')}
+                    {studyState.level === 'pro' && t('branchStudy.levelProDesc')}
+                    {studyState.level === 'master' && t('branchStudy.levelMasterDesc')}
                   </p>
                 </div>
                 
                 <Button onClick={startStudy} disabled={loading || !verseReference.trim()} className="w-full">
                   {loading ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Starting Study...</>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('branchStudy.startingStudy')}</>
                   ) : (
-                    <><BookOpen className="mr-2 h-4 w-4" />Begin BranchStudy</>
+                    <><BookOpen className="mr-2 h-4 w-4" />{t('branchStudy.beginBranchStudy')}</>
+
                   )}
                 </Button>
               </div>
@@ -345,12 +348,12 @@ export default function BranchStudy() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-semibold">Studying: {studyState.anchorText}</h3>
+                    <h3 className="font-semibold">{t('branchStudy.studying', { text: studyState.anchorText })}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Mode: {studyState.mode === "jeeves-led" ? "Jeeves-Led" : "Traditional"}
+                      {t('branchStudy.mode', { mode: studyState.mode === "jeeves-led" ? t('branchStudy.jeevesLed') : t('branchStudy.traditional') })}
                     </p>
                   </div>
-                  <Button variant="outline" onClick={resetStudy}>New Study</Button>
+                  <Button variant="outline" onClick={resetStudy}>{t('branchStudy.newStudy')}</Button>
                 </div>
 
                 <ScrollArea className="h-[600px] border rounded-lg p-6 bg-gradient-to-b from-background to-muted/20">
@@ -376,7 +379,7 @@ export default function BranchStudy() {
                                   {formatJeevesResponse(msg.content.split(/^[A-E]\./m)[0])}
                                 </div>
                                 <div className="border-t pt-4">
-                                  <h4 className="text-lg font-semibold mb-4 text-center">Choose Your Path</h4>
+                                  <h4 className="text-lg font-semibold mb-4 text-center">{t('branchStudy.chooseYourPath')}</h4>
                                   <OptionCards
                                     options={parsedOptions.options}
                                     onSelect={handleOptionSelect}
@@ -399,7 +402,7 @@ export default function BranchStudy() {
 
                 <div className="flex gap-2">
                   <Textarea
-                    placeholder="Type your response or choose A/B/C..."
+                    placeholder={t('branchStudy.responsePlaceholder')}
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && !loading && (e.preventDefault(), sendMessage())}
@@ -412,8 +415,8 @@ export default function BranchStudy() {
                 </div>
 
                 <div className="text-xs text-muted-foreground space-y-1">
-                  <p>Used: {studyState.usedVerses.length} verses, {studyState.usedRooms.length} rooms</p>
-                  <p>Type "summarize", "end", or "turn this into a study" to conclude</p>
+                  <p>{t('branchStudy.usedStats', { verses: studyState.usedVerses.length, rooms: studyState.usedRooms.length })}</p>
+                  <p>{t('branchStudy.endInstructions')}</p>
                 </div>
               </div>
             )}

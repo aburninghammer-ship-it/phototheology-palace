@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Bot, X, Sparkles, ChevronRight } from "lucide-react";
@@ -13,31 +14,30 @@ interface AIPromptBannerProps {
   onAskJeeves?: () => void;
 }
 
-const contextPrompts = {
-  bible: [
-    "Let Jeeves explain this chapter's Christ-centered meaning",
-    "Ask Jeeves to map this to the Sanctuary",
-    "Get cross-references and typology connections",
-  ],
-  palace: [
-    "Let Jeeves guide you through this room",
-    "Ask for memory techniques for this principle",
-    "Get practical application examples",
-  ],
-  study: [
-    "Let Jeeves analyze your study session",
-    "Ask for deeper connections",
-    "Generate discussion questions",
-  ],
-};
-
 export function AIPromptBanner({ context, book, chapter, roomName, onAskJeeves }: AIPromptBannerProps) {
+  const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const navigate = useNavigate();
+
+  const contextPrompts = {
+    bible: [
+      t('bible.getCrossReferences', 'Get cross-references and typology connections'),
+    ],
+    palace: [
+      "Let Jeeves guide you through this room",
+      "Ask for memory techniques for this principle",
+      "Get practical application examples",
+    ],
+    study: [
+      "Let Jeeves analyze your study session",
+      "Ask for deeper connections",
+      "Generate discussion questions",
+    ],
+  };
   
   const prompts = contextPrompts[context];
-  const currentPrompt = prompts[currentPromptIndex];
+  const currentPrompt = prompts[currentPromptIndex % prompts.length];
   
   // Rotate prompts every 5 seconds
   useState(() => {
@@ -80,7 +80,7 @@ export function AIPromptBanner({ context, book, chapter, roomName, onAskJeeves }
                   <span className="truncate">{currentPrompt}</span>
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">
-                  Jeeves AI can help you understand deeper
+                  {t('bible.jeevesCanHelp', 'Jeeves AI can help you understand deeper')}
                 </p>
               </div>
             </div>
@@ -90,7 +90,7 @@ export function AIPromptBanner({ context, book, chapter, roomName, onAskJeeves }
                 onClick={handleClick}
                 className="bg-gradient-to-r from-primary to-accent text-white hover:opacity-90 shadow-lg"
               >
-                Ask Jeeves
+                {t('bible.askJeeves', 'Ask Jeeves')}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
               <Button

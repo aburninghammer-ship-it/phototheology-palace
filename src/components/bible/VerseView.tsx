@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Verse } from "@/types/bible";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, BookOpen, RefreshCw, HelpCircle, Mic, Lightbulb, Copy, Check } from "lucide-react";
+import { Sparkles, Loader2, BookOpen, RefreshCw, HelpCircle, Mic, Lightbulb, Copy, Check, Volume2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import { VerseHighlightMenu } from "./VerseHighlightMenu";
 import { VerseNoteEditor } from "./VerseNoteEditor";
 import { VerseSermonDialog } from "./VerseSermonDialog";
 import { VerseNote } from "@/hooks/useVerseNotes";
+import { QuickAudioButton } from "@/components/audio";
 import { cn } from "@/lib/utils";
 
 interface HighlightColor {
@@ -295,6 +296,7 @@ export const VerseView = ({
   return (
     <>
       <div
+        id={`verse-${verse.verse}`}
         className={cn(
           "group cursor-pointer transition-all duration-300 p-3 rounded-lg",
           isAudioPlaying
@@ -353,6 +355,14 @@ export const VerseView = ({
                   <Copy className="h-3 w-3 text-blue-500" />
                 )}
               </Button>
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                <QuickAudioButton
+                  text={`${book || ''} chapter ${chapter || ''}, verse ${verse.verse}. ${verse.text}`}
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 p-0 [&_svg]:h-3 [&_svg]:w-3 [&_svg]:text-emerald-500"
+                />
+              </div>
               {onAskJeeves && (
                 <Button
                   variant="ghost"

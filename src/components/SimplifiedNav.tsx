@@ -15,6 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { GlobalSearch } from "./GlobalSearch";
 import { NavigationStyleToggle } from "./NavigationStyleToggle";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { BackButton } from "@/components/BackButton";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 
@@ -35,7 +36,7 @@ export const SimplifiedNav = () => {
     { to: "/bible", label: "PT Study Bible", icon: BookOpen },
     { to: "/bible-image-library", label: "PT Image Bible", icon: BookOpen },
     { to: "/bible/search", label: "Search", icon: BookOpen },
-    { to: "/palace/floor/1/room/gr", label: "Produce a Gem", icon: BookOpen },
+    { to: "/give-me-a-gem", label: "Give Me A Gem", icon: BookOpen },
     { to: "/quarterly-study", label: "Quarterly Study", icon: BookOpen },
     { to: "/memorization", label: "Memorization", icon: BookOpen },
     { to: "/notes", label: "Notes", icon: StickyNote },
@@ -50,6 +51,7 @@ export const SimplifiedNav = () => {
   ];
 
   const researchLinks = [
+    { to: "/research-assistant", label: "Research Assistant", icon: BookOpen },
     { to: "/research-mode", label: "Research Mode", icon: BookOpen },
     { to: "/prophecy-watch", label: "Prophecy Watch", icon: BookOpen },
     { to: "/culture-controversy", label: "Culture & Controversy", icon: BookOpen },
@@ -198,6 +200,8 @@ export const SimplifiedNav = () => {
           <GlobalSearch />
           
           <NavigationStyleToggle />
+          
+          <NotificationCenter />
           
           <Button asChild variant="ghost" size="sm" className="hidden md:flex">
             <Link to="/pricing"><Crown className="h-4 w-4 mr-1" />Upgrade</Link>

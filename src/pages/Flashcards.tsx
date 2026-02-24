@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,7 @@ interface FlashcardStudyState {
 
 export default function Flashcards() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [mySets, setMySets] = useState<FlashcardSet[]>([]);
@@ -114,7 +116,7 @@ export default function Flashcards() {
   const handleResumeStudy = useCallback(() => {
     resumeGame();
     setShowResumeDialog(false);
-    toast.success("Welcome back! Your study progress has been restored.");
+    toast.success(t('flashcards.welcomeBack'));
   }, [resumeGame]);
 
   // Handle start new study
@@ -147,7 +149,7 @@ export default function Flashcards() {
       setPublicSets(publicData || []);
     } catch (error) {
       console.error("Error fetching sets:", error);
-      toast.error("Failed to load flashcard sets");
+      toast.error(t('flashcards.failedToLoadSets'));
     } finally {
       setLoading(false);
     }
@@ -203,7 +205,7 @@ export default function Flashcards() {
 
       if (cardsError) throw cardsError;
 
-      toast.success("Flashcard set generated successfully!");
+      toast.success(t('flashcards.setGenerated'));
       setAiPrompt("");
       fetchSets();
     } catch (error: any) {
@@ -211,7 +213,7 @@ export default function Flashcards() {
       if (error.name === 'ZodError') {
         toast.error(error.errors[0]?.message || "Invalid input");
       } else {
-        toast.error("Failed to generate flashcards");
+        toast.error(t('flashcards.failedToGenerate'));
       }
     } finally {
       setGenerating(false);
@@ -245,7 +247,7 @@ export default function Flashcards() {
 
       if (error) throw error;
 
-      toast.success("Custom set created!");
+      toast.success(t('flashcards.customSetCreated'));
       setNewSet({ title: "", description: "", is_public: false });
       
       // Refresh both tabs to show the new set
@@ -260,7 +262,7 @@ export default function Flashcards() {
       if (error.name === 'ZodError') {
         toast.error(error.errors[0]?.message || "Invalid input");
       } else {
-        toast.error("Failed to create set");
+        toast.error(t('flashcards.failedToCreateSet'));
       }
     }
   };
@@ -273,11 +275,11 @@ export default function Flashcards() {
         .eq("id", id);
 
       if (error) throw error;
-      toast.success("Set deleted");
+      toast.success(t('flashcards.setDeleted'));
       fetchSets();
     } catch (error) {
       console.error("Error deleting set:", error);
-      toast.error("Failed to delete set");
+      toast.error(t('flashcards.failedToDeleteSet'));
     }
   };
 
@@ -292,7 +294,7 @@ export default function Flashcards() {
       if (error) throw error;
 
       if (!data || data.length === 0) {
-        toast.error("This set has no flashcards yet");
+        toast.error(t('flashcards.noFlashcardsInSet'));
         return;
       }
 
@@ -309,7 +311,7 @@ export default function Flashcards() {
       });
     } catch (error) {
       console.error("Error loading flashcards:", error);
-      toast.error("Failed to load flashcards");
+      toast.error(t('flashcards.failedToLoadFlashcards'));
     }
   };
 
@@ -365,24 +367,24 @@ export default function Flashcards() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Play className="w-5 h-5 text-primary" />
-                Resume Flashcard Study?
+                {t('flashcards.resumeStudy')}
               </DialogTitle>
               <DialogDescription>
                 You have an ongoing study session for "{studyState.setTitle}".
                 <div className="mt-3 p-3 bg-accent/10 rounded-lg space-y-1 text-sm">
-                  <p><strong>Progress:</strong> Card {studyState.currentCardIndex + 1} of {studyState.studyCards.length}</p>
-                  <p><strong>Cards Viewed:</strong> {studyState.cardsViewed}</p>
+                  <p><strong>{t('flashcards.progress')}:</strong> {t('flashcards.cardOf', { current: studyState.currentCardIndex + 1, total: studyState.studyCards.length })}</p>
+                  <p><strong>{t('flashcards.cardsViewed')}:</strong> {studyState.cardsViewed}</p>
                 </div>
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex gap-2 sm:gap-0">
               <Button variant="outline" onClick={handleStartNewStudy} className="flex items-center gap-2">
                 <RotateCcw className="w-4 h-4" />
-                Start Fresh
+                {t('flashcards.startFresh')}
               </Button>
               <Button onClick={handleResumeStudy} className="flex items-center gap-2">
                 <Play className="w-4 h-4" />
-                Resume
+                {t('flashcards.resume')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -403,11 +405,11 @@ export default function Flashcards() {
               variant="outline"
               className="bg-white/20 text-white border-white/40"
             >
-              Exit Study Mode
+              {t('flashcards.exitStudyMode')}
             </Button>
 
             <div className="flex items-center gap-2">
-              <label className="text-sm text-white">Bible Version:</label>
+              <label className="text-sm text-white">{t('flashcards.bibleVersion')}:</label>
               <Select value={selectedTranslation} onValueChange={updateTranslation}>
                 <SelectTrigger className="w-[140px] bg-white/20 text-white border-white/40">
                   <SelectValue />
@@ -424,14 +426,14 @@ export default function Flashcards() {
           </div>
 
           <div className="text-center text-white/70 text-sm mb-2">
-            Your progress is automatically saved
+            {t('flashcards.autoSaved')}
           </div>
 
           <Card className="bg-white/95 backdrop-blur-sm min-h-[400px] flex flex-col">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>
-                  Card {currentCardIndex + 1} of {studyCards.length}
+                  {t('flashcards.cardOf', { current: currentCardIndex + 1, total: studyCards.length })}
                 </CardTitle>
                 {currentCard?.verse_reference && (
                   <span className="text-sm text-purple-600 font-medium">{currentCard.verse_reference}</span>
@@ -441,13 +443,13 @@ export default function Flashcards() {
             <CardContent className="flex-1 flex flex-col justify-center">
               <div className="text-center space-y-6">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-2">Question:</p>
+                  <p className="text-sm text-muted-foreground mb-2">{t('flashcards.question')}:</p>
                   <p className="text-2xl font-medium text-foreground">{currentCard?.question}</p>
                 </div>
 
                 {showAnswer && (
                   <div className="pt-6 border-t animate-in fade-in">
-                    <p className="text-sm text-muted-foreground mb-2">Answer:</p>
+                    <p className="text-sm text-muted-foreground mb-2">{t('flashcards.answer')}:</p>
                     <p className="text-lg text-foreground">{currentCard?.answer}</p>
                   </div>
                 )}
@@ -457,7 +459,7 @@ export default function Flashcards() {
                   className="w-full"
                   size="lg"
                 >
-                  {showAnswer ? "Hide Answer" : "Show Answer"}
+                  {showAnswer ? t('flashcards.hideAnswer') : t('flashcards.showAnswer')}
                 </Button>
               </div>
             </CardContent>
@@ -469,14 +471,14 @@ export default function Flashcards() {
                 className="flex-1"
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
-                Previous
+                {t('common.previous')}
               </Button>
               <Button
                 onClick={nextCard}
                 disabled={currentCardIndex === studyCards.length - 1}
                 className="flex-1"
               >
-                Next
+                {t('common.next')}
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
@@ -494,8 +496,8 @@ export default function Flashcards() {
           <div className="flex items-center gap-4 mb-2">
             <Brain className="w-12 h-12 text-white" />
             <div>
-              <h1 className="text-4xl font-bold text-white">Flashcards</h1>
-              <p className="text-purple-200 text-lg">Master Bible knowledge through interactive study cards</p>
+              <h1 className="text-4xl font-bold text-white">{t('flashcards.title')}</h1>
+              <p className="text-purple-200 text-lg">{t('flashcards.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -508,16 +510,16 @@ export default function Flashcards() {
             <DialogTrigger asChild>
               <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
                 <Sparkles className="mr-2 h-5 w-5" />
-                Generate with AI
+                {t('flashcards.generateWithAI')}
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-card">
               <DialogHeader>
-                <DialogTitle>Generate Flashcards with AI</DialogTitle>
+                <DialogTitle>{t('flashcards.generateWithAITitle')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <Textarea
-                  placeholder="Enter a topic (e.g., 'Parables of Jesus', 'Books of the Bible', 'Ten Commandments')"
+                  placeholder={t('flashcards.topicPlaceholder')}
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
                   rows={3}
@@ -525,7 +527,7 @@ export default function Flashcards() {
                 />
                 <Button onClick={generateWithAI} disabled={generating} className="w-full">
                   {generating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Generate Flashcards
+                  {t('flashcards.generateFlashcards')}
                 </Button>
               </div>
             </DialogContent>
@@ -535,27 +537,27 @@ export default function Flashcards() {
             <DialogTrigger asChild>
               <Button size="lg" variant="outline" className="bg-white/90 text-foreground">
                 <Plus className="mr-2 h-5 w-5" />
-                Create Custom Set
+                {t('flashcards.createCustomSet')}
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-card">
               <DialogHeader>
-                <DialogTitle>Create Custom Flashcard Set</DialogTitle>
+                <DialogTitle>{t('flashcards.createCustomSetTitle')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Title</label>
+                  <label className="text-sm font-medium mb-2 block">{t('flashcards.setTitle')}</label>
                   <Input
-                    placeholder="e.g., My Favorite Verses"
+                    placeholder={t('flashcards.setTitlePlaceholder')}
                     value={newSet.title}
                     onChange={(e) => setNewSet({ ...newSet, title: e.target.value })}
                     maxLength={100}
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Description (Optional)</label>
+                  <label className="text-sm font-medium mb-2 block">{t('flashcards.descriptionOptional')}</label>
                   <Textarea
-                    placeholder="What's this set about?"
+                    placeholder={t('flashcards.descriptionPlaceholder')}
                     value={newSet.description}
                     onChange={(e) => setNewSet({ ...newSet, description: e.target.value })}
                     rows={2}
@@ -563,14 +565,14 @@ export default function Flashcards() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Make Public</label>
+                  <label className="text-sm font-medium">{t('flashcards.makePublic')}</label>
                   <Switch
                     checked={newSet.is_public}
                     onCheckedChange={(checked) => setNewSet({ ...newSet, is_public: checked })}
                   />
                 </div>
                 <Button onClick={createCustomSet} className="w-full">
-                  Create Set
+                  {t('flashcards.createSet')}
                 </Button>
               </div>
             </DialogContent>
@@ -580,8 +582,8 @@ export default function Flashcards() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "my" | "public")}>
           <TabsList className="bg-white/90">
-            <TabsTrigger value="my">My Sets</TabsTrigger>
-            <TabsTrigger value="public">Public Sets</TabsTrigger>
+            <TabsTrigger value="my">{t('flashcards.mySets')}</TabsTrigger>
+            <TabsTrigger value="public">{t('flashcards.publicSets')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="my" className="mt-6">
@@ -592,8 +594,8 @@ export default function Flashcards() {
             ) : mySets.length === 0 ? (
               <div className="text-center py-16">
                 <Brain className="w-24 h-24 mx-auto text-white/30 mb-4" />
-                <h3 className="text-xl font-medium text-white mb-2">No flashcard sets yet</h3>
-                <p className="text-purple-200">Generate some with AI or create your own custom set</p>
+                <h3 className="text-xl font-medium text-white mb-2">{t('flashcards.noSetsYet')}</h3>
+                <p className="text-purple-200">{t('flashcards.noSetsYetDesc')}</p>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -615,11 +617,11 @@ export default function Flashcards() {
                     <CardContent className="space-y-2">
                       <Button onClick={() => startStudying(set.id, set.title)} className="w-full">
                         <Eye className="mr-2 h-4 w-4" />
-                        Study
+                        {t('flashcards.study')}
                       </Button>
                       <Button onClick={() => deleteSet(set.id)} variant="outline" className="w-full">
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        {t('common.delete')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -636,8 +638,8 @@ export default function Flashcards() {
             ) : publicSets.length === 0 ? (
               <div className="text-center py-16">
                 <Brain className="w-24 h-24 mx-auto text-white/30 mb-4" />
-                <h3 className="text-xl font-medium text-white mb-2">No public sets available</h3>
-                <p className="text-purple-200">Check back later for community-created flashcards</p>
+                <h3 className="text-xl font-medium text-white mb-2">{t('flashcards.noPublicSets')}</h3>
+                <p className="text-purple-200">{t('flashcards.noPublicSetsDesc')}</p>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -652,7 +654,7 @@ export default function Flashcards() {
                     <CardContent>
                       <Button onClick={() => startStudying(set.id, set.title)} className="w-full">
                         <Eye className="mr-2 h-4 w-4" />
-                        Study
+                        {t('flashcards.study')}
                       </Button>
                     </CardContent>
                   </Card>

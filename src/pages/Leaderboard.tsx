@@ -8,8 +8,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Trophy, Medal, Award, Target, Building2, Flame, Calendar, Crown, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Leaderboard = () => {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [leaders, setLeaders] = useState<any[]>([]);
@@ -262,8 +264,8 @@ const Leaderboard = () => {
           <div className="flex items-center gap-4 mb-6">
             <Trophy className="h-16 w-16" />
             <div>
-              <h1 className="text-5xl font-bold">Leaderboard</h1>
-              <p className="text-purple-200 text-lg">Top Phototheology scholars</p>
+              <h1 className="text-5xl font-bold">{t('leaderboard.title')}</h1>
+              <p className="text-purple-200 text-lg">{t('leaderboard.subtitle')}</p>
             </div>
           </div>
 
@@ -273,7 +275,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Crown className="h-4 w-4" />
-                  Your Rank
+                  {t('leaderboard.yourStats.rank')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -285,7 +287,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Award className="h-4 w-4" />
-                  Points
+                  {t('leaderboard.yourStats.points')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -297,7 +299,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  Rooms
+                  {t('leaderboard.yourStats.rooms')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -309,7 +311,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Flame className="h-4 w-4" />
-                  Streak
+                  {t('leaderboard.yourStats.streak')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -321,7 +323,7 @@ const Leaderboard = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-white/90 text-sm font-normal flex items-center gap-2">
                   <Trophy className="h-4 w-4" />
-                  Badges
+                  {t('leaderboard.yourStats.badges')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -344,11 +346,10 @@ const Leaderboard = () => {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-amber-800 dark:text-amber-200">
-                      You're in the Top 100! 🔥
+                      {t('leaderboard.top100.title')}
                     </h3>
                     <p className="text-amber-700 dark:text-amber-300">
-                      You're currently ranked <span className="font-bold">#{userRank}</span>. 
-                      Keep pushing — just a little more effort and you'll make it to the <span className="font-bold">Top 50 Board</span>!
+                      {t('leaderboard.top100.description', { rank: userRank })}
                     </p>
                   </div>
                 </div>
@@ -360,8 +361,8 @@ const Leaderboard = () => {
           <div className="flex justify-center mb-6">
             <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)} className="w-full max-w-md">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="general">General Rankings</TabsTrigger>
-                <TabsTrigger value="categories">Category Leaders</TabsTrigger>
+                <TabsTrigger value="general">{t('leaderboard.viewModes.general')}</TabsTrigger>
+                <TabsTrigger value="categories">{t('leaderboard.viewModes.categories')}</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -374,16 +375,16 @@ const Leaderboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
-                  Time Period
+                  {t('leaderboard.filters.timePeriod')}
                 </CardTitle>
-                <CardDescription>Filter leaderboard by time range</CardDescription>
+                <CardDescription>{t('leaderboard.filters.timePeriodDescription')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Tabs value={timePeriod} onValueChange={(v) => setTimePeriod(v as any)}>
                   <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="weekly">Weekly</TabsTrigger>
-                    <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                    <TabsTrigger value="all">All Time</TabsTrigger>
+                    <TabsTrigger value="weekly">{t('leaderboard.filters.weekly')}</TabsTrigger>
+                    <TabsTrigger value="monthly">{t('leaderboard.filters.monthly')}</TabsTrigger>
+                    <TabsTrigger value="all">{t('leaderboard.filters.allTime')}</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </CardContent>
@@ -393,9 +394,9 @@ const Leaderboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5" />
-                  Sort By Metric
+                  {t('leaderboard.filters.sortByMetric')}
                 </CardTitle>
-                <CardDescription>Choose ranking criteria</CardDescription>
+                <CardDescription>{t('leaderboard.filters.chooseRanking')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-2">
@@ -405,7 +406,7 @@ const Leaderboard = () => {
                     className="flex items-center gap-2 justify-start"
                   >
                     <Award className="h-4 w-4" />
-                    Points
+                    {t('leaderboard.metrics.points')}
                   </Button>
                   <Button
                     variant={sortBy === 'rooms' ? 'default' : 'outline'}
@@ -413,7 +414,7 @@ const Leaderboard = () => {
                     className="flex items-center gap-2 justify-start"
                   >
                     <Building2 className="h-4 w-4" />
-                    Rooms
+                    {t('leaderboard.metrics.rooms')}
                   </Button>
                   <Button
                     variant={sortBy === 'studies' ? 'default' : 'outline'}
@@ -421,7 +422,7 @@ const Leaderboard = () => {
                     className="flex items-center gap-2 justify-start"
                   >
                     <Flame className="h-4 w-4" />
-                    Streak
+                    {t('leaderboard.metrics.streak')}
                   </Button>
                   <Button
                     variant={sortBy === 'challenges' ? 'default' : 'outline'}
@@ -429,7 +430,7 @@ const Leaderboard = () => {
                     className="flex items-center gap-2 justify-start"
                   >
                     <Target className="h-4 w-4" />
-                    Challenges
+                    {t('leaderboard.metrics.challenges')}
                   </Button>
                 </div>
               </CardContent>
@@ -440,11 +441,11 @@ const Leaderboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Trophy className="h-5 w-5" />
-                Top Achievers
+                {t('leaderboard.topAchievers')}
               </CardTitle>
               <CardDescription>
-                {timePeriod === 'weekly' ? 'This Week' : timePeriod === 'monthly' ? 'This Month' : 'All Time'} • 
-                Sorted by {sortBy === 'points' ? 'Points' : sortBy === 'rooms' ? 'Rooms Completed' : sortBy === 'studies' ? 'Study Streak' : 'Challenges'}
+                {timePeriod === 'weekly' ? t('leaderboard.filters.thisWeek') : timePeriod === 'monthly' ? t('leaderboard.filters.thisMonth') : t('leaderboard.filters.allTime')} {' \u2022 '}
+                {t('leaderboard.sortedBy')} {sortBy === 'points' ? t('leaderboard.metrics.points') : sortBy === 'rooms' ? t('leaderboard.metrics.roomsCompleted') : sortBy === 'studies' ? t('leaderboard.metrics.studyStreak') : t('leaderboard.metrics.challenges')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -486,17 +487,17 @@ const Leaderboard = () => {
                                 {leader.display_name || leader.username}
                               </p>
                               {isCurrentUser && (
-                                <Badge className="bg-purple-600 hover:bg-purple-700">You</Badge>
+                                <Badge className="bg-purple-600 hover:bg-purple-700">{t('leaderboard.you')}</Badge>
                               )}
                             </div>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
                               <span className="flex items-center gap-1">
                                 <Award className="h-3.5 w-3.5" />
-                                Level {leader.level}
+                                {t('leaderboard.level', { level: leader.level })}
                               </span>
                               <span className="flex items-center gap-1">
                                 <Flame className="h-3.5 w-3.5" />
-                                {leader.daily_study_streak || 0} day streak
+                                {t('leaderboard.dayStreak', { count: leader.daily_study_streak || 0 })}
                               </span>
                             </div>
                           </div>
@@ -507,7 +508,7 @@ const Leaderboard = () => {
                                 <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                                   {leader.points?.toLocaleString() || 0}
                                 </p>
-                                <p className="text-xs text-muted-foreground">points</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.points')}</p>
                               </>
                             )}
                             {sortBy === 'challenges' && (
@@ -515,7 +516,7 @@ const Leaderboard = () => {
                                 <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                                   {(leader.challengeCount || 0).toLocaleString()}
                                 </p>
-                                <p className="text-xs text-muted-foreground">challenges</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.challenges')}</p>
                               </>
                             )}
                             {sortBy === 'studies' && (
@@ -523,7 +524,7 @@ const Leaderboard = () => {
                                 <p className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                                   {leader.daily_study_streak || 0}
                                 </p>
-                                <p className="text-xs text-muted-foreground">day streak</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.dayStreak')}</p>
                               </>
                             )}
                             {sortBy === 'rooms' && (
@@ -531,7 +532,7 @@ const Leaderboard = () => {
                                 <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                                   {(leader.roomsCount || 0).toLocaleString()}
                                 </p>
-                                <p className="text-xs text-muted-foreground">rooms</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.rooms')}</p>
                               </>
                             )}
                           </div>
@@ -568,11 +569,11 @@ const Leaderboard = () => {
             <div className="space-y-8">
               {Object.entries(categoryLeaders).map(([category, users]) => {
                 const categoryConfig = {
-                  explorer: { icon: Target, color: 'from-blue-500 to-cyan-500', title: 'Top Explorers' },
-                  scholar: { icon: Award, color: 'from-purple-500 to-indigo-500', title: 'Top Scholars' },
-                  perfectionist: { icon: Star, color: 'from-green-500 to-emerald-500', title: 'Top Perfectionists' },
-                  dedicated: { icon: Flame, color: 'from-orange-500 to-red-500', title: 'Most Dedicated' },
-                  master: { icon: Crown, color: 'from-yellow-500 to-amber-500', title: 'Masters' }
+                  explorer: { icon: Target, color: 'from-blue-500 to-cyan-500', title: t('leaderboard.categories.topExplorers') },
+                  scholar: { icon: Award, color: 'from-purple-500 to-indigo-500', title: t('leaderboard.categories.topScholars') },
+                  perfectionist: { icon: Star, color: 'from-green-500 to-emerald-500', title: t('leaderboard.categories.topPerfectionists') },
+                  dedicated: { icon: Flame, color: 'from-orange-500 to-red-500', title: t('leaderboard.categories.mostDedicated') },
+                  master: { icon: Crown, color: 'from-yellow-500 to-amber-500', title: t('leaderboard.categories.masters') }
                 }[category];
 
                 if (!categoryConfig) return null;
@@ -587,7 +588,7 @@ const Leaderboard = () => {
                         </div>
                         <div>
                           <CardTitle>{categoryConfig.title}</CardTitle>
-                          <CardDescription>Top achievers in {category}</CardDescription>
+                          <CardDescription>{t('leaderboard.categories.topAchieversIn', { category })}</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
@@ -595,7 +596,7 @@ const Leaderboard = () => {
                       <div className="space-y-2">
                         {users.length === 0 ? (
                           <p className="text-sm text-muted-foreground text-center py-8">
-                            No users in this category yet
+                            {t('leaderboard.categories.noUsers')}
                           </p>
                         ) : (
                           users.map((leader: any, idx: number) => (
@@ -622,17 +623,17 @@ const Leaderboard = () => {
                                 <div>
                                   <p className="font-semibold">{leader.display_name || leader.username}</p>
                                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Badge variant="secondary">Level {leader.level || 1}</Badge>
+                                    <Badge variant="secondary">{t('leaderboard.level', { level: leader.level || 1 })}</Badge>
                                     <span className="flex items-center gap-1">
                                       <Flame className="h-3 w-3" />
-                                      {leader.daily_study_streak || 0} day streak
+                                      {t('leaderboard.dayStreak', { count: leader.daily_study_streak || 0 })}
                                     </span>
                                   </div>
                                 </div>
                               </div>
                               <div className="text-right">
                                 <p className="text-lg font-bold">{leader.count}</p>
-                                <p className="text-xs text-muted-foreground">achievements</p>
+                                <p className="text-xs text-muted-foreground">{t('leaderboard.metrics.achievements')}</p>
                               </div>
                             </div>
                           ))

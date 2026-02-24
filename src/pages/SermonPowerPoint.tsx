@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -109,6 +110,7 @@ function ThemePreview({ themeId, selected }: { themeId: string; selected: boolea
 // ============================================================================
 
 export default function SermonPowerPoint() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const sermonId = searchParams.get("id");
@@ -198,12 +200,12 @@ export default function SermonPowerPoint() {
   const saveGammaApiKey = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast.error("Please sign in to save your API key");
+      toast.error(t('sermon.ppt.signInToSave'));
       return;
     }
     
     if (!gammaApiKey.startsWith("sk-gamma-")) {
-      toast.error("Invalid Gamma API key. It should start with 'sk-gamma-'");
+      toast.error(t('sermon.ppt.invalidGammaKey'));
       return;
     }
     
@@ -216,10 +218,10 @@ export default function SermonPowerPoint() {
       
       if (error) throw error;
       setGammaKeySaved(true);
-      toast.success("Gamma API key saved!");
+      toast.success(t('sermon.ppt.gammaKeySaved'));
     } catch (error) {
       console.error("Error saving Gamma API key:", error);
-      toast.error("Failed to save API key");
+      toast.error(t('sermon.ppt.saveKeyError'));
     } finally {
       setGammaKeyLoading(false);
     }
@@ -292,11 +294,11 @@ export default function SermonPowerPoint() {
             setVersesInput(refs.join('\n'));
           }
           
-          toast.success("Sermon loaded!");
+          toast.success(t('sermon.ppt.sermonLoaded'));
         }
       } catch (error) {
         console.error("Error loading sermon:", error);
-        toast.error("Failed to load sermon");
+        toast.error(t('sermon.ppt.loadSermonError'));
       } finally {
         setLoading(false);
       }
@@ -347,7 +349,7 @@ export default function SermonPowerPoint() {
       if (useGamma) {
         // Validate API key is saved
         if (!gammaApiKey || !gammaApiKey.startsWith("sk-gamma-")) {
-          toast.error("Please enter and save your Gamma API key first");
+          toast.error(t('sermon.ppt.enterGammaKeyFirst'));
           setGenerating(false);
           return;
         }
@@ -384,7 +386,7 @@ export default function SermonPowerPoint() {
 
         setGammaResult(data);
         setStep("preview");
-        toast.success(`Gamma created ${data.numCards || 'your'} slides!`);
+        toast.success(t('sermon.ppt.gammaCreated', { count: data.numCards || 0 }));
       } else {
         // Generate with built-in renderer
         const { data, error } = await supabase.functions.invoke("sermon-to-ppt", {
@@ -414,16 +416,16 @@ export default function SermonPowerPoint() {
 
         setGeneratedDeck(data as SermonDeck);
         setStep("edit");
-        toast.success("Presentation generated! Now customize your slides.");
+        toast.success(t('sermon.ppt.presentationGenerated'));
       }
     } catch (error: any) {
       console.error("Error generating presentation:", error);
       if (error.message?.includes("401")) {
-        toast.error("Invalid Gamma API key. Please check your key.");
+        toast.error(t('sermon.ppt.invalidGammaKeyCheck'));
       } else if (error.message?.includes("403")) {
-        toast.error("Gamma API access denied. Check your credits.");
+        toast.error(t('sermon.ppt.gammaAccessDenied'));
       } else {
-        toast.error(error.message || "Failed to generate presentation. Please try again.");
+        toast.error(error.message || t('sermon.ppt.generateError'));
       }
     } finally {
       setGenerating(false);
@@ -441,7 +443,7 @@ export default function SermonPowerPoint() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast.error("Please sign in to save to library");
+        toast.error(t('sermon.ppt.signInToSaveLibrary'));
         return;
       }
 
@@ -462,10 +464,10 @@ export default function SermonPowerPoint() {
       if (error) throw error;
 
       setSavedToLibrary(true);
-      toast.success("PowerPoint saved to library!");
+      toast.success(t('sermon.ppt.savedToLibrary'));
     } catch (error) {
       console.error("Error saving to library:", error);
-      toast.error("Failed to save to library");
+      toast.error(t('sermon.ppt.saveToLibraryError'));
     } finally {
       setSaving(false);
     }
@@ -486,10 +488,10 @@ export default function SermonPowerPoint() {
       
       await downloadSermonPPT(deckWithSettings);
 
-      toast.success("PowerPoint downloaded successfully!");
+      toast.success(t('sermon.ppt.downloadSuccess'));
     } catch (error) {
       console.error("Error downloading PPT:", error);
-      toast.error("Failed to download PowerPoint");
+      toast.error(t('sermon.ppt.downloadError'));
     } finally {
       setGenerating(false);
     }
@@ -548,8 +550,8 @@ export default function SermonPowerPoint() {
                 <Presentation className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">PowerPoint Generator</h1>
-                <p className="text-purple-200">Transform your sermon into professional slides</p>
+                <h1 className="text-3xl font-bold text-white">{t('sermon.ppt.title')}</h1>
+                <p className="text-purple-200">{t('sermon.ppt.subtitle')}</p>
               </div>
             </div>
             
@@ -561,7 +563,7 @@ export default function SermonPowerPoint() {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-white/70 text-sm"
               >
                 <Save className="w-3.5 h-3.5" />
-                <span>Saved {lastSavedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <span>{t('common.saved')} {lastSavedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
               </motion.div>
             )}
           </motion.div>
@@ -572,10 +574,10 @@ export default function SermonPowerPoint() {
       <div className="max-w-4xl mx-auto px-6 py-6 relative z-10">
         <div className="flex items-center justify-center gap-2 mb-8">
           {[
-            { id: "input", label: "Content", icon: FileText },
-            { id: "settings", label: "Style", icon: Palette },
-            { id: "edit", label: "Edit", icon: Wand2 },
-            { id: "preview", label: "Download", icon: Download },
+            { id: "input", label: t('sermon.ppt.stepContent'), icon: FileText },
+            { id: "settings", label: t('sermon.ppt.stepStyle'), icon: Palette },
+            { id: "edit", label: t('common.edit'), icon: Wand2 },
+            { id: "preview", label: t('sermon.ppt.stepDownload'), icon: Download },
           ].map((s, idx) => (
             <div key={s.id} className="flex items-center">
               <button
@@ -606,7 +608,7 @@ export default function SermonPowerPoint() {
           <div className="flex items-center justify-center py-16">
             <div className="text-center">
               <Loader2 className="w-12 h-12 text-white animate-spin mx-auto mb-4" />
-              <p className="text-white/70">Loading sermon data...</p>
+              <p className="text-white/70">{t('sermon.ppt.loadingSermon')}</p>
             </div>
           </div>
         )}
@@ -621,10 +623,10 @@ export default function SermonPowerPoint() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Wand2 className="w-5 h-5 text-purple-600" />
-                  {sermonId ? "Sermon Loaded - Ready to Generate" : "What would you like to turn into slides?"}
+                  {sermonId ? t('sermon.ppt.sermonLoadedReady') : t('sermon.ppt.whatToTurnIntoSlides')}
                 </CardTitle>
                 <CardDescription>
-                  {sermonId ? `"${sermonTitle}" has been loaded. Choose full sermon or verses only.` : "Paste your sermon content or enter Scripture references"}
+                  {sermonId ? t('sermon.ppt.sermonLoadedDescription', { title: sermonTitle }) : t('sermon.ppt.pasteContentDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -633,38 +635,36 @@ export default function SermonPowerPoint() {
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="full" className="gap-2">
                       <Sparkles className="w-4 h-4" />
-                      Full Sermon
+                      {t('sermon.ppt.fullSermon')}
                     </TabsTrigger>
                     <TabsTrigger value="verses" className="gap-2">
                       <BookOpen className="w-4 h-4" />
-                      Verses Only
+                      {t('sermon.ppt.versesOnly')}
                     </TabsTrigger>
                     <TabsTrigger value="study" className="gap-2">
                       <GraduationCap className="w-4 h-4" />
-                      Build Study
+                      {t('sermon.ppt.buildStudy')}
                     </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="full" className="mt-4 space-y-4">
                     <div className="p-4 bg-purple-50 dark:bg-purple-950/30 rounded-lg border border-purple-200 dark:border-purple-800">
                       <p className="text-sm text-purple-700 dark:text-purple-300">
-                        Paste your sermon manuscript, outline, or notes. AI will extract the
-                        structure (big idea, main points, application) and create a complete
-                        presentation deck.
+                        {t('sermon.ppt.fullSermonHint')}
                       </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Sermon Title (optional)</Label>
+                      <Label>{t('sermon.ppt.sermonTitleLabel')}</Label>
                       <Input
-                        placeholder="Enter your sermon title..."
+                        placeholder={t('sermon.ppt.sermonTitlePlaceholder')}
                         value={sermonTitle}
                         onChange={(e) => setSermonTitle(e.target.value)}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Sermon Content *</Label>
+                      <Label>{t('sermon.ppt.sermonContentLabel')}</Label>
                       <Textarea
                         placeholder={`Paste your sermon manuscript, outline, or notes here...
 
@@ -688,8 +688,8 @@ No matter how far you've wandered...`}
                         className="min-h-[300px] font-mono text-sm"
                       />
                       <p className="text-xs text-muted-foreground">
-                        {sermonContent.length} characters
-                        {sermonContent.length < 50 && " (minimum 50 characters)"}
+                        {t('sermon.ppt.characterCount', { count: sermonContent.length })}
+                        {sermonContent.length < 50 && ` (${t('sermon.ppt.minimumCharacters', { count: 50 })})`}
                       </p>
                     </div>
                   </TabsContent>
@@ -697,13 +697,12 @@ No matter how far you've wandered...`}
                   <TabsContent value="verses" className="mt-4 space-y-4">
                     <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                       <p className="text-sm text-blue-700 dark:text-blue-300">
-                        Enter Scripture references (one per line). AI will build a presentation
-                        that flows through these verses with transitions and a synthesized big idea.
+                        {t('sermon.ppt.versesHint')}
                       </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Scripture References *</Label>
+                      <Label>{t('sermon.ppt.scriptureRefsLabel')}</Label>
                       <Textarea
                         placeholder={`Enter Scripture references, one per line:
 
@@ -727,8 +726,7 @@ John 3:16 - "For God so loved the world..."`}
                       <div className="flex-1">
                         <div className="p-4 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg border border-emerald-200 dark:border-emerald-800 mb-4">
                           <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                            Build your study with movable blocks. Add scripture, teaching points, 
-                            discussion questions, and more. Use Jeeves to help research and find verses.
+                            {t('sermon.ppt.studyHint')}
                           </p>
                         </div>
                         <StudyContentBuilder
@@ -766,7 +764,7 @@ John 3:16 - "For God so loved the world..."`}
                         className="gap-2"
                       >
                         {showJeeves ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
-                        {showJeeves ? "Hide Jeeves" : "Show Jeeves Assistant"}
+                        {showJeeves ? t('sermon.ppt.hideJeeves') : t('sermon.ppt.showJeeves')}
                       </Button>
                     </div>
                   </TabsContent>
@@ -778,7 +776,7 @@ John 3:16 - "For God so loved the world..."`}
                   className="w-full gap-2"
                   size="lg"
                 >
-                  Continue to Style Settings
+                  {t('sermon.ppt.continueToStyle')}
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </CardContent>
@@ -796,10 +794,10 @@ John 3:16 - "For God so loved the world..."`}
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Palette className="w-5 h-5 text-purple-600" />
-                  Choose Your Style
+                  {t('sermon.ppt.chooseStyle')}
                 </CardTitle>
                 <CardDescription>
-                  Select a visual theme and configure presentation settings
+                  {t('sermon.ppt.chooseStyleDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -811,9 +809,9 @@ John 3:16 - "For God so loved the world..."`}
                         <Wand2 className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <Label className="text-base font-semibold">Use Gamma.app</Label>
+                        <Label className="text-base font-semibold">{t('sermon.ppt.useGamma')}</Label>
                         <p className="text-xs text-muted-foreground">
-                          {useGamma ? "AI-powered stunning presentations" : "Built-in PowerPoint generator"}
+                          {useGamma ? t('sermon.ppt.gammaDescription') : t('sermon.ppt.builtInDescription')}
                         </p>
                       </div>
                     </div>
@@ -827,7 +825,7 @@ John 3:16 - "For God so loved the world..."`}
                     <div className="mt-4 space-y-4 pt-4 border-t border-purple-500/20">
                       {/* Per-user API key input */}
                       <div className="space-y-2">
-                        <Label className="text-sm">Your Gamma API Key</Label>
+                        <Label className="text-sm">{t('sermon.ppt.gammaApiKeyLabel')}</Label>
                         <div className="flex gap-2">
                           <Input
                             type="password"
@@ -850,12 +848,12 @@ John 3:16 - "For God so loved the world..."`}
                             ) : gammaKeySaved ? (
                               <Check className="w-4 h-4" />
                             ) : (
-                              "Save"
+                              t('common.save')
                             )}
                           </Button>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Get your key at{" "}
+                          {t('sermon.ppt.getKeyAt')}{" "}
                           <a
                             href="https://gamma.app/settings/developers"
                             target="_blank"
@@ -868,15 +866,15 @@ John 3:16 - "For God so loved the world..."`}
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-sm">Image Style</Label>
+                        <Label className="text-sm">{t('sermon.ppt.imageStyle')}</Label>
                         <Select value={gammaImageStyle} onValueChange={(v) => setGammaImageStyle(v as typeof gammaImageStyle)}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="photorealistic">Photorealistic</SelectItem>
-                            <SelectItem value="illustration">Illustration</SelectItem>
-                            <SelectItem value="none">No AI Images</SelectItem>
+                            <SelectItem value="photorealistic">{t('sermon.ppt.photorealistic')}</SelectItem>
+                            <SelectItem value="illustration">{t('sermon.ppt.illustration')}</SelectItem>
+                            <SelectItem value="none">{t('sermon.ppt.noAiImages')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -887,7 +885,7 @@ John 3:16 - "For God so loved the world..."`}
                 {/* Theme Selection Grid - only show for built-in */}
                 {!useGamma && (
                 <div className="space-y-3">
-                  <Label>Visual Theme</Label>
+                  <Label>{t('sermon.ppt.visualTheme')}</Label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {Object.values(PPT_THEMES).map((theme) => (
                       <div
@@ -910,7 +908,7 @@ John 3:16 - "For God so loved the world..."`}
                 <div className="grid gap-4 sm:grid-cols-2">
                   {!useGamma && (
                   <div className="space-y-2">
-                    <Label>Venue Size</Label>
+                    <Label>{t('sermon.ppt.venueSize')}</Label>
                     <Select
                       value={settings.venue_preset}
                       onValueChange={(v) => setSettings({ ...settings, venue_preset: v as VenueSize })}
@@ -930,7 +928,7 @@ John 3:16 - "For God so loved the world..."`}
                   )}
 
                   <div className="space-y-2">
-                    <Label>Slide Count</Label>
+                    <Label>{t('sermon.ppt.slideCount')}</Label>
                     <Select
                       value={String(settings.slide_count)}
                       onValueChange={(v) => setSettings({ ...settings, slide_count: parseInt(v) })}
@@ -949,7 +947,7 @@ John 3:16 - "For God so loved the world..."`}
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Bible Version</Label>
+                    <Label>{t('sermon.ppt.bibleVersion')}</Label>
                     <Select
                       value={settings.bible_version}
                       onValueChange={(v) => setSettings({ ...settings, bible_version: v })}
@@ -968,7 +966,7 @@ John 3:16 - "For God so loved the world..."`}
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Audience Type</Label>
+                    <Label>{t('sermon.ppt.audienceType')}</Label>
                     <Select
                       value={settings.audience}
                       onValueChange={(v) => setSettings({ ...settings, audience: v as AudienceType })}
@@ -977,10 +975,10 @@ John 3:16 - "For God so loved the world..."`}
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="evangelistic">Evangelistic</SelectItem>
-                        <SelectItem value="discipleship">Discipleship</SelectItem>
-                        <SelectItem value="doctrinal">Doctrinal</SelectItem>
-                        <SelectItem value="devotional">Devotional</SelectItem>
+                        <SelectItem value="evangelistic">{t('sermon.ppt.evangelistic')}</SelectItem>
+                        <SelectItem value="discipleship">{t('sermon.ppt.discipleship')}</SelectItem>
+                        <SelectItem value="doctrinal">{t('sermon.ppt.doctrinal')}</SelectItem>
+                        <SelectItem value="devotional">{t('sermon.ppt.devotional')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -988,9 +986,9 @@ John 3:16 - "For God so loved the world..."`}
 
                 <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                   <div>
-                    <Label>Include Speaker Notes</Label>
+                    <Label>{t('sermon.ppt.includeSpeakerNotes')}</Label>
                     <p className="text-xs text-muted-foreground">
-                      Add detailed notes for the presenter
+                      {t('sermon.ppt.speakerNotesDescription')}
                     </p>
                   </div>
                   <Switch
@@ -1008,7 +1006,7 @@ John 3:16 - "For God so loved the world..."`}
                     className="flex-1"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
+                    {t('common.back')}
                   </Button>
                   <Button
                     onClick={generatePresentation}
@@ -1019,12 +1017,12 @@ John 3:16 - "For God so loved the world..."`}
                     {generating ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        {useGamma ? "Creating with Gamma..." : "Generating..."}
+                        {useGamma ? t('sermon.ppt.creatingWithGamma') : t('sermon.ppt.generatingLabel')}
                       </>
                     ) : (
                       <>
                         {useGamma ? <Wand2 className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
-                        {useGamma ? "Generate with Gamma" : "Generate Presentation"}
+                        {useGamma ? t('sermon.ppt.generateWithGamma') : t('sermon.ppt.generatePresentation')}
                       </>
                     )}
                   </Button>
@@ -1047,19 +1045,19 @@ John 3:16 - "For God so loved the world..."`}
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <Wand2 className="w-5 h-5 text-purple-600" />
-                      Customize Your Slides
+                      {t('sermon.ppt.customizeSlides')}
                     </CardTitle>
                     <CardDescription>
-                      Click on slides to edit them. Use AI to generate images and refine content.
+                      {t('sermon.ppt.customizeSlidesDescription')}
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" onClick={() => setStep("settings")}>
                       <ArrowLeft className="w-4 h-4 mr-2" />
-                      Back
+                      {t('common.back')}
                     </Button>
                     <Button onClick={() => setStep("preview")} className="gap-2">
-                      Continue to Download
+                      {t('sermon.ppt.continueToDownload')}
                       <ChevronRight className="w-4 h-4" />
                     </Button>
                   </div>
@@ -1092,9 +1090,9 @@ John 3:16 - "For God so loved the world..."`}
                     <Wand2 className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white">Gamma Presentation Ready!</h3>
+                    <h3 className="text-xl font-bold text-white">{t('sermon.ppt.gammaPresentationReady')}</h3>
                     <p className="text-purple-200">
-                      {gammaResult.numCards} slides created with Gamma.app
+                      {t('sermon.ppt.gammaSlideCount', { count: gammaResult.numCards })}
                     </p>
                   </div>
                 </div>
@@ -1109,7 +1107,7 @@ John 3:16 - "For God so loved the world..."`}
                   {gammaResult.title}
                 </CardTitle>
                 <CardDescription>
-                  Your presentation is ready in Gamma
+                  {t('sermon.ppt.readyInGamma')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1118,9 +1116,9 @@ John 3:16 - "For God so loved the world..."`}
                   <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-500 to-fuchsia-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30">
                     <Sparkles className="w-10 h-10 text-white" />
                   </div>
-                  <h4 className="text-lg font-semibold mb-2">Your presentation is live!</h4>
+                  <h4 className="text-lg font-semibold mb-2">{t('sermon.ppt.presentationLive')}</h4>
                   <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                    Open in Gamma to edit, customize, and present your slides. You can also download as PowerPoint.
+                    {t('sermon.ppt.openInGammaDescription')}
                   </p>
                 </div>
 
@@ -1132,7 +1130,7 @@ John 3:16 - "For God so loved the world..."`}
                     className="flex-1"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Settings
+                    {t('sermon.ppt.backToSettings')}
                   </Button>
                   {gammaResult.exportUrl && (
                     <Button
@@ -1141,7 +1139,7 @@ John 3:16 - "For God so loved the world..."`}
                       className="flex-1"
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      Download .pptx
+                      {t('sermon.ppt.downloadPptx')}
                     </Button>
                   )}
                   <Button
@@ -1150,7 +1148,7 @@ John 3:16 - "For God so loved the world..."`}
                     size="lg"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    Open in Gamma
+                    {t('sermon.ppt.openInGamma')}
                   </Button>
                 </div>
               </CardContent>
@@ -1167,7 +1165,7 @@ John 3:16 - "For God so loved the world..."`}
                 className="text-white/70 hover:text-white"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Create Another Presentation
+                {t('sermon.ppt.createAnother')}
               </Button>
             </div>
           </motion.div>
@@ -1188,7 +1186,7 @@ John 3:16 - "For God so loved the world..."`}
                     <Check className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white">Presentation Ready!</h3>
+                    <h3 className="text-xl font-bold text-white">{t('sermon.ppt.presentationReady')}</h3>
                     <p className="text-green-200">
                       {generatedDeck.slides.length} slides generated using{" "}
                       {PPT_THEMES[settings.theme_id]?.name || "Modern Dark"} theme
@@ -1209,7 +1207,7 @@ John 3:16 - "For God so loved the world..."`}
               <CardContent className="space-y-4">
                 {/* Slide Structure */}
                 <div className="space-y-2">
-                  <Label>Slide Structure ({generatedDeck.slides.length} slides)</Label>
+                  <Label>{t('sermon.ppt.slideStructure', { count: generatedDeck.slides.length })}</Label>
                   <ScrollArea className="h-[300px] rounded-lg border bg-muted/30 p-2">
                     <div className="space-y-1">
                       {generatedDeck.slides.map((slide, idx) => (
@@ -1240,7 +1238,7 @@ John 3:16 - "For God so loved the world..."`}
                     className="flex-1"
                   >
                     <Wand2 className="w-4 h-4 mr-2" />
-                    Edit Slides
+                    {t('sermon.ppt.editSlides')}
                   </Button>
                   <Button
                     variant="outline"
@@ -1251,17 +1249,17 @@ John 3:16 - "For God so loved the world..."`}
                     {saving ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Saving...
+                        {t('common.saving')}
                       </>
                     ) : savedToLibrary ? (
                       <>
                         <CheckIcon className="w-4 h-4 mr-2 text-green-500" />
-                        Saved to Library
+                        {t('sermon.ppt.savedToLibraryLabel')}
                       </>
                     ) : (
                       <>
                         <FolderOpen className="w-4 h-4 mr-2" />
-                        Save to Library
+                        {t('sermon.ppt.saveToLibrary')}
                       </>
                     )}
                   </Button>
@@ -1274,12 +1272,12 @@ John 3:16 - "For God so loved the world..."`}
                     {generating ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Downloading...
+                        {t('sermon.ppt.downloading')}
                       </>
                     ) : (
                       <>
                         <Download className="w-4 h-4" />
-                        Download PowerPoint
+                        {t('sermon.ppt.downloadPowerPoint')}
                       </>
                     )}
                   </Button>
@@ -1298,7 +1296,7 @@ John 3:16 - "For God so loved the world..."`}
                 className="text-white/70 hover:text-white"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Create Another Presentation
+                {t('sermon.ppt.createAnother')}
               </Button>
             </div>
           </motion.div>

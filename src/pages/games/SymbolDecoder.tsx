@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -360,6 +361,7 @@ const symbolDatabase: Symbol[] = [
 ];
 
 const SymbolDecoder: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [gameState, setGameState] = useState<GameState>({
     currentRound: 0,
@@ -528,35 +530,35 @@ const SymbolDecoder: React.FC = () => {
         <Navigation />
         <div className="container mx-auto px-4 py-8 max-w-2xl">
           <Button onClick={() => navigate('/games')} variant="ghost" className="text-white/70 mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Games
+            <ArrowLeft className="mr-2 h-4 w-4" /> {t('common.backToGames')}
           </Button>
 
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🔣</div>
-            <h1 className="text-4xl font-bold text-white mb-2">Symbol Decoder</h1>
-            <p className="text-gray-400">Match biblical symbols to their true meanings</p>
+            <h1 className="text-4xl font-bold text-white mb-2">{t('games.symbolDecoder.title')}</h1>
+            <p className="text-gray-400">{t('games.symbolDecoder.subtitle')}</p>
             {highScore > 0 && (
               <div className="mt-4 text-amber-400">
                 <Trophy className="inline-block mr-2 h-5 w-5" />
-                High Score: {highScore}
+                {t('games.symbolDecoder.highScore', { score: highScore })}
               </div>
             )}
           </div>
 
           <Card className="bg-gray-900/50 border-gray-700 mb-6">
             <CardHeader>
-              <CardTitle className="text-white">How to Play</CardTitle>
+              <CardTitle className="text-white">{t('games.common.howToPlay')}</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-300 space-y-2">
-              <p>1. A biblical symbol will appear with 4 possible meanings</p>
-              <p>2. Select the <span className="text-green-400">correct typological meaning</span></p>
-              <p>3. Watch out for <span className="text-red-400">shallow or wrong interpretations</span></p>
-              <p>4. Learn how each symbol points to <span className="text-amber-400">Christ</span></p>
+              <p>{t('games.symbolDecoder.instructions.step1')}</p>
+              <p>{t('games.symbolDecoder.instructions.step2')}</p>
+              <p>{t('games.symbolDecoder.instructions.step3')}</p>
+              <p>{t('games.symbolDecoder.instructions.step4')}</p>
             </CardContent>
           </Card>
 
           <div className="space-y-4">
-            <h3 className="text-white font-semibold text-center">Select Game Mode:</h3>
+            <h3 className="text-white font-semibold text-center">{t('games.symbolDecoder.selectGameMode')}:</h3>
 
             <Button
               onClick={() => startGame('mixed', 'match')}
@@ -564,8 +566,8 @@ const SymbolDecoder: React.FC = () => {
             >
               <Target className="mr-3 h-6 w-6" />
               <div className="text-left">
-                <div className="font-bold">Classic Match</div>
-                <div className="text-xs opacity-80">10 rounds, all difficulties mixed</div>
+                <div className="font-bold">{t('games.symbolDecoder.classicMatch')}</div>
+                <div className="text-xs opacity-80">{t('games.symbolDecoder.classicMatchDesc')}</div>
               </div>
             </Button>
 
@@ -575,8 +577,8 @@ const SymbolDecoder: React.FC = () => {
             >
               <Timer className="mr-3 h-6 w-6" />
               <div className="text-left">
-                <div className="font-bold">Rapid Fire</div>
-                <div className="text-xs opacity-80">15 rounds, 15 seconds each</div>
+                <div className="font-bold">{t('games.symbolDecoder.rapidFire')}</div>
+                <div className="text-xs opacity-80">{t('games.symbolDecoder.rapidFireDesc')}</div>
               </div>
             </Button>
 
@@ -586,8 +588,8 @@ const SymbolDecoder: React.FC = () => {
             >
               <Sparkles className="mr-3 h-6 w-6" />
               <div className="text-left">
-                <div className="font-bold">Christ Focus</div>
-                <div className="text-xs opacity-80">See Christ connections after each answer</div>
+                <div className="font-bold">{t('games.symbolDecoder.christFocus')}</div>
+                <div className="text-xs opacity-80">{t('games.symbolDecoder.christFocusDesc')}</div>
               </div>
             </Button>
           </div>
@@ -598,21 +600,21 @@ const SymbolDecoder: React.FC = () => {
               variant="outline"
               className="border-green-600 text-green-400 hover:bg-green-600/20"
             >
-              Easy
+              {t('games.common.easy')}
             </Button>
             <Button
               onClick={() => startGame('medium', 'match')}
               variant="outline"
               className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/20"
             >
-              Medium
+              {t('games.common.medium')}
             </Button>
             <Button
               onClick={() => startGame('hard', 'match')}
               variant="outline"
               className="border-red-600 text-red-400 hover:bg-red-600/20"
             >
-              Hard
+              {t('games.common.hard')}
             </Button>
           </div>
         </div>
@@ -635,7 +637,7 @@ const SymbolDecoder: React.FC = () => {
               {gameState.lives > 0 ? '🏆' : '💔'}
             </div>
             <h2 className="text-3xl font-bold text-white mb-2">
-              {gameState.lives > 0 ? 'Challenge Complete!' : 'Game Over'}
+              {gameState.lives > 0 ? t('games.symbolDecoder.challengeComplete') : t('games.common.gameOver')}
             </h2>
 
             <Card className="bg-gray-900/50 border-gray-700 my-6">
@@ -643,26 +645,26 @@ const SymbolDecoder: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
                     <div className="text-4xl font-bold text-amber-400">{gameState.score}</div>
-                    <div className="text-gray-400 text-sm">Score</div>
+                    <div className="text-gray-400 text-sm">{t('games.common.score')}</div>
                   </div>
                   <div>
                     <div className="text-4xl font-bold text-purple-400">{accuracy}%</div>
-                    <div className="text-gray-400 text-sm">Accuracy</div>
+                    <div className="text-gray-400 text-sm">{t('games.symbolDecoder.accuracy')}</div>
                   </div>
                   <div>
                     <div className="text-4xl font-bold text-orange-400">{gameState.bestStreak}</div>
-                    <div className="text-gray-400 text-sm">Best Streak</div>
+                    <div className="text-gray-400 text-sm">{t('games.common.bestStreak')}</div>
                   </div>
                   <div>
                     <div className="text-4xl font-bold text-green-400">{gameState.answeredCorrect}</div>
-                    <div className="text-gray-400 text-sm">Correct</div>
+                    <div className="text-gray-400 text-sm">{t('games.common.correct')}</div>
                   </div>
                 </div>
 
                 {gameState.score >= highScore && gameState.score > 0 && (
                   <div className="mt-4 text-amber-400 font-bold">
                     <Trophy className="inline-block mr-2 h-5 w-5" />
-                    New High Score!
+                    {t('games.symbolDecoder.newHighScore')}
                   </div>
                 )}
               </CardContent>
@@ -674,14 +676,14 @@ const SymbolDecoder: React.FC = () => {
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
               >
                 <RotateCcw className="mr-2 h-4 w-4" />
-                Play Again
+                {t('games.common.playAgain')}
               </Button>
               <Button
                 onClick={() => setGameState(prev => ({ ...prev, status: 'menu' }))}
                 variant="outline"
                 className="w-full border-gray-600 text-gray-300"
               >
-                Back to Menu
+                {t('games.common.backToMenu')}
               </Button>
             </div>
           </div>
@@ -715,9 +717,9 @@ const SymbolDecoder: React.FC = () => {
         {/* Progress */}
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-400 mb-1">
-            <span>Round {gameState.currentRound + 1} of {gameState.totalRounds}</span>
+            <span>{t('games.symbolDecoder.roundOf', { current: gameState.currentRound + 1, total: gameState.totalRounds })}</span>
             {gameState.streak >= 3 && (
-              <span className="text-orange-400">🔥 {gameState.streak} streak!</span>
+              <span className="text-orange-400">{t('games.symbolDecoder.streakDisplay', { streak: gameState.streak })}</span>
             )}
           </div>
           <Progress value={(gameState.currentRound / gameState.totalRounds) * 100} className="h-2" />
@@ -795,19 +797,19 @@ const SymbolDecoder: React.FC = () => {
                     {isCorrect ? (
                       <>
                         <CheckCircle2 className="h-5 w-5 text-green-400" />
-                        <span className="font-bold text-green-400">Correct!</span>
+                        <span className="font-bold text-green-400">{t('games.common.correct')}!</span>
                       </>
                     ) : (
                       <>
                         <XCircle className="h-5 w-5 text-red-400" />
-                        <span className="font-bold text-red-400">Not quite...</span>
+                        <span className="font-bold text-red-400">{t('games.symbolDecoder.notQuite')}</span>
                       </>
                     )}
                   </div>
 
                   {(gameState.gameMode === 'christ-focus' || !isCorrect) && (
                     <div className="text-sm text-gray-300 space-y-2">
-                      <p><strong className="text-amber-400">Christ Connection:</strong></p>
+                      <p><strong className="text-amber-400">{t('games.symbolDecoder.christConnection')}:</strong></p>
                       <p className="text-gray-400">{currentSymbol.christConnection}</p>
                       <p className="text-xs text-gray-500">📖 {currentSymbol.scriptureRef}</p>
                     </div>
@@ -818,8 +820,8 @@ const SymbolDecoder: React.FC = () => {
                     className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600"
                   >
                     {gameState.currentRound + 1 >= gameState.totalRounds || gameState.lives <= 0
-                      ? 'See Results'
-                      : 'Continue'}
+                      ? t('games.symbolDecoder.seeResults')
+                      : t('games.symbolDecoder.continue')}
                   </Button>
                 </CardContent>
               </Card>

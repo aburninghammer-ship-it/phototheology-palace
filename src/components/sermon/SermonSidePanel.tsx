@@ -519,14 +519,20 @@ export function SermonSidePanel({
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center p-4 text-muted-foreground">
-                  <Save className="w-8 h-8 mb-2 opacity-30" />
-                  <p className="text-sm font-medium">No Saved Suggestions</p>
-                  <p className="text-[10px] mt-1">
-                    {sermonId
-                      ? "Use the Polish tab to analyze your sermon and get AI suggestions."
-                      : "Save your sermon first, then use Polish to get suggestions."
-                    }
+                  <Sparkles className="w-8 h-8 mb-2 opacity-30" />
+                  <p className="text-sm font-medium">No Polish Analysis Yet</p>
+                  <p className="text-[10px] mt-2 max-w-[200px]">
+                    Click the <strong>"Polish"</strong> tab at the top of the page, then click <strong>"Analyze My Sermon"</strong> to get AI-powered suggestions.
                   </p>
+                  <div className="mt-3 p-2 bg-muted/50 rounded-lg text-[10px] text-left w-full">
+                    <p className="font-medium mb-1">Polish will analyze:</p>
+                    <ul className="space-y-0.5 text-muted-foreground">
+                      <li>• Structure & flow</li>
+                      <li>• Christ connections</li>
+                      <li>• Missed opportunities</li>
+                      <li>• Areas to tighten</li>
+                    </ul>
+                  </div>
                 </div>
               )}
             </ScrollArea>

@@ -5,6 +5,7 @@ import { Palace3DViewer } from "@/components/palace/Palace3DViewer";
 import { PalaceBreadcrumbs } from "@/components/palace/PalaceBreadcrumbs";
 import { PalaceTour } from "@/components/onboarding/PalaceTour";
 import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Building2, Award, TrendingUp, BookOpen, Target, LayoutGrid, List, Box } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { palaceSteps } from "@/config/howItWorksSteps";
@@ -21,20 +22,23 @@ import { Footer } from "@/components/Footer";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from 'react-i18next';
 
 const Palace = () => {
+  const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { completedRooms, completedRoomIds, totalRooms, progressPercentage, loading } = usePalaceProgress();
   const { showTour, loading: tourLoading, completeTour, skipTour } = usePalaceTour();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<"explore" | "progress">("explore");
-  const [viewMode, setViewMode] = useState<"visual" | "list" | "3d">("list"); // Default to progressive list for new users
+  const [viewMode, setViewMode] = useState<"visual" | "list" | "3d">("list");
 
   const handleTourComplete = () => {
     completeTour();
-    toast.success("🏛️ Palace Explorer badge earned!", {
-      description: "Now explore the Story Room to begin your journey.",
+    toast.success(t('palace.badgeEarned'), {
+      description: t('palace.exploreStoryRoom'),
     });
     navigate("/palace/floor/1/room/sr");
   };
@@ -46,13 +50,11 @@ const Palace = () => {
   useEffect(() => {
     const roomParam = searchParams.get('room');
     if (roomParam) {
-      // Find which floor this room belongs to
-      const floorNumber = palaceFloors.findIndex(floor => 
+      const floorNumber = palaceFloors.findIndex(floor =>
         floor.rooms.some(room => room.tag === roomParam)
       ) + 1;
-      
+
       if (floorNumber > 0) {
-        // Scroll to that floor
         setTimeout(() => {
           const floorElement = document.getElementById(`floor-${floorNumber}`);
           if (floorElement) {
@@ -63,10 +65,9 @@ const Palace = () => {
     }
   }, [searchParams]);
 
-  // Handle subscription success redirect from Stripe
   useEffect(() => {
     const subscriptionStatus = searchParams.get('subscription');
-    
+
     const sendPurchaseNotification = async () => {
       if (!user) return;
       try {
@@ -75,12 +76,12 @@ const Palace = () => {
           .select('subscription_tier')
           .eq('id', user.id)
           .single();
-        
+
         await supabase.functions.invoke('send-purchase-notification', {
           body: {
             userEmail: user.email || 'Unknown',
             userName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Unknown',
-            amount: 0, // Amount will show in Stripe dashboard
+            amount: 0,
             currency: 'usd',
             subscriptionTier: profile?.subscription_tier || 'premium',
             isTrialing: false,
@@ -94,28 +95,24 @@ const Palace = () => {
     };
 
     if (subscriptionStatus === 'success') {
-      toast.success("🎉 Welcome to Phototheology! Your subscription is now active.");
+      toast.success(t('palace.subscriptionSuccess'));
       sendPurchaseNotification();
-      // Clear the URL param
       navigate('/palace', { replace: true });
     }
-  }, [searchParams, user, navigate]);
+  }, [searchParams, user, navigate, t]);
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <Navigation />
-      
-      {/* Palace Tour for first-time visitors */}
+
       {showTour && !tourLoading && (
         <PalaceTour onComplete={handleTourComplete} onSkip={handleTourSkip} />
       )}
-      
+
       <div className="pt-20 md:pt-24 pb-24 md:pb-16 px-3 md:px-4">
         <div className="container mx-auto max-w-6xl">
-          {/* Breadcrumbs */}
           <PalaceBreadcrumbs />
 
-          {/* Hero Header - Mobile Optimized */}
           <div className="text-center mb-6 md:mb-8">
             <img
               src="/pwa-192x192.png"
@@ -124,19 +121,19 @@ const Palace = () => {
             />
             <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full gradient-palace border border-white/20 mb-3 md:mb-4 shadow-lg">
               <Building2 className="h-4 w-4 md:h-5 md:w-5 text-white" />
-              <span className="text-xs md:text-sm font-semibold text-white">The Master System</span>
+              <span className="text-xs md:text-sm font-semibold text-white">{t('palace.masterSystem')}</span>
             </div>
 
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 bg-gradient-palace bg-clip-text text-transparent leading-tight">
-              The Eight-Floor Palace
+              {t('palace.eightFloorPalace')}
             </h1>
 
             <p className="text-base md:text-xl text-foreground max-w-2xl mx-auto mb-4 px-2">
-              Master Bible typology through our revolutionary <strong>8-floor, 38-room memory system</strong>. See Christ everywhere in Scripture.
+              {t('palace.heroDescription')}
             </p>
 
             <div className="flex justify-center mb-4 md:mb-6">
-              <HowItWorksDialog title="How to Use the Palace" steps={palaceSteps} />
+              <HowItWorksDialog title={t('palace.howToUse')} steps={palaceSteps} />
             </div>
 
             {user && !loading && (
@@ -145,15 +142,15 @@ const Palace = () => {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-primary" />
-                      <span className="font-medium text-sm md:text-base">Your Progress</span>
+                      <span className="font-medium text-sm md:text-base">{t('palace.yourProgress')}</span>
                     </div>
                     <span className="text-xs md:text-sm text-muted-foreground">
-                      {completedRooms} / {totalRooms} rooms
+                      {t('palace.roomCount', { completed: completedRooms, total: totalRooms })}
                     </span>
                   </div>
                   <Progress value={progressPercentage} className="mb-2 h-2 md:h-2.5" />
                   <p className="text-xs md:text-sm text-muted-foreground">
-                    {progressPercentage}% complete
+                    {t('palace.percentComplete', { percent: progressPercentage })}
                   </p>
                 </CardContent>
               </Card>
@@ -167,77 +164,73 @@ const Palace = () => {
               />
             )}
 
-            {/* Mobile-friendly button layout */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center px-4 sm:px-0">
               <Button asChild size="lg" className="gradient-palace text-white h-12 md:h-11 text-base">
                 <Link to={user ? "/games/palace_quiz" : "/auth"}>
                   <Building2 className="mr-2 h-5 w-5 md:h-4 md:w-4" />
-                  {user ? "Continue Learning" : "Start Your Journey"}
+                  {user ? t('palace.continueLearning') : t('palace.startYourJourney')}
                 </Link>
               </Button>
               {completedRooms === totalRooms && (
                 <Button asChild size="lg" variant="outline" className="h-12 md:h-11 text-base">
                   <Link to="/certificates">
                     <Award className="mr-2 h-5 w-5 md:h-4 md:w-4" />
-                    View Certificate
+                    {t('palace.viewCertificate')}
                   </Link>
                 </Button>
               )}
             </div>
           </div>
 
-          {/* Palace Metaphor - Mobile Optimized */}
           <Card variant="glassSubtle" className="mb-6 md:mb-8 p-4 md:p-6">
             <h2 className="font-serif text-xl md:text-2xl font-semibold mb-3 md:mb-4 text-center">
-              The Palace Metaphor
+              {t('palace.palaceMetaphor')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 text-sm text-muted-foreground">
               <div className="space-y-1 md:space-y-2">
                 <Link to="/palace/floor/1" id="floor-1" className="block scroll-mt-24 hover:bg-accent/50 active:bg-accent/70 p-3 md:p-2 rounded-lg md:rounded-md transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <strong className="text-foreground">1st Floor</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">Stories and images (width)</span>
+                  <strong className="text-foreground">{t('palace.floor1')}</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">{t('palace.floor1Desc')}</span>
                 </Link>
                 <Link to="/palace/floor/2" id="floor-2" className="block scroll-mt-24 hover:bg-accent/50 active:bg-accent/70 p-3 md:p-2 rounded-lg md:rounded-md transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <strong className="text-foreground">2nd Floor</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">Detective with magnifying glass</span>
+                  <strong className="text-foreground">{t('palace.floor2')}</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">{t('palace.floor2Desc')}</span>
                 </Link>
                 <Link to="/palace/floor/3" id="floor-3" className="block scroll-mt-24 hover:bg-accent/50 active:bg-accent/70 p-3 md:p-2 rounded-lg md:rounded-md transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <strong className="text-foreground">3rd Floor</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">Freestyle, spontaneous connections</span>
+                  <strong className="text-foreground">{t('palace.floor3')}</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">{t('palace.floor3Desc')}</span>
                 </Link>
                 <Link to="/palace/floor/4" id="floor-4" className="block scroll-mt-24 hover:bg-accent/50 active:bg-accent/70 p-3 md:p-2 rounded-lg md:rounded-md transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <strong className="text-foreground">4th Floor</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">Christ-centered, dimensional study</span>
+                  <strong className="text-foreground">{t('palace.floor4')}</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">{t('palace.floor4Desc')}</span>
                 </Link>
               </div>
               <div className="space-y-1 md:space-y-2">
                 <Link to="/palace/floor/5" id="floor-5" className="block scroll-mt-24 hover:bg-accent/50 active:bg-accent/70 p-3 md:p-2 rounded-lg md:rounded-md transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <strong className="text-foreground">5th Floor</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">The prophetic telescope</span>
+                  <strong className="text-foreground">{t('palace.floor5')}</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">{t('palace.floor5Desc')}</span>
                 </Link>
                 <Link to="/palace/floor/6" id="floor-6" className="block scroll-mt-24 hover:bg-accent/50 active:bg-accent/70 p-3 md:p-2 rounded-lg md:rounded-md transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <strong className="text-foreground">6th Floor</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">Cycles of history and heavens</span>
+                  <strong className="text-foreground">{t('palace.floor6')}</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">{t('palace.floor6Desc')}</span>
                 </Link>
                 <Link to="/palace/floor/7" id="floor-7" className="block scroll-mt-24 hover:bg-accent/50 active:bg-accent/70 p-3 md:p-2 rounded-lg md:rounded-md transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <strong className="text-foreground">7th Floor</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">Heart and soul into fire of experience</span>
+                  <strong className="text-foreground">{t('palace.floor7')}</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">{t('palace.floor7Desc')}</span>
                 </Link>
                 <Link to="/palace/floor/8" id="floor-8" className="block scroll-mt-24 hover:bg-accent/50 active:bg-accent/70 p-3 md:p-2 rounded-lg md:rounded-md transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <strong className="text-foreground">8th Floor</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">Reflexive thought mastery</span>
+                  <strong className="text-foreground">{t('palace.floor8')}</strong> <span className="hidden sm:inline">-</span> <span className="block sm:inline mt-0.5 sm:mt-0">{t('palace.floor8Desc')}</span>
                 </Link>
               </div>
             </div>
           </Card>
 
-          {/* Mode Tabs */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "explore" | "progress")} className="mb-6">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="explore">
                 <Building2 className="h-4 w-4 mr-2" />
-                Explore Palace
+                {t('palace.explorePalace')}
               </TabsTrigger>
               <TabsTrigger value="progress">
                 <Target className="h-4 w-4 mr-2" />
-                Your Progress
+                {t('palace.yourProgress')}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="explore" className="space-y-6">
-              {/* View Mode Toggle */}
               <div className="flex justify-end gap-2">
                 <Button
                   variant={viewMode === "list" ? "default" : "outline"}
@@ -245,7 +238,7 @@ const Palace = () => {
                   onClick={() => setViewMode("list")}
                 >
                   <List className="h-4 w-4 mr-2" />
-                  Guided
+                  {t('palace.guided')}
                 </Button>
                 <Button
                   variant={viewMode === "visual" ? "default" : "outline"}
@@ -253,7 +246,7 @@ const Palace = () => {
                   onClick={() => setViewMode("visual")}
                 >
                   <LayoutGrid className="h-4 w-4 mr-2" />
-                  Full
+                  {t('palace.full')}
                 </Button>
                 <Button
                   variant={viewMode === "3d" ? "default" : "outline"}
@@ -262,11 +255,10 @@ const Palace = () => {
                   className={viewMode === "3d" ? "bg-purple-600 hover:bg-purple-700" : ""}
                 >
                   <Box className="h-4 w-4 mr-2" />
-                  3D
+                  {t('palace.threeD')}
                 </Button>
               </div>
-              
-              {/* Palace Display */}
+
               <div className="mb-12">
                 {viewMode === "list" ? (
                   <ProgressivePalace showStartHere={progressPercentage < 20} />
@@ -284,12 +276,11 @@ const Palace = () => {
             </TabsContent>
 
             <TabsContent value="progress" className="space-y-6">
-              {/* Progress Overview */}
               <Card variant="glass">
                 <CardContent className="pt-6 space-y-6 relative z-10">
                   <div className="text-center">
-                    <h3 className="text-2xl font-bold mb-2">Your Journey Through the Palace</h3>
-                    <p className="text-muted-foreground">Track your progress as you master each room</p>
+                    <h3 className="text-2xl font-bold mb-2">{t('palace.journeyTitle')}</h3>
+                    <p className="text-muted-foreground">{t('palace.journeyDesc')}</p>
                   </div>
 
                   {user ? (
@@ -297,34 +288,32 @@ const Palace = () => {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <TrendingUp className="h-5 w-5 text-primary" />
-                          <span className="font-medium text-lg">Overall Progress</span>
+                          <span className="font-medium text-lg">{t('palace.overallProgress')}</span>
                         </div>
                         <span className="text-lg font-bold text-primary">
-                          {completedRooms} / {totalRooms} rooms
+                          {t('palace.roomCount', { completed: completedRooms, total: totalRooms })}
                         </span>
                       </div>
                       <Progress value={progressPercentage} className="h-3 mb-2" />
                       <p className="text-center text-2xl font-bold text-primary">
-                        {progressPercentage}% Complete
+                        {t('palace.percentComplete', { percent: progressPercentage })}
                       </p>
 
-                      {/* Floor-by-Floor Breakdown */}
                       <div className="mt-8 space-y-4">
-                        <h4 className="font-semibold text-lg mb-4">Progress by Floor</h4>
-                        {palaceFloors.map((floor, index) => {
+                        <h4 className="font-semibold text-lg mb-4">{t('palace.progressByFloor')}</h4>
+                        {translatedFloors.map((floor, index) => {
                           const floorRoomsTotal = floor.rooms.length;
-                          const floorRoomsCompleted = floor.rooms.filter(room => 
-                            // This would need actual completion data - simplified for now
+                          const floorRoomsCompleted = floor.rooms.filter(room =>
                             false
                           ).length;
                           const floorProgress = floorRoomsTotal > 0 ? (floorRoomsCompleted / floorRoomsTotal) * 100 : 0;
-                          
+
                           return (
                             <div key={floor.number} className="space-y-2">
                               <div className="flex items-center justify-between">
                                 <span className="font-medium">{floor.name}</span>
                                 <span className="text-sm text-muted-foreground">
-                                  {floorRoomsCompleted} / {floorRoomsTotal} rooms
+                                  {t('palace.roomCount', { completed: floorRoomsCompleted, total: floorRoomsTotal })}
                                 </span>
                               </div>
                               <Progress value={floorProgress} className="h-2" />
@@ -337,20 +326,20 @@ const Palace = () => {
                         <Button asChild size="lg" variant="secondary">
                           <Link to="/mastery?tab=map">
                             <Target className="mr-2 h-4 w-4" />
-                            Choose Room to Master
+                            {t('palace.chooseRoom')}
                           </Link>
                         </Button>
                         <Button asChild size="lg" className="gradient-palace text-white">
                           <Link to="/games/palace_quiz">
                             <BookOpen className="mr-2 h-4 w-4" />
-                            Continue Training
+                            {t('palace.continueTraining')}
                           </Link>
                         </Button>
                         {completedRooms === totalRooms && (
                           <Button asChild size="lg" variant="outline">
                             <Link to="/certificates">
                               <Award className="mr-2 h-4 w-4" />
-                              View Certificate
+                              {t('palace.viewCertificate')}
                             </Link>
                           </Button>
                         )}
@@ -359,10 +348,10 @@ const Palace = () => {
                   ) : (
                     <div className="text-center py-8">
                       <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-lg mb-4">Sign in to track your progress through the Palace</p>
+                      <p className="text-lg mb-4">{t('palace.signInToTrack')}</p>
                       <Button asChild size="lg" className="gradient-palace text-white">
                         <Link to="/auth">
-                          Get Started
+                          {t('palace.getStarted')}
                         </Link>
                       </Button>
                     </div>

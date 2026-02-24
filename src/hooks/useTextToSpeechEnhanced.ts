@@ -67,6 +67,9 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const keepAliveIntervalRef = useRef<number | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+
+  // Preloaded audio cache: text hash → audio URL
+  const preloadedAudioRef = useRef<Map<string, string>>(new Map());
   
   // Use refs for callbacks to avoid stale closures in event handlers
   const onEndRef = useRef(onEnd);
@@ -298,6 +301,44 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
   const speakWithElevenLabs = useCallback(async (text: string, speakOptions?: SpeakOptions) => {
     const opts: SpeakOptions = speakOptions || {};
 
+    // Check preloaded cache first — instant playback for preloaded sections
+    const cacheKey = text.slice(0, 120);
+    const preloadedUrl = preloadedAudioRef.current.get(cacheKey);
+    if (preloadedUrl) {
+      console.log('[TTS] Using preloaded audio — zero gap!');
+      preloadedAudioRef.current.delete(cacheKey);
+
+      if (!audioRef.current) audioRef.current = new Audio();
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+
+      const audio = audioRef.current;
+      const isBlobUrl = preloadedUrl.startsWith('blob:');
+      audio.onended = () => {
+        setIsPlaying(false);
+        if (isBlobUrl) URL.revokeObjectURL(preloadedUrl);
+        onEndRef.current?.();
+      };
+      audio.onerror = (e) => {
+        console.error('[TTS] Preloaded audio error:', e);
+        setIsPlaying(false);
+        if (isBlobUrl) URL.revokeObjectURL(preloadedUrl);
+        throw new Error('Audio playback failed');
+      };
+      audio.src = preloadedUrl;
+      audio.load();
+      await audio.play();
+      setCurrentMode('openai');
+      setIsPlaying(true);
+      setWasCached(true);
+      onStartRef.current?.();
+      return;
+    }
+
     // Calculate dynamic timeout based on text length (longer texts need more time)
     const baseTimeout = Math.max(timeout, 15000); // At least 15 seconds
     const textLengthBonus = Math.min(text.length * 10, 30000); // Up to 30 extra seconds for long texts
@@ -462,6 +503,53 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
       .trim();
   };
 
+  // Preload audio for a text without playing — eliminates gaps between sections
+  const preload = useCallback(async (text: string, speakOptions?: SpeakOptions) => {
+    if (!text.trim()) return;
+    const cleanText = sanitizeTextForTTS(text);
+    const cacheKey = cleanText.slice(0, 120);
+    if (preloadedAudioRef.current.has(cacheKey)) return; // already preloaded
+
+    try {
+      const opts: SpeakOptions = speakOptions || {};
+      const requestedVoice = (opts.voice || selectedVoice) as unknown as string;
+      const normalizedVoice = (requestedVoice === 'ballad'
+        ? 'sage'
+        : requestedVoice === 'verse'
+          ? 'fable'
+          : requestedVoice) as VoiceId;
+
+      const { data, error } = await supabase.functions.invoke('text-to-speech', {
+        body: {
+          text: cleanText,
+          voice: normalizedVoice,
+          provider: 'openai',
+          book: opts.book,
+          chapter: opts.chapter,
+          verse: opts.verse,
+          useCache: opts.useCache !== false
+        }
+      });
+
+      if (error || (!data?.audioUrl && !data?.audioContent)) return;
+
+      let audioUrl: string;
+      if (data.audioUrl) {
+        audioUrl = data.audioUrl;
+      } else {
+        const audioBlob = new Blob(
+          [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
+          { type: 'audio/mpeg' }
+        );
+        audioUrl = URL.createObjectURL(audioBlob);
+      }
+      preloadedAudioRef.current.set(cacheKey, audioUrl);
+      console.log('[TTS] Preloaded audio for next section');
+    } catch {
+      // Preload failures are silent — speak() will fetch normally
+    }
+  }, [selectedVoice]);
+
   const speak = useCallback(async (text: string, speakOptions?: SpeakOptions | VoiceId) => {
     if (!text.trim()) {
       toast.error('No text to speak');
@@ -524,6 +612,7 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
   return {
     speak,
     stop,
+    preload,
     isLoading,
     isPlaying,
     selectedVoice,

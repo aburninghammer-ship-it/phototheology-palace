@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { BibleReader } from "@/components/bible/BibleReader";
 import { BibleNavigation } from "@/components/bible/BibleNavigation";
+import { AtAGlanceSidebar } from "@/components/bible/AtAGlanceSidebar";
 import { Button } from "@/components/ui/button";
-import { BookMarked, HelpCircle, Headphones, FlaskConical } from "lucide-react";
+import { BookMarked, HelpCircle, Headphones, FlaskConical, PanelLeft } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { StudyBibleDemoDialog } from "@/components/bible/StudyBibleDemoDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
@@ -13,8 +15,10 @@ import { usePreservePage } from "@/hooks/usePreservePage";
 import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
 
 const Bible = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [demoOpen, setDemoOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const researchMode = searchParams.get("mode") === "research";
 
@@ -51,10 +55,10 @@ const Bible = () => {
                 />
                 <div>
                   <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
-                    Phototheology Study Bible (PSB)
+                    {t('bible.title', 'Phototheology Study Bible (PSB)')}
                   </h1>
                   <p className="text-base sm:text-lg text-muted-foreground">
-                    Scripture through principle lenses
+                    {t('bible.subtitle', 'Scripture through principle lenses')}
                   </p>
                 </div>
               </div>
@@ -62,11 +66,20 @@ const Bible = () => {
                 <Button
                   variant="outline"
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                >
+                  <PanelLeft className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">{t('bible.atAGlance', 'At a Glance')}</span>
+                  <span className="sm:hidden">{t('bible.atAGlanceShort', 'Books')}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
                   onClick={() => setResearchMode(true)}
                 >
                   <FlaskConical className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Research Mode</span>
-                  <span className="sm:hidden">Research</span>
+                  <span className="hidden sm:inline">{t('bible.researchMode', 'Research Mode')}</span>
+                  <span className="sm:hidden">{t('bible.researchModeShort', 'Research')}</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -74,21 +87,21 @@ const Bible = () => {
                   onClick={() => setDemoOpen(true)}
                 >
                   <HelpCircle className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">How to Use</span>
-                  <span className="sm:hidden">Help</span>
+                  <span className="hidden sm:inline">{t('bible.howToUse', 'How to Use')}</span>
+                  <span className="sm:hidden">{t('bible.help', 'Help')}</span>
                 </Button>
                 <Button asChild variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap">
                   <Link to="/memorization-verses">
                     <BookMarked className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">My Memorization Verses</span>
-                    <span className="sm:hidden">Memorization</span>
+                    <span className="hidden sm:inline">{t('bible.myMemorizationVerses', 'My Memorization Verses')}</span>
+                    <span className="sm:hidden">{t('bible.memorization', 'Memorization')}</span>
                   </Link>
                 </Button>
                 <Button asChild className="bg-primary/90 hover:bg-primary text-primary-foreground whitespace-nowrap">
                   <Link to="/audio-bible">
                     <Headphones className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Audio Bible & Commentary</span>
-                    <span className="sm:hidden">Listen</span>
+                    <span className="hidden sm:inline">{t('bible.audioBibleCommentary', 'Audio Bible & Commentary')}</span>
+                    <span className="sm:hidden">{t('bible.listen', 'Listen')}</span>
                   </Link>
                 </Button>
               </div>
@@ -105,13 +118,25 @@ const Bible = () => {
             />
           )}
 
-          {/* Navigation */}
-          <div className="mb-6 sm:mb-8">
-            <BibleNavigation />
-          </div>
+          {/* Main content with optional sidebar */}
+          <div className="flex gap-0 relative">
+            {/* At a Glance Sidebar */}
+            {sidebarOpen && (
+              <div className="w-56 lg:w-64 shrink-0 h-[calc(100vh-220px)] sticky top-24 rounded-xl border border-border/50 overflow-hidden shadow-lg">
+                <AtAGlanceSidebar onClose={() => setSidebarOpen(false)} />
+              </div>
+            )}
 
-          {/* Bible Reader */}
-          <BibleReader />
+            <div className={`flex-1 min-w-0 ${sidebarOpen ? 'pl-4' : ''}`}>
+              {/* Navigation */}
+              <div className="mb-6 sm:mb-8">
+                <BibleNavigation />
+              </div>
+
+              {/* Bible Reader */}
+              <BibleReader />
+            </div>
+          </div>
         </div>
       </div>
       

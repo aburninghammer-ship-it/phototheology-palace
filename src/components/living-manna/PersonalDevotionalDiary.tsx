@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,8 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { format, startOfWeek, endOfWeek, isToday, parseISO } from "date-fns";
-import { 
-  BookOpen, Plus, Calendar, ChevronLeft, ChevronRight, 
+import {
+  BookOpen, Plus, Calendar, ChevronLeft, ChevronRight,
   Loader2, Save, Trash2, Edit2, X, BookMarked
 } from "lucide-react";
 
@@ -31,6 +32,7 @@ interface PersonalDevotionalDiaryProps {
 }
 
 export function PersonalDevotionalDiary({ compact = false }: PersonalDevotionalDiaryProps) {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -209,7 +211,7 @@ export function PersonalDevotionalDiary({ compact = false }: PersonalDevotionalD
               <BookMarked className="h-5 w-5 text-primary" />
               <CardTitle className="text-base">My Devotional Diary</CardTitle>
             </div>
-            <Button size="sm" variant="ghost" onClick={startNewEntry}>
+            <Button size="sm" variant="ghost" onClick={() => navigate('/living-manna?tab=diary')}>
               <Plus className="h-4 w-4" />
             </Button>
           </div>
@@ -219,7 +221,7 @@ export function PersonalDevotionalDiary({ compact = false }: PersonalDevotionalD
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Badge variant="secondary" className="text-xs">Today</Badge>
-                <Button size="sm" variant="ghost" onClick={() => selectEntry(todayEntry)}>
+                <Button size="sm" variant="ghost" onClick={() => navigate('/living-manna?tab=diary')}>
                   <Edit2 className="h-3 w-3" />
                 </Button>
               </div>
@@ -233,7 +235,7 @@ export function PersonalDevotionalDiary({ compact = false }: PersonalDevotionalD
               <p className="text-sm text-muted-foreground mb-3">
                 Start your devotional diary today
               </p>
-              <Button size="sm" onClick={startNewEntry}>
+              <Button size="sm" onClick={() => navigate('/living-manna?tab=diary')}>
                 <Plus className="h-4 w-4 mr-2" />
                 New Entry
               </Button>

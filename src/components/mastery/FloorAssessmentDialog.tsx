@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSequentialMastery } from "@/hooks/useSequentialMastery";
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 interface FloorAssessmentDialogProps {
   floorNumber: number;
@@ -24,7 +25,6 @@ interface FloorAssessmentDialogProps {
   onSuccess: () => void;
 }
 
-// Floor-specific questions
 const FLOOR_QUESTIONS: Record<number, string[]> = {
   1: [
     "Recite the sequence of Genesis 1-11 from memory in vivid detail. Make me SEE it.",
@@ -52,7 +52,7 @@ const FLOOR_QUESTIONS: Record<number, string[]> = {
     "Which sanctuary furniture prefigures Christ's high priestly ministry? Prove it.",
   ],
   6: [
-    "Isaiah 65-66: DoL¹, DoL², or DoL³? Defend your placement with contextual evidence.",
+    "Isaiah 65-66: DoL\u00B9, DoL\u00B2, or DoL\u00B3? Defend your placement with contextual evidence.",
     "Trace the Adamic cycle through all 5 stages. Then show how it foreshadows the Remnant cycle.",
     "What heaven is Hebrews 12:26-28 describing? Wrong answer = you don't understand the framework.",
   ],
@@ -70,31 +70,31 @@ const FLOOR_QUESTIONS: Record<number, string[]> = {
   ],
 };
 
-const FLOOR_NAMES: Record<number, string> = {
-  1: "Furnishing Floor",
-  2: "Investigation Floor",
-  3: "Freestyle Floor",
-  4: "Next Level Floor",
-  5: "Vision Floor",
-  6: "Three Heavens Floor",
-  7: "Spiritual & Emotional Floor",
-  8: "Master Floor (BLACK MASTER EXAM)",
-};
-
 export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
   floorNumber,
   open,
   onOpenChange,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<any>(null);
   const { toast } = useToast();
-  
-  // Check if user can master this floor (sequential mastery enforcement)
+
   const { canMaster, nextFloorToMaster, loading: masteryLoading, masteryMessage } = useSequentialMastery(floorNumber);
+
+  const FLOOR_NAMES: Record<number, string> = {
+    1: t('floorAssessment.floorName1'),
+    2: t('floorAssessment.floorName2'),
+    3: t('floorAssessment.floorName3'),
+    4: t('floorAssessment.floorName4'),
+    5: t('floorAssessment.floorName5'),
+    6: t('floorAssessment.floorName6'),
+    7: t('floorAssessment.floorName7'),
+    8: t('floorAssessment.floorName8'),
+  };
 
   const questions = FLOOR_QUESTIONS[floorNumber] || [];
   const totalQuestions = questions.length;
@@ -103,8 +103,8 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
   const handleNext = () => {
     if (!answers[currentQuestion]?.trim()) {
       toast({
-        title: "Answer Required",
-        description: "You must answer the current question before proceeding.",
+        title: t('floorAssessment.answerRequired'),
+        description: t('floorAssessment.answerRequiredDesc'),
         variant: "destructive",
       });
       return;
@@ -137,14 +137,14 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
 
       if (data.passed) {
         toast({
-          title: floorNumber === 8 ? "🏆 BLACK MASTER ACHIEVED!" : `✅ Floor ${floorNumber} Passed!`,
+          title: floorNumber === 8 ? t('floorAssessment.blackMasterAchievedToast') : t('floorAssessment.floorPassedToast', { floor: floorNumber }),
           description: data.grandmaster_verdict,
           duration: 6000,
         });
         onSuccess();
       } else {
         toast({
-          title: "Not Yet Ready",
+          title: t('floorAssessment.notYetReady'),
           description: data.grandmaster_verdict,
           variant: "destructive",
           duration: 8000,
@@ -153,8 +153,8 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
     } catch (error) {
       console.error("Assessment error:", error);
       toast({
-        title: "Submission Error",
-        description: "Failed to grade assessment. Please try again.",
+        title: t('floorAssessment.submissionError'),
+        description: t('floorAssessment.submissionErrorDesc'),
         variant: "destructive",
       });
     } finally {
@@ -171,34 +171,32 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Brain className="h-6 w-6" />
-            {FLOOR_NAMES[floorNumber]} Assessment
+            {t('floorAssessment.assessment', { floor: FLOOR_NAMES[floorNumber] })}
           </DialogTitle>
           <DialogDescription>
             {floorNumber === 8
-              ? "Final BLACK MASTER examination. Pass rate: 95%. No mercy."
-              : `Comprehensive test for Floor ${floorNumber}. Pass rate: ${requiredScore}%.`}
+              ? t('floorAssessment.blackMasterExamDesc')
+              : t('floorAssessment.comprehensiveTestDesc', { floor: floorNumber, score: requiredScore })}
           </DialogDescription>
         </DialogHeader>
 
-        {/* Sequential Mastery Lock */}
         {!canMaster && !masteryLoading && (
           <Alert className="border-amber-500/30 bg-amber-500/5">
             <Lock className="h-4 w-4 text-amber-500" />
-            <AlertTitle className="text-amber-600 dark:text-amber-400">Sequential Mastery Required</AlertTitle>
+            <AlertTitle className="text-amber-600 dark:text-amber-400">{t('floorAssessment.sequentialMasteryRequired')}</AlertTitle>
             <AlertDescription className="text-muted-foreground space-y-3">
               <p>
-                Mastery must be earned floor by floor. You're welcome to explore and learn from this floor, 
-                but the assessment is only available after completing previous floors.
+                {t('floorAssessment.sequentialMasteryDesc')}
               </p>
               <p className="text-sm font-medium">{masteryMessage}</p>
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" size="sm" asChild>
                   <Link to={`/palace/floor/${nextFloorToMaster}`}>
-                    Go to Floor {nextFloorToMaster}
+                    {t('floorAssessment.goToFloor', { floor: nextFloorToMaster })}
                   </Link>
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-                  Close
+                  {t('floorAssessment.close')}
                 </Button>
               </div>
             </AlertDescription>
@@ -207,16 +205,14 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
 
         {canMaster && !result && (
           <div className="space-y-6">
-            {/* Progress */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span>Question {currentQuestion + 1} of {totalQuestions}</span>
+                <span>{t('floorAssessment.questionOf', { current: currentQuestion + 1, total: totalQuestions })}</span>
                 <Badge variant="outline">{Math.round(progress)}%</Badge>
               </div>
               <Progress value={progress} className="h-2" />
             </div>
 
-            {/* Current Question */}
             <div className="p-4 rounded-lg border-2 border-primary/20 bg-primary/5">
               <p className="font-semibold mb-3 text-lg">{questions[currentQuestion]}</p>
               <Textarea
@@ -224,38 +220,34 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
                 onChange={(e) =>
                   setAnswers((prev) => ({ ...prev, [currentQuestion]: e.target.value }))
                 }
-                placeholder="Your answer... (minimum 100 characters)"
+                placeholder={t('floorAssessment.answerPlaceholder')}
                 className="min-h-[200px]"
                 disabled={isSubmitting}
               />
               <p className="text-xs text-muted-foreground mt-2">
-                {(answers[currentQuestion] || "").length} characters
+                {t('floorAssessment.characters', { count: (answers[currentQuestion] || "").length })}
               </p>
             </div>
 
-            {/* Warning for Floor 8 */}
             {floorNumber === 8 && currentQuestion === 0 && (
               <div className="flex items-start gap-3 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
                 <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
                 <div className="text-sm">
-                  <p className="font-semibold text-destructive mb-1">BLACK MASTER WARNING</p>
+                  <p className="font-semibold text-destructive mb-1">{t('floorAssessment.blackMasterWarning')}</p>
                   <p className="text-muted-foreground">
-                    This is the hardest test in the system. Any stretched interpretation, any
-                    claim without Scripture backing, any confusion = immediate fail. You must
-                    demonstrate REFLEXIVE mastery, not memorized formulas.
+                    {t('floorAssessment.blackMasterWarningDesc')}
                   </p>
                 </div>
               </div>
             )}
 
-            {/* Navigation */}
             <div className="flex items-center justify-between">
               <Button
                 variant="outline"
                 onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
                 disabled={currentQuestion === 0 || isSubmitting}
               >
-                Previous
+                {t('floorAssessment.previous')}
               </Button>
               <Button
                 onClick={handleNext}
@@ -265,12 +257,12 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Grading by Grandmaster...
+                    {t('floorAssessment.gradingByGrandmaster')}
                   </>
                 ) : currentQuestion === totalQuestions - 1 ? (
-                  "Submit for Grading"
+                  t('floorAssessment.submitForGrading')
                 ) : (
-                  "Next Question"
+                  t('floorAssessment.nextQuestion')
                 )}
               </Button>
             </div>
@@ -279,7 +271,6 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
 
         {result && (
           <div className="space-y-4">
-            {/* Overall Result */}
             <div
               className={`p-6 rounded-lg border-2 ${
                 isPassed
@@ -298,30 +289,29 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
                     <h3 className="text-xl font-bold">
                       {isPassed
                         ? floorNumber === 8
-                          ? "BLACK MASTER ACHIEVED"
-                          : `Floor ${floorNumber} Passed`
-                        : "Not Yet Ready"}
+                          ? t('floorAssessment.blackMasterAchieved')
+                          : t('floorAssessment.floorPassed', { floor: floorNumber })
+                        : t('floorAssessment.notYetReady')}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Score: {result.score}% (Required: {requiredScore}%)
+                      {t('floorAssessment.score', { score: result.score, required: requiredScore })}
                     </p>
                   </div>
                 </div>
               </div>
               <Progress value={result.score} className="h-3 mb-3" />
               <div className="p-3 rounded bg-background/50">
-                <p className="text-sm font-medium mb-1">Grandmaster's Verdict:</p>
+                <p className="text-sm font-medium mb-1">{t('floorAssessment.grandmastersVerdict')}</p>
                 <p className="text-sm whitespace-pre-wrap">{result.grandmaster_verdict}</p>
               </div>
             </div>
 
-            {/* Question-by-Question Feedback */}
             <div className="space-y-3">
-              <h4 className="font-semibold">Detailed Feedback:</h4>
+              <h4 className="font-semibold">{t('floorAssessment.detailedFeedback')}</h4>
               {result.question_scores?.map((qs: any, idx: number) => (
                 <div key={idx} className="p-3 rounded-lg border bg-card">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Question {idx + 1}</span>
+                    <span className="text-sm font-medium">{t('floorAssessment.questionNumber', { number: idx + 1 })}</span>
                     <Badge variant={qs.score >= requiredScore ? "default" : "destructive"}>
                       {qs.score}%
                     </Badge>
@@ -330,7 +320,7 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
                   <p className="text-sm whitespace-pre-wrap mb-2">{qs.feedback}</p>
                   {qs.corrections && (
                     <div className="p-2 rounded bg-destructive/10 text-sm">
-                      <p className="font-medium text-destructive mb-1">Corrections:</p>
+                      <p className="font-medium text-destructive mb-1">{t('floorAssessment.corrections')}</p>
                       <p className="text-xs">{qs.corrections}</p>
                     </div>
                   )}
@@ -348,7 +338,7 @@ export const FloorAssessmentDialog: React.FC<FloorAssessmentDialogProps> = ({
                 variant="outline"
                 className="w-full"
               >
-                Retry Assessment
+                {t('floorAssessment.retryAssessment')}
               </Button>
             )}
           </div>

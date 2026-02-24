@@ -59,8 +59,8 @@ serve(async (req) => {
         ? firstDay.christ_connection.substring(0, 200) + '...'
         : `A ${plan.duration}-day devotional journey on: ${plan.theme}`;
     
-    const ogImage = 'https://thephototheologyapp.com/phototheology-hero.png';
-    const shareUrl = `https://thephototheologyapp.com/shared-devotional/${shareToken}`;
+    const ogImage = 'https://phototheologybible.com/phototheology-hero.png';
+    const shareUrl = `https://phototheologybible.com/shared-devotional/${shareToken}`;
 
     // Return OG meta data as JSON (for API use) or as HTML for crawlers
     const userAgent = req.headers.get('user-agent') || '';

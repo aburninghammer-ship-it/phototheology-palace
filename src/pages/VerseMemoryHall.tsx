@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -43,6 +44,7 @@ interface UserProgress {
 
 export default function VerseMemoryHall() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("flashcards");
   const [progress, setProgress] = useState<UserProgress | null>(null);
@@ -147,7 +149,7 @@ export default function VerseMemoryHall() {
   };
 
   const markAsMemorized = () => {
-    toast.success("Verse marked as memorized! +10 points");
+    toast.success(t('verseMemory.markedAsMemorized'));
     nextCard();
   };
 
@@ -160,7 +162,7 @@ export default function VerseMemoryHall() {
 
   const endQuiz = () => {
     setQuizActive(false);
-    toast.success(`Quiz complete! You scored ${quizScore} points`);
+    toast.success(t('verseMemory.quizComplete', { score: quizScore }));
   };
 
   const checkAnswer = () => {
@@ -170,11 +172,11 @@ export default function VerseMemoryHall() {
     
     if (normalizedAnswer.includes(normalizedCorrect.substring(0, 20))) {
       setQuizScore(quizScore + 10);
-      toast.success("Correct! +10 points");
+      toast.success(t('verseMemory.correctPoints'));
       setQuizAnswer("");
       nextCard();
     } else {
-      toast.error("Not quite right. Try again!");
+      toast.error(t('verseMemory.notQuiteRight'));
     }
   };
 
@@ -189,8 +191,8 @@ export default function VerseMemoryHall() {
             <div className="flex items-center gap-4">
               <Brain className="w-12 h-12 text-white" />
               <div>
-                <h1 className="text-4xl font-bold text-white">Verse Memory Hall</h1>
-                <p className="text-purple-200 text-lg">Master Scripture through active memorization</p>
+                <h1 className="text-4xl font-bold text-white">{t('verseMemory.title')}</h1>
+                <p className="text-purple-200 text-lg">{t('verseMemory.subtitle')}</p>
               </div>
             </div>
             <Button
@@ -199,7 +201,7 @@ export default function VerseMemoryHall() {
               className="bg-white/10 text-white border-white/20 hover:bg-white/20"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Palace
+              {t('verseMemory.backToPalace')}
             </Button>
           </div>
 
@@ -210,7 +212,7 @@ export default function VerseMemoryHall() {
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-2 mb-2">
                     <Brain className="w-5 h-5 text-purple-300" />
-                    <p className="text-purple-200 text-sm">Verses Memorized</p>
+                    <p className="text-purple-200 text-sm">{t('verseMemory.versesMemorized')}</p>
                   </div>
                   <p className="text-3xl font-bold text-white">{progress.verses_memorized}</p>
                 </CardContent>
@@ -219,16 +221,16 @@ export default function VerseMemoryHall() {
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-2 mb-2">
                     <Flame className="w-5 h-5 text-orange-300" />
-                    <p className="text-purple-200 text-sm">Current Streak</p>
+                    <p className="text-purple-200 text-sm">{t('verseMemory.currentStreak')}</p>
                   </div>
-                  <p className="text-3xl font-bold text-white">{progress.current_streak} days</p>
+                  <p className="text-3xl font-bold text-white">{t('verseMemory.streakDays', { count: progress.current_streak })}</p>
                 </CardContent>
               </Card>
               <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-2 mb-2">
                     <Trophy className="w-5 h-5 text-yellow-300" />
-                    <p className="text-purple-200 text-sm">Total Points</p>
+                    <p className="text-purple-200 text-sm">{t('verseMemory.totalPoints')}</p>
                   </div>
                   <p className="text-3xl font-bold text-white">{progress.total_points}</p>
                 </CardContent>
@@ -237,7 +239,7 @@ export default function VerseMemoryHall() {
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-2 mb-2">
                     <Award className="w-5 h-5 text-blue-300" />
-                    <p className="text-purple-200 text-sm">Rank</p>
+                    <p className="text-purple-200 text-sm">{t('verseMemory.rank')}</p>
                   </div>
                   <p className="text-xl font-bold text-white">{progress.rank}</p>
                 </CardContent>
@@ -250,11 +252,11 @@ export default function VerseMemoryHall() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-white/10 backdrop-blur-sm border-white/20">
-            <TabsTrigger value="flashcards">📇 Flashcards</TabsTrigger>
-            <TabsTrigger value="mnemonics">🧠 Mnemonics</TabsTrigger>
-            <TabsTrigger value="challenges">🎯 Challenges</TabsTrigger>
-            <TabsTrigger value="quiz">⚡ Quick Quiz</TabsTrigger>
-            <TabsTrigger value="leaderboard">🏆 Leaderboard</TabsTrigger>
+            <TabsTrigger value="flashcards">{t('verseMemory.tabs.flashcards')}</TabsTrigger>
+            <TabsTrigger value="mnemonics">{t('verseMemory.tabs.mnemonics')}</TabsTrigger>
+            <TabsTrigger value="challenges">{t('verseMemory.tabs.challenges')}</TabsTrigger>
+            <TabsTrigger value="quiz">{t('verseMemory.tabs.quiz')}</TabsTrigger>
+            <TabsTrigger value="leaderboard">{t('verseMemory.tabs.leaderboard')}</TabsTrigger>
           </TabsList>
 
           {/* Flashcards Tab */}
@@ -263,13 +265,13 @@ export default function VerseMemoryHall() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Verse Flashcards</CardTitle>
+                    <CardTitle>{t('verseMemory.verseFlashcards')}</CardTitle>
                     <span className="text-sm text-muted-foreground">
-                      Card {currentCardIndex + 1} of {verseCards.length}
+                      {t('verseMemory.cardOf', { current: currentCardIndex + 1, total: verseCards.length })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Bible Version:</label>
+                    <label className="text-sm font-medium">{t('verseMemory.bibleVersion')}:</label>
                     <Select value={selectedTranslation} onValueChange={setSelectedTranslation}>
                       <SelectTrigger className="w-[140px]">
                         <SelectValue />
@@ -297,9 +299,9 @@ export default function VerseMemoryHall() {
 
                     {!showAnswer ? (
                       <div className="text-center">
-                        <p className="text-muted-foreground mb-6">Try to recall the verse...</p>
+                        <p className="text-muted-foreground mb-6">{t('verseMemory.tryToRecall')}</p>
                         <Button onClick={() => setShowAnswer(true)} size="lg">
-                          Show Verse
+                          {t('verseMemory.showVerse')}
                         </Button>
                       </div>
                     ) : (
@@ -308,11 +310,11 @@ export default function VerseMemoryHall() {
                         <div className="flex gap-4 justify-center">
                           <Button onClick={markAsMemorized} variant="default">
                             <Star className="w-4 h-4 mr-2" />
-                            I Know This
+                            {t('verseMemory.iKnowThis')}
                           </Button>
                           <Button onClick={() => setShowAnswer(false)} variant="outline">
                             <RotateCcw className="w-4 h-4 mr-2" />
-                            Practice Again
+                            {t('verseMemory.practiceAgain')}
                           </Button>
                         </div>
                       </div>
@@ -326,14 +328,14 @@ export default function VerseMemoryHall() {
                       variant="outline"
                     >
                       <ChevronLeft className="w-4 h-4 mr-2" />
-                      Previous
+                      {t('common.previous')}
                     </Button>
                     <Progress value={((currentCardIndex + 1) / verseCards.length) * 100} className="mx-4 flex-1" />
                     <Button
                       onClick={nextCard}
                       disabled={currentCardIndex === verseCards.length - 1}
                     >
-                      Next
+                      {t('common.next')}
                       <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
                   </div>
@@ -347,64 +349,60 @@ export default function VerseMemoryHall() {
             <div className="grid md:grid-cols-2 gap-6">
               <Card className="bg-white/95 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>🎨 Visualization Method</CardTitle>
-                  <CardDescription>Create vivid mental images for each verse</CardDescription>
+                  <CardTitle>{t('verseMemory.mnemonics.visualizationTitle')}</CardTitle>
+                  <CardDescription>{t('verseMemory.mnemonics.visualizationSubtitle')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Transform abstract concepts into concrete, memorable scenes. For John 3:16, imagine a glowing globe 
-                    with a figure extending a gift to silhouettes below.
+                    {t('verseMemory.mnemonics.visualizationDesc')}
                   </p>
                   <Button variant="outline" className="w-full">
-                    Try Visualization Exercise
+                    {t('verseMemory.mnemonics.tryVisualization')}
                   </Button>
                 </CardContent>
               </Card>
 
               <Card className="bg-white/95 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>🔤 Acronym Builder</CardTitle>
-                  <CardDescription>Build memorable acronyms from verse keywords</CardDescription>
+                  <CardTitle>{t('verseMemory.mnemonics.acronymTitle')}</CardTitle>
+                  <CardDescription>{t('verseMemory.mnemonics.acronymSubtitle')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Use first letters of key words to create memorable acronyms. Example: "The LORD is my shepherd" 
-                    becomes "TLIMS" - imagine a "slim" shepherd.
+                    {t('verseMemory.mnemonics.acronymDesc')}
                   </p>
                   <Button variant="outline" className="w-full">
-                    Generate Acronym
+                    {t('verseMemory.mnemonics.generateAcronym')}
                   </Button>
                 </CardContent>
               </Card>
 
               <Card className="bg-white/95 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>🎵 Rhythm & Rhyme</CardTitle>
-                  <CardDescription>Set verses to familiar tunes</CardDescription>
+                  <CardTitle>{t('verseMemory.mnemonics.rhythmTitle')}</CardTitle>
+                  <CardDescription>{t('verseMemory.mnemonics.rhythmSubtitle')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Singing verses to familiar melodies dramatically improves retention. Try setting short verses 
-                    to nursery rhyme patterns or popular song structures.
+                    {t('verseMemory.mnemonics.rhythmDesc')}
                   </p>
                   <Button variant="outline" className="w-full">
-                    Create Melody
+                    {t('verseMemory.mnemonics.createMelody')}
                   </Button>
                 </CardContent>
               </Card>
 
               <Card className="bg-white/95 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>🧩 Chunking Technique</CardTitle>
-                  <CardDescription>Break verses into memorable phrases</CardDescription>
+                  <CardTitle>{t('verseMemory.mnemonics.chunkingTitle')}</CardTitle>
+                  <CardDescription>{t('verseMemory.mnemonics.chunkingSubtitle')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Divide long verses into 3-5 word chunks. Memorize each chunk separately, then link them together 
-                    with visual or logical connections.
+                    {t('verseMemory.mnemonics.chunkingDesc')}
                   </p>
                   <Button variant="outline" className="w-full">
-                    Start Chunking
+                    {t('verseMemory.mnemonics.startChunking')}
                   </Button>
                 </CardContent>
               </Card>
@@ -420,13 +418,13 @@ export default function VerseMemoryHall() {
                     <div>
                       <CardTitle className="flex items-center gap-2">
                         <Target className="w-5 h-5 text-primary" />
-                        Daily Challenge
+                        {t('verseMemory.challenges.dailyChallenge')}
                       </CardTitle>
-                      <CardDescription>Complete today's memorization goal</CardDescription>
+                      <CardDescription>{t('verseMemory.challenges.completeTodaysGoal')}</CardDescription>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-primary">+{dailyChallenge.points}</p>
-                      <p className="text-xs text-muted-foreground">points</p>
+                      <p className="text-xs text-muted-foreground">{t('verseMemory.points')}</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -434,7 +432,7 @@ export default function VerseMemoryHall() {
                   <p className="mb-4">{dailyChallenge.verse}</p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>Progress</span>
+                      <span>{t('verseMemory.challenges.progress')}</span>
                       <span>{dailyChallenge.progress}/{dailyChallenge.target}</span>
                     </div>
                     <Progress value={(dailyChallenge.progress / dailyChallenge.target) * 100} />
@@ -445,42 +443,42 @@ export default function VerseMemoryHall() {
               <div className="grid md:grid-cols-3 gap-6">
                 <Card className="bg-white/95 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-lg">7-Day Streak</CardTitle>
+                    <CardTitle className="text-lg">{t('verseMemory.challenges.sevenDayStreak')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Memorize at least 1 verse every day for 7 days
+                      {t('verseMemory.challenges.sevenDayStreakDesc')}
                     </p>
                     <Button variant="outline" className="w-full">
-                      Join Challenge
+                      {t('verseMemory.challenges.joinChallenge')}
                     </Button>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-white/95 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-lg">Chapter Master</CardTitle>
+                    <CardTitle className="text-lg">{t('verseMemory.challenges.chapterMaster')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Memorize an entire chapter word-for-word
+                      {t('verseMemory.challenges.chapterMasterDesc')}
                     </p>
                     <Button variant="outline" className="w-full">
-                      Start Challenge
+                      {t('verseMemory.challenges.startChallenge')}
                     </Button>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-white/95 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-lg">Speed Round</CardTitle>
+                    <CardTitle className="text-lg">{t('verseMemory.challenges.speedRound')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Recall 10 verses in under 5 minutes
+                      {t('verseMemory.challenges.speedRoundDesc')}
                     </p>
                     <Button variant="outline" className="w-full">
-                      Begin Challenge
+                      {t('verseMemory.challenges.beginChallenge')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -494,8 +492,8 @@ export default function VerseMemoryHall() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Quick Fire Quiz</CardTitle>
-                    <CardDescription>Test your memory under time pressure</CardDescription>
+                    <CardTitle>{t('verseMemory.quickFireQuiz')}</CardTitle>
+                    <CardDescription>{t('verseMemory.testUnderPressure')}</CardDescription>
                   </div>
                   {quizActive && (
                     <div className="flex items-center gap-2">
@@ -509,37 +507,37 @@ export default function VerseMemoryHall() {
                 {!quizActive ? (
                   <div className="text-center py-12">
                     <Zap className="w-16 h-16 mx-auto text-primary mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Ready to test your memory?</h3>
+                    <h3 className="text-xl font-semibold mb-2">{t('verseMemory.readyToTest')}</h3>
                     <p className="text-muted-foreground mb-6">
-                      You'll have 60 seconds to recall as many verses as possible
+                      {t('verseMemory.sixtySecondsChallenge')}
                     </p>
                     <Button onClick={startQuiz} size="lg">
-                      Start Quiz
+                      {t('verseMemory.startQuiz')}
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-6">
                     <div className="text-center">
                       <h3 className="text-2xl font-bold text-primary mb-4">{currentCard.reference}</h3>
-                      <p className="text-sm text-muted-foreground mb-4">Type the verse from memory:</p>
+                      <p className="text-sm text-muted-foreground mb-4">{t('verseMemory.typeFromMemory')}</p>
                       <Input
                         value={quizAnswer}
                         onChange={(e) => setQuizAnswer(e.target.value)}
-                        placeholder="Start typing..."
+                        placeholder={t('verseMemory.startTyping')}
                         className="text-center text-lg"
                         onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
                       />
                     </div>
                     <div className="flex gap-4">
                       <Button onClick={checkAnswer} className="flex-1">
-                        Submit Answer
+                        {t('verseMemory.submitAnswer')}
                       </Button>
                       <Button onClick={endQuiz} variant="outline">
-                        End Quiz
+                        {t('verseMemory.endQuiz')}
                       </Button>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Current Score: <span className="font-bold">{quizScore}</span></p>
+                      <p className="text-sm text-muted-foreground">{t('verseMemory.currentScore')}: <span className="font-bold">{quizScore}</span></p>
                     </div>
                   </div>
                 )}
@@ -553,9 +551,9 @@ export default function VerseMemoryHall() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Trophy className="w-6 h-6 text-yellow-500" />
-                  Global Leaderboard
+                  {t('verseMemory.globalLeaderboard')}
                 </CardTitle>
-                <CardDescription>Top memorizers this month</CardDescription>
+                <CardDescription>{t('verseMemory.topMemorizersThisMonth')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -577,11 +575,11 @@ export default function VerseMemoryHall() {
                       </div>
                       <div className="flex-1">
                         <p className="font-semibold">{user.name}</p>
-                        <p className="text-sm text-muted-foreground">{user.verses} verses</p>
+                        <p className="text-sm text-muted-foreground">{t('verseMemory.versesCount', { count: user.verses })}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-primary">{user.points}</p>
-                        <p className="text-xs text-muted-foreground">points</p>
+                        <p className="text-xs text-muted-foreground">{t('verseMemory.points')}</p>
                       </div>
                     </div>
                   ))}

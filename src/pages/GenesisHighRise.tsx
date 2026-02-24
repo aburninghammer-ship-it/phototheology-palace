@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -263,6 +264,7 @@ export default function GenesisHighRise() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
+      <SEO title="Genesis Challenge" description="Test your knowledge of Genesis with the Phototheology Genesis High Rise challenge. Match images to chapters and build your Genesis tower." />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="text-center mb-12">
           <Badge className="mb-4 text-sm px-4 py-2" variant="secondary">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Trophy, Link as LinkIcon, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { palaceFloors } from "@/data/palaceData";
+
 import { useAuth } from "@/hooks/useAuth";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
 
@@ -35,6 +36,7 @@ interface PlayerHand {
 
 export default function ChainWar() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [hand, setHand] = useState<typeof PT_SYMBOLS>([]);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
@@ -86,11 +88,11 @@ export default function ChainWar() {
 
   const handleSubmit = async () => {
     if (selectedCards.length < 2) {
-      toast.error("Play at least 2 cards to build a chain");
+      toast.error(t('games.chainWar.errorMinCards'));
       return;
     }
     if (!verse.trim() || !explanation.trim()) {
-      toast.error("Enter both a verse and your explanation");
+      toast.error(t('games.chainWar.errorVerseAndExplanation'));
       return;
     }
 
@@ -113,11 +115,11 @@ export default function ChainWar() {
       if (isValid) {
         const newScore = score + points;
         setScore(newScore);
-        toast.success(`Valid chain! +${points} points. ${feedback}`);
+        toast.success(t('games.chainWar.validChain', { points, feedback }));
         
         if (newScore >= targetScore) {
           setGameWon(true);
-          toast.success("🏆 You won Chain War!");
+          toast.success(t('games.chainWar.youWon'));
         }
         
         // Remove used cards from hand and draw new ones
@@ -132,11 +134,11 @@ export default function ChainWar() {
         setVerse("");
         setExplanation("");
       } else {
-        toast.error(`Stretch: ${feedback}`);
+        toast.error(t('games.chainWar.stretch', { feedback }));
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to validate chain");
+      toast.error(t('games.chainWar.errorValidation'));
     } finally {
       setIsSubmitting(false);
     }
@@ -151,18 +153,18 @@ export default function ChainWar() {
             <Card className="bg-black/40 border-amber-500/50 text-center">
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl text-amber-300">Chain War Victory!</CardTitle>
+                <CardTitle className="text-3xl text-amber-300">{t('games.chainWar.victory')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-4xl font-bold text-amber-400">{score} Points</div>
-                <p className="text-amber-200/80">You've mastered biblical chain building!</p>
+                <div className="text-4xl font-bold text-amber-400">{t('games.common.pointsValue', { points: score })}</div>
+                <p className="text-amber-200/80">{t('games.chainWar.victoryMessage')}</p>
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => window.location.reload()} variant="outline">
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -181,17 +183,17 @@ export default function ChainWar() {
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2" />
-            Back
+            {t('common.back')}
           </Button>
           <div className="text-center">
             <h1 className="text-4xl font-bold text-amber-400 mb-2" style={{ fontFamily: "'Cinzel', serif" }}>
-              ⛓️ CHAIN WAR
+              {t('games.chainWar.title')}
             </h1>
-            <p className="text-amber-200/80">Build the strongest biblical chain</p>
+            <p className="text-amber-200/80">{t('games.chainWar.subtitle')}</p>
           </div>
           <div className="text-right">
             <div className="text-amber-400 text-3xl font-bold">{score} / {targetScore}</div>
-            <div className="text-amber-200/60 text-sm">POINTS</div>
+            <div className="text-amber-200/60 text-sm">{t('games.common.points')}</div>
           </div>
         </div>
 
@@ -200,7 +202,7 @@ export default function ChainWar() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-amber-300">
                 <LinkIcon className="w-5 h-5" />
-                Your Hand
+                {t('games.common.yourHand')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -218,34 +220,34 @@ export default function ChainWar() {
                 ))}
               </div>
               <p className="text-sm text-muted-foreground">
-                Select 2-3 cards to build your chain
+                {t('games.chainWar.selectCards')}
               </p>
             </CardContent>
           </Card>
 
           <Card className="bg-black/40 border-amber-500/50">
             <CardHeader>
-              <CardTitle className="text-amber-300">Build Your Chain</CardTitle>
+              <CardTitle className="text-amber-300">{t('games.chainWar.buildYourChain')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm text-amber-200 mb-2 block">Bible Verse Reference</label>
+                <label className="text-sm text-amber-200 mb-2 block">{t('games.chainWar.verseReference')}</label>
                 <input
                   type="text"
                   value={verse}
                   onChange={(e) => setVerse(e.target.value)}
-                  placeholder="e.g., Revelation 12:17"
+                  placeholder={t('games.chainWar.versePlaceholder')}
                   className="w-full px-4 py-2 bg-black/60 border border-amber-500/30 rounded text-white"
                 />
               </div>
               <div>
                 <label className="text-sm text-amber-200 mb-2 block">
-                  Explain Your Chain ({selectedCards.length} cards selected)
+                  {t('games.chainWar.explainChain', { count: selectedCards.length })}
                 </label>
                 <Textarea
                   value={explanation}
                   onChange={(e) => setExplanation(e.target.value)}
-                  placeholder="Explain how each card connects to the verse..."
+                  placeholder={t('games.chainWar.explanationPlaceholder')}
                   className="bg-black/60 border-amber-500/30 text-white min-h-32"
                 />
               </div>
@@ -255,7 +257,7 @@ export default function ChainWar() {
                 className="w-full gap-2"
               >
                 <Send className="w-4 h-4" />
-                {isSubmitting ? "Validating..." : "Submit Chain"}
+                {isSubmitting ? t('games.common.validating') : t('games.chainWar.submitChain')}
               </Button>
             </CardContent>
           </Card>
@@ -263,14 +265,14 @@ export default function ChainWar() {
 
         <Card className="mt-6 bg-black/40 border-amber-500/50">
           <CardHeader>
-            <CardTitle className="text-amber-300">📋 How to Play</CardTitle>
+            <CardTitle className="text-amber-300">{t('games.common.howToPlay')}</CardTitle>
           </CardHeader>
           <CardContent className="text-amber-100/80 space-y-2">
-            <p>1. Choose ANY Bible verse you know</p>
-            <p>2. Play 2-3 cards from your hand</p>
-            <p>3. Explain how EACH card connects to that verse</p>
-            <p>4. Jeeves validates: Valid chain = keep cards as points. Stretch = no points.</p>
-            <p>5. First to 15 points wins!</p>
+            <p>{t('games.chainWar.rule1')}</p>
+            <p>{t('games.chainWar.rule2')}</p>
+            <p>{t('games.chainWar.rule3')}</p>
+            <p>{t('games.chainWar.rule4')}</p>
+            <p>{t('games.chainWar.rule5')}</p>
           </CardContent>
         </Card>
       </div>

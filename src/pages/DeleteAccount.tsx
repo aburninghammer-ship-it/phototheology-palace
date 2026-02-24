@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, Trash2, AlertTriangle } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const DeleteAccount = () => {
   const [email, setEmail] = useState("");
@@ -50,7 +51,7 @@ const DeleteAccount = () => {
       console.error('Error submitting deletion request:', error);
       toast({
         title: "Submission failed",
-        description: "Please email us directly at support@thephototheologyapp.com",
+        description: "Please email us directly at support@phototheologybible.com",
         variant: "destructive",
       });
     } finally {
@@ -60,6 +61,7 @@ const DeleteAccount = () => {
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
+      <SEO title="Delete Account" description="Request deletion of your Phototheology account and data." noindex />
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2">Delete Account</h1>

@@ -10,7 +10,7 @@ interface ChurchAccess {
 }
 
 interface SubscriptionStatus {
-  status: 'none' | 'trial' | 'active' | 'cancelled' | 'expired';
+  status: 'none' | 'trial' | 'active' | 'cancelled' | 'expired' | 'pending';
   tier: 'free' | 'essential' | 'premium' | 'student' | 'patron' | null;
   isStudent: boolean;
   trialEndsAt: string | null;
@@ -122,11 +122,17 @@ export function useSubscription() {
 
       // If database shows active subscription or church access, use that
       if (hasAccessFromDb || hasChurchAccess) {
+        // Church members should ALWAYS show as 'active'/'premium' regardless of
+        // ANY stale trial/expired status in user_subscriptions or profiles.
+        // Church access is the highest priority override.
+        const effectiveStatus = hasChurchAccess ? 'active' : statusFromDb;
+        const effectiveTier = hasChurchAccess ? 'premium' : tierFromDb;
+
         setSubscription({
-          status: statusFromDb,
-          tier: tierFromDb,
-          isStudent: tierFromDb === 'student',
-          trialEndsAt: trialEndsAtFromDb,
+          status: effectiveStatus,
+          tier: effectiveTier,
+          isStudent: effectiveTier === 'student',
+          trialEndsAt: hasChurchAccess ? null : trialEndsAtFromDb,
           studentExpiresAt: null,
           promotionalExpiresAt: null,
           hasAccess: true,
@@ -188,7 +194,18 @@ export function useSubscription() {
         if (!patreonError && patreonConnection?.is_active_patron && patreonConnection.entitled_cents >= MINIMUM_PLEDGE_CENTS) {
           console.log('[useSubscription] Active Patreon found in connections!', patreonConnection);
 
-          // Update profiles table to fix the sync issue
+          // Update user_subscriptions table (where subscription data now lives)
+          await supabase
+            .from('user_subscriptions')
+            .upsert({
+              user_id: user.id,
+              subscription_tier: 'premium',
+              subscription_status: 'active',
+              payment_source: 'patreon',
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+
+          // Also update profiles table for backwards compatibility
           await supabase
             .from('profiles')
             .update({

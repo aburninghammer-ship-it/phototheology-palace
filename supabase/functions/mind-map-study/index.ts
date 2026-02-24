@@ -1,5 +1,8 @@
 import "https://deno.land/x/xhr@0.3.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { PALACE_SYSTEM_PROMPT, THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
+import { QUALITY_TESTS, OUTPUT_TYPES, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,12 +10,12 @@ const corsHeaders = {
 };
 
 const STUDY_SYSTEM_PROMPT = `
-You are Jeeves, a sophisticated Bible study assistant. Generate a comprehensive devotional study based on the provided seed text using the Phototheology Palace framework.
+${PALACE_SYSTEM_PROMPT}
 
-THE PHOTOTHEOLOGY PALACE FRAMEWORK:
-- 8 Floors: Furnishing, Investigation, Freestyle, Next Level, Vision, Three Heavens, Spiritual, Master
-- Key Rooms: Story Room (SR), Observation Room (OR), Christ Every Chapter (CEC), Prophecy Room (PR), Sanctuary Room (SRm)
-- Sanctuary: Altar, Laver, Lampstand, Showbread, Incense, Ark, Mercy Seat
+${THEOLOGICAL_GUARDRAILS}
+
+STUDY GENERATION MODE:
+Generate a comprehensive devotional study based on the provided seed text using the full Phototheology Palace framework above.
 
 STUDY REQUIREMENTS:
 
@@ -53,6 +56,15 @@ MODE ADJUSTMENTS:
 - SCHOLAR: Deep analysis, more cross-references, scholarly connections
 - PREACHER: Focus on teaching hooks, illustrations, sermon-ready content
 - RESEARCH: Academic rigor, exhaustive connections, detailed evidence
+
+OUTPUT TYPE: ${OUTPUT_TYPES.devotional.name}
+${OUTPUT_TYPES.devotional.description}
+${OUTPUT_TYPES.devotional.requirements.map(r => `• ${r}`).join('\n')}
+
+QUALITY TESTS (apply to every output):
+${QUALITY_TESTS.map(t => `• ${t.name} (${t.room}): ${t.question}`).join('\n')}
+
+${GOLDEN_RULE}
 
 MANDATORY RULES:
 - Return ONLY valid JSON
@@ -114,6 +126,13 @@ serve(async (req) => {
     };
     const modeInstruction = modeInstructions[mode] || modeInstructions.scholar;
 
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: truncatedText.slice(0, 4000),
+      matchCount: 2,
+    });
+    const ragSection = ragResult.chunkCount > 0 ? ragResult.corpusContext : '';
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -125,7 +144,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: STUDY_SYSTEM_PROMPT + "\n\n" + modeInstruction,
+            content: STUDY_SYSTEM_PROMPT + "\n\n" + modeInstruction + ragSection,
           },
           {
             role: "user",

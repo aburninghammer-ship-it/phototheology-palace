@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getCorpusContext } from '../_shared/corpus-rag.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,7 +26,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are Jeeves, the Phototheology AI assistant, providing LIVE commentary during a sermon. Your role is to enrich the preaching moment with instant PT insights.
+    let systemPrompt = `You are Jeeves, the Phototheology AI assistant, providing LIVE commentary during a sermon. Your role is to enrich the preaching moment with instant PT insights.
 
 CRITICAL RULES:
 1. Keep responses SHORT (2-3 sentences max) - this is live commentary
@@ -59,6 +60,15 @@ Format as JSON:
 ${context ? `\nContext: ${context}` : ''}
 
 Provide instant Phototheology commentary for this moment.`;
+
+    // RAG corpus injection
+    const ragResult = await getCorpusContext({
+      query: `${sermonPoint} ${context || ''}`,
+      matchCount: 2,
+    });
+    if (ragResult.chunkCount > 0) {
+      systemPrompt += ragResult.corpusContext;
+    }
 
     console.log("Generating live commentary for:", sermonPoint);
 

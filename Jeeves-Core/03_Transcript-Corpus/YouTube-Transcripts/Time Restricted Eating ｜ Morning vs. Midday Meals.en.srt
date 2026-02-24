@@ -1,0 +1,3605 @@
+1
+00:00:00,040 --> 00:00:01,230
+
+today we're going to talk about a very
+
+2
+00:00:01,230 --> 00:00:01,240
+today we're going to talk about a very
+ 
+
+3
+00:00:01,240 --> 00:00:03,550
+today we're going to talk about a very
+interesting randomized control trial
+
+4
+00:00:03,550 --> 00:00:03,560
+interesting randomized control trial
+ 
+
+5
+00:00:03,560 --> 00:00:05,950
+interesting randomized control trial
+that was published back in February of
+
+6
+00:00:05,950 --> 00:00:05,960
+that was published back in February of
+ 
+
+7
+00:00:05,960 --> 00:00:09,310
+that was published back in February of
+2022 on intermittent fasting I'm Dr
+
+8
+00:00:09,310 --> 00:00:09,320
+2022 on intermittent fasting I'm Dr
+ 
+
+9
+00:00:09,320 --> 00:00:11,190
+2022 on intermittent fasting I'm Dr
+Roger schw welcome to another true
+
+10
+00:00:11,190 --> 00:00:11,200
+Roger schw welcome to another true
+ 
+
+11
+00:00:11,200 --> 00:00:13,789
+Roger schw welcome to another true
+Health Tuesdays now intermittent fasting
+
+12
+00:00:13,789 --> 00:00:13,799
+Health Tuesdays now intermittent fasting
+ 
+
+13
+00:00:13,799 --> 00:00:16,830
+Health Tuesdays now intermittent fasting
+has been a interesting topic there's
+
+14
+00:00:16,830 --> 00:00:16,840
+has been a interesting topic there's
+ 
+
+15
+00:00:16,840 --> 00:00:18,470
+has been a interesting topic there's
+been a number of papers that have been
+
+16
+00:00:18,470 --> 00:00:18,480
+been a number of papers that have been
+ 
+
+17
+00:00:18,480 --> 00:00:20,910
+been a number of papers that have been
+published that have showed some efficacy
+
+18
+00:00:20,910 --> 00:00:20,920
+published that have showed some efficacy
+ 
+
+19
+00:00:20,920 --> 00:00:22,950
+published that have showed some efficacy
+and also some other papers that have
+
+20
+00:00:22,950 --> 00:00:22,960
+and also some other papers that have
+ 
+
+21
+00:00:22,960 --> 00:00:25,710
+and also some other papers that have
+showed lack of advocacy so it's been
+
+22
+00:00:25,710 --> 00:00:25,720
+showed lack of advocacy so it's been
+ 
+
+23
+00:00:25,720 --> 00:00:28,029
+showed lack of advocacy so it's been
+been actually a bit of a controversial
+
+24
+00:00:28,029 --> 00:00:28,039
+been actually a bit of a controversial
+ 
+
+25
+00:00:28,039 --> 00:00:30,509
+been actually a bit of a controversial
+topic but today we're going to look at a
+
+26
+00:00:30,509 --> 00:00:30,519
+topic but today we're going to look at a
+ 
+
+27
+00:00:30,519 --> 00:00:32,790
+topic but today we're going to look at a
+head-to-head randomized control trial
+
+28
+00:00:32,790 --> 00:00:32,800
+head-to-head randomized control trial
+ 
+
+29
+00:00:32,800 --> 00:00:35,510
+head-to-head randomized control trial
+which is the best type of evidence and
+
+30
+00:00:35,510 --> 00:00:35,520
+which is the best type of evidence and
+ 
+
+31
+00:00:35,520 --> 00:00:38,869
+which is the best type of evidence and
+looking at seeing whether or not eating
+
+32
+00:00:38,869 --> 00:00:38,879
+looking at seeing whether or not eating
+ 
+
+33
+00:00:38,879 --> 00:00:41,990
+looking at seeing whether or not eating
+in the morning and restricting eating to
+
+34
+00:00:41,990 --> 00:00:42,000
+in the morning and restricting eating to
+ 
+
+35
+00:00:42,000 --> 00:00:44,270
+in the morning and restricting eating to
+just in the morning or the morning hours
+
+36
+00:00:44,270 --> 00:00:44,280
+just in the morning or the morning hours
+ 
+
+37
+00:00:44,280 --> 00:00:48,270
+just in the morning or the morning hours
+or early versus restricting eating to
+
+38
+00:00:48,270 --> 00:00:48,280
+or early versus restricting eating to
+ 
+
+39
+00:00:48,280 --> 00:00:50,470
+or early versus restricting eating to
+midday or later
+
+40
+00:00:50,470 --> 00:00:50,480
+midday or later
+ 
+
+41
+00:00:50,480 --> 00:00:52,830
+midday or later
+afternoon so the name of this study is
+
+42
+00:00:52,830 --> 00:00:52,840
+afternoon so the name of this study is
+ 
+
+43
+00:00:52,840 --> 00:00:54,750
+afternoon so the name of this study is
+randomized control trial for Tim
+
+44
+00:00:54,750 --> 00:00:54,760
+randomized control trial for Tim
+ 
+
+45
+00:00:54,760 --> 00:00:57,189
+randomized control trial for Tim
+restricted eating and healthy volunteers
+
+46
+00:00:57,189 --> 00:00:57,199
+restricted eating and healthy volunteers
+ 
+
+47
+00:00:57,199 --> 00:01:01,389
+restricted eating and healthy volunteers
+without obesity so this is the type of
+
+48
+00:01:01,389 --> 00:01:01,399
+without obesity so this is the type of
+ 
+
+49
+00:01:01,399 --> 00:01:03,950
+without obesity so this is the type of
+person that we're looking for here and
+
+50
+00:01:03,950 --> 00:01:03,960
+person that we're looking for here and
+ 
+
+51
+00:01:03,960 --> 00:01:08,550
+person that we're looking for here and
+specifically about and there are two
+
+52
+00:01:08,550 --> 00:01:08,560
+specifically about and there are two
+ 
+
+53
+00:01:08,560 --> 00:01:11,870
+specifically about and there are two
+major different types
+
+54
+00:01:11,870 --> 00:01:11,880
+major different types
+ 
+
+55
+00:01:11,880 --> 00:01:15,510
+major different types
+of interventions in this study one is
+
+56
+00:01:15,510 --> 00:01:15,520
+of interventions in this study one is
+ 
+
+57
+00:01:15,520 --> 00:01:17,510
+of interventions in this study one is
+called
+
+58
+00:01:17,510 --> 00:01:17,520
+called
+ 
+
+59
+00:01:17,520 --> 00:01:20,469
+called
+EF and that has to do with food intake
+
+60
+00:01:20,469 --> 00:01:20,479
+EF and that has to do with food intake
+ 
+
+61
+00:01:20,479 --> 00:01:22,390
+EF and that has to do with food intake
+that is restricted to the early part of
+
+62
+00:01:22,390 --> 00:01:22,400
+that is restricted to the early part of
+ 
+
+63
+00:01:22,400 --> 00:01:25,550
+that is restricted to the early part of
+the day so that would be calories
+
+64
+00:01:25,550 --> 00:01:25,560
+the day so that would be calories
+ 
+
+65
+00:01:25,560 --> 00:01:28,270
+the day so that would be calories
+particularly ingested in the morning
+
+66
+00:01:28,270 --> 00:01:28,280
+particularly ingested in the morning
+ 
+
+67
+00:01:28,280 --> 00:01:30,950
+particularly ingested in the morning
+time so bigger breakfasts much lighter
+
+68
+00:01:30,950 --> 00:01:30,960
+time so bigger breakfasts much lighter
+ 
+
+69
+00:01:30,960 --> 00:01:33,550
+time so bigger breakfasts much lighter
+dinners things of that nature versus the
+
+70
+00:01:33,550 --> 00:01:33,560
+dinners things of that nature versus the
+ 
+
+71
+00:01:33,560 --> 00:01:37,590
+dinners things of that nature versus the
+other type which is a midday trf or time
+
+72
+00:01:37,590 --> 00:01:37,600
+other type which is a midday trf or time
+ 
+
+73
+00:01:37,600 --> 00:01:41,230
+other type which is a midday trf or time
+restricted feeding which is restricted
+
+74
+00:01:41,230 --> 00:01:41,240
+restricted feeding which is restricted
+ 
+
+75
+00:01:41,240 --> 00:01:44,590
+restricted feeding which is restricted
+food to the middle of the day
+
+76
+00:01:44,590 --> 00:01:44,600
+food to the middle of the day
+ 
+
+77
+00:01:44,600 --> 00:01:47,190
+food to the middle of the day
+okay so in this situation they conducted
+
+78
+00:01:47,190 --> 00:01:47,200
+okay so in this situation they conducted
+ 
+
+79
+00:01:47,200 --> 00:01:49,830
+okay so in this situation they conducted
+a five week randomized control trial to
+
+80
+00:01:49,830 --> 00:01:49,840
+a five week randomized control trial to
+ 
+
+81
+00:01:49,840 --> 00:01:52,429
+a five week randomized control trial to
+compare the effects of the two trf
+
+82
+00:01:52,429 --> 00:01:52,439
+compare the effects of the two trf
+ 
+
+83
+00:01:52,439 --> 00:01:55,069
+compare the effects of the two trf
+regimens one where it is restricted to
+
+84
+00:01:55,069 --> 00:01:55,079
+regimens one where it is restricted to
+ 
+
+85
+00:01:55,079 --> 00:01:57,310
+regimens one where it is restricted to
+the morning and one that is restricted
+
+86
+00:01:57,310 --> 00:01:57,320
+the morning and one that is restricted
+ 
+
+87
+00:01:57,320 --> 00:02:00,109
+the morning and one that is restricted
+to the midday and these are in health
+
+88
+00:02:00,109 --> 00:02:00,119
+to the midday and these are in health
+ 
+
+89
+00:02:00,119 --> 00:02:02,350
+to the midday and these are in health
+individuals without
+
+90
+00:02:02,350 --> 00:02:02,360
+individuals without
+ 
+
+91
+00:02:02,360 --> 00:02:04,670
+individuals without
+obesity and there was one more group and
+
+92
+00:02:04,670 --> 00:02:04,680
+obesity and there was one more group and
+ 
+
+93
+00:02:04,680 --> 00:02:06,510
+obesity and there was one more group and
+that was the control group so they took
+
+94
+00:02:06,510 --> 00:02:06,520
+that was the control group so they took
+ 
+
+95
+00:02:06,520 --> 00:02:10,029
+that was the control group so they took
+90 participants and randomize them to 30
+
+96
+00:02:10,029 --> 00:02:10,039
+90 participants and randomize them to 30
+ 
+
+97
+00:02:10,039 --> 00:02:12,790
+90 participants and randomize them to 30
+in the early Tim restricted feeding
+
+98
+00:02:12,790 --> 00:02:12,800
+in the early Tim restricted feeding
+ 
+
+99
+00:02:12,800 --> 00:02:15,470
+in the early Tim restricted feeding
+group 30 in the midday Tim restricted
+
+100
+00:02:15,470 --> 00:02:15,480
+group 30 in the midday Tim restricted
+ 
+
+101
+00:02:15,480 --> 00:02:18,670
+group 30 in the midday Tim restricted
+feeding group and then finally 30 in a
+
+102
+00:02:18,670 --> 00:02:18,680
+feeding group and then finally 30 in a
+ 
+
+103
+00:02:18,680 --> 00:02:20,910
+feeding group and then finally 30 in a
+control group using a computer-based
+
+104
+00:02:20,910 --> 00:02:20,920
+control group using a computer-based
+ 
+
+105
+00:02:20,920 --> 00:02:23,350
+control group using a computer-based
+random number
+
+106
+00:02:23,350 --> 00:02:23,360
+random number
+ 
+
+107
+00:02:23,360 --> 00:02:26,270
+random number
+generator and as it turns out 82
+
+108
+00:02:26,270 --> 00:02:26,280
+generator and as it turns out 82
+ 
+
+109
+00:02:26,280 --> 00:02:29,150
+generator and as it turns out 82
+participants completed the entire five
+
+110
+00:02:29,150 --> 00:02:29,160
+participants completed the entire five
+ 
+
+111
+00:02:29,160 --> 00:02:32,550
+participants completed the entire five
+week trial that's pretty good in terms
+
+112
+00:02:32,550 --> 00:02:32,560
+week trial that's pretty good in terms
+ 
+
+113
+00:02:32,560 --> 00:02:34,589
+week trial that's pretty good in terms
+of not having a lot of
+
+114
+00:02:34,589 --> 00:02:34,599
+of not having a lot of
+ 
+
+115
+00:02:34,599 --> 00:02:36,470
+of not having a lot of
+Dropout and they wanted to see what
+
+116
+00:02:36,470 --> 00:02:36,480
+Dropout and they wanted to see what
+ 
+
+117
+00:02:36,480 --> 00:02:38,630
+Dropout and they wanted to see what
+would happen to insulin resistance now
+
+118
+00:02:38,630 --> 00:02:38,640
+would happen to insulin resistance now
+ 
+
+119
+00:02:38,640 --> 00:02:40,070
+would happen to insulin resistance now
+the researchers who assessed the
+
+120
+00:02:40,070 --> 00:02:40,080
+the researchers who assessed the
+ 
+
+121
+00:02:40,080 --> 00:02:42,390
+the researchers who assessed the
+outcomes were blinded to the group
+
+122
+00:02:42,390 --> 00:02:42,400
+outcomes were blinded to the group
+ 
+
+123
+00:02:42,400 --> 00:02:44,550
+outcomes were blinded to the group
+assignment but the participants and the
+
+124
+00:02:44,550 --> 00:02:44,560
+assignment but the participants and the
+ 
+
+125
+00:02:44,560 --> 00:02:46,350
+assignment but the participants and the
+caregivers were not so it was not a
+
+126
+00:02:46,350 --> 00:02:46,360
+caregivers were not so it was not a
+ 
+
+127
+00:02:46,360 --> 00:02:49,110
+caregivers were not so it was not a
+double blinded study but rather a single
+
+128
+00:02:49,110 --> 00:02:49,120
+double blinded study but rather a single
+ 
+
+129
+00:02:49,120 --> 00:02:52,470
+double blinded study but rather a single
+blinded randomized control trial so
+
+130
+00:02:52,470 --> 00:02:52,480
+blinded randomized control trial so
+ 
+
+131
+00:02:52,480 --> 00:02:54,309
+blinded randomized control trial so
+first of all there was no Adverse Events
+
+132
+00:02:54,309 --> 00:02:54,319
+first of all there was no Adverse Events
+ 
+
+133
+00:02:54,319 --> 00:02:56,790
+first of all there was no Adverse Events
+reported during the trial so that was
+
+134
+00:02:56,790 --> 00:02:56,800
+reported during the trial so that was
+ 
+
+135
+00:02:56,800 --> 00:02:59,190
+reported during the trial so that was
+good and sort of cutting to the chase
+
+136
+00:02:59,190 --> 00:02:59,200
+good and sort of cutting to the chase
+ 
+
+137
+00:02:59,200 --> 00:03:00,750
+good and sort of cutting to the chase
+here what did they they show they showed
+
+138
+00:03:00,750 --> 00:03:00,760
+here what did they they show they showed
+ 
+
+139
+00:03:00,760 --> 00:03:03,990
+here what did they they show they showed
+that it was the early treatment group
+
+140
+00:03:03,990 --> 00:03:04,000
+that it was the early treatment group
+ 
+
+141
+00:03:04,000 --> 00:03:06,309
+that it was the early treatment group
+The Early Tim restricted feeding group
+
+142
+00:03:06,309 --> 00:03:06,319
+The Early Tim restricted feeding group
+ 
+
+143
+00:03:06,319 --> 00:03:09,430
+The Early Tim restricted feeding group
+that was more effective than either the
+
+144
+00:03:09,430 --> 00:03:09,440
+that was more effective than either the
+ 
+
+145
+00:03:09,440 --> 00:03:12,270
+that was more effective than either the
+midday Tim restricted feeding group or
+
+146
+00:03:12,270 --> 00:03:12,280
+midday Tim restricted feeding group or
+ 
+
+147
+00:03:12,280 --> 00:03:14,990
+midday Tim restricted feeding group or
+the control group at improving insulin
+
+148
+00:03:14,990 --> 00:03:15,000
+the control group at improving insulin
+ 
+
+149
+00:03:15,000 --> 00:03:17,390
+the control group at improving insulin
+sensitivity which is the key but let's
+
+150
+00:03:17,390 --> 00:03:17,400
+sensitivity which is the key but let's
+ 
+
+151
+00:03:17,400 --> 00:03:19,710
+sensitivity which is the key but let's
+take a look at some of the the actual
+
+152
+00:03:19,710 --> 00:03:19,720
+take a look at some of the the actual
+ 
+
+153
+00:03:19,720 --> 00:03:21,670
+take a look at some of the the actual
+results that came
+
+154
+00:03:21,670 --> 00:03:21,680
+results that came
+ 
+
+155
+00:03:21,680 --> 00:03:23,949
+results that came
+back so here we're looking at a number
+
+156
+00:03:23,949 --> 00:03:23,959
+back so here we're looking at a number
+ 
+
+157
+00:03:23,959 --> 00:03:26,149
+back so here we're looking at a number
+of different topics here and the first
+
+158
+00:03:26,149 --> 00:03:26,159
+of different topics here and the first
+ 
+
+159
+00:03:26,159 --> 00:03:29,869
+of different topics here and the first
+one is a and that's the change in energy
+
+160
+00:03:29,869 --> 00:03:29,879
+one is a and that's the change in energy
+ 
+
+161
+00:03:29,879 --> 00:03:31,869
+one is a and that's the change in energy
+intake when they started this and of
+
+162
+00:03:31,869 --> 00:03:31,879
+intake when they started this and of
+ 
+
+163
+00:03:31,879 --> 00:03:33,830
+intake when they started this and of
+course the control group was Zero
+
+164
+00:03:33,830 --> 00:03:33,840
+course the control group was Zero
+ 
+
+165
+00:03:33,840 --> 00:03:35,750
+course the control group was Zero
+because they didn't change much but you
+
+166
+00:03:35,750 --> 00:03:35,760
+because they didn't change much but you
+ 
+
+167
+00:03:35,760 --> 00:03:39,309
+because they didn't change much but you
+can see in both the early Tim restricted
+
+168
+00:03:39,309 --> 00:03:39,319
+can see in both the early Tim restricted
+ 
+
+169
+00:03:39,319 --> 00:03:42,990
+can see in both the early Tim restricted
+feeding group and the midday Tim
+
+170
+00:03:42,990 --> 00:03:43,000
+feeding group and the midday Tim
+ 
+
+171
+00:03:43,000 --> 00:03:45,190
+feeding group and the midday Tim
+restricted feeding group there was a
+
+172
+00:03:45,190 --> 00:03:45,200
+restricted feeding group there was a
+ 
+
+173
+00:03:45,200 --> 00:03:48,229
+restricted feeding group there was a
+statistically significant reduction in
+
+174
+00:03:48,229 --> 00:03:48,239
+statistically significant reduction in
+ 
+
+175
+00:03:48,239 --> 00:03:49,789
+statistically significant reduction in
+the energy
+
+176
+00:03:49,789 --> 00:03:49,799
+the energy
+ 
+
+177
+00:03:49,799 --> 00:03:52,229
+the energy
+intake and if you want to know more in
+
+178
+00:03:52,229 --> 00:03:52,239
+intake and if you want to know more in
+ 
+
+179
+00:03:52,239 --> 00:03:54,830
+intake and if you want to know more in
+terms of the specifics the early
+
+180
+00:03:54,830 --> 00:03:54,840
+terms of the specifics the early
+ 
+
+181
+00:03:54,840 --> 00:03:57,350
+terms of the specifics the early
+treatment the early Tim restricted
+
+182
+00:03:57,350 --> 00:03:57,360
+treatment the early Tim restricted
+ 
+
+183
+00:03:57,360 --> 00:04:00,030
+treatment the early Tim restricted
+feeding group was a eating period perod
+
+184
+00:04:00,030 --> 00:04:00,040
+feeding group was a eating period perod
+ 
+
+185
+00:04:00,040 --> 00:04:02,830
+feeding group was a eating period perod
+of no more than 8 hours between 6:00 in
+
+186
+00:04:02,830 --> 00:04:02,840
+of no more than 8 hours between 6:00 in
+ 
+
+187
+00:04:02,840 --> 00:04:06,390
+of no more than 8 hours between 6:00 in
+the morning and 3:00 in the afternoon
+
+188
+00:04:06,390 --> 00:04:06,400
+the morning and 3:00 in the afternoon
+ 
+
+189
+00:04:06,400 --> 00:04:08,270
+the morning and 3:00 in the afternoon
+and fasting for the rest of the day
+
+190
+00:04:08,270 --> 00:04:08,280
+and fasting for the rest of the day
+ 
+
+191
+00:04:08,280 --> 00:04:11,390
+and fasting for the rest of the day
+whereas a midday Tim restricted feeding
+
+192
+00:04:11,390 --> 00:04:11,400
+whereas a midday Tim restricted feeding
+ 
+
+193
+00:04:11,400 --> 00:04:14,069
+whereas a midday Tim restricted feeding
+group was no more than 8 hours between
+
+194
+00:04:14,069 --> 00:04:14,079
+group was no more than 8 hours between
+ 
+
+195
+00:04:14,079 --> 00:04:17,749
+group was no more than 8 hours between
+11:00 in the morning and 8:00 at night
+
+196
+00:04:17,749 --> 00:04:17,759
+11:00 in the morning and 8:00 at night
+ 
+
+197
+00:04:17,759 --> 00:04:19,229
+11:00 in the morning and 8:00 at night
+and fasting for the rest of the day and
+
+198
+00:04:19,229 --> 00:04:19,239
+and fasting for the rest of the day and
+ 
+
+199
+00:04:19,239 --> 00:04:21,229
+and fasting for the rest of the day and
+then of course the control group was
+
+200
+00:04:21,229 --> 00:04:21,239
+then of course the control group was
+ 
+
+201
+00:04:21,239 --> 00:04:24,590
+then of course the control group was
+eating whenever they wanted to
+
+202
+00:04:24,590 --> 00:04:24,600
+eating whenever they wanted to
+ 
+
+203
+00:04:24,600 --> 00:04:29,350
+eating whenever they wanted to
+eat so once again in the both the early
+
+204
+00:04:29,350 --> 00:04:29,360
+eat so once again in the both the early
+ 
+
+205
+00:04:29,360 --> 00:04:31,150
+eat so once again in the both the early
+time restricted feeding and the midday
+
+206
+00:04:31,150 --> 00:04:31,160
+time restricted feeding and the midday
+ 
+
+207
+00:04:31,160 --> 00:04:32,790
+time restricted feeding and the midday
+time-restricted feeding group there was
+
+208
+00:04:32,790 --> 00:04:32,800
+time-restricted feeding group there was
+ 
+
+209
+00:04:32,800 --> 00:04:36,110
+time-restricted feeding group there was
+a statistically significantly
+
+210
+00:04:36,110 --> 00:04:36,120
+a statistically significantly
+ 
+
+211
+00:04:36,120 --> 00:04:38,990
+a statistically significantly
+lower amount of energy intake which
+
+212
+00:04:38,990 --> 00:04:39,000
+lower amount of energy intake which
+ 
+
+213
+00:04:39,000 --> 00:04:41,749
+lower amount of energy intake which
+means that whenever you restrict eating
+
+214
+00:04:41,749 --> 00:04:41,759
+means that whenever you restrict eating
+ 
+
+215
+00:04:41,759 --> 00:04:43,909
+means that whenever you restrict eating
+it's going to cause a reduction in the
+
+216
+00:04:43,909 --> 00:04:43,919
+it's going to cause a reduction in the
+ 
+
+217
+00:04:43,919 --> 00:04:45,710
+it's going to cause a reduction in the
+amount of energy intake that's not a
+
+218
+00:04:45,710 --> 00:04:45,720
+amount of energy intake that's not a
+ 
+
+219
+00:04:45,720 --> 00:04:47,430
+amount of energy intake that's not a
+surprise the question is is which one do
+
+220
+00:04:47,430 --> 00:04:47,440
+surprise the question is is which one do
+ 
+
+221
+00:04:47,440 --> 00:04:50,670
+surprise the question is is which one do
+you get a better benefit out of now when
+
+222
+00:04:50,670 --> 00:04:50,680
+you get a better benefit out of now when
+ 
+
+223
+00:04:50,680 --> 00:04:53,710
+you get a better benefit out of now when
+they looked at Delta H IR which is a
+
+224
+00:04:53,710 --> 00:04:53,720
+they looked at Delta H IR which is a
+ 
+
+225
+00:04:53,720 --> 00:04:57,550
+they looked at Delta H IR which is a
+measure of the insulin sensitivity
+
+226
+00:04:57,550 --> 00:04:57,560
+measure of the insulin sensitivity
+ 
+
+227
+00:04:57,560 --> 00:05:00,150
+measure of the insulin sensitivity
+notice that there was better sensitivity
+
+228
+00:05:00,150 --> 00:05:00,160
+notice that there was better sensitivity
+ 
+
+229
+00:05:00,160 --> 00:05:04,150
+notice that there was better sensitivity
+there was a reduction in the H air which
+
+230
+00:05:04,150 --> 00:05:04,160
+there was a reduction in the H air which
+ 
+
+231
+00:05:04,160 --> 00:05:06,990
+there was a reduction in the H air which
+is good in the early Tim restricted
+
+232
+00:05:06,990 --> 00:05:07,000
+is good in the early Tim restricted
+ 
+
+233
+00:05:07,000 --> 00:05:09,790
+is good in the early Tim restricted
+feeding group and and not much of a
+
+234
+00:05:09,790 --> 00:05:09,800
+feeding group and and not much of a
+ 
+
+235
+00:05:09,800 --> 00:05:11,310
+feeding group and and not much of a
+difference here at all between the
+
+236
+00:05:11,310 --> 00:05:11,320
+difference here at all between the
+ 
+
+237
+00:05:11,320 --> 00:05:13,550
+difference here at all between the
+control group and the midday Tim
+
+238
+00:05:13,550 --> 00:05:13,560
+control group and the midday Tim
+ 
+
+239
+00:05:13,560 --> 00:05:14,870
+control group and the midday Tim
+restricted feeding group now this is
+
+240
+00:05:14,870 --> 00:05:14,880
+restricted feeding group now this is
+ 
+
+241
+00:05:14,880 --> 00:05:16,990
+restricted feeding group now this is
+really important to understand a lot of
+
+242
+00:05:16,990 --> 00:05:17,000
+really important to understand a lot of
+ 
+
+243
+00:05:17,000 --> 00:05:19,350
+really important to understand a lot of
+times studies are done on just Tim
+
+244
+00:05:19,350 --> 00:05:19,360
+times studies are done on just Tim
+ 
+
+245
+00:05:19,360 --> 00:05:21,390
+times studies are done on just Tim
+restricted eating but here we're
+
+246
+00:05:21,390 --> 00:05:21,400
+restricted eating but here we're
+ 
+
+247
+00:05:21,400 --> 00:05:23,790
+restricted eating but here we're
+starting to see that it matters based on
+
+248
+00:05:23,790 --> 00:05:23,800
+starting to see that it matters based on
+ 
+
+249
+00:05:23,800 --> 00:05:25,870
+starting to see that it matters based on
+the Circadian rhythm whether or not that
+
+250
+00:05:25,870 --> 00:05:25,880
+the Circadian rhythm whether or not that
+ 
+
+251
+00:05:25,880 --> 00:05:29,270
+the Circadian rhythm whether or not that
+Tim restricted eating is centered around
+
+252
+00:05:29,270 --> 00:05:29,280
+Tim restricted eating is centered around
+ 
+
+253
+00:05:29,280 --> 00:05:31,629
+Tim restricted eating is centered around
+the morning morning time when circadian
+
+254
+00:05:31,629 --> 00:05:31,639
+the morning morning time when circadian
+ 
+
+255
+00:05:31,639 --> 00:05:34,909
+the morning morning time when circadian
+rhythm is designed to have that type of
+
+256
+00:05:34,909 --> 00:05:34,919
+rhythm is designed to have that type of
+ 
+
+257
+00:05:34,919 --> 00:05:37,230
+rhythm is designed to have that type of
+ingestion of calories or whether it's
+
+258
+00:05:37,230 --> 00:05:37,240
+ingestion of calories or whether it's
+ 
+
+259
+00:05:37,240 --> 00:05:39,710
+ingestion of calories or whether it's
+later in the evening when it's not uh
+
+260
+00:05:39,710 --> 00:05:39,720
+later in the evening when it's not uh
+ 
+
+261
+00:05:39,720 --> 00:05:41,550
+later in the evening when it's not uh
+let's take a look at the change in the
+
+262
+00:05:41,550 --> 00:05:41,560
+let's take a look at the change in the
+ 
+
+263
+00:05:41,560 --> 00:05:45,990
+let's take a look at the change in the
+fasting plasma glucose notice again that
+
+264
+00:05:45,990 --> 00:05:46,000
+fasting plasma glucose notice again that
+ 
+
+265
+00:05:46,000 --> 00:05:48,469
+fasting plasma glucose notice again that
+the biggest reduction here was in the
+
+266
+00:05:48,469 --> 00:05:48,479
+the biggest reduction here was in the
+ 
+
+267
+00:05:48,479 --> 00:05:51,110
+the biggest reduction here was in the
+early Tim restricted feeding that that
+
+268
+00:05:51,110 --> 00:05:51,120
+early Tim restricted feeding that that
+ 
+
+269
+00:05:51,120 --> 00:05:54,670
+early Tim restricted feeding that that
+is not surprising because we know that
+
+270
+00:05:54,670 --> 00:05:54,680
+is not surprising because we know that
+ 
+
+271
+00:05:54,680 --> 00:05:57,270
+is not surprising because we know that
+the body is more sensitive to insulin in
+
+272
+00:05:57,270 --> 00:05:57,280
+the body is more sensitive to insulin in
+ 
+
+273
+00:05:57,280 --> 00:05:59,670
+the body is more sensitive to insulin in
+the morning than it is in the evening
+
+274
+00:05:59,670 --> 00:05:59,680
+the morning than it is in the evening
+ 
+
+275
+00:05:59,680 --> 00:06:00,870
+the morning than it is in the evening
+thing as you can see here that the
+
+276
+00:06:00,870 --> 00:06:00,880
+thing as you can see here that the
+ 
+
+277
+00:06:00,880 --> 00:06:02,950
+thing as you can see here that the
+midday Tim restricted feeding group
+
+278
+00:06:02,950 --> 00:06:02,960
+midday Tim restricted feeding group
+ 
+
+279
+00:06:02,960 --> 00:06:05,309
+midday Tim restricted feeding group
+really didn't have much of a difference
+
+280
+00:06:05,309 --> 00:06:05,319
+really didn't have much of a difference
+ 
+
+281
+00:06:05,319 --> 00:06:06,990
+really didn't have much of a difference
+from the control group so you may be
+
+282
+00:06:06,990 --> 00:06:07,000
+from the control group so you may be
+ 
+
+283
+00:06:07,000 --> 00:06:09,070
+from the control group so you may be
+doing time restricted feeding but if
+
+284
+00:06:09,070 --> 00:06:09,080
+doing time restricted feeding but if
+ 
+
+285
+00:06:09,080 --> 00:06:11,230
+doing time restricted feeding but if
+you're doing it at the wrong time it
+
+286
+00:06:11,230 --> 00:06:11,240
+you're doing it at the wrong time it
+ 
+
+287
+00:06:11,240 --> 00:06:13,909
+you're doing it at the wrong time it
+doesn't really make a difference let's
+
+288
+00:06:13,909 --> 00:06:13,919
+doesn't really make a difference let's
+ 
+
+289
+00:06:13,919 --> 00:06:16,870
+doesn't really make a difference let's
+look at the change in body weight now
+
+290
+00:06:16,870 --> 00:06:16,880
+look at the change in body weight now
+ 
+
+291
+00:06:16,880 --> 00:06:19,309
+look at the change in body weight now
+this is really interesting here notice
+
+292
+00:06:19,309 --> 00:06:19,319
+this is really interesting here notice
+ 
+
+293
+00:06:19,319 --> 00:06:22,350
+this is really interesting here notice
+that despite the fact that there was a
+
+294
+00:06:22,350 --> 00:06:22,360
+that despite the fact that there was a
+ 
+
+295
+00:06:22,360 --> 00:06:25,390
+that despite the fact that there was a
+reduction in caloric
+
+296
+00:06:25,390 --> 00:06:25,400
+reduction in caloric
+ 
+
+297
+00:06:25,400 --> 00:06:28,830
+reduction in caloric
+intake there was a difference here in
+
+298
+00:06:28,830 --> 00:06:28,840
+intake there was a difference here in
+ 
+
+299
+00:06:28,840 --> 00:06:33,150
+intake there was a difference here in
+terms of reduction in body weight in the
+
+300
+00:06:33,150 --> 00:06:33,160
+terms of reduction in body weight in the
+ 
+
+301
+00:06:33,160 --> 00:06:35,790
+terms of reduction in body weight in the
+early Tim restricted feeding group in
+
+302
+00:06:35,790 --> 00:06:35,800
+early Tim restricted feeding group in
+ 
+
+303
+00:06:35,800 --> 00:06:38,029
+early Tim restricted feeding group in
+other words you could restrict calories
+
+304
+00:06:38,029 --> 00:06:38,039
+other words you could restrict calories
+ 
+
+305
+00:06:38,039 --> 00:06:39,830
+other words you could restrict calories
+just as well in the midday time
+
+306
+00:06:39,830 --> 00:06:39,840
+just as well in the midday time
+ 
+
+307
+00:06:39,840 --> 00:06:43,070
+just as well in the midday time
+restricted feeding but not see a really
+
+308
+00:06:43,070 --> 00:06:43,080
+restricted feeding but not see a really
+ 
+
+309
+00:06:43,080 --> 00:06:46,070
+restricted feeding but not see a really
+statistically significant difference
+
+310
+00:06:46,070 --> 00:06:46,080
+statistically significant difference
+ 
+
+311
+00:06:46,080 --> 00:06:49,230
+statistically significant difference
+what about change in body
+
+312
+00:06:49,230 --> 00:06:49,240
+what about change in body
+ 
+
+313
+00:06:49,240 --> 00:06:52,950
+what about change in body
+fat notice here that the only
+
+314
+00:06:52,950 --> 00:06:52,960
+fat notice here that the only
+ 
+
+315
+00:06:52,960 --> 00:06:55,510
+fat notice here that the only
+statistical significant difference here
+
+316
+00:06:55,510 --> 00:06:55,520
+statistical significant difference here
+ 
+
+317
+00:06:55,520 --> 00:06:58,309
+statistical significant difference here
+was between the early Tim restricted
+
+318
+00:06:58,309 --> 00:06:58,319
+was between the early Tim restricted
+ 
+
+319
+00:06:58,319 --> 00:07:01,350
+was between the early Tim restricted
+feeding and the control group okay and
+
+320
+00:07:01,350 --> 00:07:01,360
+feeding and the control group okay and
+ 
+
+321
+00:07:01,360 --> 00:07:05,629
+feeding and the control group okay and
+in terms of delta in body fat Mass again
+
+322
+00:07:05,629 --> 00:07:05,639
+in terms of delta in body fat Mass again
+ 
+
+323
+00:07:05,639 --> 00:07:07,629
+in terms of delta in body fat Mass again
+the only statistical significant
+
+324
+00:07:07,629 --> 00:07:07,639
+the only statistical significant
+ 
+
+325
+00:07:07,639 --> 00:07:09,230
+the only statistical significant
+difference was that between the early
+
+326
+00:07:09,230 --> 00:07:09,240
+difference was that between the early
+ 
+
+327
+00:07:09,240 --> 00:07:11,830
+difference was that between the early
+Tim restricted feeding and the control
+
+328
+00:07:11,830 --> 00:07:11,840
+Tim restricted feeding and the control
+ 
+
+329
+00:07:11,840 --> 00:07:14,629
+Tim restricted feeding and the control
+group what does all this sort of lead to
+
+330
+00:07:14,629 --> 00:07:14,639
+group what does all this sort of lead to
+ 
+
+331
+00:07:14,639 --> 00:07:15,790
+group what does all this sort of lead to
+that if you're going to do time
+
+332
+00:07:15,790 --> 00:07:15,800
+that if you're going to do time
+ 
+
+333
+00:07:15,800 --> 00:07:17,670
+that if you're going to do time
+restricted eating and limit your intake
+
+334
+00:07:17,670 --> 00:07:17,680
+restricted eating and limit your intake
+ 
+
+335
+00:07:17,680 --> 00:07:20,150
+restricted eating and limit your intake
+of calories to 8 hours a day it's best
+
+336
+00:07:20,150 --> 00:07:20,160
+of calories to 8 hours a day it's best
+ 
+
+337
+00:07:20,160 --> 00:07:22,270
+of calories to 8 hours a day it's best
+to do it earlier in the day when the
+
+338
+00:07:22,270 --> 00:07:22,280
+to do it earlier in the day when the
+ 
+
+339
+00:07:22,280 --> 00:07:24,629
+to do it earlier in the day when the
+circadium rhythm is keyed into that
+
+340
+00:07:24,629 --> 00:07:24,639
+circadium rhythm is keyed into that
+ 
+
+341
+00:07:24,639 --> 00:07:25,990
+circadium rhythm is keyed into that
+let's take a look at a couple of other
+
+342
+00:07:25,990 --> 00:07:26,000
+let's take a look at a couple of other
+ 
+
+343
+00:07:26,000 --> 00:07:29,589
+let's take a look at a couple of other
+things here here we see the change in t
+
+344
+00:07:29,589 --> 00:07:29,599
+things here here we see the change in t
+ 
+
+345
+00:07:29,599 --> 00:07:31,950
+things here here we see the change in t
+necrosis Factor Alpha again the
+
+346
+00:07:31,950 --> 00:07:31,960
+necrosis Factor Alpha again the
+ 
+
+347
+00:07:31,960 --> 00:07:34,270
+necrosis Factor Alpha again the
+reduction was statistically significant
+
+348
+00:07:34,270 --> 00:07:34,280
+reduction was statistically significant
+ 
+
+349
+00:07:34,280 --> 00:07:35,869
+reduction was statistically significant
+only in the early time-restricted
+
+350
+00:07:35,869 --> 00:07:35,879
+only in the early time-restricted
+ 
+
+351
+00:07:35,879 --> 00:07:39,589
+only in the early time-restricted
+feeding group same for the delta in the
+
+352
+00:07:39,589 --> 00:07:39,599
+feeding group same for the delta in the
+ 
+
+353
+00:07:39,599 --> 00:07:42,950
+feeding group same for the delta in the
+il8 there was a reduction there and also
+
+354
+00:07:42,950 --> 00:07:42,960
+il8 there was a reduction there and also
+ 
+
+355
+00:07:42,960 --> 00:07:45,189
+il8 there was a reduction there and also
+for a reduction in as which has to do
+
+356
+00:07:45,189 --> 00:07:45,199
+for a reduction in as which has to do
+ 
+
+357
+00:07:45,199 --> 00:07:47,510
+for a reduction in as which has to do
+with uh liver toxicity from
+
+358
+00:07:47,510 --> 00:07:47,520
+with uh liver toxicity from
+ 
+
+359
+00:07:47,520 --> 00:07:49,869
+with uh liver toxicity from
+non-alcoholic Ste
+
+360
+00:07:49,869 --> 00:07:49,879
+non-alcoholic Ste
+ 
+
+361
+00:07:49,879 --> 00:07:52,309
+non-alcoholic Ste
+steatohepatitis again early Tim
+
+362
+00:07:52,309 --> 00:07:52,319
+steatohepatitis again early Tim
+ 
+
+363
+00:07:52,319 --> 00:07:55,189
+steatohepatitis again early Tim
+restricted feeding group here we see the
+
+364
+00:07:55,189 --> 00:07:55,199
+restricted feeding group here we see the
+ 
+
+365
+00:07:55,199 --> 00:07:58,350
+restricted feeding group here we see the
+amount of te- cells and we can see that
+
+366
+00:07:58,350 --> 00:07:58,360
+amount of te- cells and we can see that
+ 
+
+367
+00:07:58,360 --> 00:08:00,950
+amount of te- cells and we can see that
+there was an increase which is is good
+
+368
+00:08:00,950 --> 00:08:00,960
+there was an increase which is is good
+ 
+
+369
+00:08:00,960 --> 00:08:03,510
+there was an increase which is is good
+again in the early Tim restricted
+
+370
+00:08:03,510 --> 00:08:03,520
+again in the early Tim restricted
+ 
+
+371
+00:08:03,520 --> 00:08:06,110
+again in the early Tim restricted
+feeding group that the change in the
+
+372
+00:08:06,110 --> 00:08:06,120
+feeding group that the change in the
+ 
+
+373
+00:08:06,120 --> 00:08:08,390
+feeding group that the change in the
+diversity of the microbiota of the gut
+
+374
+00:08:08,390 --> 00:08:08,400
+diversity of the microbiota of the gut
+ 
+
+375
+00:08:08,400 --> 00:08:10,670
+diversity of the microbiota of the gut
+was higher in the early Tim restricted
+
+376
+00:08:10,670 --> 00:08:10,680
+was higher in the early Tim restricted
+ 
+
+377
+00:08:10,680 --> 00:08:12,589
+was higher in the early Tim restricted
+feeding group and that the eating
+
+378
+00:08:12,589 --> 00:08:12,599
+feeding group and that the eating
+ 
+
+379
+00:08:12,599 --> 00:08:15,230
+feeding group and that the eating
+frequency was statistically
+
+380
+00:08:15,230 --> 00:08:15,240
+frequency was statistically
+ 
+
+381
+00:08:15,240 --> 00:08:19,550
+frequency was statistically
+significantly Less in the early Tim
+
+382
+00:08:19,550 --> 00:08:19,560
+significantly Less in the early Tim
+ 
+
+383
+00:08:19,560 --> 00:08:22,230
+significantly Less in the early Tim
+restricted feeding and the midday Tim
+
+384
+00:08:22,230 --> 00:08:22,240
+restricted feeding and the midday Tim
+ 
+
+385
+00:08:22,240 --> 00:08:24,670
+restricted feeding and the midday Tim
+restricted feeding group but despite
+
+386
+00:08:24,670 --> 00:08:24,680
+restricted feeding group but despite
+ 
+
+387
+00:08:24,680 --> 00:08:27,869
+restricted feeding group but despite
+that across the board the measurements
+
+388
+00:08:27,869 --> 00:08:27,879
+that across the board the measurements
+ 
+
+389
+00:08:27,879 --> 00:08:31,909
+that across the board the measurements
+that we wanted to see were either larger
+
+390
+00:08:31,909 --> 00:08:31,919
+that we wanted to see were either larger
+ 
+
+391
+00:08:31,919 --> 00:08:34,990
+that we wanted to see were either larger
+or exclusively seen in the early time
+
+392
+00:08:34,990 --> 00:08:35,000
+or exclusively seen in the early time
+ 
+
+393
+00:08:35,000 --> 00:08:36,589
+or exclusively seen in the early time
+restricted feeding
+
+394
+00:08:36,589 --> 00:08:36,599
+restricted feeding
+ 
+
+395
+00:08:36,599 --> 00:08:38,990
+restricted feeding
+group again going back looking at
+
+396
+00:08:38,990 --> 00:08:39,000
+group again going back looking at
+ 
+
+397
+00:08:39,000 --> 00:08:41,469
+group again going back looking at
+insulin resistance in healthy non-obese
+
+398
+00:08:41,469 --> 00:08:41,479
+insulin resistance in healthy non-obese
+ 
+
+399
+00:08:41,479 --> 00:08:43,029
+insulin resistance in healthy non-obese
+they said that the early time restricted
+
+400
+00:08:43,029 --> 00:08:43,039
+they said that the early time restricted
+ 
+
+401
+00:08:43,039 --> 00:08:45,470
+they said that the early time restricted
+feeding group showed a larger reduction
+
+402
+00:08:45,470 --> 00:08:45,480
+feeding group showed a larger reduction
+ 
+
+403
+00:08:45,480 --> 00:08:49,030
+feeding group showed a larger reduction
+in hom IR which is good than either the
+
+404
+00:08:49,030 --> 00:08:49,040
+in hom IR which is good than either the
+ 
+
+405
+00:08:49,040 --> 00:08:51,190
+in hom IR which is good than either the
+midday Tim restricted feeding group or
+
+406
+00:08:51,190 --> 00:08:51,200
+midday Tim restricted feeding group or
+ 
+
+407
+00:08:51,200 --> 00:08:53,070
+midday Tim restricted feeding group or
+the control group but there was no
+
+408
+00:08:53,070 --> 00:08:53,080
+the control group but there was no
+ 
+
+409
+00:08:53,080 --> 00:08:55,509
+the control group but there was no
+difference between the changes in the
+
+410
+00:08:55,509 --> 00:08:55,519
+difference between the changes in the
+ 
+
+411
+00:08:55,519 --> 00:08:57,670
+difference between the changes in the
+midday Tim restricted feeding and the
+
+412
+00:08:57,670 --> 00:08:57,680
+midday Tim restricted feeding and the
+ 
+
+413
+00:08:57,680 --> 00:09:00,150
+midday Tim restricted feeding and the
+control groups
+
+414
+00:09:00,150 --> 00:09:00,160
+control groups
+ 
+
+415
+00:09:00,160 --> 00:09:02,910
+control groups
+so they say here in the discussion that
+
+416
+00:09:02,910 --> 00:09:02,920
+so they say here in the discussion that
+ 
+
+417
+00:09:02,920 --> 00:09:04,790
+so they say here in the discussion that
+the present study has shown that five
+
+418
+00:09:04,790 --> 00:09:04,800
+the present study has shown that five
+ 
+
+419
+00:09:04,800 --> 00:09:07,829
+the present study has shown that five
+weeks of early Tim restricted feeding
+
+420
+00:09:07,829 --> 00:09:07,839
+weeks of early Tim restricted feeding
+ 
+
+421
+00:09:07,839 --> 00:09:10,430
+weeks of early Tim restricted feeding
+but not midday Tim restricted feeding
+
+422
+00:09:10,430 --> 00:09:10,440
+but not midday Tim restricted feeding
+ 
+
+423
+00:09:10,440 --> 00:09:12,630
+but not midday Tim restricted feeding
+improves insulin sensitivity reduces
+
+424
+00:09:12,630 --> 00:09:12,640
+improves insulin sensitivity reduces
+ 
+
+425
+00:09:12,640 --> 00:09:15,470
+improves insulin sensitivity reduces
+fasting plasma glucose reduces body mass
+
+426
+00:09:15,470 --> 00:09:15,480
+fasting plasma glucose reduces body mass
+ 
+
+427
+00:09:15,480 --> 00:09:18,710
+fasting plasma glucose reduces body mass
+and adicity ameliorates inflammation and
+
+428
+00:09:18,710 --> 00:09:18,720
+and adicity ameliorates inflammation and
+ 
+
+429
+00:09:18,720 --> 00:09:21,030
+and adicity ameliorates inflammation and
+increases gut microbial diversity
+
+430
+00:09:21,030 --> 00:09:21,040
+increases gut microbial diversity
+ 
+
+431
+00:09:21,040 --> 00:09:22,269
+increases gut microbial diversity
+however there was no significant
+
+432
+00:09:22,269 --> 00:09:22,279
+however there was no significant
+ 
+
+433
+00:09:22,279 --> 00:09:24,310
+however there was no significant
+differences among the three groups with
+
+434
+00:09:24,310 --> 00:09:24,320
+differences among the three groups with
+ 
+
+435
+00:09:24,320 --> 00:09:25,910
+differences among the three groups with
+respect to blood pressure circulating
+
+436
+00:09:25,910 --> 00:09:25,920
+respect to blood pressure circulating
+ 
+
+437
+00:09:25,920 --> 00:09:28,350
+respect to blood pressure circulating
+lipid concentrations hemoglobin
+
+438
+00:09:28,350 --> 00:09:28,360
+lipid concentrations hemoglobin
+ 
+
+439
+00:09:28,360 --> 00:09:30,269
+lipid concentrations hemoglobin
+A1c
+
+440
+00:09:30,269 --> 00:09:30,279
+A1c
+ 
+
+441
+00:09:30,279 --> 00:09:33,590
+A1c
+hscrp which is a inflammatory marker
+
+442
+00:09:33,590 --> 00:09:33,600
+hscrp which is a inflammatory marker
+ 
+
+443
+00:09:33,600 --> 00:09:36,269
+hscrp which is a inflammatory marker
+Sleep Quality or
+
+444
+00:09:36,269 --> 00:09:36,279
+Sleep Quality or
+ 
+
+445
+00:09:36,279 --> 00:09:39,470
+Sleep Quality or
+appetite the study also goes on to say
+
+446
+00:09:39,470 --> 00:09:39,480
+appetite the study also goes on to say
+ 
+
+447
+00:09:39,480 --> 00:09:41,230
+appetite the study also goes on to say
+that the good compliance between the two
+
+448
+00:09:41,230 --> 00:09:41,240
+that the good compliance between the two
+ 
+
+449
+00:09:41,240 --> 00:09:43,430
+that the good compliance between the two
+protocols in the present study implies
+
+450
+00:09:43,430 --> 00:09:43,440
+protocols in the present study implies
+ 
+
+451
+00:09:43,440 --> 00:09:45,949
+protocols in the present study implies
+that Tim restricted feeding is an easy
+
+452
+00:09:45,949 --> 00:09:45,959
+that Tim restricted feeding is an easy
+ 
+
+453
+00:09:45,959 --> 00:09:48,990
+that Tim restricted feeding is an easy
+to execute fasting regimen and that the
+
+454
+00:09:48,990 --> 00:09:49,000
+to execute fasting regimen and that the
+ 
+
+455
+00:09:49,000 --> 00:09:51,430
+to execute fasting regimen and that the
+similar compliance suggests that they
+
+456
+00:09:51,430 --> 00:09:51,440
+similar compliance suggests that they
+ 
+
+457
+00:09:51,440 --> 00:09:53,990
+similar compliance suggests that they
+are similarly feasible now realize that
+
+458
+00:09:53,990 --> 00:09:54,000
+are similarly feasible now realize that
+ 
+
+459
+00:09:54,000 --> 00:09:55,670
+are similarly feasible now realize that
+in both groups they were both told to
+
+460
+00:09:55,670 --> 00:09:55,680
+in both groups they were both told to
+ 
+
+461
+00:09:55,680 --> 00:09:57,790
+in both groups they were both told to
+just eat whatever they wanted to but
+
+462
+00:09:57,790 --> 00:09:57,800
+just eat whatever they wanted to but
+ 
+
+463
+00:09:57,800 --> 00:10:00,350
+just eat whatever they wanted to but
+limit it to 8 hour days or 8 Hour
+
+464
+00:10:00,350 --> 00:10:00,360
+limit it to 8 hour days or 8 Hour
+ 
+
+465
+00:10:00,360 --> 00:10:02,470
+limit it to 8 hour days or 8 Hour
+periods of time during the day there was
+
+466
+00:10:02,470 --> 00:10:02,480
+periods of time during the day there was
+ 
+
+467
+00:10:02,480 --> 00:10:05,150
+periods of time during the day there was
+no specific nutritional guidance given
+
+468
+00:10:05,150 --> 00:10:05,160
+no specific nutritional guidance given
+ 
+
+469
+00:10:05,160 --> 00:10:08,190
+no specific nutritional guidance given
+to them and uh what's interesting here
+
+470
+00:10:08,190 --> 00:10:08,200
+to them and uh what's interesting here
+ 
+
+471
+00:10:08,200 --> 00:10:10,430
+to them and uh what's interesting here
+is that there were energy reductions in
+
+472
+00:10:10,430 --> 00:10:10,440
+is that there were energy reductions in
+ 
+
+473
+00:10:10,440 --> 00:10:13,910
+is that there were energy reductions in
+both the midday and the early but the
+
+474
+00:10:13,910 --> 00:10:13,920
+both the midday and the early but the
+ 
+
+475
+00:10:13,920 --> 00:10:17,150
+both the midday and the early but the
+health benefits were seen in just the
+
+476
+00:10:17,150 --> 00:10:17,160
+health benefits were seen in just the
+ 
+
+477
+00:10:17,160 --> 00:10:19,870
+health benefits were seen in just the
+early which means that these benefits
+
+478
+00:10:19,870 --> 00:10:19,880
+early which means that these benefits
+ 
+
+479
+00:10:19,880 --> 00:10:23,110
+early which means that these benefits
+were not caused by differences in energy
+
+480
+00:10:23,110 --> 00:10:23,120
+were not caused by differences in energy
+ 
+
+481
+00:10:23,120 --> 00:10:25,670
+were not caused by differences in energy
+intake and by the way these findings
+
+482
+00:10:25,670 --> 00:10:25,680
+intake and by the way these findings
+ 
+
+483
+00:10:25,680 --> 00:10:27,710
+intake and by the way these findings
+showing a benefit of improving insulin
+
+484
+00:10:27,710 --> 00:10:27,720
+showing a benefit of improving insulin
+ 
+
+485
+00:10:27,720 --> 00:10:29,670
+showing a benefit of improving insulin
+sensitivity there are new numerous
+
+486
+00:10:29,670 --> 00:10:29,680
+sensitivity there are new numerous
+ 
+
+487
+00:10:29,680 --> 00:10:31,269
+sensitivity there are new numerous
+studies which show this this is not a
+
+488
+00:10:31,269 --> 00:10:31,279
+studies which show this this is not a
+ 
+
+489
+00:10:31,279 --> 00:10:33,030
+studies which show this this is not a
+unique finding and this has been seen
+
+490
+00:10:33,030 --> 00:10:33,040
+unique finding and this has been seen
+ 
+
+491
+00:10:33,040 --> 00:10:34,910
+unique finding and this has been seen
+over and over and over again that the
+
+492
+00:10:34,910 --> 00:10:34,920
+over and over and over again that the
+ 
+
+493
+00:10:34,920 --> 00:10:39,269
+over and over and over again that the
+body is most sensitive to insulin in the
+
+494
+00:10:39,269 --> 00:10:39,279
+body is most sensitive to insulin in the
+ 
+
+495
+00:10:39,279 --> 00:10:42,949
+body is most sensitive to insulin in the
+morning for instance here is another
+
+496
+00:10:42,949 --> 00:10:42,959
+morning for instance here is another
+ 
+
+497
+00:10:42,959 --> 00:10:45,030
+morning for instance here is another
+article that was published back in
+
+498
+00:10:45,030 --> 00:10:45,040
+article that was published back in
+ 
+
+499
+00:10:45,040 --> 00:10:48,030
+article that was published back in
+2014 titled dial variation in insulin
+
+500
+00:10:48,030 --> 00:10:48,040
+2014 titled dial variation in insulin
+ 
+
+501
+00:10:48,040 --> 00:10:50,190
+2014 titled dial variation in insulin
+sensitivity of glucose metabolism is
+
+502
+00:10:50,190 --> 00:10:50,200
+sensitivity of glucose metabolism is
+ 
+
+503
+00:10:50,200 --> 00:10:52,230
+sensitivity of glucose metabolism is
+associated with dial variations in whole
+
+504
+00:10:52,230 --> 00:10:52,240
+associated with dial variations in whole
+ 
+
+505
+00:10:52,240 --> 00:10:55,710
+associated with dial variations in whole
+body and cellular fat acid metabolism in
+
+506
+00:10:55,710 --> 00:10:55,720
+body and cellular fat acid metabolism in
+ 
+
+507
+00:10:55,720 --> 00:10:58,230
+body and cellular fat acid metabolism in
+metabolically normal
+
+508
+00:10:58,230 --> 00:10:58,240
+metabolically normal
+ 
+
+509
+00:10:58,240 --> 00:11:00,750
+metabolically normal
+women and in the study they measured
+
+510
+00:11:00,750 --> 00:11:00,760
+women and in the study they measured
+ 
+
+511
+00:11:00,760 --> 00:11:04,629
+women and in the study they measured
+plasma and free fatty acid concentration
+
+512
+00:11:04,629 --> 00:11:04,639
+plasma and free fatty acid concentration
+ 
+
+513
+00:11:04,639 --> 00:11:06,949
+plasma and free fatty acid concentration
+petate kinetics and skeletal muscle
+
+514
+00:11:06,949 --> 00:11:06,959
+petate kinetics and skeletal muscle
+ 
+
+515
+00:11:06,959 --> 00:11:08,590
+petate kinetics and skeletal muscle
+expression of genes involved in fatty
+
+516
+00:11:08,590 --> 00:11:08,600
+expression of genes involved in fatty
+ 
+
+517
+00:11:08,600 --> 00:11:12,230
+expression of genes involved in fatty
+acid metabolism at breakfast and dinner
+
+518
+00:11:12,230 --> 00:11:12,240
+acid metabolism at breakfast and dinner
+ 
+
+519
+00:11:12,240 --> 00:11:15,829
+acid metabolism at breakfast and dinner
+in 13 overweight but metabolically
+
+520
+00:11:15,829 --> 00:11:15,839
+in 13 overweight but metabolically
+ 
+
+521
+00:11:15,839 --> 00:11:16,829
+in 13 overweight but metabolically
+normal
+
+522
+00:11:16,829 --> 00:11:16,839
+normal
+ 
+
+523
+00:11:16,839 --> 00:11:19,389
+normal
+women and what they found was that fatty
+
+524
+00:11:19,389 --> 00:11:19,399
+women and what they found was that fatty
+ 
+
+525
+00:11:19,399 --> 00:11:23,790
+women and what they found was that fatty
+acid concentration was 30% greater just
+
+526
+00:11:23,790 --> 00:11:23,800
+acid concentration was 30% greater just
+ 
+
+527
+00:11:23,800 --> 00:11:26,590
+acid concentration was 30% greater just
+before consuming dinner than breakfast
+
+528
+00:11:26,590 --> 00:11:26,600
+before consuming dinner than breakfast
+ 
+
+529
+00:11:26,600 --> 00:11:28,389
+before consuming dinner than breakfast
+and that was statistically significant
+
+530
+00:11:28,389 --> 00:11:28,399
+and that was statistically significant
+ 
+
+531
+00:11:28,399 --> 00:11:32,430
+and that was statistically significant
+and remained greater after dinner than
+
+532
+00:11:32,430 --> 00:11:32,440
+and remained greater after dinner than
+ 
+
+533
+00:11:32,440 --> 00:11:34,470
+and remained greater after dinner than
+breakfast so therefore they concluded
+
+534
+00:11:34,470 --> 00:11:34,480
+breakfast so therefore they concluded
+ 
+
+535
+00:11:34,480 --> 00:11:36,069
+breakfast so therefore they concluded
+that metabolically normal women
+
+536
+00:11:36,069 --> 00:11:36,079
+that metabolically normal women
+ 
+
+537
+00:11:36,079 --> 00:11:38,310
+that metabolically normal women
+demonstrate dial variations in fatty
+
+538
+00:11:38,310 --> 00:11:38,320
+demonstrate dial variations in fatty
+ 
+
+539
+00:11:38,320 --> 00:11:41,110
+demonstrate dial variations in fatty
+acid metabolism manifested by an
+
+540
+00:11:41,110 --> 00:11:41,120
+acid metabolism manifested by an
+ 
+
+541
+00:11:41,120 --> 00:11:44,430
+acid metabolism manifested by an
+increase in circulating fatty acids
+
+542
+00:11:44,430 --> 00:11:44,440
+increase in circulating fatty acids
+ 
+
+543
+00:11:44,440 --> 00:11:47,030
+increase in circulating fatty acids
+presumably deriv from previous meal
+
+544
+00:11:47,030 --> 00:11:47,040
+presumably deriv from previous meal
+ 
+
+545
+00:11:47,040 --> 00:11:49,790
+presumably deriv from previous meal
+consumption rather than lipolysis or the
+
+546
+00:11:49,790 --> 00:11:49,800
+consumption rather than lipolysis or the
+ 
+
+547
+00:11:49,800 --> 00:11:52,069
+consumption rather than lipolysis or the
+breakdown of atopos tissue triglycerides
+
+548
+00:11:52,069 --> 00:11:52,079
+breakdown of atopos tissue triglycerides
+ 
+
+549
+00:11:52,079 --> 00:11:54,750
+breakdown of atopos tissue triglycerides
+and a shift in muscle fatty acid
+
+550
+00:11:54,750 --> 00:11:54,760
+and a shift in muscle fatty acid
+ 
+
+551
+00:11:54,760 --> 00:11:57,949
+and a shift in muscle fatty acid
+metabolism from oxidation to lipogenesis
+
+552
+00:11:57,949 --> 00:11:57,959
+metabolism from oxidation to lipogenesis
+ 
+
+553
+00:11:57,959 --> 00:12:00,710
+metabolism from oxidation to lipogenesis
+these metabolic alter ations could be
+
+554
+00:12:00,710 --> 00:12:00,720
+these metabolic alter ations could be
+ 
+
+555
+00:12:00,720 --> 00:12:02,910
+these metabolic alter ations could be
+responsible for the known evening
+
+556
+00:12:02,910 --> 00:12:02,920
+responsible for the known evening
+ 
+
+557
+00:12:02,920 --> 00:12:05,430
+responsible for the known evening
+decline in insulin sensitivity and
+
+558
+00:12:05,430 --> 00:12:05,440
+decline in insulin sensitivity and
+ 
+
+559
+00:12:05,440 --> 00:12:06,710
+decline in insulin sensitivity and
+here's the key word that I want you to
+
+560
+00:12:06,710 --> 00:12:06,720
+here's the key word that I want you to
+ 
+
+561
+00:12:06,720 --> 00:12:09,670
+here's the key word that I want you to
+see here this is a very well-known even
+
+562
+00:12:09,670 --> 00:12:09,680
+see here this is a very well-known even
+ 
+
+563
+00:12:09,680 --> 00:12:14,069
+see here this is a very well-known even
+back in 2014 a known decline in insulin
+
+564
+00:12:14,069 --> 00:12:14,079
+back in 2014 a known decline in insulin
+ 
+
+565
+00:12:14,079 --> 00:12:15,949
+back in 2014 a known decline in insulin
+sensitivity what does this mean this
+
+566
+00:12:15,949 --> 00:12:15,959
+sensitivity what does this mean this
+ 
+
+567
+00:12:15,959 --> 00:12:19,230
+sensitivity what does this mean this
+means that if you are ingesting calories
+
+568
+00:12:19,230 --> 00:12:19,240
+means that if you are ingesting calories
+ 
+
+569
+00:12:19,240 --> 00:12:21,509
+means that if you are ingesting calories
+towards the end of the day it's going to
+
+570
+00:12:21,509 --> 00:12:21,519
+towards the end of the day it's going to
+ 
+
+571
+00:12:21,519 --> 00:12:25,350
+towards the end of the day it's going to
+take more insulin to deal with those
+
+572
+00:12:25,350 --> 00:12:25,360
+take more insulin to deal with those
+ 
+
+573
+00:12:25,360 --> 00:12:27,750
+take more insulin to deal with those
+calories and higher amounts of insulin
+
+574
+00:12:27,750 --> 00:12:27,760
+calories and higher amounts of insulin
+ 
+
+575
+00:12:27,760 --> 00:12:30,310
+calories and higher amounts of insulin
+means insulin resistance which can lead
+
+576
+00:12:30,310 --> 00:12:30,320
+means insulin resistance which can lead
+ 
+
+577
+00:12:30,320 --> 00:12:34,030
+means insulin resistance which can lead
+to all sorts of Downstream effects from
+
+578
+00:12:34,030 --> 00:12:34,040
+to all sorts of Downstream effects from
+ 
+
+579
+00:12:34,040 --> 00:12:35,990
+to all sorts of Downstream effects from
+higher levels of
+
+580
+00:12:35,990 --> 00:12:36,000
+higher levels of
+ 
+
+581
+00:12:36,000 --> 00:12:38,389
+higher levels of
+insulin now we've talked about before
+
+582
+00:12:38,389 --> 00:12:38,399
+insulin now we've talked about before
+ 
+
+583
+00:12:38,399 --> 00:12:41,590
+insulin now we've talked about before
+and we've shown that infrared light and
+
+584
+00:12:41,590 --> 00:12:41,600
+and we've shown that infrared light and
+ 
+
+585
+00:12:41,600 --> 00:12:44,269
+and we've shown that infrared light and
+red light actually
+
+586
+00:12:44,269 --> 00:12:44,279
+red light actually
+ 
+
+587
+00:12:44,279 --> 00:12:47,189
+red light actually
+increases the metabolic activity of the
+
+588
+00:12:47,189 --> 00:12:47,199
+increases the metabolic activity of the
+ 
+
+589
+00:12:47,199 --> 00:12:50,389
+increases the metabolic activity of the
+mitochondria and reduces glucose and so
+
+590
+00:12:50,389 --> 00:12:50,399
+mitochondria and reduces glucose and so
+ 
+
+591
+00:12:50,399 --> 00:12:52,470
+mitochondria and reduces glucose and so
+it's becoming clear and clearer here
+
+592
+00:12:52,470 --> 00:12:52,480
+it's becoming clear and clearer here
+ 
+
+593
+00:12:52,480 --> 00:12:56,389
+it's becoming clear and clearer here
+that uh that ingesting carbohydrates or
+
+594
+00:12:56,389 --> 00:12:56,399
+that uh that ingesting carbohydrates or
+ 
+
+595
+00:12:56,399 --> 00:12:59,670
+that uh that ingesting carbohydrates or
+even just calories in general is better
+
+596
+00:12:59,670 --> 00:12:59,680
+even just calories in general is better
+ 
+
+597
+00:12:59,680 --> 00:13:04,189
+even just calories in general is better
+done when the Sun is up and I would even
+
+598
+00:13:04,189 --> 00:13:04,199
+done when the Sun is up and I would even
+ 
+
+599
+00:13:04,199 --> 00:13:08,030
+done when the Sun is up and I would even
+say more towards the morning based on
+
+600
+00:13:08,030 --> 00:13:08,040
+say more towards the morning based on
+ 
+
+601
+00:13:08,040 --> 00:13:09,949
+say more towards the morning based on
+the circadium
+
+602
+00:13:09,949 --> 00:13:09,959
+the circadium
+ 
+
+603
+00:13:09,959 --> 00:13:12,430
+the circadium
+Rhythm
+
+604
+00:13:12,430 --> 00:13:12,440
+Rhythm
+ 
+
+605
+00:13:12,440 --> 00:13:15,310
+Rhythm
+findings so what can we glean from this
+
+606
+00:13:15,310 --> 00:13:15,320
+findings so what can we glean from this
+ 
+
+607
+00:13:15,320 --> 00:13:18,629
+findings so what can we glean from this
+information that we should start to plan
+
+608
+00:13:18,629 --> 00:13:18,639
+information that we should start to plan
+ 
+
+609
+00:13:18,639 --> 00:13:22,150
+information that we should start to plan
+our meals around eating breakfast like a
+
+610
+00:13:22,150 --> 00:13:22,160
+our meals around eating breakfast like a
+ 
+
+611
+00:13:22,160 --> 00:13:27,990
+our meals around eating breakfast like a
+king lunch like a queen or Prince and
+
+612
+00:13:27,990 --> 00:13:28,000
+king lunch like a queen or Prince and
+ 
+
+613
+00:13:28,000 --> 00:13:29,829
+king lunch like a queen or Prince and
+dinner like a popper and the reason is
+
+614
+00:13:29,829 --> 00:13:29,839
+dinner like a popper and the reason is
+ 
+
+615
+00:13:29,839 --> 00:13:32,509
+dinner like a popper and the reason is
+is because our circadian rhythm is
+
+616
+00:13:32,509 --> 00:13:32,519
+is because our circadian rhythm is
+ 
+
+617
+00:13:32,519 --> 00:13:35,150
+is because our circadian rhythm is
+specifically designed and put in place
+
+618
+00:13:35,150 --> 00:13:35,160
+specifically designed and put in place
+ 
+
+619
+00:13:35,160 --> 00:13:38,550
+specifically designed and put in place
+to have the enzymes and the substrates
+
+620
+00:13:38,550 --> 00:13:38,560
+to have the enzymes and the substrates
+ 
+
+621
+00:13:38,560 --> 00:13:42,069
+to have the enzymes and the substrates
+and the pathways primed for dealing with
+
+622
+00:13:42,069 --> 00:13:42,079
+and the pathways primed for dealing with
+ 
+
+623
+00:13:42,079 --> 00:13:44,590
+and the pathways primed for dealing with
+caloric intake in the morning time as we
+
+624
+00:13:44,590 --> 00:13:44,600
+caloric intake in the morning time as we
+ 
+
+625
+00:13:44,600 --> 00:13:47,030
+caloric intake in the morning time as we
+can see here the
+
+626
+00:13:47,030 --> 00:13:47,040
+can see here the
+ 
+
+627
+00:13:47,040 --> 00:13:51,389
+can see here the
+Delta fasting plasma glucose was lower
+
+628
+00:13:51,389 --> 00:13:51,399
+Delta fasting plasma glucose was lower
+ 
+
+629
+00:13:51,399 --> 00:13:52,590
+Delta fasting plasma glucose was lower
+when we
+
+630
+00:13:52,590 --> 00:13:52,600
+when we
+ 
+
+631
+00:13:52,600 --> 00:13:56,389
+when we
+had the Tim restricted feeding to the
+
+632
+00:13:56,389 --> 00:13:56,399
+had the Tim restricted feeding to the
+ 
+
+633
+00:13:56,399 --> 00:13:59,230
+had the Tim restricted feeding to the
+morning and not into the afternoon or
+
+634
+00:13:59,230 --> 00:13:59,240
+morning and not into the afternoon or
+ 
+
+635
+00:13:59,240 --> 00:14:00,870
+morning and not into the afternoon or
+even into the control
+
+636
+00:14:00,870 --> 00:14:00,880
+even into the control
+ 
+
+637
+00:14:00,880 --> 00:14:05,470
+even into the control
+group once again these people with the
+
+638
+00:14:05,470 --> 00:14:05,480
+group once again these people with the
+ 
+
+639
+00:14:05,480 --> 00:14:08,189
+group once again these people with the
+EF or the time restricted feeding in the
+
+640
+00:14:08,189 --> 00:14:08,199
+EF or the time restricted feeding in the
+ 
+
+641
+00:14:08,199 --> 00:14:10,550
+EF or the time restricted feeding in the
+morning was eating during a period of no
+
+642
+00:14:10,550 --> 00:14:10,560
+morning was eating during a period of no
+ 
+
+643
+00:14:10,560 --> 00:14:13,150
+morning was eating during a period of no
+more than 8 hours between 6:00 in the
+
+644
+00:14:13,150 --> 00:14:13,160
+more than 8 hours between 6:00 in the
+ 
+
+645
+00:14:13,160 --> 00:14:16,910
+more than 8 hours between 6:00 in the
+morning and 3:00 in the afternoon and
+
+646
+00:14:16,910 --> 00:14:16,920
+morning and 3:00 in the afternoon and
+ 
+
+647
+00:14:16,920 --> 00:14:18,790
+morning and 3:00 in the afternoon and
+fasting for the rest of the day this
+
+648
+00:14:18,790 --> 00:14:18,800
+fasting for the rest of the day this
+ 
+
+649
+00:14:18,800 --> 00:14:22,069
+fasting for the rest of the day this
+means you can drink water but intake no
+
+650
+00:14:22,069 --> 00:14:22,079
+means you can drink water but intake no
+ 
+
+651
+00:14:22,079 --> 00:14:23,949
+means you can drink water but intake no
+calories and I can tell you this is
+
+652
+00:14:23,949 --> 00:14:23,959
+calories and I can tell you this is
+ 
+
+653
+00:14:23,959 --> 00:14:25,550
+calories and I can tell you this is
+something that I've asked my patients
+
+654
+00:14:25,550 --> 00:14:25,560
+something that I've asked my patients
+ 
+
+655
+00:14:25,560 --> 00:14:30,269
+something that I've asked my patients
+who have had issues with fatigue issues
+
+656
+00:14:30,269 --> 00:14:30,279
+who have had issues with fatigue issues
+ 
+
+657
+00:14:30,279 --> 00:14:33,310
+who have had issues with fatigue issues
+with sleeping at night to start to
+
+658
+00:14:33,310 --> 00:14:33,320
+with sleeping at night to start to
+ 
+
+659
+00:14:33,320 --> 00:14:37,150
+with sleeping at night to start to
+employ this type of intervention and I
+
+660
+00:14:37,150 --> 00:14:37,160
+employ this type of intervention and I
+ 
+
+661
+00:14:37,160 --> 00:14:39,110
+employ this type of intervention and I
+have noticed in my patients uh some
+
+662
+00:14:39,110 --> 00:14:39,120
+have noticed in my patients uh some
+ 
+
+663
+00:14:39,120 --> 00:14:41,590
+have noticed in my patients uh some
+improvements in their symptomatology
+
+664
+00:14:41,590 --> 00:14:41,600
+improvements in their symptomatology
+ 
+
+665
+00:14:41,600 --> 00:14:43,790
+improvements in their symptomatology
+specifically in Long covid
+
+666
+00:14:43,790 --> 00:14:43,800
+specifically in Long covid
+ 
+
+667
+00:14:43,800 --> 00:14:46,230
+specifically in Long covid
+patients this may not be for everyone
+
+668
+00:14:46,230 --> 00:14:46,240
+patients this may not be for everyone
+ 
+
+669
+00:14:46,240 --> 00:14:48,150
+patients this may not be for everyone
+although notied that in this study there
+
+670
+00:14:48,150 --> 00:14:48,160
+although notied that in this study there
+ 
+
+671
+00:14:48,160 --> 00:14:51,389
+although notied that in this study there
+were very minimal side effects but it's
+
+672
+00:14:51,389 --> 00:14:51,399
+were very minimal side effects but it's
+ 
+
+673
+00:14:51,399 --> 00:14:53,350
+were very minimal side effects but it's
+something that you definitely consider
+
+674
+00:14:53,350 --> 00:14:53,360
+something that you definitely consider
+ 
+
+675
+00:14:53,360 --> 00:14:56,749
+something that you definitely consider
+doing in your life and in lifestyle and
+
+676
+00:14:56,749 --> 00:14:56,759
+doing in your life and in lifestyle and
+ 
+
+677
+00:14:56,759 --> 00:14:59,269
+doing in your life and in lifestyle and
+see if this doesn't make a benefit where
+
+678
+00:14:59,269 --> 00:14:59,279
+see if this doesn't make a benefit where
+ 
+
+679
+00:14:59,279 --> 00:15:02,509
+see if this doesn't make a benefit where
+we restrict our eating in the evening
+
+680
+00:15:02,509 --> 00:15:02,519
+we restrict our eating in the evening
+ 
+
+681
+00:15:02,519 --> 00:15:04,710
+we restrict our eating in the evening
+time and concentrate more of the intake
+
+682
+00:15:04,710 --> 00:15:04,720
+time and concentrate more of the intake
+ 
+
+683
+00:15:04,720 --> 00:15:07,230
+time and concentrate more of the intake
+of our calories in the morning time now
+
+684
+00:15:07,230 --> 00:15:07,240
+of our calories in the morning time now
+ 
+
+685
+00:15:07,240 --> 00:15:09,470
+of our calories in the morning time now
+you may notice that during the first
+
+686
+00:15:09,470 --> 00:15:09,480
+you may notice that during the first
+ 
+
+687
+00:15:09,480 --> 00:15:11,350
+you may notice that during the first
+period of this is done that you're
+
+688
+00:15:11,350 --> 00:15:11,360
+period of this is done that you're
+ 
+
+689
+00:15:11,360 --> 00:15:12,990
+period of this is done that you're
+hungry in the evening it's because your
+
+690
+00:15:12,990 --> 00:15:13,000
+hungry in the evening it's because your
+ 
+
+691
+00:15:13,000 --> 00:15:15,550
+hungry in the evening it's because your
+body is used to eating calories in the
+
+692
+00:15:15,550 --> 00:15:15,560
+body is used to eating calories in the
+ 
+
+693
+00:15:15,560 --> 00:15:17,670
+body is used to eating calories in the
+evening time but as you start to get
+
+694
+00:15:17,670 --> 00:15:17,680
+evening time but as you start to get
+ 
+
+695
+00:15:17,680 --> 00:15:20,230
+evening time but as you start to get
+used to this after about a month or two
+
+696
+00:15:20,230 --> 00:15:20,240
+used to this after about a month or two
+ 
+
+697
+00:15:20,240 --> 00:15:21,550
+used to this after about a month or two
+you will start to notice that your body
+
+698
+00:15:21,550 --> 00:15:21,560
+you will start to notice that your body
+ 
+
+699
+00:15:21,560 --> 00:15:23,389
+you will start to notice that your body
+starts to become more attuned and
+
+700
+00:15:23,389 --> 00:15:23,399
+starts to become more attuned and
+ 
+
+701
+00:15:23,399 --> 00:15:24,990
+starts to become more attuned and
+whereas you might not have been hungry
+
+702
+00:15:24,990 --> 00:15:25,000
+whereas you might not have been hungry
+ 
+
+703
+00:15:25,000 --> 00:15:26,629
+whereas you might not have been hungry
+in the morning to take those calories
+
+704
+00:15:26,629 --> 00:15:26,639
+in the morning to take those calories
+ 
+
+705
+00:15:26,639 --> 00:15:28,550
+in the morning to take those calories
+your body will be adjusted and ready for
+
+706
+00:15:28,550 --> 00:15:28,560
+your body will be adjusted and ready for
+ 
+
+707
+00:15:28,560 --> 00:15:30,430
+your body will be adjusted and ready for
+that to Happ happen and whereas you
+
+708
+00:15:30,430 --> 00:15:30,440
+that to Happ happen and whereas you
+ 
+
+709
+00:15:30,440 --> 00:15:32,269
+that to Happ happen and whereas you
+might have been hungry in the evening
+
+710
+00:15:32,269 --> 00:15:32,279
+might have been hungry in the evening
+ 
+
+711
+00:15:32,279 --> 00:15:34,430
+might have been hungry in the evening
+time expecting to have dinner when your
+
+712
+00:15:34,430 --> 00:15:34,440
+time expecting to have dinner when your
+ 
+
+713
+00:15:34,440 --> 00:15:36,150
+time expecting to have dinner when your
+body is used to the fact that it's not
+
+714
+00:15:36,150 --> 00:15:36,160
+body is used to the fact that it's not
+ 
+
+715
+00:15:36,160 --> 00:15:37,910
+body is used to the fact that it's not
+going to have dinner you won't have
+
+716
+00:15:37,910 --> 00:15:37,920
+going to have dinner you won't have
+ 
+
+717
+00:15:37,920 --> 00:15:40,910
+going to have dinner you won't have
+those symptoms so don't feel like the
+
+718
+00:15:40,910 --> 00:15:40,920
+those symptoms so don't feel like the
+ 
+
+719
+00:15:40,920 --> 00:15:44,430
+those symptoms so don't feel like the
+inability to eat or being hungry are
+
+720
+00:15:44,430 --> 00:15:44,440
+inability to eat or being hungry are
+ 
+
+721
+00:15:44,440 --> 00:15:50,639
+inability to eat or being hungry are
+reasons not to employ this technique
+

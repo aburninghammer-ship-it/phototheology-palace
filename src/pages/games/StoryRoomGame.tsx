@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -748,6 +749,7 @@ const getAllBooks = () => {
 
 export default function StoryRoomGame() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -911,10 +913,10 @@ export default function StoryRoomGame() {
 
   const handleTimeUp = () => {
     setTimerActive(false);
-    setFeedback("Time's up!");
+    setFeedback(t('games.common.timeUp'));
     toast({
-      title: "Time's Up!",
-      description: "Moving to next challenge...",
+      title: t('games.common.timeUp'),
+      description: t('games.storyRoom.movingToNext'),
       variant: "destructive",
     });
 
@@ -948,8 +950,8 @@ export default function StoryRoomGame() {
     setShowHint(true);
 
     toast({
-      title: "Hint Used",
-      description: `${hintsRemaining - 1} hints remaining`,
+      title: t('games.common.hintUsed'),
+      description: t('games.common.hintsRemaining', { count: hintsRemaining - 1 }),
     });
   };
 
@@ -1015,7 +1017,7 @@ export default function StoryRoomGame() {
       setStreak(prev => prev + 1);
       setBestStreak(prev => Math.max(prev, streak + 1));
       setCorrectAnswers(prev => prev + 1);
-      setFeedback(`Correct! +${pointsEarned} points`);
+      setFeedback(t('games.common.correctPlusPoints', { points: pointsEarned }));
 
       // Mark as completed
       const quizIdx = storyQuizzes.findIndex(q => q.story === currentQuiz.story);
@@ -1024,18 +1026,18 @@ export default function StoryRoomGame() {
       }
 
       toast({
-        title: "Correct!",
-        description: `+${pointsEarned} points. Streak: ${streak + 1}`,
+        title: t('games.common.correct'),
+        description: t('games.common.plusPointsStreak', { points: pointsEarned, streak: streak + 1 }),
       });
 
       setTimeout(() => moveToNextQuiz(), 1500);
     } else {
       setStreak(0);
-      setFeedback("Incorrect. Try again or skip to continue.");
+      setFeedback(t('games.storyRoom.incorrectTryAgain'));
 
       toast({
-        title: "Not quite right",
-        description: "Keep trying or use a hint!",
+        title: t('games.common.notQuiteRight'),
+        description: t('games.storyRoom.keepTryingOrHint'),
         variant: "destructive",
       });
     }
@@ -1103,44 +1105,44 @@ export default function StoryRoomGame() {
             <Card className="text-center">
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl">Session Complete!</CardTitle>
+                <CardTitle className="text-3xl">{t('games.common.sessionComplete')}</CardTitle>
                 <CardDescription>
-                  You've completed this round of Story Room challenges!
+                  {t('games.storyRoom.completedRound')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-primary/10 rounded-lg">
                     <div className="text-3xl font-bold text-primary">{score}</div>
-                    <div className="text-sm text-muted-foreground">Total Score</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.totalScore')}</div>
                   </div>
                   <div className="p-4 bg-green-500/10 rounded-lg">
                     <div className="text-3xl font-bold text-green-600">{accuracy}%</div>
-                    <div className="text-sm text-muted-foreground">Accuracy</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.accuracy')}</div>
                   </div>
                   <div className="p-4 bg-orange-500/10 rounded-lg">
                     <div className="text-3xl font-bold text-orange-600">{bestStreak}</div>
-                    <div className="text-sm text-muted-foreground">Best Streak</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.bestStreak')}</div>
                   </div>
                   <div className="p-4 bg-purple-500/10 rounded-lg">
                     <div className="text-3xl font-bold text-purple-600">{correctAnswers}</div>
-                    <div className="text-sm text-muted-foreground">Correct</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.correct')}</div>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-center gap-2">
-                  <Badge className={settings.color}>{settings.name}</Badge>
+                  <Badge className={settings.color}>{t(`games.common.difficulty.${difficulty}`)}</Badge>
                   <Badge variant="outline">{CHALLENGE_TYPES[challengeType].name}</Badge>
                 </div>
 
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={resetGame} variant="outline">
                     <RotateCcw className="mr-2 h-4 w-4" />
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -1165,18 +1167,18 @@ export default function StoryRoomGame() {
             className="mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Games
+            {t('games.common.backToGames')}
           </Button>
 
           <Tabs defaultValue="game" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="library" className="flex items-center gap-2">
                 <Library className="h-4 w-4" />
-                Story Library
+                {t('games.storyRoom.storyLibrary')}
               </TabsTrigger>
               <TabsTrigger value="game" className="flex items-center gap-2">
                 <Gamepad2 className="h-4 w-4" />
-                Play Game
+                {t('games.storyRoom.playGame')}
               </TabsTrigger>
             </TabsList>
 
@@ -1189,25 +1191,25 @@ export default function StoryRoomGame() {
                 <CardHeader>
                   <CardTitle className="text-3xl flex items-center gap-2">
                     <span className="text-4xl">📚</span>
-                    Story Room Challenge
+                    {t('games.storyRoom.title')}
                   </CardTitle>
                   <CardDescription>
-                    Master Bible stories through interactive challenges. Choose your difficulty and challenge type!
+                    {t('games.storyRoom.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Stats */}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>{storyQuizzes.length} total stories</span>
+                    <span>{t('games.storyRoom.totalStories', { count: storyQuizzes.length })}</span>
                     <span>•</span>
-                    <span>{completedStoryIds.size} completed this session</span>
+                    <span>{t('games.storyRoom.completedThisSession', { count: completedStoryIds.size })}</span>
                     <span>•</span>
-                    <span>{storyQuizzes.length - completedStoryIds.size} remaining</span>
+                    <span>{t('games.storyRoom.remaining', { count: storyQuizzes.length - completedStoryIds.size })}</span>
                   </div>
 
                   {/* Difficulty Selection */}
                   <div>
-                    <h3 className="font-semibold mb-3">Select Difficulty</h3>
+                    <h3 className="font-semibold mb-3">{t('games.common.selectDifficulty')}</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {(Object.keys(DIFFICULTY_SETTINGS) as Difficulty[]).map((d) => {
                         const s = DIFFICULTY_SETTINGS[d];
@@ -1225,14 +1227,14 @@ export default function StoryRoomGame() {
                               <div className={`inline-flex p-2 rounded-full ${s.color} text-white mb-2`}>
                                 {s.icon}
                               </div>
-                              <div className="font-semibold">{s.name}</div>
+                              <div className="font-semibold">{t(`games.common.difficulty.${d}`)}</div>
                               <div className="text-xs text-muted-foreground mt-1">
                                 {s.description}
                               </div>
                               <div className="text-xs mt-2 space-y-1">
-                                <div>{s.hintsAllowed} hints</div>
-                                <div>{s.timeLimit ? `${s.timeLimit}s limit` : "No timer"}</div>
-                                <div>{s.pointsMultiplier}x points</div>
+                                <div>{t('games.common.hintsCount', { count: s.hintsAllowed })}</div>
+                                <div>{s.timeLimit ? t('games.common.timeLimit', { seconds: s.timeLimit }) : t('games.common.noTimer')}</div>
+                                <div>{t('games.common.pointsMultiplier', { multiplier: s.pointsMultiplier })}</div>
                               </div>
                             </CardContent>
                           </Card>
@@ -1243,7 +1245,7 @@ export default function StoryRoomGame() {
 
                   {/* Challenge Type Selection */}
                   <div>
-                    <h3 className="font-semibold mb-3">Select Challenge Type</h3>
+                    <h3 className="font-semibold mb-3">{t('games.storyRoom.selectChallengeType')}</h3>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                       {(Object.keys(CHALLENGE_TYPES) as ChallengeType[]).map((type) => {
                         const info = CHALLENGE_TYPES[type];
@@ -1274,19 +1276,19 @@ export default function StoryRoomGame() {
 
                   <Button onClick={startGame} size="lg" className="w-full">
                     <Gamepad2 className="mr-2 h-5 w-5" />
-                    Start Challenge
+                    {t('games.storyRoom.startChallenge')}
                   </Button>
                 </CardContent>
               </Card>
 
               <Card className="bg-blue-50 dark:bg-blue-900/20">
                 <CardContent className="pt-6">
-                  <h4 className="font-semibold mb-2">💡 Story Room Tips:</h4>
+                  <h4 className="font-semibold mb-2">{t('games.storyRoom.tipsTitle')}</h4>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Stories won't repeat until you've seen them all</li>
-                    <li>• Build streaks for bonus points</li>
-                    <li>• Higher difficulties give more points but less time</li>
-                    <li>• Use hints wisely - they cost points!</li>
+                    <li>• {t('games.storyRoom.tip1')}</li>
+                    <li>• {t('games.storyRoom.tip2')}</li>
+                    <li>• {t('games.storyRoom.tip3')}</li>
+                    <li>• {t('games.storyRoom.tip4')}</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -1302,7 +1304,7 @@ export default function StoryRoomGame() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading...</h2>
+          <h2 className="text-2xl font-bold mb-4">{t('common.loading')}</h2>
         </div>
       </div>
     );
@@ -1320,7 +1322,7 @@ export default function StoryRoomGame() {
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Exit Game
+          {t('games.storyRoom.exitGame')}
         </Button>
 
         {/* Game Header */}
@@ -1349,11 +1351,11 @@ export default function StoryRoomGame() {
                 <div className="text-2xl font-bold">{score} pts</div>
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
                   <Flame className={`h-4 w-4 ${streak > 0 ? "text-orange-500" : ""}`} />
-                  Streak: {streak}
+                  {t('games.common.streak')}: {streak}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-muted-foreground">Hints: {hintsRemaining}</div>
+                <div className="text-sm text-muted-foreground">{t('games.common.hints')}: {hintsRemaining}</div>
               </div>
             </div>
 
@@ -1364,9 +1366,16 @@ export default function StoryRoomGame() {
         {/* Challenge Card */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-xl">{currentQuiz.story}</CardTitle>
-            {settings.showBookReference && (
-              <CardDescription>{currentQuiz.book}</CardDescription>
+            {/* Hide story title for "identify" challenge - that's what the player needs to guess! */}
+            {challengeType === "identify" ? (
+              <CardTitle className="text-xl">{t('games.storyRoom.whichStory')}</CardTitle>
+            ) : (
+              <>
+                <CardTitle className="text-xl">{currentQuiz.story}</CardTitle>
+                {settings.showBookReference && (
+                  <CardDescription>{currentQuiz.book}</CardDescription>
+                )}
+              </>
             )}
           </CardHeader>
           <CardContent className="space-y-6">
@@ -1374,11 +1383,11 @@ export default function StoryRoomGame() {
             {challengeType === "sequence" && (
               <>
                 <div>
-                  <h3 className="font-semibold mb-3">Your Story Sequence:</h3>
+                  <h3 className="font-semibold mb-3">{t('games.storyRoom.yourSequence')}:</h3>
                   <div className="min-h-[120px] p-4 border-2 border-dashed rounded-lg bg-muted/50">
                     {userSequence.length === 0 ? (
                       <p className="text-muted-foreground text-center py-8">
-                        Click scenes below to build your story sequence
+                        {t('games.storyRoom.clickScenes')}
                       </p>
                     ) : (
                       <div className="space-y-2">
@@ -1396,7 +1405,7 @@ export default function StoryRoomGame() {
                               size="sm"
                               onClick={() => handleRemoveScene(index)}
                             >
-                              Remove
+                              {t('games.common.remove')}
                             </Button>
                           </div>
                         ))}
@@ -1406,7 +1415,7 @@ export default function StoryRoomGame() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold mb-3">Available Scenes:</h3>
+                  <h3 className="font-semibold mb-3">{t('games.storyRoom.availableScenes')}:</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {availableScenes.map((scene) => (
                       <Button
@@ -1428,7 +1437,7 @@ export default function StoryRoomGame() {
               <>
                 {challengeType === "identify" && (
                   <div>
-                    <h3 className="font-semibold mb-3">These scenes are from which story?</h3>
+                    <h3 className="font-semibold mb-3">{t('games.storyRoom.whichStoryScenes')}</h3>
                     <div className="space-y-2 mb-4 p-4 bg-muted/50 rounded-lg">
                       {availableScenes.map((scene, idx) => (
                         <div key={idx} className="flex items-center gap-2">
@@ -1442,7 +1451,7 @@ export default function StoryRoomGame() {
 
                 {challengeType === "missing" && (
                   <div>
-                    <h3 className="font-semibold mb-3">Which scene is missing?</h3>
+                    <h3 className="font-semibold mb-3">{t('games.storyRoom.whichSceneMissing')}</h3>
                     <div className="space-y-2 mb-4 p-4 bg-muted/50 rounded-lg">
                       {availableScenes.map((scene, idx) => (
                         <div key={idx} className="flex items-center gap-2">
@@ -1458,13 +1467,13 @@ export default function StoryRoomGame() {
 
                 {challengeType === "character" && (
                   <div>
-                    <h3 className="font-semibold mb-3">Which character appears in "{currentQuiz.story}"?</h3>
+                    <h3 className="font-semibold mb-3">{t('games.storyRoom.whichCharacter', { story: currentQuiz.story })}</h3>
                   </div>
                 )}
 
                 {challengeType === "book" && (
                   <div>
-                    <h3 className="font-semibold mb-3">Which book contains "{currentQuiz.story}"?</h3>
+                    <h3 className="font-semibold mb-3">{t('games.storyRoom.whichBook', { story: currentQuiz.story })}</h3>
                   </div>
                 )}
 
@@ -1520,18 +1529,18 @@ export default function StoryRoomGame() {
                 className="flex-1"
                 size="lg"
               >
-                Check Answer
+                {t('games.common.checkAnswer')}
               </Button>
 
               {hintsRemaining > 0 && !showHint && (
                 <Button onClick={useHint} variant="outline" size="lg">
                   <HelpCircle className="mr-2 h-4 w-4" />
-                  Hint ({hintsRemaining})
+                  {t('games.common.hint')} ({hintsRemaining})
                 </Button>
               )}
 
               <Button onClick={skipQuiz} variant="ghost" size="lg">
-                Skip
+                {t('games.common.skip')}
               </Button>
             </div>
           </CardContent>
@@ -1539,9 +1548,9 @@ export default function StoryRoomGame() {
 
         <Card className="bg-blue-50 dark:bg-blue-900/20">
           <CardContent className="pt-6">
-            <h4 className="font-semibold mb-2">💡 Story Room Tip:</h4>
+            <h4 className="font-semibold mb-2">{t('games.storyRoom.tipTitle')}</h4>
             <p className="text-sm text-muted-foreground">
-              The Story Room trains you to memorize Bible stories as vivid mental movies. Each scene becomes a frame you can recall in order. This is the foundation for all other Palace methods!
+              {t('games.storyRoom.tipContent')}
             </p>
           </CardContent>
         </Card>
