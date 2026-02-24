@@ -85,11 +85,13 @@ export const TagFriendButton = ({
 
     setSearching(true);
     try {
-      // Get all profiles except current user
+      // Get all profiles except current user - only include users with display names
       const { data, error } = await supabase
         .from("profiles")
         .select("id, display_name")
         .neq("id", user.id)
+        .not("display_name", "is", null)
+        .neq("display_name", "")
         .limit(100);
 
       if (error) throw error;
