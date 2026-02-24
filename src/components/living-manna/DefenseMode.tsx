@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
@@ -57,6 +58,19 @@ interface ArsenalWeapon {
   topic: string;
   savedAt: string;
   imageUrl?: string;
+}
+
+interface SavedDebate {
+  id: string;
+  title?: string;
+  opponent_id: string;
+  opponent_name: string;
+  topic_id?: string;
+  topic_name?: string;
+  difficulty: string;
+  round_count: number;
+  messages: ChatMessage[];
+  saved_at: string;
 }
 
 export function DefenseMode({ churchId }: DefenseModeProps) {
@@ -101,6 +115,13 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   // Arsenal state (DB-backed for cross-device sync)
   const [arsenal, setArsenal] = useState<ArsenalWeapon[]>([]);
   const [arsenalLoading, setArsenalLoading] = useState(false);
+
+  // Saved Debates state (DB-backed for cross-device sync)
+  const [savedDebates, setSavedDebates] = useState<SavedDebate[]>([]);
+  const [debatesLoading, setDebatesLoading] = useState(false);
+  const [showSaveDebateDialog, setShowSaveDebateDialog] = useState(false);
+  const [showLoadDebatesDialog, setShowLoadDebatesDialog] = useState(false);
+  const [debateTitle, setDebateTitle] = useState("");
 
   // Load arsenal from DB
   const loadArsenal = useCallback(async () => {
@@ -166,6 +187,13 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     };
     migrateLocalArsenal().then(() => loadArsenal());
   }, [loadArsenal, user]);
+
+  // Load saved debates on mount
+  useEffect(() => {
+    if (user) {
+      loadSavedDebates();
+    }
+  }, [loadSavedDebates, user]);
 
   // Auto-generate images for weapons that don't have one yet
   useEffect(() => {
@@ -383,6 +411,87 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       }
     } catch (e) {
       console.error("Failed to rename weapon:", e);
+    }
+  };
+
+  // Load saved debates from DB
+  const loadSavedDebates = useCallback(async () => {
+    if (!user) return;
+    setDebatesLoading(true);
+    try {
+      const { data, error } = await (supabase as any)
+        .from("defense_debates")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("saved_at", { ascending: false });
+      if (error) throw error;
+      setSavedDebates((data || []).map((d: any) => ({
+        id: d.id,
+        title: d.title,
+        opponent_id: d.opponent_id,
+        opponent_name: d.opponent_name,
+        topic_id: d.topic_id,
+        topic_name: d.topic_name,
+        difficulty: d.difficulty,
+        round_count: d.round_count,
+        messages: d.messages,
+        saved_at: d.saved_at,
+      })));
+    } catch (e) {
+      console.error("Failed to load debates:", e);
+    } finally {
+      setDebatesLoading(false);
+    }
+  }, [user]);
+
+  // Save current debate to DB
+  const saveDebate = async (title?: string) => {
+    if (!user || !selectedOpponent || messages.length === 0) return;
+    try {
+      const { error } = await (supabase as any).from("defense_debates").insert({
+        user_id: user.id,
+        title: title || null,
+        opponent_id: selectedOpponent.id,
+        opponent_name: selectedOpponent.name,
+        topic_id: selectedTopic?.id || null,
+        topic_name: selectedTopic?.name || null,
+        difficulty: selectedDifficulty,
+        round_count: roundCount,
+        messages: messages,
+        saved_at: new Date().toISOString(),
+      });
+      if (error) throw error;
+      await loadSavedDebates();
+      setShowSaveDebateDialog(false);
+      setDebateTitle("");
+    } catch (e) {
+      console.error("Failed to save debate:", e);
+    }
+  };
+
+  // Load a saved debate back into the UI
+  const loadDebate = (debate: SavedDebate) => {
+    const opponent = DEFENSE_OPPONENTS.find(o => o.id === debate.opponent_id);
+    const topic = DEFENSE_TOPICS.find(t => t.id === debate.topic_id);
+
+    if (opponent) {
+      setSelectedOpponent(opponent);
+      setSelectedTopic(topic || null);
+      setSelectedDifficulty(debate.difficulty);
+      setRoundCount(debate.round_count);
+      setMessages(debate.messages);
+      setPhase("sparring");
+      setSubMode("sparring");
+    }
+  };
+
+  // Delete a saved debate
+  const deleteDebate = async (debateId: string) => {
+    try {
+      await (supabase as any).from("defense_debates").delete().eq("id", debateId);
+      setSavedDebates((prev) => prev.filter((d) => d.id !== debateId));
+    } catch (e) {
+      console.error("Failed to delete debate:", e);
     }
   };
 
@@ -1535,6 +1644,21 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         ) : (
         <>
 
+        {/* Saved Debates Button */}
+        {savedDebates.length > 0 && (
+          <div className="flex justify-end mb-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowLoadDebatesDialog(true)}
+              className="border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <Archive className="h-4 w-4 mr-2" />
+              Load Saved Debate ({savedDebates.length})
+            </Button>
+          </div>
+        )}
+
         {/* Opponent Grid */}
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
@@ -1836,6 +1960,16 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           >
             {audioMode ? <Volume2 className="h-4 w-4" /> : <Volume2 className="h-4 w-4 opacity-40" />}
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowSaveDebateDialog(true)}
+            disabled={messages.length === 0}
+            title="Save this debate"
+          >
+            <Save className="h-4 w-4 mr-1" />
+            Save
+          </Button>
           <Button variant="ghost" size="sm" onClick={resetMatch}>
             <RotateCcw className="h-4 w-4 mr-1" />
             New Match
@@ -2053,6 +2187,118 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </div>
         </motion.div>
       )}
+
+      {/* Save Debate Dialog */}
+      <Dialog open={showSaveDebateDialog} onOpenChange={setShowSaveDebateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save This Debate</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="debate-title">Title (Optional)</Label>
+              <Textarea
+                id="debate-title"
+                placeholder="e.g., 'Debating Sunday Law with Evangelical'"
+                value={debateTitle}
+                onChange={(e) => setDebateTitle(e.target.value)}
+                className="min-h-[60px]"
+              />
+            </div>
+            <div className="text-sm text-muted-foreground">
+              <p><strong>Opponent:</strong> {selectedOpponent?.name}</p>
+              <p><strong>Topic:</strong> {selectedTopic?.name || "Blind Engagement"}</p>
+              <p><strong>Rounds:</strong> {roundCount}</p>
+              <p><strong>Messages:</strong> {messages.length}</p>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setShowSaveDebateDialog(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => saveDebate(debateTitle || undefined)}
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save Debate
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Load Saved Debates Dialog */}
+      <Dialog open={showLoadDebatesDialog} onOpenChange={setShowLoadDebatesDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Saved Debates</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-3 pr-4">
+              {debatesLoading ? (
+                <div className="py-8 flex justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : savedDebates.length === 0 ? (
+                <div className="py-8 text-center text-muted-foreground">
+                  <Archive className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm">No saved debates yet</p>
+                  <p className="text-xs">Save your sparring sessions to review later</p>
+                </div>
+              ) : (
+                savedDebates.map((debate) => (
+                  <Card key={debate.id} variant="glass" className="border-primary/20">
+                    <CardContent className="p-4">
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-sm truncate">
+                              {debate.title || `${debate.opponent_name} - ${debate.topic_name || "Blind"}`}
+                            </h4>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(debate.saved_at).toLocaleDateString()} • {debate.opponent_name} • {debate.topic_name || "Blind Engagement"}
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="text-xs shrink-0">
+                            {debate.difficulty}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span>{debate.round_count} rounds</span>
+                          <span>•</span>
+                          <span>{debate.messages.length} messages</span>
+                        </div>
+                        <div className="flex gap-2 mt-3">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 border-primary/30 text-primary hover:bg-primary/10"
+                            onClick={() => {
+                              loadDebate(debate);
+                              setShowLoadDebatesDialog(false);
+                            }}
+                          >
+                            <ArrowRight className="h-3.5 w-3.5 mr-1" />
+                            Load
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                            onClick={() => deleteDebate(debate.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

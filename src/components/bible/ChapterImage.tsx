@@ -41,9 +41,11 @@ export const ChapterImage = ({ book, chapter, chapterText }: ChapterImageProps) 
 
       if (data?.image_url) {
         setImageUrl(data.image_url);
+      } else {
+        // Auto-generate image if none exists
+        // This runs once per chapter when first viewed
+        generateImage();
       }
-      // Note: Auto-generation removed to prevent API quota issues
-      // User can manually generate by clicking a button if desired
     } catch (error) {
       console.error("Error loading chapter image:", error);
     }

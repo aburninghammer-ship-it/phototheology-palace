@@ -10,12 +10,15 @@ export interface COTAParagraph {
   paragraphNumber: number;
   egwText: string;
 
-  // Scripture Commentary Layer
-  scriptureRefs: string[];
-  scriptureCommentary: string;
+  // Paragraph type: theological analysis vs pure historical narrative
+  paragraphType?: "theological" | "historical";
 
-  // PT Principle Funnel Layer
-  ptPrinciples: {
+  // Scripture Commentary Layer (Optional for historical paragraphs)
+  scriptureRefs?: string[];
+  scriptureCommentary?: string;
+
+  // PT Principle Funnel Layer (Optional for historical paragraphs)
+  ptPrinciples?: {
     principle: string;
     explanation: string;
     application: string;
@@ -24,8 +27,8 @@ export interface COTAParagraph {
   // Great Controversy Conflict Tag (SIGNATURE FEATURE)
   gcConflictTag: GCConflictTag;
 
-  // Doctrinal Extraction Layer
-  doctrinesPresent: string[];
+  // Doctrinal Extraction Layer (Optional for pure narrative)
+  doctrinesPresent?: string[];
 
   // Historical Context Layer (Phase 2)
   historicalContext?: {
@@ -265,6 +268,89 @@ export const SAMPLE_COTA_PARAGRAPHS: COTAParagraph[] = [
             "SDAs unfairly demonize the Catholic Church. The papacy has been a force for good (hospitals, education, charity).",
           defense:
             "Condemning a system is not condemning individual Catholics. Revelation 18:4 ('come out of her, my people') implies God's people are in Babylon. The issue is the system's claim to change God's law (Dan 7:25) and enforce worship through state power.",
+        },
+      ],
+    },
+  },
+
+  // Example of a HISTORICAL paragraph (no forced Scripture connections or PT principles)
+  {
+    id: "gc-07-luther-birth-001",
+    book: "great_controversy",
+    chapter: 7,
+    paragraphNumber: 3,
+    paragraphType: "historical",
+    egwText:
+      "Luther's parents, while untiring in labor and exposed to hardship and privation, were of strong and hopeful temperament, of sterling character and deep piety. They trained their children in the fear of God and in strict obedience. The father sometimes made use of severity; yet the children found their chief happiness in making their way from the schoolroom to the fields and the forest.",
+
+    // No Scripture refs or commentary for pure historical narrative
+    // No PT Principles - this is biographical detail
+
+    gcConflictTag: {
+      axis: "Light vs Darkness",
+      battlefield: ["Mind", "Church"],
+
+      satanStrategy:
+        "Prevent God's chosen instrument (Luther) from ever being equipped for the Reformation. Attack through poverty, harsh discipline, fear-based religion, and discouragement in childhood to break his spirit before he can challenge Rome.",
+
+      godCounterStrategy:
+        "Providentially place Luther in a home of 'sterling character and deep piety' despite poverty. Use discipline to build resilience, not crush spirit. Balance hardship with hope ('hopeful temperament'). The very strictness that could have broken him becomes the backbone for standing before emperors.",
+
+      deceptionType: ["Gradual Compromise", "Confusion & Division"],
+
+      outcome: ["Light Preserved"],
+
+      propheticWeight: 7,
+
+      historicalPeriod: "1483 — Luther's birth and childhood in Eisleben/Mansfeld, Germany",
+
+      prophecyConnection:
+        "God preparing His instrument for the Reformation. Like Moses (raised in Pharaoh's court to later confront Pharaoh), Luther's upbringing — both hardship and piety — equipped him for the cosmic confrontation with papal Rome.",
+
+      modernParallel:
+        "God still uses difficult childhoods and strict upbringings to forge character. What Satan means for discouragement, God uses for steel. The generation most wounded by harshness may become the generation most equipped to stand against compromise.",
+
+      defenseRelevance: [
+        {
+          opponent: "atheist",
+          attackVector: "Luther's 'deep piety' was just medieval superstition. Religion was a crutch for poor, uneducated miners.",
+          defenseWeapon:
+            "Luther's parents combined rigorous work ethic with genuine faith — not escapism but integration. Their piety didn't make them passive; it made them resilient. Atheism cannot account for how this miner's son changed Western civilization.",
+        },
+        {
+          opponent: "catholic",
+          attackVector: "Luther's harsh upbringing and fear-based religion warped his theology. A balanced Catholic upbringing would have kept him from rebellion.",
+          defenseWeapon:
+            "Luther's parents were Catholic! The harshness and fear came from late medieval Catholicism's emphasis on purgatory, penance, and works. His reformation was precisely a response to that toxic environment, not a result of it.",
+        },
+      ],
+    },
+
+    // Doctrines are minimal for historical paragraphs - just context
+    doctrinesPresent: ["Providence", "Character Development"],
+
+    historicalContext: {
+      dateOfEvents: "1483-1490s (Luther's childhood)",
+      politicalPowers: ["Holy Roman Empire", "Saxony"],
+      religiousClimate: "Late medieval Catholic Europe — fear of purgatory, works-based salvation, indulgence system dominant",
+      propheticTimeline: "Pre-Reformation (Papal supremacy unchallenged, 1260-year prophecy still in progress)",
+    },
+
+    // Defense Mode Integration
+    apologeticsImplications: {
+      doctrine: "Providence in biographical detail",
+      likelyAttacks: [
+        {
+          opponent: "Former SDA",
+          attack: "Why does Ellen White spend paragraphs on Luther's childhood? This is hagiography, not theology.",
+          defense:
+            "Scripture itself includes biographical detail (Moses, David, Paul). God works through history and biography. Understanding Luther's formation helps us see God's hand in the Reformation — not hero worship, but providence.",
+        },
+        {
+          opponent: "Catholic",
+          attack: "Ellen White romanticizes Luther's upbringing to make him a hero. His parents were strict, fearful Catholics — hardly models of 'deep piety.'",
+          defense:
+            "Ellen White doesn't ignore the harshness ('severity'). She's highlighting that despite the system's errors, genuine faith existed in homes. Luther's parents' piety was real, even if their theology was incomplete. This shows God works through flawed systems to preserve light.",
         },
       ],
     },

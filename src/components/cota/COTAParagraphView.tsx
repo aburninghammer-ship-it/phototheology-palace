@@ -30,111 +30,148 @@ export function COTAParagraphView({ paragraph }: COTAParagraphViewProps) {
       {/* GC Conflict Tag - SIGNATURE FEATURE */}
       <GCConflictTag tag={paragraph.gcConflictTag} defaultExpanded={false} />
 
-      {/* Layered Commentary Tabs */}
-      <Tabs defaultValue="scripture" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="scripture" className="text-xs">
-            <BookOpen className="h-3 w-3 mr-1" />
-            Scripture
-          </TabsTrigger>
-          <TabsTrigger value="pt" className="text-xs">
-            <Sparkles className="h-3 w-3 mr-1" />
-            PT Principles
-          </TabsTrigger>
-          <TabsTrigger value="doctrine" className="text-xs">
-            <Target className="h-3 w-3 mr-1" />
-            Doctrines
-          </TabsTrigger>
-          <TabsTrigger value="defense" className="text-xs">
-            <Shield className="h-3 w-3 mr-1" />
-            Defense
-          </TabsTrigger>
-        </TabsList>
+      {/* Layered Commentary Tabs - Conditional based on paragraph type */}
+      {/* Only show Scripture/PT/Doctrine tabs for theological paragraphs */}
+      {paragraph.paragraphType !== "historical" && (paragraph.scriptureRefs || paragraph.ptPrinciples || paragraph.doctrinesPresent) && (
+        <Tabs defaultValue={paragraph.scriptureRefs ? "scripture" : paragraph.ptPrinciples ? "pt" : "doctrine"} className="w-full">
+          <TabsList className={`grid w-full ${
+            [
+              paragraph.scriptureRefs,
+              paragraph.ptPrinciples,
+              paragraph.doctrinesPresent,
+              paragraph.apologeticsImplications
+            ].filter(Boolean).length === 4 ? 'grid-cols-4' :
+            [
+              paragraph.scriptureRefs,
+              paragraph.ptPrinciples,
+              paragraph.doctrinesPresent,
+              paragraph.apologeticsImplications
+            ].filter(Boolean).length === 3 ? 'grid-cols-3' :
+            [
+              paragraph.scriptureRefs,
+              paragraph.ptPrinciples,
+              paragraph.doctrinesPresent,
+              paragraph.apologeticsImplications
+            ].filter(Boolean).length === 2 ? 'grid-cols-2' : 'grid-cols-1'
+          }`}>
+            {paragraph.scriptureRefs && (
+              <TabsTrigger value="scripture" className="text-xs">
+                <BookOpen className="h-3 w-3 mr-1" />
+                Scripture
+              </TabsTrigger>
+            )}
+            {paragraph.ptPrinciples && (
+              <TabsTrigger value="pt" className="text-xs">
+                <Sparkles className="h-3 w-3 mr-1" />
+                PT Principles
+              </TabsTrigger>
+            )}
+            {paragraph.doctrinesPresent && (
+              <TabsTrigger value="doctrine" className="text-xs">
+                <Target className="h-3 w-3 mr-1" />
+                Doctrines
+              </TabsTrigger>
+            )}
+            {paragraph.apologeticsImplications && (
+              <TabsTrigger value="defense" className="text-xs">
+                <Shield className="h-3 w-3 mr-1" />
+                Defense
+              </TabsTrigger>
+            )}
+          </TabsList>
 
         {/* Scripture Commentary */}
-        <TabsContent value="scripture" className="mt-4">
-          <Card className="bg-blue-950/20 border-blue-500/30">
-            <CardContent className="p-4 space-y-3">
-              <h4 className="font-semibold text-blue-300 flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                Scripture Commentary
-              </h4>
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {paragraph.scriptureRefs.map((ref) => (
-                  <Badge key={ref} variant="outline" className="border-blue-500/50 text-blue-300 text-xs">
-                    {ref}
-                  </Badge>
-                ))}
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {paragraph.scriptureCommentary}
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {paragraph.scriptureRefs && (
+          <TabsContent value="scripture" className="mt-4">
+            <Card className="bg-blue-950/20 border-blue-500/30">
+              <CardContent className="p-4 space-y-3">
+                <h4 className="font-semibold text-blue-300 flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Scripture Commentary
+                </h4>
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {paragraph.scriptureRefs.map((ref) => (
+                    <Badge key={ref} variant="outline" className="border-blue-500/50 text-blue-300 text-xs">
+                      {ref}
+                    </Badge>
+                  ))}
+                </div>
+                {paragraph.scriptureCommentary && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {paragraph.scriptureCommentary}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
 
         {/* PT Principles */}
-        <TabsContent value="pt" className="mt-4">
-          <div className="space-y-3">
-            {paragraph.ptPrinciples.map((principle, idx) => (
-              <Card key={idx} className="bg-purple-950/20 border-purple-500/30">
-                <CardContent className="p-4 space-y-2">
-                  <h5 className="font-semibold text-purple-300 text-sm flex items-center gap-2">
-                    <Sparkles className="h-3 w-3" />
-                    {principle.principle}
-                  </h5>
-                  <div className="space-y-2 text-xs text-muted-foreground">
-                    <div>
-                      <span className="font-medium text-purple-400">Explanation:</span>
-                      <p className="mt-1">{principle.explanation}</p>
+        {paragraph.ptPrinciples && paragraph.ptPrinciples.length > 0 && (
+          <TabsContent value="pt" className="mt-4">
+            <div className="space-y-3">
+              {paragraph.ptPrinciples.map((principle, idx) => (
+                <Card key={idx} className="bg-purple-950/20 border-purple-500/30">
+                  <CardContent className="p-4 space-y-2">
+                    <h5 className="font-semibold text-purple-300 text-sm flex items-center gap-2">
+                      <Sparkles className="h-3 w-3" />
+                      {principle.principle}
+                    </h5>
+                    <div className="space-y-2 text-xs text-muted-foreground">
+                      <div>
+                        <span className="font-medium text-purple-400">Explanation:</span>
+                        <p className="mt-1">{principle.explanation}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-purple-400">Application:</span>
+                        <p className="mt-1">{principle.application}</p>
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-medium text-purple-400">Application:</span>
-                      <p className="mt-1">{principle.application}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        )}
 
         {/* Doctrinal Extraction */}
-        <TabsContent value="doctrine" className="mt-4">
-          <Card className="bg-amber-950/20 border-amber-500/30">
-            <CardContent className="p-4 space-y-3">
-              <h4 className="font-semibold text-amber-300 flex items-center gap-2">
-                <Target className="h-4 w-4" />
-                Doctrines Present in This Paragraph
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {paragraph.doctrinesPresent.map((doctrine) => (
-                  <Badge
-                    key={doctrine}
-                    className="bg-amber-900/40 text-amber-200 border-amber-500/50"
-                  >
-                    {doctrine}
-                  </Badge>
-                ))}
-              </div>
-              {paragraph.historicalContext && (
-                <div className="mt-4 space-y-2 text-xs">
-                  <div className="font-semibold text-amber-300">Historical Context</div>
-                  <div className="space-y-1 text-muted-foreground">
-                    <p><span className="text-amber-400">Period:</span> {paragraph.historicalContext.dateOfEvents}</p>
-                    <p><span className="text-amber-400">Powers:</span> {paragraph.historicalContext.politicalPowers.join(", ")}</p>
-                    <p><span className="text-amber-400">Climate:</span> {paragraph.historicalContext.religiousClimate}</p>
-                    <p><span className="text-amber-400">Timeline:</span> {paragraph.historicalContext.propheticTimeline}</p>
-                  </div>
+        {paragraph.doctrinesPresent && paragraph.doctrinesPresent.length > 0 && (
+          <TabsContent value="doctrine" className="mt-4">
+            <Card className="bg-amber-950/20 border-amber-500/30">
+              <CardContent className="p-4 space-y-3">
+                <h4 className="font-semibold text-amber-300 flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Doctrines Present in This Paragraph
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {paragraph.doctrinesPresent.map((doctrine) => (
+                    <Badge
+                      key={doctrine}
+                      className="bg-amber-900/40 text-amber-200 border-amber-500/50"
+                    >
+                      {doctrine}
+                    </Badge>
+                  ))}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                {paragraph.historicalContext && (
+                  <div className="mt-4 space-y-2 text-xs">
+                    <div className="font-semibold text-amber-300">Historical Context</div>
+                    <div className="space-y-1 text-muted-foreground">
+                      <p><span className="text-amber-400">Period:</span> {paragraph.historicalContext.dateOfEvents}</p>
+                      <p><span className="text-amber-400">Powers:</span> {paragraph.historicalContext.politicalPowers.join(", ")}</p>
+                      <p><span className="text-amber-400">Climate:</span> {paragraph.historicalContext.religiousClimate}</p>
+                      <p><span className="text-amber-400">Timeline:</span> {paragraph.historicalContext.propheticTimeline}</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
 
         {/* Apologetics / Defense Mode */}
-        <TabsContent value="defense" className="mt-4">
-          {paragraph.apologeticsImplications && (
+        {paragraph.apologeticsImplications && (
+          <TabsContent value="defense" className="mt-4">
             <Card className="bg-red-950/20 border-red-500/30">
               <CardContent className="p-4 space-y-3">
                 <h4 className="font-semibold text-red-300 flex items-center gap-2">
@@ -162,9 +199,10 @@ export function COTAParagraphView({ paragraph }: COTAParagraphViewProps) {
                 </div>
               </CardContent>
             </Card>
-          )}
-        </TabsContent>
+          </TabsContent>
+        )}
       </Tabs>
+      )}
     </div>
   );
 }

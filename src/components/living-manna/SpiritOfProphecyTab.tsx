@@ -1389,8 +1389,9 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
 
         {/* ─── ANALYZE TAB ────────────────────────────────────────── */}
         <TabsContent value="analyze" className="mt-4">
-          <ScrollArea className="h-[65vh]">
-            <div className="space-y-4 pr-4">
+          <div className="h-[65vh] overflow-hidden rounded-lg">
+            <ScrollArea className="h-full">
+              <div className="space-y-4 pr-4">
               <div className="flex justify-end">
                 <Button
                   onClick={generateFullAnalysis}
@@ -1477,6 +1478,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
               </div>
             </div>
           </ScrollArea>
+          </div>
         </TabsContent>
       </Tabs>
 
