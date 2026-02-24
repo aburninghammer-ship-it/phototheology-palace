@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
+import { analyzeBatchUsers } from "@/utils/userActivityAnalyzer";
 import {
   Trophy, Shield, Swords, Users, Crown, Target, Loader2,
   ChevronRight, ArrowLeft, Zap, Flame, BookOpen, Warehouse,
@@ -179,17 +180,31 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const handleRunDraft = async () => {
     if (!activeSeason) return;
     setDraftLoading(true);
-    const participants = teamMembers.length > 0
-      ? teamMembers.map((m) => ({
-          userId: m.user_id,
-          displayName: m.display_name || "Warrior",
-          strengths: "General apologetics",
-        }))
-      : [{ userId: user?.id || "", displayName: "You", strengths: "General apologetics" }];
 
-    const result = await runDraft(activeSeason.id, participants, 3);
-    setDraftResult(result);
-    setDraftLoading(false);
+    try {
+      // Analyze user activity to determine real strengths
+      const userIds = teamMembers.length > 0
+        ? teamMembers.map((m) => m.user_id)
+        : [user?.id || ""];
+
+      const userAnalyses = await analyzeBatchUsers(userIds);
+
+      const participants = userAnalyses.map((analysis) => ({
+        userId: analysis.userId,
+        displayName: analysis.displayName,
+        strengths: analysis.strengthDescription,
+        skillLevel: analysis.skillLevel,
+        topicStrengths: analysis.topicStrengths,
+        metrics: analysis.activityMetrics,
+      }));
+
+      const result = await runDraft(activeSeason.id, participants, 3);
+      setDraftResult(result);
+    } catch (error) {
+      console.error("Draft error:", error);
+    } finally {
+      setDraftLoading(false);
+    }
   };
 
   // ── START BATTLE ─────────────────────────────────────
