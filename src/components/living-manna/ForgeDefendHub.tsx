@@ -448,7 +448,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               {/* Draft narrative */}
               <Card className="bg-black/20 border-amber-500/30">
                 <CardContent className="p-4">
-                  <ReactMarkdown className="prose prose-sm prose-invert max-w-none text-amber-100">
+                  <ReactMarkdown>
                     {draftResult.draftNarrative}
                   </ReactMarkdown>
                 </CardContent>
@@ -737,7 +737,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                           : "bg-amber-900/30 border border-amber-500/30 text-amber-100"
                       }`}>
                         <div className="text-xs font-semibold mb-1 opacity-70">{msg.speaker}</div>
-                        <ReactMarkdown className="prose prose-sm prose-invert max-w-none">
+                        <ReactMarkdown>
                           {msg.content}
                         </ReactMarkdown>
                       </div>

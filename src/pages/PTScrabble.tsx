@@ -105,7 +105,7 @@ export default function PTScrabble() {
 
     // Sync seed verse from DB for non-host players
     if (mpGame.seedVerse && !seedVerse) {
-      setSeedVerse({ reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text });
+      setSeedVerse({ reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text, book: '', chapter: 0, verseStart: 0 });
     }
 
     // Only auto-navigate if we're on the menu
@@ -122,7 +122,7 @@ export default function PTScrabble() {
     // Non-host: auto-transition from lobby to playing when host starts game
     if (gamePhase === 'multiplayer-lobby' && mpGame.status === 'playing') {
       if (mpGame.seedVerse) {
-        setSeedVerse({ reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text });
+        setSeedVerse({ reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text, book: '', chapter: 0, verseStart: 0 });
       }
       setGamePhaseInternal('multiplayer-playing');
     }
