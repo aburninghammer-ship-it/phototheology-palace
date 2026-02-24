@@ -62,6 +62,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const [battleSetupTopic, setBattleSetupTopic] = useState<string | null>(null);
   const [battleSetupMode, setBattleSetupMode] = useState<"offense" | "defense">("defense");
   const [battleSetupOpponent, setBattleSetupOpponent] = useState<"user" | "jeeves">("user");
+  const [battleSetupOpponentId, setBattleSetupOpponentId] = useState<string | null>(null);
 
   // Auto-detect view based on season status
   useEffect(() => {
@@ -599,45 +600,45 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
             </CardContent>
           </Card>
 
-          {/* Step 3: User vs Jeeves */}
+          {/* Step 3: Select Opponent */}
           <Card className="bg-black/20 border-amber-500/30">
             <CardContent className="p-5 space-y-3">
               <h4 className="font-semibold text-amber-300 flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Step 3: Choose Opponent Type
+                <Target className="h-4 w-4" />
+                Step 3: Select Your Opponent
               </h4>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  variant={battleSetupOpponent === "user" ? "default" : "outline"}
-                  onClick={() => setBattleSetupOpponent("user")}
-                  className={battleSetupOpponent === "user" ? "bg-gradient-to-r from-amber-600 to-orange-600 h-20 flex-col" : "border-amber-500/30 h-20 flex-col"}
-                >
-                  <Users className="h-6 w-6 mb-2" />
-                  <span className="font-semibold">Team Battle</span>
-                  <span className="text-xs opacity-70">Your team vs Enemy</span>
-                </Button>
-                <Button
-                  variant={battleSetupOpponent === "jeeves" ? "default" : "outline"}
-                  onClick={() => setBattleSetupOpponent("jeeves")}
-                  className={battleSetupOpponent === "jeeves" ? "bg-gradient-to-r from-purple-600 to-pink-600 h-20 flex-col" : "border-purple-500/30 h-20 flex-col"}
-                >
-                  <Bot className="h-6 w-6 mb-2" />
-                  <span className="font-semibold">Jeeves Assists</span>
-                  <span className="text-xs opacity-70">AI helps your team</span>
-                </Button>
+              <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                {DEFENSE_OPPONENTS.slice(0, 8).map((opponent) => (
+                  <Button
+                    key={opponent.id}
+                    variant={battleSetupOpponentId === opponent.id ? "default" : "outline"}
+                    onClick={() => setBattleSetupOpponentId(opponent.id)}
+                    className={`h-auto py-3 flex-col items-start text-left ${
+                      battleSetupOpponentId === opponent.id
+                        ? "bg-gradient-to-r from-amber-600 to-red-600"
+                        : "border-amber-500/30"
+                    }`}
+                  >
+                    <span className="font-semibold text-sm">{opponent.name}</span>
+                    <span className="text-xs opacity-70 line-clamp-2">{opponent.worldview}</span>
+                  </Button>
+                ))}
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                {battleSetupOpponent === "user"
-                  ? "Your team responds directly to challenges"
-                  : "Jeeves provides strategic guidance during battle"}
+                {battleSetupOpponentId
+                  ? `Facing: ${DEFENSE_OPPONENTS.find(o => o.id === battleSetupOpponentId)?.name}`
+                  : "Choose who you'll debate against"}
               </p>
             </CardContent>
           </Card>
 
           {/* Start Battle Button */}
           <Button
-            onClick={() => setView("battle")}
-            disabled={!battleSetupTopic}
+            onClick={() => {
+              if (!battleSetupTopic || !battleSetupOpponentId) return;
+              handleStartBattle(battleSetupTopic, battleSetupOpponentId, false);
+            }}
+            disabled={!battleSetupTopic || !battleSetupOpponentId}
             className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 h-14 text-lg"
           >
             {!battleSetupTopic ? (
@@ -645,10 +646,17 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                 <AlertTriangle className="h-5 w-5 mr-2" />
                 Choose a Topic First
               </>
+            ) : !battleSetupOpponentId ? (
+              <>
+                <AlertTriangle className="h-5 w-5 mr-2" />
+                Choose an Opponent
+              </>
             ) : (
               <>
                 <Flame className="h-5 w-5 mr-2" />
                 Begin Battle: {DEFENSE_TOPICS.find(t => t.id === battleSetupTopic)?.name}
+                {" vs "}
+                {DEFENSE_OPPONENTS.find(o => o.id === battleSetupOpponentId)?.name}
               </>
             )}
           </Button>
