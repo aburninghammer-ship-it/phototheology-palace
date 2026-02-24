@@ -6,10 +6,11 @@ type MusicRequestListener = (action: 'start' | 'stop') => void;
 let listeners = new Set<MusicRequestListener>();
 
 // Whether music should auto-start with commentary (persisted)
-let autoMusicEnabled = true;
+// Default is FALSE - user must manually enable if they want auto-music
+let autoMusicEnabled = false;
 if (typeof window !== 'undefined') {
   const stored = localStorage.getItem('pt-commentary-music-auto');
-  autoMusicEnabled = stored !== 'false'; // default true
+  autoMusicEnabled = stored === 'true'; // default false, only enabled if explicitly set to 'true'
 }
 
 let autoMusicListeners = new Set<(enabled: boolean) => void>();
