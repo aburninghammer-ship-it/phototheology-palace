@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { StyledMarkdown } from "@/components/ui/styled-markdown";
 import { useTextToSpeechEnhanced, OPENAI_VOICES } from "@/hooks/useTextToSpeechEnhanced";
 import type { VoiceId } from "@/hooks/useTextToSpeechEnhanced";
+import { DefenseMode } from "./DefenseMode";
 
 // ─── EGW Book Library ───────────────────────────────────────────────
 interface EGWBook {
@@ -454,7 +455,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   // Reader state
   const [chapterParagraphs, setChapterParagraphs] = useState<string[]>([]);
   const [loadingChapter, setLoadingChapter] = useState(false);
-  const [chapterTab, setChapterTab] = useState<"read" | "analyze" | "listen">("read");
+  const [chapterTab, setChapterTab] = useState<"read" | "analyze" | "listen" | "defense">("read");
   const [selectedParagraph, setSelectedParagraph] = useState<string | null>(null);
   const [paragraphAnalysis, setParagraphAnalysis] = useState<string | null>(null);
   const [analyzingParagraph, setAnalyzingParagraph] = useState(false);
@@ -964,9 +965,9 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
         </CardHeader>
       </Card>
 
-      {/* Read / Analyze Tabs */}
-      <Tabs value={chapterTab} onValueChange={(v) => setChapterTab(v as "read" | "analyze" | "listen")}>
-        <TabsList className="w-full grid grid-cols-3">
+      {/* Read / Analyze / Listen / Defense Tabs */}
+      <Tabs value={chapterTab} onValueChange={(v) => setChapterTab(v as "read" | "analyze" | "listen" | "defense")}>
+        <TabsList className="w-full grid grid-cols-4">
           <TabsTrigger value="read" className="gap-2">
             <BookText className="h-4 w-4" />
             Read
@@ -978,6 +979,10 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
           <TabsTrigger value="analyze" className="gap-2">
             <Telescope className="h-4 w-4" />
             Analyze
+          </TabsTrigger>
+          <TabsTrigger value="defense" className="gap-2">
+            <Shield className="h-4 w-4" />
+            Defense
           </TabsTrigger>
         </TabsList>
 
@@ -1477,6 +1482,22 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
               </div>
             </div>
           </ScrollArea>
+        </TabsContent>
+
+        {/* ─── DEFENSE MODE TAB ───────────────────────────────────── */}
+        <TabsContent value="defense" className="mt-4">
+          {churchId ? (
+            <DefenseMode churchId={churchId} />
+          ) : (
+            <Card variant="glass">
+              <CardContent className="py-12 text-center">
+                <Shield className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                <p className="text-muted-foreground">
+                  Defense Mode requires a church context. Please access this from your Living Manna Space.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
 
