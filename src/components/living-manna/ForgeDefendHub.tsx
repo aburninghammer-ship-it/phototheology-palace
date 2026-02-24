@@ -700,6 +700,97 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               )}
             </CardContent>
           </Card>
+
+          {/* Season Roadmap - Mystery Veil for Future Weeks */}
+          <Card className="bg-black/20 border-violet-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-violet-300 flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Season Journey
+              </h4>
+              <div className="space-y-2">
+                {DIFFICULTY_TIERS.map((tier, tierIdx) => {
+                  const isCurrent = tier.weeks.includes(activeSeason?.current_week || 1);
+                  const isPast = (activeSeason?.current_week || 1) > Math.max(...tier.weeks);
+                  const isFuture = (activeSeason?.current_week || 1) < Math.min(...tier.weeks);
+
+                  return (
+                    <div
+                      key={tier.tier}
+                      className={`p-3 rounded-lg border transition-all ${
+                        isCurrent
+                          ? "bg-fuchsia-500/10 border-fuchsia-500/50"
+                          : isPast
+                          ? "bg-green-500/5 border-green-500/20 opacity-60"
+                          : "bg-black/40 border-purple-500/20 relative overflow-hidden"
+                      }`}
+                    >
+                      {/* Mystery Veil Overlay for Future Weeks */}
+                      {isFuture && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-black/90 to-violet-900/80 backdrop-blur-sm flex items-center justify-center z-10">
+                          <div className="text-center">
+                            <div className="text-4xl mb-2">🔮</div>
+                            <div className="text-sm font-semibold text-purple-300">Week {tier.weeks[0]}-{tier.weeks[1]}</div>
+                            <div className="text-xs text-purple-400/70">Shrouded in Mystery</div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className={`text-xs ${
+                              isCurrent
+                                ? "border-fuchsia-500/50 text-fuchsia-300"
+                                : isPast
+                                ? "border-green-500/50 text-green-400"
+                                : "border-purple-500/50 text-purple-400"
+                            }`}
+                          >
+                            Week {tier.weeks[0]}-{tier.weeks[1]}
+                          </Badge>
+                          <span className="text-sm font-medium text-white">
+                            {isFuture ? "???" : tier.label}
+                          </span>
+                        </div>
+                        {isCurrent && (
+                          <Badge className="bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/50">
+                            Current
+                          </Badge>
+                        )}
+                        {isPast && (
+                          <Check className="h-4 w-4 text-green-400" />
+                        )}
+                      </div>
+
+                      {!isFuture && (
+                        <div className="flex flex-wrap gap-1">
+                          {tier.topics.slice(0, 4).map((topicId) => {
+                            const topic = DEFENSE_TOPICS.find((t) => t.id === topicId);
+                            return topic ? (
+                              <Badge
+                                key={topicId}
+                                variant="outline"
+                                className="border-white/10 text-[10px] opacity-70"
+                              >
+                                {topic.name}
+                              </Badge>
+                            ) : null;
+                          })}
+                          {tier.topics.length > 4 && (
+                            <Badge variant="outline" className="border-white/10 text-[10px] opacity-50">
+                              +{tier.topics.length - 4} more
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
