@@ -42,6 +42,7 @@ import { MemoryToolsPanel } from "./MemoryToolsPanel";
 import { StudyModeSelector } from "./StudyModeSelector";
 import { PreacherMentorCard } from "./PreacherMentorCard";
 import { ChapterImage } from "./ChapterImage";
+import { TagFriendButton } from "@/components/TagFriendButton";
 
 import { DimensionFilter } from "./DimensionFilter";
 import { ReadingStreakBadge } from "./ReadingStreakBadge";
@@ -399,6 +400,13 @@ export const BibleReader = () => {
           variant="outline"
           size="sm"
           className="gap-2"
+        />
+
+        <TagFriendButton
+          pageTitle={`${book} ${chapter} - PT Study Bible`}
+          pageDescription={`Check out ${book} chapter ${chapter} in the Phototheology Study Bible`}
+          variant="outline"
+          size="sm"
         />
 
         <div className="h-6 w-px bg-border" />
