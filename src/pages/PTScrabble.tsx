@@ -103,6 +103,11 @@ export default function PTScrabble() {
 
     console.log('[PTScrabble] Game loaded from URL:', mpGame.status, 'current phase:', gamePhase);
 
+    // Sync seed verse from DB for non-host players
+    if (mpGame.seedVerse && !seedVerse) {
+      setSeedVerse({ reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text });
+    }
+
     // Only auto-navigate if we're on the menu
     if (gamePhase === 'menu') {
       if (mpGame.status === 'waiting') {
@@ -113,7 +118,15 @@ export default function PTScrabble() {
         setGamePhaseInternal('multiplayer-playing');
       }
     }
-  }, [mpGame, multiplayerGameId, gamePhase]);
+
+    // Non-host: auto-transition from lobby to playing when host starts game
+    if (gamePhase === 'multiplayer-lobby' && mpGame.status === 'playing') {
+      if (mpGame.seedVerse) {
+        setSeedVerse({ reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text });
+      }
+      setGamePhaseInternal('multiplayer-playing');
+    }
+  }, [mpGame, multiplayerGameId, gamePhase, seedVerse]);
 
   // Solo mode state
   const [connectionModal, setConnectionModal] = useState<{
@@ -677,8 +690,8 @@ export default function PTScrabble() {
   if (gamePhase === "multiplayer-verse-selection") {
     const handleMultiplayerVerseSelected = async (verse: SelectedVerse) => {
       setSeedVerse(verse);
-      // Start the actual game
-      const started = await startGame();
+      // Start the actual game — pass verse so it's saved to DB for all players
+      const started = await startGame({ reference: verse.reference, text: verse.text });
       if (started) {
         setGamePhase("multiplayer-playing");
       }

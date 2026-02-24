@@ -36,7 +36,7 @@ interface UseScrabbleGameReturn {
   // Actions
   createGame: (gameMode: 'ffa' | 'team', maxPlayers?: number) => Promise<string | null>;
   joinGame: (roomCode: string) => Promise<boolean>;
-  startGame: () => Promise<boolean>;
+  startGame: (seedVerse?: { reference: string; text: string }) => Promise<boolean>;
   placeCard: (
     card: ScrabbleCard,
     position: BoardPosition,
@@ -101,6 +101,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
             setGame(prev => prev ? {
               ...prev,
               status: updated.status,
+              seedVerse: updated.seed_verse || prev.seedVerse,
               boardState: updated.board_state || {},
               deckRemaining: updated.deck_remaining || [],
               startedAt: updated.started_at,
@@ -151,6 +152,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         gameMode: data.game_mode as any,
         maxPlayers: data.max_players,
         seedCardId: data.seed_card_id,
+        seedVerse: data.seed_verse ? (data.seed_verse as unknown as { reference: string; text: string }) : undefined,
         boardState: (data.board_state as unknown as Record<string, PlacedCard>) || {},
         deckRemaining: data.deck_remaining || [],
         voteTimeoutSeconds: data.vote_timeout_seconds,
@@ -423,7 +425,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
   }, [user]);
 
   // Start the game (host only)
-  const startGame = useCallback(async (): Promise<boolean> => {
+  const startGame = useCallback(async (seedVerse?: { reference: string; text: string }): Promise<boolean> => {
     if (!game || !user) {
       toast.error('No game to start');
       return false;
@@ -490,14 +492,19 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       }
 
       // Update game state (no shared deck - each player has full deck access)
+      const updatePayload: Record<string, any> = {
+        status: 'playing',
+        board_state: JSON.parse(JSON.stringify(initialBoard)) as Json,
+        deck_remaining: [],
+        started_at: new Date().toISOString(),
+      };
+      if (seedVerse) {
+        updatePayload.seed_verse = seedVerse;
+      }
+
       const { error: updateError } = await supabase
         .from('pt_scrabble_games')
-        .update({
-          status: 'playing',
-          board_state: JSON.parse(JSON.stringify(initialBoard)) as Json,
-          deck_remaining: [],
-          started_at: new Date().toISOString(),
-        })
+        .update(updatePayload)
         .eq('id', game.id);
 
       if (updateError) throw updateError;
@@ -506,6 +513,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       setGame(prev => prev ? {
         ...prev,
         status: 'playing',
+        seedVerse,
         boardState: initialBoard,
         deckRemaining: [],
         startedAt: new Date().toISOString(),
@@ -574,7 +582,9 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       return false;
     }
 
-    if (connections.length === 0) {
+    // First card connects to the verse (no adjacent cards needed)
+    const isFirstCard = Object.keys(game.boardState).length === 0;
+    if (connections.length === 0 && !isFirstCard) {
       toast.error('Must explain at least one connection');
       return false;
     }
@@ -582,7 +592,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
     setIsLoading(true);
 
     try {
-      const pointsAwarded = calculateScore(connections.length, isChristConnection);
+      const pointsAwarded = calculateScore(Math.max(1, connections.length), isChristConnection);
 
       const placedCard: PlacedCard = {
         card,

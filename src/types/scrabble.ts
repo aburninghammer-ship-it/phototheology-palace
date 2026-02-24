@@ -102,6 +102,7 @@ export interface ScrabbleGame {
   gameMode: GameMode;
   maxPlayers: number;
   seedCardId: string;
+  seedVerse?: { reference: string; text: string }; // Synced verse for all players
   boardState: Record<string, PlacedCard>; // "{x},{y}" -> PlacedCard
   deckRemaining: string[]; // Card IDs remaining in deck
   currentMoveId?: string;
@@ -210,6 +211,11 @@ export function isValidPlacement(
   // Can't place on occupied position
   if (boardState[key]) {
     return { valid: false, adjacentCards: [] };
+  }
+
+  // Empty board: first card can go at center (0,0)
+  if (Object.keys(boardState).length === 0) {
+    return { valid: position.x === 0 && position.y === 0, adjacentCards: [] };
   }
 
   // Must be adjacent to at least one existing card
