@@ -11,7 +11,7 @@ import {
   ChevronRight, Loader2, Sparkles, BookMarked, Church, Crown, Sword, Shield,
   Heart, Cross, Star, ArrowRight, MessageSquareMore, Send, X, BookText, Telescope,
   Link2, ExternalLink, Headphones, Play, Pause, Square, SkipForward, SkipBack,
-  Volume2, RefreshCw
+  Volume2, RefreshCw, Clock, Scale, Scroll, Mic, AlertTriangle, History
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,6 +23,7 @@ import { useTextToSpeechEnhanced, OPENAI_VOICES } from "@/hooks/useTextToSpeechE
 import type { VoiceId } from "@/hooks/useTextToSpeechEnhanced";
 import { GCConflictTag } from "@/components/cota/GCConflictTag";
 import type { GCConflictTag as GCConflictTagType } from "@/types/gcConflictTag";
+import { DefenseMode } from "@/components/living-manna/DefenseMode";
 
 // ─── EGW Book Library ───────────────────────────────────────────────
 interface EGWBook {
@@ -456,7 +457,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   // Reader state
   const [chapterParagraphs, setChapterParagraphs] = useState<string[]>([]);
   const [loadingChapter, setLoadingChapter] = useState(false);
-  const [chapterTab, setChapterTab] = useState<"read" | "analyze" | "listen">("read");
+  const [chapterTab, setChapterTab] = useState<"read" | "analyze" | "listen" | "defense">("read");
   const [selectedParagraph, setSelectedParagraph] = useState<string | null>(null);
   const [paragraphAnalysis, setParagraphAnalysis] = useState<string | null>(null);
   const [analyzingParagraph, setAnalyzingParagraph] = useState(false);
@@ -645,18 +646,37 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
 
     const room = PALACE_ROOMS.find(r => r.code === roomCode);
 
-    try {
-      const { data, error } = await supabase.functions.invoke("jeeves", {
-        body: {
-          mode: "egw_palace_analysis",
-          message: `Analyze the following passage from "${selectedBook.title}", Chapter ${selectedChapter.number}: "${selectedChapter.title}" through the Phototheology ${room?.name} (${roomCode}).
+    // Special analysis layers beyond standard Palace rooms
+    const SPECIAL_PROMPTS: Record<string, string> = {
+      HIST: `Provide a "Historical Context Layer" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Include: Date/era of events, political powers involved, religious climate, prophetic timeline connection (Daniel/Revelation if applicable), and how this context intensifies Ellen White's point. Keep it scholarly, not devotional. 200-400 words.`,
+      DEF: `Provide an "Apologetics / Defense Analysis" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Include: What doctrine is being defended? Which critic type would attack this paragraph (Atheist, Evangelical, Catholic, BHI, etc.)? What is the likely objection? What is the strongest KJV biblical answer? Steelman the objection, then rebut it. 200-400 words.`,
+      DOC: `Provide a "Doctrinal Extraction" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Identify ALL doctrines present: Sabbath, Sanctuary, State of the Dead, Law, Papacy, Prophecy, Christology, Justification, Sanctification, Second Coming, etc. For each doctrine found, give a 1-2 sentence summary of how it appears. 200-400 words.`,
+      PROPH: `Provide a "Prophetic Timeline Marker" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Place this paragraph on the prophetic timeline: Pre-70 AD / 538 AD (Papacy rise) / 1798 (Deadly wound) / 1844 (Investigative Judgment) / Final Crisis (Future). Connect to Daniel/Revelation prophecies. Identify which "Day of the Lord" horizon applies (1H, 2H, or 3H). 200-400 words.`,
+      HOM: `Provide "Homiletic Sparks" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Include: One "Big Idea" sentence, one preaching tension (problem vs gospel resolution), 2-3 application questions, one key quotable line, and an evangelistic appeal angle. Do NOT write a full sermon — just provide sermon fuel. 200-400 words.`,
+    };
+
+    const isSpecial = SPECIAL_PROMPTS[roomCode];
+    const prompt = isSpecial
+      ? `${SPECIAL_PROMPTS[roomCode]}\n\n**Selected Passage:**\n"${text}"`
+      : `Analyze the following passage from "${selectedBook.title}", Chapter ${selectedChapter.number}: "${selectedChapter.title}" through the Phototheology ${room?.name} (${roomCode}).
 
 **Selected Passage:**
 "${text}"
 
 ${room?.description}
 
-Apply this Palace room lens specifically to the selected passage. Be theological, Christ-centered, and insightful. Connect to Scripture. Keep it focused (200-400 words).`,
+Apply this Palace room lens specifically to the selected passage. Be theological, Christ-centered, and insightful. Connect to Scripture. Keep it focused (200-400 words).`;
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "egw_palace_analysis",
+          message: prompt,
           context: `book:${selectedBook.id},chapter:${selectedChapter.number},room:${roomCode},passage_analysis:true`,
         },
       });
@@ -1026,20 +1046,24 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
         </CardHeader>
       </Card>
 
-      {/* Read / Analyze / Listen Tabs */}
-      <Tabs value={chapterTab} onValueChange={(v) => setChapterTab(v as "read" | "analyze" | "listen")}>
-        <TabsList className="w-full grid grid-cols-3">
-          <TabsTrigger value="read" className="gap-2">
+      {/* Read / Analyze / Listen / Defense Tabs */}
+      <Tabs value={chapterTab} onValueChange={(v) => setChapterTab(v as "read" | "analyze" | "listen" | "defense")}>
+        <TabsList className="w-full grid grid-cols-4">
+          <TabsTrigger value="read" className="gap-1.5 text-xs sm:text-sm">
             <BookText className="h-4 w-4" />
-            Read
+            <span className="hidden sm:inline">Read</span>
           </TabsTrigger>
-          <TabsTrigger value="listen" className="gap-2">
+          <TabsTrigger value="listen" className="gap-1.5 text-xs sm:text-sm">
             <Headphones className="h-4 w-4" />
-            Audio Commentary
+            <span className="hidden sm:inline">Audio</span>
           </TabsTrigger>
-          <TabsTrigger value="analyze" className="gap-2">
+          <TabsTrigger value="analyze" className="gap-1.5 text-xs sm:text-sm">
             <Telescope className="h-4 w-4" />
-            Analyze
+            <span className="hidden sm:inline">Analyze</span>
+          </TabsTrigger>
+          <TabsTrigger value="defense" className="gap-1.5 text-xs sm:text-sm">
+            <Shield className="h-4 w-4" />
+            <span className="hidden sm:inline">Defense</span>
           </TabsTrigger>
         </TabsList>
 
@@ -1124,7 +1148,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                             )}
 
                             {/* Hover action buttons */}
-                            <div className="absolute right-1.5 top-1.5 flex items-center gap-1.5 opacity-0 group-hover/para:opacity-100 transition-all duration-200">
+                            <div className="absolute right-1.5 top-1.5 flex items-center gap-1 opacity-0 group-hover/para:opacity-100 transition-all duration-200 flex-wrap justify-end max-w-[280px]">
                               <button
                                 className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-amber-500/30 text-amber-400 hover:border-amber-500/50 hover:shadow-amber-500/10 hover:shadow-lg transition-all"
                                 onClick={(e) => {
@@ -1152,6 +1176,90 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                               >
                                 <Telescope className="h-3 w-3" />
                                 Analyze
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-cyan-500/30 text-cyan-400 hover:border-cyan-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setGcTag(null);
+                                  generateGcConflictTag(paragraph);
+                                }}
+                                title="Great Controversy Conflict Tag"
+                              >
+                                <Sword className="h-3 w-3" />
+                                GC Tag
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-orange-500/30 text-orange-400 hover:border-orange-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("HIST");
+                                  analyzeParagraphWithPalace(paragraph, "HIST");
+                                }}
+                                title="Historical Context"
+                              >
+                                <History className="h-3 w-3" />
+                                Historical
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-red-500/30 text-red-400 hover:border-red-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("DEF");
+                                  analyzeParagraphWithPalace(paragraph, "DEF");
+                                }}
+                                title="Defense / Apologetics"
+                              >
+                                <Shield className="h-3 w-3" />
+                                Defense
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-emerald-500/30 text-emerald-400 hover:border-emerald-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("DOC");
+                                  analyzeParagraphWithPalace(paragraph, "DOC");
+                                }}
+                                title="Doctrinal Extraction"
+                              >
+                                <Scale className="h-3 w-3" />
+                                Doctrine
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-violet-500/30 text-violet-400 hover:border-violet-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("PROPH");
+                                  analyzeParagraphWithPalace(paragraph, "PROPH");
+                                }}
+                                title="Prophetic Timeline Marker"
+                              >
+                                <Clock className="h-3 w-3" />
+                                Prophecy
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-pink-500/30 text-pink-400 hover:border-pink-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("HOM");
+                                  analyzeParagraphWithPalace(paragraph, "HOM");
+                                }}
+                                title="Homiletic Sparks"
+                              >
+                                <Mic className="h-3 w-3" />
+                                Homiletic
                               </button>
                             </div>
                           </div>
@@ -1606,6 +1714,23 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
               </div>
             </div>
           </ScrollArea>
+          </div>
+        </TabsContent>
+
+        {/* ─── DEFENSE TAB ─────────────────────────────────────────── */}
+        <TabsContent value="defense" className="mt-4">
+          <div className="space-y-3">
+            <div className="glass-card rounded-xl px-4 py-3 flex items-center gap-3 border border-destructive/20">
+              <div className="p-1.5 rounded-lg bg-destructive/10">
+                <Shield className="h-4 w-4 text-destructive" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-foreground/70">
+                  <span className="text-destructive font-medium">Defense Mode</span> — Forge weapons from {selectedBook?.shortTitle} Ch. {selectedChapter?.number}: "{selectedChapter?.title}"
+                </p>
+              </div>
+            </div>
+            <DefenseMode churchId={churchId || ""} />
           </div>
         </TabsContent>
       </Tabs>
