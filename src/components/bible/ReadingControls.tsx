@@ -28,9 +28,19 @@ export const ReadingControls = () => {
   }, [preferences.bible_translation]);
 
   const handleTranslationChange = async (value: Translation) => {
+    console.log('[ReadingControls] Translation changing to:', value);
     setTranslation(value);
-    await updatePreference("bible_translation", value);
-    navigate(`/bible/${book}/${chapterParam}?t=${value}`);
+
+    try {
+      await updatePreference("bible_translation", value);
+      console.log('[ReadingControls] Preference updated, navigating...');
+
+      // Force page reload with new translation to ensure it applies
+      const newUrl = `/bible/${book}/${chapterParam}?t=${value}`;
+      window.location.href = newUrl;
+    } catch (error) {
+      console.error('[ReadingControls] Error updating translation:', error);
+    }
   };
 
   return (
@@ -41,7 +51,7 @@ export const ReadingControls = () => {
           {t('bible.readingSettings')}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80 sm:w-80">
         <div className="space-y-4">
           <div>
             <h4 className="font-medium mb-3 flex items-center gap-2">
@@ -49,10 +59,10 @@ export const ReadingControls = () => {
               {t('bible.translationLabel')}
             </h4>
             <Select value={translation} onValueChange={handleTranslationChange}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder={t('bible.selectTranslation')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px] z-[100]" position="popper">
                 {BIBLE_TRANSLATIONS.map((trans) => (
                   <SelectItem key={trans.value} value={trans.value}>
                     {trans.label}
