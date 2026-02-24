@@ -73,6 +73,9 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState("intermediate");
   const [selectedTemperaments, setSelectedTemperaments] = useState<string[]>(["polite"]);
   const [assistMode, setAssistMode] = useState(true);
+  const [goliathScoutMode, setGoliathScoutMode] = useState(false);
+
+  const isGoliath = selectedOpponent?.id === "goliath";
 
   // Combat state
   const [phase, setPhase] = useState<Phase>("setup");
@@ -629,15 +632,21 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   };
 
   const startSparring = async () => {
-    if (!selectedOpponent || !selectedTopic) return;
+    // Goliath blind mode: topic is optional
+    if (!selectedOpponent) return;
+    if (!isGoliath && !selectedTopic) return;
 
     setPhase("sparring");
     setIsLoading(true);
     setRoundCount(1);
 
+    const isBlindGoliath = isGoliath && !selectedTopic;
+
     addMessage({
       role: "system",
-      content: `Round 1 — ${selectedOpponent.name} vs. You on "${selectedTopic.name}" (${selectedDifficulty})`,
+      content: isBlindGoliath
+        ? `Round 1 — ${selectedOpponent.name} has entered the arena. You don't know what's coming... (${selectedDifficulty})`
+        : `Round 1 — ${selectedOpponent.name} vs. You on "${selectedTopic!.name}" (${selectedDifficulty})`,
     });
 
     try {
@@ -645,8 +654,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         body: {
           mode: "defense-sparring",
           opponent: selectedOpponent.id,
-          defenseTopicId: selectedTopic.id,
-          defenseTopicName: selectedTopic.name,
+          defenseTopicId: isBlindGoliath ? "__goliath_blind__" : selectedTopic!.id,
+          defenseTopicName: isBlindGoliath ? "Unknown — Goliath chooses" : selectedTopic!.name,
           difficulty: selectedDifficulty,
           temperament: selectedTemperaments,
           opponentWorldview: selectedOpponent.worldview,
@@ -654,7 +663,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           opponentTargets: selectedOpponent.attackTargets,
           opponentEndPrompt: selectedOpponent.endPrompt,
           opponentSteelmanRules: selectedOpponent.steelmanRules,
-          isSignatureTopic: !!selectedTopic.isSignature,
+          isSignatureTopic: isBlindGoliath ? false : !!selectedTopic?.isSignature,
+          isGoliathBlindMode: isBlindGoliath,
           phase: "opening",
         },
       });
@@ -1555,7 +1565,66 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </div>
         </div>
 
-        {/* Topic Selector */}
+        {/* Goliath Blind Mode Banner */}
+        {isGoliath && !goliathScoutMode && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-4 rounded-lg border border-purple-500/40 bg-gradient-to-br from-purple-950/40 to-black/60 space-y-3"
+          >
+            <div className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-purple-400" />
+              <h3 className="text-sm font-bold text-purple-300">Blind Engagement Mode</h3>
+            </div>
+            <p className="text-xs text-purple-200/80 leading-relaxed">
+              You don't know what doctrine Goliath will attack, or from what worldview. He picks the angle and strikes first. 
+              Prepare to think on your feet — this is the ultimate test.
+            </p>
+            <div className="flex items-center justify-between pt-1 border-t border-purple-500/20">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                <span className="text-xs text-amber-300/80">Want to preview the topic?</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setGoliathScoutMode(true)}
+                className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10 text-xs h-7"
+              >
+                Enable Scout Mode
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Scout Mode Active Banner */}
+        {isGoliath && goliathScoutMode && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 rounded-lg border border-amber-500/30 bg-amber-950/20 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-amber-400" />
+              <div>
+                <p className="text-xs font-bold text-amber-300">Scout Mode Active</p>
+                <p className="text-[10px] text-amber-400/70">Select a topic below, or go back to blind mode</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => { setGoliathScoutMode(false); setSelectedTopic(null); }}
+              className="text-amber-400 hover:text-amber-300 text-xs h-7"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Go Blind
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Topic Selector — hidden for Goliath blind mode (shown for Scout Mode) */}
+        {(!isGoliath || goliathScoutMode) && (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Select Topic</h3>
           <div className="flex flex-wrap gap-2">
@@ -1605,6 +1674,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             <p className="text-xs text-muted-foreground mt-1">{selectedTopic.description}</p>
           )}
         </div>
+        )}
 
         {/* Difficulty */}
         <div>
@@ -1701,12 +1771,19 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         {/* Begin Button */}
         <Button
           size="lg"
-          className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
-          disabled={!selectedOpponent || !selectedTopic}
+          className={`w-full text-white ${
+            isGoliath && !goliathScoutMode
+              ? "bg-gradient-to-r from-purple-700 to-fuchsia-700 hover:from-purple-800 hover:to-fuchsia-800"
+              : "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+          }`}
+          disabled={!selectedOpponent || (!isGoliath && !selectedTopic) || (isGoliath && goliathScoutMode && !selectedTopic)}
           onClick={startSparring}
         >
-          <Swords className="h-5 w-5 mr-2" />
-          Begin Sparring
+          {isGoliath && !goliathScoutMode ? (
+            <><Crown className="h-5 w-5 mr-2" /> Enter the Arena Blind</>
+          ) : (
+            <><Swords className="h-5 w-5 mr-2" /> Begin Sparring</>
+          )}
         </Button>
         </>)}
       </div>
@@ -1725,7 +1802,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           <div>
             <p className="font-semibold text-sm">{selectedOpponent?.name}</p>
             <p className="text-xs text-muted-foreground">
-              {selectedTopic?.name} · Round {roundCount}
+              {selectedTopic ? selectedTopic.name : "⚡ Blind Engagement"} · Round {roundCount}
             </p>
           </div>
           <Badge variant="outline" className="text-xs ml-2">{selectedDifficulty}</Badge>
