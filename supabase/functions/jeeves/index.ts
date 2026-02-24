@@ -8592,6 +8592,21 @@ FORMAT: Use clear markdown with headers, bullet points, and bold for emphasis. S
 3. A Christ-centered gem or takeaway`;
 
       userPrompt = message || "Please analyze this chapter through the Phototheology Palace.";
+    } else if (mode === "general") {
+      // General-purpose mode used by chapter image generation and other components
+      const greeting = userFirstName || userName || "friend";
+      systemPrompt = `You are Jeeves, ${greeting}'s Phototheology study assistant. You are a warm, knowledgeable Bible scholar who uses Phototheology principles to illuminate Scripture.
+
+${PALACE_SCHEMA}
+
+CRITICAL RULES:
+- Be Christ-centered in all analysis
+- Use valid Palace room codes when referencing PT principles
+- Be concise, clear, and insightful
+- ${userFirstName ? `Address ${greeting} by name naturally 1-2 times` : ''}
+- NEVER use "dear" in any form`;
+
+      userPrompt = message || "Please help me with this Bible study question.";
     }
 
     // Guard: if no prompt was set for this mode, return a helpful error instead of sending empty content

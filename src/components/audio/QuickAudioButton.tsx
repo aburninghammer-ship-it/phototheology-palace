@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { getGlobalMusicVolume, subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
+import { globalAudioManager } from "@/lib/globalAudioManager";
 
 // Longer silent audio that works more reliably on iOS
 const SILENT_AUDIO = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
@@ -51,6 +52,16 @@ export function QuickAudioButton({
     return unsubscribe;
   }, []);
 
+  // Cleanup: unregister audio when component unmounts
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        globalAudioManager.unregister(audioRef.current);
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
   // Unlock audio for mobile before async work
   const unlockAudio = useCallback(() => {
     if (audioUnlockedRef.current) return;
@@ -75,6 +86,7 @@ export function QuickAudioButton({
   const handleClick = async () => {
     if (isPlaying && audioRef.current) {
       audioRef.current.pause();
+      globalAudioManager.unregister(audioRef.current);
       setIsPlaying(false);
       notifyTTSStopped();
       return;
@@ -87,6 +99,9 @@ export function QuickAudioButton({
       notifyTTSStopped();
       return;
     }
+
+    // CRITICAL: Stop all other audio before starting this one
+    globalAudioManager.stopAll();
 
     if (!text.trim()) {
       toast.error("No text to read");
@@ -148,12 +163,14 @@ export function QuickAudioButton({
       console.log('[QuickAudio] Volume set to:', volumeRef.current, '%');
 
       audio.onended = () => {
+        globalAudioManager.unregister(audio);
         setIsPlaying(false);
         notifyTTSStopped();
       };
 
       audio.onerror = (e) => {
         console.error("Audio playback error:", e);
+        globalAudioManager.unregister(audio);
         setIsPlaying(false);
         notifyTTSStopped();
         // Fallback to browser TTS on error
@@ -176,6 +193,7 @@ export function QuickAudioButton({
         console.log('[QuickAudio] Attempting to play audio...');
         await audio.play();
         console.log('[QuickAudio] Audio playing successfully');
+        globalAudioManager.register(audio);
         setIsPlaying(true);
         notifyTTSStarted();
       } catch (playErr: any) {

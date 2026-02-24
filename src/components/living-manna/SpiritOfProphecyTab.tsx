@@ -1077,10 +1077,19 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                                 )}
                                 Cross-Ref
                               </button>
-                              <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-primary/30 text-primary">
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-primary/30 text-primary hover:border-primary/50 hover:shadow-primary/10 hover:shadow-lg transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setChapterTab("analyze");
+                                }}
+                                title="Analyze this paragraph through Palace"
+                              >
                                 <Telescope className="h-3 w-3" />
                                 Analyze
-                              </span>
+                              </button>
                             </div>
                           </div>
 

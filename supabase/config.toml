@@ -294,3 +294,6 @@ verify_jwt = false
 
 [functions.batch-generate-epic]
 verify_jwt = true
+
+[functions.get-subscriber-stats]
+verify_jwt = false

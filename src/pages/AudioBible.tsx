@@ -509,7 +509,7 @@ export default function AudioBible() {
 
       audio.onplay = () => {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
-        requestMusicForCommentary('start');
+        // Music is now manually controlled by user, not auto-started with commentary
       };
       audio.onended = () => {
         // Auto-advance queue (with per-item mode switching and story support)
@@ -584,7 +584,7 @@ export default function AudioBible() {
         setIsEpicPlaying(true);
         setIsEpicPaused(false);
         setIsEpicLoading(false);
-        audio.onplay = () => requestMusicForCommentary('start');
+        // Music is now manually controlled by user, not auto-started with commentary
         audio.onended = () => {
           const queue = epicQueueRef.current;
           const nextIdx = epicQueueIndexRef.current + 1;
@@ -906,7 +906,7 @@ export default function AudioBible() {
 
       audio.onplay = () => {
         setIsEpicPlaying(true); setIsEpicPaused(false); setIsEpicLoading(false);
-        requestMusicForCommentary('start');
+        // Music is now manually controlled by user, not auto-started with commentary
       };
       audio.onended = () => {
         setIsEpicPlaying(false); setIsEpicPaused(false); epicAudioRef.current = null;

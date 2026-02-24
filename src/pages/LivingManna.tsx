@@ -30,6 +30,7 @@ import { LiveMembersStrip } from "@/components/living-manna/LiveMembersStrip";
 import { BaptismTrack } from "@/components/living-manna/baptism-track/BaptismTrack";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { TagFriendButton } from "@/components/TagFriendButton";
 export default function LivingManna() {
   const { user } = useAuth();
   const { subscription, loading: subscriptionLoading } = useSubscription();
@@ -194,6 +195,13 @@ export default function LivingManna() {
                 <h1 className="text-lg font-bold truncate">{churchName}</h1>
               </div>
               <div className="flex items-center gap-1">
+                <TagFriendButton
+                  pageTitle={`${churchName} - Living Manna Space`}
+                  pageDescription="Join me in exploring this church community"
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9"
+                />
                 {isChurchAdmin && (
                   <Button
                     variant="ghost"
@@ -270,9 +278,15 @@ export default function LivingManna() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <TagFriendButton
+                    pageTitle={`${churchName} - Living Manna Space`}
+                    pageDescription="Join me in exploring this church community"
+                    variant="outline"
+                    size="sm"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => navigate('/dashboard')}
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />

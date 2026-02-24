@@ -55,16 +55,29 @@ export const ChapterImage = ({ book, chapter, chapterText }: ChapterImageProps) 
 
     try {
       // Get AI analysis of the chapter
-      const analysisPrompt = `Analyze ${book} chapter ${chapter} and create a detailed visual description for an AI image generator in Biblical Epic style. Focus on:
-1. The central dramatic moment or scene
-2. Key characters and their emotions
-3. Setting and atmosphere
-4. Symbolic elements
-5. Divine presence/intervention
+      const analysisPrompt = `Analyze ${book} chapter ${chapter} and create an EPIC, CINEMATIC visual description for an AI image generator. This must be visually stunning and dramatic. Focus on:
+
+1. The most DRAMATIC and POWERFUL moment in the chapter - the climax or most visually striking scene
+2. HEROIC or INTENSE character poses with strong emotions - faces filled with awe, determination, fear, or reverence
+3. EPIC SCALE - vast landscapes, towering architecture, crowds, or cosmic elements that show magnitude
+4. DIVINE LIGHT - dramatic rays of light, glowing presence, supernatural illumination breaking through darkness
+5. CINEMATIC COMPOSITION - dynamic angles (low angle for power, high angle for scope), depth, leading lines
+6. ATMOSPHERIC DRAMA - storm clouds, fire, mist, dramatic skies, contrasting light and shadow
+7. SYMBOLIC POWER - key objects or elements that represent the theological significance
+8. ETHNIC AUTHENTICITY - Biblical figures should reflect historically accurate Middle Eastern, Mediterranean, and African heritage based on the geographical and historical context. Ensure diverse, culturally appropriate representation.
 
 Chapter text (first 500 chars): ${chapterText.slice(0, 500)}...
 
-Provide a vivid, cinematic image prompt (2-3 sentences) in Biblical Epic style - dramatic, with divine lighting.`;
+Create a vivid, EPIC image prompt (2-3 sentences) that emphasizes:
+- Cinematic blockbuster quality like a movie poster
+- Dramatic lighting with strong contrast (chiaroscuro)
+- Epic scale and grandeur
+- Emotional intensity
+- Divine/supernatural presence made visible
+- Heroic or monumental composition
+- Historically accurate ethnic representation (Middle Eastern, Mediterranean, African features as appropriate to the biblical context)
+
+Make this look like it belongs in an epic biblical film directed by a master cinematographer.`;
 
       const { data: analysisData, error: analysisError } = await supabase.functions.invoke("jeeves", {
         body: {
@@ -79,8 +92,29 @@ Provide a vivid, cinematic image prompt (2-3 sentences) in Biblical Epic style -
 
       const finalPrompt = `${aiPrompt}
 
-Style: Cinematic, dramatic Biblical scene with divine lighting and epic composition
-Reference: ${book} ${chapter}`;
+EPIC CINEMATIC STYLE REQUIREMENTS:
+- Professional film photography quality, 8K resolution aesthetic
+- Dramatic chiaroscuro lighting (strong light and shadow contrast)
+- Volumetric lighting, god rays, ethereal glow effects
+- Epic scale and grandeur - monumental composition
+- Cinematic color grading (rich, saturated, dramatic palette)
+- Dynamic camera angle for maximum visual impact
+- Photorealistic detail with painterly drama
+- Biblical epic film aesthetic (think Ben-Hur, The Ten Commandments, Kingdom of Heaven)
+- Heroic poses and powerful emotional expressions
+- Atmospheric depth with mist, particles, or environmental effects
+- Sharp focus on key subjects, dramatic depth of field
+- NO text, NO watermarks, NO borders
+
+ETHNIC REPRESENTATION (CRITICAL):
+- Biblical figures MUST reflect historically accurate Middle Eastern, Mediterranean, and North African ethnic features
+- Skin tones: olive, tan, brown complexions appropriate to ancient Near East geography
+- Facial features: diverse Middle Eastern and Mediterranean characteristics
+- For crowds/groups: show ethnic diversity reflecting historical trade routes and migrations
+- Avoid Eurocentric defaults - this is ancient Israel, Egypt, Mesopotamia, and surrounding regions
+- Cultural authenticity in clothing, appearance, and setting
+
+Reference: ${book} ${chapter} - Biblical Epic Masterpiece`;
 
       // Generate the image
       const { data: imageData, error: imageError } = await supabase.functions.invoke("generate-visual-anchor", {
