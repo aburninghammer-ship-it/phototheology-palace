@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy, Shield, Swords, Users, Crown, Target, Loader2,
   ChevronRight, ArrowLeft, Zap, Flame, BookOpen, Warehouse,
-  FlaskConical, Star, Clock, BarChart3, Send, AlertTriangle,
+  FlaskConical, Star, Clock, BarChart3, Send, AlertTriangle, Bot,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,7 +29,7 @@ import {
   getTeamLevel,
 } from "@/data/forgeDefendConfig";
 
-type HubView = "overview" | "draft" | "battle" | "leaderboard" | "prep";
+type HubView = "overview" | "draft" | "battle" | "battle-setup" | "leaderboard" | "prep";
 
 interface ForgeDefendHubProps {
   churchId: string;
@@ -57,6 +57,11 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const [selectedWeaponId, setSelectedWeaponId] = useState<string | null>(null);
   const [teamWeapons, setTeamWeapons] = useState<any[]>([]);
   const battleScrollRef = useRef<HTMLDivElement>(null);
+
+  // Battle setup state
+  const [battleSetupTopic, setBattleSetupTopic] = useState<string | null>(null);
+  const [battleSetupMode, setBattleSetupMode] = useState<"offense" | "defense">("defense");
+  const [battleSetupOpponent, setBattleSetupOpponent] = useState<"user" | "jeeves">("user");
 
   // Auto-detect view based on season status
   useEffect(() => {
@@ -392,7 +397,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               </div>
               {myTeam && activeSeason.status === "active" && (
                 <Button
-                  onClick={() => setView("battle")}
+                  onClick={() => setView("battle-setup")}
                   className="w-full mt-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500"
                 >
                   <Swords className="h-4 w-4 mr-2" />
@@ -511,6 +516,142 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               </CardContent>
             </Card>
           )}
+        </div>
+      )}
+
+      {/* ═══ BATTLE SETUP VIEW ═══ */}
+      {view === "battle-setup" && (
+        <div className="space-y-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setView("overview")}
+            className="mb-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Overview
+          </Button>
+
+          <div className="text-center space-y-2">
+            <h3 className="text-2xl font-bold text-red-300">Battle Setup</h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Configure your battle parameters before engaging the enemy
+            </p>
+          </div>
+
+          {/* Step 1: Choose Topic/Subject */}
+          <Card className="bg-black/20 border-violet-500/30">
+            <CardContent className="p-5 space-y-3">
+              <h4 className="font-semibold text-violet-300 flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Step 1: Choose Battle Subject
+              </h4>
+              <div className="grid grid-cols-2 gap-2">
+                {currentTier.topics.map((topicId) => {
+                  const topic = DEFENSE_TOPICS.find((t) => t.id === topicId);
+                  return topic ? (
+                    <Button
+                      key={topicId}
+                      variant={battleSetupTopic === topicId ? "default" : "outline"}
+                      onClick={() => setBattleSetupTopic(topicId)}
+                      className={battleSetupTopic === topicId ? "bg-gradient-to-r from-violet-600 to-fuchsia-600" : "border-violet-500/30"}
+                    >
+                      {topic.name}
+                    </Button>
+                  ) : null;
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Step 2: Choose Offense or Defense */}
+          <Card className="bg-black/20 border-blue-500/30">
+            <CardContent className="p-5 space-y-3">
+              <h4 className="font-semibold text-blue-300 flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Step 2: Choose Your Role
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant={battleSetupMode === "defense" ? "default" : "outline"}
+                  onClick={() => setBattleSetupMode("defense")}
+                  className={battleSetupMode === "defense" ? "bg-gradient-to-r from-blue-600 to-cyan-600 h-20 flex-col" : "border-blue-500/30 h-20 flex-col"}
+                >
+                  <Shield className="h-6 w-6 mb-2" />
+                  <span className="font-semibold">Defense Mode</span>
+                  <span className="text-xs opacity-70">Defend your faith</span>
+                </Button>
+                <Button
+                  variant={battleSetupMode === "offense" ? "default" : "outline"}
+                  onClick={() => setBattleSetupMode("offense")}
+                  className={battleSetupMode === "offense" ? "bg-gradient-to-r from-red-600 to-orange-600 h-20 flex-col" : "border-red-500/30 h-20 flex-col"}
+                >
+                  <Swords className="h-6 w-6 mb-2" />
+                  <span className="font-semibold">Offense Mode</span>
+                  <span className="text-xs opacity-70">Challenge others</span>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                {battleSetupMode === "defense"
+                  ? "Defend biblical truth against opposing arguments"
+                  : "Present biblical arguments to persuade others"}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Step 3: User vs Jeeves */}
+          <Card className="bg-black/20 border-amber-500/30">
+            <CardContent className="p-5 space-y-3">
+              <h4 className="font-semibold text-amber-300 flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Step 3: Choose Opponent Type
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant={battleSetupOpponent === "user" ? "default" : "outline"}
+                  onClick={() => setBattleSetupOpponent("user")}
+                  className={battleSetupOpponent === "user" ? "bg-gradient-to-r from-amber-600 to-orange-600 h-20 flex-col" : "border-amber-500/30 h-20 flex-col"}
+                >
+                  <Users className="h-6 w-6 mb-2" />
+                  <span className="font-semibold">Team Battle</span>
+                  <span className="text-xs opacity-70">Your team vs Enemy</span>
+                </Button>
+                <Button
+                  variant={battleSetupOpponent === "jeeves" ? "default" : "outline"}
+                  onClick={() => setBattleSetupOpponent("jeeves")}
+                  className={battleSetupOpponent === "jeeves" ? "bg-gradient-to-r from-purple-600 to-pink-600 h-20 flex-col" : "border-purple-500/30 h-20 flex-col"}
+                >
+                  <Bot className="h-6 w-6 mb-2" />
+                  <span className="font-semibold">Jeeves Assists</span>
+                  <span className="text-xs opacity-70">AI helps your team</span>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                {battleSetupOpponent === "user"
+                  ? "Your team responds directly to challenges"
+                  : "Jeeves provides strategic guidance during battle"}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Start Battle Button */}
+          <Button
+            onClick={() => setView("battle")}
+            disabled={!battleSetupTopic}
+            className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 h-14 text-lg"
+          >
+            {!battleSetupTopic ? (
+              <>
+                <AlertTriangle className="h-5 w-5 mr-2" />
+                Choose a Topic First
+              </>
+            ) : (
+              <>
+                <Flame className="h-5 w-5 mr-2" />
+                Begin Battle: {DEFENSE_TOPICS.find(t => t.id === battleSetupTopic)?.name}
+              </>
+            )}
+          </Button>
         </div>
       )}
 
