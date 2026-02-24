@@ -136,23 +136,16 @@ export const TagFriendButton = ({
 
       const senderName = senderProfile?.display_name || "Someone";
 
-      // Create notifications for each selected user
-      const notifications = selectedUsers.map((recipient) => ({
+      // Create feature_tags for each selected user
+      const tags = selectedUsers.map((recipient) => ({
         sender_id: user.id,
         recipient_id: recipient.id,
-        notification_type: "page_tag",
-        title: `${senderName} tagged you`,
+        feature_path: currentPageUrl,
+        feature_label: currentPageTitle,
         message: message.trim() || `${senderName} wants you to check this out!`,
-        page_url: currentPageUrl,
-        page_title: currentPageTitle,
-        page_description: currentPageDescription,
-        data: {
-          sender_name: senderName,
-          timestamp: new Date().toISOString(),
-        },
       }));
 
-      const { error } = await supabase.from("user_notifications" as any).insert(notifications);
+      const { error } = await supabase.from("feature_tags").insert(tags);
 
       if (error) throw error;
 
