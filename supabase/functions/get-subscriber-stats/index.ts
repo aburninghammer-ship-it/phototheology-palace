@@ -128,27 +128,31 @@ serve(async (req) => {
 
     // Verify the caller is an admin
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    if (!authHeader?.startsWith("Bearer ")) {
       throw new Error("Authorization required");
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify user is admin
-    const userClient = createClient(supabaseUrl, supabaseServiceKey, {
+    // Verify user via anon key + auth header
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } }
     });
 
-    const { data: { user }, error: authError } = await userClient.auth.getUser();
-    if (authError || !user) {
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: authError } = await userClient.auth.getClaims(token);
+    if (authError || !claimsData?.claims) {
       throw new Error("Invalid authorization");
     }
+
+    const userId = claimsData.claims.sub as string;
 
     // Check if user is admin (using user_roles table)
     const { data: adminCheck } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("role", "admin")
       .maybeSingle();
 
