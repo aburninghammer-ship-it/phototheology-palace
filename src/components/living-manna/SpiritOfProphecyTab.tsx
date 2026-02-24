@@ -1379,91 +1379,95 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
         </TabsContent>
 
         {/* ─── ANALYZE TAB ────────────────────────────────────────── */}
-        <TabsContent value="analyze" className="mt-4 space-y-4">
-          <div className="flex justify-end">
-            <Button
-              onClick={generateFullAnalysis}
-              disabled={loadingFull}
-              className="gap-2"
-              size="sm"
-            >
-              {loadingFull ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              Full Palace Walkthrough
-            </Button>
-          </div>
-
-          {/* Full Analysis */}
-          {fullAnalysis && (
-            <Card variant="glass" className="border-primary/30">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
+        <TabsContent value="analyze" className="mt-4">
+          <ScrollArea className="h-[65vh]">
+            <div className="space-y-4 pr-4">
+              <div className="flex justify-end">
+                <Button
+                  onClick={generateFullAnalysis}
+                  disabled={loadingFull}
+                  className="gap-2"
+                  size="sm"
+                >
+                  {loadingFull ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                   Full Palace Walkthrough
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap text-sm leading-relaxed">
-                  {fullAnalysis}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </Button>
+              </div>
 
-          {/* Room-by-Room Analysis */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {PALACE_ROOMS.map(room => {
-              const Icon = room.icon;
-              const hasResult = analysisResults[room.code];
-              const isLoading = loadingRoom === room.code;
-
-              return (
-                <Card key={room.code} variant="glass" className={`transition-all ${hasResult ? 'border-primary/30' : ''}`}>
-                  <CardContent className="p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Icon className={`h-4 w-4 ${room.color}`} />
-                        <span className="text-sm font-bold text-foreground">{room.name}</span>
-                        <Badge variant="outline" className="text-[10px]">{room.code}</Badge>
-                      </div>
+              {/* Full Analysis */}
+              {fullAnalysis && (
+                <Card variant="glass" className="border-primary/30">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      Full Palace Walkthrough
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap text-sm leading-relaxed">
+                      {fullAnalysis}
                     </div>
-                    <p className="text-xs text-muted-foreground">{room.description}</p>
-
-                    {hasResult ? (
-                      <>
-                        <div className="text-xs text-foreground/90 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border-t border-border/50 pt-2">
-                          {analysisResults[room.code]}
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => { setExpoundOpen(room.code); setExpoundResponse(null); setExpoundQuestion(""); }}
-                          className="w-full gap-2 mt-2 border-primary/30 text-primary hover:bg-primary/10"
-                        >
-                          <MessageSquareMore className="h-3 w-3" />
-                          Expound This
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => analyzeWithRoom(room.code)}
-                        disabled={isLoading}
-                        className="w-full gap-2"
-                      >
-                        {isLoading ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          <ArrowRight className="h-3 w-3" />
-                        )}
-                        Analyze with {room.code}
-                      </Button>
-                    )}
                   </CardContent>
                 </Card>
-              );
-            })}
-          </div>
+              )}
+
+              {/* Room-by-Room Analysis */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {PALACE_ROOMS.map(room => {
+                  const Icon = room.icon;
+                  const hasResult = analysisResults[room.code];
+                  const isLoading = loadingRoom === room.code;
+
+                  return (
+                    <Card key={room.code} variant="glass" className={`transition-all ${hasResult ? 'border-primary/30' : ''}`}>
+                      <CardContent className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Icon className={`h-4 w-4 ${room.color}`} />
+                            <span className="text-sm font-bold text-foreground">{room.name}</span>
+                            <Badge variant="outline" className="text-[10px]">{room.code}</Badge>
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{room.description}</p>
+
+                        {hasResult ? (
+                          <>
+                            <div className="text-xs text-foreground/90 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border-t border-border/50 pt-2">
+                              {analysisResults[room.code]}
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => { setExpoundOpen(room.code); setExpoundResponse(null); setExpoundQuestion(""); }}
+                              className="w-full gap-2 mt-2 border-primary/30 text-primary hover:bg-primary/10"
+                            >
+                              <MessageSquareMore className="h-3 w-3" />
+                              Expound This
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => analyzeWithRoom(room.code)}
+                            disabled={isLoading}
+                            className="w-full gap-2"
+                          >
+                            {isLoading ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <ArrowRight className="h-3 w-3" />
+                            )}
+                            Analyze with {room.code}
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          </ScrollArea>
         </TabsContent>
       </Tabs>
 
