@@ -5,7 +5,7 @@ import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame, MoreHorizontal, Crown, Image as ImageIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame, MoreHorizontal, Crown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,7 +41,7 @@ import { ThemeVerseSearch } from "./ThemeVerseSearch";
 import { MemoryToolsPanel } from "./MemoryToolsPanel";
 import { StudyModeSelector } from "./StudyModeSelector";
 import { PreacherMentorCard } from "./PreacherMentorCard";
-import { ChapterImageGenerator } from "./ChapterImageGenerator";
+import { ChapterImage } from "./ChapterImage";
 
 import { DimensionFilter } from "./DimensionFilter";
 import { ReadingStreakBadge } from "./ReadingStreakBadge";
@@ -68,7 +68,6 @@ export const BibleReader = () => {
   const [activeDimensions, setActiveDimensions] = useState<string[]>(["1D", "2D", "3D", "4D", "5D"]);
   const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics" | "preacher-mentor">("advanced");
   const [sermonIdeasMode, setSermonIdeasMode] = useState(false);
-  const [chapterImageOpen, setChapterImageOpen] = useState(false);
   
   const toggleDimension = (dimension: string) => {
     setActiveDimensions(prev =>
@@ -337,17 +336,6 @@ export const BibleReader = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setChapterImageOpen(true)}
-                className="bg-primary/10 backdrop-blur-md border-primary/30 hover:bg-primary/20 text-primary"
-                title="Generate AI image for this chapter"
-              >
-                <ImageIcon className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Chapter Image</span>
-                <span className="sm:hidden">Image</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
                 onClick={() => navigateChapter("prev")}
                 disabled={chapter <= 1}
                 className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
@@ -580,6 +568,16 @@ export const BibleReader = () => {
                 </h2>
               </div>
             </div>
+
+            {/* Auto-Generated Chapter Image */}
+            <div className="px-6 pt-6">
+              <ChapterImage
+                book={book}
+                chapter={chapter}
+                chapterText={chapterData.verses.map(v => v.text).join(' ')}
+              />
+            </div>
+
             <div className={`space-y-4 p-6 ${fontSizeClass}`}>
               {strongsMode ? (
                 chapterData.verses.map((verse) => (
@@ -790,15 +788,6 @@ export const BibleReader = () => {
             </Card>
           )}
         </div>
-
-        {/* Chapter Image Generator Dialog */}
-        <ChapterImageGenerator
-          book={book}
-          chapter={chapter}
-          chapterText={chapterData.verses.map(v => v.text).join(' ')}
-          open={chapterImageOpen}
-          onOpenChange={setChapterImageOpen}
-        />
       </div>
     </div>
   );

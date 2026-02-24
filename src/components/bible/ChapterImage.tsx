@@ -1,0 +1,244 @@
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Loader2, RefreshCw, Download, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface ChapterImageProps {
+  book: string;
+  chapter: number;
+  chapterText: string;
+}
+
+export const ChapterImage = ({ book, chapter, chapterText }: ChapterImageProps) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    loadExistingImage();
+  }, [book, chapter]);
+
+  const loadExistingImage = async () => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+
+      // Check if image already exists for this chapter
+      const { data, error } = await supabase
+        .from("bible_images")
+        .select("image_url")
+        .eq("user_id", userData.user.id)
+        .eq("verse_reference", `${book} ${chapter}`)
+        .eq("room_type", "Chapter Image")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data?.image_url) {
+        setImageUrl(data.image_url);
+      } else {
+        // Auto-generate on first view
+        generateImage();
+      }
+    } catch (error) {
+      console.error("Error loading chapter image:", error);
+    }
+  };
+
+  const generateImage = async () => {
+    setLoading(true);
+
+    try {
+      // Get AI analysis of the chapter
+      const analysisPrompt = `Analyze ${book} chapter ${chapter} and create a detailed visual description for an AI image generator in Biblical Epic style. Focus on:
+1. The central dramatic moment or scene
+2. Key characters and their emotions
+3. Setting and atmosphere
+4. Symbolic elements
+5. Divine presence/intervention
+
+Chapter text (first 500 chars): ${chapterText.slice(0, 500)}...
+
+Provide a vivid, cinematic image prompt (2-3 sentences) in Biblical Epic style - dramatic, with divine lighting.`;
+
+      const { data: analysisData, error: analysisError } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "general",
+          message: analysisPrompt,
+        },
+      });
+
+      if (analysisError) throw analysisError;
+
+      const aiPrompt = typeof analysisData === 'string' ? analysisData : analysisData?.response || analysisData?.content;
+
+      const finalPrompt = `${aiPrompt}
+
+Style: Cinematic, dramatic Biblical scene with divine lighting and epic composition
+Reference: ${book} ${chapter}`;
+
+      // Generate the image
+      const { data: imageData, error: imageError } = await supabase.functions.invoke("generate-visual-anchor", {
+        body: {
+          prompt: finalPrompt,
+          size: "1024x1024"
+        }
+      });
+
+      if (imageError) throw imageError;
+      if (imageData.error) throw new Error(imageData.error);
+      if (!imageData.image) throw new Error("No image generated");
+
+      // Save to database
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) throw new Error("Not authenticated");
+
+      // Convert base64 to blob
+      const base64Data = imageData.image.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/png' });
+
+      // Upload to storage
+      const fileName = `${userData.user.id}/chapters/${book}-${chapter}-${Date.now()}.png`;
+      const { error: uploadError } = await supabase.storage
+        .from("bible-images")
+        .upload(fileName, blob);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("bible-images")
+        .getPublicUrl(fileName);
+
+      // Save to database
+      const { error: insertError } = await supabase.from("bible_images").insert({
+        user_id: userData.user.id,
+        image_url: urlData.publicUrl,
+        description: `AI-generated chapter image for ${book} ${chapter}`,
+        verse_reference: `${book} ${chapter}`,
+        room_type: "Chapter Image",
+        is_public: false,
+        is_favorite: false,
+      });
+
+      if (insertError) throw insertError;
+
+      setImageUrl(urlData.publicUrl);
+
+      toast({
+        title: "Chapter Image Generated!",
+        description: `Image created for ${book} ${chapter}`,
+      });
+
+    } catch (error: any) {
+      console.error("Generation error:", error);
+      toast({
+        title: "Could not generate image",
+        description: "Image generation is optional and will retry next time.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownload = () => {
+    if (!imageUrl) return;
+
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `${book}-${chapter}.png`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Downloaded",
+      description: "Image saved to your downloads folder",
+    });
+  };
+
+  if (hidden) return null;
+
+  return (
+    <Card className="glass-card mb-6 overflow-hidden">
+      <div className="relative">
+        {loading ? (
+          <div className="aspect-[16/9] sm:aspect-[21/9] bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 flex items-center justify-center">
+            <div className="text-center space-y-3">
+              <div className="relative inline-block">
+                <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+                <Loader2 className="h-12 w-12 animate-spin text-primary relative" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground/80">Generating Chapter Image...</p>
+                <p className="text-xs text-muted-foreground mt-1">Analyzing {book} {chapter} with AI (30-60s)</p>
+              </div>
+            </div>
+          </div>
+        ) : imageUrl ? (
+          <>
+            <img
+              src={imageUrl}
+              alt={`${book} ${chapter}`}
+              className="w-full h-auto object-cover aspect-[16/9] sm:aspect-[21/9]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+            {/* Image controls overlay */}
+            <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 flex items-center justify-between">
+              <div className="text-white drop-shadow-lg">
+                <p className="text-xs sm:text-sm font-medium opacity-90">AI-Generated Chapter Image</p>
+                <p className="text-xs opacity-75">{book} {chapter}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={handleDownload}
+                  className="h-8 px-2 sm:px-3 bg-white/90 hover:bg-white backdrop-blur-sm"
+                >
+                  <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline ml-2">Download</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    setImageUrl(null);
+                    generateImage();
+                  }}
+                  disabled={loading}
+                  className="h-8 px-2 sm:px-3 bg-white/90 hover:bg-white backdrop-blur-sm"
+                >
+                  <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline ml-2">Regenerate</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setHidden(true)}
+                  className="h-8 px-2 sm:px-3 bg-white/90 hover:bg-white backdrop-blur-sm"
+                >
+                  <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+              </div>
+            </div>
+          </>
+        ) : null}
+      </div>
+    </Card>
+  );
+};
