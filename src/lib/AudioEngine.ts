@@ -3,6 +3,8 @@
  * Handles iOS audio unlock and provides consistent playback across devices
  */
 
+import { globalAudioManager } from './globalAudioManager';
+
 type AudioState = 'idle' | 'loading' | 'playing' | 'paused' | 'ended' | 'error';
 
 type AudioEventCallback = (state: AudioState, data?: any) => void;
@@ -72,11 +74,13 @@ class AudioEngine {
 
     this.audio.addEventListener('playing', () => {
       console.log('[AudioEngine] playing');
+      globalAudioManager.register(this.audio!);
       this.setState('playing');
     });
 
     this.audio.addEventListener('pause', () => {
       console.log('[AudioEngine] pause, currentState:', this.currentState);
+      globalAudioManager.unregister(this.audio!);
       // Don't change state to paused if we just ended
       if (this.currentState !== 'ended' && this.currentState !== 'idle') {
         this.setState('paused');
@@ -85,6 +89,7 @@ class AudioEngine {
 
     this.audio.addEventListener('ended', () => {
       console.log('[AudioEngine] ended');
+      globalAudioManager.unregister(this.audio!);
       this.setState('ended');
     });
 
@@ -184,6 +189,9 @@ class AudioEngine {
     console.log('[AudioEngine] play() called with URL:', url.substring(0, 100) + '...');
 
     try {
+      // Stop all other audio across the app
+      globalAudioManager.stopAllExcept(this.audio);
+
       // Stop any current playback first
       this.audio.pause();
       this.audio.currentTime = 0;
@@ -228,6 +236,7 @@ class AudioEngine {
   stop() {
     console.log('[AudioEngine] stop() called');
     if (this.audio) {
+      globalAudioManager.unregister(this.audio);
       this.audio.pause();
       this.audio.currentTime = 0;
       this.audio.src = '';
