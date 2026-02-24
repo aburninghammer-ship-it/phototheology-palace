@@ -1183,6 +1183,190 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
         </div>
       )}
 
+      {/* ═══ DRILL VIEW ═══ */}
+      {view === "drill" && (
+        <div className="space-y-4">
+          <Button variant="ghost" size="sm" onClick={() => setView("team")}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back to Team
+          </Button>
+
+          <Card className="bg-black/20 border-purple-500/30">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-purple-300 flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  Practice Drill — Jeeves Coaching
+                </h3>
+                <Badge className="bg-purple-500/20 text-purple-300">10-15 min</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Sharpen your skills with guided practice. Jeeves will coach you through focused exercises on your weak topics.
+              </p>
+            </CardContent>
+          </Card>
+
+          {!drillActive ? (
+            <Card className="bg-black/20 border-emerald-500/30">
+              <CardContent className="p-4 space-y-3 text-center">
+                <Bot className="h-12 w-12 text-emerald-400 mx-auto" />
+                <h4 className="font-semibold text-emerald-300">Ready to Train?</h4>
+                <p className="text-xs text-muted-foreground">
+                  Jeeves will guide you through mini-debates focusing on your team's weakest topics.
+                  This is a safe space to practice, make mistakes, and improve.
+                </p>
+                <Button
+                  onClick={() => {
+                    setDrillActive(true);
+                    setDrillMessages([
+                      {
+                        role: "coach",
+                        content: "Welcome to drill practice! I'm Coach Jeeves, and I'm here to help you sharpen your defense skills. We'll do a quick 10-15 minute drill focusing on one of your weak topics. Let's start with the Sabbath. I'll pose a common objection, and you respond. Ready? Here's the challenge: **'The Sabbath was only for the Jews. Christians worship on Sunday to honor the resurrection.'** How do you respond?",
+                      },
+                    ]);
+                  }}
+                  className="bg-gradient-to-r from-emerald-600 to-green-600"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Start Drill Session
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <div className="h-[350px] overflow-y-auto space-y-3 bg-black/20 rounded-lg p-3 border border-purple-500/30">
+                {drillMessages.map((msg, i) => (
+                  <div
+                    key={i}
+                    className={`p-3 rounded-lg ${
+                      msg.role === "coach"
+                        ? "bg-emerald-900/30 border border-emerald-500/30 text-emerald-100"
+                        : "ml-auto bg-violet-900/40 border border-violet-500/30 text-violet-100 max-w-[85%]"
+                    }`}
+                  >
+                    <div className="text-xs font-semibold mb-1 opacity-70">
+                      {msg.role === "coach" ? "🤖 Coach Jeeves" : "You"}
+                    </div>
+                    <ReactMarkdown className="text-sm">{msg.content}</ReactMarkdown>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Textarea
+                  placeholder="Your response to the drill..."
+                  className="bg-black/30 border-purple-500/30 min-h-[60px]"
+                />
+                <Button className="bg-purple-600 hover:bg-purple-500 px-3">
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDrillActive(false)}
+                className="w-full"
+              >
+                End Drill Session
+              </Button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ═══ POST-BATTLE DEBRIEF VIEW ═══ */}
+      {view === "debrief" && (
+        <div className="space-y-4">
+          <Button variant="ghost" size="sm" onClick={() => setView("overview")}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back
+          </Button>
+
+          <Card className="bg-black/20 border-emerald-500/30">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Bot className="h-8 w-8 text-emerald-400" />
+                <div>
+                  <h3 className="text-lg font-bold text-emerald-300">Post-Battle Analysis</h3>
+                  <p className="text-xs text-muted-foreground">Coach Jeeves' Team Debrief</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/20 border-blue-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-blue-300 flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                What You Did Well
+              </h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>
+                  <strong className="text-green-400">✓ Strong Scripture Usage:</strong> You backed up your arguments with solid biblical evidence. Genesis 2:1-3 and Exodus 20:8-11 were cited effectively.
+                </p>
+                <p>
+                  <strong className="text-green-400">✓ Team Coordination:</strong> Great job tag-teaming responses. Each member contributed roughly equally — excellent participation balance.
+                </p>
+                <p>
+                  <strong className="text-green-400">✓ Stayed Calm Under Pressure:</strong> When the opponent pressed hard on Colossians 2:16, you didn't panic. You regrouped and gave a measured response.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/20 border-amber-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-amber-300 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Areas for Improvement
+              </h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>
+                  <strong className="text-orange-400">⚠ Context Matters:</strong> When quoting Isaiah 58:13-14, make sure to read the surrounding context. The opponent caught you using a verse out of context. Always give the full picture.
+                </p>
+                <p>
+                  <strong className="text-orange-400">⚠ Anticipate Counter-Arguments:</strong> You were caught off-guard by the "nailed to the cross" argument. Study common objections beforehand so you're never surprised.
+                </p>
+                <p>
+                  <strong className="text-orange-400">⚠ Use Your Weapons:</strong> You forged 3 study weapons but only used 1. Don't forget your arsenal! Those weapons exist to give you an edge.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/20 border-purple-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-purple-300 flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                Focus for Next Battle
+              </h4>
+              <div className="space-y-2 text-xs text-muted-foreground">
+                <p>
+                  <strong className="text-purple-300">1. Deep-dive Hebrews 4:</strong> The Sabbath rest argument is powerful but you need to master the whole chapter, not just verse 9.
+                </p>
+                <p>
+                  <strong className="text-purple-300">2. Study the "Mark of the Beast" connection:</strong> Next week includes Prophecy. Tie the Sabbath to Revelation 14 early and often.
+                </p>
+                <p>
+                  <strong className="text-purple-300">3. Practice drills on Law & Gospel:</strong> This is still a weak spot. Run 2-3 drill sessions before Thursday's battle.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/20 border-green-500/30">
+            <CardContent className="p-4 text-center space-y-2">
+              <Trophy className="h-10 w-10 text-green-400 mx-auto" />
+              <h4 className="font-semibold text-green-300">Overall: Solid Performance!</h4>
+              <p className="text-sm text-muted-foreground">
+                You held your ground against a tough opponent. A few adjustments and you'll be unstoppable.
+                Keep studying, keep drilling, and trust the process.
+              </p>
+              <Badge className="bg-green-500/20 text-green-300 text-lg px-4 py-2">
+                Battle Score: 82/100
+              </Badge>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* ═══ DRAFT VIEW ═══ */}
       {view === "draft" && (
         <div className="space-y-4">
