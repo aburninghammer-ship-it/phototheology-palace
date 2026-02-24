@@ -7366,10 +7366,19 @@ DIFFICULTY LEVEL: ${difficulty || 'intermediate'}
 ${difficultyInstruction}
 
 TOPIC FOCUS: ${defenseTopicName || 'General theology'}
-${isSignatureTopic ? 'MODE: SIGNATURE TOPIC — You are arguing IN FAVOR of your own belief/position. This is YOUR home turf.' : 'MODE: ATTACK — You are challenging the Seventh-day Adventist position on this topic.'}
+${requestBody.isGoliathBlindMode
+  ? `MODE: GOLIATH BLIND ENGAGEMENT — The disciple does NOT know what doctrine you will attack or from what worldview. You MUST:
+1. CHOOSE a random SDA-relevant doctrine to challenge from your full arsenal of attack targets.
+2. CHOOSE a random worldview angle (atheist, Muslim, Mormon, JW, evangelical, Catholic, BHI, former SDA, Jewish, etc.) to begin from.
+3. Use a GRADUAL REVEAL strategy: Open with a provocative, probing question that could come from any worldview. Do NOT declare who you are or what position you hold. Let the disciple wonder. Over 2-3 exchanges, progressively reveal which worldview you are wielding.
+4. Your opening should feel like an ambush — intelligent, disorienting, and impossible to prepare for.
+5. Do NOT tell them what topic you chose. Let them figure it out from your questions.`
+  : isSignatureTopic ? 'MODE: SIGNATURE TOPIC — You are arguing IN FAVOR of your own belief/position. This is YOUR home turf.' : 'MODE: ATTACK — You are challenging the Seventh-day Adventist position on this topic.'}
 
 YOUR TASK:
-${isSignatureTopic
+${requestBody.isGoliathBlindMode
+  ? `Launch your opening salvo. Pick a doctrine and a worldview angle at random — the disciple has no idea what's coming. Start with a provocative question or observation that hints at your challenge without fully revealing it. Make it feel like walking into a dark room where something is waiting. Keep it to 2-3 paragraphs. Do NOT announce your worldview or the topic. Let the mystery build.`
+  : isSignatureTopic
   ? `Present the STRONGEST POSSIBLE CASE FOR your own position on this topic. This is YOUR signature belief — the hill you would die on. Build your affirmative case using your best scriptures, logic, historical evidence, and theological reasoning. Make it so compelling that the disciple must work hard to refute it. You are not merely attacking SDA doctrine here — you are BUILDING YOUR OWN CASE and daring the disciple to tear it down.`
   : `Present a compelling theological challenge against the Seventh-day Adventist position on this topic. Stay in character as someone who genuinely holds this worldview. Make your argument tight, specific, and hard to dismiss.`}
 
@@ -7384,7 +7393,9 @@ ${conversationBlock}
 SIGNATURE CLOSING LINE: "${opponentEndPrompt || 'Defend this from Scripture.'}"`;
 
       userPrompt = phase === 'follow-up'
-        ? `Continue the debate. The disciple has responded. Review their response in the conversation history and press harder on weak points or pivot to a new angle of attack on ${defenseTopicName || 'this topic'}.`
+        ? `Continue the debate. The disciple has responded. Review their response in the conversation history and press harder on weak points or pivot to a new angle of attack on ${defenseTopicName || 'this topic'}.${requestBody.isGoliathBlindMode ? ' Continue your gradual reveal — if this is exchange 2 or 3, you may begin to reveal more of your worldview angle and sharpen your doctrinal challenge.' : ''}`
+        : requestBody.isGoliathBlindMode
+        ? `Launch your blind opening challenge. Pick a random doctrine and worldview. Do NOT reveal what you chose. Start with provocative questions that disorient and intrigue.`
         : isSignatureTopic
         ? `Present your strongest affirmative case FOR your position on: ${defenseTopicName || 'this doctrine'}. This is YOUR home turf — build the most compelling argument you can and challenge the disciple to dismantle it.`
         : `Present your opening challenge against the Seventh-day Adventist position on: ${defenseTopicName || 'this doctrine'}. Make it specific, scholarly, and hard to dismiss.`;
