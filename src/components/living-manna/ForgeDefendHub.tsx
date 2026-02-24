@@ -369,13 +369,22 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">Squad Emoji</Label>
-                <Input
-                  value={squadEmoji}
-                  onChange={(e) => setSquadEmoji(e.target.value)}
-                  placeholder="⚔️"
-                  className="bg-black/30 border-amber-500/30"
-                  maxLength={4}
-                />
+                <div className="grid grid-cols-6 gap-1.5 p-2 bg-black/30 border border-amber-500/30 rounded-md">
+                  {["⚔️", "🛡️", "👑", "🔥", "⚡", "🦁", "🗡️", "🏆", "💎", "🌟", "⭐", "🎯", "📖", "✝️", "🕊️", "💪", "🦅", "🔱"].map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => setSquadEmoji(emoji)}
+                      className={`text-2xl p-2 rounded transition-all hover:scale-110 ${
+                        squadEmoji === emoji
+                          ? "bg-amber-500/40 ring-2 ring-amber-500 scale-110"
+                          : "bg-black/20 hover:bg-amber-500/20"
+                      }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
