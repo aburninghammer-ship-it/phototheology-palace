@@ -64,6 +64,7 @@ export const ChapterImage = ({ book, chapter, chapterText }: ChapterImageProps) 
 5. CINEMATIC COMPOSITION - dynamic angles (low angle for power, high angle for scope), depth, leading lines
 6. ATMOSPHERIC DRAMA - storm clouds, fire, mist, dramatic skies, contrasting light and shadow
 7. SYMBOLIC POWER - key objects or elements that represent the theological significance
+8. ETHNIC AUTHENTICITY - Biblical figures should reflect historically accurate Middle Eastern, Mediterranean, and African heritage based on the geographical and historical context. Ensure diverse, culturally appropriate representation.
 
 Chapter text (first 500 chars): ${chapterText.slice(0, 500)}...
 
@@ -74,6 +75,7 @@ Create a vivid, EPIC image prompt (2-3 sentences) that emphasizes:
 - Emotional intensity
 - Divine/supernatural presence made visible
 - Heroic or monumental composition
+- Historically accurate ethnic representation (Middle Eastern, Mediterranean, African features as appropriate to the biblical context)
 
 Make this look like it belongs in an epic biblical film directed by a master cinematographer.`;
 
@@ -103,6 +105,14 @@ EPIC CINEMATIC STYLE REQUIREMENTS:
 - Atmospheric depth with mist, particles, or environmental effects
 - Sharp focus on key subjects, dramatic depth of field
 - NO text, NO watermarks, NO borders
+
+ETHNIC REPRESENTATION (CRITICAL):
+- Biblical figures MUST reflect historically accurate Middle Eastern, Mediterranean, and North African ethnic features
+- Skin tones: olive, tan, brown complexions appropriate to ancient Near East geography
+- Facial features: diverse Middle Eastern and Mediterranean characteristics
+- For crowds/groups: show ethnic diversity reflecting historical trade routes and migrations
+- Avoid Eurocentric defaults - this is ancient Israel, Egypt, Mesopotamia, and surrounding regions
+- Cultural authenticity in clothing, appearance, and setting
 
 Reference: ${book} ${chapter} - Biblical Epic Masterpiece`;
 
