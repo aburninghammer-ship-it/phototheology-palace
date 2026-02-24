@@ -21,6 +21,8 @@ import { useToast } from "@/hooks/use-toast";
 import { StyledMarkdown } from "@/components/ui/styled-markdown";
 import { useTextToSpeechEnhanced, OPENAI_VOICES } from "@/hooks/useTextToSpeechEnhanced";
 import type { VoiceId } from "@/hooks/useTextToSpeechEnhanced";
+import { GCConflictTag } from "@/components/cota/GCConflictTag";
+import type { GCConflictTag as GCConflictTagType } from "@/types/gcConflictTag";
 
 // ─── EGW Book Library ───────────────────────────────────────────────
 interface EGWBook {
@@ -459,6 +461,8 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   const [paragraphAnalysis, setParagraphAnalysis] = useState<string | null>(null);
   const [analyzingParagraph, setAnalyzingParagraph] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<string>("CR");
+  const [gcTag, setGcTag] = useState<GCConflictTagType | null>(null);
+  const [loadingGcTag, setLoadingGcTag] = useState(false);
 
   // Cross-reference state
   const [crossRefs, setCrossRefs] = useState<Record<number, { reference: string; text: string; connection: string }[]>>({});
@@ -661,6 +665,56 @@ Apply this Palace room lens specifically to the selected passage. Be theological
       });
     } finally {
       setAnalyzingParagraph(false);
+    }
+  };
+
+  // Generate GC Conflict Tag for a paragraph
+  const generateGcConflictTag = async (text: string) => {
+    if (!selectedBook || !selectedChapter) return;
+    setLoadingGcTag(true);
+    setGcTag(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "egw_palace_analysis",
+          message: `You are the Great Controversy Conflict Tag engine. Analyze this paragraph from "${selectedBook.title}", Chapter ${selectedChapter.number}: "${selectedChapter.title}" and return ONLY a valid JSON object (no markdown, no explanation) with these exact fields:
+
+{
+  "axis": one of "Truth vs Error" | "Freedom vs Tyranny" | "Light vs Darkness" | "Christ vs Satan" | "Heaven vs Hell",
+  "battlefield": array of 1-4 from ["Mind","Church","State","Doctrine","Worship","Scripture","Conscience","Prophecy","Law","Sanctuary"],
+  "satanStrategy": string describing Satan's strategy in this paragraph (1-2 sentences),
+  "godCounterStrategy": string describing God's counter-strategy (1-2 sentences),
+  "deceptionType": array of 0-3 from ["Counterfeit Authority","Gradual Compromise","Force & Coercion","Tradition Over Scripture","Spiritualism","False Security","Confusion & Division","Prosperity Gospel","Antinomianism","Legalism","Time Manipulation","Identity Theft"],
+  "outcome": array of 1-3 from ["Light Preserved","Light Suppressed","Remnant Emerges","Apostasy Deepens","Persecution Intensifies","Reform Begins","Deception Exposed","Crisis Point","Victory Secured","Judgment Pronounced"],
+  "propheticWeight": number 1-10,
+  "historicalPeriod": string or null,
+  "prophecyConnection": string connecting to Daniel/Revelation or null,
+  "modernParallel": string with modern application or null,
+  "defenseRelevance": array of objects with {opponent, attackVector, defenseWeapon} or empty array
+}
+
+**Paragraph:**
+"${text}"
+
+Return ONLY the JSON. No markdown fences, no explanation.`,
+          context: `book:${selectedBook.id},chapter:${selectedChapter.number},gc_conflict_tag:true`,
+        },
+      });
+      if (error) throw error;
+      const raw = typeof data === 'string' ? data : data?.response || data?.content || JSON.stringify(data);
+      // Parse JSON from response, stripping any markdown fences
+      const cleaned = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      setGcTag(parsed as GCConflictTagType);
+    } catch (err) {
+      console.error("GC Conflict Tag error:", err);
+      toast({
+        title: "Conflict Tag Error",
+        description: "Could not generate Great Controversy analysis.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingGcTag(false);
     }
   };
 
@@ -1042,6 +1096,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                             onClick={() => {
                               setSelectedParagraph(paragraph);
                               setParagraphAnalysis(null);
+                              setGcTag(null);
                             }}
                           >
                             {/* Paragraph number */}
@@ -1540,6 +1595,40 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                 </div>
               </div>
             )}
+
+            {/* ─── GC Conflict Tag Section ─────────────────────────── */}
+            <Separator className="opacity-30" />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1.5">
+                  <Sword className="h-3 w-3 text-destructive" />
+                  Great Controversy Conflict Tag
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 text-xs h-7 border-destructive/30 text-destructive hover:bg-destructive/10"
+                  onClick={() => selectedParagraph && generateGcConflictTag(selectedParagraph)}
+                  disabled={loadingGcTag}
+                >
+                  {loadingGcTag ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Shield className="h-3 w-3" />
+                  )}
+                  {gcTag ? "Regenerate" : "Generate"} Tag
+                </Button>
+              </div>
+              {gcTag && (
+                <GCConflictTag tag={gcTag} defaultExpanded={true} />
+              )}
+              {!gcTag && !loadingGcTag && (
+                <p className="text-xs text-muted-foreground/60 italic pl-1">
+                  Tap "Generate Tag" to map this paragraph onto the cosmic conflict meta-narrative.
+                </p>
+              )}
+            </div>
+            <Separator className="opacity-30" />
 
             {/* Action buttons */}
             <div className="flex gap-2">

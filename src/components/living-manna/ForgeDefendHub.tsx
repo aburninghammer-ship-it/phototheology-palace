@@ -1246,7 +1246,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                     <div className="text-xs font-semibold mb-1 opacity-70">
                       {msg.role === "coach" ? "🤖 Coach Jeeves" : "You"}
                     </div>
-                    <ReactMarkdown className="text-sm">{msg.content}</ReactMarkdown>
+                    <div className="text-sm"><ReactMarkdown>{msg.content}</ReactMarkdown></div>
                   </div>
                 ))}
               </div>

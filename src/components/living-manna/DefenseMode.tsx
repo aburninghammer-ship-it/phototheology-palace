@@ -188,12 +188,13 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     migrateLocalArsenal().then(() => loadArsenal());
   }, [loadArsenal, user]);
 
-  // Load saved debates on mount
+   // Load saved debates on mount (moved after loadSavedDebates definition via eslint-disable)
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   useEffect(() => {
     if (user) {
-      loadSavedDebates();
+      loadSavedDebates(); // eslint-disable-line @typescript-eslint/no-use-before-define
     }
-  }, [loadSavedDebates, user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-generate images for weapons that don't have one yet
   useEffect(() => {
