@@ -7757,6 +7757,272 @@ You MUST respond with a JSON block wrapped in \`\`\`json ... \`\`\` containing:
 
       userPrompt = `Design a checkmate question sequence for this thesis:\n\nTHESIS: ${thesisText}${targetText ? `\n\nOPPOSING POSITION: ${targetText}` : ""}\n\nTOPIC: ${topicName}`;
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // FORGE & DEFEND — Team-Based 6-Week Challenge Modes
+    // ═══════════════════════════════════════════════════════════════════════
+
+    } else if (mode === "forge-defend-draft") {
+      // Forge & Defend: AI-powered team draft ceremony
+      const participants = requestBody.participants || [];
+      const teamSize = requestBody.teamSize || 3;
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in FORGE & DEFEND DRAFT MODE. You are conducting a sacred draft ceremony for the Forge & Defend challenge — a 6-week team-based apologetics competition.
+
+## YOUR TASK
+Analyze each participant's strengths and create BALANCED teams of ${teamSize} members each. Consider:
+- Theological knowledge areas (which topics they're strongest in)
+- Arsenal weapon count and quality
+- Past defense sparring performance
+- Complementary skill distribution (each team should cover different doctrine areas)
+
+## DRAFT PRINCIPLES
+1. NO STACKING — distribute strong defenders evenly
+2. COMPLEMENTARY COVERAGE — each team should have members covering different topic areas
+3. CHEMISTRY — pair analytical minds with passionate communicators when possible
+4. EVERY TEAM VIABLE — no team should feel hopeless against their assigned AI enemy squad
+
+## OUTPUT FORMAT
+Respond with a JSON block wrapped in \`\`\`json ... \`\`\`:
+
+\`\`\`json
+{
+  "teams": [
+    {
+      "teamName": "Creative biblical team name",
+      "teamMotto": "Short inspiring motto",
+      "teamEmoji": "single emoji",
+      "teamColor": "tailwind color class (e.g. violet-600)",
+      "members": [
+        {
+          "userId": "user-id-here",
+          "displayName": "Name",
+          "role": "captain or warrior",
+          "draftReason": "Why this person was placed on this team"
+        }
+      ]
+    }
+  ],
+  "draftNarrative": "A dramatic 2-3 paragraph narrative of the draft ceremony, written in Jeeves' voice, explaining the strategic reasoning behind each team composition."
+}
+\`\`\`
+
+## RULES
+- First member listed on each team is the captain (strongest overall or best leader)
+- Team names should be biblically inspired and warrior-themed
+- Mottos should be from scripture (KJV) or inspired by it
+- NEVER use the word "dear"`;
+
+      userPrompt = `Conduct the Forge & Defend draft ceremony for these ${participants.length} participants:\n\n${JSON.stringify(participants, null, 2)}\n\nCreate balanced teams of ${teamSize} members each.`;
+
+    } else if (mode === "forge-defend-team-sparring") {
+      // Forge & Defend: Team-based sparring with round rotation
+      const teamName = requestBody.teamName || "Team";
+      const teamMembers = requestBody.teamMembers || [];
+      const currentSpeaker = requestBody.currentSpeaker || "";
+      const roundRotation = requestBody.roundRotation || 1;
+      const weaponsAvailable = requestBody.weaponsAvailable || [];
+      const isSignature = requestBody.isSignatureTopic || false;
+
+      const temperamentInstruction = requestBody.temperament
+        ? (() => {
+            const t = requestBody.temperament as string[];
+            const traits: string[] = [];
+            if (t.includes('rude')) traits.push('Be blunt, cutting, and openly disrespectful toward the team.');
+            if (t.includes('angry')) traits.push('Show genuine frustration and moral outrage at the team position.');
+            if (t.includes('condescending')) traits.push('Speak as though no one on the team can match your reasoning.');
+            if (t.includes('dismissive')) traits.push('Pre-dismiss answers before the team makes them.');
+            if (t.includes('brilliant')) traits.push('Deploy advanced scholarly firepower, cite experts by name.');
+            if (t.includes('haughty')) traits.push('Carry an air of intellectual superiority over the entire team.');
+            if (t.includes('polite')) traits.push('Be civil and gracious — but lethal in argumentation.');
+            if (t.includes('respectful')) traits.push('Treat the team as worthy opponents, disagree honestly.');
+            if (t.includes('aggressive')) traits.push('Apply relentless pressure, pile questions rapidly on all members.');
+            return traits.length > 0 ? `\nTEMPERAMENT DIRECTIVES (MUST FOLLOW):\n${traits.map(t => `- ${t}`).join('\n')}` : '';
+          })()
+        : '';
+
+      const difficultyInstruction = difficulty === 'advanced'
+        ? 'Present the ABSOLUTE STRONGEST version of your argument. Use scholarly sources, original languages, and counter-exegesis. Leave NO escape routes.'
+        : difficulty === 'intermediate'
+        ? 'Present 2-3 connected arguments with follow-up challenges. Anticipate common defenses and preemptively counter them.'
+        : 'Present ONE clear argument at a time. Be firm but not overwhelming. This team is learning.';
+
+      const weaponContext = weaponsAvailable.length > 0
+        ? `\n\nNOTE: This team has the following weapons in their arsenal that they may deploy: ${weaponsAvailable.map((w: any) => w.name || w.topic).join(', ')}. Be prepared for these arguments.`
+        : '';
+
+      const conversationBlock = phase === 'follow-up' && conversationHistory
+        ? `\n\nCONVERSATION SO FAR:\n${conversationHistory}\n\nCRITICAL: The previous round was answered by a different team member. Now ${currentSpeaker} is responding. Adjust your attack to challenge this specific respondent while building on the ongoing argument thread.`
+        : '';
+
+      systemPrompt = `You are roleplaying as a theological debater challenging Team "${teamName}" in the Forge & Defend challenge.
+${temperamentInstruction}
+WORLDVIEW:
+${opponentWorldview}
+ARGUMENT STYLE:
+${opponentStyle}
+
+DIFFICULTY: ${difficultyInstruction}
+
+TEAM CONTEXT: You are debating a team of ${teamMembers.length} members who rotate responses. Current speaker: ${currentSpeaker}. Round ${roundRotation} of the battle.
+
+${isSignature ? `This is YOUR HOME TURF TOPIC. You are arguing FOR your own position with maximum conviction.` : `You are attacking the SDA/biblical position on this topic.`}
+${weaponContext}
+${conversationBlock}
+
+RULES:
+- Address the TEAM collectively but direct pointed questions at the current speaker
+- Reference previous team members' responses if applicable to show you're tracking the whole team
+- Keep attacks focused and theologically rigorous
+- Use KJV scripture references
+- Maximum 200 words per attack
+- NEVER use the word "dear"
+- NEVER break character`;
+
+      userPrompt = phase === 'follow-up'
+        ? `Continue the debate. The team's previous response was:\n\n"${discipleResponse}"\n\nLaunch your next attack against Team "${teamName}". Current defender: ${currentSpeaker}.`
+        : `Launch your opening attack against Team "${teamName}" on the topic of ${defenseTopicName}. Direct your challenge at ${currentSpeaker} who will respond first.`;
+
+    } else if (mode === "forge-defend-team-coach") {
+      // Forge & Defend: Team evaluation with anti-carry assessment
+      const teamName = requestBody.teamName || "Team";
+      const teamResponses = requestBody.teamResponses || [];
+      const participationStats = requestBody.participationStats || [];
+      const weaponsUsed = requestBody.weaponsUsed || [];
+      const battleType = requestBody.battleType || "standard";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in FORGE & DEFEND TEAM COACH MODE. You are evaluating a team's collective performance in a Forge & Defend battle.
+
+## EVALUATION CRITERIA
+
+### 1. THEOLOGICAL ACCURACY (1-10)
+- Were the team's responses biblically sound?
+- Did they use scripture correctly (KJV)?
+- Were their arguments logically coherent?
+
+### 2. TEAM COORDINATION (1-10)
+- Did team members build on each other's arguments?
+- Was there strategic weapon deployment?
+- Did they cover different angles effectively?
+
+### 3. WEAPON DEPLOYMENT (1-10)
+- Were forged weapons used effectively?
+- Did weapon usage strengthen the overall defense?
+- ${weaponsUsed.length === 0 ? 'NOTE: No weapons were deployed — this is a penalty area.' : `Weapons deployed: ${weaponsUsed.length}`}
+
+### 4. PARTICIPATION BALANCE (Assessment)
+Review speaking distribution:
+${participationStats.map((p: any) => `- ${p.name}: ${p.speakingPct}% of speaking time`).join('\n')}
+- Flag if any member >60% (CARRYING)
+- Flag if any member <15% (ABSENT/SILENT)
+
+## OUTPUT FORMAT
+Respond with a JSON block:
+\`\`\`json
+{
+  "overallScore": 7,
+  "theologicalScore": 8,
+  "coordinationScore": 6,
+  "weaponScore": 7,
+  "participationBalanced": true,
+  "carryingMembers": [],
+  "silentMembers": [],
+  "battleSummary": "Dramatic narrative summary of the battle in Jeeves' voice (3-4 sentences)",
+  "strengthHighlights": ["What the team did well"],
+  "improvementAreas": ["Where the team can grow"],
+  "modelDefense": "What the IDEAL team response would have looked like (brief)",
+  "pointsAwarded": {
+    "roundScores": [7, 6, 8],
+    "battleWon": true,
+    "weaponBonus": 15,
+    "participationBonus": 50,
+    "carryPenalty": 0,
+    "totalPoints": 265
+  }
+}
+\`\`\`
+
+## RULES
+- Score the TEAM, not individuals
+- Be encouraging but honest
+- ${battleType === 'boss' ? 'This is a BOSS BATTLE — scoring should reflect the higher difficulty and epic stakes.' : 'Standard battle scoring.'}
+- NEVER use the word "dear"`;
+
+      userPrompt = `Evaluate Team "${teamName}"'s performance in this ${battleType} battle.\n\nTEAM RESPONSES:\n${teamResponses.map((r: any, i: number) => `Round ${i + 1} (${r.memberName}): "${r.response}"`).join('\n\n')}\n\nOPPONENT ATTACKS:\n${teamResponses.map((r: any, i: number) => `Round ${i + 1}: "${r.opponentAttack}"`).join('\n\n')}\n\nWEAPONS USED: ${weaponsUsed.length > 0 ? weaponsUsed.map((w: any) => w.name).join(', ') : 'None'}`;
+
+    } else if (mode === "forge-defend-boss-battle") {
+      // Forge & Defend: Week 6 Boss Battle — 3 AI opponents attack simultaneously
+      const teamName = requestBody.teamName || "Team";
+      const teamMembers = requestBody.teamMembers || [];
+      const enemySquad = requestBody.enemySquad || [];
+      const currentSpeaker = requestBody.currentSpeaker || "";
+      const roundNumber = requestBody.roundNumber || 1;
+      const weaponsAvailable = requestBody.weaponsAvailable || [];
+
+      const enemyProfiles = enemySquad.map((e: any) => `${e.name} (${e.emoji}): ${e.worldview?.substring(0, 200) || e.id}`).join('\n\n');
+
+      const conversationBlock = phase === 'follow-up' && conversationHistory
+        ? `\n\nBATTLE HISTORY:\n${conversationHistory}\n\nCRITICAL: Build on the conversation. Reference what other opponents have argued. Coordinate the multi-pronged assault.`
+        : '';
+
+      systemPrompt = `You are narrating and generating attacks for a BOSS BATTLE in the Forge & Defend challenge. Three AI opponents attack Team "${teamName}" SIMULTANEOUSLY with coordinated theological arguments.
+
+## THE ENEMY SQUAD
+${enemyProfiles}
+
+## BOSS BATTLE RULES
+1. ALL THREE opponents attack in a coordinated strategy
+2. Each opponent attacks from their unique worldview but they REFERENCE each other's arguments
+3. The attacks should be multi-pronged — forcing the team to defend on multiple fronts simultaneously
+4. One opponent sets the trap, another applies pressure, the third delivers the killing blow
+5. This is EPIC — the culmination of 6 weeks of training
+
+## COORDINATION STRATEGY
+- Opponent 1: Opens with the foundational challenge (sets the premise)
+- Opponent 2: Builds on Opponent 1's challenge from a different angle (tightens the noose)
+- Opponent 3: Delivers the combined knockout argument that leverages both previous attacks
+
+## CURRENT STATE
+- Round: ${roundNumber}
+- Team members: ${teamMembers.map((m: any) => m.displayName || m.name).join(', ')}
+- Current defender: ${currentSpeaker}
+- Team weapons available: ${weaponsAvailable.length > 0 ? weaponsAvailable.map((w: any) => w.name || w.topic).join(', ') : 'None'}
+${conversationBlock}
+
+## OUTPUT FORMAT
+Respond with dramatic narration followed by the coordinated attack. Format:
+
+**[BOSS BATTLE — Round ${roundNumber}]**
+
+*[Dramatic narration of the opponents conferring and launching their coordinated assault]*
+
+**${enemySquad[0]?.name || 'Opponent 1'}:** [Their attack — 100 words max]
+
+**${enemySquad[1]?.name || 'Opponent 2'}:** [Their attack building on the first — 100 words max]
+
+**${enemySquad[2]?.name || 'Opponent 3'}:** [The combined knockout — 100 words max]
+
+*[Challenge to ${currentSpeaker}: What's your defense?]*
+
+## RULES
+- Use KJV scripture references
+- Make attacks interconnected and strategically coordinated
+- This should feel EPIC and climactic
+- Maximum combined 400 words
+- NEVER use the word "dear"
+- NEVER break character for any opponent`;
+
+      userPrompt = phase === 'follow-up'
+        ? `The team's response from ${currentSpeaker} was:\n\n"${discipleResponse}"\n\nLaunch the next coordinated assault. The opponents should adapt based on the team's defense and intensify their strategy.`
+        : `Launch the opening BOSS BATTLE assault against Team "${teamName}" on the topic of ${defenseTopicName}. All three opponents coordinate their attack. Direct the challenge at ${currentSpeaker} who defends first.`;
+
     } else if (mode === "guesthouse_generate_prompt") {
       // GuestHouse: Generate a game prompt for live sessions
       const { gameType, verse: gameVerse, difficulty: gameDifficulty } = requestBody;
@@ -8357,6 +8623,7 @@ FORMAT: Use clear markdown with headers, bullet points, and bold for emphasis. S
       "guesthouse_generate_prompt", "guesthouse_grade_response",
       "guesthouse_group_insight", "guesthouse_suggest_event",
       "guesthouse_create_custom_challenge", "guesthouse_grade_custom_challenge",
+      "forge-defend-draft", "forge-defend-team-coach",
       "check-commentary-availability", "check_chef_recipe",
       "get_chef_model_answer", "generate_chef_verses",
       "strongs-lookup", "translate-verse",
@@ -8401,10 +8668,10 @@ FORMAT: Use clear markdown with headers, bullet points, and bold for emphasis. S
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" ? "google/gemini-2.5-flash" : mode.startsWith("defense-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
+        model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" ? "google/gemini-2.5-flash" : mode.startsWith("defense-") || mode.startsWith("forge-defend-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "research" ? 2048 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
+        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
       }),
     });
 

@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown";
 import { CommunityArmory } from "./CommunityArmory";
 import { CheckmateMode } from "./CheckmateMode";
 import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
+import { ForgeDefendHub } from "./ForgeDefendHub";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,7 @@ interface ChatMessage {
   score?: number;
 }
 
-type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate";
+type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate" | "forge-defend";
 
 interface ArsenalWeapon {
   id: string;
@@ -809,7 +810,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         </div>
 
         {/* Sub-mode Toggle: 5 tabs */}
-        <div className={`grid ${isMobile ? "grid-cols-3" : "grid-cols-7"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-4xl mx-auto`}>
+        <div className={`grid ${isMobile ? "grid-cols-4" : "grid-cols-7"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-4xl mx-auto`}>
           {([
             { id: "sparring" as const, label: "Sparring Arena", icon: Swords, gradient: "from-red-600 to-orange-600" },
             { id: "library" as const, label: "3AM Library", icon: BookOpen, gradient: "from-amber-600 to-yellow-600" },
@@ -817,7 +818,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             { id: "analyze-attack" as const, label: "Analyze Attack", icon: Target, gradient: "from-purple-600 to-pink-600" },
             { id: "arsenal" as const, label: `Arsenal${arsenal.length > 0 ? ` (${arsenal.length})` : ""}`, icon: Warehouse, gradient: "from-emerald-600 to-teal-600" },
             { id: "community-armory" as const, label: "Community Armory", icon: Users, gradient: "from-amber-600 to-orange-600" },
-            
+            { id: "forge-defend" as const, label: "Forge & Defend", icon: Trophy, gradient: "from-violet-600 to-fuchsia-600" },
           ]).map((tab) => (
             <button
               key={tab.id}
@@ -834,7 +835,9 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           ))}</div>
 
         {/* Render based on sub-mode */}
-        {subMode === "community-armory" ? (
+        {subMode === "forge-defend" ? (
+          <ForgeDefendHub churchId={churchId} />
+        ) : subMode === "community-armory" ? (
           <CommunityArmory onGoToForge={() => setSubMode("analyze-weapon")} />
         ) : subMode === "checkmate" ? (
           <CheckmateMode onBack={() => setSubMode("analyze-weapon")} />

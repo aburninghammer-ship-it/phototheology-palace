@@ -484,6 +484,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   const {
     speak: ttsSpeak,
     stop: ttsStop,
+    preload: ttsPreload,
     isLoading: ttsLoading,
     isPlaying: commentaryPlaying,
     selectedVoice: egwVoice,
@@ -497,6 +498,10 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
         const nextIdx = idx + 1;
         updateCurrentSection(nextIdx);
         ttsSpeakRef.current?.(sections[nextIdx]);
+        // Preload the section after next for seamless flow
+        if (nextIdx + 1 < sections.length) {
+          ttsPreloadRef.current?.(sections[nextIdx + 1]);
+        }
       } else {
         autoAdvancingRef.current = false;
       }
@@ -505,6 +510,8 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
 
   // Keep speak ref updated
   ttsSpeakRef.current = ttsSpeak;
+  const ttsPreloadRef = useRef(ttsPreload);
+  ttsPreloadRef.current = ttsPreload;
   
   const { toast } = useToast();
 
@@ -547,8 +554,12 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
     autoAdvancingRef.current = true;
     if (commentarySectionsRef.current[idx]) {
       ttsSpeak(commentarySectionsRef.current[idx]);
+      // Preload the next section for seamless transition
+      if (idx + 1 < commentarySectionsRef.current.length) {
+        ttsPreload(commentarySectionsRef.current[idx + 1]);
+      }
     }
-  }, [ttsSpeak, updateCurrentSection]);
+  }, [ttsSpeak, ttsPreload, updateCurrentSection]);
 
   const stopCommentary = useCallback(() => {
     ttsStop();
@@ -962,7 +973,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
           </TabsTrigger>
           <TabsTrigger value="listen" className="gap-2">
             <Headphones className="h-4 w-4" />
-            Listen
+            Audio Commentary
           </TabsTrigger>
           <TabsTrigger value="analyze" className="gap-2">
             <Telescope className="h-4 w-4" />
