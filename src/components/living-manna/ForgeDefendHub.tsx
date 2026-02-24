@@ -1009,14 +1009,65 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
       {/* ═══ PREP VIEW ═══ */}
       {view === "prep" && (
         <div className="space-y-4">
+          {/* Weekly Overview */}
           <Card className="bg-black/20 border-emerald-500/30">
             <CardContent className="p-4 space-y-3">
               <h3 className="text-lg font-bold text-emerald-300 flex items-center gap-2">
-                <BookOpen className="h-5 w-5" /> Weekly Prep
+                <BookOpen className="h-5 w-5" /> Week {activeSeason?.current_week || 1} Prep Guide
               </h3>
               <p className="text-sm text-muted-foreground">
-                This week's topics: {currentTier.label}
+                <strong className="text-emerald-300">{currentTier.label}</strong> — Strategic preparation for the battles ahead
               </p>
+            </CardContent>
+          </Card>
+
+          {/* AI Opponents Intelligence */}
+          <Card className="bg-black/20 border-red-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-red-300 flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                Know Your Enemy — AI Critics You'll Face
+              </h4>
+              <p className="text-xs text-muted-foreground mb-3">
+                These opponents are active this week. Study their tactics and prepare your defense.
+              </p>
+              <div className="space-y-2">
+                {DEFENSE_OPPONENTS.slice(0, 5).map((opponent) => (
+                  <div key={opponent.id} className="p-3 bg-black/40 rounded-lg border border-red-500/20">
+                    <div className="flex items-start gap-2 mb-2">
+                      <span className="text-2xl">{opponent.emoji}</span>
+                      <div className="flex-1">
+                        <h5 className="font-semibold text-sm text-white">{opponent.name}</h5>
+                        <p className="text-xs text-muted-foreground">{opponent.description}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5 mt-2">
+                      <div className="text-xs">
+                        <span className="text-orange-400 font-medium">Arguments you'll face:</span>
+                        <ul className="list-disc list-inside mt-1 space-y-0.5 text-muted-foreground">
+                          {opponent.attackTargets.slice(0, 3).map((target, idx) => (
+                            <li key={idx}>{target}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="text-xs">
+                        <span className="text-blue-400 font-medium">Their style:</span>
+                        <p className="text-muted-foreground mt-0.5">{opponent.argumentStyle.split('.')[0]}.</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* This Week's Topics */}
+          <Card className="bg-black/20 border-emerald-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-emerald-300 flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                This Week's Doctrines to Master
+              </h4>
               <div className="space-y-2">
                 {currentTier.topics.map((topicId) => {
                   const topic = DEFENSE_TOPICS.find((t) => t.id === topicId);
@@ -1027,6 +1078,195 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                     </div>
                   ) : null;
                 })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bible Study Recommendations */}
+          <Card className="bg-black/20 border-blue-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-blue-300 flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Essential Bible Study — Where to Dig Deep
+              </h4>
+              <div className="space-y-3">
+                {currentTier.tier === "foundational" && (
+                  <>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Sabbath Defense</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Study these key chapters:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Genesis 2:1-3</Badge>
+                        <Badge variant="outline" className="text-xs">Exodus 20:8-11</Badge>
+                        <Badge variant="outline" className="text-xs">Isaiah 58:13-14</Badge>
+                        <Badge variant="outline" className="text-xs">Mark 2:27-28</Badge>
+                        <Badge variant="outline" className="text-xs">Hebrews 4:1-11</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Creation week, Manna in wilderness, Jesus healing on Sabbath</p>
+                    </div>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">State of the Dead</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Master these texts:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Ecclesiastes 9:5-6</Badge>
+                        <Badge variant="outline" className="text-xs">Psalm 146:4</Badge>
+                        <Badge variant="outline" className="text-xs">John 11:11-14</Badge>
+                        <Badge variant="outline" className="text-xs">1 Thess 4:13-18</Badge>
+                        <Badge variant="outline" className="text-xs">1 Cor 15:51-55</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Lazarus, Rich man and Lazarus parable, Samuel and the witch</p>
+                    </div>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Law & Gospel</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Know these passages:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Romans 3:31</Badge>
+                        <Badge variant="outline" className="text-xs">Matthew 5:17-19</Badge>
+                        <Badge variant="outline" className="text-xs">James 2:10-12</Badge>
+                        <Badge variant="outline" className="text-xs">1 John 2:3-6</Badge>
+                        <Badge variant="outline" className="text-xs">Revelation 14:12</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Rich young ruler, Woman at the well, Paul's conversion</p>
+                    </div>
+                  </>
+                )}
+                {currentTier.tier === "advanced" && (
+                  <>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Sanctuary & 1844</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Deep study required:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Daniel 8:14</Badge>
+                        <Badge variant="outline" className="text-xs">Leviticus 16</Badge>
+                        <Badge variant="outline" className="text-xs">Hebrews 8-10</Badge>
+                        <Badge variant="outline" className="text-xs">Revelation 11:19</Badge>
+                        <Badge variant="outline" className="text-xs">Ezekiel 4:6</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Day of Atonement, Temple cleansing, High Priest garments</p>
+                    </div>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Trinity Defense</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Critical passages:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Matthew 28:19</Badge>
+                        <Badge variant="outline" className="text-xs">2 Cor 13:14</Badge>
+                        <Badge variant="outline" className="text-xs">John 1:1-3</Badge>
+                        <Badge variant="outline" className="text-xs">John 14-16</Badge>
+                        <Badge variant="outline" className="text-xs">Acts 5:3-4</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Jesus' baptism, Great Commission, Ananias and Sapphira</p>
+                    </div>
+                  </>
+                )}
+                {currentTier.tier === "elite" && (
+                  <>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Remnant Church</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Master these prophecies:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Revelation 12:17</Badge>
+                        <Badge variant="outline" className="text-xs">Revelation 14:6-12</Badge>
+                        <Badge variant="outline" className="text-xs">Joel 2:28-32</Badge>
+                        <Badge variant="outline" className="text-xs">Malachi 4:5-6</Badge>
+                        <Badge variant="outline" className="text-xs">Matthew 24:14</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Elijah, 144,000, Three Angels' Messages</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* App Training Recommendations */}
+          <Card className="bg-black/20 border-purple-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-purple-300 flex items-center gap-2">
+                <Zap className="h-4 w-4" />
+                Recommended Training in Phototheology Suite
+              </h4>
+              <div className="space-y-2">
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    <BookOpen className="h-3 w-3" /> Study Bible
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Read chapters with <strong>CATO</strong> commentary for deeper understanding.
+                    Focus on the passages listed above. Use the <strong>Analyze</strong> tab to get AI insights.
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    🎮 Bible Scrabble
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Play <strong>Topic Mode</strong> selecting this week's doctrines. Build vocabulary and verse knowledge.
+                    Multiplayer mode sharpens competitive skills.
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    <Flame className="h-3 w-3" /> Defense Mode (Solo Practice)
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Practice <strong>Scout Mode</strong> against the opponents listed above on <strong>Beginner</strong> difficulty.
+                    Build confidence before the real battle.
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    📚 Living Manna Space
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Read EGW writings on this week's topics. Use the <strong>Spirit of Prophecy</strong> tab for
+                    Desire of Ages, Great Controversy, and Patriarchs & Prophets insights.
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    🎧 Audio Bible (Epic Mode)
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Listen to chapters with <strong>Epic commentary</strong> for narrative immersion.
+                    Perfect for commute or workout prep sessions.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Strategic Advice */}
+          <Card className="bg-black/20 border-amber-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-amber-300 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Battle Strategy & Team Prep Tips
+              </h4>
+              <div className="space-y-2 text-xs text-muted-foreground">
+                <p>
+                  <strong className="text-amber-300">1. Divide & Conquer:</strong> Assign each team member 1-2 topics to become experts in.
+                  Don't try to master everything — specialize and support each other.
+                </p>
+                <p>
+                  <strong className="text-amber-300">2. Know Your Opponent:</strong> Study the worldview and argument style of each AI critic.
+                  Anticipate their objections before they make them.
+                </p>
+                <p>
+                  <strong className="text-amber-300">3. Scripture Saturation:</strong> The best defense is deep Bible knowledge.
+                  Memorize 3-5 key verses per topic. Context is everything.
+                </p>
+                <p>
+                  <strong className="text-amber-300">4. Practice Under Pressure:</strong> Use Defense Mode solo practice on Advanced difficulty.
+                  Get comfortable being uncomfortable.
+                </p>
+                <p>
+                  <strong className="text-amber-300">5. Team Coordination:</strong> Meet as a squad before battles. Discuss strategy.
+                  Who handles which arguments? Who's your anchor for tough questions?
+                </p>
+                <p>
+                  <strong className="text-amber-300">6. Use Weapons Wisely:</strong> Forge study weapons this week.
+                  Save your strongest weapons for the hardest battles (Goliath, boss fights).
+                </p>
               </div>
             </CardContent>
           </Card>
