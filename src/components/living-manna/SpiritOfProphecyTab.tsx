@@ -879,6 +879,40 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
           </CardHeader>
         </Card>
 
+        {/* Defense Mode CTA */}
+        <Card variant="glass" className="border-destructive/30 bg-gradient-to-r from-destructive/5 via-background to-destructive/5 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-destructive/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative">
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 shrink-0">
+              <Shield className="h-7 w-7 text-destructive" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                Defense Mode
+                <Badge variant="outline" className="text-[10px] border-destructive/40 text-destructive">Forge & Defend</Badge>
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Sharpen your theological arguments. Forge weapons from Scripture and EGW writings, spar with AI critics, and build your apologetics arsenal.
+              </p>
+            </div>
+            <Button 
+              variant="destructive" 
+              size="lg"
+              className="gap-2 shrink-0 shadow-lg"
+              onClick={() => {
+                setSelectedBook(EGW_BOOKS[4]); // GC as default
+                setTimeout(() => {
+                  setChapterTab("defense");
+                  setSelectedChapter(EGW_BOOKS[4].chapters[0]);
+                }, 100);
+              }}
+            >
+              <Sword className="h-4 w-4" />
+              Enter the Forge
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Conflict of the Ages */}
         <div>
           <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
