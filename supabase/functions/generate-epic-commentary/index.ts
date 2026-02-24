@@ -16,7 +16,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 // ElevenLabs voice IDs per commentary mode
 const VOICE_IDS: Record<string, string> = {
-  epic: "fjnwTZkKtQOJaYzGLa6n",      // William - Deep Engaging Storyteller
+  epic: "bIHbv24MWmeRgasZH58o",      // William (Will) - Deep Engaging Storyteller
   urban: "cgSgspJ2msm6clMCkdW9",     // Jessica - Warm expressive ethnic voice
   ancient: "onwK4e9ZLuTAKqWW03F9",    // Daniel - Measured authoritative
   preacher: "iP95p4xoKVk53GoZ742B",   // Chris - Clear natural male voice

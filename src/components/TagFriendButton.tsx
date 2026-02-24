@@ -88,14 +88,15 @@ export const TagFriendButton = ({
       // Get all profiles except current user
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, display_name, full_name")
+        .select("id, display_name")
         .neq("id", user.id)
         .limit(100);
 
       if (error) throw error;
 
-      setAllUsers(data || []);
-      setFilteredUsers(data || []);
+      const mapped = (data || []).map((d: any) => ({ id: d.id, display_name: d.display_name, full_name: d.display_name }));
+      setAllUsers(mapped);
+      setFilteredUsers(mapped);
     } catch (error: any) {
       console.error("Error loading users:", error);
       toast.error("Failed to load users");
@@ -127,11 +128,11 @@ export const TagFriendButton = ({
     try {
       const { data: senderProfile } = await supabase
         .from("profiles")
-        .select("display_name, full_name")
+        .select("display_name")
         .eq("id", user.id)
         .single();
 
-      const senderName = senderProfile?.display_name || senderProfile?.full_name || "Someone";
+      const senderName = senderProfile?.display_name || "Someone";
 
       // Create notifications for each selected user
       const notifications = selectedUsers.map((recipient) => ({
@@ -149,7 +150,7 @@ export const TagFriendButton = ({
         },
       }));
 
-      const { error } = await supabase.from("user_notifications").insert(notifications);
+      const { error } = await supabase.from("user_notifications" as any).insert(notifications);
 
       if (error) throw error;
 

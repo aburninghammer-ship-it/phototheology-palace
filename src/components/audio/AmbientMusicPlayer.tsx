@@ -49,7 +49,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
-import { subscribeToMusicRequests } from "@/hooks/useCommentaryMusicSync";
+import { subscribeToMusicRequests, getAutoMusicEnabled } from "@/hooks/useCommentaryMusicSync";
 
 // Study Music Playlist - 10 tracks for Bible study and meditation
 const AMBIENT_TRACKS: Array<{
@@ -621,11 +621,11 @@ export function AmbientMusicPlayer({
     return unsubscribe;
   }, []);
 
-  // Listen for commentary music requests (auto-start music when commentary plays)
+  // Listen for commentary music requests — only acts when user has explicitly enabled auto-music
   useEffect(() => {
     const unsubscribe = subscribeToMusicRequests((action) => {
-      if (action === 'start' && !isPlaying && audioRef.current) {
-        console.log('[AmbientMusic] Commentary requested music start');
+      if (action === 'start' && !isPlaying && audioRef.current && getAutoMusicEnabled()) {
+        console.log('[AmbientMusic] Commentary requested music start (user-enabled)');
         setIsEnabled(true);
         audioRef.current.play().then(() => {
           setIsPlaying(true);
