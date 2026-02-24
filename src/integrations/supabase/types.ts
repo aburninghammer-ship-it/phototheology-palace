@@ -3084,6 +3084,35 @@ export type Database = {
           },
         ]
       }
+      community_post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_post_notifications: {
         Row: {
           comment_id: string | null
@@ -3700,6 +3729,1063 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      defense_battle_spectator_comments: {
+        Row: {
+          battle_id: string
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          battle_id: string
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          battle_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_battle_spectator_comments_battle_id_fkey"
+            columns: ["battle_id"]
+            isOneToOne: false
+            referencedRelation: "defense_battles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_battles: {
+        Row: {
+          balanced_participation: boolean | null
+          battle_date: string | null
+          battle_log: Json | null
+          created_at: string
+          difficulty: string
+          full_attendance: boolean | null
+          id: string
+          points_earned: number | null
+          result: string | null
+          season_id: string
+          squad_id: string
+          status: string
+          topic: string
+          weapons_used: number | null
+          week_number: number
+        }
+        Insert: {
+          balanced_participation?: boolean | null
+          battle_date?: string | null
+          battle_log?: Json | null
+          created_at?: string
+          difficulty?: string
+          full_attendance?: boolean | null
+          id?: string
+          points_earned?: number | null
+          result?: string | null
+          season_id: string
+          squad_id: string
+          status?: string
+          topic: string
+          weapons_used?: number | null
+          week_number: number
+        }
+        Update: {
+          balanced_participation?: boolean | null
+          battle_date?: string | null
+          battle_log?: Json | null
+          created_at?: string
+          difficulty?: string
+          full_attendance?: boolean | null
+          id?: string
+          points_earned?: number | null
+          result?: string | null
+          season_id?: string
+          squad_id?: string
+          status?: string
+          topic?: string
+          weapons_used?: number | null
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_battles_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "defense_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_battles_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_bounties: {
+        Row: {
+          bounty_type: string
+          created_at: string
+          description: string
+          difficulty: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          points_reward: number
+          requirements: Json | null
+          season_id: string
+          title: string
+        }
+        Insert: {
+          bounty_type?: string
+          created_at?: string
+          description: string
+          difficulty?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          points_reward?: number
+          requirements?: Json | null
+          season_id: string
+          title: string
+        }
+        Update: {
+          bounty_type?: string
+          created_at?: string
+          description?: string
+          difficulty?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          points_reward?: number
+          requirements?: Json | null
+          season_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_bounties_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "defense_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_bounty_completions: {
+        Row: {
+          bounty_id: string
+          created_at: string
+          id: string
+          points_awarded: number | null
+          squad_id: string
+          submission: string
+          user_id: string
+          verified: boolean | null
+        }
+        Insert: {
+          bounty_id: string
+          created_at?: string
+          id?: string
+          points_awarded?: number | null
+          squad_id: string
+          submission: string
+          user_id: string
+          verified?: boolean | null
+        }
+        Update: {
+          bounty_id?: string
+          created_at?: string
+          id?: string
+          points_awarded?: number | null
+          squad_id?: string
+          submission?: string
+          user_id?: string
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_bounty_completions_bounty_id_fkey"
+            columns: ["bounty_id"]
+            isOneToOne: false
+            referencedRelation: "defense_bounties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_bounty_completions_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_doctrine_mastery: {
+        Row: {
+          avg_score: number | null
+          battles_in_category: number | null
+          category: string
+          id: string
+          mastery_score: number | null
+          season_id: string
+          squad_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avg_score?: number | null
+          battles_in_category?: number | null
+          category: string
+          id?: string
+          mastery_score?: number | null
+          season_id: string
+          squad_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avg_score?: number | null
+          battles_in_category?: number | null
+          category?: string
+          id?: string
+          mastery_score?: number | null
+          season_id?: string
+          squad_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_doctrine_mastery_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_legacy_wall: {
+        Row: {
+          achievement_icon: string | null
+          achievement_name: string
+          achievement_type: string
+          banner_emoji: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          season_id: string
+          season_number: number | null
+          squad_id: string | null
+          squad_name: string
+        }
+        Insert: {
+          achievement_icon?: string | null
+          achievement_name: string
+          achievement_type: string
+          banner_emoji?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          season_id: string
+          season_number?: number | null
+          squad_id?: string | null
+          squad_name: string
+        }
+        Update: {
+          achievement_icon?: string | null
+          achievement_name?: string
+          achievement_type?: string
+          banner_emoji?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          season_id?: string
+          season_number?: number | null
+          squad_id?: string | null
+          squad_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_legacy_wall_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_member_weekly_activity: {
+        Row: {
+          activity_type: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          points_earned: number
+          squad_id: string
+          topic_id: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          points_earned?: number
+          squad_id: string
+          topic_id: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          points_earned?: number
+          squad_id?: string
+          topic_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_member_weekly_activity_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_member_weekly_activity_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "defense_weekly_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_personal_stats: {
+        Row: {
+          accuracy_rating: number | null
+          battles_fought: number | null
+          battles_won: number | null
+          best_round_score: number | null
+          created_at: string | null
+          drills_completed: number | null
+          id: string
+          legendary_weapons: number | null
+          scriptures_cited: number | null
+          season_id: string
+          squad_id: string | null
+          total_score: number | null
+          updated_at: string | null
+          user_id: string
+          weapons_forged: number | null
+        }
+        Insert: {
+          accuracy_rating?: number | null
+          battles_fought?: number | null
+          battles_won?: number | null
+          best_round_score?: number | null
+          created_at?: string | null
+          drills_completed?: number | null
+          id?: string
+          legendary_weapons?: number | null
+          scriptures_cited?: number | null
+          season_id: string
+          squad_id?: string | null
+          total_score?: number | null
+          updated_at?: string | null
+          user_id: string
+          weapons_forged?: number | null
+        }
+        Update: {
+          accuracy_rating?: number | null
+          battles_fought?: number | null
+          battles_won?: number | null
+          best_round_score?: number | null
+          created_at?: string | null
+          drills_completed?: number | null
+          id?: string
+          legendary_weapons?: number | null
+          scriptures_cited?: number | null
+          season_id?: string
+          squad_id?: string | null
+          total_score?: number | null
+          updated_at?: string | null
+          user_id?: string
+          weapons_forged?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_personal_stats_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_redemption_challenges: {
+        Row: {
+          challenge_type: string
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_completed: boolean
+          points_earned: number
+          points_required: number
+          season_id: string
+          squad_id: string
+          title: string
+        }
+        Insert: {
+          challenge_type?: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_completed?: boolean
+          points_earned?: number
+          points_required?: number
+          season_id: string
+          squad_id: string
+          title: string
+        }
+        Update: {
+          challenge_type?: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_completed?: boolean
+          points_earned?: number
+          points_required?: number
+          season_id?: string
+          squad_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_redemption_challenges_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "defense_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_redemption_challenges_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_season_events: {
+        Row: {
+          created_at: string | null
+          event_icon: string | null
+          event_message: string
+          event_type: string
+          id: string
+          season_id: string
+          squad_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_icon?: string | null
+          event_message: string
+          event_type: string
+          id?: string
+          season_id: string
+          squad_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_icon?: string | null
+          event_message?: string
+          event_type?: string
+          id?: string
+          season_id?: string
+          squad_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_season_events_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_season_participants: {
+        Row: {
+          experience_level: string | null
+          id: string
+          joined_at: string
+          preferred_doctrine: string | null
+          season_id: string
+          skill_strength: string | null
+          squad_id: string | null
+          user_id: string
+        }
+        Insert: {
+          experience_level?: string | null
+          id?: string
+          joined_at?: string
+          preferred_doctrine?: string | null
+          season_id: string
+          skill_strength?: string | null
+          squad_id?: string | null
+          user_id: string
+        }
+        Update: {
+          experience_level?: string | null
+          id?: string
+          joined_at?: string
+          preferred_doctrine?: string | null
+          season_id?: string
+          skill_strength?: string | null
+          squad_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_season_participants_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "defense_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_season_participants_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_seasons: {
+        Row: {
+          army_health: number | null
+          army_morale: number | null
+          church_id: string | null
+          config_mode: string | null
+          created_at: string
+          created_by: string
+          current_week: number
+          description: string | null
+          doctrines: string[] | null
+          ends_at: string | null
+          id: string
+          is_global: boolean | null
+          opponents: string[] | null
+          season_number: number | null
+          squads_survived: number | null
+          starts_at: string | null
+          status: string
+          title: string
+          total_army_points: number | null
+          updated_at: string
+          week_count: number
+        }
+        Insert: {
+          army_health?: number | null
+          army_morale?: number | null
+          church_id?: string | null
+          config_mode?: string | null
+          created_at?: string
+          created_by: string
+          current_week?: number
+          description?: string | null
+          doctrines?: string[] | null
+          ends_at?: string | null
+          id?: string
+          is_global?: boolean | null
+          opponents?: string[] | null
+          season_number?: number | null
+          squads_survived?: number | null
+          starts_at?: string | null
+          status?: string
+          title: string
+          total_army_points?: number | null
+          updated_at?: string
+          week_count?: number
+        }
+        Update: {
+          army_health?: number | null
+          army_morale?: number | null
+          church_id?: string | null
+          config_mode?: string | null
+          created_at?: string
+          created_by?: string
+          current_week?: number
+          description?: string | null
+          doctrines?: string[] | null
+          ends_at?: string | null
+          id?: string
+          is_global?: boolean | null
+          opponents?: string[] | null
+          season_number?: number | null
+          squads_survived?: number | null
+          starts_at?: string | null
+          status?: string
+          title?: string
+          total_army_points?: number | null
+          updated_at?: string
+          week_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_seasons_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_seasons_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_sparring_matches: {
+        Row: {
+          ai_verdict: string | null
+          challenger_argument: string | null
+          challenger_id: string
+          challenger_score: number | null
+          completed_at: string | null
+          created_at: string
+          defender_argument: string | null
+          defender_id: string
+          defender_score: number | null
+          id: string
+          points_each: number | null
+          season_id: string
+          squad_id: string
+          status: string
+          topic: string
+        }
+        Insert: {
+          ai_verdict?: string | null
+          challenger_argument?: string | null
+          challenger_id: string
+          challenger_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          defender_argument?: string | null
+          defender_id: string
+          defender_score?: number | null
+          id?: string
+          points_each?: number | null
+          season_id: string
+          squad_id: string
+          status?: string
+          topic: string
+        }
+        Update: {
+          ai_verdict?: string | null
+          challenger_argument?: string | null
+          challenger_id?: string
+          challenger_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          defender_argument?: string | null
+          defender_id?: string
+          defender_score?: number | null
+          id?: string
+          points_each?: number | null
+          season_id?: string
+          squad_id?: string
+          status?: string
+          topic?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_sparring_matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "defense_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_sparring_matches_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_squad_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string | null
+          evolution_count: number | null
+          id: string
+          metadata: Json | null
+          parent_weapon_id: string | null
+          points_earned: number
+          rarity: string | null
+          season_id: string
+          squad_id: string
+          title: string | null
+          topic_id: string | null
+          user_id: string
+          weapon_tier: string | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description?: string | null
+          evolution_count?: number | null
+          id?: string
+          metadata?: Json | null
+          parent_weapon_id?: string | null
+          points_earned?: number
+          rarity?: string | null
+          season_id: string
+          squad_id: string
+          title?: string | null
+          topic_id?: string | null
+          user_id: string
+          weapon_tier?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string | null
+          evolution_count?: number | null
+          id?: string
+          metadata?: Json | null
+          parent_weapon_id?: string | null
+          points_earned?: number
+          rarity?: string | null
+          season_id?: string
+          squad_id?: string
+          title?: string | null
+          topic_id?: string | null
+          user_id?: string
+          weapon_tier?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_squad_activities_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "defense_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_squad_activities_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_squad_activities_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "defense_weekly_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_squad_members: {
+        Row: {
+          id: string
+          is_captain: boolean | null
+          joined_at: string
+          role: string
+          squad_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_captain?: boolean | null
+          joined_at?: string
+          role?: string
+          squad_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_captain?: boolean | null
+          joined_at?: string
+          role?: string
+          squad_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_squad_members_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_squad_rewards: {
+        Row: {
+          earned_at: string
+          id: string
+          reward_description: string | null
+          reward_icon: string | null
+          reward_name: string
+          reward_type: string
+          season_id: string
+          squad_id: string
+        }
+        Insert: {
+          earned_at?: string
+          id?: string
+          reward_description?: string | null
+          reward_icon?: string | null
+          reward_name: string
+          reward_type: string
+          season_id: string
+          squad_id: string
+        }
+        Update: {
+          earned_at?: string
+          id?: string
+          reward_description?: string | null
+          reward_icon?: string | null
+          reward_name?: string
+          reward_type?: string
+          season_id?: string
+          squad_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_squad_rewards_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "defense_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_squad_rewards_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_squad_weekly_scores: {
+        Row: {
+          battle_points: number
+          battle_summary: string | null
+          bonus_points: number
+          created_at: string
+          id: string
+          members_participated: number
+          prep_points: number
+          squad_id: string
+          topic_id: string
+          total_points: number
+          updated_at: string
+          weapons_used: number
+        }
+        Insert: {
+          battle_points?: number
+          battle_summary?: string | null
+          bonus_points?: number
+          created_at?: string
+          id?: string
+          members_participated?: number
+          prep_points?: number
+          squad_id: string
+          topic_id: string
+          total_points?: number
+          updated_at?: string
+          weapons_used?: number
+        }
+        Update: {
+          battle_points?: number
+          battle_summary?: string | null
+          bonus_points?: number
+          created_at?: string
+          id?: string
+          members_participated?: number
+          prep_points?: number
+          squad_id?: string
+          topic_id?: string
+          total_points?: number
+          updated_at?: string
+          weapons_used?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_squad_weekly_scores_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "defense_squads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "defense_squad_weekly_scores_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "defense_weekly_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_squads: {
+        Row: {
+          ai_enemy: string
+          banner_emoji: string | null
+          created_at: string
+          eliminated_at: string | null
+          elimination_week: number | null
+          id: string
+          is_eliminated: boolean | null
+          losses: number
+          motto: string | null
+          name: string
+          rank_position: number | null
+          redeemed_at: string | null
+          redemption_points: number
+          redemption_unlocked: boolean
+          season_id: string
+          season_title: string | null
+          tier: string
+          total_points: number
+          updated_at: string
+          war_cry: string | null
+          wins: number
+        }
+        Insert: {
+          ai_enemy?: string
+          banner_emoji?: string | null
+          created_at?: string
+          eliminated_at?: string | null
+          elimination_week?: number | null
+          id?: string
+          is_eliminated?: boolean | null
+          losses?: number
+          motto?: string | null
+          name: string
+          rank_position?: number | null
+          redeemed_at?: string | null
+          redemption_points?: number
+          redemption_unlocked?: boolean
+          season_id: string
+          season_title?: string | null
+          tier?: string
+          total_points?: number
+          updated_at?: string
+          war_cry?: string | null
+          wins?: number
+        }
+        Update: {
+          ai_enemy?: string
+          banner_emoji?: string | null
+          created_at?: string
+          eliminated_at?: string | null
+          elimination_week?: number | null
+          id?: string
+          is_eliminated?: boolean | null
+          losses?: number
+          motto?: string | null
+          name?: string
+          rank_position?: number | null
+          redeemed_at?: string | null
+          redemption_points?: number
+          redemption_unlocked?: boolean
+          season_id?: string
+          season_title?: string | null
+          tier?: string
+          total_points?: number
+          updated_at?: string
+          war_cry?: string | null
+          wins?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_squads_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "defense_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      defense_weekly_topics: {
+        Row: {
+          battle_ends_at: string | null
+          battle_starts_at: string | null
+          briefing_codename: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_boss_battle: boolean | null
+          mission_briefing: string | null
+          phase: string
+          prep_starts_at: string | null
+          scripture_focus: string | null
+          season_id: string
+          topic: string
+          week_number: number
+        }
+        Insert: {
+          battle_ends_at?: string | null
+          battle_starts_at?: string | null
+          briefing_codename?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_boss_battle?: boolean | null
+          mission_briefing?: string | null
+          phase?: string
+          prep_starts_at?: string | null
+          scripture_focus?: string | null
+          season_id: string
+          topic: string
+          week_number: number
+        }
+        Update: {
+          battle_ends_at?: string | null
+          battle_starts_at?: string | null
+          briefing_codename?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_boss_battle?: boolean | null
+          mission_briefing?: string | null
+          phase?: string
+          prep_starts_at?: string | null
+          scripture_focus?: string | null
+          season_id?: string
+          topic?: string
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defense_weekly_topics_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "defense_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       devotional_days: {
         Row: {
@@ -5791,6 +6877,39 @@ export type Database = {
           name?: string
           traffic_percentage?: number | null
           variants?: Json
+        }
+        Relationships: []
+      }
+      feature_tags: {
+        Row: {
+          created_at: string
+          feature_label: string
+          feature_path: string
+          id: string
+          is_read: boolean | null
+          message: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_label: string
+          feature_path: string
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_label?: string
+          feature_path?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          recipient_id?: string
+          sender_id?: string
         }
         Relationships: []
       }
@@ -17911,6 +19030,23 @@ export type Database = {
           master_title: string
           points: number
           username: string
+        }[]
+      }
+      get_season_standings: {
+        Args: { p_season_id: string }
+        Returns: {
+          banner_emoji: string
+          eliminated_at: string
+          elimination_week: number
+          hq_points: number
+          is_eliminated: boolean
+          losses: number
+          member_count: number
+          motto: string
+          squad_id: string
+          squad_name: string
+          total_points: number
+          wins: number
         }[]
       }
       get_subscription_summary: {
