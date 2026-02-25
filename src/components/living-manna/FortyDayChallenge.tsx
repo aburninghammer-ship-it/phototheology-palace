@@ -584,6 +584,7 @@ export function FortyDayChallenge() {
           messages: session.messages || [],
           opponentName: opponent?.name || session.opponent_name,
           topicName: session.topic_name,
+          defenderName: user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Defender",
         },
       });
       if (error) throw error;
