@@ -85,7 +85,7 @@ For EVERY distinct fallacy or rhetorical trick the opponent used (identify ALL o
 - **How to expose it in debate:** Give ${dName} a 1-sentence response that calls out the fallacy directly and redirects to solid ground.
 
 ## ⚔️ Argument-by-Argument Rebuttal Clinic
-Analyze EVERY major argument the opponent made (typically 3-5). For each:
+You MUST address EVERY SINGLE argument the opponent presented — no exceptions, no skipping, no summarizing multiple arguments into one. If the opponent made 7 arguments, list 7 rebuttals. If they made 10, list 10. Count them from the transcript and confirm the count. For each:
 ### [Argument Title]
 - **What they claimed:** Full summary — don't abbreviate. Show you understood the argument deeply.
 - **The fallacy (if any):** Name it, or note "No fallacy — genuinely strong argument that requires a substantive counter."
