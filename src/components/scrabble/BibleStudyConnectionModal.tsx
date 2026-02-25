@@ -164,6 +164,7 @@ export function BibleStudyConnectionModal({
   const [isChristConnection, setIsChristConnection] = useState(false);
   const [isJudging, setIsJudging] = useState(false);
   const [jeevesJudgment, setJeevesJudgment] = useState<string | null>(null);
+  const [showSeedVerse, setShowSeedVerse] = useState(false);
 
   // Determine if this is the first play (connect to verse) or subsequent (connect to previous)
   const isFirstPlay = !previousEntry;
@@ -328,10 +329,22 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
           ) : (
             /* Subsequent Play: Show the previous insight to build upon */
             <div className="space-y-3">
-              {/* Small verse reference */}
-              <div className="p-2 bg-muted/50 rounded border text-xs">
-                <span className="text-muted-foreground">Studying: </span>
-                <span className="font-medium">{seedVerse.reference}</span>
+              {/* Verse reference with expandable text */}
+              <div className="bg-muted/50 rounded border text-xs overflow-hidden">
+                <div
+                  className="p-2 flex items-center gap-2 cursor-pointer hover:bg-muted/80 transition-colors"
+                  onClick={() => setShowSeedVerse(!showSeedVerse)}
+                >
+                  <Book className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <span className="text-muted-foreground">Studying: </span>
+                  <span className="font-medium">{seedVerse.reference}</span>
+                  <span className="text-muted-foreground ml-auto">{showSeedVerse ? 'hide' : 'tap to view verse'}</span>
+                </div>
+                {showSeedVerse && (
+                  <div className="px-3 pb-2 border-t border-border">
+                    <p className="text-sm italic leading-relaxed pt-2 text-foreground/80">"{seedVerse.text}"</p>
+                  </div>
+                )}
               </div>
 
               {/* Previous insight to connect to */}
