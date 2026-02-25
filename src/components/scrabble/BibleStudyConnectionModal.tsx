@@ -36,7 +36,7 @@ import { cn } from '@/lib/utils';
 interface BibleStudyConnectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (connections: Connection[], explanation: string, isChristConnection: boolean, jeevesJudgment?: string) => void;
+  onSubmit: (connections: Connection[], explanation: string, isChristConnection: boolean, jeevesJudgment?: string, jeevesScore?: number) => void;
   card: ScrabbleCard;
   position: BoardPosition;
   adjacentCards: PlacedCard[];
@@ -194,9 +194,11 @@ export function BibleStudyConnectionModal({
     return () => clearInterval(timer);
   }, [isOpen]);
 
-  // Jeeves judging function
-  const getJeevesJudgment = async (playerExplanation: string): Promise<string> => {
+  // Jeeves judging function — returns { commentary, score }
+  const getJeevesJudgment = async (playerExplanation: string): Promise<{ commentary: string; score: number }> => {
     try {
+      const scoreInstructions = `\n\nIMPORTANT: You MUST end your response with a score on its own line in this exact format:\nSCORE: <number>\nwhere <number> is an integer from 1 to 10.\n- 1-4 = weak / incorrect / shallow / off-topic (player loses the card and their turn)\n- 5-6 = acceptable but surface-level\n- 7-8 = solid theological insight\n- 9-10 = exceptional, deeply connected, masterful`;
+
       const prompt = isFirstPlay
         ? `You are Jeeves, a wise Bible study assistant. A player is connecting the PT principle "${card.name}" to ${seedVerse.reference}.
 
@@ -207,7 +209,7 @@ ${card.description ? `DESCRIPTION: ${card.description}` : ''}
 
 PLAYER'S EXPLANATION: "${playerExplanation}"
 
-In 2-3 sentences, validate how well their explanation connects the PT principle to the verse. Be encouraging but also insightful - point out what they got right and add a brief additional insight they might have missed. Keep it warm and conversational.`
+In 2-3 sentences, validate how well their explanation connects the PT principle to the verse. Be encouraging if the insight is strong, but be honest if it's weak or off-topic.${scoreInstructions}`
         : `You are Jeeves, a warm and scholarly Bible study companion. A player is building on the previous insight by connecting a new Phototheology principle.
 
 SEED VERSE: ${seedVerse.reference} - "${seedVerse.text}"
@@ -222,10 +224,10 @@ ${card.description ? `DESCRIPTION: ${card.description}` : ''}
 PLAYER'S EXPLANATION: "${playerExplanation}"
 
 In 2-3 crisp sentences:
-1. Affirm what the player saw correctly.
-2. Show the specific theological thread connecting this answer to the PREVIOUS answer — name the link (e.g. "Both point to Christ's mediatorial role" or "This deepens the sanctuary imagery from the prior insight").
+1. Affirm what the player saw correctly (or explain what's missing if weak).
+2. Show the specific theological thread connecting this answer to the PREVIOUS answer.
 3. Add one brief additional insight they may have missed.
-Keep it conversational, warm, and concise. Never use the word "dear".`;
+Keep it conversational, warm, and concise. Never use the word "dear".${scoreInstructions}`;
 
       const { data, error } = await supabase.functions.invoke('jeeves', {
         body: {
@@ -235,12 +237,22 @@ Keep it conversational, warm, and concise. Never use the word "dear".`;
       });
 
       if (error) throw error;
-      return data?.content || data?.response || data?.message || 'Great connection!';
+      const raw = data?.content || data?.response || data?.message || '';
+
+      // Parse score from response
+      const scoreMatch = raw.match(/SCORE:\s*(\d+)/i);
+      const score = scoreMatch ? Math.min(10, Math.max(1, parseInt(scoreMatch[1], 10))) : 6;
+      const commentary = raw.replace(/\n?SCORE:\s*\d+/i, '').trim() || 'Good connection!';
+
+      return { commentary, score };
     } catch (err) {
       console.error('Error getting Jeeves judgment:', err);
-      return isFirstPlay
-        ? `Good connection of "${card.name}" to the verse!`
-        : `Nice way to build on ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}!`;
+      return {
+        commentary: isFirstPlay
+          ? `Good connection of "${card.name}" to the verse!`
+          : `Nice way to build on ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}!`,
+        score: 6, // Default pass on error
+      };
     }
   };
 
@@ -265,19 +277,12 @@ Keep it conversational, warm, and concise. Never use the word "dear".`;
           isChristConnection: isChristConnection,
         }];
 
-    // For first play: NO Jeeves judgment - first to submit wins!
-    // For subsequent plays: Get Jeeves judgment to validate connection
-    if (isFirstPlay) {
-      // Direct submission - race is on!
-      onSubmit(connectionList, explanation, isChristConnection, undefined);
-    } else {
-      // Get Jeeves judgment for subsequent plays
-      setIsJudging(true);
-      const judgment = await getJeevesJudgment(explanation);
-      setJeevesJudgment(judgment);
-      setIsJudging(false);
-      onSubmit(connectionList, explanation, isChristConnection, judgment);
-    }
+    // ALL plays now go through Jeeves for scoring
+    setIsJudging(true);
+    const { commentary, score } = await getJeevesJudgment(explanation);
+    setJeevesJudgment(commentary);
+    setIsJudging(false);
+    onSubmit(connectionList, explanation, isChristConnection, commentary, score);
   };
 
   // Calculate potential score with time bonus

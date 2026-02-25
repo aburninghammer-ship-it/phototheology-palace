@@ -255,7 +255,8 @@ export default function PTScrabble() {
     connections: Connection[],
     explanation: string,
     isChristConnection: boolean,
-    jeevesJudgment?: string
+    jeevesJudgment?: string,
+    jeevesScore?: number
   ) => {
     if (!connectionModal.card || !connectionModal.position) return;
 
@@ -263,25 +264,35 @@ export default function PTScrabble() {
     const adjacentCount = connectionModal.adjacentCards.length;
     const playerName = user?.email?.split("@")[0] || "Player";
 
-    // Calculate points
-    let points = adjacentCount === 1 ? 1 : adjacentCount === 2 ? 3 : adjacentCount === 3 ? 6 : 10;
-    if (isChristConnection) points *= 2;
+    const score = jeevesScore ?? 6;
+    const rejected = score < 5;
+
+    // Calculate points — 0 if rejected
+    let points = 0;
+    if (!rejected) {
+      points = adjacentCount === 1 ? 1 : adjacentCount === 2 ? 3 : adjacentCount === 3 ? 6 : 10;
+      if (isChristConnection) points *= 2;
+      // Scale points by Jeeves score: multiply by score/10
+      points = Math.max(1, Math.round(points * (score / 10)));
+    }
 
     const moveId = crypto.randomUUID();
 
-    // Add card to board
-    setBoardState(prev => ({
-      ...prev,
-      [key]: {
-        card: connectionModal.card!,
-        position: connectionModal.position!,
-        playerId: user?.id || 'solo-player',
-        playerName,
-        connections,
-        timestamp: new Date().toISOString(),
-        moveId,
-      }
-    }));
+    // Only place card on board if NOT rejected
+    if (!rejected) {
+      setBoardState(prev => ({
+        ...prev,
+        [key]: {
+          card: connectionModal.card!,
+          position: connectionModal.position!,
+          playerId: user?.id || 'solo-player',
+          playerName,
+          connections,
+          timestamp: new Date().toISOString(),
+          moveId,
+        }
+      }));
+    }
 
     // Determine if this was connecting to verse (first play) or previous insight
     const isFirstPlay = studyLogEntries.length === 0;
@@ -298,19 +309,21 @@ export default function PTScrabble() {
       points,
       timestamp: new Date().toISOString(),
       jeevesJudgment,
+      jeevesScore: score,
+      rejected,
       connectingTo: isFirstPlay ? 'verse' : 'previous',
       previousPlayerName: previousEntry?.playerName,
       previousCardName: previousEntry?.cardName,
       previousExplanation: previousEntry?.explanation,
     };
 
-    // Add to study log
+    // Add to study log (even rejected ones, so players can learn)
     setStudyLogEntries(prev => [...prev, newEntry]);
 
-    // Update score
+    // Update score (0 if rejected)
     setScore(prev => prev + points);
 
-    // Remove from hand (card is permanently removed from the full deck via boardState)
+    // Remove from hand — card is ALWAYS consumed (even if rejected, it's lost)
     setPlayerHand(prev => prev.filter(c => c.id !== connectionModal.card!.id));
 
     setSelectedCard(null);

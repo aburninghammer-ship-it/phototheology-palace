@@ -1,7 +1,7 @@
 // Study Progress Panel — Glassified with Jeeves connection commentary
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, ChevronDown, ChevronUp, Bot, Cross, Link, Book, Sparkles, ArrowDown } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Bot, Cross, Link, Book, Sparkles, ArrowDown, Star, AlertTriangle, XCircle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { StudyLogEntry } from './StudyLog';
 import type { SelectedVerse } from './VerseSelectionScreen';
@@ -94,35 +94,61 @@ export function StudyProgressPanel({ entries, seedVerse, className }: StudyProgr
                         transition={{ delay: index * 0.08 }}
                         className={cn(
                           'p-3 rounded-xl border backdrop-blur-sm',
-                          entry.isChristConnection
+                          entry.rejected
+                            ? 'border-red-500/30 bg-red-500/5 opacity-70'
+                            : entry.isChristConnection
                             ? 'border-purple-500/30 bg-purple-500/5 shadow-[0_0_12px_rgba(168,85,247,0.08)]'
                             : 'border-border/50 bg-card/50'
                         )}
                       >
+                        {/* Rejected banner */}
+                        {entry.rejected && (
+                          <div className="flex items-center gap-1.5 mb-2 p-1.5 bg-red-500/10 border border-red-500/20 rounded-lg">
+                            <XCircle className="h-3.5 w-3.5 text-red-500 shrink-0" />
+                            <span className="text-[10px] font-bold text-red-500">Card lost — answer scored {entry.jeevesScore}/10</span>
+                          </div>
+                        )}
+
                         {/* Header */}
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <span className={cn(
                               'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold',
-                              entry.isChristConnection
+                              entry.rejected
+                                ? 'bg-red-500/20 text-red-400'
+                                : entry.isChristConnection
                                 ? 'bg-purple-500/20 text-purple-400'
                                 : 'bg-primary/15 text-primary'
                             )}>
-                              {index + 1}
+                              {entry.rejected ? <AlertTriangle className="h-3 w-3" /> : index + 1}
                             </span>
                             <span className="text-xs font-semibold">{entry.playerName}</span>
-                            {entry.isChristConnection && (
+                            {entry.isChristConnection && !entry.rejected && (
                               <span className="flex items-center gap-0.5 text-[10px] text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded-full">
                                 <Cross className="h-2.5 w-2.5" /> Christ
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] font-mono bg-muted/80 px-2 py-0.5 rounded-md">{entry.cardCode}</span>
+                          <div className="flex items-center gap-1.5">
+                            {/* Score stars */}
+                            {entry.jeevesScore != null && (
+                              <span className={cn(
+                                'flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full',
+                                entry.jeevesScore >= 8 ? 'bg-green-500/15 text-green-500' :
+                                entry.jeevesScore >= 5 ? 'bg-yellow-500/15 text-yellow-500' :
+                                'bg-red-500/15 text-red-500'
+                              )}>
+                                <Star className="h-2.5 w-2.5" />
+                                {entry.jeevesScore}
+                              </span>
+                            )}
+                            <span className="text-[10px] font-mono bg-muted/80 px-2 py-0.5 rounded-md">{entry.cardCode}</span>
+                          </div>
                         </div>
 
                         {/* Card name + connection type */}
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs font-semibold text-primary">{entry.cardName}</span>
+                          <span className={cn("text-xs font-semibold", entry.rejected ? "text-red-400 line-through" : "text-primary")}>{entry.cardName}</span>
                           {entry.connectingTo && (
                             <span className={cn(
                               'text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5 font-medium',
@@ -154,12 +180,20 @@ export function StudyProgressPanel({ entries, seedVerse, className }: StudyProgr
 
                         {/* Jeeves commentary */}
                         {entry.jeevesJudgment && (
-                          <div className="p-2.5 rounded-lg bg-gradient-to-br from-blue-500/10 to-purple-500/5 border border-blue-500/15">
+                          <div className={cn(
+                            "p-2.5 rounded-lg border",
+                            entry.rejected
+                              ? "bg-gradient-to-br from-red-500/10 to-orange-500/5 border-red-500/15"
+                              : "bg-gradient-to-br from-blue-500/10 to-purple-500/5 border-blue-500/15"
+                          )}>
                             <div className="flex items-center gap-1.5 mb-1">
-                              <div className="h-4 w-4 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                <Bot className="h-2.5 w-2.5 text-blue-400" />
+                              <div className={cn(
+                                "h-4 w-4 rounded-full flex items-center justify-center",
+                                entry.rejected ? "bg-red-500/20" : "bg-blue-500/20"
+                              )}>
+                                <Bot className={cn("h-2.5 w-2.5", entry.rejected ? "text-red-400" : "text-blue-400")} />
                               </div>
-                              <span className="text-[10px] font-bold text-blue-400 tracking-wide uppercase">Jeeves</span>
+                              <span className={cn("text-[10px] font-bold tracking-wide uppercase", entry.rejected ? "text-red-400" : "text-blue-400")}>Jeeves</span>
                             </div>
                             <p className="text-[11px] text-foreground/70 leading-relaxed">{entry.jeevesJudgment}</p>
                           </div>
@@ -167,8 +201,17 @@ export function StudyProgressPanel({ entries, seedVerse, className }: StudyProgr
 
                         {/* Points */}
                         <div className="flex items-center justify-end gap-1 mt-2">
-                          <Sparkles className="h-3 w-3 text-yellow-500" />
-                          <span className="text-[11px] font-bold text-yellow-500">+{entry.points} pts</span>
+                          {entry.rejected ? (
+                            <>
+                              <XCircle className="h-3 w-3 text-red-500" />
+                              <span className="text-[11px] font-bold text-red-500">0 pts — card lost</span>
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="h-3 w-3 text-yellow-500" />
+                              <span className="text-[11px] font-bold text-yellow-500">+{entry.points} pts</span>
+                            </>
+                          )}
                         </div>
                       </motion.div>
                     </div>
