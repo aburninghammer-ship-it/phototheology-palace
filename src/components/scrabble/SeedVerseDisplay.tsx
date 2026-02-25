@@ -14,9 +14,12 @@ interface SeedVerseDisplayProps {
 }
 
 export function SeedVerseDisplay({ verse, className, compact = false }: SeedVerseDisplayProps) {
-  const [showFullVerse, setShowFullVerse] = useState(false);
+  const [showFullVerse, setShowFullVerse] = useState(!compact);
 
   if (compact) {
+    // Always show at least a truncated preview of the verse text
+    const truncatedText = verse.text.length > 120 ? verse.text.slice(0, 120) + '…' : verse.text;
+
     return (
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -26,41 +29,29 @@ export function SeedVerseDisplay({ verse, className, compact = false }: SeedVers
           className
         )}
       >
-        {/* Clickable reference header */}
+        {/* Reference header with always-visible preview */}
         <div
           onClick={() => setShowFullVerse(!showFullVerse)}
           className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-primary/5 transition-colors"
         >
           <Book className="h-4 w-4 text-primary shrink-0" />
-          <span className="font-medium text-sm text-primary">Studying: {verse.reference}</span>
-          <span className="text-xs text-muted-foreground hidden sm:inline flex-1">
-            Click to {showFullVerse ? 'hide' : 'view'} verse
-          </span>
-          {showFullVerse ? (
-            <ChevronUp className="h-4 w-4 text-primary shrink-0" />
-          ) : (
-            <ChevronDown className="h-4 w-4 text-primary shrink-0" />
+          <span className="font-medium text-sm text-primary">📖 {verse.reference}</span>
+          <span className="flex-1" />
+          {verse.text.length > 120 && (
+            showFullVerse ? (
+              <ChevronUp className="h-4 w-4 text-primary shrink-0" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-primary shrink-0" />
+            )
           )}
         </div>
 
-        {/* Expandable verse text */}
-        <AnimatePresence>
-          {showFullVerse && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
-              <div className="px-3 py-2 border-t border-primary/20 bg-primary/5">
-                <p className="text-sm italic leading-relaxed text-foreground/80">
-                  "{verse.text}"
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Always-visible verse preview */}
+        <div className="px-3 pb-2 border-t border-primary/20 bg-primary/5">
+          <p className="text-sm italic leading-relaxed text-foreground/80">
+            "{showFullVerse ? verse.text : truncatedText}"
+          </p>
+        </div>
       </motion.div>
     );
   }
