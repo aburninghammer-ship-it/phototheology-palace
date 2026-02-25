@@ -327,8 +327,26 @@ export default function PTScrabble() {
     // Update score (0 if rejected)
     setScore(prev => prev + points);
 
-    // Remove from hand — card is ALWAYS consumed (even if rejected, it's lost)
-    setPlayerHand(prev => prev.filter(c => c.id !== connectionModal.card!.id));
+    // Remove played card from hand
+    setPlayerHand(prev => {
+      const remaining = prev.filter(c => c.id !== connectionModal.card!.id);
+      
+      if (rejected) {
+        // Rejected: card is lost AND player must draw a penalty card
+        const playedCardIds = new Set([
+          ...Object.values(boardState).map(p => p.card.id),
+          ...remaining.map(c => c.id),
+          connectionModal.card!.id,
+        ]);
+        const available = getAllScrabbleCards().filter(c => !playedCardIds.has(c.id));
+        if (available.length > 0) {
+          const penaltyCard = shuffleCards(available)[0];
+          return [...remaining, penaltyCard];
+        }
+      }
+      
+      return remaining;
+    });
 
     setSelectedCard(null);
     setConnectionModal({ isOpen: false, card: null, position: null, adjacentCards: [] });
