@@ -1183,7 +1183,7 @@ export function FortyDayChallenge() {
           </div>
         </div>
 
-        {/* Jeeves Tactical Debrief - Glassmorphism style */}
+        {/* Jeeves Tactical Analysis - Glassmorphism style */}
         <div className="p-3 border-b border-border">
           {jeevesRecap ? (
             <div className="relative text-left rounded-xl p-[1px] overflow-hidden"
@@ -1197,7 +1197,7 @@ export function FortyDayChallenge() {
                   </div>
                   <div>
                     <p className="text-xs font-bold" style={{ color: "hsl(270 80% 80%)" }}>
-                      Jeeves's Tactical Debrief
+                      Jeeves's Tactical Analysis
                     </p>
                     <p className="text-[9px]" style={{ color: "hsl(200 60% 70%)" }}>
                       Post-debate analysis & coaching
@@ -1236,7 +1236,7 @@ export function FortyDayChallenge() {
                       style={{ background: "linear-gradient(135deg, hsl(270 80% 60%), hsl(200 80% 55%))" }}>
                       <Crown className="h-3 w-3 text-white" />
                     </div>
-                    <span className="text-sm font-medium" style={{ color: "hsl(270 80% 80%)" }}>Show Jeeves's Tactical Debrief</span>
+                    <span className="text-sm font-medium" style={{ color: "hsl(270 80% 80%)" }}>Show Jeeves's Tactical Analysis</span>
                   </>
                 )}
               </div>
