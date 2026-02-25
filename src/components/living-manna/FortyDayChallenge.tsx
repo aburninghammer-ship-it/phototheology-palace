@@ -1,0 +1,765 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Shield, Swords, Send, Loader2, Trophy, Flame, Calendar,
+  ChevronRight, ArrowLeft, Star, Lock, CheckCircle2, XCircle,
+  Target, Zap, Crown, Award, RotateCcw,
+} from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  generate40DaySchedule,
+  getXPLevel,
+  BADGE_MILESTONES,
+  type DayConfig,
+} from "@/data/fortyDayChallengeConfig";
+import {
+  DEFENSE_OPPONENTS,
+  DEFENSE_TOPICS,
+} from "@/data/defenseModeOpponents";
+
+interface ChatMessage {
+  role: "opponent" | "defender";
+  content: string;
+}
+
+type Phase = "overview" | "enroll" | "daily-map" | "debating" | "verdict";
+
+export function FortyDayChallenge() {
+  const { user } = useAuth();
+  const isMobile = useIsMobile();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const [phase, setPhase] = useState<Phase>("overview");
+  const [enrollment, setEnrollment] = useState<any>(null);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [badges, setBadges] = useState<any[]>([]);
+  const [schedule, setSchedule] = useState<DayConfig[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Debate state
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [userInput, setUserInput] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [currentSession, setCurrentSession] = useState<any>(null);
+  const [verdict, setVerdict] = useState<any>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState("intermediate");
+
+  // Load enrollment data
+  useEffect(() => {
+    if (!user) return;
+    loadData();
+  }, [user]);
+
+  const loadData = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const { data: enrollments } = await supabase
+        .from("debate_challenge_enrollments")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (enrollments && enrollments.length > 0) {
+        const e = enrollments[0];
+        setEnrollment(e);
+        setSchedule(generate40DaySchedule(e.id));
+
+        const { data: sess } = await supabase
+          .from("debate_challenge_sessions")
+          .select("*")
+          .eq("enrollment_id", e.id)
+          .order("day_number");
+        setSessions(sess || []);
+
+        const { data: bdgs } = await supabase
+          .from("debate_challenge_badges")
+          .select("*")
+          .eq("enrollment_id", e.id);
+        setBadges(bdgs || []);
+
+        setPhase("daily-map");
+      } else {
+        setPhase("overview");
+      }
+    } catch (err) {
+      console.error("Load error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEnroll = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from("debate_challenge_enrollments")
+        .insert({
+          user_id: user.id,
+          difficulty: selectedDifficulty,
+          current_day: 1,
+          last_activity_date: new Date().toISOString().split("T")[0],
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setEnrollment(data);
+      setSchedule(generate40DaySchedule(data.id));
+      setPhase("daily-map");
+      toast.success("🔥 40-Day Challenge begun! Your first opponent awaits.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to enroll");
+    }
+  };
+
+  const startDayDebate = async (dayNumber: number) => {
+    if (!enrollment || !user) return;
+    const dayConfig = schedule[dayNumber - 1];
+    if (!dayConfig) return;
+
+    const opponent = DEFENSE_OPPONENTS.find(o => o.id === dayConfig.opponentId);
+    const topic = DEFENSE_TOPICS.find(t => t.id === dayConfig.topicId);
+    if (!opponent || !topic) {
+      toast.error("Configuration error for this day");
+      return;
+    }
+
+    // Check if session already exists
+    const existing = sessions.find(s => s.day_number === dayNumber);
+    if (existing?.completed_at) {
+      toast.info("You've already completed this day's debate!");
+      return;
+    }
+
+    setIsAiLoading(true);
+    setMessages([]);
+    setVerdict(null);
+
+    try {
+      // Create or get session
+      let session = existing;
+      if (!session) {
+        const { data, error } = await supabase
+          .from("debate_challenge_sessions")
+          .insert({
+            enrollment_id: enrollment.id,
+            user_id: user.id,
+            day_number: dayNumber,
+            opponent_id: opponent.id,
+            opponent_name: opponent.name,
+            topic_id: topic.id,
+            topic_name: topic.name,
+            difficulty: enrollment.difficulty,
+          })
+          .select()
+          .single();
+        if (error) throw error;
+        session = data;
+      }
+
+      setCurrentSession(session);
+
+      // Load existing messages if resuming
+      if (session.messages && (session.messages as any[]).length > 0) {
+        setMessages(session.messages as ChatMessage[]);
+        setPhase("debating");
+        setIsAiLoading(false);
+        return;
+      }
+
+      // Get AI opening
+      const { data: aiData, error: aiError } = await supabase.functions.invoke("forty-day-debate", {
+        body: {
+          action: "open",
+          opponentWorldview: opponent.worldview,
+          opponentStyle: opponent.argumentStyle,
+          opponentName: opponent.name,
+          topicName: topic.name,
+          topicDescription: topic.description,
+          difficulty: enrollment.difficulty,
+        },
+      });
+
+      if (aiError) throw aiError;
+
+      const opening: ChatMessage = { role: "opponent", content: aiData.response };
+      setMessages([opening]);
+      setPhase("debating");
+
+      // Save opening to session
+      await supabase
+        .from("debate_challenge_sessions")
+        .update({ messages: [opening] as unknown as any })
+        .eq("id", session.id);
+
+    } catch (err: any) {
+      toast.error(err.message || "Failed to start debate");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const sendReply = async () => {
+    if (!userInput.trim() || !currentSession || isAiLoading) return;
+
+    const opponent = DEFENSE_OPPONENTS.find(o => o.id === currentSession.opponent_id);
+    const topic = DEFENSE_TOPICS.find(t => t.id === currentSession.topic_id);
+    if (!opponent || !topic) return;
+
+    const userMsg: ChatMessage = { role: "defender", content: userInput.trim() };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setUserInput("");
+    setIsAiLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("forty-day-debate", {
+        body: {
+          action: "reply",
+          messages: newMessages,
+          userMessage: userMsg.content,
+          opponentWorldview: opponent.worldview,
+          opponentStyle: opponent.argumentStyle,
+          opponentName: opponent.name,
+          topicName: topic.name,
+          topicDescription: topic.description,
+          difficulty: enrollment.difficulty,
+        },
+      });
+
+      if (error) throw error;
+
+      const aiReply: ChatMessage = { role: "opponent", content: data.response };
+      const updatedMessages = [...newMessages, aiReply];
+      setMessages(updatedMessages);
+
+      // Save messages
+      await supabase
+        .from("debate_challenge_sessions")
+        .update({
+          messages: updatedMessages as unknown as any,
+          rounds_completed: Math.floor(updatedMessages.filter(m => m.role === "defender").length),
+        })
+        .eq("id", currentSession.id);
+
+    } catch (err: any) {
+      toast.error(err.message || "AI response failed");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const endDebate = async () => {
+    if (!currentSession || messages.length < 2) {
+      toast.error("Complete at least one exchange first");
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const opponent = DEFENSE_OPPONENTS.find(o => o.id === currentSession.opponent_id);
+      
+      const { data, error } = await supabase.functions.invoke("forty-day-debate", {
+        body: {
+          action: "verdict",
+          messages,
+          opponentName: opponent?.name || currentSession.opponent_name,
+          topicName: currentSession.topic_name,
+        },
+      });
+
+      if (error) throw error;
+      setVerdict(data);
+
+      // Update session
+      await supabase
+        .from("debate_challenge_sessions")
+        .update({
+          messages: messages as unknown as any,
+          completed_at: new Date().toISOString(),
+          xp_earned: data.xp || 100,
+          outcome: data.outcome || "draw",
+          ai_verdict: data.verdict,
+          rounds_completed: messages.filter(m => m.role === "defender").length,
+        })
+        .eq("id", currentSession.id);
+
+      // Update enrollment
+      const today = new Date().toISOString().split("T")[0];
+      const newStreak = enrollment.last_activity_date === today ? enrollment.streak : 
+        (daysSince(enrollment.last_activity_date) <= 2 ? enrollment.streak + 1 : 1);
+
+      await supabase
+        .from("debate_challenge_enrollments")
+        .update({
+          completed_days: enrollment.completed_days + 1,
+          current_day: Math.min(enrollment.current_day + 1, 40),
+          total_xp: enrollment.total_xp + (data.xp || 100),
+          streak: newStreak,
+          longest_streak: Math.max(enrollment.longest_streak, newStreak),
+          last_activity_date: today,
+          status: enrollment.current_day >= 40 ? "completed" : "active",
+          completed_at: enrollment.current_day >= 40 ? new Date().toISOString() : null,
+        })
+        .eq("id", enrollment.id);
+
+      // Save badge if earned
+      if (data.badge && user) {
+        await supabase.from("debate_challenge_badges").insert({
+          user_id: user.id,
+          enrollment_id: enrollment.id,
+          badge_type: data.badge.type,
+          badge_name: data.badge.name,
+          badge_icon: data.badge.icon,
+          badge_description: data.badge.description,
+        });
+      }
+
+      setPhase("verdict");
+      // Reload data
+      loadData();
+
+    } catch (err: any) {
+      toast.error(err.message || "Failed to get verdict");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  // Auto-scroll chat
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // ─── OVERVIEW / ENROLLMENT ────────────────────────────────
+  if (phase === "overview" || phase === "enroll") {
+    return (
+      <div className="space-y-6 max-w-2xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="border-red-500/30 bg-gradient-to-br from-red-950/20 via-background to-amber-950/20 overflow-hidden">
+            <CardContent className="p-6 text-center space-y-4">
+              <div className="flex items-center justify-center gap-3">
+                <Flame className="h-10 w-10 text-red-500" />
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-amber-400 bg-clip-text text-transparent">
+                  40 Days of Fire
+                </h2>
+                <Flame className="h-10 w-10 text-amber-500" />
+              </div>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Face a different AI opponent every day for 40 days. You won't know who you're facing until the debate begins.
+                Defend the faith. Earn XP. Forge your theological steel.
+              </p>
+
+              <div className="grid grid-cols-3 gap-3 pt-4">
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <Swords className="h-5 w-5 text-red-400 mx-auto mb-1" />
+                  <p className="text-xs font-medium text-red-300">40 Debates</p>
+                  <p className="text-[10px] text-muted-foreground">Blind matchups</p>
+                </div>
+                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                  <Trophy className="h-5 w-5 text-amber-400 mx-auto mb-1" />
+                  <p className="text-xs font-medium text-amber-300">XP & Badges</p>
+                  <p className="text-[10px] text-muted-foreground">Gamified progress</p>
+                </div>
+                <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                  <Shield className="h-5 w-5 text-purple-400 mx-auto mb-1" />
+                  <p className="text-xs font-medium text-purple-300">2-Day Grace</p>
+                  <p className="text-[10px] text-muted-foreground">Miss up to 2 days</p>
+                </div>
+              </div>
+
+              {/* Difficulty selection */}
+              <div className="pt-4 space-y-3">
+                <p className="text-sm font-semibold text-foreground">Choose Your Level</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: "beginner", label: "Beginner", icon: "🛡️", desc: "Simple arguments, gentle pace" },
+                    { id: "intermediate", label: "Intermediate", icon: "⚔️", desc: "Scholarly, pressing" },
+                    { id: "advanced", label: "Advanced", icon: "🔥", desc: "Relentless, expert-level" },
+                  ].map(d => (
+                    <button
+                      key={d.id}
+                      onClick={() => setSelectedDifficulty(d.id)}
+                      className={`p-3 rounded-lg border text-left transition-all ${
+                        selectedDifficulty === d.id
+                          ? "border-primary bg-primary/10 ring-1 ring-primary"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="text-lg">{d.icon}</span>
+                      <p className="text-xs font-bold mt-1">{d.label}</p>
+                      <p className="text-[10px] text-muted-foreground">{d.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <Button
+                onClick={handleEnroll}
+                className="w-full bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-amber-700 text-white font-bold mt-4"
+                size="lg"
+              >
+                <Flame className="h-5 w-5 mr-2" />
+                Begin the 40-Day Challenge
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ─── DAILY MAP ────────────────────────────────────────────
+  if (phase === "daily-map") {
+    const xpLevel = getXPLevel(enrollment?.total_xp || 0);
+    const completedDays = sessions.filter(s => s.completed_at).map(s => s.day_number);
+    const todayNumber = enrollment?.current_day || 1;
+    const canDebateToday = !completedDays.includes(todayNumber);
+
+    return (
+      <div className="space-y-4 max-w-2xl mx-auto">
+        {/* Stats Header */}
+        <Card className="border-primary/30">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{xpLevel.emoji}</span>
+                <div>
+                  <p className="text-sm font-bold">{xpLevel.title}</p>
+                  <p className="text-xs text-muted-foreground">Level {xpLevel.level}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-primary">{enrollment?.total_xp || 0} XP</p>
+                <div className="flex items-center gap-1 text-xs text-amber-400">
+                  <Flame className="h-3 w-3" />
+                  <span>{enrollment?.streak || 0} day streak</span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Day {todayNumber} / 40</span>
+                <span>{Math.round((completedDays.length / 40) * 100)}% complete</span>
+              </div>
+              <Progress value={(completedDays.length / 40) * 100} className="h-2" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Badges */}
+        {badges.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {badges.map(b => (
+              <Badge key={b.id} variant="outline" className="gap-1 border-amber-500/40 text-amber-300">
+                <span>{b.badge_icon}</span>
+                <span className="text-[10px]">{b.badge_name}</span>
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {/* Today's Challenge CTA */}
+        {canDebateToday && (
+          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+            <Card className="border-red-500/40 bg-gradient-to-r from-red-950/30 to-amber-950/30">
+              <CardContent className="p-4 text-center">
+                <p className="text-sm font-bold text-red-300 mb-1">
+                  Day {todayNumber} — Your Opponent Awaits
+                </p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  You won't know who you're facing until the debate begins.
+                </p>
+                <Button
+                  onClick={() => startDayDebate(todayNumber)}
+                  className="bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-amber-700"
+                  disabled={isAiLoading}
+                >
+                  {isAiLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Swords className="h-4 w-4 mr-2" />
+                  )}
+                  Enter the Arena
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* 40-Day Grid */}
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
+              <Calendar className="h-4 w-4" /> Progress Map
+            </h3>
+            <div className="grid grid-cols-8 gap-1.5">
+              {Array.from({ length: 40 }, (_, i) => {
+                const dayNum = i + 1;
+                const session = sessions.find(s => s.day_number === dayNum);
+                const isCompleted = !!session?.completed_at;
+                const isCurrent = dayNum === todayNumber && !isCompleted;
+                const isLocked = dayNum > todayNumber;
+                const won = session?.outcome === "win";
+                const lost = session?.outcome === "loss";
+
+                return (
+                  <button
+                    key={dayNum}
+                    onClick={() => {
+                      if (isCurrent) startDayDebate(dayNum);
+                    }}
+                    disabled={isLocked || (isCompleted && true)}
+                    className={`
+                      aspect-square rounded-md flex items-center justify-center text-[10px] font-bold
+                      transition-all relative
+                      ${isCompleted && won ? "bg-green-500/20 border border-green-500/40 text-green-300" : ""}
+                      ${isCompleted && lost ? "bg-red-500/20 border border-red-500/40 text-red-300" : ""}
+                      ${isCompleted && !won && !lost ? "bg-amber-500/20 border border-amber-500/40 text-amber-300" : ""}
+                      ${isCurrent ? "bg-primary/20 border-2 border-primary text-primary animate-pulse" : ""}
+                      ${isLocked ? "bg-muted/20 border border-border text-muted-foreground/40" : ""}
+                    `}
+                  >
+                    {isCompleted ? (
+                      won ? <CheckCircle2 className="h-3 w-3" /> : lost ? <XCircle className="h-3 w-3" /> : <Star className="h-3 w-3" />
+                    ) : isLocked ? (
+                      <Lock className="h-2.5 w-2.5" />
+                    ) : (
+                      dayNum
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-4 mt-3 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-400" /> Win</span>
+              <span className="flex items-center gap-1"><XCircle className="h-3 w-3 text-red-400" /> Loss</span>
+              <span className="flex items-center gap-1"><Star className="h-3 w-3 text-amber-400" /> Draw</span>
+              <span className="flex items-center gap-1"><Lock className="h-3 w-3" /> Locked</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // ─── DEBATING ─────────────────────────────────────────────
+  if (phase === "debating" && currentSession) {
+    const opponent = DEFENSE_OPPONENTS.find(o => o.id === currentSession.opponent_id);
+    const defenderRounds = messages.filter(m => m.role === "defender").length;
+
+    return (
+      <div className="flex flex-col h-[calc(100vh-200px)] max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-3 border-b border-border">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => { setPhase("daily-map"); setCurrentSession(null); }}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <p className="text-sm font-bold flex items-center gap-2">
+                Day {currentSession.day_number}
+                <Badge variant="outline" className="text-[10px]">
+                  {currentSession.difficulty}
+                </Badge>
+              </p>
+              <p className="text-[10px] text-muted-foreground">
+                Topic: {currentSession.topic_name}
+              </p>
+            </div>
+          </div>
+          {defenderRounds >= 1 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={endDebate}
+              disabled={isAiLoading}
+              className="text-xs"
+            >
+              <Target className="h-3 w-3 mr-1" />
+              End & Judge
+            </Button>
+          )}
+        </div>
+
+        {/* Chat Area */}
+        <ScrollArea className="flex-1 p-3">
+          <div className="space-y-3">
+            <AnimatePresence>
+              {messages.map((msg, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex ${msg.role === "defender" ? "justify-end" : "justify-start"}`}
+                >
+                  <div className={`max-w-[85%] rounded-lg p-3 text-sm ${
+                    msg.role === "defender"
+                      ? "bg-primary/20 border border-primary/30"
+                      : "bg-red-500/10 border border-red-500/20"
+                  }`}>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      {msg.role === "opponent" ? (
+                        <>
+                          <span className="text-xs">{opponent?.emoji || "👤"}</span>
+                          <span className="text-[10px] font-bold text-red-300">???</span>
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="h-3 w-3 text-primary" />
+                          <span className="text-[10px] font-bold text-primary">You</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+            {isAiLoading && (
+              <div className="flex justify-start">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-red-400" />
+                  <span className="text-xs text-muted-foreground">Opponent is responding...</span>
+                </div>
+              </div>
+            )}
+            <div ref={scrollRef} />
+          </div>
+        </ScrollArea>
+
+        {/* Input */}
+        <div className="p-3 border-t border-border">
+          <div className="flex gap-2">
+            <Textarea
+              value={userInput}
+              onChange={e => setUserInput(e.target.value)}
+              placeholder="Defend the faith..."
+              className="min-h-[60px] max-h-[120px] resize-none text-sm"
+              onKeyDown={e => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendReply();
+                }
+              }}
+            />
+            <Button
+              onClick={sendReply}
+              disabled={!userInput.trim() || isAiLoading}
+              size="icon"
+              className="h-[60px] w-[60px] shrink-0"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-1 text-center">
+            Round {defenderRounds + 1} • Press Enter to send • End debate after 1+ exchanges
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── VERDICT ──────────────────────────────────────────────
+  if (phase === "verdict" && verdict) {
+    const outcomeConfig = {
+      win: { color: "text-green-400", bg: "from-green-950/30", icon: Trophy, label: "VICTORY" },
+      loss: { color: "text-red-400", bg: "from-red-950/30", icon: XCircle, label: "DEFEAT" },
+      draw: { color: "text-amber-400", bg: "from-amber-950/30", icon: Star, label: "DRAW" },
+    };
+    const oc = outcomeConfig[verdict.outcome as keyof typeof outcomeConfig] || outcomeConfig.draw;
+    const Icon = oc.icon;
+
+    return (
+      <div className="space-y-4 max-w-2xl mx-auto">
+        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+          <Card className={`border-${verdict.outcome === "win" ? "green" : verdict.outcome === "loss" ? "red" : "amber"}-500/30 bg-gradient-to-br ${oc.bg} to-background`}>
+            <CardContent className="p-6 text-center space-y-4">
+              <Icon className={`h-16 w-16 mx-auto ${oc.color}`} />
+              <h2 className={`text-3xl font-black ${oc.color}`}>{oc.label}</h2>
+              <p className="text-muted-foreground text-sm">{verdict.verdict}</p>
+
+              <div className="flex items-center justify-center gap-6 py-3">
+                <div>
+                  <p className="text-2xl font-bold text-primary">+{verdict.xp}</p>
+                  <p className="text-[10px] text-muted-foreground">XP Earned</p>
+                </div>
+                {verdict.badge && (
+                  <div className="text-center">
+                    <p className="text-2xl">{verdict.badge.icon}</p>
+                    <p className="text-[10px] text-amber-300 font-bold">{verdict.badge.name}</p>
+                  </div>
+                )}
+              </div>
+
+              {verdict.strengths?.length > 0 && (
+                <div className="text-left bg-green-500/5 rounded-lg p-3 border border-green-500/20">
+                  <p className="text-xs font-bold text-green-300 mb-1">💪 Strengths</p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    {verdict.strengths.map((s: string, i: number) => (
+                      <li key={i} className="flex items-start gap-1.5">
+                        <CheckCircle2 className="h-3 w-3 text-green-400 mt-0.5 shrink-0" />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {verdict.improvements?.length > 0 && (
+                <div className="text-left bg-amber-500/5 rounded-lg p-3 border border-amber-500/20">
+                  <p className="text-xs font-bold text-amber-300 mb-1">📈 Areas to Sharpen</p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    {verdict.improvements.map((s: string, i: number) => (
+                      <li key={i} className="flex items-start gap-1.5">
+                        <Zap className="h-3 w-3 text-amber-400 mt-0.5 shrink-0" />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <Button onClick={() => setPhase("daily-map")} className="w-full mt-4">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Return to Progress Map
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function daysSince(dateStr: string | null): number {
+  if (!dateStr) return 999;
+  const d = new Date(dateStr);
+  const now = new Date();
+  return Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+}

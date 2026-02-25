@@ -5,13 +5,14 @@ import {
   Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
   Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
   FlaskConical, Target, Save, Archive, Trash2, ChevronDown, ChevronUp,
-  Warehouse, ArrowLeft, Users, Share2, Crown,
+  Warehouse, ArrowLeft, Users, Share2, Crown, Flame,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { CommunityArmory } from "./CommunityArmory";
 import { CheckmateMode } from "./CheckmateMode";
 import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { ForgeDefendHub } from "./ForgeDefendHub";
+import { FortyDayChallenge } from "./FortyDayChallenge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +48,7 @@ interface ChatMessage {
   score?: number;
 }
 
-type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate" | "forge-defend";
+type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate" | "forge-defend" | "forty-day";
 
 interface ArsenalWeapon {
   id: string;
@@ -939,6 +940,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             { id: "arsenal" as const, label: `Arsenal${arsenal.length > 0 ? ` (${arsenal.length})` : ""}`, icon: Warehouse, gradient: "from-emerald-600 to-teal-600" },
             { id: "community-armory" as const, label: "Community Armory", icon: Users, gradient: "from-amber-600 to-orange-600" },
             { id: "forge-defend" as const, label: "Forge & Defend", icon: Trophy, gradient: "from-violet-600 to-fuchsia-600" },
+            { id: "forty-day" as const, label: "40-Day Fire", icon: Flame, gradient: "from-red-600 to-red-800" },
           ]).map((tab) => (
             <button
               key={tab.id}
@@ -955,7 +957,9 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           ))}</div>
 
         {/* Render based on sub-mode */}
-        {subMode === "forge-defend" ? (
+        {subMode === "forty-day" ? (
+          <FortyDayChallenge />
+        ) : subMode === "forge-defend" ? (
           <ForgeDefendHub churchId={churchId} />
         ) : subMode === "community-armory" ? (
           <CommunityArmory onGoToForge={() => setSubMode("analyze-weapon")} />
