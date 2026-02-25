@@ -53,49 +53,49 @@ const MULTI_PRINCIPLE_ROOMS = new Set(['DR', 'TZ', 'C6', '1H/2H/3H', '@', 'MATH'
 // 2-3 sentence card descriptions for every room, with application instruction.
 const ROOM_DESCRIPTIONS: Record<string, string> = {
   // Floor 1 — Furnishing
-  'SR': 'The Story Room trains you to retell biblical events as memorable, sequential scenes. Break the passage into its key story beats and retell them in order. Apply this method to the text.',
-  'IR': 'The Imagination Room trains you to experience Scripture with all five senses. Step inside the scene — what do you see, hear, smell, and feel? Apply this method to the text.',
-  '24': 'The 24FPS Room creates a visual GPS for the Bible — one memorable image per chapter. Pick a single vivid image from this text that captures its essence. Apply this method to the text.',
-  'BR': 'Bible Rendered compresses Scripture into symbolic glyphs — one symbol per 24-chapter block. Identify the central movement of this passage and assign it one simple glyph. Apply this method to the text.',
-  'TR': 'The Translation Room converts abstract biblical concepts into concrete visual pictures. Turn the key idea of this text into a vivid image. Apply this method to the text.',
-  'GR': 'The Gems Room mines Scripture for rare truths by combining unrelated texts until they illuminate each other. Find a hidden gem — a truth most people miss in this passage. Apply this method to the text.',
+  'SR': 'The Story Room trains you to retell biblical events as memorable, sequential scenes. Break the passage into its key story beats and retell them in order. How does the text relate to this principle?',
+  'IR': 'The Imagination Room trains you to experience Scripture with all five senses. Step inside the scene — what do you see, hear, smell, and feel? How does the text relate to this principle?',
+  '24': 'The 24FPS Room creates a visual GPS for the Bible — one memorable image per chapter. Pick a single vivid image from this text that captures its essence. How does the text relate to this principle?',
+  'BR': 'Bible Rendered compresses Scripture into symbolic glyphs — one symbol per 24-chapter block. Identify the central movement of this passage and assign it one simple glyph. How does the text relate to this principle?',
+  'TR': 'The Translation Room converts abstract biblical concepts into concrete visual pictures. Turn the key idea of this text into a vivid image. How does the text relate to this principle?',
+  'GR': 'The Gems Room mines Scripture for rare truths by combining unrelated texts until they illuminate each other. Find a hidden gem — a truth most people miss in this passage. How does the text relate to this principle?',
 
   // Floor 2 — Investigation
-  'OR': 'The Observation Room trains you to gather raw data before interpreting. Count people, objects, actions, repeated words, and contrasts in the text. Apply this method to the text.',
-  'DC': 'The Def-Com Room defines key terms in their original language and consults trusted commentaries. Identify the most important word in this text and explore its deeper meaning. Apply this method to the text.',
-  'ST': 'The Symbols/Types Room tracks consistent biblical imagery — Lamb, Rock, Light — through Scripture to see how it points to Christ. Find a symbol or type in this text. Apply this method to the text.',
-  'QR': 'The Questions Room generates precision questions using three types: INTRA (inside the passage), INTER (across Scripture), and PALACE (Phototheology framework). Ask penetrating questions of this text. Apply this method to the text.',
+  'OR': 'The Observation Room trains you to gather raw data before interpreting. Count people, objects, actions, repeated words, and contrasts in the text. How does the text relate to this principle?',
+  'DC': 'The Def-Com Room defines key terms in their original language and consults trusted commentaries. Identify the most important word in this text and explore its deeper meaning. How does the text relate to this principle?',
+  'ST': 'The Symbols/Types Room tracks consistent biblical imagery — Lamb, Rock, Light — through Scripture to see how it points to Christ. Find a symbol or type in this text. How does the text relate to this principle?',
+  'QR': 'The Questions Room generates precision questions using three types: INTRA (inside the passage), INTER (across Scripture), and PALACE (Phototheology framework). Ask penetrating questions of this text. How does the text relate to this principle?',
 
   // Floor 3 — Freestyle
-  'QA': 'The Q&A Chains Room lets Scripture interpret Scripture. Take a question about this text and find 2-4 biblical cross-references that answer it. Apply this method to the text.',
-  'NF': 'Nature Freestyle sees God\'s invisible attributes in visible creation. Find a natural element — a tree, storm, or animal — that illustrates a truth in this text. Apply this method to the text.',
-  'PF': 'Personal Freestyle turns your biography into theology. Find a moment in your own life story that echoes or illustrates the truth in this text. Apply this method to the text.',
-  'BF': 'Bible Freestyle trains you to see how every verse connects to other verses — some are siblings, others distant relatives. Find a verse that connects to this text and explain the relationship. Apply this method to the text.',
-  'HF': 'History/Social Freestyle mines secular history, culture, and current events for gospel illustrations. Find something from history or culture that this text illuminates. Apply this method to the text.',
-  'LR': 'The Listening Room transforms passive hearing into active Scripture-linking. Find a theological echo from a sermon, conversation, or life experience that connects to this text. Apply this method to the text.',
+  'QA': 'The Q&A Chains Room lets Scripture interpret Scripture. Take a question about this text and find 2-4 biblical cross-references that answer it. How does the text relate to this principle?',
+  'NF': 'Nature Freestyle sees God\'s invisible attributes in visible creation. Find a natural element — a tree, storm, or animal — that illustrates a truth in this text. How does the text relate to this principle?',
+  'PF': 'Personal Freestyle turns your biography into theology. Find a moment in your own life story that echoes or illustrates the truth in this text. How does the text relate to this principle?',
+  'BF': 'Bible Freestyle trains you to see how every verse connects to other verses — some are siblings, others distant relatives. Find a verse that connects to this text and explain the relationship. How does the text relate to this principle?',
+  'HF': 'History/Social Freestyle mines secular history, culture, and current events for gospel illustrations. Find something from history or culture that this text illuminates. How does the text relate to this principle?',
+  'LR': 'The Listening Room transforms passive hearing into active Scripture-linking. Find a theological echo from a sermon, conversation, or life experience that connects to this text. How does the text relate to this principle?',
 
   // Floor 4 — Next Level (non-excluded rooms)
-  'PRm': 'The Patterns Room identifies recurring theological motifs that God plays throughout Scripture in different keys. Find a pattern in this text that echoes elsewhere in the Bible. Apply this method to the text.',
-  'P\u2016': 'The Parallels Room places two biblical events side by side and asks: what echoes, and what escalates? Find a parallel event in Scripture that mirrors this text. Apply this method to the text.',
-  'FRt': 'The Fruit Room is your interpretive conscience — it asks what kind of life your interpretation produces. Does your reading of this text produce good fruit or bad fruit? Apply this test to the text.',
+  'PRm': 'The Patterns Room identifies recurring theological motifs that God plays throughout Scripture in different keys. Find a pattern in this text that echoes elsewhere in the Bible. How does the text relate to this principle?',
+  'P\u2016': 'The Parallels Room places two biblical events side by side and asks: what echoes, and what escalates? Find a parallel event in Scripture that mirrors this text. How does the text relate to this principle?',
+  'FRt': 'The Fruit Room is your interpretive conscience — it asks what kind of life your interpretation produces. Does your reading of this text produce good fruit or bad fruit? How does the text relate to this principle?',
 
   // Floor 5 — Vision
-  'BL': 'The Blue Room reveals the Sanctuary as God\'s architectural blueprint for understanding Scripture. Connect this text to a piece of tabernacle furniture, a ritual, or a priestly service. Apply this method to the text.',
-  'PR': 'The Prophecy Room reads Daniel and Revelation as God\'s cohesive timeline of redemptive history. Find the prophetic significance of this text — what was or will be fulfilled? Apply this method to the text.',
-  'CEC': 'Christ in Every Chapter enforces the principle that ALL Scripture is about Jesus. Find Christ in this text — even where He seems hidden. Apply this method to the text.',
-  'R66': 'Room 66 traces a single theme through every book of the Bible, from Genesis to Revelation. Pick a theme from this text and trace it across Scripture. Apply this method to the text.',
+  'BL': 'The Blue Room reveals the Sanctuary as God\'s architectural blueprint for understanding Scripture. Connect this text to a piece of tabernacle furniture, a ritual, or a priestly service. How does the text relate to this principle?',
+  'PR': 'The Prophecy Room reads Daniel and Revelation as God\'s cohesive timeline of redemptive history. Find the prophetic significance of this text — what was or will be fulfilled? How does the text relate to this principle?',
+  'CEC': 'Christ in Every Chapter enforces the principle that ALL Scripture is about Jesus. Find Christ in this text — even where He seems hidden. How does the text relate to this principle?',
+  'R66': 'Room 66 traces a single theme through every book of the Bible, from Genesis to Revelation. Pick a theme from this text and trace it across Scripture. How does the text relate to this principle?',
 
   // Floor 6 (non-excluded rooms)
-  'JR': 'The Juice Room extracts maximum theological, narrative, and practical meaning from Scripture at any scale. Squeeze every drop of meaning from this text without distortion. Apply this method to the text.',
+  'JR': 'The Juice Room extracts maximum theological, narrative, and practical meaning from Scripture at any scale. Squeeze every drop of meaning from this text without distortion. How does the text relate to this principle?',
 
   // Floor 7 — Spiritual & Emotional
-  'FRm': 'The Fire Room is where Scripture moves from your head to your heart, igniting conviction, comfort, or worship. What in this text sets your soul on fire? Apply this method to the text.',
-  'MR': 'The Meditation Room trains you to marinate in a single verse or phrase until it absorbs into your being. Choose one phrase from this text and dwell on it deeply. Apply this method to the text.',
-  'SRm': 'The Speed Room trains you to retrieve biblical knowledge instantly under time pressure. Quickly connect this text to as many other Scriptures, principles, or applications as you can. Apply this method to the text.',
+  'FRm': 'The Fire Room is where Scripture moves from your head to your heart, igniting conviction, comfort, or worship. What in this text sets your soul on fire? How does the text relate to this principle?',
+  'MR': 'The Meditation Room trains you to marinate in a single verse or phrase until it absorbs into your being. Choose one phrase from this text and dwell on it deeply. How does the text relate to this principle?',
+  'SRm': 'The Speed Room trains you to retrieve biblical knowledge instantly under time pressure. Quickly connect this text to as many other Scriptures, principles, or applications as you can. How does the text relate to this principle?',
 
   // Floor 8 — Master
-  '\u221E': 'Reflexive Mastery is when the Palace structure becomes invisible because it\'s wired into your instincts. Read this text naturally through layered lenses without consciously naming rooms. Apply this method to the text.',
-  'PFS': 'Palace Freestyle is a relational study environment where you think out loud with Scripture, building patterns before concluding. Freely explore connections in this text. Apply this method to the text.',
+  '\u221E': 'Reflexive Mastery is when the Palace structure becomes invisible because it\'s wired into your instincts. Read this text naturally through layered lenses without consciously naming rooms. How does the text relate to this principle?',
+  'PFS': 'Palace Freestyle is a relational study environment where you think out loud with Scripture, building patterns before concluding. Freely explore connections in this text. How does the text relate to this principle?',
 };
 
 // Generate room cards from palaceData (authentic rooms only)
@@ -359,15 +359,15 @@ function generateSpecialCards(): ScrabbleCard[] {
 
   // 9 Fruits of the Spirit (from Fruit Room - Floor 4)
   const fruits = [
-    { id: 'fruit-love', code: 'FRt-Lo', name: 'Love', description: 'This fruit asks: does your interpretation produce selfless, sacrificial love for God and others (1 Cor 13:4-7)? Test this text by its love-fruit. Apply this test to the text.', tags: ['fruit', 'love', 'character', 'application'], icon: 'Heart' },
-    { id: 'fruit-joy', code: 'FRt-Jo', name: 'Joy', description: 'This fruit asks: does your interpretation produce deep, abiding joy that transcends circumstances (Phil 4:4)? Test this text by its joy-fruit. Apply this test to the text.', tags: ['fruit', 'joy', 'character', 'application'], icon: 'Smile' },
-    { id: 'fruit-peace', code: 'FRt-Pe', name: 'Peace', description: 'This fruit asks: does your interpretation produce peace with God and peace of mind (Phil 4:7)? Test this text by its peace-fruit. Apply this test to the text.', tags: ['fruit', 'peace', 'character', 'application'], icon: 'Leaf' },
-    { id: 'fruit-patience', code: 'FRt-Pa', name: 'Patience', description: 'This fruit asks: does your interpretation cultivate patient endurance under trial and slow-to-anger restraint (James 1:3-4)? Test this text by its patience-fruit. Apply this test to the text.', tags: ['fruit', 'patience', 'character', 'endurance'], icon: 'Clock' },
-    { id: 'fruit-kindness', code: 'FRt-Ki', name: 'Kindness', description: 'This fruit asks: does your interpretation move you toward generous, tender action toward others (Eph 4:32)? Test this text by its kindness-fruit. Apply this test to the text.', tags: ['fruit', 'kindness', 'character', 'compassion'], icon: 'HandHeart' },
-    { id: 'fruit-goodness', code: 'FRt-Go', name: 'Goodness', description: 'This fruit asks: does your interpretation produce moral integrity and active virtue that reflects God\'s character (Mic 6:8)? Test this text by its goodness-fruit. Apply this test to the text.', tags: ['fruit', 'goodness', 'character', 'righteousness'], icon: 'Sun' },
-    { id: 'fruit-faithfulness', code: 'FRt-Fa', name: 'Faithfulness', description: 'This fruit asks: does your interpretation build trustworthy, covenant-keeping loyalty to God and others (Lam 3:22-23)? Test this text by its faithfulness-fruit. Apply this test to the text.', tags: ['fruit', 'faithfulness', 'character', 'covenant'], icon: 'Shield' },
-    { id: 'fruit-gentleness', code: 'FRt-Ge', name: 'Gentleness', description: 'This fruit asks: does your interpretation cultivate meekness — power under control, strength without harshness (Matt 11:29)? Test this text by its gentleness-fruit. Apply this test to the text.', tags: ['fruit', 'gentleness', 'character', 'meekness'], icon: 'Feather' },
-    { id: 'fruit-selfcontrol', code: 'FRt-SC', name: 'Self-Control', description: 'This fruit asks: does your interpretation strengthen mastery over impulse, appetite, and passion (2 Pet 1:5-6)? Test this text by its self-control-fruit. Apply this test to the text.', tags: ['fruit', 'self-control', 'character', 'discipline'], icon: 'Lock' },
+    { id: 'fruit-love', code: 'FRt-Lo', name: 'Love', description: 'This fruit asks: does your interpretation produce selfless, sacrificial love for God and others (1 Cor 13:4-7)? How does the text relate to this principle?', tags: ['fruit', 'love', 'character', 'application'], icon: 'Heart' },
+    { id: 'fruit-joy', code: 'FRt-Jo', name: 'Joy', description: 'This fruit asks: does your interpretation produce deep, abiding joy that transcends circumstances (Phil 4:4)? How does the text relate to this principle?', tags: ['fruit', 'joy', 'character', 'application'], icon: 'Smile' },
+    { id: 'fruit-peace', code: 'FRt-Pe', name: 'Peace', description: 'This fruit asks: does your interpretation produce peace with God and peace of mind (Phil 4:7)? How does the text relate to this principle?', tags: ['fruit', 'peace', 'character', 'application'], icon: 'Leaf' },
+    { id: 'fruit-patience', code: 'FRt-Pa', name: 'Patience', description: 'This fruit asks: does your interpretation cultivate patient endurance under trial and slow-to-anger restraint (James 1:3-4)? How does the text relate to this principle?', tags: ['fruit', 'patience', 'character', 'endurance'], icon: 'Clock' },
+    { id: 'fruit-kindness', code: 'FRt-Ki', name: 'Kindness', description: 'This fruit asks: does your interpretation move you toward generous, tender action toward others (Eph 4:32)? How does the text relate to this principle?', tags: ['fruit', 'kindness', 'character', 'compassion'], icon: 'HandHeart' },
+    { id: 'fruit-goodness', code: 'FRt-Go', name: 'Goodness', description: 'This fruit asks: does your interpretation produce moral integrity and active virtue that reflects God\'s character (Mic 6:8)? How does the text relate to this principle?', tags: ['fruit', 'goodness', 'character', 'righteousness'], icon: 'Sun' },
+    { id: 'fruit-faithfulness', code: 'FRt-Fa', name: 'Faithfulness', description: 'This fruit asks: does your interpretation build trustworthy, covenant-keeping loyalty to God and others (Lam 3:22-23)? How does the text relate to this principle?', tags: ['fruit', 'faithfulness', 'character', 'covenant'], icon: 'Shield' },
+    { id: 'fruit-gentleness', code: 'FRt-Ge', name: 'Gentleness', description: 'This fruit asks: does your interpretation cultivate meekness — power under control, strength without harshness (Matt 11:29)? How does the text relate to this principle?', tags: ['fruit', 'gentleness', 'character', 'meekness'], icon: 'Feather' },
+    { id: 'fruit-selfcontrol', code: 'FRt-SC', name: 'Self-Control', description: 'This fruit asks: does your interpretation strengthen mastery over impulse, appetite, and passion (2 Pet 1:5-6)? How does the text relate to this principle?', tags: ['fruit', 'self-control', 'character', 'discipline'], icon: 'Lock' },
   ];
 
   fruits.forEach(f => {

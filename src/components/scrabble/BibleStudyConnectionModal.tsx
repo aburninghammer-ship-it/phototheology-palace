@@ -381,8 +381,8 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
             <Textarea
               id="explanation"
               placeholder={isFirstPlay
-                ? `How does the ${card.name} principle help you understand ${seedVerse.reference}?`
-                : `How does ${card.name} connect to or build upon ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}?`
+                ? `How does the text relate to ${card.name}?`
+                : `How does the text relate to ${card.name}, building on ${previousEntry?.playerName}'s insight?`
               }
               value={explanation}
               onChange={(e) => setExplanation(e.target.value)}
