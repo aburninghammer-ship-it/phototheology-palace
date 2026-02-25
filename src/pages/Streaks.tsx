@@ -62,49 +62,57 @@ export default function Streaks() {
   }, [user]);
 
   const fetchStreakData = async () => {
-    // Fetch user streak data from database
+    // Fetch user streak data from profiles
     const { data: userData } = await supabase
       .from('profiles')
       .select('daily_study_streak, longest_study_streak, gem_creation_streak, longest_gem_streak, chain_chess_streak, longest_chess_streak, equations_streak, longest_equations_streak')
       .eq('id', user?.id)
       .single();
 
-    if (userData) {
-      setStreaks([
-        {
-          activity: t('streaks.activities.dailyStudy.name'),
-          icon: <Calendar className="h-6 w-6" />,
-          currentStreak: userData.daily_study_streak || 0,
-          longestStreak: userData.longest_study_streak || 0,
-          description: t('streaks.activities.dailyStudy.description'),
-          color: userData.daily_study_streak > 0 ? "border-orange-500" : "border-gray-400"
-        },
-        {
-          activity: t('streaks.activities.gemCreation.name'),
-          icon: <Sparkles className="h-6 w-6" />,
-          currentStreak: userData.gem_creation_streak || 0,
-          longestStreak: userData.longest_gem_streak || 0,
-          description: t('streaks.activities.gemCreation.description'),
-          color: userData.gem_creation_streak > 0 ? "border-orange-500" : "border-gray-400"
-        },
-        {
-          activity: t('streaks.activities.chainChess.name'),
-          icon: <Gamepad2 className="h-6 w-6" />,
-          currentStreak: userData.chain_chess_streak || 0,
-          longestStreak: userData.longest_chess_streak || 0,
-          description: t('streaks.activities.chainChess.description'),
-          color: userData.chain_chess_streak > 0 ? "border-purple-500" : "border-gray-400"
-        },
-        {
-          activity: t('streaks.activities.equations.name'),
-          icon: <Calculator className="h-6 w-6" />,
-          currentStreak: userData.equations_streak || 0,
-          longestStreak: userData.longest_equations_streak || 0,
-          description: t('streaks.activities.equations.description'),
-          color: userData.equations_streak > 0 ? "border-blue-500" : "border-gray-400"
-        }
-      ]);
-    }
+    // Also fetch reading_streaks as primary source of truth for study streaks
+    const { data: readingData } = await supabase
+      .from('reading_streaks')
+      .select('current_streak, longest_streak')
+      .eq('user_id', user?.id)
+      .maybeSingle();
+
+    const studyStreak = readingData?.current_streak || userData?.daily_study_streak || 0;
+    const longestStudy = readingData?.longest_streak || userData?.longest_study_streak || 0;
+
+    setStreaks([
+      {
+        activity: t('streaks.activities.dailyStudy.name'),
+        icon: <Calendar className="h-6 w-6" />,
+        currentStreak: studyStreak,
+        longestStreak: longestStudy,
+        description: t('streaks.activities.dailyStudy.description'),
+        color: studyStreak > 0 ? "border-orange-500" : "border-gray-400"
+      },
+      {
+        activity: t('streaks.activities.gemCreation.name'),
+        icon: <Sparkles className="h-6 w-6" />,
+        currentStreak: userData?.gem_creation_streak || 0,
+        longestStreak: userData?.longest_gem_streak || 0,
+        description: t('streaks.activities.gemCreation.description'),
+        color: (userData?.gem_creation_streak || 0) > 0 ? "border-orange-500" : "border-gray-400"
+      },
+      {
+        activity: t('streaks.activities.chainChess.name'),
+        icon: <Gamepad2 className="h-6 w-6" />,
+        currentStreak: userData?.chain_chess_streak || 0,
+        longestStreak: userData?.longest_chess_streak || 0,
+        description: t('streaks.activities.chainChess.description'),
+        color: (userData?.chain_chess_streak || 0) > 0 ? "border-purple-500" : "border-gray-400"
+      },
+      {
+        activity: t('streaks.activities.equations.name'),
+        icon: <Calculator className="h-6 w-6" />,
+        currentStreak: userData?.equations_streak || 0,
+        longestStreak: userData?.longest_equations_streak || 0,
+        description: t('streaks.activities.equations.description'),
+        color: (userData?.equations_streak || 0) > 0 ? "border-blue-500" : "border-gray-400"
+      }
+    ]);
   };
 
   return (
