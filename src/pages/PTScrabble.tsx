@@ -853,6 +853,13 @@ export default function PTScrabble() {
             </div>
           </header>
 
+          {/* Seed Verse Display — visible to ALL players on the "table" */}
+          {seedVerse && (
+            <div className="px-3 pt-2">
+              <SeedVerseDisplay verse={seedVerse} compact />
+            </div>
+          )}
+
           {/* Game board */}
           <div className="flex-1 min-h-0 pb-40">
             <ScrabbleBoard
