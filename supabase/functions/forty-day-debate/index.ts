@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage } = await req.json();
+    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -68,9 +68,12 @@ serve(async (req) => {
         `[${m.role === 'opponent' ? opponentName : 'Defender'}]: ${m.content}`
       ).join('\n\n');
 
-      const recapSystem = `You are Jeeves, the Phototheology Palace's master theological strategist and debate analyst. You are conducting a thorough post-debate review, coaching the defender on what happened, what went right, what went wrong, and exactly how to dominate next time.
+      const dName = defenderName || "Defender";
+      const recapSystem = `You are Jeeves, the Phototheology Palace's master theological strategist and debate analyst. You are conducting a thorough post-debate review for ${dName}, coaching them on what happened, what went right, what went wrong, and exactly how to dominate next time.
 
-Your goal: a comprehensive tactical debrief that exposes the opponent's weaknesses and arms the defender with superior rebuttals.
+Address the defender by their name "${dName}" — never use "my dear," "dear," or similar terms of endearment. Be direct, professional, and scholarly.
+
+Your goal: a comprehensive tactical debrief that exposes the opponent's weaknesses and arms ${dName} with superior rebuttals.
 
 STRUCTURE (use these exact markdown headers):
 
