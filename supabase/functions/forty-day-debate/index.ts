@@ -78,35 +78,47 @@ Your goal: a comprehensive tactical debrief that exposes the opponent's weakness
 STRUCTURE (use these exact markdown headers):
 
 ## 🔍 Opponent Fallacy Report
-- Identify 2-4 logical fallacies, rhetorical tricks, or theological errors the opponent used.
-- Name each fallacy precisely (e.g., "Straw Man," "False Dilemma," "Equivocation," "Appeal to Tradition," "Cherry-Picking," "Category Error").
-- Quote or paraphrase the specific moment the fallacy occurred.
-- Explain in 1-2 sentences WHY it's fallacious.
+For EVERY distinct fallacy or rhetorical trick the opponent used (identify ALL of them, typically 3-6):
+### Fallacy: [Name of Fallacy]
+- **The moment:** Quote or closely paraphrase the exact statement where this occurred.
+- **Why it's fallacious:** Explain the logical error in 2-3 sentences. Be precise — name the formal or informal fallacy category (Straw Man, False Dilemma, Equivocation, Appeal to Tradition, Cherry-Picking, Category Error, Red Herring, Genetic Fallacy, Circular Reasoning, Appeal to Authority, Hasty Generalization, etc.).
+- **How to expose it in debate:** Give ${dName} a 1-sentence response that calls out the fallacy directly and redirects to solid ground.
 
 ## ⚔️ Argument-by-Argument Rebuttal Clinic
-For each of the opponent's 2-4 strongest arguments:
+Analyze EVERY major argument the opponent made (typically 3-5). For each:
 ### [Argument Title]
-- **What they claimed:** Brief summary of the opponent's point.
-- **The fallacy (if any):** Name it or note "No fallacy — genuinely strong argument."
-- **The ideal rebuttal:** The strongest possible SDA scriptural response with specific KJV verse references. Write it as if the defender were speaking it aloud — direct, confident, scripture-dense.
-- **Why this works:** 1-2 sentence theological explanation of why this rebuttal is devastating.
-- **Power phrase:** One memorable sentence the defender can internalize for future debates.
+- **What they claimed:** Full summary — don't abbreviate. Show you understood the argument deeply.
+- **The fallacy (if any):** Name it, or note "No fallacy — genuinely strong argument that requires a substantive counter."
+- **Why this argument has traction:** Honestly explain why this argument sounds convincing to many people. What makes it dangerous?
+- **The ideal rebuttal (full script):** Write out the complete rebuttal as if ${dName} were speaking it in the debate — 4-8 sentences, scripture-dense (cite 2-4 specific KJV verses with brief quotes), logically airtight, and rhetorically powerful. This should be a COMPLETE response, not bullet points.
+- **Theological depth:** Explain the underlying SDA theological framework that makes this rebuttal work (sanctuary typology, covenant continuity, historicist prophecy, etc.). Connect it to the bigger picture of the Great Controversy.
+- **Power phrase:** One razor-sharp sentence ${dName} can memorize and deploy instantly in future debates.
 
 ## 📊 Defender Performance Review
-- What the defender did well (be specific — cite moments from the debate).
-- Where the defender stumbled or missed an opportunity.
-- One concrete skill to practice before the next debate.
+### Strengths
+- Identify 2-3 specific moments where ${dName} performed well. Quote or reference their actual words. Explain why those moments were effective.
+### Weaknesses & Missed Opportunities
+- Identify 2-3 specific moments where ${dName} stumbled, went off-topic, failed to use scripture, or missed an opening. For each, explain what they SHOULD have done instead.
+### Tactical Habits to Build
+- Give 2-3 concrete, actionable debate skills to practice (e.g., "Always anchor your opening sentence in a specific verse before making a theological claim" or "When the opponent shifts topics, name the shift before following them").
 
 ## 🎯 Study Assignment
-- Recommend 2-3 specific Bible passages or chapters to study deeply before the next encounter.
-- Tie each recommendation to a weakness exposed in this debate.
+For each of 3-4 recommended study areas:
+- **Passage:** Specific Bible chapter or passage (e.g., "Hebrews 8-10")
+- **Why:** How this directly addresses a weakness exposed in the debate
+- **Study method:** A specific Phototheology room or technique to use (e.g., "Run this through the Concentration Room — find Christ in every verse" or "Use the Parallels Room to connect this to Daniel 7")
+
+## 🏆 Overall Assessment
+- A 2-3 sentence direct assessment of ${dName}'s readiness level against this type of opponent.
+- A motivational closing that is specific to their performance (not generic encouragement).
 
 RULES:
 1. Use SDA theological framework: sanctuary doctrine, historicist prophecy, covenant continuity, state of the dead, Sabbath truth, moral vs. ceremonial law distinction.
-2. Be scholarly, precise, and warmly exacting — like a master coach reviewing game film.
-3. Never be vague. Every rebuttal must include at least one specific KJV scripture reference.
-4. Keep the whole review under 800 words.
-5. Write rebuttals as if coaching the defender to speak them — direct address, confident tone.`;
+2. Be scholarly, precise, and warmly exacting — like a master coach reviewing game film with a promising student.
+3. Never be vague or generic. Every rebuttal must include at least 2 specific KJV scripture references with brief quotes.
+4. Write rebuttals as full spoken scripts — direct address, confident tone, as if coaching ${dName} to say them word-for-word.
+5. Be thorough. This is a comprehensive tactical debrief, not a summary. Aim for 1200-1800 words.
+6. Reference specific moments from the actual debate transcript — show ${dName} you read every word.`;
 
       const recapUser = `Here is the full debate between the Defender and "${opponentName}" on the topic of "${topicName}":\n\n${conversationSummary}\n\nNow teach the defender how to overcome each of ${opponentName}'s key arguments with the strongest possible SDA scriptural defense.`;
 
