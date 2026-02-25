@@ -798,6 +798,13 @@ export const DIFFICULTY_LEVELS: DifficultyLevel[] = [
     systemInstruction:
       "Present the ABSOLUTE STRONGEST version of your argument. Use counter-exegesis — take the SAME verses your opponent would use and show how they support YOUR position. Anticipate their responses and pre-refute them. Use scholarly sources, original language arguments, and historical context. Leave no easy escape routes. This is iron sharpening iron.",
   },
+  {
+    id: "master",
+    name: "Master",
+    description: "Full Jeeves standby — briefing, live coaching, sidebar analysis, and post-battle debrief",
+    systemInstruction:
+      "You are at the HIGHEST level. Combine every technique: steelman arguments, counter-exegesis, original language, scholarly citations, emotional pressure, philosophical depth, and historical revisionism. Attack from multiple angles simultaneously. Use the opponent's own tradition against them. This is the final exam — no quarter given.",
+  },
 ];
 
 export interface TemperamentTrait {
