@@ -98,11 +98,14 @@ export function ScrabbleBoard({
       {/* Highlighted verse banner on the board */}
       {verseReference && (
         <div className="absolute top-0 left-0 right-0 z-20 px-3 py-2">
-          <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg px-4 py-2 backdrop-blur-sm shadow-[0_0_20px_rgba(234,179,8,0.15)]">
-            <span className="font-bold text-yellow-400 text-sm">📖 {verseReference}</span>
-            {verseText && (
-              <p className="text-xs text-yellow-200/80 italic leading-relaxed mt-0.5 line-clamp-2">"{verseText}"</p>
-            )}
+          <div className="glass-card rounded-xl px-4 py-3 relative overflow-hidden">
+            <div className="glass-card-bubbles"><span /><span /><span /><span /><span /><span /><span /><span /></div>
+            <div className="relative z-10">
+              <span className="font-bold text-primary text-sm drop-shadow-sm">📖 {verseReference}</span>
+              {verseText && (
+                <p className="text-xs text-foreground/70 italic leading-relaxed mt-1 line-clamp-2">"{verseText}"</p>
+              )}
+            </div>
           </div>
         </div>
       )}
