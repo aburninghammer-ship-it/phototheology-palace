@@ -8684,8 +8684,8 @@ CRITICAL RULES:
       finalMessages.push({ role: "user", content: userPrompt });
     }
 
-    // Use lower temperature for research mode to improve reliability and reduce timeouts
-    const modelTemperature = (mode === "research") ? 0.4 : 0.9;
+    // Use lower temperature for structured JSON modes to improve reliability
+    const modelTemperature = (mode === "research") ? 0.4 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : 0.9;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -8697,7 +8697,7 @@ CRITICAL RULES:
         model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" ? "google/gemini-2.5-flash" : mode.startsWith("defense-") || mode.startsWith("forge-defend-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
+        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
       }),
     });
 
@@ -8774,16 +8774,18 @@ CRITICAL RULES:
     // Clean markdown code fencing from JSON responses
     content = content.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
 
-    // Global cleanup for Jeeves text responses
+    // Global cleanup for Jeeves text responses (skip for JSON analysis modes to avoid corrupting JSON)
     // Remove all markdown bold/italic markers and discourage theatrical openings
-    content = content
-      .replace(/\*\*/g, '')
-      .replace(/__([^_]+)__/g, '$1')
-      .replace(/\*(?!\s)/g, '')
-      .replace(/^[Aa]h, my friend[.!]?\s*/m, '')
-      .replace(/^[Aa]h[,!]?\s*/m, '')
-      .replace(/my friend[,!]?/gi, '')
-      .trim();
+    if (mode !== "analyze-thoughts" && mode !== "analyze-thoughts-scholar") {
+      content = content
+        .replace(/\*\*/g, '')
+        .replace(/__([^_]+)__/g, '$1')
+        .replace(/\*(?!\s)/g, '')
+        .replace(/^[Aa]h, my friend[.!]?\s*/m, '')
+        .replace(/^[Aa]h[,!]?\s*/m, '')
+        .replace(/my friend[,!]?/gi, '')
+        .trim();
+    }
 
     // For maps or charts category in encyclopedia mode, generate an image
     let mapImageUrl = null;
@@ -9671,6 +9673,19 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
         const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const analysis = JSON.parse(jsonMatch[0]);
+
+          // Clean markdown formatting from parsed string values (done after parse to avoid corrupting JSON)
+          const stripMarkdown = (str: string) => str
+            .replace(/\*\*/g, '')
+            .replace(/__([^_]+)__/g, '$1')
+            .replace(/\*(?!\s)/g, '')
+            .replace(/^[Aa]h, my friend[.!]?\s*/m, '')
+            .replace(/^[Aa]h[,!]?\s*/m, '')
+            .replace(/my friend[,!]?/gi, '')
+            .trim();
+          if (analysis.narrativeAnalysis) analysis.narrativeAnalysis = stripMarkdown(analysis.narrativeAnalysis);
+          if (analysis.summary) analysis.summary = stripMarkdown(analysis.summary);
+          if (analysis.encouragement) analysis.encouragement = stripMarkdown(analysis.encouragement);
 
           // ======== PT CODE VALIDATION ========
           // Check narrativeAnalysis for hallucinated PT codes/meanings
