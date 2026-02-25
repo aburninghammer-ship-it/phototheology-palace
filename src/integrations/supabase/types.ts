@@ -3649,6 +3649,178 @@ export type Database = {
         }
         Relationships: []
       }
+      debate_challenge_badges: {
+        Row: {
+          badge_description: string | null
+          badge_icon: string
+          badge_name: string
+          badge_type: string
+          earned_at: string
+          enrollment_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_description?: string | null
+          badge_icon: string
+          badge_name: string
+          badge_type: string
+          earned_at?: string
+          enrollment_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_description?: string | null
+          badge_icon?: string
+          badge_name?: string
+          badge_type?: string
+          earned_at?: string
+          enrollment_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debate_challenge_badges_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "debate_challenge_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      debate_challenge_enrollments: {
+        Row: {
+          completed_at: string | null
+          completed_days: number
+          created_at: string
+          current_day: number
+          difficulty: string
+          grace_days_used: number
+          id: string
+          last_activity_date: string | null
+          longest_streak: number
+          max_grace_days: number
+          missed_days: number
+          started_at: string
+          status: string
+          streak: number
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_days?: number
+          created_at?: string
+          current_day?: number
+          difficulty: string
+          grace_days_used?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          max_grace_days?: number
+          missed_days?: number
+          started_at?: string
+          status?: string
+          streak?: number
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_days?: number
+          created_at?: string
+          current_day?: number
+          difficulty?: string
+          grace_days_used?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          max_grace_days?: number
+          missed_days?: number
+          started_at?: string
+          status?: string
+          streak?: number
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      debate_challenge_sessions: {
+        Row: {
+          ai_verdict: string | null
+          completed_at: string | null
+          created_at: string
+          day_number: number
+          difficulty: string
+          enrollment_id: string
+          id: string
+          messages: Json
+          opponent_id: string
+          opponent_name: string
+          outcome: string | null
+          rounds_completed: number
+          session_date: string
+          started_at: string
+          topic_id: string
+          topic_name: string
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          ai_verdict?: string | null
+          completed_at?: string | null
+          created_at?: string
+          day_number: number
+          difficulty: string
+          enrollment_id: string
+          id?: string
+          messages?: Json
+          opponent_id: string
+          opponent_name: string
+          outcome?: string | null
+          rounds_completed?: number
+          session_date?: string
+          started_at?: string
+          topic_id: string
+          topic_name: string
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          ai_verdict?: string | null
+          completed_at?: string | null
+          created_at?: string
+          day_number?: number
+          difficulty?: string
+          enrollment_id?: string
+          id?: string
+          messages?: Json
+          opponent_id?: string
+          opponent_name?: string
+          outcome?: string | null
+          rounds_completed?: number
+          session_date?: string
+          started_at?: string
+          topic_id?: string
+          topic_name?: string
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debate_challenge_sessions_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "debate_challenge_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deck_studies: {
         Row: {
           cards_used: Json
