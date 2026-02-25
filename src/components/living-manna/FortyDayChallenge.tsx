@@ -129,12 +129,32 @@ export function FortyDayChallenge() {
     }
   };
 
+  // Check if today's debate window is open (6am–midnight local time)
+  const isDebateWindowOpen = (): boolean => {
+    const now = new Date();
+    return now.getHours() >= 6; // 6am to midnight
+  };
+
+  // Get time until 6am (next debate window opens)
+  const getTimeUntil6am = (): string => {
+    const now = new Date();
+    const sixAm = new Date(now);
+    if (now.getHours() >= 6) {
+      sixAm.setDate(sixAm.getDate() + 1);
+    }
+    sixAm.setHours(6, 0, 0, 0);
+    const diff = sixAm.getTime() - now.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${mins}m`;
+  };
+
   // Check if a debate has expired (past midnight)
   const isDebateExpired = (session: any): boolean => {
     if (!session || session.completed_at) return false;
     const createdAt = new Date(session.created_at);
     const midnight = new Date(createdAt);
-    midnight.setHours(24, 0, 0, 0); // midnight after creation
+    midnight.setHours(24, 0, 0, 0);
     return new Date() >= midnight;
   };
 
@@ -148,6 +168,26 @@ export function FortyDayChallenge() {
     const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours}h ${mins}m`;
   };
+
+  // Show "Smoke is ready" notification at 6am
+  const [smokeAlertShown, setSmokeAlertShown] = useState(false);
+  useEffect(() => {
+    if (!enrollment || smokeAlertShown) return;
+    if (isDebateWindowOpen()) {
+      const todayNumber = enrollment.current_day || 1;
+      const todaySession = sessions.find(s => s.day_number === todayNumber);
+      if (!todaySession?.completed_at) {
+        const dayConfig = schedule[todayNumber - 1];
+        if (dayConfig) {
+          toast("🔥 Today's Smoke is ready!", {
+            description: `Day ${todayNumber} — A new opponent and doctrine await you. Step into the arena.`,
+            duration: 8000,
+          });
+          setSmokeAlertShown(true);
+        }
+      }
+    }
+  }, [enrollment, sessions, schedule, smokeAlertShown]);
 
   // Auto-expire any in-progress sessions past midnight
   useEffect(() => {
@@ -179,6 +219,12 @@ export function FortyDayChallenge() {
     const topic = DEFENSE_TOPICS.find(t => t.id === dayConfig.topicId);
     if (!opponent || !topic) {
       toast.error("Configuration error for this day");
+      return;
+    }
+
+    // Block debates before 6am
+    if (!isDebateWindowOpen()) {
+      toast.error("Today's Smoke drops at 6:00 AM. Come back then!");
       return;
     }
 
@@ -606,7 +652,8 @@ export function FortyDayChallenge() {
     const todayNumber = enrollment?.current_day || 1;
     const todaySession = sessions.find(s => s.day_number === todayNumber);
     const isInProgress = todaySession && !todaySession.completed_at && !isDebateExpired(todaySession);
-    const canDebateToday = !completedDays.includes(todayNumber) && (!todaySession || isInProgress);
+    const windowOpen = isDebateWindowOpen();
+    const canDebateToday = windowOpen && !completedDays.includes(todayNumber) && (!todaySession || isInProgress);
 
     return (
       <div className="space-y-4 max-w-2xl mx-auto">
@@ -651,22 +698,36 @@ export function FortyDayChallenge() {
           </div>
         )}
 
+        {/* Pre-6am waiting state */}
+        {!windowOpen && !completedDays.includes(todayNumber) && (
+          <Card className="border-muted-foreground/20 bg-muted/10">
+            <CardContent className="p-4 text-center">
+              <p className="text-sm font-bold text-muted-foreground mb-1">
+                🌅 Day {todayNumber} — Smoke drops at 6:00 AM
+              </p>
+              <p className="text-xs text-muted-foreground">
+                A new opponent and a fresh doctrine will be waiting. Get some rest — your next debate opens in {getTimeUntil6am()}.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Today's Challenge CTA */}
         {canDebateToday && (
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
             <Card className="border-red-500/40 bg-gradient-to-r from-red-950/30 to-amber-950/30">
               <CardContent className="p-4 text-center">
                 <p className="text-sm font-bold text-red-300 mb-1">
-                  {isInProgress ? "Day " + todayNumber + " — Debate In Progress" : "Day " + todayNumber + " — Your Opponent Awaits"}
+                  {isInProgress ? "Day " + todayNumber + " — Debate In Progress" : "🔥 Day " + todayNumber + " — Today's Smoke Is Ready"}
                 </p>
                 <p className="text-xs text-muted-foreground mb-1">
                   {isInProgress
                     ? "Pick up where you left off. Take your time — respond when you're ready."
-                    : "You won't know who you're facing until the debate begins."}
+                    : "A new opponent and a new doctrine await. You won't know who you're facing until the debate begins."}
                 </p>
                 <p className="text-[10px] text-amber-400 mb-3 flex items-center justify-center gap-1">
                   <Calendar className="h-3 w-3" />
-                  Debate expires at midnight — {getTimeUntilMidnight()} remaining
+                  Arena open 6 AM — midnight • {getTimeUntilMidnight()} remaining
                 </p>
                 <Button
                   onClick={() => startDayDebate(todayNumber)}
@@ -776,7 +837,7 @@ export function FortyDayChallenge() {
               </p>
               <p className="text-[10px] text-amber-400 flex items-center gap-1">
                 <Calendar className="h-2.5 w-2.5" />
-                Expires at midnight — {getTimeUntilMidnight()} left
+                Arena: 6 AM — midnight • {getTimeUntilMidnight()} left
               </p>
             </div>
           </div>
@@ -916,7 +977,7 @@ export function FortyDayChallenge() {
             </Button>
           </div>
           <p className="text-[10px] text-muted-foreground mt-1 text-center">
-            Round {defenderRounds + 1} • {enrollment?.difficulty === "beginner" ? "Jeeves is coaching you" : enrollment?.difficulty === "intermediate" ? "Ask Jeeves when you need help" : "Jeeves will review after the debate"} • Expires at midnight
+            Round {defenderRounds + 1} • {enrollment?.difficulty === "beginner" ? "Jeeves is coaching you" : enrollment?.difficulty === "intermediate" ? "Ask Jeeves when you need help" : "Jeeves will review after the debate"} • Arena closes at midnight
           </p>
         </div>
       </div>
