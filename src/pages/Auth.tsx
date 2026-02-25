@@ -361,10 +361,29 @@ export default function Auth() {
 
         toast.success(t('auth.accountCreatedRedirecting'));
         
-        // UNIFIED SIGNUP + TRIAL FLOW: Immediately redirect to Stripe checkout
-        // Users MUST enter credit card to complete signup - it's one process
+        // UNIFIED SIGNUP + TRIAL FLOW
+        // Before asking for credit card, check if user is pre-approved or has external membership
         try {
-          // Check for external membership first (Church, Patreon, Pickaxe, Teachable)
+          // Small delay to let DB triggers fire (pending_lifetime_grants, church_preapproved_members)
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          // 1. Re-read profile — triggers may have already granted lifetime/church access
+          const { data: freshProfile } = await supabase
+            .from("profiles")
+            .select("has_lifetime_access, subscription_status, subscription_tier")
+            .eq("id", data.user.id)
+            .single();
+
+          if (freshProfile?.has_lifetime_access || 
+              (freshProfile?.subscription_status === "active" && freshProfile?.subscription_tier)) {
+            console.log("[Auth] Pre-approved access detected via trigger:", freshProfile);
+            trackExternalMembershipDetected('patreon'); // pre-approved via trigger
+            toast.success("Welcome! Your access has been activated automatically.");
+            navigate("/gatehouse", { replace: true });
+            return;
+          }
+
+          // 2. Check for external memberships (Church, Patreon, Pickaxe, Teachable)
           const [churchResult, patreonResult, pickaxeResult, teachableResult] = await Promise.all([
             supabase.rpc("has_church_access", { _user_id: data.user.id }),
             supabase.from("patreon_connections")
@@ -437,7 +456,7 @@ export default function Auth() {
             return;
           }
 
-          // No external membership - redirect to Stripe checkout for 7-day trial
+          // No pre-approved or external membership - redirect to Stripe checkout
           // Track checkout redirect - STEP 2 of checkout funnel
           trackCheckoutRedirect('premium', 'monthly');
 
