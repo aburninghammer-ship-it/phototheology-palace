@@ -820,6 +820,11 @@ export default function PTScrabble() {
 
     // Active multiplayer game
     if (mpGame) {
+      // Use seedVerse from state OR fallback to mpGame.seedVerse directly
+      const activeSeedVerse: SelectedVerse | null = seedVerse || (mpGame.seedVerse
+        ? { reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text, book: '', chapter: 0, verseStart: 0 }
+        : null);
+
       return (
         <div className="h-screen flex flex-col overflow-hidden">
           {/* Study Log Sidebar - shows all player submissions */}
@@ -876,17 +881,17 @@ export default function PTScrabble() {
             </div>
           </header>
 
-          {/* Seed Verse Display — visible to ALL players on the "table" */}
-          {seedVerse && (
+          {/* Seed Verse Display — always visible to ALL players */}
+          {activeSeedVerse && (
             <div className="px-3 pt-2">
-              <SeedVerseDisplay verse={seedVerse} compact />
+              <SeedVerseDisplay verse={activeSeedVerse} compact />
             </div>
           )}
 
           {/* Study Progress Panel - shows the study building answer by answer */}
           {mpStudyLogEntries.length > 0 && (
             <div className="px-3 pt-2">
-              <StudyProgressPanel entries={mpStudyLogEntries} seedVerse={seedVerse} />
+              <StudyProgressPanel entries={mpStudyLogEntries} seedVerse={activeSeedVerse} />
             </div>
           )}
 
@@ -897,8 +902,8 @@ export default function PTScrabble() {
               selectedCard={mpSelectedCard}
               onPositionClick={handleMpPositionClick}
               validPositions={mpSelectedCard ? getValidPositions() : []}
-              verseReference={seedVerse?.reference}
-              verseText={seedVerse?.text}
+              verseReference={activeSeedVerse?.reference}
+              verseText={activeSeedVerse?.text}
             />
           </div>
 
@@ -910,27 +915,46 @@ export default function PTScrabble() {
             onRefresh={mpRefreshHand}
             disabled={false}
             score={mpMyPlayer?.score || 0}
-            verseReference={seedVerse?.reference}
+            verseReference={activeSeedVerse?.reference}
           />
 
-          {/* Connection modal */}
-          <AnimatePresence>
-            {showMpConnectionModal && mpSelectedCard && mpSelectedPosition && (
-              <ConnectionModal
-                isOpen={showMpConnectionModal}
-                onClose={() => {
-                  setShowMpConnectionModal(false);
-                  setMpSelectedPosition(null);
-                }}
-                onSubmit={handleMpConnectionSubmit}
-                card={mpSelectedCard}
-                position={mpSelectedPosition}
-                adjacentCards={mpAdjacentCards}
-                seedVerse={seedVerse || undefined}
-                previousEntry={mpStudyLogEntries.length > 0 ? mpStudyLogEntries[mpStudyLogEntries.length - 1] : undefined}
-              />
-            )}
-          </AnimatePresence>
+          {/* Bible Study Connection modal — with Jeeves scoring */}
+          {showMpConnectionModal && mpSelectedCard && mpSelectedPosition && activeSeedVerse && (
+            <BibleStudyConnectionModal
+              isOpen={showMpConnectionModal}
+              onClose={() => {
+                setShowMpConnectionModal(false);
+                setMpSelectedPosition(null);
+              }}
+              onSubmit={(connections, explanation, isChristConnection, jeevesJudgment, jeevesScore) => {
+                handleMpConnectionSubmit(connections, explanation, isChristConnection);
+                // Show Jeeves feedback in multiplayer too
+                if (jeevesJudgment) {
+                  const entry: StudyLogEntry = {
+                    id: crypto.randomUUID(),
+                    playerName: mpMyPlayer?.displayName || 'Player',
+                    cardCode: mpSelectedCard.code,
+                    cardName: mpSelectedCard.name,
+                    explanation,
+                    isChristConnection,
+                    points: 0,
+                    timestamp: new Date().toISOString(),
+                    jeevesJudgment,
+                    jeevesScore: jeevesScore ?? 6,
+                    rejected: (jeevesScore ?? 6) < 5,
+                    connectingTo: mpStudyLogEntries.length === 0 ? 'verse' : 'previous',
+                  };
+                  setLastPlacedEntry(entry);
+                  setShowFeedbackPanel(true);
+                }
+              }}
+              card={mpSelectedCard}
+              position={mpSelectedPosition}
+              adjacentCards={mpAdjacentCards}
+              seedVerse={activeSeedVerse}
+              previousEntry={mpStudyLogEntries.length > 0 ? mpStudyLogEntries[mpStudyLogEntries.length - 1] : undefined}
+            />
+          )}
 
           {/* Non-blocking voting panel */}
           <VotingPanel
@@ -939,6 +963,17 @@ export default function PTScrabble() {
             currentPlayerId={mpMyPlayer?.id}
             myVotes={myVotes}
             onVote={handleMpVote}
+          />
+
+          {/* Jeeves Feedback Panel for multiplayer */}
+          <JeevesFeedbackPanel
+            entry={lastPlacedEntry}
+            seedVerse={activeSeedVerse}
+            onDismiss={() => {
+              setShowFeedbackPanel(false);
+              setLastPlacedEntry(null);
+            }}
+            isVisible={showFeedbackPanel}
           />
         </div>
       );
