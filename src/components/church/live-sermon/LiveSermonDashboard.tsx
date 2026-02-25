@@ -59,12 +59,39 @@ export function LiveSermonDashboard({ churchId }: LiveSermonDashboardProps) {
 
   const handleGoLive = async (sessionId: string) => {
     try {
+      const session = sessions.find(s => s.id === sessionId);
       const { error } = await supabase
         .from("live_sermon_sessions")
         .update({ status: "live", started_at: new Date().toISOString() })
         .eq("id", sessionId);
 
       if (error) throw error;
+
+      // Notify all church members via notifications table
+      const { data: members } = await supabase
+        .from("church_members")
+        .select("user_id")
+        .eq("church_id", churchId);
+
+      if (members && members.length > 0) {
+        const { data: currentUser } = await supabase.auth.getUser();
+        const hostId = currentUser?.user?.id;
+
+        const notifications = members
+          .filter(m => m.user_id !== hostId)
+          .map(m => ({
+            user_id: m.user_id,
+            type: "live_sermon",
+            title: "🔴 Live Sermon Now!",
+            message: `"${session?.title || 'A sermon'}" is now live. Join the study!`,
+            link: "/living-manna",
+            is_read: false,
+          }));
+
+        if (notifications.length > 0) {
+          await supabase.from("notifications").insert(notifications);
+        }
+      }
 
       toast.success("You're live! Study cards will be generated as you preach.");
       setActiveSession(sessionId);
