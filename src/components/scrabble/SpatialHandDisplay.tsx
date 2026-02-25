@@ -20,6 +20,7 @@ interface SpatialHandDisplayProps {
   onRefresh?: () => void;
   disabled?: boolean;
   score?: number;
+  verseReference?: string;
   className?: string;
 }
 
@@ -29,6 +30,7 @@ export function SpatialHandDisplay({
   onRefresh,
   disabled = false,
   score = 0,
+  verseReference,
   className,
 }: SpatialHandDisplayProps) {
 
@@ -97,6 +99,7 @@ export function SpatialHandDisplay({
                       card={cardWithPos.card}
                       size="md"
                       isInHand
+                      verseReference={verseReference}
                       onClick={disabled ? undefined : () => onCardSelect(cardWithPos.card, cardWithPos.position)}
                       className={cn(
                         disabled && 'opacity-50 cursor-not-allowed',

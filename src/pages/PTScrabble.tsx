@@ -28,6 +28,8 @@ import {
   StudyLog,
   StudyTranscript,
   JeevesFeedbackPanel,
+  InGameChat,
+  StudyProgressPanel,
   type SelectedVerse,
   type StudyLogEntry,
   type CardWithPosition,
@@ -810,6 +812,14 @@ export default function PTScrabble() {
           {/* Study Log Sidebar - shows all player submissions */}
           <StudyLog entries={mpStudyLogEntries} />
 
+          {/* In-Game Chat - right sidebar */}
+          {mpGame.id && mpMyPlayer && (
+            <InGameChat
+              gameId={mpGame.id}
+              playerName={mpMyPlayer.displayName}
+            />
+          )}
+
           {/* Header */}
           <header className="flex items-center justify-between p-3 border-b bg-background/95 backdrop-blur z-10">
             <Button variant="ghost" size="icon" onClick={() => {
@@ -860,6 +870,13 @@ export default function PTScrabble() {
             </div>
           )}
 
+          {/* Study Progress Panel - shows the study building answer by answer */}
+          {mpStudyLogEntries.length > 0 && (
+            <div className="px-3 pt-2">
+              <StudyProgressPanel entries={mpStudyLogEntries} seedVerse={seedVerse} />
+            </div>
+          )}
+
           {/* Game board */}
           <div className="flex-1 min-h-0 pb-40">
             <ScrabbleBoard
@@ -867,6 +884,7 @@ export default function PTScrabble() {
               selectedCard={mpSelectedCard}
               onPositionClick={handleMpPositionClick}
               validPositions={mpSelectedCard ? getValidPositions() : []}
+              verseReference={seedVerse?.reference}
             />
           </div>
 
@@ -878,6 +896,7 @@ export default function PTScrabble() {
             onRefresh={mpRefreshHand}
             disabled={false}
             score={mpMyPlayer?.score || 0}
+            verseReference={seedVerse?.reference}
           />
 
           {/* Connection modal */}
@@ -1015,11 +1034,17 @@ export default function PTScrabble() {
           <SeedVerseDisplay verse={seedVerse} />
         )}
 
+        {/* Study Progress Panel */}
+        {studyLogEntries.length > 0 && (
+          <StudyProgressPanel entries={studyLogEntries} seedVerse={seedVerse} />
+        )}
+
         {/* Main game area - click cards to view details */}
         <div className="flex-1 min-h-[350px] border rounded-lg overflow-hidden">
           <ScrabbleBoard
             boardState={boardState}
             onCardClick={(placedCard) => setViewingCard(placedCard)}
+            verseReference={seedVerse?.reference}
             className="h-full"
           />
         </div>
@@ -1031,6 +1056,7 @@ export default function PTScrabble() {
         onCardSelect={handleDirectPlacement}
         onRefresh={handleRefreshHand}
         score={score}
+        verseReference={seedVerse?.reference}
       />
 
       {/* Connection Modal */}

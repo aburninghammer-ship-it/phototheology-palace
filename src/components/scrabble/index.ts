@@ -15,3 +15,5 @@ export { SeedCardInsight } from './SeedCardInsight';
 export { StudyLog, type StudyLogEntry } from './StudyLog';
 export { StudyTranscript } from './StudyTranscript';
 export { JeevesFeedbackPanel } from './JeevesFeedbackPanel';
+export { InGameChat } from './InGameChat';
+export { StudyProgressPanel } from './StudyProgressPanel';
