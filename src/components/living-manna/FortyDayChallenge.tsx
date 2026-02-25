@@ -1182,6 +1182,35 @@ export function FortyDayChallenge() {
           </div>
         </div>
 
+        {/* Jeeves Tactical Debrief - Prominent placement */}
+        <div className="p-3 border-b border-border">
+          {jeevesRecap ? (
+            <div className="text-left bg-purple-500/5 rounded-lg p-4 border border-purple-500/20">
+              <p className="text-xs font-bold text-purple-300 mb-2 flex items-center gap-1">
+                <Crown className="h-3 w-3" /> Jeeves's Tactical Debrief
+              </p>
+              <ScrollArea className="max-h-[300px]">
+                <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
+                  <ReactMarkdown>{jeevesRecap}</ReactMarkdown>
+                </div>
+              </ScrollArea>
+            </div>
+          ) : (
+            <Button
+              onClick={() => fetchJeevesRecap(reviewSession)}
+              disabled={isRecapLoading}
+              className="w-full bg-purple-600/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
+              variant="outline"
+            >
+              {isRecapLoading ? (
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Jeeves is analyzing the debate...</>
+              ) : (
+                <><Crown className="h-4 w-4 mr-2" /> Show Jeeves's Tactical Debrief</>
+              )}
+            </Button>
+          )}
+        </div>
+
         {/* Transcript */}
         <ScrollArea className="flex-1 p-3">
           <div className="space-y-3">
