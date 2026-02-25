@@ -126,9 +126,11 @@ const [certificateAchievement, setCertificateAchievement] = useState<any>(null);
 
   const filteredAchievements = achievements.filter((achievement) => {
     const isUnlocked = userAchievements.has(achievement.id);
+    // Apply category filter first (applies to all tabs)
+    if (categoryFilter !== "all" && achievement.category !== categoryFilter) return false;
+    // Then apply unlock status filter
     if (filterType === "unlocked") return isUnlocked;
     if (filterType === "locked") return !isUnlocked;
-    if (categoryFilter !== "all" && achievement.category !== categoryFilter) return false;
     return true;
   }).sort((a, b) => {
     if (sortBy === "points") return (b.points || 0) - (a.points || 0);
