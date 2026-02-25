@@ -57,6 +57,7 @@ export function generate40DaySchedule(seed: string): DayConfig[] {
 // XP milestones for badges
 export const BADGE_MILESTONES = {
   first_blood: { name: "First Blood", icon: "🩸", description: "Completed your first debate" },
+  concession_victory: { name: "Smoke Screen", icon: "💨", description: "Forced your opponent to concede" },
   streak_5: { name: "5-Day Fire", icon: "🔥", description: "5 consecutive days of debate" },
   streak_10: { name: "10-Day Warrior", icon: "⚔️", description: "10 consecutive days of debate" },
   streak_20: { name: "20-Day Champion", icon: "🏆", description: "20 consecutive days of debate" },
