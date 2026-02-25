@@ -132,7 +132,7 @@ export const TagFriendButton = ({
         .from("profiles")
         .select("display_name")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       const senderName = senderProfile?.display_name || "Someone";
 
@@ -157,8 +157,8 @@ export const TagFriendButton = ({
       setSearchQuery("");
       setOpen(false);
     } catch (error: any) {
-      console.error("Error sending notifications:", error);
-      toast.error("Failed to tag friends");
+      console.error("Error tagging friends:", error?.message || error?.code || JSON.stringify(error));
+      toast.error(error?.message || "Failed to tag friends");
     } finally {
       setLoading(false);
     }
