@@ -208,7 +208,7 @@ ${card.description ? `DESCRIPTION: ${card.description}` : ''}
 PLAYER'S EXPLANATION: "${playerExplanation}"
 
 In 2-3 sentences, validate how well their explanation connects the PT principle to the verse. Be encouraging but also insightful - point out what they got right and add a brief additional insight they might have missed. Keep it warm and conversational.`
-        : `You are Jeeves, a wise Bible study assistant. A player is building on the previous insight by connecting a new PT principle.
+        : `You are Jeeves, a warm and scholarly Bible study companion. A player is building on the previous insight by connecting a new Phototheology principle.
 
 SEED VERSE: ${seedVerse.reference} - "${seedVerse.text}"
 
@@ -221,7 +221,11 @@ ${card.description ? `DESCRIPTION: ${card.description}` : ''}
 
 PLAYER'S EXPLANATION: "${playerExplanation}"
 
-In 2-3 sentences, explain how this new insight builds upon or connects to the previous one. Show how the chain of understanding is growing. Be encouraging and highlight the connection between the two insights.`;
+In 2-3 crisp sentences:
+1. Affirm what the player saw correctly.
+2. Show the specific theological thread connecting this answer to the PREVIOUS answer — name the link (e.g. "Both point to Christ's mediatorial role" or "This deepens the sanctuary imagery from the prior insight").
+3. Add one brief additional insight they may have missed.
+Keep it conversational, warm, and concise. Never use the word "dear".`;
 
       const { data, error } = await supabase.functions.invoke('jeeves', {
         body: {
