@@ -362,7 +362,7 @@ export function FortyDayChallenge() {
               <div className="flex items-center justify-center gap-3">
                 <Flame className="h-10 w-10 text-red-500" />
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-amber-400 bg-clip-text text-transparent">
-                  40 Days of Fire
+                  40 Days of Smoke
                 </h2>
                 <Flame className="h-10 w-10 text-amber-500" />
               </div>
