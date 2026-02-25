@@ -115,6 +115,8 @@ export function ScrabbleBoard({
         maxScale={2}
         centerOnInit
         limitToBounds={false}
+        panning={{ velocityDisabled: true }}
+        doubleClick={{ disabled: true }}
       >
         {({ zoomIn, zoomOut, resetTransform }) => (
           <>
