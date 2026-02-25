@@ -62,6 +62,41 @@ serve(async (req) => {
       });
     }
 
+    if (action === "recap") {
+      // Post-debate teaching recap — Jeeves shows how to overcome each argument
+      const conversationSummary = messages.map((m: any) =>
+        `[${m.role === 'opponent' ? opponentName : 'Defender'}]: ${m.content}`
+      ).join('\n\n');
+
+      const recapSystem = `You are Jeeves, the Phototheology Palace's master theological strategist. You are reviewing a completed debate and teaching the defender exactly how they SHOULD have responded to each of the opponent's key arguments.
+
+Your goal: demonstrate the ideal SDA defense for each major argument the opponent raised.
+
+RULES:
+1. Go through each of the opponent's 2-4 strongest arguments one by one.
+2. For each argument, provide:
+   - A brief summary of what the opponent claimed
+   - The ideal scriptural response (with specific KJV verse references)
+   - A concise theological explanation of WHY that response works
+   - A one-sentence "power phrase" the defender could memorize
+3. Use SDA theological framework: sanctuary doctrine, historicist prophecy, covenant continuity, state of the dead, Sabbath truth.
+4. Be encouraging but rigorous — this is a teaching moment.
+5. End with a practical study recommendation.
+6. Keep the whole recap under 600 words.
+7. Format with clear markdown headers for each argument.`;
+
+      const recapUser = `Here is the full debate between the Defender and "${opponentName}" on the topic of "${topicName}":\n\n${conversationSummary}\n\nNow teach the defender how to overcome each of ${opponentName}'s key arguments with the strongest possible SDA scriptural defense.`;
+
+      const response = await callAI(LOVABLE_API_KEY, [
+        { role: "system", content: recapSystem },
+        { role: "user", content: recapUser },
+      ]);
+
+      return new Response(JSON.stringify({ response }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "jeeves-coach") {
       // Jeeves coaching mode — helps the defender mid-debate
       const coachPrompt = buildJeevesCoachPrompt(messages, opponentName, topicName, userMessage, difficulty);
