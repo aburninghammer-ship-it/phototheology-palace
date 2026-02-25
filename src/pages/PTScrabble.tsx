@@ -885,6 +885,7 @@ export default function PTScrabble() {
               onPositionClick={handleMpPositionClick}
               validPositions={mpSelectedCard ? getValidPositions() : []}
               verseReference={seedVerse?.reference}
+              verseText={seedVerse?.text}
             />
           </div>
 
@@ -1045,6 +1046,7 @@ export default function PTScrabble() {
             boardState={boardState}
             onCardClick={(placedCard) => setViewingCard(placedCard)}
             verseReference={seedVerse?.reference}
+            verseText={seedVerse?.text}
             className="h-full"
           />
         </div>

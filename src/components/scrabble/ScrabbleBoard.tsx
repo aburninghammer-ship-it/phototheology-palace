@@ -18,6 +18,7 @@ interface ScrabbleBoardProps {
   onCardClick?: (placedCard: PlacedCard) => void;
   validPositions?: BoardPosition[];
   verseReference?: string;
+  verseText?: string;
   className?: string;
 }
 
@@ -28,6 +29,7 @@ export function ScrabbleBoard({
   onCardClick,
   validPositions: externalValidPositions,
   verseReference,
+  verseText,
   className,
 }: ScrabbleBoardProps) {
   const [hoveredPosition, setHoveredPosition] = useState<string | null>(null);
@@ -93,6 +95,17 @@ export function ScrabbleBoard({
 
   return (
     <div className={cn('relative w-full h-full bg-background/50 rounded-lg overflow-hidden', className)}>
+      {/* Highlighted verse banner on the board */}
+      {verseReference && (
+        <div className="absolute top-0 left-0 right-0 z-20 px-3 py-2">
+          <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg px-4 py-2 backdrop-blur-sm shadow-[0_0_20px_rgba(234,179,8,0.15)]">
+            <span className="font-bold text-yellow-400 text-sm">📖 {verseReference}</span>
+            {verseText && (
+              <p className="text-xs text-yellow-200/80 italic leading-relaxed mt-0.5 line-clamp-2">"{verseText}"</p>
+            )}
+          </div>
+        </div>
+      )}
       <TransformWrapper
         initialScale={1}
         minScale={0.3}
