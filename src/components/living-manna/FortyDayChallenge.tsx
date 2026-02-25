@@ -1204,7 +1204,7 @@ export function FortyDayChallenge() {
                     </p>
                   </div>
                 </div>
-                <ScrollArea className="max-h-[300px]">
+                <ScrollArea className="max-h-[70vh]">
                   <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed
                     [&_h2]:text-[13px] [&_h2]:font-bold [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:pb-1 [&_h2]:border-b [&_h2]:border-purple-500/20
                     [&_h3]:text-[11px] [&_h3]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1
