@@ -125,6 +125,47 @@ export function FortyDayChallenge() {
     }
   };
 
+  // Check if a debate has expired (past midnight)
+  const isDebateExpired = (session: any): boolean => {
+    if (!session || session.completed_at) return false;
+    const createdAt = new Date(session.created_at);
+    const midnight = new Date(createdAt);
+    midnight.setHours(24, 0, 0, 0); // midnight after creation
+    return new Date() >= midnight;
+  };
+
+  // Get time remaining until midnight
+  const getTimeUntilMidnight = (): string => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const diff = midnight.getTime() - now.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${mins}m`;
+  };
+
+  // Auto-expire any in-progress sessions past midnight
+  useEffect(() => {
+    if (!sessions.length) return;
+    const expireSessions = async () => {
+      for (const s of sessions) {
+        if (!s.completed_at && isDebateExpired(s)) {
+          await supabase
+            .from("debate_challenge_sessions")
+            .update({
+              completed_at: new Date(new Date(s.created_at).setHours(24, 0, 0, 0)).toISOString(),
+              outcome: "expired",
+              ai_verdict: "Debate expired at midnight. Try to complete your next debate within the day!",
+              xp_earned: 25, // partial XP for starting
+            })
+            .eq("id", s.id);
+        }
+      }
+    };
+    expireSessions();
+  }, [sessions]);
+
   const startDayDebate = async (dayNumber: number) => {
     if (!enrollment || !user) return;
     const dayConfig = schedule[dayNumber - 1];
@@ -139,8 +180,14 @@ export function FortyDayChallenge() {
 
     // Check if session already exists
     const existing = sessions.find(s => s.day_number === dayNumber);
+    
+    // If completed or expired, don't allow restart
     if (existing?.completed_at) {
       toast.info("You've already completed this day's debate!");
+      return;
+    }
+    if (existing && isDebateExpired(existing)) {
+      toast.error("This debate expired at midnight. Move to the next day.");
       return;
     }
 
@@ -435,7 +482,9 @@ export function FortyDayChallenge() {
     const xpLevel = getXPLevel(enrollment?.total_xp || 0);
     const completedDays = sessions.filter(s => s.completed_at).map(s => s.day_number);
     const todayNumber = enrollment?.current_day || 1;
-    const canDebateToday = !completedDays.includes(todayNumber);
+    const todaySession = sessions.find(s => s.day_number === todayNumber);
+    const isInProgress = todaySession && !todaySession.completed_at && !isDebateExpired(todaySession);
+    const canDebateToday = !completedDays.includes(todayNumber) && (!todaySession || isInProgress);
 
     return (
       <div className="space-y-4 max-w-2xl mx-auto">
@@ -486,10 +535,16 @@ export function FortyDayChallenge() {
             <Card className="border-red-500/40 bg-gradient-to-r from-red-950/30 to-amber-950/30">
               <CardContent className="p-4 text-center">
                 <p className="text-sm font-bold text-red-300 mb-1">
-                  Day {todayNumber} — Your Opponent Awaits
+                  {isInProgress ? "Day " + todayNumber + " — Debate In Progress" : "Day " + todayNumber + " — Your Opponent Awaits"}
                 </p>
-                <p className="text-xs text-muted-foreground mb-3">
-                  You won't know who you're facing until the debate begins.
+                <p className="text-xs text-muted-foreground mb-1">
+                  {isInProgress
+                    ? "Pick up where you left off. Take your time — respond when you're ready."
+                    : "You won't know who you're facing until the debate begins."}
+                </p>
+                <p className="text-[10px] text-amber-400 mb-3 flex items-center justify-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  Debate expires at midnight — {getTimeUntilMidnight()} remaining
                 </p>
                 <Button
                   onClick={() => startDayDebate(todayNumber)}
@@ -498,10 +553,12 @@ export function FortyDayChallenge() {
                 >
                   {isAiLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : isInProgress ? (
+                    <RotateCcw className="h-4 w-4 mr-2" />
                   ) : (
                     <Swords className="h-4 w-4 mr-2" />
                   )}
-                  Enter the Arena
+                  {isInProgress ? "Resume Debate" : "Enter the Arena"}
                 </Button>
               </CardContent>
             </Card>
@@ -519,6 +576,8 @@ export function FortyDayChallenge() {
                 const dayNum = i + 1;
                 const session = sessions.find(s => s.day_number === dayNum);
                 const isCompleted = !!session?.completed_at;
+                const isExpired = session?.outcome === "expired";
+                const isSessionInProgress = session && !session.completed_at && !isDebateExpired(session);
                 const isCurrent = dayNum === todayNumber && !isCompleted;
                 const isLocked = dayNum > todayNumber;
                 const won = session?.outcome === "win";
@@ -528,20 +587,25 @@ export function FortyDayChallenge() {
                   <button
                     key={dayNum}
                     onClick={() => {
-                      if (isCurrent) startDayDebate(dayNum);
+                      if (isCurrent || isSessionInProgress) startDayDebate(dayNum);
                     }}
-                    disabled={isLocked || (isCompleted && true)}
+                    disabled={isLocked || (isCompleted && !isSessionInProgress)}
                     className={`
                       aspect-square rounded-md flex items-center justify-center text-[10px] font-bold
                       transition-all relative
                       ${isCompleted && won ? "bg-green-500/20 border border-green-500/40 text-green-300" : ""}
                       ${isCompleted && lost ? "bg-red-500/20 border border-red-500/40 text-red-300" : ""}
-                      ${isCompleted && !won && !lost ? "bg-amber-500/20 border border-amber-500/40 text-amber-300" : ""}
-                      ${isCurrent ? "bg-primary/20 border-2 border-primary text-primary animate-pulse" : ""}
+                      ${isExpired ? "bg-muted/30 border border-muted-foreground/30 text-muted-foreground" : ""}
+                      ${isCompleted && !won && !lost && !isExpired ? "bg-amber-500/20 border border-amber-500/40 text-amber-300" : ""}
+                      ${isSessionInProgress ? "bg-blue-500/20 border-2 border-blue-500/40 text-blue-300 animate-pulse" : ""}
+                      ${isCurrent && !isSessionInProgress ? "bg-primary/20 border-2 border-primary text-primary animate-pulse" : ""}
                       ${isLocked ? "bg-muted/20 border border-border text-muted-foreground/40" : ""}
                     `}
                   >
-                    {isCompleted ? (
+                    {isSessionInProgress ? (
+                      <RotateCcw className="h-3 w-3" />
+                    ) : isCompleted ? (
+                      isExpired ? <XCircle className="h-3 w-3" /> :
                       won ? <CheckCircle2 className="h-3 w-3" /> : lost ? <XCircle className="h-3 w-3" /> : <Star className="h-3 w-3" />
                     ) : isLocked ? (
                       <Lock className="h-2.5 w-2.5" />
@@ -552,10 +616,11 @@ export function FortyDayChallenge() {
                 );
               })}
             </div>
-            <div className="flex items-center gap-4 mt-3 text-[10px] text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-3 mt-3 text-[10px] text-muted-foreground">
               <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-400" /> Win</span>
               <span className="flex items-center gap-1"><XCircle className="h-3 w-3 text-red-400" /> Loss</span>
               <span className="flex items-center gap-1"><Star className="h-3 w-3 text-amber-400" /> Draw</span>
+              <span className="flex items-center gap-1"><RotateCcw className="h-3 w-3 text-blue-400" /> In Progress</span>
               <span className="flex items-center gap-1"><Lock className="h-3 w-3" /> Locked</span>
             </div>
           </CardContent>
@@ -586,6 +651,10 @@ export function FortyDayChallenge() {
               </p>
               <p className="text-[10px] text-muted-foreground">
                 Topic: {currentSession.topic_name}
+              </p>
+              <p className="text-[10px] text-amber-400 flex items-center gap-1">
+                <Calendar className="h-2.5 w-2.5" />
+                Expires at midnight — {getTimeUntilMidnight()} left
               </p>
             </div>
           </div>
@@ -676,7 +745,7 @@ export function FortyDayChallenge() {
             </Button>
           </div>
           <p className="text-[10px] text-muted-foreground mt-1 text-center">
-            Round {defenderRounds + 1} • Press Enter to send • End debate after 1+ exchanges
+            Round {defenderRounds + 1} • Take your time — respond when ready • Debate expires at midnight
           </p>
         </div>
       </div>
