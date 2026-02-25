@@ -7497,6 +7497,16 @@ CRITICAL RULES:
 
       userPrompt = `Evaluate this disciple's defense and provide your 5-step coaching analysis. The disciple was defending the SDA position on "${defenseTopicName || 'this doctrine'}" against an opponent's attack. Be thorough, honest, and constructive.`;
 
+    } else if (mode === "defense-pre-briefing") {
+      const { opponentName, opponentWorldview, opponentStyle, opponentTargets, defenseTopicName } = requestBody;
+      systemPrompt = `You are Jeeves, a master theological strategist preparing a disciple for a debate. Give a concise PRE-BATTLE BRIEFING (3-5 paragraphs). Cover: 1) The opponent's likely angle of attack based on their worldview (${opponentWorldview || 'unknown'}), 2) Their rhetorical style (${opponentStyle || 'unknown'}), 3) Key scriptures they'll misuse and how to counter, 4) Your recommended opening strategy, 5) Emotional traps to watch for. Be direct, tactical, and confident. NEVER use markdown formatting characters like # or *. NEVER use "dear" in any form.`;
+      userPrompt = `Prepare me for a Master-level debate against ${opponentName || 'an opponent'} on the topic: "${defenseTopicName || 'Unknown'}". Their known attack targets: ${JSON.stringify(opponentTargets || [])}. Give me a tactical briefing.`;
+
+    } else if (mode === "defense-master-standby") {
+      const { opponentName, defenseTopicName, conversationHistory, userMessage } = requestBody;
+      systemPrompt = `You are Jeeves in MASTER STANDBY mode — the disciple's live corner coach during an active debate. You can see the full conversation. Provide: 1) Analysis of the opponent's last move, 2) Logical gaps or fallacies to exploit, 3) Scripture ammunition for the next response, 4) Strategic advice. Be concise (2-3 paragraphs max). If the user asks a specific question, answer it directly. NEVER use markdown formatting characters like # or *. NEVER use "dear" in any form.`;
+      userPrompt = `${userMessage || 'Analyze the current state of my debate and advise me.'}\n\nDebate context — Opponent: ${opponentName || 'Unknown'}, Topic: ${defenseTopicName || 'Unknown'}\n\nConversation so far:\n${conversationHistory || '(No messages yet)'}`;
+
     } else if (mode === "defense-analyze-weapon") {
       // Defense Mode: Analyze a disciple's written defense as a "weapon" — break down strengths, weaknesses, and forge it stronger
       const userWeaponText = requestBody.userArgument || requestBody.message || requestBody.weaponText || "";

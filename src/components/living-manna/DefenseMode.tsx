@@ -5,7 +5,7 @@ import {
   Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
   Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
   FlaskConical, Target, Save, Archive, Trash2, ChevronDown, ChevronUp,
-  Warehouse, ArrowLeft, Users, Share2, Crown, Flame,
+  Warehouse, ArrowLeft, Users, Share2, Crown, Flame, MessageSquare,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { CommunityArmory } from "./CommunityArmory";
@@ -89,6 +89,16 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [selectedTemperaments, setSelectedTemperaments] = useState<string[]>(["polite"]);
   const [assistMode, setAssistMode] = useState(true);
   const [goliathScoutMode, setGoliathScoutMode] = useState(false);
+
+  // Master Mode Jeeves standby state
+  const [jeevesPreBriefing, setJeevesPreBriefing] = useState<string | null>(null);
+  const [isPreBriefingLoading, setIsPreBriefingLoading] = useState(false);
+  const [showJeevesStandby, setShowJeevesStandby] = useState(false);
+  const [jeevesStandbyMsg, setJeevesStandbyMsg] = useState<string | null>(null);
+  const [isStandbyLoading, setIsStandbyLoading] = useState(false);
+  const [jeevesStandbyInput, setJeevesStandbyInput] = useState("");
+
+  const isMasterMode = selectedDifficulty === "master";
 
   const isGoliath = selectedOpponent?.id === "goliath";
 
@@ -532,6 +542,115 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [attackAnalysis, setAttackAnalysis] = useState<string | null>(null);
   const [attackLoading, setAttackLoading] = useState(false);
 
+  // ─── TAB PERSISTENCE ─────────────────────────────────────────
+  const SESSION_KEY = "defense-mode-session";
+
+  // Save state to sessionStorage when tab becomes hidden
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden" && phase !== "setup") {
+        try {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+            phase, messages, subMode, roundCount, lastScore,
+            selectedOpponentId: selectedOpponent?.id || null,
+            selectedTopicId: selectedTopic?.id || null,
+            selectedDifficulty, selectedTemperaments, assistMode,
+            userInput, audioMode, ts: Date.now(),
+          }));
+        } catch { /* quota */ }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [phase, messages, subMode, roundCount, lastScore, selectedOpponent, selectedTopic, selectedDifficulty, selectedTemperaments, assistMode, userInput, audioMode]);
+
+  // Restore state from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(SESSION_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      // Expire after 30 minutes
+      if (saved.ts && Date.now() - saved.ts > 1800000) {
+        sessionStorage.removeItem(SESSION_KEY);
+        return;
+      }
+      if (saved.selectedOpponentId) {
+        const opp = DEFENSE_OPPONENTS.find(o => o.id === saved.selectedOpponentId);
+        if (opp) setSelectedOpponent(opp);
+      }
+      if (saved.selectedTopicId) {
+        const topic = DEFENSE_TOPICS.find(t => t.id === saved.selectedTopicId);
+        if (topic) setSelectedTopic(topic);
+      }
+      if (saved.phase && saved.phase !== "setup") setPhase(saved.phase);
+      if (saved.messages?.length) setMessages(saved.messages);
+      if (saved.subMode) setSubMode(saved.subMode);
+      if (saved.roundCount) setRoundCount(saved.roundCount);
+      if (saved.lastScore !== undefined) setLastScore(saved.lastScore);
+      if (saved.selectedDifficulty) setSelectedDifficulty(saved.selectedDifficulty);
+      if (saved.selectedTemperaments) setSelectedTemperaments(saved.selectedTemperaments);
+      if (saved.assistMode !== undefined) setAssistMode(saved.assistMode);
+      if (saved.userInput) setUserInput(saved.userInput);
+      if (saved.audioMode !== undefined) setAudioMode(saved.audioMode);
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch { /* ignore */ }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─── JEEVES MASTER MODE FUNCTIONS ────────────────────────────
+  const fetchPreBriefing = useCallback(async (opponent: DefenseOpponent, topic: DefenseTopic | null) => {
+    setIsPreBriefingLoading(true);
+    setJeevesPreBriefing(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-pre-briefing",
+          opponentName: opponent.name,
+          opponentWorldview: opponent.worldview,
+          opponentStyle: opponent.argumentStyle,
+          opponentTargets: opponent.attackTargets,
+          defenseTopicName: topic?.name || "Unknown — Blind Engagement",
+          difficulty: "master",
+        },
+      });
+      if (error) throw error;
+      setJeevesPreBriefing(data?.content || "Briefing unavailable. Trust your training.");
+    } catch {
+      setJeevesPreBriefing("Jeeves couldn't prepare a briefing. Stand on the Word — you've trained for this.");
+    } finally {
+      setIsPreBriefingLoading(false);
+    }
+  }, []);
+
+  const askJeevesStandby = useCallback(async (question?: string) => {
+    if (!selectedOpponent) return;
+    setIsStandbyLoading(true);
+    setShowJeevesStandby(true);
+    try {
+      const conversationContext = messages
+        .filter(m => m.role !== "system" && m.role !== "assist")
+        .map(m => `[${m.role === "opponent" ? selectedOpponent.name : m.role === "disciple" ? "You" : "Jeeves"}]: ${m.content}`)
+        .join("\n\n");
+
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-master-standby",
+          opponentName: selectedOpponent.name,
+          defenseTopicName: selectedTopic?.name || "Blind Engagement",
+          conversationHistory: conversationContext,
+          userMessage: question || "Analyze the current debate state and advise me.",
+          difficulty: "master",
+        },
+      });
+      if (error) throw error;
+      setJeevesStandbyMsg(data?.content || "Jeeves is processing...");
+    } catch {
+      setJeevesStandbyMsg("Jeeves is momentarily unavailable. Trust your Palace training.");
+    } finally {
+      setIsStandbyLoading(false);
+    }
+  }, [selectedOpponent, selectedTopic, messages]);
+
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
@@ -746,6 +865,12 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     // Goliath blind mode: topic is optional
     if (!selectedOpponent) return;
     if (!isGoliath && !selectedTopic) return;
+
+    // Master Mode: fire pre-briefing in parallel
+    if (isMasterMode) {
+      fetchPreBriefing(selectedOpponent, selectedTopic || null);
+      setShowJeevesStandby(true);
+    }
 
     setPhase("sparring");
     setIsLoading(true);
@@ -2112,6 +2237,98 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           )}
         </div>
       </ScrollArea>
+
+      {/* ─── JEEVES MASTER MODE STANDBY PANEL ───────────────────── */}
+      {isMasterMode && (
+        <div className="rounded-lg border border-blue-500/30 bg-gradient-to-br from-blue-950/30 to-indigo-950/20 p-3 space-y-2">
+          {/* Pre-briefing (shows at start) */}
+          {jeevesPreBriefing && !showJeevesStandby && (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-blue-300 flex items-center gap-1">
+                  <Shield className="h-3 w-3" /> JEEVES — Pre-Battle Briefing
+                </p>
+                <button onClick={() => setJeevesPreBriefing(null)} className="text-[10px] text-muted-foreground hover:text-foreground">✕</button>
+              </div>
+              <div className="prose prose-sm prose-invert max-w-none text-[11px] leading-relaxed text-blue-200/80">
+                <ReactMarkdown>{jeevesPreBriefing}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+          {isPreBriefingLoading && (
+            <div className="flex items-center gap-2 py-1">
+              <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+              <span className="text-[10px] text-blue-300">Jeeves is preparing your pre-battle briefing...</span>
+            </div>
+          )}
+
+          {/* Standby coaching panel */}
+          {showJeevesStandby && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-blue-300 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" /> JEEVES — On Standby
+                </p>
+                <button onClick={() => setShowJeevesStandby(false)} className="text-[10px] text-muted-foreground hover:text-foreground">✕</button>
+              </div>
+              {isStandbyLoading ? (
+                <div className="flex items-center gap-2 py-1">
+                  <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+                  <span className="text-[10px] text-muted-foreground">Jeeves is analyzing...</span>
+                </div>
+              ) : jeevesStandbyMsg ? (
+                <div className="prose prose-sm prose-invert max-w-none text-[11px] leading-relaxed text-blue-200/80">
+                  <ReactMarkdown>{jeevesStandbyMsg}</ReactMarkdown>
+                </div>
+              ) : null}
+              <div className="flex gap-2">
+                <input
+                  value={jeevesStandbyInput}
+                  onChange={e => setJeevesStandbyInput(e.target.value)}
+                  placeholder="Ask Jeeves anything..."
+                  className="flex-1 rounded-md bg-blue-500/5 border border-blue-500/20 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      askJeevesStandby(jeevesStandbyInput.trim() || undefined);
+                      setJeevesStandbyInput("");
+                    }
+                  }}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    askJeevesStandby(jeevesStandbyInput.trim() || undefined);
+                    setJeevesStandbyInput("");
+                  }}
+                  disabled={isStandbyLoading}
+                  className="text-[10px] border-blue-500/30 text-blue-300 hover:bg-blue-500/10"
+                >
+                  <MessageSquare className="h-3 w-3 mr-1" />
+                  Ask
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Toggle standby visibility */}
+          {!showJeevesStandby && !isPreBriefingLoading && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setShowJeevesStandby(true);
+                if (!jeevesStandbyMsg) askJeevesStandby();
+              }}
+              className="text-[10px] text-blue-400 hover:text-blue-300 w-full"
+            >
+              <Sparkles className="h-3 w-3 mr-1" />
+              Open Jeeves Standby Panel
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* Input Area */}
       {phase === "responding" && (
