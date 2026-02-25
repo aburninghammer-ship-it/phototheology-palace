@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, Sparkles, Gem, ChevronRight, X, Loader2, Check } from 'lucide-react';
+import { Bot, Sparkles, Gem, ChevronRight, X, Loader2, Check, AlertTriangle, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
@@ -127,20 +127,52 @@ Respond in this exact JSON format:
         className="fixed right-0 top-20 bottom-44 z-40 w-80 md:w-96 bg-background/95 backdrop-blur border-l shadow-xl flex flex-col"
       >
         {/* Header */}
-        <div className="p-4 border-b bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+        <div className={cn(
+          "p-4 border-b",
+          entry.rejected
+            ? "bg-gradient-to-r from-red-500/15 to-orange-500/10"
+            : "bg-gradient-to-r from-blue-500/10 to-purple-500/10"
+        )}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                <Bot className="h-5 w-5 text-blue-500" />
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                entry.rejected ? "bg-red-500/20" : "bg-blue-500/20"
+              )}>
+                {entry.rejected ? (
+                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                ) : (
+                  <Bot className="h-5 w-5 text-blue-500" />
+                )}
               </div>
               <div>
-                <h3 className="font-semibold">Jeeves' Feedback</h3>
-                <p className="text-xs text-muted-foreground">Your {entry.cardName} insight</p>
+                <h3 className="font-semibold">
+                  {entry.rejected ? 'Card Rejected!' : "Jeeves' Feedback"}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {entry.rejected
+                    ? 'Your answer scored below 5 — card lost'
+                    : `Your ${entry.cardName} insight`}
+                </p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={onDismiss} className="h-8 w-8">
-              <X className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {/* Score badge */}
+              {entry.jeevesScore != null && (
+                <div className={cn(
+                  "flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold",
+                  entry.jeevesScore >= 8 ? "bg-green-500/20 text-green-500" :
+                  entry.jeevesScore >= 5 ? "bg-yellow-500/20 text-yellow-500" :
+                  "bg-red-500/20 text-red-500"
+                )}>
+                  <Star className="h-3.5 w-3.5" />
+                  {entry.jeevesScore}/10
+                </div>
+              )}
+              <Button variant="ghost" size="icon" onClick={onDismiss} className="h-8 w-8">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
 

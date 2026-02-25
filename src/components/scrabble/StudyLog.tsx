@@ -17,6 +17,8 @@ export interface StudyLogEntry {
   points: number;
   timestamp: string;
   jeevesJudgment?: string; // Jeeves' explanation of how this connects
+  jeevesScore?: number; // 1-10 score from Jeeves. Below 5 = lose card & turn
+  rejected?: boolean; // true if score < 5 — card lost, 0 points
   connectingTo?: 'verse' | 'previous'; // What this entry connects to
   previousPlayerName?: string; // Who they're building on
   previousCardName?: string; // What principle they're building on
