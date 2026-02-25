@@ -197,7 +197,7 @@ export function BibleStudyConnectionModal({
   // Jeeves judging function — returns { commentary, score }
   const getJeevesJudgment = async (playerExplanation: string): Promise<{ commentary: string; score: number }> => {
     try {
-      const scoreInstructions = `\n\nIMPORTANT: You MUST end your response with a score on its own line in this exact format:\nSCORE: <number>\nwhere <number> is an integer from 1 to 10.\n- 1-4 = weak / incorrect / shallow / off-topic (player loses the card and their turn)\n- 5-6 = acceptable but surface-level\n- 7-8 = solid theological insight\n- 9-10 = exceptional, deeply connected, masterful`;
+      const scoreInstructions = `\n\nIMPORTANT: You MUST end your response with a score on its own line in this exact format:\nSCORE: <number>\nwhere <number> is an integer from 1 to 10.\n- 1-4 = weak / incorrect / shallow / off-topic (player loses the card and their turn)\n- 5-6 = acceptable but surface-level\n- 7-8 = solid theological insight\n- 9-10 = exceptional, deeply connected, masterful\n\nCRITICAL: If you score BELOW 5, you MUST:\n1. Explain specifically WHY the answer fell short (was it off-topic? too vague? misapplied the principle? missed the verse context?)\n2. Give 1-2 concrete tips on how they COULD have connected "${card.name}" more effectively to the text.\n3. Offer a brief example of what a stronger answer might look like (just one sentence).\nThis helps the player learn and improve. Be honest but kind — coach, don't crush.`;
 
       const prompt = isFirstPlay
         ? `You are Jeeves, a wise Bible study assistant. A player is connecting the PT principle "${card.name}" to ${seedVerse.reference}.
