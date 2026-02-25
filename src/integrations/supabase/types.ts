@@ -10437,6 +10437,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_lifetime_grants: {
+        Row: {
+          claimed_at: string | null
+          claimed_by: string | null
+          created_at: string
+          email: string
+          granted_by: string | null
+          id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          email: string
+          granted_by?: string | null
+          id?: string
+        }
+        Update: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          email?: string
+          granted_by?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       pending_student_verifications: {
         Row: {
           attempts: number
