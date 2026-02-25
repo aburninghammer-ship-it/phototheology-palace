@@ -42,6 +42,8 @@ interface BibleStudyConnectionModalProps {
   adjacentCards: PlacedCard[];
   seedVerse: SelectedVerse;
   previousEntry?: StudyLogEntry; // The previous player's insight to connect to
+  jeevesAssistsUsed?: number; // How many Jeeves assists this player has used
+  maxJeevesAssists?: number; // Max assists allowed (default 3)
 }
 
 // Simple, clear principle explanations for the timed game context
@@ -158,6 +160,8 @@ export function BibleStudyConnectionModal({
   adjacentCards,
   seedVerse,
   previousEntry,
+  jeevesAssistsUsed = 0,
+  maxJeevesAssists = 3,
 }: BibleStudyConnectionModalProps) {
   const [timeLeft, setTimeLeft] = useState<number>(SCRABBLE_SCORING.TIMER_SECONDS); // 2 minutes
   const [explanation, setExplanation] = useState('');
@@ -277,12 +281,19 @@ Keep it conversational, warm, and concise. Never use the word "dear".${scoreInst
           isChristConnection: isChristConnection,
         }];
 
-    // ALL plays now go through Jeeves for scoring
-    setIsJudging(true);
-    const { commentary, score } = await getJeevesJudgment(explanation);
-    setJeevesJudgment(commentary);
-    setIsJudging(false);
-    onSubmit(connectionList, explanation, isChristConnection, commentary, score);
+    // Only use Jeeves if assists remain
+    const canUseJeeves = jeevesAssistsUsed < maxJeevesAssists;
+    
+    if (canUseJeeves) {
+      setIsJudging(true);
+      const { commentary, score } = await getJeevesJudgment(explanation);
+      setJeevesJudgment(commentary);
+      setIsJudging(false);
+      onSubmit(connectionList, explanation, isChristConnection, commentary, score);
+    } else {
+      // No Jeeves assists left — auto-approve with default score
+      onSubmit(connectionList, explanation, isChristConnection, undefined, 6);
+    }
   };
 
   // Calculate potential score with time bonus
@@ -440,6 +451,19 @@ Keep it conversational, warm, and concise. Never use the word "dear".${scoreInst
             </div>
           </div>
 
+          {/* Jeeves assists remaining indicator */}
+          {jeevesAssistsUsed < maxJeevesAssists ? (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground px-1">
+              <Bot className="h-3.5 w-3.5" />
+              <span>Jeeves assists remaining: <strong className="text-foreground">{maxJeevesAssists - jeevesAssistsUsed}</strong> of {maxJeevesAssists}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-xs text-amber-500 px-1">
+              <Bot className="h-3.5 w-3.5" />
+              <span>No Jeeves assists remaining — you're on your own!</span>
+            </div>
+          )}
+
           {/* Submit button */}
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose} className="flex-1" disabled={isJudging}>
@@ -454,6 +478,11 @@ Keep it conversational, warm, and concise. Never use the word "dear".${scoreInst
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Jeeves is judging...
+                </>
+              ) : jeevesAssistsUsed >= maxJeevesAssists ? (
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  Submit (No Jeeves)
                 </>
               ) : explanation.trim() ? (
                 <>

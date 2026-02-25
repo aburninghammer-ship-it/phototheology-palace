@@ -61,6 +61,10 @@ export default function PTScrabble() {
   // Study log entries - tracks all submissions for display and transcript
   const [studyLogEntries, setStudyLogEntries] = useState<StudyLogEntry[]>([]);
 
+  // Jeeves assist tracking - max 3 per player
+  const [jeevesAssistsUsed, setJeevesAssistsUsed] = useState(0);
+  const MAX_JEEVES_ASSISTS = 3;
+
   // Multiplayer state
   const gameIdFromUrl = searchParams.get('game');
   const [multiplayerGameId, setMultiplayerGameId] = useState<string | undefined>(gameIdFromUrl || undefined);
@@ -329,9 +333,21 @@ export default function PTScrabble() {
     setSelectedCard(null);
     setConnectionModal({ isOpen: false, card: null, position: null, adjacentCards: [] });
 
+    // Track Jeeves assist usage (Jeeves judged this play)
+    if (!rejected) {
+      setJeevesAssistsUsed(prev => prev + 1);
+    }
+
     // Show Jeeves feedback panel with the new entry
     setLastPlacedEntry(newEntry);
     setShowFeedbackPanel(true);
+
+    // Check win condition: hand is empty after removing this card
+    const remainingHand = playerHand.filter(c => c.id !== connectionModal.card!.id);
+    if (remainingHand.length === 0) {
+      // Player emptied their hand - game complete!
+      setTimeout(() => setGamePhase("completed"), 1500);
+    }
   }, [connectionModal, user, studyLogEntries.length]);
 
   const handleNewGame = useCallback(() => {
@@ -344,6 +360,7 @@ export default function PTScrabble() {
     setStudyLogEntries([]);
     setShowFeedbackPanel(false);
     setLastPlacedEntry(null);
+    setJeevesAssistsUsed(0);
   }, []);
 
   // ========== MULTIPLAYER HANDLERS ==========
@@ -743,10 +760,17 @@ export default function PTScrabble() {
 
   // ========== MULTIPLAYER PLAYING VIEW ==========
   if (gamePhase === "multiplayer-playing") {
-    // Game completed
-    if (mpGame?.status === 'completed') {
-      const sortedPlayers = [...mpPlayers].sort((a, b) => b.score - a.score);
-      const winner = sortedPlayers[0];
+    // Check if any player has emptied their hand → they win!
+    const emptyHandWinner = mpPlayers.find(p => p.hand.length === 0 && p.cardsPlayed > 0);
+    
+    // Game completed (either by status or by empty hand)
+    if (mpGame?.status === 'completed' || emptyHandWinner) {
+      // Sort by fewest cards remaining (winner has 0), then by score
+      const sortedPlayers = [...mpPlayers].sort((a, b) => {
+        if (a.hand.length !== b.hand.length) return a.hand.length - b.hand.length;
+        return b.score - a.score;
+      });
+      const winner = emptyHandWinner || sortedPlayers[0];
       const totalMpScore = sortedPlayers.reduce((sum, p) => sum + p.score, 0);
 
       return (
@@ -758,12 +782,15 @@ export default function PTScrabble() {
           >
             <div className="text-center space-y-4">
               <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
-              <h1 className="text-3xl font-bold">Game Over!</h1>
+              <h1 className="text-3xl font-bold">
+                {emptyHandWinner ? `${winner?.displayName} emptied their hand!` : 'Game Over!'}
+              </h1>
               <div className="space-y-2">
                 <p className="text-xl">
-                  Winner: <span className="font-bold text-yellow-500">{winner?.displayName}</span>
+                  🏆 Winner: <span className="font-bold text-yellow-500">{winner?.displayName}</span>
                 </p>
                 <p className="text-2xl font-bold">{winner?.score} points</p>
+                <p className="text-sm text-muted-foreground">First to play all their cards!</p>
               </div>
             </div>
 
@@ -784,7 +811,10 @@ export default function PTScrabble() {
                       </span>
                       {player.displayName}
                     </span>
-                    <span className="font-bold">{player.score}</span>
+                    <span className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground">{player.hand.length} cards left</span>
+                      <span className="font-bold">{player.score} pts</span>
+                    </span>
                   </div>
                 ))}
               </div>
@@ -872,6 +902,7 @@ export default function PTScrabble() {
                   <span className={player.userId === user?.id ? 'font-bold text-primary' : ''}>
                     {player.displayName.slice(0, 8)}
                   </span>
+                  <span className="text-muted-foreground">🃏{player.hand.length}</span>
                   <span className="text-yellow-500">{player.score}</span>
                 </div>
               ))}
@@ -928,6 +959,10 @@ export default function PTScrabble() {
               }}
               onSubmit={(connections, explanation, isChristConnection, jeevesJudgment, jeevesScore) => {
                 handleMpConnectionSubmit(connections, explanation, isChristConnection);
+                // Track Jeeves assist usage
+                if (jeevesJudgment) {
+                  setJeevesAssistsUsed(prev => prev + 1);
+                }
                 // Show Jeeves feedback in multiplayer too
                 if (jeevesJudgment) {
                   const entry: StudyLogEntry = {
@@ -953,6 +988,8 @@ export default function PTScrabble() {
               adjacentCards={mpAdjacentCards}
               seedVerse={activeSeedVerse}
               previousEntry={mpStudyLogEntries.length > 0 ? mpStudyLogEntries[mpStudyLogEntries.length - 1] : undefined}
+              jeevesAssistsUsed={jeevesAssistsUsed}
+              maxJeevesAssists={MAX_JEEVES_ASSISTS}
             />
           )}
 
@@ -994,7 +1031,9 @@ export default function PTScrabble() {
             {/* Victory header */}
             <div className="text-center space-y-4">
               <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
-              <h1 className="text-3xl font-bold">Study Complete!</h1>
+              <h1 className="text-3xl font-bold">
+                {playerHand.length === 0 ? '🎉 You emptied your hand!' : 'Study Complete!'}
+              </h1>
               <p className="text-xl text-muted-foreground">
                 Final Score: <span className="font-bold text-yellow-500">{score}</span> points
               </p>
@@ -1120,6 +1159,8 @@ export default function PTScrabble() {
           adjacentCards={connectionModal.adjacentCards}
           seedVerse={seedVerse}
           previousEntry={studyLogEntries.length > 0 ? studyLogEntries[studyLogEntries.length - 1] : undefined}
+          jeevesAssistsUsed={jeevesAssistsUsed}
+          maxJeevesAssists={MAX_JEEVES_ASSISTS}
         />
       )}
 
