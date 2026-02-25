@@ -825,6 +825,9 @@ export function FortyDayChallenge() {
             <Button variant="ghost" size="icon" onClick={() => { setPhase("daily-map"); setCurrentSession(null); }}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
+            {opponent?.avatar && (
+              <img src={opponent.avatar} alt={opponent.name} className="h-10 w-10 rounded-full object-cover border-2 border-red-500/40 shrink-0" />
+            )}
             <div>
               <p className="text-sm font-bold flex items-center gap-2">
                 Day {currentSession.day_number}
@@ -874,8 +877,12 @@ export function FortyDayChallenge() {
                     <div className="flex items-center gap-1.5 mb-1">
                       {msg.role === "opponent" ? (
                         <>
-                          <span className="text-xs">{opponent?.emoji || "👤"}</span>
-                          <span className="text-[10px] font-bold text-red-300">???</span>
+                          {opponent?.avatar ? (
+                            <img src={opponent.avatar} alt="" className="h-5 w-5 rounded-full object-cover border border-red-500/40" />
+                          ) : (
+                            <span className="text-xs">{opponent?.emoji || "👤"}</span>
+                          )}
+                          <span className="text-[10px] font-bold text-red-300">Opponent</span>
                         </>
                       ) : (
                         <>

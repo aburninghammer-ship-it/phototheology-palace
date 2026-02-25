@@ -28,26 +28,71 @@ const SIGNATURE_ATTACK_TOPICS = [
   "islamic-monotheism", "joseph-smith",
 ];
 
-// Generate a deterministic but varied 40-day schedule using enrollment seed
+// Seeded PRNG (Mulberry32) — produces unique deterministic sequences per seed
+function mulberry32(seed: number) {
+  return () => {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// Fisher-Yates shuffle using seeded random
+function seededShuffle<T>(arr: T[], rand: () => number): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Generate a deterministic but unique 40-day schedule per enrollment
 export function generate40DaySchedule(seed: string): DayConfig[] {
-  const schedule: DayConfig[] = [];
-  // Simple hash to create variation per enrollment
+  // Hash the seed string into a number for the PRNG
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
   }
+  const rand = mulberry32(hash);
 
+  // Build shuffled opponent rotation — 4 full cycles of 10 opponents
+  let opponents: string[] = [];
+  for (let cycle = 0; cycle < 4; cycle++) {
+    opponents = opponents.concat(seededShuffle(OPPONENT_POOL, rand));
+  }
+
+  // Build shuffled topic list — mix defense (70%) and signature (30%) in varied order
+  const allTopics: { id: string; isSignature: boolean }[] = [];
+  const shuffledDefense = seededShuffle(SDA_DEFENSE_TOPICS, rand);
+  const shuffledSignature = seededShuffle(SIGNATURE_ATTACK_TOPICS, rand);
+  let dIdx = 0, sIdx = 0;
+  for (let day = 0; day < 40; day++) {
+    // Use seeded random for 70/30 split instead of fixed pattern
+    const useSignature = rand() < 0.3 && sIdx < shuffledSignature.length;
+    if (useSignature) {
+      allTopics.push({ id: shuffledSignature[sIdx % shuffledSignature.length], isSignature: true });
+      sIdx++;
+    } else {
+      allTopics.push({ id: shuffledDefense[dIdx % shuffledDefense.length], isSignature: false });
+      dIdx++;
+    }
+  }
+
+  // Assemble schedule — no back-to-back same opponent
+  const schedule: DayConfig[] = [];
   for (let day = 1; day <= 40; day++) {
-    const opIdx = Math.abs((hash + day * 7) % OPPONENT_POOL.length);
-    // Mix SDA defense topics (70%) and signature attacks (30%)
-    const useSignature = day % 3 === 0;
-    const topicPool = useSignature ? SIGNATURE_ATTACK_TOPICS : SDA_DEFENSE_TOPICS;
-    const topicIdx = Math.abs((hash + day * 13) % topicPool.length);
-
+    let opponentId = opponents[day - 1];
+    // Avoid back-to-back same opponent by swapping forward
+    if (day > 1 && opponentId === schedule[day - 2].opponentId && day < 40) {
+      [opponents[day - 1], opponents[day]] = [opponents[day], opponents[day - 1]];
+      opponentId = opponents[day - 1];
+    }
     schedule.push({
       day,
-      opponentId: OPPONENT_POOL[opIdx],
-      topicId: topicPool[topicIdx],
+      opponentId,
+      topicId: allTopics[day - 1].id,
     });
   }
 

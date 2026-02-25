@@ -18,7 +18,18 @@ serve(async (req) => {
 
     if (action === "open") {
       const systemPrompt = buildSystemPrompt(opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty);
-      const openingPrompt = `Begin the debate. You are attacking the Seventh-day Adventist position on "${topicName}". ${topicDescription}. Open with a strong, provocative argument. Do NOT reveal your full identity or worldview immediately — let the user figure out who they're dealing with through your arguments. Start with your STRONGEST challenge.`;
+      // Vary the opening angle so repeated matchups feel fresh
+      const angles = [
+        "Open with a historical/scholarly challenge",
+        "Open with a philosophical or logical challenge",
+        "Open with a textual/exegetical challenge using original languages",
+        "Open with a personal/emotional challenge — why does this matter practically?",
+        "Open by citing a specific counter-example or contradiction",
+        "Open with a question that forces the defender to justify their position",
+        "Open with a bold claim that reframes the entire topic",
+      ];
+      const angleIndex = Math.floor(Math.random() * angles.length);
+      const openingPrompt = `Begin the debate. You are attacking the Seventh-day Adventist position on "${topicName}". ${topicDescription}. ${angles[angleIndex]}. Do NOT reveal your full identity or worldview immediately — let the user figure out who they're dealing with through your arguments. Start with your STRONGEST challenge.`;
 
       const response = await callAI(LOVABLE_API_KEY, [
         { role: "system", content: systemPrompt },
