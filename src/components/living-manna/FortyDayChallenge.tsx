@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, Swords, Send, Loader2, Trophy, Flame, Calendar,
   ChevronRight, ArrowLeft, Star, Lock, CheckCircle2, XCircle,
-  Target, Zap, Crown, Award, RotateCcw, MessageSquare,
+  Target, Zap, Crown, Award, RotateCcw, MessageSquare, Eye,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,7 +32,7 @@ interface ChatMessage {
   content: string;
 }
 
-type Phase = "overview" | "enroll" | "daily-map" | "debating" | "verdict";
+type Phase = "overview" | "enroll" | "daily-map" | "debating" | "verdict" | "review";
 
 export function FortyDayChallenge() {
   const { user } = useAuth();
@@ -57,6 +57,7 @@ export function FortyDayChallenge() {
   const [isJeevesLoading, setIsJeevesLoading] = useState(false);
   const [showJeevesPanel, setShowJeevesPanel] = useState(false);
   const [jeevesInput, setJeevesInput] = useState("");
+  const [reviewSession, setReviewSession] = useState<any>(null);
 
   // Load enrollment data
   useEffect(() => {
@@ -771,8 +772,12 @@ export function FortyDayChallenge() {
                     key={dayNum}
                     onClick={() => {
                       if (isCurrent || isSessionInProgress) startDayDebate(dayNum);
+                      else if (isCompleted && session) {
+                        setReviewSession(session);
+                        setPhase("review");
+                      }
                     }}
-                    disabled={isLocked || (isCompleted && !isSessionInProgress)}
+                    disabled={isLocked || (!isCompleted && !isCurrent && !isSessionInProgress)}
                     className={`
                       aspect-square rounded-md flex items-center justify-center text-[10px] font-bold
                       transition-all relative
@@ -965,8 +970,8 @@ export function FortyDayChallenge() {
             <Textarea
               value={userInput}
               onChange={e => setUserInput(e.target.value)}
-              placeholder="Defend the faith..."
-              className="min-h-[60px] max-h-[120px] resize-none text-sm"
+              placeholder="Defend the faith... Use Scripture, reason clearly, and stand firm."
+              className="min-h-[100px] max-h-[220px] resize-y text-sm"
               onKeyDown={e => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -978,7 +983,7 @@ export function FortyDayChallenge() {
               onClick={sendReply}
               disabled={!userInput.trim() || isAiLoading}
               size="icon"
-              className="h-[60px] w-[60px] shrink-0"
+              className="h-[100px] w-[60px] shrink-0"
             >
               <Send className="h-5 w-5" />
             </Button>
@@ -1066,6 +1071,99 @@ export function FortyDayChallenge() {
             </CardContent>
           </Card>
         </motion.div>
+      </div>
+    );
+  }
+
+  // ─── REVIEW COMPLETED DEBATE ────────────────────────────
+  if (phase === "review" && reviewSession) {
+    const reviewMessages = (reviewSession.messages as ChatMessage[]) || [];
+    const opponent = DEFENSE_OPPONENTS.find(o => o.id === reviewSession.opponent_id);
+    const outcomeConfig: Record<string, { color: string; label: string; icon: typeof Trophy }> = {
+      win: { color: "text-green-400", label: "VICTORY", icon: Trophy },
+      loss: { color: "text-red-400", label: "DEFEAT", icon: XCircle },
+      draw: { color: "text-amber-400", label: "DRAW", icon: Star },
+      expired: { color: "text-muted-foreground", label: "EXPIRED", icon: XCircle },
+    };
+    const oc = outcomeConfig[reviewSession.outcome] || outcomeConfig.draw;
+
+    return (
+      <div className="space-y-4 max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => { setPhase("daily-map"); setReviewSession(null); }}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h3 className="text-sm font-bold flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Day {reviewSession.day_number} Review
+              <Badge variant="outline" className={`text-[10px] ${oc.color}`}>{oc.label}</Badge>
+            </h3>
+            <p className="text-[10px] text-muted-foreground">
+              {reviewSession.topic_name} • {reviewSession.xp_earned || 0} XP earned
+            </p>
+          </div>
+        </div>
+
+        {/* Verdict Summary */}
+        {reviewSession.ai_verdict && (
+          <Card className="border-primary/20">
+            <CardContent className="p-4 space-y-3">
+              <p className="text-xs font-bold text-primary flex items-center gap-1.5">
+                <Target className="h-3.5 w-3.5" /> Judge's Verdict
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{reviewSession.ai_verdict}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Debate Transcript */}
+        <Card>
+          <CardContent className="p-4 space-y-3">
+            <p className="text-xs font-bold flex items-center gap-1.5">
+              <MessageSquare className="h-3.5 w-3.5" /> Full Debate Transcript
+            </p>
+            <ScrollArea className="max-h-[400px]">
+              <div className="space-y-3">
+                {reviewMessages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === "defender" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[85%] rounded-lg p-3 text-sm ${
+                      msg.role === "defender"
+                        ? "bg-primary/10 border border-primary/20"
+                        : "bg-red-500/10 border border-red-500/20"
+                    }`}>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        {msg.role === "opponent" ? (
+                          <>
+                            {opponent?.avatar ? (
+                              <img src={opponent.avatar} alt="" className="h-4 w-4 rounded-full object-cover" />
+                            ) : (
+                              <span className="text-xs">{opponent?.emoji || "👤"}</span>
+                            )}
+                            <span className="text-[10px] font-bold text-red-300">{opponent?.name || "Opponent"}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="h-3 w-3 text-primary" />
+                            <span className="text-[10px] font-bold text-primary">You</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        <Button variant="outline" className="w-full" onClick={() => { setPhase("daily-map"); setReviewSession(null); }}>
+          <ArrowLeft className="h-4 w-4 mr-2" /> Back to Progress Map
+        </Button>
       </div>
     );
   }
