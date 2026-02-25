@@ -589,7 +589,8 @@ export function FortyDayChallenge() {
       if (error) throw error;
       setJeevesRecap(data.response);
     } catch (err: any) {
-      toast.error("Failed to load Jeeves recap");
+      console.error("Jeeves recap error:", err);
+      toast.error(err?.message || "Failed to load Jeeves recap. The function may need redeployment.");
     } finally {
       setIsRecapLoading(false);
     }
@@ -1100,6 +1101,31 @@ export function FortyDayChallenge() {
                   </ul>
                 </div>
               )}
+
+              {/* Jeeves Debrief on Verdict Screen */}
+              {jeevesRecap ? (
+                <div className="text-left bg-purple-500/5 rounded-lg p-4 border border-purple-500/20">
+                  <p className="text-xs font-bold text-purple-300 mb-2 flex items-center gap-1">
+                    <Crown className="h-3 w-3" /> Jeeves's Debrief — How to Overcome
+                  </p>
+                  <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
+                    <ReactMarkdown>{jeevesRecap}</ReactMarkdown>
+                  </div>
+                </div>
+              ) : currentSession ? (
+                <Button
+                  onClick={() => fetchJeevesRecap(currentSession)}
+                  disabled={isRecapLoading}
+                  variant="outline"
+                  className="w-full mt-2 border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
+                >
+                  {isRecapLoading ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Jeeves is preparing the debrief...</>
+                  ) : (
+                    <><Crown className="h-4 w-4 mr-2" /> Show Jeeves's Debrief</>
+                  )}
+                </Button>
+              ) : null}
 
               <Button
                 onClick={() => {

@@ -80,14 +80,26 @@ export function generate40DaySchedule(seed: string): DayConfig[] {
     }
   }
 
-  // Assemble schedule — no back-to-back same opponent
+  // Assemble schedule — guarantee no back-to-back same opponent
   const schedule: DayConfig[] = [];
   for (let day = 1; day <= 40; day++) {
     let opponentId = opponents[day - 1];
-    // Avoid back-to-back same opponent by swapping forward
-    if (day > 1 && opponentId === schedule[day - 2].opponentId && day < 40) {
-      [opponents[day - 1], opponents[day]] = [opponents[day], opponents[day - 1]];
-      opponentId = opponents[day - 1];
+    // If same as previous day, find the nearest different opponent and swap
+    if (day > 1 && opponentId === schedule[day - 2].opponentId) {
+      let swapped = false;
+      for (let j = day; j < opponents.length; j++) {
+        if (opponents[j] !== opponentId) {
+          [opponents[day - 1], opponents[j]] = [opponents[j], opponents[day - 1]];
+          opponentId = opponents[day - 1];
+          swapped = true;
+          break;
+        }
+      }
+      // Fallback: pick a random different opponent from the pool
+      if (!swapped) {
+        const alternatives = OPPONENT_POOL.filter(o => o !== opponentId);
+        opponentId = alternatives[Math.floor(rand() * alternatives.length)];
+      }
     }
     schedule.push({
       day,
