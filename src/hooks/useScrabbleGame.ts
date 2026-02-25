@@ -355,10 +355,12 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         return false;
       }
 
-      if (gameData.status !== 'waiting') {
-        toast.error('Game has already started');
+      if (gameData.status === 'completed') {
+        toast.error('Game has already ended');
         return false;
       }
+
+      const isLateJoin = gameData.status === 'playing';
 
       // Check if already in game
       const { data: existingPlayer } = await supabase
@@ -410,9 +412,22 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
 
       if (playerError) throw playerError;
 
+      // If joining a game already in progress, deal cards to the late joiner
+      if (isLateJoin) {
+        const cardsPerPlayer = 10;
+        const { hands } = dealCards(1, cardsPerPlayer);
+        const lateHand = hands[0] || [];
+        await supabase
+          .from('pt_scrabble_players')
+          .update({
+            hand: lateHand.map(c => ({ id: c.id, code: c.code, name: c.name, floor: c.floor })),
+          })
+          .eq('id', playerData.id);
+      }
+
       setMyPlayerId(playerData.id);
       await loadGame(gameData.id);
-      toast.success('Joined game!');
+      toast.success(isLateJoin ? 'Joined game in progress!' : 'Joined game!');
       return true;
     } catch (err: any) {
       console.error('Error joining game:', err);
