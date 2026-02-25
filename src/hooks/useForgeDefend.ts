@@ -94,7 +94,10 @@ export function useForgeDefend(churchId: string) {
   const [teamBattles, setTeamBattles] = useState<Battle[]>([]);
 
   const loadSeasonData = useCallback(async () => {
-    if (!user?.id || !churchId) return;
+    if (!user?.id || !churchId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       // Get active season
