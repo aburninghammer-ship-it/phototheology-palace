@@ -1182,32 +1182,64 @@ export function FortyDayChallenge() {
           </div>
         </div>
 
-        {/* Jeeves Tactical Debrief - Prominent placement */}
+        {/* Jeeves Tactical Debrief - Glassmorphism style */}
         <div className="p-3 border-b border-border">
           {jeevesRecap ? (
-            <div className="text-left bg-purple-500/5 rounded-lg p-4 border border-purple-500/20">
-              <p className="text-xs font-bold text-purple-300 mb-2 flex items-center gap-1">
-                <Crown className="h-3 w-3" /> Jeeves's Tactical Debrief
-              </p>
-              <ScrollArea className="max-h-[300px]">
-                <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
-                  <ReactMarkdown>{jeevesRecap}</ReactMarkdown>
+            <div className="relative text-left rounded-xl p-[1px] overflow-hidden"
+              style={{ background: "linear-gradient(135deg, hsl(270 80% 60% / 0.6), hsl(200 90% 50% / 0.4), hsl(330 80% 55% / 0.4))" }}>
+              <div className="rounded-xl p-4 backdrop-blur-xl"
+                style={{ background: "linear-gradient(135deg, hsl(270 50% 15% / 0.85), hsl(220 40% 12% / 0.9))" }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-7 w-7 rounded-full flex items-center justify-center"
+                    style={{ background: "linear-gradient(135deg, hsl(270 80% 60%), hsl(200 80% 55%))" }}>
+                    <Crown className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: "hsl(270 80% 80%)" }}>
+                      Jeeves's Tactical Debrief
+                    </p>
+                    <p className="text-[9px]" style={{ color: "hsl(200 60% 70%)" }}>
+                      Post-debate analysis & coaching
+                    </p>
+                  </div>
                 </div>
-              </ScrollArea>
+                <ScrollArea className="max-h-[300px]">
+                  <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed
+                    [&_h2]:text-[13px] [&_h2]:font-bold [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:pb-1 [&_h2]:border-b [&_h2]:border-purple-500/20
+                    [&_h3]:text-[11px] [&_h3]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1
+                    [&_strong]:font-semibold
+                    [&_ul]:space-y-1 [&_li]:leading-relaxed"
+                    style={{ color: "hsl(220 20% 85%)" }}>
+                    <ReactMarkdown>{jeevesRecap}</ReactMarkdown>
+                  </div>
+                </ScrollArea>
+              </div>
             </div>
           ) : (
-            <Button
+            <button
               onClick={() => fetchJeevesRecap(reviewSession)}
               disabled={isRecapLoading}
-              className="w-full bg-purple-600/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
-              variant="outline"
+              className="w-full relative rounded-xl p-[1px] overflow-hidden group disabled:opacity-60"
+              style={{ background: "linear-gradient(135deg, hsl(270 80% 60% / 0.5), hsl(200 90% 50% / 0.3), hsl(330 80% 55% / 0.3))" }}
             >
-              {isRecapLoading ? (
-                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Jeeves is analyzing the debate...</>
-              ) : (
-                <><Crown className="h-4 w-4 mr-2" /> Show Jeeves's Tactical Debrief</>
-              )}
-            </Button>
+              <div className="rounded-xl px-4 py-3 flex items-center justify-center gap-2 transition-all group-hover:brightness-125"
+                style={{ background: "linear-gradient(135deg, hsl(270 50% 18% / 0.9), hsl(220 40% 14% / 0.95))" }}>
+                {isRecapLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" style={{ color: "hsl(270 80% 75%)" }} />
+                    <span className="text-sm font-medium" style={{ color: "hsl(270 80% 80%)" }}>Jeeves is analyzing the debate...</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="h-6 w-6 rounded-full flex items-center justify-center"
+                      style={{ background: "linear-gradient(135deg, hsl(270 80% 60%), hsl(200 80% 55%))" }}>
+                      <Crown className="h-3 w-3 text-white" />
+                    </div>
+                    <span className="text-sm font-medium" style={{ color: "hsl(270 80% 80%)" }}>Show Jeeves's Tactical Debrief</span>
+                  </>
+                )}
+              </div>
+            </button>
           )}
         </div>
 
