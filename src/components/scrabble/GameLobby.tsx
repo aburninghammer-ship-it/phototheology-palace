@@ -25,6 +25,7 @@ import type { ScrabbleGame, ScrabblePlayer } from '@/types/scrabble';
 import { getTotalCardCount } from '@/data/scrabbleCards';
 import { cn } from '@/lib/utils';
 import { CallToPlayButton } from './CallToPlayButton';
+import { QuickShareCode } from './QuickShareCode';
 
 interface GameLobbyProps {
   game?: ScrabbleGame | null;
@@ -102,9 +103,16 @@ export function GameLobby({
               </Button>
             </div>
 
-            <p className="text-center text-sm text-muted-foreground">
-              Share this code with other players to join
-            </p>
+            <div className="flex items-center justify-center gap-2">
+              <p className="text-sm text-muted-foreground">
+                Share this code with other players to join
+              </p>
+            </div>
+
+            {/* Quick share via DM */}
+            <div className="flex justify-center">
+              <QuickShareCode roomCode={game.roomCode} />
+            </div>
 
             {/* Call to Play button - broadcast to online users */}
             {isHost && onBroadcastInvitation && (
