@@ -90,11 +90,13 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
   useEffect(() => {
     if (!game?.id) return;
 
+    const gameId = game.id;
+
     const channel = supabase
-      .channel(`scrabble-${game.id}`)
+      .channel(`scrabble-${gameId}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'pt_scrabble_games', filter: `id=eq.${game.id}` },
+        { event: '*', schema: 'public', table: 'pt_scrabble_games', filter: `id=eq.${gameId}` },
         (payload) => {
           if (payload.eventType === 'UPDATE' && payload.new) {
             const updated = payload.new as any;
@@ -112,23 +114,29 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       )
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'pt_scrabble_players', filter: `game_id=eq.${game.id}` },
+        { event: '*', schema: 'public', table: 'pt_scrabble_players', filter: `game_id=eq.${gameId}` },
         () => {
-          // Reload players on any change
-          loadPlayers(game.id);
+          loadPlayers(gameId);
         }
       )
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'pt_scrabble_moves', filter: `game_id=eq.${game.id}` },
+        { event: 'INSERT', schema: 'public', table: 'pt_scrabble_moves', filter: `game_id=eq.${gameId}` },
         () => {
-          // Reload game state when new move is made
-          loadGame(game.id);
+          loadGame(gameId);
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[Scrabble Realtime] Channel status:', status);
+      });
+
+    // Polling fallback: refetch game state every 4 seconds to catch missed realtime events
+    const pollInterval = setInterval(() => {
+      loadGame(gameId);
+    }, 4000);
 
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, [game?.id]);
