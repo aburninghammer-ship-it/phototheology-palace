@@ -61,7 +61,7 @@ export const BADGE_MILESTONES = {
   streak_10: { name: "10-Day Warrior", icon: "⚔️", description: "10 consecutive days of debate" },
   streak_20: { name: "20-Day Champion", icon: "🏆", description: "20 consecutive days of debate" },
   halfway: { name: "Halfway Hero", icon: "🎯", description: "Completed day 20 of 40" },
-  finisher: { name: "40-Day Defender", icon: "👑", description: "Completed the full 40-day challenge!" },
+  finisher: { name: "40 Days of Smoke", icon: "👑", description: "Completed the full 40 Days of Smoke challenge!" },
   perfect_defense: { name: "Perfect Defense", icon: "🛡️", description: "Flawless theological accuracy" },
   scripture_warrior: { name: "Scripture Warrior", icon: "📖", description: "Used 5+ scripture references" },
   steel_wall: { name: "Steel Wall", icon: "🧱", description: "Impenetrable defense" },

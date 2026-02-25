@@ -940,7 +940,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             { id: "arsenal" as const, label: `Arsenal${arsenal.length > 0 ? ` (${arsenal.length})` : ""}`, icon: Warehouse, gradient: "from-emerald-600 to-teal-600" },
             { id: "community-armory" as const, label: "Community Armory", icon: Users, gradient: "from-amber-600 to-orange-600" },
             { id: "forge-defend" as const, label: "Forge & Defend", icon: Trophy, gradient: "from-violet-600 to-fuchsia-600" },
-            { id: "forty-day" as const, label: "40-Day Fire", icon: Flame, gradient: "from-red-600 to-red-800" },
+            { id: "forty-day" as const, label: "40 Days of Smoke", icon: Flame, gradient: "from-red-600 to-red-800" },
           ]).map((tab) => (
             <button
               key={tab.id}
