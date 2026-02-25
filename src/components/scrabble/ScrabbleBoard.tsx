@@ -17,6 +17,7 @@ interface ScrabbleBoardProps {
   onPositionClick?: (position: BoardPosition) => void;
   onCardClick?: (placedCard: PlacedCard) => void;
   validPositions?: BoardPosition[];
+  verseReference?: string;
   className?: string;
 }
 
@@ -26,6 +27,7 @@ export function ScrabbleBoard({
   onPositionClick,
   onCardClick,
   validPositions: externalValidPositions,
+  verseReference,
   className,
 }: ScrabbleBoardProps) {
   const [hoveredPosition, setHoveredPosition] = useState<string | null>(null);
@@ -154,6 +156,7 @@ export function ScrabbleBoard({
                           placedCard={placedCard}
                           size="md"
                           showConnections
+                          verseReference={verseReference}
                           onClick={onCardClick ? () => onCardClick(placedCard) : undefined}
                         />
                       ) : isValid ? (
