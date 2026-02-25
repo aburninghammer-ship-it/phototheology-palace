@@ -17,7 +17,6 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     if (action === "open") {
-      // Generate the AI's opening salvo
       const systemPrompt = buildSystemPrompt(opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty);
       const openingPrompt = `Begin the debate. You are attacking the Seventh-day Adventist position on "${topicName}". ${topicDescription}. Open with a strong, provocative argument. Do NOT reveal your full identity or worldview immediately — let the user figure out who they're dealing with through your arguments. Start with your STRONGEST challenge.`;
 
@@ -43,24 +42,51 @@ serve(async (req) => {
       ];
 
       const response = await callAI(LOVABLE_API_KEY, chatMessages);
+      
+      // Check if the opponent conceded
+      const conceded = detectConcession(response);
+
+      return new Response(JSON.stringify({ response, conceded }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "jeeves-coach") {
+      // Jeeves coaching mode — helps the defender mid-debate
+      const coachPrompt = buildJeevesCoachPrompt(messages, opponentName, topicName, userMessage, difficulty);
+      const response = await callAI(LOVABLE_API_KEY, [
+        { role: "system", content: coachPrompt.system },
+        { role: "user", content: coachPrompt.user },
+      ]);
+
       return new Response(JSON.stringify({ response }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     if (action === "verdict") {
-      const verdictPrompt = `You are a theological debate judge. Review this debate between a Seventh-day Adventist defender and "${opponentName}" on "${topicName}".
+      const verdictPrompt = `You are Jeeves, the Phototheology Palace's chief theological analyst and debate judge. You are scholarly, precise, warm but exacting. You care about truth, scripture density, logical coherence, and Christ-centered reasoning.
+
+Review this debate between an SDA defender and "${opponentName}" on "${topicName}".
 
 Conversation:
 ${messages.map((m: any) => `[${m.role === 'opponent' ? opponentName : 'Defender'}]: ${m.content}`).join('\n\n')}
 
-Evaluate the Defender's performance. Return JSON:
+Evaluate the Defender's performance with the eye of a seasoned theological strategist. Consider:
+- Scripture usage: Were references accurate, relevant, and well-deployed?
+- Logical coherence: Did arguments flow or scatter?
+- Theological precision: Were SDA distinctive doctrines correctly represented?
+- Engagement quality: Did the defender address the opponent's actual arguments or talk past them?
+- Christ-centeredness: Was Christ the anchor of the defense?
+
+Return JSON:
 {
   "outcome": "win" | "loss" | "draw",
   "xp": <number 50-200>,
-  "verdict": "<2-3 sentence analysis of performance>",
+  "verdict": "<2-3 sentence Jeeves-style analysis — scholarly, direct, with a touch of warmth>",
   "strengths": ["<strength 1>", "<strength 2>"],
-  "improvements": ["<area 1>", "<area 2>"],
+  "improvements": ["<specific actionable area 1>", "<specific actionable area 2>"],
+  "jeeves_note": "<1-2 sentence personal encouragement or sharp observation from Jeeves>",
   "badge": null | { "type": "<badge_type>", "name": "<badge_name>", "icon": "<emoji>", "description": "<why earned>" }
 }
 
@@ -70,7 +96,8 @@ Badge criteria:
 - "steel_wall": Opponent couldn't land a strong counter
 - "comeback_king": Recovered from a weak opening
 - "perfect_defense": Flawless theological accuracy
-- "streak_5": 5-day streak (check context)
+- "concession_victory": Forced the opponent to concede
+- "streak_5": 5-day streak
 - "streak_10": 10-day streak
 - "streak_20": 20-day streak
 - "halfway": Completed day 20
@@ -79,7 +106,7 @@ Badge criteria:
 XP Guide: 50-80 (loss), 80-120 (draw), 120-200 (win). Bonus for scripture density and theological precision.`;
 
       const response = await callAI(LOVABLE_API_KEY, [
-        { role: "system", content: "You are a fair theological debate judge. Always respond with valid JSON only." },
+        { role: "system", content: "You are Jeeves, the Phototheology Palace's theological analyst and debate judge. Always respond with valid JSON only. Your tone is scholarly, precise, and warmly exacting." },
         { role: "user", content: verdictPrompt },
       ]);
 
@@ -88,7 +115,7 @@ XP Guide: 50-80 (loss), 80-120 (draw), 120-200 (win). Bonus for scripture densit
         const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         parsed = JSON.parse(cleaned);
       } catch {
-        parsed = { outcome: "draw", xp: 100, verdict: "Good effort in the debate.", strengths: ["Participation"], improvements: ["Continue studying"], badge: null };
+        parsed = { outcome: "draw", xp: 100, verdict: "A commendable effort. Jeeves notes room for sharper scriptural engagement.", strengths: ["Participation"], improvements: ["Continue studying"], jeeves_note: "Every debate sharpens the sword. Press on.", badge: null };
       }
 
       return new Response(JSON.stringify(parsed), {
@@ -109,6 +136,62 @@ XP Guide: 50-80 (loss), 80-120 (draw), 120-200 (win). Bonus for scripture densit
     );
   }
 });
+
+/**
+ * Detect if the opponent's response contains a concession
+ */
+function detectConcession(response: string): boolean {
+  const concessionPhrases = [
+    "i concede",
+    "you make a fair point",
+    "i must admit you're right",
+    "i cannot refute",
+    "i have no counter",
+    "you've convinced me",
+    "i yield",
+    "i stand corrected",
+    "i'll concede that",
+    "i must concede",
+    "you win this point",
+    "i have to agree",
+    "i can't argue with that",
+    "touché",
+    "well played, i concede",
+    "i withdraw my objection",
+    "your argument is stronger",
+  ];
+  const lower = response.toLowerCase();
+  return concessionPhrases.some(phrase => lower.includes(phrase));
+}
+
+function buildJeevesCoachPrompt(messages: any[], opponentName: string, topicName: string, userQuestion: string, difficulty: string): { system: string; user: string } {
+  const isBeginnerAutoCoach = difficulty === "beginner" && !userQuestion;
+
+  const system = `You are Jeeves, the Phototheology Palace's chief theological strategist and debate coach. You are coaching an SDA defender in a live debate against "${opponentName}" on "${topicName}".
+
+Your role:
+${difficulty === "beginner" ? `- You are actively coaching. After each opponent response, proactively suggest scripture references, argument angles, and specific talking points.
+- Be encouraging but precise. Give the defender 2-3 concrete bullet points they can use.
+- Frame suggestions as "Consider using..." or "A strong response would reference..."` : `- You are available on demand. The defender has asked for help.
+- Give targeted, strategic advice — not full answers. Help them think, don't think for them.
+- Suggest 1-2 scripture anchors and a logical angle.`}
+
+RULES:
+1. Never write the defender's response for them — coach, don't play.
+2. Use SDA theological framework (sanctuary, historicist prophecy, covenant continuity).
+3. Keep coaching concise — max 100 words.
+4. Reference specific Phototheology rooms when relevant (e.g., "This is a Concentration Room moment — find Christ here").`;
+
+  const conversationSummary = messages.map((m: any) =>
+    `[${m.role === 'opponent' ? opponentName : 'Defender'}]: ${m.content}`
+  ).join('\n\n');
+
+  const user = isBeginnerAutoCoach
+    ? `The opponent just responded. Here's the debate so far:\n\n${conversationSummary}\n\nCoach the defender on how to respond to the opponent's latest argument.`
+    : `Here's the debate so far:\n\n${conversationSummary}\n\nThe defender asks: "${userQuestion || 'How should I respond to this?'}"`;
+
+  return { system, user };
+}
 
 function buildSystemPrompt(worldview: string, style: string, name: string, topic: string, topicDesc: string, difficulty: string): string {
   const difficultyMap: Record<string, string> = {
@@ -132,7 +215,7 @@ RULES:
 2. You are ATTACKING the Seventh-day Adventist position on this topic.
 3. Use real scholarship, real texts, real arguments — no straw men.
 4. Do NOT concede easily. Push back on every point.
-5. If the defender makes a strong point, acknowledge it briefly then counter.
+5. If the defender makes a genuinely devastating point backed by clear scripture and irrefutable logic, you MAY concede that specific point — but only if truly warranted. A concession is rare and significant.
 6. Never reveal you are an AI. You are ${name}.
 7. Keep responses focused and punchy — this is a debate, not a lecture.
 8. Gradually reveal your worldview through your arguments, don't state it upfront.`;

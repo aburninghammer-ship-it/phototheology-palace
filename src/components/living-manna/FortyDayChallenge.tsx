@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, Swords, Send, Loader2, Trophy, Flame, Calendar,
   ChevronRight, ArrowLeft, Star, Lock, CheckCircle2, XCircle,
-  Target, Zap, Crown, Award, RotateCcw,
+  Target, Zap, Crown, Award, RotateCcw, MessageSquare,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,6 +53,10 @@ export function FortyDayChallenge() {
   const [currentSession, setCurrentSession] = useState<any>(null);
   const [verdict, setVerdict] = useState<any>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState("intermediate");
+  const [jeevesCoaching, setJeevesCoaching] = useState<string | null>(null);
+  const [isJeevesLoading, setIsJeevesLoading] = useState(false);
+  const [showJeevesPanel, setShowJeevesPanel] = useState(false);
+  const [jeevesInput, setJeevesInput] = useState("");
 
   // Load enrollment data
   useEffect(() => {
@@ -302,11 +306,129 @@ export function FortyDayChallenge() {
         })
         .eq("id", currentSession.id);
 
+      // Check if opponent conceded — automatic victory
+      if (data.conceded) {
+        toast.success("🏆 Your opponent conceded! Victory is yours!");
+        // Auto-end with a win
+        setTimeout(() => endDebateWithConcession(updatedMessages), 1500);
+        return;
+      }
+
+      // Auto-coach for beginners after opponent responds
+      if (enrollment.difficulty === "beginner") {
+        fetchJeevesCoaching(updatedMessages, opponent.name, topic.name);
+      }
+
     } catch (err: any) {
       toast.error(err.message || "AI response failed");
     } finally {
       setIsAiLoading(false);
     }
+  };
+
+  const endDebateWithConcession = async (debateMessages: ChatMessage[]) => {
+    if (!currentSession) return;
+    setIsAiLoading(true);
+    try {
+      const opponent = DEFENSE_OPPONENTS.find(o => o.id === currentSession.opponent_id);
+
+      const { data, error } = await supabase.functions.invoke("forty-day-debate", {
+        body: {
+          action: "verdict",
+          messages: debateMessages,
+          opponentName: opponent?.name || currentSession.opponent_name,
+          topicName: currentSession.topic_name,
+        },
+      });
+
+      if (error) throw error;
+
+      // Force win outcome since opponent conceded
+      const verdictData = { ...data, outcome: "win", xp: Math.max(data.xp || 150, 150) };
+      if (!verdictData.badge) {
+        verdictData.badge = { type: "concession_victory", name: "Smoke Screen", icon: "💨", description: "Forced your opponent to concede" };
+      }
+      setVerdict(verdictData);
+
+      await supabase
+        .from("debate_challenge_sessions")
+        .update({
+          messages: debateMessages as unknown as any,
+          completed_at: new Date().toISOString(),
+          xp_earned: verdictData.xp,
+          outcome: "win",
+          ai_verdict: verdictData.verdict + " [CONCESSION VICTORY]",
+          rounds_completed: debateMessages.filter(m => m.role === "defender").length,
+        })
+        .eq("id", currentSession.id);
+
+      const today = new Date().toISOString().split("T")[0];
+      const newStreak = enrollment.last_activity_date === today ? enrollment.streak :
+        (daysSince(enrollment.last_activity_date) <= 2 ? enrollment.streak + 1 : 1);
+
+      await supabase
+        .from("debate_challenge_enrollments")
+        .update({
+          completed_days: enrollment.completed_days + 1,
+          current_day: Math.min(enrollment.current_day + 1, 40),
+          total_xp: enrollment.total_xp + verdictData.xp,
+          streak: newStreak,
+          longest_streak: Math.max(enrollment.longest_streak, newStreak),
+          last_activity_date: today,
+          status: enrollment.current_day >= 40 ? "completed" : "active",
+          completed_at: enrollment.current_day >= 40 ? new Date().toISOString() : null,
+        })
+        .eq("id", enrollment.id);
+
+      if (verdictData.badge && user) {
+        await supabase.from("debate_challenge_badges").insert({
+          user_id: user.id,
+          enrollment_id: enrollment.id,
+          badge_type: verdictData.badge.type,
+          badge_name: verdictData.badge.name,
+          badge_icon: verdictData.badge.icon,
+          badge_description: verdictData.badge.description,
+        });
+      }
+
+      setPhase("verdict");
+      loadData();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to process concession verdict");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const fetchJeevesCoaching = async (debateMessages: ChatMessage[], opponentName: string, topicName: string, question?: string) => {
+    setIsJeevesLoading(true);
+    setShowJeevesPanel(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("forty-day-debate", {
+        body: {
+          action: "jeeves-coach",
+          messages: debateMessages,
+          opponentName,
+          topicName,
+          userMessage: question || "",
+          difficulty: enrollment?.difficulty || "intermediate",
+        },
+      });
+      if (error) throw error;
+      setJeevesCoaching(data.response);
+    } catch (err: any) {
+      setJeevesCoaching("Jeeves is momentarily unavailable. Trust your training — the Palace is with you.");
+    } finally {
+      setIsJeevesLoading(false);
+    }
+  };
+
+  const handleAskJeeves = () => {
+    if (!currentSession) return;
+    const opponent = DEFENSE_OPPONENTS.find(o => o.id === currentSession.opponent_id);
+    const topic = DEFENSE_TOPICS.find(t => t.id === currentSession.topic_id);
+    fetchJeevesCoaching(messages, opponent?.name || "", topic?.name || "", jeevesInput.trim() || undefined);
+    setJeevesInput("");
   };
 
   const endDebate = async () => {
@@ -441,9 +563,9 @@ export function FortyDayChallenge() {
                 <p className="text-sm font-semibold text-foreground">Choose Your Level</p>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { id: "beginner", label: "Beginner", icon: "🛡️", desc: "Simple arguments, gentle pace" },
-                    { id: "intermediate", label: "Intermediate", icon: "⚔️", desc: "Scholarly, pressing" },
-                    { id: "advanced", label: "Advanced", icon: "🔥", desc: "Relentless, expert-level" },
+                    { id: "beginner", label: "Beginner", icon: "🛡️", desc: "Jeeves coaches you live" },
+                    { id: "intermediate", label: "Intermediate", icon: "⚔️", desc: "Ask Jeeves on demand" },
+                    { id: "advanced", label: "Advanced", icon: "🔥", desc: "Jeeves reviews after only" },
                   ].map(d => (
                     <button
                       key={d.id}
@@ -720,8 +842,57 @@ export function FortyDayChallenge() {
           </div>
         </ScrollArea>
 
+        {/* Jeeves Coaching Panel */}
+        {showJeevesPanel && (enrollment?.difficulty === "beginner" || enrollment?.difficulty === "intermediate") && (
+          <div className="mx-3 mb-2 rounded-lg bg-blue-500/10 border border-blue-500/20 p-3">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] font-bold text-blue-300 flex items-center gap-1">
+                <MessageSquare className="h-3 w-3" /> Jeeves — Debate Coach
+              </p>
+              <button onClick={() => setShowJeevesPanel(false)} className="text-[10px] text-muted-foreground hover:text-foreground">✕</button>
+            </div>
+            {isJeevesLoading ? (
+              <div className="flex items-center gap-2 py-2">
+                <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+                <span className="text-[10px] text-muted-foreground">Jeeves is analyzing...</span>
+              </div>
+            ) : jeevesCoaching ? (
+              <div className="prose prose-sm prose-invert max-w-none text-[11px] leading-relaxed text-blue-200/80">
+                <ReactMarkdown>{jeevesCoaching}</ReactMarkdown>
+              </div>
+            ) : null}
+          </div>
+        )}
+
         {/* Input */}
         <div className="p-3 border-t border-border">
+          {/* Jeeves Ask Button for Intermediate */}
+          {enrollment?.difficulty === "intermediate" && !showJeevesPanel && messages.length >= 2 && (
+            <div className="mb-2 flex gap-2">
+              <input
+                value={jeevesInput}
+                onChange={e => setJeevesInput(e.target.value)}
+                placeholder="Ask Jeeves for coaching..."
+                className="flex-1 rounded-md bg-blue-500/5 border border-blue-500/20 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                onKeyDown={e => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAskJeeves();
+                  }
+                }}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAskJeeves}
+                disabled={isJeevesLoading}
+                className="text-[10px] border-blue-500/30 text-blue-300 hover:bg-blue-500/10"
+              >
+                <MessageSquare className="h-3 w-3 mr-1" />
+                Ask Jeeves
+              </Button>
+            </div>
+          )}
           <div className="flex gap-2">
             <Textarea
               value={userInput}
@@ -745,7 +916,7 @@ export function FortyDayChallenge() {
             </Button>
           </div>
           <p className="text-[10px] text-muted-foreground mt-1 text-center">
-            Round {defenderRounds + 1} • Take your time — respond when ready • Debate expires at midnight
+            Round {defenderRounds + 1} • {enrollment?.difficulty === "beginner" ? "Jeeves is coaching you" : enrollment?.difficulty === "intermediate" ? "Ask Jeeves when you need help" : "Jeeves will review after the debate"} • Expires at midnight
           </p>
         </div>
       </div>
@@ -770,6 +941,14 @@ export function FortyDayChallenge() {
               <Icon className={`h-16 w-16 mx-auto ${oc.color}`} />
               <h2 className={`text-3xl font-black ${oc.color}`}>{oc.label}</h2>
               <p className="text-muted-foreground text-sm">{verdict.verdict}</p>
+              {verdict.jeeves_note && (
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-2">
+                  <p className="text-xs text-blue-300 italic flex items-center gap-1.5">
+                    <MessageSquare className="h-3 w-3 shrink-0" />
+                    <span>Jeeves: {verdict.jeeves_note}</span>
+                  </p>
+                </div>
+              )}
 
               <div className="flex items-center justify-center gap-6 py-3">
                 <div>
