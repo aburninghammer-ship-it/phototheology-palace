@@ -13,12 +13,19 @@ import { useAuth } from "@/hooks/useAuth";
 import { OfflineIndicator } from "@/components/bible/OfflineIndicator";
 import { usePreservePage } from "@/hooks/usePreservePage";
 import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Bible = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [demoOpen, setDemoOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Auto-close sidebar on mobile, auto-open on desktop
+  useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
   const [searchParams, setSearchParams] = useSearchParams();
   const researchMode = searchParams.get("mode") === "research";
 
@@ -42,7 +49,7 @@ const Bible = () => {
     <div className="min-h-screen gradient-subtle">
       <Navigation />
       
-      <div className="pt-4 pb-16 px-3 sm:px-4 md:px-6">
+      <div className="pt-4 pb-24 md:pb-16 px-3 sm:px-4 md:px-6">
         <div className="container mx-auto max-w-7xl">
           {/* Header - Glass Card */}
           <div className="glass-card mb-8 p-6 rounded-2xl">
@@ -120,14 +127,22 @@ const Bible = () => {
 
           {/* Main content with optional sidebar */}
           <div className="flex gap-0 relative">
-            {/* At a Glance Sidebar */}
-            {sidebarOpen && (
+            {/* At a Glance Sidebar - overlay on mobile, inline on desktop */}
+            {sidebarOpen && isMobile && (
+              <>
+                <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)} />
+                <div className="fixed left-0 top-0 bottom-0 w-72 z-50 bg-background shadow-xl overflow-hidden">
+                  <AtAGlanceSidebar onClose={() => setSidebarOpen(false)} />
+                </div>
+              </>
+            )}
+            {sidebarOpen && !isMobile && (
               <div className="w-56 lg:w-64 shrink-0 h-[calc(100vh-220px)] sticky top-24 rounded-xl border border-border/50 overflow-hidden shadow-lg">
                 <AtAGlanceSidebar onClose={() => setSidebarOpen(false)} />
               </div>
             )}
 
-            <div className={`flex-1 min-w-0 ${sidebarOpen ? 'pl-4' : ''}`}>
+            <div className={`flex-1 min-w-0 ${sidebarOpen && !isMobile ? 'pl-4' : ''}`}>
               {/* Navigation */}
               <div className="mb-6 sm:mb-8">
                 <BibleNavigation />
