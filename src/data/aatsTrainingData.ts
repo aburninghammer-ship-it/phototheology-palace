@@ -112,6 +112,42 @@ export const AATS_AVATAR_IDS = [
 
 export type AATSAvatarId = (typeof AATS_AVATAR_IDS)[number];
 
+export interface ArenaRing {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  avatarIds: AATSAvatarId[];
+}
+
+export const ARENA_RINGS: ArenaRing[] = [
+  {
+    id: "ring-1",
+    title: "Ring 1 — Non-belief & Skepticism",
+    description: "Atheists, agnostics, secular thinkers, and spiritual-but-not-religious challengers",
+    icon: "HelpCircle",
+    color: "text-slate-400",
+    avatarIds: ["atheist", "agnostic", "secular-scholar", "philosopher", "internet-skeptic", "new-age"],
+  },
+  {
+    id: "ring-2",
+    title: "Ring 2 — Non-Christian Religions",
+    description: "Opponents from Islam, Judaism, Black Hebrew Israelites, and Mormonism",
+    icon: "Users",
+    color: "text-amber-400",
+    avatarIds: ["muslim", "jewish", "bhi", "mormon"],
+  },
+  {
+    id: "ring-3",
+    title: "Ring 3 — Christianity",
+    description: "Intra-Christian challengers including evangelicals, Catholics, ex-SDAs, and prophecy schools",
+    icon: "Sparkles",
+    color: "text-blue-400",
+    avatarIds: ["evangelical", "catholic", "jw", "progressive-christian", "former-sda", "offshoot-sda", "skeptical-exsda", "anti-prophet", "preterist", "futurist"],
+  },
+];
+
 /** Cross-avatar subjects that appear across multiple worldviews */
 export const CROSS_AVATAR_SUBJECTS: { id: string; title: string; avatarIds: AATSAvatarId[] }[] = [
   { id: "trinity", title: "The Trinity", avatarIds: ["muslim", "jw", "mormon", "bhi", "jewish", "philosopher"] },

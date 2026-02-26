@@ -15,9 +15,9 @@ import { useAATSProgress } from "@/hooks/useAATSProgress";
 import {
   AATS_PHASES,
   AATS_AVATAR_IDS,
+  ARENA_RINGS,
   CROSS_AVATAR_SUBJECTS,
   getAvatarTraining,
-  getAllAvatarTrainings,
   UNIVERSAL_MIND_GAMES,
   UNIVERSAL_FALLACIES,
   DETECTION_EXERCISES,
@@ -70,8 +70,6 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [exerciseAnswers, setExerciseAnswers] = useState<Record<string, string>>({});
   const [revealedExercises, setRevealedExercises] = useState<Set<string>>(new Set());
-
-  const allTrainings = useMemo(() => getAllAvatarTrainings(), []);
 
   const selectedTraining = useMemo(
     () => (selectedAvatarId ? getAvatarTraining(selectedAvatarId) : null),
@@ -152,64 +150,69 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
           )}
         </div>
 
-        {/* Avatar Grid */}
-        <div>
-          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <Target className="h-5 w-5 text-red-400" />
-            Training Paths ({AATS_AVATAR_IDS.length} Opponents)
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {allTrainings.map((training) => {
-              const opponent = getOpponent(training.avatarId);
-              const progress = getAvatarProgress(training.avatarId);
-              return (
-                <motion.div
-                  key={training.avatarId}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <Card
-                    className="cursor-pointer hover:border-primary/50 transition-all group overflow-hidden"
-                    onClick={() => {
-                      setSelectedAvatarId(training.avatarId as AATSAvatarId);
-                      setView("avatar-path");
-                    }}
+        {/* Arena Rings */}
+        {ARENA_RINGS.map((ring) => (
+          <div key={ring.id}>
+            <h3 className="text-lg font-semibold mb-1 flex items-center gap-2">
+              <Target className={`h-5 w-5 ${ring.color}`} />
+              {ring.title}
+              <Badge variant="secondary" className="text-[10px]">{ring.avatarIds.length}</Badge>
+            </h3>
+            <p className="text-xs text-muted-foreground mb-3">{ring.description}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {ring.avatarIds.map((avatarId) => {
+                const training = getAvatarTraining(avatarId);
+                const opponent = getOpponent(avatarId);
+                const progress = getAvatarProgress(avatarId);
+                return (
+                  <motion.div
+                    key={avatarId}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                   >
-                    <CardContent className="p-3 text-center space-y-2">
-                      <div className="relative mx-auto w-14 h-14">
-                        {opponent?.avatar ? (
-                          <img
-                            src={opponent.avatar}
-                            alt={training.avatarName}
-                            className={`w-14 h-14 rounded-full object-cover border-2 ${training.color}`}
-                          />
-                        ) : (
-                          <div className={`w-14 h-14 rounded-full border-2 ${training.color} flex items-center justify-center text-2xl bg-muted`}>
-                            {training.emoji}
-                          </div>
-                        )}
-                        {/* Progress ring overlay */}
-                        <svg className="absolute inset-0 w-14 h-14 -rotate-90" viewBox="0 0 56 56">
-                          <circle cx="28" cy="28" r="26" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted/30" />
-                          <circle
-                            cx="28" cy="28" r="26" fill="none" stroke="currentColor" strokeWidth="2.5"
-                            className="text-primary"
-                            strokeDasharray={`${(progress / 100) * 163.4} 163.4`}
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold truncate">{training.avatarName}</p>
-                        <p className="text-[10px] text-muted-foreground">{progress}% complete</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
+                    <Card
+                      className="cursor-pointer hover:border-primary/50 transition-all group overflow-hidden"
+                      onClick={() => {
+                        setSelectedAvatarId(avatarId);
+                        setView("avatar-path");
+                      }}
+                    >
+                      <CardContent className="p-3 text-center space-y-2">
+                        <div className="relative mx-auto w-14 h-14">
+                          {opponent?.avatar ? (
+                            <img
+                              src={opponent.avatar}
+                              alt={training.avatarName}
+                              className={`w-14 h-14 rounded-full object-cover border-2 ${training.color}`}
+                            />
+                          ) : (
+                            <div className={`w-14 h-14 rounded-full border-2 ${training.color} flex items-center justify-center text-2xl bg-muted`}>
+                              {training.emoji}
+                            </div>
+                          )}
+                          {/* Progress ring overlay */}
+                          <svg className="absolute inset-0 w-14 h-14 -rotate-90" viewBox="0 0 56 56">
+                            <circle cx="28" cy="28" r="26" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted/30" />
+                            <circle
+                              cx="28" cy="28" r="26" fill="none" stroke="currentColor" strokeWidth="2.5"
+                              className="text-primary"
+                              strokeDasharray={`${(progress / 100) * 163.4} 163.4`}
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold truncate">{training.avatarName}</p>
+                          <p className="text-[10px] text-muted-foreground">{progress}% complete</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        ))}
 
         {/* Mind Games Lab Card */}
         <div>
