@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName, partialResponse } = await req.json();
+    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName, partialResponse, sessionId, analysisId } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -63,183 +64,112 @@ serve(async (req) => {
     }
 
     if (action === "recap") {
-      // Post-debate teaching recap — streamed to avoid timeout on long analyses
+      // Fire-and-forget: create DB record, kick off AI in background, return immediately
       const conversationSummary = messages.map((m: any) =>
         `[${m.role === 'opponent' ? opponentName : 'Defender'}]: ${m.content}`
       ).join('\n\n');
 
       const dName = defenderName || "Defender";
-      const recapSystem = `You are Jeeves, a high-level apologetics strategist and post-debate analyst for the Phototheology Bible Study Suite and Living Manna Defense Mode.
+      // sessionId comes from destructured body above
 
-Your task is NOT to merely summarize debates.
-Your task is to produce a forensic, tactical, and coach-level analysis of a theological or apologetic debate between:
-- The User (Defender): ${dName}
-- The AI Apologist (Critic): ${opponentName}
+      // Build the Supabase service client
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const sbAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-You must analyze the debate like a war-room strategist, not a casual commentator.
-Address the defender by their name "${dName}" — never use "my dear," "dear," or similar terms of endearment. Be direct, professional, and scholarly.
+      // Extract user from JWT
+      const authHeader = req.headers.get("Authorization") || "";
+      const token = authHeader.replace("Bearer ", "");
+      let userId: string | null = null;
+      try {
+        const supabaseAnon = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") || token);
+        const { data: { user } } = await supabaseAnon.auth.getUser(token);
+        userId = user?.id || null;
+      } catch { /* fallback below */ }
 
-CORE OBJECTIVE:
-Encourage ${dName}. Generate a comprehensive Tactical Analysis that:
-- Addresses EVERY argument made in the debate
-- Identifies logical fallacies and rhetorical tactics
-- Detects theological errors and misinterpretations
-- Shows where ${dName} was strong
-- Shows where ${dName} misstepped or could improve
-- Suggests stronger arguments ${dName} SHOULD have used
-- Rates the overall debate performance
-- Trains ${dName} to become a more precise apologist
+      // Check for existing analysis for this session
+      const debateSessionId = sessionId || crypto.randomUUID();
+      
+      if (userId) {
+        const { data: existing } = await sbAdmin
+          .from("debate_analyses")
+          .select("id, status, analysis_text")
+          .eq("session_id", debateSessionId)
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
 
-This is a coaching tool, not a neutral recap.
-
-REQUIRED OUTPUT STRUCTURE — Follow this EXACT structure with these EXACT markdown headers:
-
-## 1. ⚔️ Battlefield Summary
-- 1-2 paragraphs ONLY
-- Identify the central issue of the debate
-- Identify the main clash of worldviews
-- No fluff, no repetition
-
-## 2. 🔍 Argument-by-Argument Breakdown
-For EACH argument made by ${opponentName} — address EVERY SINGLE ONE, no exceptions, no skipping, no merging:
-
-### Argument [N]: [Title]
-- **Opponent's Claim:** Quote or summarize their argument clearly and fully — don't abbreviate.
-- **Type of Argument:** (e.g., Strawman, Proof-texting, Emotional Appeal, Tradition-based, Circular Reasoning, Historical Revisionism, Textual Criticism, etc.)
-- **Hidden Assumptions:** What they assumed without proving.
-- **Logical Fallacies (if present):** Name the fallacy (Straw Man, False Dichotomy, Equivocation, Anachronism, Selective Evidence, Moving the Goalposts, Red Herring, Circular Reasoning, Appeal to Authority, Hasty Generalization, Genetic Fallacy, Category Error, etc.). Brief explanation of why it's fallacious.
-- **Theological Errors:** Misuse of Scripture, context violations, category confusion (moral vs. ceremonial law, covenant vs. covenant administration, etc.).
-- **Why This Argument Has Traction:** Honestly explain why this argument sounds convincing to many people. What makes it dangerous?
-- **Strength Level of Opponent's Argument:** [1-10]
-
-## 3. 📋 User Response Analysis (Surgical Review)
-For EACH of ${dName}'s responses:
-
-### Response [N]
-- **${dName}'s Response:** Summarized.
-- **Strengths:** Biblical grounding, logical clarity, strategic framing, use of covenant/theological structure.
-- **Weaknesses / Missteps:** Missed opportunities, unanswered assumptions, overstatements, lack of textual precision, emotional vs. strategic responses.
-- **Debate Precision Score:** [1-10]
-
-## 4. 🚨 Fallacy Detection Report
-List ALL detected fallacies used by ${opponentName}:
-For each:
-- **Fallacy:** [Name]
-- **Where it occurred:** Quote or closely paraphrase the exact statement.
-- **Explanation:** Why this is fallacious (2-3 sentences).
-- **How to expose it in debate:** Give ${dName} a 1-sentence response that calls out the fallacy directly and redirects to solid ground.
-
-## 5. ⚔️ Strategic Counter-Arguments (What ${dName} Should Have Said)
-This is the MOST important coaching section.
-For each major opponent argument:
-
-### Optimal Apologist Response [N]: [Title] (Refined Weapon)
-- Write out the complete rebuttal as if ${dName} were speaking it in the debate — 4-8 sentences.
-- Scripture-dense: cite 2-4 specific KJV verses with brief quotes.
-- Logically airtight and rhetorically powerful.
-- This should be a COMPLETE spoken script, not bullet points.
-- **Theological depth:** Explain the underlying SDA theological framework that makes this rebuttal work (sanctuary typology, covenant continuity, historicist prophecy, Great Controversy theme, etc.).
-- **Power phrase:** One razor-sharp sentence ${dName} can memorize and deploy instantly.
-
-## 6. 📖 Doctrinal Accuracy Check (SDA Guardrail Mode)
-Evaluate:
-- Was ${dName} doctrinally accurate?
-- Did ${dName} defend the position biblically?
-- Did they rely on assumption or Scripture?
-- Did they properly distinguish law, covenant, gospel, and typology?
-- Flag any doctrinal drift or unclear framing.
-
-## 7. 🎓 Tactical Coaching (Apologetics Training Mode)
-Provide personalized coaching:
-- How ${dName} can improve clarity
-- How to control the debate framing
-- How to expose hidden assumptions faster
-- How to avoid common debate traps
-- How to argue with surgical precision instead of reactive defense
-- 2-3 concrete, actionable debate skills to practice (e.g., "Always anchor your opening sentence in a specific verse before making a theological claim")
-Tone: Direct, constructive, and strategic (not flattering).
-
-## 8. 📊 Performance Metrics Dashboard
-Rate the debate:
-| Metric | Score |
-|--------|-------|
-| Biblical Accuracy | /10 |
-| Logical Precision | /10 |
-| Strategic Framing | /10 |
-| Fallacy Detection | /10 |
-| Scripture Density | /10 |
-| Christ-Centeredness | /10 |
-| Overall Apologetics Strength | /10 |
-
-## 9. 🏆 Final Verdict (Tactical Conclusion)
-Answer clearly:
-- Who had the stronger arguments? Why?
-- What was the decisive turning point in the debate?
-- What would make ${dName} elite-level in future debates?
-- A motivational closing that is specific to their performance (not generic encouragement).
-No neutrality. Give a reasoned conclusion.
-
-## 📚 Study Assignment
-For each of 3-4 recommended study areas:
-- **Passage:** Specific Bible chapter or passage (e.g., "Hebrews 8-10")
-- **Why:** How this directly addresses a weakness exposed in the debate
-- **Study method:** A specific Phototheology room or technique to use (e.g., "Run this through the Concentration Room — find Christ in every verse" or "Use the Parallels Room to connect this to Daniel 7")
-
-RULES:
-1. Use SDA theological framework: sanctuary doctrine, historicist prophecy, covenant continuity, state of the dead, Sabbath truth, moral vs. ceremonial law distinction.
-2. Be scholarly, precise, and warmly exacting — like a master coach reviewing game film with a promising student.
-3. Never be vague or generic. Every rebuttal must include at least 2 specific KJV scripture references with brief quotes.
-4. Write rebuttals as full spoken scripts — direct address, confident tone, as if coaching ${dName} to say them word-for-word.
-5. Be EXHAUSTIVE. This is a comprehensive forensic tactical analysis, not a summary. Address every single argument. Aim for 2000-3000+ words.
-6. Reference specific moments from the actual debate transcript — show ${dName} you read every word.
-7. No fluff or generic praise. Truth-focused, not diplomatic.
-8. Identify context misuse, detect proof-texting vs contextual theology, highlight covenantal continuity or discontinuity when relevant.`;
-
-      const recapUser = `Here is the full debate transcript between ${dName} (Defender) and "${opponentName}" (Critic) on the topic of "${topicName}":\n\n${conversationSummary}\n\nProduce the full forensic tactical analysis. Address EVERY argument ${opponentName} made — count them and confirm the count. For each one, provide the full breakdown, fallacy analysis, and a complete rebuttal script. Then evaluate ${dName}'s responses surgically. This is a war-room analysis, not a summary.`;
-
-      // Stream the response to avoid edge function timeout on long analyses
-      const aiStreamResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: recapSystem },
-            { role: "user", content: recapUser },
-          ],
-          temperature: 0.8,
-          max_tokens: 65536,
-          stream: true,
-        }),
-      });
-
-      if (!aiStreamResponse.ok) {
-        if (aiStreamResponse.status === 429) throw Object.assign(new Error("Rate limit exceeded. Please try again in a moment."), { status: 429 });
-        if (aiStreamResponse.status === 402) throw Object.assign(new Error("AI credits depleted. Please add credits in your workspace settings."), { status: 402 });
-        const errText = await aiStreamResponse.text();
-        console.error("AI Gateway stream error:", aiStreamResponse.status, errText);
-        throw new Error(`AI Gateway error: ${aiStreamResponse.status}`);
+        if (existing?.status === "ready" && existing.analysis_text) {
+          return new Response(JSON.stringify({ analysisId: existing.id, status: "ready", analysis: existing.analysis_text }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (existing?.status === "processing") {
+          return new Response(JSON.stringify({ analysisId: existing.id, status: "processing" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
       }
 
-      // Pass the SSE stream directly to the client
-      return new Response(aiStreamResponse.body, {
-        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      // Create a pending record
+      const finalUserId = userId || "00000000-0000-0000-0000-000000000000";
+      const { data: record, error: insertErr } = await sbAdmin
+        .from("debate_analyses")
+        .insert({ session_id: debateSessionId, user_id: finalUserId, status: "processing" })
+        .select("id")
+        .single();
+
+      if (insertErr || !record) {
+        console.error("Failed to create analysis record:", insertErr);
+        throw new Error("Failed to start analysis");
+      }
+
+      const recAnalysisId = record.id;
+
+      // Fire-and-forget: generate the analysis in the background
+      const recapSystem = buildRecapSystemPrompt(dName, opponentName);
+      const recapUser = `Here is the full debate transcript between ${dName} (Defender) and "${opponentName}" (Critic) on the topic of "${topicName}":\n\n${conversationSummary}\n\nProduce the full forensic tactical analysis. Address EVERY argument ${opponentName} made — count them and confirm the count. For each one, provide the full breakdown, fallacy analysis, and a complete rebuttal script. Then evaluate ${dName}'s responses surgically. This is a war-room analysis, not a summary.`;
+
+      // Don't await — let it run in the background
+      generateAnalysisInBackground(LOVABLE_API_KEY, recapSystem, recapUser, recAnalysisId, sbAdmin);
+
+      return new Response(JSON.stringify({ analysisId: recAnalysisId, status: "processing" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "recap-status") {
+      // Poll for analysis completion — analysisId from destructured body
+      
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const sbAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+      const { data, error } = await sbAdmin
+        .from("debate_analyses")
+        .select("status, analysis_text, error_message")
+        .eq("id", analysisId)
+        .single();
+
+      if (error || !data) {
+        return new Response(JSON.stringify({ status: "error", error: "Analysis not found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      return new Response(JSON.stringify({
+        status: data.status,
+        analysis: data.status === "ready" ? data.analysis_text : null,
+        error: data.error_message,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     if (action === "recap-continue") {
-      // Continue a truncated recap from where it left off
-      const dName = defenderName || "Defender";
-      const continueResponse = await callAI(LOVABLE_API_KEY, [
-        { role: "system", content: `You are Jeeves, continuing a forensic tactical debate analysis. You MUST pick up EXACTLY where the previous response ended. Do NOT repeat any content. Do NOT add any preamble or introduction. Continue mid-sentence if needed. Complete ALL remaining sections through to the ## 📚 Study Assignment section. Address the defender as "${dName}".` },
-        { role: "assistant", content: partialResponse },
-        { role: "user", content: "Continue EXACTLY where you left off. Complete all remaining sections of the analysis. Do not repeat anything already written." },
-      ], "google/gemini-2.5-pro", 65536);
-
-      return new Response(JSON.stringify({ response: continueResponse }), {
+      // Legacy — no longer needed but keep for compatibility
+      return new Response(JSON.stringify({ response: "Please use the new analysis system." }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -451,4 +381,186 @@ async function callAI(apiKey: string, messages: any[], model?: string, maxTokens
     console.warn(`[callAI] Response truncated (finish_reason=length). Model: ${body.model}`);
   }
   return content;
+}
+
+function buildRecapSystemPrompt(dName: string, opponentName: string): string {
+  return `You are Jeeves, a high-level apologetics strategist and post-debate analyst for the Phototheology Bible Study Suite and Living Manna Defense Mode.
+
+Your task is NOT to merely summarize debates.
+Your task is to produce a forensic, tactical, and coach-level analysis of a theological or apologetic debate between:
+- The User (Defender): ${dName}
+- The AI Apologist (Critic): ${opponentName}
+
+You must analyze the debate like a war-room strategist, not a casual commentator.
+Address the defender by their name "${dName}" — never use "my dear," "dear," or similar terms of endearment. Be direct, professional, and scholarly.
+
+CORE OBJECTIVE:
+Encourage ${dName}. Generate a comprehensive Tactical Analysis that:
+- Addresses EVERY argument made in the debate
+- Identifies logical fallacies and rhetorical tactics
+- Detects theological errors and misinterpretations
+- Shows where ${dName} was strong
+- Shows where ${dName} misstepped or could improve
+- Suggests stronger arguments ${dName} SHOULD have used
+- Rates the overall debate performance
+- Trains ${dName} to become a more precise apologist
+
+This is a coaching tool, not a neutral recap.
+
+REQUIRED OUTPUT STRUCTURE — Follow this EXACT structure with these EXACT markdown headers:
+
+## 1. ⚔️ Battlefield Summary
+- 1-2 paragraphs ONLY
+- Identify the central issue of the debate
+- Identify the main clash of worldviews
+- No fluff, no repetition
+
+## 2. 🔍 Argument-by-Argument Breakdown
+For EACH argument made by ${opponentName} — address EVERY SINGLE ONE, no exceptions, no skipping, no merging:
+
+### Argument [N]: [Title]
+- **Opponent's Claim:** Quote or summarize their argument clearly and fully — don't abbreviate.
+- **Type of Argument:** (e.g., Strawman, Proof-texting, Emotional Appeal, Tradition-based, Circular Reasoning, Historical Revisionism, Textual Criticism, etc.)
+- **Hidden Assumptions:** What they assumed without proving.
+- **Logical Fallacies (if present):** Name the fallacy. Brief explanation of why it's fallacious.
+- **Theological Errors:** Misuse of Scripture, context violations, category confusion.
+- **Why This Argument Has Traction:** Honestly explain why this argument sounds convincing to many people.
+- **Strength Level of Opponent's Argument:** [1-10]
+
+## 3. 📋 User Response Analysis (Surgical Review)
+For EACH of ${dName}'s responses:
+
+### Response [N]
+- **${dName}'s Response:** Summarized.
+- **Strengths:** Biblical grounding, logical clarity, strategic framing.
+- **Weaknesses / Missteps:** Missed opportunities, unanswered assumptions, overstatements.
+- **Debate Precision Score:** [1-10]
+
+## 4. 🚨 Fallacy Detection Report
+List ALL detected fallacies used by ${opponentName}:
+For each:
+- **Fallacy:** [Name]
+- **Where it occurred:** Quote or closely paraphrase.
+- **Explanation:** Why this is fallacious (2-3 sentences).
+- **How to expose it in debate:** Give ${dName} a 1-sentence response.
+
+## 5. ⚔️ Strategic Counter-Arguments (What ${dName} Should Have Said)
+For each major opponent argument:
+
+### Optimal Apologist Response [N]: [Title] (Refined Weapon)
+- Write out the complete rebuttal as if ${dName} were speaking — 4-8 sentences.
+- Scripture-dense: cite 2-4 specific KJV verses with brief quotes.
+- Logically airtight and rhetorically powerful.
+- **Theological depth:** Explain the underlying SDA framework.
+- **Power phrase:** One razor-sharp sentence ${dName} can memorize.
+
+## 6. 📖 Doctrinal Accuracy Check (SDA Guardrail Mode)
+Evaluate:
+- Was ${dName} doctrinally accurate?
+- Did ${dName} defend the position biblically?
+- Did they rely on assumption or Scripture?
+- Flag any doctrinal drift.
+
+## 7. 🎓 Tactical Coaching (Apologetics Training Mode)
+Provide personalized coaching:
+- How to improve clarity, control framing, expose assumptions faster
+- 2-3 concrete, actionable debate skills
+Tone: Direct, constructive, and strategic.
+
+## 8. 📊 Performance Metrics Dashboard
+| Metric | Score |
+|--------|-------|
+| Biblical Accuracy | /10 |
+| Logical Precision | /10 |
+| Strategic Framing | /10 |
+| Fallacy Detection | /10 |
+| Scripture Density | /10 |
+| Christ-Centeredness | /10 |
+| Overall Apologetics Strength | /10 |
+
+## 9. 🏆 Final Verdict (Tactical Conclusion)
+- Who had the stronger arguments? Why?
+- What was the decisive turning point?
+- What would make ${dName} elite-level?
+- A motivational closing specific to their performance.
+
+## 📚 Study Assignment
+3-4 recommended study areas with specific passages, why they matter, and which Phototheology room to use.
+
+RULES:
+1. Use SDA theological framework.
+2. Be scholarly, precise, and warmly exacting.
+3. Every rebuttal must include at least 2 specific KJV scripture references.
+4. Write rebuttals as full spoken scripts.
+5. Be EXHAUSTIVE. Aim for 2000-3000+ words.
+6. Reference specific moments from the actual debate transcript.
+7. No fluff or generic praise.`;
+}
+
+async function generateAnalysisInBackground(
+  apiKey: string,
+  systemPrompt: string,
+  userPrompt: string,
+  analysisId: string,
+  sbAdmin: any
+): Promise<void> {
+  try {
+    console.log(`[Analysis ${analysisId}] Starting background generation...`);
+    
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.8,
+        max_tokens: 65536,
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error(`[Analysis ${analysisId}] AI error:`, response.status, errText);
+      await sbAdmin.from("debate_analyses").update({
+        status: "error",
+        error_message: `AI Gateway error: ${response.status}`,
+        completed_at: new Date().toISOString(),
+      }).eq("id", analysisId);
+      return;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || "";
+
+    if (!content) {
+      await sbAdmin.from("debate_analyses").update({
+        status: "error",
+        error_message: "Empty response from AI",
+        completed_at: new Date().toISOString(),
+      }).eq("id", analysisId);
+      return;
+    }
+
+    console.log(`[Analysis ${analysisId}] Generation complete. Length: ${content.length} chars`);
+
+    await sbAdmin.from("debate_analyses").update({
+      status: "ready",
+      analysis_text: content,
+      completed_at: new Date().toISOString(),
+    }).eq("id", analysisId);
+
+  } catch (err) {
+    console.error(`[Analysis ${analysisId}] Background error:`, err);
+    await sbAdmin.from("debate_analyses").update({
+      status: "error",
+      error_message: err instanceof Error ? err.message : "Unknown error",
+      completed_at: new Date().toISOString(),
+    }).eq("id", analysisId);
+  }
 }
