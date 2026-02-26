@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -197,11 +197,11 @@ RULES:
 
       const recapUser = `Here is the full debate transcript between ${dName} (Defender) and "${opponentName}" (Critic) on the topic of "${topicName}":\n\n${conversationSummary}\n\nProduce the full forensic tactical analysis. Address EVERY argument ${opponentName} made — count them and confirm the count. For each one, provide the full breakdown, fallacy analysis, and a complete rebuttal script. Then evaluate ${dName}'s responses surgically. This is a war-room analysis, not a summary.`;
 
-      // Use a more powerful model for the comprehensive debrief
+      // Use a more powerful model for the comprehensive debrief with high token limit
       const response = await callAI(LOVABLE_API_KEY, [
         { role: "system", content: recapSystem },
         { role: "user", content: recapUser },
-      ], "google/gemini-2.5-pro");
+      ], "google/gemini-2.5-pro", 16384);
 
       return new Response(JSON.stringify({ response }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -378,23 +378,28 @@ RULES:
 8. Gradually reveal your worldview through your arguments, don't state it upfront.`;
 }
 
-async function callAI(apiKey: string, messages: any[], model?: string): Promise<string> {
+async function callAI(apiKey: string, messages: any[], model?: string, maxTokens?: number): Promise<string> {
+  const body: any = {
+    model: model || "google/gemini-2.5-flash",
+    messages,
+    temperature: 0.8,
+  };
+  if (maxTokens) body.max_tokens = maxTokens;
+
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model: model || "google/gemini-2.5-flash",
-      messages,
-      temperature: 0.8,
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
-    if (response.status === 429) throw Object.assign(new Error("Rate limit exceeded"), { status: 429 });
-    if (response.status === 402) throw Object.assign(new Error("Credits depleted"), { status: 402 });
+    if (response.status === 429) throw Object.assign(new Error("Rate limit exceeded. Please try again in a moment."), { status: 429 });
+    if (response.status === 402) throw Object.assign(new Error("AI credits depleted. Please add credits in your workspace settings."), { status: 402 });
+    const errText = await response.text();
+    console.error("AI Gateway error:", response.status, errText);
     throw new Error(`AI Gateway error: ${response.status}`);
   }
 

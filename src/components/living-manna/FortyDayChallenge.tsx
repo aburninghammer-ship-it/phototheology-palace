@@ -588,10 +588,22 @@ export function FortyDayChallenge() {
         },
       });
       if (error) throw error;
-      setJeevesRecap(data.response);
+      const content = data?.response || data?.content || (typeof data === "string" ? data : null);
+      if (!content) {
+        console.error("Empty response from recap:", data);
+        throw new Error("Empty response from analysis. Please try again.");
+      }
+      setJeevesRecap(content);
     } catch (err: any) {
       console.error("Jeeves recap error:", err);
-      toast.error(err?.message || "Failed to load Jeeves recap. The function may need redeployment.");
+      const msg = err?.message || "Failed to load Jeeves analysis.";
+      if (msg.includes("402") || msg.includes("credits")) {
+        toast.error("AI credits depleted. Please add credits in your workspace settings.");
+      } else if (msg.includes("429") || msg.includes("Rate limit")) {
+        toast.error("Rate limited — please wait a moment and try again.");
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setIsRecapLoading(false);
     }
