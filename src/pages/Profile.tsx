@@ -25,6 +25,7 @@ import { PatreonConnect } from "@/components/PatreonConnect";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { TeachableVerification } from "@/components/settings/TeachableVerification";
 import { useTranslation } from "react-i18next";
+import { UserAiUsageWidget } from "@/components/profile/UserAiUsageWidget";
 
 export default function Profile() {
   const { t } = useTranslation();
@@ -387,6 +388,9 @@ export default function Profile() {
           <div id="social">
             <SocialMediaConnect />
           </div>
+
+          {/* AI Usage Widget */}
+          <UserAiUsageWidget />
 
           {/* Notification Preferences */}
           <NotificationPreferences />
