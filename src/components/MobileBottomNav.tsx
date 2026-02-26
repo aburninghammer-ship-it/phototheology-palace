@@ -36,7 +36,7 @@ export function MobileBottomNav() {
         paddingBottom: 'env(safe-area-inset-bottom, 8px)'
       }}
     >
-      <div className="flex items-center justify-around h-[72px] px-1 max-w-md mx-auto">
+      <div className="flex items-center justify-evenly h-[64px] px-2 w-full">
         {navItemDefs.map((item) => {
           const isActive = location.pathname === item.path ||
             (item.path !== "/dashboard" && location.pathname.startsWith(item.path));
@@ -46,18 +46,18 @@ export function MobileBottomNav() {
               key={item.path}
               to={item.path}
               className={cn(
-                "flex flex-col items-center justify-center gap-0.5 py-2 px-4 rounded-2xl transition-all duration-200 min-w-[64px] min-h-[56px] active:scale-95",
+                "flex flex-col items-center justify-center gap-1 py-1.5 px-2 rounded-xl transition-all duration-200 min-w-[56px] min-h-[48px] active:scale-95",
                 isActive
-                  ? "text-primary bg-primary/12 shadow-sm"
+                  ? "text-primary bg-primary/12"
                   : "text-muted-foreground hover:text-foreground active:bg-muted/60"
               )}
             >
               <item.icon className={cn(
-                "h-6 w-6 transition-transform duration-200",
-                isActive && "text-primary scale-110"
+                "h-5 w-5 shrink-0",
+                isActive && "text-primary"
               )} />
               <span className={cn(
-                "text-[11px] font-semibold tracking-tight",
+                "text-[10px] font-medium leading-tight truncate max-w-[56px]",
                 isActive ? "text-primary" : "text-muted-foreground"
               )}>
                 {t(item.labelKey)}
