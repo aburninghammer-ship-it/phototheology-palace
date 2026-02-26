@@ -2087,6 +2087,15 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           )}
         </Button>
         </>)}
+        <OpponentProfileDialog
+          opponent={profileOpponent}
+          open={!!profileOpponent}
+          onOpenChange={(open) => { if (!open) setProfileOpponent(null); }}
+          onSelectOpponent={(opp) => {
+            setSelectedOpponent(opp);
+            setProfileOpponent(null);
+          }}
+        />
       </div>
     );
   }
