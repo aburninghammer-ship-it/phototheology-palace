@@ -74,14 +74,31 @@ export function usePaymentGate() {
         const { data: churchAccess } = await supabase
           .rpc("has_church_access", { _user_id: user.id });
 
-        if (churchAccess && churchAccess.length > 0 && churchAccess[0].has_access) {
-          console.log("[PaymentGate] User has church membership access, tier:", churchAccess[0].church_tier);
+        // Belt-and-suspenders: if RPC says no church access, check preapproved list by email
+        let churchHasAccess = churchAccess && churchAccess.length > 0 && churchAccess[0].has_access;
+        if (!churchHasAccess && user.email) {
+          const { data: preapproved } = await supabase
+            .from("church_preapproved_members")
+            .select("church_id")
+            .eq("email", user.email.toLowerCase())
+            .limit(1)
+            .maybeSingle();
+
+          if (preapproved) {
+            console.log("[PaymentGate] Email found in church_preapproved_members — granting access");
+            churchHasAccess = true;
+          }
+        }
+
+        if (churchHasAccess) {
+          const churchTier = churchAccess?.[0]?.church_tier || "premium";
+          console.log("[PaymentGate] User has church membership access, tier:", churchTier);
           // Persist to profile so other hooks pick it up without re-checking
           await supabase
             .from("profiles")
             .update({
               subscription_status: "active",
-              subscription_tier: churchAccess[0].church_tier || "premium",
+              subscription_tier: churchTier,
               payment_source: "church" as any,
               updated_at: new Date().toISOString(),
             })

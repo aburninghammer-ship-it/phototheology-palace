@@ -7497,6 +7497,34 @@ CRITICAL RULES:
 
       userPrompt = `Evaluate this disciple's defense and provide your 5-step coaching analysis. The disciple was defending the SDA position on "${defenseTopicName || 'this doctrine'}" against an opponent's attack. Be thorough, honest, and constructive.`;
 
+    } else if (mode === "defense-coach-continue") {
+      // Continuation of a truncated defense coaching response
+      const partialResponse = requestBody.partialResponse || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in DEFENSE COACH mode. You were providing a 5-step coaching evaluation but your response was cut off mid-way. Here is what you wrote so far:
+
+---BEGIN PARTIAL RESPONSE---
+${partialResponse}
+---END PARTIAL RESPONSE---
+
+CONTINUE your coaching analysis from EXACTLY where it was cut off. Do NOT repeat any content that was already provided. Pick up mid-sentence if necessary and complete the remaining sections.
+
+Remember the format:
+- LOGIC ASSESSMENT: [X]/10
+- SCRIPTURE USAGE: [X]/10
+- PT ROOM ANALYSIS: [X]/10
+- SDA DOCTRINAL REFINEMENT: [X]/10
+- TOTAL SCORE: [sum]/40
+- MODEL DEFENSE: [complete model defense]
+
+Only output the REMAINING sections that were not completed. If the MODEL DEFENSE was cut off, complete it fully with Scripture-rich content. Use KJV Scripture ONLY. NEVER use the word "dear" in any form.`;
+
+      userPrompt = `Continue the coaching analysis from where it was cut off. Complete all remaining sections including the full MODEL DEFENSE if it wasn't finished. Topic: "${defenseTopicName || 'this doctrine'}"`;
+
     } else if (mode === "defense-pre-briefing") {
       const { opponentName, opponentWorldview, opponentStyle, opponentTargets, defenseTopicName } = requestBody;
       systemPrompt = `You are Jeeves, a master theological strategist preparing a disciple for a debate. Give a concise PRE-BATTLE BRIEFING (3-5 paragraphs). Cover: 1) The opponent's likely angle of attack based on their worldview (${opponentWorldview || 'unknown'}), 2) Their rhetorical style (${opponentStyle || 'unknown'}), 3) Key scriptures they'll misuse and how to counter, 4) Your recommended opening strategy, 5) Emotional traps to watch for. Be direct, tactical, and confident. NEVER use markdown formatting characters like # or *. NEVER use "dear" in any form.`;
@@ -8707,7 +8735,7 @@ CRITICAL RULES:
         model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" ? "google/gemini-2.5-flash" : mode.startsWith("defense-") || mode.startsWith("forge-defend-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
+        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-coach" ? 16384 : mode === "defense-coach-continue" ? 16384 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
       }),
     });
 
@@ -9518,7 +9546,7 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     let responseData: any = { content };
 
     // Defense coach mode: extract score from response
-    if (mode === "defense-coach") {
+    if (mode === "defense-coach" || mode === "defense-coach-continue") {
       const scoreMatch = content.match(/TOTAL SCORE:\s*(\d+)\s*\/\s*40/i);
       responseData.score = scoreMatch ? parseInt(scoreMatch[1], 10) : 0;
     }

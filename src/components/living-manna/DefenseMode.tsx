@@ -948,9 +948,54 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
       if (error) throw error;
 
-      const score = data.score || 0;
+      let content = data.content || "Coaching unavailable.";
+      let score = data.score || 0;
+
+      // Check if response is truncated (missing key sections)
+      const hasScore = /TOTAL SCORE:\s*\d+\s*\/\s*40/i.test(content);
+      const hasModelDefense = /MODEL DEFENSE:/i.test(content);
+      const isComplete = hasScore && hasModelDefense && content.length > 500;
+
+      if (!isComplete && content.length > 200) {
+        // Attempt up to 2 continuations to get the full analysis
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const { data: contData, error: contError } = await supabase.functions.invoke("jeeves", {
+              body: {
+                mode: "defense-coach-continue",
+                defenseTopicName: selectedTopic?.name,
+                partialResponse: content,
+              },
+            });
+
+            if (contError) break;
+
+            const continuation = contData.content || "";
+            if (!continuation) break;
+
+            content = content + "\n\n" + continuation;
+
+            // Extract score from combined content
+            const combinedScoreMatch = content.match(/TOTAL SCORE:\s*(\d+)\s*\/\s*40/i);
+            if (combinedScoreMatch) {
+              score = parseInt(combinedScoreMatch[1], 10);
+            } else if (contData.score) {
+              score = contData.score;
+            }
+
+            // Check if now complete
+            const nowHasScore = /TOTAL SCORE:\s*\d+\s*\/\s*40/i.test(content);
+            const nowHasDefense = /MODEL DEFENSE:/i.test(content);
+            if (nowHasScore && nowHasDefense) break;
+          } catch {
+            break;
+          }
+        }
+      }
+
       setLastScore(score);
-      addMessage({ role: "coach", content: data.content || "Coaching unavailable.", score });
+      addMessage({ role: "coach", content, score });
+
       setPhase("review");
     } catch (err) {
       console.error("Coaching error:", err);
