@@ -15,7 +15,7 @@ export function LiveChatToggle() {
     <Button
       onClick={() => setIsOpen(true)}
       size="icon"
-      className="fixed bottom-20 right-4 z-40 h-14 w-14 rounded-full shadow-lg sm:bottom-6"
+      className="fixed bottom-[88px] right-4 z-[55] h-14 w-14 rounded-full shadow-lg md:bottom-6"
     >
       <MessageSquare className="h-6 w-6" />
       {totalUnread > 0 && (
