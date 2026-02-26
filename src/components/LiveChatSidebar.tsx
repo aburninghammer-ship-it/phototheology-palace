@@ -142,12 +142,13 @@ function MessageBubble({
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => onOpenThread(message)}
-                    className="ml-1 p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                    className="ml-1.5 px-1.5 py-0.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary/80 transition-colors flex items-center gap-1 text-[10px] font-medium"
                   >
-                    <MessageSquareText className="h-3.5 w-3.5" />
+                    <Reply className="h-3 w-3" />
+                    Reply
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="text-xs">Thread</TooltipContent>
+                <TooltipContent side="top" className="text-xs">Reply in thread</TooltipContent>
               </Tooltip>
               {isOwn && (
                 <AlertDialog>
@@ -278,6 +279,10 @@ export function LiveChatSidebar() {
                   <p className="mt-1 text-xs text-muted-foreground/60">
                     Start the conversation! 💬
                   </p>
+                  <p className="mt-3 text-[11px] text-muted-foreground/50 flex items-center gap-1.5">
+                    <MessageSquareText className="h-3 w-3" />
+                    Hover any message to reply in a thread
+                  </p>
                 </motion.div>
               )}
               {topLevelMessages.map(msg => (
@@ -318,11 +323,15 @@ export function LiveChatSidebar() {
           </AnimatePresence>
 
           {/* Input */}
-          <div className="border-t border-border/30 bg-muted/20 p-3" onKeyDown={handleTyping}>
+          <div className="border-t border-border/30 bg-muted/20 p-3 space-y-1.5" onKeyDown={handleTyping}>
             <ChatInput
               onSend={handleSend}
               placeholder="Say something... ✨"
             />
+            <p className="text-[10px] text-muted-foreground/50 text-center flex items-center justify-center gap-1">
+              <MessageSquareText className="h-2.5 w-2.5" />
+              Hover a message &amp; tap <Reply className="h-2.5 w-2.5 inline" /> to start a thread
+            </p>
           </div>
 
           {/* Thread panel overlay */}
