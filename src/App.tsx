@@ -35,6 +35,9 @@ import { JeevesWidget } from "@/components/JeevesWidget";
 import { ReginaldButler } from "@/components/ReginaldButler";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { DraggableWidgetStack } from "@/components/DraggableWidgetStack";
+import { LiveChatProvider } from "@/contexts/LiveChatContext";
+import { LiveChatSidebar } from "@/components/LiveChatSidebar";
+import { LiveChatToggle } from "@/components/LiveChatToggle";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
 import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
@@ -365,6 +368,7 @@ function App() {
               <LiveNotificationsProvider>
                 <AchievementProvider>
                   <DirectMessagesProvider>
+                    <LiveChatProvider>
                     <UserPreferencesProvider>
                     <SidebarProvider defaultOpen={false}>
                     <ChangeManagerProvider>
@@ -737,10 +741,13 @@ function App() {
                       <ReginaldButler />
                     </DraggableWidgetStack>
                   )}
+                  {!isWorkspacePane && <LiveChatSidebar />}
+                  {!isWorkspacePane && <LiveChatToggle />}
                 </div>
               </ChangeManagerProvider>
               </SidebarProvider>
               </UserPreferencesProvider>
+              </LiveChatProvider>
             </DirectMessagesProvider>
           </AchievementProvider>
         </LiveNotificationsProvider>
