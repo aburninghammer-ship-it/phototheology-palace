@@ -71,6 +71,45 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_usage_log: {
+        Row: {
+          completion_tokens: number | null
+          created_at: string
+          estimated_cost_cents: number | null
+          function_name: string
+          id: string
+          metadata: Json | null
+          model: string | null
+          prompt_tokens: number | null
+          total_tokens: number | null
+          user_id: string
+        }
+        Insert: {
+          completion_tokens?: number | null
+          created_at?: string
+          estimated_cost_cents?: number | null
+          function_name: string
+          id?: string
+          metadata?: Json | null
+          model?: string | null
+          prompt_tokens?: number | null
+          total_tokens?: number | null
+          user_id: string
+        }
+        Update: {
+          completion_tokens?: number | null
+          created_at?: string
+          estimated_cost_cents?: number | null
+          function_name?: string
+          id?: string
+          metadata?: Json | null
+          model?: string | null
+          prompt_tokens?: number | null
+          total_tokens?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       analytics_snapshots: {
         Row: {
           active_churches: number
