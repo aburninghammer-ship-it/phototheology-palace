@@ -131,8 +131,14 @@ serve(async (req) => {
       const recapSystem = buildRecapSystemPrompt(dName, opponentName);
       const recapUser = `Here is the full debate transcript between ${dName} (Defender) and "${opponentName}" (Critic) on the topic of "${topicName}":\n\n${conversationSummary}\n\nProduce the full forensic tactical analysis. Address EVERY argument ${opponentName} made — count them and confirm the count. For each one, provide the full breakdown, fallacy analysis, and a complete rebuttal script. Then evaluate ${dName}'s responses surgically. This is a war-room analysis, not a summary.`;
 
-      // Don't await — let it run in the background
-      generateAnalysisInBackground(LOVABLE_API_KEY, recapSystem, recapUser, recAnalysisId, sbAdmin);
+      // Use EdgeRuntime.waitUntil to keep the worker alive for background generation
+      const backgroundPromise = generateAnalysisInBackground(LOVABLE_API_KEY, recapSystem, recapUser, recAnalysisId, sbAdmin);
+      
+      // @ts-ignore - EdgeRuntime is available in Supabase Edge Functions
+      if (typeof EdgeRuntime !== "undefined" && EdgeRuntime.waitUntil) {
+        // @ts-ignore
+        EdgeRuntime.waitUntil(backgroundPromise);
+      }
 
       return new Response(JSON.stringify({ analysisId: recAnalysisId, status: "processing" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
