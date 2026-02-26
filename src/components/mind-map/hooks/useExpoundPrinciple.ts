@@ -36,8 +36,9 @@ export function useExpoundPrinciple(): UseExpoundPrincipleReturn {
     setResult(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke('mind-map-expound', {
+      const { data, error } = await supabase.functions.invoke('mind-map-analyze', {
         body: {
+          action: "expound",
           principleContent,
           insight,
           seedText,
