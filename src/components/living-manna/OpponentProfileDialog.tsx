@@ -11,6 +11,30 @@ import { Separator } from "@/components/ui/separator";
 import type { DefenseOpponent } from "@/data/defenseModeOpponents";
 import { DEFENSE_TOPICS } from "@/data/defenseModeOpponents";
 
+// Convert second-person AI prompt text to third-person for display
+function toThirdPerson(text: string, name: string): string {
+  const n = name.split(" ")[0];
+  let s = text;
+  const verbs: [string, string][] = [
+    ["are", "is"], ["hold", "holds"], ["reject", "rejects"], ["consider", "considers"],
+    ["view", "views"], ["believe", "believes"], ["argue", "argues"], ["emphasize", "emphasizes"],
+    ["teach", "teaches"], ["maintain", "maintains"], ["use", "uses"], ["cite", "cites"],
+    ["press", "presses"], ["point", "points"], ["challenge", "challenges"], ["insist", "insists"],
+    ["seek", "seeks"], ["draw", "draws"], ["identify", "identifies"], ["know", "knows"],
+    ["have", "has"], ["follow", "follows"], ["see", "sees"], ["study", "studies"],
+    ["respect", "respects"], ["demand", "demands"], ["rely", "relies"], ["focus", "focuses"],
+    ["practice", "practices"], ["explore", "explores"], ["question", "questions"],
+    ["engage", "engages"], ["promote", "promotes"], ["prefer", "prefers"], ["lean", "leans"],
+    ["advocate", "advocates"], ["deny", "denies"], ["claim", "claims"], ["were", "was"],
+    ["grew", "grew"], ["left", "left"], ["feel", "feels"], ["once", "once"],
+  ];
+  for (const [v2, v3] of verbs) {
+    s = s.replace(new RegExp(`\\bYou ${v2}\\b`, "g"), `${n} ${v3}`);
+  }
+  s = s.replace(/\byour\b/g, `${n}'s`).replace(/\bYour\b/g, `${n}'s`).replace(/\bYou\b/g, n);
+  return s;
+}
+
 interface OpponentProfileDialogProps {
   opponent: DefenseOpponent | null;
   open: boolean;
@@ -349,7 +373,7 @@ export function OpponentProfileDialog({
                 <Eye className="h-4 w-4" /> Worldview Profile
               </h3>
               <p className="text-sm leading-relaxed text-foreground/80">
-                {opponent.worldview.slice(0, 400)}...
+                {toThirdPerson(opponent.worldview, opponent.name).slice(0, 400)}...
               </p>
             </section>
 
