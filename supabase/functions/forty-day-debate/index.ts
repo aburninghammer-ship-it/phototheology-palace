@@ -205,14 +205,13 @@ RULES:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-pro",
+          model: "google/gemini-2.5-flash",
           messages: [
             { role: "system", content: recapSystem },
             { role: "user", content: recapUser },
           ],
           temperature: 0.8,
           max_tokens: 65536,
-          max_completion_tokens: 65536,
           stream: true,
         }),
       });
