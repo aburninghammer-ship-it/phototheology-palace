@@ -54,7 +54,7 @@ export interface DifficultyLevel {
 export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   {
     id: "atheist",
-    name: "The Atheist",
+    name: "Dr. Marcus Steele",
     emoji: "🧪",
     avatar: atheistAvatar,
     color: "border-gray-500",
@@ -77,7 +77,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "muslim",
-    name: "The Muslim Apologist",
+    name: "Sheikh Tariq Al-Rashid",
     emoji: "☪️",
     avatar: muslimAvatar,
     color: "border-green-600",
@@ -101,7 +101,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "mormon",
-    name: "The LDS Missionary",
+    name: "Elder Bryce Kimball",
     emoji: "📖",
     avatar: mormonAvatar,
     color: "border-blue-400",
@@ -125,7 +125,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "jw",
-    name: "The Jehovah's Witness",
+    name: "Sister Helen Voss",
     emoji: "🏠",
     avatar: jwAvatar,
     color: "border-purple-500",
@@ -149,7 +149,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "evangelical",
-    name: "The Evangelical",
+    name: "Pastor Jake Thornton",
     emoji: "⛪",
     avatar: evangelicalAvatar,
     color: "border-amber-500",
@@ -172,7 +172,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "catholic",
-    name: "The Catholic Theologian",
+    name: "Fr. Dominic Aurelius",
     emoji: "✝️",
     avatar: catholicAvatar,
     color: "border-yellow-600",
@@ -196,7 +196,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "bhi",
-    name: "The Hebrew Israelite",
+    name: "Captain Yahawadah Ben Israel",
     emoji: "🦁",
     avatar: bhiAvatar,
     color: "border-red-600",
@@ -220,7 +220,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "former-sda",
-    name: "The Former SDA",
+    name: "Derek Lawson",
     emoji: "🚪",
     avatar: formerSdaAvatar,
     color: "border-slate-500",
@@ -244,7 +244,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "offshoot-sda",
-    name: "The Offshoot SDA",
+    name: "Brother Ezra Flame",
     emoji: "🌀",
     avatar: offshotSdaAvatar,
     color: "border-orange-700",
@@ -271,7 +271,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "jewish",
-    name: "The Jewish Scholar",
+    name: "Rabbi Yosef Halevi",
     emoji: "✡️",
     avatar: jewishAvatar,
     color: "border-indigo-500",
@@ -297,7 +297,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "preterist",
-    name: "The Preterist",
+    name: "Dr. Nathan Cross",
     emoji: "📜",
     avatar: preteristAvatar,
     color: "border-teal-600",
@@ -322,7 +322,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "futurist",
-    name: "The Futurist",
+    name: "Pastor Troy Bridges",
     emoji: "🔮",
     avatar: futuristAvatar,
     color: "border-sky-500",
@@ -347,7 +347,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "secular-scholar",
-    name: "The Secular Scholar",
+    name: "Prof. Elena Fischer",
     emoji: "🎓",
     avatar: secularScholarAvatar,
     color: "border-stone-600",
@@ -374,7 +374,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "progressive-christian",
-    name: "The Progressive Christian",
+    name: "Rev. Skyler Arden",
     emoji: "🌈",
     avatar: progressiveChristianAvatar,
     color: "border-emerald-400",
@@ -400,7 +400,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "skeptical-exsda",
-    name: "The Skeptical Ex-Adventist",
+    name: "Jordan Reeves",
     emoji: "💔",
     avatar: skepticalExsdaAvatar,
     color: "border-rose-700",
@@ -426,7 +426,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "philosopher",
-    name: "The Philosopher",
+    name: "Prof. Alaric Vane",
     emoji: "🏛️",
     avatar: philosopherAvatar,
     color: "border-violet-600",
@@ -452,7 +452,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "new-age",
-    name: "The New Age Spiritualist",
+    name: "Sage Luminara",
     emoji: "🔮",
     avatar: newAgeAvatar,
     color: "border-pink-400",
@@ -478,7 +478,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "anti-prophet",
-    name: "The Anti-Prophet Critic",
+    name: "Dirk Harmon",
     emoji: "📋",
     avatar: antiProphetAvatar,
     color: "border-amber-800",
@@ -505,7 +505,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "internet-skeptic",
-    name: "The Internet Skeptic",
+    name: "SkeptikBro99",
     emoji: "📱",
     avatar: internetSkepticAvatar,
     color: "border-cyan-500",
