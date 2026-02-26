@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName, partialResponse, sessionId, analysisId } = await req.json();
+    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName, partialResponse, sessionId, analysisId, forceRegenerate } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -70,6 +70,7 @@ serve(async (req) => {
       ).join('\n\n');
 
       const dName = defenderName || "Defender";
+      const shouldForceRegen = forceRegenerate === true;
       // sessionId comes from destructured body above
 
       // Build the Supabase service client
@@ -89,8 +90,8 @@ serve(async (req) => {
 
       // Check for existing analysis for this session
       const debateSessionId = sessionId || crypto.randomUUID();
-      
-      if (userId) {
+
+      if (userId && !shouldForceRegen) {
         const { data: existing } = await sbAdmin
           .from("debate_analyses")
           .select("id, status, analysis_text")
@@ -100,7 +101,7 @@ serve(async (req) => {
           .limit(1)
           .single();
 
-        if (existing?.status === "ready" && existing.analysis_text) {
+        if (existing?.status === "ready" && existing.analysis_text && isAnalysisComplete(existing.analysis_text)) {
           return new Response(JSON.stringify({ analysisId: existing.id, status: "ready", analysis: existing.analysis_text }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
@@ -110,6 +111,17 @@ serve(async (req) => {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
+        // If existing analysis is truncated/incomplete, delete it so we regenerate
+        if (existing?.status === "ready" && existing.analysis_text && !isAnalysisComplete(existing.analysis_text)) {
+          console.log(`[Analysis ${existing.id}] Cached analysis is truncated — deleting for regeneration`);
+          await sbAdmin.from("debate_analyses").delete().eq("id", existing.id);
+        }
+      } else if (userId && shouldForceRegen) {
+        // Delete all existing analyses for this session to force fresh generation
+        await sbAdmin.from("debate_analyses").delete()
+          .eq("session_id", debateSessionId)
+          .eq("user_id", userId);
+        console.log(`[Force regen] Cleared existing analyses for session ${debateSessionId}`);
       }
 
       // Create a pending record
@@ -394,53 +406,71 @@ function buildRecapSystemPrompt(dName: string, opponentName: string): string {
 
 Analyze the debate between ${dName} (Defender) and ${opponentName} (Critic). Address ${dName} by name — never "my dear" or similar.
 
-Produce a focused Tactical Analysis using this structure:
+Produce a COMPREHENSIVE, IN-DEPTH Tactical Analysis using this structure. DO NOT abbreviate or summarize — give the FULL analysis for every single argument and response.
 
 ## ⚔️ Battlefield Summary
-2-3 sentences: the core clash, who pressed harder, the pivotal moment.
+3-5 sentences: the core clash, who pressed harder, the pivotal moment, and the overall flow of the debate.
 
 ## 🔍 Opponent's Arguments Dissected
-For each argument ${opponentName} made (number them):
-- **Claim:** What they argued (1-2 sentences)
-- **Tactic:** (Strawman / Proof-texting / Appeal to Emotion / etc.)
-- **Hidden Assumption:** What they assumed without proving
-- **Strength:** [1-10] — honestly rate how persuasive it sounds
-- **Rebuttal Script:** 3-5 sentences ${dName} should use, citing 1-2 KJV verses
+For EACH argument ${opponentName} made (number them ALL — do NOT skip any):
+- **Claim:** What they argued (2-3 sentences, quote their actual words where possible)
+- **Tactic:** (Strawman / Proof-texting / Appeal to Emotion / Red Herring / Ad Hominem / False Dilemma / Equivocation / etc.) — explain WHY this tactic label applies
+- **Hidden Assumption:** What they assumed without proving — expose the unspoken premise
+- **Strength:** [1-10] — honestly rate how persuasive it sounds to an uninformed listener, and explain why
+- **Rebuttal Script:** 5-8 sentences ${dName} should memorize for next time, citing 2-3 KJV verses with full verse text. Write this as a ready-to-use spoken response.
 
 ## 📋 ${dName}'s Performance
-For each of ${dName}'s responses (number them):
-- **What worked:** 1-2 sentences on strengths
-- **What to sharpen:** 1-2 sentences on gaps or missed opportunities
-- **Score:** [1-10]
+For EACH of ${dName}'s responses (number them ALL):
+- **What worked:** 2-3 sentences on strengths — quote their best lines
+- **What to sharpen:** 2-3 sentences on gaps, missed opportunities, or weak framing
+- **Missed Scripture:** Verses they should have used but didn't (with full KJV text)
+- **Palace Room Connection:** Which Phototheology Palace room method would have strengthened this response
+- **Score:** [1-10] with brief justification
 
 ## 🚨 Fallacy Report
-Bullet list of fallacies detected from ${opponentName}: name, where it occurred, one-sentence exposure line.
+For each fallacy detected from ${opponentName}: name the fallacy, quote where it occurred, give a one-sentence exposure line ${dName} could use in real-time.
+
+## 🛡️ Arsenal Upgrade
+Top 5 Scripture weapons ${dName} needs to memorize for this topic:
+- Full KJV verse text with reference
+- When to deploy it (which type of attack it counters)
+- How to deliver it (suggested framing/lead-in)
 
 ## 📊 Scorecard
-| Metric | Score |
-|--------|-------|
-| Biblical Accuracy | /10 |
-| Logical Precision | /10 |
-| Strategic Framing | /10 |
-| Christ-Centeredness | /10 |
-| Overall Strength | /10 |
+| Metric | ${dName}'s Score | Notes |
+|--------|-------|-------|
+| Biblical Accuracy | /10 | Brief note |
+| Logical Precision | /10 | Brief note |
+| Strategic Framing | /10 | Brief note |
+| Christ-Centeredness | /10 | Brief note |
+| Opponent Handling | /10 | Brief note |
+| Scripture Deployment | /10 | Brief note |
+| Overall Strength | /10 | Brief note |
 
 ## 🏆 Verdict & Next Steps
-- Who won and why (2-3 sentences)
-- 2 specific study assignments with Scripture references and which Phototheology room to use
+- Who won this exchange and why (3-5 sentences — be specific about the turning points)
+- What ${dName} did that was MOST effective (so they can repeat it)
+- The single biggest improvement that would level up their defense
+- 3 specific study assignments with Scripture references and which Phototheology Palace room to use for each
+- A "next debate" strategy: what to do differently if ${opponentName} uses this angle again
 
-RULES:
-1. SDA theological framework throughout.
-2. Be direct, scholarly, encouraging but honest.
-3. Every rebuttal must cite specific KJV scripture.
-4. Reference actual moments from the transcript.
-5. Aim for 800-1500 words — thorough but not bloated.`;
+CRITICAL RULES:
+1. SDA theological framework throughout — historicist prophecy, sanctuary typology, three angels' messages.
+2. Be direct, scholarly, encouraging but BRUTALLY honest about weaknesses.
+3. Every rebuttal MUST cite specific KJV scripture with full verse text.
+4. Reference and QUOTE actual moments from the transcript — never generalize.
+5. This analysis should be EXHAUSTIVE. Cover every single exchange. Do NOT truncate, abbreviate, or say "and so on." The disciple is counting on this to improve.
+6. You MUST complete ALL sections through the Verdict & Next Steps. An incomplete analysis is useless.
+7. NEVER use the word "dear" in any form.`;
 }
 
 function isAnalysisComplete(text: string): boolean {
-  const hasScorecard = /Scorecard/i.test(text) && /\|\s*Overall Strength\s*\|/i.test(text);
-  const hasVerdict = /Verdict/i.test(text) || /Next Steps/i.test(text);
-  return hasScorecard && hasVerdict;
+  const hasScorecard = /Scorecard/i.test(text) && /Overall Strength/i.test(text);
+  const hasVerdict = /Verdict/i.test(text) && /Next Steps/i.test(text);
+  // Must have both scorecard AND verdict, and not end mid-sentence
+  const lastLine = text.trim().split("\n").pop() || "";
+  const endsCleanly = lastLine.endsWith(".") || lastLine.endsWith(")") || lastLine.endsWith('"') || lastLine.endsWith("*") || lastLine.endsWith("|") || lastLine.endsWith("---");
+  return hasScorecard && hasVerdict && endsCleanly;
 }
 
 async function generateAnalysisInBackground(

@@ -584,13 +584,13 @@ export function FortyDayChallenge() {
   };
 
   // Fetch Jeeves recap — fire-and-forget + polling pattern
-  const fetchJeevesRecap = async (session: any) => {
+  const fetchJeevesRecap = async (session: any, forceRegenerate = false) => {
     setIsRecapLoading(true);
     setJeevesRecap("⏳ Generating your full forensic tactical analysis... This may take 1-2 minutes for a thorough breakdown.");
     try {
       const opponent = DEFENSE_OPPONENTS.find(o => o.id === session.opponent_id);
       const dName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Defender";
-      
+
       // Step 1: Kick off analysis (returns immediately)
       const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/forty-day-debate`, {
         method: "POST",
@@ -605,6 +605,7 @@ export function FortyDayChallenge() {
           topicName: session.topic_name,
           defenderName: dName,
           sessionId: session.id,
+          forceRegenerate,
         }),
       });
 
@@ -1277,19 +1278,31 @@ export function FortyDayChallenge() {
               style={{ background: "linear-gradient(135deg, hsl(270 80% 60% / 0.6), hsl(200 90% 50% / 0.4), hsl(330 80% 55% / 0.4))" }}>
               <div className="rounded-xl p-4 backdrop-blur-xl"
                 style={{ background: "linear-gradient(135deg, hsl(270 50% 15% / 0.85), hsl(220 40% 12% / 0.9))" }}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="h-7 w-7 rounded-full flex items-center justify-center"
-                    style={{ background: "linear-gradient(135deg, hsl(270 80% 60%), hsl(200 80% 55%))" }}>
-                    <Crown className="h-3.5 w-3.5 text-white" />
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="h-7 w-7 rounded-full flex items-center justify-center"
+                      style={{ background: "linear-gradient(135deg, hsl(270 80% 60%), hsl(200 80% 55%))" }}>
+                      <Crown className="h-3.5 w-3.5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold" style={{ color: "hsl(270 80% 80%)" }}>
+                        Jeeves's Tactical Analysis
+                      </p>
+                      <p className="text-[9px]" style={{ color: "hsl(200 60% 70%)" }}>
+                        Post-debate analysis & coaching
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold" style={{ color: "hsl(270 80% 80%)" }}>
-                      Jeeves's Tactical Analysis
-                    </p>
-                    <p className="text-[9px]" style={{ color: "hsl(200 60% 70%)" }}>
-                      Post-debate analysis & coaching
-                    </p>
-                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); fetchJeevesRecap(reviewSession, true); }}
+                    disabled={isRecapLoading}
+                    className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium transition-colors hover:bg-white/10 disabled:opacity-40"
+                    style={{ color: "hsl(200 60% 70%)" }}
+                    title="Regenerate full analysis"
+                  >
+                    {isRecapLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <RotateCcw className="h-3 w-3" />}
+                    Regenerate
+                  </button>
                 </div>
                 <ScrollArea className="max-h-[70vh]">
                   <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed
