@@ -112,6 +112,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
     }
 
     try {
+      // Load all messages — no limit so old threads remain visible and commentable
       const { data, error } = await (supabase as any)
         .from('public_chat_messages')
         .select(`
@@ -119,8 +120,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
           sender:profiles!sender_id(id, display_name, avatar_url, username)
         `)
         .eq('room_id', activeRoomId)
-        .order('created_at', { ascending: true })
-        .limit(200);
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
 
