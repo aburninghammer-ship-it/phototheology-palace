@@ -12754,6 +12754,8 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          is_deleted: boolean
+          reply_to_id: string | null
           room_id: string
           sender_id: string
         }
@@ -12761,6 +12763,8 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          is_deleted?: boolean
+          reply_to_id?: string | null
           room_id: string
           sender_id: string
         }
@@ -12768,10 +12772,19 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          is_deleted?: boolean
+          reply_to_id?: string | null
           room_id?: string
           sender_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "public_chat_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "public_chat_messages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "public_chat_messages_room_id_fkey"
             columns: ["room_id"]

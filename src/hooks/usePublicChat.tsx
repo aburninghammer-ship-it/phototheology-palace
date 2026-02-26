@@ -54,6 +54,8 @@ interface UsePublicChatReturn {
   markRoomAsRead: (roomId: string) => Promise<void>;
   pinnedMessages: PublicChatMessage[];
   totalUnread: number;
+  deleteMessage: (messageId: string) => Promise<void>;
+  getThreadMessages: (parentId: string) => PublicChatMessage[];
 }
 
 export const usePublicChat = (): UsePublicChatReturn => {
@@ -118,7 +120,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
         `)
         .eq('room_id', activeRoomId)
         .order('created_at', { ascending: true })
-        .limit(100);
+        .limit(200);
 
       if (error) throw error;
 
@@ -127,6 +129,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
         images: msg.images || null,
         reply_to_id: msg.reply_to_id || null,
         is_pinned: msg.is_pinned ?? false,
+        is_deleted: msg.is_deleted ?? false,
         reply_to: null,
       }));
 
@@ -160,6 +163,10 @@ export const usePublicChat = (): UsePublicChatReturn => {
         content: content.trim(),
       };
 
+      if (replyToId) {
+        insertData.reply_to_id = replyToId;
+      }
+
       const { error } = await (supabase as any).from('public_chat_messages').insert(insertData);
 
       if (error) throw error;
@@ -175,6 +182,32 @@ export const usePublicChat = (): UsePublicChatReturn => {
       });
     }
   }, [activeRoomId, user, toast, fetchMessages]);
+
+  // Delete (soft-delete) own message
+  const deleteMessage = useCallback(async (messageId: string) => {
+    if (!user) return;
+    try {
+      const { error } = await (supabase as any)
+        .from('public_chat_messages')
+        .update({ is_deleted: true, content: '[deleted]' })
+        .eq('id', messageId)
+        .eq('sender_id', user.id);
+
+      if (error) throw error;
+
+      setMessages(prev =>
+        prev.map(m => m.id === messageId ? { ...m, is_deleted: true, content: '[deleted]' } as any : m)
+      );
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      toast({ title: 'Error', description: 'Failed to delete message.', variant: 'destructive' });
+    }
+  }, [user, toast]);
+
+  // Get thread messages (replies to a parent)
+  const getThreadMessages = useCallback((parentId: string) => {
+    return messages.filter(m => m.reply_to_id === parentId);
+  }, [messages]);
 
   // Typing indicator (no-op if table doesn't exist)
   const updateTypingIndicator = useCallback((_isTyping: boolean) => {
@@ -266,5 +299,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
     markRoomAsRead,
     pinnedMessages,
     totalUnread,
+    deleteMessage,
+    getThreadMessages,
   };
 };
