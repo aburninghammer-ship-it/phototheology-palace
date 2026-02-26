@@ -63,7 +63,7 @@ serve(async (req) => {
     }
 
     if (action === "recap") {
-      // Post-debate teaching recap — Jeeves shows how to overcome each argument
+      // Post-debate teaching recap — streamed to avoid timeout on long analyses
       const conversationSummary = messages.map((m: any) =>
         `[${m.role === 'opponent' ? opponentName : 'Defender'}]: ${m.content}`
       ).join('\n\n');
@@ -197,15 +197,37 @@ RULES:
 
       const recapUser = `Here is the full debate transcript between ${dName} (Defender) and "${opponentName}" (Critic) on the topic of "${topicName}":\n\n${conversationSummary}\n\nProduce the full forensic tactical analysis. Address EVERY argument ${opponentName} made — count them and confirm the count. For each one, provide the full breakdown, fallacy analysis, and a complete rebuttal script. Then evaluate ${dName}'s responses surgically. This is a war-room analysis, not a summary.`;
 
-      // Use a more powerful model for the comprehensive debrief with high token limit
-      // 65536 tokens allows for exhaustive analysis of long debates without truncation
-      const aiResponse = await callAI(LOVABLE_API_KEY, [
-        { role: "system", content: recapSystem },
-        { role: "user", content: recapUser },
-      ], "google/gemini-2.5-pro", 65536);
+      // Stream the response to avoid edge function timeout on long analyses
+      const aiStreamResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-pro",
+          messages: [
+            { role: "system", content: recapSystem },
+            { role: "user", content: recapUser },
+          ],
+          temperature: 0.8,
+          max_tokens: 65536,
+          max_completion_tokens: 65536,
+          stream: true,
+        }),
+      });
 
-      return new Response(JSON.stringify({ response: aiResponse }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      if (!aiStreamResponse.ok) {
+        if (aiStreamResponse.status === 429) throw Object.assign(new Error("Rate limit exceeded. Please try again in a moment."), { status: 429 });
+        if (aiStreamResponse.status === 402) throw Object.assign(new Error("AI credits depleted. Please add credits in your workspace settings."), { status: 402 });
+        const errText = await aiStreamResponse.text();
+        console.error("AI Gateway stream error:", aiStreamResponse.status, errText);
+        throw new Error(`AI Gateway error: ${aiStreamResponse.status}`);
+      }
+
+      // Pass the SSE stream directly to the client
+      return new Response(aiStreamResponse.body, {
+        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
       });
     }
 
