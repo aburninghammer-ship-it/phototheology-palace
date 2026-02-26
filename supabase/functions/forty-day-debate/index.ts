@@ -380,34 +380,54 @@ RULES:
 }
 
 async function callAI(apiKey: string, messages: any[], model?: string, maxTokens?: number): Promise<string> {
-  const body: any = {
-    model: model || "google/gemini-2.5-flash",
-    messages,
-    temperature: 0.8,
-  };
-  if (maxTokens) body.max_tokens = maxTokens;
+  const useModel = model || "google/gemini-2.5-flash";
+  let fullResponse = "";
+  let currentMessages = [...messages];
+  const MAX_CONTINUATIONS = 4;
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+  for (let attempt = 0; attempt <= MAX_CONTINUATIONS; attempt++) {
+    const body: any = {
+      model: useModel,
+      messages: currentMessages,
+      temperature: 0.8,
+    };
+    if (maxTokens) body.max_tokens = maxTokens;
 
-  if (!response.ok) {
-    if (response.status === 429) throw Object.assign(new Error("Rate limit exceeded. Please try again in a moment."), { status: 429 });
-    if (response.status === 402) throw Object.assign(new Error("AI credits depleted. Please add credits in your workspace settings."), { status: 402 });
-    const errText = await response.text();
-    console.error("AI Gateway error:", response.status, errText);
-    throw new Error(`AI Gateway error: ${response.status}`);
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) throw Object.assign(new Error("Rate limit exceeded. Please try again in a moment."), { status: 429 });
+      if (response.status === 402) throw Object.assign(new Error("AI credits depleted. Please add credits in your workspace settings."), { status: 402 });
+      const errText = await response.text();
+      console.error("AI Gateway error:", response.status, errText);
+      throw new Error(`AI Gateway error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const chunk = data.choices[0].message.content;
+    fullResponse += chunk;
+
+    const finishReason = data.choices?.[0]?.finish_reason;
+    if (finishReason !== "length") {
+      // Response completed naturally
+      break;
+    }
+
+    // Response was truncated — continue generating
+    console.log(`[callAI] Continuation ${attempt + 1}/${MAX_CONTINUATIONS} (finish_reason=length). Model: ${useModel}`);
+    currentMessages = [
+      ...messages,
+      { role: "assistant", content: fullResponse },
+      { role: "user", content: "Continue EXACTLY where you left off. Do not repeat any content. Do not add any preamble. Pick up mid-sentence if needed." },
+    ];
   }
 
-  const data = await response.json();
-  const finishReason = data.choices?.[0]?.finish_reason;
-  if (finishReason === "length") {
-    console.warn(`[callAI] Response was truncated (finish_reason=length). Model: ${body.model}, max_tokens: ${maxTokens || 'default'}`);
-  }
-  return data.choices[0].message.content;
+  return fullResponse;
 }
