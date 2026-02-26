@@ -437,6 +437,12 @@ RULES:
 5. Aim for 800-1500 words — thorough but not bloated.`;
 }
 
+function isAnalysisComplete(text: string): boolean {
+  const hasScorecard = /Scorecard/i.test(text) && /\|\s*Overall Strength\s*\|/i.test(text);
+  const hasVerdict = /Verdict/i.test(text) || /Next Steps/i.test(text);
+  return hasScorecard && hasVerdict;
+}
+
 async function generateAnalysisInBackground(
   apiKey: string,
   systemPrompt: string,
@@ -446,7 +452,7 @@ async function generateAnalysisInBackground(
 ): Promise<void> {
   try {
     console.log(`[Analysis ${analysisId}] Starting background generation...`);
-    
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -454,7 +460,7 @@ async function generateAnalysisInBackground(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -476,7 +482,8 @@ async function generateAnalysisInBackground(
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
+    let content = data.choices?.[0]?.message?.content || "";
+    const finishReason = data.choices?.[0]?.finish_reason;
 
     if (!content) {
       await sbAdmin.from("debate_analyses").update({
@@ -487,7 +494,55 @@ async function generateAnalysisInBackground(
       return;
     }
 
-    console.log(`[Analysis ${analysisId}] Generation complete. Length: ${content.length} chars`);
+    console.log(`[Analysis ${analysisId}] Initial generation: ${content.length} chars, finish_reason: ${finishReason}`);
+
+    // Continuation loop: if truncated or missing key sections, request continuation
+    const wasTruncated = finishReason === "length" || !isAnalysisComplete(content);
+    if (wasTruncated && content.length > 200) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        console.log(`[Analysis ${analysisId}] Continuation attempt ${attempt + 1}...`);
+
+        try {
+          const contResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-pro",
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt },
+                { role: "assistant", content: content },
+                { role: "user", content: "Your analysis was cut off. Continue EXACTLY where you left off — do NOT repeat anything already written. Complete all remaining sections through the Scorecard and Verdict & Next Steps." },
+              ],
+              temperature: 0.7,
+              max_tokens: 16384,
+            }),
+          });
+
+          if (!contResponse.ok) {
+            console.warn(`[Analysis ${analysisId}] Continuation ${attempt + 1} HTTP error: ${contResponse.status}`);
+            break;
+          }
+
+          const contData = await contResponse.json();
+          const continuation = contData.choices?.[0]?.message?.content || "";
+          if (!continuation) break;
+
+          content = content + "\n\n" + continuation;
+          console.log(`[Analysis ${analysisId}] After continuation ${attempt + 1}: ${content.length} chars`);
+
+          if (isAnalysisComplete(content)) break;
+        } catch (contErr) {
+          console.warn(`[Analysis ${analysisId}] Continuation ${attempt + 1} error:`, contErr);
+          break;
+        }
+      }
+    }
+
+    console.log(`[Analysis ${analysisId}] Final length: ${content.length} chars, complete: ${isAnalysisComplete(content)}`);
 
     await sbAdmin.from("debate_analyses").update({
       status: "ready",
