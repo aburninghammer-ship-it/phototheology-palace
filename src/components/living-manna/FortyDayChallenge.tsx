@@ -6,8 +6,13 @@ import {
   Shield, Swords, Send, Loader2, Trophy, Flame, Calendar,
   ChevronRight, ArrowLeft, Star, Lock, CheckCircle2, XCircle,
   Target, Zap, Crown, Award, RotateCcw, MessageSquare, Eye,
-  ScrollText, Unlock,
+  ScrollText, Unlock, RefreshCw, AlertTriangle,
 } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import ReactMarkdown from "react-markdown";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -143,6 +148,39 @@ export function FortyDayChallenge() {
       toast.success("🔥 40-Day Challenge begun! Your first opponent awaits.");
     } catch (err: any) {
       toast.error(err.message || "Failed to enroll");
+    }
+  };
+
+  const handleRestart = async () => {
+    if (!user || !enrollment) return;
+    try {
+      // Archive the current enrollment
+      await supabase
+        .from("debate_challenge_enrollments")
+        .update({ status: "abandoned" })
+        .eq("id", enrollment.id);
+
+      // Create fresh enrollment
+      const { data, error } = await supabase
+        .from("debate_challenge_enrollments")
+        .insert({
+          user_id: user.id,
+          difficulty: selectedDifficulty || enrollment.difficulty,
+          current_day: 1,
+          last_activity_date: new Date().toISOString().split("T")[0],
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setEnrollment(data);
+      setSchedule(generate40DaySchedule(data.id));
+      setSessions([]);
+      setBadges([]);
+      toast.success("🔥 Challenge reset! A fresh 40 days begins now.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to restart");
     }
   };
 
@@ -1002,6 +1040,39 @@ export function FortyDayChallenge() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Restart Challenge */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-full text-muted-foreground hover:text-destructive gap-2">
+              <RefreshCw className="h-3.5 w-3.5" />
+              Restart 40 Days of Smoke
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+                Restart the Challenge?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2">
+                <p>This will archive your current progress and start a completely fresh 40-day challenge with new opponent matchups.</p>
+                <p className="font-medium text-foreground">Current progress: Day {todayNumber}/40 • {completedDays.length} debates completed • {enrollment?.total_xp || 0} XP earned</p>
+                <p className="text-destructive/80 text-xs">⚠️ This cannot be undone. Your previous run will be archived but no longer active.</p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Keep Going</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleRestart}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Restart Challenge
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
   }
