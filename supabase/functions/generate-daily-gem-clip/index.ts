@@ -231,7 +231,7 @@ CTA: [A compelling call-to-action for viewers, 1-2 sentences, directing them to 
   } catch (error) {
     console.error('generate-daily-gem-clip error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
