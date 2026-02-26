@@ -287,6 +287,7 @@ const PathWeek = lazy(() => import("./pages/PathWeek"));
 const Sessions = lazy(() => import("./pages/Sessions"));
 const Notes = lazy(() => import("./pages/Notes"));
 const DonationSuccess = lazy(() => import("./pages/DonationSuccess"));
+const CreditPurchaseSuccess = lazy(() => import("./pages/CreditPurchaseSuccess"));
 const LiveDemo = lazy(() => import("./pages/LiveDemo"));
 const PublicChat = lazy(() => import("./pages/PublicChat"));
 const Schedule = lazy(() => import("./pages/Schedule"));
@@ -421,6 +422,7 @@ function App() {
             <Route path="/day-pass/:token" element={<DayPassRedeem />} />
             <Route path="/donate" element={<DonationPage />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
+            <Route path="/credit-purchase-success" element={<ProtectedRoute><CreditPurchaseSuccess /></ProtectedRoute>} />
             <Route path="/paths" element={<Paths />} />
             <Route path="/path/week" element={<ProtectedRoute><PathWeek /></ProtectedRoute>} />
             <Route path="/why-phototheology" element={<WhyPhototheology />} />

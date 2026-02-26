@@ -71,6 +71,66 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_credit_balances: {
+        Row: {
+          created_at: string
+          credits_balance: number
+          has_unlimited: boolean
+          id: string
+          lifetime_purchased: number
+          unlimited_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_balance?: number
+          has_unlimited?: boolean
+          id?: string
+          lifetime_purchased?: number
+          unlimited_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_balance?: number
+          has_unlimited?: boolean
+          id?: string
+          lifetime_purchased?: number
+          unlimited_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_credit_purchases: {
+        Row: {
+          created_at: string
+          credits_added: number
+          id: string
+          pack_id: string
+          stripe_session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_added: number
+          id?: string
+          pack_id: string
+          stripe_session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_added?: number
+          id?: string
+          pack_id?: string
+          stripe_session_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_usage_log: {
         Row: {
           completion_tokens: number | null
