@@ -313,8 +313,8 @@ export const searchBibleByWord = async (
 ): Promise<{ verses: Verse[]; total: number; hasMore: boolean }> => {
   try {
     // Use AI-powered search for accurate KJV results
-    const { data, error } = await supabase.functions.invoke("search-bible-word", {
-      body: { searchTerm, scope, page, limit },
+    const { data, error } = await supabase.functions.invoke("search-bible", {
+      body: { action: "word", searchTerm, scope, page, limit },
     });
 
     if (error) {

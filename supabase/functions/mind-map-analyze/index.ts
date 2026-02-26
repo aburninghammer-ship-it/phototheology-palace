@@ -473,6 +473,133 @@ RESPONSE FORMAT (JSON only, no markdown):
 }
 `;
 
+// ─── EXPOUND action handler (merged from mind-map-expound) ───
+async function handleExpound(body: any) {
+  const { principleContent, insight, seedText, roomTag } = body;
+  if (!principleContent || !seedText) throw new Error("Principle content and seed text are required");
+
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+  const expoundSystemPrompt = `You are a master Phototheology scholar with deep expertise in biblical exegesis and the Palace system. Your task is to EXPOUND on a principle, revealing its DEEP, NON-OBVIOUS connections to the seed text.
+
+CRITICAL RULES:
+1. Go BEYOND surface-level connections. Find the hidden theological threads.
+2. Every insight must trace back to the specific seed text provided.
+3. Use the Palace methodology: types, patterns, dimensions, cross-references.
+4. Make connections that would surprise and delight a serious Bible student.
+5. Always cite Scripture (KJV preferred) to support your claims.
+6. Think typologically - how does this pattern repeat across Scripture?
+7. Consider sanctuary implications if applicable.
+
+Respond ONLY with valid JSON in this exact format:
+{
+  "deepConnection": "A 2-3 sentence profound insight revealing the NON-OBVIOUS connection between this principle and the seed text.",
+  "seedRelevance": "Explain specifically HOW this principle illuminates the seed text in a new way.",
+  "hiddenPattern": "Identify a recurring biblical pattern this principle reveals.",
+  "practicalDepth": "A transformative application that goes beyond 'pray more' or 'trust God'.",
+  "scripturalChain": ["Verse 1", "Verse 2", "Verse 3"],
+  "palaceRooms": ["Room code and why it connects"]
+}`;
+
+  const userPrompt = `SEED TEXT:\n"""\n${seedText.substring(0, 1500)}\n"""\n\nPRINCIPLE TO EXPOUND:\n"""\n${principleContent}\n"""\n\nCURRENT INSIGHT:\n"""\n${insight}\n"""\n\n${roomTag ? `PALACE ROOM: ${roomTag}` : ''}\n\nNow EXPOUND this principle. Go deep.`;
+
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages: [{ role: "system", content: expoundSystemPrompt }, { role: "user", content: userPrompt }], max_tokens: 1500, temperature: 0.7 }),
+  });
+
+  if (!response.ok) {
+    if (response.status === 429) return { error: "Rate limits exceeded, please try again later.", _status: 429 };
+    if (response.status === 402) return { error: "Payment required, please add funds.", _status: 402 };
+    throw new Error(`AI gateway error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const aiResponse = data.choices?.[0]?.message?.content || "";
+  let parsed;
+  try {
+    const cleaned = aiResponse.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+    else throw new Error("No JSON found");
+  } catch {
+    parsed = {
+      deepConnection: "This principle reveals a deeper layer of meaning when viewed through the lens of the seed text.",
+      seedRelevance: "The connection illuminates patterns that resonate throughout Scripture.",
+      hiddenPattern: "This pattern appears across multiple biblical narratives.",
+      practicalDepth: "Apply this understanding by meditating on how this pattern plays out in your own spiritual journey.",
+      scripturalChain: ["John 3:16", "Romans 5:8", "Ephesians 2:8-9"],
+      palaceRooms: ["CR - Christ at center of all interpretation"],
+    };
+  }
+  return parsed;
+}
+
+// ─── STUDY action handler (merged from mind-map-study) ───
+async function handleStudy(body: any) {
+  const { text, mode = "scholar" } = body;
+  if (!text || typeof text !== "string") throw new Error("Text is required");
+
+  const truncatedText = text.length > 10000 ? text.substring(0, 10000) + "..." : text;
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+
+  // Import shared prompts inline
+  const { PALACE_SYSTEM_PROMPT, THEOLOGICAL_GUARDRAILS: TG2 } = await import("../_shared/palace-prompt.ts");
+  const { QUALITY_TESTS: QT2, OUTPUT_TYPES, GOLDEN_RULE: GR2 } = await import("../_shared/palace-output-engine.ts");
+  const { getCorpusContext } = await import('../_shared/corpus-rag.ts');
+
+  const STUDY_SYSTEM_PROMPT = `${PALACE_SYSTEM_PROMPT}\n\n${TG2}\n\nSTUDY GENERATION MODE:\nGenerate a comprehensive devotional study based on the provided seed text using the full Phototheology Palace framework above.\n\nSTUDY REQUIREMENTS:\n1. TITLE: Create an engaging, descriptive title.\n2. INTRODUCTION: 2-3 compelling sentences.\n3. SECTIONS (3-5):\n   - Clear title, rich content (2-4 paragraphs), palace connections, supporting scriptures (KJV)\n4. APPLICATION POINTS (3-5): Practical, actionable takeaways.\n5. CLOSING PRAYER.\n6. RELATED PASSAGES: 3-5 cross-references.\n\nMODE: ${mode.toUpperCase()}\n\nOUTPUT TYPE: ${OUTPUT_TYPES.devotional.name}\n${OUTPUT_TYPES.devotional.description}\n${OUTPUT_TYPES.devotional.requirements.map((r: string) => `• ${r}`).join('\n')}\n\nQUALITY TESTS:\n${QT2.map((t: any) => `• ${t.name} (${t.room}): ${t.question}`).join('\n')}\n\n${GR2}\n\nReturn ONLY valid JSON.`;
+
+  const modeInstructions: Record<string, string> = {
+    beginner: "MODE: BEGINNER - Simple language, fewer sections.",
+    scholar: "MODE: SCHOLAR - Deep analysis, comprehensive cross-references.",
+    preacher: "MODE: PREACHER - Teaching hooks, illustrations, sermon-ready content.",
+    research: "MODE: RESEARCH - Exhaustive academic analysis.",
+  };
+
+  const ragResult = await getCorpusContext({ query: truncatedText.slice(0, 4000), matchCount: 2 });
+  const ragSection = ragResult.chunkCount > 0 ? ragResult.corpusContext : '';
+
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: STUDY_SYSTEM_PROMPT + "\n\n" + (modeInstructions[mode] || modeInstructions.scholar) + ragSection },
+        { role: "user", content: `Generate a comprehensive Phototheology study based on this seed text:\n\n${truncatedText}` },
+      ],
+      temperature: 0.7,
+      max_tokens: 8192,
+    }),
+  });
+
+  if (!response.ok) throw new Error(`AI API error: ${response.status}`);
+  const aiResponse = await response.json();
+  const content = aiResponse.choices?.[0]?.message?.content || "";
+
+  let study;
+  try {
+    let jsonStr = content;
+    if (jsonStr.includes("```json")) jsonStr = jsonStr.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+    else if (jsonStr.includes("```")) jsonStr = jsonStr.replace(/```\n?/g, "");
+    study = JSON.parse(jsonStr.trim());
+  } catch {
+    study = {
+      title: "Study of the Provided Text",
+      introduction: "This study explores the rich truths contained in your seed text through the Phototheology Palace framework.",
+      sections: [{ title: "Initial Observations", content: "The text presents foundational truths.", palaceConnections: ["Floor 2: Investigation"], scriptures: ["Psalm 119:18"] }],
+      applicationPoints: ["Meditate on the key truths discovered"],
+      closingPrayer: "Heavenly Father, thank You for Your Word. In Jesus' name, Amen.",
+      relatedPassages: ["John 5:39", "2 Timothy 3:16-17"],
+    };
+  }
+  return study;
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -480,7 +607,24 @@ serve(async (req) => {
   }
 
   try {
-    const { text, mode = "scholar", fullStudy = false } = await req.json();
+    const body = await req.json();
+    const action = body.action || "analyze";
+
+    // Route to sub-handlers
+    if (action === "expound") {
+      const result = await handleExpound(body);
+      const status = result?._status || 200;
+      if (result?._status) delete result._status;
+      return new Response(JSON.stringify(result), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    if (action === "study") {
+      const result = await handleStudy(body);
+      return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Default: analyze action
+    const { text, mode = "scholar", fullStudy = false } = body;
 
     if (!text || typeof text !== "string") {
       return new Response(

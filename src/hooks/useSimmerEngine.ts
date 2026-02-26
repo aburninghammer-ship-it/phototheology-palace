@@ -129,8 +129,8 @@ export function useSimmerEngine(sessionId: string | undefined) {
 
     setIsProcessing(true);
     try {
-      const { data, error } = await supabase.functions.invoke("simmer-engine", {
-        body: { action: "initialize", sessionId, duration },
+      const { data, error } = await supabase.functions.invoke("sermon-simmer", {
+        body: { mode: "engine", action: "initialize", sessionId, duration },
       });
 
       if (error) throw error;
@@ -156,8 +156,8 @@ export function useSimmerEngine(sessionId: string | undefined) {
 
     setIsProcessing(true);
     try {
-      const { data, error } = await supabase.functions.invoke("simmer-engine", {
-        body: { action: "run_pass", sessionId, forceLane },
+      const { data, error } = await supabase.functions.invoke("sermon-simmer", {
+        body: { mode: "engine", action: "run_pass", sessionId, forceLane },
       });
 
       if (error) throw error;
@@ -290,8 +290,8 @@ export function useSimmerEngine(sessionId: string | undefined) {
       });
 
       try {
-        const { data, error } = await supabase.functions.invoke("simmer-engine", {
-          body: { action: "run_pass", sessionId },
+        const { data, error } = await supabase.functions.invoke("sermon-simmer", {
+          body: { mode: "engine", action: "run_pass", sessionId },
         });
 
         if (error) throw error;
@@ -327,8 +327,8 @@ export function useSimmerEngine(sessionId: string | undefined) {
     if (!sessionId) return;
     
     try {
-      await supabase.functions.invoke("simmer-engine", {
-        body: { action: "pause", sessionId },
+      await supabase.functions.invoke("sermon-simmer", {
+        body: { mode: "engine", action: "pause", sessionId },
       });
       toast.info("⏸️ Stopping simmer...");
     } catch (error: any) {
@@ -342,8 +342,8 @@ export function useSimmerEngine(sessionId: string | undefined) {
 
     setIsProcessing(true);
     try {
-      const { data, error } = await supabase.functions.invoke("simmer-validator", {
-        body: { sessionId, artifactIds },
+      const { data, error } = await supabase.functions.invoke("sermon-simmer", {
+        body: { mode: "validate", sessionId, artifactIds },
       });
 
       if (error) throw error;
@@ -367,8 +367,8 @@ export function useSimmerEngine(sessionId: string | undefined) {
     const action = engineState?.isPaused ? "resume" : "pause";
     
     try {
-      const { data, error } = await supabase.functions.invoke("simmer-engine", {
-        body: { action, sessionId },
+      const { data, error } = await supabase.functions.invoke("sermon-simmer", {
+        body: { mode: "engine", action, sessionId },
       });
 
       if (error) throw error;
@@ -387,8 +387,8 @@ export function useSimmerEngine(sessionId: string | undefined) {
     const action = engineState?.lockedThesis ? "unlock_thesis" : "lock_thesis";
     
     try {
-      const { data, error } = await supabase.functions.invoke("simmer-engine", {
-        body: { action, sessionId },
+      const { data, error } = await supabase.functions.invoke("sermon-simmer", {
+        body: { mode: "engine", action, sessionId },
       });
 
       if (error) throw error;
@@ -405,8 +405,8 @@ export function useSimmerEngine(sessionId: string | undefined) {
     if (!sessionId) return;
 
     try {
-      const { error } = await supabase.functions.invoke("simmer-engine", {
-        body: { action: "approve_artifact", sessionId, artifactId },
+      const { error } = await supabase.functions.invoke("sermon-simmer", {
+        body: { mode: "engine", action: "approve_artifact", sessionId, artifactId },
       });
 
       if (error) throw error;
@@ -421,8 +421,8 @@ export function useSimmerEngine(sessionId: string | undefined) {
     if (!sessionId) return;
 
     try {
-      const { error } = await supabase.functions.invoke("simmer-engine", {
-        body: { action: "reject_artifact", sessionId, artifactId },
+      const { error } = await supabase.functions.invoke("sermon-simmer", {
+        body: { mode: "engine", action: "reject_artifact", sessionId, artifactId },
       });
 
       if (error) throw error;
