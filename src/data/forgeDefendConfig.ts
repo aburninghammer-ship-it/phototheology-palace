@@ -75,8 +75,8 @@ export const SCORING: ScoringRule = {
 export const AI_ENEMY_SQUADS: Record<string, { name: string; opponents: string[]; description: string }> = {
   "atheist-trio": {
     name: "The Secular Front",
-    opponents: ["atheist", "former-sda", "jewish"],
-    description: "Empirical skeptics + insider critics + Torah scholars",
+    opponents: ["atheist", "secular-scholar", "philosopher"],
+    description: "Empirical skeptics + academic critics + philosophical challengers",
   },
   "abrahamic-trio": {
     name: "The Abrahamic Council",
@@ -90,8 +90,18 @@ export const AI_ENEMY_SQUADS: Record<string, { name: string; opponents: string[]
   },
   "insider-trio": {
     name: "The Insider Threat",
-    opponents: ["former-sda", "offshoot-sda", "evangelical"],
-    description: "Ex-Adventist critics + fringe reformers + Sunday keepers",
+    opponents: ["former-sda", "skeptical-exsda", "anti-prophet"],
+    description: "Ex-Adventist critics + trauma survivors + Ellen White specialists",
+  },
+  "modern-trio": {
+    name: "The Modern Challenge",
+    opponents: ["progressive-christian", "new-age", "internet-skeptic"],
+    description: "Progressive theology + New Age spirituality + viral skepticism",
+  },
+  "prophecy-trio": {
+    name: "The Prophecy Tribunal",
+    opponents: ["preterist", "futurist", "secular-scholar"],
+    description: "70 AD fulfillment + dispensational futurism + academic dating criticism",
   },
 };
 

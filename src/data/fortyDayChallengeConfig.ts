@@ -12,7 +12,8 @@ export interface DayConfig {
 const OPPONENT_POOL = [
   "atheist", "muslim", "mormon", "jw", "evangelical",
   "catholic", "bhi", "former-sda", "offshoot-sda", "jewish",
-  "preterist", "futurist",
+  "preterist", "futurist", "secular-scholar", "progressive-christian",
+  "skeptical-exsda", "philosopher", "new-age", "anti-prophet", "internet-skeptic",
 ];
 
 const SDA_DEFENSE_TOPICS = [
