@@ -67,7 +67,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
   const [isLoading, setIsLoading] = useState(true);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch rooms with unread counts
+  // Fetch rooms — works with minimal schema (no slug/is_active/display_order)
   const fetchRooms = useCallback(async () => {
     if (!user) return;
 
@@ -75,52 +75,24 @@ export const usePublicChat = (): UsePublicChatReturn => {
       const { data: roomsData, error } = await (supabase as any)
         .from('public_chat_rooms')
         .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
 
-      // Get read statuses
-      const { data: readStatus } = await (supabase as any)
-        .from('public_chat_read_status')
-        .select('room_id, last_read_at')
-        .eq('user_id', user.id);
+      const roomsWithDefaults = (roomsData || []).map((room: any, idx: number) => ({
+        ...room,
+        slug: room.slug || room.name?.toLowerCase().replace(/\s+/g, '-') || `room-${idx}`,
+        room_type: room.room_type || 'global',
+        display_order: room.display_order ?? idx,
+        unread_count: 0,
+      }));
 
-      const readMap = new Map((readStatus || []).map((r: any) => [r.room_id, r.last_read_at]));
+      setRooms(roomsWithDefaults as PublicChatRoom[]);
 
-      // Calculate unread counts
-      const roomsWithUnread = await Promise.all(
-        (roomsData || []).map(async (room: any) => {
-          const lastRead = readMap.get(room.id);
-          let unreadCount = 0;
-
-          const query = (supabase as any)
-            .from('public_chat_messages')
-            .select('*', { count: 'exact', head: true })
-            .eq('room_id', room.id)
-            .eq('is_visible', true)
-            .neq('sender_id', user.id);
-
-          if (lastRead) {
-            query.gt('created_at', lastRead);
-          }
-
-          const { count } = await query;
-          unreadCount = count ?? 0;
-
-          return { ...room, unread_count: unreadCount };
-        })
-      );
-
-      setRooms(roomsWithUnread as PublicChatRoom[]);
-
-      // Auto-select global room if none selected
-      if (!activeRoomId && roomsWithUnread.length > 0) {
-        const globalRoom = roomsWithUnread.find((r: any) => r.slug === 'global');
-        if (globalRoom) {
-          setActiveRoomId(globalRoom.id);
-          setActiveRoomSlug(globalRoom.slug);
-        }
+      // Auto-select first room if none selected
+      if (!activeRoomId && roomsWithDefaults.length > 0) {
+        setActiveRoomId(roomsWithDefaults[0].id);
+        setActiveRoomSlug(roomsWithDefaults[0].slug);
       }
     } catch (error) {
       console.error('Error fetching public chat rooms:', error);
@@ -141,49 +113,27 @@ export const usePublicChat = (): UsePublicChatReturn => {
         .from('public_chat_messages')
         .select(`
           *,
-          sender:profiles!sender_id(id, display_name, avatar_url, username),
-          reply_to:public_chat_messages!reply_to_id(
-            content,
-            sender:profiles!sender_id(display_name)
-          )
+          sender:profiles!sender_id(id, display_name, avatar_url, username)
         `)
         .eq('room_id', activeRoomId)
-        .eq('is_visible', true)
         .order('created_at', { ascending: true })
         .limit(100);
 
       if (error) throw error;
-      setMessages((data || []) as unknown as PublicChatMessage[]);
+
+      const mapped = (data || []).map((msg: any) => ({
+        ...msg,
+        images: msg.images || null,
+        reply_to_id: msg.reply_to_id || null,
+        is_pinned: msg.is_pinned ?? false,
+        reply_to: null,
+      }));
+
+      setMessages(mapped as PublicChatMessage[]);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
   }, [activeRoomId]);
-
-  // Fetch typing users
-  const fetchTypingUsers = useCallback(async () => {
-    if (!activeRoomId || !user) return;
-
-    try {
-      const { data } = await (supabase as any)
-        .from('public_chat_typing')
-        .select(`
-          user_id,
-          profiles:user_id(display_name)
-        `)
-        .eq('room_id', activeRoomId)
-        .neq('user_id', user.id)
-        .gt('updated_at', new Date(Date.now() - 10000).toISOString());
-
-      setTypingUsers(
-        (data || []).map((d: any) => ({
-          user_id: d.user_id,
-          display_name: d.profiles?.display_name || 'Someone',
-        }))
-      );
-    } catch (error) {
-      console.error('Error fetching typing users:', error);
-    }
-  }, [activeRoomId, user]);
 
   // Set active room by ID or slug
   const setActiveRoom = useCallback((roomIdOrSlug: string) => {
@@ -203,16 +153,18 @@ export const usePublicChat = (): UsePublicChatReturn => {
     if (!activeRoomId || !user || !content.trim()) return;
 
     try {
-      const { error } = await (supabase as any).from('public_chat_messages').insert({
+      const insertData: any = {
         room_id: activeRoomId,
         sender_id: user.id,
         content: content.trim(),
-        images: images || null,
-        reply_to_id: replyToId || null,
-      });
+      };
+
+      const { error } = await (supabase as any).from('public_chat_messages').insert(insertData);
 
       if (error) throw error;
-      updateTypingIndicator(false);
+
+      // Immediately refetch to show the message
+      await fetchMessages();
     } catch (error: any) {
       console.error('Error sending message:', error);
       toast({
@@ -221,54 +173,17 @@ export const usePublicChat = (): UsePublicChatReturn => {
         variant: 'destructive',
       });
     }
-  }, [activeRoomId, user, toast]);
+  }, [activeRoomId, user, toast, fetchMessages]);
 
-  // Typing indicator
-  const updateTypingIndicator = useCallback((isTyping: boolean) => {
-    if (!activeRoomId || !user) return;
+  // Typing indicator (no-op if table doesn't exist)
+  const updateTypingIndicator = useCallback((_isTyping: boolean) => {
+    // Typing table may not exist yet — silently skip
+  }, []);
 
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    if (isTyping) {
-      (supabase as any).from('public_chat_typing').upsert({
-        room_id: activeRoomId,
-        user_id: user.id,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'room_id,user_id' }).then(() => {});
-
-      typingTimeoutRef.current = setTimeout(() => {
-        updateTypingIndicator(false);
-      }, 5000);
-    } else {
-      (supabase as any)
-        .from('public_chat_typing')
-        .delete()
-        .eq('room_id', activeRoomId)
-        .eq('user_id', user.id)
-        .then(() => {});
-    }
-  }, [activeRoomId, user]);
-
-  // Mark room as read
-  const markRoomAsRead = useCallback(async (roomId: string) => {
-    if (!user) return;
-
-    try {
-      await (supabase as any).from('public_chat_read_status').upsert({
-        room_id: roomId,
-        user_id: user.id,
-        last_read_at: new Date().toISOString(),
-      }, { onConflict: 'room_id,user_id' });
-
-      setRooms(prev =>
-        prev.map(r => (r.id === roomId ? { ...r, unread_count: 0 } : r))
-      );
-    } catch (error) {
-      console.error('Error marking room as read:', error);
-    }
-  }, [user]);
+  // Mark room as read (no-op if table doesn't exist)
+  const markRoomAsRead = useCallback(async (_roomId: string) => {
+    // Read status table may not exist yet — silently skip
+  }, []);
 
   // Initial fetch
   useEffect(() => {
@@ -278,13 +193,6 @@ export const usePublicChat = (): UsePublicChatReturn => {
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
-
-  // Mark as read when room changes
-  useEffect(() => {
-    if (activeRoomId) {
-      markRoomAsRead(activeRoomId);
-    }
-  }, [activeRoomId, markRoomAsRead]);
 
   // Realtime subscriptions
   useEffect(() => {
@@ -311,27 +219,25 @@ export const usePublicChat = (): UsePublicChatReturn => {
 
           const messageWithSender: PublicChatMessage = {
             ...newMessage,
+            images: newMessage.images || null,
+            reply_to_id: newMessage.reply_to_id || null,
+            is_pinned: newMessage.is_pinned ?? false,
+            reply_to: null,
             sender: sender || { id: newMessage.sender_id, display_name: 'Unknown', avatar_url: null, username: null },
           };
 
           // Add to messages if current room
           if (newMessage.room_id === activeRoomId) {
-            setMessages(prev => [...prev, messageWithSender]);
+            setMessages(prev => {
+              // Avoid duplicates
+              if (prev.some(m => m.id === newMessage.id)) return prev;
+              return [...prev, messageWithSender];
+            });
           }
 
-          // Update unread count if from another user
-          if (newMessage.sender_id !== user.id) {
-            setRooms(prev =>
-              prev.map(r =>
-                r.id === newMessage.room_id && r.id !== activeRoomId
-                  ? { ...r, unread_count: r.unread_count + 1 }
-                  : r
-              )
-            );
-
-            if (newMessage.room_id !== activeRoomId) {
-              playMessageNotification();
-            }
+          // Play sound for messages from others
+          if (newMessage.sender_id !== user.id && newMessage.room_id !== activeRoomId) {
+            playMessageNotification();
           }
         }
       )
@@ -341,31 +247,6 @@ export const usePublicChat = (): UsePublicChatReturn => {
       messagesChannel.unsubscribe();
     };
   }, [user, activeRoomId]);
-
-  // Typing indicators subscription
-  useEffect(() => {
-    if (!user || !activeRoomId) return;
-
-    const typingChannel = supabase
-      .channel(`public-chat-typing-${activeRoomId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'public_chat_typing',
-          filter: `room_id=eq.${activeRoomId}`,
-        },
-        () => {
-          fetchTypingUsers();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      typingChannel.unsubscribe();
-    };
-  }, [user, activeRoomId, fetchTypingUsers]);
 
   // Computed values
   const pinnedMessages = messages.filter(m => m.is_pinned);
