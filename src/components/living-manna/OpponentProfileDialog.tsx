@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import {
   Shield, Swords, Target, BookOpen, Sparkles, Crosshair,
-  AlertTriangle, Brain, Flame, ChevronRight, Eye, Zap,
+  AlertTriangle, Brain, Flame, ChevronRight, Eye, Zap, GraduationCap,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import type { DefenseOpponent } from "@/data/defenseModeOpponents";
 import { DEFENSE_TOPICS } from "@/data/defenseModeOpponents";
+import { AATS_AVATAR_IDS, AATS_PHASES, type AATSAvatarId } from "@/data/aatsTrainingData";
+import { useAATSProgress } from "@/hooks/useAATSProgress";
+import { Progress } from "@/components/ui/progress";
 
 // Convert second-person AI prompt text to third-person for display
 function toThirdPerson(text: string): string {
@@ -39,6 +42,7 @@ interface OpponentProfileDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectOpponent: (opponent: DefenseOpponent) => void;
+  onNavigateToAATS?: (avatarId: string) => void;
 }
 
 // Map opponent IDs to preparation strategies
@@ -317,11 +321,16 @@ export function OpponentProfileDialog({
   open,
   onOpenChange,
   onSelectOpponent,
+  onNavigateToAATS,
 }: OpponentProfileDialogProps) {
+  const { getAvatarProgress, getPhaseProgress } = useAATSProgress();
+
   if (!opponent) return null;
 
   const strategy = PREPARATION_STRATEGIES[opponent.id];
   const signatureTopics = DEFENSE_TOPICS.filter(t => opponent.signatureTopics.includes(t.id));
+  const hasAATSTraining = AATS_AVATAR_IDS.includes(opponent.id as AATSAvatarId);
+  const aatsProgress = hasAATSTraining ? getAvatarProgress(opponent.id) : 0;
 
   const dangerColors = {
     moderate: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
@@ -482,6 +491,48 @@ export function OpponentProfileDialog({
                       <p className="text-xs text-muted-foreground mt-1">{topic.description}</p>
                     </div>
                   ))}
+                </div>
+              </section>
+            )}
+
+            {/* AATS Training Path */}
+            {hasAATSTraining && (
+              <section className="space-y-3">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4 text-primary" /> Training Path
+                </h3>
+                <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 to-violet-500/5 border border-primary/15 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Overall Progress</span>
+                    <span className="text-xs text-muted-foreground">{aatsProgress}%</span>
+                  </div>
+                  <Progress value={aatsProgress} className="h-2" />
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1">
+                    {AATS_PHASES.map((phase) => {
+                      const pp = getPhaseProgress(opponent.id, phase.number);
+                      return (
+                        <div key={phase.number} className="text-center">
+                          <div className="text-[10px] text-muted-foreground mb-1 truncate">P{phase.number}</div>
+                          <Progress value={pp} className="h-1.5" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {onNavigateToAATS && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full mt-2"
+                      onClick={() => {
+                        onNavigateToAATS(opponent.id);
+                        onOpenChange(false);
+                      }}
+                    >
+                      <GraduationCap className="h-3.5 w-3.5 mr-1.5" />
+                      {aatsProgress > 0 ? "Continue Training" : "Start Training"}
+                      <ChevronRight className="h-3.5 w-3.5 ml-1.5" />
+                    </Button>
+                  )}
                 </div>
               </section>
             )}

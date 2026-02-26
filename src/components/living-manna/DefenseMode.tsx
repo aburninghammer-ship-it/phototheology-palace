@@ -37,6 +37,7 @@ import {
 
 interface DefenseModeProps {
   churchId: string;
+  onNavigateToAATS?: (avatarId: string) => void;
 }
 
 type Phase = "setup" | "sparring" | "responding" | "coaching" | "review";
@@ -75,7 +76,7 @@ interface SavedDebate {
   saved_at: string;
 }
 
-export function DefenseMode({ churchId }: DefenseModeProps) {
+export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -2151,6 +2152,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             setSelectedOpponent(opp);
             setProfileOpponent(null);
           }}
+          onNavigateToAATS={onNavigateToAATS}
         />
       </div>
     );
@@ -2641,6 +2643,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           setSelectedOpponent(opp);
           setProfileOpponent(null);
         }}
+        onNavigateToAATS={onNavigateToAATS}
       />
     </div>
   );

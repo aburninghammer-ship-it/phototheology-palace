@@ -1,0 +1,1205 @@
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  BookOpen, Shield, Brain, Zap, Swords, Flame, ArrowLeft, ArrowRight,
+  CheckCircle2, Circle, ChevronDown, ChevronUp, ChevronRight, GraduationCap,
+  Target, Eye, Sparkles, Trophy, Users, Lightbulb, HelpCircle,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { useAATSProgress } from "@/hooks/useAATSProgress";
+import {
+  AATS_PHASES,
+  AATS_AVATAR_IDS,
+  CROSS_AVATAR_SUBJECTS,
+  getAvatarTraining,
+  getAllAvatarTrainings,
+  UNIVERSAL_MIND_GAMES,
+  UNIVERSAL_FALLACIES,
+  DETECTION_EXERCISES,
+  type AATSAvatarId,
+  type AATSModule,
+  type AATSAvatarTraining,
+} from "@/data/aatsTrainingData";
+import { DEFENSE_OPPONENTS } from "@/data/defenseModeOpponents";
+
+// ── Icon map for phases ─────────────────────────────────────────────────────
+const PHASE_ICONS: Record<string, React.ElementType> = {
+  BookOpen, Shield, Brain, Zap, Swords, Flame,
+};
+
+function getPhaseIcon(iconName: string) {
+  return PHASE_ICONS[iconName] || BookOpen;
+}
+
+// ── Types ───────────────────────────────────────────────────────────────────
+
+type AATSView =
+  | "overview"
+  | "avatar-path"
+  | "phase-content"
+  | "module-viewer"
+  | "cross-avatar"
+  | "mind-games-lab";
+
+interface AATSTrainingProps {
+  churchId: string;
+  onNavigateToDefense?: () => void;
+  initialAvatarId?: string;
+}
+
+// ── Component ───────────────────────────────────────────────────────────────
+
+export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }: AATSTrainingProps) {
+  const { completeItem, isItemCompleted, getAvatarProgress, getOverallProgress, loading } = useAATSProgress();
+
+  const [view, setView] = useState<AATSView>(initialAvatarId ? "avatar-path" : "overview");
+  const [selectedAvatarId, setSelectedAvatarId] = useState<AATSAvatarId | null>(
+    initialAvatarId && AATS_AVATAR_IDS.includes(initialAvatarId as AATSAvatarId)
+      ? (initialAvatarId as AATSAvatarId)
+      : null,
+  );
+  const [selectedPhase, setSelectedPhase] = useState<number | null>(null);
+  const [selectedModule, setSelectedModule] = useState<AATSModule | null>(null);
+  const [moduleStep, setModuleStep] = useState(0);
+  const [selectedCrossSubject, setSelectedCrossSubject] = useState<string | null>(null);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [exerciseAnswers, setExerciseAnswers] = useState<Record<string, string>>({});
+  const [revealedExercises, setRevealedExercises] = useState<Set<string>>(new Set());
+
+  const allTrainings = useMemo(() => getAllAvatarTrainings(), []);
+
+  const selectedTraining = useMemo(
+    () => (selectedAvatarId ? getAvatarTraining(selectedAvatarId) : null),
+    [selectedAvatarId],
+  );
+
+  // Get opponent data from DefenseMode for avatar images
+  const getOpponent = (avatarId: string) => DEFENSE_OPPONENTS.find((o) => o.id === avatarId);
+
+  const toggleExpand = (id: string) => {
+    setExpandedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // Count total training items for an avatar
+  const getTotalItems = (training: AATSAvatarTraining): number => {
+    return (
+      training.subjects.length +
+      training.steelmanArguments.length +
+      training.mindGames.length +
+      training.fallacies.length +
+      training.counterStrategies.length +
+      training.modules.length
+    );
+  };
+
+  const handleMarkComplete = (avatarId: string, itemId: string, total: number) => {
+    completeItem(avatarId, itemId, total);
+  };
+
+  const navigateBack = () => {
+    if (view === "module-viewer") {
+      setView("phase-content");
+      setSelectedModule(null);
+      setModuleStep(0);
+    } else if (view === "phase-content") {
+      setView("avatar-path");
+      setSelectedPhase(null);
+    } else if (view === "avatar-path") {
+      setView("overview");
+      setSelectedAvatarId(null);
+    } else if (view === "cross-avatar") {
+      setView("overview");
+      setSelectedCrossSubject(null);
+    } else if (view === "mind-games-lab") {
+      setView("overview");
+    }
+  };
+
+  // ─── OVERVIEW ─────────────────────────────────────────────────────────────
+
+  const renderOverview = () => {
+    const overall = getOverallProgress();
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-3">
+            <GraduationCap className="h-8 w-8 text-primary" />
+            <h2 className="text-2xl font-bold">Apologetics Avatar Training System</h2>
+          </div>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Master 6 phases of training against every opponent worldview. Study their doctrines, steelman their arguments,
+            detect their mind games, expose their fallacies, and enter combat prepared.
+          </p>
+          {overall > 0 && (
+            <div className="max-w-xs mx-auto pt-2">
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                <span>Overall Progress</span>
+                <span>{overall}%</span>
+              </div>
+              <Progress value={overall} className="h-2" />
+            </div>
+          )}
+        </div>
+
+        {/* Avatar Grid */}
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Target className="h-5 w-5 text-red-400" />
+            Training Paths ({AATS_AVATAR_IDS.length} Opponents)
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {allTrainings.map((training) => {
+              const opponent = getOpponent(training.avatarId);
+              const progress = getAvatarProgress(training.avatarId);
+              return (
+                <motion.div
+                  key={training.avatarId}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Card
+                    className="cursor-pointer hover:border-primary/50 transition-all group overflow-hidden"
+                    onClick={() => {
+                      setSelectedAvatarId(training.avatarId as AATSAvatarId);
+                      setView("avatar-path");
+                    }}
+                  >
+                    <CardContent className="p-3 text-center space-y-2">
+                      <div className="relative mx-auto w-14 h-14">
+                        {opponent?.avatar ? (
+                          <img
+                            src={opponent.avatar}
+                            alt={training.avatarName}
+                            className={`w-14 h-14 rounded-full object-cover border-2 ${training.color}`}
+                          />
+                        ) : (
+                          <div className={`w-14 h-14 rounded-full border-2 ${training.color} flex items-center justify-center text-2xl bg-muted`}>
+                            {training.emoji}
+                          </div>
+                        )}
+                        {/* Progress ring overlay */}
+                        <svg className="absolute inset-0 w-14 h-14 -rotate-90" viewBox="0 0 56 56">
+                          <circle cx="28" cy="28" r="26" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted/30" />
+                          <circle
+                            cx="28" cy="28" r="26" fill="none" stroke="currentColor" strokeWidth="2.5"
+                            className="text-primary"
+                            strokeDasharray={`${(progress / 100) * 163.4} 163.4`}
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold truncate">{training.avatarName}</p>
+                        <p className="text-[10px] text-muted-foreground">{progress}% complete</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Mind Games Lab Card */}
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Brain className="h-5 w-5 text-violet-400" />
+            Special Training
+          </h3>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Card
+              className="cursor-pointer hover:border-violet-500/50 transition-all"
+              onClick={() => setView("mind-games-lab")}
+            >
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center">
+                  <Brain className="h-6 w-6 text-violet-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold">Mind Games & Fallacy Lab</p>
+                  <p className="text-xs text-muted-foreground">
+                    {UNIVERSAL_MIND_GAMES.length} mind games, {UNIVERSAL_FALLACIES.length} fallacies, {DETECTION_EXERCISES.length}+ exercises
+                  </p>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </CardContent>
+            </Card>
+
+            <Card
+              className="cursor-pointer hover:border-amber-500/50 transition-all"
+              onClick={() => {
+                setSelectedCrossSubject(CROSS_AVATAR_SUBJECTS[0]?.id || null);
+                setView("cross-avatar");
+              }}
+            >
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold">Cross-Avatar Analysis</p>
+                  <p className="text-xs text-muted-foreground">
+                    See how {CROSS_AVATAR_SUBJECTS.length} key subjects are attacked from multiple worldviews
+                  </p>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── AVATAR PATH (6-phase timeline) ───────────────────────────────────────
+
+  const renderAvatarPath = () => {
+    if (!selectedTraining) return null;
+    const opponent = getOpponent(selectedTraining.avatarId);
+    const progress = getAvatarProgress(selectedTraining.avatarId);
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={navigateBack}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="flex items-center gap-3 flex-1">
+            {opponent?.avatar ? (
+              <img src={opponent.avatar} alt="" className={`w-12 h-12 rounded-full object-cover border-2 ${selectedTraining.color}`} />
+            ) : (
+              <div className={`w-12 h-12 rounded-full border-2 ${selectedTraining.color} flex items-center justify-center text-xl bg-muted`}>
+                {selectedTraining.emoji}
+              </div>
+            )}
+            <div>
+              <h2 className="text-xl font-bold">{selectedTraining.emoji} {selectedTraining.avatarName} Training</h2>
+              <div className="flex items-center gap-3 mt-1">
+                <Progress value={progress} className="h-2 w-32" />
+                <span className="text-xs text-muted-foreground">{progress}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 6-Phase Timeline */}
+        <div className="space-y-3">
+          {AATS_PHASES.map((phase, idx) => {
+            const PhaseIcon = getPhaseIcon(phase.icon);
+            const isLast = phase.number === 6;
+            return (
+              <motion.div
+                key={phase.number}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.08 }}
+              >
+                <Card
+                  className={`cursor-pointer hover:border-primary/50 transition-all ${
+                    isLast ? "border-orange-500/30 bg-orange-500/5" : ""
+                  }`}
+                  onClick={() => {
+                    if (isLast && onNavigateToDefense) {
+                      onNavigateToDefense();
+                    } else {
+                      setSelectedPhase(phase.number);
+                      setView("phase-content");
+                    }
+                  }}
+                >
+                  <CardContent className="p-4 flex items-center gap-4">
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      {/* Phase number circle */}
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
+                        isLast
+                          ? "bg-gradient-to-br from-orange-500 to-red-600 text-white"
+                          : "bg-primary/10 text-primary border border-primary/30"
+                      }`}>
+                        {phase.number}
+                      </div>
+                      {/* Connector line */}
+                      {idx < AATS_PHASES.length - 1 && (
+                        <div className="absolute ml-5 mt-14 w-0.5 h-6 bg-border hidden" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <PhaseIcon className={`h-4 w-4 ${isLast ? "text-orange-400" : "text-primary"}`} />
+                        <p className="font-semibold text-sm">{phase.title}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">{phase.description}</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Modules Quick Access */}
+        {selectedTraining.modules.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-amber-400" />
+              Subject Modules ({selectedTraining.modules.length})
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-2">
+              {selectedTraining.modules.map((mod) => (
+                <Card
+                  key={mod.id}
+                  className="cursor-pointer hover:border-primary/50 transition-all"
+                  onClick={() => {
+                    setSelectedModule(mod);
+                    setModuleStep(0);
+                    setView("module-viewer");
+                  }}
+                >
+                  <CardContent className="p-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs">
+                      <BookOpen className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{mod.title}</p>
+                      <p className="text-[10px] text-muted-foreground">8-step deep dive</p>
+                    </div>
+                    {isItemCompleted(selectedTraining.avatarId, mod.id) && (
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ─── PHASE CONTENT ────────────────────────────────────────────────────────
+
+  const renderPhaseContent = () => {
+    if (!selectedTraining || !selectedPhase) return null;
+    const phase = AATS_PHASES.find((p) => p.number === selectedPhase);
+    if (!phase) return null;
+    const PhaseIcon = getPhaseIcon(phase.icon);
+    const total = getTotalItems(selectedTraining);
+
+    const renderPhaseItems = () => {
+      switch (selectedPhase) {
+        case 1: // Know Their Doctrine — subjects
+          return selectedTraining.subjects.map((subject) => {
+            const itemId = `p1-subject-${subject.id}`;
+            const done = isItemCompleted(selectedTraining.avatarId, itemId);
+            return (
+              <Card key={subject.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <button
+                    className="w-full p-4 text-left flex items-start gap-3"
+                    onClick={() => toggleExpand(subject.id)}
+                  >
+                    <div className={`mt-0.5 ${done ? "text-green-500" : "text-muted-foreground"}`}>
+                      {done ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm">{subject.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{subject.description}</p>
+                    </div>
+                    {expandedItems.has(subject.id) ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </button>
+                  <AnimatePresence>
+                    {expandedItems.has(subject.id) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-4 pb-4 pt-0 space-y-3">
+                          <Separator />
+                          <p className="text-sm text-foreground/80">{subject.description}</p>
+                          {/* Find the matching module for deeper content */}
+                          {selectedTraining.modules.filter((m) => m.subjectId === subject.id).map((mod) => (
+                            <div key={mod.id} className="space-y-2">
+                              <p className="text-sm leading-relaxed">{mod.doctrineBrief}</p>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedModule(mod);
+                                  setModuleStep(0);
+                                  setView("module-viewer");
+                                }}
+                              >
+                                <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+                                Full 8-Step Module
+                              </Button>
+                            </div>
+                          ))}
+                          {!done && (
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMarkComplete(selectedTraining.avatarId, itemId, total);
+                              }}
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+                              Mark Complete
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            );
+          });
+
+        case 2: // Steelman Arguments
+          return selectedTraining.steelmanArguments.map((arg) => {
+            const itemId = `p2-steelman-${arg.id}`;
+            const done = isItemCompleted(selectedTraining.avatarId, itemId);
+            return (
+              <Card key={arg.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <button
+                    className="w-full p-4 text-left flex items-start gap-3"
+                    onClick={() => toggleExpand(arg.id)}
+                  >
+                    <div className={`mt-0.5 ${done ? "text-green-500" : "text-muted-foreground"}`}>
+                      {done ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm">"{arg.title}"</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{arg.argument}</p>
+                    </div>
+                    {expandedItems.has(arg.id) ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </button>
+                  <AnimatePresence>
+                    {expandedItems.has(arg.id) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-4 pb-4 pt-0 space-y-3">
+                          <Separator />
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Their Argument (Steelmanned)</p>
+                            <p className="text-sm">{arg.argument}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Hidden Assumptions</p>
+                            <ul className="space-y-1">
+                              {arg.hiddenAssumptions.map((a, i) => (
+                                <li key={i} className="text-sm flex items-start gap-2">
+                                  <Eye className="h-3.5 w-3.5 text-amber-400 mt-0.5 flex-shrink-0" />
+                                  {a}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">SDA Response</p>
+                            <p className="text-sm p-3 rounded-lg bg-primary/5 border border-primary/15">{arg.sdaResponse}</p>
+                          </div>
+                          {!done && (
+                            <Button size="sm" onClick={(e) => { e.stopPropagation(); handleMarkComplete(selectedTraining.avatarId, itemId, total); }}>
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Mark Complete
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            );
+          });
+
+        case 3: // Mind Games
+          return selectedTraining.mindGames.map((mg) => {
+            const itemId = `p3-mindgame-${mg.id}`;
+            const done = isItemCompleted(selectedTraining.avatarId, itemId);
+            return (
+              <Card key={mg.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <button className="w-full p-4 text-left flex items-start gap-3" onClick={() => toggleExpand(mg.id)}>
+                    <div className={`mt-0.5 ${done ? "text-green-500" : "text-muted-foreground"}`}>
+                      {done ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{mg.name}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{mg.description}</p>
+                    </div>
+                    {expandedItems.has(mg.id) ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                  </button>
+                  <AnimatePresence>
+                    {expandedItems.has(mg.id) && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="px-4 pb-4 pt-0 space-y-3">
+                          <Separator />
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Example</p>
+                            <p className="text-sm italic p-3 rounded-lg bg-violet-500/5 border border-violet-500/15">"{mg.example}"</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">How to Detect It</p>
+                            <p className="text-sm p-3 rounded-lg bg-amber-500/5 border border-amber-500/15">{mg.detectionTip}</p>
+                          </div>
+                          {!done && (
+                            <Button size="sm" onClick={(e) => { e.stopPropagation(); handleMarkComplete(selectedTraining.avatarId, itemId, total); }}>
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Mark Complete
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            );
+          });
+
+        case 4: // Fallacies
+          return selectedTraining.fallacies.map((f) => {
+            const itemId = `p4-fallacy-${f.id}`;
+            const done = isItemCompleted(selectedTraining.avatarId, itemId);
+            return (
+              <Card key={f.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <button className="w-full p-4 text-left flex items-start gap-3" onClick={() => toggleExpand(f.id)}>
+                    <div className={`mt-0.5 ${done ? "text-green-500" : "text-muted-foreground"}`}>
+                      {done ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{f.name}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{f.definition}</p>
+                    </div>
+                    {expandedItems.has(f.id) ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                  </button>
+                  <AnimatePresence>
+                    {expandedItems.has(f.id) && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="px-4 pb-4 pt-0 space-y-3">
+                          <Separator />
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Example</p>
+                            <p className="text-sm italic p-3 rounded-lg bg-red-500/5 border border-red-500/15">"{f.example}"</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Counter Move</p>
+                            <p className="text-sm p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/15">{f.counterMove}</p>
+                          </div>
+                          {!done && (
+                            <Button size="sm" onClick={(e) => { e.stopPropagation(); handleMarkComplete(selectedTraining.avatarId, itemId, total); }}>
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Mark Complete
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            );
+          });
+
+        case 5: // Counter Strategies
+          return selectedTraining.counterStrategies.map((cs) => {
+            const itemId = `p5-counter-${cs.subjectId}`;
+            const done = isItemCompleted(selectedTraining.avatarId, itemId);
+            return (
+              <Card key={cs.subjectId} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <button className="w-full p-4 text-left flex items-start gap-3" onClick={() => toggleExpand(cs.subjectId)}>
+                    <div className={`mt-0.5 ${done ? "text-green-500" : "text-muted-foreground"}`}>
+                      {done ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{cs.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{cs.sdaPosition}</p>
+                    </div>
+                    {expandedItems.has(cs.subjectId) ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                  </button>
+                  <AnimatePresence>
+                    {expandedItems.has(cs.subjectId) && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="px-4 pb-4 pt-0 space-y-3">
+                          <Separator />
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">SDA Position</p>
+                            <p className="text-sm">{cs.sdaPosition}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Key Scriptures</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {cs.keyScriptures.map((ref, i) => (
+                                <Badge key={i} variant="outline" className="text-xs border-emerald-500/30 text-emerald-400 bg-emerald-500/5">
+                                  {ref}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Counter Arguments</p>
+                            <ul className="space-y-1.5">
+                              {cs.counterArguments.map((ca, i) => (
+                                <li key={i} className="text-sm flex items-start gap-2">
+                                  <Swords className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
+                                  {ca}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div className="p-3 rounded-lg bg-primary/5 border border-primary/15">
+                            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Closing Statement</p>
+                            <p className="text-sm italic">{cs.closingStatement}</p>
+                          </div>
+                          {!done && (
+                            <Button size="sm" onClick={(e) => { e.stopPropagation(); handleMarkComplete(selectedTraining.avatarId, itemId, total); }}>
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Mark Complete
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            );
+          });
+
+        default:
+          return null;
+      }
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={navigateBack}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="flex items-center gap-2">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-primary/10 text-primary border border-primary/30`}>
+              {phase.number}
+            </div>
+            <PhaseIcon className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-bold">{phase.title}</h2>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground">{phase.description}</p>
+        <div className="space-y-2">{renderPhaseItems()}</div>
+      </div>
+    );
+  };
+
+  // ─── MODULE VIEWER (8-step walkthrough) ───────────────────────────────────
+
+  const MODULE_STEPS = [
+    { label: "Doctrine Brief", icon: BookOpen },
+    { label: "Steelman Arguments", icon: Shield },
+    { label: "Hidden Assumptions", icon: Eye },
+    { label: "Mind Games", icon: Brain },
+    { label: "Fallacies", icon: Zap },
+    { label: "Counter Strategy", icon: Swords },
+    { label: "Debate Simulation", icon: Flame },
+    { label: "Debrief", icon: Trophy },
+  ];
+
+  const renderModuleViewer = () => {
+    if (!selectedModule || !selectedTraining) return null;
+    const step = MODULE_STEPS[moduleStep];
+    const total = getTotalItems(selectedTraining);
+
+    const renderStepContent = () => {
+      const mod = selectedModule;
+      switch (moduleStep) {
+        case 0: // Doctrine Brief
+          return (
+            <div className="space-y-4">
+              <p className="text-sm leading-relaxed whitespace-pre-line">{mod.doctrineBrief}</p>
+            </div>
+          );
+
+        case 1: // Steelman Arguments
+          return (
+            <div className="space-y-3">
+              {mod.steelmanArguments.map((arg) => (
+                <Card key={arg.id} className="bg-muted/30">
+                  <CardContent className="p-4 space-y-2">
+                    <p className="font-semibold text-sm">"{arg.title}"</p>
+                    <p className="text-sm">{arg.argument}</p>
+                    <div>
+                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">SDA Response</p>
+                      <p className="text-sm text-primary/80">{arg.sdaResponse}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          );
+
+        case 2: // Hidden Assumptions
+          return (
+            <div className="space-y-2">
+              {mod.hiddenAssumptions.map((a, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/15">
+                  <Eye className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm">{a}</p>
+                </div>
+              ))}
+            </div>
+          );
+
+        case 3: // Mind Games
+          return (
+            <div className="space-y-3">
+              {mod.mindGames.map((mg) => (
+                <Card key={mg.id} className="bg-violet-500/5 border-violet-500/15">
+                  <CardContent className="p-4 space-y-2">
+                    <p className="font-semibold text-sm flex items-center gap-2">
+                      <Brain className="h-4 w-4 text-violet-400" /> {mg.name}
+                    </p>
+                    <p className="text-sm">{mg.description}</p>
+                    <p className="text-sm italic text-muted-foreground">Example: "{mg.example}"</p>
+                    <p className="text-sm text-amber-400">Tip: {mg.detectionTip}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          );
+
+        case 4: // Fallacies
+          return (
+            <div className="space-y-3">
+              {mod.fallacies.map((f) => (
+                <Card key={f.id} className="bg-red-500/5 border-red-500/15">
+                  <CardContent className="p-4 space-y-2">
+                    <p className="font-semibold text-sm flex items-center gap-2">
+                      <Zap className="h-4 w-4 text-red-400" /> {f.name}
+                    </p>
+                    <p className="text-sm">{f.definition}</p>
+                    <p className="text-sm italic text-muted-foreground">Example: "{f.example}"</p>
+                    <p className="text-sm text-emerald-400">Counter: {f.counterMove}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          );
+
+        case 5: // Counter Strategy
+          return (
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">SDA Position</p>
+                <p className="text-sm">{mod.counterStrategy.sdaPosition}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Key Scriptures</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {mod.counterStrategy.keyScriptures.map((ref, i) => (
+                    <Badge key={i} variant="outline" className="text-xs border-emerald-500/30 text-emerald-400 bg-emerald-500/5">{ref}</Badge>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Counter Arguments</p>
+                <ul className="space-y-1.5">
+                  {mod.counterStrategy.counterArguments.map((ca, i) => (
+                    <li key={i} className="text-sm flex items-start gap-2">
+                      <Swords className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" /> {ca}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="p-3 rounded-lg bg-primary/5 border border-primary/15">
+                <p className="text-xs font-semibold text-muted-foreground mb-1">Closing Statement</p>
+                <p className="text-sm italic">{mod.counterStrategy.closingStatement}</p>
+              </div>
+            </div>
+          );
+
+        case 6: // Debate Simulation
+          return (
+            <div className="text-center space-y-4 py-6">
+              <Flame className="h-12 w-12 text-orange-500 mx-auto" />
+              <h3 className="text-lg font-bold">Ready for Battle?</h3>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                You've studied the doctrine, steelmanned the arguments, detected mind games, exposed fallacies, and mastered counter strategies.
+                Time to put your training to the test.
+              </p>
+              {onNavigateToDefense ? (
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
+                  onClick={onNavigateToDefense}
+                >
+                  <Swords className="h-5 w-5 mr-2" />
+                  Enter Defense Mode — Spar with {selectedTraining.avatarName}
+                </Button>
+              ) : (
+                <p className="text-sm text-muted-foreground">Navigate to the Defense tab to begin sparring.</p>
+              )}
+            </div>
+          );
+
+        case 7: // Debrief
+          return (
+            <div className="space-y-4">
+              <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 to-amber-500/5 border border-primary/15">
+                <p className="text-xs font-semibold uppercase text-muted-foreground mb-2">Debrief Reflection</p>
+                <p className="text-sm leading-relaxed">{mod.debriefPrompt}</p>
+              </div>
+              <Button
+                onClick={() => handleMarkComplete(selectedTraining.avatarId, mod.id, total)}
+                disabled={isItemCompleted(selectedTraining.avatarId, mod.id)}
+              >
+                {isItemCompleted(selectedTraining.avatarId, mod.id) ? (
+                  <><CheckCircle2 className="h-4 w-4 mr-2" /> Module Completed</>
+                ) : (
+                  <><Trophy className="h-4 w-4 mr-2" /> Complete This Module</>
+                )}
+              </Button>
+            </div>
+          );
+
+        default:
+          return null;
+      }
+    };
+
+    return (
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={navigateBack}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h2 className="text-lg font-bold flex-1 truncate">{selectedModule.title}</h2>
+        </div>
+
+        {/* Step Indicator */}
+        <div className="flex gap-1 overflow-x-auto pb-2">
+          {MODULE_STEPS.map((s, i) => {
+            const StepIcon = s.icon;
+            return (
+              <button
+                key={i}
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs whitespace-nowrap transition-all ${
+                  i === moduleStep
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : i < moduleStep
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground"
+                }`}
+                onClick={() => setModuleStep(i)}
+              >
+                <StepIcon className="h-3 w-3" />
+                <span className="hidden sm:inline">{s.label}</span>
+                <span className="sm:hidden">{i + 1}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Step Content */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              {(() => { const StepIcon = step.icon; return <StepIcon className="h-5 w-5 text-primary" />; })()}
+              Step {moduleStep + 1}: {step.label}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>{renderStepContent()}</CardContent>
+        </Card>
+
+        {/* Navigation */}
+        <div className="flex justify-between">
+          <Button
+            variant="outline"
+            disabled={moduleStep === 0}
+            onClick={() => setModuleStep((s) => s - 1)}
+          >
+            <ArrowLeft className="h-4 w-4 mr-1.5" /> Previous
+          </Button>
+          <Button
+            disabled={moduleStep === MODULE_STEPS.length - 1}
+            onClick={() => setModuleStep((s) => s + 1)}
+          >
+            Next <ArrowRight className="h-4 w-4 ml-1.5" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── CROSS-AVATAR VIEW ────────────────────────────────────────────────────
+
+  const renderCrossAvatar = () => {
+    const subjects = CROSS_AVATAR_SUBJECTS;
+    const current = subjects.find((s) => s.id === selectedCrossSubject);
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={navigateBack}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h2 className="text-xl font-bold">Cross-Avatar Analysis</h2>
+        </div>
+
+        {/* Subject selector */}
+        <div className="flex flex-wrap gap-2">
+          {subjects.map((s) => (
+            <Badge
+              key={s.id}
+              variant={s.id === selectedCrossSubject ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => setSelectedCrossSubject(s.id)}
+            >
+              {s.title} ({s.avatarIds.length})
+            </Badge>
+          ))}
+        </div>
+
+        {/* Content for selected subject */}
+        {current && (
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">{current.title} — Attacked from {current.avatarIds.length} Worldviews</h3>
+            {current.avatarIds.map((avatarId) => {
+              const training = getAvatarTraining(avatarId);
+              const opponent = getOpponent(avatarId);
+              // Find steelman arguments related to this cross-subject
+              const relatedArgs = training.steelmanArguments.slice(0, 2);
+              const relatedCounter = training.counterStrategies[0];
+
+              return (
+                <Card key={avatarId} className="overflow-hidden">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      {opponent?.avatar ? (
+                        <img src={opponent.avatar} alt="" className={`w-10 h-10 rounded-full object-cover border-2 ${training.color}`} />
+                      ) : (
+                        <div className={`w-10 h-10 rounded-full border-2 ${training.color} flex items-center justify-center bg-muted`}>
+                          {training.emoji}
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-semibold text-sm">{training.avatarName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {training.subjects.length} subjects, {training.steelmanArguments.length} arguments
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="ml-auto"
+                        onClick={() => {
+                          setSelectedAvatarId(avatarId);
+                          setView("avatar-path");
+                        }}
+                      >
+                        Train <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                      </Button>
+                    </div>
+
+                    {/* Sample attacks */}
+                    {relatedArgs.length > 0 && (
+                      <div className="space-y-1.5">
+                        <p className="text-xs font-semibold text-muted-foreground">Sample Attacks:</p>
+                        {relatedArgs.map((arg) => (
+                          <p key={arg.id} className="text-xs p-2 rounded bg-red-500/5 border border-red-500/10">
+                            "{arg.title}"
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ─── MIND GAMES LAB ───────────────────────────────────────────────────────
+
+  const renderMindGamesLab = () => {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={navigateBack}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Brain className="h-6 w-6 text-violet-400" /> Mind Games & Fallacy Detection Lab
+            </h2>
+            <p className="text-sm text-muted-foreground">Universal tactics and exercises across all worldviews</p>
+          </div>
+        </div>
+
+        {/* Mind Games */}
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Brain className="h-5 w-5 text-violet-400" /> Universal Mind Games ({UNIVERSAL_MIND_GAMES.length})
+          </h3>
+          <div className="space-y-2">
+            {UNIVERSAL_MIND_GAMES.map((mg) => (
+              <Card key={mg.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <button className="w-full p-3 text-left flex items-start gap-3" onClick={() => toggleExpand(`lab-mg-${mg.id}`)}>
+                    <Brain className="h-4 w-4 text-violet-400 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{mg.name}</p>
+                      <p className="text-xs text-muted-foreground">{mg.description}</p>
+                    </div>
+                    {expandedItems.has(`lab-mg-${mg.id}`) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </button>
+                  <AnimatePresence>
+                    {expandedItems.has(`lab-mg-${mg.id}`) && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="px-3 pb-3 space-y-2">
+                          <p className="text-xs italic p-2 rounded bg-violet-500/5 border border-violet-500/10">"{mg.example}"</p>
+                          <p className="text-xs p-2 rounded bg-amber-500/5 border border-amber-500/10">Detection: {mg.detectionTip}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Fallacies */}
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Zap className="h-5 w-5 text-red-400" /> Universal Fallacies ({UNIVERSAL_FALLACIES.length})
+          </h3>
+          <div className="space-y-2">
+            {UNIVERSAL_FALLACIES.map((f) => (
+              <Card key={f.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <button className="w-full p-3 text-left flex items-start gap-3" onClick={() => toggleExpand(`lab-f-${f.id}`)}>
+                    <Zap className="h-4 w-4 text-red-400 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{f.name}</p>
+                      <p className="text-xs text-muted-foreground">{f.definition}</p>
+                    </div>
+                    {expandedItems.has(`lab-f-${f.id}`) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </button>
+                  <AnimatePresence>
+                    {expandedItems.has(`lab-f-${f.id}`) && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="px-3 pb-3 space-y-2">
+                          <p className="text-xs italic p-2 rounded bg-red-500/5 border border-red-500/10">"{f.example}"</p>
+                          <p className="text-xs p-2 rounded bg-emerald-500/5 border border-emerald-500/10">Counter: {f.counterMove}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Detection Exercises */}
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <HelpCircle className="h-5 w-5 text-amber-400" /> Detection Exercises ({DETECTION_EXERCISES.length})
+          </h3>
+          <div className="space-y-3">
+            {DETECTION_EXERCISES.map((ex, idx) => {
+              const revealed = revealedExercises.has(ex.id);
+              return (
+                <Card key={ex.id} className="overflow-hidden">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-start gap-2">
+                      <Badge variant="secondary" className="text-[10px] flex-shrink-0">#{idx + 1}</Badge>
+                      <p className="text-sm">{ex.scenario}</p>
+                    </div>
+                    <p className="text-sm font-semibold text-primary">{ex.question}</p>
+
+                    {!revealed ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setRevealedExercises((prev) => new Set([...prev, ex.id]))}
+                      >
+                        <Eye className="h-3.5 w-3.5 mr-1.5" /> Reveal Answer
+                      </Button>
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-2"
+                      >
+                        <div className="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/15">
+                          <p className="text-xs font-semibold text-emerald-400 mb-1">Answer: {ex.correctAnswer}</p>
+                          <p className="text-sm">{ex.explanation}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── MAIN RENDER ──────────────────────────────────────────────────────────
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={view}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+        >
+          {view === "overview" && renderOverview()}
+          {view === "avatar-path" && renderAvatarPath()}
+          {view === "phase-content" && renderPhaseContent()}
+          {view === "module-viewer" && renderModuleViewer()}
+          {view === "cross-avatar" && renderCrossAvatar()}
+          {view === "mind-games-lab" && renderMindGamesLab()}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
