@@ -583,14 +583,15 @@ export function FortyDayChallenge() {
     return hasFinalSection && endsCleanly;
   };
 
-  // Fetch Jeeves recap — streamed for long analyses
+  // Fetch Jeeves recap — fire-and-forget + polling pattern
   const fetchJeevesRecap = async (session: any) => {
     setIsRecapLoading(true);
-    setJeevesRecap(""); // Clear any previous recap
+    setJeevesRecap("⏳ Generating your full forensic tactical analysis... This may take 1-2 minutes for a thorough breakdown.");
     try {
       const opponent = DEFENSE_OPPONENTS.find(o => o.id === session.opponent_id);
       const dName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Defender";
       
+      // Step 1: Kick off analysis (returns immediately)
       const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/forty-day-debate`, {
         method: "POST",
         headers: {
@@ -603,6 +604,7 @@ export function FortyDayChallenge() {
           opponentName: opponent?.name || session.opponent_name,
           topicName: session.topic_name,
           defenderName: dName,
+          sessionId: session.id,
         }),
       });
 
@@ -612,66 +614,63 @@ export function FortyDayChallenge() {
         throw new Error(`Analysis failed (${resp.status})`);
       }
 
-      if (!resp.body) throw new Error("No response stream");
+      const result = await resp.json();
+      
+      // If already ready (cached), show it immediately
+      if (result.status === "ready" && result.analysis) {
+        setJeevesRecap(result.analysis);
+        return;
+      }
 
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let fullContent = "";
-      let textBuffer = "";
+      // Step 2: Poll for completion
+      const pollAnalysisId = result.analysisId;
+      if (!pollAnalysisId) throw new Error("No analysis ID returned");
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        textBuffer += decoder.decode(value, { stream: true });
-
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
-
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (line.startsWith(":") || line.trim() === "") continue;
-          if (!line.startsWith("data: ")) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") break;
-
+      let attempts = 0;
+      const maxAttempts = 40; // 40 * 5s = 200s max wait
+      
+      const poll = async (): Promise<string | null> => {
+        while (attempts < maxAttempts) {
+          attempts++;
+          await new Promise(r => setTimeout(r, 5000)); // Poll every 5 seconds
+          
           try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              fullContent += content;
-              setJeevesRecap(fullContent);
+            const statusResp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/forty-day-debate`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+              },
+              body: JSON.stringify({
+                action: "recap-status",
+                analysisId: pollAnalysisId,
+              }),
+            });
+
+            if (!statusResp.ok) continue;
+            const statusResult = await statusResp.json();
+            
+            if (statusResult.status === "ready" && statusResult.analysis) {
+              return statusResult.analysis;
             }
-          } catch {
-            // Partial JSON, put it back
-            textBuffer = line + "\n" + textBuffer;
-            break;
+            if (statusResult.status === "error") {
+              throw new Error(statusResult.error || "Analysis generation failed");
+            }
+            
+            // Still processing — update the loading message
+            setJeevesRecap(`⏳ Generating your full forensic tactical analysis... (${attempts * 5}s elapsed). Jeeves is meticulously reviewing every argument.`);
+          } catch (pollErr) {
+            console.warn("Poll error (retrying):", pollErr);
           }
         }
-      }
+        return null;
+      };
 
-      // Final flush
-      if (textBuffer.trim()) {
-        for (let raw of textBuffer.split("\n")) {
-          if (!raw) continue;
-          if (raw.endsWith("\r")) raw = raw.slice(0, -1);
-          if (!raw.startsWith("data: ")) continue;
-          const jsonStr = raw.slice(6).trim();
-          if (jsonStr === "[DONE]") continue;
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              fullContent += content;
-              setJeevesRecap(fullContent);
-            }
-          } catch { /* ignore */ }
-        }
-      }
-
-      if (!fullContent) {
-        throw new Error("Empty response from analysis. Please try again.");
+      const analysis = await poll();
+      if (analysis) {
+        setJeevesRecap(analysis);
+      } else {
+        throw new Error("Analysis timed out. Please try again.");
       }
     } catch (err: any) {
       console.error("Jeeves recap error:", err);
@@ -679,6 +678,7 @@ export function FortyDayChallenge() {
       if (!msg.includes("402") && !msg.includes("429")) {
         toast.error(msg);
       }
+      setJeevesRecap(null);
     } finally {
       setIsRecapLoading(false);
     }

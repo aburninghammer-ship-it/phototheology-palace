@@ -3649,6 +3649,39 @@ export type Database = {
         }
         Relationships: []
       }
+      debate_analyses: {
+        Row: {
+          analysis_text: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          session_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          analysis_text?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          session_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          analysis_text?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          session_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       debate_challenge_badges: {
         Row: {
           badge_description: string | null
