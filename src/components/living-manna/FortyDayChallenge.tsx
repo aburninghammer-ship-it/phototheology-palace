@@ -6,6 +6,7 @@ import {
   Shield, Swords, Send, Loader2, Trophy, Flame, Calendar,
   ChevronRight, ArrowLeft, Star, Lock, CheckCircle2, XCircle,
   Target, Zap, Crown, Award, RotateCcw, MessageSquare, Eye,
+  ScrollText, Unlock,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,7 +33,15 @@ interface ChatMessage {
   content: string;
 }
 
-type Phase = "overview" | "enroll" | "daily-map" | "debating" | "verdict" | "review";
+interface TurnAnalysis {
+  id: string;
+  turn_index: number;
+  turn_role: string;
+  status: string;
+  analysis_text: string | null;
+}
+
+type Phase = "overview" | "enroll" | "daily-map" | "debating" | "verdict" | "review" | "debrief";
 
 export function FortyDayChallenge() {
   const { user } = useAuth();
@@ -60,6 +69,11 @@ export function FortyDayChallenge() {
   const [reviewSession, setReviewSession] = useState<any>(null);
   const [jeevesRecap, setJeevesRecap] = useState<string | null>(null);
   const [isRecapLoading, setIsRecapLoading] = useState(false);
+
+  // Sealed envelope state — tracks which turns have been analyzed
+  const [sealedTurns, setSealedTurns] = useState<Set<number>>(new Set());
+  const [turnAnalyses, setTurnAnalyses] = useState<TurnAnalysis[]>([]);
+  const [expandedTurnAnalysis, setExpandedTurnAnalysis] = useState<number | null>(null);
 
   // Load enrollment data
   useEffect(() => {
@@ -132,13 +146,11 @@ export function FortyDayChallenge() {
     }
   };
 
-  // Check if today's debate window is open (6am–midnight local time)
   const isDebateWindowOpen = (): boolean => {
     const now = new Date();
-    return now.getHours() >= 6; // 6am to midnight
+    return now.getHours() >= 6;
   };
 
-  // Get time until 6am (next debate window opens)
   const getTimeUntil6am = (): string => {
     const now = new Date();
     const sixAm = new Date(now);
@@ -152,24 +164,19 @@ export function FortyDayChallenge() {
     return `${hours}h ${mins}m`;
   };
 
-  // Check if a debate has expired (past midnight LOCAL time on the day it was started)
   const isDebateExpired = (session: any): boolean => {
     if (!session || session.completed_at) return false;
-    // Use session_date (YYYY-MM-DD) if available, otherwise fall back to created_at
-    // Build midnight in local time from the date string to avoid UTC conversion issues
     if (session.session_date) {
       const [year, month, day] = session.session_date.split('-').map(Number);
-      const midnight = new Date(year, month - 1, day + 1, 0, 0, 0); // midnight = start of next day local
+      const midnight = new Date(year, month - 1, day + 1, 0, 0, 0);
       return new Date() >= midnight;
     }
-    // Fallback: use today's midnight (debate is valid for the rest of today)
     const now = new Date();
     const midnight = new Date(now);
     midnight.setHours(24, 0, 0, 0);
-    return now >= midnight; // always false — keeps debate open until midnight
+    return now >= midnight;
   };
 
-  // Get time remaining until midnight
   const getTimeUntilMidnight = (): string => {
     const now = new Date();
     const midnight = new Date(now);
@@ -180,7 +187,6 @@ export function FortyDayChallenge() {
     return `${hours}h ${mins}m`;
   };
 
-  // Show "Smoke is ready" notification at 6am
   const [smokeAlertShown, setSmokeAlertShown] = useState(false);
   useEffect(() => {
     if (!enrollment || smokeAlertShown) return;
@@ -200,7 +206,6 @@ export function FortyDayChallenge() {
     }
   }, [enrollment, sessions, schedule, smokeAlertShown]);
 
-  // Auto-expire any in-progress sessions past midnight
   useEffect(() => {
     if (!sessions.length) return;
     const expireSessions = async () => {
@@ -210,9 +215,9 @@ export function FortyDayChallenge() {
             .from("debate_challenge_sessions")
             .update({
               completed_at: new Date().toISOString(),
-              outcome: "loss", // expired debates count as a loss (valid CHECK constraint value)
+              outcome: "loss",
               ai_verdict: "Debate expired at midnight. Try to complete your next debate within the day!",
-              xp_earned: 25, // partial XP for starting
+              xp_earned: 25,
             })
             .eq("id", s.id);
         }
@@ -220,6 +225,45 @@ export function FortyDayChallenge() {
     };
     expireSessions();
   }, [sessions]);
+
+  // ─── FIRE BACKGROUND JEEVES TURN ANALYSIS ─────────────────
+  const triggerTurnAnalysis = useCallback(async (
+    sessionId: string,
+    turnIndex: number,
+    turnRole: "opponent" | "defender",
+    allMsgs: ChatMessage[],
+    opponentName: string,
+    topicName: string,
+  ) => {
+    try {
+      const dName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Defender";
+      
+      const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/forty-day-debate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          action: "analyze-turn",
+          sessionId,
+          turnIndex,
+          turnRole,
+          allMessages: allMsgs,
+          opponentName,
+          topicName,
+          defenderName: dName,
+        }),
+      });
+
+      if (resp.ok) {
+        // Mark turn as sealed
+        setSealedTurns(prev => new Set(prev).add(turnIndex));
+      }
+    } catch (err) {
+      console.warn("Turn analysis trigger failed (non-blocking):", err);
+    }
+  }, [user]);
 
   const startDayDebate = async (dayNumber: number) => {
     if (!enrollment || !user) return;
@@ -233,16 +277,13 @@ export function FortyDayChallenge() {
       return;
     }
 
-    // Block debates before 6am
     if (!isDebateWindowOpen()) {
       toast.error("Today's Smoke drops at 6:00 AM. Come back then!");
       return;
     }
 
-    // Check if session already exists
     const existing = sessions.find(s => s.day_number === dayNumber);
     
-    // If completed or expired, don't allow restart
     if (existing?.completed_at) {
       toast.info("You've already completed this day's debate!");
       return;
@@ -255,9 +296,10 @@ export function FortyDayChallenge() {
     setIsAiLoading(true);
     setMessages([]);
     setVerdict(null);
+    setSealedTurns(new Set());
+    setTurnAnalyses([]);
 
     try {
-      // Create or get session
       let session = existing;
       if (!session) {
         const { data, error } = await supabase
@@ -280,15 +322,18 @@ export function FortyDayChallenge() {
 
       setCurrentSession(session);
 
-      // Load existing messages if resuming (only if there are actual messages)
       if (session.messages && Array.isArray(session.messages) && (session.messages as any[]).length > 0) {
-        setMessages(session.messages as ChatMessage[]);
+        const existingMsgs = session.messages as ChatMessage[];
+        setMessages(existingMsgs);
         setPhase("debating");
         setIsAiLoading(false);
+        // Restore sealed state for existing messages
+        const sealed = new Set<number>();
+        existingMsgs.forEach((_, i) => sealed.add(i));
+        setSealedTurns(sealed);
         return;
       }
 
-      // Get AI opening
       const { data: aiData, error: aiError } = await supabase.functions.invoke("forty-day-debate", {
         body: {
           action: "open",
@@ -307,11 +352,13 @@ export function FortyDayChallenge() {
       setMessages([opening]);
       setPhase("debating");
 
-      // Save opening to session
       await supabase
         .from("debate_challenge_sessions")
         .update({ messages: [opening] as unknown as any })
         .eq("id", session.id);
+
+      // 🔥 Fire Jeeves analysis on the opening attack
+      triggerTurnAnalysis(session.id, 0, "opponent", [opening], opponent.name, topic.name);
 
     } catch (err: any) {
       console.error("Debate start error:", err);
@@ -334,6 +381,13 @@ export function FortyDayChallenge() {
     setUserInput("");
     setIsAiLoading(true);
 
+    // 🔥 Fire Jeeves analysis on the user's defense
+    const defenderTurnIndex = newMessages.length - 1;
+    triggerTurnAnalysis(
+      currentSession.id, defenderTurnIndex, "defender",
+      newMessages, opponent.name, topic.name,
+    );
+
     try {
       const { data, error } = await supabase.functions.invoke("forty-day-debate", {
         body: {
@@ -355,7 +409,6 @@ export function FortyDayChallenge() {
       const updatedMessages = [...newMessages, aiReply];
       setMessages(updatedMessages);
 
-      // Save messages
       await supabase
         .from("debate_challenge_sessions")
         .update({
@@ -364,15 +417,19 @@ export function FortyDayChallenge() {
         })
         .eq("id", currentSession.id);
 
-      // Check if opponent conceded — automatic victory
+      // 🔥 Fire Jeeves analysis on opponent's new attack
+      const opponentTurnIndex = updatedMessages.length - 1;
+      triggerTurnAnalysis(
+        currentSession.id, opponentTurnIndex, "opponent",
+        updatedMessages, opponent.name, topic.name,
+      );
+
       if (data.conceded) {
         toast.success("🏆 Your opponent conceded! Victory is yours!");
-        // Auto-end with a win
         setTimeout(() => endDebateWithConcession(updatedMessages), 1500);
         return;
       }
 
-      // Auto-coach for beginners after opponent responds
       if (enrollment.difficulty === "beginner") {
         fetchJeevesCoaching(updatedMessages, opponent.name, topic.name);
       }
@@ -401,7 +458,6 @@ export function FortyDayChallenge() {
 
       if (error) throw error;
 
-      // Force win outcome since opponent conceded
       const verdictData = { ...data, outcome: "win", xp: Math.max(data.xp || 150, 150) };
       if (!verdictData.badge) {
         verdictData.badge = { type: "concession_victory", name: "Smoke Screen", icon: "💨", description: "Forced your opponent to concede" };
@@ -511,7 +567,6 @@ export function FortyDayChallenge() {
       if (error) throw error;
       setVerdict(data);
 
-      // Update session
       await supabase
         .from("debate_challenge_sessions")
         .update({
@@ -524,7 +579,6 @@ export function FortyDayChallenge() {
         })
         .eq("id", currentSession.id);
 
-      // Update enrollment
       const today = new Date().toISOString().split("T")[0];
       const newStreak = enrollment.last_activity_date === today ? enrollment.streak : 
         (daysSince(enrollment.last_activity_date) <= 2 ? enrollment.streak + 1 : 1);
@@ -543,7 +597,6 @@ export function FortyDayChallenge() {
         })
         .eq("id", enrollment.id);
 
-      // Save badge if earned
       if (data.badge && user) {
         await supabase.from("debate_challenge_badges").insert({
           user_id: user.id,
@@ -556,7 +609,6 @@ export function FortyDayChallenge() {
       }
 
       setPhase("verdict");
-      // Reload data
       loadData();
 
     } catch (err: any) {
@@ -566,7 +618,29 @@ export function FortyDayChallenge() {
     }
   };
 
-  // Open a completed debate for review
+  // Load sealed turn analyses for a session (for debrief)
+  const loadTurnAnalyses = async (sessionId: string) => {
+    try {
+      const { data } = await supabase
+        .from("debate_turn_analyses")
+        .select("*")
+        .eq("session_id", sessionId)
+        .order("turn_index");
+      setTurnAnalyses((data as TurnAnalysis[]) || []);
+    } catch (err) {
+      console.error("Failed to load turn analyses:", err);
+    }
+  };
+
+  // Open the Tactical Debrief page
+  const openDebrief = (session: any) => {
+    setReviewSession(session);
+    setMessages((session.messages as ChatMessage[]) || []);
+    setExpandedTurnAnalysis(null);
+    loadTurnAnalyses(session.id);
+    setPhase("debrief");
+  };
+
   const reviewDebate = (session: any) => {
     setReviewSession(session);
     setMessages((session.messages as ChatMessage[]) || []);
@@ -574,17 +648,14 @@ export function FortyDayChallenge() {
     setPhase("review");
   };
 
-  // Check if recap contains the final section marker indicating completeness
   const isRecapComplete = (text: string): boolean => {
     const finalMarkers = ["Study Assignment", "## 📚", "## 9.", "🏆 Final Verdict"];
     const hasFinalSection = finalMarkers.some(marker => text.includes(marker));
-    // Must have at least one final marker AND not end abruptly mid-sentence
     const lastLine = text.trim().split("\n").pop() || "";
     const endsCleanly = lastLine.endsWith(".") || lastLine.endsWith(")") || lastLine.endsWith('"') || lastLine.endsWith("*") || lastLine.endsWith("|") || lastLine.endsWith("---");
     return hasFinalSection && endsCleanly;
   };
 
-  // Fetch Jeeves recap — fire-and-forget + polling pattern
   const fetchJeevesRecap = async (session: any, forceRegenerate = false) => {
     setIsRecapLoading(true);
     setJeevesRecap("⏳ Generating your full forensic tactical analysis... This may take 1-2 minutes for a thorough breakdown.");
@@ -592,7 +663,6 @@ export function FortyDayChallenge() {
       const opponent = DEFENSE_OPPONENTS.find(o => o.id === session.opponent_id);
       const dName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Defender";
 
-      // Step 1: Kick off analysis (returns immediately)
       const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/forty-day-debate`, {
         method: "POST",
         headers: {
@@ -618,23 +688,21 @@ export function FortyDayChallenge() {
 
       const result = await resp.json();
       
-      // If already ready (cached), show it immediately
       if (result.status === "ready" && result.analysis) {
         setJeevesRecap(result.analysis);
         return;
       }
 
-      // Step 2: Poll for completion
       const pollAnalysisId = result.analysisId;
       if (!pollAnalysisId) throw new Error("No analysis ID returned");
 
       let attempts = 0;
-      const maxAttempts = 40; // 40 * 5s = 200s max wait
+      const maxAttempts = 40;
       
       const poll = async (): Promise<string | null> => {
         while (attempts < maxAttempts) {
           attempts++;
-          await new Promise(r => setTimeout(r, 5000)); // Poll every 5 seconds
+          await new Promise(r => setTimeout(r, 5000));
           
           try {
             const statusResp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/forty-day-debate`, {
@@ -659,7 +727,6 @@ export function FortyDayChallenge() {
               throw new Error(statusResult.error || "Analysis generation failed");
             }
             
-            // Still processing — update the loading message
             setJeevesRecap(`⏳ Generating your full forensic tactical analysis... (${attempts * 5}s elapsed). Jeeves is meticulously reviewing every argument.`);
           } catch (pollErr) {
             console.warn("Poll error (retrying):", pollErr);
@@ -736,7 +803,6 @@ export function FortyDayChallenge() {
                 </div>
               </div>
 
-              {/* Difficulty selection */}
               <div className="pt-4 space-y-3">
                 <p className="text-sm font-semibold text-foreground">Choose Your Level</p>
                 <div className="grid grid-cols-3 gap-2">
@@ -789,7 +855,6 @@ export function FortyDayChallenge() {
 
     return (
       <div className="space-y-4 max-w-2xl mx-auto">
-        {/* Stats Header */}
         <Card className="border-primary/30">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-3">
@@ -818,7 +883,6 @@ export function FortyDayChallenge() {
           </CardContent>
         </Card>
 
-        {/* Badges */}
         {badges.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {badges.map(b => (
@@ -830,7 +894,6 @@ export function FortyDayChallenge() {
           </div>
         )}
 
-        {/* Pre-6am waiting state */}
         {!windowOpen && !completedDays.includes(todayNumber) && (
           <Card className="border-muted-foreground/20 bg-muted/10">
             <CardContent className="p-4 text-center">
@@ -844,7 +907,6 @@ export function FortyDayChallenge() {
           </Card>
         )}
 
-        {/* Today's Challenge CTA */}
         {canDebateToday && (
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
             <Card className="border-red-500/40 bg-gradient-to-r from-red-950/30 to-amber-950/30">
@@ -880,7 +942,6 @@ export function FortyDayChallenge() {
           </motion.div>
         )}
 
-        {/* 40-Day Grid */}
         <Card>
           <CardContent className="p-4">
             <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
@@ -949,6 +1010,7 @@ export function FortyDayChallenge() {
   if (phase === "debating" && currentSession) {
     const opponent = DEFENSE_OPPONENTS.find(o => o.id === currentSession.opponent_id);
     const defenderRounds = messages.filter(m => m.role === "defender").length;
+    const sealedCount = sealedTurns.size;
 
     return (
       <div className="flex flex-col h-[calc(100vh-200px)] max-w-2xl mx-auto">
@@ -977,18 +1039,27 @@ export function FortyDayChallenge() {
               </p>
             </div>
           </div>
-          {defenderRounds >= 1 && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={endDebate}
-              disabled={isAiLoading}
-              className="text-xs"
-            >
-              <Target className="h-3 w-3 mr-1" />
-              End & Judge
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {/* Sealed scroll counter */}
+            {sealedCount > 0 && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-purple-500/10 border border-purple-500/20">
+                <ScrollText className="h-3 w-3 text-purple-400" />
+                <span className="text-[10px] font-bold text-purple-300">{sealedCount} sealed</span>
+              </div>
+            )}
+            {defenderRounds >= 1 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={endDebate}
+                disabled={isAiLoading}
+                className="text-xs"
+              >
+                <Target className="h-3 w-3 mr-1" />
+                End & Judge
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Chat Area */}
@@ -1000,34 +1071,51 @@ export function FortyDayChallenge() {
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${msg.role === "defender" ? "justify-end" : "justify-start"}`}
                 >
-                  <div className={`max-w-[85%] rounded-lg p-3 text-sm ${
-                    msg.role === "defender"
-                      ? "bg-primary/20 border border-primary/30"
-                      : "bg-red-500/10 border border-red-500/20"
-                  }`}>
-                    <div className="flex items-center gap-1.5 mb-1">
-                      {msg.role === "opponent" ? (
-                        <>
-                          {opponent?.avatar ? (
-                            <img src={opponent.avatar} alt="" className="h-5 w-5 rounded-full object-cover border border-red-500/40" />
-                          ) : (
-                            <span className="text-xs">{opponent?.emoji || "👤"}</span>
-                          )}
-                          <span className="text-[10px] font-bold text-red-300">{opponent?.name || "Opponent"}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Shield className="h-3 w-3 text-primary" />
-                          <span className="text-[10px] font-bold text-primary">You</span>
-                        </>
-                      )}
-                    </div>
-                    <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  <div className={`flex ${msg.role === "defender" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[85%] rounded-lg p-3 text-sm ${
+                      msg.role === "defender"
+                        ? "bg-primary/20 border border-primary/30"
+                        : "bg-red-500/10 border border-red-500/20"
+                    }`}>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        {msg.role === "opponent" ? (
+                          <>
+                            {opponent?.avatar ? (
+                              <img src={opponent.avatar} alt="" className="h-5 w-5 rounded-full object-cover border border-red-500/40" />
+                            ) : (
+                              <span className="text-xs">{opponent?.emoji || "👤"}</span>
+                            )}
+                            <span className="text-[10px] font-bold text-red-300">{opponent?.name || "Opponent"}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="h-3 w-3 text-primary" />
+                            <span className="text-[10px] font-bold text-primary">You</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
                     </div>
                   </div>
+                  {/* Sealed Envelope Badge */}
+                  {sealedTurns.has(i) && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.5 }}
+                      className={`flex ${msg.role === "defender" ? "justify-end" : "justify-start"} mt-1`}
+                    >
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/25">
+                        <ScrollText className="h-3 w-3 text-purple-400" />
+                        <span className="text-[9px] font-medium text-purple-300">
+                          📜 Jeeves has analyzed this — sealed until debrief
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -1067,7 +1155,6 @@ export function FortyDayChallenge() {
 
         {/* Input */}
         <div className="p-3 border-t border-border">
-          {/* Jeeves Ask Button for Intermediate */}
           {enrollment?.difficulty === "intermediate" && !showJeevesPanel && messages.length >= 2 && (
             <div className="mb-2 flex gap-2">
               <input
@@ -1192,30 +1279,17 @@ export function FortyDayChallenge() {
                 </div>
               )}
 
-              {/* Jeeves Debrief on Verdict Screen */}
-              {jeevesRecap ? (
-                <div className="text-left bg-purple-500/5 rounded-lg p-4 border border-purple-500/20">
-                  <p className="text-xs font-bold text-purple-300 mb-2 flex items-center gap-1">
-                    <Crown className="h-3 w-3" /> Jeeves's Debrief — How to Overcome
-                  </p>
-                  <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
-                    <ReactMarkdown>{jeevesRecap}</ReactMarkdown>
-                  </div>
-                </div>
-              ) : currentSession ? (
+              {/* Sealed Scrolls CTA */}
+              {currentSession && (
                 <Button
-                  onClick={() => fetchJeevesRecap(currentSession)}
-                  disabled={isRecapLoading}
-                  variant="outline"
-                  className="w-full mt-2 border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
+                  onClick={() => openDebrief(currentSession)}
+                  className="w-full mt-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold"
+                  size="lg"
                 >
-                  {isRecapLoading ? (
-                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Jeeves is preparing the debrief...</>
-                  ) : (
-                    <><Crown className="h-4 w-4 mr-2" /> Show Jeeves's Debrief</>
-                  )}
+                  <Unlock className="h-5 w-5 mr-2" />
+                  Unseal Jeeves's Tactical Debrief
                 </Button>
-              ) : null}
+              )}
 
               <Button
                 onClick={() => {
@@ -1242,14 +1316,248 @@ export function FortyDayChallenge() {
     );
   }
 
-  // ─── REVIEW ──────────────────────────────────────────────
+  // ─── TACTICAL DEBRIEF (Sealed Scrolls Revealed) ──────────
+  if (phase === "debrief" && reviewSession) {
+    const opponent = DEFENSE_OPPONENTS.find(o => o.id === reviewSession.opponent_id);
+    const reviewMessages = (reviewSession.messages as ChatMessage[]) || [];
+    const analysesReady = turnAnalyses.filter(a => a.status === "ready").length;
+    const totalTurns = reviewMessages.length;
+
+    return (
+      <div className="flex flex-col h-[calc(100vh-200px)] max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-3 border-b border-border">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => { setPhase("daily-map"); setReviewSession(null); setTurnAnalyses([]); }}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="h-8 w-8 rounded-full flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, hsl(270 80% 60%), hsl(200 80% 55%))" }}>
+              <Crown className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-bold" style={{ color: "hsl(270 80% 80%)" }}>
+                Tactical Debrief — Day {reviewSession.day_number}
+              </p>
+              <p className="text-[10px] text-muted-foreground">
+                {opponent?.name || reviewSession.opponent_name} • {reviewSession.topic_name} • {analysesReady}/{totalTurns} analyses
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Full Tactical Analysis Button */}
+        <div className="p-3 border-b border-border">
+          {jeevesRecap ? (
+            <div className="relative text-left rounded-xl p-[1px] overflow-hidden"
+              style={{ background: "linear-gradient(135deg, hsl(270 80% 60% / 0.6), hsl(200 90% 50% / 0.4), hsl(330 80% 55% / 0.4))" }}>
+              <div className="rounded-xl p-4 backdrop-blur-xl"
+                style={{ background: "linear-gradient(135deg, hsl(270 50% 15% / 0.85), hsl(220 40% 12% / 0.9))" }}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Crown className="h-4 w-4" style={{ color: "hsl(270 80% 75%)" }} />
+                    <p className="text-xs font-bold" style={{ color: "hsl(270 80% 80%)" }}>
+                      Full Tactical Analysis
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => fetchJeevesRecap(reviewSession, true)}
+                    disabled={isRecapLoading}
+                    className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium transition-colors hover:bg-white/10 disabled:opacity-40"
+                    style={{ color: "hsl(200 60% 70%)" }}
+                  >
+                    {isRecapLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <RotateCcw className="h-3 w-3" />}
+                    Regenerate
+                  </button>
+                </div>
+                <ScrollArea className="max-h-[70vh]">
+                  <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed
+                    [&_h2]:text-[13px] [&_h2]:font-bold [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:pb-1 [&_h2]:border-b [&_h2]:border-purple-500/20
+                    [&_h3]:text-[11px] [&_h3]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1
+                    [&_strong]:font-semibold
+                    [&_ul]:space-y-1 [&_li]:leading-relaxed"
+                    style={{ color: "hsl(220 20% 85%)" }}>
+                    <ReactMarkdown>{jeevesRecap}</ReactMarkdown>
+                  </div>
+                </ScrollArea>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => fetchJeevesRecap(reviewSession)}
+              disabled={isRecapLoading}
+              className="w-full relative rounded-xl p-[1px] overflow-hidden group disabled:opacity-60"
+              style={{ background: "linear-gradient(135deg, hsl(270 80% 60% / 0.5), hsl(200 90% 50% / 0.3), hsl(330 80% 55% / 0.3))" }}
+            >
+              <div className="rounded-xl px-4 py-3 flex items-center justify-center gap-2 transition-all group-hover:brightness-125"
+                style={{ background: "linear-gradient(135deg, hsl(270 50% 18% / 0.9), hsl(220 40% 14% / 0.95))" }}>
+                {isRecapLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" style={{ color: "hsl(270 80% 75%)" }} />
+                    <span className="text-sm font-medium" style={{ color: "hsl(270 80% 80%)" }}>Generating full analysis...</span>
+                  </>
+                ) : (
+                  <>
+                    <Crown className="h-5 w-5" style={{ color: "hsl(270 80% 75%)" }} />
+                    <span className="text-sm font-medium" style={{ color: "hsl(270 80% 80%)" }}>Generate Full Tactical Analysis</span>
+                  </>
+                )}
+              </div>
+            </button>
+          )}
+        </div>
+
+        {/* Debate Transcript with Unsealed Per-Turn Analyses */}
+        <ScrollArea className="flex-1 p-3">
+          <div className="space-y-4">
+            {reviewMessages.map((msg, i) => {
+              const turnAnalysis = turnAnalyses.find(a => a.turn_index === i);
+              const isExpanded = expandedTurnAnalysis === i;
+
+              return (
+                <div key={i}>
+                  {/* Message bubble */}
+                  <div className={`flex ${msg.role === "defender" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[85%] rounded-lg p-3 text-sm ${
+                      msg.role === "defender"
+                        ? "bg-primary/20 border border-primary/30"
+                        : "bg-red-500/10 border border-red-500/20"
+                    }`}>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        {msg.role === "opponent" ? (
+                          <>
+                            {opponent?.avatar ? (
+                              <img src={opponent.avatar} alt="" className="h-5 w-5 rounded-full object-cover border border-red-500/40" />
+                            ) : (
+                              <span className="text-xs">{opponent?.emoji || "👤"}</span>
+                            )}
+                            <span className="text-[10px] font-bold text-red-300">{opponent?.name || "Opponent"}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="h-3 w-3 text-primary" />
+                            <span className="text-[10px] font-bold text-primary">You</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Unsealed Analysis Card */}
+                  {turnAnalysis?.status === "ready" && turnAnalysis.analysis_text && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`mt-2 ${msg.role === "defender" ? "ml-4" : "mr-4"}`}
+                    >
+                      <button
+                        onClick={() => setExpandedTurnAnalysis(isExpanded ? null : i)}
+                        className={`w-full text-left rounded-lg p-[1px] overflow-hidden transition-all ${
+                          msg.role === "opponent"
+                            ? "bg-gradient-to-r from-red-500/30 to-purple-500/30"
+                            : "bg-gradient-to-r from-blue-500/30 to-purple-500/30"
+                        }`}
+                      >
+                        <div className={`rounded-lg px-3 py-2 ${
+                          msg.role === "opponent"
+                            ? "bg-red-950/60"
+                            : "bg-blue-950/60"
+                        }`}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Unlock className="h-3 w-3 text-purple-400" />
+                              <span className="text-[10px] font-bold text-purple-300">
+                                {msg.role === "opponent" ? "🔍 Jeeves's Attack Breakdown" : "📋 Jeeves's Defense Evaluation"}
+                              </span>
+                            </div>
+                            <ChevronRight className={`h-3 w-3 text-purple-400 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                          </div>
+                        </div>
+                      </button>
+
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <div className={`mt-1 rounded-lg p-3 border ${
+                              msg.role === "opponent"
+                                ? "bg-red-950/30 border-red-500/20"
+                                : "bg-blue-950/30 border-blue-500/20"
+                            }`}>
+                              <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed
+                                [&_h2]:text-[12px] [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-1
+                                [&_h3]:text-[11px] [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1
+                                [&_strong]:font-semibold [&_ul]:space-y-0.5"
+                                style={{ color: "hsl(220 20% 85%)" }}>
+                                <ReactMarkdown>{turnAnalysis.analysis_text}</ReactMarkdown>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  )}
+
+                  {/* Still processing indicator */}
+                  {turnAnalysis?.status === "processing" && (
+                    <div className={`mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-purple-500/5 border border-purple-500/15 ${msg.role === "defender" ? "ml-4" : "mr-4"}`}>
+                      <Loader2 className="h-3 w-3 animate-spin text-purple-400" />
+                      <span className="text-[9px] text-purple-300">Jeeves is still analyzing this turn...</span>
+                    </div>
+                  )}
+
+                  {/* No analysis available */}
+                  {!turnAnalysis && (
+                    <div className={`mt-1 flex items-center gap-1.5 px-2 ${msg.role === "defender" ? "ml-4" : "mr-4"}`}>
+                      <span className="text-[9px] text-muted-foreground/50">No real-time analysis for this turn</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Verdict Summary */}
+            {reviewSession.ai_verdict && (
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-4">
+                <p className="text-xs font-bold text-blue-300 mb-1 flex items-center gap-1">
+                  <MessageSquare className="h-3 w-3" /> Jeeves's Verdict
+                </p>
+                <p className="text-xs text-muted-foreground">{reviewSession.ai_verdict}</p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        {/* Footer */}
+        <div className="p-3 border-t border-border flex gap-2">
+          <Button onClick={() => { setPhase("daily-map"); setReviewSession(null); setTurnAnalyses([]); }} className="flex-1">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Map
+          </Button>
+          <Button onClick={() => reviewDebate(reviewSession)} variant="outline" className="flex-1">
+            <Eye className="h-4 w-4 mr-2" />
+            Simple Review
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── REVIEW (legacy simple view) ─────────────────────────
   if (phase === "review" && reviewSession) {
     const opponent = DEFENSE_OPPONENTS.find(o => o.id === reviewSession.opponent_id);
     const reviewMessages = (reviewSession.messages as ChatMessage[]) || [];
 
     return (
       <div className="flex flex-col h-[calc(100vh-200px)] max-w-2xl mx-auto">
-        {/* Header */}
         <div className="flex items-center justify-between p-3 border-b border-border">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => { setPhase("daily-map"); setReviewSession(null); setJeevesRecap(null); }}>
@@ -1270,6 +1578,17 @@ export function FortyDayChallenge() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Debrief CTA */}
+        <div className="p-3 border-b border-border">
+          <Button
+            onClick={() => openDebrief(reviewSession)}
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold"
+          >
+            <Unlock className="h-4 w-4 mr-2" />
+            Open Tactical Debrief (Sealed Analyses)
+          </Button>
         </div>
 
         {/* Jeeves Tactical Analysis - Glassmorphism style */}
@@ -1382,7 +1701,6 @@ export function FortyDayChallenge() {
               </div>
             ))}
 
-            {/* Verdict Summary */}
             {reviewSession.ai_verdict && (
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-4">
                 <p className="text-xs font-bold text-blue-300 mb-1 flex items-center gap-1">
@@ -1391,37 +1709,9 @@ export function FortyDayChallenge() {
                 <p className="text-xs text-muted-foreground">{reviewSession.ai_verdict}</p>
               </div>
             )}
-
-            {/* Jeeves Recap — How to Overcome */}
-            {jeevesRecap ? (
-              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4 mt-4">
-                <p className="text-xs font-bold text-purple-300 mb-2 flex items-center gap-1">
-                  <Crown className="h-3 w-3" /> Jeeves's Teaching Recap — How to Overcome
-                </p>
-                <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
-                  <ReactMarkdown>{jeevesRecap}</ReactMarkdown>
-                </div>
-              </div>
-            ) : (
-              <div className="mt-4">
-                <Button
-                  onClick={() => fetchJeevesRecap(reviewSession)}
-                  disabled={isRecapLoading}
-                  variant="outline"
-                  className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
-                >
-                  {isRecapLoading ? (
-                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Jeeves is preparing the recap...</>
-                  ) : (
-                    <><Crown className="h-4 w-4 mr-2" /> Show Jeeves's Teaching Recap</>
-                  )}
-                </Button>
-              </div>
-            )}
           </div>
         </ScrollArea>
 
-        {/* Footer */}
         <div className="p-3 border-t border-border">
           <Button onClick={() => { setPhase("daily-map"); setReviewSession(null); setJeevesRecap(null); }} className="w-full">
             <ArrowLeft className="h-4 w-4 mr-2" />

@@ -12,14 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName, partialResponse, sessionId, analysisId, forceRegenerate } = await req.json();
+    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName, partialResponse, sessionId, analysisId, forceRegenerate, turnIndex, turnRole, turnContent, allMessages } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     if (action === "open") {
       const systemPrompt = buildSystemPrompt(opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty);
-      // Vary the opening angle so repeated matchups feel fresh
       const angles = [
         "Open with a historical/scholarly challenge",
         "Open with a philosophical or logical challenge",
@@ -54,8 +53,6 @@ serve(async (req) => {
       ];
 
       const response = await callAI(LOVABLE_API_KEY, chatMessages);
-      
-      // Check if the opponent conceded
       const conceded = detectConcession(response);
 
       return new Response(JSON.stringify({ response, conceded }), {
@@ -63,17 +60,8 @@ serve(async (req) => {
       });
     }
 
-    if (action === "recap") {
-      // Fire-and-forget: create DB record, kick off AI in background, return immediately
-      const conversationSummary = messages.map((m: any) =>
-        `[${m.role === 'opponent' ? opponentName : 'Defender'}]: ${m.content}`
-      ).join('\n\n');
-
-      const dName = defenderName || "Defender";
-      const shouldForceRegen = forceRegenerate === true;
-      // sessionId comes from destructured body above
-
-      // Build the Supabase service client
+    // ─── REAL-TIME TURN ANALYSIS (fire-and-forget) ────────────
+    if (action === "analyze-turn") {
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const sbAdmin = createClient(supabaseUrl, supabaseServiceKey);
@@ -86,9 +74,176 @@ serve(async (req) => {
         const supabaseAnon = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") || token);
         const { data: { user } } = await supabaseAnon.auth.getUser(token);
         userId = user?.id || null;
+      } catch { /* fallback */ }
+
+      const finalUserId = userId || "00000000-0000-0000-0000-000000000000";
+
+      // Check if already exists
+      const { data: existing } = await sbAdmin
+        .from("debate_turn_analyses")
+        .select("id, status")
+        .eq("session_id", sessionId)
+        .eq("turn_index", turnIndex)
+        .maybeSingle();
+
+      if (existing?.status === "ready") {
+        return new Response(JSON.stringify({ status: "ready", id: existing.id }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (existing?.status === "processing") {
+        return new Response(JSON.stringify({ status: "processing", id: existing.id }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Create record
+      const { data: record, error: insertErr } = await sbAdmin
+        .from("debate_turn_analyses")
+        .insert({
+          session_id: sessionId,
+          user_id: finalUserId,
+          turn_index: turnIndex,
+          turn_role: turnRole,
+          status: "processing",
+        })
+        .select("id")
+        .single();
+
+      if (insertErr || !record) {
+        console.error("Failed to create turn analysis record:", insertErr);
+        throw new Error("Failed to start turn analysis");
+      }
+
+      const dName = defenderName || "Defender";
+
+      // Build context from all messages up to this turn
+      const contextMessages = (allMessages || []).slice(0, turnIndex + 1);
+      const conversationSummary = contextMessages.map((m: any, i: number) =>
+        `[Turn ${i} - ${m.role === 'opponent' ? opponentName : dName}]: ${m.content}`
+      ).join('\n\n');
+
+      // Build the appropriate prompt based on turn role
+      let systemPrompt: string;
+      let userPrompt: string;
+
+      if (turnRole === "opponent") {
+        systemPrompt = `You are Jeeves, the Phototheology Palace's chief theological strategist. You are performing a REAL-TIME silent analysis of an opponent's argument in a debate between ${dName} (SDA Defender) and "${opponentName}" (Critic) on "${topicName}".
+
+Your analysis will be SEALED and hidden from ${dName} during the debate, then revealed afterward. Be thorough and strategic.
+
+CRITICAL: Write as if coaching ${dName} after the fact. Address ${dName} by name. Never use "my dear" or similar.`;
+
+        userPrompt = `Here is the debate so far:
+
+${conversationSummary}
+
+Analyze the opponent's argument at Turn ${turnIndex} in detail:
+
+## 🔍 Attack Breakdown
+- **Core Claim:** What exactly is ${opponentName} arguing? (2-3 sentences)
+- **Tactic Used:** (Strawman / Proof-texting / Appeal to Emotion / Red Herring / Ad Hominem / False Dilemma / Equivocation / Appeal to Authority / Genetic Fallacy / Category Error / etc.) — explain WHY this label applies
+- **Hidden Assumption:** What are they assuming without proving? Expose the unspoken premise
+- **Strength Rating:** [1-10] — how persuasive this sounds to an uninformed listener
+
+## 🛡️ How to Beat This
+- **Refutation Strategy:** 3-5 sentences explaining the logical and scriptural counter
+- **Scripture Weapons:** 2-3 KJV verses with full text that directly dismantle this argument
+- **Palace Room Connection:** Which Phototheology Palace room/principle applies here
+- **One-Liner Kill Shot:** A single devastating sentence ${dName} could use to expose this argument
+
+## ⚠️ Fallacy Alert
+If any logical fallacy is present, name it, quote where it occurs, and give a one-sentence exposure line.
+
+Keep the analysis focused and actionable — this is a tactical briefing, not a lecture.`;
+      } else {
+        // Defender turn analysis
+        systemPrompt = `You are Jeeves, the Phototheology Palace's chief theological strategist. You are performing a REAL-TIME silent evaluation of ${dName}'s defense in a debate against "${opponentName}" on "${topicName}".
+
+Your evaluation will be SEALED and hidden during the debate, then revealed afterward. Be honest but encouraging.
+
+CRITICAL: Address ${dName} by name. Never use "my dear" or similar.`;
+
+        userPrompt = `Here is the debate so far:
+
+${conversationSummary}
+
+Evaluate ${dName}'s response at Turn ${turnIndex}:
+
+## 📋 Defense Assessment
+- **What Worked:** 2-3 sentences on strengths — quote their best lines if applicable
+- **What Missed:** 2-3 sentences on gaps, missed opportunities, or weak framing
+- **Score:** [1-10] with brief justification
+
+## 📖 Missed Opportunities
+- **Unused Scripture:** Verses ${dName} should have deployed but didn't (with full KJV text)
+- **Stronger Angle:** An alternative framing that would have been more effective
+- **Palace Room Tip:** Which Phototheology principle would have strengthened this response
+
+## 💡 Coaching Note
+One sentence of tactical advice for the next exchange.
+
+Keep it concise and actionable.`;
+      }
+
+      // Fire-and-forget background generation
+      const backgroundPromise = (async () => {
+        try {
+          console.log(`[TurnAnalysis ${record.id}] Starting for turn ${turnIndex} (${turnRole})...`);
+          const analysis = await callAI(LOVABLE_API_KEY, [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ], "google/gemini-2.5-flash", 4096);
+
+          await sbAdmin.from("debate_turn_analyses").update({
+            status: "ready",
+            analysis_text: analysis,
+            completed_at: new Date().toISOString(),
+          }).eq("id", record.id);
+          console.log(`[TurnAnalysis ${record.id}] Complete: ${analysis.length} chars`);
+        } catch (err) {
+          console.error(`[TurnAnalysis ${record.id}] Error:`, err);
+          await sbAdmin.from("debate_turn_analyses").update({
+            status: "error",
+            error_message: err instanceof Error ? err.message : "Unknown error",
+            completed_at: new Date().toISOString(),
+          }).eq("id", record.id);
+        }
+      })();
+
+      // @ts-ignore - EdgeRuntime is available in Supabase Edge Functions
+      if (typeof EdgeRuntime !== "undefined" && EdgeRuntime.waitUntil) {
+        // @ts-ignore
+        EdgeRuntime.waitUntil(backgroundPromise);
+      }
+
+      return new Response(JSON.stringify({ status: "processing", id: record.id }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "recap") {
+      // Fire-and-forget: create DB record, kick off AI in background, return immediately
+      const conversationSummary = messages.map((m: any) =>
+        `[${m.role === 'opponent' ? opponentName : 'Defender'}]: ${m.content}`
+      ).join('\n\n');
+
+      const dName = defenderName || "Defender";
+      const shouldForceRegen = forceRegenerate === true;
+
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const sbAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+      const authHeader = req.headers.get("Authorization") || "";
+      const token = authHeader.replace("Bearer ", "");
+      let userId: string | null = null;
+      try {
+        const supabaseAnon = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") || token);
+        const { data: { user } } = await supabaseAnon.auth.getUser(token);
+        userId = user?.id || null;
       } catch { /* fallback below */ }
 
-      // Check for existing analysis for this session
       const debateSessionId = sessionId || crypto.randomUUID();
 
       if (userId && !shouldForceRegen) {
@@ -111,20 +266,17 @@ serve(async (req) => {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
-        // If existing analysis is truncated/incomplete, delete it so we regenerate
         if (existing?.status === "ready" && existing.analysis_text && !isAnalysisComplete(existing.analysis_text)) {
           console.log(`[Analysis ${existing.id}] Cached analysis is truncated — deleting for regeneration`);
           await sbAdmin.from("debate_analyses").delete().eq("id", existing.id);
         }
       } else if (userId && shouldForceRegen) {
-        // Delete all existing analyses for this session to force fresh generation
         await sbAdmin.from("debate_analyses").delete()
           .eq("session_id", debateSessionId)
           .eq("user_id", userId);
         console.log(`[Force regen] Cleared existing analyses for session ${debateSessionId}`);
       }
 
-      // Create a pending record
       const finalUserId = userId || "00000000-0000-0000-0000-000000000000";
       const { data: record, error: insertErr } = await sbAdmin
         .from("debate_analyses")
@@ -139,14 +291,12 @@ serve(async (req) => {
 
       const recAnalysisId = record.id;
 
-      // Fire-and-forget: generate the analysis in the background
       const recapSystem = buildRecapSystemPrompt(dName, opponentName);
       const recapUser = `Here is the full debate transcript between ${dName} (Defender) and "${opponentName}" (Critic) on the topic of "${topicName}":\n\n${conversationSummary}\n\nProduce the Tactical Analysis now. Number every argument ${opponentName} made and address each one individually.`;
 
-      // Use EdgeRuntime.waitUntil to keep the worker alive for background generation
       const backgroundPromise = generateAnalysisInBackground(LOVABLE_API_KEY, recapSystem, recapUser, recAnalysisId, sbAdmin);
       
-      // @ts-ignore - EdgeRuntime is available in Supabase Edge Functions
+      // @ts-ignore
       if (typeof EdgeRuntime !== "undefined" && EdgeRuntime.waitUntil) {
         // @ts-ignore
         EdgeRuntime.waitUntil(backgroundPromise);
@@ -158,8 +308,6 @@ serve(async (req) => {
     }
 
     if (action === "recap-status") {
-      // Poll for analysis completion — analysisId from destructured body
-      
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const sbAdmin = createClient(supabaseUrl, supabaseServiceKey);
@@ -186,14 +334,12 @@ serve(async (req) => {
     }
 
     if (action === "recap-continue") {
-      // Legacy — no longer needed but keep for compatibility
       return new Response(JSON.stringify({ response: "Please use the new analysis system." }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     if (action === "jeeves-coach") {
-      // Jeeves coaching mode — helps the defender mid-debate
       const coachPrompt = buildJeevesCoachPrompt(messages, opponentName, topicName, userMessage, difficulty);
       const response = await callAI(LOVABLE_API_KEY, [
         { role: "system", content: coachPrompt.system },
@@ -278,27 +424,13 @@ XP Guide: 50-80 (loss), 80-120 (draw), 120-200 (win). Bonus for scripture densit
   }
 });
 
-/**
- * Detect if the opponent's response contains a concession
- */
 function detectConcession(response: string): boolean {
   const concessionPhrases = [
-    "i concede",
-    "you make a fair point",
-    "i must admit you're right",
-    "i cannot refute",
-    "i have no counter",
-    "you've convinced me",
-    "i yield",
-    "i stand corrected",
-    "i'll concede that",
-    "i must concede",
-    "you win this point",
-    "i have to agree",
-    "i can't argue with that",
-    "touché",
-    "well played, i concede",
-    "i withdraw my objection",
+    "i concede", "you make a fair point", "i must admit you're right",
+    "i cannot refute", "i have no counter", "you've convinced me",
+    "i yield", "i stand corrected", "i'll concede that", "i must concede",
+    "you win this point", "i have to agree", "i can't argue with that",
+    "touché", "well played, i concede", "i withdraw my objection",
     "your argument is stronger",
   ];
   const lower = response.toLowerCase();
@@ -394,7 +526,6 @@ async function callAI(apiKey: string, messages: any[], model?: string, maxTokens
   const finishReason = data.choices?.[0]?.finish_reason;
   const content = data.choices[0].message.content;
 
-  // Return both content and truncation status so callers can handle continuation
   if (finishReason === "length") {
     console.warn(`[callAI] Response truncated (finish_reason=length). Model: ${body.model}`);
   }
@@ -467,7 +598,6 @@ CRITICAL RULES:
 function isAnalysisComplete(text: string): boolean {
   const hasScorecard = /Scorecard/i.test(text) && /Overall Strength/i.test(text);
   const hasVerdict = /Verdict/i.test(text) && /Next Steps/i.test(text);
-  // Must have both scorecard AND verdict, and not end mid-sentence
   const lastLine = text.trim().split("\n").pop() || "";
   const endsCleanly = lastLine.endsWith(".") || lastLine.endsWith(")") || lastLine.endsWith('"') || lastLine.endsWith("*") || lastLine.endsWith("|") || lastLine.endsWith("---");
   return hasScorecard && hasVerdict && endsCleanly;
@@ -526,7 +656,6 @@ async function generateAnalysisInBackground(
 
     console.log(`[Analysis ${analysisId}] Initial generation: ${content.length} chars, finish_reason: ${finishReason}`);
 
-    // Continuation loop: if truncated or missing key sections, request continuation
     const wasTruncated = finishReason === "length" || !isAnalysisComplete(content);
     if (wasTruncated && content.length > 200) {
       for (let attempt = 0; attempt < 2; attempt++) {

@@ -3854,6 +3854,45 @@ export type Database = {
           },
         ]
       }
+      debate_turn_analyses: {
+        Row: {
+          analysis_text: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          session_id: string
+          status: string
+          turn_index: number
+          turn_role: string
+          user_id: string
+        }
+        Insert: {
+          analysis_text?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          session_id: string
+          status?: string
+          turn_index: number
+          turn_role: string
+          user_id: string
+        }
+        Update: {
+          analysis_text?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          session_id?: string
+          status?: string
+          turn_index?: number
+          turn_role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       deck_studies: {
         Row: {
           cards_used: Json
