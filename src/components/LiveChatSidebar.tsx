@@ -7,9 +7,21 @@ import { useLiveChat } from '@/contexts/LiveChatContext';
 import { PublicChatMessage } from '@/hooks/usePublicChat';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Users, Sparkles, Reply, X } from 'lucide-react';
+import { MessageSquare, Users, Sparkles, Reply, X, Trash2, MessageSquareText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { LiveChatThreadPanel } from '@/components/LiveChatThreadPanel';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const QUICK_REACTIONS = ['❤️', '🙏', '🔥', '👏', '💎', '✝️'];
 
@@ -28,10 +40,16 @@ function MessageBubble({
   message,
   isOwn,
   onReply,
+  onOpenThread,
+  onDelete,
+  threadCount,
 }: {
   message: PublicChatMessage;
   isOwn: boolean;
   onReply: (msg: PublicChatMessage) => void;
+  onOpenThread: (msg: PublicChatMessage) => void;
+  onDelete: (id: string) => void;
+  threadCount: number;
 }) {
   const [showReactions, setShowReactions] = useState(false);
   const initials = (message.sender?.display_name || '?')
@@ -40,6 +58,8 @@ function MessageBubble({
     .join('')
     .slice(0, 2)
     .toUpperCase();
+
+  const isDeleted = (message as any).is_deleted;
 
   return (
     <motion.div
@@ -68,26 +88,18 @@ function MessageBubble({
           </span>
         </div>
 
-        {/* Reply preview */}
-        {message.reply_to && (
-          <div className="rounded-lg border-l-2 border-primary/50 bg-primary/5 px-2.5 py-1.5 text-xs text-muted-foreground">
-            <span className="font-semibold text-primary/70">
-              {message.reply_to.sender.display_name}:
-            </span>{' '}
-            {message.reply_to.content.slice(0, 80)}
-          </div>
-        )}
-
         {/* Message bubble */}
         <div
           className={`relative rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${
-            isOwn
+            isDeleted
+              ? 'bg-muted/40 italic text-muted-foreground'
+              : isOwn
               ? 'bg-gradient-to-br from-primary to-primary/85 text-primary-foreground rounded-br-md'
               : 'bg-muted/70 backdrop-blur-sm rounded-bl-md'
           }`}
         >
-          {message.content}
-          {message.images && message.images.length > 0 && (
+          {isDeleted ? 'This message was deleted' : message.content}
+          {!isDeleted && message.images && message.images.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {message.images.map((img, i) => (
                 <img key={i} src={img} alt="" className="max-h-44 rounded-xl shadow-md" />
@@ -96,9 +108,20 @@ function MessageBubble({
           )}
         </div>
 
+        {/* Thread indicator */}
+        {threadCount > 0 && (
+          <button
+            onClick={() => onOpenThread(message)}
+            className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
+          >
+            <MessageSquareText className="h-3 w-3" />
+            {threadCount} {threadCount === 1 ? 'reply' : 'replies'}
+          </button>
+        )}
+
         {/* Quick reaction bar */}
         <AnimatePresence>
-          {showReactions && (
+          {showReactions && !isDeleted && (
             <motion.div
               initial={{ opacity: 0, y: -4, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -118,14 +141,40 @@ function MessageBubble({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => onReply(message)}
+                    onClick={() => onOpenThread(message)}
                     className="ml-1 p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <Reply className="h-3.5 w-3.5" />
+                    <MessageSquareText className="h-3.5 w-3.5" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="text-xs">Reply</TooltipContent>
+                <TooltipContent side="top" className="text-xs">Thread</TooltipContent>
               </Tooltip>
+              {isOwn && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="ml-0.5 p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete message?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This message will be removed for everyone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => onDelete(message.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -145,15 +194,19 @@ export function LiveChatSidebar() {
     sendMessage,
     updateTypingIndicator,
     markRoomAsRead,
+    deleteMessage,
+    getThreadMessages,
   } = useLiveChat();
 
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [replyTo, setReplyTo] = useState<PublicChatMessage | null>(null);
+  const [threadParent, setThreadParent] = useState<PublicChatMessage | null>(null);
 
   // Auto-scroll on new messages
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (!threadParent) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, threadParent]);
 
   // Mark as read when opening
   useEffect(() => {
@@ -165,15 +218,15 @@ export function LiveChatSidebar() {
   if (!user) return null;
 
   const handleSend = (content: string, images?: string[]) => {
-    sendMessage(content, images, replyTo?.id || null);
-    setReplyTo(null);
+    sendMessage(content, images, null);
   };
 
   const handleTyping = () => {
     updateTypingIndicator(true);
   };
 
-  const onlineCount = typingUsers.length + 1; // simplified
+  // Only show top-level messages (no reply_to_id)
+  const topLevelMessages = messages.filter(m => !m.reply_to_id);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -205,96 +258,88 @@ export function LiveChatSidebar() {
           </div>
         </SheetHeader>
 
-        {/* Messages */}
-        <ScrollArea className="flex-1">
-          <div className="flex flex-col gap-4 p-4">
-            {messages.length === 0 && (
+        {/* Main content area - relative for thread panel overlay */}
+        <div className="relative flex-1 flex flex-col overflow-hidden">
+          {/* Messages */}
+          <ScrollArea className="flex-1">
+            <div className="flex flex-col gap-4 p-4">
+              {topLevelMessages.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col items-center justify-center py-16 text-center"
+                >
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-accent/15">
+                    <MessageSquare className="h-8 w-8 text-primary/50" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    No messages yet
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground/60">
+                    Start the conversation! 💬
+                  </p>
+                </motion.div>
+              )}
+              {topLevelMessages.map(msg => (
+                <MessageBubble
+                  key={msg.id}
+                  message={msg}
+                  isOwn={msg.sender_id === user.id}
+                  onReply={() => {}}
+                  onOpenThread={setThreadParent}
+                  onDelete={deleteMessage}
+                  threadCount={getThreadMessages(msg.id).length}
+                />
+              ))}
+              <div ref={bottomRef} />
+            </div>
+          </ScrollArea>
+
+          {/* Typing indicator */}
+          <AnimatePresence>
+            {typingUsers.length > 0 && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-16 text-center"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="px-5 py-1.5 text-xs text-muted-foreground flex items-center gap-2"
               >
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-accent/15">
-                  <MessageSquare className="h-8 w-8 text-primary/50" />
-                </div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  No messages yet
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground/60">
-                  Start the conversation! 💬
-                </p>
+                <span className="flex gap-0.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+                </span>
+                <span className="italic">
+                  {typingUsers.map(u => u.display_name).join(', ')}{' '}
+                  {typingUsers.length === 1 ? 'is' : 'are'} typing
+                </span>
               </motion.div>
             )}
-            {messages.map(msg => (
-              <MessageBubble
-                key={msg.id}
-                message={msg}
-                isOwn={msg.sender_id === user.id}
-                onReply={setReplyTo}
-              />
-            ))}
-            <div ref={bottomRef} />
+          </AnimatePresence>
+
+          {/* Input */}
+          <div className="border-t border-border/30 bg-muted/20 p-3" onKeyDown={handleTyping}>
+            <ChatInput
+              onSend={handleSend}
+              placeholder="Say something... ✨"
+            />
           </div>
-        </ScrollArea>
 
-        {/* Typing indicator */}
-        <AnimatePresence>
-          {typingUsers.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="px-5 py-1.5 text-xs text-muted-foreground flex items-center gap-2"
-            >
-              <span className="flex gap-0.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }} />
-              </span>
-              <span className="italic">
-                {typingUsers.map(u => u.display_name).join(', ')}{' '}
-                {typingUsers.length === 1 ? 'is' : 'are'} typing
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Reply preview */}
-        <AnimatePresence>
-          {replyTo && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              className="flex items-center gap-3 border-t border-primary/20 bg-primary/5 px-4 py-2.5"
-            >
-              <Reply className="h-4 w-4 text-primary/60 shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-primary/70">
-                  {replyTo.sender?.display_name}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {replyTo.content.slice(0, 60)}
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 shrink-0"
-                onClick={() => setReplyTo(null)}
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Input */}
-        <div className="border-t border-border/30 bg-muted/20 p-3" onKeyDown={handleTyping}>
-          <ChatInput
-            onSend={handleSend}
-            placeholder="Say something... ✨"
-          />
+          {/* Thread panel overlay */}
+          <AnimatePresence>
+            {threadParent && (
+              <LiveChatThreadPanel
+                parentMessage={threadParent}
+                threadMessages={getThreadMessages(threadParent.id)}
+                currentUserId={user.id}
+                onClose={() => setThreadParent(null)}
+                onSendReply={(content, parentId) => {
+                  sendMessage(content, undefined, parentId);
+                }}
+                onDeleteMessage={deleteMessage}
+              />
+            )}
+          </AnimatePresence>
         </div>
       </SheetContent>
     </Sheet>

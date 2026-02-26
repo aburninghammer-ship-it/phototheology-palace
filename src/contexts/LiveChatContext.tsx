@@ -16,6 +16,8 @@ interface LiveChatContextType {
   updateTypingIndicator: (isTyping: boolean) => void;
   markRoomAsRead: (roomId: string) => Promise<void>;
   totalUnread: number;
+  deleteMessage: (messageId: string) => Promise<void>;
+  getThreadMessages: (parentId: string) => PublicChatMessage[];
 }
 
 const LiveChatContext = createContext<LiveChatContextType | undefined>(undefined);
@@ -30,6 +32,8 @@ export function LiveChatProvider({ children }: { children: React.ReactNode }) {
     updateTypingIndicator,
     markRoomAsRead,
     totalUnread,
+    deleteMessage,
+    getThreadMessages,
   } = usePublicChat();
 
   return (
@@ -44,6 +48,8 @@ export function LiveChatProvider({ children }: { children: React.ReactNode }) {
         updateTypingIndicator,
         markRoomAsRead,
         totalUnread,
+        deleteMessage,
+        getThreadMessages,
       }}
     >
       {children}
