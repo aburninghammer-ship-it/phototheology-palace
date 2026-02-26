@@ -12,6 +12,7 @@ import { CommunityArmory } from "./CommunityArmory";
 import { CheckmateMode } from "./CheckmateMode";
 import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { ForgeDefendHub } from "./ForgeDefendHub";
+import { OpponentProfileDialog } from "./OpponentProfileDialog";
 import { FortyDayChallenge } from "./FortyDayChallenge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
   // Sub-mode: sparring arena vs 3AM library
   const [subMode, setSubMode] = useState<DefenseSubMode>("sparring");
+  const [profileOpponent, setProfileOpponent] = useState<DefenseOpponent | null>(null);
 
   // Setup state
   const [selectedOpponent, setSelectedOpponent] = useState<DefenseOpponent | null>(null);
@@ -1849,7 +1851,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                       ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-lg"
                       : "hover:shadow-md"
                   }`}
-                  onClick={() => setSelectedOpponent(opp)}
+                  onClick={() => setProfileOpponent(opp)}
                 >
                   <CardContent className="p-3 text-center space-y-1">
                     <div className="relative mx-auto w-16 h-16 rounded-full overflow-hidden border-2 border-current mb-1">
@@ -2566,6 +2568,15 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+      <OpponentProfileDialog
+        opponent={profileOpponent}
+        open={!!profileOpponent}
+        onOpenChange={(open) => { if (!open) setProfileOpponent(null); }}
+        onSelectOpponent={(opp) => {
+          setSelectedOpponent(opp);
+          setProfileOpponent(null);
+        }}
+      />
     </div>
   );
 }
