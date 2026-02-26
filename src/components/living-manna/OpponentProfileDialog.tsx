@@ -12,8 +12,7 @@ import type { DefenseOpponent } from "@/data/defenseModeOpponents";
 import { DEFENSE_TOPICS } from "@/data/defenseModeOpponents";
 
 // Convert second-person AI prompt text to third-person for display
-function toThirdPerson(text: string, name: string): string {
-  const n = name.split(" ")[0];
+function toThirdPerson(text: string): string {
   let s = text;
   const verbs: [string, string][] = [
     ["are", "is"], ["hold", "holds"], ["reject", "rejects"], ["consider", "considers"],
@@ -29,9 +28,9 @@ function toThirdPerson(text: string, name: string): string {
     ["grew", "grew"], ["left", "left"], ["feel", "feels"], ["once", "once"],
   ];
   for (const [v2, v3] of verbs) {
-    s = s.replace(new RegExp(`\\bYou ${v2}\\b`, "g"), `${n} ${v3}`);
+    s = s.replace(new RegExp(`\\bYou ${v2}\\b`, "g"), `He ${v3}`);
   }
-  s = s.replace(/\byour\b/g, `${n}'s`).replace(/\bYour\b/g, `${n}'s`).replace(/\bYou\b/g, n);
+  s = s.replace(/\byour\b/g, "his").replace(/\bYour\b/g, "His").replace(/\bYou\b/g, "He");
   return s;
 }
 
@@ -373,7 +372,7 @@ export function OpponentProfileDialog({
                 <Eye className="h-4 w-4" /> Worldview Profile
               </h3>
               <p className="text-sm leading-relaxed text-foreground/80">
-                {toThirdPerson(opponent.worldview, opponent.name).slice(0, 400)}...
+                {toThirdPerson(opponent.worldview).slice(0, 400)}...
               </p>
             </section>
 
