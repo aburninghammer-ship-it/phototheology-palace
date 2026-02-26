@@ -198,12 +198,13 @@ RULES:
       const recapUser = `Here is the full debate transcript between ${dName} (Defender) and "${opponentName}" (Critic) on the topic of "${topicName}":\n\n${conversationSummary}\n\nProduce the full forensic tactical analysis. Address EVERY argument ${opponentName} made — count them and confirm the count. For each one, provide the full breakdown, fallacy analysis, and a complete rebuttal script. Then evaluate ${dName}'s responses surgically. This is a war-room analysis, not a summary.`;
 
       // Use a more powerful model for the comprehensive debrief with high token limit
-      const response = await callAI(LOVABLE_API_KEY, [
+      // 65536 tokens allows for exhaustive analysis of long debates without truncation
+      const aiResponse = await callAI(LOVABLE_API_KEY, [
         { role: "system", content: recapSystem },
         { role: "user", content: recapUser },
-      ], "google/gemini-2.5-pro", 16384);
+      ], "google/gemini-2.5-pro", 65536);
 
-      return new Response(JSON.stringify({ response }), {
+      return new Response(JSON.stringify({ response: aiResponse }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -404,5 +405,9 @@ async function callAI(apiKey: string, messages: any[], model?: string, maxTokens
   }
 
   const data = await response.json();
+  const finishReason = data.choices?.[0]?.finish_reason;
+  if (finishReason === "length") {
+    console.warn(`[callAI] Response was truncated (finish_reason=length). Model: ${body.model}, max_tokens: ${maxTokens || 'default'}`);
+  }
   return data.choices[0].message.content;
 }
