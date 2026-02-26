@@ -124,6 +124,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [forgeAutoSaveRestored, setForgeAutoSaveRestored] = useState(false);
   const [weaponAnalysis, setWeaponAnalysis] = useState<string | null>(null);
   const [weaponLoading, setWeaponLoading] = useState(false);
+  const [jeevesGenerating, setJeevesGenerating] = useState(false);
 
   // Arsenal state (DB-backed for cross-device sync)
   const [arsenal, setArsenal] = useState<ArsenalWeapon[]>([]);
@@ -840,6 +841,30 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     }
   };
 
+  // ─── Jeeves Generate Weapon handler ─────────────────────────────
+  const jeevesGenerateWeapon = async () => {
+    if (weaponTarget.trim().length < 20) return;
+    setJeevesGenerating(true);
+    setWeaponAnalysis(null);
+    setWeaponInput("");
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-jeeves-generate",
+          weaponTarget: weaponTarget.trim(),
+          doctrineTopic: weaponTopic || undefined,
+        },
+      });
+      if (error) throw error;
+      setWeaponAnalysis(data?.content || "Generation failed. Please try again.");
+    } catch (err) {
+      console.error("Jeeves generate weapon error:", err);
+      setWeaponAnalysis("Failed to generate weapon. Please try again.");
+    } finally {
+      setJeevesGenerating(false);
+    }
+  };
+
   // ─── Analyze This Attack handler ─────────────────────────────
   const analyzeAttack = async () => {
     if (attackInput.trim().length < 50) return;
@@ -1229,15 +1254,46 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
               </div>
             </div>
 
+            {/* Jeeves Generate divider */}
+            <div className="relative flex items-center gap-3">
+              <div className="flex-1 border-t border-muted-foreground/20" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">or let Jeeves forge one</span>
+              <div className="flex-1 border-t border-muted-foreground/20" />
+            </div>
+
+            <div className="text-center">
+              <Button
+                size="sm"
+                disabled={weaponTarget.trim().length < 20 || jeevesGenerating || weaponLoading}
+                onClick={jeevesGenerateWeapon}
+                className="bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-700 hover:to-red-700 text-white"
+              >
+                {jeevesGenerating ? (
+                  <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Jeeves is Forging...</>
+                ) : (
+                  <><Swords className="h-4 w-4 mr-1" /> Let Jeeves Forge a Weapon</>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Jeeves will create an original, arsenal-grade weapon using Scripture, logic, and PT principles
+              </p>
+            </div>
+
             {/* Analysis result */}
-            {weaponLoading && !weaponAnalysis && (
+            {(weaponLoading || jeevesGenerating) && !weaponAnalysis && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <Card variant="glass" className="border-cyan-500/30 bg-cyan-950/20">
                   <CardContent className="p-4 flex items-center gap-3">
                     <Loader2 className="h-5 w-5 animate-spin text-cyan-400" />
                     <div>
-                      <p className="text-sm font-semibold text-cyan-300">Jeeves is examining your weapon...</p>
-                      <p className="text-xs text-muted-foreground">Checking biblical accuracy, logical structure, rhetorical power, and persuasive force.</p>
+                      <p className="text-sm font-semibold text-cyan-300">
+                        {jeevesGenerating ? "Jeeves is forging an original weapon..." : "Jeeves is examining your weapon..."}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {jeevesGenerating
+                          ? "Using Scripture chains, sanctuary typology, prophetic patterns, and PT Palace rooms to forge something devastating."
+                          : "Checking biblical accuracy, logical structure, rhetorical power, and persuasive force."}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
