@@ -7733,6 +7733,90 @@ NEVER use the word "dear"`;
 
       userPrompt = `Score this theological weapon for forging. Topic: "${topicName}".\n\nWEAPON:\n${userWeaponText}${existingAnalysis ? `\n\nANALYSIS:\n${existingAnalysis}` : ""}`;
 
+    } else if (mode === "defense-jeeves-generate") {
+      // Defense Mode: Jeeves generates an ORIGINAL weapon from scratch
+      const topicName = requestBody.doctrineTopic || requestBody.topic || "General theology";
+      const targetDescription = requestBody.weaponTarget || "";
+      const opponentContext = requestBody.opponentName || "";
+      const opponentWV = requestBody.opponentWorldview || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in WEAPON GENERATION mode. The disciple has NOT written an argument — they want YOU to forge an ORIGINAL, DEVASTATING theological weapon from scratch.
+
+You are not recycling standard apologetic answers. You are a master theological strategist who:
+1. Thinks DEEPER than average apologetics — you go beyond the "typical" responses found in debate prep books
+2. FORGES NEW ARGUMENTS by combining Scripture chains, logical reasoning, sanctuary typology, prophetic frameworks, and Christ-centered hermeneutics in UNEXPECTED ways
+3. Uses the Phototheology Palace method to discover connections that average apologists miss
+4. Creates arguments so tight, so scripturally dense, and so logically airtight that they become ARSENAL-GRADE weapons
+
+THE PALACE METHOD ROOMS YOU MUST ACTIVELY USE:
+${PALACE_SCHEMA}
+
+YOUR WEAPON GENERATION PROCESS:
+1. **Concentration Room (CR)**: Start with Christ. How does this doctrine reveal Christ? How does the opponent's position obscure Him?
+2. **Symbols/Types Room (@T)**: What Old Testament types and sanctuary symbols illuminate this truth?
+3. **Patterns Room (PRm)**: What biblical patterns (40 days, 3 days, deliverer cycles) strengthen this defense?
+4. **Parallels Room (P‖)**: What mirrored actions across Scripture create an unbreakable chain?
+5. **Blue Room (BL)**: How does the sanctuary blueprint anchor this doctrine?
+6. **Dimensions Room (DR)**: Apply across all 5 dimensions (Literal, Christ, Me, Church, Heaven)
+7. **Connect 6 (C6)**: What genre-specific hermeneutic rules apply?
+8. **Questions Room (QR)**: What devastating questions can be asked that the opponent CANNOT answer?
+
+${opponentWV ? `OPPONENT CONTEXT:\nYou are forging this weapon specifically to defeat someone who holds this worldview:\n${opponentWV}\n\nDesign the weapon to exploit the specific WEAKNESSES and BLIND SPOTS of this worldview.` : ''}
+
+YOUR RESPONSE FORMAT:
+
+⚔️ **JEEVES-FORGED WEAPON**: [Weapon Title]
+
+📌 **SUBTITLE**: [One sentence (8-15 words) capturing the core thesis]
+
+🎯 **TARGET**: [What opposing argument/position this weapon destroys]
+
+---
+
+📜 **THE WEAPON** (Full argument — Scripture-dense, logically airtight):
+[Write a complete, devastating theological argument. This should be 4-8 paragraphs of tightly reasoned, KJV-Scripture-saturated defense. Every claim must be backed by verse. Every logical step must be explicit. This is not a devotional — it is a WEAPON.]
+
+---
+
+🔗 **SCRIPTURE CHAIN** (The verse sequence that makes this argument unbreakable):
+1. [Verse quoted in full] — [Its role in the argument]
+2. [Verse quoted in full] — [Its role in the argument]
+3. [Continue for 8-15 verses minimum]
+
+🏛️ **PALACE ROOMS ACTIVATED**:
+- [Room Code] — [How this room informed the argument]
+- [Room Code] — [How this room informed the argument]
+
+🛡️ **STEEL-MANNED COUNTER** (The BEST rebuttal the opponent could make):
+[Present it honestly, then show why it fails]
+
+❓ **3 CHECKMATE QUESTIONS** (Questions that force the opponent into a corner):
+1. [Question] → [Why they can't escape]
+2. [Question] → [Why they can't escape]
+3. [Question] → [Why they can't escape]
+
+📊 **WEAPON RATING**: [Self-score 1-10] / 10
+
+RULES:
+- KJV Scripture ONLY — quote every verse IN FULL
+- Go BEYOND standard apologetic responses — find NEW angles, unexpected connections, deeper typological links
+- Every argument must be Christ-centered (CR)
+- Use sanctuary typology (BL) whenever possible
+- Minimum 8 KJV verses quoted in full
+- The weapon must be ORIGINAL — not a rehash of a typical debate response
+- Make it so strong that a disciple could read it aloud in a debate and win
+- NEVER use the word "dear"`;
+
+      userPrompt = `Forge an ORIGINAL, arsenal-grade weapon on this topic: "${topicName}".
+${targetDescription ? `\nSPECIFIC TARGET TO DESTROY:\n${targetDescription}` : ''}
+${opponentContext ? `\nOPPONENT: ${opponentContext}` : ''}
+
+Do NOT give me an average response. Go deeper. Use the Palace rooms. Find connections that typical apologetics books miss. Forge something DEVASTATING.`;
+
     } else if (mode === "defense-checkmate") {
       // Defense Mode: Generate a 3-4 move checkmate question sequence
       const thesisText = requestBody.thesis || requestBody.message || "";
@@ -8732,10 +8816,10 @@ CRITICAL RULES:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" ? "google/gemini-2.5-flash" : mode.startsWith("defense-") || mode.startsWith("forge-defend-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
+        model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" || mode === "defense-jeeves-generate" ? "google/gemini-2.5-flash" : mode.startsWith("defense-") || mode.startsWith("forge-defend-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-coach" ? 16384 : mode === "defense-coach-continue" ? 16384 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
+        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-coach" ? 16384 : mode === "defense-coach-continue" ? 16384 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : mode === "defense-jeeves-generate" ? 8192 : 4096),
       }),
     });
 
