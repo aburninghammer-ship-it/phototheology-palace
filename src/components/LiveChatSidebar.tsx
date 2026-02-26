@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChatInput } from '@/components/ChatInput';
 import { useLiveChat } from '@/contexts/LiveChatContext';
-import { usePublicChat, PublicChatMessage } from '@/hooks/usePublicChat';
+import { PublicChatMessage } from '@/hooks/usePublicChat';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Users, Sparkles, Reply, X } from 'lucide-react';
@@ -136,15 +136,16 @@ function MessageBubble({
 
 export function LiveChatSidebar() {
   const { user } = useAuth();
-  const { isOpen, setIsOpen } = useLiveChat();
   const {
+    isOpen,
+    setIsOpen,
     messages,
     activeRoomId,
     typingUsers,
     sendMessage,
     updateTypingIndicator,
     markRoomAsRead,
-  } = usePublicChat();
+  } = useLiveChat();
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const [replyTo, setReplyTo] = useState<PublicChatMessage | null>(null);

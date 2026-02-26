@@ -3,13 +3,11 @@ import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useLiveChat } from '@/contexts/LiveChatContext';
-import { usePublicChat } from '@/hooks/usePublicChat';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function LiveChatToggle() {
   const { user } = useAuth();
-  const { isOpen, setIsOpen } = useLiveChat();
-  const { totalUnread } = usePublicChat();
+  const { isOpen, setIsOpen, totalUnread } = useLiveChat();
   const hasDragged = useRef(false);
 
   if (!user || isOpen) return null;

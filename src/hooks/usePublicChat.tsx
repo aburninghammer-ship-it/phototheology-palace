@@ -66,6 +66,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const instanceIdRef = useRef(Math.random().toString(36).slice(2, 8));
 
   // Fetch rooms — works with minimal schema (no slug/is_active/display_order)
   const fetchRooms = useCallback(async () => {
@@ -199,7 +200,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
     if (!user) return;
 
     const messagesChannel = supabase
-      .channel('public-chat-messages')
+      .channel(`public-chat-messages-${instanceIdRef.current}`)
       .on(
         'postgres_changes',
         {
