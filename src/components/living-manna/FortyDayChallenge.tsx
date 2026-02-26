@@ -583,60 +583,100 @@ export function FortyDayChallenge() {
     return hasFinalSection && endsCleanly;
   };
 
-  // Fetch Jeeves recap — teaches how to overcome the opponent's arguments
+  // Fetch Jeeves recap — streamed for long analyses
   const fetchJeevesRecap = async (session: any) => {
     setIsRecapLoading(true);
+    setJeevesRecap(""); // Clear any previous recap
     try {
       const opponent = DEFENSE_OPPONENTS.find(o => o.id === session.opponent_id);
       const dName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Defender";
-      const { data, error } = await supabase.functions.invoke("forty-day-debate", {
-        body: {
+      
+      const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/forty-day-debate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
           action: "recap",
           messages: session.messages || [],
           opponentName: opponent?.name || session.opponent_name,
           topicName: session.topic_name,
           defenderName: dName,
-        },
+        }),
       });
-      if (error) throw error;
-      let content = data?.response || data?.content || (typeof data === "string" ? data : null);
-      if (!content) {
-        console.error("Empty response from recap:", data);
-        throw new Error("Empty response from analysis. Please try again.");
+
+      if (!resp.ok) {
+        if (resp.status === 429) { toast.error("Rate limited — please wait a moment and try again."); return; }
+        if (resp.status === 402) { toast.error("AI credits depleted. Please add credits in your workspace settings."); return; }
+        throw new Error(`Analysis failed (${resp.status})`);
       }
 
-      // Show partial content immediately so user sees progress
-      setJeevesRecap(content);
+      if (!resp.body) throw new Error("No response stream");
 
-      // Auto-continue if the analysis was truncated (up to 3 continuations)
-      const MAX_CONTINUATIONS = 3;
-      for (let i = 0; i < MAX_CONTINUATIONS; i++) {
-        if (isRecapComplete(content)) break;
-        console.log(`[recap] Continuation ${i + 1}/${MAX_CONTINUATIONS} — analysis appears incomplete`);
-        const { data: contData, error: contError } = await supabase.functions.invoke("forty-day-debate", {
-          body: {
-            action: "recap-continue",
-            partialResponse: content,
-            defenderName: dName,
-          },
-        });
-        if (contError) {
-          console.warn("Continuation error, using partial recap:", contError);
-          break;
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let fullContent = "";
+      let textBuffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              fullContent += content;
+              setJeevesRecap(fullContent);
+            }
+          } catch {
+            // Partial JSON, put it back
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
         }
-        const contContent = contData?.response || contData?.content || (typeof contData === "string" ? contData : null);
-        if (!contContent) break;
-        content += "\n" + contContent;
-        setJeevesRecap(content);
+      }
+
+      // Final flush
+      if (textBuffer.trim()) {
+        for (let raw of textBuffer.split("\n")) {
+          if (!raw) continue;
+          if (raw.endsWith("\r")) raw = raw.slice(0, -1);
+          if (!raw.startsWith("data: ")) continue;
+          const jsonStr = raw.slice(6).trim();
+          if (jsonStr === "[DONE]") continue;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              fullContent += content;
+              setJeevesRecap(fullContent);
+            }
+          } catch { /* ignore */ }
+        }
+      }
+
+      if (!fullContent) {
+        throw new Error("Empty response from analysis. Please try again.");
       }
     } catch (err: any) {
       console.error("Jeeves recap error:", err);
       const msg = err?.message || "Failed to load Jeeves analysis.";
-      if (msg.includes("402") || msg.includes("credits")) {
-        toast.error("AI credits depleted. Please add credits in your workspace settings.");
-      } else if (msg.includes("429") || msg.includes("Rate limit")) {
-        toast.error("Rate limited — please wait a moment and try again.");
-      } else {
+      if (!msg.includes("402") && !msg.includes("429")) {
         toast.error(msg);
       }
     } finally {
