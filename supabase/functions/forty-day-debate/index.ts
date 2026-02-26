@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName } = await req.json();
+    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName, partialResponse } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -209,6 +209,20 @@ RULES:
       });
     }
 
+    if (action === "recap-continue") {
+      // Continue a truncated recap from where it left off
+      const dName = defenderName || "Defender";
+      const continueResponse = await callAI(LOVABLE_API_KEY, [
+        { role: "system", content: `You are Jeeves, continuing a forensic tactical debate analysis. You MUST pick up EXACTLY where the previous response ended. Do NOT repeat any content. Do NOT add any preamble or introduction. Continue mid-sentence if needed. Complete ALL remaining sections through to the ## 📚 Study Assignment section. Address the defender as "${dName}".` },
+        { role: "assistant", content: partialResponse },
+        { role: "user", content: "Continue EXACTLY where you left off. Complete all remaining sections of the analysis. Do not repeat anything already written." },
+      ], "google/gemini-2.5-pro", 65536);
+
+      return new Response(JSON.stringify({ response: continueResponse }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "jeeves-coach") {
       // Jeeves coaching mode — helps the defender mid-debate
       const coachPrompt = buildJeevesCoachPrompt(messages, opponentName, topicName, userMessage, difficulty);
@@ -380,54 +394,40 @@ RULES:
 }
 
 async function callAI(apiKey: string, messages: any[], model?: string, maxTokens?: number): Promise<string> {
-  const useModel = model || "google/gemini-2.5-flash";
-  let fullResponse = "";
-  let currentMessages = [...messages];
-  const MAX_CONTINUATIONS = 4;
-
-  for (let attempt = 0; attempt <= MAX_CONTINUATIONS; attempt++) {
-    const body: any = {
-      model: useModel,
-      messages: currentMessages,
-      temperature: 0.8,
-    };
-    if (maxTokens) body.max_tokens = maxTokens;
-
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      if (response.status === 429) throw Object.assign(new Error("Rate limit exceeded. Please try again in a moment."), { status: 429 });
-      if (response.status === 402) throw Object.assign(new Error("AI credits depleted. Please add credits in your workspace settings."), { status: 402 });
-      const errText = await response.text();
-      console.error("AI Gateway error:", response.status, errText);
-      throw new Error(`AI Gateway error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const chunk = data.choices[0].message.content;
-    fullResponse += chunk;
-
-    const finishReason = data.choices?.[0]?.finish_reason;
-    if (finishReason !== "length") {
-      // Response completed naturally
-      break;
-    }
-
-    // Response was truncated — continue generating
-    console.log(`[callAI] Continuation ${attempt + 1}/${MAX_CONTINUATIONS} (finish_reason=length). Model: ${useModel}`);
-    currentMessages = [
-      ...messages,
-      { role: "assistant", content: fullResponse },
-      { role: "user", content: "Continue EXACTLY where you left off. Do not repeat any content. Do not add any preamble. Pick up mid-sentence if needed." },
-    ];
+  const body: any = {
+    model: model || "google/gemini-2.5-flash",
+    messages,
+    temperature: 0.8,
+  };
+  if (maxTokens) {
+    body.max_tokens = maxTokens;
+    body.max_completion_tokens = maxTokens;
   }
 
-  return fullResponse;
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    if (response.status === 429) throw Object.assign(new Error("Rate limit exceeded. Please try again in a moment."), { status: 429 });
+    if (response.status === 402) throw Object.assign(new Error("AI credits depleted. Please add credits in your workspace settings."), { status: 402 });
+    const errText = await response.text();
+    console.error("AI Gateway error:", response.status, errText);
+    throw new Error(`AI Gateway error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const finishReason = data.choices?.[0]?.finish_reason;
+  const content = data.choices[0].message.content;
+
+  // Return both content and truncation status so callers can handle continuation
+  if (finishReason === "length") {
+    console.warn(`[callAI] Response truncated (finish_reason=length). Model: ${body.model}`);
+  }
+  return content;
 }

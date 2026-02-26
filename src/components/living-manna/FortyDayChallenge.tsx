@@ -573,27 +573,62 @@ export function FortyDayChallenge() {
     setPhase("review");
   };
 
+  // Check if recap contains the final section marker indicating completeness
+  const isRecapComplete = (text: string): boolean => {
+    const finalMarkers = ["Study Assignment", "## 📚", "## 9.", "🏆 Final Verdict"];
+    const hasFinalSection = finalMarkers.some(marker => text.includes(marker));
+    // Must have at least one final marker AND not end abruptly mid-sentence
+    const lastLine = text.trim().split("\n").pop() || "";
+    const endsCleanly = lastLine.endsWith(".") || lastLine.endsWith(")") || lastLine.endsWith('"') || lastLine.endsWith("*") || lastLine.endsWith("|") || lastLine.endsWith("---");
+    return hasFinalSection && endsCleanly;
+  };
+
   // Fetch Jeeves recap — teaches how to overcome the opponent's arguments
   const fetchJeevesRecap = async (session: any) => {
     setIsRecapLoading(true);
     try {
       const opponent = DEFENSE_OPPONENTS.find(o => o.id === session.opponent_id);
+      const dName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Defender";
       const { data, error } = await supabase.functions.invoke("forty-day-debate", {
         body: {
           action: "recap",
           messages: session.messages || [],
           opponentName: opponent?.name || session.opponent_name,
           topicName: session.topic_name,
-          defenderName: user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Defender",
+          defenderName: dName,
         },
       });
       if (error) throw error;
-      const content = data?.response || data?.content || (typeof data === "string" ? data : null);
+      let content = data?.response || data?.content || (typeof data === "string" ? data : null);
       if (!content) {
         console.error("Empty response from recap:", data);
         throw new Error("Empty response from analysis. Please try again.");
       }
+
+      // Show partial content immediately so user sees progress
       setJeevesRecap(content);
+
+      // Auto-continue if the analysis was truncated (up to 3 continuations)
+      const MAX_CONTINUATIONS = 3;
+      for (let i = 0; i < MAX_CONTINUATIONS; i++) {
+        if (isRecapComplete(content)) break;
+        console.log(`[recap] Continuation ${i + 1}/${MAX_CONTINUATIONS} — analysis appears incomplete`);
+        const { data: contData, error: contError } = await supabase.functions.invoke("forty-day-debate", {
+          body: {
+            action: "recap-continue",
+            partialResponse: content,
+            defenderName: dName,
+          },
+        });
+        if (contError) {
+          console.warn("Continuation error, using partial recap:", contError);
+          break;
+        }
+        const contContent = contData?.response || contData?.content || (typeof contData === "string" ? contData : null);
+        if (!contContent) break;
+        content += "\n" + contContent;
+        setJeevesRecap(content);
+      }
     } catch (err: any) {
       console.error("Jeeves recap error:", err);
       const msg = err?.message || "Failed to load Jeeves analysis.";
