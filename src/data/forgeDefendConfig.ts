@@ -41,7 +41,7 @@ export const DIFFICULTY_TIERS: DifficultyTier[] = [
     weeks: [3, 4],
     tier: "advanced",
     label: "Advanced Theological",
-    topics: ["sanctuary-1844", "trinity", "little-horn", "prophecy", "rapture", "tongues", "antichrist", "investigative-judgment", "scapegoat"],
+    topics: ["sanctuary-1844", "trinity", "little-horn", "prophecy", "rapture", "tongues", "antichrist", "investigative-judgment", "scapegoat", "preterism", "futurism"],
   },
   {
     weeks: [5, 6],
