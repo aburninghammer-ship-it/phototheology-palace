@@ -280,8 +280,8 @@ export function FortyDayChallenge() {
 
       setCurrentSession(session);
 
-      // Load existing messages if resuming
-      if (session.messages && (session.messages as any[]).length > 0) {
+      // Load existing messages if resuming (only if there are actual messages)
+      if (session.messages && Array.isArray(session.messages) && (session.messages as any[]).length > 0) {
         setMessages(session.messages as ChatMessage[]);
         setPhase("debating");
         setIsAiLoading(false);
@@ -314,7 +314,8 @@ export function FortyDayChallenge() {
         .eq("id", session.id);
 
     } catch (err: any) {
-      toast.error(err.message || "Failed to start debate");
+      console.error("Debate start error:", err);
+      toast.error("Connection issue — please try again. " + (err.message || ""));
     } finally {
       setIsAiLoading(false);
     }
