@@ -117,24 +117,11 @@ export function AudioTrainingPlaylist({
     notifyTTSStopped();
   };
 
-  const primeAudioForMobile = async (audio: HTMLAudioElement) => {
-    audio.preload = "auto";
-
-    try {
-      audio.muted = true;
-      await audio.play();
-      audio.pause();
-      audio.currentTime = 0;
-    } catch {
-      // Best effort warm-up for iOS/Safari autoplay restrictions
-    } finally {
-      audio.muted = false;
-    }
-  };
+  // Tiny silent MP3 for priming audio element in user gesture context
+  const SILENT_MP3 = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwBHAAAAAAD/+1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
   const playItem = useCallback(async (index: number, userInitiated = false) => {
     if (index < 0 || index >= playlist.length) {
-      // Playlist finished
       stopPlayback();
       setCurrentIndex(-1);
       toast.success("Playlist complete! 🎧");
@@ -145,9 +132,18 @@ export function AudioTrainingPlaylist({
     setIsLoading(true);
     setCurrentIndex(index);
 
+    // Create and prime audio element SYNCHRONOUSLY in user gesture context
     const audio = new Audio();
+    audio.preload = "auto";
+
     if (userInitiated) {
-      await primeAudioForMobile(audio);
+      try {
+        audio.src = SILENT_MP3;
+        await audio.play();
+        audio.pause();
+      } catch {
+        // Best effort
+      }
     }
 
     try {
@@ -184,9 +180,20 @@ export function AudioTrainingPlaylist({
       const data = await response.json();
 
       let url: string;
-      if (data.audioUrl) url = data.audioUrl;
-      else if (data.audioContent) url = `data:audio/mpeg;base64,${data.audioContent}`;
-      else throw new Error("No audio data");
+      if (data.audioUrl) {
+        // Fetch as blob to avoid CORS/redirect issues on mobile
+        try {
+          const audioResponse = await fetch(data.audioUrl);
+          const blob = await audioResponse.blob();
+          url = URL.createObjectURL(blob);
+        } catch {
+          url = data.audioUrl;
+        }
+      } else if (data.audioContent) {
+        url = `data:audio/mpeg;base64,${data.audioContent}`;
+      } else {
+        throw new Error("No audio data");
+      }
 
       // Stop previous audio
       if (audioRef.current) {
