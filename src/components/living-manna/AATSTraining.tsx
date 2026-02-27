@@ -549,7 +549,13 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
           <p className="text-xs text-muted-foreground">
             Each day has a full in-depth strategic manuscript (25–30 min). Generated on first access, then cached for instant replay.
           </p>
-          {Array.from({ length: 8 }, (_, wIdx) => {
+          {(() => {
+            // Compute highest completed day once for gating
+            const highestCompleted = Array.from({ length: 56 }, (_, i) => i + 1)
+              .reverse()
+              .find(day => isItemCompleted(selectedTraining.avatarId, `wc-day-${day}`)) ?? 0;
+            const nextUnlocked = highestCompleted + 1;
+            return Array.from({ length: 8 }, (_, wIdx) => {
             const week = wIdx + 1;
             const rank = getRankForDay((week - 1) * 7 + 1);
             const ri = RANK_CONFIG[rank];
@@ -563,23 +569,26 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
                   </Badge>
                   <span className="text-[10px] text-muted-foreground">{weekCompleted}/{days.length}</span>
                 </div>
-                <div className="grid grid-cols-7 gap-1.5">
+        <div className="grid grid-cols-7 gap-1.5">
                   {days.map(d => {
                     const done = isItemCompleted(selectedTraining.avatarId, `wc-day-${d}`);
                     const isGenerating = generatingPhaseDay === d;
+                    const isUnlocked = done || d <= nextUnlocked;
                     return (
                       <motion.button
                         key={d}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        disabled={!!generatingPhaseDay}
-                        onClick={() => handleGeneratePhaseManuscript(d)}
+                        whileHover={isUnlocked ? { scale: 1.05 } : {}}
+                        whileTap={isUnlocked ? { scale: 0.95 } : {}}
+                        disabled={!!generatingPhaseDay || !isUnlocked}
+                        onClick={() => isUnlocked && handleGeneratePhaseManuscript(d)}
                         className={`
                           relative aspect-square rounded-lg flex flex-col items-center justify-center text-sm font-bold
-                          border transition-all cursor-pointer
+                          border transition-all
                           ${done
-                            ? "bg-green-500/10 border-green-500/30 text-green-400"
-                            : "bg-muted/30 border-border/50 text-muted-foreground hover:border-primary/30"
+                            ? "bg-green-500/10 border-green-500/30 text-green-400 cursor-pointer"
+                            : isUnlocked
+                              ? "bg-muted/30 border-border/50 text-muted-foreground hover:border-primary/30 cursor-pointer"
+                              : "bg-muted/10 border-border/20 text-muted-foreground/30 cursor-not-allowed opacity-50"
                           }
                         `}
                       >
@@ -587,6 +596,8 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
                         ) : done ? (
                           <CheckCircle2 className="h-3.5 w-3.5 mb-0.5" />
+                        ) : !isUnlocked ? (
+                          <Shield className="h-3 w-3 mb-0.5 opacity-40" />
                         ) : null}
                         <span className="text-xs">{d}</span>
                       </motion.button>
@@ -595,7 +606,8 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
                 </div>
               </div>
             );
-          })}
+          });
+          })()}
         </div>
 
         {/* Modules Quick Access */}

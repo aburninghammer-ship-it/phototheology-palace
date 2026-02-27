@@ -6,7 +6,7 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, CheckCircle2, BookOpen, Swords, Clock,
-  GraduationCap, Loader2, Sparkles,
+  GraduationCap, Loader2, Sparkles, Shield,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -215,26 +215,33 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
                 {days.map((d) => {
                   const done = completedDays.has(d);
                   const isNext = d === nextDay;
+                  const isUnlocked = done || d <= nextDay;
 
                   return (
                     <motion.button
                       key={d}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      disabled={generating}
-                      onClick={() => handleOpenDay(d)}
+                      whileHover={isUnlocked ? { scale: 1.05 } : {}}
+                      whileTap={isUnlocked ? { scale: 0.95 } : {}}
+                      disabled={generating || !isUnlocked}
+                      onClick={() => isUnlocked && handleOpenDay(d)}
                       className={`
                         relative aspect-square rounded-lg flex flex-col items-center justify-center text-sm font-bold
-                        border transition-all cursor-pointer
+                        border transition-all
                         ${done
-                          ? "bg-green-500/10 border-green-500/30 text-green-400"
+                          ? "bg-green-500/10 border-green-500/30 text-green-400 cursor-pointer"
                           : isNext
-                            ? "bg-primary/10 border-primary/50 text-primary ring-2 ring-primary/20"
-                            : "bg-muted/30 border-border/50 text-muted-foreground hover:border-primary/30"
+                            ? "bg-primary/10 border-primary/50 text-primary ring-2 ring-primary/20 cursor-pointer"
+                            : isUnlocked
+                              ? "bg-muted/30 border-border/50 text-muted-foreground hover:border-primary/30 cursor-pointer"
+                              : "bg-muted/10 border-border/20 text-muted-foreground/30 cursor-not-allowed opacity-50"
                         }
                       `}
                     >
-                      {done && <CheckCircle2 className="h-4 w-4 mb-0.5" />}
+                      {done ? (
+                        <CheckCircle2 className="h-4 w-4 mb-0.5" />
+                      ) : !isUnlocked ? (
+                        <Shield className="h-3 w-3 mb-0.5 opacity-40" />
+                      ) : null}
                       <span className="text-xs">{d}</span>
                     </motion.button>
                   );
