@@ -44,6 +44,12 @@ const subjects: AATSSubject[] = [
     description:
       "A good God wouldn't allow suffering. The existence of gratuitous evil and innocent suffering is logically incompatible with an all-powerful, all-knowing, all-loving God.",
   },
+  {
+    id: "fulfilled-prophecy",
+    title: "Fulfilled Prophecy as Evidence",
+    description:
+      "Biblical prophecy — particularly in Daniel and Revelation — provides historically verifiable, centuries-in-advance predictions that no human author could fabricate. The succession of world empires, the rise and fall of specific powers, and the precision of prophetic timelines constitute unique, testable evidence for divine inspiration that no other religious or secular text can match.",
+  },
 ];
 
 // ── Steelman Arguments ───────────────────────────────────────────────────────
@@ -113,6 +119,20 @@ const steelmanArguments: AATSSteelmanArgument[] = [
     ],
     sdaResponse:
       "SDAs unequivocally condemn all violence done in the name of religion. Jesus taught love for enemies (Matthew 5:44) and declared His kingdom 'not of this world' (John 18:36). The atrocities cited are violations of, not expressions of, biblical Christianity. Meanwhile, the 20th century's greatest mass murders were perpetrated by explicitly atheistic regimes -- Stalin, Mao, and Pol Pot collectively killed over 100 million people. The issue is not religion vs. irreligion but fallen human nature. SDA eschatology specifically warns against religious coercion in the last days (Revelation 13), demonstrating that forced worship is antithetical to biblical faith. Religious liberty is a core SDA doctrine precisely because genuine faith can never be compelled.",
+  },
+  {
+    id: "atheist-steelman-prophecy-fabricated",
+    title: "Biblical Prophecy Is Vague, Retrodicted, or Fabricated",
+    argument:
+      "Believers point to Daniel and Revelation as proof of divine foresight, but the evidence falls apart under scrutiny. Daniel was almost certainly written in the 2nd century BC (Maccabean thesis), after the empires it 'predicts,' making its 'prophecies' history dressed as prediction — retrodiction. The symbolic language is so vague that any sequence of empires could be retrofitted into it. Revelation is apocalyptic literature full of bizarre imagery that has been applied to every century by every generation — failed predictions about every pope, Napoleon, Hitler, and now modern geopolitics. Nostradamus-level pattern matching does not constitute evidence. If biblical prophecy were genuinely predictive, there would be a consensus among historians, not just believers reading their own expectations into ancient texts.",
+    hiddenAssumptions: [
+      "The Maccabean dating of Daniel is an established fact — but it is a contested scholarly hypothesis driven in part by the antisupernatural bias that predictive prophecy is impossible, the very conclusion it claims to prove.",
+      "Symbolic language equals vagueness — ignores that Daniel identifies empires by name (Medo-Persia, Greece in Daniel 8:20-21) and by unmistakable historical detail (four divisions of Greece in Daniel 8:22, the iron legs of Rome in Daniel 2).",
+      "Failed applications disprove the prophecy itself — confuses the misapplication of prophecy by interpreters with the validity of the prophetic text.",
+      "Scholarly consensus determines truth — but consensus has been wrong before, and the antisupernatural presupposition that drives much critical scholarship is itself a philosophical commitment, not a conclusion of evidence.",
+    ],
+    sdaResponse:
+      "The Maccabean dating hypothesis is circular: it assumes predictive prophecy is impossible, then dates Daniel after the events to avoid admitting prophecy occurred. But even critical scholars acknowledge that Daniel accurately portrays details of Babylonian court life that a 2nd-century author would not know. More importantly, Daniel's prophecies extend far beyond the Maccabean period. Daniel 2 predicts not only Babylon, Medo-Persia, Greece, and Rome but the fragmented state of post-Roman Europe — a prediction that has held for 1,500 years and counting. Daniel 7 adds the little horn power rising among the divisions of Rome, persecuting the saints for 1,260 years (Daniel 7:25) — a timeline that maps precisely to the rise of papal dominance from 538 AD to 1798 AD. Daniel 8:14's 2,300-day prophecy (using the day-for-a-year principle confirmed by Numbers 14:34 and Ezekiel 4:6) reaches to 1844, inaugurating the pre-Advent judgment. Daniel 9:24-27 pinpoints the exact year of Christ's baptism (27 AD) and crucifixion (31 AD). These are not vague symbols susceptible to any interpretation — they are historically anchored, mathematically precise, and uniquely verifiable. No other religious text on earth offers anything comparable. The prophecy of Revelation 9:13-21 (the sixth trumpet) predicted the 391-year-and-15-day career of Ottoman power, culminating on August 11, 1840 — a date published in advance by Josiah Litch and confirmed by history. This is testable, falsifiable evidence for divine foreknowledge. The atheist who dismisses it has not engaged it.",
   },
 ];
 
@@ -309,6 +329,29 @@ const counterStrategies: AATSCounterStrategy[] = [
     closingStatement:
       "The problem of evil is the atheist's strongest emotional argument, but it is logically self-defeating: you cannot call something 'evil' without an objective moral standard, and you cannot have an objective moral standard without God. The SDA great controversy theme offers what no other worldview can: a coherent explanation of evil's origin in free will, a God who entered our suffering at the cross, and a guaranteed future in which every tear will be wiped away and sin will never rise again. This is not blind optimism; it is the promise of the God who conquered the grave.",
   },
+  {
+    subjectId: "fulfilled-prophecy",
+    title: "Countering Prophecy Dismissal with Historically Verifiable Evidence",
+    sdaPosition:
+      "Biblical prophecy is the single most powerful apologetic weapon against unbelief because it is testable. Unlike philosophical arguments that depend on contested premises, fulfilled prophecy provides historically verifiable, centuries-in-advance predictions that either came true or did not. Daniel's prophecies name empires (Medo-Persia and Greece in Daniel 8:20-21), predict their sequence, describe their characteristics, and provide mathematical timelines that can be checked against the historical record. The historicist method of prophetic interpretation — reading prophecy as a continuous timeline from the prophet's day to the end of the world — has been vindicated by the march of history across more than 2,500 years. This is not a 'God of the gaps' argument; it is an argument from evidence that the atheist must engage on its own terms.",
+    keyScriptures: [
+      "Daniel 2:31-45 — The great image prophecy: Babylon (gold head), Medo-Persia (silver chest), Greece (bronze belly), Rome (iron legs), divided Europe (iron/clay feet). Written in the 6th century BC, historically verified across 2,500 years. No other religious text offers anything comparable.",
+      "Daniel 7:23-25 — The fourth beast (Rome) produces a little horn that speaks against the Most High and persecutes the saints for 'a time, times, and half a time' (1,260 years). Historical fulfillment: 538 AD to 1798 AD.",
+      "Daniel 8:14 — 'Unto two thousand and three hundred days; then shall the sanctuary be cleansed.' Using the day-for-a-year principle (Numbers 14:34; Ezekiel 4:6), this timeline begins in 457 BC (Artaxerxes' decree, Ezra 7) and reaches to 1844 AD — the inauguration of the pre-Advent investigative judgment in the heavenly sanctuary.",
+      "Daniel 9:24-27 — The seventy-week prophecy (490 years) pinpoints the baptism of Jesus (27 AD), His crucifixion ('cut off,' 31 AD), and the close of the gospel's exclusive mission to Israel (34 AD). This is mathematical prophecy: start date, duration, and fulfillment events are all historically verifiable.",
+      "Revelation 9:13-21 — The sixth trumpet prophesies the 391-year-and-15-day period of Ottoman Turkish power (1449 to August 11, 1840). Josiah Litch published this prediction in advance, and it was confirmed by history — a falsifiable, publicly verifiable test of prophetic reliability.",
+      "Isaiah 46:9-10 — 'I am God, and there is none like me, declaring the end from the beginning, and from ancient times the things that are not yet done.' God Himself points to predictive prophecy as the distinguishing evidence of His deity.",
+    ],
+    counterArguments: [
+      "The Maccabean dating hypothesis for Daniel is circular. It assumes predictive prophecy is impossible and then dates the book after the events to avoid admitting prophecy occurred. This is antisupernatural bias disguised as scholarship. Even on a late dating, Daniel's predictions about Rome, Europe's fragmentation, and the 1,260-year timeline extend centuries beyond the Maccabean period and cannot be explained as retrodiction.",
+      "Daniel's prophecies are not vague — they name empires (Daniel 8:20-21), describe their characteristics in detail (four divisions of Greece, iron strength of Rome), predict their sequence, and provide mathematical timelines (2,300 days, 70 weeks, 1,260 years) that can be checked against the historical record. This is the opposite of Nostradamus-style vagueness.",
+      "The sixth trumpet prophecy (Revelation 9) demonstrates testable, falsifiable prophetic accuracy. Josiah Litch published the predicted date of August 11, 1840, for the fall of Ottoman independence — and it happened. This is not retroactive pattern-matching; it is advance prediction confirmed by documented history.",
+      "No other religious text — the Quran, the Vedas, the Book of Mormon, the Tao Te Ching — offers anything approaching the Bible's prophetic track record. This is a unique, distinguishing mark of divine inspiration that places the Bible in a category by itself. The atheist who dismisses prophecy without engaging the specific evidence is avoiding the strongest argument against their position.",
+      "The convergence of Daniel 8:14 and Revelation 14:6-7 is the capstone of prophetic apologetics. Daniel gives the time (2,300 days ending in 1844); Revelation gives the meaning ('the hour of his judgment is come'). Together they reveal that God is not only sovereign over history — He is conducting a judgment right now, and the prophetic timeline that predicted it is itself evidence that the Judge is real.",
+    ],
+    closingStatement:
+      "Fulfilled biblical prophecy is the atheist's most formidable challenge because it is testable, historically verifiable, and mathematically precise. Daniel predicted the succession of world empires centuries in advance. Daniel 9 pinpointed the year of Christ's baptism and crucifixion. The sixth trumpet predicted the fall of Ottoman independence to the exact day. No naturalistic explanation accounts for this prophetic track record. The atheist who dismisses prophecy as 'vague symbolism' has not engaged the evidence; the atheist who engages it must explain how an ancient text predicted the future with such precision — without God. 'I am God, and there is none like me, declaring the end from the beginning' (Isaiah 46:9-10).",
+  },
 ];
 
 // ── Modules ──────────────────────────────────────────────────────────────────
@@ -461,6 +504,36 @@ const modules: AATSModule[] = [
     debateSimLink: "atheist",
     debriefPrompt:
       "Reflect carefully on this most personal of topics. Were you able to balance intellectual rigor with pastoral compassion? Could you explain the SDA great controversy theme as a comprehensive answer to evil? Did you show that the problem of evil is actually harder for the atheist to solve than for the Christian? Most importantly, did you point to the cross as God's definitive answer to suffering? What would you do differently when facing someone in genuine pain?",
+  },
+  // ────── Module 6: Fulfilled Prophecy ──────
+  {
+    id: "atheist-mod-fulfilled-prophecy",
+    subjectId: "fulfilled-prophecy",
+    title: "Confronting Atheism with Fulfilled Prophecy: The Bible's Testable Evidence",
+    doctrineBrief:
+      "Fulfilled biblical prophecy is the most underutilized weapon in apologetics against atheism — and it is arguably the strongest. While the design argument, the moral argument, and the argument from personal transformation are powerful, they are often dismissed as 'subjective' or 'philosophical.' Prophecy is different. It is testable. It is historically verifiable. It is mathematically precise. And it has no naturalistic explanation.\n\nDaniel chapter 2, written in the 6th century BC, predicted the exact succession of four world empires — Babylon, Medo-Persia, Greece, and Rome — followed by a fragmented Europe that would never reunite into a single empire. Napoleon tried. Hitler tried. The EU strives. None have succeeded. The prophecy stands after 2,500 years.\n\nDaniel chapter 7 enlarges the same timeline with greater detail, adding the rise of a 'little horn' power among the divisions of Rome that would persecute God's people for 1,260 years (Daniel 7:25). This maps precisely to the dominance of papal Rome from 538 AD (when Justinian's decree gave the bishop of Rome supremacy) to 1798 AD (when Napoleon's general Berthier arrested Pope Pius VI).\n\nDaniel 9:24-27 provides the seventy-week (490-year) prophecy, beginning with the decree to restore Jerusalem in 457 BC (Ezra 7). This timeline pinpoints the baptism of Jesus Christ in 27 AD and His crucifixion in 31 AD — centuries in advance, with mathematical precision.\n\nDaniel 8:14 extends the prophetic telescope further: the 2,300-day prophecy, beginning from the same starting point of 457 BC, reaches to 1844 AD — the commencement of the pre-Advent investigative judgment in the heavenly sanctuary. This is the meaning of Revelation 14:7: 'the hour of his judgment is come.' Daniel gives the time; Revelation gives the meaning.\n\nPerhaps most strikingly, the sixth trumpet prophecy of Revelation 9:13-21 predicted the 391-year-and-15-day career of Ottoman Turkish power. Using the day-for-a-year principle, this period runs from July 27, 1449, to August 11, 1840. Josiah Litch, an American preacher, published this prediction before the date arrived. When the Ottoman Empire surrendered its independent power on August 11, 1840, exactly as predicted, it sent shockwaves through the religious world and validated the prophetic time methodology.\n\nNo other religious text on earth offers anything approaching this prophetic track record. Not the Quran. Not the Vedas. Not the Book of Mormon. Not the writings of any philosopher, scientist, or futurist. Biblical prophecy stands alone as testable, falsifiable, historically verifiable evidence of divine foreknowledge.\n\nThe atheist who has never engaged this evidence has never confronted the strongest case for God's existence. The atheist who engages it must explain how ancient texts predicted specific empires, specific dates, and specific events centuries in advance — without divine inspiration. 'I am God, and there is none like me, declaring the end from the beginning, and from ancient times the things that are not yet done' (Isaiah 46:9-10).",
+    steelmanArguments: [
+      steelmanArguments[5], // "Biblical Prophecy Is Vague, Retrodicted, or Fabricated"
+      steelmanArguments[3], // "No Evidence for God"
+    ],
+    hiddenAssumptions: [
+      "Predictive prophecy is impossible by definition — an antisupernatural presupposition that predetermines the conclusion before examining the evidence.",
+      "Daniel must be late-dated to avoid admitting prophecy — but even a 2nd-century date cannot explain Daniel's predictions about Rome, Europe's fragmentation, or the 1,260-year, 2,300-day, and 70-week timelines.",
+      "Symbolic language equals vagueness — ignores that Daniel names empires explicitly and provides mathematical timelines.",
+      "Prophecy can always be explained by coincidence, retroactive interpretation, or cultural influence — but the convergence of multiple independent prophetic timelines reaching specific dates eliminates chance as an explanation.",
+    ],
+    mindGames: [
+      mindGames[2], // Intellectual Intimidation
+      mindGames[3], // False Superiority
+    ],
+    fallacies: [
+      fallacies[3], // Genetic Fallacy (dismissing prophecy based on origin rather than content)
+      fallacies[2], // Category Error
+    ],
+    counterStrategy: counterStrategies[5],
+    debateSimLink: "atheist",
+    debriefPrompt:
+      "This module targets the atheist's weakest point: testable evidence. Evaluate your performance. Were you able to present Daniel 2 and 7 as historically verifiable predictions, not retroactive readings? Could you walk through the 70-week and 2,300-day timelines mathematically? Did you use the sixth trumpet (Ottoman) prophecy as a falsifiable, publicly verifiable test case? Were you able to show that no other religious text offers comparable predictive evidence? Could you articulate the connection between Daniel 8:14 and Revelation 14:7 — that the 2,300-day prophecy does not end at a date but at a process (the judgment)? What areas of prophetic apologetics do you need to study more deeply?",
   },
 ];
 
