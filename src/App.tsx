@@ -225,6 +225,7 @@ const StoryRoom3D = lazy(() => import("./pages/games/StoryRoom3D"));
 const SpeedVerse3D = lazy(() => import("./pages/games/SpeedVerse3D"));
 const Room24FPS3D = lazy(() => import("./pages/games/Room24FPS3D"));
 const PublicImageLibrary = lazy(() => import("./pages/PublicImageLibrary"));
+const SharedBaptismAudio = lazy(() => import("./pages/SharedBaptismAudio"));
 const BibleStudySeriesBuilder = lazy(() => import("./pages/BibleStudySeriesBuilder"));
 const SeriesLessonEditor = lazy(() => import("./pages/SeriesLessonEditor"));
 const SeriesPresenter = lazy(() => import("./pages/SeriesPresenter"));
@@ -424,6 +425,7 @@ function App() {
             <Route path="/gift/success" element={<GiftSuccess />} />
             <Route path="/gift/redeem/:token" element={<GiftRedeem />} />
             <Route path="/day-pass/:token" element={<DayPassRedeem />} />
+            <Route path="/shared/baptism-audio/:token" element={<SharedBaptismAudio />} />
             <Route path="/donate" element={<DonationPage />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
             <Route path="/credit-purchase-success" element={<ProtectedRoute><CreditPurchaseSuccess /></ProtectedRoute>} />

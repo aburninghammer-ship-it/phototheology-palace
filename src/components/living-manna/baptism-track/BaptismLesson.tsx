@@ -14,13 +14,14 @@ import {
   Sparkles, CheckCircle2, ChevronRight, ChevronDown,
   Target, Lightbulb, History, Award,
   HelpCircle, BookMarked, Heart, Shield, Quote,
-  Save, StickyNote, AlertCircle, Volume2
+  Save, StickyNote, AlertCircle, Volume2, Download, Share2
 } from "lucide-react";
 import { QuickAudioButton } from "@/components/audio";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { PalacePathVisualizer } from "./PalacePathVisualizer";
 import { BaptismQuiz } from "./BaptismQuiz";
+import { ExportBaptismAudioDialog } from "./ExportBaptismAudioDialog";
 
 // Helper to safely parse JSON fields that might be strings
 const parseJsonField = (field: any): any[] => {
@@ -243,6 +244,9 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
   const [studyNotes, setStudyNotes] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
   const [notesLoaded, setNotesLoaded] = useState(false);
+
+  // Export audio dialog
+  const [showExportAudio, setShowExportAudio] = useState(false);
 
   // Parse scripture_pack
   const scriptures = useMemo(() => {
@@ -867,10 +871,14 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                 </div>
               </div>
 
-              <div className="flex justify-center pt-4">
+              <div className="flex justify-center gap-3 pt-4">
                 <Button size="lg" onClick={goToNextSection}>
                   Begin Comprehensive Study
                   <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => setShowExportAudio(true)}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Audio
                 </Button>
               </div>
             </div>
@@ -1412,6 +1420,13 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
           )}
         </CardContent>
       </Card>
+      <ExportBaptismAudioDialog
+        open={showExportAudio}
+        onOpenChange={setShowExportAudio}
+        lessonId={lesson.id}
+        lessonTitle={lesson.title}
+        fundamentalNumber={lesson.fundamental_number}
+      />
     </div>
   );
 }
