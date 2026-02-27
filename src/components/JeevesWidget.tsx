@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import jeevesAvatar from "@/assets/avatars/jeeves-avatar.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Send, Loader2, ChevronDown, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
@@ -55,7 +55,7 @@ export const JeevesWidget = () => {
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef<InstanceType<typeof window.SpeechRecognition> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Fetch user name and context snapshot
   useEffect(() => {
@@ -332,32 +332,38 @@ export const JeevesWidget = () => {
             )}
 
             {/* Input */}
-            <div className="bg-background border-t border-border px-3 py-3 flex gap-2 flex-shrink-0" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+            <div className="bg-background border-t border-border px-3 py-3 flex items-end gap-2 flex-shrink-0" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
               <Button
                 type="button"
                 onClick={toggleMic}
                 size="icon"
                 variant="ghost"
-                className={`h-12 w-12 flex-shrink-0 transition-colors ${listening ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
+                className={`h-10 w-10 flex-shrink-0 transition-colors ${listening ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
                 title={listening ? "Stop recording" : "Speak your question"}
               >
                 {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
               </Button>
-              <Input
+              <Textarea
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                  }
+                }}
                 placeholder={listening ? "Listening…" : "Ask Jeeves a theological question…"}
                 disabled={loading}
-                className="flex-1 !text-base h-12 rounded-xl bg-muted/50 border-border focus:bg-background"
+                rows={2}
+                className="flex-1 min-h-[56px] max-h-32 resize-none text-base leading-5 rounded-xl bg-muted/50 border-border focus:bg-background"
                 style={{ fontSize: "16px" }}
               />
               <Button
                 onClick={() => sendMessage()}
                 disabled={loading || !input.trim()}
                 size="icon"
-                className="h-12 w-12 flex-shrink-0 text-white rounded-xl"
+                className="h-10 w-10 flex-shrink-0 text-white rounded-xl"
                 style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81)" }}
               >
                 <Send className="h-4 w-4" />
