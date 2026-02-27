@@ -1,7 +1,7 @@
 import { useRef, useCallback, useEffect, type ReactNode } from "react";
 import { GripVertical } from "lucide-react";
 
-const STORAGE_KEY = "widget-stack-position-v3";
+const STORAGE_KEY = "widget-stack-position-v4";
 
 function getInitialPosition() {
   try {
