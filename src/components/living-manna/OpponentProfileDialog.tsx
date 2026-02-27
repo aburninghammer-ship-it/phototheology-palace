@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Shield, Swords, Target, BookOpen, Sparkles, Crosshair,
@@ -8,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { DefenseOpponent } from "@/data/defenseModeOpponents";
 import { DEFENSE_TOPICS } from "@/data/defenseModeOpponents";
 import { AATS_AVATAR_IDS, AATS_PHASES, type AATSAvatarId } from "@/data/aatsTrainingData";
 import { useAATSProgress } from "@/hooks/useAATSProgress";
 import { Progress } from "@/components/ui/progress";
+import { getAvatarTraining } from "@/data/aatsTrainingData";
 
 // Convert second-person AI prompt text to third-person for display
 function toThirdPerson(text: string): string {
@@ -324,6 +327,7 @@ export function OpponentProfileDialog({
   onNavigateToAATS,
 }: OpponentProfileDialogProps) {
   const { getAvatarProgress, getPhaseProgress } = useAATSProgress();
+  const [dialogTab, setDialogTab] = useState<"profile" | "training">("profile");
 
   if (!opponent) return null;
 
@@ -373,169 +377,248 @@ export function OpponentProfileDialog({
               </div>
             </div>
 
-            <Separator />
+            {/* Tabs: Profile | Training */}
+            <Tabs value={dialogTab} onValueChange={(v) => setDialogTab(v as "profile" | "training")} className="w-full">
+              <TabsList className="w-full grid grid-cols-2">
+                <TabsTrigger value="profile" className="flex items-center gap-1.5">
+                  <Eye className="h-3.5 w-3.5" /> Profile
+                </TabsTrigger>
+                <TabsTrigger value="training" className="flex items-center gap-1.5">
+                  <GraduationCap className="h-3.5 w-3.5" /> Training
+                </TabsTrigger>
+              </TabsList>
 
-            {/* Worldview Summary */}
-            <section className="space-y-2">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Eye className="h-4 w-4" /> Worldview Profile
-              </h3>
-              <p className="text-sm leading-relaxed text-foreground/80">
-                {toThirdPerson(opponent.worldview).slice(0, 400)}...
-              </p>
-            </section>
+              {/* ─── Profile Tab ─── */}
+              <TabsContent value="profile" className="space-y-6 mt-4">
+                {/* Worldview Summary */}
+                <section className="space-y-2">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                    <Eye className="h-4 w-4" /> Worldview Profile
+                  </h3>
+                  <p className="text-sm leading-relaxed text-foreground/80">
+                    {toThirdPerson(opponent.worldview).slice(0, 400)}...
+                  </p>
+                </section>
 
-            {/* Attack Targets */}
-            <section className="space-y-3">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Crosshair className="h-4 w-4 text-red-400" /> Primary Attack Targets
-              </h3>
-              <div className="grid gap-1.5">
-                {opponent.attackTargets.map((target, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm">
-                    <Target className="h-3.5 w-3.5 text-red-400 mt-0.5 flex-shrink-0" />
-                    <span>{target}</span>
+                {/* Attack Targets */}
+                <section className="space-y-3">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                    <Crosshair className="h-4 w-4 text-destructive" /> Primary Attack Targets
+                  </h3>
+                  <div className="grid gap-1.5">
+                    {opponent.attackTargets.map((target, i) => (
+                      <div key={i} className="flex items-start gap-2 text-sm">
+                        <Target className="h-3.5 w-3.5 text-destructive mt-0.5 flex-shrink-0" />
+                        <span>{target}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </section>
+                </section>
 
-            {/* Where You'll Encounter Them */}
-            {strategy && (
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-400" /> Where You'll Encounter This
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {strategy.commonEncounters.map((enc, i) => (
-                    <Badge key={i} variant="secondary" className="text-xs">
-                      {enc}
-                    </Badge>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Common Fallacies to Expose */}
-            {strategy && (
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Brain className="h-4 w-4 text-violet-400" /> Fallacies Jeeves Will Help You Expose
-                </h3>
-                <div className="space-y-2">
-                  {strategy.fallacies.map((f, i) => (
-                    <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-violet-500/5 border border-violet-500/10">
-                      <Zap className="h-3.5 w-3.5 text-violet-400 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">{f}</span>
+                {/* Where You'll Encounter Them */}
+                {strategy && (
+                  <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-accent-foreground" /> Where You'll Encounter This
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {strategy.commonEncounters.map((enc, i) => (
+                        <Badge key={i} variant="secondary" className="text-xs">
+                          {enc}
+                        </Badge>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </section>
-            )}
+                  </section>
+                )}
 
-            {/* How Jeeves Prepares You */}
-            {strategy && (
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-amber-400" /> How Jeeves Prepares You
-                </h3>
-                <div className="p-4 rounded-lg bg-gradient-to-br from-amber-500/5 to-primary/5 border border-amber-500/15">
-                  <p className="text-sm leading-relaxed">{strategy.jeevesApproach}</p>
-                </div>
-              </section>
-            )}
-
-            {/* Weapon Sharpening Tips */}
-            {strategy && (
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Swords className="h-4 w-4 text-orange-400" /> Weapon Sharpening Approaches
-                </h3>
-                <div className="space-y-2">
-                  {strategy.weaponTips.map((tip, i) => (
-                    <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-orange-500/5 border border-orange-500/10">
-                      <Shield className="h-3.5 w-3.5 text-orange-400 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">{tip}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Key Scriptures */}
-            {strategy && (
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-emerald-400" /> Key Scripture Arsenal
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {strategy.keyScriptures.map((ref, i) => (
-                    <Badge key={i} variant="outline" className="text-xs border-emerald-500/30 text-emerald-400 bg-emerald-500/5">
-                      📖 {ref}
-                    </Badge>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Signature Topics */}
-            {signatureTopics.length > 0 && (
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Flame className="h-4 w-4 text-red-400" /> Signature Attack Topics
-                </h3>
-                <div className="space-y-2">
-                  {signatureTopics.map((topic) => (
-                    <div key={topic.id} className="p-3 rounded-lg bg-red-500/5 border border-red-500/10">
-                      <p className="font-semibold text-sm">{topic.name}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{topic.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* AATS Training Path */}
-            {hasAATSTraining && (
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4 text-primary" /> Training Path
-                </h3>
-                <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 to-violet-500/5 border border-primary/15 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Overall Progress</span>
-                    <span className="text-xs text-muted-foreground">{aatsProgress}%</span>
-                  </div>
-                  <Progress value={aatsProgress} className="h-2" />
-                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1">
-                    {AATS_PHASES.map((phase) => {
-                      const pp = getPhaseProgress(opponent.id, phase.number);
-                      return (
-                        <div key={phase.number} className="text-center">
-                          <div className="text-[10px] text-muted-foreground mb-1 truncate">P{phase.number}</div>
-                          <Progress value={pp} className="h-1.5" />
+                {/* Common Fallacies to Expose */}
+                {strategy && (
+                  <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <Brain className="h-4 w-4 text-primary" /> Fallacies Jeeves Will Help You Expose
+                    </h3>
+                    <div className="space-y-2">
+                      {strategy.fallacies.map((f, i) => (
+                        <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-primary/5 border border-primary/10">
+                          <Zap className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
+                          <span className="text-sm">{f}</span>
                         </div>
-                      );
-                    })}
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* How Jeeves Prepares You */}
+                {strategy && (
+                  <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-accent-foreground" /> How Jeeves Prepares You
+                    </h3>
+                    <div className="p-4 rounded-lg bg-gradient-to-br from-accent/10 to-primary/5 border border-accent/15">
+                      <p className="text-sm leading-relaxed">{strategy.jeevesApproach}</p>
+                    </div>
+                  </section>
+                )}
+
+                {/* Weapon Sharpening Tips */}
+                {strategy && (
+                  <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <Swords className="h-4 w-4 text-accent-foreground" /> Weapon Sharpening Approaches
+                    </h3>
+                    <div className="space-y-2">
+                      {strategy.weaponTips.map((tip, i) => (
+                        <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-accent/5 border border-accent/10">
+                          <Shield className="h-3.5 w-3.5 text-accent-foreground mt-0.5 flex-shrink-0" />
+                          <span className="text-sm">{tip}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* Key Scriptures */}
+                {strategy && (
+                  <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-primary" /> Key Scripture Arsenal
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {strategy.keyScriptures.map((ref, i) => (
+                        <Badge key={i} variant="outline" className="text-xs border-primary/30 text-primary bg-primary/5">
+                          📖 {ref}
+                        </Badge>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* Signature Topics */}
+                {signatureTopics.length > 0 && (
+                  <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <Flame className="h-4 w-4 text-destructive" /> Signature Attack Topics
+                    </h3>
+                    <div className="space-y-2">
+                      {signatureTopics.map((topic) => (
+                        <div key={topic.id} className="p-3 rounded-lg bg-destructive/5 border border-destructive/10">
+                          <p className="font-semibold text-sm">{topic.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{topic.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </TabsContent>
+
+              {/* ─── Training Tab ─── */}
+              <TabsContent value="training" className="space-y-6 mt-4">
+                {hasAATSTraining ? (() => {
+                  const training = getAvatarTraining(opponent.id as AATSAvatarId);
+                  return (
+                    <>
+                      {/* Overall Progress */}
+                      <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/15 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Overall Progress</span>
+                          <span className="text-xs text-muted-foreground">{aatsProgress}%</span>
+                        </div>
+                        <Progress value={aatsProgress} className="h-2" />
+                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1">
+                          {AATS_PHASES.map((phase) => {
+                            const pp = getPhaseProgress(opponent.id, phase.number);
+                            return (
+                              <div key={phase.number} className="text-center">
+                                <div className="text-[10px] text-muted-foreground mb-1 truncate">P{phase.number}</div>
+                                <Progress value={pp} className="h-1.5" />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Training Subjects */}
+                      {training.subjects.length > 0 && (
+                        <section className="space-y-3">
+                          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                            <BookOpen className="h-4 w-4" /> Training Subjects
+                          </h3>
+                          <div className="space-y-2">
+                            {training.subjects.map((subject) => (
+                              <div key={subject.id} className="p-3 rounded-lg bg-muted/50 border border-border/50">
+                                <p className="font-medium text-sm">{subject.title}</p>
+                                <p className="text-xs text-muted-foreground mt-1">{subject.description}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </section>
+                      )}
+
+                      {/* Steelman Arguments */}
+                      {training.steelmanArguments.length > 0 && (
+                        <section className="space-y-3">
+                          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                            <Brain className="h-4 w-4" /> Steelman Arguments to Master
+                          </h3>
+                          <div className="space-y-2">
+                            {training.steelmanArguments.slice(0, 5).map((arg) => (
+                              <div key={arg.id} className="p-3 rounded-lg bg-muted/50 border border-border/50 space-y-1">
+                                <p className="font-medium text-sm">{arg.title}</p>
+                                <p className="text-xs text-muted-foreground">{arg.argument.slice(0, 150)}...</p>
+                              </div>
+                            ))}
+                            {training.steelmanArguments.length > 5 && (
+                              <p className="text-xs text-muted-foreground text-center">+{training.steelmanArguments.length - 5} more arguments</p>
+                            )}
+                          </div>
+                        </section>
+                      )}
+
+                      {/* Mind Games */}
+                      {training.mindGames.length > 0 && (
+                        <section className="space-y-3">
+                          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4" /> Mind Games to Detect
+                          </h3>
+                          <div className="space-y-2">
+                            {training.mindGames.slice(0, 4).map((mg) => (
+                              <div key={mg.id} className="p-3 rounded-lg bg-muted/50 border border-border/50 space-y-1">
+                                <p className="font-medium text-sm">{mg.name}</p>
+                                <p className="text-xs text-muted-foreground">{mg.description.slice(0, 120)}...</p>
+                              </div>
+                            ))}
+                            {training.mindGames.length > 4 && (
+                              <p className="text-xs text-muted-foreground text-center">+{training.mindGames.length - 4} more mind games</p>
+                            )}
+                          </div>
+                        </section>
+                      )}
+
+                      {/* CTA to full AATS */}
+                      {onNavigateToAATS && (
+                        <Button
+                          className="w-full"
+                          onClick={() => {
+                            onNavigateToAATS(opponent.id);
+                            onOpenChange(false);
+                          }}
+                        >
+                          <GraduationCap className="h-4 w-4 mr-2" />
+                          {aatsProgress > 0 ? "Continue Full Training" : "Start Full Training"}
+                          <ChevronRight className="h-4 w-4 ml-2" />
+                        </Button>
+                      )}
+                    </>
+                  );
+                })() : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <GraduationCap className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                    <p className="font-medium">Training Coming Soon</p>
+                    <p className="text-sm mt-1">AATS training for this opponent is not yet available.</p>
                   </div>
-                  {onNavigateToAATS && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full mt-2"
-                      onClick={() => {
-                        onNavigateToAATS(opponent.id);
-                        onOpenChange(false);
-                      }}
-                    >
-                      <GraduationCap className="h-3.5 w-3.5 mr-1.5" />
-                      {aatsProgress > 0 ? "Continue Training" : "Start Training"}
-                      <ChevronRight className="h-3.5 w-3.5 ml-1.5" />
-                    </Button>
-                  )}
-                </div>
-              </section>
-            )}
+                )}
+              </TabsContent>
+            </Tabs>
 
             <Separator />
 
