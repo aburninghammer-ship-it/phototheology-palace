@@ -111,48 +111,70 @@ export const AudioNarrator = ({
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice: selectedVoice, speed }
-      });
-
-      if (error) throw error;
-
-      if (data?.audioContent || data?.audioUrl) {
-        let url: string;
-        if (data.audioContent) {
-          // Convert base64 to blob
-          const audioBlob = base64ToBlob(data.audioContent, "audio/mpeg");
-          url = URL.createObjectURL(audioBlob);
-        } else {
-          url = data.audioUrl;
+      // Use fetch instead of supabase.functions.invoke to handle both JSON and binary responses properly
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/text-to-speech`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text, voice: selectedVoice, speed, returnType: "url" }),
         }
-        setAudioUrl(url);
-        
-        // Create audio element
-        const audio = new Audio(url);
-        audioRef.current = audio;
-        
-        audio.onloadedmetadata = () => {
-          setDuration(audio.duration);
-        };
-        
-        audio.ontimeupdate = () => {
-          setProgress((audio.currentTime / audio.duration) * 100);
-        };
-        
-        audio.onended = () => {
-          setIsPlaying(false);
-          setProgress(0);
-          notifyTTSStopped();
-        };
+      );
 
-        audio.volume = volume / 100;
-        
-        // Auto-play after generation
-        audio.play();
-        setIsPlaying(true);
-        notifyTTSStarted();
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`TTS request failed: ${response.status} - ${errText}`);
       }
+
+      const data = await response.json();
+
+      let url: string;
+      if (data.audioUrl) {
+        url = data.audioUrl;
+      } else if (data.audioContent) {
+        // Use data URI instead of atob() to avoid binary corruption
+        url = `data:audio/mpeg;base64,${data.audioContent}`;
+      } else {
+        throw new Error("No audio data returned");
+      }
+
+      setAudioUrl(url);
+        
+      // Create audio element
+      const audio = new Audio(url);
+      audioRef.current = audio;
+        
+      audio.onloadedmetadata = () => {
+        setDuration(audio.duration);
+      };
+        
+      audio.ontimeupdate = () => {
+        setProgress((audio.currentTime / audio.duration) * 100);
+      };
+        
+      audio.onended = () => {
+        setIsPlaying(false);
+        setProgress(0);
+        notifyTTSStopped();
+      };
+
+      audio.onerror = (e) => {
+        console.error("Audio playback error:", e);
+        toast.error("Audio failed to load. Try again.");
+        setIsPlaying(false);
+        setIsLoading(false);
+      };
+
+      audio.volume = volume / 100;
+        
+      // Auto-play after generation
+      audio.play();
+      setIsPlaying(true);
+      notifyTTSStarted();
     } catch (error) {
       console.error("Error generating audio:", error);
       toast.error("Failed to generate audio. Please try again.");
