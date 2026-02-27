@@ -7,7 +7,7 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio, Shield, Globe, GraduationCap, Crown } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio, Shield, Globe, GraduationCap } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { useTheme } from "next-themes";
@@ -29,7 +29,6 @@ import { LibraryTab } from "@/components/living-manna/LibraryTab";
 import { LMLiveTab } from "@/components/living-manna/LMLiveTab";
 import { LiveMembersStrip } from "@/components/living-manna/LiveMembersStrip";
 import { BaptismTrack } from "@/components/living-manna/baptism-track/BaptismTrack";
-import { WarCollege } from "@/components/living-manna/WarCollege";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TagFriendButton } from "@/components/TagFriendButton";
@@ -364,10 +363,6 @@ export default function LivingManna() {
                     <GraduationCap className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">AATS</span>
                   </TabsTrigger>
-                  <TabsTrigger value="war-college" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
-                    <Crown className="h-4 w-4" />
-                    <span className="text-xs sm:text-sm">War College</span>
-                  </TabsTrigger>
                   <TabsTrigger value="connect" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <MessagesSquare className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Connect</span>
@@ -470,14 +465,6 @@ export default function LivingManna() {
                   churchId={effectiveChurchId!}
                   onNavigateToDefense={() => handleTabChange("defense")}
                   initialAvatarId={undefined}
-                />
-              </TabsContent>
-
-              <TabsContent value="war-college">
-                <WarCollege
-                  churchId={effectiveChurchId!}
-                  onNavigateToDefense={() => handleTabChange("defense")}
-                  onNavigateToAATS={() => handleTabChange("aats")}
                 />
               </TabsContent>
 
