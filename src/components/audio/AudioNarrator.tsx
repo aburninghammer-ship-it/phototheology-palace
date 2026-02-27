@@ -119,23 +119,8 @@ export const AudioNarrator = ({
     notifyTTSStopped();
   };
 
-  const primeAudioForMobile = async (audio: HTMLAudioElement) => {
-    audio.preload = "auto";
-    audio.volume = volume / 100;
-
-    if (!isMobile) return;
-
-    try {
-      audio.muted = true;
-      await audio.play();
-      audio.pause();
-      audio.currentTime = 0;
-    } catch {
-      // Best effort warm-up for iOS/Safari autoplay restrictions
-    } finally {
-      audio.muted = false;
-    }
-  };
+  // Tiny silent MP3 for priming audio element in user gesture context
+  const SILENT_MP3 = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwBHAAAAAAD/+1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
   const generateAudio = async () => {
     if (audioUrl && audioRef.current) {
@@ -143,9 +128,20 @@ export const AudioNarrator = ({
       return;
     }
 
+    // Create and prime audio element SYNCHRONOUSLY in user gesture context
     const audio = new Audio();
+    audio.preload = "auto";
+    audio.volume = volume / 100;
     audioRef.current = audio;
-    await primeAudioForMobile(audio);
+
+    // Prime with silent audio to unlock playback on mobile
+    try {
+      audio.src = SILENT_MP3;
+      await audio.play();
+      audio.pause();
+    } catch {
+      // Best effort - some browsers still allow later play
+    }
 
     setIsLoading(true);
     try {
@@ -171,7 +167,15 @@ export const AudioNarrator = ({
 
       let url: string;
       if (data.audioUrl) {
-        url = data.audioUrl;
+        // Fetch the audio URL as a blob to avoid CORS/redirect issues on mobile
+        try {
+          const audioResponse = await fetch(data.audioUrl);
+          const blob = await audioResponse.blob();
+          url = URL.createObjectURL(blob);
+        } catch {
+          // Fallback to direct URL if blob fetch fails
+          url = data.audioUrl;
+        }
       } else if (data.audioContent) {
         url = `data:audio/mpeg;base64,${data.audioContent}`;
       } else {
