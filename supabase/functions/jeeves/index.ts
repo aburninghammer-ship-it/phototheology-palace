@@ -7526,8 +7526,9 @@ Only output the REMAINING sections that were not completed. If the MODEL DEFENSE
       userPrompt = `Continue the coaching analysis from where it was cut off. Complete all remaining sections including the full MODEL DEFENSE if it wasn't finished. Topic: "${defenseTopicName || 'this doctrine'}"`;
 
     } else if (mode === "defense-pre-briefing") {
-      const { opponentName, opponentWorldview, opponentStyle, opponentTargets, defenseTopicName } = requestBody;
-      systemPrompt = `You are Jeeves, a master theological strategist preparing a disciple for a debate. Give a concise PRE-BATTLE BRIEFING (3-5 paragraphs). Cover: 1) The opponent's likely angle of attack based on their worldview (${opponentWorldview || 'unknown'}), 2) Their rhetorical style (${opponentStyle || 'unknown'}), 3) Key scriptures they'll misuse and how to counter, 4) Your recommended opening strategy, 5) Emotional traps to watch for. Be direct, tactical, and confident. NEVER use markdown formatting characters like # or *. NEVER use "dear" in any form.`;
+      const { opponentName, opponentPronouns, opponentWorldview, opponentStyle, opponentTargets, defenseTopicName } = requestBody;
+      const pronounNote = opponentPronouns ? ` Use ${opponentPronouns} pronouns when referring to the opponent.` : '';
+      systemPrompt = `You are Jeeves, a master theological strategist preparing a disciple for a debate. Give a concise PRE-BATTLE BRIEFING (3-5 paragraphs). Cover: 1) The opponent's likely angle of attack based on their worldview (${opponentWorldview || 'unknown'}), 2) Their rhetorical style (${opponentStyle || 'unknown'}), 3) Key scriptures they'll misuse and how to counter, 4) Your recommended opening strategy, 5) Emotional traps to watch for. Be direct, tactical, and confident. NEVER use markdown formatting characters like # or *. NEVER use "dear" in any form.${pronounNote}`;
       userPrompt = `Prepare me for a Master-level debate against ${opponentName || 'an opponent'} on the topic: "${defenseTopicName || 'Unknown'}". Their known attack targets: ${JSON.stringify(opponentTargets || [])}. Give me a tactical briefing.`;
 
     } else if (mode === "defense-master-standby") {

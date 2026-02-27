@@ -12,13 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    const { action, messages, opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, userMessage, defenderName, partialResponse, sessionId, analysisId, forceRegenerate, turnIndex, turnRole, turnContent, allMessages } = await req.json();
+    const { action, messages, opponentWorldview, opponentStyle, opponentName, opponentPronouns, topicName, topicDescription, difficulty, userMessage, defenderName, partialResponse, sessionId, analysisId, forceRegenerate, turnIndex, turnRole, turnContent, allMessages } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     if (action === "open") {
-      const systemPrompt = buildSystemPrompt(opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty);
+      const systemPrompt = buildSystemPrompt(opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, opponentPronouns);
       const angles = [
         "Open with a historical/scholarly challenge",
         "Open with a philosophical or logical challenge",
@@ -42,7 +42,7 @@ serve(async (req) => {
     }
 
     if (action === "reply") {
-      const systemPrompt = buildSystemPrompt(opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty);
+      const systemPrompt = buildSystemPrompt(opponentWorldview, opponentStyle, opponentName, topicName, topicDescription, difficulty, opponentPronouns);
       const chatMessages = [
         { role: "system", content: systemPrompt },
         ...messages.map((m: any) => ({
@@ -466,15 +466,17 @@ RULES:
   return { system, user };
 }
 
-function buildSystemPrompt(worldview: string, style: string, name: string, topic: string, topicDesc: string, difficulty: string): string {
+function buildSystemPrompt(worldview: string, style: string, name: string, topic: string, topicDesc: string, difficulty: string, pronouns?: string): string {
   const difficultyMap: Record<string, string> = {
     beginner: "Use simple, direct arguments. Be firm but not overwhelming. Allow the defender time to think. Limit to 1-2 points per response. Keep responses under 150 words.",
     intermediate: "Use moderately complex arguments with some scholarly references. Press harder on weak points. 2-3 points per response. Keep responses under 200 words.",
     advanced: "Use the strongest possible arguments with deep scholarly sources, textual criticism, and logical precision. Be relentless. Anticipate counter-arguments. 3-4 points per response. Keep responses under 250 words.",
   };
 
-  return `You are "${name}", a theological debater.
+  const pronounNote = pronouns ? `\nIMPORTANT: When referring to yourself in third person or when the system describes you, use ${pronouns} pronouns.` : '';
 
+  return `You are "${name}", a theological debater.
+${pronounNote}
 WORLDVIEW: ${worldview}
 
 ARGUMENT STYLE: ${style}
