@@ -104,14 +104,20 @@ export const AudioNarrator = ({
 
   const generateAudio = async () => {
     if (audioUrl) {
-      // Already have audio, just play it
       playAudio();
       return;
     }
 
+    // Create and unlock Audio element immediately in user gesture context (critical for mobile)
+    const audio = new Audio();
+    audio.preload = "auto";
+    audio.volume = volume / 100;
+    // Unlock audio element for iOS Safari
+    audio.play().catch(() => {});
+    audioRef.current = audio;
+
     setIsLoading(true);
     try {
-      // Use fetch instead of supabase.functions.invoke to handle both JSON and binary responses properly
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/text-to-speech`,
         {
@@ -136,17 +142,12 @@ export const AudioNarrator = ({
       if (data.audioUrl) {
         url = data.audioUrl;
       } else if (data.audioContent) {
-        // Use data URI instead of atob() to avoid binary corruption
         url = `data:audio/mpeg;base64,${data.audioContent}`;
       } else {
         throw new Error("No audio data returned");
       }
 
       setAudioUrl(url);
-        
-      // Create audio element
-      const audio = new Audio(url);
-      audioRef.current = audio;
         
       audio.onloadedmetadata = () => {
         setDuration(audio.duration);
@@ -169,10 +170,9 @@ export const AudioNarrator = ({
         setIsLoading(false);
       };
 
-      audio.volume = volume / 100;
-        
-      // Auto-play after generation
-      audio.play();
+      // Set source and play - element was already unlocked in user gesture
+      audio.src = url;
+      await audio.play();
       setIsPlaying(true);
       notifyTTSStarted();
     } catch (error) {
