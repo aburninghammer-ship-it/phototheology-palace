@@ -612,6 +612,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
         body: {
           mode: "defense-pre-briefing",
           opponentName: opponent.name,
+          opponentPronouns: opponent.pronouns,
           opponentWorldview: opponent.worldview,
           opponentStyle: opponent.argumentStyle,
           opponentTargets: opponent.attackTargets,
