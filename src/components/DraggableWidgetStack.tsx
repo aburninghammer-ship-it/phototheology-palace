@@ -30,7 +30,8 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
 
   const applyPos = useCallback(() => {
     if (stackRef.current) {
-      stackRef.current.style.transform = `translate(${posRef.current.x}px, ${posRef.current.y}px)`;
+      stackRef.current.style.left = `${posRef.current.x}px`;
+      stackRef.current.style.top = `${posRef.current.y}px`;
     }
   }, []);
 
@@ -100,7 +101,7 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
     <div
       ref={stackRef}
       className="fixed z-[1000] flex items-end gap-1 select-none"
-      style={{ left: 0, top: 0, willChange: "transform", touchAction: "none" }}
+      style={{ left: 0, top: 0, willChange: "left, top", touchAction: "none" }}
     >
       {/* Drag handle */}
       <div
