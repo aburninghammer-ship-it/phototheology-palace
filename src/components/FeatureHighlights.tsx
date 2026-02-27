@@ -22,7 +22,7 @@ const FEATURES = [
     title: "Original Language Tools",
     description: "Tap any word to see Greek/Hebrew with Strong's numbers",
     icon: Languages,
-    path: "/bible/John/1",
+    path: "/bible",
     gradient: "from-blue-500 to-cyan-500",
     tip: "Try tapping a word in the Bible reader"
   },
