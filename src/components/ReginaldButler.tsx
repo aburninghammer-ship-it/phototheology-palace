@@ -329,7 +329,7 @@ export const ReginaldButler = () => {
                 onClick={toggleMic}
                 size="icon"
                 variant="ghost"
-                className={`h-11 w-11 flex-shrink-0 transition-colors ${listening ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
+                className={`h-12 w-12 flex-shrink-0 transition-colors ${listening ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
                 title={listening ? "Stop recording" : "Speak your question"}
               >
                 {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
@@ -341,13 +341,14 @@ export const ReginaldButler = () => {
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
                 placeholder={listening ? "Listening…" : "Ask Reginald about the Palace…"}
                 disabled={loading}
-                className="flex-1 text-base h-11 rounded-xl"
+                className="flex-1 !text-base h-12 rounded-xl bg-muted/50 border-border focus:bg-background"
+                style={{ fontSize: "16px" }}
               />
               <Button
                 onClick={() => sendMessage()}
                 disabled={loading || !input.trim()}
                 size="icon"
-                className="h-11 w-11 flex-shrink-0 text-primary-foreground rounded-xl"
+                className="h-12 w-12 flex-shrink-0 text-primary-foreground rounded-xl"
                 style={{ background: "linear-gradient(135deg, #78350f, #92400e)" }}
               >
                 <Send className="h-4 w-4" />
