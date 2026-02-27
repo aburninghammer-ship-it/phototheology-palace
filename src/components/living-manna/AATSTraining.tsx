@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { WarCollegeTrackView } from "./WarCollegeTrackView";
+import { WAR_COLLEGE_TRACKS, type WarCollegeTrack } from "@/data/aats/warCollegeTypes";
 import {
   BookOpen, Shield, Brain, Zap, Swords, Flame, ArrowLeft, ArrowRight,
   CheckCircle2, Circle, ChevronDown, ChevronUp, ChevronRight, GraduationCap,
@@ -44,7 +46,8 @@ type AATSView =
   | "phase-content"
   | "module-viewer"
   | "cross-avatar"
-  | "mind-games-lab";
+  | "mind-games-lab"
+  | "war-college";
 
 interface AATSTrainingProps {
   churchId: string;
@@ -70,6 +73,7 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [exerciseAnswers, setExerciseAnswers] = useState<Record<string, string>>({});
   const [revealedExercises, setRevealedExercises] = useState<Set<string>>(new Set());
+  const [selectedWarCollegeTrack, setSelectedWarCollegeTrack] = useState<WarCollegeTrack | null>(null);
 
   const selectedTraining = useMemo(
     () => (selectedAvatarId ? getAvatarTraining(selectedAvatarId) : null),
@@ -120,6 +124,9 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
       setSelectedCrossSubject(null);
     } else if (view === "mind-games-lab") {
       setView("overview");
+    } else if (view === "war-college") {
+      setView("overview");
+      setSelectedWarCollegeTrack(null);
     }
   };
 
@@ -240,6 +247,47 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
             </div>
           </div>
         ))}
+
+        {/* ─── War College ─── */}
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <GraduationCap className="h-5 w-5 text-sky-400" />
+            War College — 56-Day Formation
+          </h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Ultra-immersive strategic manuscripts. 25–30 minute deep studies that train the mind like a War College reading assignment.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {WAR_COLLEGE_TRACKS.map((track) => {
+              const opponent = DEFENSE_OPPONENTS.find((o) => o.id === track.avatarId);
+              return (
+                <Card
+                  key={track.id}
+                  className="cursor-pointer hover:border-sky-500/50 transition-all group"
+                  onClick={() => {
+                    setSelectedWarCollegeTrack(track);
+                    setView("war-college");
+                  }}
+                >
+                  <CardContent className="p-4 flex items-center gap-4">
+                    {opponent?.avatar ? (
+                      <img src={opponent.avatar} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-sky-500/30" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-xl">
+                        {track.emoji}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm">{track.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{track.avatarName} — {track.totalDays} days</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Mind Games Lab Card */}
         <div>
@@ -1228,6 +1276,12 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
           {view === "module-viewer" && renderModuleViewer()}
           {view === "cross-avatar" && renderCrossAvatar()}
           {view === "mind-games-lab" && renderMindGamesLab()}
+          {view === "war-college" && selectedWarCollegeTrack && (
+            <WarCollegeTrackView
+              track={selectedWarCollegeTrack}
+              onBack={() => { setView("overview"); setSelectedWarCollegeTrack(null); }}
+            />
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
