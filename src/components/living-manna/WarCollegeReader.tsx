@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import type { WarCollegeDay } from "@/data/aats/warCollegeTypes";
 import { RANK_CONFIG } from "@/data/aats/warCollegeTypes";
@@ -33,6 +34,7 @@ export function WarCollegeReader({
   const [showDrills, setShowDrills] = useState(false);
   const [forgeResponse, setForgeResponse] = useState("");
   const [masteryAnswers, setMasteryAnswers] = useState<Record<number, boolean>>({});
+  const [activePanel, setActivePanel] = useState<"read" | "audio">("read");
   const rankInfo = RANK_CONFIG[study.rank];
 
   return (
@@ -85,30 +87,49 @@ export function WarCollegeReader({
         <Separator />
       </div>
 
-      {/* ─── Audio Narrator for Manuscript ─── */}
-      <AudioNarrator
-        text={study.manuscript}
-        title={`🎧 Listen — Day ${study.dayNumber}: ${study.title}`}
-        voice="onyx"
-        showVoiceSelector={true}
-      />
+      {/* ─── Reader Panels ─── */}
+      <Tabs
+        value={activePanel}
+        onValueChange={(value) => setActivePanel(value as "read" | "audio")}
+        className="w-full"
+      >
+        <TabsList className="w-full">
+          <TabsTrigger value="read" className="gap-2">
+            <BookOpen className="h-4 w-4" /> Read Manuscript
+          </TabsTrigger>
+          <TabsTrigger value="audio" className="gap-2">
+            <Headphones className="h-4 w-4" /> Audio Training
+          </TabsTrigger>
+        </TabsList>
 
-      {/* ─── Manuscript Body ─── */}
-      <Card className="border-primary/10 shadow-lg">
-        <CardContent className="p-6 sm:p-8 md:p-10">
-          <div className="prose prose-lg dark:prose-invert max-w-none
-            prose-p:text-foreground/90 prose-p:leading-[1.85] prose-p:mb-6
-            prose-blockquote:border-l-primary prose-blockquote:bg-primary/5
-            prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
-            prose-blockquote:not-italic
-            prose-strong:text-primary prose-em:text-foreground/80
-            prose-headings:text-foreground
-            [&>blockquote_strong]:text-primary [&>blockquote_em]:text-foreground/70
-            text-[15px] sm:text-base">
-            <ReactMarkdown>{study.manuscript}</ReactMarkdown>
-          </div>
-        </CardContent>
-      </Card>
+        <TabsContent value="audio" className="mt-4">
+          <AudioNarrator
+            text={study.manuscript}
+            title={`🎧 Listen — Day ${study.dayNumber}: ${study.title}`}
+            voice="onyx"
+            showVoiceSelector={true}
+          />
+        </TabsContent>
+
+        <TabsContent value="read" className="mt-4">
+          {/* ─── Manuscript Body ─── */}
+          <Card className="border-primary/10 shadow-lg">
+            <CardContent className="p-6 sm:p-8 md:p-10">
+              <div className="prose prose-lg dark:prose-invert max-w-none
+                prose-p:text-foreground/90 prose-p:leading-[1.85] prose-p:mb-6
+                prose-blockquote:border-l-primary prose-blockquote:bg-primary/5
+                prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
+                prose-blockquote:not-italic
+                prose-strong:text-primary prose-em:text-foreground/80
+                prose-headings:text-foreground
+                [&>blockquote_strong]:text-primary [&>blockquote_em]:text-foreground/70
+                text-[15px] sm:text-base">
+                <ReactMarkdown>{study.manuscript}</ReactMarkdown>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* ─── Post-Manuscript Tactical Section Toggle ─── */}
       <div className="text-center">
