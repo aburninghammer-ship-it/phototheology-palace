@@ -1,17 +1,17 @@
 // ─── War College Track View ─────────────────────────────────────────────────
 // Shows the 56-day journey for a specific avatar's War College track.
+// ALL days are AI-generated on demand. No pre-built manuscripts.
 
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Lock, CheckCircle2, BookOpen, Swords, Clock,
-  GraduationCap, ChevronRight, Sparkles, Loader2,
+  ArrowLeft, CheckCircle2, BookOpen, Swords, Clock,
+  GraduationCap, Loader2, Sparkles,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useAATSProgress } from "@/hooks/useAATSProgress";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +24,6 @@ import {
   type WarCollegeRank,
   type WarCollegeTrack,
 } from "@/data/aats/warCollegeTypes";
-import { getPrebuiltManuscript, hasPrebuiltManuscript } from "@/data/aats/warCollegeManuscripts";
 import { DEFENSE_OPPONENTS } from "@/data/defenseModeOpponents";
 
 interface WarCollegeTrackViewProps {
@@ -35,12 +34,10 @@ interface WarCollegeTrackViewProps {
 export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { completeItem, isItemCompleted, getAvatarProgress } = useAATSProgress();
+  const { completeItem, isItemCompleted } = useAATSProgress();
   const [selectedDay, setSelectedDay] = useState<WarCollegeDay | null>(null);
   const [generating, setGenerating] = useState(false);
   const opponent = DEFENSE_OPPONENTS.find((o) => o.id === track.avatarId);
-
-  const progress = getAvatarProgress(track.avatarId);
 
   // Group days into weeks
   const weeks = useMemo(() => {
@@ -71,14 +68,6 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
   }, [completedDays, track.totalDays]);
 
   const handleOpenDay = async (dayNumber: number) => {
-    // Check for pre-built manuscript first
-    const prebuilt = getPrebuiltManuscript(track.avatarId, dayNumber);
-    if (prebuilt) {
-      setSelectedDay(prebuilt);
-      return;
-    }
-
-    // Otherwise generate via AI
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-war-college-day", {
@@ -226,8 +215,6 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
                 {days.map((d) => {
                   const done = completedDays.has(d);
                   const isNext = d === nextDay;
-                  const hasContent = hasPrebuiltManuscript(track.avatarId, d);
-                  const isLocked = d > nextDay + 1 && !done; // Allow 1 day ahead
 
                   return (
                     <motion.button
@@ -247,11 +234,7 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
                         }
                       `}
                     >
-                      {done ? (
-                        <CheckCircle2 className="h-4 w-4 mb-0.5" />
-                      ) : hasContent ? (
-                        <Sparkles className="h-3 w-3 mb-0.5 text-amber-400" />
-                      ) : null}
+                      {done && <CheckCircle2 className="h-4 w-4 mb-0.5" />}
                       <span className="text-xs">{d}</span>
                     </motion.button>
                   );

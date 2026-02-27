@@ -31,19 +31,32 @@ serve(async (req) => {
 
 CRITICAL RULES:
 1. Write as a CONTINUOUS MANUSCRIPT — not an outline, not a worksheet, not modular segments.
-2. Tone: Strategic, intellectual, formational. Like a War College reading assignment.
+2. Tone: Strategic, intellectual, formational. Like a War College reading assignment — NOT a devotional, NOT a classroom lecture, NOT a casual lesson.
 3. Integrate theology, philosophy, and strategy ORGANICALLY — no choppy sections.
-4. Weave the avatar's presence naturally (refer to the opponent by name as a strategic adversary).
-5. Use Scripture as INTELLECTUAL ANCHORS (full KJV quotes with book/chapter/verse), not decorative.
+4. Weave the avatar's presence naturally (refer to the opponent by name as a strategic adversary whose arguments you are dissecting).
+5. Use Scripture as INTELLECTUAL ANCHORS (full KJV quotes with book/chapter/verse in markdown blockquotes), not decorative.
 6. Train the mind, don't just inform it.
-7. Minimum 2,000 words for the manuscript body.
+7. Minimum 2,000 words for the manuscript body. Target 2,500–3,000 for depth.
 8. NO headings or subheadings in the manuscript body — continuous prose only.
 9. Use markdown blockquotes (>) for Scripture citations.
-10. Phototheology integration: weave Palace concepts (Great Controversy, Sanctuary, Cycles, Types/Parallels) without naming rooms explicitly.
-11. SDA historicist and sanctuary theology guardrails apply.
-12. The manuscript should feel like a 25-30 minute deep study session.
+10. Phototheology integration: weave Great Controversy, Sanctuary typology, Covenant Cycles, Types/Parallels, and Christ-centered hermeneutics naturally without naming Palace rooms or codes.
+11. SDA historicist and sanctuary theology guardrails apply at all times.
+12. The manuscript should feel like a true 25–30 minute deep study session.
+13. Each day MUST cover a distinct topic that progressively builds on the previous days within the track.
+14. Day 1 always starts with the foundational epistemological or theological conflict central to the opponent's worldview.
+15. Each subsequent day should advance deeper — never repeat the same ground.
+
+OPPONENT WORLDVIEW CONTEXT:
+- Avatar: ${avatarName} (${avatarId})
+- Track: ${trackTitle}
+- This opponent represents a specific worldview. Study their actual doctrines, arguments, and philosophical positions with scholarly accuracy before refuting them.
 
 RANK DEPTH: ${rank} — ${rankDesc}
+- Initiate (Weeks 1-2): Build foundations — define the conflict, establish epistemological ground, introduce the opponent's core framework.
+- Apprentice (Weeks 3-4): Confront core challenges — engage their strongest arguments head-on with deeper analysis.
+- Strategist (Weeks 5-6): Multi-layered defense — weave sanctuary, prophecy, Great Controversy themes into sophisticated rebuttals.
+- Tactician (Weeks 7-8): Proactive offense — turn the opponent's own framework against itself, expose internal contradictions.
+- Commander (Weeks 9-10): Comprehensive dominance — synthesize all dimensions into masterful theological warfare.
 
 You MUST return valid JSON with this exact structure:
 {
@@ -58,12 +71,12 @@ You MUST return valid JSON with this exact structure:
     "estimatedMinutes": 28,
     "manuscript": "... (the full continuous manuscript, 2000+ words, with markdown formatting for Scripture blockquotes) ...",
     "defenseApplication": {
-      "commonObjection": "...",
-      "eliteResponse": "..."
+      "commonObjection": "A real objection this opponent would raise, stated in their voice",
+      "eliteResponse": "A devastating, philosophically precise SDA response"
     },
-    "forgeExercise": "...",
+    "forgeExercise": "A specific writing exercise that forces the student to craft their own argument on today's topic (6-8 sentences, War College rating 9-10/10)",
     "masteryChecks": ["question1", "question2", "question3", "question4"],
-    "tomorrowTeaser": "..."
+    "tomorrowTeaser": "A compelling preview of tomorrow's escalation — what conflict comes next"
   }
 }`;
 

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WarCollegeTrackView } from "./WarCollegeTrackView";
-import { WAR_COLLEGE_TRACKS, type WarCollegeTrack } from "@/data/aats/warCollegeTypes";
+import { WAR_COLLEGE_TRACKS, WAR_COLLEGE_RINGS, type WarCollegeTrack } from "@/data/aats/warCollegeTypes";
 import {
   BookOpen, Shield, Brain, Zap, Swords, Flame, ArrowLeft, ArrowRight,
   CheckCircle2, Circle, ChevronDown, ChevronUp, ChevronRight, GraduationCap,
@@ -248,45 +248,57 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
           </div>
         ))}
 
-        {/* ─── War College ─── */}
-        <div>
-          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <GraduationCap className="h-5 w-5 text-sky-400" />
-            War College — 56-Day Formation
-          </h3>
-          <p className="text-xs text-muted-foreground mb-3">
-            Ultra-immersive strategic manuscripts. 25–30 minute deep studies that train the mind like a War College reading assignment.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {WAR_COLLEGE_TRACKS.map((track) => {
-              const opponent = DEFENSE_OPPONENTS.find((o) => o.id === track.avatarId);
-              return (
-                <Card
-                  key={track.id}
-                  className="cursor-pointer hover:border-sky-500/50 transition-all group"
-                  onClick={() => {
-                    setSelectedWarCollegeTrack(track);
-                    setView("war-college");
-                  }}
-                >
-                  <CardContent className="p-4 flex items-center gap-4">
-                    {opponent?.avatar ? (
-                      <img src={opponent.avatar} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-sky-500/30" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-xl">
-                        {track.emoji}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm">{track.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">{track.avatarName} — {track.totalDays} days</p>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </CardContent>
-                </Card>
-              );
-            })}
+        {/* ─── War College — All 20 Avatars ─── */}
+        <div className="space-y-5">
+          <div>
+            <h3 className="text-lg font-semibold mb-1 flex items-center gap-2">
+              <GraduationCap className="h-5 w-5 text-primary" />
+              War College — 56-Day Formation
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Ultra-immersive strategic manuscripts for every opponent. 25–30 minute deep studies that train the mind like a War College reading assignment.
+            </p>
           </div>
+
+          {WAR_COLLEGE_RINGS.map((ring) => (
+            <div key={ring.id}>
+              <h4 className={`text-sm font-semibold mb-2 flex items-center gap-2 ${ring.color}`}>
+                <Target className="h-4 w-4" />
+                {ring.title}
+                <Badge variant="secondary" className="text-[10px]">{ring.tracks.length}</Badge>
+              </h4>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {ring.tracks.map((track) => {
+                  const opponent = DEFENSE_OPPONENTS.find((o) => o.id === track.avatarId);
+                  return (
+                    <Card
+                      key={track.id}
+                      className="cursor-pointer hover:border-primary/50 transition-all group"
+                      onClick={() => {
+                        setSelectedWarCollegeTrack(track);
+                        setView("war-college");
+                      }}
+                    >
+                      <CardContent className="p-3 flex items-center gap-3">
+                        {opponent?.avatar ? (
+                          <img src={opponent.avatar} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-primary/30" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-lg">
+                            {track.emoji}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm truncate">{track.title}</p>
+                          <p className="text-[10px] text-muted-foreground truncate">{track.avatarName} — {track.totalDays} days</p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Mind Games Lab Card */}
