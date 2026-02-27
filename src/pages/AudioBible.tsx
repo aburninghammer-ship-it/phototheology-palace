@@ -1613,14 +1613,12 @@ export default function AudioBible() {
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
-                              <ScrollArea className="h-64">
+                            <SelectContent className="max-h-64 overflow-y-auto">
                                 {BIBLE_BOOK_METADATA.map((book) => (
                                   <SelectItem key={book.name} value={book.name}>
                                     {book.name} ({t('audioBible.chAbbrev', { count: book.chapters })})
                                   </SelectItem>
                                 ))}
-                              </ScrollArea>
                             </SelectContent>
                           </Select>
                           <div className="flex gap-2 items-center">
@@ -1637,14 +1635,12 @@ export default function AudioBible() {
                                 <SelectTrigger>
                                   <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent>
-                                  <ScrollArea className="h-48">
+                                <SelectContent className="max-h-48 overflow-y-auto">
                                     {Array.from({ length: getChapterCount(customBook) }, (_, i) => i + 1).map((ch) => (
                                       <SelectItem key={ch} value={ch.toString()}>
                                         {ch}
                                       </SelectItem>
                                     ))}
-                                  </ScrollArea>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1658,14 +1654,12 @@ export default function AudioBible() {
                                 <SelectTrigger>
                                   <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent>
-                                  <ScrollArea className="h-48">
+                                <SelectContent className="max-h-48 overflow-y-auto">
                                     {Array.from({ length: getChapterCount(customBook) - rangeStartChapter + 1 }, (_, i) => i + rangeStartChapter).map((ch) => (
                                       <SelectItem key={ch} value={ch.toString()}>
                                         {ch}
                                       </SelectItem>
                                     ))}
-                                  </ScrollArea>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1695,14 +1689,12 @@ export default function AudioBible() {
                                 <SelectTrigger>
                                   <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent>
-                                  <ScrollArea className="h-64">
+                                <SelectContent className="max-h-64 overflow-y-auto">
                                     {BIBLE_BOOK_METADATA.map((book) => (
                                       <SelectItem key={book.name} value={book.name}>
                                         {book.name}
                                       </SelectItem>
                                     ))}
-                                  </ScrollArea>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1716,14 +1708,12 @@ export default function AudioBible() {
                                 <SelectTrigger>
                                   <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent>
-                                  <ScrollArea className="h-64">
+                                <SelectContent className="max-h-64 overflow-y-auto">
                                     {BIBLE_BOOK_METADATA.filter((_, idx) => idx >= BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeStartBook)).map((book) => (
                                       <SelectItem key={book.name} value={book.name}>
                                         {book.name}
                                       </SelectItem>
                                     ))}
-                                  </ScrollArea>
                                 </SelectContent>
                               </Select>
                             </div>
