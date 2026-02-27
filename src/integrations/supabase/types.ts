@@ -648,6 +648,68 @@ export type Database = {
           },
         ]
       }
+      baptism_study_audio: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          error_message: string | null
+          file_size_bytes: number | null
+          fundamental_number: number
+          generated_by: string | null
+          id: string
+          lesson_id: string
+          public_url: string | null
+          share_token: string | null
+          status: string
+          storage_path: string
+          title: string
+          updated_at: string
+          voice: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          error_message?: string | null
+          file_size_bytes?: number | null
+          fundamental_number: number
+          generated_by?: string | null
+          id?: string
+          lesson_id: string
+          public_url?: string | null
+          share_token?: string | null
+          status?: string
+          storage_path: string
+          title: string
+          updated_at?: string
+          voice?: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          error_message?: string | null
+          file_size_bytes?: number | null
+          fundamental_number?: number
+          generated_by?: string | null
+          id?: string
+          lesson_id?: string
+          public_url?: string | null
+          share_token?: string | null
+          status?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string
+          voice?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baptism_study_audio_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "baptism_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bible_audio_cache: {
         Row: {
           book: string
