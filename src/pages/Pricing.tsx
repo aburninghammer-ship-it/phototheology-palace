@@ -5,7 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Star, Crown, Zap, Building2, ArrowRight, CreditCard, Gift } from "lucide-react";
+import { Check, Sparkles, Star, Crown, Zap, Building2, ArrowRight, CreditCard, Gift, GraduationCap } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -194,6 +194,39 @@ export default function Pricing() {
   };
 
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [studentEmail, setStudentEmail] = useState('');
+  const [isStudentCheckout, setIsStudentCheckout] = useState(false);
+
+  const startStudentCheckout = async () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    if (!studentEmail.trim()) {
+      toast.error("Please enter your .edu student email");
+      return;
+    }
+    const domain = studentEmail.trim().toLowerCase().split('@')[1] || '';
+    if (!domain.endsWith('.edu') && !domain.endsWith('.edu.au') && !domain.endsWith('.ac.uk') && !domain.endsWith('.edu.br') && !domain.endsWith('.edu.mx')) {
+      toast.error("Please enter a valid .edu email address");
+      return;
+    }
+    setIsStudentCheckout(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-student-checkout', {
+        body: { studentEmail: studentEmail.trim() },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error: any) {
+      console.error("Error starting student checkout:", error);
+      toast.error(error.message || "Failed to start student checkout");
+    } finally {
+      setIsStudentCheckout(false);
+    }
+  };
 
   const startDirectSubscription = async (plan: 'essential' | 'premium') => {
     if (!user) {
@@ -463,7 +496,49 @@ export default function Pricing() {
           </CardContent>
         </Card>
 
-        {/* Pricing Cards */}
+        {/* Student Discount */}
+        <Card className="mb-12 border-2 border-emerald-500/20 bg-gradient-to-r from-emerald-500/5 to-teal-500/10 max-w-4xl mx-auto">
+          <CardContent className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-lg bg-emerald-500/10">
+                  <GraduationCap className="h-8 w-8 text-emerald-500" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-2xl font-bold">Student Plan</h3>
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">$7/mo</Badge>
+                  </div>
+                  <p className="text-muted-foreground mb-3">
+                    Full Premium access at a student rate. Just verify your .edu email to unlock the discount.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full">
+                    <input
+                      type="email"
+                      placeholder="your.name@university.edu"
+                      value={studentEmail}
+                      onChange={(e) => setStudentEmail(e.target.value)}
+                      className="flex-1 px-4 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    />
+                    <Button
+                      onClick={startStudentCheckout}
+                      disabled={isStudentCheckout}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white whitespace-nowrap gap-2"
+                    >
+                      {isStudentCheckout ? 'Verifying...' : 'Get Student Rate'}
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Accepted: .edu, .ac.uk, .edu.au, and other academic domains
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {plans.map((plan) => (
             <Card
