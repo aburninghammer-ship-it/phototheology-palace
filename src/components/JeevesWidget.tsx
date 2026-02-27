@@ -224,8 +224,7 @@ export const JeevesWidget = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="fixed inset-x-2 bottom-[72px] md:inset-x-auto md:bottom-6 md:right-[22rem] md:w-[24rem] z-[998] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border bg-background"
-            style={{ height: "min(600px, calc(100vh - 90px))", maxHeight: "calc(100dvh - 90px)" }}
+            className="fixed inset-x-2 top-2 bottom-[72px] md:inset-x-auto md:top-auto md:bottom-6 md:right-[22rem] md:w-[24rem] md:max-h-[min(600px,calc(100dvh-90px))] z-[998] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border bg-background"
           >
             {/* Header */}
             <div
