@@ -53,11 +53,9 @@ export const JeevesWidget = () => {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const recognitionRef = useRef<InstanceType<typeof window.SpeechRecognition> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const dragConstraintsRef = useRef<HTMLDivElement>(null);
 
   // Fetch user name and context snapshot
   useEffect(() => {
@@ -192,30 +190,22 @@ export const JeevesWidget = () => {
 
   return (
     <>
-      {/* Invisible drag boundary — full viewport */}
-      <div ref={dragConstraintsRef} className="fixed inset-0 pointer-events-none z-[997]" />
-
-      {/* Floating draggable trigger */}
+      {/* Floating trigger */}
       <AnimatePresence>
         {!open && (
           <motion.div
-            drag
-            dragMomentum={false}
-            dragConstraints={dragConstraintsRef}
-            onDragStart={() => setIsDragging(true)}
-            onDragEnd={() => setTimeout(() => setIsDragging(false), 100)}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="flex items-center gap-2 cursor-grab active:cursor-grabbing touch-none"
+            className="flex items-center gap-2"
             style={{ zIndex: 50 }}
           >
             <span className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-full shadow-lg bg-indigo-950/90 text-indigo-100 pointer-events-none">
               Jeeves
             </span>
             <button
-              onClick={() => { if (!isDragging) setOpen(true); }}
+              onClick={() => setOpen(true)}
               className="h-11 w-11 rounded-full shadow-xl border-2 border-indigo-500/40 flex-shrink-0 overflow-hidden"
               style={{ background: "#fff", padding: 0 }}
               aria-label="Open Jeeves the Theological Guide"
