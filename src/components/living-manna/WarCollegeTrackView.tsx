@@ -9,6 +9,7 @@ import {
   GraduationCap, Loader2, Sparkles, Shield,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { AudioTrainingPlaylist } from "./AudioTrainingPlaylist";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -70,21 +71,8 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
   const handleOpenDay = async (dayNumber: number) => {
     setGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-war-college-day", {
-        body: {
-          avatarId: track.avatarId,
-          avatarName: track.avatarName,
-          trackTitle: track.title,
-          dayNumber,
-          rank: getRankForDay(dayNumber),
-          weekNumber: Math.ceil(dayNumber / 7),
-        },
-      });
-
-      if (error) throw error;
-      if (!data?.study) throw new Error("No study returned");
-
-      setSelectedDay(data.study);
+      const study = await loadDayStudy(dayNumber);
+      setSelectedDay(study);
     } catch (err: any) {
       console.error("War College generation error:", err);
       toast({
@@ -95,6 +83,23 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
     } finally {
       setGenerating(false);
     }
+  };
+
+  /** Shared loader for both direct open and playlist use */
+  const loadDayStudy = async (dayNumber: number): Promise<WarCollegeDay> => {
+    const { data, error } = await supabase.functions.invoke("generate-war-college-day", {
+      body: {
+        avatarId: track.avatarId,
+        avatarName: track.avatarName,
+        trackTitle: track.title,
+        dayNumber,
+        rank: getRankForDay(dayNumber),
+        weekNumber: Math.ceil(dayNumber / 7),
+      },
+    });
+    if (error) throw error;
+    if (!data?.study) throw new Error("No study returned");
+    return data.study as WarCollegeDay;
   };
 
   const handleComplete = () => {
@@ -178,7 +183,23 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
         </CardContent>
       </Card>
 
-      {/* Loading overlay */}
+      {/* Audio Training Playlist */}
+      <AudioTrainingPlaylist
+        trackTitle={track.title}
+        avatarId={track.avatarId}
+        avatarName={track.avatarName}
+        maxUnlockedDay={nextDay}
+        totalDays={track.totalDays}
+        completedDays={completedDays}
+        onLoadDay={async (dayNumber) => {
+          try {
+            return await loadDayStudy(dayNumber);
+          } catch {
+            return null;
+          }
+        }}
+      />
+
       {generating && (
         <Card className="border-primary/30 bg-primary/5">
           <CardContent className="p-6 text-center space-y-3">
