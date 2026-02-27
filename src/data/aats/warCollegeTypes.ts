@@ -1,5 +1,9 @@
 // ─── War College Strategic Manuscript Types ─────────────────────────────────
 // Ultra-immersive, long-form study format for AATS training.
+// ALL 20 avatars × 56 days = fully AI-generated manuscripts.
+
+import { AATS_AVATAR_IDS, getAvatarTraining, type AATSAvatarId } from "@/data/aatsTrainingData";
+import { DEFENSE_OPPONENTS } from "@/data/defenseModeOpponents";
 
 export interface WarCollegeDay {
   dayNumber: number;
@@ -93,34 +97,140 @@ export interface WarCollegeTrack {
   description: string;
   totalDays: number;
   emoji: string;
+  ringId: string;
 }
 
-export const WAR_COLLEGE_TRACKS: WarCollegeTrack[] = [
-  {
-    id: "philosophical-warfare",
+// ─── Track title mapping per avatar ─────────────────────────────────────────
+const TRACK_TITLES: Record<string, { title: string; description: string }> = {
+  atheist: {
     title: "Philosophical Warfare",
-    avatarId: "atheist",
-    avatarName: "Dr. Marcus Steele",
     description: "Reclaiming epistemology, reason, and metaphysical ground against naturalistic materialism",
-    totalDays: 56,
-    emoji: "🧠",
   },
-  {
-    id: "abrahamic-defense",
+  muslim: {
     title: "Abrahamic Defense",
-    avatarId: "muslim",
-    avatarName: "Imam Khalid",
     description: "Defending biblical authority and Christology against Islamic monotheism",
+  },
+  evangelical: {
+    title: "Protestant Apologetics",
+    description: "Navigating grace-alone theology, Sabbath challenges, and prophetic identity",
+  },
+  catholic: {
+    title: "Rome & Reformation",
+    description: "Confronting papal authority, tradition supremacy, and sacramental theology",
+  },
+  jw: {
+    title: "Watchtower Deconstruction",
+    description: "Exposing Christological distortion, false prophecy, and organizational control",
+  },
+  mormon: {
+    title: "Latter-Day Analysis",
+    description: "Challenging extra-biblical revelation, polytheism, and prophetic authority claims",
+  },
+  bhi: {
+    title: "Israelite Identity Crisis",
+    description: "Addressing racial exclusivism, covenant theology distortion, and identity-based hermeneutics",
+  },
+  "former-sda": {
+    title: "Remnant Under Fire",
+    description: "Defending Adventist identity against those who once held it",
+  },
+  "offshoot-sda": {
+    title: "Splinter Theology",
+    description: "Addressing offshoots that radicalize, distort, or fragment SDA theology",
+  },
+  jewish: {
+    title: "Messianic Confrontation",
+    description: "Defending Christ as the Messiah against rabbinic Judaism's rejection",
+  },
+  preterist: {
+    title: "Prophecy Fulfilled Fallacy",
+    description: "Refuting the claim that all prophecy was fulfilled by 70 AD",
+  },
+  futurist: {
+    title: "Dispensational Dismantlement",
+    description: "Confronting secret rapture, two-covenant theology, and prophetic misplacement",
+  },
+  "secular-scholar": {
+    title: "Academy vs. Revelation",
+    description: "Defending Scripture against higher criticism, JEDP hypothesis, and textual skepticism",
+  },
+  "progressive-christian": {
+    title: "Progressive Theology Exposed",
+    description: "Confronting moral relativism, deconstruction theology, and redefined doctrines",
+  },
+  "skeptical-exsda": {
+    title: "The Wounded Skeptic",
+    description: "Engaging hurt, disillusioned former believers with truth and compassion",
+  },
+  philosopher: {
+    title: "Philosophical Battleground",
+    description: "Engaging existentialism, moral subjectivism, and anti-theistic philosophy",
+  },
+  "new-age": {
+    title: "Cosmic Deception",
+    description: "Confronting pantheism, spiritual universalism, and occult infiltration of Christianity",
+  },
+  "anti-prophet": {
+    title: "Prophetic Defense",
+    description: "Defending the Spirit of Prophecy against attacks on Ellen White's authority and integrity",
+  },
+  "internet-skeptic": {
+    title: "Digital Battlefield",
+    description: "Refuting viral contradictions, meme theology, and surface-level skepticism",
+  },
+  agnostic: {
+    title: "The Uncertainty Front",
+    description: "Engaging honest doubt with epistemological clarity and evidential faith",
+  },
+};
+
+// ─── Ring classification ────────────────────────────────────────────────────
+function getRingId(avatarId: string): string {
+  const ring1 = ["atheist", "agnostic", "secular-scholar", "philosopher", "internet-skeptic", "new-age"];
+  const ring2 = ["muslim", "jewish", "bhi", "mormon"];
+  if (ring1.includes(avatarId)) return "ring-1";
+  if (ring2.includes(avatarId)) return "ring-2";
+  return "ring-3";
+}
+
+// ─── Generate ALL War College tracks from AATS avatars ──────────────────────
+export const WAR_COLLEGE_TRACKS: WarCollegeTrack[] = AATS_AVATAR_IDS.map((avatarId) => {
+  const training = getAvatarTraining(avatarId);
+  const meta = TRACK_TITLES[avatarId] || {
+    title: `${training.avatarName} Warfare`,
+    description: `Strategic apologetics formation against ${training.avatarName}`,
+  };
+
+  return {
+    id: `wc-${avatarId}`,
+    title: meta.title,
+    avatarId,
+    avatarName: training.avatarName,
+    description: meta.description,
     totalDays: 56,
-    emoji: "📖",
+    emoji: training.emoji,
+    ringId: getRingId(avatarId),
+  };
+});
+
+// ─── Grouped by ring for display ────────────────────────────────────────────
+export const WAR_COLLEGE_RINGS = [
+  {
+    id: "ring-1",
+    title: "Ring 1 — Non-Belief & Skepticism",
+    color: "text-slate-400",
+    tracks: WAR_COLLEGE_TRACKS.filter((t) => t.ringId === "ring-1"),
   },
   {
-    id: "protestant-apologetics",
-    title: "Protestant Apologetics",
-    avatarId: "evangelical",
-    avatarName: "Pastor Jake",
-    description: "Navigating grace-alone theology, Sabbath challenges, and prophetic identity",
-    totalDays: 56,
-    emoji: "⛪",
+    id: "ring-2",
+    title: "Ring 2 — Non-Christian Religions",
+    color: "text-amber-400",
+    tracks: WAR_COLLEGE_TRACKS.filter((t) => t.ringId === "ring-2"),
+  },
+  {
+    id: "ring-3",
+    title: "Ring 3 — Intra-Christian Challengers",
+    color: "text-blue-400",
+    tracks: WAR_COLLEGE_TRACKS.filter((t) => t.ringId === "ring-3"),
   },
 ];
