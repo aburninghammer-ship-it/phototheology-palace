@@ -8,12 +8,21 @@ interface ChatInputProps {
   onSend: (message: string, images?: string[]) => void;
   placeholder?: string;
   disabled?: boolean;
+  externalMessage?: string;
+  onExternalMessageChange?: (msg: string) => void;
+  externalImages?: string[];
+  onExternalImagesChange?: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export function ChatInput({ onSend, placeholder = "Type a message... (emojis supported 😊)", disabled = false }: ChatInputProps) {
-  const [message, setMessage] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+export function ChatInput({ onSend, placeholder = "Type a message... (emojis supported 😊)", disabled = false, externalMessage, onExternalMessageChange, externalImages, onExternalImagesChange }: ChatInputProps) {
+  const [internalMessage, setInternalMessage] = useState("");
+  const [internalImages, setInternalImages] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const message = externalMessage !== undefined ? externalMessage : internalMessage;
+  const setMessage = onExternalMessageChange || setInternalMessage;
+  const images = externalImages !== undefined ? externalImages : internalImages;
+  const setImages = onExternalImagesChange || setInternalImages;
 
   const handleSend = () => {
     if (message.trim() || images.length > 0) {
