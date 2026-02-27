@@ -20,12 +20,18 @@ interface LiveChatContextType {
   getThreadMessages: (parentId: string) => PublicChatMessage[];
   reactions: ReactionsMap;
   toggleReaction: (messageId: string, emoji: string) => Promise<void>;
+  draftMessage: string;
+  setDraftMessage: (msg: string) => void;
+  draftImages: string[];
+  setDraftImages: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const LiveChatContext = createContext<LiveChatContextType | undefined>(undefined);
 
 export function LiveChatProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [draftMessage, setDraftMessage] = useState('');
+  const [draftImages, setDraftImages] = useState<string[]>([]);
   const {
     messages,
     activeRoomId,
@@ -56,6 +62,10 @@ export function LiveChatProvider({ children }: { children: React.ReactNode }) {
         getThreadMessages,
         reactions,
         toggleReaction,
+        draftMessage,
+        setDraftMessage,
+        draftImages,
+        setDraftImages,
       }}
     >
       {children}

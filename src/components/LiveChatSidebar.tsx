@@ -229,6 +229,10 @@ export function LiveChatSidebar() {
     getThreadMessages,
     reactions,
     toggleReaction,
+    draftMessage,
+    setDraftMessage,
+    draftImages,
+    setDraftImages,
   } = useLiveChat();
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -362,6 +366,10 @@ export function LiveChatSidebar() {
             <ChatInput
               onSend={handleSend}
               placeholder="Say something... ✨"
+              externalMessage={draftMessage}
+              onExternalMessageChange={setDraftMessage}
+              externalImages={draftImages}
+              onExternalImagesChange={setDraftImages}
             />
             <p className="text-[10px] text-muted-foreground/50 text-center flex items-center justify-center gap-1">
               <MessageSquareText className="h-2.5 w-2.5" />
