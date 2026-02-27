@@ -290,7 +290,8 @@ serve(async (req) => {
       opponentAttack,
       discipleResponse,
       defenseTopicName,
-      isSignatureTopic
+      isSignatureTopic,
+      opponentPronouns
     } = requestBody;
     
     // Handle both message formats
@@ -7281,7 +7282,7 @@ ${category === "people" ? `**PEOPLE:**
 
     } else if (mode === "defense-assist") {
       // Defense Mode: Jeeves coaches the disciple IN REAL TIME before they respond
-      const { opponentAttack: assistAttack, defenseTopicName: assistTopic, opponentName, opponentPersonality } = requestBody;
+      const { opponentAttack: assistAttack, defenseTopicName: assistTopic, opponentName, opponentPersonality, opponentPronouns: assistPronouns } = requestBody;
 
       systemPrompt = `${MASTER_IDENTITY}
 
@@ -7309,7 +7310,9 @@ FORMAT:
 🧘 STAY COMPOSED: [Emotional/composure coaching, especially if they were aggressive/rude]
 ❤️ WIN THE HEART: [Brief reminder about the human being you're speaking to]
 
-Keep it punchy, practical, and encouraging. Max 300 words. You're in a coaching huddle, not a lecture hall.`;
+Keep it punchy, practical, and encouraging. Max 300 words. You're in a coaching huddle, not a lecture hall.
+${assistPronouns ? `\nIMPORTANT: When referring to the opponent in third person, use ${assistPronouns} pronouns (e.g., "${assistPronouns === 'she/her' ? 'she argues' : assistPronouns === 'they/them' ? 'they argue' : 'he argues'}").` : ''}`;
+
 
       userPrompt = `OPPONENT (${opponentName || 'The Challenger'}): "${assistAttack}"
 
@@ -7347,8 +7350,11 @@ Coach me on how to respond to this attack. Be specific, tactical, and help me st
         ? `\n\nCONVERSATION SO FAR:\n${conversationHistory}\n\nCRITICAL: Review the disciple's previous response. Identify weak points, unaddressed arguments, or logical gaps. Press HARDER on those weaknesses. Escalate your challenge. Do NOT repeat the same argument — build on it or pivot to a stronger angle.`
         : '';
 
+      const pronounInstruction = opponentPronouns ? `\nIMPORTANT PRONOUN RULE: You are a character who uses ${opponentPronouns} pronouns. When the system or narrator refers to you in third person, use ${opponentPronouns}. Your identity and gender presentation must be consistent with ${opponentPronouns} pronouns throughout.` : '';
+
       systemPrompt = `You are roleplaying as a theological debater with the following worldview and identity. Stay FULLY in character at all times.
 ${temperamentInstruction}
+${pronounInstruction}
 
 WORLDVIEW:
 ${opponentWorldview}
@@ -7425,6 +7431,8 @@ ${PALACE_SCHEMA}
 
 OPPONENT'S ATTACK:
 ${opponentAttack}
+${requestBody.opponentName ? `\nOPPONENT: ${requestBody.opponentName}` : ''}
+${requestBody.opponentPronouns ? `\nIMPORTANT: When referring to the opponent, use ${requestBody.opponentPronouns} pronouns (e.g., "${requestBody.opponentPronouns === 'she/her' ? 'she argues, her position, she claims' : requestBody.opponentPronouns === 'they/them' ? 'they argue, their position, they claim' : 'he argues, his position, he claims'}").` : ''}
 
 DISCIPLE'S RESPONSE:
 ${discipleResponse}
