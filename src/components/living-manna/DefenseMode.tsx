@@ -6,6 +6,7 @@ import {
   Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
   FlaskConical, Target, Save, Archive, Trash2, ChevronDown, ChevronUp,
   Warehouse, ArrowLeft, Users, Share2, Crown, Flame, MessageSquare,
+  GraduationCap,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { CommunityArmory } from "./CommunityArmory";
@@ -14,6 +15,7 @@ import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { ForgeDefendHub } from "./ForgeDefendHub";
 import { OpponentProfileDialog } from "./OpponentProfileDialog";
 import { FortyDayChallenge } from "./FortyDayChallenge";
+import { AATSTraining } from "./AATSTraining";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +52,7 @@ interface ChatMessage {
   score?: number;
 }
 
-type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate" | "forge-defend" | "forty-day";
+type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate" | "forge-defend" | "forty-day" | "aats";
 
 interface ArsenalWeapon {
   id: string;
@@ -1129,7 +1131,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
         </div>
 
         {/* Sub-mode Toggle: 5 tabs */}
-        <div className={`grid ${isMobile ? "grid-cols-4" : "grid-cols-7"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-4xl mx-auto`}>
+        <div className={`grid ${isMobile ? "grid-cols-4" : "grid-cols-9"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-5xl mx-auto`}>
           {([
             { id: "sparring" as const, label: "Sparring Arena", icon: Swords, gradient: "from-red-600 to-orange-600" },
             { id: "library" as const, label: "3AM Library", icon: BookOpen, gradient: "from-amber-600 to-yellow-600" },
@@ -1139,6 +1141,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
             { id: "community-armory" as const, label: "Community Armory", icon: Users, gradient: "from-amber-600 to-orange-600" },
             { id: "forge-defend" as const, label: "Forge & Defend", icon: Trophy, gradient: "from-violet-600 to-fuchsia-600" },
             { id: "forty-day" as const, label: "40 Days of Smoke", icon: Flame, gradient: "from-red-600 to-red-800" },
+            { id: "aats" as const, label: "AATS", icon: GraduationCap, gradient: "from-sky-600 to-indigo-600" },
           ]).map((tab) => (
             <button
               key={tab.id}
@@ -1155,7 +1158,9 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
           ))}</div>
 
         {/* Render based on sub-mode */}
-        {subMode === "forty-day" ? (
+        {subMode === "aats" ? (
+          <AATSTraining churchId={churchId} onNavigateToDefense={() => setSubMode("sparring")} />
+        ) : subMode === "forty-day" ? (
           <FortyDayChallenge />
         ) : subMode === "forge-defend" ? (
           <ForgeDefendHub churchId={churchId} />
