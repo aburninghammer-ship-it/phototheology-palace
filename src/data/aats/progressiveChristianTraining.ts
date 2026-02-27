@@ -161,7 +161,7 @@ const mindGames: AATSMindGame[] = [
     example:
       "\"The church will eventually accept this, just like it accepted the end of slavery and the equality of women. You're just delaying the inevitable and hurting people in the process.\" -- This assumes that all cultural change is moral progress and that the church's role is to follow culture rather than prophetically challenge it.",
     detectionTip:
-      "When someone invokes historical inevitability, point out that 'the wrong side of history' is a secular eschatological claim with no more authority than anyone's prediction about the future. History is not a moral agent. The German church that accommodated Nazism was following the cultural trajectory of its day. Ask: 'Who decides which cultural direction is "progress"? Is it possible that a culture can "progress" in the wrong direction?' Jesus warned that the end times would be marked by widespread deception, not inevitable enlightenment (Matthew 24:24).",
+      `When someone invokes historical inevitability, point out that 'the wrong side of history' is a secular eschatological claim with no more authority than anyone's prediction about the future. History is not a moral agent. The German church that accommodated Nazism was following the cultural trajectory of its day. Ask: 'Who decides which cultural direction is "progress"? Is it possible that a culture can "progress" in the wrong direction?' Jesus warned that the end times would be marked by widespread deception, not inevitable enlightenment (Matthew 24:24).`,
   },
   {
     id: "prog-mg-pharisee-labeling",

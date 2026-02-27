@@ -150,7 +150,7 @@ const mindGames: AATSMindGame[] = [
     example:
       "'You Christians believe God had a wife and a child — astaghfirullah! How can the Creator have a son?' This redefines 'Son of God' as biological procreation, which no Christian has ever taught.",
     detectionTip:
-      "When a term is being redefined in a way no Christian has ever used it, name the tactic directly: 'You are redefining our term. Let me explain what Christians actually mean by "Son of God" — an eternal relationship within the Godhead, not biological reproduction.'",
+      'When a term is being redefined in a way no Christian has ever used it, name the tactic directly: "You are redefining our term. Let me explain what Christians actually mean by \'Son of God\' — an eternal relationship within the Godhead, not biological reproduction."',
   },
   {
     id: "mg-muslim-question-traps",
@@ -270,7 +270,7 @@ const counterStrategies: AATSCounterStrategy[] = [
     keyScriptures: [
       "Hebrews 1:1-3 — 'God, who at various times and in various ways spoke in time past to the fathers by the prophets, has in these last days spoken to us by His Son ... who is the brightness of His glory and the express image of His person.' Jesus is the final and supreme revelation — not a prophet among prophets but the Son above all prophets.",
       "John 5:39 — 'You search the Scriptures, for in them you think you have eternal life; and these are they which testify of Me.' All Scripture points to Jesus, not to a subsequent prophet.",
-      "Deuteronomy 13:1-3 — 'If a prophet ... gives you a sign ... saying, "Let us go after other gods" ... you shall not listen.' Any prophet whose God contradicts the God revealed in Scripture is a false prophet by biblical definition.",
+      `Deuteronomy 13:1-3 — 'If a prophet ... gives you a sign ... saying, "Let us go after other gods" ... you shall not listen.' Any prophet whose God contradicts the God revealed in Scripture is a false prophet by biblical definition.`,
       "Galatians 1:8 — 'Even if we, or an angel from heaven, preach any other gospel to you than what we have preached to you, let him be accursed.' Paul anticipated the possibility of a later angelic revelation (cf. Jibril/Gabriel in Islamic tradition) contradicting the gospel and preemptively warned against it.",
     ],
     counterArguments: [
