@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WarCollegeTrackView } from "./WarCollegeTrackView";
-import { WAR_COLLEGE_TRACKS, WAR_COLLEGE_RINGS, type WarCollegeTrack } from "@/data/aats/warCollegeTypes";
+import { WarCollegeReader } from "./WarCollegeReader";
+import { WAR_COLLEGE_TRACKS, WAR_COLLEGE_RINGS, type WarCollegeTrack, type WarCollegeDay, getRankForDay } from "@/data/aats/warCollegeTypes";
 import {
   BookOpen, Shield, Brain, Zap, Swords, Flame, ArrowLeft, ArrowRight,
   CheckCircle2, Circle, ChevronDown, ChevronUp, ChevronRight, GraduationCap,
-  Target, Eye, Sparkles, Trophy, Users, Lightbulb, HelpCircle,
+  Target, Eye, Sparkles, Trophy, Users, Lightbulb, HelpCircle, Loader2, Headphones,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { useAATSProgress } from "@/hooks/useAATSProgress";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   AATS_PHASES,
   AATS_AVATAR_IDS,
@@ -59,6 +62,7 @@ interface AATSTrainingProps {
 
 export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }: AATSTrainingProps) {
   const { completeItem, isItemCompleted, getAvatarProgress, getPhaseProgress, getOverallProgress, loading } = useAATSProgress();
+  const { toast } = useToast();
 
   const [view, setView] = useState<AATSView>(initialAvatarId ? "avatar-path" : "overview");
   const [selectedAvatarId, setSelectedAvatarId] = useState<AATSAvatarId | null>(
@@ -74,6 +78,10 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
   const [exerciseAnswers, setExerciseAnswers] = useState<Record<string, string>>({});
   const [revealedExercises, setRevealedExercises] = useState<Set<string>>(new Set());
   const [selectedWarCollegeTrack, setSelectedWarCollegeTrack] = useState<WarCollegeTrack | null>(null);
+  
+  // Manuscript generation state
+  const [generatingPhaseDay, setGeneratingPhaseDay] = useState<number | null>(null);
+  const [phaseManuscript, setPhaseManuscript] = useState<WarCollegeDay | null>(null);
 
   const selectedTraining = useMemo(
     () => (selectedAvatarId ? getAvatarTraining(selectedAvatarId) : null),
@@ -117,8 +125,12 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
       setView("avatar-path");
       setSelectedPhase(null);
     } else if (view === "avatar-path") {
-      setView("overview");
-      setSelectedAvatarId(null);
+      if (phaseManuscript) {
+        setPhaseManuscript(null);
+      } else {
+        setView("overview");
+        setSelectedAvatarId(null);
+      }
     } else if (view === "cross-avatar") {
       setView("overview");
       setSelectedCrossSubject(null);
@@ -127,6 +139,46 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
     } else if (view === "war-college") {
       setView("overview");
       setSelectedWarCollegeTrack(null);
+    }
+  };
+
+  // Generate a War College manuscript for a specific phase/day
+  const handleGeneratePhaseManuscript = async (phaseNumber: number) => {
+    if (!selectedTraining || generatingPhaseDay) return;
+    
+    // Map phase number to War College day
+    const dayNumber = phaseNumber;
+    setGeneratingPhaseDay(phaseNumber);
+    
+    try {
+      // Find the matching War College track
+      const trackTitle = WAR_COLLEGE_TRACKS.find(t => t.avatarId === selectedTraining.avatarId)?.title 
+        || `${selectedTraining.avatarName} Warfare`;
+      
+      const { data, error } = await supabase.functions.invoke("generate-war-college-day", {
+        body: {
+          avatarId: selectedTraining.avatarId,
+          avatarName: selectedTraining.avatarName,
+          trackTitle,
+          dayNumber,
+          rank: getRankForDay(dayNumber),
+          weekNumber: Math.ceil(dayNumber / 7),
+        },
+      });
+
+      if (error) throw error;
+      if (!data?.study) throw new Error("No study returned");
+
+      setPhaseManuscript(data.study);
+    } catch (err: any) {
+      console.error("Manuscript generation error:", err);
+      toast({
+        title: "Generation failed",
+        description: err.message || "Could not generate the manuscript. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingPhaseDay(null);
     }
   };
 
@@ -359,6 +411,21 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
     const opponent = getOpponent(selectedTraining.avatarId);
     const progress = getAvatarProgress(selectedTraining.avatarId);
 
+    // If a manuscript is being viewed, show the reader
+    if (phaseManuscript) {
+      return (
+        <WarCollegeReader
+          study={phaseManuscript}
+          onBack={() => setPhaseManuscript(null)}
+          onComplete={() => {
+            completeItem(selectedTraining.avatarId, `wc-day-${phaseManuscript.dayNumber}`, selectedTraining.modules.length + 6);
+            toast({ title: `Day ${phaseManuscript.dayNumber} Complete! 🎓` });
+          }}
+          isCompleted={isItemCompleted(selectedTraining.avatarId, `wc-day-${phaseManuscript.dayNumber}`)}
+        />
+      );
+    }
+
     return (
       <div className="space-y-6">
         {/* Header */}
@@ -384,11 +451,27 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
           </div>
         </div>
 
+        {/* Generating overlay */}
+        {generatingPhaseDay && (
+          <Card className="border-primary/30 bg-primary/5">
+            <CardContent className="p-6 text-center space-y-3">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+              <p className="text-sm font-medium">
+                Generating War College Manuscript — Day {generatingPhaseDay}...
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Crafting an immersive, strategic study. This may take 15–30 seconds.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* 6-Phase Timeline */}
         <div className="space-y-3">
           {AATS_PHASES.map((phase, idx) => {
             const PhaseIcon = getPhaseIcon(phase.icon);
             const isLast = phase.number === 6;
+            const isGenerating = generatingPhaseDay === phase.number;
             return (
               <motion.div
                 key={phase.number}
@@ -419,10 +502,6 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
                       }`}>
                         {phase.number}
                       </div>
-                      {/* Connector line */}
-                      {idx < AATS_PHASES.length - 1 && (
-                        <div className="absolute ml-5 mt-14 w-0.5 h-6 bg-border hidden" />
-                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -431,7 +510,29 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">{phase.description}</p>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Manuscript generation button — not on phase 6 (combat) */}
+                      {!isLast && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="gap-1.5 text-xs border-primary/30 hover:bg-primary/10"
+                          disabled={!!generatingPhaseDay}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleGeneratePhaseManuscript(phase.number);
+                          }}
+                        >
+                          {isGenerating ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Headphones className="h-3.5 w-3.5" />
+                          )}
+                          <span className="hidden sm:inline">Day {phase.number}</span>
+                        </Button>
+                      )}
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
