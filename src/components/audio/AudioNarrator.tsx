@@ -117,10 +117,15 @@ export const AudioNarrator = ({
 
       if (error) throw error;
 
-      if (data?.audioContent) {
-        // Convert base64 to blob
-        const audioBlob = base64ToBlob(data.audioContent, "audio/mpeg");
-        const url = URL.createObjectURL(audioBlob);
+      if (data?.audioContent || data?.audioUrl) {
+        let url: string;
+        if (data.audioContent) {
+          // Convert base64 to blob
+          const audioBlob = base64ToBlob(data.audioContent, "audio/mpeg");
+          url = URL.createObjectURL(audioBlob);
+        } else {
+          url = data.audioUrl;
+        }
         setAudioUrl(url);
         
         // Create audio element
