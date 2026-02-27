@@ -17,29 +17,30 @@ import { useAATSProgress } from "@/hooks/useAATSProgress";
 import { Progress } from "@/components/ui/progress";
 import { getAvatarTraining } from "@/data/aatsTrainingData";
 
-// Convert second-person AI prompt text to third-person for display
-function toThirdPerson(text: string, gender: "male" | "female" = "male"): string {
+// Convert second-person AI prompt text to third-person for display, respecting pronouns
+function toThirdPerson(text: string, pronouns: "he/him" | "she/her" | "they/them" = "he/him"): string {
   let s = text;
-  const pronoun = gender === "female" ? "She" : "He";
-  const possessive = gender === "female" ? "her" : "his";
-  const possessiveCap = gender === "female" ? "Her" : "His";
+  const subj = pronouns === "she/her" ? "She" : pronouns === "they/them" ? "They" : "He";
+  const poss = pronouns === "she/her" ? "her" : pronouns === "they/them" ? "their" : "his";
+  const possCap = pronouns === "she/her" ? "Her" : pronouns === "they/them" ? "Their" : "His";
+  const sg = pronouns !== "they/them";
   const verbs: [string, string][] = [
-    ["are", "is"], ["hold", "holds"], ["reject", "rejects"], ["consider", "considers"],
-    ["view", "views"], ["believe", "believes"], ["argue", "argues"], ["emphasize", "emphasizes"],
-    ["teach", "teaches"], ["maintain", "maintains"], ["use", "uses"], ["cite", "cites"],
-    ["press", "presses"], ["point", "points"], ["challenge", "challenges"], ["insist", "insists"],
-    ["seek", "seeks"], ["draw", "draws"], ["identify", "identifies"], ["know", "knows"],
-    ["have", "has"], ["follow", "follows"], ["see", "sees"], ["study", "studies"],
-    ["respect", "respects"], ["demand", "demands"], ["rely", "relies"], ["focus", "focuses"],
-    ["practice", "practices"], ["explore", "explores"], ["question", "questions"],
-    ["engage", "engages"], ["promote", "promotes"], ["prefer", "prefers"], ["lean", "leans"],
-    ["advocate", "advocates"], ["deny", "denies"], ["claim", "claims"], ["were", "was"],
-    ["grew", "grew"], ["left", "left"], ["feel", "feels"], ["once", "once"],
+    ["are", sg ? "is" : "are"], ["hold", sg ? "holds" : "hold"], ["reject", sg ? "rejects" : "reject"], ["consider", sg ? "considers" : "consider"],
+    ["view", sg ? "views" : "view"], ["believe", sg ? "believes" : "believe"], ["argue", sg ? "argues" : "argue"], ["emphasize", sg ? "emphasizes" : "emphasize"],
+    ["teach", sg ? "teaches" : "teach"], ["maintain", sg ? "maintains" : "maintain"], ["use", sg ? "uses" : "use"], ["cite", sg ? "cites" : "cite"],
+    ["press", sg ? "presses" : "press"], ["point", sg ? "points" : "point"], ["challenge", sg ? "challenges" : "challenge"], ["insist", sg ? "insists" : "insist"],
+    ["seek", sg ? "seeks" : "seek"], ["draw", sg ? "draws" : "draw"], ["identify", sg ? "identifies" : "identify"], ["know", sg ? "knows" : "know"],
+    ["have", sg ? "has" : "have"], ["follow", sg ? "follows" : "follow"], ["see", sg ? "sees" : "see"], ["study", sg ? "studies" : "study"],
+    ["respect", sg ? "respects" : "respect"], ["demand", sg ? "demands" : "demand"], ["rely", sg ? "relies" : "rely"], ["focus", sg ? "focuses" : "focus"],
+    ["practice", sg ? "practices" : "practice"], ["explore", sg ? "explores" : "explore"], ["question", sg ? "questions" : "question"],
+    ["engage", sg ? "engages" : "engage"], ["promote", sg ? "promotes" : "promote"], ["prefer", sg ? "prefers" : "prefer"], ["lean", sg ? "leans" : "lean"],
+    ["advocate", sg ? "advocates" : "advocate"], ["deny", sg ? "denies" : "deny"], ["claim", sg ? "claims" : "claim"], ["were", sg ? "was" : "were"],
+    ["grew", "grew"], ["left", "left"], ["feel", sg ? "feels" : "feel"], ["once", "once"],
   ];
   for (const [v2, v3] of verbs) {
-    s = s.replace(new RegExp(`\\bYou ${v2}\\b`, "g"), `${pronoun} ${v3}`);
+    s = s.replace(new RegExp(`\\bYou ${v2}\\b`, "g"), `${subj} ${v3}`);
   }
-  s = s.replace(/\byour\b/g, possessive).replace(/\bYour\b/g, possessiveCap).replace(/\bYou\b/g, pronoun);
+  s = s.replace(/\byour\b/g, poss).replace(/\bYour\b/g, possCap).replace(/\bYou\b/g, subj);
   return s;
 }
 
@@ -399,7 +400,7 @@ export function OpponentProfileDialog({
                     <Eye className="h-4 w-4" /> Worldview Profile
                   </h3>
                   <p className="text-sm leading-relaxed text-foreground/80">
-                    {toThirdPerson(opponent.worldview, opponent.gender || "male").slice(0, 400)}...
+                    {toThirdPerson(opponent.worldview, opponent.pronouns).slice(0, 400)}...
                   </p>
                 </section>
 
@@ -540,84 +541,46 @@ export function OpponentProfileDialog({
                         </div>
                       </div>
 
-                      {/* Training Subjects */}
-                      {training.subjects.length > 0 && (
-                        <section className="space-y-3">
-                          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                            <BookOpen className="h-4 w-4" /> Training Subjects
-                          </h3>
-                          <div className="space-y-2">
-                            {training.subjects.map((subject) => (
-                              <div key={subject.id} className="p-3 rounded-lg bg-muted/50 border border-border/50">
-                                <p className="font-medium text-sm">{subject.title}</p>
-                                <p className="text-xs text-muted-foreground mt-1">{subject.description}</p>
-                              </div>
-                            ))}
+                      {/* Phase breakdown */}
+                      {training && AATS_PHASES.map((phase) => {
+                        const pp = getPhaseProgress(opponent.id, phase.number);
+                        return (
+                          <div key={phase.number} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-sm font-semibold flex items-center gap-2">
+                                Phase {phase.number}: {phase.title}
+                              </h4>
+                              <span className="text-xs text-muted-foreground">{pp}%</span>
+                            </div>
+                            <Progress value={pp} className="h-1.5" />
                           </div>
-                        </section>
-                      )}
+                        );
+                      })}
 
-                      {/* Steelman Arguments */}
-                      {training.steelmanArguments.length > 0 && (
-                        <section className="space-y-3">
-                          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                            <Brain className="h-4 w-4" /> Steelman Arguments to Master
-                          </h3>
-                          <div className="space-y-2">
-                            {training.steelmanArguments.slice(0, 5).map((arg) => (
-                              <div key={arg.id} className="p-3 rounded-lg bg-muted/50 border border-border/50 space-y-1">
-                                <p className="font-medium text-sm">{arg.title}</p>
-                                <p className="text-xs text-muted-foreground">{arg.argument.slice(0, 150)}...</p>
-                              </div>
-                            ))}
-                            {training.steelmanArguments.length > 5 && (
-                              <p className="text-xs text-muted-foreground text-center">+{training.steelmanArguments.length - 5} more arguments</p>
-                            )}
-                          </div>
-                        </section>
-                      )}
+                      <Separator />
 
-                      {/* Mind Games */}
-                      {training.mindGames.length > 0 && (
-                        <section className="space-y-3">
-                          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                            <AlertTriangle className="h-4 w-4" /> Mind Games to Detect
-                          </h3>
-                          <div className="space-y-2">
-                            {training.mindGames.slice(0, 4).map((mg) => (
-                              <div key={mg.id} className="p-3 rounded-lg bg-muted/50 border border-border/50 space-y-1">
-                                <p className="font-medium text-sm">{mg.name}</p>
-                                <p className="text-xs text-muted-foreground">{mg.description.slice(0, 120)}...</p>
-                              </div>
-                            ))}
-                            {training.mindGames.length > 4 && (
-                              <p className="text-xs text-muted-foreground text-center">+{training.mindGames.length - 4} more mind games</p>
-                            )}
-                          </div>
-                        </section>
-                      )}
-
-                      {/* CTA to full AATS */}
-                      {onNavigateToAATS && (
-                        <Button
-                          className="w-full"
-                          onClick={() => {
-                            onNavigateToAATS(opponent.id);
-                            onOpenChange(false);
-                          }}
-                        >
-                          <GraduationCap className="h-4 w-4 mr-2" />
-                          {aatsProgress > 0 ? "Continue Full Training" : "Start Full Training"}
-                          <ChevronRight className="h-4 w-4 ml-2" />
-                        </Button>
-                      )}
+                      <Button
+                        variant="default"
+                        className="w-full"
+                        onClick={() => {
+                          onOpenChange(false);
+                          onNavigateToAATS?.(opponent.id);
+                        }}
+                      >
+                        <GraduationCap className="h-4 w-4 mr-2" />
+                        Go to Full Training
+                      </Button>
                     </>
                   );
                 })() : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <GraduationCap className="h-12 w-12 mx-auto mb-3 opacity-40" />
-                    <p className="font-medium">Training Coming Soon</p>
-                    <p className="text-sm mt-1">AATS training for this opponent is not yet available.</p>
+                  <div className="text-center py-8 space-y-3">
+                    <GraduationCap className="h-10 w-10 mx-auto text-muted-foreground/50" />
+                    <p className="text-sm text-muted-foreground">
+                      Advanced training for this opponent is coming soon.
+                    </p>
+                    <p className="text-xs text-muted-foreground/70">
+                      In the meantime, use the Forge to build weapons against this worldview.
+                    </p>
                   </div>
                 )}
               </TabsContent>
@@ -625,19 +588,24 @@ export function OpponentProfileDialog({
 
             <Separator />
 
-            {/* CTA */}
-            <div className="flex gap-3 pt-2">
+            {/* Action Buttons */}
+            <div className="flex gap-3">
               <Button
+                variant="default"
                 className="flex-1"
-                size="lg"
                 onClick={() => {
                   onSelectOpponent(opponent);
                   onOpenChange(false);
                 }}
               >
                 <Swords className="h-4 w-4 mr-2" />
-                Select {opponent.name}
-                <ChevronRight className="h-4 w-4 ml-2" />
+                Enter Combat
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Close
               </Button>
             </div>
           </div>
