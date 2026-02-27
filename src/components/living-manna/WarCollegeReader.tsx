@@ -5,8 +5,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, BookOpen, Swords, Target, CheckCircle2,
-  ChevronDown, ChevronUp, GraduationCap, Flame, Clock, Sparkles,
+  ChevronDown, ChevronUp, GraduationCap, Flame, Clock, Sparkles, Headphones,
 } from "lucide-react";
+import { AudioNarrator } from "@/components/audio/AudioNarrator";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -83,6 +84,14 @@ export function WarCollegeReader({
 
         <Separator />
       </div>
+
+      {/* ─── Audio Narrator for Manuscript ─── */}
+      <AudioNarrator
+        text={study.manuscript}
+        title={`🎧 Listen — Day ${study.dayNumber}: ${study.title}`}
+        voice="onyx"
+        showVoiceSelector={true}
+      />
 
       {/* ─── Manuscript Body ─── */}
       <Card className="border-primary/10 shadow-lg">
