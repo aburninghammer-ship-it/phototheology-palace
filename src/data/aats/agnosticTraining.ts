@@ -44,6 +44,12 @@ const subjects: AATSSubject[] = [
     description:
       "The practical position that even if God might exist, it makes no functional difference to daily life. One can live a moral, meaningful, and fulfilling life without settling the God question, so the issue is irrelevant rather than urgent.",
   },
+  {
+    id: "prophetic-evidence",
+    title: "Prophetic Evidence for God",
+    description:
+      "Biblical prophecy — particularly in Daniel and Revelation — provides historically verifiable, mathematically precise, centuries-in-advance predictions that constitute uniquely testable evidence for divine inspiration. The agnostic who claims the evidence is insufficient has often never engaged the prophetic evidence at all.",
+  },
 ];
 
 // ── Steelman Arguments ───────────────────────────────────────────────────────
@@ -113,6 +119,20 @@ const steelmanArguments: AATSSteelmanArgument[] = [
     ],
     sdaResponse:
       "The claim that God is practically irrelevant assumes that this life is all there is -- but if there is a Creator who will judge the living and the dead, then the God question is the most practically urgent question imaginable. SDAs believe that we are living in the time of the end, that Christ's return is imminent, and that every human being will stand before God in judgment (Ecclesiastes 12:14; Revelation 14:7). The moral values the agnostic cherishes -- human dignity, equality, compassion, justice -- are borrowed capital from the Christian worldview. Without God, these values have no objective grounding; they are preferences masquerading as principles. The testimony of personal transformation proves that God is not practically irrelevant: countless lives have been rescued from addiction, despair, broken relationships, and purposelessness through encounter with Jesus Christ. The design argument shows that the universe itself is not neutral but points unmistakably to a purposeful Creator (Romans 1:20). The question is not whether you can live without answering it -- the question is whether you should.",
+  },
+  {
+    id: "agnostic-steelman-prophecy-unconvincing",
+    title: "Biblical Prophecy Is Not Convincing Evidence",
+    argument:
+      "Believers often point to biblical prophecy as unique evidence for God, but this argument collapses under scrutiny. Daniel was likely written after the events it describes (the Maccabean thesis places it in the 2nd century BC), making its 'predictions' history written as prophecy. The symbolic language of apocalyptic literature is inherently flexible — beasts, horns, and numbers can be mapped onto virtually any historical sequence by a sufficiently motivated interpreter. Every generation has applied Revelation to its own era and been wrong. Nostradamus, the Quran, and the Hindu Puranas also contain passages that followers claim as prophecy. Why should we privilege the Bible's claims over theirs? At best, biblical prophecy is an interesting feature of ancient literature; it is not the kind of rigorous, testable evidence that would justify believing in an omniscient deity.",
+    hiddenAssumptions: [
+      "The Maccabean dating is established fact — but it is a contested hypothesis driven partly by the antisupernatural presupposition that genuine prediction is impossible.",
+      "All prophecy claims are epistemically equal — treats the Bible's detailed, historically specific, mathematically timed prophecies as equivalent to vague or post-hoc 'predictions' in other traditions.",
+      "Symbolic language cannot be precise — ignores that Daniel explicitly names empires (Daniel 8:20-21) and provides exact timelines (70 weeks, 1,260 days, 2,300 days).",
+      "Failed applications by interpreters invalidate the prophecy itself — confuses human misinterpretation with the reliability of the prophetic text.",
+    ],
+    sdaResponse:
+      "Biblical prophecy is qualitatively different from anything in Nostradamus, the Quran, or any other text. Daniel 2 predicts the exact succession of four world empires and the permanent fragmentation of the fourth — a prediction now verified across 2,500 years. Daniel 8:20-21 names Medo-Persia and Greece by name before Greece was a world power. Daniel 9:24-27 provides a 490-year mathematical timeline that pinpoints the year of Christ's baptism (27 AD) and crucifixion (31 AD). Daniel 8:14's 2,300-day prophecy, starting from 457 BC, reaches to 1844 — the commencement of the pre-Advent judgment that Revelation 14:7 announces. The sixth trumpet of Revelation 9 predicted the fall of Ottoman independence to August 11, 1840 — a date published in advance by Josiah Litch and confirmed by documented history. These are not vague symbols susceptible to any reading. They are historically anchored, mathematically precise, and uniquely verifiable. The agnostic who says 'the evidence is insufficient' while ignoring the prophetic evidence has not yet engaged the strongest case. Isaiah 46:9-10: 'I am God, and there is none like me, declaring the end from the beginning.'",
   },
 ];
 
@@ -309,6 +329,28 @@ const counterStrategies: AATSCounterStrategy[] = [
     closingStatement:
       "The agnostic says the God question does not matter practically, but that claim only works if there is no eternity, no judgment, no purpose, and no transcendent moral law. If any of these exist -- and the evidence from design, morality, prophecy, and personal transformation strongly suggests they do -- then ignoring the God question is not pragmatic wisdom but catastrophic negligence. The most practically relevant thing a human being can do is settle the question of their relationship with their Creator -- because eternity is a very long time to have been wrong.",
   },
+  {
+    subjectId: "prophetic-evidence",
+    title: "Countering Prophecy Dismissal with the Bible's Unique Prophetic Track Record",
+    sdaPosition:
+      "Biblical prophecy offers what no philosophical argument or subjective testimony alone can: historically verifiable, mathematically precise, centuries-in-advance predictions. This is the evidence the agnostic claims does not exist. Daniel's prophecies name empires, describe their characteristics, predict their sequence, and provide exact timelines that can be checked against the historical record. The historicist method reads prophecy as a continuous timeline from the prophet's day to the end — and history has confirmed it for 2,500 years. The agnostic who demands testable evidence and then refuses to examine prophetic evidence is not following the evidence; they are avoiding it.",
+    keyScriptures: [
+      "Daniel 2:31-45 — The great image prophecy predicting Babylon, Medo-Persia, Greece, Rome, and fragmented Europe — verified by 2,500 years of history.",
+      "Daniel 7:23-25 — The little horn persecutes the saints for 1,260 years (538 AD to 1798 AD) — historically verifiable.",
+      "Daniel 8:14 — The 2,300-day prophecy reaching to 1844 AD — the inauguration of the pre-Advent judgment. Daniel gives the time; Revelation 14:7 gives the meaning.",
+      "Daniel 9:24-27 — The 70-week (490-year) prophecy pinpointing Christ's baptism (27 AD) and crucifixion (31 AD) — mathematical precision centuries in advance.",
+      "Revelation 9:13-21 — The sixth trumpet predicts the 391-year-and-15-day Ottoman period ending August 11, 1840 — predicted in advance by Josiah Litch and confirmed by history.",
+      "Isaiah 46:9-10 — 'I am God, and there is none like me, declaring the end from the beginning.' God identifies predictive prophecy as His unique credential.",
+    ],
+    counterArguments: [
+      "The Maccabean dating of Daniel is a hypothesis, not an established fact. It is driven in part by the antisupernatural assumption that genuine prediction is impossible — the very conclusion it claims to prove. Even on a late date, Daniel's prophecies about Rome, Europe's permanent fragmentation, and the mathematical timelines extend centuries beyond the 2nd century BC.",
+      "Biblical prophecy is categorically different from Nostradamus, the Quran, or any other text. Daniel names empires explicitly (Daniel 8:20-21), provides mathematical timelines (70 weeks = 490 years), and describes historical details that can be independently verified. No other religious or secular text offers comparable predictive precision.",
+      "The sixth trumpet prophecy (Revelation 9) is a publicly falsifiable test case. Josiah Litch published the predicted date of August 11, 1840, for the end of Ottoman independence before it happened. It happened. This is advance prediction confirmed by documented history — exactly the kind of evidence the agnostic claims is missing.",
+      "The convergence of multiple independent prophetic timelines — 1,260 years, 2,300 days, 70 weeks, 391 years and 15 days — all reaching historically verified endpoints eliminates coincidence as an explanation. This is a pattern of prophetic accuracy that demands an explanation beyond human authorship.",
+    ],
+    closingStatement:
+      "The agnostic says the evidence for God is insufficient, but biblical prophecy is the most underexamined evidence in the conversation. Daniel predicted the succession of world empires, the timing of Christ's coming, and the inauguration of the heavenly judgment — all with mathematical precision, centuries in advance. The sixth trumpet predicted the fall of Ottoman independence to the exact day. No naturalistic explanation accounts for this prophetic track record. The evidence the agnostic seeks already exists — it has simply never been engaged. 'I am God, and there is none like me, declaring the end from the beginning' (Isaiah 46:9-10).",
+  },
 ];
 
 // ── Modules ──────────────────────────────────────────────────────────────────
@@ -463,6 +505,36 @@ const modules: AATSModule[] = [
     debateSimLink: "agnostic",
     debriefPrompt:
       "Evaluate your engagement with pragmatic unbelief. Were you able to show that the moral values the agnostic relies on are borrowed from a Christian worldview? Could you present the eternal consequences of ignoring the God question using SDA eschatology and the judgment-hour message? Did you effectively use the design argument from Romans 1:20 to show that indifference is not innocent? Were you able to present the testimony of personal transformation as proof that God makes a tangible, practical difference? What would you emphasize more strongly next time?",
+  },
+  // ────── Module 6: Prophetic Evidence ──────
+  {
+    id: "agnostic-mod-prophetic-evidence",
+    subjectId: "prophetic-evidence",
+    title: "Confronting Agnosticism with Fulfilled Prophecy: The Bible's Testable Evidence",
+    doctrineBrief:
+      "The agnostic says the evidence for God is insufficient. Fulfilled biblical prophecy is the direct answer to that claim — because prophecy is not subjective, not philosophical, and not a matter of personal interpretation. It is testable. It is historically verifiable. It is mathematically precise. And it is unique to the Bible.\n\nDaniel chapter 2, written in the 6th century BC, predicted the exact succession of four world empires — Babylon, Medo-Persia, Greece, and Rome — followed by a fragmented Europe that would never reunite. This prophecy has been verified by 2,500 years of unbroken history. Napoleon could not unite Europe. Hitler could not. The European Union cannot. The prophecy stands.\n\nDaniel 9:24-27 provides the seventy-week (490-year) prophecy beginning with the decree to restore Jerusalem in 457 BC (Ezra 7). This timeline pinpoints the baptism of Jesus Christ in 27 AD and His crucifixion in 31 AD — centuries in advance, with mathematical precision. This is not vague symbolism; it is a date-specific prediction confirmed by history.\n\nDaniel 8:14 extends the prophetic telescope further: the 2,300-day prophecy, sharing the same starting point of 457 BC, reaches to 1844 AD — the inauguration of the pre-Advent investigative judgment in the heavenly sanctuary. Revelation 14:7 announces: 'the hour of his judgment is come.' Daniel gives the time; Revelation gives the meaning.\n\nThe sixth trumpet of Revelation 9:13-21 predicted the 391-year-and-15-day career of Ottoman Turkish power, culminating on August 11, 1840. Josiah Litch published this prediction before the date arrived. When the Ottoman Empire surrendered its independent power on that exact date, it was a publicly falsifiable prophecy confirmed in real time.\n\nNo other religious or secular text on earth offers anything comparable. This is the evidence the agnostic claims to seek. It is specific, testable, historically verifiable, and mathematically precise. The agnostic who engages it must explain how ancient authors predicted specific empires, specific dates, and specific events centuries in advance — without recourse to divine inspiration.\n\n'I am God, and there is none like me, declaring the end from the beginning, and from ancient times the things that are not yet done' (Isaiah 46:9-10).",
+    steelmanArguments: [
+      steelmanArguments[5], // "Biblical Prophecy Is Not Convincing"
+      steelmanArguments[1], // "The Evidence Does Not Meet the Burden"
+    ],
+    hiddenAssumptions: [
+      "Predictive prophecy is impossible by definition — a presupposition that predetermines the conclusion before examining evidence.",
+      "All prophecy claims are equally vague — ignores that Daniel names empires and provides exact mathematical timelines.",
+      "The Maccabean dating eliminates the problem — but Daniel's predictions about Rome, European fragmentation, and the multi-century timelines extend far beyond the 2nd century BC.",
+      "Failed interpretive applications disprove the prophecy itself — confuses interpreter error with textual reliability.",
+    ],
+    mindGames: [
+      mindGames[2], // Moving the Goalposts
+      mindGames[0], // False Neutrality
+    ],
+    fallacies: [
+      fallacies[0], // Argument from Ignorance
+      fallacies[3], // Appeal to Complexity
+    ],
+    counterStrategy: counterStrategies[5],
+    debateSimLink: "agnostic",
+    debriefPrompt:
+      "This module addresses the agnostic's central claim head-on: that the evidence is insufficient. Evaluate your performance. Were you able to present Daniel 2 and 7 as historically verifiable predictions rather than retroactive readings? Could you walk through the 70-week and 2,300-day timelines mathematically? Did you use the sixth trumpet (Ottoman) prophecy as a falsifiable test case? Were you able to show that no other text — religious or secular — offers comparable predictive evidence? Could you articulate the connection between Daniel 8:14 and Revelation 14:7? What areas of prophetic apologetics do you need to strengthen?",
   },
 ];
 
