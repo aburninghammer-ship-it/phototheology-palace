@@ -355,6 +355,14 @@ export default function LivingManna() {
                     <Zap className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Exploits</span>
                   </TabsTrigger>
+                  <TabsTrigger value="defense" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Shield className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Defense</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="aats" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <GraduationCap className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">AATS</span>
+                  </TabsTrigger>
                   <TabsTrigger value="connect" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <MessagesSquare className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Connect</span>
@@ -382,14 +390,6 @@ export default function LivingManna() {
                   <TabsTrigger value="grow" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <Sprout className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Grow</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="defense" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
-                    <Shield className="h-4 w-4" />
-                    <span className="text-xs sm:text-sm">Defense</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="aats" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
-                    <GraduationCap className="h-4 w-4" />
-                    <span className="text-xs sm:text-sm">AATS</span>
                   </TabsTrigger>
                   <TabsTrigger value="egw" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <BookMarked className="h-4 w-4" />
