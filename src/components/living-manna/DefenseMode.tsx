@@ -660,7 +660,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isLoading, isAssistLoading]);
+  }, [messages.length]);
 
   // Auto-speak opponent/coach messages when audio mode is on
   useEffect(() => {
@@ -2241,13 +2241,14 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
       {/* Message Thread */}
       <ScrollArea className={`${isMobile ? "h-[370px]" : "h-[480px]"} rounded-lg border border-border/50 bg-black/10 p-3`}>
         <div ref={scrollRef} className="space-y-3">
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {messages.map((msg) => (
               <motion.div
                 key={msg.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
                 className={`flex ${
                   msg.role === "disciple"
                     ? "justify-end"
@@ -2334,7 +2335,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
 
           {/* Loading indicators */}
           {isLoading && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="flex justify-start">
               <div className="flex items-center gap-2 rounded-lg bg-muted/30 border border-border/50 p-3 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 {phase === "coaching" ? "Jeeves is analyzing your defense..." : "Opponent is thinking..."}
@@ -2342,7 +2343,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
             </motion.div>
           )}
           {isAssistLoading && assistMode && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="flex justify-start">
               <div className="flex items-center gap-2 rounded-xl bg-amber-950/30 border border-amber-500/30 p-3 text-xs text-amber-400">
                 <Sparkles className="h-3.5 w-3.5 animate-pulse" />
                 Jeeves is analyzing the attack for you...

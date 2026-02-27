@@ -3,7 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ChatInput } from '@/components/ChatInput';
-import { PublicChatMessage } from '@/hooks/usePublicChat';
+import { PublicChatMessage, ReactionGroup, ReactionsMap } from '@/hooks/usePublicChat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, MessageSquareText, Trash2 } from 'lucide-react';
 import {
@@ -28,6 +28,8 @@ function formatRelativeTime(dateStr: string) {
   return `${Math.floor(diff / 86400)}d ago`;
 }
 
+const QUICK_REACTIONS = ['❤️', '🙏', '🔥', '👏', '💎', '✝️'];
+
 interface LiveChatThreadPanelProps {
   parentMessage: PublicChatMessage;
   threadMessages: PublicChatMessage[];
@@ -35,17 +37,26 @@ interface LiveChatThreadPanelProps {
   onClose: () => void;
   onSendReply: (content: string, parentId: string) => void;
   onDeleteMessage: (messageId: string) => void;
+  reactions: ReactionsMap;
+  onToggleReaction: (messageId: string, emoji: string) => void;
 }
 
 function ThreadMessage({
   message,
   isOwn,
   onDelete,
+  reactionGroups,
+  onToggleReaction,
+  currentUserId,
 }: {
   message: PublicChatMessage;
   isOwn: boolean;
   onDelete: (id: string) => void;
+  reactionGroups: ReactionGroup[];
+  onToggleReaction: (messageId: string, emoji: string) => void;
+  currentUserId: string;
 }) {
+  const [showReactions, setShowReactions] = useState(false);
   const initials = (message.sender?.display_name || '?')
     .split(' ')
     .map(w => w[0])
@@ -60,6 +71,8 @@ function ThreadMessage({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className={`group flex gap-2.5 ${isOwn ? 'flex-row-reverse' : ''}`}
+      onMouseEnter={() => setShowReactions(true)}
+      onMouseLeave={() => setShowReactions(false)}
     >
       <Avatar className="h-7 w-7 shrink-0 ring-1 ring-border">
         <AvatarImage src={message.sender?.avatar_url || undefined} />
@@ -87,34 +100,78 @@ function ThreadMessage({
         >
           {isDeleted ? 'This message was deleted' : message.content}
         </div>
-        {isOwn && !isDeleted && (
-          <div className={`flex ${isOwn ? 'justify-end' : ''} opacity-0 group-hover:opacity-100 transition-opacity`}>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <button className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
-                  <Trash2 className="h-3 w-3" />
+        {/* Reaction summary badges */}
+        {reactionGroups.length > 0 && (
+          <div className={`flex flex-wrap gap-1 ${isOwn ? 'justify-end' : ''}`}>
+            {reactionGroups.map(g => {
+              const isMine = g.user_ids.includes(currentUserId);
+              return (
+                <button
+                  key={g.emoji}
+                  onClick={() => onToggleReaction(message.id, g.emoji)}
+                  className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-colors ${
+                    isMine
+                      ? 'bg-primary/20 ring-1 ring-primary/40 text-primary'
+                      : 'bg-muted/60 hover:bg-muted text-muted-foreground'
+                  }`}
+                >
+                  <span>{g.emoji}</span>
+                  <span className="font-medium">{g.user_ids.length}</span>
                 </button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete message?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This message will be removed for everyone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => onDelete(message.id)}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+              );
+            })}
           </div>
         )}
+
+        {/* Quick reaction bar */}
+        <AnimatePresence>
+          {showReactions && !isDeleted && (
+            <motion.div
+              initial={{ opacity: 0, y: -4, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -4, scale: 0.9 }}
+              transition={{ duration: 0.15 }}
+              className={`flex items-center gap-0.5 ${isOwn ? 'justify-end' : ''}`}
+            >
+              {QUICK_REACTIONS.map(emoji => (
+                <button
+                  key={emoji}
+                  onClick={() => onToggleReaction(message.id, emoji)}
+                  className="text-sm hover:scale-125 transition-transform p-0.5 rounded hover:bg-muted"
+                  title={`React with ${emoji}`}
+                >
+                  {emoji}
+                </button>
+              ))}
+              {isOwn && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="ml-0.5 p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete message?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This message will be removed for everyone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => onDelete(message.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
@@ -127,6 +184,8 @@ export function LiveChatThreadPanel({
   onClose,
   onSendReply,
   onDeleteMessage,
+  reactions,
+  onToggleReaction,
 }: LiveChatThreadPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -200,6 +259,9 @@ export function LiveChatThreadPanel({
               message={msg}
               isOwn={msg.sender_id === currentUserId}
               onDelete={onDeleteMessage}
+              reactionGroups={reactions[msg.id] || []}
+              onToggleReaction={onToggleReaction}
+              currentUserId={currentUserId}
             />
           ))}
           <div ref={bottomRef} />

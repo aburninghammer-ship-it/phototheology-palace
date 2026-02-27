@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { usePublicChat, PublicChatMessage } from '@/hooks/usePublicChat';
+import { usePublicChat, PublicChatMessage, ReactionsMap } from '@/hooks/usePublicChat';
 
 interface TypingUser {
   user_id: string;
@@ -18,6 +18,8 @@ interface LiveChatContextType {
   totalUnread: number;
   deleteMessage: (messageId: string) => Promise<void>;
   getThreadMessages: (parentId: string) => PublicChatMessage[];
+  reactions: ReactionsMap;
+  toggleReaction: (messageId: string, emoji: string) => Promise<void>;
 }
 
 const LiveChatContext = createContext<LiveChatContextType | undefined>(undefined);
@@ -34,6 +36,8 @@ export function LiveChatProvider({ children }: { children: React.ReactNode }) {
     totalUnread,
     deleteMessage,
     getThreadMessages,
+    reactions,
+    toggleReaction,
   } = usePublicChat();
 
   return (
@@ -50,6 +54,8 @@ export function LiveChatProvider({ children }: { children: React.ReactNode }) {
         totalUnread,
         deleteMessage,
         getThreadMessages,
+        reactions,
+        toggleReaction,
       }}
     >
       {children}

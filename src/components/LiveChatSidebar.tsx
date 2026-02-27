@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChatInput } from '@/components/ChatInput';
 import { useLiveChat } from '@/contexts/LiveChatContext';
-import { PublicChatMessage } from '@/hooks/usePublicChat';
+import { PublicChatMessage, ReactionGroup } from '@/hooks/usePublicChat';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Users, Sparkles, Reply, X, Trash2, MessageSquareText } from 'lucide-react';
@@ -43,6 +43,9 @@ function MessageBubble({
   onOpenThread,
   onDelete,
   threadCount,
+  reactionGroups,
+  onToggleReaction,
+  currentUserId,
 }: {
   message: PublicChatMessage;
   isOwn: boolean;
@@ -50,6 +53,9 @@ function MessageBubble({
   onOpenThread: (msg: PublicChatMessage) => void;
   onDelete: (id: string) => void;
   threadCount: number;
+  reactionGroups: ReactionGroup[];
+  onToggleReaction: (messageId: string, emoji: string) => void;
+  currentUserId: string;
 }) {
   const [showReactions, setShowReactions] = useState(false);
   const initials = (message.sender?.display_name || '?')
@@ -119,6 +125,29 @@ function MessageBubble({
           </button>
         )}
 
+        {/* Reaction summary badges */}
+        {reactionGroups.length > 0 && (
+          <div className={`flex flex-wrap gap-1 ${isOwn ? 'justify-end' : ''}`}>
+            {reactionGroups.map(g => {
+              const isMine = g.user_ids.includes(currentUserId);
+              return (
+                <button
+                  key={g.emoji}
+                  onClick={() => onToggleReaction(message.id, g.emoji)}
+                  className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-colors ${
+                    isMine
+                      ? 'bg-primary/20 ring-1 ring-primary/40 text-primary'
+                      : 'bg-muted/60 hover:bg-muted text-muted-foreground'
+                  }`}
+                >
+                  <span>{g.emoji}</span>
+                  <span className="font-medium">{g.user_ids.length}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {/* Quick reaction bar */}
         <AnimatePresence>
           {showReactions && !isDeleted && (
@@ -132,6 +161,7 @@ function MessageBubble({
               {QUICK_REACTIONS.map(emoji => (
                 <button
                   key={emoji}
+                  onClick={() => onToggleReaction(message.id, emoji)}
                   className="text-sm hover:scale-125 transition-transform p-0.5 rounded hover:bg-muted"
                   title={`React with ${emoji}`}
                 >
@@ -197,6 +227,8 @@ export function LiveChatSidebar() {
     markRoomAsRead,
     deleteMessage,
     getThreadMessages,
+    reactions,
+    toggleReaction,
   } = useLiveChat();
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -294,6 +326,9 @@ export function LiveChatSidebar() {
                   onOpenThread={setThreadParent}
                   onDelete={deleteMessage}
                   threadCount={getThreadMessages(msg.id).length}
+                  reactionGroups={reactions[msg.id] || []}
+                  onToggleReaction={toggleReaction}
+                  currentUserId={user.id}
                 />
               ))}
               <div ref={bottomRef} />
@@ -346,6 +381,8 @@ export function LiveChatSidebar() {
                   sendMessage(content, undefined, parentId);
                 }}
                 onDeleteMessage={deleteMessage}
+                reactions={reactions}
+                onToggleReaction={toggleReaction}
               />
             )}
           </AnimatePresence>

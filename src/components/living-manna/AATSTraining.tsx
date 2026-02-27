@@ -55,7 +55,7 @@ interface AATSTrainingProps {
 // ── Component ───────────────────────────────────────────────────────────────
 
 export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }: AATSTrainingProps) {
-  const { completeItem, isItemCompleted, getAvatarProgress, getOverallProgress, loading } = useAATSProgress();
+  const { completeItem, isItemCompleted, getAvatarProgress, getPhaseProgress, getOverallProgress, loading } = useAATSProgress();
 
   const [view, setView] = useState<AATSView>(initialAvatarId ? "avatar-path" : "overview");
   const [selectedAvatarId, setSelectedAvatarId] = useState<AATSAvatarId | null>(
@@ -204,6 +204,33 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
                         <div>
                           <p className="text-xs font-semibold truncate">{training.avatarName}</p>
                           <p className="text-[10px] text-muted-foreground">{progress}% complete</p>
+                        </div>
+
+                        {/* Training course summary */}
+                        <div className="text-[10px] text-muted-foreground space-y-1.5 pt-1 border-t border-border/30">
+                          <p className="font-medium text-foreground/70">
+                            {training.subjects.length} subjects &middot; {training.modules.length} modules
+                          </p>
+                          <p className="truncate leading-snug" title={training.subjects.map(s => s.title).join(', ')}>
+                            {training.subjects.slice(0, 3).map(s => s.title).join(', ')}
+                            {training.subjects.length > 3 ? '...' : ''}
+                          </p>
+                          {/* Mini phase progress bars */}
+                          <div className="grid grid-cols-6 gap-0.5 pt-1">
+                            {AATS_PHASES.map((phase) => {
+                              const pp = getPhaseProgress(avatarId, phase.number);
+                              return (
+                                <div key={phase.number} title={`P${phase.number}: ${phase.title} — ${pp}%`}>
+                                  <div className="h-1 rounded-full bg-muted/40 overflow-hidden">
+                                    <div
+                                      className="h-full rounded-full bg-primary transition-all"
+                                      style={{ width: `${pp}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

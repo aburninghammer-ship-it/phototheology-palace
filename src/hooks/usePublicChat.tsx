@@ -41,6 +41,14 @@ interface TypingUser {
   display_name: string;
 }
 
+export interface ReactionGroup {
+  emoji: string;
+  user_ids: string[];
+}
+
+// message_id → array of { emoji, user_ids[] }
+export type ReactionsMap = Record<string, ReactionGroup[]>;
+
 interface UsePublicChatReturn {
   rooms: PublicChatRoom[];
   messages: PublicChatMessage[];
@@ -56,6 +64,8 @@ interface UsePublicChatReturn {
   totalUnread: number;
   deleteMessage: (messageId: string) => Promise<void>;
   getThreadMessages: (parentId: string) => PublicChatMessage[];
+  reactions: ReactionsMap;
+  toggleReaction: (messageId: string, emoji: string) => Promise<void>;
 }
 
 export const usePublicChat = (): UsePublicChatReturn => {
@@ -67,6 +77,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
   const [activeRoomSlug, setActiveRoomSlug] = useState<string | null>(null);
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [reactions, setReactions] = useState<ReactionsMap>({});
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const instanceIdRef = useRef(Math.random().toString(36).slice(2, 8));
 
@@ -209,6 +220,81 @@ export const usePublicChat = (): UsePublicChatReturn => {
     return messages.filter(m => m.reply_to_id === parentId);
   }, [messages]);
 
+  // Fetch reactions for a set of message IDs and group by message+emoji
+  const fetchReactions = useCallback(async (messageIds: string[]) => {
+    if (messageIds.length === 0) return;
+    try {
+      const { data, error } = await (supabase as any)
+        .from('public_chat_reactions')
+        .select('message_id, user_id, emoji')
+        .in('message_id', messageIds);
+
+      if (error) throw error;
+
+      const map: ReactionsMap = {};
+      for (const row of data || []) {
+        if (!map[row.message_id]) map[row.message_id] = [];
+        const group = map[row.message_id].find((g: ReactionGroup) => g.emoji === row.emoji);
+        if (group) {
+          if (!group.user_ids.includes(row.user_id)) group.user_ids.push(row.user_id);
+        } else {
+          map[row.message_id].push({ emoji: row.emoji, user_ids: [row.user_id] });
+        }
+      }
+      setReactions(map);
+    } catch (err) {
+      console.error('Error fetching reactions:', err);
+    }
+  }, []);
+
+  // Toggle a reaction (add or remove)
+  const toggleReaction = useCallback(async (messageId: string, emoji: string) => {
+    if (!user) return;
+
+    const existing = reactions[messageId]?.find(g => g.emoji === emoji);
+    const alreadyReacted = existing?.user_ids.includes(user.id);
+
+    // Optimistic update
+    setReactions(prev => {
+      const groups = [...(prev[messageId] || [])];
+      const idx = groups.findIndex(g => g.emoji === emoji);
+      if (alreadyReacted) {
+        if (idx !== -1) {
+          const updated = { ...groups[idx], user_ids: groups[idx].user_ids.filter(id => id !== user.id) };
+          if (updated.user_ids.length === 0) groups.splice(idx, 1);
+          else groups[idx] = updated;
+        }
+      } else {
+        if (idx !== -1) {
+          groups[idx] = { ...groups[idx], user_ids: [...groups[idx].user_ids, user.id] };
+        } else {
+          groups.push({ emoji, user_ids: [user.id] });
+        }
+      }
+      return { ...prev, [messageId]: groups };
+    });
+
+    try {
+      if (alreadyReacted) {
+        await (supabase as any)
+          .from('public_chat_reactions')
+          .delete()
+          .eq('message_id', messageId)
+          .eq('user_id', user.id)
+          .eq('emoji', emoji);
+      } else {
+        await (supabase as any)
+          .from('public_chat_reactions')
+          .insert({ message_id: messageId, user_id: user.id, emoji });
+      }
+    } catch (err) {
+      console.error('Error toggling reaction:', err);
+      // Re-fetch to correct state
+      const ids = messages.map(m => m.id);
+      fetchReactions(ids);
+    }
+  }, [user, reactions, messages, fetchReactions]);
+
   // Typing indicator (no-op if table doesn't exist)
   const updateTypingIndicator = useCallback((_isTyping: boolean) => {
     // Typing table may not exist yet — silently skip
@@ -227,6 +313,12 @@ export const usePublicChat = (): UsePublicChatReturn => {
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
+
+  // Fetch reactions whenever messages change
+  useEffect(() => {
+    const ids = messages.map(m => m.id);
+    if (ids.length > 0) fetchReactions(ids);
+  }, [messages, fetchReactions]);
 
   // Realtime subscriptions
   useEffect(() => {
@@ -277,8 +369,51 @@ export const usePublicChat = (): UsePublicChatReturn => {
       )
       .subscribe();
 
+    const reactionsChannel = supabase
+      .channel(`public-chat-reactions-${instanceIdRef.current}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'public_chat_reactions',
+        },
+        (payload) => {
+          const row = (payload.new || payload.old) as any;
+          if (!row?.message_id) return;
+
+          if (payload.eventType === 'INSERT') {
+            setReactions(prev => {
+              const groups = [...(prev[row.message_id] || [])];
+              const idx = groups.findIndex(g => g.emoji === row.emoji);
+              if (idx !== -1) {
+                if (!groups[idx].user_ids.includes(row.user_id)) {
+                  groups[idx] = { ...groups[idx], user_ids: [...groups[idx].user_ids, row.user_id] };
+                }
+              } else {
+                groups.push({ emoji: row.emoji, user_ids: [row.user_id] });
+              }
+              return { ...prev, [row.message_id]: groups };
+            });
+          } else if (payload.eventType === 'DELETE') {
+            setReactions(prev => {
+              const groups = [...(prev[row.message_id] || [])];
+              const idx = groups.findIndex(g => g.emoji === row.emoji);
+              if (idx !== -1) {
+                const updated = { ...groups[idx], user_ids: groups[idx].user_ids.filter((id: string) => id !== row.user_id) };
+                if (updated.user_ids.length === 0) groups.splice(idx, 1);
+                else groups[idx] = updated;
+              }
+              return { ...prev, [row.message_id]: groups };
+            });
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
       messagesChannel.unsubscribe();
+      reactionsChannel.unsubscribe();
     };
   }, [user, activeRoomId]);
 
@@ -301,5 +436,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
     totalUnread,
     deleteMessage,
     getThreadMessages,
+    reactions,
+    toggleReaction,
   };
 };
