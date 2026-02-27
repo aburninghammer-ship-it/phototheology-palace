@@ -47,8 +47,7 @@ class AudioEngine {
     // Preload metadata for faster start
     this.audio.preload = 'auto';
 
-    // Cross-origin for Supabase storage URLs
-    this.audio.crossOrigin = 'anonymous';
+    // NOTE: crossOrigin removed - we fetch as blob instead to avoid CORS issues on mobile
   }
 
   private setupEventListeners() {
@@ -196,12 +195,30 @@ class AudioEngine {
       this.audio.pause();
       this.audio.currentTime = 0;
 
+      this.setState('loading');
+
+      // CRITICAL: On mobile, fetch as blob to avoid CORS issues with cross-origin audio URLs
+      let audioSrc = url;
+      if (url.startsWith('http') && !url.startsWith('data:')) {
+        try {
+          console.log('[AudioEngine] Fetching audio as blob for reliable mobile playback...');
+          const response = await fetch(url);
+          if (response.ok) {
+            const blob = await response.blob();
+            audioSrc = URL.createObjectURL(blob);
+            console.log('[AudioEngine] Created blob URL for playback, size:', blob.size);
+          } else {
+            console.warn('[AudioEngine] Blob fetch failed with status:', response.status, '- using URL directly');
+          }
+        } catch (fetchErr) {
+          console.warn('[AudioEngine] Blob fetch failed, using URL directly:', fetchErr);
+        }
+      }
+
       // Set the new source
-      this.audio.src = url;
+      this.audio.src = audioSrc;
       this.audio.playbackRate = this.playbackRate;
       this.audio.volume = this.volume;
-
-      this.setState('loading');
 
       // Load and play
       this.audio.load();
