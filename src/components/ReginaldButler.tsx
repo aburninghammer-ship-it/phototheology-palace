@@ -227,8 +227,8 @@ export const ReginaldButler = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="fixed bottom-20 right-3 md:bottom-6 md:right-5 z-[999] w-[min(92vw,24rem)] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border bg-background"
-            style={{ height: "min(600px, calc(100vh - 100px))" }}
+            className="fixed inset-x-2 bottom-[72px] md:inset-x-auto md:bottom-6 md:right-5 md:w-[24rem] z-[999] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border bg-background"
+            style={{ height: "min(600px, calc(100vh - 90px))", maxHeight: "calc(100dvh - 90px)" }}
           >
             {/* Header */}
             <div
@@ -333,16 +333,16 @@ export const ReginaldButler = () => {
             )}
 
             {/* Input */}
-            <div className="bg-background border-t border-border px-3 py-2.5 flex gap-2 flex-shrink-0">
+            <div className="bg-background border-t border-border px-3 py-3 flex gap-2 flex-shrink-0" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
               <Button
                 type="button"
                 onClick={toggleMic}
                 size="icon"
                 variant="ghost"
-                className={`h-9 w-9 flex-shrink-0 transition-colors ${listening ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
+                className={`h-11 w-11 flex-shrink-0 transition-colors ${listening ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
                 title={listening ? "Stop recording" : "Speak your question"}
               >
-                {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
               </Button>
               <Input
                 ref={inputRef}
@@ -351,16 +351,16 @@ export const ReginaldButler = () => {
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
                 placeholder={listening ? "Listening…" : "Ask Reginald about the Palace…"}
                 disabled={loading}
-                className="flex-1 text-sm h-9"
+                className="flex-1 text-base h-11 rounded-xl"
               />
               <Button
                 onClick={() => sendMessage()}
                 disabled={loading || !input.trim()}
                 size="icon"
-                className="h-9 w-9 flex-shrink-0 text-primary-foreground"
+                className="h-11 w-11 flex-shrink-0 text-primary-foreground rounded-xl"
                 style={{ background: "linear-gradient(135deg, #78350f, #92400e)" }}
               >
-                <Send className="h-3.5 w-3.5" />
+                <Send className="h-4 w-4" />
               </Button>
             </div>
           </motion.div>
