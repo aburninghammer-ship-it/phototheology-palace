@@ -19646,6 +19646,7 @@ export type Database = {
         | "sabbath_school_lead"
         | "youth_lead"
         | "personal_ministry_admin"
+        | "bible_worker"
       pt_mastery_level: "beginner" | "intermediate" | "master"
       pt_pain_point_type: "diagnostic" | "symptomatic"
       pt_study_burden:
@@ -19847,6 +19848,7 @@ export const Constants = {
         "sabbath_school_lead",
         "youth_lead",
         "personal_ministry_admin",
+        "bible_worker",
       ],
       pt_mastery_level: ["beginner", "intermediate", "master"],
       pt_pain_point_type: ["diagnostic", "symptomatic"],
