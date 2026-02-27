@@ -1020,6 +1020,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                       text={teachingContent.replace(/<[^>]*>/g, ' ').substring(0, 4000)}
                       variant="outline"
                       size="sm"
+                      showLabel
                     />
                   </div>
                 )}
@@ -1112,6 +1113,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                       text={objectionsContent.replace(/<[^>]*>/g, ' ').substring(0, 4000)}
                       variant="outline"
                       size="sm"
+                      showLabel
                     />
                   </div>
                 )}
@@ -1184,6 +1186,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                       text={historyContent.replace(/<[^>]*>/g, ' ').substring(0, 4000)}
                       variant="outline"
                       size="sm"
+                      showLabel
                     />
                   </div>
                 )}
@@ -1231,6 +1234,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                       text={egwContent.replace(/<[^>]*>/g, ' ').substring(0, 4000)}
                       variant="outline"
                       size="sm"
+                      showLabel
                     />
                   </div>
                 )}
