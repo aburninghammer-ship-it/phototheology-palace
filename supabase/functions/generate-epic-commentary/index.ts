@@ -1558,6 +1558,11 @@ async function generateEpicAudio(
         );
       } catch (elevenErr) {
         const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
+        // For Epic mode, NEVER fall back to OpenAI — William voice is essential
+        if (mode === "epic") {
+          console.error(`[EpicCommentary] ElevenLabs error on chunk ${i + 1} in Epic mode (no fallback): ${errMsg}`);
+          throw new Error(`ElevenLabs Epic voice unavailable: ${errMsg}. Please try again later.`);
+        }
         if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429")) {
           console.warn(`[EpicCommentary] ElevenLabs error on chunk ${i + 1}, falling back to OpenAI TTS: ${errMsg}`);
           const openAISubChunks = splitTextIntoChunks(chunks[i], 3900);
