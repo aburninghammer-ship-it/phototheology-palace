@@ -132,6 +132,15 @@ export function AudioTrainingPlaylist({
     setIsLoading(true);
     setCurrentIndex(index);
 
+    // Stop any existing audio BEFORE creating a new one to prevent echo
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.ontimeupdate = null;
+      audioRef.current.onerror = null;
+      audioRef.current = null;
+    }
+
     // Create and prime audio element SYNCHRONOUSLY in user gesture context
     const audio = new Audio();
     audio.preload = "auto";
@@ -195,11 +204,7 @@ export function AudioTrainingPlaylist({
         throw new Error("No audio data");
       }
 
-      // Stop previous audio
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
+      // Audio element already cleaned up at the top of playItem
 
       audio.src = url;
       audioRef.current = audio;

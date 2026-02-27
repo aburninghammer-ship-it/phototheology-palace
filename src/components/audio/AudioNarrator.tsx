@@ -128,6 +128,15 @@ export const AudioNarrator = ({
       return;
     }
 
+    // Stop any existing audio BEFORE creating a new one to prevent echo
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.ontimeupdate = null;
+      audioRef.current.onerror = null;
+      audioRef.current = null;
+    }
+
     // Create and prime audio element SYNCHRONOUSLY in user gesture context
     const audio = new Audio();
     audio.preload = "auto";
