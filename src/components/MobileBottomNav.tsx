@@ -1,4 +1,4 @@
-import { Home, BookOpen, Building2, MessageCircle, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X } from "lucide-react";
+import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const primaryNavItems = [
   { icon: Home, labelKey: "common.home", path: "/dashboard" },
   { icon: BookOpen, labelKey: "nav.bible", path: "/bible" },
-  { icon: MessageCircle, labelKey: "nav.chat", path: "/public-chat" },
+  { icon: Church, labelKey: "nav.church", path: "/living-manna" },
   { icon: Building2, labelKey: "nav.palace", path: "/palace" },
 ];
 
@@ -18,7 +18,7 @@ const moreNavItems = [
   { icon: Crown, label: "COTA Series", path: "/cota-series" },
   { icon: Microscope, label: "Research Mode", path: "/research-mode" },
   { icon: BrainCircuit, label: "Analyze My Thoughts", path: "/analyze-my-thoughts" },
-  { icon: Church, label: "Living Manna", path: "/living-manna" },
+  { icon: MessageCircle, label: "Public Chat", path: "/public-chat" },
   { icon: Scroll, label: "Bible Studies", path: "/bible-study-series" },
 ];
 
@@ -36,7 +36,7 @@ export function MobileBottomNav() {
   const hiddenPaths = ["/auth", "/onboarding", "/interactive-demo"];
   if (hiddenPaths.some(path => location.pathname.startsWith(path))) return null;
 
-  const isMoreActive = moreNavItems.some(item => 
+  const isMoreActive = moreNavItems.some(item =>
     location.pathname === item.path || location.pathname.startsWith(item.path)
   );
 

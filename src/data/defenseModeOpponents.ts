@@ -37,6 +37,7 @@ export interface DefenseOpponent {
   signatureTopics: string[]; // topic IDs where this opponent argues FOR their own position
   steelmanRules: string;
   endPrompt: string;
+  gender?: "male" | "female";
 }
 
 export interface DefenseTopic {
@@ -152,6 +153,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "Use actual Watchtower arguments and New World Translation renderings. Present the strongest JW case against the Trinity using John 14:28, Colossians 1:15, Revelation 3:14. Do not use weak arguments. Debate as a well-prepared JW elder would.",
     endPrompt:
       "Can you show me from the Scriptures where Jehovah commands this?",
+    gender: "female",
   },
   {
     id: "evangelical",
@@ -386,6 +388,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "Present the STRONGEST academic arguments. Cite actual scholars by name (Ehrman, Collins, Kugel, Finkelstein). Reference specific archaeological findings and manuscript evidence. Use technical terms correctly (hapax legomenon, terminus post quem, redaction layer). Never be dismissive or snarky — argue as a PhD committee chair evaluating a dissertation defense. This is scholarship, not mockery.",
     endPrompt:
       "Show me the peer-reviewed evidence — not devotional conviction — that supports your reading of this text.",
+    gender: "female",
   },
   {
     id: "progressive-christian",
@@ -494,6 +497,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
       "Present the New Age position at its most compelling and spiritually attractive. Use actual NDE research (Moody, van Lommel, Moorjani). Reference quantum physics popularizations (Capra's 'Tao of Physics'). Quote mystical traditions accurately. Do not caricature as 'crystals and astrology' — present the sophisticated philosophical version that draws from Perennial Philosophy (Aldous Huxley), Ken Wilber's integral spirituality, and mystic Christianity (Meister Eckhart, Thomas Merton). This opponent is dangerous because they are LOVING and seem more spiritual than the legalist Christian.",
     endPrompt:
       "If God is infinite love and consciousness, why would this love confine itself to one book, one day, one group? Isn't that making God smaller than God is?",
+    gender: "female",
   },
   {
     id: "anti-prophet",

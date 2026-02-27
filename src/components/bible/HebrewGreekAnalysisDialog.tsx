@@ -71,7 +71,7 @@ export const HebrewGreekAnalysisDialog: React.FC<HebrewGreekAnalysisDialogProps>
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh]">
+      <DialogContent className="w-[95vw] max-w-3xl max-h-[85vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <span className="text-2xl">📚</span>
@@ -83,7 +83,7 @@ export const HebrewGreekAnalysisDialog: React.FC<HebrewGreekAnalysisDialogProps>
         </DialogHeader>
         
         <div className="mb-4 p-4 bg-muted/50 rounded-lg">
-          <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div>
               <span className="font-semibold">Original:</span> {wordData.lemma}
             </div>

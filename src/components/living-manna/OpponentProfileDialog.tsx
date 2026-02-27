@@ -18,8 +18,11 @@ import { Progress } from "@/components/ui/progress";
 import { getAvatarTraining } from "@/data/aatsTrainingData";
 
 // Convert second-person AI prompt text to third-person for display
-function toThirdPerson(text: string): string {
+function toThirdPerson(text: string, gender: "male" | "female" = "male"): string {
   let s = text;
+  const pronoun = gender === "female" ? "She" : "He";
+  const possessive = gender === "female" ? "her" : "his";
+  const possessiveCap = gender === "female" ? "Her" : "His";
   const verbs: [string, string][] = [
     ["are", "is"], ["hold", "holds"], ["reject", "rejects"], ["consider", "considers"],
     ["view", "views"], ["believe", "believes"], ["argue", "argues"], ["emphasize", "emphasizes"],
@@ -34,9 +37,9 @@ function toThirdPerson(text: string): string {
     ["grew", "grew"], ["left", "left"], ["feel", "feels"], ["once", "once"],
   ];
   for (const [v2, v3] of verbs) {
-    s = s.replace(new RegExp(`\\bYou ${v2}\\b`, "g"), `He ${v3}`);
+    s = s.replace(new RegExp(`\\bYou ${v2}\\b`, "g"), `${pronoun} ${v3}`);
   }
-  s = s.replace(/\byour\b/g, "his").replace(/\bYour\b/g, "His").replace(/\bYou\b/g, "He");
+  s = s.replace(/\byour\b/g, possessive).replace(/\bYour\b/g, possessiveCap).replace(/\bYou\b/g, pronoun);
   return s;
 }
 
@@ -396,7 +399,7 @@ export function OpponentProfileDialog({
                     <Eye className="h-4 w-4" /> Worldview Profile
                   </h3>
                   <p className="text-sm leading-relaxed text-foreground/80">
-                    {toThirdPerson(opponent.worldview).slice(0, 400)}...
+                    {toThirdPerson(opponent.worldview, opponent.gender || "male").slice(0, 400)}...
                   </p>
                 </section>
 
