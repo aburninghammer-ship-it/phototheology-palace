@@ -117,7 +117,22 @@ export function AudioTrainingPlaylist({
     notifyTTSStopped();
   };
 
-  const playItem = useCallback(async (index: number) => {
+  const primeAudioForMobile = async (audio: HTMLAudioElement) => {
+    audio.preload = "auto";
+
+    try {
+      audio.muted = true;
+      await audio.play();
+      audio.pause();
+      audio.currentTime = 0;
+    } catch {
+      // Best effort warm-up for iOS/Safari autoplay restrictions
+    } finally {
+      audio.muted = false;
+    }
+  };
+
+  const playItem = useCallback(async (index: number, userInitiated = false) => {
     if (index < 0 || index >= playlist.length) {
       // Playlist finished
       stopPlayback();
@@ -129,6 +144,11 @@ export function AudioTrainingPlaylist({
     loadingRef.current = true;
     setIsLoading(true);
     setCurrentIndex(index);
+
+    const audio = new Audio();
+    if (userInitiated) {
+      await primeAudioForMobile(audio);
+    }
 
     try {
       let item = playlist[index];
@@ -174,7 +194,7 @@ export function AudioTrainingPlaylist({
         audioRef.current = null;
       }
 
-      const audio = new Audio(url);
+      audio.src = url;
       audioRef.current = audio;
 
       audio.onloadedmetadata = () => setDuration(audio.duration);
@@ -183,16 +203,16 @@ export function AudioTrainingPlaylist({
       };
       audio.onended = () => {
         notifyTTSStopped();
-        // Auto-advance to next
         loadingRef.current = false;
-        playItem(index + 1);
+        void playItem(index + 1, false);
       };
       audio.onerror = () => {
         toast.error(`Audio error on Day ${item.dayNumber}. Skipping...`);
         loadingRef.current = false;
-        playItem(index + 1);
+        void playItem(index + 1, false);
       };
 
+      audio.load();
       await audio.play();
       setIsPlaying(true);
       notifyTTSStarted();
@@ -216,26 +236,30 @@ export function AudioTrainingPlaylist({
       setIsPlaying(false);
       notifyTTSStopped();
     } else if (!isPlaying && audioRef.current && currentIndex >= 0) {
-      audioRef.current.play();
-      setIsPlaying(true);
-      notifyTTSStarted();
+      void audioRef.current.play().then(() => {
+        setIsPlaying(true);
+        notifyTTSStarted();
+      }).catch((error) => {
+        console.error("Resume play failed:", error);
+        toast.error("Playback blocked. Tap Play again.");
+      });
     } else {
       // Start from beginning or current
-      playItem(currentIndex >= 0 ? currentIndex : 0);
+      void playItem(currentIndex >= 0 ? currentIndex : 0, true);
     }
   };
 
   const skipNext = () => {
     if (currentIndex < playlist.length - 1) {
       stopPlayback();
-      playItem(currentIndex + 1);
+      void playItem(currentIndex + 1, true);
     }
   };
 
   const skipPrev = () => {
     if (currentIndex > 0) {
       stopPlayback();
-      playItem(currentIndex - 1);
+      void playItem(currentIndex - 1, true);
     }
   };
 

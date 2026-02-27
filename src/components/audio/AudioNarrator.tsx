@@ -102,19 +102,50 @@ export const AudioNarrator = ({
     setProgress(0);
   };
 
+  const resetAudioState = () => {
+    if (audioUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(audioUrl);
+    }
+    setAudioUrl(null);
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
+    setIsPlaying(false);
+    setProgress(0);
+    setDuration(0);
+    notifyTTSStopped();
+  };
+
+  const primeAudioForMobile = async (audio: HTMLAudioElement) => {
+    audio.preload = "auto";
+    audio.volume = volume / 100;
+
+    if (!isMobile) return;
+
+    try {
+      audio.muted = true;
+      await audio.play();
+      audio.pause();
+      audio.currentTime = 0;
+    } catch {
+      // Best effort warm-up for iOS/Safari autoplay restrictions
+    } finally {
+      audio.muted = false;
+    }
+  };
+
   const generateAudio = async () => {
-    if (audioUrl) {
-      playAudio();
+    if (audioUrl && audioRef.current) {
+      void playAudio();
       return;
     }
 
-    // Create and unlock Audio element immediately in user gesture context (critical for mobile)
     const audio = new Audio();
-    audio.preload = "auto";
-    audio.volume = volume / 100;
-    // Unlock audio element for iOS Safari
-    audio.play().catch(() => {});
     audioRef.current = audio;
+    await primeAudioForMobile(audio);
 
     setIsLoading(true);
     try {
@@ -148,15 +179,15 @@ export const AudioNarrator = ({
       }
 
       setAudioUrl(url);
-        
+
       audio.onloadedmetadata = () => {
         setDuration(audio.duration);
       };
-        
+
       audio.ontimeupdate = () => {
         setProgress((audio.currentTime / audio.duration) * 100);
       };
-        
+
       audio.onended = () => {
         setIsPlaying(false);
         setProgress(0);
@@ -166,28 +197,41 @@ export const AudioNarrator = ({
       audio.onerror = (e) => {
         console.error("Audio playback error:", e);
         toast.error("Audio failed to load. Try again.");
-        setIsPlaying(false);
+        resetAudioState();
         setIsLoading(false);
       };
 
-      // Set source and play - element was already unlocked in user gesture
       audio.src = url;
+      audio.load();
       await audio.play();
       setIsPlaying(true);
       notifyTTSStarted();
     } catch (error) {
       console.error("Error generating audio:", error);
+      resetAudioState();
       toast.error("Failed to generate audio. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const playAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
+  const playAudio = async () => {
+    if (!audioRef.current) return;
+
+    try {
+      await audioRef.current.play();
       setIsPlaying(true);
       notifyTTSStarted();
+    } catch (error) {
+      const notAllowed = error instanceof DOMException && error.name === "NotAllowedError";
+      if (notAllowed) {
+        toast.error("Playback was blocked by your browser. Tap play again.");
+        return;
+      }
+
+      console.error("Error playing audio:", error);
+      resetAudioState();
+      toast.error("Playback failed. Regenerating may be required.");
     }
   };
 
@@ -201,14 +245,14 @@ export const AudioNarrator = ({
 
   const togglePlayPause = () => {
     if (!audioUrl) {
-      generateAudio();
+      void generateAudio();
       return;
     }
-    
+
     if (isPlaying) {
       pauseAudio();
     } else {
-      playAudio();
+      void playAudio();
     }
   };
 
