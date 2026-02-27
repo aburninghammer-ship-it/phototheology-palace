@@ -12816,7 +12816,9 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          images: string[] | null
           is_deleted: boolean
+          is_pinned: boolean
           reply_to_id: string | null
           room_id: string
           sender_id: string
@@ -12825,7 +12827,9 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          images?: string[] | null
           is_deleted?: boolean
+          is_pinned?: boolean
           reply_to_id?: string | null
           room_id: string
           sender_id: string
@@ -12834,7 +12838,9 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          images?: string[] | null
           is_deleted?: boolean
+          is_pinned?: boolean
           reply_to_id?: string | null
           room_id?: string
           sender_id?: string
@@ -12852,6 +12858,38 @@ export type Database = {
             columns: ["room_id"]
             isOneToOne: false
             referencedRelation: "public_chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_chat_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_chat_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "public_chat_messages"
             referencedColumns: ["id"]
           },
         ]
