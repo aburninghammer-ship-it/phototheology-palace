@@ -86,9 +86,11 @@ export function FortyDayChallenge() {
     loadData();
   }, [user]);
 
+  const initialLoadDone = useRef(false);
+
   const loadData = async () => {
     if (!user) return;
-    setLoading(true);
+    if (!initialLoadDone.current) setLoading(true);
     try {
       const { data: enrollments } = await supabase
         .from("debate_challenge_enrollments")
@@ -124,6 +126,7 @@ export function FortyDayChallenge() {
       console.error("Load error:", err);
     } finally {
       setLoading(false);
+      initialLoadDone.current = true;
     }
   };
 
@@ -794,7 +797,7 @@ export function FortyDayChallenge() {
   // Auto-scroll chat
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages.length]);
 
   if (loading) {
     return (
@@ -1136,12 +1139,13 @@ export function FortyDayChallenge() {
         {/* Chat Area */}
         <ScrollArea className="flex-1 p-3">
           <div className="space-y-3">
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
               {messages.map((msg, i) => (
                 <motion.div
-                  key={i}
+                  key={`${msg.role}-${i}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
                 >
                   <div className={`flex ${msg.role === "defender" ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[85%] rounded-lg p-3 text-sm ${
