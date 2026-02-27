@@ -1,22 +1,22 @@
 import { useRef, useCallback, useEffect, type ReactNode } from "react";
 import { GripVertical } from "lucide-react";
 
-const STORAGE_KEY = "widget-stack-position-v5";
+const STORAGE_KEY = "widget-stack-position-v6";
 
 function getInitialPosition() {
+  const w = window.innerWidth || 800;
+  const h = window.innerHeight || 600;
+  const fallback = { x: Math.max(0, w - 180), y: Math.max(0, h - 300) };
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const pos = JSON.parse(saved) as { x: number; y: number };
-      // Validate saved position is still on-screen
-      if (pos.x >= 0 && pos.y >= 0 && pos.x < window.innerWidth && pos.y < window.innerHeight) {
+      if (pos.x >= 0 && pos.y >= 0 && pos.x < w - 20 && pos.y < h - 20) {
         return pos;
       }
     }
   } catch {}
-  const w = window.innerWidth || 800;
-  const h = window.innerHeight || 600;
-  return { x: Math.max(0, w - 160), y: Math.max(0, h - 350) };
+  return fallback;
 }
 
 function clamp(val: number, min: number, max: number) {
