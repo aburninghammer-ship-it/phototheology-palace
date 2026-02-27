@@ -18258,6 +18258,36 @@ export type Database = {
         }
         Relationships: []
       }
+      war_college_manuscripts: {
+        Row: {
+          avatar_id: string
+          created_at: string
+          day_number: number
+          id: string
+          manuscript_data: Json
+          rank: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_id: string
+          created_at?: string
+          day_number: number
+          id?: string
+          manuscript_data: Json
+          rank: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_id?: string
+          created_at?: string
+          day_number?: number
+          id?: string
+          manuscript_data?: Json
+          rank?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       warrior_characteristics: {
         Row: {
           characteristic_name: string

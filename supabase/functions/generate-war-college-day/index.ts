@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,6 +26,26 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
+    // Check cache first
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data: cached } = await supabase
+      .from("war_college_manuscripts")
+      .select("manuscript_data")
+      .eq("avatar_id", avatarId)
+      .eq("day_number", dayNumber)
+      .maybeSingle();
+
+    if (cached?.manuscript_data) {
+      console.log(`Cache hit: ${avatarId} day ${dayNumber}`);
+      return new Response(JSON.stringify(cached.manuscript_data), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Cache miss — generate
     const rankDesc = RANK_DESCRIPTIONS[rank] || RANK_DESCRIPTIONS.initiate;
 
     const systemPrompt = `You are the Phototheology War College Manuscript Generator. You produce ultra-immersive, long-form strategic manuscripts for apologetics training.
@@ -138,7 +159,6 @@ Produce the complete War College manuscript now.`;
       const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
       parsed = JSON.parse(jsonStr);
     } catch {
-      // Try direct parse
       try {
         parsed = JSON.parse(content);
       } catch {
@@ -146,6 +166,20 @@ Produce the complete War College manuscript now.`;
         throw new Error("Failed to parse manuscript from AI response");
       }
     }
+
+    // Cache the result (fire-and-forget)
+    supabase
+      .from("war_college_manuscripts")
+      .upsert({
+        avatar_id: avatarId,
+        day_number: dayNumber,
+        rank,
+        manuscript_data: parsed,
+      }, { onConflict: "avatar_id,day_number" })
+      .then(({ error }) => {
+        if (error) console.error("Cache write error:", error);
+        else console.log(`Cached: ${avatarId} day ${dayNumber}`);
+      });
 
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

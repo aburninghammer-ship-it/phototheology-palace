@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WarCollegeTrackView } from "./WarCollegeTrackView";
 import { WarCollegeReader } from "./WarCollegeReader";
-import { WAR_COLLEGE_TRACKS, WAR_COLLEGE_RINGS, type WarCollegeTrack, type WarCollegeDay, getRankForDay } from "@/data/aats/warCollegeTypes";
+import { WAR_COLLEGE_TRACKS, WAR_COLLEGE_RINGS, RANK_CONFIG, type WarCollegeTrack, type WarCollegeDay, getRankForDay } from "@/data/aats/warCollegeTypes";
 import {
   BookOpen, Shield, Brain, Zap, Swords, Flame, ArrowLeft, ArrowRight,
   CheckCircle2, Circle, ChevronDown, ChevronUp, ChevronRight, GraduationCap,
@@ -536,6 +536,64 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
                   </CardContent>
                 </Card>
               </motion.div>
+            );
+          })}
+        </div>
+
+        {/* ─── 56-Day War College Manuscripts ─── */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <GraduationCap className="h-5 w-5 text-primary" />
+            Daily Manuscripts — 56-Day War College
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Each day has a full in-depth strategic manuscript (25–30 min). Generated on first access, then cached for instant replay.
+          </p>
+          {Array.from({ length: 8 }, (_, wIdx) => {
+            const week = wIdx + 1;
+            const rank = getRankForDay((week - 1) * 7 + 1);
+            const ri = RANK_CONFIG[rank];
+            const days = Array.from({ length: 7 }, (_, d) => (week - 1) * 7 + d + 1).filter(d => d <= 56);
+            const weekCompleted = days.filter(d => isItemCompleted(selectedTraining.avatarId, `wc-day-${d}`)).length;
+            return (
+              <div key={week}>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Badge variant="outline" className={`${ri.color} border-current/30 text-[10px]`}>
+                    {ri.emoji} Week {week} — {ri.label}
+                  </Badge>
+                  <span className="text-[10px] text-muted-foreground">{weekCompleted}/{days.length}</span>
+                </div>
+                <div className="grid grid-cols-7 gap-1.5">
+                  {days.map(d => {
+                    const done = isItemCompleted(selectedTraining.avatarId, `wc-day-${d}`);
+                    const isGenerating = generatingPhaseDay === d;
+                    return (
+                      <motion.button
+                        key={d}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        disabled={!!generatingPhaseDay}
+                        onClick={() => handleGeneratePhaseManuscript(d)}
+                        className={`
+                          relative aspect-square rounded-lg flex flex-col items-center justify-center text-sm font-bold
+                          border transition-all cursor-pointer
+                          ${done
+                            ? "bg-green-500/10 border-green-500/30 text-green-400"
+                            : "bg-muted/30 border-border/50 text-muted-foreground hover:border-primary/30"
+                          }
+                        `}
+                      >
+                        {isGenerating ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : done ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 mb-0.5" />
+                        ) : null}
+                        <span className="text-xs">{d}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </div>
