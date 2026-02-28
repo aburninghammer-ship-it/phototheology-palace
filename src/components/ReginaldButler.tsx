@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ const QUICK_QUESTIONS = [
 
 export const ReginaldButler = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -124,7 +126,19 @@ export const ReginaldButler = () => {
 
       if (error) throw error;
 
-      const reply = data.response || "I do beg your pardon — let us try that again.";
+      let reply = data.response || "I do beg your pardon — let us try that again.";
+
+      // Check for navigation marker
+      const navMatch = reply.match(/\[NAVIGATE:\s*(\/[^\]]+)\]/);
+      if (navMatch) {
+        const path = navMatch[1].trim();
+        reply = reply.replace(/\n?\[NAVIGATE:\s*\/[^\]]+\]/, "").trim();
+        // Navigate after a short delay so the user sees the message
+        setTimeout(() => {
+          navigate(path);
+        }, 1200);
+      }
+
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
 
       if (audioEnabled) {
