@@ -56,60 +56,21 @@ export const AudioNarrator = ({
   const [speed, setSpeed] = useState(1.0); // 0.5 = slower/deeper, 1.5 = faster/higher
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const isMobile = useIsMobile();
 
-  useEffect(() => {
-    return () => {
-      // Cleanup audio on unmount
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
-      }
-    };
-  }, [audioUrl]);
-
-  // Reset audio when voice or speed changes
-  const handleVoiceChange = (voice: VoiceId) => {
-    setSelectedVoice(voice);
-    // Clear existing audio so it regenerates with new voice
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl);
-      setAudioUrl(null);
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    setIsPlaying(false);
-    setProgress(0);
-  };
-
-  const handleSpeedChange = (newSpeed: number) => {
-    setSpeed(newSpeed);
-    // Clear existing audio so it regenerates with new speed
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl);
-      setAudioUrl(null);
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    setIsPlaying(false);
-    setProgress(0);
-  };
-
   const resetAudioState = () => {
-    if (audioUrl?.startsWith("blob:")) {
-      URL.revokeObjectURL(audioUrl);
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
     }
     setAudioUrl(null);
 
     if (audioRef.current) {
       audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.ontimeupdate = null;
+      audioRef.current.onerror = null;
       audioRef.current = null;
     }
 
@@ -117,6 +78,36 @@ export const AudioNarrator = ({
     setProgress(0);
     setDuration(0);
     notifyTTSStopped();
+  };
+
+  useEffect(() => {
+    return () => {
+      // Cleanup audio only on unmount
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.onended = null;
+        audioRef.current.ontimeupdate = null;
+        audioRef.current.onerror = null;
+        audioRef.current = null;
+      }
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
+  }, []);
+
+  // Reset audio when voice or speed changes
+  const handleVoiceChange = (voice: VoiceId) => {
+    setSelectedVoice(voice);
+    // Clear existing audio so it regenerates with new voice
+    resetAudioState();
+  };
+
+  const handleSpeedChange = (newSpeed: number) => {
+    setSpeed(newSpeed);
+    // Clear existing audio so it regenerates with new speed
+    resetAudioState();
   };
 
   // Tiny silent MP3 for priming audio element in user gesture context
@@ -179,20 +170,24 @@ export const AudioNarrator = ({
         // Fetch the audio URL as a blob to avoid CORS/redirect issues on mobile
         try {
           const audioResponse = await fetch(data.audioUrl);
+          if (!audioResponse.ok) throw new Error(`Audio fetch failed: ${audioResponse.status}`);
           const blob = await audioResponse.blob();
-          url = URL.createObjectURL(blob);
+          const blobUrl = URL.createObjectURL(blob);
+          objectUrlRef.current = blobUrl;
+          url = blobUrl;
         } catch {
           // Fallback to direct URL if blob fetch fails
+          objectUrlRef.current = null;
           url = data.audioUrl;
         }
       } else if (data.audioContent) {
+        objectUrlRef.current = null;
         url = `data:audio/mpeg;base64,${data.audioContent}`;
       } else {
         throw new Error("No audio data returned");
       }
 
       setAudioUrl(url);
-
       audio.onloadedmetadata = () => {
         setDuration(audio.duration);
       };
@@ -222,7 +217,10 @@ export const AudioNarrator = ({
     } catch (error) {
       console.error("Error generating audio:", error);
       resetAudioState();
-      toast.error("Failed to generate audio. Please try again.");
+      const aborted = error instanceof DOMException && error.name === "AbortError";
+      if (!aborted) {
+        toast.error("Failed to generate audio. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
