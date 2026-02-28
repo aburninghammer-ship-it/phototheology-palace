@@ -5,7 +5,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ListMusic, Plus, Trash2, Play, Pause, SkipForward, SkipBack,
-  Loader2, GripVertical, ChevronDown, ChevronUp, Headphones, X, Check,
+  Loader2, GripVertical, ChevronDown, ChevronUp, Headphones, X, Check, Shuffle, ArrowDownAZ, Hand,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,7 @@ export function AudioTrainingPlaylist({
   const [duration, setDuration] = useState(0);
   const [selectedVoice, setSelectedVoice] = useState<VoiceId>("onyx");
   const [expanded, setExpanded] = useState(true);
+  const [playOrder, setPlayOrder] = useState<"listed" | "random" | "manual">("listed");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const loadingRef = useRef(false);
 
@@ -299,12 +300,22 @@ export function AudioTrainingPlaylist({
       audio.onended = () => {
         notifyTTSStopped();
         loadingRef.current = false;
-        void playItem(index + 1, false);
+        if (playOrder === "manual") {
+          // In manual mode, stop and let user pick next
+          setIsPlaying(false);
+          toast.info("Track finished. Pick the next one from the queue.");
+        } else {
+          void playItem(index + 1, false);
+        }
       };
       audio.onerror = () => {
         toast.error(`Audio error on Day ${item.dayNumber}. Skipping...`);
         loadingRef.current = false;
-        void playItem(index + 1, false);
+        if (playOrder === "manual") {
+          setIsPlaying(false);
+        } else {
+          void playItem(index + 1, false);
+        }
       };
 
       audio.load();
@@ -341,7 +352,18 @@ export function AudioTrainingPlaylist({
       setIsLoading(false);
       loadingRef.current = false;
     }
-  }, [playlist, selectedVoice, onLoadDay]);
+  }, [playlist, selectedVoice, onLoadDay, resolveLoader, playOrder]);
+
+  const shufflePlaylist = () => {
+    setPlaylist(prev => {
+      const shuffled = [...prev];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    });
+  };
 
   const togglePlayPause = () => {
     if (playlist.length === 0) {
@@ -361,6 +383,10 @@ export function AudioTrainingPlaylist({
         toast.error("Playback blocked. Tap Play again.");
       });
     } else {
+      // Shuffle if random mode and starting fresh
+      if (playOrder === "random" && currentIndex < 0) {
+        shufflePlaylist();
+      }
       // Start from beginning or current
       void playItem(currentIndex >= 0 ? currentIndex : 0, true);
     }
@@ -433,7 +459,7 @@ export function AudioTrainingPlaylist({
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-muted-foreground">Voice:</span>
                   <Select value={selectedVoice} onValueChange={(v) => setSelectedVoice(v as VoiceId)}>
-                    <SelectTrigger className="w-[130px] h-7 text-xs">
+                    <SelectTrigger className="w-[110px] h-7 text-xs">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-background border-border">
@@ -442,6 +468,23 @@ export function AudioTrainingPlaylist({
                           {v.name}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                  <span className="text-xs text-muted-foreground">Order:</span>
+                  <Select value={playOrder} onValueChange={(v) => setPlayOrder(v as "listed" | "random" | "manual")}>
+                    <SelectTrigger className="w-[110px] h-7 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border-border">
+                      <SelectItem value="listed" className="text-xs">
+                        <span className="flex items-center gap-1"><ArrowDownAZ className="h-3 w-3" /> In Order</span>
+                      </SelectItem>
+                      <SelectItem value="random" className="text-xs">
+                        <span className="flex items-center gap-1"><Shuffle className="h-3 w-3" /> Random</span>
+                      </SelectItem>
+                      <SelectItem value="manual" className="text-xs">
+                        <span className="flex items-center gap-1"><Hand className="h-3 w-3" /> Manual</span>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <Button
@@ -563,9 +606,15 @@ export function AudioTrainingPlaylist({
                       const isCurrent = idx === currentIndex;
                       return (
                         <div
-                          key={`${item.avatarId}-${item.dayNumber}`}
+                          key={`${item.avatarId}-${item.dayNumber}-${idx}`}
+                          onClick={() => {
+                            if (!isCurrent && !isLoading) {
+                              stopPlayback();
+                              void playItem(idx, true);
+                            }
+                          }}
                           className={`
-                            flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-all
+                            flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-all cursor-pointer
                             ${isCurrent
                               ? "bg-amber-500/15 border border-amber-500/30"
                               : "hover:bg-muted/30"
@@ -589,7 +638,7 @@ export function AudioTrainingPlaylist({
                             variant="ghost"
                             size="sm"
                             className="h-5 w-5 p-0 text-muted-foreground hover:text-destructive"
-                            onClick={() => removeFromPlaylist(idx)}
+                            onClick={(e) => { e.stopPropagation(); removeFromPlaylist(idx); }}
                           >
                             <X className="h-3 w-3" />
                           </Button>
