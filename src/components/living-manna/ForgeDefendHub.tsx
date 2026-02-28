@@ -192,7 +192,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   };
 
   const addInvitedMember = (member: { id: string; display_name: string }) => {
-    if (selectedMembers.length + invitedMembers.length >= 2) return;
+    if (selectedMembers.length >= 3) return;
     setInvitedMembers((prev) => [...prev, member]);
     setSelectedMembers((prev) => [...prev, member.id]);
     setInviteSearch("");
@@ -545,12 +545,12 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                       key={member.id}
                       className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-white/5 transition-colors ${
                         selectedMembers.includes(member.id) ? "bg-amber-500/10" : ""
-                      } ${selectedMembers.length >= 2 && !selectedMembers.includes(member.id) ? "opacity-40 pointer-events-none" : ""}`}
+                      } ${selectedMembers.length >= 3 && !selectedMembers.includes(member.id) ? "opacity-40 pointer-events-none" : ""}`}
                     >
                       <Checkbox
                         checked={selectedMembers.includes(member.id)}
                         onCheckedChange={() => toggleMember(member.id)}
-                        disabled={selectedMembers.length >= 2 && !selectedMembers.includes(member.id)}
+                        disabled={selectedMembers.length >= 3 && !selectedMembers.includes(member.id)}
                       />
                       <span className="text-sm">{member.display_name}</span>
                       {selectedMembers.includes(member.id) && (
