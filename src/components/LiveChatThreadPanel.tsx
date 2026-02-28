@@ -6,6 +6,7 @@ import { ChatInput } from '@/components/ChatInput';
 import { PublicChatMessage, ReactionGroup, ReactionsMap } from '@/hooks/usePublicChat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, MessageSquareText, Trash2 } from 'lucide-react';
+import { renderWithMentions } from '@/components/MentionAutocomplete';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -98,7 +99,7 @@ function ThreadMessage({
               : 'bg-muted/70 rounded-bl-sm'
           }`}
         >
-          {isDeleted ? 'This message was deleted' : message.content}
+          {isDeleted ? 'This message was deleted' : renderWithMentions(message.content)}
         </div>
         {/* Reaction summary badges */}
         {reactionGroups.length > 0 && (
