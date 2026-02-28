@@ -511,14 +511,21 @@ export function AudioTrainingPlaylist({
                       Add All Unlocked
                     </Button>
                     {allTracks && allTracks.length > 1 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-6 text-[10px] border-primary/30 text-primary"
-                        onClick={() => addDayAllAvatars(maxUnlockedDay)}
+                      <Select
+                        value=""
+                        onValueChange={(val) => addDayAllAvatars(Number(val))}
                       >
-                        🌐 Add Day {maxUnlockedDay} — All Avatars
-                      </Button>
+                        <SelectTrigger className="h-6 w-auto text-[10px] border-primary/30 text-primary gap-1 px-2">
+                          <span>🌐 Add Day — All {allTracks.length} Avatars</span>
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-border max-h-[200px]">
+                          {availableDays.map((d) => (
+                            <SelectItem key={d} value={String(d)} className="text-xs">
+                              Day {d}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     )}
                   </div>
                 </div>
