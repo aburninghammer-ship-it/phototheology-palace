@@ -604,6 +604,7 @@ function App() {
           <Route path="/revelation-course" element={<ProtectedRoute><RevelationCourse /></ProtectedRoute>} />
            <Route path="/revelation-course/kids" element={<ProtectedRoute><RevelationCourseKids /></ProtectedRoute>} />
            <Route path="/cota-series" element={<ProtectedRoute><COTASeries /></ProtectedRoute>} />
+           <Route path="/defense-mode" element={<Navigate to="/cota-series?tab=defense" replace />} />
           <Route path="/kidgpt" element={<ProtectedRoute><KidGPT /></ProtectedRoute>} />
           <Route path="/kid-gpt" element={<ProtectedRoute><KidGPT /></ProtectedRoute>} />
           <Route path="/pt-kids-games" element={<ProtectedRoute><PTKidsGames /></ProtectedRoute>} />
