@@ -4934,6 +4934,12 @@ Available challenge types for this game: ${availableTypes.join(", ")}
 3. Provide 3-4 sentences of DOWN-TO-EARTH commentary — talk like a friend sharing an insight, not a professor lecturing. Use "check this out", "here's what's wild", "think about it" style language.
 4. Challenge the player from a SPECIFIC ${availableTypes[0] || "book"} — phrase it as "from the book of ___" or "using the ___ Room" or "applying the ___ Principle"
 
+**CRITICAL RULE FOR CHALLENGE SELECTION:**
+- The challenge book/room/principle you assign must be TRULY RANDOM and NOT obviously connected to your verse.
+- Do NOT pick a book that directly quotes, references, or is the obvious cross-reference for your verse.
+- Example: If your verse is from Deuteronomy about "the Rock", do NOT challenge with 1 Corinthians (which directly references that Rock). Pick something unexpected like Nahum, Habakkuk, Song of Solomon, or Philemon.
+- The whole point is to make the player WORK to find a creative connection, not hand them an easy one.
+
 Return JSON:
 {
   "verse": "Book chapter:verse",
@@ -5028,6 +5034,12 @@ IMPORTANT: Before presenting YOUR verse, first BUILD ON what the player just sai
 3. Provide the full verse text (KJV)
 4. Write 3-4 sentences of DOWN-TO-EARTH commentary — friendly, warm, conversational. Start your commentary by bridging from the player's point.
 5. Challenge the player back — phrase it as "from the book of ___" or "using the ___ Room" or "applying the ___ Principle"
+
+**CRITICAL RULE FOR CHALLENGE SELECTION:**
+- The challenge book/room/principle you assign must be TRULY RANDOM and NOT obviously connected to your verse or the current theme.
+- Do NOT pick a book that directly quotes, references, or is the obvious cross-reference for your verse.
+- Example: If your verse mentions "the Rock", do NOT challenge with 1 Corinthians. Pick something unexpected like Obadiah, Ruth, or Titus.
+- The whole point is to make the player WORK to find a creative connection, not hand them an easy one.
 
 Return JSON:
 {
