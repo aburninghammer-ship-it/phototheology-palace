@@ -8,6 +8,7 @@ import {
   ChevronDown, ChevronUp, GraduationCap, Flame, Clock, Sparkles, Headphones,
 } from "lucide-react";
 import { AudioNarrator } from "@/components/audio/AudioNarrator";
+import { ManuscriptQA } from "./ManuscriptQA";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +35,7 @@ export function WarCollegeReader({
   const [showDrills, setShowDrills] = useState(false);
   const [forgeResponse, setForgeResponse] = useState("");
   const [masteryAnswers, setMasteryAnswers] = useState<Record<number, boolean>>({});
-  const [activePanel, setActivePanel] = useState<"read" | "audio">("read");
+  const [activePanel, setActivePanel] = useState<"read" | "audio" | "qa">("read");
   const rankInfo = RANK_CONFIG[study.rank];
 
   return (
@@ -90,15 +91,18 @@ export function WarCollegeReader({
       {/* ─── Reader Panels ─── */}
       <Tabs
         value={activePanel}
-        onValueChange={(value) => setActivePanel(value as "read" | "audio")}
+        onValueChange={(value) => setActivePanel(value as "read" | "audio" | "qa")}
         className="w-full"
       >
         <TabsList className="w-full">
           <TabsTrigger value="read" className="gap-2">
-            <BookOpen className="h-4 w-4" /> Read Manuscript
+            <BookOpen className="h-4 w-4" /> Read
           </TabsTrigger>
           <TabsTrigger value="audio" className="gap-2">
-            <Headphones className="h-4 w-4" /> Audio Training
+            <Headphones className="h-4 w-4" /> Audio
+          </TabsTrigger>
+          <TabsTrigger value="qa" className="gap-2">
+            <Sparkles className="h-4 w-4" /> Ask Jeeves
           </TabsTrigger>
         </TabsList>
 
@@ -128,6 +132,16 @@ export function WarCollegeReader({
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="qa" className="mt-4">
+          <ManuscriptQA
+            manuscript={study.manuscript}
+            dayNumber={study.dayNumber}
+            title={study.title}
+            track={study.track}
+            avatarName={study.avatarName}
+          />
         </TabsContent>
       </Tabs>
 
