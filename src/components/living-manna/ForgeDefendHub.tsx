@@ -158,7 +158,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const toggleMember = (id: string) => {
     if (selectedMembers.includes(id)) {
       setSelectedMembers((prev) => prev.filter((m) => m !== id));
-    } else if (selectedMembers.length < 2) {
+    } else if (selectedMembers.length < 3) {
       setSelectedMembers((prev) => [...prev, id]);
     }
   };
@@ -520,7 +520,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
             {/* Member Selection */}
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">
-                Select Team Members ({selectedMembers.length}/2 selected)
+                Select Team Members ({selectedMembers.length}/3 selected)
               </Label>
 
               {/* Invited members display */}
@@ -562,7 +562,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               )}
 
               {/* Invite by search */}
-              {selectedMembers.length < 2 && (
+              {selectedMembers.length < 3 && (
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
                     <Plus className="h-3 w-3" /> Invite by username or name
