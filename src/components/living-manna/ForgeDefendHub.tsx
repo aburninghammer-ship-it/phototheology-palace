@@ -74,6 +74,10 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const [churchMembers, setChurchMembers] = useState<{ id: string; display_name: string }[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [createLoading, setCreateLoading] = useState(false);
+  const [inviteSearch, setInviteSearch] = useState("");
+  const [inviteResults, setInviteResults] = useState<{ id: string; display_name: string }[]>([]);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [invitedMembers, setInvitedMembers] = useState<{ id: string; display_name: string }[]>([]);
 
   // Battle setup state
   const [battleSetupTopic, setBattleSetupTopic] = useState<string | null>(null);
@@ -152,9 +156,46 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
     );
   };
   const toggleMember = (id: string) => {
-    setSelectedMembers((prev) =>
-      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
-    );
+    if (selectedMembers.includes(id)) {
+      setSelectedMembers((prev) => prev.filter((m) => m !== id));
+    } else if (selectedMembers.length < 2) {
+      setSelectedMembers((prev) => [...prev, id]);
+    }
+  };
+
+  // Search for users to invite by username or display name
+  const searchUsers = async (query: string) => {
+    setInviteSearch(query);
+    if (query.trim().length < 2) { setInviteResults([]); return; }
+    setInviteLoading(true);
+    try {
+      const { data } = await (supabase as any)
+        .from("profiles")
+        .select("id, display_name, username")
+        .or(`display_name.ilike.%${query}%,username.ilike.%${query}%`)
+        .neq("id", user?.id)
+        .limit(10);
+      const alreadySelected = [...selectedMembers, ...invitedMembers.map(m => m.id)];
+      setInviteResults(
+        (data || [])
+          .filter((p: any) => !alreadySelected.includes(p.id))
+          .map((p: any) => ({ id: p.id, display_name: p.display_name || p.username || "User" }))
+      );
+    } catch { setInviteResults([]); }
+    finally { setInviteLoading(false); }
+  };
+
+  const addInvitedMember = (member: { id: string; display_name: string }) => {
+    if (selectedMembers.length + invitedMembers.length >= 2) return;
+    setInvitedMembers((prev) => [...prev, member]);
+    setSelectedMembers((prev) => [...prev, member.id]);
+    setInviteSearch("");
+    setInviteResults([]);
+  };
+
+  const removeInvitedMember = (id: string) => {
+    setInvitedMembers((prev) => prev.filter((m) => m.id !== id));
+    setSelectedMembers((prev) => prev.filter((m) => m !== id));
   };
 
   // ── CREATE SEASON + SQUAD ───────────────────────────
@@ -473,24 +514,37 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
             {/* Member Selection */}
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">
-                Select Team Members ({selectedMembers.length} selected)
+                Select Team Members ({selectedMembers.length}/2 selected)
               </Label>
-              {churchMembers.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic">
-                  No other church members found. You'll be on a solo squad.
-                </p>
-              ) : (
-                <div className="max-h-40 overflow-y-auto space-y-1 bg-black/20 rounded-lg p-2 border border-amber-500/20">
+
+              {/* Invited members display */}
+              {invitedMembers.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {invitedMembers.map((m) => (
+                    <Badge key={m.id} variant="secondary" className="gap-1 pr-1">
+                      {m.display_name}
+                      <button onClick={() => removeInvitedMember(m.id)} className="ml-1 hover:text-destructive">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Church members list */}
+              {churchMembers.length > 0 && (
+                <div className="max-h-32 overflow-y-auto space-y-1 bg-black/20 rounded-lg p-2 border border-amber-500/20">
                   {churchMembers.map((member) => (
                     <label
                       key={member.id}
                       className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-white/5 transition-colors ${
                         selectedMembers.includes(member.id) ? "bg-amber-500/10" : ""
-                      }`}
+                      } ${selectedMembers.length >= 2 && !selectedMembers.includes(member.id) ? "opacity-40 pointer-events-none" : ""}`}
                     >
                       <Checkbox
                         checked={selectedMembers.includes(member.id)}
                         onCheckedChange={() => toggleMember(member.id)}
+                        disabled={selectedMembers.length >= 2 && !selectedMembers.includes(member.id)}
                       />
                       <span className="text-sm">{member.display_name}</span>
                       {selectedMembers.includes(member.id) && (
@@ -499,6 +553,50 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                     </label>
                   ))}
                 </div>
+              )}
+
+              {/* Invite by search */}
+              {selectedMembers.length < 2 && (
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Plus className="h-3 w-3" /> Invite by username or name
+                  </Label>
+                  <Input
+                    value={inviteSearch}
+                    onChange={(e) => searchUsers(e.target.value)}
+                    placeholder="Search for a user to invite…"
+                    className="bg-black/30 border-amber-500/30"
+                  />
+                  {inviteLoading && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground p-2">
+                      <Loader2 className="h-3 w-3 animate-spin" /> Searching…
+                    </div>
+                  )}
+                  {inviteResults.length > 0 && (
+                    <div className="max-h-32 overflow-y-auto space-y-1 bg-black/20 rounded-lg p-2 border border-amber-500/20">
+                      {inviteResults.map((r) => (
+                        <button
+                          key={r.id}
+                          onClick={() => addInvitedMember(r)}
+                          className="flex items-center gap-2 p-2 rounded hover:bg-white/10 transition-colors w-full text-left"
+                        >
+                          <Users className="h-3.5 w-3.5 text-amber-400" />
+                          <span className="text-sm">{r.display_name}</span>
+                          <Plus className="h-3 w-3 ml-auto text-amber-400" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {inviteSearch.length >= 2 && !inviteLoading && inviteResults.length === 0 && (
+                    <p className="text-xs text-muted-foreground italic px-2">No users found.</p>
+                  )}
+                </div>
+              )}
+
+              {selectedMembers.length === 0 && churchMembers.length === 0 && invitedMembers.length === 0 && (
+                <p className="text-xs text-muted-foreground italic">
+                  Search above to invite teammates, or start as a solo squad.
+                </p>
               )}
             </div>
           </CardContent>
