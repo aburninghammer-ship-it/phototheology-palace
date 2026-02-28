@@ -8,10 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { ArrowLeft, Trophy, Star, Sparkles, Check, X, Zap, Timer, Users, User } from "lucide-react";
+import { ArrowLeft, Trophy, Star, Sparkles, Check, X, Zap, Timer, Users, User, Wifi } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
+import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/Footer";
 
@@ -125,6 +127,8 @@ export default function PhototheologyJeopardy() {
 
   // Game state
   const [gameMode, setGameMode] = useState<"classic" | "easy" | null>(null);
+  const [onlineMode, setOnlineMode] = useState(false);
+  const multiplayer = useGameMultiplayer("jeopardy");
   const [playerCount, setPlayerCount] = useState<number>(1);
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -379,8 +383,30 @@ export default function PhototheologyJeopardy() {
           )}
         </div>
 
+        {/* Online Multiplayer Lobby */}
+        {onlineMode && multiplayer.room?.status !== "active" && (
+          <MultiplayerLobby
+            room={multiplayer.room}
+            players={multiplayer.players}
+            loading={multiplayer.loading}
+            isHost={multiplayer.isHost}
+            minPlayers={2}
+            maxPlayers={6}
+            gameName="Jeopardy"
+            onCreateRoom={() => multiplayer.createRoom(6)}
+            onJoinRoom={(code) => multiplayer.joinRoom(code)}
+            onStartGame={() => {
+              if (multiplayer.players.length >= 2) {
+                multiplayer.startGame({ phase: "jeopardy" }, multiplayer.players[0].user_id);
+              }
+            }}
+            onLeaveRoom={() => { multiplayer.leaveRoom(); setOnlineMode(false); }}
+            onBack={() => setOnlineMode(false)}
+          />
+        )}
+
         {/* Setup Phase */}
-        {gamePhase === "setup" && (
+        {gamePhase === "setup" && !onlineMode && (
           <div className="max-w-2xl mx-auto space-y-6">
             <Card className="bg-black/40 border-yellow-500/50">
               <CardHeader>
@@ -417,6 +443,20 @@ export default function PhototheologyJeopardy() {
                         <Check className="h-6 w-6 mx-auto mb-2" />
                         <div className="font-bold">{t('games.jeopardy.easyMode')}</div>
                         <div className="text-xs opacity-80">{t('games.jeopardy.easyModeDesc')}</div>
+                      </div>
+                    </Button>
+                  </div>
+                  
+                  {/* Online Multiplayer Option */}
+                  <div className="mt-4">
+                    <Button
+                      onClick={() => setOnlineMode(true)}
+                      className="w-full h-auto py-4 bg-green-600 hover:bg-green-700"
+                    >
+                      <Wifi className="h-6 w-6 mr-3" />
+                      <div className="text-left">
+                        <div className="font-bold">Online Multiplayer</div>
+                        <div className="text-xs opacity-80">Play with friends online</div>
                       </div>
                     </Button>
                   </div>

@@ -7563,6 +7563,95 @@ export type Database = {
           },
         ]
       }
+      game_room_players: {
+        Row: {
+          display_name: string
+          id: string
+          is_active: boolean
+          joined_at: string
+          player_data: Json
+          player_index: number
+          room_id: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          display_name: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          player_data?: Json
+          player_index?: number
+          room_id: string
+          score?: number
+          user_id: string
+        }
+        Update: {
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          player_data?: Json
+          player_index?: number
+          room_id?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "game_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_rooms: {
+        Row: {
+          created_at: string
+          current_turn_user_id: string | null
+          game_state: Json
+          game_type: string
+          host_id: string
+          id: string
+          max_players: number
+          room_code: string
+          settings: Json
+          status: string
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_turn_user_id?: string | null
+          game_state?: Json
+          game_type: string
+          host_id: string
+          id?: string
+          max_players?: number
+          room_code: string
+          settings?: Json
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_turn_user_id?: string | null
+          game_state?: Json
+          game_type?: string
+          host_id?: string
+          id?: string
+          max_players?: number
+          room_code?: string
+          settings?: Json
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: []
+      }
       game_scores: {
         Row: {
           created_at: string
