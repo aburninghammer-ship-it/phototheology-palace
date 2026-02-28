@@ -195,7 +195,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         teamId: p.team_id || undefined,
         displayName: p.display_name,
         avatarUrl: p.avatar_url || undefined,
-        hand: ((p.hand as any[]) || []).map((cardData: any) => {
+        hand: (Array.isArray(p.hand) ? (p.hand as any[]) : []).map((cardData: any) => {
           // Try to get full card data, fall back to stored data with defaults
           const fullCard = getCardById(cardData.id);
           if (fullCard) return fullCard;

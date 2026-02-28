@@ -930,12 +930,7 @@ export default function PTScrabble() {
             </div>
           </header>
 
-          {/* Seed Verse Display — always visible to ALL players */}
-          {activeSeedVerse && (
-            <div className="px-3 pt-2">
-              <SeedVerseDisplay verse={activeSeedVerse} compact />
-            </div>
-          )}
+          {/* Seed verse is shown inside StudyProgressPanel, no separate banner needed */}
 
           {/* Study Progress Panel - shows the study building answer by answer */}
           {mpStudyLogEntries.length > 0 && (
