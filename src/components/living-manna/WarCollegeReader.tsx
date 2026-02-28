@@ -5,7 +5,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, BookOpen, Swords, Target, CheckCircle2,
-  ChevronDown, ChevronUp, GraduationCap, Flame, Clock, Sparkles, Headphones,
+  ChevronDown, ChevronUp, GraduationCap, Flame, Clock, Sparkles, Headphones, ListMusic,
 } from "lucide-react";
 import { AudioNarrator } from "@/components/audio/AudioNarrator";
 import { ManuscriptQA } from "./ManuscriptQA";
@@ -106,7 +106,16 @@ export function WarCollegeReader({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="audio" className="mt-4">
+        <TabsContent value="audio" className="mt-4 space-y-3">
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-3 flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">Playlist controls live in the track view.</p>
+              <Button variant="outline" size="sm" className="h-8" onClick={onBack}>
+                <ListMusic className="h-3.5 w-3.5 mr-1.5" /> Open Playlist
+              </Button>
+            </CardContent>
+          </Card>
+
           <AudioNarrator
             text={study.manuscript}
             title={`🎧 Listen — Day ${study.dayNumber}: ${study.title}`}

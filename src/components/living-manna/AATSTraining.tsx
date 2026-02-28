@@ -410,6 +410,7 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
     if (!selectedTraining) return null;
     const opponent = getOpponent(selectedTraining.avatarId);
     const progress = getAvatarProgress(selectedTraining.avatarId);
+    const warCollegeTrackForAvatar = WAR_COLLEGE_TRACKS.find((t) => t.avatarId === selectedTraining.avatarId) || null;
 
     // If a manuscript is being viewed, show the reader
     if (phaseManuscript) {
@@ -462,6 +463,31 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
               <p className="text-xs text-muted-foreground">
                 Crafting an immersive, strategic study. This may take 15–30 seconds.
               </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Playlist quick access */}
+        {warCollegeTrackForAvatar && (
+          <Card className="border-primary/30 bg-primary/5">
+            <CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold">Looking for Audio Playlist?</p>
+                <p className="text-xs text-muted-foreground">
+                  Open this avatar’s 56-day War College track to use Add Current Week / Add All Unlocked.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => {
+                  setSelectedWarCollegeTrack(warCollegeTrackForAvatar);
+                  setView("war-college");
+                }}
+              >
+                <Headphones className="h-3.5 w-3.5" /> Open Playlist
+              </Button>
             </CardContent>
           </Card>
         )}
@@ -657,6 +683,7 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
     if (!phase) return null;
     const PhaseIcon = getPhaseIcon(phase.icon);
     const total = getTotalItems(selectedTraining);
+    const warCollegeTrackForAvatar = WAR_COLLEGE_TRACKS.find((t) => t.avatarId === selectedTraining.avatarId) || null;
 
     const renderPhaseItems = () => {
       switch (selectedPhase) {
@@ -975,6 +1002,28 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
           </div>
         </div>
         <p className="text-sm text-muted-foreground">{phase.description}</p>
+
+        {warCollegeTrackForAvatar && (
+          <Card className="border-primary/30 bg-primary/5">
+            <CardContent className="p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-muted-foreground">
+                Need the playlist? Open this avatar’s 56-day War College track.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5"
+                onClick={() => {
+                  setSelectedWarCollegeTrack(warCollegeTrackForAvatar);
+                  setView("war-college");
+                }}
+              >
+                <Headphones className="h-3.5 w-3.5" /> Open Playlist
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="space-y-2">{renderPhaseItems()}</div>
       </div>
     );
