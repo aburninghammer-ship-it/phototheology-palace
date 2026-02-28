@@ -42,6 +42,7 @@ const QUICK_QUESTIONS = [
   "Give me a tour of the Palace",
   "Where are my saved studies?",
   "What room should I start with?",
+  "Take me to the Research tab",
   "Something isn't working",
 ];
 
