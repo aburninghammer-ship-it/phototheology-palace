@@ -126,17 +126,24 @@ serve(async (req) => {
           let detectedProductKey: string | null = metadata.product_id || null;
           
           if (!detectedProductKey) {
-            // Try to detect from line items
-            const lineItems = session.line_items?.data || [];
-            for (const [key, config] of Object.entries(PDF_PRODUCTS)) {
-              for (const item of lineItems) {
-                if (item.price?.id === config.priceId || item.price?.product === config.productId) {
-                  detectedProductKey = key;
-                  logStep('Detected PDF product from line items', { key, priceId: item.price?.id });
-                  break;
+            // Fetch line items from Stripe API (they are NOT included in webhook events by default)
+            try {
+              const lineItemsResponse = await stripe.checkout.sessions.listLineItems(session.id, { limit: 5 });
+              const lineItems = lineItemsResponse.data || [];
+              logStep('Fetched line items from Stripe API', { count: lineItems.length });
+              
+              for (const [key, config] of Object.entries(PDF_PRODUCTS)) {
+                for (const item of lineItems) {
+                  if (item.price?.id === config.priceId || item.price?.product === config.productId) {
+                    detectedProductKey = key;
+                    logStep('Detected PDF product from line items', { key, priceId: item.price?.id });
+                    break;
+                  }
                 }
+                if (detectedProductKey) break;
               }
-              if (detectedProductKey) break;
+            } catch (lineItemsError) {
+              logStep('Failed to fetch line items, falling back to amount detection', { error: String(lineItemsError) });
             }
           }
 
