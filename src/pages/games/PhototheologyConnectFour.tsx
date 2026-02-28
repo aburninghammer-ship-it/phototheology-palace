@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { ArrowLeft, CircleDot, BookOpen, RotateCcw, Users, Swords, Trophy, ChevronDown } from "lucide-react";
+import { ArrowLeft, CircleDot, BookOpen, RotateCcw, Users, Swords, Trophy, ChevronDown, Wifi } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
+import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/Footer";
 
@@ -47,7 +49,8 @@ export default function PhototheologyConnectFour() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [gameMode, setGameMode] = useState<"local" | "ai" | null>(null);
+  const [gameMode, setGameMode] = useState<"local" | "ai" | "online" | null>(null);
+  const multiplayer = useGameMultiplayer("connect-four");
   const [board, setBoard] = useState<Player[][]>(Array(ROWS).fill(null).map(() => Array(COLS).fill(null)));
   const [currentPlayer, setCurrentPlayer] = useState<'red' | 'yellow'>('red');
   const [winner, setWinner] = useState<Player>(null);
@@ -316,13 +319,46 @@ export default function PhototheologyConnectFour() {
                     <div className="text-xs opacity-80">{t('games.common.playAgainstAI')}</div>
                   </div>
                 </Button>
+                <Button
+                  onClick={() => setGameMode("online")}
+                  className="w-full h-auto py-4 bg-green-600 hover:bg-green-700"
+                >
+                  <Wifi className="h-6 w-6 mr-3" />
+                  <div className="text-left">
+                    <div className="font-bold">Online Multiplayer</div>
+                    <div className="text-xs opacity-80">Play with friends online</div>
+                  </div>
+                </Button>
               </CardContent>
             </Card>
           </div>
         )}
 
+        {/* Online Multiplayer Lobby */}
+        {gameMode === "online" && multiplayer.room?.status !== "active" && (
+          <MultiplayerLobby
+            room={multiplayer.room}
+            players={multiplayer.players}
+            loading={multiplayer.loading}
+            isHost={multiplayer.isHost}
+            gameName="Connect Four"
+            onCreateRoom={() => multiplayer.createRoom(2)}
+            onJoinRoom={(code) => multiplayer.joinRoom(code)}
+            onStartGame={() => {
+              if (multiplayer.players.length >= 2) {
+                multiplayer.startGame(
+                  { board: Array(6).fill(null).map(() => Array(7).fill(null)), currentPlayer: 'red' },
+                  multiplayer.players[0].user_id
+                );
+              }
+            }}
+            onLeaveRoom={multiplayer.leaveRoom}
+            onBack={() => { setGameMode(null); multiplayer.leaveRoom(); }}
+          />
+        )}
+
         {/* Game Board */}
-        {gameMode && (
+        {((gameMode === "local" || gameMode === "ai") || (gameMode === "online" && multiplayer.room?.status === "active")) && (
           <div className="flex flex-col items-center gap-6">
             {/* Score */}
             <div className="flex items-center gap-8">
