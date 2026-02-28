@@ -26,6 +26,7 @@ import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { getRankForDay, RANK_CONFIG } from "@/data/aats/warCollegeTypes";
 import type { WarCollegeDay } from "@/data/aats/warCollegeTypes";
+import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from "@/lib/mediaSessionHelper";
 
 interface PlaylistItem {
   dayNumber: number;
@@ -115,6 +116,7 @@ export function AudioTrainingPlaylist({
     setProgress(0);
     setDuration(0);
     notifyTTSStopped();
+    clearMediaSession();
   };
 
   // Tiny silent MP3 for priming audio element in user gesture context
@@ -228,6 +230,28 @@ export function AudioTrainingPlaylist({
       await audio.play();
       setIsPlaying(true);
       notifyTTSStarted();
+
+      // Register with Media Session for lock-screen / background playback
+      setupMediaSession({
+        title: `Day ${item.dayNumber}${item.title ? ' — ' + item.title : ''}`,
+        artist: 'Phototheology Palace',
+        album: trackTitle || 'War College',
+        onPlay: () => {
+          audio.play();
+          setIsPlaying(true);
+          notifyTTSStarted();
+          updateMediaSessionPlaybackState('playing');
+        },
+        onPause: () => {
+          audio.pause();
+          setIsPlaying(false);
+          notifyTTSStopped();
+          updateMediaSessionPlaybackState('paused');
+        },
+        onNextTrack: () => skipNext(),
+        onPreviousTrack: () => skipPrev(),
+      });
+      updateMediaSessionPlaybackState('playing');
     } catch (err: any) {
       console.error("Playlist playback error:", err);
       toast.error(err.message || "Playback failed");
