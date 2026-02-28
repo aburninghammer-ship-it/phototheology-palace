@@ -2,6 +2,7 @@
 // 7 AI opponents, 7 topics, 3 difficulty levels
 
 import atheistAvatar from "@/assets/defense/atheist.jpg";
+import scientistAvatar from "@/assets/avatars/scientist-avatar.png";
 import muslimAvatar from "@/assets/defense/muslim.jpg";
 import mormonAvatar from "@/assets/defense/mormon.jpg";
 import jwAvatar from "@/assets/defense/jw-female.jpg";
@@ -83,7 +84,7 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
     id: "scientist",
     name: "Dr. Elena Vasquez — The Scientist",
     emoji: "🔬",
-    avatar: atheistAvatar, // placeholder until unique avatar is generated
+    avatar: scientistAvatar,
     color: "border-emerald-500",
     description: "Challenges faith with empirical data, fossil evidence, and scientific methodology",
     pronouns: "she/her",
