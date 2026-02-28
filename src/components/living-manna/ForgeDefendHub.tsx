@@ -42,13 +42,15 @@ interface ForgeDefendHubProps {
 export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const [resolvedChurchId, setResolvedChurchId] = useState(churchId);
+  const [createError, setCreateError] = useState<string | null>(null);
   const {
     loading, activeSeason, myTeam, teamMembers, leaderboard,
     currentBattle, battleRounds, teamBattles,
     createSeason, createSquad, runDraft, startBattle, submitRound, completeBattle,
     activateSeason, advanceWeek, getTeamStats, getParticipationBalance,
     refresh,
-  } = useForgeDefend(churchId);
+  } = useForgeDefend(resolvedChurchId);
 
   const [view, setView] = useState<HubView>("overview");
   const [draftLoading, setDraftLoading] = useState(false);
