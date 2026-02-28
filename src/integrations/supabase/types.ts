@@ -17050,6 +17050,89 @@ export type Database = {
           },
         ]
       }
+      uno_games: {
+        Row: {
+          created_at: string
+          current_player_index: number
+          game_mode: string
+          game_state: Json
+          host_id: string
+          id: string
+          max_players: number
+          room_code: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_player_index?: number
+          game_mode?: string
+          game_state?: Json
+          host_id: string
+          id?: string
+          max_players?: number
+          room_code: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_player_index?: number
+          game_mode?: string
+          game_state?: Json
+          host_id?: string
+          id?: string
+          max_players?: number
+          room_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      uno_players: {
+        Row: {
+          display_name: string
+          game_id: string
+          hand: Json
+          id: string
+          is_host: boolean
+          joined_at: string
+          player_index: number
+          score: number
+          user_id: string
+        }
+        Insert: {
+          display_name?: string
+          game_id: string
+          hand?: Json
+          id?: string
+          is_host?: boolean
+          joined_at?: string
+          player_index?: number
+          score?: number
+          user_id: string
+        }
+        Update: {
+          display_name?: string
+          game_id?: string
+          hand?: Json
+          id?: string
+          is_host?: boolean
+          joined_at?: string
+          player_index?: number
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uno_players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "uno_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_achievements: {
         Row: {
           achievement_id: string | null

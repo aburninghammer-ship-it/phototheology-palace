@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useUnoMultiplayer } from "@/hooks/useUnoMultiplayer";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Shuffle, Check, X, RefreshCw, Zap, Users,
@@ -214,9 +215,11 @@ const CONNECTION_CARDS: ConnectionCard[] = [
 
 const PhototheologyUno = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const multiplayer = useUnoMultiplayer();
 
   const [gameState, setGameState] = useState<GameState>({
     mode: "easy",
@@ -246,6 +249,18 @@ const PhototheologyUno = () => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [showPassDeviceAlert, setShowPassDeviceAlert] = useState(false);
   const [nextPlayerName, setNextPlayerName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+  const [onlineTab, setOnlineTab] = useState<"create" | "join">("create");
+
+  // Auto-join from URL params (e.g. ?room=ABCDEF)
+  useEffect(() => {
+    const roomParam = searchParams.get("room");
+    if (roomParam && user) {
+      setGameState(prev => ({ ...prev, playMode: "online" }));
+      setJoinCode(roomParam);
+      setOnlineTab("join");
+    }
+  }, [searchParams, user]);
 
   // Generate room code for online play
   const generateRoomCode = () => {
@@ -724,8 +739,8 @@ Return ONLY valid JSON:
           recipientEmail: inviteEmail,
           gameType: 'uno',
           gameName: 'Phototheology UNO',
-          inviteLink: `${window.location.origin}/games/uno?room=${gameState.roomCode}`,
-          roomCode: gameState.roomCode,
+          inviteLink: `${window.location.origin}/games/phototheology-uno?room=${gameState.roomCode || multiplayer.game?.room_code}`,
+          roomCode: gameState.roomCode || multiplayer.game?.room_code,
         }
       });
       if (error || !data?.success) {
@@ -1020,24 +1035,249 @@ Return ONLY valid JSON:
                   </div>
                 )}
 
-                {/* Start Buttons */}
-                <div className="flex gap-3 pt-4">
+                {/* Online Mode: Create or Join */}
+                {gameState.playMode === "online" && (
+                  <div className="space-y-4">
+                    <Tabs value={onlineTab} onValueChange={(v) => setOnlineTab(v as "create" | "join")}>
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="create">
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          Create Game
+                        </TabsTrigger>
+                        <TabsTrigger value="join">
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          Join Game
+                        </TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="create" className="mt-4 space-y-4">
+                        <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Create a room and share the code with friends. They'll join in real-time!
+                          </p>
+                          <div className="flex gap-2">
+                            <Button
+                              className="flex-1 h-12"
+                              variant="outline"
+                              disabled={multiplayer.loading}
+                              onClick={async () => {
+                                const game = await multiplayer.createGame("easy", playerCount);
+                                if (game) {
+                                  setGameState(prev => ({
+                                    ...prev,
+                                    roomCode: game.room_code,
+                                    gamePhase: "waitingForPlayer",
+                                  }));
+                                }
+                              }}
+                            >
+                              {multiplayer.loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
+                              Easy Mode
+                            </Button>
+                            <Button
+                              className="flex-1 h-12"
+                              disabled={multiplayer.loading}
+                              onClick={async () => {
+                                const game = await multiplayer.createGame("classic", playerCount);
+                                if (game) {
+                                  setGameState(prev => ({
+                                    ...prev,
+                                    roomCode: game.room_code,
+                                    gamePhase: "waitingForPlayer",
+                                  }));
+                                }
+                              }}
+                            >
+                              {multiplayer.loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <BookOpen className="mr-2 h-5 w-5" />}
+                              Classic Mode
+                            </Button>
+                          </div>
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="join" className="mt-4 space-y-4">
+                        <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Enter the 6-character room code from your friend to join their game.
+                          </p>
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder="Enter room code (e.g. ABC123)"
+                              value={joinCode}
+                              onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                              maxLength={6}
+                              className="text-lg font-mono tracking-widest text-center uppercase"
+                            />
+                            <Button
+                              disabled={joinCode.length < 4 || multiplayer.loading}
+                              onClick={async () => {
+                                const game = await multiplayer.joinGame(joinCode);
+                                if (game) {
+                                  setGameState(prev => ({
+                                    ...prev,
+                                    roomCode: game.room_code,
+                                    gamePhase: "waitingForPlayer",
+                                  }));
+                                }
+                              }}
+                            >
+                              {multiplayer.loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Join"}
+                            </Button>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                )}
+
+                {/* Start Buttons (Solo & Local only) */}
+                {gameState.playMode !== "online" && (
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      className="flex-1 h-12"
+                      variant="outline"
+                      onClick={() => startGame("easy", gameState.playMode, playerCount)}
+                    >
+                      <Sparkles className="mr-2 h-5 w-5" />
+                      {t('games.uno.easyMode')}
+                    </Button>
+                    <Button
+                      className="flex-1 h-12"
+                      onClick={() => startGame("classic", gameState.playMode, playerCount)}
+                    >
+                      <BookOpen className="mr-2 h-5 w-5" />
+                      {t('games.uno.classicMode')}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Waiting for Players (Online Lobby) */}
+        {gameState.gamePhase === "waitingForPlayer" && multiplayer.game && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-lg mx-auto"
+          >
+            <Card className="border-2 border-primary/20">
+              <CardHeader className="text-center">
+                <CardTitle className="flex items-center justify-center gap-2">
+                  <Wifi className="h-5 w-5 text-primary" />
+                  Waiting for Players
+                </CardTitle>
+                <CardDescription>Share the room code with friends to join</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Room Code Display */}
+                <div className="p-6 bg-muted rounded-xl text-center">
+                  <p className="text-sm text-muted-foreground mb-2">Room Code</p>
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="text-4xl font-mono font-bold tracking-[0.3em] text-primary">
+                      {multiplayer.game.room_code}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        navigator.clipboard.writeText(multiplayer.game!.room_code);
+                        toast({ title: "Copied!", description: "Room code copied to clipboard" });
+                      }}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Share Link */}
+                <div className="flex gap-2">
                   <Button
-                    className="flex-1 h-12"
                     variant="outline"
-                    onClick={() => startGame("easy", gameState.playMode, playerCount)}
+                    className="flex-1"
+                    onClick={() => {
+                      const link = `${window.location.origin}/games/phototheology-uno?room=${multiplayer.game!.room_code}`;
+                      navigator.clipboard.writeText(link);
+                      toast({ title: "Link Copied!", description: "Share this link with friends" });
+                    }}
                   >
-                    <Sparkles className="mr-2 h-5 w-5" />
-                    {t('games.uno.easyMode')}
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Copy Invite Link
                   </Button>
                   <Button
-                    className="flex-1 h-12"
-                    onClick={() => startGame("classic", gameState.playMode, playerCount)}
+                    variant="outline"
+                    onClick={() => setShowInviteDialog(true)}
                   >
-                    <BookOpen className="mr-2 h-5 w-5" />
-                    {t('games.uno.classicMode')}
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Email Invite
                   </Button>
                 </div>
+
+                {/* Players List */}
+                <div>
+                  <Label className="text-base font-semibold mb-3 block">
+                    Players ({multiplayer.players.length}/{multiplayer.game.max_players})
+                  </Label>
+                  <div className="space-y-2">
+                    {multiplayer.players.map((player, i) => (
+                      <div key={player.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-border">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                          style={{ backgroundColor: PLAYER_COLORS[i % PLAYER_COLORS.length] }}
+                        >
+                          {player.display_name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-medium flex-1">{player.display_name}</span>
+                        {player.is_host && (
+                          <Badge variant="secondary" className="text-xs">Host</Badge>
+                        )}
+                        <Badge variant="outline" className="text-xs text-green-600">Connected</Badge>
+                      </div>
+                    ))}
+                    {Array.from({ length: multiplayer.game.max_players - multiplayer.players.length }).map((_, i) => (
+                      <div key={`empty-${i}`} className="flex items-center gap-3 p-3 rounded-lg border border-dashed border-muted-foreground/30">
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <span className="text-muted-foreground text-sm">Waiting...</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Start Game Button (Host Only) */}
+                {multiplayer.isHost && multiplayer.players.length >= 2 && (
+                  <Button
+                    className="w-full h-12"
+                    onClick={() => {
+                      // Start the game with all connected players
+                      const onlinePlayers: LocalPlayer[] = multiplayer.players.map((p, i) => ({
+                        id: p.user_id,
+                        name: p.display_name,
+                        hand: [],
+                        score: 0,
+                        isAI: false,
+                        color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+                      }));
+                      startGame(
+                        (multiplayer.game?.game_mode as "easy" | "classic") || "easy",
+                        "online",
+                        onlinePlayers.length
+                      );
+                      // Update backend status
+                      multiplayer.updateGameState(multiplayer.game!.id, {}, "active");
+                    }}
+                  >
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    Start Game ({multiplayer.players.length} players)
+                  </Button>
+                )}
+
+                {!multiplayer.isHost && (
+                  <div className="text-center p-4 bg-muted/30 rounded-lg">
+                    <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2 text-primary" />
+                    <p className="text-sm text-muted-foreground">Waiting for host to start the game...</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
