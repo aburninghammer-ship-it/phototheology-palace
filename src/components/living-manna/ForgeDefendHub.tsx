@@ -93,14 +93,49 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const [drillActive, setDrillActive] = useState(false);
   const [drillMessages, setDrillMessages] = useState<{ role: string; content: string }[]>([]);
 
+  const [churchIdLoading, setChurchIdLoading] = useState(!churchId);
+
+  useEffect(() => {
+    if (churchId) {
+      setResolvedChurchId(churchId);
+      setChurchIdLoading(false);
+    }
+  }, [churchId]);
+
+  useEffect(() => {
+    if (resolvedChurchId || !user?.id) {
+      if (resolvedChurchId) setChurchIdLoading(false);
+      return;
+    }
+    setChurchIdLoading(true);
+    const resolveChurchMembership = async () => {
+      try {
+        const { data, error } = await (supabase as any)
+          .from("church_members")
+          .select("church_id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (!error && data?.church_id) {
+          setResolvedChurchId(data.church_id);
+        }
+      } catch (e) {
+        console.error("Church resolution error:", e);
+      } finally {
+        setChurchIdLoading(false);
+      }
+    };
+    resolveChurchMembership();
+  }, [resolvedChurchId, user?.id]);
+
   // Load church members for selection
   useEffect(() => {
-    if (!churchId || !user?.id) return;
+    if (!resolvedChurchId || !user?.id) return;
     const loadMembers = async () => {
       const { data } = await (supabase as any)
         .from("church_members")
         .select("user_id")
-        .eq("church_id", churchId);
+        .eq("church_id", resolvedChurchId);
       if (!data) return;
       const userIds = data.map((m: any) => m.user_id).filter((id: string) => id !== user.id);
       if (userIds.length === 0) { setChurchMembers([]); return; }
@@ -111,7 +146,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
       setChurchMembers((profiles || []).map((p: any) => ({ id: p.id, display_name: p.display_name || "Member" })));
     };
     loadMembers();
-  }, [churchId, user?.id]);
+  }, [resolvedChurchId, user?.id]);
 
   // Auto-detect view based on season status
   useEffect(() => {
@@ -206,9 +241,18 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
 
   // ── CREATE SEASON + SQUAD ───────────────────────────
   const handleCreateSeason = async () => {
+    if (!resolvedChurchId) {
+      setCreateError("No church context detected. Please join a church first or access from your church dashboard.");
+      return;
+    }
+    if (!user?.id) {
+      setCreateError("Please sign in to launch a season.");
+      return;
+    }
     if (!squadName.trim()) {
       squadName || setSquadName("The Remnant");
     }
+    setCreateError(null);
     setCreateLoading(true);
     try {
       const season = await createSeason(seasonTitle, {
@@ -216,16 +260,24 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
         opponents: selectedOpponents.length > 0 ? selectedOpponents : undefined,
         configMode,
       });
-      if (season) {
-        const memberIds = [user!.id, ...selectedMembers];
-        await createSquad(season.id, squadName || "The Remnant", memberIds, {
-          motto: squadMotto || undefined,
-          warCry: squadWarCry || undefined,
-          emoji: squadEmoji,
-        });
+      if (!season) {
+        setCreateError("Season launch failed. Check console for details and try again.");
+        return;
       }
+      const memberIds = [user.id, ...selectedMembers];
+      const squad = await createSquad(season.id, squadName || "The Remnant", memberIds, {
+        motto: squadMotto || undefined,
+        warCry: squadWarCry || undefined,
+        emoji: squadEmoji,
+      });
+      if (!squad) {
+        setCreateError("Season created but squad setup failed. Please try again.");
+        return;
+      }
+      await refresh();
     } catch (e) {
       console.error("Season creation error:", e);
+      setCreateError("Unexpected error while launching season.");
     } finally {
       setCreateLoading(false);
     }
@@ -392,7 +444,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   };
 
   // ── LOADING STATE ────────────────────────────────────
-  if (loading) {
+  if (loading || churchIdLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-violet-400" />
@@ -708,6 +760,16 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
           )}
           Launch New Season
         </Button>
+
+        {createError && (
+          <p className="text-xs text-destructive text-center">{createError}</p>
+        )}
+
+        {!resolvedChurchId && !createError && (
+          <p className="text-xs text-destructive text-center">
+            No church found for your account. Please join a church first, or access this page from your church dashboard.
+          </p>
+        )}
       </div>
     );
   }
