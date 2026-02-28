@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from "@/lib/mediaSessionHelper";
 
 interface AudioNarratorProps {
   text: string;
@@ -200,6 +201,7 @@ export const AudioNarrator = ({
         setIsPlaying(false);
         setProgress(0);
         notifyTTSStopped();
+        clearMediaSession();
       };
 
       audio.onerror = (e) => {
@@ -214,6 +216,28 @@ export const AudioNarrator = ({
       await audio.play();
       setIsPlaying(true);
       notifyTTSStarted();
+
+      // Register with Media Session for lock-screen / background playback
+      setupMediaSession({
+        title: title || 'PT Commentary',
+        artist: 'Phototheology Palace',
+        album: 'Commentary',
+        onPlay: () => {
+          audio.play();
+          setIsPlaying(true);
+          notifyTTSStarted();
+          updateMediaSessionPlaybackState('playing');
+        },
+        onPause: () => {
+          audio.pause();
+          setIsPlaying(false);
+          notifyTTSStopped();
+          updateMediaSessionPlaybackState('paused');
+        },
+        onSeekBackward: () => skip(-10),
+        onSeekForward: () => skip(10),
+      });
+      updateMediaSessionPlaybackState('playing');
     } catch (error) {
       console.error("Error generating audio:", error);
       resetAudioState();
@@ -251,6 +275,7 @@ export const AudioNarrator = ({
       audioRef.current.pause();
       setIsPlaying(false);
       notifyTTSStopped();
+      updateMediaSessionPlaybackState('paused');
     }
   };
 
