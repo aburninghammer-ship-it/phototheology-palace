@@ -766,7 +766,7 @@ const ChainChess = () => {
                   <CardContent className="space-y-4">
                     {/* User's verse */}
                     <div className="space-y-2">
-                      <Label>Your Verse (that relates to {gameState.currentChallenge?.name})</Label>
+                      <Label>Your Verse <span className="text-muted-foreground font-normal">(optional — from the book of {gameState.currentChallenge?.name || "..."})</span></Label>
                       <Input
                         placeholder="e.g., John 3:16"
                         value={userVerse}
