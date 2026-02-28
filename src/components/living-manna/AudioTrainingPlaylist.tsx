@@ -73,6 +73,9 @@ export function AudioTrainingPlaylist({
 }: AudioTrainingPlaylistProps) {
   const [playlist, setPlaylist] = useState<PlaylistItem[]>([]);
   const [showPicker, setShowPicker] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [avatarPickerDay, setAvatarPickerDay] = useState<number | null>(null);
+  const [selectedAvatars, setSelectedAvatars] = useState<Set<string>>(new Set());
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -157,21 +160,51 @@ export function AudioTrainingPlaylist({
     setPlaylist((prev) => [...prev, ...toAdd]);
   };
 
-  /** Add a specific day from ALL avatar tracks at once */
-  const addDayAllAvatars = (dayNumber: number) => {
-    if (!allTracks || allTracks.length === 0) return;
+  /** Add a specific day from selected avatar tracks */
+  const addDaySelectedAvatars = (dayNumber: number, avatarIds: Set<string>) => {
+    if (!allTracks || allTracks.length === 0 || avatarIds.size === 0) return;
     const existing = new Set(playlist.map((p) => `${p.avatarId}-${p.dayNumber}`));
     const toAdd = allTracks
-      .filter((t) => !existing.has(`${t.avatarId}-${dayNumber}`))
+      .filter((t) => avatarIds.has(t.avatarId) && !existing.has(`${t.avatarId}-${dayNumber}`))
       .map((t) => makeItem(dayNumber, t.avatarId, t.avatarName, t.trackTitle));
 
     if (toAdd.length === 0) {
-      toast.info(`Day ${dayNumber} from all avatars is already queued.`);
+      toast.info(`Day ${dayNumber} from selected avatars is already queued.`);
       return;
     }
 
     setPlaylist((prev) => [...prev, ...toAdd]);
-    toast.success(`Added Day ${dayNumber} from ${toAdd.length} avatars!`);
+    toast.success(`Added Day ${dayNumber} from ${toAdd.length} avatar${toAdd.length > 1 ? 's' : ''}!`);
+  };
+
+  /** Open the avatar picker for a specific day */
+  const openAvatarPicker = (dayNumber: number) => {
+    setAvatarPickerDay(dayNumber);
+    // Pre-select all avatars by default
+    if (allTracks) {
+      setSelectedAvatars(new Set(allTracks.map(t => t.avatarId)));
+    }
+    setShowAvatarPicker(true);
+  };
+
+  const toggleAvatarSelection = (avatarId: string) => {
+    setSelectedAvatars(prev => {
+      const next = new Set(prev);
+      if (next.has(avatarId)) {
+        next.delete(avatarId);
+      } else {
+        next.add(avatarId);
+      }
+      return next;
+    });
+  };
+
+  const confirmAvatarSelection = () => {
+    if (avatarPickerDay !== null && selectedAvatars.size > 0) {
+      addDaySelectedAvatars(avatarPickerDay, selectedAvatars);
+    }
+    setShowAvatarPicker(false);
+    setAvatarPickerDay(null);
   };
 
   const removeFromPlaylist = (idx: number) => {
@@ -513,10 +546,10 @@ export function AudioTrainingPlaylist({
                     {allTracks && allTracks.length > 1 && (
                       <Select
                         value=""
-                        onValueChange={(val) => addDayAllAvatars(Number(val))}
+                        onValueChange={(val) => openAvatarPicker(Number(val))}
                       >
                         <SelectTrigger className="h-6 w-auto text-[10px] border-primary/30 text-primary gap-1 px-2">
-                          <span>🌐 Add Day — All {allTracks.length} Avatars</span>
+                          <span>🌐 Add Day — Choose Avatars</span>
                         </SelectTrigger>
                         <SelectContent className="bg-background border-border max-h-[200px]">
                           {availableDays.map((d) => (
@@ -595,6 +628,83 @@ export function AudioTrainingPlaylist({
                             onClick={addCurrentWeekToPlaylist}
                           >
                             Add Current Week
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Avatar Picker for cross-track day add */}
+              <AnimatePresence>
+                {showAvatarPicker && avatarPickerDay !== null && allTracks && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <Card className="border-primary/30">
+                      <CardContent className="p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-medium">
+                            Day {avatarPickerDay} — Select Avatars
+                          </p>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowAvatarPicker(false)}>
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <div className="flex gap-1.5 flex-wrap">
+                          <Button
+                            variant={selectedAvatars.size === allTracks.length ? "default" : "outline"}
+                            size="sm"
+                            className="h-6 text-[10px]"
+                            onClick={() => setSelectedAvatars(new Set(allTracks.map(t => t.avatarId)))}
+                          >
+                            Select All
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-6 text-[10px]"
+                            onClick={() => setSelectedAvatars(new Set())}
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 max-h-[200px] overflow-y-auto">
+                          {allTracks.map((t) => {
+                            const isSelected = selectedAvatars.has(t.avatarId);
+                            return (
+                              <button
+                                key={t.avatarId}
+                                onClick={() => toggleAvatarSelection(t.avatarId)}
+                                className={`
+                                  relative px-2 py-1 rounded-md text-[10px] font-medium border transition-all
+                                  ${isSelected
+                                    ? "bg-primary/15 border-primary/50 text-primary ring-1 ring-primary/30"
+                                    : "bg-muted/30 border-border/50 text-muted-foreground hover:border-primary/40"
+                                  }
+                                `}
+                              >
+                                {isSelected && <Check className="inline h-2.5 w-2.5 mr-0.5" />}
+                                {t.emoji} {t.avatarName}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div className="flex justify-end gap-2 pt-1">
+                          <Button variant="ghost" size="sm" className="h-6 text-[10px]" onClick={() => setShowAvatarPicker(false)}>
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="h-6 text-[10px]"
+                            disabled={selectedAvatars.size === 0}
+                            onClick={confirmAvatarSelection}
+                          >
+                            Add {selectedAvatars.size} Avatar{selectedAvatars.size !== 1 ? 's' : ''}
                           </Button>
                         </div>
                       </CardContent>
