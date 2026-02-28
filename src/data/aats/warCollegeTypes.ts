@@ -1,6 +1,6 @@
 // ─── War College Strategic Manuscript Types ─────────────────────────────────
 // Ultra-immersive, long-form study format for AATS training.
-// ALL 20 avatars × 56 days = fully AI-generated manuscripts.
+// ALL 21 avatars × 56 days = fully AI-generated manuscripts.
 
 import { AATS_AVATAR_IDS, getAvatarTraining, type AATSAvatarId } from "@/data/aatsTrainingData";
 import { DEFENSE_OPPONENTS } from "@/data/defenseModeOpponents";
@@ -106,6 +106,10 @@ const TRACK_TITLES: Record<string, { title: string; description: string }> = {
     title: "Philosophical Warfare",
     description: "Reclaiming epistemology, reason, and metaphysical ground against naturalistic materialism",
   },
+  scientist: {
+    title: "Empirical Battlefront",
+    description: "Defending creation, the Flood, and biblical history against empirical and scientific objections",
+  },
   muslim: {
     title: "Abrahamic Defense",
     description: "Defending biblical authority and Christology against Islamic monotheism",
@@ -186,7 +190,7 @@ const TRACK_TITLES: Record<string, { title: string; description: string }> = {
 
 // ─── Ring classification ────────────────────────────────────────────────────
 function getRingId(avatarId: string): string {
-  const ring1 = ["atheist", "agnostic", "secular-scholar", "philosopher", "internet-skeptic", "new-age"];
+  const ring1 = ["atheist", "scientist", "agnostic", "secular-scholar", "philosopher", "internet-skeptic", "new-age"];
   const ring2 = ["muslim", "jewish", "bhi", "mormon"];
   if (ring1.includes(avatarId)) return "ring-1";
   if (ring2.includes(avatarId)) return "ring-2";

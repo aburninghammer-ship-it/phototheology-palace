@@ -89,6 +89,7 @@ export const AATS_PHASES: AATSPhase[] = [
 
 export const AATS_AVATAR_IDS = [
   "atheist",
+  "scientist",
   "muslim",
   "evangelical",
   "catholic",
@@ -128,7 +129,7 @@ export const ARENA_RINGS: ArenaRing[] = [
     description: "Atheists, agnostics, secular thinkers, and spiritual-but-not-religious challengers",
     icon: "HelpCircle",
     color: "text-slate-400",
-    avatarIds: ["atheist", "agnostic", "secular-scholar", "philosopher", "internet-skeptic", "new-age"],
+    avatarIds: ["atheist", "scientist", "agnostic", "secular-scholar", "philosopher", "internet-skeptic", "new-age"],
   },
   {
     id: "ring-2",
@@ -189,9 +190,11 @@ import { newAgeTraining } from "./aats/newAgeTraining";
 import { antiProphetTraining } from "./aats/antiProphetTraining";
 import { internetSkepticTraining } from "./aats/internetSkepticTraining";
 import { agnosticTraining } from "./aats/agnosticTraining";
+import { scientistTraining } from "./aats/scientistTraining";
 
 const TRAINING_MAP: Record<AATSAvatarId, AATSAvatarTraining> = {
   atheist: atheistTraining,
+  scientist: scientistTraining,
   muslim: muslimTraining,
   evangelical: evangelicalTraining,
   catholic: catholicTraining,
