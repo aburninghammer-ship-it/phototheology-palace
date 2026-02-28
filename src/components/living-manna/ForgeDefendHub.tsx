@@ -891,17 +891,178 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               </CardContent>
             </Card>
           ) : (
-            <Card className="bg-black/20 border-amber-500/30">
-              <CardContent className="p-4 text-center space-y-2">
-                <Users className="h-8 w-8 text-amber-400 mx-auto" />
-                <p className="text-amber-300 font-semibold">You're not on a team yet!</p>
-                <p className="text-xs text-muted-foreground">Create your squad to start battling this season.</p>
-                <Button onClick={() => setView("draft")} className="mt-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create a Team
-                </Button>
-              </CardContent>
-            </Card>
+            /* ── INLINE TEAM CREATION FORM (no team yet) ── */
+            <div className="space-y-4">
+              <Card className="bg-black/20 border-amber-500/30">
+                <CardContent className="p-4 text-center space-y-2">
+                  <Users className="h-10 w-10 text-amber-400 mx-auto" />
+                  <h3 className="text-lg font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                    Create Your Squad
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Build your team and join the battle!
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-black/20 border-amber-500/30">
+                <CardContent className="p-4 space-y-4">
+                  <Label className="text-amber-300 font-semibold flex items-center gap-2">
+                    <Shield className="h-4 w-4" /> Squad Details
+                  </Label>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Squad Name</Label>
+                      <Input
+                        value={squadName}
+                        onChange={(e) => setSquadName(e.target.value)}
+                        placeholder="e.g., The Remnant Warriors"
+                        className="bg-black/30 border-amber-500/30"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Squad Emoji</Label>
+                      <div className="grid grid-cols-6 gap-1.5 p-2 bg-black/30 border border-amber-500/30 rounded-md">
+                        {["⚔️", "🛡️", "👑", "🔥", "⚡", "🦁", "🗡️", "🏆", "💎", "🌟", "⭐", "🎯", "📖", "✝️", "🕊️", "💪", "🦅", "🔱"].map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => setSquadEmoji(emoji)}
+                            className={`text-2xl p-2 rounded transition-all hover:scale-110 ${
+                              squadEmoji === emoji
+                                ? "bg-amber-500/40 ring-2 ring-amber-500 scale-110"
+                                : "bg-black/20 hover:bg-amber-500/20"
+                            }`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">War Cry (optional)</Label>
+                    <Input
+                      value={squadWarCry}
+                      onChange={(e) => setSquadWarCry(e.target.value)}
+                      placeholder='e.g., "Truth is our sword, Christ is our shield!"'
+                      className="bg-black/30 border-amber-500/30"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Motto (optional)</Label>
+                    <Input
+                      value={squadMotto}
+                      onChange={(e) => setSquadMotto(e.target.value)}
+                      placeholder="e.g., Standing firm in the faith"
+                      className="bg-black/30 border-amber-500/30"
+                    />
+                  </div>
+
+                  {/* Member Selection */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">
+                      Invite Team Members ({selectedMembers.length}/3 selected)
+                    </Label>
+
+                    {invitedMembers.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {invitedMembers.map((m) => (
+                          <Badge key={m.id} variant="secondary" className="gap-1 pr-1">
+                            {m.display_name}
+                            <button onClick={() => removeInvitedMember(m.id)} className="ml-1 hover:text-destructive">
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
+                    {churchMembers.length > 0 && (
+                      <div className="max-h-32 overflow-y-auto space-y-1 bg-black/20 rounded-lg p-2 border border-amber-500/20">
+                        {churchMembers.map((member) => (
+                          <label
+                            key={member.id}
+                            className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-white/5 transition-colors ${
+                              selectedMembers.includes(member.id) ? "bg-amber-500/10" : ""
+                            } ${selectedMembers.length >= 3 && !selectedMembers.includes(member.id) ? "opacity-40 pointer-events-none" : ""}`}
+                          >
+                            <Checkbox
+                              checked={selectedMembers.includes(member.id)}
+                              onCheckedChange={() => toggleMember(member.id)}
+                              disabled={selectedMembers.length >= 3 && !selectedMembers.includes(member.id)}
+                            />
+                            <span className="text-sm">{member.display_name}</span>
+                            {selectedMembers.includes(member.id) && (
+                              <Check className="h-3 w-3 text-amber-400 ml-auto" />
+                            )}
+                          </label>
+                        ))}
+                      </div>
+                    )}
+
+                    {selectedMembers.length < 3 && (
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                          <Plus className="h-3 w-3" /> Invite by username or name
+                        </Label>
+                        <Input
+                          value={inviteSearch}
+                          onChange={(e) => searchUsers(e.target.value)}
+                          placeholder="Search for a user to invite…"
+                          className="bg-black/30 border-amber-500/30"
+                        />
+                        {inviteLoading && (
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground p-2">
+                            <Loader2 className="h-3 w-3 animate-spin" /> Searching…
+                          </div>
+                        )}
+                        {inviteResults.length > 0 && (
+                          <div className="max-h-32 overflow-y-auto space-y-1 bg-black/20 rounded-lg p-2 border border-amber-500/20">
+                            {inviteResults.map((r) => (
+                              <button
+                                key={r.id}
+                                onClick={() => addInvitedMember(r)}
+                                className="flex items-center gap-2 p-2 rounded hover:bg-white/10 transition-colors w-full text-left"
+                              >
+                                <Users className="h-3.5 w-3.5 text-amber-400" />
+                                <span className="text-sm">{r.display_name}</span>
+                                <Plus className="h-3 w-3 ml-auto text-amber-400" />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {inviteSearch.length >= 2 && !inviteLoading && inviteResults.length === 0 && (
+                          <p className="text-xs text-muted-foreground italic px-2">No users found.</p>
+                        )}
+                      </div>
+                    )}
+
+                    {selectedMembers.length === 0 && churchMembers.length === 0 && invitedMembers.length === 0 && (
+                      <p className="text-xs text-muted-foreground italic">
+                        Search above to invite teammates, or start as a solo squad.
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Button
+                onClick={handleCreateTeam}
+                disabled={createLoading}
+                className="w-full h-12 text-lg bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500"
+              >
+                {createLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                ) : (
+                  <Shield className="h-5 w-5 mr-2" />
+                )}
+                Create Squad
+              </Button>
+            </div>
           )}
 
           {/* This Week Panel */}
