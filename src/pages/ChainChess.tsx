@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import {
   Trophy, MessageSquare, Sparkles, Target, ChevronDown, Bot, User,
-  BookOpen, Building2, Lightbulb, Send, Loader2, ArrowRight
+  BookOpen, Building2, Lightbulb, Send, Loader2, ArrowRight, RotateCcw
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -565,8 +565,8 @@ const ChainChess = () => {
               </p>
             </div>
 
-            {gameState.status === "in_progress" && (
-              <div className="flex items-center gap-4">
+            {(gameState.status === "in_progress" || gameState.status === "completed") && (
+              <div className="flex items-center gap-3">
                 <Badge variant="secondary" className="text-lg px-4 py-2">
                   <User className="mr-2 h-4 w-4" />
                   You: {gameState.playerScore}
@@ -575,6 +575,27 @@ const ChainChess = () => {
                   <Bot className="mr-2 h-4 w-4" />
                   Jeeves: {gameState.jeevesScore}
                 </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setGameState({
+                      status: "setup",
+                      settings: gameState.settings,
+                      moves: [],
+                      currentTurn: "jeeves",
+                      playerScore: 0,
+                      jeevesScore: 0,
+                      roundNumber: 1,
+                    });
+                    setUserVerse("");
+                    setUserCommentary("");
+                  }}
+                  className="gap-1.5"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  New Game
+                </Button>
               </div>
             )}
           </div>
