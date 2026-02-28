@@ -457,11 +457,11 @@ export function InterdenominationalLibrary() {
       {/* Footer */}
       <div className="p-4 rounded-lg border border-amber-500/20 bg-amber-950/10 text-center space-y-2">
         <p className="text-xs text-amber-300/80 font-medium">
-          Library v1.0 — {totalTopics} Topics, {totalClaims} Claims, {totalWitnesses} Witnesses
+          Library v3.0 — {totalTopics} Topics, {totalClaims} Claims, {totalWitnesses} Witnesses
         </p>
         <p className="text-[10px] text-muted-foreground leading-relaxed max-w-lg mx-auto">
-          Every witness includes agreement-scope labels so critics can't say disagreements were hidden.
-          Sources are verifiable via primary links. Structure supports rapid v1.1+ expansion.
+          Every witness includes agreement-scope labels so critics can&apos;t say disagreements were hidden.
+          Sources are verifiable via primary links. 25 doctrine topics across 12+ Christian traditions.
         </p>
       </div>
     </div>
