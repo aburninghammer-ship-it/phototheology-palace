@@ -201,39 +201,26 @@ export function useForgeDefend(churchId: string) {
       configMode?: string;
     }
   ) => {
-    if (!user?.id || !churchId) {
-      console.error("Create season blocked: missing user or church context", { hasUser: !!user?.id, churchId });
-      return null;
-    }
+    if (!user?.id || !churchId) return null;
+    const { data, error } = await (supabase as any)
+      .from("defense_seasons")
+      .insert({
+        church_id: churchId,
+        title,
+        status: "recruiting",
+        created_by: user.id,
+        current_week: 1,
+        week_count: 6,
+        doctrines: options?.doctrines || null,
+        opponents: options?.opponents || null,
+        config_mode: options?.configMode || "manual",
+      })
+      .select()
+      .single();
 
-    try {
-      const { data, error } = await (supabase as any)
-        .from("defense_seasons")
-        .insert({
-          church_id: churchId,
-          title,
-          status: "recruiting",
-          created_by: user.id,
-          current_week: 1,
-          week_count: 6,
-          doctrines: options?.doctrines || null,
-          opponents: options?.opponents || null,
-          config_mode: options?.configMode || "manual",
-        })
-        .select()
-        .single();
-
-      if (error || !data) {
-        console.error("Create season error:", error);
-        return null;
-      }
-
-      setActiveSeason(data);
-      return data;
-    } catch (error) {
-      console.error("Unexpected create season error:", error);
-      return null;
-    }
+    if (error) { console.error("Create season error:", error); return null; }
+    setActiveSeason(data);
+    return data;
   }, [user?.id, churchId]);
 
   // Create a squad for the season
@@ -245,109 +232,83 @@ export function useForgeDefend(churchId: string) {
   ) => {
     if (!user?.id) return null;
 
-    try {
-      const { data: squad, error: squadError } = await (supabase as any)
-        .from("defense_squads")
-        .insert({
-          season_id: seasonId,
-          name: squadName,
-          motto: options?.motto || null,
-          war_cry: options?.warCry || null,
-          banner_emoji: options?.emoji || "⚔️",
-          total_points: 0,
-          wins: 0,
-          losses: 0,
-        })
-        .select()
-        .single();
+    const { data: squad, error } = await (supabase as any)
+      .from("defense_squads")
+      .insert({
+        season_id: seasonId,
+        name: squadName,
+        motto: options?.motto || null,
+        war_cry: options?.warCry || null,
+        banner_emoji: options?.emoji || "⚔️",
+        total_points: 0,
+        wins: 0,
+        losses: 0,
+      })
+      .select()
+      .single();
 
-      if (squadError || !squad) {
-        console.error("Create squad error:", squadError);
-        return null;
-      }
+    if (error) { console.error("Create squad error:", error); return null; }
 
-      // Get organizer profile
-      const { data: organizerProfile, error: organizerError } = await supabase
-        .from("profiles")
-        .select("display_name")
-        .eq("id", user.id)
-        .single();
+    // Get organizer profile
+    const { data: organizerProfile } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .single();
 
-      if (organizerError) {
-        console.warn("Organizer profile lookup warning:", organizerError);
-      }
+    const organizerName = organizerProfile?.display_name || "Squad Organizer";
 
-      const organizerName = organizerProfile?.display_name || "Squad Organizer";
+    // Send invitations to all members (except creator who auto-joins)
+    for (let i = 0; i < memberUserIds.length; i++) {
+      const memberId = memberUserIds[i];
+      const isCaptain = i === 0;
 
-      // Send invitations to all members (except creator who auto-joins)
-      for (let i = 0; i < memberUserIds.length; i++) {
-        const memberId = memberUserIds[i];
-        const isCaptain = i === 0;
-
-        if (memberId === user.id) {
-          // Creator auto-joins as captain
-          const { error: memberError } = await (supabase as any)
-            .from("defense_squad_members")
-            .insert({
+      if (memberId === user.id) {
+        // Creator auto-joins as captain
+        await (supabase as any)
+          .from("defense_squad_members")
+          .insert({
+            squad_id: squad.id,
+            user_id: user.id,
+            role: "captain",
+            is_captain: true,
+          });
+      } else {
+        // Send invitation notification to other members
+        await (supabase as any)
+          .from("user_notifications")
+          .insert({
+            sender_id: user.id,
+            recipient_id: memberId,
+            notification_type: "squad_invitation",
+            title: `You've been drafted to ${squadName}!`,
+            message: `${organizerName} has invited you to join the Forge & Defend squad "${squadName}". ${options?.motto || ""}`,
+            page_url: `/living-manna?view=forge-defend`,
+            page_title: "Forge & Defend",
+            data: {
               squad_id: squad.id,
-              user_id: user.id,
-              role: "captain",
-              is_captain: true,
-            });
-
-          if (memberError) {
-            console.error("Create squad member error:", memberError);
-            return null;
-          }
-        } else {
-          // Send invitation notification to other members
-          const { error: inviteError } = await (supabase as any)
-            .from("user_notifications")
-            .insert({
-              sender_id: user.id,
-              recipient_id: memberId,
-              notification_type: "squad_invitation",
-              title: `You've been drafted to ${squadName}!`,
-              message: `${organizerName} has invited you to join the Forge & Defend squad "${squadName}". ${options?.motto || ""}`,
-              page_url: `/living-manna?view=forge-defend`,
-              page_title: "Forge & Defend",
-              data: {
-                squad_id: squad.id,
-                squad_name: squadName,
-                season_id: seasonId,
-                role: isCaptain ? "captain" : "warrior",
-                is_captain: isCaptain,
-                organizer_name: organizerName,
-              },
-            });
-
-          if (inviteError) {
-            console.error("Squad invitation notification error:", inviteError);
-          }
-        }
+              squad_name: squadName,
+              season_id: seasonId,
+              role: isCaptain ? "captain" : "warrior",
+              is_captain: isCaptain,
+              organizer_name: organizerName,
+            },
+          });
       }
-
-      // Also add the creator as participant
-      const { error: participantError } = await (supabase as any)
-        .from("defense_season_participants")
-        .upsert({
-          season_id: seasonId,
-          user_id: user.id,
-          squad_id: squad.id,
-        }, { onConflict: "season_id,user_id" })
-        .select();
-
-      if (participantError) {
-        console.error("Create season participant error:", participantError);
-        return null;
-      }
-
-      await loadSeasonData();
-      return squad;
-    } catch (error) {
-      console.error("Unexpected create squad error:", error);
-      return null;
     }
+
+    // Also add the creator as participant
+    await (supabase as any)
+      .from("defense_season_participants")
+      .upsert({
+        season_id: seasonId,
+        user_id: user.id,
+        squad_id: squad.id,
+      }, { onConflict: "season_id,user_id" })
+      .select();
+
+    await loadSeasonData();
+    return squad;
   }, [user?.id, loadSeasonData]);
 
   // Run AI draft
