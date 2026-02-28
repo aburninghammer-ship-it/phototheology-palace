@@ -261,6 +261,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
         return;
       }
       await refresh();
+      setView("overview");
     } catch (e) {
       console.error("Team creation error:", e);
       setCreateError("Unexpected error creating squad.");
@@ -305,6 +306,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
         return;
       }
       await refresh();
+      setView("overview");
     } catch (e) {
       console.error("Season creation error:", e);
       setCreateError("Unexpected error while launching season.");
