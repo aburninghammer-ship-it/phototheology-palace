@@ -17,6 +17,7 @@ interface LiveChatContextType {
   markRoomAsRead: (roomId: string) => Promise<void>;
   totalUnread: number;
   deleteMessage: (messageId: string) => Promise<void>;
+  editMessage: (messageId: string, newContent: string) => Promise<void>;
   getThreadMessages: (parentId: string) => PublicChatMessage[];
   reactions: ReactionsMap;
   toggleReaction: (messageId: string, emoji: string) => Promise<void>;
@@ -41,6 +42,7 @@ export function LiveChatProvider({ children }: { children: React.ReactNode }) {
     markRoomAsRead,
     totalUnread,
     deleteMessage,
+    editMessage,
     getThreadMessages,
     reactions,
     toggleReaction,
@@ -59,6 +61,7 @@ export function LiveChatProvider({ children }: { children: React.ReactNode }) {
         markRoomAsRead,
         totalUnread,
         deleteMessage,
+        editMessage,
         getThreadMessages,
         reactions,
         toggleReaction,
