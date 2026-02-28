@@ -147,6 +147,50 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
         </div>
       </div>
 
+      {/* Playlist visibility helper */}
+      <Card className="border-primary/30 bg-primary/5">
+        <CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Audio playlist lives in this track
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Use “Add Current Week” or “Add All Unlocked” to build your queue fast.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const section = document.getElementById("audio-training-playlist");
+              section?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          >
+            Jump to playlist
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Audio Training Playlist */}
+      <div id="audio-training-playlist">
+        <AudioTrainingPlaylist
+          trackTitle={track.title}
+          avatarId={track.avatarId}
+          avatarName={track.avatarName}
+          maxUnlockedDay={nextDay}
+          totalDays={track.totalDays}
+          completedDays={completedDays}
+          onLoadDay={async (dayNumber) => {
+            try {
+              return await loadDayStudy(dayNumber);
+            } catch {
+              return null;
+            }
+          }}
+        />
+      </div>
+
       {/* Progress */}
       <Card className="border-primary/20">
         <CardContent className="p-4 flex items-center gap-4">
@@ -182,23 +226,6 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
           )}
         </CardContent>
       </Card>
-
-      {/* Audio Training Playlist */}
-      <AudioTrainingPlaylist
-        trackTitle={track.title}
-        avatarId={track.avatarId}
-        avatarName={track.avatarName}
-        maxUnlockedDay={nextDay}
-        totalDays={track.totalDays}
-        completedDays={completedDays}
-        onLoadDay={async (dayNumber) => {
-          try {
-            return await loadDayStudy(dayNumber);
-          } catch {
-            return null;
-          }
-        }}
-      />
 
       {generating && (
         <Card className="border-primary/30 bg-primary/5">
