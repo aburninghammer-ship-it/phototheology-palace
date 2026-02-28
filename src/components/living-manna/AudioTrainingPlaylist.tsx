@@ -30,9 +30,19 @@ import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession }
 
 interface PlaylistItem {
   dayNumber: number;
+  avatarId: string;
+  avatarName: string;
+  trackTitle: string;
   title?: string;
   manuscript?: string; // loaded on demand
   loaded: boolean;
+}
+
+interface CrossTrackInfo {
+  avatarId: string;
+  avatarName: string;
+  trackTitle: string;
+  emoji: string;
 }
 
 interface AudioTrainingPlaylistProps {
@@ -44,6 +54,10 @@ interface AudioTrainingPlaylistProps {
   totalDays: number;
   completedDays: Set<number>;
   onLoadDay: (dayNumber: number) => Promise<WarCollegeDay | null>;
+  /** All available tracks for cross-track "Add Day X of All Avatars" */
+  allTracks?: CrossTrackInfo[];
+  /** Loader that works across tracks */
+  onLoadDayCrossTrack?: (avatarId: string, dayNumber: number) => Promise<WarCollegeDay | null>;
 }
 
 export function AudioTrainingPlaylist({
@@ -54,6 +68,8 @@ export function AudioTrainingPlaylist({
   totalDays,
   completedDays,
   onLoadDay,
+  allTracks,
+  onLoadDayCrossTrack,
 }: AudioTrainingPlaylistProps) {
   const [playlist, setPlaylist] = useState<PlaylistItem[]>([]);
   const [showPicker, setShowPicker] = useState(false);
@@ -67,6 +83,17 @@ export function AudioTrainingPlaylist({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const loadingRef = useRef(false);
 
+  // Helper to resolve the correct loader for a playlist item
+  const resolveLoader = useCallback((item: PlaylistItem) => {
+    if (item.avatarId === avatarId) {
+      return onLoadDay(item.dayNumber);
+    }
+    if (onLoadDayCrossTrack) {
+      return onLoadDayCrossTrack(item.avatarId, item.dayNumber);
+    }
+    return onLoadDay(item.dayNumber);
+  }, [avatarId, onLoadDay, onLoadDayCrossTrack]);
+
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -78,19 +105,27 @@ export function AudioTrainingPlaylist({
 
   const availableDays = Array.from({ length: maxUnlockedDay }, (_, i) => i + 1);
 
+  const makeItem = (dayNumber: number, aId?: string, aName?: string, tTitle?: string): PlaylistItem => ({
+    dayNumber,
+    avatarId: aId || avatarId,
+    avatarName: aName || avatarName,
+    trackTitle: tTitle || trackTitle,
+    loaded: false,
+  });
+
   const addToPlaylist = (dayNumber: number) => {
-    if (playlist.some((p) => p.dayNumber === dayNumber)) {
+    if (playlist.some((p) => p.dayNumber === dayNumber && p.avatarId === avatarId)) {
       toast.info(`Day ${dayNumber} is already in the playlist.`);
       return;
     }
-    setPlaylist((prev) => [...prev, { dayNumber, loaded: false }]);
+    setPlaylist((prev) => [...prev, makeItem(dayNumber)]);
   };
 
   const addAllUnlockedToPlaylist = () => {
-    const existing = new Set(playlist.map((p) => p.dayNumber));
+    const existing = new Set(playlist.map((p) => `${p.avatarId}-${p.dayNumber}`));
     const toAdd = availableDays
-      .filter((d) => !existing.has(d))
-      .map((dayNumber) => ({ dayNumber, loaded: false }));
+      .filter((d) => !existing.has(`${avatarId}-${d}`))
+      .map((dayNumber) => makeItem(dayNumber));
 
     if (toAdd.length === 0) {
       toast.info("All unlocked days are already in the playlist.");
@@ -108,10 +143,10 @@ export function AudioTrainingPlaylist({
       (_, index) => start + index,
     );
 
-    const existing = new Set(playlist.map((p) => p.dayNumber));
+    const existing = new Set(playlist.map((p) => `${p.avatarId}-${p.dayNumber}`));
     const toAdd = currentWeekDays
-      .filter((d) => !existing.has(d))
-      .map((dayNumber) => ({ dayNumber, loaded: false }));
+      .filter((d) => !existing.has(`${avatarId}-${d}`))
+      .map((dayNumber) => makeItem(dayNumber));
 
     if (toAdd.length === 0) {
       toast.info("Current week is already in your playlist.");
@@ -121,16 +156,30 @@ export function AudioTrainingPlaylist({
     setPlaylist((prev) => [...prev, ...toAdd]);
   };
 
-  const removeFromPlaylist = (dayNumber: number) => {
-    const idx = playlist.findIndex((p) => p.dayNumber === dayNumber);
-    if (idx === -1) return;
-    // If removing the currently playing item, stop
+  /** Add a specific day from ALL avatar tracks at once */
+  const addDayAllAvatars = (dayNumber: number) => {
+    if (!allTracks || allTracks.length === 0) return;
+    const existing = new Set(playlist.map((p) => `${p.avatarId}-${p.dayNumber}`));
+    const toAdd = allTracks
+      .filter((t) => !existing.has(`${t.avatarId}-${dayNumber}`))
+      .map((t) => makeItem(dayNumber, t.avatarId, t.avatarName, t.trackTitle));
+
+    if (toAdd.length === 0) {
+      toast.info(`Day ${dayNumber} from all avatars is already queued.`);
+      return;
+    }
+
+    setPlaylist((prev) => [...prev, ...toAdd]);
+    toast.success(`Added Day ${dayNumber} from ${toAdd.length} avatars!`);
+  };
+
+  const removeFromPlaylist = (idx: number) => {
     if (idx === currentIndex) {
       stopPlayback();
     } else if (idx < currentIndex) {
       setCurrentIndex((prev) => prev - 1);
     }
-    setPlaylist((prev) => prev.filter((p) => p.dayNumber !== dayNumber));
+    setPlaylist((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const clearPlaylist = () => {
@@ -194,7 +243,7 @@ export function AudioTrainingPlaylist({
 
       // Load manuscript if not cached
       if (!item.manuscript) {
-        const study = await onLoadDay(item.dayNumber);
+        const study = await resolveLoader(item);
         if (!study) throw new Error("Failed to load manuscript");
         item = { ...item, manuscript: study.manuscript, title: study.title, loaded: true };
         setPlaylist((prev) => prev.map((p, i) => (i === index ? item : p)));
@@ -418,6 +467,16 @@ export function AudioTrainingPlaylist({
                     <Button variant="outline" size="sm" className="h-6 text-[10px]" onClick={addAllUnlockedToPlaylist}>
                       Add All Unlocked
                     </Button>
+                    {allTracks && allTracks.length > 1 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-6 text-[10px] border-primary/30 text-primary"
+                        onClick={() => addDayAllAvatars(maxUnlockedDay)}
+                      >
+                        🌐 Add Day {maxUnlockedDay} — All Avatars
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -443,14 +502,14 @@ export function AudioTrainingPlaylist({
                         </div>
                         <div className="flex flex-wrap gap-1.5 max-h-[200px] overflow-y-auto">
                           {availableDays.map((d) => {
-                            const inPlaylist = playlist.some((p) => p.dayNumber === d);
+                            const inPlaylist = playlist.some((p) => p.dayNumber === d && p.avatarId === avatarId);
                             const done = completedDays.has(d);
                             const rank = getRankForDay(d);
                             const ri = RANK_CONFIG[rank];
                             return (
                               <button
                                 key={d}
-                                onClick={() => inPlaylist ? removeFromPlaylist(d) : addToPlaylist(d)}
+                                onClick={() => inPlaylist ? undefined : addToPlaylist(d)}
                                 className={`
                                   relative h-9 w-9 rounded-md text-xs font-bold border transition-all
                                   ${inPlaylist
@@ -504,7 +563,7 @@ export function AudioTrainingPlaylist({
                       const isCurrent = idx === currentIndex;
                       return (
                         <div
-                          key={item.dayNumber}
+                          key={`${item.avatarId}-${item.dayNumber}`}
                           className={`
                             flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-all
                             ${isCurrent
@@ -517,6 +576,9 @@ export function AudioTrainingPlaylist({
                             {isCurrent && isPlaying ? "▶" : idx + 1}
                           </span>
                           <span className="font-medium flex-1 truncate">
+                            {item.avatarId !== avatarId && (
+                              <span className="text-primary/70 mr-1">[{item.avatarName}]</span>
+                            )}
                             Day {item.dayNumber}
                             {item.title && <span className="text-muted-foreground ml-1">— {item.title}</span>}
                           </span>
@@ -527,7 +589,7 @@ export function AudioTrainingPlaylist({
                             variant="ghost"
                             size="sm"
                             className="h-5 w-5 p-0 text-muted-foreground hover:text-destructive"
-                            onClick={() => removeFromPlaylist(item.dayNumber)}
+                            onClick={() => removeFromPlaylist(idx)}
                           >
                             <X className="h-3 w-3" />
                           </Button>

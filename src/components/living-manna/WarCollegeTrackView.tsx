@@ -21,6 +21,7 @@ import { WarCollegeReader } from "./WarCollegeReader";
 import {
   RANK_CONFIG,
   getRankForDay,
+  WAR_COLLEGE_TRACKS,
   type WarCollegeDay,
   type WarCollegeRank,
   type WarCollegeTrack,
@@ -86,12 +87,14 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
   };
 
   /** Shared loader for both direct open and playlist use */
-  const loadDayStudy = async (dayNumber: number): Promise<WarCollegeDay> => {
+  const loadDayStudy = async (dayNumber: number, overrideAvatarId?: string): Promise<WarCollegeDay> => {
+    const aId = overrideAvatarId || track.avatarId;
+    const aTrack = WAR_COLLEGE_TRACKS.find(t => t.avatarId === aId) || track;
     const { data, error } = await supabase.functions.invoke("generate-war-college-day", {
       body: {
-        avatarId: track.avatarId,
-        avatarName: track.avatarName,
-        trackTitle: track.title,
+        avatarId: aId,
+        avatarName: aTrack.avatarName,
+        trackTitle: aTrack.title,
         dayNumber,
         rank: getRankForDay(dayNumber),
         weekNumber: Math.ceil(dayNumber / 7),
@@ -101,6 +104,16 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
     if (!data?.study) throw new Error("No study returned");
     return data.study as WarCollegeDay;
   };
+
+  // Cross-track info for "Add Day X — All Avatars"
+  const allTracksInfo = useMemo(() =>
+    WAR_COLLEGE_TRACKS.map(t => ({
+      avatarId: t.avatarId,
+      avatarName: t.avatarName,
+      trackTitle: t.title,
+      emoji: t.emoji,
+    })),
+  []);
 
   const handleComplete = () => {
     if (!selectedDay) return;
@@ -184,6 +197,14 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
           onLoadDay={async (dayNumber) => {
             try {
               return await loadDayStudy(dayNumber);
+            } catch {
+              return null;
+            }
+          }}
+          allTracks={allTracksInfo}
+          onLoadDayCrossTrack={async (aId, dayNumber) => {
+            try {
+              return await loadDayStudy(dayNumber, aId);
             } catch {
               return null;
             }
