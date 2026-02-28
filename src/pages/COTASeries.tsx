@@ -4,6 +4,8 @@ import { Navigation } from "@/components/Navigation";
 import { SpiritOfProphecyTab } from "@/components/living-manna/SpiritOfProphecyTab";
 import { DefenseMode } from "@/components/living-manna/DefenseMode";
 import { AATSTraining } from "@/components/living-manna/AATSTraining";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookMarked, Shield, Swords } from "lucide-react";
 
@@ -14,6 +16,10 @@ const COTASeries = () => {
   const [searchParams] = useSearchParams();
   const initialTab = validTabs.includes(searchParams.get("tab") as TabValue) ? (searchParams.get("tab") as TabValue) : "library";
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
+  const { churchId: memberChurchId } = useChurchMembership();
+  const { subscription } = useSubscription();
+  const urlChurchId = searchParams.get("church");
+  const effectiveChurchId = urlChurchId || memberChurchId || subscription.church.churchId || "";
 
   return (
     <div className="min-h-screen bg-background">
@@ -40,11 +46,11 @@ const COTASeries = () => {
           </TabsContent>
 
           <TabsContent value="defense" className="mt-4">
-            <DefenseMode churchId="" />
+            <DefenseMode churchId={effectiveChurchId} />
           </TabsContent>
 
           <TabsContent value="aats" className="mt-4">
-            <AATSTraining churchId="" onNavigateToDefense={() => setActiveTab("defense")} />
+            <AATSTraining churchId={effectiveChurchId} onNavigateToDefense={() => setActiveTab("defense")} />
           </TabsContent>
         </Tabs>
       </main>
