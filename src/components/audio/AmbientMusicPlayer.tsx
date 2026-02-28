@@ -174,6 +174,7 @@ export function AmbientMusicPlayer({
   
   const [isPlaying, setIsPlaying] = useState(false);
   const isPlayingRef = useRef(false);
+  const userPausedRef = useRef(false); // Track intentional user pauses to prevent auto-resume fighting
   // Keep ref in sync for use in event handlers (avoids stale closures)
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   const [volume, setVolume] = useState(() => {
@@ -475,11 +476,11 @@ export function AmbientMusicPlayer({
         
         // Only try to resume if we think we should still be playing
         // and the track hasn't naturally ended
-        if (isPlayingRef.current && !audio.ended && audio.currentTime > 0) {
+        if (isPlayingRef.current && !userPausedRef.current && !audio.ended && audio.currentTime > 0) {
           console.log('[AmbientMusic] Unexpected pause detected, scheduling resume...');
           // Small delay to avoid fighting with the browser
           setTimeout(() => {
-            if (audioRef.current && isPlayingRef.current && audioRef.current.paused && !audioRef.current.ended) {
+            if (audioRef.current && isPlayingRef.current && !userPausedRef.current && audioRef.current.paused && !audioRef.current.ended) {
               console.log('[AmbientMusic] Resuming after unexpected pause');
               audioRef.current.play().catch((err) => {
                 console.warn('[AmbientMusic] Could not resume after pause:', err);
@@ -525,7 +526,7 @@ export function AmbientMusicPlayer({
     const handleVisibilityChange = () => {
       if (!audioRef.current) return;
 
-      if (document.hidden && isPlaying) {
+      if (document.hidden && isPlaying && !userPausedRef.current) {
         // App went to background - try to keep music playing
         console.log('[AmbientMusic] Tab hidden - keeping music alive');
         if (audioRef.current.paused) {
@@ -533,7 +534,7 @@ export function AmbientMusicPlayer({
             console.log('[AmbientMusic] Could not resume music in background');
           });
         }
-      } else if (!document.hidden && isPlaying) {
+      } else if (!document.hidden && isPlaying && !userPausedRef.current) {
         // App came back to foreground - ensure music is still playing
         console.log('[AmbientMusic] Tab visible - ensuring music continues');
         if (audioRef.current.paused) {
@@ -551,7 +552,7 @@ export function AmbientMusicPlayer({
     if (!isPlaying) return;
 
     const keepAlive = () => {
-      if (audioRef.current && isPlaying && audioRef.current.paused) {
+      if (audioRef.current && isPlaying && !userPausedRef.current && audioRef.current.paused) {
         console.log('[AmbientMusic] Keep-alive: resuming paused music');
         audioRef.current.play().catch(() => {});
       }
@@ -660,6 +661,7 @@ export function AmbientMusicPlayer({
     }
 
     if (isPlaying) {
+      userPausedRef.current = true;
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
@@ -701,6 +703,7 @@ export function AmbientMusicPlayer({
         }
         
         console.log("Attempting to play:", currentTrack.url);
+        userPausedRef.current = false;
         await audioRef.current.play();
         console.log("Audio playing successfully");
         setIsPlaying(true);
@@ -715,10 +718,12 @@ export function AmbientMusicPlayer({
           });
           
           navigator.mediaSession.setActionHandler('play', () => {
+            userPausedRef.current = false;
             audioRef.current?.play();
             setIsPlaying(true);
           });
           navigator.mediaSession.setActionHandler('pause', () => {
+            userPausedRef.current = true;
             audioRef.current?.pause();
             setIsPlaying(false);
           });

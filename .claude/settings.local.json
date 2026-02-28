@@ -122,7 +122,10 @@
       "Bash(npx vite:*)",
       "Bash(brew install:*)",
       "Bash(pdftotext:*)",
-      "Bash(pdfinfo:*)"
+      "Bash(pdfinfo:*)",
+      "Bash(textutil:*)",
+      "Bash(cd:*)",
+      "Bash(supabase:*)"
     ],
     "deny": [],
     "ask": []

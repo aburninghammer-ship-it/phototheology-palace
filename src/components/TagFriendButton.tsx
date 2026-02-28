@@ -85,11 +85,13 @@ export const TagFriendButton = ({
 
     setSearching(true);
     try {
-      // Get all profiles except current user
+      // Get all profiles except current user - only include users with display names
       const { data, error } = await supabase
         .from("profiles")
         .select("id, display_name")
         .neq("id", user.id)
+        .not("display_name", "is", null)
+        .neq("display_name", "")
         .limit(100);
 
       if (error) throw error;
@@ -130,27 +132,20 @@ export const TagFriendButton = ({
         .from("profiles")
         .select("display_name")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       const senderName = senderProfile?.display_name || "Someone";
 
-      // Create notifications for each selected user
-      const notifications = selectedUsers.map((recipient) => ({
+      // Create feature_tags for each selected user
+      const tags = selectedUsers.map((recipient) => ({
         sender_id: user.id,
         recipient_id: recipient.id,
-        notification_type: "page_tag",
-        title: `${senderName} tagged you`,
+        feature_path: currentPageUrl,
+        feature_label: currentPageTitle,
         message: message.trim() || `${senderName} wants you to check this out!`,
-        page_url: currentPageUrl,
-        page_title: currentPageTitle,
-        page_description: currentPageDescription,
-        data: {
-          sender_name: senderName,
-          timestamp: new Date().toISOString(),
-        },
       }));
 
-      const { error } = await supabase.from("user_notifications" as any).insert(notifications);
+      const { error } = await supabase.from("feature_tags").insert(tags);
 
       if (error) throw error;
 
@@ -162,8 +157,8 @@ export const TagFriendButton = ({
       setSearchQuery("");
       setOpen(false);
     } catch (error: any) {
-      console.error("Error sending notifications:", error);
-      toast.error("Failed to tag friends");
+      console.error("Error tagging friends:", error?.message || error?.code || JSON.stringify(error));
+      toast.error(error?.message || "Failed to tag friends");
     } finally {
       setLoading(false);
     }

@@ -199,8 +199,8 @@ export function ConnectionModal({
             <Textarea
               id="explanation"
               placeholder={isFirstPlay
-                ? `How does ${card.name} help you understand the verse?`
-                : `How does ${card.name} connect to ${previousEntry?.playerName}'s insight?`
+                ? `How does the text relate to ${card.name}?`
+                : `How does the text relate to ${card.name}, building on ${previousEntry?.playerName}'s insight?`
               }
               value={explanation}
               onChange={(e) => setExplanation(e.target.value)}

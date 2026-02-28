@@ -90,11 +90,13 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
   useEffect(() => {
     if (!game?.id) return;
 
+    const gameId = game.id;
+
     const channel = supabase
-      .channel(`scrabble-${game.id}`)
+      .channel(`scrabble-${gameId}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'pt_scrabble_games', filter: `id=eq.${game.id}` },
+        { event: '*', schema: 'public', table: 'pt_scrabble_games', filter: `id=eq.${gameId}` },
         (payload) => {
           if (payload.eventType === 'UPDATE' && payload.new) {
             const updated = payload.new as any;
@@ -112,23 +114,29 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       )
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'pt_scrabble_players', filter: `game_id=eq.${game.id}` },
+        { event: '*', schema: 'public', table: 'pt_scrabble_players', filter: `game_id=eq.${gameId}` },
         () => {
-          // Reload players on any change
-          loadPlayers(game.id);
+          loadPlayers(gameId);
         }
       )
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'pt_scrabble_moves', filter: `game_id=eq.${game.id}` },
+        { event: 'INSERT', schema: 'public', table: 'pt_scrabble_moves', filter: `game_id=eq.${gameId}` },
         () => {
-          // Reload game state when new move is made
-          loadGame(game.id);
+          loadGame(gameId);
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[Scrabble Realtime] Channel status:', status);
+      });
+
+    // Polling fallback: refetch game state every 4 seconds to catch missed realtime events
+    const pollInterval = setInterval(() => {
+      loadGame(gameId);
+    }, 4000);
 
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, [game?.id]);
@@ -187,7 +195,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         teamId: p.team_id || undefined,
         displayName: p.display_name,
         avatarUrl: p.avatar_url || undefined,
-        hand: ((p.hand as any[]) || []).map((cardData: any) => {
+        hand: (Array.isArray(p.hand) ? (p.hand as any[]) : []).map((cardData: any) => {
           // Try to get full card data, fall back to stored data with defaults
           const fullCard = getCardById(cardData.id);
           if (fullCard) return fullCard;
@@ -348,17 +356,19 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         .from('pt_scrabble_games')
         .select('*')
         .eq('room_code', roomCode.toUpperCase())
-        .single();
+        .maybeSingle();
 
       if (gameError || !gameData) {
         toast.error('Game not found');
         return false;
       }
 
-      if (gameData.status !== 'waiting') {
-        toast.error('Game has already started');
+      if (gameData.status === 'completed') {
+        toast.error('Game has already ended');
         return false;
       }
+
+      const isLateJoin = gameData.status === 'playing';
 
       // Check if already in game
       const { data: existingPlayer } = await supabase
@@ -366,7 +376,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         .select('id')
         .eq('game_id', gameData.id)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (existingPlayer) {
         // Already in game, just load it
@@ -410,9 +420,22 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
 
       if (playerError) throw playerError;
 
+      // If joining a game already in progress, deal cards to the late joiner
+      if (isLateJoin) {
+        const cardsPerPlayer = 10;
+        const { hands } = dealCards(1, cardsPerPlayer);
+        const lateHand = hands[0] || [];
+        await supabase
+          .from('pt_scrabble_players')
+          .update({
+            hand: lateHand.map(c => ({ id: c.id, code: c.code, name: c.name, floor: c.floor })),
+          })
+          .eq('id', playerData.id);
+      }
+
       setMyPlayerId(playerData.id);
       await loadGame(gameData.id);
-      toast.success('Joined game!');
+      toast.success(isLateJoin ? 'Joined game in progress!' : 'Joined game!');
       return true;
     } catch (err: any) {
       console.error('Error joining game:', err);

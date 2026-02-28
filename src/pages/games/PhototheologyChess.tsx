@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { ArrowLeft, Crown, Swords, BookOpen, RotateCcw, Users, User, Trophy } from "lucide-react";
+import { ArrowLeft, Crown, Swords, BookOpen, RotateCcw, Users, User, Trophy, Wifi } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
+import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/Footer";
 
@@ -107,7 +109,8 @@ export default function PhototheologyChess() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [gameMode, setGameMode] = useState<"local" | "ai" | null>(null);
+  const [gameMode, setGameMode] = useState<"local" | "ai" | "online" | null>(null);
+  const multiplayer = useGameMultiplayer("chess");
   const [board, setBoard] = useState<(ChessPiece | null)[][]>(createInitialBoard());
   const [currentPlayer, setCurrentPlayer] = useState<PieceColor>('white');
   const [selectedPiece, setSelectedPiece] = useState<Position | null>(null);
@@ -494,13 +497,46 @@ export default function PhototheologyChess() {
                     <div className="text-xs opacity-80">{t('games.common.playAgainstAI')}</div>
                   </div>
                 </Button>
+                <Button
+                  onClick={() => setGameMode("online")}
+                  className="w-full h-auto py-4 bg-green-600 hover:bg-green-700"
+                >
+                  <Wifi className="h-6 w-6 mr-3" />
+                  <div className="text-left">
+                    <div className="font-bold">Online Multiplayer</div>
+                    <div className="text-xs opacity-80">Play with friends online</div>
+                  </div>
+                </Button>
               </CardContent>
             </Card>
           </div>
         )}
 
+        {/* Online Multiplayer Lobby */}
+        {gameMode === "online" && multiplayer.room?.status !== "active" && (
+          <MultiplayerLobby
+            room={multiplayer.room}
+            players={multiplayer.players}
+            loading={multiplayer.loading}
+            isHost={multiplayer.isHost}
+            gameName="Chess"
+            onCreateRoom={() => multiplayer.createRoom(2)}
+            onJoinRoom={(code) => multiplayer.joinRoom(code)}
+            onStartGame={() => {
+              if (multiplayer.players.length >= 2) {
+                multiplayer.startGame(
+                  { board: "initial", currentPlayer: 'white' },
+                  multiplayer.players[0].user_id
+                );
+              }
+            }}
+            onLeaveRoom={multiplayer.leaveRoom}
+            onBack={() => { setGameMode(null); multiplayer.leaveRoom(); }}
+          />
+        )}
+
         {/* Game Board */}
-        {gameMode && (
+        {((gameMode === "local" || gameMode === "ai") || (gameMode === "online" && multiplayer.room?.status === "active")) && (
           <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
             {/* Captured pieces - Black */}
             <Card className="bg-black/40 border-amber-500/50 p-4 min-w-[120px]">

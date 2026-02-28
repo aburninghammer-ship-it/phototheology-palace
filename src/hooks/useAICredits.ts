@@ -28,14 +28,35 @@ export interface CreditPackage {
   stripe_price_id: string | null;
 }
 
-// Feature credit costs (should match database)
+// Feature credit costs — FREE features cost 0 (text-based AI)
+// Only TTS audio and long-form generation cost credits
 export const FEATURE_COSTS: Record<string, number> = {
-  'infographic': 3,
-  'study-guide-ai': 2,
-  'study-series-lesson': 10,
-  'study-series-outline': 5,
-  'jeeves-response': 1,
-  'mind-map-analyze': 2,
+  // FREE — text-based AI (no credits consumed)
+  'jeeves-response': 0,
+  'mind-map-analyze': 0,
+  'gem-mining': 0,
+  'verse-commentary': 0,
+  'bible-freestyle': 0,
+  'study-buddy': 0,
+  'defense-mode': 0,
+  'drill': 0,
+  'spark': 0,
+  'palace-ai': 0,
+  'web-research': 0,
+  'chapter-commentary-text': 0,
+
+  // PAID — TTS audio generation (expensive API calls)
+  'tts-verse': 5,
+  'tts-chapter': 15,
+  'tts-epic': 25,
+  'tts-commentary-audio': 10,
+
+  // PAID — long-form AI generation
+  'infographic': 5,
+  'study-guide-ai': 3,
+  'study-series-lesson': 15,
+  'study-series-outline': 8,
+  'sermon-full-generation': 10,
 };
 
 export function useAICredits() {
@@ -222,6 +243,13 @@ export function useAICredits() {
       operation: () => Promise<T>,
       options?: { skipDeduction?: boolean }
     ): Promise<T | null> => {
+      const cost = FEATURE_COSTS[feature] ?? 1;
+
+      // FREE features — skip credit checks entirely
+      if (cost === 0) {
+        return await operation();
+      }
+
       const check = await checkCredits(feature);
 
       if (!check.has_credits) {

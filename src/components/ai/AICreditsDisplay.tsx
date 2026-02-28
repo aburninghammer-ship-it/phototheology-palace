@@ -1,14 +1,8 @@
-import { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { CreditPurchaseModal } from "@/components/CreditPurchaseModal";
 import {
   Popover,
   PopoverContent,
@@ -17,12 +11,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Zap,
-  TrendingUp,
-  Sparkles,
   Crown,
   Loader2,
-  CheckCircle,
-  ArrowRight,
   Infinity
 } from "lucide-react";
 import { useAICredits, FEATURE_COSTS } from "@/hooks/useAICredits";
@@ -144,8 +134,7 @@ export function AICreditsDisplay({ variant = "badge", className }: AICreditsDisp
         <CreditPurchaseModal
           open={showPurchaseModal}
           onOpenChange={setShowPurchaseModal}
-          packages={packages}
-          currentBalance={creditsInfo.credits_balance}
+          currentCredits={creditsInfo.credits_balance}
         />
       </>
     );
@@ -261,140 +250,7 @@ export function AICreditsDisplay({ variant = "badge", className }: AICreditsDisp
   );
 }
 
-// Purchase Modal Component
-interface CreditPurchaseModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  packages: Array<{
-    id: string;
-    name: string;
-    credits: number;
-    price_cents: number;
-  }>;
-  currentBalance: number;
-}
 
-function CreditPurchaseModal({
-  open,
-  onOpenChange,
-  packages,
-  currentBalance,
-}: CreditPurchaseModalProps) {
-  const navigate = useNavigate();
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
-  const [isPurchasing, setIsPurchasing] = useState(false);
-
-  const handlePurchase = async () => {
-    if (!selectedPackage) return;
-
-    setIsPurchasing(true);
-    // TODO: Implement Stripe checkout for credit packages
-    // For now, redirect to pricing page
-    navigate("/pricing?credits=true");
-    setIsPurchasing(false);
-    onOpenChange(false);
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-yellow-500" />
-            Get More AI Credits
-          </DialogTitle>
-          <DialogDescription>
-            Current balance: <strong>{currentBalance} credits</strong>
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            {packages.map((pkg) => (
-              <div
-                key={pkg.id}
-                className={cn(
-                  "p-4 rounded-lg border-2 cursor-pointer transition-all",
-                  selectedPackage === pkg.id
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50"
-                )}
-                onClick={() => setSelectedPackage(pkg.id)}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold">{pkg.name}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {pkg.credits} credits
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold">
-                      ${(pkg.price_cents / 100).toFixed(2)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      ${(pkg.price_cents / pkg.credits / 100).toFixed(3)}/credit
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
-            <div className="flex items-center gap-3">
-              <Crown className="h-8 w-8 text-purple-500" />
-              <div className="flex-1">
-                <h4 className="font-semibold">Go Unlimited</h4>
-                <p className="text-sm text-muted-foreground">
-                  $30/month for unlimited AI features
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  onOpenChange(false);
-                  navigate("/pricing?tier=unlimited");
-                }}
-              >
-                Upgrade
-                <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={() => onOpenChange(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            className="flex-1"
-            disabled={!selectedPackage || isPurchasing}
-            onClick={handlePurchase}
-          >
-            {isPurchasing ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Purchase
-              </>
-            )}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 // Export for use in feature components
 export function CreditsRequiredBadge({ feature }: { feature: string }) {

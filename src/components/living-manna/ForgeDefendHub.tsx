@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
+import { analyzeBatchUsers } from "@/utils/userActivityAnalyzer";
 import {
   Trophy, Shield, Swords, Users, Crown, Target, Loader2,
   ChevronRight, ArrowLeft, Zap, Flame, BookOpen, Warehouse,
@@ -32,7 +33,7 @@ import {
   getTeamLevel,
 } from "@/data/forgeDefendConfig";
 
-type HubView = "overview" | "draft" | "battle" | "battle-setup" | "leaderboard" | "prep";
+type HubView = "overview" | "draft" | "battle" | "battle-setup" | "leaderboard" | "prep" | "team" | "drill" | "debrief";
 
 interface ForgeDefendHubProps {
   churchId: string;
@@ -41,13 +42,15 @@ interface ForgeDefendHubProps {
 export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const [resolvedChurchId, setResolvedChurchId] = useState(churchId);
+  const [createError, setCreateError] = useState<string | null>(null);
   const {
     loading, activeSeason, myTeam, teamMembers, leaderboard,
     currentBattle, battleRounds, teamBattles,
     createSeason, createSquad, runDraft, startBattle, submitRound, completeBattle,
     activateSeason, advanceWeek, getTeamStats, getParticipationBalance,
     refresh,
-  } = useForgeDefend(churchId);
+  } = useForgeDefend(resolvedChurchId);
 
   const [view, setView] = useState<HubView>("overview");
   const [draftLoading, setDraftLoading] = useState(false);
@@ -73,6 +76,10 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const [churchMembers, setChurchMembers] = useState<{ id: string; display_name: string }[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [createLoading, setCreateLoading] = useState(false);
+  const [inviteSearch, setInviteSearch] = useState("");
+  const [inviteResults, setInviteResults] = useState<{ id: string; display_name: string }[]>([]);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [invitedMembers, setInvitedMembers] = useState<{ id: string; display_name: string }[]>([]);
 
   // Battle setup state
   const [battleSetupTopic, setBattleSetupTopic] = useState<string | null>(null);
@@ -80,14 +87,57 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const [battleSetupOpponent, setBattleSetupOpponent] = useState<"user" | "jeeves">("user");
   const [battleSetupOpponentId, setBattleSetupOpponentId] = useState<string | null>(null);
 
+  // Team analytics state
+  const [teamAnalytics, setTeamAnalytics] = useState<any>(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+
+  // Drill state
+  const [drillActive, setDrillActive] = useState(false);
+  const [drillMessages, setDrillMessages] = useState<{ role: string; content: string }[]>([]);
+
+  const [churchIdLoading, setChurchIdLoading] = useState(!churchId);
+
+  useEffect(() => {
+    if (churchId) {
+      setResolvedChurchId(churchId);
+      setChurchIdLoading(false);
+    }
+  }, [churchId]);
+
+  useEffect(() => {
+    if (resolvedChurchId || !user?.id) {
+      if (resolvedChurchId) setChurchIdLoading(false);
+      return;
+    }
+    setChurchIdLoading(true);
+    const resolveChurchMembership = async () => {
+      try {
+        const { data, error } = await (supabase as any)
+          .from("church_members")
+          .select("church_id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (!error && data?.church_id) {
+          setResolvedChurchId(data.church_id);
+        }
+      } catch (e) {
+        console.error("Church resolution error:", e);
+      } finally {
+        setChurchIdLoading(false);
+      }
+    };
+    resolveChurchMembership();
+  }, [resolvedChurchId, user?.id]);
+
   // Load church members for selection
   useEffect(() => {
-    if (!churchId || !user?.id) return;
+    if (!resolvedChurchId || !user?.id) return;
     const loadMembers = async () => {
       const { data } = await (supabase as any)
         .from("church_members")
         .select("user_id")
-        .eq("church_id", churchId);
+        .eq("church_id", resolvedChurchId);
       if (!data) return;
       const userIds = data.map((m: any) => m.user_id).filter((id: string) => id !== user.id);
       if (userIds.length === 0) { setChurchMembers([]); return; }
@@ -98,7 +148,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
       setChurchMembers((profiles || []).map((p: any) => ({ id: p.id, display_name: p.display_name || "Member" })));
     };
     loadMembers();
-  }, [churchId, user?.id]);
+  }, [resolvedChurchId, user?.id]);
 
   // Auto-detect view based on season status
   useEffect(() => {
@@ -143,16 +193,68 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
     );
   };
   const toggleMember = (id: string) => {
-    setSelectedMembers((prev) =>
-      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
-    );
+    if (selectedMembers.includes(id)) {
+      setSelectedMembers((prev) => prev.filter((m) => m !== id));
+    } else if (selectedMembers.length < 3) {
+      setSelectedMembers((prev) => [...prev, id]);
+    }
+  };
+
+  // Search for users to invite by username or display name
+  const searchUsers = async (query: string) => {
+    setInviteSearch(query);
+    if (query.trim().length < 2) { setInviteResults([]); return; }
+    setInviteLoading(true);
+    try {
+      const sanitized = query.trim().replace(/^@/, '').replace(/[%_]/g, '');
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, display_name, username")
+        .or(`display_name.ilike.%${sanitized}%,username.ilike.%${sanitized}%`)
+        .neq("id", user?.id || "")
+        .limit(10);
+      if (error) {
+        console.error("[ForgeDefend] Search error:", error);
+        setInviteResults([]);
+        return;
+      }
+      const alreadySelected = [...selectedMembers, ...invitedMembers.map(m => m.id)];
+      setInviteResults(
+        (data || [])
+          .filter((p: any) => !alreadySelected.includes(p.id))
+          .map((p: any) => ({ id: p.id, display_name: p.display_name || p.username || "User" }))
+      );
+    } catch (err) { console.error("[ForgeDefend] Search exception:", err); setInviteResults([]); }
+    finally { setInviteLoading(false); }
+  };
+
+  const addInvitedMember = (member: { id: string; display_name: string }) => {
+    if (selectedMembers.length >= 3) return;
+    setInvitedMembers((prev) => [...prev, member]);
+    setSelectedMembers((prev) => [...prev, member.id]);
+    setInviteSearch("");
+    setInviteResults([]);
+  };
+
+  const removeInvitedMember = (id: string) => {
+    setInvitedMembers((prev) => prev.filter((m) => m.id !== id));
+    setSelectedMembers((prev) => prev.filter((m) => m !== id));
   };
 
   // ── CREATE SEASON + SQUAD ───────────────────────────
   const handleCreateSeason = async () => {
+    if (!resolvedChurchId) {
+      setCreateError("No church context detected. Please join a church first or access from your church dashboard.");
+      return;
+    }
+    if (!user?.id) {
+      setCreateError("Please sign in to launch a season.");
+      return;
+    }
     if (!squadName.trim()) {
       squadName || setSquadName("The Remnant");
     }
+    setCreateError(null);
     setCreateLoading(true);
     try {
       const season = await createSeason(seasonTitle, {
@@ -160,18 +262,65 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
         opponents: selectedOpponents.length > 0 ? selectedOpponents : undefined,
         configMode,
       });
-      if (season) {
-        const memberIds = [user!.id, ...selectedMembers];
-        await createSquad(season.id, squadName || "The Remnant", memberIds, {
-          motto: squadMotto || undefined,
-          warCry: squadWarCry || undefined,
-          emoji: squadEmoji,
-        });
+      if (!season) {
+        setCreateError("Season launch failed. Check console for details and try again.");
+        return;
       }
+      const memberIds = [user.id, ...selectedMembers];
+      const squad = await createSquad(season.id, squadName || "The Remnant", memberIds, {
+        motto: squadMotto || undefined,
+        warCry: squadWarCry || undefined,
+        emoji: squadEmoji,
+      });
+      if (!squad) {
+        setCreateError("Season created but squad setup failed. Please try again.");
+        return;
+      }
+      await refresh();
     } catch (e) {
       console.error("Season creation error:", e);
+      setCreateError("Unexpected error while launching season.");
     } finally {
       setCreateLoading(false);
+    }
+  };
+
+  // ── LOAD TEAM ANALYTICS ─────────────────────────────
+  const loadTeamAnalytics = async () => {
+    if (!myTeam || teamMembers.length === 0) return;
+
+    setLoadingAnalytics(true);
+    try {
+      const userIds = teamMembers.map((m) => m.user_id);
+      const analyses = await analyzeBatchUsers(userIds);
+
+      // Calculate team strengths and weaknesses
+      const teamTopicStrengths: Record<string, number> = {};
+      const topicKeys = Object.keys(analyses[0]?.topicStrengths || {});
+
+      topicKeys.forEach((topic) => {
+        const avg = analyses.reduce((sum, a) => sum + (a.topicStrengths[topic as keyof typeof a.topicStrengths] || 0), 0) / analyses.length;
+        teamTopicStrengths[topic] = Math.round(avg);
+      });
+
+      // Find top 3 strengths and bottom 3 weaknesses
+      const sortedTopics = Object.entries(teamTopicStrengths).sort(([, a], [, b]) => b - a);
+      const topStrengths = sortedTopics.slice(0, 3);
+      const bottomWeaknesses = sortedTopics.slice(-3).reverse();
+
+      setTeamAnalytics({
+        members: analyses,
+        teamTopicStrengths,
+        topStrengths,
+        bottomWeaknesses,
+        avgOverallScore: Math.round(analyses.reduce((sum, a) => sum + a.overallScore, 0) / analyses.length),
+        avgBibleStudyHours: analyses.reduce((sum, a) => sum + a.activityMetrics.bibleStudyHours, 0) / analyses.length,
+        avgQuizScore: analyses.reduce((sum, a) => sum + a.activityMetrics.quizScoreAvg, 0) / analyses.length,
+      });
+    } catch (error) {
+      console.error("Error loading team analytics:", error);
+    } finally {
+      setLoadingAnalytics(false);
     }
   };
 
@@ -179,17 +328,31 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const handleRunDraft = async () => {
     if (!activeSeason) return;
     setDraftLoading(true);
-    const participants = teamMembers.length > 0
-      ? teamMembers.map((m) => ({
-          userId: m.user_id,
-          displayName: m.display_name || "Warrior",
-          strengths: "General apologetics",
-        }))
-      : [{ userId: user?.id || "", displayName: "You", strengths: "General apologetics" }];
 
-    const result = await runDraft(activeSeason.id, participants, 3);
-    setDraftResult(result);
-    setDraftLoading(false);
+    try {
+      // Analyze user activity to determine real strengths
+      const userIds = teamMembers.length > 0
+        ? teamMembers.map((m) => m.user_id)
+        : [user?.id || ""];
+
+      const userAnalyses = await analyzeBatchUsers(userIds);
+
+      const participants = userAnalyses.map((analysis) => ({
+        userId: analysis.userId,
+        displayName: analysis.displayName,
+        strengths: analysis.strengthDescription,
+        skillLevel: analysis.skillLevel,
+        topicStrengths: analysis.topicStrengths,
+        metrics: analysis.activityMetrics,
+      }));
+
+      const result = await runDraft(activeSeason.id, participants, 3);
+      setDraftResult(result);
+    } catch (error) {
+      console.error("Draft error:", error);
+    } finally {
+      setDraftLoading(false);
+    }
   };
 
   // ── START BATTLE ─────────────────────────────────────
@@ -283,7 +446,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   };
 
   // ── LOADING STATE ────────────────────────────────────
-  if (loading) {
+  if (loading || churchIdLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-violet-400" />
@@ -369,13 +532,22 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">Squad Emoji</Label>
-                <Input
-                  value={squadEmoji}
-                  onChange={(e) => setSquadEmoji(e.target.value)}
-                  placeholder="⚔️"
-                  className="bg-black/30 border-amber-500/30"
-                  maxLength={4}
-                />
+                <div className="grid grid-cols-6 gap-1.5 p-2 bg-black/30 border border-amber-500/30 rounded-md">
+                  {["⚔️", "🛡️", "👑", "🔥", "⚡", "🦁", "🗡️", "🏆", "💎", "🌟", "⭐", "🎯", "📖", "✝️", "🕊️", "💪", "🦅", "🔱"].map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => setSquadEmoji(emoji)}
+                      className={`text-2xl p-2 rounded transition-all hover:scale-110 ${
+                        squadEmoji === emoji
+                          ? "bg-amber-500/40 ring-2 ring-amber-500 scale-110"
+                          : "bg-black/20 hover:bg-amber-500/20"
+                      }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -402,24 +574,37 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
             {/* Member Selection */}
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">
-                Select Team Members ({selectedMembers.length} selected)
+                Select Team Members ({selectedMembers.length}/3 selected)
               </Label>
-              {churchMembers.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic">
-                  No other church members found. You'll be on a solo squad.
-                </p>
-              ) : (
-                <div className="max-h-40 overflow-y-auto space-y-1 bg-black/20 rounded-lg p-2 border border-amber-500/20">
+
+              {/* Invited members display */}
+              {invitedMembers.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {invitedMembers.map((m) => (
+                    <Badge key={m.id} variant="secondary" className="gap-1 pr-1">
+                      {m.display_name}
+                      <button onClick={() => removeInvitedMember(m.id)} className="ml-1 hover:text-destructive">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Church members list */}
+              {churchMembers.length > 0 && (
+                <div className="max-h-32 overflow-y-auto space-y-1 bg-black/20 rounded-lg p-2 border border-amber-500/20">
                   {churchMembers.map((member) => (
                     <label
                       key={member.id}
                       className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-white/5 transition-colors ${
                         selectedMembers.includes(member.id) ? "bg-amber-500/10" : ""
-                      }`}
+                      } ${selectedMembers.length >= 3 && !selectedMembers.includes(member.id) ? "opacity-40 pointer-events-none" : ""}`}
                     >
                       <Checkbox
                         checked={selectedMembers.includes(member.id)}
                         onCheckedChange={() => toggleMember(member.id)}
+                        disabled={selectedMembers.length >= 3 && !selectedMembers.includes(member.id)}
                       />
                       <span className="text-sm">{member.display_name}</span>
                       {selectedMembers.includes(member.id) && (
@@ -428,6 +613,50 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                     </label>
                   ))}
                 </div>
+              )}
+
+              {/* Invite by search */}
+              {selectedMembers.length < 3 && (
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Plus className="h-3 w-3" /> Invite by username or name
+                  </Label>
+                  <Input
+                    value={inviteSearch}
+                    onChange={(e) => searchUsers(e.target.value)}
+                    placeholder="Search for a user to invite…"
+                    className="bg-black/30 border-amber-500/30"
+                  />
+                  {inviteLoading && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground p-2">
+                      <Loader2 className="h-3 w-3 animate-spin" /> Searching…
+                    </div>
+                  )}
+                  {inviteResults.length > 0 && (
+                    <div className="max-h-32 overflow-y-auto space-y-1 bg-black/20 rounded-lg p-2 border border-amber-500/20">
+                      {inviteResults.map((r) => (
+                        <button
+                          key={r.id}
+                          onClick={() => addInvitedMember(r)}
+                          className="flex items-center gap-2 p-2 rounded hover:bg-white/10 transition-colors w-full text-left"
+                        >
+                          <Users className="h-3.5 w-3.5 text-amber-400" />
+                          <span className="text-sm">{r.display_name}</span>
+                          <Plus className="h-3 w-3 ml-auto text-amber-400" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {inviteSearch.length >= 2 && !inviteLoading && inviteResults.length === 0 && (
+                    <p className="text-xs text-muted-foreground italic px-2">No users found.</p>
+                  )}
+                </div>
+              )}
+
+              {selectedMembers.length === 0 && churchMembers.length === 0 && invitedMembers.length === 0 && (
+                <p className="text-xs text-muted-foreground italic">
+                  Search above to invite teammates, or start as a solo squad.
+                </p>
               )}
             </div>
           </CardContent>
@@ -533,6 +762,16 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
           )}
           Launch New Season
         </Button>
+
+        {createError && (
+          <p className="text-xs text-destructive text-center">{createError}</p>
+        )}
+
+        {!resolvedChurchId && !createError && (
+          <p className="text-xs text-destructive text-center">
+            No church found for your account. Please join a church first, or access this page from your church dashboard.
+          </p>
+        )}
       </div>
     );
   }
@@ -540,6 +779,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   // ── VIEW NAVIGATION ──────────────────────────────────
   const navItems = [
     { id: "overview" as const, label: "Overview", icon: Shield },
+    { id: "team" as const, label: "Team", icon: Users },
     { id: "battle" as const, label: "Battle", icon: Swords },
     { id: "leaderboard" as const, label: "Rankings", icon: Trophy },
     { id: "prep" as const, label: "Prep", icon: BookOpen },
@@ -676,6 +916,283 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
               )}
             </CardContent>
           </Card>
+
+          {/* Season Roadmap - Mystery Veil for Future Weeks */}
+          <Card className="bg-black/20 border-violet-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-violet-300 flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Season Journey
+              </h4>
+              <div className="space-y-2">
+                {DIFFICULTY_TIERS.map((tier, tierIdx) => {
+                  const isCurrent = tier.weeks.includes(activeSeason?.current_week || 1);
+                  const isPast = (activeSeason?.current_week || 1) > Math.max(...tier.weeks);
+                  const isFuture = (activeSeason?.current_week || 1) < Math.min(...tier.weeks);
+
+                  return (
+                    <div
+                      key={tier.tier}
+                      className={`p-3 rounded-lg border transition-all ${
+                        isCurrent
+                          ? "bg-fuchsia-500/10 border-fuchsia-500/50"
+                          : isPast
+                          ? "bg-green-500/5 border-green-500/20 opacity-60"
+                          : "bg-black/40 border-purple-500/20 relative overflow-hidden"
+                      }`}
+                    >
+                      {/* Mystery Veil Overlay for Future Weeks */}
+                      {isFuture && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-black/90 to-violet-900/80 backdrop-blur-sm flex items-center justify-center z-10">
+                          <div className="text-center">
+                            <div className="text-4xl mb-2">🔮</div>
+                            <div className="text-sm font-semibold text-purple-300">Week {tier.weeks[0]}-{tier.weeks[1]}</div>
+                            <div className="text-xs text-purple-400/70">Shrouded in Mystery</div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className={`text-xs ${
+                              isCurrent
+                                ? "border-fuchsia-500/50 text-fuchsia-300"
+                                : isPast
+                                ? "border-green-500/50 text-green-400"
+                                : "border-purple-500/50 text-purple-400"
+                            }`}
+                          >
+                            Week {tier.weeks[0]}-{tier.weeks[1]}
+                          </Badge>
+                          <span className="text-sm font-medium text-white">
+                            {isFuture ? "???" : tier.label}
+                          </span>
+                        </div>
+                        {isCurrent && (
+                          <Badge className="bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/50">
+                            Current
+                          </Badge>
+                        )}
+                        {isPast && (
+                          <Check className="h-4 w-4 text-green-400" />
+                        )}
+                      </div>
+
+                      {!isFuture && (
+                        <div className="flex flex-wrap gap-1">
+                          {tier.topics.slice(0, 4).map((topicId) => {
+                            const topic = DEFENSE_TOPICS.find((t) => t.id === topicId);
+                            return topic ? (
+                              <Badge
+                                key={topicId}
+                                variant="outline"
+                                className="border-white/10 text-[10px] opacity-70"
+                              >
+                                {topic.name}
+                              </Badge>
+                            ) : null;
+                          })}
+                          {tier.topics.length > 4 && (
+                            <Badge variant="outline" className="border-white/10 text-[10px] opacity-50">
+                              +{tier.topics.length - 4} more
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* ═══ TEAM ANALYTICS VIEW ═══ */}
+      {view === "team" && (
+        <div className="space-y-4">
+          <Button variant="ghost" size="sm" onClick={() => setView("overview")}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back
+          </Button>
+
+          {!myTeam ? (
+            <Card className="bg-black/20 border-amber-500/30">
+              <CardContent className="p-4 text-center">
+                <p className="text-amber-300">You're not on a team yet. Join the draft!</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Team Overview */}
+              <Card className="bg-black/20 border-violet-500/30">
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-violet-300 flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Team Analytics
+                    </h3>
+                    <Button
+                      size="sm"
+                      onClick={loadTeamAnalytics}
+                      disabled={loadingAnalytics}
+                      variant="outline"
+                    >
+                      {loadingAnalytics ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                      Analyze
+                    </Button>
+                  </div>
+                  {!teamAnalytics ? (
+                    <p className="text-sm text-muted-foreground">Click Analyze to view team strengths and weaknesses</p>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="p-2 bg-violet-500/10 rounded border border-violet-500/30">
+                          <div className="text-2xl font-bold text-violet-300">{teamAnalytics.avgOverallScore}</div>
+                          <div className="text-[10px] text-muted-foreground">Team Score</div>
+                        </div>
+                        <div className="p-2 bg-blue-500/10 rounded border border-blue-500/30">
+                          <div className="text-2xl font-bold text-blue-300">{teamAnalytics.avgBibleStudyHours.toFixed(1)}h</div>
+                          <div className="text-[10px] text-muted-foreground">Avg Study</div>
+                        </div>
+                        <div className="p-2 bg-green-500/10 rounded border border-green-500/30">
+                          <div className="text-2xl font-bold text-green-300">{teamAnalytics.avgQuizScore.toFixed(0)}%</div>
+                          <div className="text-[10px] text-muted-foreground">Quiz Avg</div>
+                        </div>
+                      </div>
+
+                      {/* Team Strengths */}
+                      <div className="p-3 bg-green-500/5 rounded-lg border border-green-500/20">
+                        <h4 className="text-sm font-semibold text-green-300 mb-2 flex items-center gap-1.5">
+                          <Star className="h-3 w-3" /> Team Strengths
+                        </h4>
+                        <div className="space-y-1.5">
+                          {teamAnalytics.topStrengths.map(([topic, score]: [string, number]) => (
+                            <div key={topic} className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground capitalize">{topic.replace(/([A-Z])/g, ' $1')}</span>
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 bg-black/30 rounded-full h-1.5">
+                                  <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${score}%` }} />
+                                </div>
+                                <span className="text-green-400 font-medium w-8 text-right">{score}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Team Weaknesses */}
+                      <div className="p-3 bg-red-500/5 rounded-lg border border-red-500/20">
+                        <h4 className="text-sm font-semibold text-red-300 mb-2 flex items-center gap-1.5">
+                          <AlertTriangle className="h-3 w-3" /> Areas to Improve
+                        </h4>
+                        <div className="space-y-1.5">
+                          {teamAnalytics.bottomWeaknesses.map(([topic, score]: [string, number]) => (
+                            <div key={topic} className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground capitalize">{topic.replace(/([A-Z])/g, ' $1')}</span>
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 bg-black/30 rounded-full h-1.5">
+                                  <div className="bg-red-500 h-1.5 rounded-full" style={{ width: `${score}%` }} />
+                                </div>
+                                <span className="text-red-400 font-medium w-8 text-right">{score}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-xs text-amber-300 mt-2">💡 Focus drill sessions on these topics</p>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Member Profiles */}
+              <Card className="bg-black/20 border-blue-500/30">
+                <CardContent className="p-4 space-y-3">
+                  <h4 className="font-semibold text-blue-300 flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Squad Members ({teamMembers.length})
+                  </h4>
+                  <div className="space-y-2">
+                    {teamAnalytics?.members.map((member: any) => (
+                      <div key={member.userId} className="p-3 bg-black/30 rounded-lg border border-blue-500/20">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-lg font-bold text-white">
+                              {member.displayName[0]}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm text-white">{member.displayName}</div>
+                              <div className="text-xs text-muted-foreground">{member.strengthDescription}</div>
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {member.overallScore} pts
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1.5 text-[10px]">
+                          <div className="text-center p-1.5 bg-black/30 rounded">
+                            <div className="text-blue-300 font-medium">{member.activityMetrics.bibleStudyHours.toFixed(1)}h</div>
+                            <div className="text-muted-foreground">Study</div>
+                          </div>
+                          <div className="text-center p-1.5 bg-black/30 rounded">
+                            <div className="text-green-300 font-medium">{member.activityMetrics.quizScoreAvg}%</div>
+                            <div className="text-muted-foreground">Quiz</div>
+                          </div>
+                          <div className="text-center p-1.5 bg-black/30 rounded">
+                            <div className="text-amber-300 font-medium">{member.activityMetrics.defenseWinRate}%</div>
+                            <div className="text-muted-foreground">Win Rate</div>
+                          </div>
+                        </div>
+                      </div>
+                    )) || teamMembers.map((member) => (
+                      <div key={member.id} className="p-3 bg-black/30 rounded-lg border border-blue-500/20">
+                        <div className="flex items-center gap-2">
+                          {member.is_captain && <Crown className="h-3 w-3 text-yellow-400" />}
+                          <span className="text-sm text-white">{member.display_name}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Drill Recommendations */}
+              {teamAnalytics && (
+                <Card className="bg-black/20 border-purple-500/30">
+                  <CardContent className="p-4 space-y-3">
+                    <h4 className="font-semibold text-purple-300 flex items-center gap-2">
+                      <Zap className="h-4 w-4" />
+                      Recommended Training Drills
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Based on team analysis, focus on these practice areas:
+                    </p>
+                    <div className="space-y-2">
+                      {teamAnalytics.bottomWeaknesses.map(([topic]: [string, number]) => (
+                        <Button
+                          key={topic}
+                          onClick={() => {
+                            setView("drill");
+                            // TODO: Start drill with this topic
+                          }}
+                          variant="outline"
+                          className="w-full justify-between text-xs h-auto py-3"
+                        >
+                          <div className="text-left">
+                            <div className="font-medium capitalize">{topic.replace(/([A-Z])/g, ' $1')} Drill</div>
+                            <div className="text-muted-foreground text-[10px]">10-15 min • Jeeves coaches</div>
+                          </div>
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
         </div>
       )}
 
@@ -834,6 +1351,190 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
         </div>
       )}
 
+      {/* ═══ DRILL VIEW ═══ */}
+      {view === "drill" && (
+        <div className="space-y-4">
+          <Button variant="ghost" size="sm" onClick={() => setView("team")}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back to Team
+          </Button>
+
+          <Card className="bg-black/20 border-purple-500/30">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-purple-300 flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  Practice Drill — Jeeves Coaching
+                </h3>
+                <Badge className="bg-purple-500/20 text-purple-300">10-15 min</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Sharpen your skills with guided practice. Jeeves will coach you through focused exercises on your weak topics.
+              </p>
+            </CardContent>
+          </Card>
+
+          {!drillActive ? (
+            <Card className="bg-black/20 border-emerald-500/30">
+              <CardContent className="p-4 space-y-3 text-center">
+                <Bot className="h-12 w-12 text-emerald-400 mx-auto" />
+                <h4 className="font-semibold text-emerald-300">Ready to Train?</h4>
+                <p className="text-xs text-muted-foreground">
+                  Jeeves will guide you through mini-debates focusing on your team's weakest topics.
+                  This is a safe space to practice, make mistakes, and improve.
+                </p>
+                <Button
+                  onClick={() => {
+                    setDrillActive(true);
+                    setDrillMessages([
+                      {
+                        role: "coach",
+                        content: "Welcome to drill practice! I'm Coach Jeeves, and I'm here to help you sharpen your defense skills. We'll do a quick 10-15 minute drill focusing on one of your weak topics. Let's start with the Sabbath. I'll pose a common objection, and you respond. Ready? Here's the challenge: **'The Sabbath was only for the Jews. Christians worship on Sunday to honor the resurrection.'** How do you respond?",
+                      },
+                    ]);
+                  }}
+                  className="bg-gradient-to-r from-emerald-600 to-green-600"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Start Drill Session
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <div className="h-[350px] overflow-y-auto space-y-3 bg-black/20 rounded-lg p-3 border border-purple-500/30">
+                {drillMessages.map((msg, i) => (
+                  <div
+                    key={i}
+                    className={`p-3 rounded-lg ${
+                      msg.role === "coach"
+                        ? "bg-emerald-900/30 border border-emerald-500/30 text-emerald-100"
+                        : "ml-auto bg-violet-900/40 border border-violet-500/30 text-violet-100 max-w-[85%]"
+                    }`}
+                  >
+                    <div className="text-xs font-semibold mb-1 opacity-70">
+                      {msg.role === "coach" ? "🤖 Coach Jeeves" : "You"}
+                    </div>
+                    <div className="text-sm"><ReactMarkdown>{msg.content}</ReactMarkdown></div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Textarea
+                  placeholder="Your response to the drill..."
+                  className="bg-black/30 border-purple-500/30 min-h-[60px]"
+                />
+                <Button className="bg-purple-600 hover:bg-purple-500 px-3">
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDrillActive(false)}
+                className="w-full"
+              >
+                End Drill Session
+              </Button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ═══ POST-BATTLE DEBRIEF VIEW ═══ */}
+      {view === "debrief" && (
+        <div className="space-y-4">
+          <Button variant="ghost" size="sm" onClick={() => setView("overview")}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back
+          </Button>
+
+          <Card className="bg-black/20 border-emerald-500/30">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Bot className="h-8 w-8 text-emerald-400" />
+                <div>
+                  <h3 className="text-lg font-bold text-emerald-300">Post-Battle Analysis</h3>
+                  <p className="text-xs text-muted-foreground">Coach Jeeves' Team Debrief</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/20 border-blue-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-blue-300 flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                What You Did Well
+              </h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>
+                  <strong className="text-green-400">✓ Strong Scripture Usage:</strong> You backed up your arguments with solid biblical evidence. Genesis 2:1-3 and Exodus 20:8-11 were cited effectively.
+                </p>
+                <p>
+                  <strong className="text-green-400">✓ Team Coordination:</strong> Great job tag-teaming responses. Each member contributed roughly equally — excellent participation balance.
+                </p>
+                <p>
+                  <strong className="text-green-400">✓ Stayed Calm Under Pressure:</strong> When the opponent pressed hard on Colossians 2:16, you didn't panic. You regrouped and gave a measured response.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/20 border-amber-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-amber-300 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Areas for Improvement
+              </h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>
+                  <strong className="text-orange-400">⚠ Context Matters:</strong> When quoting Isaiah 58:13-14, make sure to read the surrounding context. The opponent caught you using a verse out of context. Always give the full picture.
+                </p>
+                <p>
+                  <strong className="text-orange-400">⚠ Anticipate Counter-Arguments:</strong> You were caught off-guard by the "nailed to the cross" argument. Study common objections beforehand so you're never surprised.
+                </p>
+                <p>
+                  <strong className="text-orange-400">⚠ Use Your Weapons:</strong> You forged 3 study weapons but only used 1. Don't forget your arsenal! Those weapons exist to give you an edge.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/20 border-purple-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-purple-300 flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                Focus for Next Battle
+              </h4>
+              <div className="space-y-2 text-xs text-muted-foreground">
+                <p>
+                  <strong className="text-purple-300">1. Deep-dive Hebrews 4:</strong> The Sabbath rest argument is powerful but you need to master the whole chapter, not just verse 9.
+                </p>
+                <p>
+                  <strong className="text-purple-300">2. Study the "Mark of the Beast" connection:</strong> Next week includes Prophecy. Tie the Sabbath to Revelation 14 early and often.
+                </p>
+                <p>
+                  <strong className="text-purple-300">3. Practice drills on Law & Gospel:</strong> This is still a weak spot. Run 2-3 drill sessions before Thursday's battle.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/20 border-green-500/30">
+            <CardContent className="p-4 text-center space-y-2">
+              <Trophy className="h-10 w-10 text-green-400 mx-auto" />
+              <h4 className="font-semibold text-green-300">Overall: Solid Performance!</h4>
+              <p className="text-sm text-muted-foreground">
+                You held your ground against a tough opponent. A few adjustments and you'll be unstoppable.
+                Keep studying, keep drilling, and trust the process.
+              </p>
+              <Badge className="bg-green-500/20 text-green-300 text-lg px-4 py-2">
+                Battle Score: 82/100
+              </Badge>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* ═══ DRAFT VIEW ═══ */}
       {view === "draft" && (
         <div className="space-y-4">
@@ -894,14 +1595,65 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
       {/* ═══ PREP VIEW ═══ */}
       {view === "prep" && (
         <div className="space-y-4">
+          {/* Weekly Overview */}
           <Card className="bg-black/20 border-emerald-500/30">
             <CardContent className="p-4 space-y-3">
               <h3 className="text-lg font-bold text-emerald-300 flex items-center gap-2">
-                <BookOpen className="h-5 w-5" /> Weekly Prep
+                <BookOpen className="h-5 w-5" /> Week {activeSeason?.current_week || 1} Prep Guide
               </h3>
               <p className="text-sm text-muted-foreground">
-                This week's topics: {currentTier.label}
+                <strong className="text-emerald-300">{currentTier.label}</strong> — Strategic preparation for the battles ahead
               </p>
+            </CardContent>
+          </Card>
+
+          {/* AI Opponents Intelligence */}
+          <Card className="bg-black/20 border-red-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-red-300 flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                Know Your Enemy — AI Critics You'll Face
+              </h4>
+              <p className="text-xs text-muted-foreground mb-3">
+                These opponents are active this week. Study their tactics and prepare your defense.
+              </p>
+              <div className="space-y-2">
+                {DEFENSE_OPPONENTS.slice(0, 5).map((opponent) => (
+                  <div key={opponent.id} className="p-3 bg-black/40 rounded-lg border border-red-500/20">
+                    <div className="flex items-start gap-2 mb-2">
+                      <span className="text-2xl">{opponent.emoji}</span>
+                      <div className="flex-1">
+                        <h5 className="font-semibold text-sm text-white">{opponent.name}</h5>
+                        <p className="text-xs text-muted-foreground">{opponent.description}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5 mt-2">
+                      <div className="text-xs">
+                        <span className="text-orange-400 font-medium">Arguments you'll face:</span>
+                        <ul className="list-disc list-inside mt-1 space-y-0.5 text-muted-foreground">
+                          {opponent.attackTargets.slice(0, 3).map((target, idx) => (
+                            <li key={idx}>{target}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="text-xs">
+                        <span className="text-blue-400 font-medium">Their style:</span>
+                        <p className="text-muted-foreground mt-0.5">{opponent.argumentStyle.split('.')[0]}.</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* This Week's Topics */}
+          <Card className="bg-black/20 border-emerald-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-emerald-300 flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                This Week's Doctrines to Master
+              </h4>
               <div className="space-y-2">
                 {currentTier.topics.map((topicId) => {
                   const topic = DEFENSE_TOPICS.find((t) => t.id === topicId);
@@ -912,6 +1664,195 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                     </div>
                   ) : null;
                 })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bible Study Recommendations */}
+          <Card className="bg-black/20 border-blue-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-blue-300 flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Essential Bible Study — Where to Dig Deep
+              </h4>
+              <div className="space-y-3">
+                {currentTier.tier === "foundational" && (
+                  <>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Sabbath Defense</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Study these key chapters:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Genesis 2:1-3</Badge>
+                        <Badge variant="outline" className="text-xs">Exodus 20:8-11</Badge>
+                        <Badge variant="outline" className="text-xs">Isaiah 58:13-14</Badge>
+                        <Badge variant="outline" className="text-xs">Mark 2:27-28</Badge>
+                        <Badge variant="outline" className="text-xs">Hebrews 4:1-11</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Creation week, Manna in wilderness, Jesus healing on Sabbath</p>
+                    </div>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">State of the Dead</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Master these texts:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Ecclesiastes 9:5-6</Badge>
+                        <Badge variant="outline" className="text-xs">Psalm 146:4</Badge>
+                        <Badge variant="outline" className="text-xs">John 11:11-14</Badge>
+                        <Badge variant="outline" className="text-xs">1 Thess 4:13-18</Badge>
+                        <Badge variant="outline" className="text-xs">1 Cor 15:51-55</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Lazarus, Rich man and Lazarus parable, Samuel and the witch</p>
+                    </div>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Law & Gospel</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Know these passages:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Romans 3:31</Badge>
+                        <Badge variant="outline" className="text-xs">Matthew 5:17-19</Badge>
+                        <Badge variant="outline" className="text-xs">James 2:10-12</Badge>
+                        <Badge variant="outline" className="text-xs">1 John 2:3-6</Badge>
+                        <Badge variant="outline" className="text-xs">Revelation 14:12</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Rich young ruler, Woman at the well, Paul's conversion</p>
+                    </div>
+                  </>
+                )}
+                {currentTier.tier === "advanced" && (
+                  <>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Sanctuary & 1844</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Deep study required:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Daniel 8:14</Badge>
+                        <Badge variant="outline" className="text-xs">Leviticus 16</Badge>
+                        <Badge variant="outline" className="text-xs">Hebrews 8-10</Badge>
+                        <Badge variant="outline" className="text-xs">Revelation 11:19</Badge>
+                        <Badge variant="outline" className="text-xs">Ezekiel 4:6</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Day of Atonement, Temple cleansing, High Priest garments</p>
+                    </div>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Trinity Defense</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Critical passages:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Matthew 28:19</Badge>
+                        <Badge variant="outline" className="text-xs">2 Cor 13:14</Badge>
+                        <Badge variant="outline" className="text-xs">John 1:1-3</Badge>
+                        <Badge variant="outline" className="text-xs">John 14-16</Badge>
+                        <Badge variant="outline" className="text-xs">Acts 5:3-4</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Jesus' baptism, Great Commission, Ananias and Sapphira</p>
+                    </div>
+                  </>
+                )}
+                {currentTier.tier === "elite" && (
+                  <>
+                    <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                      <h5 className="text-xs font-semibold text-blue-300 mb-1">Remnant Church</h5>
+                      <p className="text-xs text-muted-foreground mb-2">Master these prophecies:</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">Revelation 12:17</Badge>
+                        <Badge variant="outline" className="text-xs">Revelation 14:6-12</Badge>
+                        <Badge variant="outline" className="text-xs">Joel 2:28-32</Badge>
+                        <Badge variant="outline" className="text-xs">Malachi 4:5-6</Badge>
+                        <Badge variant="outline" className="text-xs">Matthew 24:14</Badge>
+                      </div>
+                      <p className="text-xs text-amber-300 mt-2">📖 Stories: Elijah, 144,000, Three Angels' Messages</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* App Training Recommendations */}
+          <Card className="bg-black/20 border-purple-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-purple-300 flex items-center gap-2">
+                <Zap className="h-4 w-4" />
+                Recommended Training in Phototheology Suite
+              </h4>
+              <div className="space-y-2">
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    <BookOpen className="h-3 w-3" /> Study Bible
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Read chapters with <strong>CATO</strong> commentary for deeper understanding.
+                    Focus on the passages listed above. Use the <strong>Analyze</strong> tab to get AI insights.
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    🎮 Bible Scrabble
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Play <strong>Topic Mode</strong> selecting this week's doctrines. Build vocabulary and verse knowledge.
+                    Multiplayer mode sharpens competitive skills.
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    <Flame className="h-3 w-3" /> Defense Mode (Solo Practice)
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Practice <strong>Scout Mode</strong> against the opponents listed above on <strong>Beginner</strong> difficulty.
+                    Build confidence before the real battle.
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    📚 Living Manna Space
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Read EGW writings on this week's topics. Use the <strong>Spirit of Prophecy</strong> tab for
+                    Desire of Ages, Great Controversy, and Patriarchs & Prophets insights.
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                  <h5 className="text-xs font-semibold text-purple-300 mb-2 flex items-center gap-1.5">
+                    🎧 Audio Bible (Epic Mode)
+                  </h5>
+                  <p className="text-xs text-muted-foreground">
+                    Listen to chapters with <strong>Epic commentary</strong> for narrative immersion.
+                    Perfect for commute or workout prep sessions.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Strategic Advice */}
+          <Card className="bg-black/20 border-amber-500/30">
+            <CardContent className="p-4 space-y-3">
+              <h4 className="font-semibold text-amber-300 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Battle Strategy & Team Prep Tips
+              </h4>
+              <div className="space-y-2 text-xs text-muted-foreground">
+                <p>
+                  <strong className="text-amber-300">1. Divide & Conquer:</strong> Assign each team member 1-2 topics to become experts in.
+                  Don't try to master everything — specialize and support each other.
+                </p>
+                <p>
+                  <strong className="text-amber-300">2. Know Your Opponent:</strong> Study the worldview and argument style of each AI critic.
+                  Anticipate their objections before they make them.
+                </p>
+                <p>
+                  <strong className="text-amber-300">3. Scripture Saturation:</strong> The best defense is deep Bible knowledge.
+                  Memorize 3-5 key verses per topic. Context is everything.
+                </p>
+                <p>
+                  <strong className="text-amber-300">4. Practice Under Pressure:</strong> Use Defense Mode solo practice on Advanced difficulty.
+                  Get comfortable being uncomfortable.
+                </p>
+                <p>
+                  <strong className="text-amber-300">5. Team Coordination:</strong> Meet as a squad before battles. Discuss strategy.
+                  Who handles which arguments? Who's your anchor for tough questions?
+                </p>
+                <p>
+                  <strong className="text-amber-300">6. Use Weapons Wisely:</strong> Forge study weapons this week.
+                  Save your strongest weapons for the hardest battles (Goliath, boss fights).
+                </p>
               </div>
             </CardContent>
           </Card>

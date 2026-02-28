@@ -35,19 +35,19 @@ export const DIFFICULTY_TIERS: DifficultyTier[] = [
     weeks: [1, 2],
     tier: "foundational",
     label: "Foundational",
-    topics: ["sabbath", "state-of-dead", "hellfire", "law-gospel", "diet", "second-coming"],
+    topics: ["sabbath", "state-of-dead", "hellfire", "law-gospel", "diet", "second-coming", "new-covenant", "millennium"],
   },
   {
     weeks: [3, 4],
     tier: "advanced",
     label: "Advanced Theological",
-    topics: ["sanctuary-1844", "trinity", "little-horn", "prophecy", "rapture", "tongues", "antichrist"],
+    topics: ["sanctuary-1844", "trinity", "little-horn", "prophecy", "rapture", "tongues", "antichrist", "investigative-judgment", "scapegoat", "preterism", "futurism"],
   },
   {
     weeks: [5, 6],
     tier: "elite",
     label: "Elite Endgame",
-    topics: ["remnant", "preterism", "futurism", "israel-identity", "antiochus-epiphanes", "three-angels"],
+    topics: ["remnant", "preterism", "futurism", "israel-identity", "antiochus-epiphanes", "three-angels", "mark-of-the-beast"],
   },
 ];
 
@@ -75,8 +75,8 @@ export const SCORING: ScoringRule = {
 export const AI_ENEMY_SQUADS: Record<string, { name: string; opponents: string[]; description: string }> = {
   "atheist-trio": {
     name: "The Secular Front",
-    opponents: ["atheist", "former-sda", "jewish"],
-    description: "Empirical skeptics + insider critics + Torah scholars",
+    opponents: ["atheist", "secular-scholar", "philosopher"],
+    description: "Empirical skeptics + academic critics + philosophical challengers",
   },
   "abrahamic-trio": {
     name: "The Abrahamic Council",
@@ -90,8 +90,18 @@ export const AI_ENEMY_SQUADS: Record<string, { name: string; opponents: string[]
   },
   "insider-trio": {
     name: "The Insider Threat",
-    opponents: ["former-sda", "offshoot-sda", "evangelical"],
-    description: "Ex-Adventist critics + fringe reformers + Sunday keepers",
+    opponents: ["former-sda", "skeptical-exsda", "anti-prophet"],
+    description: "Ex-Adventist critics + trauma survivors + Ellen White specialists",
+  },
+  "modern-trio": {
+    name: "The Modern Challenge",
+    opponents: ["progressive-christian", "new-age", "internet-skeptic"],
+    description: "Progressive theology + New Age spirituality + viral skepticism",
+  },
+  "prophecy-trio": {
+    name: "The Prophecy Tribunal",
+    opponents: ["preterist", "futurist", "secular-scholar"],
+    description: "70 AD fulfillment + dispensational futurism + academic dating criticism",
   },
 };
 

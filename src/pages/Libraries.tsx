@@ -153,6 +153,7 @@ const roomNames: Record<string, string> = {
   'cec': 'Christ Every Chapter', 'r66': 'Room 66', 'bl': 'Blue Room',
   'pr': 'Prophecy Room', '3a': 'Three Angels Room', 'fe': 'Feasts Room',
   'frm': 'Fire Room', 'mr': 'Meditation Room', 'srm': 'Speed Room',
+  'gem-page': 'Give Me A Gem',
 };
 
 export default function Libraries() {
@@ -191,13 +192,33 @@ export default function Libraries() {
           .order('created_at', { ascending: false })
           .limit(50);
 
-        // Fetch gems
+        // Fetch gems from user_gems table
         const { data: gemsData } = await supabase
           .from('user_gems')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(50);
+
+        // Also fetch gems saved from "Give Me A Gem" (stored in deck_studies)
+        const { data: deckGemsData } = await supabase
+          .from('deck_studies')
+          .select('id, verse_reference, verse_text, gem_title, created_at')
+          .eq('user_id', user.id)
+          .eq('is_gem', true)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        // Merge deck_studies gems into the same format as user_gems
+        const deckGemsFormatted: GemItem[] = (deckGemsData || []).map(dg => ({
+          id: dg.id,
+          gem_name: dg.gem_title || dg.verse_reference || 'Saved Gem',
+          gem_content: dg.verse_text,
+          room_id: 'gem-page',
+          floor_number: 0,
+          category: null,
+          created_at: dg.created_at,
+        }));
 
         // Fetch bookmarks
         const { data: bookmarksData } = await supabase
@@ -241,7 +262,9 @@ export default function Libraries() {
 
         // Set data
         setSparks((sparksData as unknown as SparkItem[]) || []);
-        setGems((gemsData as GemItem[]) || []);
+        const allGems = [...((gemsData as GemItem[]) || []), ...deckGemsFormatted]
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        setGems(allGems);
         setBookmarks((bookmarksData as BookmarkItem[]) || []);
         setHighlights((highlightsData as HighlightItem[]) || []);
         setNotes((notesData as NoteItem[]) || []);
@@ -251,7 +274,7 @@ export default function Libraries() {
         // Set stats
         setStats({
           sparks: sparksData?.length || 0,
-          gems: gemsData?.length || 0,
+          gems: (gemsData?.length || 0) + (deckGemsData?.length || 0),
           bookmarks: bookmarksData?.length || 0,
           highlights: highlightsData?.length || 0,
           notes: notesData?.length || 0,
@@ -750,7 +773,7 @@ export default function Libraries() {
                         </Badge>
                       </div>
                       <CardDescription className="text-xs">
-                        Floor {gem.floor_number} • {format(new Date(gem.created_at), 'MMM d, yyyy')}
+                        {gem.floor_number > 0 ? `Floor ${gem.floor_number} • ` : ''}{format(new Date(gem.created_at), 'MMM d, yyyy')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>

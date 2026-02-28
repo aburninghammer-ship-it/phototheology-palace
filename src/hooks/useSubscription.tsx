@@ -105,7 +105,22 @@ export function useSubscription() {
         _user_id: user.id
       }).single();
 
-      const hasChurchAccess = churchAccess?.has_access || false;
+      let hasChurchAccess = churchAccess?.has_access || false;
+
+      // Belt-and-suspenders: if RPC says no church access, check preapproved list by email
+      if (!hasChurchAccess && user.email) {
+        const { data: preapproved } = await supabase
+          .from('church_preapproved_members')
+          .select('church_id')
+          .eq('email', user.email.toLowerCase())
+          .limit(1)
+          .maybeSingle();
+
+        if (preapproved) {
+          console.log('[useSubscription] Email found in church_preapproved_members — granting access');
+          hasChurchAccess = true;
+        }
+      }
 
       let hasAccessFromDb = false;
       let tierFromDb: SubscriptionStatus['tier'] = 'free';

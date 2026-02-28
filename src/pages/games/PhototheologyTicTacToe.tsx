@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { ArrowLeft, Grid3X3, BookOpen, RotateCcw, Users, Swords, Trophy, X, Circle } from "lucide-react";
+import { ArrowLeft, Grid3X3, BookOpen, RotateCcw, Users, Swords, Trophy, X, Circle, Wifi } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
+import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/Footer";
 
@@ -47,7 +49,8 @@ export default function PhototheologyTicTacToe() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [gameMode, setGameMode] = useState<"local" | "ai" | null>(null);
+  const [gameMode, setGameMode] = useState<"local" | "ai" | "online" | null>(null);
+  const multiplayer = useGameMultiplayer("tic-tac-toe");
   const [board, setBoard] = useState<Player[]>(Array(9).fill(null));
   const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X');
   const [winner, setWinner] = useState<Player>(null);
@@ -71,12 +74,33 @@ export default function PhototheologyTicTacToe() {
 
   const handleCellClick = (index: number) => {
     if (board[index] || winner || isDraw || showQuestion) return;
+    
+    // Online: check if it's my turn
+    if (gameMode === "online" && !multiplayer.isMyTurn) {
+      toast.error("Not your turn!");
+      return;
+    }
 
     // Show Bible question before allowing the move
     setCurrentQuestion(BIBLE_QUESTIONS[Math.floor(Math.random() * BIBLE_QUESTIONS.length)]);
     setPendingMove(index);
     setShowQuestion(true);
   };
+
+  // Sync online game state
+  useEffect(() => {
+    if (gameMode !== "online" || !multiplayer.room || multiplayer.room.status !== "active") return;
+    const gs = multiplayer.room.game_state;
+    if (gs?.board) {
+      setBoard(gs.board);
+      setCurrentPlayer(gs.currentPlayer || 'X');
+      if (gs.winner) {
+        setWinner(gs.winner);
+        setWinningLine(gs.winningLine || null);
+      }
+      if (gs.isDraw) setIsDraw(true);
+    }
+  }, [multiplayer.room?.game_state, multiplayer.room?.status, gameMode]);
 
   const handleQuestionAnswer = (answer: string) => {
     if (!currentQuestion || pendingMove === null) return;
@@ -94,6 +118,17 @@ export default function PhototheologyTicTacToe() {
 
       if (gameMode === 'ai' && currentPlayer === 'X') {
         setTimeout(() => makeAIMove(board), 500);
+      }
+      
+      // Online: sync turn change
+      if (gameMode === "online" && multiplayer.room && multiplayer.players.length >= 2) {
+        const nextUserId = multiplayer.players.find(p => p.user_id !== user?.id)?.user_id;
+        if (nextUserId) {
+          multiplayer.updateGameState(
+            { ...multiplayer.room.game_state, board, currentPlayer: currentPlayer === 'X' ? 'O' : 'X' },
+            nextUserId
+          );
+        }
       }
     }
 
@@ -121,6 +156,9 @@ export default function PhototheologyTicTacToe() {
 
     if (newBoard.every(cell => cell !== null)) {
       setIsDraw(true);
+      if (gameMode === "online") {
+        multiplayer.updateGameState({ board: newBoard, currentPlayer, isDraw: true }, null, "completed");
+      }
       return;
     }
 
@@ -129,6 +167,17 @@ export default function PhototheologyTicTacToe() {
 
     if (gameMode === 'ai' && nextPlayer === 'O') {
       setTimeout(() => makeAIMove(newBoard), 500);
+    }
+
+    // Online: sync move
+    if (gameMode === "online" && multiplayer.room && multiplayer.players.length >= 2) {
+      const nextUserId = multiplayer.players.find(p => p.user_id !== user?.id)?.user_id;
+      if (nextUserId) {
+        multiplayer.updateGameState(
+          { board: newBoard, currentPlayer: nextPlayer },
+          nextUserId
+        );
+      }
     }
   };
 
@@ -257,13 +306,47 @@ export default function PhototheologyTicTacToe() {
                     <div className="text-xs opacity-80">{t('games.common.playAgainstAI')}</div>
                   </div>
                 </Button>
+                <Button
+                  onClick={() => setGameMode("online")}
+                  className="w-full h-auto py-4 bg-green-600 hover:bg-green-700"
+                >
+                  <Wifi className="h-6 w-6 mr-3" />
+                  <div className="text-left">
+                    <div className="font-bold">Online Multiplayer</div>
+                    <div className="text-xs opacity-80">Play with friends online</div>
+                  </div>
+                </Button>
               </CardContent>
             </Card>
           </div>
         )}
 
+        {/* Online Multiplayer Lobby */}
+        {gameMode === "online" && multiplayer.room?.status !== "active" && (
+          <MultiplayerLobby
+            room={multiplayer.room}
+            players={multiplayer.players}
+            loading={multiplayer.loading}
+            isHost={multiplayer.isHost}
+            gameName="Tic Tac Toe"
+            onCreateRoom={() => multiplayer.createRoom(2)}
+            onJoinRoom={(code) => multiplayer.joinRoom(code)}
+            onStartGame={() => {
+              if (multiplayer.players.length >= 2) {
+                const firstPlayer = multiplayer.players[0];
+                multiplayer.startGame(
+                  { board: Array(9).fill(null), currentPlayer: 'X' },
+                  firstPlayer.user_id
+                );
+              }
+            }}
+            onLeaveRoom={multiplayer.leaveRoom}
+            onBack={() => { setGameMode(null); multiplayer.leaveRoom(); }}
+          />
+        )}
+
         {/* Game Board */}
-        {gameMode && (
+        {((gameMode === "local" || gameMode === "ai") || (gameMode === "online" && multiplayer.room?.status === "active")) && (
           <div className="flex flex-col items-center gap-6">
             {/* Score */}
             <div className="flex items-center gap-8">

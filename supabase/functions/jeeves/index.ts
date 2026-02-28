@@ -290,7 +290,8 @@ serve(async (req) => {
       opponentAttack,
       discipleResponse,
       defenseTopicName,
-      isSignatureTopic
+      isSignatureTopic,
+      opponentPronouns
     } = requestBody;
     
     // Handle both message formats
@@ -4888,7 +4889,7 @@ Return JSON:
       // Chain Chess V3 - Jeeves ALWAYS opens first
       const difficultyContext = difficulty === "kids"
         ? "Use simpler language and shorter sentences. Make it encouraging and fun for children."
-        : "Use scholarly language with depth. Make it theologically rich for adult learners.";
+        : "Keep it conversational but insightful. Talk like a knowledgeable friend, not a professor. Real talk, not academic language.";
 
       // Determine which challenge types are enabled
       const enabledCats = requestBody.enabledCategories || { books: true, rooms: true, principles: true };
@@ -4897,8 +4898,10 @@ Return JSON:
       if (enabledCats.rooms) availableTypes.push("room");
       if (enabledCats.principles) availableTypes.push("principle");
 
-      systemPrompt = `You are Jeeves, an expert Phototheology scholar playing Chain Chess V3!
-You ALWAYS make the opening move. Your role is to present a compelling verse, provide rich commentary, and challenge the player.
+      systemPrompt = `You are Jeeves, a friend and study partner playing Chain Chess V3!
+You ALWAYS make the opening move. Talk like a warm, down-to-earth friend — not a professor. 
+Keep it real, conversational, and relatable. Use everyday language. No lofty academic tone.
+Think of yourself as a friend sitting across the table sharing Bible gems over coffee.
 ${difficultyContext}
 
 **Available Challenge Types for this game:** ${availableTypes.join(", ")}
@@ -4928,41 +4931,47 @@ Available challenge types for this game: ${availableTypes.join(", ")}
 **YOUR TASK:**
 1. Choose an interesting, thought-provoking verse (avoid overused ones like John 3:16)
 2. Write the full verse text (KJV)
-3. Provide 3-4 sentences of rich commentary demonstrating PT methodology
-4. Challenge the player with a SPECIFIC ${availableTypes[0] || "book"} they must respond from
+3. Provide 3-4 sentences of DOWN-TO-EARTH commentary — talk like a friend sharing an insight, not a professor lecturing. Use "check this out", "here's what's wild", "think about it" style language.
+4. Challenge the player from a SPECIFIC ${availableTypes[0] || "book"} — phrase it as "from the book of ___" or "using the ___ Room" or "applying the ___ Principle"
+
+**CRITICAL RULE FOR CHALLENGE SELECTION:**
+- The challenge book/room/principle you assign must be TRULY RANDOM and NOT obviously connected to your verse.
+- Do NOT pick a book that directly quotes, references, or is the obvious cross-reference for your verse.
+- Example: If your verse is from Deuteronomy about "the Rock", do NOT challenge with 1 Corinthians (which directly references that Rock). Pick something unexpected like Nahum, Habakkuk, Song of Solomon, or Philemon.
+- The whole point is to make the player WORK to find a creative connection, not hand them an easy one.
 
 Return JSON:
 {
   "verse": "Book chapter:verse",
   "verseText": "The complete verse text from KJV",
-  "commentary": "Your 3-4 sentence exposition using PT insights - explain what the verse teaches and how it connects to Christ",
+  "commentary": "Your 3-4 sentence friendly exposition — conversational, warm, insightful but NOT academic",
   "challengeType": "${availableTypes[0] || "book"}",
   "challengeId": "specific id (e.g., 'romans' for Romans, 'sr' for Story Room, 'three-heavens' for Three Heavens)",
   "challengeName": "The full name (e.g., 'Romans', 'Story Room', 'The Three Heavens Principle')"
 }`;
-
     } else if (mode === "chain-chess-v3-judge") {
       // Chain Chess V3 - Judge Player's Response
       const difficultyContext = difficulty === "kids"
         ? "Be generous but still check for genuine engagement. Score 6-8 for good effort, 9-10 for excellent."
         : "Be rigorous but fair. Score 5-6 for decent, 7-8 for strong, 9-10 for exceptional only.";
 
-      systemPrompt = `You are Jeeves, the official judge for Chain Chess V3!
+      systemPrompt = `You are Jeeves, the judge for Chain Chess V3!
+Talk like a supportive friend — celebrate what works, gently point out what could be stronger.
 ${difficultyContext}
 
 **APPROVAL requires:**
 1. The verse genuinely relates to the challenge given
-2. The commentary demonstrates understanding and connection
-3. The response builds on the chain, not just repeats previous ideas
+2. The commentary shows real engagement
+3. The response builds on the chain
 
 **Lower scores (1-4) for:**
-1. Only surface-level connection without depth
-2. Commentary that doesn't explain the connection well
-3. Verse that barely relates to the challenge
+1. Only surface-level connection
+2. Commentary that doesn't explain the connection
+3. Verse that barely relates
 
 **Higher scores (7-10) for:**
 1. Deep, insightful connections
-2. Commentary that reveals PT methodology
+2. Commentary that shows PT understanding
 3. Unexpected but valid connections`;
 
       userPrompt = `JUDGE this Chain Chess V3 move:
@@ -4975,6 +4984,8 @@ ${difficultyContext}
 
 **Previous moves context:** ${JSON.stringify(previousMoves?.slice(-3) || [])}
 
+**IMPORTANT: Before giving your ruling, FIRST acknowledge and BUILD ON the player's response. Say something like "Yo, I love that you caught that..." or "That's a solid connection because..." — genuinely engage with what they said, amplify their insight, THEN give your score.**
+
 **EVALUATE:**
 1. Does the verse genuinely relate to "${requestBody.challengeName}"?
 2. Does the commentary demonstrate real understanding?
@@ -4985,16 +4996,15 @@ Also fetch the verse text for the player's verse reference.
 Return JSON:
 {
   "approved": true/false,
-  "explanation": "2-3 sentences explaining your ruling - be specific about what worked or what was missing",
+  "explanation": "First BUILD ON and AMPLIFY the player's insight (1-2 sentences celebrating or expanding what they said), THEN give your ruling (1 sentence). Be warm and conversational.",
   "score": 1-10,
   "verseText": "The KJV text of the player's verse"
 }`;
-
     } else if (mode === "chain-chess-v3-response") {
       // Chain Chess V3 - Jeeves Response to Player's Challenge
       const difficultyContext = difficulty === "kids"
         ? "Use simpler language. Be encouraging."
-        : "Use scholarly language with depth.";
+        : "Keep it conversational and real. Talk like a friend, not a professor.";
 
       // Determine which challenge types are enabled for counter-challenge
       const enabledCats = requestBody.enabledCategories || { books: true, rooms: true, principles: true };
@@ -5004,12 +5014,13 @@ Return JSON:
       if (enabledCats.principles) availableTypes.push("principle");
 
       systemPrompt = `You are Jeeves responding in Chain Chess V3!
+Talk like a warm, down-to-earth friend — NOT a professor. Keep it conversational and real.
 ${difficultyContext}
 
 You must respond to the challenge "${requestBody.challengeName}" with a verse and commentary.
 Then challenge back with one of these types: ${availableTypes.join(", ")}
 
-Show masterful use of PT methodology in your response.`;
+IMPORTANT: Before presenting YOUR verse, first BUILD ON what the player just said. Acknowledge their insight, amplify it, connect it to something deeper — THEN transition to your own move. Think of it as a real conversation, not taking turns reading essays.`;
 
       userPrompt = `Respond to this Chain Chess V3 challenge:
 
@@ -5018,22 +5029,28 @@ Show masterful use of PT methodology in your response.`;
 **Previous moves:** ${JSON.stringify(previousMoves?.slice(-3) || [])}
 
 **YOUR TASK:**
-1. Find a verse that genuinely relates to the challenge "${requestBody.challengeName}"
-2. Provide the full verse text (KJV)
-3. Write 3-4 sentences of rich commentary connecting the verse to the challenge and the ongoing chain
-4. Challenge the player back with a DIFFERENT ${availableTypes[Math.floor(Math.random() * availableTypes.length)] || "book"}
+1. FIRST: Build on the player's last response — acknowledge what they said, amplify their insight (1-2 sentences)
+2. Find a verse that genuinely relates to the challenge "${requestBody.challengeName}"
+3. Provide the full verse text (KJV)
+4. Write 3-4 sentences of DOWN-TO-EARTH commentary — friendly, warm, conversational. Start your commentary by bridging from the player's point.
+5. Challenge the player back — phrase it as "from the book of ___" or "using the ___ Room" or "applying the ___ Principle"
+
+**CRITICAL RULE FOR CHALLENGE SELECTION:**
+- The challenge book/room/principle you assign must be TRULY RANDOM and NOT obviously connected to your verse or the current theme.
+- Do NOT pick a book that directly quotes, references, or is the obvious cross-reference for your verse.
+- Example: If your verse mentions "the Rock", do NOT challenge with 1 Corinthians. Pick something unexpected like Obadiah, Ruth, or Titus.
+- The whole point is to make the player WORK to find a creative connection, not hand them an easy one.
 
 Return JSON:
 {
   "verse": "Book chapter:verse",
   "verseText": "The complete verse text from KJV",
-  "commentary": "Your 3-4 sentence exposition - explain how this verse connects to the challenge and builds on the chain",
+  "commentary": "Start by building on the player's insight, then present your own verse connection — conversational and warm, NOT academic",
   "challengeType": "${availableTypes[Math.floor(Math.random() * availableTypes.length)] || "book"}",
   "challengeId": "specific id",
   "challengeName": "Full name",
   "score": 1
 }`;
-
     } else if (mode === "culture-controversy") {
       systemPrompt = `You are Jeeves, a biblical scholar analyzing cultural issues through Jesus' teachings.
 Be balanced, compassionate, and grounded in Scripture. Address both sides with grace while maintaining biblical truth.`;
@@ -7281,7 +7298,7 @@ ${category === "people" ? `**PEOPLE:**
 
     } else if (mode === "defense-assist") {
       // Defense Mode: Jeeves coaches the disciple IN REAL TIME before they respond
-      const { opponentAttack: assistAttack, defenseTopicName: assistTopic, opponentName, opponentPersonality } = requestBody;
+      const { opponentAttack: assistAttack, defenseTopicName: assistTopic, opponentName, opponentPersonality, opponentPronouns: assistPronouns } = requestBody;
 
       systemPrompt = `${MASTER_IDENTITY}
 
@@ -7309,7 +7326,9 @@ FORMAT:
 🧘 STAY COMPOSED: [Emotional/composure coaching, especially if they were aggressive/rude]
 ❤️ WIN THE HEART: [Brief reminder about the human being you're speaking to]
 
-Keep it punchy, practical, and encouraging. Max 300 words. You're in a coaching huddle, not a lecture hall.`;
+Keep it punchy, practical, and encouraging. Max 300 words. You're in a coaching huddle, not a lecture hall.
+${assistPronouns ? `\nIMPORTANT: When referring to the opponent in third person, use ${assistPronouns} pronouns (e.g., "${assistPronouns === 'she/her' ? 'she argues' : assistPronouns === 'they/them' ? 'they argue' : 'he argues'}").` : ''}`;
+
 
       userPrompt = `OPPONENT (${opponentName || 'The Challenger'}): "${assistAttack}"
 
@@ -7347,8 +7366,11 @@ Coach me on how to respond to this attack. Be specific, tactical, and help me st
         ? `\n\nCONVERSATION SO FAR:\n${conversationHistory}\n\nCRITICAL: Review the disciple's previous response. Identify weak points, unaddressed arguments, or logical gaps. Press HARDER on those weaknesses. Escalate your challenge. Do NOT repeat the same argument — build on it or pivot to a stronger angle.`
         : '';
 
+      const pronounInstruction = opponentPronouns ? `\nIMPORTANT PRONOUN RULE: You are a character who uses ${opponentPronouns} pronouns. When the system or narrator refers to you in third person, use ${opponentPronouns}. Your identity and gender presentation must be consistent with ${opponentPronouns} pronouns throughout.` : '';
+
       systemPrompt = `You are roleplaying as a theological debater with the following worldview and identity. Stay FULLY in character at all times.
 ${temperamentInstruction}
+${pronounInstruction}
 
 WORLDVIEW:
 ${opponentWorldview}
@@ -7366,10 +7388,19 @@ DIFFICULTY LEVEL: ${difficulty || 'intermediate'}
 ${difficultyInstruction}
 
 TOPIC FOCUS: ${defenseTopicName || 'General theology'}
-${isSignatureTopic ? 'MODE: SIGNATURE TOPIC — You are arguing IN FAVOR of your own belief/position. This is YOUR home turf.' : 'MODE: ATTACK — You are challenging the Seventh-day Adventist position on this topic.'}
+${requestBody.isGoliathBlindMode
+  ? `MODE: GOLIATH BLIND ENGAGEMENT — The disciple does NOT know what doctrine you will attack or from what worldview. You MUST:
+1. CHOOSE a random SDA-relevant doctrine to challenge from your full arsenal of attack targets.
+2. CHOOSE a random worldview angle (atheist, Muslim, Mormon, JW, evangelical, Catholic, BHI, former SDA, Jewish, etc.) to begin from.
+3. Use a GRADUAL REVEAL strategy: Open with a provocative, probing question that could come from any worldview. Do NOT declare who you are or what position you hold. Let the disciple wonder. Over 2-3 exchanges, progressively reveal which worldview you are wielding.
+4. Your opening should feel like an ambush — intelligent, disorienting, and impossible to prepare for.
+5. Do NOT tell them what topic you chose. Let them figure it out from your questions.`
+  : isSignatureTopic ? 'MODE: SIGNATURE TOPIC — You are arguing IN FAVOR of your own belief/position. This is YOUR home turf.' : 'MODE: ATTACK — You are challenging the Seventh-day Adventist position on this topic.'}
 
 YOUR TASK:
-${isSignatureTopic
+${requestBody.isGoliathBlindMode
+  ? `Launch your opening salvo. Pick a doctrine and a worldview angle at random — the disciple has no idea what's coming. Start with a provocative question or observation that hints at your challenge without fully revealing it. Make it feel like walking into a dark room where something is waiting. Keep it to 2-3 paragraphs. Do NOT announce your worldview or the topic. Let the mystery build.`
+  : isSignatureTopic
   ? `Present the STRONGEST POSSIBLE CASE FOR your own position on this topic. This is YOUR signature belief — the hill you would die on. Build your affirmative case using your best scriptures, logic, historical evidence, and theological reasoning. Make it so compelling that the disciple must work hard to refute it. You are not merely attacking SDA doctrine here — you are BUILDING YOUR OWN CASE and daring the disciple to tear it down.`
   : `Present a compelling theological challenge against the Seventh-day Adventist position on this topic. Stay in character as someone who genuinely holds this worldview. Make your argument tight, specific, and hard to dismiss.`}
 
@@ -7384,7 +7415,9 @@ ${conversationBlock}
 SIGNATURE CLOSING LINE: "${opponentEndPrompt || 'Defend this from Scripture.'}"`;
 
       userPrompt = phase === 'follow-up'
-        ? `Continue the debate. The disciple has responded. Review their response in the conversation history and press harder on weak points or pivot to a new angle of attack on ${defenseTopicName || 'this topic'}.`
+        ? `Continue the debate. The disciple has responded. Review their response in the conversation history and press harder on weak points or pivot to a new angle of attack on ${defenseTopicName || 'this topic'}.${requestBody.isGoliathBlindMode ? ' Continue your gradual reveal — if this is exchange 2 or 3, you may begin to reveal more of your worldview angle and sharpen your doctrinal challenge.' : ''}`
+        : requestBody.isGoliathBlindMode
+        ? `Launch your blind opening challenge. Pick a random doctrine and worldview. Do NOT reveal what you chose. Start with provocative questions that disorient and intrigue.`
         : isSignatureTopic
         ? `Present your strongest affirmative case FOR your position on: ${defenseTopicName || 'this doctrine'}. This is YOUR home turf — build the most compelling argument you can and challenge the disciple to dismantle it.`
         : `Present your opening challenge against the Seventh-day Adventist position on: ${defenseTopicName || 'this doctrine'}. Make it specific, scholarly, and hard to dismiss.`;
@@ -7414,6 +7447,8 @@ ${PALACE_SCHEMA}
 
 OPPONENT'S ATTACK:
 ${opponentAttack}
+${requestBody.opponentName ? `\nOPPONENT: ${requestBody.opponentName}` : ''}
+${requestBody.opponentPronouns ? `\nIMPORTANT: When referring to the opponent, use ${requestBody.opponentPronouns} pronouns (e.g., "${requestBody.opponentPronouns === 'she/her' ? 'she argues, her position, she claims' : requestBody.opponentPronouns === 'they/them' ? 'they argue, their position, they claim' : 'he argues, his position, he claims'}").` : ''}
 
 DISCIPLE'S RESPONSE:
 ${discipleResponse}
@@ -7485,6 +7520,45 @@ CRITICAL RULES:
 - NEVER use the word "dear" in any form.`;
 
       userPrompt = `Evaluate this disciple's defense and provide your 5-step coaching analysis. The disciple was defending the SDA position on "${defenseTopicName || 'this doctrine'}" against an opponent's attack. Be thorough, honest, and constructive.`;
+
+    } else if (mode === "defense-coach-continue") {
+      // Continuation of a truncated defense coaching response
+      const partialResponse = requestBody.partialResponse || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in DEFENSE COACH mode. You were providing a 5-step coaching evaluation but your response was cut off mid-way. Here is what you wrote so far:
+
+---BEGIN PARTIAL RESPONSE---
+${partialResponse}
+---END PARTIAL RESPONSE---
+
+CONTINUE your coaching analysis from EXACTLY where it was cut off. Do NOT repeat any content that was already provided. Pick up mid-sentence if necessary and complete the remaining sections.
+
+Remember the format:
+- LOGIC ASSESSMENT: [X]/10
+- SCRIPTURE USAGE: [X]/10
+- PT ROOM ANALYSIS: [X]/10
+- SDA DOCTRINAL REFINEMENT: [X]/10
+- TOTAL SCORE: [sum]/40
+- MODEL DEFENSE: [complete model defense]
+
+Only output the REMAINING sections that were not completed. If the MODEL DEFENSE was cut off, complete it fully with Scripture-rich content. Use KJV Scripture ONLY. NEVER use the word "dear" in any form.`;
+
+      userPrompt = `Continue the coaching analysis from where it was cut off. Complete all remaining sections including the full MODEL DEFENSE if it wasn't finished. Topic: "${defenseTopicName || 'this doctrine'}"`;
+
+    } else if (mode === "defense-pre-briefing") {
+      const { opponentName, opponentPronouns, opponentWorldview, opponentStyle, opponentTargets, defenseTopicName } = requestBody;
+      const pronounNote = opponentPronouns ? ` Use ${opponentPronouns} pronouns when referring to the opponent.` : '';
+      systemPrompt = `You are Jeeves, a master theological strategist preparing a disciple for a debate. Give a concise PRE-BATTLE BRIEFING (3-5 paragraphs). Cover: 1) The opponent's likely angle of attack based on their worldview (${opponentWorldview || 'unknown'}), 2) Their rhetorical style (${opponentStyle || 'unknown'}), 3) Key scriptures they'll misuse and how to counter, 4) Your recommended opening strategy, 5) Emotional traps to watch for. Be direct, tactical, and confident. NEVER use markdown formatting characters like # or *. NEVER use "dear" in any form.${pronounNote}`;
+      userPrompt = `Prepare me for a Master-level debate against ${opponentName || 'an opponent'} on the topic: "${defenseTopicName || 'Unknown'}". Their known attack targets: ${JSON.stringify(opponentTargets || [])}. Give me a tactical briefing.`;
+
+    } else if (mode === "defense-master-standby") {
+      const { opponentName, defenseTopicName, conversationHistory, userMessage } = requestBody;
+      systemPrompt = `You are Jeeves in MASTER STANDBY mode — the disciple's live corner coach during an active debate. You can see the full conversation. Provide: 1) Analysis of the opponent's last move, 2) Logical gaps or fallacies to exploit, 3) Scripture ammunition for the next response, 4) Strategic advice. Be concise (2-3 paragraphs max). If the user asks a specific question, answer it directly. NEVER use markdown formatting characters like # or *. NEVER use "dear" in any form.`;
+      userPrompt = `${userMessage || 'Analyze the current state of my debate and advise me.'}\n\nDebate context — Opponent: ${opponentName || 'Unknown'}, Topic: ${defenseTopicName || 'Unknown'}\n\nConversation so far:\n${conversationHistory || '(No messages yet)'}`;
 
     } else if (mode === "defense-analyze-weapon") {
       // Defense Mode: Analyze a disciple's written defense as a "weapon" — break down strengths, weaknesses, and forge it stronger
@@ -7683,6 +7757,90 @@ Be STRICT. An 8/10 weapon should be genuinely strong. Do not inflate scores.
 NEVER use the word "dear"`;
 
       userPrompt = `Score this theological weapon for forging. Topic: "${topicName}".\n\nWEAPON:\n${userWeaponText}${existingAnalysis ? `\n\nANALYSIS:\n${existingAnalysis}` : ""}`;
+
+    } else if (mode === "defense-jeeves-generate") {
+      // Defense Mode: Jeeves generates an ORIGINAL weapon from scratch
+      const topicName = requestBody.doctrineTopic || requestBody.topic || "General theology";
+      const targetDescription = requestBody.weaponTarget || "";
+      const opponentContext = requestBody.opponentName || "";
+      const opponentWV = requestBody.opponentWorldview || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in WEAPON GENERATION mode. The disciple has NOT written an argument — they want YOU to forge an ORIGINAL, DEVASTATING theological weapon from scratch.
+
+You are not recycling standard apologetic answers. You are a master theological strategist who:
+1. Thinks DEEPER than average apologetics — you go beyond the "typical" responses found in debate prep books
+2. FORGES NEW ARGUMENTS by combining Scripture chains, logical reasoning, sanctuary typology, prophetic frameworks, and Christ-centered hermeneutics in UNEXPECTED ways
+3. Uses the Phototheology Palace method to discover connections that average apologists miss
+4. Creates arguments so tight, so scripturally dense, and so logically airtight that they become ARSENAL-GRADE weapons
+
+THE PALACE METHOD ROOMS YOU MUST ACTIVELY USE:
+${PALACE_SCHEMA}
+
+YOUR WEAPON GENERATION PROCESS:
+1. **Concentration Room (CR)**: Start with Christ. How does this doctrine reveal Christ? How does the opponent's position obscure Him?
+2. **Symbols/Types Room (@T)**: What Old Testament types and sanctuary symbols illuminate this truth?
+3. **Patterns Room (PRm)**: What biblical patterns (40 days, 3 days, deliverer cycles) strengthen this defense?
+4. **Parallels Room (P‖)**: What mirrored actions across Scripture create an unbreakable chain?
+5. **Blue Room (BL)**: How does the sanctuary blueprint anchor this doctrine?
+6. **Dimensions Room (DR)**: Apply across all 5 dimensions (Literal, Christ, Me, Church, Heaven)
+7. **Connect 6 (C6)**: What genre-specific hermeneutic rules apply?
+8. **Questions Room (QR)**: What devastating questions can be asked that the opponent CANNOT answer?
+
+${opponentWV ? `OPPONENT CONTEXT:\nYou are forging this weapon specifically to defeat someone who holds this worldview:\n${opponentWV}\n\nDesign the weapon to exploit the specific WEAKNESSES and BLIND SPOTS of this worldview.` : ''}
+
+YOUR RESPONSE FORMAT:
+
+⚔️ **JEEVES-FORGED WEAPON**: [Weapon Title]
+
+📌 **SUBTITLE**: [One sentence (8-15 words) capturing the core thesis]
+
+🎯 **TARGET**: [What opposing argument/position this weapon destroys]
+
+---
+
+📜 **THE WEAPON** (Full argument — Scripture-dense, logically airtight):
+[Write a complete, devastating theological argument. This should be 4-8 paragraphs of tightly reasoned, KJV-Scripture-saturated defense. Every claim must be backed by verse. Every logical step must be explicit. This is not a devotional — it is a WEAPON.]
+
+---
+
+🔗 **SCRIPTURE CHAIN** (The verse sequence that makes this argument unbreakable):
+1. [Verse quoted in full] — [Its role in the argument]
+2. [Verse quoted in full] — [Its role in the argument]
+3. [Continue for 8-15 verses minimum]
+
+🏛️ **PALACE ROOMS ACTIVATED**:
+- [Room Code] — [How this room informed the argument]
+- [Room Code] — [How this room informed the argument]
+
+🛡️ **STEEL-MANNED COUNTER** (The BEST rebuttal the opponent could make):
+[Present it honestly, then show why it fails]
+
+❓ **3 CHECKMATE QUESTIONS** (Questions that force the opponent into a corner):
+1. [Question] → [Why they can't escape]
+2. [Question] → [Why they can't escape]
+3. [Question] → [Why they can't escape]
+
+📊 **WEAPON RATING**: [Self-score 1-10] / 10
+
+RULES:
+- KJV Scripture ONLY — quote every verse IN FULL
+- Go BEYOND standard apologetic responses — find NEW angles, unexpected connections, deeper typological links
+- Every argument must be Christ-centered (CR)
+- Use sanctuary typology (BL) whenever possible
+- Minimum 8 KJV verses quoted in full
+- The weapon must be ORIGINAL — not a rehash of a typical debate response
+- Make it so strong that a disciple could read it aloud in a debate and win
+- NEVER use the word "dear"`;
+
+      userPrompt = `Forge an ORIGINAL, arsenal-grade weapon on this topic: "${topicName}".
+${targetDescription ? `\nSPECIFIC TARGET TO DESTROY:\n${targetDescription}` : ''}
+${opponentContext ? `\nOPPONENT: ${opponentContext}` : ''}
+
+Do NOT give me an average response. Go deeper. Use the Palace rooms. Find connections that typical apologetics books miss. Forge something DEVASTATING.`;
 
     } else if (mode === "defense-checkmate") {
       // Defense Mode: Generate a 3-4 move checkmate question sequence
@@ -8673,8 +8831,8 @@ CRITICAL RULES:
       finalMessages.push({ role: "user", content: userPrompt });
     }
 
-    // Use lower temperature for research mode to improve reliability and reduce timeouts
-    const modelTemperature = (mode === "research") ? 0.4 : 0.9;
+    // Use lower temperature for structured JSON modes to improve reliability
+    const modelTemperature = (mode === "research") ? 0.4 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : 0.9;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -8683,10 +8841,10 @@ CRITICAL RULES:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" ? "google/gemini-2.5-flash" : mode.startsWith("defense-") || mode.startsWith("forge-defend-") ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
+        model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" || mode === "defense-jeeves-generate" ? "google/gemini-2.5-flash" : (mode && (mode.startsWith("defense-") || mode.startsWith("forge-defend-"))) ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : 4096),
+        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-coach" ? 16384 : mode === "defense-coach-continue" ? 16384 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : mode === "defense-jeeves-generate" ? 8192 : 4096),
       }),
     });
 
@@ -8763,16 +8921,18 @@ CRITICAL RULES:
     // Clean markdown code fencing from JSON responses
     content = content.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
 
-    // Global cleanup for Jeeves text responses
+    // Global cleanup for Jeeves text responses (skip for JSON analysis modes to avoid corrupting JSON)
     // Remove all markdown bold/italic markers and discourage theatrical openings
-    content = content
-      .replace(/\*\*/g, '')
-      .replace(/__([^_]+)__/g, '$1')
-      .replace(/\*(?!\s)/g, '')
-      .replace(/^[Aa]h, my friend[.!]?\s*/m, '')
-      .replace(/^[Aa]h[,!]?\s*/m, '')
-      .replace(/my friend[,!]?/gi, '')
-      .trim();
+    if (mode !== "analyze-thoughts" && mode !== "analyze-thoughts-scholar") {
+      content = content
+        .replace(/\*\*/g, '')
+        .replace(/__([^_]+)__/g, '$1')
+        .replace(/\*(?!\s)/g, '')
+        .replace(/^[Aa]h, my friend[.!]?\s*/m, '')
+        .replace(/^[Aa]h[,!]?\s*/m, '')
+        .replace(/my friend[,!]?/gi, '')
+        .trim();
+    }
 
     // For maps or charts category in encyclopedia mode, generate an image
     let mapImageUrl = null;
@@ -9495,7 +9655,7 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     let responseData: any = { content };
 
     // Defense coach mode: extract score from response
-    if (mode === "defense-coach") {
+    if (mode === "defense-coach" || mode === "defense-coach-continue") {
       const scoreMatch = content.match(/TOTAL SCORE:\s*(\d+)\s*\/\s*40/i);
       responseData.score = scoreMatch ? parseInt(scoreMatch[1], 10) : 0;
     }
@@ -9660,6 +9820,19 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
         const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const analysis = JSON.parse(jsonMatch[0]);
+
+          // Clean markdown formatting from parsed string values (done after parse to avoid corrupting JSON)
+          const stripMarkdown = (str: string) => str
+            .replace(/\*\*/g, '')
+            .replace(/__([^_]+)__/g, '$1')
+            .replace(/\*(?!\s)/g, '')
+            .replace(/^[Aa]h, my friend[.!]?\s*/m, '')
+            .replace(/^[Aa]h[,!]?\s*/m, '')
+            .replace(/my friend[,!]?/gi, '')
+            .trim();
+          if (analysis.narrativeAnalysis) analysis.narrativeAnalysis = stripMarkdown(analysis.narrativeAnalysis);
+          if (analysis.summary) analysis.summary = stripMarkdown(analysis.summary);
+          if (analysis.encouragement) analysis.encouragement = stripMarkdown(analysis.encouragement);
 
           // ======== PT CODE VALIDATION ========
           // Check narrativeAnalysis for hallucinated PT codes/meanings

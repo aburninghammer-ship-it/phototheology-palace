@@ -11,7 +11,7 @@ import {
   ChevronRight, Loader2, Sparkles, BookMarked, Church, Crown, Sword, Shield,
   Heart, Cross, Star, ArrowRight, MessageSquareMore, Send, X, BookText, Telescope,
   Link2, ExternalLink, Headphones, Play, Pause, Square, SkipForward, SkipBack,
-  Volume2, RefreshCw
+  Volume2, RefreshCw, Clock, Scale, Scroll, Mic, AlertTriangle, History
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,7 +21,9 @@ import { useToast } from "@/hooks/use-toast";
 import { StyledMarkdown } from "@/components/ui/styled-markdown";
 import { useTextToSpeechEnhanced, OPENAI_VOICES } from "@/hooks/useTextToSpeechEnhanced";
 import type { VoiceId } from "@/hooks/useTextToSpeechEnhanced";
-import { DefenseMode } from "./DefenseMode";
+import { GCConflictTag } from "@/components/cota/GCConflictTag";
+import type { GCConflictTag as GCConflictTagType } from "@/types/gcConflictTag";
+import { DefenseMode } from "@/components/living-manna/DefenseMode";
 
 // ─── EGW Book Library ───────────────────────────────────────────────
 interface EGWBook {
@@ -460,6 +462,8 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   const [paragraphAnalysis, setParagraphAnalysis] = useState<string | null>(null);
   const [analyzingParagraph, setAnalyzingParagraph] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<string>("CR");
+  const [gcTag, setGcTag] = useState<GCConflictTagType | null>(null);
+  const [loadingGcTag, setLoadingGcTag] = useState(false);
 
   // Cross-reference state
   const [crossRefs, setCrossRefs] = useState<Record<number, { reference: string; text: string; connection: string }[]>>({});
@@ -474,6 +478,11 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   const commentarySectionsRef = useRef<string[]>([]);
   const autoAdvancingRef = useRef(false);
   const ttsSpeakRef = useRef<((text: string) => Promise<void>) | null>(null);
+
+  // Commentary configuration (Jeeves Master Prompt settings)
+  const [commentaryMode, setCommentaryMode] = useState<"Epic" | "Scholar" | "Counselor" | "Ancient" | "Preacher" | "Defense" | "Auto">("Epic");
+  const [commentaryLength, setCommentaryLength] = useState<"Short" | "Medium" | "Long">("Medium");
+  const [commentaryLevel, setCommentaryLevel] = useState<"Beginner" | "Intermediate" | "Advanced">("Intermediate");
 
   // Keep refs synced
   const updateCurrentSection = useCallback((idx: number) => {
@@ -531,6 +540,9 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
           chapterTitle: selectedChapter.title,
           paragraphs: chapterParagraphs,
           mode: "chapter",
+          commentaryMode,
+          commentaryLength,
+          commentaryLevel,
         },
       });
       if (error) throw error;
@@ -547,7 +559,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
     } finally {
       setLoadingCommentary(false);
     }
-  }, [selectedBook, selectedChapter, chapterParagraphs, toast]);
+  }, [selectedBook, selectedChapter, chapterParagraphs, commentaryMode, commentaryLength, commentaryLevel, toast]);
 
   const playCommentary = useCallback((startIdx?: number) => {
     const idx = startIdx ?? currentSectionRef.current;
@@ -634,18 +646,37 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
 
     const room = PALACE_ROOMS.find(r => r.code === roomCode);
 
-    try {
-      const { data, error } = await supabase.functions.invoke("jeeves", {
-        body: {
-          mode: "egw_palace_analysis",
-          message: `Analyze the following passage from "${selectedBook.title}", Chapter ${selectedChapter.number}: "${selectedChapter.title}" through the Phototheology ${room?.name} (${roomCode}).
+    // Special analysis layers beyond standard Palace rooms
+    const SPECIAL_PROMPTS: Record<string, string> = {
+      HIST: `Provide a "Historical Context Layer" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Include: Date/era of events, political powers involved, religious climate, prophetic timeline connection (Daniel/Revelation if applicable), and how this context intensifies Ellen White's point. Keep it scholarly, not devotional. 200-400 words.`,
+      DEF: `Provide an "Apologetics / Defense Analysis" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Include: What doctrine is being defended? Which critic type would attack this paragraph (Atheist, Evangelical, Catholic, BHI, etc.)? What is the likely objection? What is the strongest KJV biblical answer? Steelman the objection, then rebut it. 200-400 words.`,
+      DOC: `Provide a "Doctrinal Extraction" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Identify ALL doctrines present: Sabbath, Sanctuary, State of the Dead, Law, Papacy, Prophecy, Christology, Justification, Sanctification, Second Coming, etc. For each doctrine found, give a 1-2 sentence summary of how it appears. 200-400 words.`,
+      PROPH: `Provide a "Prophetic Timeline Marker" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Place this paragraph on the prophetic timeline: Pre-70 AD / 538 AD (Papacy rise) / 1798 (Deadly wound) / 1844 (Investigative Judgment) / Final Crisis (Future). Connect to Daniel/Revelation prophecies. Identify which "Day of the Lord" horizon applies (1H, 2H, or 3H). 200-400 words.`,
+      HOM: `Provide "Homiletic Sparks" for this passage from "${selectedBook.title}", Ch ${selectedChapter.number}: "${selectedChapter.title}".
+Include: One "Big Idea" sentence, one preaching tension (problem vs gospel resolution), 2-3 application questions, one key quotable line, and an evangelistic appeal angle. Do NOT write a full sermon — just provide sermon fuel. 200-400 words.`,
+    };
+
+    const isSpecial = SPECIAL_PROMPTS[roomCode];
+    const prompt = isSpecial
+      ? `${SPECIAL_PROMPTS[roomCode]}\n\n**Selected Passage:**\n"${text}"`
+      : `Analyze the following passage from "${selectedBook.title}", Chapter ${selectedChapter.number}: "${selectedChapter.title}" through the Phototheology ${room?.name} (${roomCode}).
 
 **Selected Passage:**
 "${text}"
 
 ${room?.description}
 
-Apply this Palace room lens specifically to the selected passage. Be theological, Christ-centered, and insightful. Connect to Scripture. Keep it focused (200-400 words).`,
+Apply this Palace room lens specifically to the selected passage. Be theological, Christ-centered, and insightful. Connect to Scripture. Keep it focused (200-400 words).`;
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "egw_palace_analysis",
+          message: prompt,
           context: `book:${selectedBook.id},chapter:${selectedChapter.number},room:${roomCode},passage_analysis:true`,
         },
       });
@@ -662,6 +693,56 @@ Apply this Palace room lens specifically to the selected passage. Be theological
       });
     } finally {
       setAnalyzingParagraph(false);
+    }
+  };
+
+  // Generate GC Conflict Tag for a paragraph
+  const generateGcConflictTag = async (text: string) => {
+    if (!selectedBook || !selectedChapter) return;
+    setLoadingGcTag(true);
+    setGcTag(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "egw_palace_analysis",
+          message: `You are the Great Controversy Conflict Tag engine. Analyze this paragraph from "${selectedBook.title}", Chapter ${selectedChapter.number}: "${selectedChapter.title}" and return ONLY a valid JSON object (no markdown, no explanation) with these exact fields:
+
+{
+  "axis": one of "Truth vs Error" | "Freedom vs Tyranny" | "Light vs Darkness" | "Christ vs Satan" | "Heaven vs Hell",
+  "battlefield": array of 1-4 from ["Mind","Church","State","Doctrine","Worship","Scripture","Conscience","Prophecy","Law","Sanctuary"],
+  "satanStrategy": string describing Satan's strategy in this paragraph (1-2 sentences),
+  "godCounterStrategy": string describing God's counter-strategy (1-2 sentences),
+  "deceptionType": array of 0-3 from ["Counterfeit Authority","Gradual Compromise","Force & Coercion","Tradition Over Scripture","Spiritualism","False Security","Confusion & Division","Prosperity Gospel","Antinomianism","Legalism","Time Manipulation","Identity Theft"],
+  "outcome": array of 1-3 from ["Light Preserved","Light Suppressed","Remnant Emerges","Apostasy Deepens","Persecution Intensifies","Reform Begins","Deception Exposed","Crisis Point","Victory Secured","Judgment Pronounced"],
+  "propheticWeight": number 1-10,
+  "historicalPeriod": string or null,
+  "prophecyConnection": string connecting to Daniel/Revelation or null,
+  "modernParallel": string with modern application or null,
+  "defenseRelevance": array of objects with {opponent, attackVector, defenseWeapon} or empty array
+}
+
+**Paragraph:**
+"${text}"
+
+Return ONLY the JSON. No markdown fences, no explanation.`,
+          context: `book:${selectedBook.id},chapter:${selectedChapter.number},gc_conflict_tag:true`,
+        },
+      });
+      if (error) throw error;
+      const raw = typeof data === 'string' ? data : data?.response || data?.content || JSON.stringify(data);
+      // Parse JSON from response, stripping any markdown fences
+      const cleaned = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      setGcTag(parsed as GCConflictTagType);
+    } catch (err) {
+      console.error("GC Conflict Tag error:", err);
+      toast({
+        title: "Conflict Tag Error",
+        description: "Could not generate Great Controversy analysis.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingGcTag(false);
     }
   };
 
@@ -796,6 +877,40 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
               </div>
             </div>
           </CardHeader>
+        </Card>
+
+        {/* Defense Mode CTA */}
+        <Card variant="glass" className="border-destructive/30 bg-gradient-to-r from-destructive/5 via-background to-destructive/5 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-destructive/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative">
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 shrink-0">
+              <Shield className="h-7 w-7 text-destructive" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                Defense Mode
+                <Badge variant="outline" className="text-[10px] border-destructive/40 text-destructive">Forge & Defend</Badge>
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Sharpen your theological arguments. Forge weapons from Scripture and EGW writings, spar with AI critics, and build your apologetics arsenal.
+              </p>
+            </div>
+            <Button 
+              variant="destructive" 
+              size="lg"
+              className="gap-2 shrink-0 shadow-lg"
+              onClick={() => {
+                setSelectedBook(EGW_BOOKS[4]); // GC as default
+                setTimeout(() => {
+                  setChapterTab("defense");
+                  setSelectedChapter(EGW_BOOKS[4].chapters[0]);
+                }, 100);
+              }}
+            >
+              <Sword className="h-4 w-4" />
+              Enter the Forge
+            </Button>
+          </CardContent>
         </Card>
 
         {/* Conflict of the Ages */}
@@ -968,21 +1083,21 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
       {/* Read / Analyze / Listen / Defense Tabs */}
       <Tabs value={chapterTab} onValueChange={(v) => setChapterTab(v as "read" | "analyze" | "listen" | "defense")}>
         <TabsList className="w-full grid grid-cols-4">
-          <TabsTrigger value="read" className="gap-2">
+          <TabsTrigger value="read" className="gap-1.5 text-xs sm:text-sm">
             <BookText className="h-4 w-4" />
-            Read
+            <span className="hidden sm:inline">Read</span>
           </TabsTrigger>
-          <TabsTrigger value="listen" className="gap-2">
+          <TabsTrigger value="listen" className="gap-1.5 text-xs sm:text-sm">
             <Headphones className="h-4 w-4" />
-            Audio Commentary
+            <span className="hidden sm:inline">Audio</span>
           </TabsTrigger>
-          <TabsTrigger value="analyze" className="gap-2">
+          <TabsTrigger value="analyze" className="gap-1.5 text-xs sm:text-sm">
             <Telescope className="h-4 w-4" />
-            Analyze
+            <span className="hidden sm:inline">Analyze</span>
           </TabsTrigger>
-          <TabsTrigger value="defense" className="gap-2">
+          <TabsTrigger value="defense" className="gap-1.5 text-xs sm:text-sm">
             <Shield className="h-4 w-4" />
-            Defense
+            <span className="hidden sm:inline">Defense</span>
           </TabsTrigger>
         </TabsList>
 
@@ -1047,6 +1162,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                             onClick={() => {
                               setSelectedParagraph(paragraph);
                               setParagraphAnalysis(null);
+                              setGcTag(null);
                             }}
                           >
                             {/* Paragraph number */}
@@ -1066,7 +1182,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                             )}
 
                             {/* Hover action buttons */}
-                            <div className="absolute right-1.5 top-1.5 flex items-center gap-1.5 opacity-0 group-hover/para:opacity-100 transition-all duration-200">
+                            <div className="absolute right-1.5 top-1.5 flex items-center gap-1 opacity-0 group-hover/para:opacity-100 transition-all duration-200 flex-wrap justify-end max-w-[280px]">
                               <button
                                 className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-amber-500/30 text-amber-400 hover:border-amber-500/50 hover:shadow-amber-500/10 hover:shadow-lg transition-all"
                                 onClick={(e) => {
@@ -1094,6 +1210,90 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                               >
                                 <Telescope className="h-3 w-3" />
                                 Analyze
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-cyan-500/30 text-cyan-400 hover:border-cyan-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setGcTag(null);
+                                  generateGcConflictTag(paragraph);
+                                }}
+                                title="Great Controversy Conflict Tag"
+                              >
+                                <Sword className="h-3 w-3" />
+                                GC Tag
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-orange-500/30 text-orange-400 hover:border-orange-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("HIST");
+                                  analyzeParagraphWithPalace(paragraph, "HIST");
+                                }}
+                                title="Historical Context"
+                              >
+                                <History className="h-3 w-3" />
+                                Historical
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-red-500/30 text-red-400 hover:border-red-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("DEF");
+                                  analyzeParagraphWithPalace(paragraph, "DEF");
+                                }}
+                                title="Defense / Apologetics"
+                              >
+                                <Shield className="h-3 w-3" />
+                                Defense
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-emerald-500/30 text-emerald-400 hover:border-emerald-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("DOC");
+                                  analyzeParagraphWithPalace(paragraph, "DOC");
+                                }}
+                                title="Doctrinal Extraction"
+                              >
+                                <Scale className="h-3 w-3" />
+                                Doctrine
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-violet-500/30 text-violet-400 hover:border-violet-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("PROPH");
+                                  analyzeParagraphWithPalace(paragraph, "PROPH");
+                                }}
+                                title="Prophetic Timeline Marker"
+                              >
+                                <Clock className="h-3 w-3" />
+                                Prophecy
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium glass-card border-pink-500/30 text-pink-400 hover:border-pink-500/50 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedParagraph(paragraph);
+                                  setParagraphAnalysis(null);
+                                  setSelectedRoom("HOM");
+                                  analyzeParagraphWithPalace(paragraph, "HOM");
+                                }}
+                                title="Homiletic Sparks"
+                              >
+                                <Mic className="h-3 w-3" />
+                                Homiletic
                               </button>
                             </div>
                           </div>
@@ -1162,13 +1362,78 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                 <div className="text-center space-y-2">
                   <h3 className="font-bold text-foreground text-lg">Audio Commentary</h3>
                   <p className="text-sm text-muted-foreground max-w-md">
-                    Jeeves will create a Bible-only audio commentary for this chapter, buttressing Ellen White's insights 
-                    with KJV Scripture and Phototheology Palace principles.
+                    Jeeves will create an Epic audio commentary for this chapter, experiencing the cosmic conflict while buttressing Ellen White's insights with KJV Scripture and Phototheology Palace principles.
                   </p>
                 </div>
-                <Button 
-                  onClick={generateCommentary} 
-                  className="gap-2 px-6" 
+
+                {/* Commentary Configuration */}
+                <div className="w-full max-w-2xl space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* Mode Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">Commentary Mode</label>
+                      <Select value={commentaryMode} onValueChange={(v) => setCommentaryMode(v as any)}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Epic">⚔️ Epic — Great Controversy Lens</SelectItem>
+                          <SelectItem value="Scholar">📚 Scholar — Historical-Theological</SelectItem>
+                          <SelectItem value="Counselor">💭 Counselor — Spiritual Formation</SelectItem>
+                          <SelectItem value="Ancient">🕎 Ancient — Biblical-Prophetic</SelectItem>
+                          <SelectItem value="Preacher">🎤 Preacher — Homiletic Sparks</SelectItem>
+                          <SelectItem value="Defense">🛡️ Defense — Apologetics</SelectItem>
+                          <SelectItem value="Auto">🤖 Auto — Smart Selection</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Length Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">Length Target</label>
+                      <Select value={commentaryLength} onValueChange={(v) => setCommentaryLength(v as any)}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Short">⚡ Short — 45-70s per section</SelectItem>
+                          <SelectItem value="Medium">📖 Medium — 2-4 min total</SelectItem>
+                          <SelectItem value="Long">📚 Long — 5-8 min total</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Level Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">User Level</label>
+                      <Select value={commentaryLevel} onValueChange={(v) => setCommentaryLevel(v as any)}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Beginner">🌱 Beginner</SelectItem>
+                          <SelectItem value="Intermediate">📈 Intermediate</SelectItem>
+                          <SelectItem value="Advanced">🎓 Advanced</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Mode description */}
+                  <div className="text-xs text-muted-foreground/70 text-center px-4">
+                    {commentaryMode === "Epic" && "Experience the cosmic conflict — truth vs deception, Christ vs Satan"}
+                    {commentaryMode === "Scholar" && "Intellectually clear, historically grounded theological analysis"}
+                    {commentaryMode === "Counselor" && "Spiritual formation, motives, emotional patterns, and healing"}
+                    {commentaryMode === "Ancient" && "OT patterns, sanctuary, covenant, typology, prophetic continuity"}
+                    {commentaryMode === "Preacher" && "Sermon fuel: Big Idea, tension/resolution, application questions"}
+                    {commentaryMode === "Defense" && "Apologetics-ready: objections, biblical answers, steelman rebuttals"}
+                    {commentaryMode === "Auto" && "AI selects the best mode based on paragraph content"}
+                  </div>
+                </div>
+
+                <Button
+                  onClick={generateCommentary}
+                  className="gap-2 px-6"
                   size="lg"
                   disabled={chapterParagraphs.length === 0}
                 >
@@ -1394,8 +1659,9 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
 
         {/* ─── ANALYZE TAB ────────────────────────────────────────── */}
         <TabsContent value="analyze" className="mt-4">
-          <ScrollArea className="h-[65vh]">
-            <div className="space-y-4 pr-4">
+          <div className="h-[65vh] overflow-hidden rounded-lg">
+            <ScrollArea className="h-full">
+              <div className="space-y-4 pr-4">
               <div className="flex justify-end">
                 <Button
                   onClick={generateFullAnalysis}
@@ -1482,22 +1748,24 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
               </div>
             </div>
           </ScrollArea>
+          </div>
         </TabsContent>
 
-        {/* ─── DEFENSE MODE TAB ───────────────────────────────────── */}
+        {/* ─── DEFENSE TAB ─────────────────────────────────────────── */}
         <TabsContent value="defense" className="mt-4">
-          {churchId ? (
-            <DefenseMode churchId={churchId} />
-          ) : (
-            <Card variant="glass">
-              <CardContent className="py-12 text-center">
-                <Shield className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                <p className="text-muted-foreground">
-                  Defense Mode requires a church context. Please access this from your Living Manna Space.
+          <div className="space-y-3">
+            <div className="glass-card rounded-xl px-4 py-3 flex items-center gap-3 border border-destructive/20">
+              <div className="p-1.5 rounded-lg bg-destructive/10">
+                <Shield className="h-4 w-4 text-destructive" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-foreground/70">
+                  <span className="text-destructive font-medium">Defense Mode</span> — Forge weapons from {selectedBook?.shortTitle} Ch. {selectedChapter?.number}: "{selectedChapter?.title}"
                 </p>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </div>
+            <DefenseMode churchId={churchId || ""} />
+          </div>
         </TabsContent>
       </Tabs>
 
@@ -1559,6 +1827,40 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                 </div>
               </div>
             )}
+
+            {/* ─── GC Conflict Tag Section ─────────────────────────── */}
+            <Separator className="opacity-30" />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1.5">
+                  <Sword className="h-3 w-3 text-destructive" />
+                  Great Controversy Conflict Tag
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 text-xs h-7 border-destructive/30 text-destructive hover:bg-destructive/10"
+                  onClick={() => selectedParagraph && generateGcConflictTag(selectedParagraph)}
+                  disabled={loadingGcTag}
+                >
+                  {loadingGcTag ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Shield className="h-3 w-3" />
+                  )}
+                  {gcTag ? "Regenerate" : "Generate"} Tag
+                </Button>
+              </div>
+              {gcTag && (
+                <GCConflictTag tag={gcTag} defaultExpanded={true} />
+              )}
+              {!gcTag && !loadingGcTag && (
+                <p className="text-xs text-muted-foreground/60 italic pl-1">
+                  Tap "Generate Tag" to map this paragraph onto the cosmic conflict meta-narrative.
+                </p>
+              )}
+            </div>
+            <Separator className="opacity-30" />
 
             {/* Action buttons */}
             <div className="flex gap-2">

@@ -71,6 +71,105 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_credit_balances: {
+        Row: {
+          created_at: string
+          credits_balance: number
+          has_unlimited: boolean
+          id: string
+          lifetime_purchased: number
+          unlimited_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_balance?: number
+          has_unlimited?: boolean
+          id?: string
+          lifetime_purchased?: number
+          unlimited_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_balance?: number
+          has_unlimited?: boolean
+          id?: string
+          lifetime_purchased?: number
+          unlimited_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_credit_purchases: {
+        Row: {
+          created_at: string
+          credits_added: number
+          id: string
+          pack_id: string
+          stripe_session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_added: number
+          id?: string
+          pack_id: string
+          stripe_session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_added?: number
+          id?: string
+          pack_id?: string
+          stripe_session_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_usage_log: {
+        Row: {
+          completion_tokens: number | null
+          created_at: string
+          estimated_cost_cents: number | null
+          function_name: string
+          id: string
+          metadata: Json | null
+          model: string | null
+          prompt_tokens: number | null
+          total_tokens: number | null
+          user_id: string
+        }
+        Insert: {
+          completion_tokens?: number | null
+          created_at?: string
+          estimated_cost_cents?: number | null
+          function_name: string
+          id?: string
+          metadata?: Json | null
+          model?: string | null
+          prompt_tokens?: number | null
+          total_tokens?: number | null
+          user_id: string
+        }
+        Update: {
+          completion_tokens?: number | null
+          created_at?: string
+          estimated_cost_cents?: number | null
+          function_name?: string
+          id?: string
+          metadata?: Json | null
+          model?: string | null
+          prompt_tokens?: number | null
+          total_tokens?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       analytics_snapshots: {
         Row: {
           active_churches: number
@@ -545,6 +644,68 @@ export type Database = {
             columns: ["candidate_id"]
             isOneToOne: false
             referencedRelation: "baptism_candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baptism_study_audio: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          error_message: string | null
+          file_size_bytes: number | null
+          fundamental_number: number
+          generated_by: string | null
+          id: string
+          lesson_id: string
+          public_url: string | null
+          share_token: string | null
+          status: string
+          storage_path: string
+          title: string
+          updated_at: string
+          voice: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          error_message?: string | null
+          file_size_bytes?: number | null
+          fundamental_number: number
+          generated_by?: string | null
+          id?: string
+          lesson_id: string
+          public_url?: string | null
+          share_token?: string | null
+          status?: string
+          storage_path: string
+          title: string
+          updated_at?: string
+          voice?: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          error_message?: string | null
+          file_size_bytes?: number | null
+          fundamental_number?: number
+          generated_by?: string | null
+          id?: string
+          lesson_id?: string
+          public_url?: string | null
+          share_token?: string | null
+          status?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string
+          voice?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baptism_study_audio_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "baptism_lessons"
             referencedColumns: ["id"]
           },
         ]
@@ -3646,6 +3807,250 @@ export type Database = {
           recipient_identifier?: string | null
           redeemed_at?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      debate_analyses: {
+        Row: {
+          analysis_text: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          session_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          analysis_text?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          session_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          analysis_text?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          session_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      debate_challenge_badges: {
+        Row: {
+          badge_description: string | null
+          badge_icon: string
+          badge_name: string
+          badge_type: string
+          earned_at: string
+          enrollment_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_description?: string | null
+          badge_icon: string
+          badge_name: string
+          badge_type: string
+          earned_at?: string
+          enrollment_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_description?: string | null
+          badge_icon?: string
+          badge_name?: string
+          badge_type?: string
+          earned_at?: string
+          enrollment_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debate_challenge_badges_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "debate_challenge_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      debate_challenge_enrollments: {
+        Row: {
+          completed_at: string | null
+          completed_days: number
+          created_at: string
+          current_day: number
+          difficulty: string
+          grace_days_used: number
+          id: string
+          last_activity_date: string | null
+          longest_streak: number
+          max_grace_days: number
+          missed_days: number
+          started_at: string
+          status: string
+          streak: number
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_days?: number
+          created_at?: string
+          current_day?: number
+          difficulty: string
+          grace_days_used?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          max_grace_days?: number
+          missed_days?: number
+          started_at?: string
+          status?: string
+          streak?: number
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_days?: number
+          created_at?: string
+          current_day?: number
+          difficulty?: string
+          grace_days_used?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          max_grace_days?: number
+          missed_days?: number
+          started_at?: string
+          status?: string
+          streak?: number
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      debate_challenge_sessions: {
+        Row: {
+          ai_verdict: string | null
+          completed_at: string | null
+          created_at: string
+          day_number: number
+          difficulty: string
+          enrollment_id: string
+          id: string
+          messages: Json
+          opponent_id: string
+          opponent_name: string
+          outcome: string | null
+          rounds_completed: number
+          session_date: string
+          started_at: string
+          topic_id: string
+          topic_name: string
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          ai_verdict?: string | null
+          completed_at?: string | null
+          created_at?: string
+          day_number: number
+          difficulty: string
+          enrollment_id: string
+          id?: string
+          messages?: Json
+          opponent_id: string
+          opponent_name: string
+          outcome?: string | null
+          rounds_completed?: number
+          session_date?: string
+          started_at?: string
+          topic_id: string
+          topic_name: string
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          ai_verdict?: string | null
+          completed_at?: string | null
+          created_at?: string
+          day_number?: number
+          difficulty?: string
+          enrollment_id?: string
+          id?: string
+          messages?: Json
+          opponent_id?: string
+          opponent_name?: string
+          outcome?: string | null
+          rounds_completed?: number
+          session_date?: string
+          started_at?: string
+          topic_id?: string
+          topic_name?: string
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debate_challenge_sessions_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "debate_challenge_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      debate_turn_analyses: {
+        Row: {
+          analysis_text: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          session_id: string
+          status: string
+          turn_index: number
+          turn_role: string
+          user_id: string
+        }
+        Insert: {
+          analysis_text?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          session_id: string
+          status?: string
+          turn_index: number
+          turn_role: string
+          user_id: string
+        }
+        Update: {
+          analysis_text?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          session_id?: string
+          status?: string
+          turn_index?: number
+          turn_role?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -7158,6 +7563,95 @@ export type Database = {
           },
         ]
       }
+      game_room_players: {
+        Row: {
+          display_name: string
+          id: string
+          is_active: boolean
+          joined_at: string
+          player_data: Json
+          player_index: number
+          room_id: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          display_name: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          player_data?: Json
+          player_index?: number
+          room_id: string
+          score?: number
+          user_id: string
+        }
+        Update: {
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          player_data?: Json
+          player_index?: number
+          room_id?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "game_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_rooms: {
+        Row: {
+          created_at: string
+          current_turn_user_id: string | null
+          game_state: Json
+          game_type: string
+          host_id: string
+          id: string
+          max_players: number
+          room_code: string
+          settings: Json
+          status: string
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_turn_user_id?: string | null
+          game_state?: Json
+          game_type: string
+          host_id: string
+          id?: string
+          max_players?: number
+          room_code: string
+          settings?: Json
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_turn_user_id?: string | null
+          game_state?: Json
+          game_type?: string
+          host_id?: string
+          id?: string
+          max_players?: number
+          room_code?: string
+          settings?: Json
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: []
+      }
       game_scores: {
         Row: {
           created_at: string
@@ -9778,6 +10272,7 @@ export type Database = {
           dimension_challenges: boolean
           equation_challenges: boolean
           fruit_check_challenges: boolean
+          global_live_chat: boolean
           id: string
           memory_challenge_reminders: boolean | null
           palace_practice_reminders: boolean | null
@@ -9800,6 +10295,7 @@ export type Database = {
           dimension_challenges?: boolean
           equation_challenges?: boolean
           fruit_check_challenges?: boolean
+          global_live_chat?: boolean
           id?: string
           memory_challenge_reminders?: boolean | null
           palace_practice_reminders?: boolean | null
@@ -9822,6 +10318,7 @@ export type Database = {
           dimension_challenges?: boolean
           equation_challenges?: boolean
           fruit_check_challenges?: boolean
+          global_live_chat?: boolean
           id?: string
           memory_challenge_reminders?: boolean | null
           palace_practice_reminders?: boolean | null
@@ -10262,6 +10759,33 @@ export type Database = {
           product_key?: string
           sent_at?: string
           success?: boolean
+        }
+        Relationships: []
+      }
+      pending_lifetime_grants: {
+        Row: {
+          claimed_at: string | null
+          claimed_by: string | null
+          created_at: string
+          email: string
+          granted_by: string | null
+          id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          email: string
+          granted_by?: string | null
+          id?: string
+        }
+        Update: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          email?: string
+          granted_by?: string | null
+          id?: string
         }
         Relationships: []
       }
@@ -12384,29 +12908,97 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          images: string[] | null
+          is_deleted: boolean
+          is_pinned: boolean
+          reply_to_id: string | null
           room_id: string
           sender_id: string
+          updated_at: string | null
         }
         Insert: {
           content: string
           created_at?: string
           id?: string
+          images?: string[] | null
+          is_deleted?: boolean
+          is_pinned?: boolean
+          reply_to_id?: string | null
           room_id: string
           sender_id: string
+          updated_at?: string | null
         }
         Update: {
           content?: string
           created_at?: string
           id?: string
+          images?: string[] | null
+          is_deleted?: boolean
+          is_pinned?: boolean
+          reply_to_id?: string | null
           room_id?: string
           sender_id?: string
+          updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "public_chat_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "public_chat_messages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "public_chat_messages_room_id_fkey"
             columns: ["room_id"]
             isOneToOne: false
             referencedRelation: "public_chat_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_chat_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_chat_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "public_chat_messages"
             referencedColumns: ["id"]
           },
         ]
@@ -16547,6 +17139,89 @@ export type Database = {
           },
         ]
       }
+      uno_games: {
+        Row: {
+          created_at: string
+          current_player_index: number
+          game_mode: string
+          game_state: Json
+          host_id: string
+          id: string
+          max_players: number
+          room_code: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_player_index?: number
+          game_mode?: string
+          game_state?: Json
+          host_id: string
+          id?: string
+          max_players?: number
+          room_code: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_player_index?: number
+          game_mode?: string
+          game_state?: Json
+          host_id?: string
+          id?: string
+          max_players?: number
+          room_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      uno_players: {
+        Row: {
+          display_name: string
+          game_id: string
+          hand: Json
+          id: string
+          is_host: boolean
+          joined_at: string
+          player_index: number
+          score: number
+          user_id: string
+        }
+        Insert: {
+          display_name?: string
+          game_id: string
+          hand?: Json
+          id?: string
+          is_host?: boolean
+          joined_at?: string
+          player_index?: number
+          score?: number
+          user_id: string
+        }
+        Update: {
+          display_name?: string
+          game_id?: string
+          hand?: Json
+          id?: string
+          is_host?: boolean
+          joined_at?: string
+          player_index?: number
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uno_players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "uno_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_achievements: {
         Row: {
           achievement_id: string | null
@@ -17772,6 +18447,36 @@ export type Database = {
           room_id?: string
           room_name?: string
           status?: string
+        }
+        Relationships: []
+      }
+      war_college_manuscripts: {
+        Row: {
+          avatar_id: string
+          created_at: string
+          day_number: number
+          id: string
+          manuscript_data: Json
+          rank: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_id: string
+          created_at?: string
+          day_number: number
+          id?: string
+          manuscript_data: Json
+          rank: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_id?: string
+          created_at?: string
+          day_number?: number
+          id?: string
+          manuscript_data?: Json
+          rank?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -19201,6 +19906,7 @@ export type Database = {
         | "sabbath_school_lead"
         | "youth_lead"
         | "personal_ministry_admin"
+        | "bible_worker"
       pt_mastery_level: "beginner" | "intermediate" | "master"
       pt_pain_point_type: "diagnostic" | "symptomatic"
       pt_study_burden:
@@ -19402,6 +20108,7 @@ export const Constants = {
         "sabbath_school_lead",
         "youth_lead",
         "personal_ministry_admin",
+        "bible_worker",
       ],
       pt_mastery_level: ["beginner", "intermediate", "master"],
       pt_pain_point_type: ["diagnostic", "symptomatic"],

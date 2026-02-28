@@ -1,14 +1,22 @@
 import { useRef, useCallback, useEffect, type ReactNode } from "react";
 import { GripVertical } from "lucide-react";
 
-const STORAGE_KEY = "widget-stack-position-v3";
+const STORAGE_KEY = "widget-stack-position-v6";
 
 function getInitialPosition() {
+  const w = window.innerWidth || 800;
+  const h = window.innerHeight || 600;
+  const fallback = { x: Math.max(0, w - 180), y: Math.max(0, h - 300) };
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved) as { x: number; y: number };
+    if (saved) {
+      const pos = JSON.parse(saved) as { x: number; y: number };
+      if (pos.x >= 0 && pos.y >= 0 && pos.x < w - 20 && pos.y < h - 20) {
+        return pos;
+      }
+    }
   } catch {}
-  return { x: window.innerWidth - 100, y: window.innerHeight - 350 };
+  return fallback;
 }
 
 function clamp(val: number, min: number, max: number) {
@@ -22,18 +30,20 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
 
   const applyPos = useCallback(() => {
     if (stackRef.current) {
-      stackRef.current.style.transform = `translate(${posRef.current.x}px, ${posRef.current.y}px)`;
+      stackRef.current.style.left = `${posRef.current.x}px`;
+      stackRef.current.style.top = `${posRef.current.y}px`;
     }
   }, []);
 
-  // Use native event listener on handle to avoid React re-render issues
+  // Drag from handle OR any non-interactive part of the stack
   useEffect(() => {
     applyPos();
 
     const handle = handleRef.current;
-    if (!handle) return;
+    const stack = stackRef.current;
+    if (!stack) return;
 
-    const onDown = (e: PointerEvent) => {
+    const startDrag = (e: PointerEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -65,8 +75,25 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
       window.addEventListener("pointerup", onUp);
     };
 
-    handle.addEventListener("pointerdown", onDown);
-    return () => handle.removeEventListener("pointerdown", onDown);
+    const onHandleDown = (e: PointerEvent) => {
+      startDrag(e);
+    };
+
+    const onStackDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button, a, input, textarea, select, [role='button'], [data-no-widget-drag='true']")) {
+        return;
+      }
+      startDrag(e);
+    };
+
+    handle?.addEventListener("pointerdown", onHandleDown);
+    stack.addEventListener("pointerdown", onStackDown);
+
+    return () => {
+      handle?.removeEventListener("pointerdown", onHandleDown);
+      stack.removeEventListener("pointerdown", onStackDown);
+    };
   }, [applyPos]);
 
   // Keep in viewport on resize
@@ -90,15 +117,22 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
 
   return (
     <div
-      ref={(el) => {
-        (stackRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-        (handleRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-      }}
-      className="fixed z-50 flex flex-col items-end gap-2 cursor-grab active:cursor-grabbing select-none"
-      style={{ left: 0, top: 0, willChange: "transform", touchAction: "none" }}
-      title="Drag to move"
+      ref={stackRef}
+      className="fixed z-[9999] flex items-end gap-1 select-none pointer-events-auto"
+      style={{ left: 0, top: 0, willChange: "left, top", touchAction: "none" }}
     >
-      {children}
+      {/* Drag handle */}
+      <div
+        ref={handleRef}
+        className="flex items-center justify-center h-10 w-7 rounded-lg bg-muted/70 backdrop-blur-sm border border-border/50 cursor-grab active:cursor-grabbing hover:bg-muted/90 transition-colors self-center"
+        style={{ touchAction: "none" }}
+        title="Drag to move widgets"
+      >
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <div className="flex flex-col items-end gap-2">
+        {children}
+      </div>
     </div>
   );
 }

@@ -28,7 +28,7 @@ export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
           <Smile className="h-5 w-5" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 border-0" align="end">
+      <PopoverContent className="w-full p-0 border-0 z-[9999]" align="end" side="top" sideOffset={8} collisionPadding={16} avoidCollisions>
         <EmojiPickerReact
           onEmojiClick={handleEmojiClick}
           width={320}

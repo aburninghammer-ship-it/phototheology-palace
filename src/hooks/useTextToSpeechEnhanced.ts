@@ -327,7 +327,7 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
         console.error('[TTS] Preloaded audio error:', e);
         setIsPlaying(false);
         if (isBlobUrl) URL.revokeObjectURL(preloadedUrl);
-        throw new Error('Audio playback failed');
+        onErrorRef.current?.('Audio playback failed');
       };
       audio.src = preloadedUrl;
       audio.load();
@@ -442,7 +442,7 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
         if (isBlobUrl) {
           URL.revokeObjectURL(audioUrl);
         }
-        throw new Error('Audio playback failed');
+        onErrorRef.current?.('Audio playback failed');
       };
 
       audio.onpause = () => {
@@ -459,6 +459,16 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
 
     } catch (error) {
       if (timeoutId) clearTimeout(timeoutId);
+
+      // Clean up audio element to prevent ghost playback after fallback
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.onended = null;
+        audioRef.current.onerror = null;
+        audioRef.current.onpause = null;
+        audioRef.current.removeAttribute('src');
+        audioRef.current.load();
+      }
 
       throw error;
     }
@@ -594,6 +604,8 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
           await speakWithElevenLabs(cleanText, opts);
         } catch (elevenLabsError) {
           console.warn('[TTS] ElevenLabs failed, falling back to browser TTS:', elevenLabsError);
+          // Ensure any partially-loaded OpenAI audio is fully killed before fallback
+          stop();
           toast.info('Using offline voice mode');
           await speakWithBrowser(cleanText);
         }

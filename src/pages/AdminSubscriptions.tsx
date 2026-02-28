@@ -25,6 +25,8 @@ import { RecentSubscribers } from "@/components/admin/RecentSubscribers";
 import { NewSignupsList } from "@/components/admin/NewSignupsList";
 import { DonationStats } from "@/components/admin/DonationStats";
 import { SubscriptionDatabase } from "@/components/admin/SubscriptionDatabase";
+import { DailyGemMiner } from "@/components/admin/DailyGemMiner";
+import { AdminAiUsageDashboard } from "@/components/admin/AdminAiUsageDashboard";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -615,6 +617,8 @@ export default function AdminSubscriptions() {
           <TabsTrigger value="teachable">Teachable</TabsTrigger>
           <TabsTrigger value="pickaxe">Pickaxe</TabsTrigger>
           <TabsTrigger value="users">User Tools</TabsTrigger>
+          <TabsTrigger value="gem-miner">Gem Miner</TabsTrigger>
+          <TabsTrigger value="ai-usage">🤖 AI Usage</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -1177,6 +1181,16 @@ export default function AdminSubscriptions() {
         <TabsContent value="users" className="space-y-6">
           <AdminUserManagement />
           <AdminPasswordReset />
+        </TabsContent>
+
+        {/* Gem Miner Tab */}
+        <TabsContent value="gem-miner" className="space-y-6">
+          <DailyGemMiner />
+        </TabsContent>
+
+        {/* AI Usage Tab */}
+        <TabsContent value="ai-usage" className="space-y-6">
+          <AdminAiUsageDashboard />
         </TabsContent>
       </Tabs>
     </div>

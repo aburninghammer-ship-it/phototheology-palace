@@ -352,6 +352,41 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Route "engine" and "validate" modes to their respective functions
+    if (mode === "engine") {
+      const resp = await fetch(`${supabaseUrl}/functions/v1/simmer-engine`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": req.headers.get("Authorization") || `Bearer ${supabaseKey}`,
+          "apikey": Deno.env.get("SUPABASE_ANON_KEY") || supabaseKey,
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await resp.json();
+      return new Response(JSON.stringify(data), {
+        status: resp.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (mode === "validate") {
+      const resp = await fetch(`${supabaseUrl}/functions/v1/simmer-validator`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": req.headers.get("Authorization") || `Bearer ${supabaseKey}`,
+          "apikey": Deno.env.get("SUPABASE_ANON_KEY") || supabaseKey,
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await resp.json();
+      return new Response(JSON.stringify(data), {
+        status: resp.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Handle CHAT mode - conversational development
     if (mode === "chat") {
       const chatMessages = [

@@ -1,5 +1,8 @@
 project_id = "tdjtumtdkjicnhlpqqzd"
 
+[functions.generate-war-college-day]
+verify_jwt = false
+
 [functions.deal-pt-cards]
 verify_jwt = false
 

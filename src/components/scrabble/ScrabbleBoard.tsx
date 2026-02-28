@@ -17,6 +17,8 @@ interface ScrabbleBoardProps {
   onPositionClick?: (position: BoardPosition) => void;
   onCardClick?: (placedCard: PlacedCard) => void;
   validPositions?: BoardPosition[];
+  verseReference?: string;
+  verseText?: string;
   className?: string;
 }
 
@@ -26,6 +28,8 @@ export function ScrabbleBoard({
   onPositionClick,
   onCardClick,
   validPositions: externalValidPositions,
+  verseReference,
+  verseText,
   className,
 }: ScrabbleBoardProps) {
   const [hoveredPosition, setHoveredPosition] = useState<string | null>(null);
@@ -91,12 +95,28 @@ export function ScrabbleBoard({
 
   return (
     <div className={cn('relative w-full h-full bg-background/50 rounded-lg overflow-hidden', className)}>
+      {/* Highlighted verse banner on the board */}
+      {verseReference && (
+        <div className="absolute top-0 left-0 right-0 z-20 px-3 py-2">
+          <div className="glass-card rounded-xl px-4 py-3 relative overflow-hidden">
+            <div className="glass-card-bubbles"><span /><span /><span /><span /><span /><span /><span /><span /></div>
+            <div className="relative z-10">
+              <span className="font-bold text-primary text-sm drop-shadow-sm">📖 {verseReference}</span>
+              {verseText && (
+                <p className="text-xs text-foreground/70 italic leading-relaxed mt-1 line-clamp-2">"{verseText}"</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <TransformWrapper
         initialScale={1}
         minScale={0.3}
         maxScale={2}
         centerOnInit
         limitToBounds={false}
+        panning={{ velocityDisabled: true }}
+        doubleClick={{ disabled: true }}
       >
         {({ zoomIn, zoomOut, resetTransform }) => (
           <>
@@ -154,6 +174,7 @@ export function ScrabbleBoard({
                           placedCard={placedCard}
                           size="md"
                           showConnections
+                          verseReference={verseReference}
                           onClick={onCardClick ? () => onCardClick(placedCard) : undefined}
                         />
                       ) : isValid ? (

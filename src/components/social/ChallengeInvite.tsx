@@ -4,9 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Share2, Copy, Check, Users, Swords, Trophy, Link as LinkIcon } from "lucide-react";
+import { Share2, Copy, Check, Users, Swords, Trophy, Link as LinkIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ChallengeInviteProps {
   challengeType: "room" | "chess" | "escape" | "quiz";
@@ -25,6 +26,7 @@ export const ChallengeInvite = ({
   const [copied, setCopied] = useState(false);
   const [email, setEmail] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const getInviteLink = () => {
     const baseUrl = window.location.origin;
@@ -43,17 +45,29 @@ export const ChallengeInvite = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const sendEmailInvite = () => {
+  const sendEmailInvite = async () => {
     if (!email) return;
-    // In production, this would send via backend
-    const subject = encodeURIComponent(`Join me in a ${getChallengeTitle()} Challenge!`);
-    const body = encodeURIComponent(
-      `I'm challenging you to a ${getChallengeTitle()} battle on Phototheology!\n\nClick here to join: ${getInviteLink()}`
-    );
-    window.open(`mailto:${email}?subject=${subject}&body=${body}`);
-    toast.success("Email invite opened!");
-    setEmail("");
-    onInviteSent?.();
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-game-invite', {
+        body: {
+          recipientEmail: email,
+          gameType: challengeType,
+          gameName: getChallengeTitle(),
+          inviteLink: getInviteLink(),
+        }
+      });
+      if (error || !data?.success) {
+        throw new Error(data?.error || error?.message || 'Failed to send invite');
+      }
+      toast.success("Invite sent!");
+      setEmail("");
+      onInviteSent?.();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send invite");
+    } finally {
+      setSending(false);
+    }
   };
 
   const shareNative = async () => {
@@ -141,8 +155,8 @@ export const ChallengeInvite = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <Button onClick={sendEmailInvite} disabled={!email}>
-                Send
+              <Button onClick={sendEmailInvite} disabled={!email || sending}>
+                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}
               </Button>
             </div>
           </div>

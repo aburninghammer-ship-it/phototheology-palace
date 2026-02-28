@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, Download, X } from "lucide-react";
+import { Loader2, RefreshCw, Download, X, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -42,7 +42,8 @@ export const ChapterImage = ({ book, chapter, chapterText }: ChapterImageProps) 
       if (data?.image_url) {
         setImageUrl(data.image_url);
       } else {
-        // Auto-generate on first view
+        // Auto-generate image if none exists
+        // This runs once per chapter when first viewed
         generateImage();
       }
     } catch (error) {
@@ -177,11 +178,33 @@ Reference: ${book} ${chapter} - Biblical Epic Masterpiece`;
 
     } catch (error: any) {
       console.error("Generation error:", error);
+
+      // More detailed error logging
+      if (error?.message) {
+        console.error("Error message:", error.message);
+      }
+      if (error?.response) {
+        console.error("Error response:", error.response);
+      }
+
+      // Check for specific error types
+      let errorMessage = "Image generation is optional and will retry next time.";
+      if (error?.message?.includes("quota") || error?.message?.includes("rate limit")) {
+        errorMessage = "API quota exceeded. Images will resume when quota resets.";
+      } else if (error?.message?.includes("API key") || error?.message?.includes("unauthorized")) {
+        errorMessage = "API configuration issue. Please check settings.";
+      } else if (error?.message?.includes("timeout")) {
+        errorMessage = "Request timed out. Try again in a moment.";
+      }
+
       toast({
         title: "Could not generate image",
-        description: "Image generation is optional and will retry next time.",
+        description: errorMessage,
         variant: "destructive",
       });
+
+      // Set imageUrl to null to prevent infinite retry on same chapter
+      setImageUrl(null);
     } finally {
       setLoading(false);
     }
@@ -271,7 +294,27 @@ Reference: ${book} ${chapter} - Biblical Epic Masterpiece`;
               </div>
             </div>
           </>
-        ) : null}
+        ) : (
+          <div className="aspect-[16/9] sm:aspect-[21/9] bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 flex items-center justify-center border-2 border-dashed border-primary/20">
+            <div className="text-center space-y-3 p-6">
+              <div className="text-4xl opacity-30">🖼️</div>
+              <div>
+                <p className="text-sm font-medium text-foreground/60">No chapter image yet</p>
+                <p className="text-xs text-muted-foreground mt-1">Generate an AI-powered visual for {book} {chapter}</p>
+              </div>
+              <Button
+                onClick={generateImage}
+                disabled={loading}
+                size="sm"
+                variant="outline"
+                className="mt-2"
+              >
+                <Zap className="h-3 w-3 mr-2" />
+                Generate Image
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </Card>
   );

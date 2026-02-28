@@ -16,6 +16,7 @@ interface ScrabbleTileProps {
   isInHand?: boolean;
   onClick?: () => void;
   showConnections?: boolean;
+  verseReference?: string;
   className?: string;
 }
 
@@ -28,6 +29,7 @@ export function ScrabbleTile({
   isInHand = false,
   onClick,
   showConnections = false,
+  verseReference,
   className,
 }: ScrabbleTileProps) {
   const gradient = FLOOR_GRADIENTS[card.floor] || FLOOR_GRADIENTS[1];
@@ -99,6 +101,13 @@ export function ScrabbleTile({
       {size !== 'sm' && (
         <span className="text-center text-muted-foreground leading-tight px-1 line-clamp-2">
           {card.name}
+        </span>
+      )}
+
+      {/* Verse reference badge */}
+      {verseReference && size !== 'sm' && (
+        <span className="text-[7px] text-center text-muted-foreground/70 px-1 leading-tight line-clamp-1 mt-0.5">
+          📖 {verseReference}
         </span>
       )}
 

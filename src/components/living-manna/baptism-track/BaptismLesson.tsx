@@ -14,12 +14,14 @@ import {
   Sparkles, CheckCircle2, ChevronRight, ChevronDown,
   Target, Lightbulb, History, Award,
   HelpCircle, BookMarked, Heart, Shield, Quote,
-  Save, StickyNote, AlertCircle
+  Save, StickyNote, AlertCircle, Volume2, Download, Share2
 } from "lucide-react";
+import { QuickAudioButton } from "@/components/audio";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { PalacePathVisualizer } from "./PalacePathVisualizer";
 import { BaptismQuiz } from "./BaptismQuiz";
+import { ExportBaptismAudioDialog } from "./ExportBaptismAudioDialog";
 
 // Helper to safely parse JSON fields that might be strings
 const parseJsonField = (field: any): any[] => {
@@ -242,6 +244,9 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
   const [studyNotes, setStudyNotes] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
   const [notesLoaded, setNotesLoaded] = useState(false);
+
+  // Export audio dialog
+  const [showExportAudio, setShowExportAudio] = useState(false);
 
   // Parse scripture_pack
   const scriptures = useMemo(() => {
@@ -524,16 +529,26 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     }
   };
 
-  // Save study notes
+  // Save study notes (preserve existing state - don't overwrite completed)
   const saveStudyNotes = async () => {
     setSavingNotes(true);
     try {
+      // First check if there's existing progress to preserve state
+      const { data: existing } = await supabase
+        .from("baptism_candidate_progress")
+        .select("state")
+        .eq("candidate_id", candidateId)
+        .eq("lesson_id", lesson.id)
+        .maybeSingle();
+
+      const currentState = existing?.state || "in_progress";
+      
       await supabase
         .from("baptism_candidate_progress")
         .upsert({
           candidate_id: candidateId,
           lesson_id: lesson.id,
-          state: "in_progress",
+          state: currentState === "completed" ? "completed" : "in_progress",
           last_step: `NOTES:${studyNotes}`,
           last_active_at: new Date().toISOString(),
         }, {
@@ -747,7 +762,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                       idx === currentSectionIndex ? 'bg-primary' :
                       'bg-muted'
                     }`}
-                    onClick={() => idx <= currentSectionIndex && setCurrentSection(section)}
+                    onClick={() => setCurrentSection(section)}
                     title={SECTION_LABELS[section]}
                   />
                 );
@@ -856,10 +871,14 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                 </div>
               </div>
 
-              <div className="flex justify-center pt-4">
+              <div className="flex justify-center gap-3 pt-4">
                 <Button size="lg" onClick={goToNextSection}>
                   Begin Comprehensive Study
                   <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => setShowExportAudio(true)}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Audio
                 </Button>
               </div>
             </div>
@@ -1003,6 +1022,16 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   Comprehensive Teaching: {lesson.title}
                 </h2>
                 <p className="text-muted-foreground">In-depth doctrinal study with Scripture foundation</p>
+                {teachingContent && (
+                  <div className="mt-3">
+                    <QuickAudioButton
+                      text={teachingContent.replace(/<[^>]*>/g, ' ').substring(0, 4000)}
+                      variant="outline"
+                      size="sm"
+                      showLabel
+                    />
+                  </div>
+                )}
               </div>
 
               {loadingContent ? (
@@ -1086,6 +1115,16 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   Objections & Biblical Answers
                 </h2>
                 <p className="text-muted-foreground">Prepare to defend and explain this belief</p>
+                {objectionsContent && (
+                  <div className="mt-3">
+                    <QuickAudioButton
+                      text={objectionsContent.replace(/<[^>]*>/g, ' ').substring(0, 4000)}
+                      variant="outline"
+                      size="sm"
+                      showLabel
+                    />
+                  </div>
+                )}
               </div>
 
               {loadingContent ? (
@@ -1149,6 +1188,16 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   Adventist Heritage
                 </h2>
                 <p className="text-muted-foreground">How our pioneers discovered this truth</p>
+                {historyContent && (
+                  <div className="mt-3">
+                    <QuickAudioButton
+                      text={historyContent.replace(/<[^>]*>/g, ' ').substring(0, 4000)}
+                      variant="outline"
+                      size="sm"
+                      showLabel
+                    />
+                  </div>
+                )}
               </div>
 
               {loadingContent ? (
@@ -1187,6 +1236,16 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   Spirit of Prophecy Insights
                 </h2>
                 <p className="text-muted-foreground">Ellen G. White's inspired counsel on this topic</p>
+                {egwContent && (
+                  <div className="mt-3">
+                    <QuickAudioButton
+                      text={egwContent.replace(/<[^>]*>/g, ' ').substring(0, 4000)}
+                      variant="outline"
+                      size="sm"
+                      showLabel
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="max-w-2xl mx-auto p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 text-sm">
@@ -1242,27 +1301,39 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   <p className="text-muted-foreground">Generating quiz questions...</p>
                 </div>
               ) : (
-                <BaptismQuiz 
-                  questions={quizQuestions.map((q, idx) => ({
-                    id: `q-${idx}`,
-                    type: 'multiple_choice', // Default to MC for now, AI could generate fill-in-blank later
-                    question: q.question,
-                    options: q.options,
-                    correctAnswer: q.correct,
-                    explanation: q.explanation || "Correct answer based on the lesson content."
-                  }))}
-                  onComplete={async (score) => {
-                    // Handle quiz completion logic
-                    const percentage = Math.round((score / quizQuestions.length) * 100);
-                    if (percentage >= 70) {
-                      toast.success(`Excellent! You scored ${percentage}%`);
-                      await updateProgress(90); // Near completion
-                      goToNextSection();
-                    } else {
-                      toast.info(`You scored ${percentage}%. Review the material and try again.`);
-                    }
-                  }}
-                />
+                <>
+                  <BaptismQuiz 
+                    questions={quizQuestions.map((q, idx) => ({
+                      id: `q-${idx}`,
+                      type: 'multiple_choice',
+                      question: q.question,
+                      options: q.options,
+                      correctAnswer: q.correct,
+                      explanation: q.explanation || "Correct answer based on the lesson content."
+                    }))}
+                    onComplete={async (score) => {
+                      const percentage = Math.round((score / quizQuestions.length) * 100);
+                      if (percentage >= 70) {
+                        toast.success(`Excellent! You scored ${percentage}%`);
+                        await updateProgress(90);
+                        goToNextSection();
+                      } else {
+                        toast.info(`You scored ${percentage}%. You can review and retry, or continue anyway.`);
+                        await updateProgress(Math.max(progressPercent, 78));
+                      }
+                    }}
+                  />
+                  <div className="flex justify-between pt-4">
+                    <Button variant="outline" onClick={goToPrevSection}>
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Back to EGW
+                    </Button>
+                    <Button variant="outline" onClick={goToNextSection}>
+                      Continue to Reflection
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -1349,6 +1420,13 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
           )}
         </CardContent>
       </Card>
+      <ExportBaptismAudioDialog
+        open={showExportAudio}
+        onOpenChange={setShowExportAudio}
+        lessonId={lesson.id}
+        lessonTitle={lesson.title}
+        fundamentalNumber={lesson.fundamental_number}
+      />
     </div>
   );
 }

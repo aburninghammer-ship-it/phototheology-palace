@@ -1258,29 +1258,29 @@ const AnalyzeThoughts = () => {
 
               {/* Palace Mapping - Enhanced with Practice Prompts */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
-                <Card className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
-                  <CardHeader className="border-b border-border/50">
-                    <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-purple-400" /><span className="bg-gradient-to-r from-purple-200 to-blue-200 bg-clip-text text-transparent">Palace Mapping</span></CardTitle>
+                <Card className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 border-purple-400/30">
+                  <CardHeader className="border-b border-purple-400/20">
+                    <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-purple-300" /><span className="text-white font-bold">Palace Mapping</span></CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6">
                     <div className="grid gap-4">
                       {(result.palaceRooms || []).map((r, i) => (
                         <motion.div 
                           key={i} 
-                          className="p-4 rounded-xl bg-background/30 border border-purple-500/10 hover:border-purple-500/30 transition-all"
+                          className="p-4 rounded-xl bg-background/60 border border-purple-400/20 hover:border-purple-400/40 transition-all"
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.9 + i * 0.1 }}
                         >
                           <div className="flex items-start gap-3">
-                            <Badge variant="outline" className="font-mono bg-purple-500/20 text-purple-300 border-purple-500/30 shrink-0">{r.code}</Badge>
+                            <Badge variant="outline" className="font-mono bg-purple-600/30 text-white border-purple-400/40 shrink-0">{r.code}</Badge>
                             <div className="flex-1">
-                              <p className="font-medium text-purple-200 mb-1">{r.name}</p>
-                              <p className="text-sm text-muted-foreground mb-2">{r.relevance}</p>
+                              <p className="font-semibold text-foreground mb-1">{r.name}</p>
+                              <p className="text-sm text-foreground/80 mb-2">{r.relevance}</p>
                               {r.practicePrompt && (
-                                <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                                <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-amber-500/15 border border-amber-400/30">
                                   <Zap className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-                                  <p className="text-sm text-amber-200/90 italic">{r.practicePrompt}</p>
+                                  <p className="text-sm text-foreground/90 italic">{r.practicePrompt}</p>
                                 </div>
                               )}
                             </div>

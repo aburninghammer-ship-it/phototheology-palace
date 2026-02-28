@@ -35,6 +35,9 @@ import { JeevesWidget } from "@/components/JeevesWidget";
 import { ReginaldButler } from "@/components/ReginaldButler";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { DraggableWidgetStack } from "@/components/DraggableWidgetStack";
+import { LiveChatProvider } from "@/contexts/LiveChatContext";
+import { LiveChatSidebar } from "@/components/LiveChatSidebar";
+import { LiveChatToggle } from "@/components/LiveChatToggle";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
 import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
@@ -222,6 +225,7 @@ const StoryRoom3D = lazy(() => import("./pages/games/StoryRoom3D"));
 const SpeedVerse3D = lazy(() => import("./pages/games/SpeedVerse3D"));
 const Room24FPS3D = lazy(() => import("./pages/games/Room24FPS3D"));
 const PublicImageLibrary = lazy(() => import("./pages/PublicImageLibrary"));
+const SharedBaptismAudio = lazy(() => import("./pages/SharedBaptismAudio"));
 const BibleStudySeriesBuilder = lazy(() => import("./pages/BibleStudySeriesBuilder"));
 const SeriesLessonEditor = lazy(() => import("./pages/SeriesLessonEditor"));
 const SeriesPresenter = lazy(() => import("./pages/SeriesPresenter"));
@@ -287,6 +291,7 @@ const PathWeek = lazy(() => import("./pages/PathWeek"));
 const Sessions = lazy(() => import("./pages/Sessions"));
 const Notes = lazy(() => import("./pages/Notes"));
 const DonationSuccess = lazy(() => import("./pages/DonationSuccess"));
+const CreditPurchaseSuccess = lazy(() => import("./pages/CreditPurchaseSuccess"));
 const LiveDemo = lazy(() => import("./pages/LiveDemo"));
 const PublicChat = lazy(() => import("./pages/PublicChat"));
 const Schedule = lazy(() => import("./pages/Schedule"));
@@ -364,6 +369,7 @@ function App() {
               <LiveNotificationsProvider>
                 <AchievementProvider>
                   <DirectMessagesProvider>
+                    <LiveChatProvider>
                     <UserPreferencesProvider>
                     <SidebarProvider defaultOpen={false}>
                     <ChangeManagerProvider>
@@ -419,8 +425,10 @@ function App() {
             <Route path="/gift/success" element={<GiftSuccess />} />
             <Route path="/gift/redeem/:token" element={<GiftRedeem />} />
             <Route path="/day-pass/:token" element={<DayPassRedeem />} />
+            <Route path="/shared/baptism-audio/:token" element={<SharedBaptismAudio />} />
             <Route path="/donate" element={<DonationPage />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
+            <Route path="/credit-purchase-success" element={<ProtectedRoute><CreditPurchaseSuccess /></ProtectedRoute>} />
             <Route path="/paths" element={<Paths />} />
             <Route path="/path/week" element={<ProtectedRoute><PathWeek /></ProtectedRoute>} />
             <Route path="/why-phototheology" element={<WhyPhototheology />} />
@@ -596,6 +604,7 @@ function App() {
           <Route path="/revelation-course" element={<ProtectedRoute><RevelationCourse /></ProtectedRoute>} />
            <Route path="/revelation-course/kids" element={<ProtectedRoute><RevelationCourseKids /></ProtectedRoute>} />
            <Route path="/cota-series" element={<ProtectedRoute><COTASeries /></ProtectedRoute>} />
+           <Route path="/defense-mode" element={<Navigate to="/cota-series?tab=defense" replace />} />
           <Route path="/kidgpt" element={<ProtectedRoute><KidGPT /></ProtectedRoute>} />
           <Route path="/kid-gpt" element={<ProtectedRoute><KidGPT /></ProtectedRoute>} />
           <Route path="/pt-kids-games" element={<ProtectedRoute><PTKidsGames /></ProtectedRoute>} />
@@ -735,10 +744,13 @@ function App() {
                       <ReginaldButler />
                     </DraggableWidgetStack>
                   )}
+                  {!isWorkspacePane && <LiveChatSidebar />}
+                  {!isWorkspacePane && <LiveChatToggle />}
                 </div>
               </ChangeManagerProvider>
               </SidebarProvider>
               </UserPreferencesProvider>
+              </LiveChatProvider>
             </DirectMessagesProvider>
           </AchievementProvider>
         </LiveNotificationsProvider>

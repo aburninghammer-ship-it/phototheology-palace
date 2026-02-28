@@ -17,11 +17,11 @@ interface QuotaState {
   tts: QuotaResult | null;
 }
 
-// Daily limits for free users
+// Daily limits for free users — generous defaults
 const FREE_TIER_LIMITS = {
-  jeeves: 20,   // 20 Jeeves calls per day
-  image: 3,     // 3 image generations per day
-  tts: 10,      // 10 TTS requests per day
+  jeeves: 100,  // 100 Jeeves calls per day (text AI is cheap)
+  image: 10,    // 10 image generations per day
+  tts: 30,      // 30 TTS requests per day
 };
 
 export function useAIQuota() {

@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Send, Loader2, ChevronDown, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
@@ -41,11 +42,13 @@ const QUICK_QUESTIONS = [
   "Give me a tour of the Palace",
   "Where are my saved studies?",
   "What room should I start with?",
+  "Take me to the Research tab",
   "Something isn't working",
 ];
 
 export const ReginaldButler = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -55,11 +58,9 @@ export const ReginaldButler = () => {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const recognitionRef = useRef<InstanceType<typeof window.SpeechRecognition> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dragConstraintsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Fetch user name and context snapshot
   useEffect(() => {
@@ -126,7 +127,19 @@ export const ReginaldButler = () => {
 
       if (error) throw error;
 
-      const reply = data.response || "I do beg your pardon — let us try that again.";
+      let reply = data.response || "I do beg your pardon — let us try that again.";
+
+      // Check for navigation marker
+      const navMatch = reply.match(/\[NAVIGATE:\s*(\/[^\]]+)\]/);
+      if (navMatch) {
+        const path = navMatch[1].trim();
+        reply = reply.replace(/\n?\[NAVIGATE:\s*\/[^\]]+\]/, "").trim();
+        // Navigate after a short delay so the user sees the message
+        setTimeout(() => {
+          navigate(path);
+        }, 1200);
+      }
+
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
 
       if (audioEnabled) {
@@ -185,30 +198,22 @@ export const ReginaldButler = () => {
 
   return (
     <>
-      {/* Invisible drag boundary — full viewport */}
-      <div ref={dragConstraintsRef} className="fixed inset-0 pointer-events-none z-[997]" />
-
-      {/* Floating draggable trigger button */}
+      {/* Floating trigger button */}
       <AnimatePresence>
         {!open && (
           <motion.div
-            drag
-            dragMomentum={false}
-            dragConstraints={dragConstraintsRef}
-            onDragStart={() => setIsDragging(true)}
-            onDragEnd={() => setTimeout(() => setIsDragging(false), 100)}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="flex items-center gap-2 cursor-grab active:cursor-grabbing touch-none"
+            className="flex items-center gap-2"
             style={{ zIndex: 50 }}
           >
             <span className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-full shadow-lg bg-amber-900/90 text-amber-100 pointer-events-none">
               Reginald
             </span>
             <Button
-              onClick={() => { if (!isDragging) setOpen(true); }}
+              onClick={() => setOpen(true)}
               className="h-11 w-11 rounded-full shadow-xl border-2 border-amber-500/40 p-0 flex items-center justify-center flex-shrink-0 overflow-hidden"
               style={{ background: "linear-gradient(135deg, #78350f, #92400e)" }}
               aria-label="Open Reginald the Palace Butler"
@@ -227,8 +232,7 @@ export const ReginaldButler = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="fixed bottom-20 right-3 md:bottom-6 md:right-5 z-[999] w-[min(92vw,24rem)] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border bg-background"
-            style={{ height: "min(600px, calc(100vh - 100px))" }}
+            className="fixed inset-x-2 top-2 bottom-[72px] md:inset-x-auto md:top-auto md:bottom-6 md:right-5 md:w-[24rem] md:max-h-[min(600px,calc(100dvh-90px))] z-[999] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-border bg-background"
           >
             {/* Header */}
             <div
@@ -333,34 +337,41 @@ export const ReginaldButler = () => {
             )}
 
             {/* Input */}
-            <div className="bg-background border-t border-border px-3 py-2.5 flex gap-2 flex-shrink-0">
+            <div className="bg-background border-t border-border px-3 py-3 flex items-end gap-2 flex-shrink-0" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
               <Button
                 type="button"
                 onClick={toggleMic}
                 size="icon"
                 variant="ghost"
-                className={`h-9 w-9 flex-shrink-0 transition-colors ${listening ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
+                className={`h-10 w-10 flex-shrink-0 transition-colors ${listening ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-foreground"}`}
                 title={listening ? "Stop recording" : "Speak your question"}
               >
-                {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
               </Button>
-              <Input
+              <Textarea
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                  }
+                }}
                 placeholder={listening ? "Listening…" : "Ask Reginald about the Palace…"}
                 disabled={loading}
-                className="flex-1 text-sm h-9"
+                rows={2}
+                className="flex-1 min-h-[56px] max-h-32 resize-none text-base leading-5 rounded-xl bg-muted/50 border-border focus:bg-background"
+                style={{ fontSize: "16px" }}
               />
               <Button
                 onClick={() => sendMessage()}
                 disabled={loading || !input.trim()}
                 size="icon"
-                className="h-9 w-9 flex-shrink-0 text-primary-foreground"
+                className="h-10 w-10 flex-shrink-0 text-primary-foreground rounded-xl"
                 style={{ background: "linear-gradient(135deg, #78350f, #92400e)" }}
               >
-                <Send className="h-3.5 w-3.5" />
+                <Send className="h-4 w-4" />
               </Button>
             </div>
           </motion.div>

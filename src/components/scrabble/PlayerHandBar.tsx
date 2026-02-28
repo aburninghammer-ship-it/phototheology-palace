@@ -15,6 +15,7 @@ interface PlayerHandBarProps {
   onRefresh?: () => void;
   disabled?: boolean;
   score?: number;
+  verseReference?: string;
   className?: string;
 }
 
@@ -25,6 +26,7 @@ export function PlayerHandBar({
   onRefresh,
   disabled = false,
   score = 0,
+  verseReference,
   className,
 }: PlayerHandBarProps) {
   return (
@@ -89,6 +91,7 @@ export function PlayerHandBar({
                     size="md"
                     isSelected={selectedCard?.id === card.id}
                     isInHand
+                    verseReference={verseReference}
                     onClick={disabled ? undefined : () => onCardSelect(card)}
                     className={cn(
                       disabled && 'opacity-50 cursor-not-allowed',

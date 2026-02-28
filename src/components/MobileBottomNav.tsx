@@ -1,71 +1,159 @@
-import { Home, BookOpen, Building2, MessageCircle, Zap } from "lucide-react";
+import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const navItemDefs = [
+const primaryNavItems = [
   { icon: Home, labelKey: "common.home", path: "/dashboard" },
   { icon: BookOpen, labelKey: "nav.bible", path: "/bible" },
-  { icon: MessageCircle, labelKey: "nav.chat", path: "/public-chat" },
-  { icon: Zap, labelKey: "nav.freestyle", path: "/palace/freestyle" },
+  { icon: Church, labelKey: "nav.church", path: "/living-manna" },
   { icon: Building2, labelKey: "nav.palace", path: "/palace" },
+];
+
+const moreNavItems = [
+  { icon: Zap, label: "Freestyle", path: "/palace/freestyle" },
+  { icon: Crown, label: "COTA Series", path: "/cota-series" },
+  { icon: Microscope, label: "Research Mode", path: "/research-mode" },
+  { icon: BrainCircuit, label: "Analyze My Thoughts", path: "/analyze-my-thoughts" },
+  { icon: MessageCircle, label: "Public Chat", path: "/public-chat" },
+  { icon: Scroll, label: "Bible Studies", path: "/bible-study-series" },
 ];
 
 export function MobileBottomNav() {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const [showMore, setShowMore] = useState(false);
 
-  // Don't show on landing page or auth pages when not logged in
   if (!user) return null;
 
-  // Hide inside workspace iframe panes
   const isWorkspacePane = new URLSearchParams(window.location.search).has('workspace');
   if (isWorkspacePane) return null;
 
-  // Don't show on certain pages
   const hiddenPaths = ["/auth", "/onboarding", "/interactive-demo"];
   if (hiddenPaths.some(path => location.pathname.startsWith(path))) return null;
 
-  return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-[60] md:hidden bg-background/98 backdrop-blur-xl border-t border-border/50 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]"
-      style={{
-        touchAction: 'manipulation',
-        paddingBottom: 'env(safe-area-inset-bottom, 8px)'
-      }}
-    >
-      <div className="flex items-center justify-around h-[72px] px-1 max-w-md mx-auto">
-        {navItemDefs.map((item) => {
-          const isActive = location.pathname === item.path ||
-            (item.path !== "/dashboard" && location.pathname.startsWith(item.path));
+  const isMoreActive = moreNavItems.some(item =>
+    location.pathname === item.path || location.pathname.startsWith(item.path)
+  );
 
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex flex-col items-center justify-center gap-0.5 py-2 px-4 rounded-2xl transition-all duration-200 min-w-[64px] min-h-[56px] active:scale-95",
-                isActive
-                  ? "text-primary bg-primary/12 shadow-sm"
-                  : "text-muted-foreground hover:text-foreground active:bg-muted/60"
-              )}
+  return (
+    <>
+      {/* More menu overlay */}
+      <AnimatePresence>
+        {showMore && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[59] bg-black/50 backdrop-blur-sm md:hidden"
+            onClick={() => setShowMore(false)}
+          >
+            <motion.div
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="absolute bottom-[72px] left-2 right-2 bg-card border border-border rounded-2xl shadow-xl p-3"
+              style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <item.icon className={cn(
-                "h-6 w-6 transition-transform duration-200",
-                isActive && "text-primary scale-110"
-              )} />
-              <span className={cn(
-                "text-[11px] font-semibold tracking-tight",
-                isActive ? "text-primary" : "text-muted-foreground"
-              )}>
-                {t(item.labelKey)}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+              <div className="flex items-center justify-between mb-3 px-1">
+                <span className="text-sm font-semibold text-foreground">More</span>
+                <button onClick={() => setShowMore(false)} className="p-1 rounded-full hover:bg-muted">
+                  <X className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {moreNavItems.map((item) => {
+                  const isActive = location.pathname === item.path || location.pathname.startsWith(item.path);
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setShowMore(false)}
+                      className={cn(
+                        "flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all",
+                        isActive
+                          ? "bg-primary/12 text-primary"
+                          : "text-muted-foreground hover:bg-muted/60 active:bg-muted"
+                      )}
+                    >
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      <span className="text-[10px] font-medium leading-tight text-center">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Bottom nav bar */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-[60] md:hidden bg-background/98 backdrop-blur-xl border-t border-border/50 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]"
+        style={{
+          touchAction: 'manipulation',
+          paddingBottom: 'env(safe-area-inset-bottom, 8px)'
+        }}
+      >
+        <div className="flex items-center justify-evenly h-[64px] px-2 w-full">
+          {primaryNavItems.map((item) => {
+            const isActive = location.pathname === item.path ||
+              (item.path !== "/dashboard" && location.pathname.startsWith(item.path));
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 py-1.5 px-2 rounded-xl transition-all duration-200 min-w-[56px] min-h-[48px] active:scale-95",
+                  isActive
+                    ? "text-primary bg-primary/12"
+                    : "text-muted-foreground hover:text-foreground active:bg-muted/60"
+                )}
+              >
+                <item.icon className={cn(
+                  "h-5 w-5 shrink-0",
+                  isActive && "text-primary"
+                )} />
+                <span className={cn(
+                  "text-[10px] font-medium leading-tight truncate max-w-[56px]",
+                  isActive ? "text-primary" : "text-muted-foreground"
+                )}>
+                  {t(item.labelKey)}
+                </span>
+              </Link>
+            );
+          })}
+
+          {/* More button */}
+          <button
+            onClick={() => setShowMore(!showMore)}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 py-1.5 px-2 rounded-xl transition-all duration-200 min-w-[56px] min-h-[48px] active:scale-95",
+              isMoreActive || showMore
+                ? "text-primary bg-primary/12"
+                : "text-muted-foreground hover:text-foreground active:bg-muted/60"
+            )}
+          >
+            <MoreHorizontal className={cn(
+              "h-5 w-5 shrink-0",
+              (isMoreActive || showMore) && "text-primary"
+            )} />
+            <span className={cn(
+              "text-[10px] font-medium leading-tight",
+              (isMoreActive || showMore) ? "text-primary" : "text-muted-foreground"
+            )}>
+              More
+            </span>
+          </button>
+        </div>
+      </nav>
+    </>
   );
 }

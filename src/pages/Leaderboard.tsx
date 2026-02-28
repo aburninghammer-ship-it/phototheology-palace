@@ -85,7 +85,6 @@ const Leaderboard = () => {
   };
 
   const fetchLeaders = async () => {
-    let query = supabase.from("profiles");
     let leaderData: any[] = [];
 
     // Apply time period filter
@@ -107,34 +106,41 @@ const Leaderboard = () => {
       
       leaderData = data || [];
     } else if (sortBy === 'challenges') {
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, username, display_name, points, level, daily_study_streak");
-
-      if (profiles) {
-        const leadersWithChallenges = await Promise.all(
-          profiles.map(async (profile) => {
-            let submissionsQuery = supabase
-              .from("challenge_submissions")
-              .select("id")
-              .eq("user_id", profile.id);
-            
-            if (dateFilter) {
-              submissionsQuery = submissionsQuery.gte("created_at", dateFilter.toISOString());
-            }
-            
-            const { data: submissions } = await submissionsQuery;
-            
-            return {
-              ...profile,
-              challengeCount: submissions?.length || 0
-            };
-          })
-        );
-
-        leaderData = leadersWithChallenges
-          .sort((a, b) => b.challengeCount - a.challengeCount)
-          .slice(0, 50);
+      // Use aggregation approach: get challenge counts grouped by user
+      let submissionsQuery = supabase
+        .from("challenge_submissions")
+        .select("user_id");
+      
+      if (dateFilter) {
+        submissionsQuery = submissionsQuery.gte("created_at", dateFilter.toISOString());
+      }
+      
+      const { data: submissions } = await submissionsQuery;
+      
+      if (submissions) {
+        // Count submissions per user
+        const userCounts: Record<string, number> = {};
+        submissions.forEach(s => {
+          userCounts[s.user_id] = (userCounts[s.user_id] || 0) + 1;
+        });
+        
+        // Get top 50 user IDs by count
+        const topUserIds = Object.entries(userCounts)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 50)
+          .map(([id]) => id);
+        
+        if (topUserIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from("profiles")
+            .select("id, username, display_name, points, level, daily_study_streak")
+            .in("id", topUserIds);
+          
+          leaderData = (profiles || []).map(p => ({
+            ...p,
+            challengeCount: userCounts[p.id] || 0,
+          })).sort((a, b) => b.challengeCount - a.challengeCount);
+        }
       }
     } else if (sortBy === 'studies') {
       const { data } = await supabase
@@ -145,35 +151,42 @@ const Leaderboard = () => {
       
       leaderData = data || [];
     } else if (sortBy === 'rooms') {
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, username, display_name, points, level, daily_study_streak");
-
-      if (profiles) {
-        const leadersWithRooms = await Promise.all(
-          profiles.map(async (profile) => {
-            let roomsQuery = supabase
-              .from("room_progress")
-              .select("id")
-              .eq("user_id", profile.id)
-              .not("completed_at", "is", null);
-            
-            if (dateFilter) {
-              roomsQuery = roomsQuery.gte("completed_at", dateFilter.toISOString());
-            }
-            
-            const { data: rooms } = await roomsQuery;
-            
-            return {
-              ...profile,
-              roomsCount: rooms?.length || 0
-            };
-          })
-        );
-
-        leaderData = leadersWithRooms
-          .sort((a, b) => b.roomsCount - a.roomsCount)
-          .slice(0, 50);
+      // Use aggregation approach: get room completions grouped by user
+      let roomsQuery = supabase
+        .from("room_progress")
+        .select("user_id")
+        .not("completed_at", "is", null);
+      
+      if (dateFilter) {
+        roomsQuery = roomsQuery.gte("completed_at", dateFilter.toISOString());
+      }
+      
+      const { data: rooms } = await roomsQuery;
+      
+      if (rooms) {
+        // Count rooms per user
+        const userCounts: Record<string, number> = {};
+        rooms.forEach(r => {
+          userCounts[r.user_id] = (userCounts[r.user_id] || 0) + 1;
+        });
+        
+        // Get top 50 user IDs by count
+        const topUserIds = Object.entries(userCounts)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 50)
+          .map(([id]) => id);
+        
+        if (topUserIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from("profiles")
+            .select("id, username, display_name, points, level, daily_study_streak")
+            .in("id", topUserIds);
+          
+          leaderData = (profiles || []).map(p => ({
+            ...p,
+            roomsCount: userCounts[p.id] || 0,
+          })).sort((a, b) => b.roomsCount - a.roomsCount);
+        }
       }
     }
 

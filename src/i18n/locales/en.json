@@ -146,6 +146,7 @@
     "encyclopedia": "Encyclopedia",
     "games": "Games",
     "chat": "Chat",
+    "church": "Church",
     "messages": "Messages",
     "notifications": "Notifications",
     "schedule": "Schedule",
@@ -3077,7 +3078,11 @@
     "lessonsCount": "{{count}} lessons",
     "continueStudying": "Continue Studying",
     "enroll": "Enroll",
-    "preview": "Preview"
+    "preview": "Preview",
+    "noMessagesYet": "No messages yet",
+    "beFirstToConverse": "Be the first to start a conversation!",
+    "messagePlaceholder": "Type a message in {{room}}...",
+    "publicChat": "Public Chat"
   },
   "branchStudy": {
     "pageTitle": "Branch Study",

@@ -21,13 +21,15 @@ interface QuickAudioButtonProps {
   variant?: "default" | "outline" | "ghost" | "secondary";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
+  showLabel?: boolean;
 }
 
 export function QuickAudioButton({ 
   text, 
   variant = "ghost", 
   size = "icon",
-  className 
+  className,
+  showLabel = false,
 }: QuickAudioButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -120,7 +122,7 @@ export function QuickAudioButton({
       console.log('[QuickAudio] Calling text-to-speech, mobile:', isMobile());
 
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice: "daniel", returnType: "url" }
+        body: { text, voice: "nova", returnType: "url" }
       });
 
       if (error) throw error;
@@ -246,18 +248,27 @@ export function QuickAudioButton({
   return (
     <Button
       variant={variant}
-      size={size}
+      size={showLabel ? size : "icon"}
       onClick={handleClick}
       disabled={isLoading}
       className={className}
       title={isPlaying ? "Stop" : "Listen"}
     >
       {isLoading ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {showLabel && <span className="ml-2">Loading...</span>}
+        </>
       ) : isPlaying ? (
-        <VolumeX className="h-4 w-4" />
+        <>
+          <VolumeX className="h-4 w-4" />
+          {showLabel && <span className="ml-2">Stop</span>}
+        </>
       ) : (
-        <Volume2 className="h-4 w-4" />
+        <>
+          <Volume2 className="h-4 w-4" />
+          {showLabel && <span className="ml-2">Listen</span>}
+        </>
       )}
     </Button>
   );

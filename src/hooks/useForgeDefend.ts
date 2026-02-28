@@ -94,7 +94,10 @@ export function useForgeDefend(churchId: string) {
   const [teamBattles, setTeamBattles] = useState<Battle[]>([]);
 
   const loadSeasonData = useCallback(async () => {
-    if (!user?.id || !churchId) return;
+    if (!user?.id || !churchId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       // Get active season
@@ -246,16 +249,52 @@ export function useForgeDefend(churchId: string) {
 
     if (error) { console.error("Create squad error:", error); return null; }
 
-    // Add members
+    // Get organizer profile
+    const { data: organizerProfile } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .single();
+
+    const organizerName = organizerProfile?.display_name || "Squad Organizer";
+
+    // Send invitations to all members (except creator who auto-joins)
     for (let i = 0; i < memberUserIds.length; i++) {
-      await (supabase as any)
-        .from("defense_squad_members")
-        .insert({
-          squad_id: squad.id,
-          user_id: memberUserIds[i],
-          role: i === 0 ? "captain" : "warrior",
-          is_captain: i === 0,
-        });
+      const memberId = memberUserIds[i];
+      const isCaptain = i === 0;
+
+      if (memberId === user.id) {
+        // Creator auto-joins as captain
+        await (supabase as any)
+          .from("defense_squad_members")
+          .insert({
+            squad_id: squad.id,
+            user_id: user.id,
+            role: "captain",
+            is_captain: true,
+          });
+      } else {
+        // Send invitation notification to other members
+        await (supabase as any)
+          .from("user_notifications")
+          .insert({
+            sender_id: user.id,
+            recipient_id: memberId,
+            notification_type: "squad_invitation",
+            title: `You've been drafted to ${squadName}!`,
+            message: `${organizerName} has invited you to join the Forge & Defend squad "${squadName}". ${options?.motto || ""}`,
+            page_url: `/living-manna?view=forge-defend`,
+            page_title: "Forge & Defend",
+            data: {
+              squad_id: squad.id,
+              squad_name: squadName,
+              season_id: seasonId,
+              role: isCaptain ? "captain" : "warrior",
+              is_captain: isCaptain,
+              organizer_name: organizerName,
+            },
+          });
+      }
     }
 
     // Also add the creator as participant
@@ -483,6 +522,51 @@ export function useForgeDefend(churchId: string) {
     });
   }, [battleRounds, teamMembers]);
 
+  // Accept squad invitation
+  const acceptSquadInvitation = useCallback(async (notificationId: string, squadId: string, role: string, isCaptain: boolean) => {
+    if (!user?.id) return false;
+
+    try {
+      // Add member to squad
+      await (supabase as any)
+        .from("defense_squad_members")
+        .insert({
+          squad_id: squadId,
+          user_id: user.id,
+          role: role || "warrior",
+          is_captain: isCaptain || false,
+        });
+
+      // Mark notification as read
+      await (supabase as any)
+        .from("user_notifications")
+        .update({ is_read: true })
+        .eq("id", notificationId);
+
+      await loadSeasonData();
+      return true;
+    } catch (error) {
+      console.error("Error accepting invitation:", error);
+      return false;
+    }
+  }, [user?.id, loadSeasonData]);
+
+  // Decline squad invitation
+  const declineSquadInvitation = useCallback(async (notificationId: string) => {
+    try {
+      // Mark notification as read
+      await (supabase as any)
+        .from("user_notifications")
+        .update({ is_read: true })
+        .eq("id", notificationId);
+
+      return true;
+    } catch (error) {
+      console.error("Error declining invitation:", error);
+      return false;
+    }
+  }, []);
+
   return {
     loading,
     activeSeason,
@@ -502,6 +586,8 @@ export function useForgeDefend(churchId: string) {
     advanceWeek,
     getTeamStats,
     getParticipationBalance,
+    acceptSquadInvitation,
+    declineSquadInvitation,
     refresh: loadSeasonData,
   };
 }

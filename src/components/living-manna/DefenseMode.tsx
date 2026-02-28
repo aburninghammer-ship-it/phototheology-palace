@@ -5,13 +5,17 @@ import {
   Shield, Swords, Send, Loader2, RotateCcw, ArrowRight,
   Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
   FlaskConical, Target, Save, Archive, Trash2, ChevronDown, ChevronUp,
-  Warehouse, ArrowLeft, Users, Share2, Crown,
+  Warehouse, ArrowLeft, Users, Share2, Crown, Flame, MessageSquare,
+  GraduationCap,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { CommunityArmory } from "./CommunityArmory";
 import { CheckmateMode } from "./CheckmateMode";
 import { InterdenominationalLibrary } from "./InterdenominationalLibrary";
 import { ForgeDefendHub } from "./ForgeDefendHub";
+import { OpponentProfileDialog } from "./OpponentProfileDialog";
+import { FortyDayChallenge } from "./FortyDayChallenge";
+import { AATSTraining } from "./AATSTraining";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
@@ -34,6 +39,7 @@ import {
 
 interface DefenseModeProps {
   churchId: string;
+  onNavigateToAATS?: (avatarId: string) => void;
 }
 
 type Phase = "setup" | "sparring" | "responding" | "coaching" | "review";
@@ -46,7 +52,7 @@ interface ChatMessage {
   score?: number;
 }
 
-type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate" | "forge-defend";
+type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate" | "forge-defend" | "forty-day" | "aats";
 
 interface ArsenalWeapon {
   id: string;
@@ -59,13 +65,27 @@ interface ArsenalWeapon {
   imageUrl?: string;
 }
 
-export function DefenseMode({ churchId }: DefenseModeProps) {
+interface SavedDebate {
+  id: string;
+  title?: string;
+  opponent_id: string;
+  opponent_name: string;
+  topic_id?: string;
+  topic_name?: string;
+  difficulty: string;
+  round_count: number;
+  messages: ChatMessage[];
+  saved_at: string;
+}
+
+export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Sub-mode: sparring arena vs 3AM library
   const [subMode, setSubMode] = useState<DefenseSubMode>("sparring");
+  const [profileOpponent, setProfileOpponent] = useState<DefenseOpponent | null>(null);
 
   // Setup state
   const [selectedOpponent, setSelectedOpponent] = useState<DefenseOpponent | null>(null);
@@ -73,6 +93,19 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState("intermediate");
   const [selectedTemperaments, setSelectedTemperaments] = useState<string[]>(["polite"]);
   const [assistMode, setAssistMode] = useState(true);
+  const [goliathScoutMode, setGoliathScoutMode] = useState(false);
+
+  // Master Mode Jeeves standby state
+  const [jeevesPreBriefing, setJeevesPreBriefing] = useState<string | null>(null);
+  const [isPreBriefingLoading, setIsPreBriefingLoading] = useState(false);
+  const [showJeevesStandby, setShowJeevesStandby] = useState(false);
+  const [jeevesStandbyMsg, setJeevesStandbyMsg] = useState<string | null>(null);
+  const [isStandbyLoading, setIsStandbyLoading] = useState(false);
+  const [jeevesStandbyInput, setJeevesStandbyInput] = useState("");
+
+  const isMasterMode = selectedDifficulty === "master";
+
+  const isGoliath = selectedOpponent?.id === "goliath";
 
   // Combat state
   const [phase, setPhase] = useState<Phase>("setup");
@@ -94,10 +127,18 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [forgeAutoSaveRestored, setForgeAutoSaveRestored] = useState(false);
   const [weaponAnalysis, setWeaponAnalysis] = useState<string | null>(null);
   const [weaponLoading, setWeaponLoading] = useState(false);
+  const [jeevesGenerating, setJeevesGenerating] = useState(false);
 
   // Arsenal state (DB-backed for cross-device sync)
   const [arsenal, setArsenal] = useState<ArsenalWeapon[]>([]);
   const [arsenalLoading, setArsenalLoading] = useState(false);
+
+  // Saved Debates state (DB-backed for cross-device sync)
+  const [savedDebates, setSavedDebates] = useState<SavedDebate[]>([]);
+  const [debatesLoading, setDebatesLoading] = useState(false);
+  const [showSaveDebateDialog, setShowSaveDebateDialog] = useState(false);
+  const [showLoadDebatesDialog, setShowLoadDebatesDialog] = useState(false);
+  const [debateTitle, setDebateTitle] = useState("");
 
   // Load arsenal from DB
   const loadArsenal = useCallback(async () => {
@@ -163,6 +204,14 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     };
     migrateLocalArsenal().then(() => loadArsenal());
   }, [loadArsenal, user]);
+
+   // Load saved debates on mount (moved after loadSavedDebates definition via eslint-disable)
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  useEffect(() => {
+    if (user) {
+      loadSavedDebates(); // eslint-disable-line @typescript-eslint/no-use-before-define
+    }
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-generate images for weapons that don't have one yet
   useEffect(() => {
@@ -383,6 +432,87 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     }
   };
 
+  // Load saved debates from DB
+  const loadSavedDebates = useCallback(async () => {
+    if (!user) return;
+    setDebatesLoading(true);
+    try {
+      const { data, error } = await (supabase as any)
+        .from("defense_debates")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("saved_at", { ascending: false });
+      if (error) throw error;
+      setSavedDebates((data || []).map((d: any) => ({
+        id: d.id,
+        title: d.title,
+        opponent_id: d.opponent_id,
+        opponent_name: d.opponent_name,
+        topic_id: d.topic_id,
+        topic_name: d.topic_name,
+        difficulty: d.difficulty,
+        round_count: d.round_count,
+        messages: d.messages,
+        saved_at: d.saved_at,
+      })));
+    } catch (e) {
+      console.error("Failed to load debates:", e);
+    } finally {
+      setDebatesLoading(false);
+    }
+  }, [user]);
+
+  // Save current debate to DB
+  const saveDebate = async (title?: string) => {
+    if (!user || !selectedOpponent || messages.length === 0) return;
+    try {
+      const { error } = await (supabase as any).from("defense_debates").insert({
+        user_id: user.id,
+        title: title || null,
+        opponent_id: selectedOpponent.id,
+        opponent_name: selectedOpponent.name,
+        topic_id: selectedTopic?.id || null,
+        topic_name: selectedTopic?.name || null,
+        difficulty: selectedDifficulty,
+        round_count: roundCount,
+        messages: messages,
+        saved_at: new Date().toISOString(),
+      });
+      if (error) throw error;
+      await loadSavedDebates();
+      setShowSaveDebateDialog(false);
+      setDebateTitle("");
+    } catch (e) {
+      console.error("Failed to save debate:", e);
+    }
+  };
+
+  // Load a saved debate back into the UI
+  const loadDebate = (debate: SavedDebate) => {
+    const opponent = DEFENSE_OPPONENTS.find(o => o.id === debate.opponent_id);
+    const topic = DEFENSE_TOPICS.find(t => t.id === debate.topic_id);
+
+    if (opponent) {
+      setSelectedOpponent(opponent);
+      setSelectedTopic(topic || null);
+      setSelectedDifficulty(debate.difficulty);
+      setRoundCount(debate.round_count);
+      setMessages(debate.messages);
+      setPhase("sparring");
+      setSubMode("sparring");
+    }
+  };
+
+  // Delete a saved debate
+  const deleteDebate = async (debateId: string) => {
+    try {
+      await (supabase as any).from("defense_debates").delete().eq("id", debateId);
+      setSavedDebates((prev) => prev.filter((d) => d.id !== debateId));
+    } catch (e) {
+      console.error("Failed to delete debate:", e);
+    }
+  };
+
   // Arsenal room state
   const [selectedArsenalWeapon, setSelectedArsenalWeapon] = useState<ArsenalWeapon | null>(null);
 
@@ -418,12 +548,122 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   const [attackAnalysis, setAttackAnalysis] = useState<string | null>(null);
   const [attackLoading, setAttackLoading] = useState(false);
 
+  // ─── TAB PERSISTENCE ─────────────────────────────────────────
+  const SESSION_KEY = "defense-mode-session";
+
+  // Save state to sessionStorage when tab becomes hidden
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden" && phase !== "setup") {
+        try {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+            phase, messages, subMode, roundCount, lastScore,
+            selectedOpponentId: selectedOpponent?.id || null,
+            selectedTopicId: selectedTopic?.id || null,
+            selectedDifficulty, selectedTemperaments, assistMode,
+            userInput, audioMode, ts: Date.now(),
+          }));
+        } catch { /* quota */ }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [phase, messages, subMode, roundCount, lastScore, selectedOpponent, selectedTopic, selectedDifficulty, selectedTemperaments, assistMode, userInput, audioMode]);
+
+  // Restore state from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(SESSION_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      // Expire after 30 minutes
+      if (saved.ts && Date.now() - saved.ts > 1800000) {
+        sessionStorage.removeItem(SESSION_KEY);
+        return;
+      }
+      if (saved.selectedOpponentId) {
+        const opp = DEFENSE_OPPONENTS.find(o => o.id === saved.selectedOpponentId);
+        if (opp) setSelectedOpponent(opp);
+      }
+      if (saved.selectedTopicId) {
+        const topic = DEFENSE_TOPICS.find(t => t.id === saved.selectedTopicId);
+        if (topic) setSelectedTopic(topic);
+      }
+      if (saved.phase && saved.phase !== "setup") setPhase(saved.phase);
+      if (saved.messages?.length) setMessages(saved.messages);
+      if (saved.subMode) setSubMode(saved.subMode);
+      if (saved.roundCount) setRoundCount(saved.roundCount);
+      if (saved.lastScore !== undefined) setLastScore(saved.lastScore);
+      if (saved.selectedDifficulty) setSelectedDifficulty(saved.selectedDifficulty);
+      if (saved.selectedTemperaments) setSelectedTemperaments(saved.selectedTemperaments);
+      if (saved.assistMode !== undefined) setAssistMode(saved.assistMode);
+      if (saved.userInput) setUserInput(saved.userInput);
+      if (saved.audioMode !== undefined) setAudioMode(saved.audioMode);
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch { /* ignore */ }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─── JEEVES MASTER MODE FUNCTIONS ────────────────────────────
+  const fetchPreBriefing = useCallback(async (opponent: DefenseOpponent, topic: DefenseTopic | null) => {
+    setIsPreBriefingLoading(true);
+    setJeevesPreBriefing(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-pre-briefing",
+          opponentName: opponent.name,
+          opponentPronouns: opponent.pronouns,
+          opponentWorldview: opponent.worldview,
+          opponentStyle: opponent.argumentStyle,
+          opponentTargets: opponent.attackTargets,
+          defenseTopicName: topic?.name || "Unknown — Blind Engagement",
+          difficulty: "master",
+        },
+      });
+      if (error) throw error;
+      setJeevesPreBriefing(data?.content || "Briefing unavailable. Trust your training.");
+    } catch {
+      setJeevesPreBriefing("Jeeves couldn't prepare a briefing. Stand on the Word — you've trained for this.");
+    } finally {
+      setIsPreBriefingLoading(false);
+    }
+  }, []);
+
+  const askJeevesStandby = useCallback(async (question?: string) => {
+    if (!selectedOpponent) return;
+    setIsStandbyLoading(true);
+    setShowJeevesStandby(true);
+    try {
+      const conversationContext = messages
+        .filter(m => m.role !== "system" && m.role !== "assist")
+        .map(m => `[${m.role === "opponent" ? selectedOpponent.name : m.role === "disciple" ? "You" : "Jeeves"}]: ${m.content}`)
+        .join("\n\n");
+
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-master-standby",
+          opponentName: selectedOpponent.name,
+          defenseTopicName: selectedTopic?.name || "Blind Engagement",
+          conversationHistory: conversationContext,
+          userMessage: question || "Analyze the current debate state and advise me.",
+          difficulty: "master",
+        },
+      });
+      if (error) throw error;
+      setJeevesStandbyMsg(data?.content || "Jeeves is processing...");
+    } catch {
+      setJeevesStandbyMsg("Jeeves is momentarily unavailable. Trust your Palace training.");
+    } finally {
+      setIsStandbyLoading(false);
+    }
+  }, [selectedOpponent, selectedTopic, messages]);
+
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isLoading, isAssistLoading]);
+  }, [messages.length]);
 
   // Auto-speak opponent/coach messages when audio mode is on
   useEffect(() => {
@@ -508,6 +748,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           mode: "defense-assist",
           opponentAttack,
           opponentName: selectedOpponent.name,
+          opponentPronouns: selectedOpponent.pronouns,
           defenseTopicName: selectedTopic.name,
           opponentPersonality: selectedTemperaments.join(", "),
         },
@@ -605,6 +846,30 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
     }
   };
 
+  // ─── Jeeves Generate Weapon handler ─────────────────────────────
+  const jeevesGenerateWeapon = async () => {
+    if (weaponTarget.trim().length < 20) return;
+    setJeevesGenerating(true);
+    setWeaponAnalysis(null);
+    setWeaponInput("");
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-jeeves-generate",
+          weaponTarget: weaponTarget.trim(),
+          doctrineTopic: weaponTopic || undefined,
+        },
+      });
+      if (error) throw error;
+      setWeaponAnalysis(data?.content || "Generation failed. Please try again.");
+    } catch (err) {
+      console.error("Jeeves generate weapon error:", err);
+      setWeaponAnalysis("Failed to generate weapon. Please try again.");
+    } finally {
+      setJeevesGenerating(false);
+    }
+  };
+
   // ─── Analyze This Attack handler ─────────────────────────────
   const analyzeAttack = async () => {
     if (attackInput.trim().length < 50) return;
@@ -629,15 +894,27 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
   };
 
   const startSparring = async () => {
-    if (!selectedOpponent || !selectedTopic) return;
+    // Goliath blind mode: topic is optional
+    if (!selectedOpponent) return;
+    if (!isGoliath && !selectedTopic) return;
+
+    // Master Mode: fire pre-briefing in parallel
+    if (isMasterMode) {
+      fetchPreBriefing(selectedOpponent, selectedTopic || null);
+      setShowJeevesStandby(true);
+    }
 
     setPhase("sparring");
     setIsLoading(true);
     setRoundCount(1);
 
+    const isBlindGoliath = isGoliath && !selectedTopic;
+
     addMessage({
       role: "system",
-      content: `Round 1 — ${selectedOpponent.name} vs. You on "${selectedTopic.name}" (${selectedDifficulty})`,
+      content: isBlindGoliath
+        ? `Round 1 — ${selectedOpponent.name} has entered the arena. You don't know what's coming... (${selectedDifficulty})`
+        : `Round 1 — ${selectedOpponent.name} vs. You on "${selectedTopic!.name}" (${selectedDifficulty})`,
     });
 
     try {
@@ -645,8 +922,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         body: {
           mode: "defense-sparring",
           opponent: selectedOpponent.id,
-          defenseTopicId: selectedTopic.id,
-          defenseTopicName: selectedTopic.name,
+          defenseTopicId: isBlindGoliath ? "__goliath_blind__" : selectedTopic!.id,
+          defenseTopicName: isBlindGoliath ? "Unknown — Goliath chooses" : selectedTopic!.name,
           difficulty: selectedDifficulty,
           temperament: selectedTemperaments,
           opponentWorldview: selectedOpponent.worldview,
@@ -654,7 +931,9 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           opponentTargets: selectedOpponent.attackTargets,
           opponentEndPrompt: selectedOpponent.endPrompt,
           opponentSteelmanRules: selectedOpponent.steelmanRules,
-          isSignatureTopic: !!selectedTopic.isSignature,
+          opponentPronouns: selectedOpponent.pronouns,
+          isSignatureTopic: isBlindGoliath ? false : !!selectedTopic?.isSignature,
+          isGoliathBlindMode: isBlindGoliath,
           phase: "opening",
         },
       });
@@ -695,6 +974,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         body: {
           mode: "defense-coach",
           defenseTopicName: selectedTopic?.name,
+          opponentName: selectedOpponent?.name,
+          opponentPronouns: selectedOpponent?.pronouns,
           opponentAttack,
           discipleResponse,
         },
@@ -702,9 +983,54 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
       if (error) throw error;
 
-      const score = data.score || 0;
+      let content = data.content || "Coaching unavailable.";
+      let score = data.score || 0;
+
+      // Check if response is truncated (missing key sections)
+      const hasScore = /TOTAL SCORE:\s*\d+\s*\/\s*40/i.test(content);
+      const hasModelDefense = /MODEL DEFENSE:/i.test(content);
+      const isComplete = hasScore && hasModelDefense && content.length > 500;
+
+      if (!isComplete && content.length > 200) {
+        // Attempt up to 2 continuations to get the full analysis
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const { data: contData, error: contError } = await supabase.functions.invoke("jeeves", {
+              body: {
+                mode: "defense-coach-continue",
+                defenseTopicName: selectedTopic?.name,
+                partialResponse: content,
+              },
+            });
+
+            if (contError) break;
+
+            const continuation = contData.content || "";
+            if (!continuation) break;
+
+            content = content + "\n\n" + continuation;
+
+            // Extract score from combined content
+            const combinedScoreMatch = content.match(/TOTAL SCORE:\s*(\d+)\s*\/\s*40/i);
+            if (combinedScoreMatch) {
+              score = parseInt(combinedScoreMatch[1], 10);
+            } else if (contData.score) {
+              score = contData.score;
+            }
+
+            // Check if now complete
+            const nowHasScore = /TOTAL SCORE:\s*\d+\s*\/\s*40/i.test(content);
+            const nowHasDefense = /MODEL DEFENSE:/i.test(content);
+            if (nowHasScore && nowHasDefense) break;
+          } catch {
+            break;
+          }
+        }
+      }
+
       setLastScore(score);
-      addMessage({ role: "coach", content: data.content || "Coaching unavailable.", score });
+      addMessage({ role: "coach", content, score });
+
       setPhase("review");
     } catch (err) {
       console.error("Coaching error:", err);
@@ -742,6 +1068,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           opponentTargets: selectedOpponent.attackTargets,
           opponentEndPrompt: selectedOpponent.endPrompt,
           opponentSteelmanRules: selectedOpponent.steelmanRules,
+          opponentPronouns: selectedOpponent.pronouns,
           isSignatureTopic: !!selectedTopic?.isSignature,
           phase: "follow-up",
           conversationHistory: buildConversationHistory(),
@@ -810,7 +1137,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         </div>
 
         {/* Sub-mode Toggle: 5 tabs */}
-        <div className={`grid ${isMobile ? "grid-cols-4" : "grid-cols-7"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-4xl mx-auto`}>
+        <div className={`grid ${isMobile ? "grid-cols-4" : "grid-cols-9"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-5xl mx-auto`}>
           {([
             { id: "sparring" as const, label: "Sparring Arena", icon: Swords, gradient: "from-red-600 to-orange-600" },
             { id: "library" as const, label: "3AM Library", icon: BookOpen, gradient: "from-amber-600 to-yellow-600" },
@@ -819,6 +1146,8 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             { id: "arsenal" as const, label: `Arsenal${arsenal.length > 0 ? ` (${arsenal.length})` : ""}`, icon: Warehouse, gradient: "from-emerald-600 to-teal-600" },
             { id: "community-armory" as const, label: "Community Armory", icon: Users, gradient: "from-amber-600 to-orange-600" },
             { id: "forge-defend" as const, label: "Forge & Defend", icon: Trophy, gradient: "from-violet-600 to-fuchsia-600" },
+            { id: "forty-day" as const, label: "40 Days of Smoke", icon: Flame, gradient: "from-red-600 to-red-800" },
+            { id: "aats" as const, label: "AATS", icon: GraduationCap, gradient: "from-sky-600 to-indigo-600" },
           ]).map((tab) => (
             <button
               key={tab.id}
@@ -835,7 +1164,11 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           ))}</div>
 
         {/* Render based on sub-mode */}
-        {subMode === "forge-defend" ? (
+        {subMode === "aats" ? (
+          <AATSTraining churchId={churchId} onNavigateToDefense={() => setSubMode("sparring")} />
+        ) : subMode === "forty-day" ? (
+          <FortyDayChallenge />
+        ) : subMode === "forge-defend" ? (
           <ForgeDefendHub churchId={churchId} />
         ) : subMode === "community-armory" ? (
           <CommunityArmory onGoToForge={() => setSubMode("analyze-weapon")} />
@@ -933,15 +1266,46 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
               </div>
             </div>
 
+            {/* Jeeves Generate divider */}
+            <div className="relative flex items-center gap-3">
+              <div className="flex-1 border-t border-muted-foreground/20" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">or let Jeeves forge one</span>
+              <div className="flex-1 border-t border-muted-foreground/20" />
+            </div>
+
+            <div className="text-center">
+              <Button
+                size="sm"
+                disabled={weaponTarget.trim().length < 20 || jeevesGenerating || weaponLoading}
+                onClick={jeevesGenerateWeapon}
+                className="bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-700 hover:to-red-700 text-white"
+              >
+                {jeevesGenerating ? (
+                  <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Jeeves is Forging...</>
+                ) : (
+                  <><Swords className="h-4 w-4 mr-1" /> Let Jeeves Forge a Weapon</>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Jeeves will create an original, arsenal-grade weapon using Scripture, logic, and PT principles
+              </p>
+            </div>
+
             {/* Analysis result */}
-            {weaponLoading && !weaponAnalysis && (
+            {(weaponLoading || jeevesGenerating) && !weaponAnalysis && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <Card variant="glass" className="border-cyan-500/30 bg-cyan-950/20">
                   <CardContent className="p-4 flex items-center gap-3">
                     <Loader2 className="h-5 w-5 animate-spin text-cyan-400" />
                     <div>
-                      <p className="text-sm font-semibold text-cyan-300">Jeeves is examining your weapon...</p>
-                      <p className="text-xs text-muted-foreground">Checking biblical accuracy, logical structure, rhetorical power, and persuasive force.</p>
+                      <p className="text-sm font-semibold text-cyan-300">
+                        {jeevesGenerating ? "Jeeves is forging an original weapon..." : "Jeeves is examining your weapon..."}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {jeevesGenerating
+                          ? "Using Scripture chains, sanctuary typology, prophetic patterns, and PT Palace rooms to forge something devastating."
+                          : "Checking biblical accuracy, logical structure, rhetorical power, and persuasive force."}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1525,6 +1889,21 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         ) : (
         <>
 
+        {/* Saved Debates Button */}
+        {savedDebates.length > 0 && (
+          <div className="flex justify-end mb-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowLoadDebatesDialog(true)}
+              className="border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <Archive className="h-4 w-4 mr-2" />
+              Load Saved Debate ({savedDebates.length})
+            </Button>
+          </div>
+        )}
+
         {/* Opponent Grid */}
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
@@ -1540,7 +1919,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
                       ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-lg"
                       : "hover:shadow-md"
                   }`}
-                  onClick={() => setSelectedOpponent(opp)}
+                  onClick={() => setProfileOpponent(opp)}
                 >
                   <CardContent className="p-3 text-center space-y-1">
                     <div className="relative mx-auto w-16 h-16 rounded-full overflow-hidden border-2 border-current mb-1">
@@ -1555,7 +1934,66 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </div>
         </div>
 
-        {/* Topic Selector */}
+        {/* Goliath Blind Mode Banner */}
+        {isGoliath && !goliathScoutMode && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-4 rounded-lg border border-purple-500/40 bg-gradient-to-br from-purple-950/40 to-black/60 space-y-3"
+          >
+            <div className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-purple-400" />
+              <h3 className="text-sm font-bold text-purple-300">Blind Engagement Mode</h3>
+            </div>
+            <p className="text-xs text-purple-200/80 leading-relaxed">
+              You don't know what doctrine Goliath will attack, or from what worldview. He picks the angle and strikes first. 
+              Prepare to think on your feet — this is the ultimate test.
+            </p>
+            <div className="flex items-center justify-between pt-1 border-t border-purple-500/20">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                <span className="text-xs text-amber-300/80">Want to preview the topic?</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setGoliathScoutMode(true)}
+                className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10 text-xs h-7"
+              >
+                Enable Scout Mode
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Scout Mode Active Banner */}
+        {isGoliath && goliathScoutMode && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 rounded-lg border border-amber-500/30 bg-amber-950/20 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-amber-400" />
+              <div>
+                <p className="text-xs font-bold text-amber-300">Scout Mode Active</p>
+                <p className="text-[10px] text-amber-400/70">Select a topic below, or go back to blind mode</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => { setGoliathScoutMode(false); setSelectedTopic(null); }}
+              className="text-amber-400 hover:text-amber-300 text-xs h-7"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Go Blind
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Topic Selector — hidden for Goliath blind mode (shown for Scout Mode) */}
+        {(!isGoliath || goliathScoutMode) && (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Select Topic</h3>
           <div className="flex flex-wrap gap-2">
@@ -1605,6 +2043,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             <p className="text-xs text-muted-foreground mt-1">{selectedTopic.description}</p>
           )}
         </div>
+        )}
 
         {/* Difficulty */}
         <div>
@@ -1701,14 +2140,31 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
         {/* Begin Button */}
         <Button
           size="lg"
-          className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
-          disabled={!selectedOpponent || !selectedTopic}
+          className={`w-full text-white ${
+            isGoliath && !goliathScoutMode
+              ? "bg-gradient-to-r from-purple-700 to-fuchsia-700 hover:from-purple-800 hover:to-fuchsia-800"
+              : "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+          }`}
+          disabled={!selectedOpponent || (!isGoliath && !selectedTopic) || (isGoliath && goliathScoutMode && !selectedTopic)}
           onClick={startSparring}
         >
-          <Swords className="h-5 w-5 mr-2" />
-          Begin Sparring
+          {isGoliath && !goliathScoutMode ? (
+            <><Crown className="h-5 w-5 mr-2" /> Enter the Arena Blind</>
+          ) : (
+            <><Swords className="h-5 w-5 mr-2" /> Begin Sparring</>
+          )}
         </Button>
         </>)}
+        <OpponentProfileDialog
+          opponent={profileOpponent}
+          open={!!profileOpponent}
+          onOpenChange={(open) => { if (!open) setProfileOpponent(null); }}
+          onSelectOpponent={(opp) => {
+            setSelectedOpponent(opp);
+            setProfileOpponent(null);
+          }}
+          onNavigateToAATS={onNavigateToAATS}
+        />
       </div>
     );
   }
@@ -1725,7 +2181,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           <div>
             <p className="font-semibold text-sm">{selectedOpponent?.name}</p>
             <p className="text-xs text-muted-foreground">
-              {selectedTopic?.name} · Round {roundCount}
+              {selectedTopic ? selectedTopic.name : "⚡ Blind Engagement"} · Round {roundCount}
             </p>
           </div>
           <Badge variant="outline" className="text-xs ml-2">{selectedDifficulty}</Badge>
@@ -1759,6 +2215,16 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           >
             {audioMode ? <Volume2 className="h-4 w-4" /> : <Volume2 className="h-4 w-4 opacity-40" />}
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowSaveDebateDialog(true)}
+            disabled={messages.length === 0}
+            title="Save this debate"
+          >
+            <Save className="h-4 w-4 mr-1" />
+            Save
+          </Button>
           <Button variant="ghost" size="sm" onClick={resetMatch}>
             <RotateCcw className="h-4 w-4 mr-1" />
             New Match
@@ -1786,13 +2252,14 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
       {/* Message Thread */}
       <ScrollArea className={`${isMobile ? "h-[370px]" : "h-[480px]"} rounded-lg border border-border/50 bg-black/10 p-3`}>
         <div ref={scrollRef} className="space-y-3">
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {messages.map((msg) => (
               <motion.div
                 key={msg.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
                 className={`flex ${
                   msg.role === "disciple"
                     ? "justify-end"
@@ -1879,7 +2346,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
 
           {/* Loading indicators */}
           {isLoading && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="flex justify-start">
               <div className="flex items-center gap-2 rounded-lg bg-muted/30 border border-border/50 p-3 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 {phase === "coaching" ? "Jeeves is analyzing your defense..." : "Opponent is thinking..."}
@@ -1887,7 +2354,7 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
             </motion.div>
           )}
           {isAssistLoading && assistMode && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="flex justify-start">
               <div className="flex items-center gap-2 rounded-xl bg-amber-950/30 border border-amber-500/30 p-3 text-xs text-amber-400">
                 <Sparkles className="h-3.5 w-3.5 animate-pulse" />
                 Jeeves is analyzing the attack for you...
@@ -1896,6 +2363,98 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           )}
         </div>
       </ScrollArea>
+
+      {/* ─── JEEVES MASTER MODE STANDBY PANEL ───────────────────── */}
+      {isMasterMode && (
+        <div className="rounded-lg border border-blue-500/30 bg-gradient-to-br from-blue-950/30 to-indigo-950/20 p-3 space-y-2">
+          {/* Pre-briefing (shows at start) */}
+          {jeevesPreBriefing && !showJeevesStandby && (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-blue-300 flex items-center gap-1">
+                  <Shield className="h-3 w-3" /> JEEVES — Pre-Battle Briefing
+                </p>
+                <button onClick={() => setJeevesPreBriefing(null)} className="text-[10px] text-muted-foreground hover:text-foreground">✕</button>
+              </div>
+              <div className="prose prose-sm prose-invert max-w-none text-[11px] leading-relaxed text-blue-200/80">
+                <ReactMarkdown>{jeevesPreBriefing}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+          {isPreBriefingLoading && (
+            <div className="flex items-center gap-2 py-1">
+              <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+              <span className="text-[10px] text-blue-300">Jeeves is preparing your pre-battle briefing...</span>
+            </div>
+          )}
+
+          {/* Standby coaching panel */}
+          {showJeevesStandby && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-blue-300 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" /> JEEVES — On Standby
+                </p>
+                <button onClick={() => setShowJeevesStandby(false)} className="text-[10px] text-muted-foreground hover:text-foreground">✕</button>
+              </div>
+              {isStandbyLoading ? (
+                <div className="flex items-center gap-2 py-1">
+                  <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+                  <span className="text-[10px] text-muted-foreground">Jeeves is analyzing...</span>
+                </div>
+              ) : jeevesStandbyMsg ? (
+                <div className="prose prose-sm prose-invert max-w-none text-[11px] leading-relaxed text-blue-200/80">
+                  <ReactMarkdown>{jeevesStandbyMsg}</ReactMarkdown>
+                </div>
+              ) : null}
+              <div className="flex gap-2">
+                <input
+                  value={jeevesStandbyInput}
+                  onChange={e => setJeevesStandbyInput(e.target.value)}
+                  placeholder="Ask Jeeves anything..."
+                  className="flex-1 rounded-md bg-blue-500/5 border border-blue-500/20 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      askJeevesStandby(jeevesStandbyInput.trim() || undefined);
+                      setJeevesStandbyInput("");
+                    }
+                  }}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    askJeevesStandby(jeevesStandbyInput.trim() || undefined);
+                    setJeevesStandbyInput("");
+                  }}
+                  disabled={isStandbyLoading}
+                  className="text-[10px] border-blue-500/30 text-blue-300 hover:bg-blue-500/10"
+                >
+                  <MessageSquare className="h-3 w-3 mr-1" />
+                  Ask
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Toggle standby visibility */}
+          {!showJeevesStandby && !isPreBriefingLoading && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setShowJeevesStandby(true);
+                if (!jeevesStandbyMsg) askJeevesStandby();
+              }}
+              className="text-[10px] text-blue-400 hover:text-blue-300 w-full"
+            >
+              <Sparkles className="h-3 w-3 mr-1" />
+              Open Jeeves Standby Panel
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* Input Area */}
       {phase === "responding" && (
@@ -1976,6 +2535,128 @@ export function DefenseMode({ churchId }: DefenseModeProps) {
           </div>
         </motion.div>
       )}
+
+      {/* Save Debate Dialog */}
+      <Dialog open={showSaveDebateDialog} onOpenChange={setShowSaveDebateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save This Debate</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="debate-title">Title (Optional)</Label>
+              <Textarea
+                id="debate-title"
+                placeholder="e.g., 'Debating Sunday Law with Evangelical'"
+                value={debateTitle}
+                onChange={(e) => setDebateTitle(e.target.value)}
+                className="min-h-[60px]"
+              />
+            </div>
+            <div className="text-sm text-muted-foreground">
+              <p><strong>Opponent:</strong> {selectedOpponent?.name}</p>
+              <p><strong>Topic:</strong> {selectedTopic?.name || "Blind Engagement"}</p>
+              <p><strong>Rounds:</strong> {roundCount}</p>
+              <p><strong>Messages:</strong> {messages.length}</p>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setShowSaveDebateDialog(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => saveDebate(debateTitle || undefined)}
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save Debate
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Load Saved Debates Dialog */}
+      <Dialog open={showLoadDebatesDialog} onOpenChange={setShowLoadDebatesDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Saved Debates</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-3 pr-4">
+              {debatesLoading ? (
+                <div className="py-8 flex justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : savedDebates.length === 0 ? (
+                <div className="py-8 text-center text-muted-foreground">
+                  <Archive className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm">No saved debates yet</p>
+                  <p className="text-xs">Save your sparring sessions to review later</p>
+                </div>
+              ) : (
+                savedDebates.map((debate) => (
+                  <Card key={debate.id} variant="glass" className="border-primary/20">
+                    <CardContent className="p-4">
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-sm truncate">
+                              {debate.title || `${debate.opponent_name} - ${debate.topic_name || "Blind"}`}
+                            </h4>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(debate.saved_at).toLocaleDateString()} • {debate.opponent_name} • {debate.topic_name || "Blind Engagement"}
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="text-xs shrink-0">
+                            {debate.difficulty}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span>{debate.round_count} rounds</span>
+                          <span>•</span>
+                          <span>{debate.messages.length} messages</span>
+                        </div>
+                        <div className="flex gap-2 mt-3">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 border-primary/30 text-primary hover:bg-primary/10"
+                            onClick={() => {
+                              loadDebate(debate);
+                              setShowLoadDebatesDialog(false);
+                            }}
+                          >
+                            <ArrowRight className="h-3.5 w-3.5 mr-1" />
+                            Load
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                            onClick={() => deleteDebate(debate.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+      <OpponentProfileDialog
+        opponent={profileOpponent}
+        open={!!profileOpponent}
+        onOpenChange={(open) => { if (!open) setProfileOpponent(null); }}
+        onSelectOpponent={(opp) => {
+          setSelectedOpponent(opp);
+          setProfileOpponent(null);
+        }}
+        onNavigateToAATS={onNavigateToAATS}
+      />
     </div>
   );
 }

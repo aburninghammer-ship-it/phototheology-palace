@@ -36,12 +36,14 @@ import { cn } from '@/lib/utils';
 interface BibleStudyConnectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (connections: Connection[], explanation: string, isChristConnection: boolean, jeevesJudgment?: string) => void;
+  onSubmit: (connections: Connection[], explanation: string, isChristConnection: boolean, jeevesJudgment?: string, jeevesScore?: number) => void;
   card: ScrabbleCard;
   position: BoardPosition;
   adjacentCards: PlacedCard[];
   seedVerse: SelectedVerse;
   previousEntry?: StudyLogEntry; // The previous player's insight to connect to
+  jeevesAssistsUsed?: number; // How many Jeeves assists this player has used
+  maxJeevesAssists?: number; // Max assists allowed (default 3)
 }
 
 // Simple, clear principle explanations for the timed game context
@@ -158,12 +160,15 @@ export function BibleStudyConnectionModal({
   adjacentCards,
   seedVerse,
   previousEntry,
+  jeevesAssistsUsed = 0,
+  maxJeevesAssists = 3,
 }: BibleStudyConnectionModalProps) {
   const [timeLeft, setTimeLeft] = useState<number>(SCRABBLE_SCORING.TIMER_SECONDS); // 2 minutes
   const [explanation, setExplanation] = useState('');
   const [isChristConnection, setIsChristConnection] = useState(false);
   const [isJudging, setIsJudging] = useState(false);
   const [jeevesJudgment, setJeevesJudgment] = useState<string | null>(null);
+  const [showSeedVerse, setShowSeedVerse] = useState(false);
 
   // Determine if this is the first play (connect to verse) or subsequent (connect to previous)
   const isFirstPlay = !previousEntry;
@@ -193,9 +198,11 @@ export function BibleStudyConnectionModal({
     return () => clearInterval(timer);
   }, [isOpen]);
 
-  // Jeeves judging function
-  const getJeevesJudgment = async (playerExplanation: string): Promise<string> => {
+  // Jeeves judging function — returns { commentary, score }
+  const getJeevesJudgment = async (playerExplanation: string): Promise<{ commentary: string; score: number }> => {
     try {
+      const scoreInstructions = `\n\nIMPORTANT: You MUST end your response with a score on its own line in this exact format:\nSCORE: <number>\nwhere <number> is an integer from 1 to 10.\n- 1-4 = weak / incorrect / shallow / off-topic (player loses the card and their turn)\n- 5-6 = acceptable but surface-level\n- 7-8 = solid theological insight\n- 9-10 = exceptional, deeply connected, masterful\n\nCRITICAL: If you score BELOW 5, you MUST:\n1. Explain specifically WHY the answer fell short (was it off-topic? too vague? misapplied the principle? missed the verse context?)\n2. Give 1-2 concrete tips on how they COULD have connected "${card.name}" more effectively to the text.\n3. Offer a brief example of what a stronger answer might look like (just one sentence).\nThis helps the player learn and improve. Be honest but kind — coach, don't crush.`;
+
       const prompt = isFirstPlay
         ? `You are Jeeves, a wise Bible study assistant. A player is connecting the PT principle "${card.name}" to ${seedVerse.reference}.
 
@@ -206,8 +213,8 @@ ${card.description ? `DESCRIPTION: ${card.description}` : ''}
 
 PLAYER'S EXPLANATION: "${playerExplanation}"
 
-In 2-3 sentences, validate how well their explanation connects the PT principle to the verse. Be encouraging but also insightful - point out what they got right and add a brief additional insight they might have missed. Keep it warm and conversational.`
-        : `You are Jeeves, a wise Bible study assistant. A player is building on the previous insight by connecting a new PT principle.
+In 2-3 sentences, validate how well their explanation connects the PT principle to the verse. Be encouraging if the insight is strong, but be honest if it's weak or off-topic.${scoreInstructions}`
+        : `You are Jeeves, a warm and scholarly Bible study companion. A player is building on the previous insight by connecting a new Phototheology principle.
 
 SEED VERSE: ${seedVerse.reference} - "${seedVerse.text}"
 
@@ -220,7 +227,11 @@ ${card.description ? `DESCRIPTION: ${card.description}` : ''}
 
 PLAYER'S EXPLANATION: "${playerExplanation}"
 
-In 2-3 sentences, explain how this new insight builds upon or connects to the previous one. Show how the chain of understanding is growing. Be encouraging and highlight the connection between the two insights.`;
+In 2-3 crisp sentences:
+1. Affirm what the player saw correctly (or explain what's missing if weak).
+2. Show the specific theological thread connecting this answer to the PREVIOUS answer.
+3. Add one brief additional insight they may have missed.
+Keep it conversational, warm, and concise. Never use the word "dear".${scoreInstructions}`;
 
       const { data, error } = await supabase.functions.invoke('jeeves', {
         body: {
@@ -230,12 +241,22 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
       });
 
       if (error) throw error;
-      return data?.content || data?.response || data?.message || 'Great connection!';
+      const raw = data?.content || data?.response || data?.message || '';
+
+      // Parse score from response
+      const scoreMatch = raw.match(/SCORE:\s*(\d+)/i);
+      const score = scoreMatch ? Math.min(10, Math.max(1, parseInt(scoreMatch[1], 10))) : 6;
+      const commentary = raw.replace(/\n?SCORE:\s*\d+/i, '').trim() || 'Good connection!';
+
+      return { commentary, score };
     } catch (err) {
       console.error('Error getting Jeeves judgment:', err);
-      return isFirstPlay
-        ? `Good connection of "${card.name}" to the verse!`
-        : `Nice way to build on ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}!`;
+      return {
+        commentary: isFirstPlay
+          ? `Good connection of "${card.name}" to the verse!`
+          : `Nice way to build on ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}!`,
+        score: 6, // Default pass on error
+      };
     }
   };
 
@@ -260,18 +281,18 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
           isChristConnection: isChristConnection,
         }];
 
-    // For first play: NO Jeeves judgment - first to submit wins!
-    // For subsequent plays: Get Jeeves judgment to validate connection
-    if (isFirstPlay) {
-      // Direct submission - race is on!
-      onSubmit(connectionList, explanation, isChristConnection, undefined);
-    } else {
-      // Get Jeeves judgment for subsequent plays
+    // Only use Jeeves if assists remain
+    const canUseJeeves = jeevesAssistsUsed < maxJeevesAssists;
+    
+    if (canUseJeeves) {
       setIsJudging(true);
-      const judgment = await getJeevesJudgment(explanation);
-      setJeevesJudgment(judgment);
+      const { commentary, score } = await getJeevesJudgment(explanation);
+      setJeevesJudgment(commentary);
       setIsJudging(false);
-      onSubmit(connectionList, explanation, isChristConnection, judgment);
+      onSubmit(connectionList, explanation, isChristConnection, commentary, score);
+    } else {
+      // No Jeeves assists left — auto-approve with default score
+      onSubmit(connectionList, explanation, isChristConnection, undefined, 6);
     }
   };
 
@@ -328,10 +349,22 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
           ) : (
             /* Subsequent Play: Show the previous insight to build upon */
             <div className="space-y-3">
-              {/* Small verse reference */}
-              <div className="p-2 bg-muted/50 rounded border text-xs">
-                <span className="text-muted-foreground">Studying: </span>
-                <span className="font-medium">{seedVerse.reference}</span>
+              {/* Verse reference with expandable text */}
+              <div className="bg-muted/50 rounded border text-xs overflow-hidden">
+                <div
+                  className="p-2 flex items-center gap-2 cursor-pointer hover:bg-muted/80 transition-colors"
+                  onClick={() => setShowSeedVerse(!showSeedVerse)}
+                >
+                  <Book className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <span className="text-muted-foreground">Studying: </span>
+                  <span className="font-medium">{seedVerse.reference}</span>
+                  <span className="text-muted-foreground ml-auto">{showSeedVerse ? 'hide' : 'tap to view verse'}</span>
+                </div>
+                {showSeedVerse && (
+                  <div className="px-3 pb-2 border-t border-border">
+                    <p className="text-sm italic leading-relaxed pt-2 text-foreground/80">"{seedVerse.text}"</p>
+                  </div>
+                )}
               </div>
 
               {/* Previous insight to connect to */}
@@ -368,8 +401,8 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
             <Textarea
               id="explanation"
               placeholder={isFirstPlay
-                ? `How does the ${card.name} principle help you understand ${seedVerse.reference}?`
-                : `How does ${card.name} connect to or build upon ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}?`
+                ? `How does the text relate to ${card.name}?`
+                : `How does the text relate to ${card.name}, building on ${previousEntry?.playerName}'s insight?`
               }
               value={explanation}
               onChange={(e) => setExplanation(e.target.value)}
@@ -418,6 +451,19 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
             </div>
           </div>
 
+          {/* Jeeves assists remaining indicator */}
+          {jeevesAssistsUsed < maxJeevesAssists ? (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground px-1">
+              <Bot className="h-3.5 w-3.5" />
+              <span>Jeeves assists remaining: <strong className="text-foreground">{maxJeevesAssists - jeevesAssistsUsed}</strong> of {maxJeevesAssists}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-xs text-amber-500 px-1">
+              <Bot className="h-3.5 w-3.5" />
+              <span>No Jeeves assists remaining — you're on your own!</span>
+            </div>
+          )}
+
           {/* Submit button */}
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose} className="flex-1" disabled={isJudging}>
@@ -432,6 +478,11 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Jeeves is judging...
+                </>
+              ) : jeevesAssistsUsed >= maxJeevesAssists ? (
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  Submit (No Jeeves)
                 </>
               ) : explanation.trim() ? (
                 <>

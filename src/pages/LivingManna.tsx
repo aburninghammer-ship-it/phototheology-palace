@@ -7,7 +7,7 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio, Shield, Globe } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio, Shield, Globe, GraduationCap } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { useTheme } from "next-themes";
@@ -20,6 +20,7 @@ import { YouthSpace } from "@/components/living-manna/YouthSpace";
 import { PersonalDevotionalDiary } from "@/components/living-manna/PersonalDevotionalDiary";
 import { ExploitsHub } from "@/components/living-manna/ExploitsHub";
 import { DefenseMode } from "@/components/living-manna/DefenseMode";
+import { AATSTraining } from "@/components/living-manna/AATSTraining";
 import { SpiritOfProphecyTab } from "@/components/living-manna/SpiritOfProphecyTab";
 import { ChurchAdminTab } from "@/components/living-manna/ChurchAdminTab";
 import { ServeTab } from "@/components/living-manna/ServeTab";
@@ -354,6 +355,14 @@ export default function LivingManna() {
                     <Zap className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Exploits</span>
                   </TabsTrigger>
+                  <TabsTrigger value="defense" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Shield className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Defense</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="aats" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <GraduationCap className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">AATS</span>
+                  </TabsTrigger>
                   <TabsTrigger value="connect" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <MessagesSquare className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Connect</span>
@@ -381,10 +390,6 @@ export default function LivingManna() {
                   <TabsTrigger value="grow" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <Sprout className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Grow</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="defense" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
-                    <Shield className="h-4 w-4" />
-                    <span className="text-xs sm:text-sm">Defense</span>
                   </TabsTrigger>
                   <TabsTrigger value="egw" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <BookMarked className="h-4 w-4" />
@@ -452,7 +457,15 @@ export default function LivingManna() {
               </TabsContent>
 
               <TabsContent value="defense">
-                <DefenseMode churchId={effectiveChurchId!} />
+                <DefenseMode churchId={effectiveChurchId!} onNavigateToAATS={(avatarId) => { handleTabChange("aats"); }} />
+              </TabsContent>
+
+              <TabsContent value="aats">
+                <AATSTraining
+                  churchId={effectiveChurchId!}
+                  onNavigateToDefense={() => handleTabChange("defense")}
+                  initialAvatarId={undefined}
+                />
               </TabsContent>
 
               <TabsContent value="egw">
