@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { playMessageNotification } from '@/utils/notificationSound';
+import { useGlobalLiveChatPref } from '@/hooks/useGlobalLiveChatPref';
 
 export interface PublicChatRoom {
   id: string;
@@ -72,6 +73,7 @@ interface UsePublicChatReturn {
 export const usePublicChat = (): UsePublicChatReturn => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const liveChatEnabled = useGlobalLiveChatPref();
   const [rooms, setRooms] = useState<PublicChatRoom[]>([]);
   const [messages, setMessages] = useState<PublicChatMessage[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
@@ -383,8 +385,8 @@ export const usePublicChat = (): UsePublicChatReturn => {
               });
             }
 
-            // Play sound for messages from others
-            if (newMessage.sender_id !== user.id && newMessage.room_id !== activeRoomId) {
+            // Play sound for messages from others (only if live chat notifications enabled)
+            if (newMessage.sender_id !== user.id && newMessage.room_id !== activeRoomId && liveChatEnabled) {
               playMessageNotification();
             }
           } else if (payload.eventType === 'UPDATE') {
