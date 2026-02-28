@@ -248,8 +248,9 @@ export function FortyDayChallenge() {
   }, [enrollment, sessions, schedule, smokeAlertShown]);
 
   useEffect(() => {
-    if (!sessions.length) return;
+    if (!sessions.length || !enrollment) return;
     const expireSessions = async () => {
+      let needsReload = false;
       for (const s of sessions) {
         if (!s.completed_at && isDebateExpired(s)) {
           await supabase
@@ -261,7 +262,24 @@ export function FortyDayChallenge() {
               xp_earned: 25,
             })
             .eq("id", s.id);
+
+          // Advance current_day so user isn't stuck on an expired day
+          if (s.day_number === enrollment.current_day) {
+            const nextDay = Math.min(enrollment.current_day + 1, 40);
+            await supabase
+              .from("debate_challenge_enrollments")
+              .update({
+                current_day: nextDay,
+                completed_days: enrollment.completed_days + 1,
+                total_xp: enrollment.total_xp + 25,
+              })
+              .eq("id", enrollment.id);
+            needsReload = true;
+          }
         }
+      }
+      if (needsReload) {
+        loadData();
       }
     };
     expireSessions();
