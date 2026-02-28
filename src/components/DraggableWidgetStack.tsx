@@ -100,7 +100,7 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
   return (
     <div
       ref={stackRef}
-      className="fixed z-[1000] flex items-end gap-1 select-none"
+      className="fixed z-[9999] flex items-end gap-1 select-none pointer-events-auto"
       style={{ left: 0, top: 0, willChange: "left, top", touchAction: "none" }}
     >
       {/* Drag handle */}
