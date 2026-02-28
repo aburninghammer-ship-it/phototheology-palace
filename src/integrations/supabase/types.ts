@@ -12863,6 +12863,20 @@ export type Database = {
             referencedRelation: "public_chat_rooms"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "public_chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public_info"
+            referencedColumns: ["id"]
+          },
         ]
       }
       public_chat_reactions: {
