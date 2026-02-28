@@ -10183,6 +10183,7 @@ export type Database = {
           dimension_challenges: boolean
           equation_challenges: boolean
           fruit_check_challenges: boolean
+          global_live_chat: boolean
           id: string
           memory_challenge_reminders: boolean | null
           palace_practice_reminders: boolean | null
@@ -10205,6 +10206,7 @@ export type Database = {
           dimension_challenges?: boolean
           equation_challenges?: boolean
           fruit_check_challenges?: boolean
+          global_live_chat?: boolean
           id?: string
           memory_challenge_reminders?: boolean | null
           palace_practice_reminders?: boolean | null
@@ -10227,6 +10229,7 @@ export type Database = {
           dimension_challenges?: boolean
           equation_challenges?: boolean
           fruit_check_challenges?: boolean
+          global_live_chat?: boolean
           id?: string
           memory_challenge_reminders?: boolean | null
           palace_practice_reminders?: boolean | null
