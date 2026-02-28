@@ -82,6 +82,9 @@ const searchItems = [
   { title: "Streaks", path: "/streaks", icon: Trophy, category: "Community & Social" },
   
   // Tools & Features
+  { title: "Prophecy Watch", path: "/prophecy-watch", icon: Search, category: "Tools & Features" },
+  { title: "Culture & Controversy", path: "/culture-controversy", icon: MessageSquare, category: "Tools & Features" },
+  { title: "What Would Jesus Do", path: "/culture-controversy", icon: MessageSquare, category: "Tools & Features" },
   { title: "Sermon Builder", path: "/sermon-builder", icon: FileText, category: "Tools & Features" },
   { title: "Bible Study Series Builder", path: "/bible-study-series-builder", icon: FileText, category: "Tools & Features" },
   { title: "Growth Journal", path: "/growth-journal", icon: BookOpen, category: "Tools & Features" },
