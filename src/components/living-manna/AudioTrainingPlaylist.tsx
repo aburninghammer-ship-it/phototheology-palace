@@ -5,7 +5,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ListMusic, Plus, Trash2, Play, Pause, SkipForward, SkipBack,
-  Loader2, GripVertical, ChevronDown, ChevronUp, Headphones, X, Check, Shuffle, ArrowDownAZ, Hand,
+  Loader2, GripVertical, ChevronDown, ChevronUp, Headphones, X, Check, Shuffle, ArrowDownAZ, MousePointerClick,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -483,7 +483,7 @@ export function AudioTrainingPlaylist({
                         <span className="flex items-center gap-1"><Shuffle className="h-3 w-3" /> Random</span>
                       </SelectItem>
                       <SelectItem value="manual" className="text-xs">
-                        <span className="flex items-center gap-1"><Hand className="h-3 w-3" /> Manual</span>
+                        <span className="flex items-center gap-1"><MousePointerClick className="h-3 w-3" /> Manual</span>
                       </SelectItem>
                     </SelectContent>
                   </Select>
