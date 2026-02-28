@@ -57,7 +57,7 @@ export interface DifficultyLevel {
 export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   {
     id: "atheist",
-    name: "Dr. Marcus Steele — The Atheist",
+    name: "Prof. Marcus Steele — The Atheist",
     emoji: "🧪",
     avatar: atheistAvatar,
     color: "border-gray-500",
