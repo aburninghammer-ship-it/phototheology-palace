@@ -182,7 +182,7 @@ export default function PalaceFreestyle() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900">
+    <div className="min-h-screen bg-background text-foreground">
       <Navigation />
 
       <div className="container max-w-4xl mx-auto px-4 py-6 pb-24">
@@ -193,11 +193,11 @@ export default function PalaceFreestyle() {
           className="text-center mb-10"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 rounded-full bg-gradient-to-br from-indigo-500/30 to-purple-500/30 border border-indigo-500/20">
-              <Sparkles className="h-8 w-8 text-indigo-400" />
+               <div className="p-3 rounded-full bg-primary/10 border border-primary/20">
+              <Sparkles className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">
             Palace Freestyle
           </h1>
           <p className="text-muted-foreground italic text-lg">
@@ -221,7 +221,7 @@ export default function PalaceFreestyle() {
               setShowLibrary(!showLibrary);
               if (!showLibrary) loadSavedStudies();
             }}
-            className="w-full border-indigo-500/30 bg-slate-900/40 hover:bg-indigo-500/10 text-indigo-300 gap-2 h-11"
+            className="w-full border-primary/30 bg-muted/40 hover:bg-primary/10 text-primary gap-2 h-11"
           >
             <Library className="h-4 w-4" />
             My Saved Freestyles ({savedStudies.length})
@@ -240,25 +240,25 @@ export default function PalaceFreestyle() {
                 <div className="mt-3 space-y-2 max-h-[60vh] overflow-y-auto pr-1">
                   {loadingSaved ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-5 w-5 animate-spin text-indigo-400" />
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     </div>
                   ) : savedStudies.length === 0 ? (
-                    <Card className="border-slate-700/50 bg-slate-900/30 p-6 text-center">
+                    <Card className="border-border bg-card p-6 text-center">
                       <p className="text-sm text-muted-foreground">No saved freestyles yet. Cook a meal and hit Save!</p>
                     </Card>
                   ) : (
                     savedStudies.map((study) => (
                       <Card
                         key={study.id}
-                        className="border-slate-700/50 bg-slate-900/40 overflow-hidden"
+                        className="border-border bg-card overflow-hidden"
                       >
                         <button
                           onClick={() => setExpandedStudy(expandedStudy === study.id ? null : study.id)}
-                          className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-indigo-500/5 transition-colors"
+                          className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-accent/50 transition-colors"
                         >
-                          <ChefHat className="h-4 w-4 text-purple-400 flex-shrink-0" />
+                          <ChefHat className="h-4 w-4 text-primary flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-200 truncate">
+                            <p className="text-sm font-medium text-foreground truncate">
                               {study.title.replace(/^Freestyle:\s*/, '')}
                             </p>
                             <div className="flex items-center gap-2 mt-0.5">
@@ -311,12 +311,12 @@ export default function PalaceFreestyle() {
                               exit={{ opacity: 0, height: 0 }}
                               className="overflow-hidden"
                             >
-                              <div className="px-4 pb-4 border-t border-slate-700/30">
+                              <div className="px-4 pb-4 border-t border-border">
                                 <div className="jeeves-response space-y-4 mt-3">
                                   {formatJeevesResponse(study.content)}
                                 </div>
                                 {study.tags && study.tags.length > 0 && (
-                                  <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-slate-700/30">
+                                  <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-border">
                                     {study.tags.map((tag) => (
                                       <Badge
                                         key={tag}
@@ -347,14 +347,14 @@ export default function PalaceFreestyle() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="border-indigo-500/30 bg-slate-900/60 backdrop-blur-sm overflow-hidden">
+          <Card className="border-primary/30 bg-card backdrop-blur-sm overflow-hidden">
             {/* Ingredients Header */}
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-indigo-500/20 bg-indigo-500/5">
-              <div className="p-2 rounded-lg bg-indigo-500/20">
-                <FlaskConical className="h-5 w-5 text-indigo-400" />
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-primary/20 bg-primary/5">
+              <div className="p-2 rounded-lg bg-primary/20">
+                <FlaskConical className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h2 className="font-semibold text-indigo-200 text-sm uppercase tracking-widest">Ingredients</h2>
+                <h2 className="font-semibold text-foreground text-sm uppercase tracking-widest">Ingredients</h2>
                 <p className="text-xs text-muted-foreground">Your verses, thoughts, questions, patterns — raw material for the study</p>
               </div>
               {hasConversation && (
@@ -403,7 +403,7 @@ export default function PalaceFreestyle() {
                     <button
                       key={i}
                       onClick={() => handleExample(ex)}
-                      className="text-left text-xs text-indigo-400/70 hover:text-indigo-300 transition-colors line-clamp-2 py-1 px-2 rounded hover:bg-indigo-500/10"
+                      className="text-left text-xs text-primary/70 hover:text-primary transition-colors line-clamp-2 py-1 px-2 rounded hover:bg-primary/10"
                     >
                       "{ex.substring(0, 100)}..."
                     </button>
@@ -417,7 +417,7 @@ export default function PalaceFreestyle() {
               <Button
                 onClick={handleCook}
                 disabled={!ingredients.trim() || isLoading}
-                className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 h-12 text-base font-semibold gap-2 shadow-lg shadow-indigo-900/40"
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground h-12 text-base font-semibold gap-2 shadow-lg"
               >
                 {isLoading ? (
                   <>
@@ -450,7 +450,7 @@ export default function PalaceFreestyle() {
               className="flex justify-center my-4"
             >
               <div className="flex flex-col items-center gap-1">
-                <ArrowDown className="h-5 w-5 text-indigo-400 animate-bounce" />
+                <ArrowDown className="h-5 w-5 text-primary animate-bounce" />
                 <span className="text-xs text-muted-foreground">
                   {isLoading ? "Preparing..." : "The Meal"}
                 </span>
@@ -469,14 +469,14 @@ export default function PalaceFreestyle() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <Card variant="glass" className="border-purple-500/30 bg-purple-950/30 backdrop-blur-xl overflow-hidden shadow-lg shadow-purple-900/20">
+              <Card variant="glass" className="border-primary/30 bg-card backdrop-blur-xl overflow-hidden shadow-lg">
                 {/* Meal Header */}
-                <div className="flex items-center gap-3 px-5 py-4 border-b border-purple-500/20 bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/30 to-pink-500/30 border border-purple-400/20 shadow-sm shadow-purple-500/20">
-                    <ChefHat className="h-5 w-5 text-purple-300" />
+                <div className="flex items-center gap-3 px-5 py-4 border-b border-primary/20 bg-primary/5">
+                  <div className="p-2 rounded-lg bg-primary/20 border border-primary/20">
+                    <ChefHat className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h2 className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-200 to-indigo-200 text-sm uppercase tracking-widest">The Meal</h2>
+                    <h2 className="font-semibold text-foreground text-sm uppercase tracking-widest">The Meal</h2>
                     <p className="text-xs text-muted-foreground">
                       {isStreaming ? "Jeeves is writing..." : `Jeeves' full study — ${wordCount.toLocaleString()} words`}
                     </p>
@@ -484,14 +484,14 @@ export default function PalaceFreestyle() {
                   <div className="ml-auto flex items-center gap-2">
                     {isStreaming ? (
                       <div className="flex gap-1">
-                        <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <span className="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="w-1.5 h-1.5 bg-primary/70 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="w-1.5 h-1.5 bg-primary/50 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
                     ) : (
                       <>
-                        <BookOpen className="h-3.5 w-3.5 text-purple-400" />
-                        <span className="text-xs text-purple-400">Deep Study</span>
+                        <BookOpen className="h-3.5 w-3.5 text-primary" />
+                        <span className="text-xs text-primary">Deep Study</span>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -526,12 +526,12 @@ export default function PalaceFreestyle() {
 
                   {/* Tags */}
                   {lastMeal.tags && lastMeal.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-purple-500/20">
+                    <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-border">
                       {lastMeal.tags.map((tag) => (
                         <Badge
                           key={tag}
                           variant="outline"
-                          className="text-xs bg-gradient-to-r from-purple-500/15 to-pink-500/15 text-purple-300 border-purple-500/30 backdrop-blur-sm"
+                          className="text-xs bg-primary/10 text-primary border-primary/30"
                         >
                           {tag.replace(/_/g, " ")}
                         </Badge>
@@ -542,7 +542,7 @@ export default function PalaceFreestyle() {
 
                 {/* Exit-to-Precision Bar */}
                 {!isStreaming && (
-                  <div className="px-5 py-3 border-t border-purple-500/20 bg-background/30">
+                  <div className="px-5 py-3 border-t border-border bg-muted/30">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs text-muted-foreground font-medium">Refine further:</span>
                       {EXIT_COMMANDS.map((cmd) => {
@@ -552,7 +552,7 @@ export default function PalaceFreestyle() {
                             key={cmd.id}
                             variant="ghost"
                             size="sm"
-                            className="h-7 text-xs gap-1.5 text-purple-400 hover:text-purple-200 hover:bg-purple-500/10"
+                            className="h-7 text-xs gap-1.5 text-primary hover:text-primary/80 hover:bg-primary/10"
                             onClick={() => handleExitCommand(cmd.id)}
                             disabled={isLoading}
                           >
@@ -564,7 +564,7 @@ export default function PalaceFreestyle() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-7 text-xs gap-1.5 text-indigo-400 hover:text-indigo-200 hover:bg-indigo-500/10 ml-auto"
+                        className="h-7 text-xs gap-1.5 text-secondary-foreground hover:text-foreground hover:bg-accent ml-auto"
                         onClick={() => {
                           setIngredients("");
                           textareaRef.current?.focus();
@@ -589,8 +589,8 @@ export default function PalaceFreestyle() {
                       .slice(0, -1)
                       .reverse()
                       .map((msg, idx) => (
-                        <Card key={idx} variant="glass" className="border-slate-700/50 bg-slate-900/30 p-4">
-                          <div className="prose prose-invert prose-sm max-w-none text-slate-400 line-clamp-6">
+                         <Card key={idx} variant="glass" className="border-border bg-muted/30 p-4">
+                          <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground line-clamp-6">
                             {formatJeevesResponse(msg.content)}
                           </div>
                         </Card>
