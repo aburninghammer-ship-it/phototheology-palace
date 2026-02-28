@@ -169,7 +169,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
     if (query.trim().length < 2) { setInviteResults([]); return; }
     setInviteLoading(true);
     try {
-      const sanitized = query.trim().replace(/[%_]/g, '');
+      const sanitized = query.trim().replace(/^@/, '').replace(/[%_]/g, '');
       const { data, error } = await supabase
         .from("profiles")
         .select("id, display_name, username")
