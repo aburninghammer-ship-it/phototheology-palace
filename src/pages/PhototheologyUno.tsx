@@ -719,14 +719,25 @@ Return ONLY valid JSON:
     if (!inviteEmail || !gameState.roomCode) return;
 
     try {
-      // In a full implementation, this would send an email or push notification
+      const { data, error } = await supabase.functions.invoke('send-game-invite', {
+        body: {
+          recipientEmail: inviteEmail,
+          gameType: 'uno',
+          gameName: 'Phototheology UNO',
+          inviteLink: `${window.location.origin}/games/uno?room=${gameState.roomCode}`,
+          roomCode: gameState.roomCode,
+        }
+      });
+      if (error || !data?.success) {
+        throw new Error(data?.error || error?.message || 'Failed to send invite');
+      }
       toast({
         title: t('games.uno.inviteSent'),
         description: t('games.uno.inviteSentDesc', { email: inviteEmail, code: gameState.roomCode }),
       });
       setInviteEmail("");
       setShowInviteDialog(false);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: t('common.error'),
         description: t('games.uno.failedToSendInvite'),
