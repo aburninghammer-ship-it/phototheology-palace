@@ -8,6 +8,7 @@ import { PublicChatMessage, ReactionGroup } from '@/hooks/usePublicChat';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Users, Sparkles, Reply, X, Trash2, MessageSquareText, Pencil, Check } from 'lucide-react';
+import { renderWithMentions } from '@/components/MentionAutocomplete';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -136,7 +137,7 @@ function MessageBubble({
                 : 'bg-muted/70 backdrop-blur-sm rounded-bl-md'
             }`}
           >
-            {isDeleted ? 'This message was deleted' : message.content}
+            {isDeleted ? 'This message was deleted' : renderWithMentions(message.content)}
             {!isDeleted && (message as any).updated_at && (message as any).updated_at !== message.created_at && !isDeleted && (
               <span className="text-[10px] opacity-60 ml-1">(edited)</span>
             )}
