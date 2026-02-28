@@ -162,6 +162,7 @@ export function AudioTrainingPlaylist({
 
   /** Add a specific day from selected avatar tracks */
   const addDaySelectedAvatars = (dayNumber: number, avatarIds: Set<string>) => {
+    console.log("[Playlist] addDaySelectedAvatars:", { dayNumber, avatarCount: avatarIds.size, allTracksCount: allTracks?.length, avatarIds: [...avatarIds] });
     if (!allTracks || allTracks.length === 0 || avatarIds.size === 0) return;
     const existing = new Set(playlist.map((p) => `${p.avatarId}-${p.dayNumber}`));
     const toAdd = allTracks
@@ -741,7 +742,9 @@ export function AudioTrainingPlaylist({
 
               {/* Playlist Queue */}
               {playlist.length > 0 && (
-                <ScrollArea className="max-h-[180px]">
+              <div>
+                <p className="text-[10px] text-muted-foreground px-1 mb-1">Queue: {playlist.length} item{playlist.length !== 1 ? 's' : ''}</p>
+                <ScrollArea className="max-h-[400px]">
                   <div className="space-y-1">
                     {playlist.map((item, idx) => {
                       const rank = getRankForDay(item.dayNumber);
@@ -790,6 +793,7 @@ export function AudioTrainingPlaylist({
                     })}
                   </div>
                 </ScrollArea>
+              </div>
               )}
 
               {/* Playback Controls */}
