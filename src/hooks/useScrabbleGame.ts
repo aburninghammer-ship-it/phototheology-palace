@@ -356,7 +356,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         .from('pt_scrabble_games')
         .select('*')
         .eq('room_code', roomCode.toUpperCase())
-        .single();
+        .maybeSingle();
 
       if (gameError || !gameData) {
         toast.error('Game not found');
@@ -376,7 +376,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         .select('id')
         .eq('game_id', gameData.id)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (existingPlayer) {
         // Already in game, just load it
