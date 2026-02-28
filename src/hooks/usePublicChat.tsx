@@ -358,45 +358,17 @@ export const usePublicChat = (): UsePublicChatReturn => {
           table: 'public_chat_messages',
         },
         async (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const newMessage = payload.new as any;
+          const row = (payload.new || payload.old) as any;
+          if (!row?.room_id) return;
 
-            // Fetch sender info
-            const { data: sender } = await supabase
-              .from('profiles')
-              .select('id, display_name, avatar_url, username')
-              .eq('id', newMessage.sender_id)
-              .single();
+          // Keep active room fully in sync across all clients
+          if (row.room_id === activeRoomId) {
+            await fetchMessages();
+          }
 
-            const messageWithSender: PublicChatMessage = {
-              ...newMessage,
-              images: newMessage.images || null,
-              reply_to_id: newMessage.reply_to_id || null,
-              is_pinned: newMessage.is_pinned ?? false,
-              reply_to: null,
-              sender: sender || { id: newMessage.sender_id, display_name: 'Unknown', avatar_url: null, username: null },
-            };
-
-            // Add to messages if current room
-            if (newMessage.room_id === activeRoomId) {
-              setMessages(prev => {
-                if (prev.some(m => m.id === newMessage.id)) return prev;
-                return [...prev, messageWithSender];
-              });
-            }
-
-            // Play sound for messages from others (only if live chat notifications enabled)
-            if (newMessage.sender_id !== user.id && newMessage.room_id !== activeRoomId && liveChatEnabled) {
-              playMessageNotification();
-            }
-          } else if (payload.eventType === 'UPDATE') {
-            const updated = payload.new as any;
-            setMessages(prev =>
-              prev.map(m => m.id === updated.id
-                ? { ...m, content: updated.content, is_deleted: updated.is_deleted ?? (m as any).is_deleted, is_pinned: updated.is_pinned ?? m.is_pinned, updated_at: updated.updated_at } as any
-                : m
-              )
-            );
+          // Play sound for off-room messages from others (only if enabled)
+          if (payload.eventType === 'INSERT' && row.sender_id !== user.id && row.room_id !== activeRoomId && liveChatEnabled) {
+            playMessageNotification();
           }
         }
       )
@@ -448,7 +420,18 @@ export const usePublicChat = (): UsePublicChatReturn => {
       messagesChannel.unsubscribe();
       reactionsChannel.unsubscribe();
     };
-  }, [user, activeRoomId]);
+  }, [user, activeRoomId, fetchMessages, liveChatEnabled]);
+
+  // Fallback sync in case a realtime event is dropped on poor connections
+  useEffect(() => {
+    if (!user || !activeRoomId) return;
+
+    const interval = setInterval(() => {
+      fetchMessages();
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [user, activeRoomId, fetchMessages]);
 
   // Computed values
   const pinnedMessages = messages.filter(m => m.is_pinned);
