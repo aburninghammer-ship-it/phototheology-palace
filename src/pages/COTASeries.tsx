@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { SpiritOfProphecyTab } from "@/components/living-manna/SpiritOfProphecyTab";
 import { DefenseMode } from "@/components/living-manna/DefenseMode";
@@ -6,8 +7,13 @@ import { AATSTraining } from "@/components/living-manna/AATSTraining";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookMarked, Shield, Swords } from "lucide-react";
 
+const validTabs = ["library", "defense", "aats"] as const;
+type TabValue = typeof validTabs[number];
+
 const COTASeries = () => {
-  const [activeTab, setActiveTab] = useState<"library" | "defense" | "aats">("library");
+  const [searchParams] = useSearchParams();
+  const initialTab = validTabs.includes(searchParams.get("tab") as TabValue) ? (searchParams.get("tab") as TabValue) : "library";
+  const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
 
   return (
     <div className="min-h-screen bg-background">
