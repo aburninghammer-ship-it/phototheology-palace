@@ -544,21 +544,22 @@ export function AudioTrainingPlaylist({
                       Add All Unlocked
                     </Button>
                     {allTracks && allTracks.length > 1 && (
-                      <Select
-                        value=""
-                        onValueChange={(val) => openAvatarPicker(Number(val))}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-6 text-[10px] border-primary/30 text-primary gap-1 px-2"
+                        onClick={() => {
+                          if (showAvatarPicker) {
+                            setShowAvatarPicker(false);
+                          } else {
+                            setShowAvatarPicker(true);
+                            setAvatarPickerDay(null);
+                            setSelectedAvatars(new Set(allTracks.map(t => t.avatarId)));
+                          }
+                        }}
                       >
-                        <SelectTrigger className="h-6 w-auto text-[10px] border-primary/30 text-primary gap-1 px-2">
-                          <span>🌐 Add Day — Choose Avatars</span>
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border-border max-h-[200px]">
-                          {availableDays.map((d) => (
-                            <SelectItem key={d} value={String(d)} className="text-xs">
-                              Day {d}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        🌐 Add Day — Choose Avatars {showAvatarPicker ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -638,7 +639,7 @@ export function AudioTrainingPlaylist({
 
               {/* Avatar Picker for cross-track day add */}
               <AnimatePresence>
-                {showAvatarPicker && avatarPickerDay !== null && allTracks && (
+                {showAvatarPicker && allTracks && allTracks.length > 1 && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
@@ -649,64 +650,89 @@ export function AudioTrainingPlaylist({
                       <CardContent className="p-3 space-y-2">
                         <div className="flex items-center justify-between">
                           <p className="text-xs font-medium">
-                            Day {avatarPickerDay} — Select Avatars
+                            Add Day — Choose Avatars
                           </p>
                           <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowAvatarPicker(false)}>
                             <X className="h-3 w-3" />
                           </Button>
                         </div>
-                        <div className="flex gap-1.5 flex-wrap">
-                          <Button
-                            variant={selectedAvatars.size === allTracks.length ? "default" : "outline"}
-                            size="sm"
-                            className="h-6 text-[10px]"
-                            onClick={() => setSelectedAvatars(new Set(allTracks.map(t => t.avatarId)))}
-                          >
-                            Select All
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-6 text-[10px]"
-                            onClick={() => setSelectedAvatars(new Set())}
-                          >
-                            Clear
-                          </Button>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5 max-h-[200px] overflow-y-auto">
-                          {allTracks.map((t) => {
-                            const isSelected = selectedAvatars.has(t.avatarId);
-                            return (
+
+                        {/* Day selector */}
+                        <div className="space-y-1">
+                          <p className="text-[10px] text-muted-foreground">Pick a day:</p>
+                          <div className="flex flex-wrap gap-1.5 max-h-[80px] overflow-y-auto">
+                            {availableDays.map((d) => (
                               <button
-                                key={t.avatarId}
-                                onClick={() => toggleAvatarSelection(t.avatarId)}
+                                key={d}
+                                onClick={() => setAvatarPickerDay(d)}
                                 className={`
-                                  relative px-2 py-1 rounded-md text-[10px] font-medium border transition-all
-                                  ${isSelected
-                                    ? "bg-primary/15 border-primary/50 text-primary ring-1 ring-primary/30"
+                                  h-7 w-7 rounded-md text-[10px] font-bold border transition-all
+                                  ${avatarPickerDay === d
+                                    ? "bg-primary/20 border-primary/50 text-primary ring-1 ring-primary/30"
                                     : "bg-muted/30 border-border/50 text-muted-foreground hover:border-primary/40"
                                   }
                                 `}
                               >
-                                {isSelected && <Check className="inline h-2.5 w-2.5 mr-0.5" />}
-                                {t.emoji} {t.avatarName}
+                                {d}
                               </button>
-                            );
-                          })}
+                            ))}
+                          </div>
                         </div>
-                        <div className="flex justify-end gap-2 pt-1">
-                          <Button variant="ghost" size="sm" className="h-6 text-[10px]" onClick={() => setShowAvatarPicker(false)}>
-                            Cancel
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="h-6 text-[10px]"
-                            disabled={selectedAvatars.size === 0}
-                            onClick={confirmAvatarSelection}
-                          >
-                            Add {selectedAvatars.size} Avatar{selectedAvatars.size !== 1 ? 's' : ''}
-                          </Button>
-                        </div>
+
+                        {avatarPickerDay !== null && (
+                          <>
+                            {/* Avatar selection */}
+                            <div className="flex gap-1.5 flex-wrap">
+                              <Button
+                                variant={selectedAvatars.size === allTracks.length ? "default" : "outline"}
+                                size="sm"
+                                className="h-6 text-[10px]"
+                                onClick={() => setSelectedAvatars(new Set(allTracks.map(t => t.avatarId)))}
+                              >
+                                Select All ({allTracks.length})
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-6 text-[10px]"
+                                onClick={() => setSelectedAvatars(new Set())}
+                              >
+                                Clear
+                              </Button>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5 max-h-[160px] overflow-y-auto">
+                              {allTracks.map((t) => {
+                                const isSelected = selectedAvatars.has(t.avatarId);
+                                return (
+                                  <button
+                                    key={t.avatarId}
+                                    onClick={() => toggleAvatarSelection(t.avatarId)}
+                                    className={`
+                                      relative px-2 py-1 rounded-md text-[10px] font-medium border transition-all
+                                      ${isSelected
+                                        ? "bg-primary/15 border-primary/50 text-primary ring-1 ring-primary/30"
+                                        : "bg-muted/30 border-border/50 text-muted-foreground hover:border-primary/40"
+                                      }
+                                    `}
+                                  >
+                                    {isSelected && <Check className="inline h-2.5 w-2.5 mr-0.5" />}
+                                    {t.emoji} {t.avatarName}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <div className="flex justify-end gap-2 pt-1">
+                              <Button
+                                size="sm"
+                                className="h-6 text-[10px]"
+                                disabled={selectedAvatars.size === 0}
+                                onClick={confirmAvatarSelection}
+                              >
+                                Add Day {avatarPickerDay} × {selectedAvatars.size} Avatar{selectedAvatars.size !== 1 ? 's' : ''}
+                              </Button>
+                            </div>
+                          </>
+                        )}
                       </CardContent>
                     </Card>
                   </motion.div>
