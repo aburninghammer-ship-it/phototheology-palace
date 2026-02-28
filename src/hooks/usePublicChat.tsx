@@ -63,6 +63,7 @@ interface UsePublicChatReturn {
   pinnedMessages: PublicChatMessage[];
   totalUnread: number;
   deleteMessage: (messageId: string) => Promise<void>;
+  editMessage: (messageId: string, newContent: string) => Promise<void>;
   getThreadMessages: (parentId: string) => PublicChatMessage[];
   reactions: ReactionsMap;
   toggleReaction: (messageId: string, emoji: string) => Promise<void>;
@@ -200,7 +201,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
     try {
       const { error } = await (supabase as any)
         .from('public_chat_messages')
-        .update({ is_deleted: true, content: '[deleted]' })
+        .update({ is_deleted: true, content: '[deleted]', updated_at: new Date().toISOString() })
         .eq('id', messageId)
         .eq('sender_id', user.id);
 
@@ -212,6 +213,27 @@ export const usePublicChat = (): UsePublicChatReturn => {
     } catch (error) {
       console.error('Error deleting message:', error);
       toast({ title: 'Error', description: 'Failed to delete message.', variant: 'destructive' });
+    }
+  }, [user, toast]);
+
+  // Edit own message
+  const editMessage = useCallback(async (messageId: string, newContent: string) => {
+    if (!user || !newContent.trim()) return;
+    try {
+      const { error } = await (supabase as any)
+        .from('public_chat_messages')
+        .update({ content: newContent.trim(), updated_at: new Date().toISOString() })
+        .eq('id', messageId)
+        .eq('sender_id', user.id);
+
+      if (error) throw error;
+
+      setMessages(prev =>
+        prev.map(m => m.id === messageId ? { ...m, content: newContent.trim(), updated_at: new Date().toISOString() } as any : m)
+      );
+    } catch (error) {
+      console.error('Error editing message:', error);
+      toast({ title: 'Error', description: 'Failed to edit message.', variant: 'destructive' });
     }
   }, [user, toast]);
 
@@ -329,41 +351,50 @@ export const usePublicChat = (): UsePublicChatReturn => {
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'public_chat_messages',
         },
         async (payload) => {
-          const newMessage = payload.new as any;
+          if (payload.eventType === 'INSERT') {
+            const newMessage = payload.new as any;
 
-          // Fetch sender info
-          const { data: sender } = await supabase
-            .from('profiles')
-            .select('id, display_name, avatar_url, username')
-            .eq('id', newMessage.sender_id)
-            .single();
+            // Fetch sender info
+            const { data: sender } = await supabase
+              .from('profiles')
+              .select('id, display_name, avatar_url, username')
+              .eq('id', newMessage.sender_id)
+              .single();
 
-          const messageWithSender: PublicChatMessage = {
-            ...newMessage,
-            images: newMessage.images || null,
-            reply_to_id: newMessage.reply_to_id || null,
-            is_pinned: newMessage.is_pinned ?? false,
-            reply_to: null,
-            sender: sender || { id: newMessage.sender_id, display_name: 'Unknown', avatar_url: null, username: null },
-          };
+            const messageWithSender: PublicChatMessage = {
+              ...newMessage,
+              images: newMessage.images || null,
+              reply_to_id: newMessage.reply_to_id || null,
+              is_pinned: newMessage.is_pinned ?? false,
+              reply_to: null,
+              sender: sender || { id: newMessage.sender_id, display_name: 'Unknown', avatar_url: null, username: null },
+            };
 
-          // Add to messages if current room
-          if (newMessage.room_id === activeRoomId) {
-            setMessages(prev => {
-              // Avoid duplicates
-              if (prev.some(m => m.id === newMessage.id)) return prev;
-              return [...prev, messageWithSender];
-            });
-          }
+            // Add to messages if current room
+            if (newMessage.room_id === activeRoomId) {
+              setMessages(prev => {
+                if (prev.some(m => m.id === newMessage.id)) return prev;
+                return [...prev, messageWithSender];
+              });
+            }
 
-          // Play sound for messages from others
-          if (newMessage.sender_id !== user.id && newMessage.room_id !== activeRoomId) {
-            playMessageNotification();
+            // Play sound for messages from others
+            if (newMessage.sender_id !== user.id && newMessage.room_id !== activeRoomId) {
+              playMessageNotification();
+            }
+          } else if (payload.eventType === 'UPDATE') {
+            const updated = payload.new as any;
+            setMessages(prev =>
+              prev.map(m => m.id === updated.id
+                ? { ...m, content: updated.content, is_deleted: updated.is_deleted ?? (m as any).is_deleted, is_pinned: updated.is_pinned ?? m.is_pinned, updated_at: updated.updated_at } as any
+                : m
+              )
+            );
           }
         }
       )
@@ -435,6 +466,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
     pinnedMessages,
     totalUnread,
     deleteMessage,
+    editMessage,
     getThreadMessages,
     reactions,
     toggleReaction,

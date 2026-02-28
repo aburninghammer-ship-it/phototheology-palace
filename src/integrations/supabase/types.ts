@@ -12822,6 +12822,7 @@ export type Database = {
           reply_to_id: string | null
           room_id: string
           sender_id: string
+          updated_at: string | null
         }
         Insert: {
           content: string
@@ -12833,6 +12834,7 @@ export type Database = {
           reply_to_id?: string | null
           room_id: string
           sender_id: string
+          updated_at?: string | null
         }
         Update: {
           content?: string
@@ -12844,6 +12846,7 @@ export type Database = {
           reply_to_id?: string | null
           room_id?: string
           sender_id?: string
+          updated_at?: string | null
         }
         Relationships: [
           {

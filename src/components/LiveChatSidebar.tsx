@@ -7,7 +7,8 @@ import { useLiveChat } from '@/contexts/LiveChatContext';
 import { PublicChatMessage, ReactionGroup } from '@/hooks/usePublicChat';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Users, Sparkles, Reply, X, Trash2, MessageSquareText } from 'lucide-react';
+import { MessageSquare, Users, Sparkles, Reply, X, Trash2, MessageSquareText, Pencil, Check } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { LiveChatThreadPanel } from '@/components/LiveChatThreadPanel';
@@ -42,6 +43,7 @@ function MessageBubble({
   onReply,
   onOpenThread,
   onDelete,
+  onEdit,
   threadCount,
   reactionGroups,
   onToggleReaction,
@@ -52,12 +54,15 @@ function MessageBubble({
   onReply: (msg: PublicChatMessage) => void;
   onOpenThread: (msg: PublicChatMessage) => void;
   onDelete: (id: string) => void;
+  onEdit: (id: string, content: string) => void;
   threadCount: number;
   reactionGroups: ReactionGroup[];
   onToggleReaction: (messageId: string, emoji: string) => void;
   currentUserId: string;
 }) {
   const [showReactions, setShowReactions] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState('');
   const initials = (message.sender?.display_name || '?')
     .split(' ')
     .map(w => w[0])
@@ -95,24 +100,55 @@ function MessageBubble({
         </div>
 
         {/* Message bubble */}
-        <div
-          className={`relative rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${
-            isDeleted
-              ? 'bg-muted/40 italic text-muted-foreground'
-              : isOwn
-              ? 'bg-gradient-to-br from-primary to-primary/85 text-primary-foreground rounded-br-md'
-              : 'bg-muted/70 backdrop-blur-sm rounded-bl-md'
-          }`}
-        >
-          {isDeleted ? 'This message was deleted' : message.content}
-          {!isDeleted && message.images && message.images.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {message.images.map((img, i) => (
-                <img key={i} src={img} alt="" className="max-h-44 rounded-xl shadow-md" />
-              ))}
+        {isEditing ? (
+          <div className="space-y-2">
+            <Textarea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              className="min-h-[60px] text-sm"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (editText.trim()) {
+                    onEdit(message.id, editText);
+                    setIsEditing(false);
+                  }
+                }
+                if (e.key === 'Escape') setIsEditing(false);
+              }}
+            />
+            <div className="flex gap-1.5">
+              <Button size="sm" variant="default" className="h-7 text-xs" onClick={() => { onEdit(message.id, editText); setIsEditing(false); }}>
+                <Check className="h-3 w-3 mr-1" /> Save
+              </Button>
+              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setIsEditing(false)}>
+                Cancel
+              </Button>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div
+            className={`relative rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${
+              isDeleted
+                ? 'bg-muted/40 italic text-muted-foreground'
+                : isOwn
+                ? 'bg-gradient-to-br from-primary to-primary/85 text-primary-foreground rounded-br-md'
+                : 'bg-muted/70 backdrop-blur-sm rounded-bl-md'
+            }`}
+          >
+            {isDeleted ? 'This message was deleted' : message.content}
+            {!isDeleted && (message as any).updated_at && (message as any).updated_at !== message.created_at && !isDeleted && (
+              <span className="text-[10px] opacity-60 ml-1">(edited)</span>
+            )}
+            {!isDeleted && message.images && message.images.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {message.images.map((img, i) => (
+                  <img key={i} src={img} alt="" className="max-h-44 rounded-xl shadow-md" />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Thread indicator */}
         {threadCount > 0 && (
@@ -180,31 +216,39 @@ function MessageBubble({
                 </TooltipTrigger>
                 <TooltipContent side="top" className="text-xs">Reply in thread</TooltipContent>
               </Tooltip>
-              {isOwn && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <button className="ml-0.5 p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete message?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This message will be removed for everyone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => onDelete(message.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+              {isOwn && !isDeleted && (
+                <>
+                  <button
+                    onClick={() => { setIsEditing(true); setEditText(message.content); }}
+                    className="ml-0.5 p-1 rounded hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button className="ml-0.5 p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete message?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This message will be removed for everyone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => onDelete(message.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
               )}
             </motion.div>
           )}
@@ -226,6 +270,7 @@ export function LiveChatSidebar() {
     updateTypingIndicator,
     markRoomAsRead,
     deleteMessage,
+    editMessage,
     getThreadMessages,
     reactions,
     toggleReaction,
@@ -329,6 +374,7 @@ export function LiveChatSidebar() {
                   onReply={() => {}}
                   onOpenThread={setThreadParent}
                   onDelete={deleteMessage}
+                  onEdit={editMessage}
                   threadCount={getThreadMessages(msg.id).length}
                   reactionGroups={reactions[msg.id] || []}
                   onToggleReaction={toggleReaction}
