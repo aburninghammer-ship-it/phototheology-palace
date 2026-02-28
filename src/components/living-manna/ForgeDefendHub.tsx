@@ -169,19 +169,25 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
     if (query.trim().length < 2) { setInviteResults([]); return; }
     setInviteLoading(true);
     try {
-      const { data } = await (supabase as any)
+      const sanitized = query.trim().replace(/[%_]/g, '');
+      const { data, error } = await supabase
         .from("profiles")
         .select("id, display_name, username")
-        .or(`display_name.ilike.%${query}%,username.ilike.%${query}%`)
-        .neq("id", user?.id)
+        .or(`display_name.ilike.%${sanitized}%,username.ilike.%${sanitized}%`)
+        .neq("id", user?.id || "")
         .limit(10);
+      if (error) {
+        console.error("[ForgeDefend] Search error:", error);
+        setInviteResults([]);
+        return;
+      }
       const alreadySelected = [...selectedMembers, ...invitedMembers.map(m => m.id)];
       setInviteResults(
         (data || [])
           .filter((p: any) => !alreadySelected.includes(p.id))
           .map((p: any) => ({ id: p.id, display_name: p.display_name || p.username || "User" }))
       );
-    } catch { setInviteResults([]); }
+    } catch (err) { console.error("[ForgeDefend] Search exception:", err); setInviteResults([]); }
     finally { setInviteLoading(false); }
   };
 
