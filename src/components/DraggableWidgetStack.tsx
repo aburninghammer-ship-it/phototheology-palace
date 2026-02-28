@@ -35,14 +35,15 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Use native event listener on handle to avoid React re-render issues
+  // Drag from handle OR any non-interactive part of the stack
   useEffect(() => {
     applyPos();
 
     const handle = handleRef.current;
-    if (!handle) return;
+    const stack = stackRef.current;
+    if (!stack) return;
 
-    const onDown = (e: PointerEvent) => {
+    const startDrag = (e: PointerEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -74,8 +75,25 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
       window.addEventListener("pointerup", onUp);
     };
 
-    handle.addEventListener("pointerdown", onDown);
-    return () => handle.removeEventListener("pointerdown", onDown);
+    const onHandleDown = (e: PointerEvent) => {
+      startDrag(e);
+    };
+
+    const onStackDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button, a, input, textarea, select, [role='button'], [data-no-widget-drag='true']")) {
+        return;
+      }
+      startDrag(e);
+    };
+
+    handle?.addEventListener("pointerdown", onHandleDown);
+    stack.addEventListener("pointerdown", onStackDown);
+
+    return () => {
+      handle?.removeEventListener("pointerdown", onHandleDown);
+      stack.removeEventListener("pointerdown", onStackDown);
+    };
   }, [applyPos]);
 
   // Keep in viewport on resize
@@ -106,11 +124,11 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
       {/* Drag handle */}
       <div
         ref={handleRef}
-        className="flex items-center justify-center h-8 w-5 rounded-md bg-muted/60 backdrop-blur-sm border border-border/40 cursor-grab active:cursor-grabbing hover:bg-muted/80 transition-colors self-center"
+        className="flex items-center justify-center h-10 w-7 rounded-lg bg-muted/70 backdrop-blur-sm border border-border/50 cursor-grab active:cursor-grabbing hover:bg-muted/90 transition-colors self-center"
         style={{ touchAction: "none" }}
         title="Drag to move widgets"
       >
-        <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
       </div>
       <div className="flex flex-col items-end gap-2">
         {children}
