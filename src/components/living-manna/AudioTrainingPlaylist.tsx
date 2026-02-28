@@ -83,10 +83,42 @@ export function AudioTrainingPlaylist({
       toast.info(`Day ${dayNumber} is already in the playlist.`);
       return;
     }
-    setPlaylist((prev) => [
-      ...prev,
-      { dayNumber, loaded: false },
-    ]);
+    setPlaylist((prev) => [...prev, { dayNumber, loaded: false }]);
+  };
+
+  const addAllUnlockedToPlaylist = () => {
+    const existing = new Set(playlist.map((p) => p.dayNumber));
+    const toAdd = availableDays
+      .filter((d) => !existing.has(d))
+      .map((dayNumber) => ({ dayNumber, loaded: false }));
+
+    if (toAdd.length === 0) {
+      toast.info("All unlocked days are already in the playlist.");
+      return;
+    }
+
+    setPlaylist((prev) => [...prev, ...toAdd]);
+  };
+
+  const addCurrentWeekToPlaylist = () => {
+    const week = Math.ceil(maxUnlockedDay / 7);
+    const start = (week - 1) * 7 + 1;
+    const currentWeekDays = Array.from(
+      { length: maxUnlockedDay - start + 1 },
+      (_, index) => start + index,
+    );
+
+    const existing = new Set(playlist.map((p) => p.dayNumber));
+    const toAdd = currentWeekDays
+      .filter((d) => !existing.has(d))
+      .map((dayNumber) => ({ dayNumber, loaded: false }));
+
+    if (toAdd.length === 0) {
+      toast.info("Current week is already in your playlist.");
+      return;
+    }
+
+    setPlaylist((prev) => [...prev, ...toAdd]);
   };
 
   const removeFromPlaylist = (dayNumber: number) => {
@@ -347,30 +379,47 @@ export function AudioTrainingPlaylist({
               exit={{ height: 0, opacity: 0 }}
               className="space-y-3 overflow-hidden"
             >
-              {/* Voice Selector */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-muted-foreground">Voice:</span>
-                <Select value={selectedVoice} onValueChange={(v) => setSelectedVoice(v as VoiceId)}>
-                  <SelectTrigger className="w-[130px] h-7 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background border-border">
-                    {OPENAI_VOICES.map((v) => (
-                      <SelectItem key={v.id} value={v.id} className="text-xs">
-                        {v.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs gap-1"
-                  onClick={() => setShowPicker(!showPicker)}
-                >
-                  <Plus className="h-3 w-3" />
-                  Add Days
-                </Button>
+              {/* Voice Selector + CTA */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-muted-foreground">Voice:</span>
+                  <Select value={selectedVoice} onValueChange={(v) => setSelectedVoice(v as VoiceId)}>
+                    <SelectTrigger className="w-[130px] h-7 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border-border">
+                      {OPENAI_VOICES.map((v) => (
+                        <SelectItem key={v.id} value={v.id} className="text-xs">
+                          {v.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs gap-1"
+                    onClick={() => setShowPicker(!showPicker)}
+                  >
+                    <Plus className="h-3 w-3" />
+                    Add Days
+                  </Button>
+                </div>
+
+                <div className="rounded-md border border-border/60 bg-muted/20 p-2.5">
+                  <p className="text-[11px] font-medium">Start here</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Build your playlist fast with quick-add, then tap Play.
+                  </p>
+                  <div className="mt-2 flex gap-2 flex-wrap">
+                    <Button variant="secondary" size="sm" className="h-6 text-[10px]" onClick={addCurrentWeekToPlaylist}>
+                      Add Current Week
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-6 text-[10px]" onClick={addAllUnlockedToPlaylist}>
+                      Add All Unlocked
+                    </Button>
+                  </div>
+                </div>
               </div>
 
               {/* Day Picker */}
@@ -426,9 +475,7 @@ export function AudioTrainingPlaylist({
                             variant="outline"
                             size="sm"
                             className="h-6 text-[10px]"
-                            onClick={() => {
-                              availableDays.forEach((d) => addToPlaylist(d));
-                            }}
+                            onClick={addAllUnlockedToPlaylist}
                           >
                             Add All Unlocked
                           </Button>
@@ -436,11 +483,7 @@ export function AudioTrainingPlaylist({
                             variant="outline"
                             size="sm"
                             className="h-6 text-[10px]"
-                            onClick={() => {
-                              const week = Math.ceil(maxUnlockedDay / 7);
-                              const start = (week - 1) * 7 + 1;
-                              for (let d = start; d <= maxUnlockedDay; d++) addToPlaylist(d);
-                            }}
+                            onClick={addCurrentWeekToPlaylist}
                           >
                             Add Current Week
                           </Button>
@@ -550,8 +593,8 @@ export function AudioTrainingPlaylist({
               {playlist.length === 0 && (
                 <div className="text-center py-4 text-muted-foreground">
                   <Headphones className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-xs">No days in playlist yet.</p>
-                  <p className="text-[10px]">Tap "Add Days" to build your queue.</p>
+                  <p className="text-xs font-medium">No days in playlist yet.</p>
+                  <p className="text-[10px]">Tap “Add Current Week” to start instantly.</p>
                 </div>
               )}
             </motion.div>
