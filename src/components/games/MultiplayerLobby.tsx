@@ -8,6 +8,8 @@ import { Users, Copy, Check, Loader2, Crown, Wifi, ArrowLeft } from "lucide-reac
 import { toast } from "sonner";
 import { GameRoom, GameRoomPlayer } from "@/hooks/useGameMultiplayer";
 import { motion } from "framer-motion";
+import { QuickShareCode } from "@/components/scrabble/QuickShareCode";
+import { CallToPlayButton } from "@/components/scrabble/CallToPlayButton";
 
 interface MultiplayerLobbyProps {
   room: GameRoom | null;
@@ -22,6 +24,9 @@ interface MultiplayerLobbyProps {
   onStartGame: () => void;
   onLeaveRoom: () => void;
   onBack: () => void;
+  onBroadcastInvitation?: () => void;
+  onlineCount?: number;
+  isOnline?: boolean;
 }
 
 export function MultiplayerLobby({
@@ -37,6 +42,9 @@ export function MultiplayerLobby({
   onStartGame,
   onLeaveRoom,
   onBack,
+  onBroadcastInvitation,
+  onlineCount = 0,
+  isOnline = false,
 }: MultiplayerLobbyProps) {
   const [joinCode, setJoinCode] = useState("");
   const [copied, setCopied] = useState(false);
@@ -136,6 +144,20 @@ export function MultiplayerLobby({
               {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
             </Button>
           </div>
+
+          {/* Share buttons */}
+          {isHost && (
+            <div className="flex items-center justify-center gap-2">
+              <QuickShareCode roomCode={room.room_code} gameName={gameName} />
+              {onBroadcastInvitation && (
+                <CallToPlayButton
+                  onlineCount={onlineCount}
+                  isOnline={isOnline}
+                  onBroadcast={onBroadcastInvitation}
+                />
+              )}
+            </div>
+          )}
 
           {/* Players */}
           <div className="space-y-2">

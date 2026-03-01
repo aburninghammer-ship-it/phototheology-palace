@@ -191,13 +191,14 @@ export function useUnoMultiplayer() {
 
     fetchPlayers(game.id);
 
+    const gameId = game.id;
     const channel = supabase
-      .channel(`uno-game-${game.id}`)
+      .channel(`uno-game-${gameId}`)
       .on("postgres_changes", {
         event: "*",
         schema: "public",
         table: "uno_games",
-        filter: `id=eq.${game.id}`,
+        filter: `id=eq.${gameId}`,
       }, (payload) => {
         if (payload.new) setGame(payload.new as UnoGame);
       })
@@ -205,11 +206,15 @@ export function useUnoMultiplayer() {
         event: "*",
         schema: "public",
         table: "uno_players",
-        filter: `game_id=eq.${game.id}`,
+        filter: `game_id=eq.${gameId}`,
       }, () => {
-        fetchPlayers(game.id);
+        fetchPlayers(gameId);
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR") {
+          console.error("[useUnoMultiplayer] Realtime subscription error for game", gameId);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);

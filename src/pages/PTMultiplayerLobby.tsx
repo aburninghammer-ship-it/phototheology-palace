@@ -64,7 +64,11 @@ const PTMultiplayerLobby = () => {
           cards_remaining: 7
         });
 
-      if (playerError) throw playerError;
+      if (playerError) {
+        // Clean up orphaned game record
+        await supabase.from('pt_multiplayer_games').delete().eq('id', game.id);
+        throw playerError;
+      }
 
       toast({ title: t('multiplayer.gameCreated'), description: t('multiplayer.waitingForPlayers') });
       navigate(`/pt-multiplayer/${game.id}`);

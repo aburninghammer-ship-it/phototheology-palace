@@ -930,14 +930,10 @@ export default function PTScrabble() {
             </div>
           </header>
 
-          {/* Seed verse is shown inside StudyProgressPanel, no separate banner needed */}
-
-          {/* Study Progress Panel - shows the study building answer by answer */}
-          {mpStudyLogEntries.length > 0 && (
-            <div className="px-3 pt-2">
-              <StudyProgressPanel entries={mpStudyLogEntries} seedVerse={activeSeedVerse} />
-            </div>
-          )}
+          {/* Study Progress Panel - always visible so all players see the seed verse and can race to submit */}
+          <div className="px-3 pt-2">
+            <StudyProgressPanel entries={mpStudyLogEntries} seedVerse={activeSeedVerse} />
+          </div>
 
           {/* Game board */}
           <div className="flex-1 min-h-0 pb-40">

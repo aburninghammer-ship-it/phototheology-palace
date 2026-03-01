@@ -216,13 +216,14 @@ export function useGameMultiplayer(gameType: string) {
 
     fetchPlayers(room.id);
 
+    const roomId = room.id;
     const channel = supabase
-      .channel(`game-room-${room.id}`)
+      .channel(`game-room-${roomId}`)
       .on("postgres_changes", {
         event: "*",
         schema: "public",
         table: "game_rooms",
-        filter: `id=eq.${room.id}`,
+        filter: `id=eq.${roomId}`,
       }, (payload) => {
         if (payload.new) setRoom(payload.new as GameRoom);
       })
@@ -230,11 +231,15 @@ export function useGameMultiplayer(gameType: string) {
         event: "*",
         schema: "public",
         table: "game_room_players",
-        filter: `room_id=eq.${room.id}`,
+        filter: `room_id=eq.${roomId}`,
       }, () => {
-        fetchPlayers(room.id);
+        fetchPlayers(roomId);
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR") {
+          console.error("[useGameMultiplayer] Realtime subscription error for room", roomId);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);

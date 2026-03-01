@@ -36,7 +36,7 @@ import { cn } from '@/lib/utils';
 interface BibleStudyConnectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (connections: Connection[], explanation: string, isChristConnection: boolean, jeevesJudgment?: string, jeevesScore?: number) => void;
+  onSubmit: (connections: Connection[], explanation: string, isChristConnection: boolean, jeevesJudgment?: string, jeevesScore?: number, correctedExplanation?: string) => void;
   card: ScrabbleCard;
   position: BoardPosition;
   adjacentCards: PlacedCard[];
@@ -198,10 +198,10 @@ export function BibleStudyConnectionModal({
     return () => clearInterval(timer);
   }, [isOpen]);
 
-  // Jeeves judging function — returns { commentary, score }
-  const getJeevesJudgment = async (playerExplanation: string): Promise<{ commentary: string; score: number }> => {
+  // Jeeves judging function — returns { commentary, score, corrected }
+  const getJeevesJudgment = async (playerExplanation: string): Promise<{ commentary: string; score: number; corrected: string }> => {
     try {
-      const scoreInstructions = `\n\nIMPORTANT: You MUST end your response with a score on its own line in this exact format:\nSCORE: <number>\nwhere <number> is an integer from 1 to 10.\n- 1-4 = weak / incorrect / shallow / off-topic (player loses the card and their turn)\n- 5-6 = acceptable but surface-level\n- 7-8 = solid theological insight\n- 9-10 = exceptional, deeply connected, masterful\n\nCRITICAL: If you score BELOW 5, you MUST:\n1. Explain specifically WHY the answer fell short (was it off-topic? too vague? misapplied the principle? missed the verse context?)\n2. Give 1-2 concrete tips on how they COULD have connected "${card.name}" more effectively to the text.\n3. Offer a brief example of what a stronger answer might look like (just one sentence).\nThis helps the player learn and improve. Be honest but kind — coach, don't crush.`;
+      const scoreInstructions = `\n\nIMPORTANT: You MUST end your response with BOTH a corrected version and a score, each on their own line, in this exact format:\nCORRECTED: <the player's explanation rewritten into clear, grammatically correct sentences while preserving their meaning>\nSCORE: <number>\nwhere <number> is an integer from 1 to 10.\n- 1-4 = weak / incorrect / shallow / off-topic (player loses the card and their turn)\n- 5-6 = acceptable but surface-level\n- 7-8 = solid theological insight\n- 9-10 = exceptional, deeply connected, masterful\n\nCRITICAL: If you score BELOW 5, you MUST:\n1. Explain specifically WHY the answer fell short (was it off-topic? too vague? misapplied the principle? missed the verse context?)\n2. Give 1-2 concrete tips on how they COULD have connected "${card.name}" more effectively to the text.\n3. Offer a brief example of what a stronger answer might look like (just one sentence).\nThis helps the player learn and improve. Be honest but kind — coach, don't crush.`;
 
       const prompt = isFirstPlay
         ? `You are Jeeves, a wise Bible study assistant. A player is connecting the PT principle "${card.name}" to ${seedVerse.reference}.
@@ -243,12 +243,14 @@ Keep it conversational, warm, and concise. Never use the word "dear".${scoreInst
       if (error) throw error;
       const raw = data?.content || data?.response || data?.message || '';
 
-      // Parse score from response
+      // Parse corrected explanation and score from response
+      const correctedMatch = raw.match(/CORRECTED:\s*(.+?)(?=\nSCORE:|\n*$)/is);
+      const corrected = correctedMatch ? correctedMatch[1].trim() : playerExplanation;
       const scoreMatch = raw.match(/SCORE:\s*(\d+)/i);
       const score = scoreMatch ? Math.min(10, Math.max(1, parseInt(scoreMatch[1], 10))) : 6;
-      const commentary = raw.replace(/\n?SCORE:\s*\d+/i, '').trim() || 'Good connection!';
+      const commentary = raw.replace(/\n?CORRECTED:\s*.+?(?=\nSCORE:|\n*$)/is, '').replace(/\n?SCORE:\s*\d+/i, '').trim() || 'Good connection!';
 
-      return { commentary, score };
+      return { commentary, score, corrected };
     } catch (err) {
       console.error('Error getting Jeeves judgment:', err);
       return {
@@ -256,6 +258,7 @@ Keep it conversational, warm, and concise. Never use the word "dear".${scoreInst
           ? `Good connection of "${card.name}" to the verse!`
           : `Nice way to build on ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}!`,
         score: 6, // Default pass on error
+        corrected: playerExplanation, // Use original on error
       };
     }
   };
@@ -286,10 +289,10 @@ Keep it conversational, warm, and concise. Never use the word "dear".${scoreInst
     
     if (canUseJeeves) {
       setIsJudging(true);
-      const { commentary, score } = await getJeevesJudgment(explanation);
+      const { commentary, score, corrected } = await getJeevesJudgment(explanation);
       setJeevesJudgment(commentary);
       setIsJudging(false);
-      onSubmit(connectionList, explanation, isChristConnection, commentary, score);
+      onSubmit(connectionList, corrected, isChristConnection, commentary, score, corrected);
     } else {
       // No Jeeves assists left — auto-approve with default score
       onSubmit(connectionList, explanation, isChristConnection, undefined, 6);

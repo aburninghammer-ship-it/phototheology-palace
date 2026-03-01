@@ -28,6 +28,7 @@ export interface Season {
   doctrines: string[] | null;
   opponents: string[] | null;
   config_mode: string | null;
+  is_public: boolean | null;
 }
 
 export interface Squad {
@@ -70,6 +71,36 @@ export interface Battle {
   weapons_used: number;
   result: string | null;
   battle_log: any;
+  is_public: boolean | null;
+  scheduled_at: string | null;
+}
+
+export interface BoardSquad {
+  id: string;
+  name: string;
+  banner_emoji: string | null;
+  motto: string | null;
+  tier: string | null;
+  total_points: number;
+  wins: number;
+  losses: number;
+  season_id: string;
+  season_title: string;
+  rank: number;
+}
+
+export interface PublicBattle {
+  id: string;
+  squad_id: string;
+  squad_name: string;
+  squad_emoji: string;
+  topic: string | null;
+  difficulty: string | null;
+  scheduled_at: string;
+  status: string;
+  result: string | null;
+  points_earned: number;
+  weapons_used: number;
 }
 
 export interface LeaderboardEntry {
@@ -79,6 +110,8 @@ export interface LeaderboardEntry {
   team_banner_color: string;
   team_level: string;
   total_points: number;
+  wins: number;
+  losses: number;
   rank: number;
 }
 
@@ -92,6 +125,9 @@ export function useForgeDefend(churchId: string) {
   const [currentBattle, setCurrentBattle] = useState<Battle | null>(null);
   const [battleRounds, setBattleRounds] = useState<any[]>([]);
   const [teamBattles, setTeamBattles] = useState<Battle[]>([]);
+  const [allSquads, setAllSquads] = useState<BoardSquad[]>([]);
+  const [publicBattles, setPublicBattles] = useState<PublicBattle[]>([]);
+  const [allSeasons, setAllSeasons] = useState<Season[]>([]);
 
   const loadSeasonData = useCallback(async () => {
     if (!user?.id || !churchId) {
@@ -177,6 +213,8 @@ export function useForgeDefend(churchId: string) {
             team_banner_color: "violet-600",
             team_level: t.tier || "bronze",
             total_points: t.total_points || 0,
+            wins: t.wins || 0,
+            losses: t.losses || 0,
             rank: i + 1,
           }))
         );
@@ -192,6 +230,99 @@ export function useForgeDefend(churchId: string) {
     loadSeasonData();
   }, [loadSeasonData]);
 
+  // Load season board — all squads across seasons, public battles, all seasons
+  const loadSeasonBoard = useCallback(async () => {
+    if (!churchId) return;
+    try {
+      // Get all seasons for this church
+      const { data: seasons } = await (supabase as any)
+        .from("defense_seasons")
+        .select("*")
+        .eq("church_id", churchId)
+        .order("created_at", { ascending: false });
+
+      const seasonsList: Season[] = seasons || [];
+      setAllSeasons(seasonsList);
+
+      if (seasonsList.length === 0) {
+        setAllSquads([]);
+        setPublicBattles([]);
+        return;
+      }
+
+      const seasonIds = seasonsList.map((s) => s.id);
+      const seasonMap = new Map(seasonsList.map((s) => [s.id, s.title]));
+
+      // Get all squads across all seasons
+      const { data: squads } = await (supabase as any)
+        .from("defense_squads")
+        .select("*")
+        .in("season_id", seasonIds)
+        .order("total_points", { ascending: false });
+
+      if (squads) {
+        setAllSquads(
+          squads.map((s: any, i: number) => ({
+            id: s.id,
+            name: s.name,
+            banner_emoji: s.banner_emoji,
+            motto: s.motto,
+            tier: s.tier || "bronze",
+            total_points: s.total_points || 0,
+            wins: s.wins || 0,
+            losses: s.losses || 0,
+            season_id: s.season_id,
+            season_title: seasonMap.get(s.season_id) || "Unknown Season",
+            rank: i + 1,
+          }))
+        );
+      }
+
+      // Get upcoming public battles
+      const { data: battles } = await (supabase as any)
+        .from("defense_battles")
+        .select("*, defense_squads(name, banner_emoji)")
+        .in("season_id", seasonIds)
+        .eq("is_public", true)
+        .in("status", ["pending", "in_progress"])
+        .order("scheduled_at", { ascending: true });
+
+      if (battles) {
+        setPublicBattles(
+          battles.map((b: any) => ({
+            id: b.id,
+            squad_id: b.squad_id,
+            squad_name: b.defense_squads?.name || "Unknown",
+            squad_emoji: b.defense_squads?.banner_emoji || "⚔️",
+            topic: b.topic,
+            difficulty: b.difficulty,
+            scheduled_at: b.scheduled_at,
+            status: b.status,
+            result: b.result,
+            points_earned: b.points_earned || 0,
+            weapons_used: b.weapons_used || 0,
+          }))
+        );
+      }
+    } catch (err) {
+      console.error("Failed to load season board:", err);
+    }
+  }, [churchId]);
+
+  // Toggle battle public/spectator visibility
+  const toggleBattlePublic = useCallback(async (
+    battleId: string,
+    isPublic: boolean,
+    scheduledAt?: string
+  ) => {
+    const update: any = { is_public: isPublic };
+    if (scheduledAt) update.scheduled_at = scheduledAt;
+    await (supabase as any)
+      .from("defense_battles")
+      .update(update)
+      .eq("id", battleId);
+  }, []);
+
   // Create a new season
   const createSeason = useCallback(async (
     title: string,
@@ -199,6 +330,7 @@ export function useForgeDefend(churchId: string) {
       doctrines?: string[];
       opponents?: string[];
       configMode?: string;
+      isPublic?: boolean;
     }
   ) => {
     if (!user?.id || !churchId) return null;
@@ -214,6 +346,7 @@ export function useForgeDefend(churchId: string) {
         doctrines: options?.doctrines || null,
         opponents: options?.opponents || null,
         config_mode: options?.configMode || "manual",
+        is_public: options?.isPublic ?? false,
       })
       .select()
       .single();
@@ -576,6 +709,9 @@ export function useForgeDefend(churchId: string) {
     currentBattle,
     battleRounds,
     teamBattles,
+    allSquads,
+    publicBattles,
+    allSeasons,
     createSeason,
     createSquad,
     runDraft,
@@ -588,6 +724,8 @@ export function useForgeDefend(churchId: string) {
     getParticipationBalance,
     acceptSquadInvitation,
     declineSquadInvitation,
+    loadSeasonBoard,
+    toggleBattlePublic,
     refresh: loadSeasonData,
   };
 }

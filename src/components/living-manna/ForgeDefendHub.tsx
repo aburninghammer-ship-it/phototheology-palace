@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useForgeDefend, type LeaderboardEntry } from "@/hooks/useForgeDefend";
+import { useForgeDefend, type LeaderboardEntry, type BoardSquad, type PublicBattle } from "@/hooks/useForgeDefend";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -33,7 +33,7 @@ import {
   getTeamLevel,
 } from "@/data/forgeDefendConfig";
 
-type HubView = "overview" | "draft" | "battle" | "battle-setup" | "leaderboard" | "prep" | "team" | "drill" | "debrief" | "new-season";
+type HubView = "overview" | "draft" | "battle" | "battle-setup" | "leaderboard" | "prep" | "team" | "drill" | "debrief" | "new-season" | "season-board";
 
 interface ForgeDefendHubProps {
   churchId: string;
@@ -47,8 +47,10 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const {
     loading, activeSeason, myTeam, teamMembers, leaderboard,
     currentBattle, battleRounds, teamBattles,
+    allSquads, publicBattles, allSeasons,
     createSeason, createSquad, runDraft, startBattle, submitRound, completeBattle,
     activateSeason, advanceWeek, getTeamStats, getParticipationBalance,
+    loadSeasonBoard, toggleBattlePublic,
     refresh,
   } = useForgeDefend(resolvedChurchId);
 
@@ -86,6 +88,11 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
   const [battleSetupMode, setBattleSetupMode] = useState<"offense" | "defense">("defense");
   const [battleSetupOpponent, setBattleSetupOpponent] = useState<"user" | "jeeves">("user");
   const [battleSetupOpponentId, setBattleSetupOpponentId] = useState<string | null>(null);
+  const [battleSetupPublic, setBattleSetupPublic] = useState(false);
+  const [battleSetupSchedule, setBattleSetupSchedule] = useState("");
+
+  // Season public toggle state
+  const [seasonIsPublic, setSeasonIsPublic] = useState(false);
 
   // Team analytics state
   const [teamAnalytics, setTeamAnalytics] = useState<any>(null);
@@ -290,6 +297,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
         doctrines: selectedDoctrines.length > 0 ? selectedDoctrines : undefined,
         opponents: selectedOpponents.length > 0 ? selectedOpponents : undefined,
         configMode,
+        isPublic: seasonIsPublic,
       });
       if (!season) {
         setCreateError("Season launch failed. Check console for details and try again.");
@@ -540,6 +548,21 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                   : "Choose your own doctrines, opponents, and battle mode."}
               </p>
             </div>
+
+            {/* Make Season Public */}
+            <div className="flex items-center gap-2 border-t border-white/10 pt-3">
+              <Checkbox
+                id="initial-season-public"
+                checked={seasonIsPublic}
+                onCheckedChange={(v) => setSeasonIsPublic(!!v)}
+              />
+              <Label htmlFor="initial-season-public" className="text-sm text-violet-300 cursor-pointer">
+                Make season public on the Board
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Public seasons appear on the church-wide Season Board so other teams can see progress and rankings.
+            </p>
           </CardContent>
         </Card>
 
@@ -816,6 +839,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
     ...(activeSeason.status === "recruiting" || !myTeam
       ? [{ id: "draft" as const, label: !myTeam ? "Create Team" : "Draft", icon: !myTeam ? Plus : Users }]
       : []),
+    { id: "season-board" as const, label: "Board", icon: BarChart3 },
     { id: "new-season" as const, label: "New Season", icon: Flame },
   ];
 
@@ -840,7 +864,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
       </div>
 
       {/* Navigation */}
-      <div className={`grid ${isMobile ? "grid-cols-4" : "grid-cols-5"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50`}>
+      <div className={`grid ${isMobile ? "grid-cols-4" : "grid-cols-6"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50`}>
         {navItems.map((nav) => (
           <button
             key={nav.id}
@@ -1444,10 +1468,48 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                 </div>
               </div>
 
+              {/* Open to Spectators */}
+              <div className="space-y-2 border-t border-white/10 pt-3">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="battle-public"
+                    checked={battleSetupPublic}
+                    onCheckedChange={(v) => setBattleSetupPublic(!!v)}
+                  />
+                  <Label htmlFor="battle-public" className="text-sm text-muted-foreground cursor-pointer">
+                    Open to spectators
+                  </Label>
+                </div>
+                {battleSetupPublic && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Scheduled Time</Label>
+                    <Input
+                      type="datetime-local"
+                      value={battleSetupSchedule}
+                      onChange={(e) => setBattleSetupSchedule(e.target.value)}
+                      className="bg-black/30 border-red-500/30"
+                    />
+                  </div>
+                )}
+              </div>
+
               <Button
-                onClick={() => {
+                onClick={async () => {
                   if (battleSetupTopic && battleSetupOpponentId) {
-                    handleStartBattle(battleSetupTopic, battleSetupOpponentId);
+                    const battle = await startBattle(battleSetupTopic, battleSetupOpponentId);
+                    if (battle && battleSetupPublic) {
+                      await toggleBattlePublic(
+                        battle.id,
+                        true,
+                        battleSetupSchedule ? new Date(battleSetupSchedule).toISOString() : undefined
+                      );
+                    }
+                    if (battle) {
+                      setBattleMessages([]);
+                      setCurrentSpeakerIdx(0);
+                      setView("battle");
+                      await getOpponentAttack(battle, null, false);
+                    }
                   }
                 }}
                 disabled={!battleSetupTopic || !battleSetupOpponentId}
@@ -1841,6 +1903,21 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
                   </Button>
                 </div>
               </div>
+
+              {/* Make Season Public */}
+              <div className="flex items-center gap-2 border-t border-white/10 pt-3">
+                <Checkbox
+                  id="new-season-public"
+                  checked={seasonIsPublic}
+                  onCheckedChange={(v) => setSeasonIsPublic(!!v)}
+                />
+                <Label htmlFor="new-season-public" className="text-sm text-violet-300 cursor-pointer">
+                  Make season public on the Board
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Public seasons appear on the church-wide Season Board so other teams can see progress and rankings.
+              </p>
             </CardContent>
           </Card>
 
@@ -1982,21 +2059,37 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
         </div>
       )}
 
+      {/* ═══ SEASON BOARD VIEW ═══ */}
+      {view === "season-board" && (
+        <SeasonBoardView
+          allSquads={allSquads}
+          allSeasons={allSeasons}
+          publicBattles={publicBattles}
+          loadSeasonBoard={loadSeasonBoard}
+        />
+      )}
+
       {/* ═══ LEADERBOARD VIEW ═══ */}
       {view === "leaderboard" && (
         <div className="space-y-2">
           {leaderboard.map((entry, i) => (
-            <Card key={entry.team_id} className="bg-black/20 border-violet-500/30">
+            <Card key={entry.team_id} className={`bg-black/20 ${i === 0 ? "border-yellow-500/40" : i === 1 ? "border-gray-400/30" : i === 2 ? "border-amber-600/30" : "border-violet-500/30"}`}>
               <CardContent className="p-3 flex items-center gap-3">
-                <div className={`text-2xl font-bold ${i === 0 ? "text-yellow-400" : i === 1 ? "text-gray-300" : i === 2 ? "text-amber-600" : "text-muted-foreground"}`}>
+                <div className={`text-2xl font-bold w-10 text-center ${i === 0 ? "text-yellow-400" : i === 1 ? "text-gray-300" : i === 2 ? "text-amber-600" : "text-muted-foreground"}`}>
                   #{entry.rank}
                 </div>
                 <span className="text-2xl">{entry.team_avatar_emoji}</span>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-white">{entry.team_name}</h4>
-                  <p className="text-xs text-muted-foreground">{entry.team_level}</p>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-white truncate">{entry.team_name}</h4>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] border-violet-500/30">{entry.team_level}</Badge>
+                    <span className="text-[10px] text-muted-foreground">{entry.wins}W / {entry.losses}L</span>
+                  </div>
                 </div>
-                <div className="text-lg font-bold text-violet-300">{entry.total_points}</div>
+                <div className="text-right shrink-0">
+                  <div className="text-lg font-bold text-violet-300">{entry.total_points}</div>
+                  <div className="text-[10px] text-muted-foreground">pts</div>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -2287,6 +2380,160 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── SEASON BOARD VIEW COMPONENT ─────────────────────
+function SeasonBoardView({
+  allSquads,
+  allSeasons,
+  publicBattles,
+  loadSeasonBoard,
+}: {
+  allSquads: BoardSquad[];
+  allSeasons: import("@/hooks/useForgeDefend").Season[];
+  publicBattles: PublicBattle[];
+  loadSeasonBoard: () => Promise<void>;
+}) {
+  const [boardLoading, setBoardLoading] = useState(false);
+
+  useEffect(() => {
+    setBoardLoading(true);
+    loadSeasonBoard().finally(() => setBoardLoading(false));
+  }, [loadSeasonBoard]);
+
+  if (boardLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-violet-400" />
+      </div>
+    );
+  }
+
+  const activeSeasons = allSeasons.filter((s) => s.status === "active" || s.status === "recruiting");
+
+  return (
+    <div className="space-y-6">
+      {/* Global Leaderboard */}
+      <Card className="bg-black/20 border-violet-500/30">
+        <CardContent className="p-4 space-y-3">
+          <h3 className="text-lg font-bold text-violet-300 flex items-center gap-2">
+            <Trophy className="h-5 w-5" /> Global Leaderboard
+          </h3>
+          {allSquads.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No squads yet.</p>
+          ) : (
+            <div className="space-y-1.5">
+              {allSquads.map((squad) => (
+                <div
+                  key={squad.id}
+                  className="flex items-center gap-3 p-2.5 rounded-lg bg-black/30 border border-white/5"
+                >
+                  <span className="text-lg font-bold text-violet-400 w-8 text-center">
+                    {squad.rank <= 3 ? ["", "1st", "2nd", "3rd"][squad.rank] : `#${squad.rank}`}
+                  </span>
+                  <span className="text-xl">{squad.banner_emoji || "⚔️"}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm text-white truncate">{squad.name}</div>
+                    <div className="text-[10px] text-muted-foreground truncate">{squad.season_title}</div>
+                  </div>
+                  <Badge variant="outline" className="border-violet-500/30 text-[10px]">
+                    {squad.tier || "bronze"}
+                  </Badge>
+                  <div className="text-right shrink-0">
+                    <div className="text-sm font-bold text-violet-300">{squad.total_points}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {squad.wins}W / {squad.losses}L
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Active Seasons */}
+      <Card className="bg-black/20 border-amber-500/30">
+        <CardContent className="p-4 space-y-3">
+          <h3 className="text-lg font-bold text-amber-300 flex items-center gap-2">
+            <Flame className="h-5 w-5" /> Active Seasons
+          </h3>
+          {activeSeasons.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No active seasons.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {activeSeasons.map((season) => {
+                const seasonSquads = allSquads.filter((s) => s.season_id === season.id);
+                return (
+                  <div
+                    key={season.id}
+                    className="p-3 rounded-lg bg-black/30 border border-amber-500/20 space-y-1.5"
+                  >
+                    <div className="font-semibold text-sm text-white">{season.title}</div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Badge variant="outline" className="border-amber-500/30 text-[10px]">
+                        Week {season.current_week}/{season.week_count}
+                      </Badge>
+                      <span>{seasonSquads.length} squad{seasonSquads.length !== 1 ? "s" : ""}</span>
+                    </div>
+                    <Badge variant="outline" className="text-[10px]">
+                      {season.status}
+                    </Badge>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Upcoming Public Debates */}
+      <Card className="bg-black/20 border-emerald-500/30">
+        <CardContent className="p-4 space-y-3">
+          <h3 className="text-lg font-bold text-emerald-300 flex items-center gap-2">
+            <Clock className="h-5 w-5" /> Upcoming Public Debates
+          </h3>
+          {publicBattles.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No upcoming public debates. Teams can open their battles to spectators from the battle setup screen.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {publicBattles.map((battle) => (
+                <div
+                  key={battle.id}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-black/30 border border-emerald-500/20"
+                >
+                  <span className="text-xl">{battle.squad_emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm text-white">{battle.squad_name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Topic: {battle.topic || "TBD"} &middot; {battle.difficulty || "standard"}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-xs text-emerald-300">
+                      {battle.scheduled_at
+                        ? new Date(battle.scheduled_at).toLocaleString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })
+                        : "Time TBD"}
+                    </div>
+                    <Badge variant="outline" className="text-[10px] border-emerald-500/30">
+                      {battle.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

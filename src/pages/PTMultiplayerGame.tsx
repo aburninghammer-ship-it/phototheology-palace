@@ -168,7 +168,8 @@ const PTMultiplayerGame = () => {
   useEffect(() => {
     if (!gameId) return;
     fetchGameData();
-    subscribeToUpdates();
+    const cleanup = subscribeToUpdates();
+    return cleanup;
   }, [gameId]);
 
   const fetchGameData = async () => {
@@ -179,6 +180,18 @@ const PTMultiplayerGame = () => {
       supabase.from('pt_multiplayer_players').select('*').eq('game_id', gameId).order('joined_at'),
       supabase.from('pt_multiplayer_moves').select('*').eq('game_id', gameId).order('created_at', { ascending: false }).limit(20)
     ]);
+
+    if (gameRes.error) {
+      console.error('[PTMultiplayer] Error fetching game:', gameRes.error);
+      setLoading(false);
+      return;
+    }
+    if (playersRes.error) {
+      console.error('[PTMultiplayer] Error fetching players:', playersRes.error);
+    }
+    if (movesRes.error) {
+      console.error('[PTMultiplayer] Error fetching moves:', movesRes.error);
+    }
 
     if (gameRes.data) setGame(gameRes.data);
     if (playersRes.data) setPlayers(playersRes.data);
@@ -306,15 +319,21 @@ const PTMultiplayerGame = () => {
   };
 
   const subscribeToUpdates = () => {
+    if (!gameId) return () => {};
+
     const channel = supabase
       .channel(`pt-game-${gameId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_games', filter: `id=eq.${gameId}` }, 
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_games', filter: `id=eq.${gameId}` },
         () => fetchGameData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_players', filter: `game_id=eq.${gameId}` }, 
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_players', filter: `game_id=eq.${gameId}` },
         () => fetchGameData())
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pt_multiplayer_moves', filter: `game_id=eq.${gameId}` }, 
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pt_multiplayer_moves', filter: `game_id=eq.${gameId}` },
         () => fetchGameData())
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          console.error('[PTMultiplayer] Realtime subscription error for game', gameId);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -380,15 +399,17 @@ const PTMultiplayerGame = () => {
       setExplanation("");
 
       // Move to next player if approved or rejected
-      if (verdict === 'approved' || verdict === 'rejected') {
+      if ((verdict === 'approved' || verdict === 'rejected') && currentPlayer && game && players.length > 0) {
         const currentIndex = players.findIndex(p => p.id === currentPlayer.id);
         const nextIndex = (currentIndex + 1) % players.length;
         const nextPlayer = players[nextIndex];
-        
-        await supabase
-          .from('pt_multiplayer_games')
-          .update({ current_turn_player_id: nextPlayer.id })
-          .eq('id', game.id);
+
+        if (nextPlayer) {
+          await supabase
+            .from('pt_multiplayer_games')
+            .update({ current_turn_player_id: nextPlayer.id })
+            .eq('id', game.id);
+        }
       }
 
     } catch (error: any) {
