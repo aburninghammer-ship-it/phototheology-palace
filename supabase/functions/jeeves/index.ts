@@ -8854,13 +8854,29 @@ Return ONLY valid JSON: {"question": "..."}`;
       const category = body.category || "General Bible";
       const isDefense = body.isDefense || false;
 
-      systemPrompt = `You are a Family Feud game host for a Bible/Theology edition. Generate a survey-style question with 6 ranked answers. Higher-ranked answers should be worth more points.
+      systemPrompt = `You are a Family Feud game host for PHOTOTHEOLOGY Family Feud — NOT regular Bible trivia. Every question must test deep PT Palace principles, typological thinking, dimensional reasoning, sanctuary theology, or cycle awareness.
 
-RULES:
-- Answers should be common, well-known responses that most Bible students would give
-- Point values should descend: top answer ~40, then 30, 20, 15, 10, 5
-- Keep answers short (1-4 words each)
-${isDefense ? '- For Defense Mode: generate a question like "Name a common argument against [doctrine]" and include a "defensePrompt" — a specific theological argument to respond to' : ''}
+THE PT PALACE SYSTEM (use as backbone):
+- Floor 1: Story Room, Imagination Room, 24FPS, Bible Rendered, Translation Room, Gems Room
+- Floor 2: Observation, Def-Com, Symbols/Types, Questions, Q&A Chains
+- Floor 3: Nature Freestyle, Personal Freestyle, Bible Freestyle (Verse Genetics), History/Social, Listening
+- Floor 4: Concentration Room (Christ in every text), Dimensions Room (5: Literal, Christ, Me, Church, Heaven), Connect 6, Theme Room (Sanctuary Wall, Life of Christ Wall, Great Controversy Wall, Time Prophecy Wall, Gospel Floor, Heaven Ceiling), Time Zone (Heaven/Earth × Past/Present/Future), Patterns, Parallels, Fruit Room
+- Floor 5: Blue Room (Sanctuary furniture & services), Prophecy Room, Three Angels Room, Feasts Room
+- Floor 6: 8 Cycles (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re), Three Heavens (1H/2H/3H)
+- Floor 7: Fire Room, Meditation Room, Speed Room
+- Floor 8: Reflexive Mastery
+
+QUESTION DESIGN RULES:
+- NEVER generate surface-level questions like "Name a book of the Bible" or "Name a disciple"
+- Questions must probe PT thinking. Examples:
+  • "Name a piece of sanctuary furniture and its Christ-fulfillment" → Altar of Burnt Offering/Cross, Laver/Baptism, Lampstand/Holy Spirit, Table of Showbread/Word of God, Altar of Incense/Intercession, Ark/God's Throne
+  • "Name a biblical event that follows the Fall→Covenant→Sanctuary→Enemy→Restoration cycle pattern" → Flood, Exodus, Exile/Return, Cross/Resurrection, Pentecost, Second Coming
+  • "Name a recurring '40' pattern in Scripture and what it represents" → 40 days rain/judgment, 40 years wilderness/testing, 40 days Sinai/communion, 40 days temptation/victory, 40 days post-resurrection/commission
+  • "Name one of the 5 Dimensions and how it transforms Exodus 12" → Literal/Passover event, Christ/Lamb of God, Me/apply the blood by faith, Church/preserved by sacrifice, Heaven/eternal deliverance
+- Answers should be PT concepts, sanctuary elements, typological connections, cycle names, room principles, or dimensional applications
+- Point values descend: top answer ~40, then 30, 20, 15, 10, 5
+- Keep answers short (1-5 words each) but conceptually rich
+${isDefense ? '- For Defense Mode: generate a question like "Name a PT principle that dismantles [false doctrine]" and include a "defensePrompt" — a specific theological argument to respond to' : ''}
 
 Return ONLY valid JSON: ${isDefense ? '{"question": "...", "defensePrompt": "...", "answers": [{"text": "...", "points": 40}, ...]}' : '{"question": "...", "answers": [{"text": "...", "points": 40}, ...]}'}`;
 
