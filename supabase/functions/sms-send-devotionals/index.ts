@@ -33,9 +33,9 @@ serve(async (req) => {
     const awsRegion = Deno.env.get('AWS_REGION') ?? 'us-east-1';
 
     if (!awsAccessKeyId || !awsSecretAccessKey) {
-      console.error('Missing AWS credentials');
+      console.error('Missing AWS credentials. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in Supabase Edge Function secrets.');
       return new Response(
-        JSON.stringify({ error: 'Missing AWS credentials' }),
+        JSON.stringify({ error: 'Missing AWS credentials. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in Supabase Edge Function secrets.' }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

@@ -528,6 +528,9 @@ serve(async (req) => {
         }
 
         // Send SMS to opted-in recipients
+        if (!twilioConfigured) {
+          console.warn(`[SMS] Twilio not configured (missing TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_PHONE_NUMBER). Skipping SMS for plan ${plan.id}.`);
+        }
         if (twilioConfigured) {
           try {
             // Get profiles with SMS enabled for this plan (include timezone)
