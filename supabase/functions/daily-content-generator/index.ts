@@ -240,6 +240,81 @@ Return JSON format:
     const huntJsonStr = huntJsonMatch ? huntJsonMatch[1].trim() : rawHuntContent.trim();
     const huntContent = JSON.parse(huntJsonStr);
 
+    // ── Validate room answers against real Palace rooms ──
+    const VALID_ROOMS: Record<string, string[]> = {
+      'sr': ['sr', 'story room'],
+      'ir': ['ir', 'imagination room'],
+      '24': ['24', '24fps', '24fps room'],
+      'br': ['br', 'bible rendered', 'bible rendered room'],
+      'tr': ['tr', 'translation room'],
+      'gr': ['gr', 'gems room'],
+      'or': ['or', 'observation room'],
+      'dc': ['dc', 'def-com', 'def-com room', 'defcom'],
+      'st': ['st', 'symbols/types room', 'symbols types room', 'symbols room', 'types room'],
+      'qr': ['qr', 'questions room'],
+      'qa': ['qa', 'q&a chains room', 'qa chains', 'q&a room'],
+      'nf': ['nf', 'nature freestyle'],
+      'pf': ['pf', 'personal freestyle'],
+      'bf': ['bf', 'bible freestyle', 'verse genetics'],
+      'hf': ['hf', 'history freestyle', 'history/social freestyle'],
+      'lr': ['lr', 'listening room'],
+      'cr': ['cr', 'concentration room'],
+      'dr': ['dr', 'dimensions room'],
+      'c6': ['c6', 'connect 6', 'connect-6'],
+      'trm': ['trm', 'theme room'],
+      'tz': ['tz', 'time zone', 'time zone room'],
+      'prm': ['prm', 'patterns room'],
+      'p||': ['p||', 'parallels room', 'parallels'],
+      'frt': ['frt', 'fruit room'],
+      'cec': ['cec', 'christ every chapter', 'christ in every chapter'],
+      'r66': ['r66', 'room 66'],
+      'bl': ['bl', 'blue room', 'sanctuary room', 'blue room sanctuary'],
+      'pr': ['pr', 'prophecy room'],
+      '3a': ['3a', 'three angels room', 'three angels'],
+      'fe': ['fe', 'feasts room'],
+      'frm': ['frm', 'fire room'],
+      'mr': ['mr', 'meditation room'],
+      'srm': ['srm', 'speed room'],
+      'jr': ['jr', 'juice room'],
+    };
+
+    const allValidAnswers = new Set<string>();
+    for (const aliases of Object.values(VALID_ROOMS)) {
+      for (const a of aliases) allValidAnswers.add(a.toLowerCase());
+    }
+
+    // Validate each clue's correct_answers for room-type clues
+    if (huntContent.clues) {
+      for (const clue of huntContent.clues) {
+        if (clue.clue_type === 'room' && clue.correct_answers) {
+          const validatedAnswers = clue.correct_answers.filter((ans: string) =>
+            allValidAnswers.has(ans.toLowerCase().trim())
+          );
+          if (validatedAnswers.length === 0) {
+            // AI hallucinated — try to extract a valid room from the hint text
+            for (const [tag, aliases] of Object.entries(VALID_ROOMS)) {
+              if (clue.hint && aliases.some((a: string) => clue.hint.toLowerCase().includes(a))) {
+                clue.correct_answers = [tag, ...aliases];
+                console.log(`Fixed hallucinated room answer for clue ${clue.clue_number} → ${tag}`);
+                break;
+              }
+            }
+          } else {
+            // Enrich with aliases so more user inputs are accepted
+            const enriched = new Set<string>(validatedAnswers.map((a: string) => a.toLowerCase().trim()));
+            for (const ans of validatedAnswers) {
+              for (const [tag, aliases] of Object.entries(VALID_ROOMS)) {
+                if (aliases.some((a: string) => a.toLowerCase() === ans.toLowerCase().trim())) {
+                  for (const alias of aliases) enriched.add(alias);
+                }
+              }
+            }
+            clue.correct_answers = Array.from(enriched);
+          }
+        }
+      }
+    }
+
     // Calculate expiration (24 hours from tomorrow start)
     const expiration = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
 
