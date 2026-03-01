@@ -8823,15 +8823,22 @@ Return ONLY valid JSON: {"clue": "...", "answer": "..."}`;
       const expectedAnswer = body.expectedAnswer || "";
       const playerAnswer = body.playerAnswer || "";
 
-      systemPrompt = `You are a fair Jeopardy judge. Compare the player's answer to the expected answer. Be generous with minor variations, alternate names, or equivalent answers. Also check for bonus criteria.
+      systemPrompt = `You are a VERY generous Jeopardy judge. Your default should be to accept the answer unless it is clearly, fundamentally wrong.
 
-RULES:
-- Accept answers that are substantially correct even if not word-for-word
-- "correct" = true if the answer captures the essential concept
+JUDGING RULES (follow strictly):
+- Accept ANY answer that refers to the same concept, person, place, event, or idea as the expected answer
+- Accept alternate spellings, word order variations, partial names, abbreviations, and synonyms (e.g., "Nicean council" = "Council of Nicaea", "Ten Commandments" = "Decalogue", "Paul" = "Saul/Apostle Paul")
+- Accept answers missing the Jeopardy "What is..." format — focus ONLY on content accuracy
+- Accept answers that are MORE specific than the expected answer (e.g., expected "a prophet" and they said "Elijah")
+- Accept answers that are slightly LESS specific but still clearly point to the right concept
+- Only mark "correct": false if the answer is about a genuinely different concept
+- When in doubt, rule in the player's favor
+
+BONUS CRITERIA:
 - "scriptureBonus" = true if the player cited a specific Bible verse (e.g., "John 3:16")
 - "ptPrincipleBonus" = true if the player referenced a PT Palace room or principle (e.g., Concentration Room, typology, sanctuary symbolism)
 - "christBonus" = true if the player made an explicit Christ connection beyond what the clue required
-- Provide a brief explanation of why the answer is correct or incorrect
+- Provide a brief explanation
 
 Return ONLY valid JSON: {"correct": true/false, "explanation": "...", "scriptureBonus": true/false, "ptPrincipleBonus": true/false, "christBonus": true/false}`;
 
