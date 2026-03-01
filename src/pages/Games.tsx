@@ -368,6 +368,30 @@ const Games = () => {
       difficulties: ["easy"],
       route: "/group-study"
     },
+    {
+      id: "pt_jeopardy",
+      name: "🧠 PT Jeopardy",
+      description: "Test your Bible knowledge Jeopardy-style! Pick categories from PT Rooms, answer AI-generated questions, and earn bonus points for Scripture citations and Christ connections.",
+      icon: "🧠",
+      floor: 0,
+      timed: true,
+      rooms: ["All"],
+      modes: ["solo", "multiplayer"],
+      difficulties: ["easy", "medium", "hard"],
+      route: "/games/pt-jeopardy"
+    },
+    {
+      id: "pt_family_feud",
+      name: "👨‍👩‍👧‍👦 PT Family Feud",
+      description: "Team-based Bible trivia! Two teams compete to guess the top-ranked answers to theological survey questions. Includes a Forge a Weapon championship round!",
+      icon: "👨‍👩‍👧‍👦",
+      floor: 0,
+      timed: true,
+      rooms: ["All"],
+      modes: ["multiplayer"],
+      difficulties: ["easy", "medium"],
+      route: "/games/pt-family-feud"
+    },
   ];
 
   const filteredGames = allGames.filter(game => {
