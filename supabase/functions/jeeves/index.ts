@@ -8771,6 +8771,97 @@ CRITICAL RULES:
 - NEVER use "dear" in any form`;
 
       userPrompt = message || "Please help me with this Bible study question.";
+    } else if (mode === "jeopardy_question") {
+      // PT Jeopardy - Generate a question for a category and difficulty
+      const category = body.category || "General Bible";
+      const difficulty = body.difficulty || "medium";
+      const points = body.points || 300;
+
+      systemPrompt = `You are a Jeopardy game host specializing in Bible and Phototheology questions. Generate a single Jeopardy-style clue and answer for the given category and difficulty.
+
+RULES:
+- The clue should be phrased as a statement (e.g., "This prophet was swallowed by a great fish")
+- The answer should be short and specific (e.g., "Jonah")
+- Scale difficulty: easy (100-200 pts) = basic Bible facts, medium (300 pts) = requires deeper knowledge, hard (400-500 pts) = requires connections, typology, or advanced theology
+- Keep clues concise (1-2 sentences)
+- For "Defense Mode" category, focus on apologetics and doctrinal defense
+- For "Sanctuary Room", focus on tabernacle/temple types and symbolism
+- For "Christ-Centered", focus on Christological connections throughout Scripture
+- For "Story Room", focus on biblical narratives
+- For "Symbols Library", focus on biblical symbols and typology
+- For "Connect 6", focus on connections and parallels across Scripture
+- For "Freestyle", focus on general Bible knowledge
+
+Return ONLY valid JSON: {"clue": "...", "answer": "..."}`;
+
+      userPrompt = `Generate a ${difficulty} difficulty (${points} points) Jeopardy clue for the category: "${category}". Return ONLY valid JSON.`;
+    } else if (mode === "jeopardy_judge") {
+      // PT Jeopardy - Judge a player's answer
+      const clue = body.clue || "";
+      const expectedAnswer = body.expectedAnswer || "";
+      const playerAnswer = body.playerAnswer || "";
+
+      systemPrompt = `You are a fair Jeopardy judge. Compare the player's answer to the expected answer. Be generous with minor variations, alternate names, or equivalent answers. Also check for bonus criteria.
+
+RULES:
+- Accept answers that are substantially correct even if not word-for-word
+- "correct" = true if the answer captures the essential concept
+- "scriptureBonus" = true if the player cited a specific Bible verse (e.g., "John 3:16")
+- "ptPrincipleBonus" = true if the player referenced a PT Palace room or principle (e.g., Concentration Room, typology, sanctuary symbolism)
+- "christBonus" = true if the player made an explicit Christ connection beyond what the clue required
+- Provide a brief explanation of why the answer is correct or incorrect
+
+Return ONLY valid JSON: {"correct": true/false, "explanation": "...", "scriptureBonus": true/false, "ptPrincipleBonus": true/false, "christBonus": true/false}`;
+
+      userPrompt = `Clue: "${clue}"\nExpected answer: "${expectedAnswer}"\nPlayer's answer: "${playerAnswer}"\n\nJudge this answer. Return ONLY valid JSON.`;
+    } else if (mode === "jeopardy_final") {
+      // PT Jeopardy - Final "Forge a Weapon" round question
+      systemPrompt = `You are Jeeves, a Phototheology mentor. Generate a challenging, open-ended theological question for the final "Forge a Weapon" round of PT Jeopardy. The question should require deep scriptural reasoning, knowledge of sanctuary symbolism, typology, or prophetic interpretation.
+
+RULES:
+- The question should be answerable in 2-4 sentences
+- It should require citing Scripture
+- It should connect to PT Palace principles (Christ-centered interpretation, sanctuary, types, parallels)
+- Make it thought-provoking but fair
+
+Return ONLY valid JSON: {"question": "..."}`;
+
+      userPrompt = message || `Generate a Final Jeopardy "Forge a Weapon" question. Return ONLY valid JSON.`;
+    } else if (mode === "family_feud_round") {
+      // PT Family Feud - Generate a survey-style round
+      const category = body.category || "General Bible";
+      const isDefense = body.isDefense || false;
+
+      systemPrompt = `You are a Family Feud game host for a Bible/Theology edition. Generate a survey-style question with 6 ranked answers. Higher-ranked answers should be worth more points.
+
+RULES:
+- Answers should be common, well-known responses that most Bible students would give
+- Point values should descend: top answer ~40, then 30, 20, 15, 10, 5
+- Keep answers short (1-4 words each)
+${isDefense ? '- For Defense Mode: generate a question like "Name a common argument against [doctrine]" and include a "defensePrompt" — a specific theological argument to respond to' : ''}
+
+Return ONLY valid JSON: ${isDefense ? '{"question": "...", "defensePrompt": "...", "answers": [{"text": "...", "points": 40}, ...]}' : '{"question": "...", "answers": [{"text": "...", "points": 40}, ...]}'}`;
+
+      userPrompt = `Generate a Family Feud round for the category: "${category}". ${isDefense ? 'This is a Defense Mode round.' : ''} Return ONLY valid JSON.`;
+    } else if (mode === "family_feud_judge") {
+      // PT Family Feud - Judge a guess
+      systemPrompt = `You are a Family Feud judge. Determine if a player's guess matches any of the survey answers. Be generous with synonyms and close variations.
+
+RULES:
+- Match if the guess is essentially the same concept as a survey answer
+- "scriptureBonus" = true if the player cited a specific Bible verse
+- Return the exact text of the matched answer if there's a match
+
+Return ONLY valid JSON: {"matched": true/false, "matchedAnswer": "exact text or null", "scriptureBonus": true/false}`;
+
+      userPrompt = message || "Judge this Family Feud guess.";
+    } else if (mode === "family_feud_forge" || mode === "family_feud_judge_forge") {
+      // PT Family Feud - Forge a Weapon round
+      systemPrompt = `You are Jeeves, a Phototheology mentor. ${mode === "family_feud_forge" ? "Generate an open-ended theological question for the championship 'Forge a Weapon' round." : "Judge a team's theological argument on a scale of 0-100 based on: theological depth, Scripture citations, PT principles applied, and Christ-centered reasoning."}
+
+Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' : '{"score": 75, "feedback": "..."}'}`;
+
+      userPrompt = message || "Generate/judge a Forge a Weapon round.";
     }
 
     // Guard: if no prompt was set for this mode, return a helpful error instead of sending empty content
@@ -8806,6 +8897,8 @@ CRITICAL RULES:
       "check-commentary-availability", "check_chef_recipe",
       "get_chef_model_answer", "generate_chef_verses",
       "strongs-lookup", "translate-verse",
+      "jeopardy_question", "jeopardy_judge", "jeopardy_final",
+      "family_feud_round", "family_feud_judge", "family_feud_forge", "family_feud_judge_forge",
     ]);
 
     if (!RAG_EXCLUDED_MODES.has(mode)) {
