@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Trophy, Lightbulb, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
+import { HelpMeButton } from "@/components/HelpMeButton";
 
 interface Clue {
   clue_number: number;
@@ -417,6 +418,14 @@ const TreasureHuntPlay = () => {
                         <Lightbulb className="h-4 w-4" />
                       </Button>
                     )}
+                    <HelpMeButton
+                      contextType="game"
+                      question={currentClue.hint}
+                      context={`This is a Phototheology Palace Treasure Hunt clue. The clue type is "${currentClue.clue_type}". The user needs to identify a Palace room, principle, verse, or theme. Guide them toward the answer without giving it away directly. The correct answer is one of: ${currentClue.correct_answers?.join(', ')}. Remind them what each Palace room does if relevant.`}
+                      userAttempt={userAnswer || undefined}
+                      variant="outline"
+                      size="sm"
+                    />
                   </div>
                 </div>
 
