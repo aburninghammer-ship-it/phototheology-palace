@@ -175,16 +175,21 @@ export function useJeopardyGame() {
       if (data) {
         try {
           const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-          const responseText = parsed.response || parsed.message || (typeof parsed === 'string' ? parsed : JSON.stringify(parsed));
-
-          // Try to extract JSON from response
-          const jsonMatch = responseText.match(/\{[\s\S]*"clue"[\s\S]*"answer"[\s\S]*\}/);
-          if (jsonMatch) {
-            const questionData = JSON.parse(jsonMatch[0]);
-            clue = questionData.clue || clue;
-            answer = questionData.answer || answer;
+          // Server now returns {clue, answer} directly for jeopardy_question mode
+          if (parsed.clue) {
+            clue = parsed.clue;
+            answer = parsed.answer || answer;
           } else {
-            clue = responseText;
+            // Fallback: try extracting from response field
+            const responseText = parsed.response || parsed.message || (typeof parsed === 'string' ? parsed : JSON.stringify(parsed));
+            const jsonMatch = responseText.match(/\{[\s\S]*"clue"[\s\S]*"answer"[\s\S]*\}/);
+            if (jsonMatch) {
+              const questionData = JSON.parse(jsonMatch[0]);
+              clue = questionData.clue || clue;
+              answer = questionData.answer || answer;
+            } else {
+              clue = responseText;
+            }
           }
         } catch {
           clue = typeof data === 'string' ? data : JSON.stringify(data);
@@ -231,10 +236,15 @@ export function useJeopardyGame() {
       if (data) {
         try {
           const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-          const responseText = parsed.response || parsed.message || (typeof parsed === 'string' ? parsed : JSON.stringify(parsed));
-          const jsonMatch = responseText.match(/\{[\s\S]*"correct"[\s\S]*\}/);
-          if (jsonMatch) {
-            result = { ...result, ...JSON.parse(jsonMatch[0]) };
+          // Server now returns judgment fields directly
+          if (parsed.correct !== undefined) {
+            result = { ...result, ...parsed };
+          } else {
+            const responseText = parsed.response || parsed.message || (typeof parsed === 'string' ? parsed : JSON.stringify(parsed));
+            const jsonMatch = responseText.match(/\{[\s\S]*"correct"[\s\S]*\}/);
+            if (jsonMatch) {
+              result = { ...result, ...JSON.parse(jsonMatch[0]) };
+            }
           }
         } catch {
           // Keep default
