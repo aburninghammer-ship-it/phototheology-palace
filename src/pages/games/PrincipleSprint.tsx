@@ -527,7 +527,9 @@ export default function PrincipleSprint() {
                   const isCorrectAnswer = lastCorrectPrinciples.includes(option);
 
                   let variant: "default" | "outline" | "destructive" = isSelected ? "default" : "outline";
-                  let extraClass = "";
+                  let extraClass = isSelected && !showFeedback
+                    ? "ring-2 ring-primary ring-offset-2 bg-primary text-primary-foreground"
+                    : "";
 
                   if (showFeedback) {
                     if (isCorrectAnswer) {
