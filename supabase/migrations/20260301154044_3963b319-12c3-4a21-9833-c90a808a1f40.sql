@@ -1,0 +1,3 @@
+UPDATE public.profiles SET has_lifetime_access = true, subscription_status = 'active', subscription_tier = 'premium' WHERE id = '212e94e6-ec7d-45d7-98bc-c8c3c0ec35f3';
+
+INSERT INTO public.user_subscriptions (user_id, subscription_status, subscription_tier) VALUES ('212e94e6-ec7d-45d7-98bc-c8c3c0ec35f3', 'active', 'premium') ON CONFLICT (user_id) DO UPDATE SET subscription_status = 'active', subscription_tier = 'premium';
