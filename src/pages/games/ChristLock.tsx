@@ -40,12 +40,25 @@ const RANDOM_VERSES = [
   "Zechariah 9:9",
 ];
 
+function parseVerseReference(ref: string): { book: string; chapter: number; verse: number; endVerse?: number } | null {
+  const match = ref.match(/^(.+?)\s+(\d+):(\d+)(?:-(\d+))?$/);
+  if (!match) return null;
+  return {
+    book: match[1],
+    chapter: parseInt(match[2]),
+    verse: parseInt(match[3]),
+    endVerse: match[4] ? parseInt(match[4]) : undefined,
+  };
+}
+
 export default function ChristLock() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
   const [currentCard, setCurrentCard] = useState<typeof CHRIST_CARDS[0] | null>(null);
   const [currentVerse, setCurrentVerse] = useState("");
+  const [verseText, setVerseText] = useState("");
+  const [loadingVerse, setLoadingVerse] = useState(false);
   const [answer, setAnswer] = useState("");
   const [score, setScore] = useState(0);
   const [targetScore] = useState(3);
@@ -71,12 +84,44 @@ export default function ChristLock() {
     saveScore();
   }, [gameWon, user, score]);
 
+  const fetchVerseText = async (ref: string) => {
+    const parsed = parseVerseReference(ref);
+    if (!parsed) return;
+    setLoadingVerse(true);
+    try {
+      let query = supabase
+        .from("bible_verses_tokenized")
+        .select("verse_num, text_kjv")
+        .eq("book", parsed.book)
+        .eq("chapter", parsed.chapter);
+
+      if (parsed.endVerse) {
+        query = query.gte("verse_num", parsed.verse).lte("verse_num", parsed.endVerse);
+      } else {
+        query = query.eq("verse_num", parsed.verse);
+      }
+
+      const { data, error } = await query.order("verse_num");
+      if (!error && data && data.length > 0) {
+        setVerseText(data.map(v => v.text_kjv).join(" "));
+      } else {
+        setVerseText("");
+      }
+    } catch {
+      setVerseText("");
+    } finally {
+      setLoadingVerse(false);
+    }
+  };
+
   const startRound = () => {
     const randomCard = CHRIST_CARDS[Math.floor(Math.random() * CHRIST_CARDS.length)];
     const randomVerse = RANDOM_VERSES[Math.floor(Math.random() * RANDOM_VERSES.length)];
     setCurrentCard(randomCard);
     setCurrentVerse(randomVerse);
+    setVerseText("");
     setAnswer("");
+    fetchVerseText(randomVerse);
   };
 
   const handleSubmit = async () => {
@@ -211,9 +256,16 @@ export default function ChristLock() {
               </div>
               <div className="bg-amber-500/20 rounded-lg p-4 border border-amber-500/30">
                 <div className="text-sm text-amber-200/60 mb-2">{t('games.christLock.yourVerse')}</div>
-                <div className="text-lg font-serif text-amber-100">
+                <div className="text-lg font-serif text-amber-100 font-bold">
                   {currentVerse}
                 </div>
+                {loadingVerse ? (
+                  <div className="text-sm text-amber-200/50 mt-2 italic">Loading verse text...</div>
+                ) : verseText ? (
+                  <p className="text-amber-100/80 mt-3 text-base leading-relaxed italic">
+                    "{verseText}"
+                  </p>
+                ) : null}
               </div>
             </CardContent>
           </Card>
