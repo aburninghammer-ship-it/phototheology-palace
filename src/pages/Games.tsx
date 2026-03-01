@@ -405,18 +405,6 @@ const Games = () => {
       route: "/games/bible-tetris"
     },
     {
-      id: "christ_in_focus",
-      name: "✝️ Christ in Focus",
-      description: "Drag verse words to the center anchor (Christ) to build connections. Each word must link to the right target — connect them all to complete the verse. Watch out for false centers in the corners!",
-      icon: "✝️",
-      floor: 4,
-      timed: false,
-      rooms: ["CR"],
-      modes: ["solo"],
-      difficulties: ["beginner", "intermediate", "master"],
-      route: "/games/christ-in-focus"
-    },
-    {
       id: "pt_scrabble",
       name: "🎯 PT Scrabble",
       description: "Build theological connections on a shared board! Place Palace room cards adjacent to existing ones and explain your Christ-centered connections.",
