@@ -1050,13 +1050,13 @@ Return ONLY valid JSON:
                         </TabsTrigger>
                       </TabsList>
                       <TabsContent value="create" className="mt-4 space-y-4">
-                        <div className="p-4 bg-muted/50 rounded-lg border border-border">
-                          <p className="text-sm text-muted-foreground mb-3">
-                            Create a room and share the code with friends. They'll join in real-time!
+                        <div className="p-4 bg-muted/50 rounded-lg border border-border space-y-4">
+                          <p className="text-sm text-muted-foreground">
+                            Choose a mode to create a room. Share the code with friends, then start when everyone's in!
                           </p>
                           <div className="flex gap-2">
                             <Button
-                              className="flex-1 h-12"
+                              className="flex-1 h-14"
                               variant="outline"
                               disabled={multiplayer.loading}
                               onClick={async () => {
@@ -1071,10 +1071,13 @@ Return ONLY valid JSON:
                               }}
                             >
                               {multiplayer.loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-                              Easy Mode
+                              <div className="text-left">
+                                <div className="font-semibold">Create Easy Game</div>
+                                <div className="text-xs text-muted-foreground">Multiple choice connections</div>
+                              </div>
                             </Button>
                             <Button
-                              className="flex-1 h-12"
+                              className="flex-1 h-14"
                               disabled={multiplayer.loading}
                               onClick={async () => {
                                 const game = await multiplayer.createGame("classic", playerCount);
@@ -1088,7 +1091,10 @@ Return ONLY valid JSON:
                               }}
                             >
                               {multiplayer.loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <BookOpen className="mr-2 h-5 w-5" />}
-                              Classic Mode
+                              <div className="text-left">
+                                <div className="font-semibold">Create Classic Game</div>
+                                <div className="text-xs text-muted-foreground">Write your own connections</div>
+                              </div>
                             </Button>
                           </div>
                         </div>
@@ -1245,31 +1251,37 @@ Return ONLY valid JSON:
                 </div>
 
                 {/* Start Game Button (Host Only) */}
-                {multiplayer.isHost && multiplayer.players.length >= 2 && (
-                  <Button
-                    className="w-full h-12"
-                    onClick={() => {
-                      // Start the game with all connected players
-                      const onlinePlayers: LocalPlayer[] = multiplayer.players.map((p, i) => ({
-                        id: p.user_id,
-                        name: p.display_name,
-                        hand: [],
-                        score: 0,
-                        isAI: false,
-                        color: PLAYER_COLORS[i % PLAYER_COLORS.length],
-                      }));
-                      startGame(
-                        (multiplayer.game?.game_mode as "easy" | "classic") || "easy",
-                        "online",
-                        onlinePlayers.length
-                      );
-                      // Update backend status
-                      multiplayer.updateGameState(multiplayer.game!.id, {}, "active");
-                    }}
-                  >
-                    <Sparkles className="mr-2 h-5 w-5" />
-                    Start Game ({multiplayer.players.length} players)
-                  </Button>
+                {multiplayer.isHost && (
+                  <>
+                    <Button
+                      className="w-full h-14 text-lg"
+                      disabled={multiplayer.players.length < 2}
+                      onClick={() => {
+                        const onlinePlayers: LocalPlayer[] = multiplayer.players.map((p, i) => ({
+                          id: p.user_id,
+                          name: p.display_name,
+                          hand: [],
+                          score: 0,
+                          isAI: false,
+                          color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+                        }));
+                        startGame(
+                          (multiplayer.game?.game_mode as "easy" | "classic") || "easy",
+                          "online",
+                          onlinePlayers.length
+                        );
+                        multiplayer.updateGameState(multiplayer.game!.id, {}, "active");
+                      }}
+                    >
+                      <Sparkles className="mr-2 h-5 w-5" />
+                      Start Game ({multiplayer.players.length} player{multiplayer.players.length !== 1 ? 's' : ''})
+                    </Button>
+                    {multiplayer.players.length < 2 && (
+                      <p className="text-sm text-muted-foreground text-center">
+                        Need at least 2 players to start. Share the code above!
+                      </p>
+                    )}
+                  </>
                 )}
 
                 {!multiplayer.isHost && (
