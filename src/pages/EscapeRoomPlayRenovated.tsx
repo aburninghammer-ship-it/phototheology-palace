@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
+import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import {
   Clock,
   HelpCircle,
@@ -31,7 +33,8 @@ import {
   Star,
   Sparkles,
   Key,
-  AlertTriangle
+  AlertTriangle,
+  Users
 } from "lucide-react";
 import {
   getEscapeRoomById,
@@ -556,9 +559,23 @@ const CipherPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
 export default function EscapeRoomPlayRenovated() {
   const { roomId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { t } = useTranslation();
   const { playSuccess, playError, playUnlock, playVictory, soundEnabled, setSoundEnabled } = useSound();
+
+  // Multiplayer
+  const multiplayer = useGameMultiplayer("escape_room");
+  const [gameMode, setGameMode] = useState<"solo" | "online" | null>(null);
+  const autoJoinCode = searchParams.get("room");
+
+  // Auto-join from URL
+  useEffect(() => {
+    if (autoJoinCode && !multiplayer.room) {
+      setGameMode("online");
+      multiplayer.joinRoom(autoJoinCode);
+    }
+  }, [autoJoinCode]);
 
   const [room, setRoom] = useState<EscapeRoom | null>(null);
   const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState(0);
@@ -574,6 +591,33 @@ export default function EscapeRoomPlayRenovated() {
   const [showFinalPuzzle, setShowFinalPuzzle] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [wrongAnswerShake, setWrongAnswerShake] = useState(false);
+  const isMultiplayer = gameMode === "online" && multiplayer.room;
+
+  // Sync multiplayer game state when host updates
+  useEffect(() => {
+    if (!isMultiplayer || !multiplayer.room?.game_state) return;
+    const gs = multiplayer.room.game_state as any;
+    if (!gs.puzzleIndex && gs.puzzleIndex !== 0) return;
+
+    // Only non-hosts sync from game state
+    if (!multiplayer.isHost) {
+      setCurrentPuzzleIndex(gs.puzzleIndex ?? 0);
+      setSolvedPuzzles(new Set(gs.solvedPuzzles ?? []));
+      setCluesRevealed(gs.cluesRevealed ?? []);
+      setScore(gs.score ?? 0);
+      setHintsUsed(gs.hintsUsed ?? 0);
+      setShowFinalPuzzle(gs.showFinalPuzzle ?? false);
+      if (gs.gameState === 'solved') setGameState('solved');
+      if (gs.gameState === 'failed') setGameState('failed');
+    }
+  }, [multiplayer.room?.game_state, multiplayer.room?.updated_at]);
+
+  // When multiplayer room goes active, start the game
+  useEffect(() => {
+    if (isMultiplayer && multiplayer.room?.status === "active" && gameMode === "online") {
+      // Game has started
+    }
+  }, [multiplayer.room?.status]);
 
   // Load room data
   useEffect(() => {
@@ -630,38 +674,95 @@ export default function EscapeRoomPlayRenovated() {
     }
   }, [gameState, saveProgress]);
 
+  // Broadcast multiplayer state
+  const broadcastState = useCallback((overrides: Record<string, any> = {}) => {
+    if (!isMultiplayer || !multiplayer.isHost) return;
+    multiplayer.updateGameState({
+      puzzleIndex: currentPuzzleIndex,
+      solvedPuzzles: [...solvedPuzzles],
+      cluesRevealed,
+      score,
+      hintsUsed,
+      showFinalPuzzle,
+      gameState,
+      ...overrides,
+    });
+  }, [isMultiplayer, multiplayer.isHost, currentPuzzleIndex, solvedPuzzles, cluesRevealed, score, hintsUsed, showFinalPuzzle, gameState]);
+
   const handlePuzzleSolved = (correct: boolean, answer: string) => {
     if (!room) return;
 
+    // In multiplayer, only allow current turn player to answer (or any player in co-op)
     const currentPuzzle = room.puzzles[currentPuzzleIndex];
 
     if (correct) {
       playSuccess();
-      setSolvedPuzzles(new Set([...solvedPuzzles, currentPuzzle.id]));
-      setCluesRevealed([...cluesRevealed, currentPuzzle.clueRevealed]);
-      setScore(prev => prev + currentPuzzle.points);
+      const newSolved = new Set([...solvedPuzzles, currentPuzzle.id]);
+      const newClues = [...cluesRevealed, currentPuzzle.clueRevealed];
+      const newScore = score + currentPuzzle.points;
+      setSolvedPuzzles(newSolved);
+      setCluesRevealed(newClues);
+      setScore(newScore);
 
-      toast.success(
-        <div className="flex items-center gap-2">
-          <CheckCircle className="h-5 w-5 text-green-500" />
-          <div>
-            <div className="font-bold">{t('escapeRoom.renovated.correctPoints', { points: currentPuzzle.points })}</div>
-            <div className="text-sm opacity-80">{t('escapeRoom.renovated.clueRevealed')}</div>
-          </div>
-        </div>,
-        { duration: 3000 }
-      );
+      // Find who solved it for multiplayer display
+      if (isMultiplayer && multiplayer.myPlayer) {
+        toast.success(
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-500" />
+            <div>
+              <div className="font-bold">{multiplayer.myPlayer.display_name} solved it! +{currentPuzzle.points} pts</div>
+              <div className="text-sm opacity-80">{t('escapeRoom.renovated.clueRevealed')}</div>
+            </div>
+          </div>,
+          { duration: 3000 }
+        );
+      } else {
+        toast.success(
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-500" />
+            <div>
+              <div className="font-bold">{t('escapeRoom.renovated.correctPoints', { points: currentPuzzle.points })}</div>
+              <div className="text-sm opacity-80">{t('escapeRoom.renovated.clueRevealed')}</div>
+            </div>
+          </div>,
+          { duration: 3000 }
+        );
+      }
 
       // Move to next puzzle or show final
       setTimeout(() => {
         if (currentPuzzleIndex < room.puzzles.length - 1) {
-          setCurrentPuzzleIndex(prev => prev + 1);
+          const newIndex = currentPuzzleIndex + 1;
+          setCurrentPuzzleIndex(newIndex);
           setShowHint(false);
           setShowPrinciple(false);
           playUnlock();
+          // Broadcast updated state
+          if (isMultiplayer && multiplayer.isHost) {
+            multiplayer.updateGameState({
+              puzzleIndex: newIndex,
+              solvedPuzzles: [...newSolved],
+              cluesRevealed: newClues,
+              score: newScore,
+              hintsUsed,
+              showFinalPuzzle: false,
+              gameState: 'playing',
+            });
+          }
         } else {
           setShowFinalPuzzle(true);
           playUnlock();
+          if (isMultiplayer && multiplayer.isHost) {
+            multiplayer.updateGameState({
+              puzzleIndex: currentPuzzleIndex,
+              solvedPuzzles: [...newSolved],
+              cluesRevealed: newClues,
+              score: newScore,
+              hintsUsed,
+              showFinalPuzzle: true,
+              gameState: 'playing',
+            });
+          }
         }
       }, 1500);
     } else {
@@ -687,10 +788,25 @@ export default function EscapeRoomPlayRenovated() {
       toast.error(t('escapeRoom.renovated.noHintsRemaining'));
       return;
     }
-    setHintsUsed(prev => prev + 1);
-    setScore(prev => Math.max(0, prev - 5));
+    const newHints = hintsUsed + 1;
+    const newScore = Math.max(0, score - 5);
+    setHintsUsed(newHints);
+    setScore(newScore);
     setShowHint(true);
     toast.info(t('escapeRoom.renovated.hintRevealedPoints'));
+    
+    // Broadcast hint usage in multiplayer
+    if (isMultiplayer && multiplayer.isHost) {
+      multiplayer.updateGameState({
+        puzzleIndex: currentPuzzleIndex,
+        solvedPuzzles: [...solvedPuzzles],
+        cluesRevealed,
+        score: newScore,
+        hintsUsed: newHints,
+        showFinalPuzzle,
+        gameState: 'playing',
+      });
+    }
   };
 
   const checkFinalAnswer = () => {
@@ -727,9 +843,22 @@ export default function EscapeRoomPlayRenovated() {
       const timeBonus = Math.floor(timeRemaining / 10);
       setScore(prev => prev + timeBonus + 50); // 50 bonus for solving
 
+      // Broadcast victory in multiplayer
+      if (isMultiplayer && multiplayer.isHost) {
+        multiplayer.updateGameState({
+          puzzleIndex: currentPuzzleIndex,
+          solvedPuzzles: [...solvedPuzzles],
+          cluesRevealed,
+          score: score + timeBonus + 50,
+          hintsUsed,
+          showFinalPuzzle: true,
+          gameState: 'solved',
+        }, undefined, 'completed');
+      }
+
       toast.success(
         <div className="text-center">
-          <div className="text-2xl mb-2">{t('escapeRoom.renovated.youEscaped')}</div>
+          <div className="text-2xl mb-2">{isMultiplayer ? '🎉 Team Escaped!' : t('escapeRoom.renovated.youEscaped')}</div>
           <div>{t('escapeRoom.renovated.timeBonusEscapeBonus', { timeBonus })}</div>
         </div>,
         { duration: 5000 }
@@ -764,6 +893,102 @@ export default function EscapeRoomPlayRenovated() {
     );
   }
 
+  // Mode Selection Screen (before game starts)
+  if (!gameMode) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+        <Navigation />
+        <main className="container mx-auto px-4 pt-24 pb-12 max-w-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            <div className="text-center space-y-2">
+              <div className="text-5xl mb-4">{room.icon}</div>
+              <h1 className="text-3xl font-bold">{room.title}</h1>
+              <p className="text-muted-foreground">{room.storyIntro?.slice(0, 120)}...</p>
+            </div>
+
+            <div className="grid gap-4">
+              <Card
+                className="cursor-pointer border-2 hover:border-primary/50 transition-all"
+                onClick={() => setGameMode("solo")}
+              >
+                <CardContent className="pt-6 flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-primary/10">
+                    <Zap className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">Solo Mode</h3>
+                    <p className="text-sm text-muted-foreground">Race against the clock on your own</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card
+                className="cursor-pointer border-2 hover:border-primary/50 transition-all"
+                onClick={() => setGameMode("online")}
+              >
+                <CardContent className="pt-6 flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-accent/10">
+                    <Users className="h-6 w-6 text-accent-foreground" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">Team Mode (Online)</h3>
+                    <p className="text-sm text-muted-foreground">Solve puzzles with 2–4 friends in real time</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Button variant="outline" onClick={() => navigate('/escape-room')} className="w-full">
+              Back to Escape Rooms
+            </Button>
+          </motion.div>
+        </main>
+      </div>
+    );
+  }
+
+  // Multiplayer Lobby (waiting for players)
+  if (gameMode === "online" && (!multiplayer.room || multiplayer.room.status === "waiting")) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+        <Navigation />
+        <main className="container mx-auto px-4 pt-24 pb-12">
+          <MultiplayerLobby
+            room={multiplayer.room}
+            players={multiplayer.players}
+            loading={multiplayer.loading}
+            isHost={multiplayer.isHost}
+            minPlayers={2}
+            maxPlayers={4}
+            gameName={`Escape Room: ${room.title}`}
+            onCreateRoom={(max) => multiplayer.createRoom(max || 4, { roomId: room.id })}
+            onJoinRoom={(code) => multiplayer.joinRoom(code)}
+            onStartGame={() => {
+              multiplayer.startGame({
+                puzzleIndex: 0,
+                solvedPuzzles: [],
+                cluesRevealed: [],
+                score: 0,
+                hintsUsed: 0,
+                showFinalPuzzle: false,
+                gameState: 'playing',
+              }, multiplayer.players[0]?.user_id || user?.id || '');
+            }}
+            onLeaveRoom={() => {
+              multiplayer.leaveRoom();
+              setGameMode(null);
+            }}
+            onBack={() => setGameMode(null)}
+          />
+        </main>
+      </div>
+    );
+  }
+
   const currentPuzzle = room.puzzles[currentPuzzleIndex];
   const progress = (solvedPuzzles.size / room.puzzles.length) * 100;
   const timeRemaining = room.timeLimit * 60 - timeElapsed;
@@ -784,9 +1009,20 @@ export default function EscapeRoomPlayRenovated() {
           >
             <div className="text-6xl mb-4">🎉</div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 bg-clip-text text-transparent">
-              {t('escapeRoom.renovated.escaped')}
+              {isMultiplayer ? '🎉 Team Escaped!' : t('escapeRoom.renovated.escaped')}
             </h1>
             <p className="text-xl text-muted-foreground">{room.title}</p>
+
+            {/* Team Members on Victory */}
+            {isMultiplayer && multiplayer.players.length > 0 && (
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                {multiplayer.players.map((player) => (
+                  <Badge key={player.id} variant="secondary" className="text-sm px-3 py-1">
+                    {player.display_name}
+                  </Badge>
+                ))}
+              </div>
+            )}
 
             <Card className="max-w-md mx-auto">
               <CardContent className="pt-6 space-y-4">
@@ -925,6 +1161,29 @@ export default function EscapeRoomPlayRenovated() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Teammates Bar (Multiplayer) */}
+        {isMultiplayer && multiplayer.players.length > 0 && (
+          <div className="mb-6 flex items-center gap-3 flex-wrap">
+            <Badge variant="outline" className="bg-white/10 text-white border-white/20">
+              <Users className="h-3 w-3 mr-1" /> Team
+            </Badge>
+            {multiplayer.players.map((player) => (
+              <div
+                key={player.id}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20"
+              >
+                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
+                  {player.display_name[0]?.toUpperCase()}
+                </div>
+                <span className="text-sm text-white font-medium">{player.display_name}</span>
+                {player.user_id === user?.id && (
+                  <span className="text-xs text-white/60">(you)</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Puzzle Area */}
