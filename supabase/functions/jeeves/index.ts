@@ -8969,7 +8969,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
     }
 
     // Use lower temperature for structured JSON modes to improve reliability
-    const modelTemperature = (mode === "research") ? 0.4 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : 0.9;
+    const modelTemperature = (mode === "research") ? 0.4 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : (mode.startsWith("jeopardy_") || mode.startsWith("family_feud_")) ? 0.7 : 0.9;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -9060,7 +9060,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
 
     // Global cleanup for Jeeves text responses (skip for JSON analysis modes to avoid corrupting JSON)
     // Remove all markdown bold/italic markers and discourage theatrical openings
-    if (mode !== "analyze-thoughts" && mode !== "analyze-thoughts-scholar") {
+    if (mode !== "analyze-thoughts" && mode !== "analyze-thoughts-scholar" && !mode.startsWith("jeopardy_") && !mode.startsWith("family_feud_")) {
       content = content
         .replace(/\*\*/g, '')
         .replace(/__([^_]+)__/g, '$1')
@@ -9243,7 +9243,151 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
       );
     }
 
-    // For generate-flashcards mode, parse JSON
+    // For jeopardy modes, parse JSON directly to prevent text cleanup from corrupting responses
+    if (mode === "jeopardy_question") {
+      try {
+        // Re-extract from the raw AI response (content may have been cleaned)
+        const rawContent = data.choices[0]?.message?.content || "";
+        const cleanedRaw = rawContent.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+        const jsonMatch = cleanedRaw.match(/\{[\s\S]*"clue"[\s\S]*"answer"[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return new Response(
+            JSON.stringify({ clue: parsed.clue, answer: parsed.answer }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        // Fallback: try parsing content directly
+        const parsed = JSON.parse(cleanedRaw);
+        return new Response(
+          JSON.stringify({ clue: parsed.clue || "No clue generated", answer: parsed.answer || "No answer" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch (e) {
+        console.error("jeopardy_question parse error:", e, "content:", content.substring(0, 500));
+        return new Response(
+          JSON.stringify({ clue: content || "Question generation failed", answer: "Please try again" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    if (mode === "jeopardy_judge") {
+      try {
+        const rawContent = data.choices[0]?.message?.content || "";
+        const cleanedRaw = rawContent.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+        const jsonMatch = cleanedRaw.match(/\{[\s\S]*"correct"[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return new Response(
+            JSON.stringify({
+              correct: !!parsed.correct,
+              explanation: parsed.explanation || "",
+              scriptureBonus: !!parsed.scriptureBonus,
+              ptPrincipleBonus: !!parsed.ptPrincipleBonus,
+              christBonus: !!parsed.christBonus,
+            }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        const parsed = JSON.parse(cleanedRaw);
+        return new Response(
+          JSON.stringify({
+            correct: !!parsed.correct,
+            explanation: parsed.explanation || "",
+            scriptureBonus: !!parsed.scriptureBonus,
+            ptPrincipleBonus: !!parsed.ptPrincipleBonus,
+            christBonus: !!parsed.christBonus,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch (e) {
+        console.error("jeopardy_judge parse error:", e);
+        return new Response(
+          JSON.stringify({ correct: false, explanation: "Could not judge answer", scriptureBonus: false, ptPrincipleBonus: false, christBonus: false }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    if (mode === "jeopardy_final") {
+      try {
+        const rawContent = data.choices[0]?.message?.content || "";
+        const cleanedRaw = rawContent.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+        const jsonMatch = cleanedRaw.match(/\{[\s\S]*"question"[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return new Response(
+            JSON.stringify({ question: parsed.question }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        const parsed = JSON.parse(cleanedRaw);
+        return new Response(
+          JSON.stringify({ question: parsed.question || cleanedRaw }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch {
+        return new Response(
+          JSON.stringify({ question: content || "How does the entire Sanctuary system point to the plan of salvation through Christ?" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // For family_feud modes, parse JSON directly
+    if (mode === "family_feud_round") {
+      try {
+        const rawContent = data.choices[0]?.message?.content || "";
+        const cleanedRaw = rawContent.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+        const jsonMatch = cleanedRaw.match(/\{[\s\S]*"question"[\s\S]*"answers"[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return new Response(JSON.stringify(parsed), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        const parsed = JSON.parse(cleanedRaw);
+        return new Response(JSON.stringify(parsed), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      } catch (e) {
+        console.error("family_feud_round parse error:", e);
+        return new Response(
+          JSON.stringify({ question: "Name a piece of sanctuary furniture and its Christ-fulfillment", answers: [{ text: "Altar of Burnt Offering / Cross", points: 40 }, { text: "Laver / Baptism", points: 30 }, { text: "Lampstand / Holy Spirit", points: 20 }, { text: "Altar of Incense / Intercession", points: 10 }] }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    if (mode === "family_feud_judge") {
+      try {
+        const rawContent = data.choices[0]?.message?.content || "";
+        const cleanedRaw = rawContent.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+        const jsonMatch = cleanedRaw.match(/\{[\s\S]*"matched"[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return new Response(JSON.stringify(parsed), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        return new Response(JSON.stringify(JSON.parse(cleanedRaw)), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      } catch {
+        return new Response(JSON.stringify({ matched: false, matchedAnswer: null, scriptureBonus: false }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
+    if (mode === "family_feud_forge" || mode === "family_feud_judge_forge") {
+      try {
+        const rawContent = data.choices[0]?.message?.content || "";
+        const cleanedRaw = rawContent.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+        const jsonMatch = cleanedRaw.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          return new Response(JSON.stringify(JSON.parse(jsonMatch[0])), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        return new Response(JSON.stringify(JSON.parse(cleanedRaw)), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      } catch {
+        return new Response(
+          JSON.stringify(mode === "family_feud_forge" ? { question: "How does Christ fulfill every piece of sanctuary furniture?" } : { score: 50, feedback: "Please try again." }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     if (mode === "generate-flashcards") {
       try {
         const parsed = JSON.parse(content);
