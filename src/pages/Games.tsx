@@ -357,18 +357,6 @@ const Games = () => {
       route: "/games/principle-sprint"
     },
     {
-      id: "connection_dash",
-      name: "🔗 Connection Dash",
-      description: "Speed game to connect verses and explore interpretations! Find all verses that connect to the main verse quickly.",
-      icon: "🔗",
-      floor: 4,
-      timed: true,
-      rooms: ["BF", "P‖", "QR", "QA"],
-      modes: ["solo"],
-      difficulties: ["medium", "hard", "expert"],
-      route: "/games/connection-dash"
-    },
-    {
       id: "phototheology_uno",
       name: "🃏 Phototheology Uno",
       description: "Biblical connections card game! Race to empty your hand by drawing meaningful theological connections. Jeeves judges your plays!",
