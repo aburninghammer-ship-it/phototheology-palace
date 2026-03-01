@@ -130,12 +130,12 @@ Choose 2–4 per output, and explicitly name them:
 - Story Room: What is happening? Who is acting? What is the turning point?
 - Dimensions Room: Literal / moral / prophetic / Christ-centered layer
 - Connect-6 Room: 6 quick cross-text links (only if Long)
-- War Room: Tactics of deception vs tactics of truth
-- Sanctuary Room: altar/laver/bread/lamp/incense/ark/atonement motifs
+- Def-Com Room: Tactics of deception vs tactics of truth (defense & combat)
+- Blue Room (Sanctuary): altar/laver/bread/lamp/incense/ark/atonement motifs
 - Time-Zone Room: past fulfillment / present principle / future implication
 - Mathematics Room: prophecy/time only if the paragraph truly requires it
-- Character Room: virtues/vices formed by choices under pressure
-- Mirror Room: self-examination questions
+- Fire Room: transformation under pressure, refining, spiritual growth
+- Meditation Room: self-examination, devotional reflection
 
 LENGTH RULES
 Short: 1 Focus + 1 Scripture + 2 PT principles + 1 So What
