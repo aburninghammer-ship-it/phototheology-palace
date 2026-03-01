@@ -30,6 +30,7 @@ interface UseGroupStudySessionReturn {
   error: string | null;
 
   // Actions
+  createSession: (contentReference: string, contentText?: string) => Promise<string | null>;
   joinSession: (roomCode: string) => Promise<boolean>;
   leaveSession: () => Promise<void>;
   shareInsight: (input: CreateInsightInput) => Promise<boolean>;
@@ -302,6 +303,81 @@ export function useGroupStudySession(sessionId?: string): UseGroupStudySessionRe
       console.error('Error loading chat:', err);
     }
   };
+
+  // Create a new session (returns session ID on success)
+  const createSession = useCallback(async (contentReference: string, contentText?: string): Promise<string | null> => {
+    if (!user) {
+      toast.error('Please sign in to create a session');
+      return null;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { generateStudyRoomCode } = await import('@/types/groupStudy');
+      const roomCode = generateStudyRoomCode();
+
+      // Get display name
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      const displayName = profile?.display_name || user.email?.split('@')[0] || 'Host';
+
+      // Create the session
+      const { data: sessionData, error: sessionError } = await db
+        .from('group_study_sessions')
+        .insert({
+          room_code: roomCode,
+          host_id: user.id,
+          content_type: 'passage',
+          content_reference: contentReference,
+          content_text: contentText || null,
+          current_phase: 'gathering',
+          status: 'active',
+          total_insights: 0,
+          total_votes: 0,
+          started_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (sessionError) throw sessionError;
+
+      // Auto-add creator as participant
+      const { data: participantData, error: participantError } = await db
+        .from('study_session_participants')
+        .insert({
+          session_id: sessionData.id,
+          user_id: user.id,
+          display_name: displayName,
+          avatar_url: profile?.avatar_url,
+          score: 0,
+          insights_shared: 0,
+          votes_cast: 0,
+          is_connected: true,
+        })
+        .select()
+        .single();
+
+      if (participantError) throw participantError;
+
+      setMyParticipantId(participantData.id);
+      await loadSession(sessionData.id);
+      toast.success(`Session created! Code: ${roomCode}`);
+      return sessionData.id;
+    } catch (err: any) {
+      console.error('Error creating session:', err);
+      setError(err.message);
+      toast.error('Failed to create session');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
 
   // Join a session by room code
   const joinSession = useCallback(async (roomCode: string): Promise<boolean> => {
@@ -745,6 +821,7 @@ export function useGroupStudySession(sessionId?: string): UseGroupStudySessionRe
     isLoading,
     error,
 
+    createSession,
     joinSession,
     leaveSession,
     shareInsight,

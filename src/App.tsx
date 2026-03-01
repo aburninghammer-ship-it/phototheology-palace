@@ -217,6 +217,8 @@ const PhototheologyTicTacToe = lazy(() => import("./pages/games/PhototheologyTic
 const PhototheologyConnectFour = lazy(() => import("./pages/games/PhototheologyConnectFour"));
 const PrinciplesClassification = lazy(() => import("./pages/games/PrinciplesClassification"));
 const PTPalaceTetris = lazy(() => import("./pages/PTPalaceTetris"));
+const PTJeopardy = lazy(() => import("./pages/PTJeopardy"));
+const PTFamilyFeud = lazy(() => import("./pages/PTFamilyFeud"));
 const SymbolDecoder = lazy(() => import("./pages/games/SymbolDecoder"));
 const BibleTetris = lazy(() => import("./pages/games/BibleTetris"));
 const ChristInFocus = lazy(() => import("./pages/games/ChristInFocus"));
@@ -535,6 +537,8 @@ function App() {
             <Route path="/games/palace-tetris" element={<ProtectedRoute><PTPalaceTetris /></ProtectedRoute>} />
             <Route path="/games/symbol-decoder" element={<ProtectedRoute><SymbolDecoder /></ProtectedRoute>} />
             <Route path="/games/bible-tetris" element={<ProtectedRoute><BibleTetris /></ProtectedRoute>} />
+            <Route path="/games/pt-jeopardy" element={<ProtectedRoute><PTJeopardy /></ProtectedRoute>} />
+            <Route path="/games/pt-family-feud" element={<ProtectedRoute><PTFamilyFeud /></ProtectedRoute>} />
             <Route path="/games/christ-in-focus" element={<ProtectedRoute><ChristInFocus /></ProtectedRoute>} />
             <Route path="/games/principles-classification" element={<ProtectedRoute><PrinciplesClassification /></ProtectedRoute>} />
             <Route path="/games/principle-cards" element={<ProtectedRoute><PrincipleCards /></ProtectedRoute>} />

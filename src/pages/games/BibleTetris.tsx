@@ -51,7 +51,7 @@ const BibleTetris: React.FC = () => {
   // Game state
   const [gameState, setGameState] = useState<GameState>('menu');
   const [currentLevel, setCurrentLevel] = useState<LevelConfig | null>(null);
-  const [unlockedLevels, setUnlockedLevels] = useState<string[]>(['LV1_WEIGHT_OF_THE_CUP']);
+  const [unlockedLevels, setUnlockedLevels] = useState<string[]>(() => LEVELS.map(l => l.id));
 
   // Grid state
   const [grid, setGrid] = useState<GridCell[][]>(() =>
@@ -409,6 +409,17 @@ const BibleTetris: React.FC = () => {
     </div>
   );
 
+  // First play hint state
+  const [showFirstPlayHint, setShowFirstPlayHint] = useState(false);
+
+  // Check if first play
+  useEffect(() => {
+    if (gameState === 'playing' && !localStorage.getItem('bible_tetris_played')) {
+      setShowFirstPlayHint(true);
+      localStorage.setItem('bible_tetris_played', 'true');
+    }
+  }, [gameState]);
+
   // Menu screen
   const renderMenu = () => (
     <div className="min-h-screen bg-gradient-to-b from-indigo-950 via-purple-950 to-black text-white">
@@ -425,31 +436,94 @@ const BibleTetris: React.FC = () => {
           <p className="text-gray-400">{t('games.bibleTetris.subtitle')}</p>
         </div>
 
+        {/* Detailed How to Play */}
         <Card className="bg-gray-900/50 border-gray-700 mb-6">
           <CardHeader>
-            <CardTitle className="text-xl">{t('games.common.howToPlay')}</CardTitle>
+            <CardTitle className="text-xl">How to Play</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-sm">
+          <CardContent className="space-y-5 text-sm">
+            {/* Step 1: Pieces */}
             <div className="flex items-start gap-3">
-              <span className="text-2xl">1.</span>
+              <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+                <span className="font-bold text-amber-400">1</span>
+              </div>
               <div>
-                <p className="font-semibold text-amber-400">{t('games.bibleTetris.piecesFall')}</p>
-                <p className="text-gray-400">{t('games.bibleTetris.piecesFallDesc')}</p>
+                <p className="font-semibold text-amber-400">Biblical Pieces Fall</p>
+                <p className="text-gray-400">Themed pieces drop into a 6-column grid. Each piece belongs to a category and represents a biblical concept.</p>
               </div>
             </div>
+
+            {/* Piece categories visual */}
+            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 px-2">
+              {Object.entries(CATEGORY_ICONS).map(([cat, icon]) => (
+                <div key={cat} className="text-center">
+                  <div className={`w-10 h-10 mx-auto rounded flex items-center justify-center text-lg bg-gradient-to-br ${CATEGORY_COLORS[cat as PieceCategory]}`}>
+                    {icon}
+                  </div>
+                  <span className="text-[10px] text-gray-500 mt-1 block">{cat.replace('_', ' ')}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Step 2: Fill rows */}
             <div className="flex items-start gap-3">
-              <span className="text-2xl">2.</span>
+              <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+                <span className="font-bold text-green-400">2</span>
+              </div>
               <div>
-                <p className="font-semibold text-green-400">{t('games.bibleTetris.matchRules')}</p>
-                <p className="text-gray-400">{t('games.bibleTetris.matchRulesDesc')}</p>
+                <p className="font-semibold text-green-400">Fill Complete Rows That Match Rules</p>
+                <p className="text-gray-400">When a row is completely filled, it's evaluated against the level's required rules. If the pieces satisfy at least one rule, the row clears and you earn points!</p>
               </div>
             </div>
+
+            {/* Step 3: Avoid confusion */}
             <div className="flex items-start gap-3">
-              <span className="text-2xl">3.</span>
-              <div>
-                <p className="font-semibold text-red-400">{t('games.bibleTetris.avoidConfusion')}</p>
-                <p className="text-gray-400">{t('games.bibleTetris.avoidConfusionDesc')}</p>
+              <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+                <span className="font-bold text-red-400">3</span>
               </div>
+              <div>
+                <p className="font-semibold text-red-400">Watch the Confusion Meter</p>
+                <p className="text-gray-400">Failed row clears and deception pieces (marked with a red ring) increase your confusion meter. If it fills up completely, game over!</p>
+              </div>
+            </div>
+
+            {/* Step 4: Win condition */}
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+                <span className="font-bold text-blue-400">4</span>
+              </div>
+              <div>
+                <p className="font-semibold text-blue-400">Clear 5 Valid Rows to Win</p>
+                <p className="text-gray-400">Successfully clear 5 rows that satisfy the level rules to complete the level. Build streaks for bonus points!</p>
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="border-t border-gray-700 pt-4">
+              <p className="font-semibold text-purple-400 mb-3">Controls</p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center gap-2 bg-gray-800/50 rounded p-2">
+                  <kbd className="px-2 py-0.5 bg-gray-700 rounded text-gray-300">←</kbd>
+                  <span className="text-gray-400">Move left</span>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-800/50 rounded p-2">
+                  <kbd className="px-2 py-0.5 bg-gray-700 rounded text-gray-300">→</kbd>
+                  <span className="text-gray-400">Move right</span>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-800/50 rounded p-2">
+                  <kbd className="px-2 py-0.5 bg-gray-700 rounded text-gray-300">↓</kbd>
+                  <span className="text-gray-400">Speed up</span>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-800/50 rounded p-2">
+                  <kbd className="px-2 py-0.5 bg-gray-700 rounded text-gray-300">Space</kbd>
+                  <span className="text-gray-400">Instant drop</span>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-800/50 rounded p-2 col-span-2">
+                  <kbd className="px-2 py-0.5 bg-gray-700 rounded text-gray-300">P</kbd>
+                  <span className="text-gray-400">Pause game</span>
+                </div>
+              </div>
+              <p className="text-gray-500 text-xs mt-2">On mobile, use the on-screen arrow buttons and Drop button.</p>
             </div>
           </CardContent>
         </Card>
@@ -663,6 +737,27 @@ const BibleTetris: React.FC = () => {
             <ArrowLeft className="h-6 w-6 rotate-180" />
           </Button>
         </div>
+
+        {/* First play hint overlay */}
+        {showFirstPlayHint && (
+          <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setShowFirstPlayHint(false)}>
+            <Card className="bg-gray-900/95 border-amber-500/50 max-w-sm">
+              <CardContent className="p-6 text-center space-y-3">
+                <div className="text-4xl mb-2">🎮</div>
+                <h3 className="text-lg font-bold text-amber-400">Quick Tips</h3>
+                <div className="text-sm text-gray-300 space-y-2 text-left">
+                  <p>• Use <kbd className="px-1.5 py-0.5 bg-gray-700 rounded text-xs">← →</kbd> to position pieces</p>
+                  <p>• Fill a complete row with pieces that match the level's rules</p>
+                  <p>• Watch out for <span className="text-red-400">deception pieces</span> (red ring) — they increase confusion!</p>
+                  <p>• Clear <span className="text-amber-400 font-bold">5 valid rows</span> to complete the level</p>
+                </div>
+                <Button onClick={() => setShowFirstPlayHint(false)} className="w-full mt-4 bg-amber-500 hover:bg-amber-600">
+                  Got it — Let's Play!
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     );
   };
