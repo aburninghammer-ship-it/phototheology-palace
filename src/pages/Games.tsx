@@ -381,30 +381,6 @@ const Games = () => {
       route: "/games/phototheology-uno"
     },
     {
-      id: "pt_tetris",
-      name: "🧱 PT Palace Tetris",
-      description: "Stack biblical knowledge blocks! Clear lines by matching Palace room concepts in this addictive puzzle game with all 38 rooms.",
-      icon: "🧱",
-      floor: 0,
-      timed: true,
-      rooms: ["All"],
-      modes: ["solo"],
-      difficulties: ["easy", "medium", "hard", "endless"],
-      route: "/games/palace-tetris"
-    },
-    {
-      id: "bible_tetris",
-      name: "📖 Bible Tetris",
-      description: "Match biblical patterns to clear rows! Combine STORY, SYMBOL, LAW, and CHRIST_KEY pieces according to Phototheology rules. Watch out for deception pieces!",
-      icon: "📖",
-      floor: 0,
-      timed: true,
-      rooms: ["All"],
-      modes: ["solo"],
-      difficulties: ["beginner", "intermediate", "master"],
-      route: "/games/bible-tetris"
-    },
-    {
       id: "pt_scrabble",
       name: "🎯 PT Scrabble",
       description: "Build theological connections on a shared board! Place Palace room cards adjacent to existing ones and explain your Christ-centered connections.",
