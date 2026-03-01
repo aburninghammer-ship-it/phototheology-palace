@@ -29,23 +29,47 @@ const DRAGON_ATTACKS = [
 ];
 
 const DEFENSE_CARDS = [
-  "CR", "ST", "PR", "BL", "3A", "GC", "TP", "S", "FRt", "P‖", "PRm", "TZ", "DR"
+  "CR", "ST", "PR", "P‖", "PRm", "OR",
+  // Specific sub-principles from multi-principle rooms
+  "TZ-HP", "TZ-EN", "TZ-HF",
+  "Literal", "Christ", "Heaven",
+  "BL-Ark", "BL-Altar", "BL-Lamp",
+  "3A-1", "3A-2", "3A-3",
+  "TRm-GC", "TRm-TP", "TRm-Sa",
+  "FRt-Love", "FRt-Peace", "FRt-Faith",
 ];
 
 const CARD_EXPLANATIONS: Record<string, string> = {
   "CR": "Concentration Room — Every text must reveal Christ (John 5:39)",
   "ST": "Symbols/Types Room — God's symbolic language: lamb, rock, light, water",
   "PR": "Prophecy Room — Daniel & Revelation prophetic timelines and constellations",
-  "BL": "Blue Room (Sanctuary) — The sanctuary blueprint: altar, laver, lampstand, ark",
-  "3A": "Three Angels' Room — The final gospel appeal of Revelation 14:6-12",
-  "GC": "Great Controversy Wall — The cosmic conflict between Christ and Satan",
-  "TP": "Time Prophecy Wall — 2300 days, 70 weeks, 1260 years",
-  "S": "Sanctuary Wall — Every text connected to the sanctuary system",
-  "FRt": "Fruit Room — Does this produce love, joy, peace? (Galatians 5:22-23)",
   "P‖": "Parallels Room — Mirrored actions across time (Babel/Pentecost, Exodus/Return)",
   "PRm": "Patterns Room — God's recurring motifs: 40 days, 3 days, deliverer stories",
-  "TZ": "Time Zone Room — Past, present, future × heaven and earth",
-  "DR": "Dimensions Room — Literal, Christ, Me, Church, Heaven",
+  "OR": "Observation Room — Log details without interpretation, like a detective",
+  // Time Zone specifics
+  "TZ-HP": "Time Zone: Heaven Past — What happened in heaven before creation or the fall?",
+  "TZ-EN": "Time Zone: Earth Now — How does this text apply to present earthly reality?",
+  "TZ-HF": "Time Zone: Heaven Future — What does this reveal about heaven's future fulfillment?",
+  // Dimensions specifics
+  "Literal": "Literal Dimension — What did this text mean at face value to its original audience?",
+  "Christ": "Christ Dimension — How does this passage point to Jesus?",
+  "Heaven": "Heaven Dimension — How does this text connect to heavenly or eternal realities?",
+  // Blue Room specifics
+  "BL-Ark": "Sanctuary: Ark of the Covenant — Law, mercy seat, God's throne",
+  "BL-Altar": "Sanctuary: Altar of Burnt Offering — The cross and sacrifice",
+  "BL-Lamp": "Sanctuary: Lampstand — The light of the Spirit",
+  // Three Angels specifics
+  "3A-1": "First Angel — Everlasting gospel, worship Creator, judgment hour (Rev 14:6-7)",
+  "3A-2": "Second Angel — Babylon is fallen, false systems exposed (Rev 14:8)",
+  "3A-3": "Third Angel — Warning against beast, image, mark (Rev 14:9-12)",
+  // Theme Room walls
+  "TRm-GC": "Great Controversy Wall — The cosmic conflict between Christ and Satan",
+  "TRm-TP": "Time-Prophecy Wall — 2300 days, 70 weeks, 1260 years",
+  "TRm-Sa": "Sanctuary Wall — Every text connected to the sanctuary system",
+  // Fruit specifics
+  "FRt-Love": "Fruit of Love — Does this interpretation produce selfless, Christlike love?",
+  "FRt-Peace": "Fruit of Peace — Does this bring the peace of God that passes understanding?",
+  "FRt-Faith": "Fruit of Faithfulness — Does this produce faithful endurance and trust in God?",
 };
 
 export default function EscapeTheDragon() {
