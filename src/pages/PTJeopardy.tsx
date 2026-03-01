@@ -124,7 +124,7 @@ export default function PTJeopardy() {
   // Menu
   if (mode === 'menu') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white">
         <Navigation />
         <div className="container mx-auto px-4 py-8 max-w-2xl">
           <Button onClick={() => navigate('/games')} variant="ghost" className="mb-6">
@@ -176,7 +176,7 @@ export default function PTJeopardy() {
   // Local setup
   if (mode === 'local') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white">
         <Navigation />
         <div className="container mx-auto px-4 py-8 max-w-md">
           <Button onClick={() => setMode('menu')} variant="ghost" className="mb-6">
@@ -236,7 +236,7 @@ export default function PTJeopardy() {
   // Online lobby
   if (mode === 'online_lobby') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white">
         <Navigation />
         <div className="container mx-auto px-4 py-8">
           <MultiplayerLobby
@@ -262,7 +262,7 @@ export default function PTJeopardy() {
   if (state.phase === 'board') {
     const currentPlayer = state.players[state.currentPlayerIndex];
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white p-2">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white p-2">
         {/* Scoreboard */}
         <div className="flex items-center justify-between mb-3 px-2">
           <div className="flex items-center gap-3 overflow-x-auto">
@@ -271,20 +271,20 @@ export default function PTJeopardy() {
                 key={p.id}
                 className={cn(
                   'px-3 py-1.5 rounded-lg text-sm shrink-0',
-                  idx === state.currentPlayerIndex ? 'bg-blue-600 font-bold' : 'bg-gray-800/50'
+                  idx === state.currentPlayerIndex ? 'bg-yellow-600 text-white font-bold' : 'bg-gray-800/70 text-gray-200'
                 )}
               >
-                {p.name}: <span className={p.score >= 0 ? 'text-green-400' : 'text-red-400'}>${p.score}</span>
+                {p.name}: <span className={p.score >= 0 ? 'text-green-300' : 'text-red-300'}>${p.score}</span>
               </div>
             ))}
           </div>
-          <Badge variant="outline" className="text-xs shrink-0 ml-2">
+          <Badge className="bg-gray-700 text-white text-xs shrink-0 ml-2">
             {state.tilesRemaining} left
           </Badge>
         </div>
 
-        <p className="text-center text-sm text-blue-300 mb-2">
-          <span className="font-semibold">{currentPlayer?.name}</span>, pick a category!
+        <p className="text-center text-base text-yellow-300 font-semibold mb-2">
+          {currentPlayer?.name}, pick a category!
         </p>
 
         {/* Jeopardy Board */}
@@ -296,7 +296,7 @@ export default function PTJeopardy() {
                 <div
                   key={cat.id}
                   className={cn(
-                    'p-2 rounded-t text-center text-xs font-bold uppercase tracking-wider bg-gradient-to-br',
+                    'p-2 rounded-t text-center text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-br',
                     categoryColors[cat.id] || 'from-gray-600 to-gray-800'
                   )}
                 >
@@ -325,8 +325,8 @@ export default function PTJeopardy() {
                       className={cn(
                         'p-3 rounded text-center font-bold text-lg transition-all',
                         isAnswered
-                          ? 'bg-gray-800/30 text-gray-600 cursor-default'
-                          : 'bg-blue-900/60 hover:bg-blue-800/80 text-yellow-400 hover:text-yellow-300 cursor-pointer hover:scale-105'
+                          ? 'bg-gray-800/30 text-gray-700 cursor-default'
+                          : 'bg-slate-700/80 hover:bg-slate-600 text-yellow-400 hover:text-yellow-300 cursor-pointer hover:scale-105 border border-slate-600/50'
                       )}
                     >
                       {isAnswered ? '' : `$${points}`}
@@ -340,8 +340,8 @@ export default function PTJeopardy() {
 
         {isLoading && (
           <div className="text-center mt-4">
-            <Loader2 className="h-6 w-6 animate-spin mx-auto text-blue-400" />
-            <p className="text-sm text-gray-400 mt-1">Jeeves is crafting a question...</p>
+            <Loader2 className="h-6 w-6 animate-spin mx-auto text-yellow-400" />
+            <p className="text-sm text-gray-300 mt-1">Jeeves is crafting a question...</p>
           </div>
         )}
       </div>
@@ -352,8 +352,8 @@ export default function PTJeopardy() {
   if (state.phase === 'clue' && state.currentTile) {
     const currentPlayer = state.players[state.currentPlayerIndex];
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white flex items-center justify-center p-4">
-        <Card className="bg-blue-900/50 border-blue-500/50 max-w-lg w-full">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white flex items-center justify-center p-4">
+        <Card className="bg-slate-800/80 border-yellow-500/40 max-w-lg w-full shadow-2xl">
           <CardContent className="p-8 text-center space-y-6">
             {state.currentTile.isHiddenGem && (
               <motion.div
@@ -361,23 +361,23 @@ export default function PTJeopardy() {
                 animate={{ scale: 1 }}
                 className="text-center"
               >
-                <Badge className="bg-yellow-500 text-black text-lg px-4 py-1">
+                <Badge className="bg-yellow-500 text-black text-lg px-4 py-2 font-bold">
                   <Star className="h-4 w-4 mr-1 inline" /> HIDDEN GEM — Double Points!
                 </Badge>
               </motion.div>
             )}
 
             <div>
-              <Badge variant="outline" className="mb-2">${state.currentTile.points}</Badge>
-              <p className="text-xl font-medium leading-relaxed">{state.currentTile.clue}</p>
+              <Badge className="bg-yellow-600 text-white mb-3 text-sm">${state.currentTile.points}</Badge>
+              <p className="text-2xl font-semibold leading-relaxed text-white">{state.currentTile.clue}</p>
             </div>
 
-            <div className="flex items-center justify-center gap-2 text-2xl font-mono">
-              <Clock className="h-5 w-5" />
-              <span className={timer <= 10 ? 'text-red-400 animate-pulse' : 'text-blue-300'}>{timer}s</span>
+            <div className="flex items-center justify-center gap-2 text-3xl font-mono">
+              <Clock className="h-6 w-6 text-white" />
+              <span className={timer <= 10 ? 'text-red-400 animate-pulse font-bold' : 'text-white font-bold'}>{timer}s</span>
             </div>
 
-            <p className="text-sm text-blue-300">{currentPlayer?.name}'s turn</p>
+            <p className="text-base text-yellow-300 font-semibold">{currentPlayer?.name}'s turn</p>
 
             <div className="flex gap-2">
               <Input
@@ -385,15 +385,15 @@ export default function PTJeopardy() {
                 onChange={(e) => setAnswerInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSubmitAnswer()}
                 placeholder="What is..."
-                className="bg-blue-950/50 border-blue-500/50 text-white"
+                className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 text-lg"
                 autoFocus
               />
-              <Button onClick={handleSubmitAnswer} disabled={!answerInput.trim() || isLoading}>
+              <Button onClick={handleSubmitAnswer} disabled={!answerInput.trim() || isLoading} className="bg-yellow-600 hover:bg-yellow-700 text-white">
                 <Send className="h-4 w-4" />
               </Button>
             </div>
 
-            <Button variant="ghost" size="sm" onClick={skipQuestion} className="text-gray-400">
+            <Button variant="ghost" size="sm" onClick={skipQuestion} className="text-gray-300 hover:text-white">
               Pass
             </Button>
           </CardContent>
@@ -405,7 +405,7 @@ export default function PTJeopardy() {
   // Judging phase
   if (state.phase === 'judging') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin mx-auto text-blue-400 mb-4" />
           <p className="text-lg">Jeeves is judging your answer...</p>
@@ -419,7 +419,7 @@ export default function PTJeopardy() {
     const result = state.judgmentResult;
     const currentPlayer = state.players[state.currentPlayerIndex];
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white flex items-center justify-center p-4">
         <Card className={cn(
           'max-w-lg w-full border',
           result.correct ? 'bg-green-900/30 border-green-500/50' : 'bg-red-900/30 border-red-500/50'
@@ -465,7 +465,7 @@ export default function PTJeopardy() {
   // Final wager phase
   if (state.phase === 'final_wager' && state.finalRound) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white flex items-center justify-center p-4">
         <Card className="bg-purple-900/30 border-purple-500/50 max-w-md w-full">
           <CardContent className="p-8 text-center space-y-6">
             <div className="text-4xl mb-2"><Sword className="h-12 w-12 mx-auto text-purple-400" /></div>
@@ -515,7 +515,7 @@ export default function PTJeopardy() {
   // Final answer phase
   if (state.phase === 'final_answer' && state.finalRound) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white flex items-center justify-center p-4">
         <Card className="bg-purple-900/30 border-purple-500/50 max-w-lg w-full">
           <CardContent className="p-8 space-y-6">
             <h2 className="text-xl font-bold text-center text-purple-300">Final Question</h2>
@@ -561,7 +561,7 @@ export default function PTJeopardy() {
   // Final result phase
   if (state.phase === 'final_result' && state.finalRound) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white flex items-center justify-center p-4">
         <Card className="bg-gray-900/50 border-gray-700 max-w-lg w-full">
           <CardContent className="p-8 space-y-6 text-center">
             {!state.finalRound.revealed ? (
@@ -607,7 +607,7 @@ export default function PTJeopardy() {
   if (state.phase === 'debrief') {
     const winner = [...state.players].sort((a, b) => b.score - a.score)[0];
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white p-4">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white p-4">
         <div className="container mx-auto max-w-lg">
           <div className="text-center mb-8">
             <Trophy className="h-16 w-16 mx-auto text-yellow-400 mb-4" />
@@ -660,7 +660,7 @@ export default function PTJeopardy() {
 
   // Setup fallback
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-950 to-black text-white flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-black text-white flex items-center justify-center">
       <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
     </div>
   );

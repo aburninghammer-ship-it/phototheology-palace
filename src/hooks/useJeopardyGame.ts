@@ -65,9 +65,69 @@ export interface JeopardyGameState {
   judgmentResult: { correct: boolean; explanation: string; scriptureBonus: boolean; ptPrincipleBonus: boolean; christBonus: boolean } | null;
 }
 
+// Fallback question bank so the game always works even if Jeeves is unavailable
+const FALLBACK_QUESTIONS: Record<string, { clue: string; answer: string }[]> = {
+  story: [
+    { clue: 'This patriarch was asked to sacrifice his son on Mount Moriah, foreshadowing Christ as the Lamb of God.', answer: 'Who is Abraham?' },
+    { clue: 'After this prophet was swallowed by a great fish, he spent three days inside — a type of Christ\'s burial and resurrection.', answer: 'Who is Jonah?' },
+    { clue: 'This deliverer led Israel through the Red Sea on dry ground, typifying baptism and deliverance through Christ.', answer: 'Who is Moses?' },
+    { clue: 'This shepherd boy defeated a giant with a sling and a stone, prefiguring Christ conquering sin.', answer: 'Who is David?' },
+    { clue: 'This patriarch\'s coat of many colors and betrayal by his brothers foreshadows Christ\'s rejection and exaltation.', answer: 'Who is Joseph?' },
+  ],
+  sanctuary: [
+    { clue: 'This piece of sanctuary furniture held the Ten Commandments, Aaron\'s rod, and a pot of manna.', answer: 'What is the Ark of the Covenant?' },
+    { clue: 'The blood of the sacrifice was first applied here, representing initial confession and repentance.', answer: 'What is the Altar of Burnt Offering?' },
+    { clue: 'This veil separated the Holy Place from the Most Holy Place and was torn at Christ\'s crucifixion.', answer: 'What is the inner veil (second curtain)?' },
+    { clue: 'This golden fixture with seven branches provided the only light in the Holy Place, representing Christ as the Light of the World.', answer: 'What is the Lampstand (Menorah)?' },
+    { clue: 'On this annual day the High Priest entered the Most Holy Place to cleanse the sanctuary from the accumulated sins of the people.', answer: 'What is the Day of Atonement (Yom Kippur)?' },
+  ],
+  connect6: [
+    { clue: 'Name the six days of Creation in Genesis 1 — each one reveals a layer of God\'s redemptive design.', answer: 'What are Light, Firmament, Land/Vegetation, Luminaries, Sea/Air creatures, Land creatures/Man?' },
+    { clue: 'This letter to the churches in Revelation 2-3 addresses seven churches; name the first and last.', answer: 'What are Ephesus and Laodicea?' },
+    { clue: 'Isaiah 11:2 lists attributes of the Spirit resting on the Messiah. Name three.', answer: 'What are wisdom, understanding, counsel, might, knowledge, fear of the Lord?' },
+    { clue: 'The armor of God in Ephesians 6 includes this piece that protects the heart.', answer: 'What is the breastplate of righteousness?' },
+    { clue: 'Jesus spoke seven last words from the cross. The final one in John 19:30 was this Greek word meaning "paid in full."', answer: 'What is Tetelestai (It is finished)?' },
+  ],
+  symbols: [
+    { clue: 'In Daniel 7, this metal-and-clay mixture in the statue\'s feet represents a divided kingdom.', answer: 'What is iron mixed with clay?' },
+    { clue: 'This symbol in Revelation 12 represents God\'s people — clothed with the sun, moon under her feet, crown of twelve stars.', answer: 'What is the Woman?' },
+    { clue: 'In biblical typology, leaven consistently represents this spiritual concept.', answer: 'What is sin (or false doctrine)?' },
+    { clue: 'The bronze serpent lifted up by Moses in the wilderness was a type of this New Testament event.', answer: 'What is Christ lifted up on the cross?' },
+    { clue: 'In Revelation, the number 666 is identified as this.', answer: 'What is the number of the beast (number of a man)?' },
+  ],
+  christ: [
+    { clue: 'Hebrews 4:14-15 calls Jesus this title, emphasizing He can sympathize with our weaknesses.', answer: 'What is our Great High Priest?' },
+    { clue: 'In John 15, Jesus uses this agricultural metaphor to describe the believer\'s dependence on Him.', answer: 'What is the Vine and branches?' },
+    { clue: 'Colossians 1:15 calls Christ this, meaning He is the visible representation of the invisible God.', answer: 'What is the image of the invisible God?' },
+    { clue: 'This title used in Revelation 5 emphasizes Christ\'s sacrificial and kingly role simultaneously.', answer: 'What is the Lamb (who was slain)?' },
+    { clue: 'In Isaiah 9:6, the Messiah is given four names. Name the one that declares His deity.', answer: 'What is Mighty God (or Everlasting Father)?' },
+  ],
+  freestyle: [
+    { clue: 'This Old Testament book never mentions God by name yet powerfully demonstrates His providence.', answer: 'What is Esther?' },
+    { clue: 'Paul wrote this prison epistle focused on joy, containing the famous "I can do all things through Christ" verse.', answer: 'What is Philippians?' },
+    { clue: 'This is the shortest verse in the Bible (in English), found in John 11:35.', answer: 'What is "Jesus wept"?' },
+    { clue: 'The Bereans in Acts 17:11 were commended for doing this daily with the Scriptures.', answer: 'What is searching/examining the Scriptures?' },
+    { clue: 'This prophet was told to marry an unfaithful wife as a living parable of God\'s love for wayward Israel.', answer: 'Who is Hosea?' },
+  ],
+  defense: [
+    { clue: 'This common objection says a good God cannot coexist with evil — yet the Bible frames suffering within this larger narrative.', answer: 'What is the Great Controversy (Problem of Evil)?' },
+    { clue: 'Critics claim the Bible was assembled by council vote. This early church event is often mistakenly credited with "choosing" the biblical canon.', answer: 'What is the Council of Nicaea?' },
+    { clue: 'When skeptics claim the resurrection was invented, this minimal-facts argument uses only data that critical scholars accept.', answer: 'What is the minimal facts approach (Habermas)?' },
+    { clue: 'This apologetic approach starts with Scripture\'s self-attestation rather than neutral evidence to defend the faith.', answer: 'What is presuppositional apologetics?' },
+    { clue: 'The claim that "science disproves God" commits this logical fallacy by assuming only material explanations are valid.', answer: 'What is scientism (or the category error/begging the question)?' },
+  ],
+};
+
 function getRandomCategories(count: number): JeopardyCategory[] {
   const shuffled = [...JEOPARDY_CATEGORIES].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
+}
+
+function getFallbackQuestion(categoryId: string, points: number): { clue: string; answer: string } {
+  const questions = FALLBACK_QUESTIONS[categoryId] || FALLBACK_QUESTIONS.freestyle;
+  // Use points to pick different questions (100=0, 200=1, etc.)
+  const idx = Math.floor((points / 100) - 1) % questions.length;
+  return questions[idx];
 }
 
 function generateBoardKey(categoryId: string, points: PointValue): string {
@@ -169,30 +229,35 @@ export function useJeopardyGame() {
         points,
       }, 'pt-jeopardy');
 
-      let clue = `${category?.name} question for ${points} points`;
-      let answer = 'Answer not available';
+      // Start with fallback questions so game always works
+      const fallback = getFallbackQuestion(categoryId, points);
+      let clue = fallback.clue;
+      let answer = fallback.answer;
 
       if (data) {
         try {
+          // Handle various response shapes from Jeeves
           const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-          // Server now returns {clue, answer} directly for jeopardy_question mode
+          // Server may return {clue, answer} directly
           if (parsed.clue) {
             clue = parsed.clue;
             answer = parsed.answer || answer;
           } else {
-            // Fallback: try extracting from response field
-            const responseText = parsed.response || parsed.message || (typeof parsed === 'string' ? parsed : JSON.stringify(parsed));
-            const jsonMatch = responseText.match(/\{[\s\S]*"clue"[\s\S]*"answer"[\s\S]*\}/);
-            if (jsonMatch) {
-              const questionData = JSON.parse(jsonMatch[0]);
-              clue = questionData.clue || clue;
-              answer = questionData.answer || answer;
-            } else {
-              clue = responseText;
+            // Try extracting from various response shapes
+            const responseText = parsed?.response || parsed?.message || parsed?.text || parsed?.data?.response || parsed?.data?.text || (typeof parsed === 'string' ? parsed : '');
+            if (responseText) {
+              const jsonMatch = responseText.match(/\{[\s\S]*?"clue"[\s\S]*?"answer"[\s\S]*?\}/);
+              if (jsonMatch) {
+                const questionData = JSON.parse(jsonMatch[0]);
+                if (questionData.clue && questionData.answer) {
+                  clue = questionData.clue;
+                  answer = questionData.answer;
+                }
+              }
             }
           }
         } catch {
-          clue = typeof data === 'string' ? data : JSON.stringify(data);
+          // Keep fallback question
         }
       }
 
