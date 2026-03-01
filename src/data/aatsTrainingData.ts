@@ -109,6 +109,7 @@ export const AATS_AVATAR_IDS = [
   "anti-prophet",
   "internet-skeptic",
   "agnostic",
+  "pentecostal",
 ] as const;
 
 export type AATSAvatarId = (typeof AATS_AVATAR_IDS)[number];
@@ -145,7 +146,7 @@ export const ARENA_RINGS: ArenaRing[] = [
     description: "Intra-Christian challengers including evangelicals, Catholics, ex-SDAs, and prophecy schools",
     icon: "Sparkles",
     color: "text-blue-400",
-    avatarIds: ["evangelical", "catholic", "jw", "progressive-christian", "former-sda", "offshoot-sda", "skeptical-exsda", "anti-prophet", "preterist", "futurist"],
+    avatarIds: ["evangelical", "catholic", "jw", "progressive-christian", "former-sda", "offshoot-sda", "skeptical-exsda", "anti-prophet", "preterist", "futurist", "pentecostal"],
   },
 ];
 
@@ -155,8 +156,8 @@ export const CROSS_AVATAR_SUBJECTS: { id: string; title: string; avatarIds: AATS
   { id: "sabbath", title: "The Sabbath", avatarIds: ["evangelical", "catholic", "atheist", "progressive-christian", "former-sda"] },
   { id: "deity-of-christ", title: "Deity of Christ", avatarIds: ["muslim", "jw", "atheist", "jewish", "new-age"] },
   { id: "bible-authority", title: "Bible Authority", avatarIds: ["muslim", "catholic", "mormon", "secular-scholar", "atheist"] },
-  { id: "salvation", title: "Salvation & Works", avatarIds: ["evangelical", "catholic", "mormon", "progressive-christian"] },
-  { id: "law-gospel", title: "Law vs Grace", avatarIds: ["evangelical", "catholic", "former-sda"] },
+  { id: "salvation", title: "Salvation & Works", avatarIds: ["evangelical", "catholic", "mormon", "progressive-christian", "pentecostal"] },
+  { id: "law-gospel", title: "Law vs Grace", avatarIds: ["evangelical", "catholic", "former-sda", "pentecostal"] },
   { id: "state-of-dead", title: "State of the Dead", avatarIds: ["evangelical", "catholic", "mormon", "new-age"] },
   { id: "investigative-judgment", title: "Investigative Judgment", avatarIds: ["evangelical", "former-sda", "skeptical-exsda", "philosopher"] },
   { id: "spirit-of-prophecy", title: "Spirit of Prophecy", avatarIds: ["anti-prophet", "former-sda", "skeptical-exsda", "offshoot-sda"] },
@@ -191,6 +192,7 @@ import { antiProphetTraining } from "./aats/antiProphetTraining";
 import { internetSkepticTraining } from "./aats/internetSkepticTraining";
 import { agnosticTraining } from "./aats/agnosticTraining";
 import { scientistTraining } from "./aats/scientistTraining";
+import { pentecostalTraining } from "./aats/pentecostalTraining";
 
 const TRAINING_MAP: Record<AATSAvatarId, AATSAvatarTraining> = {
   atheist: atheistTraining,
@@ -214,6 +216,7 @@ const TRAINING_MAP: Record<AATSAvatarId, AATSAvatarTraining> = {
   "anti-prophet": antiProphetTraining,
   "internet-skeptic": internetSkepticTraining,
   agnostic: agnosticTraining,
+  pentecostal: pentecostalTraining,
 };
 
 export function getAvatarTraining(avatarId: AATSAvatarId): AATSAvatarTraining {
