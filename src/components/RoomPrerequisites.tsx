@@ -36,7 +36,7 @@ const roomNames: Record<string, { name: string; floor: number }> = {
   FRt: { name: "Fruit Room", floor: 4 },
   BL: { name: "Blue Room — Sanctuary", floor: 5 },
   PR: { name: "Prophecy Room", floor: 5 },
-  FR: { name: "Feast Room", floor: 5 },
+  FE: { name: "Feasts Room", floor: 5 },
 };
 
 export const RoomPrerequisites = ({ rooms, compact = false }: RoomPrerequisitesProps) => {

@@ -17,7 +17,7 @@ const ROOM_3D_VIEWERS: Record<string, { component: React.LazyExoticComponent<any
   sr: { component: StoryRoom3DViewer, name: "Story Room" },
   ir: { component: Imagination3DViewer, name: "Imagination Room" },
   gr: { component: Gems3DViewer, name: "Gems Room" },
-  st: { component: Symbols3DViewer, name: "Symbols Room" },
+  st: { component: Symbols3DViewer, name: "Symbols/Types Room" },
   pr: { component: Prophecy3DViewer, name: "Prophecy Room" },
   "123h": { component: ThreeHeavens3DViewer, name: "Three Heavens Room" },
   bl: { component: Sanctuary3DViewer, name: "Blue Room (Sanctuary)" },

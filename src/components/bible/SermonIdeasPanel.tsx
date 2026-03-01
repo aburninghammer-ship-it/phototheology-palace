@@ -55,15 +55,15 @@ interface SermonIdeasPanelProps {
 const AVAILABLE_ROOMS = [
   { name: "Observation Room", icon: "👁️", description: "Examine text details" },
   { name: "Concentration Room", icon: "✝️", description: "Find Christ in passage" },
-  { name: "Fire Room", icon: "🔥", description: "Personal application" },
-  { name: "Symbols Room", icon: "🔣", description: "Decode biblical symbols" },
-  { name: "Types Room", icon: "📐", description: "Type-antitype connections" },
-  { name: "Sanctuary Room", icon: "⛪", description: "Sanctuary blueprint lens" },
+  { name: "Fire Room", icon: "🔥", description: "Emotional conviction & application" },
+  { name: "Symbols/Types Room", icon: "🔣", description: "Decode symbols & type-antitype" },
+  { name: "Blue Room (Sanctuary)", icon: "⛪", description: "Sanctuary blueprint lens" },
   { name: "Patterns Room", icon: "🔄", description: "Recurring biblical patterns" },
-  { name: "Parallels Room", icon: "⚖️", description: "Parallel stories & themes" },
+  { name: "Parallels Room", icon: "⚖️", description: "Mirrored actions across time" },
   { name: "Prophecy Room", icon: "📜", description: "Prophetic interpretation" },
   { name: "Three Angels Room", icon: "👼", description: "Revelation 14 message" },
   { name: "Story Room", icon: "📖", description: "Visualize narratives" },
+  { name: "Dimensions Room", icon: "📐", description: "Literal, Christ, Me, Church, Heaven" },
   { name: "24FPS Room", icon: "🎬", description: "Memory visualization" },
 ];
 
