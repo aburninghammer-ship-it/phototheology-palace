@@ -8026,6 +8026,60 @@ export type Database = {
         }
         Relationships: []
       }
+      group_study_sessions: {
+        Row: {
+          content_reference: string | null
+          content_text: string | null
+          content_type: string
+          created_at: string
+          current_phase: string
+          ended_at: string | null
+          host_id: string
+          id: string
+          phase_ends_at: string | null
+          room_code: string
+          scheduled_study_id: string | null
+          started_at: string
+          status: string
+          total_insights: number
+          total_votes: number
+        }
+        Insert: {
+          content_reference?: string | null
+          content_text?: string | null
+          content_type?: string
+          created_at?: string
+          current_phase?: string
+          ended_at?: string | null
+          host_id: string
+          id?: string
+          phase_ends_at?: string | null
+          room_code: string
+          scheduled_study_id?: string | null
+          started_at?: string
+          status?: string
+          total_insights?: number
+          total_votes?: number
+        }
+        Update: {
+          content_reference?: string | null
+          content_text?: string | null
+          content_type?: string
+          created_at?: string
+          current_phase?: string
+          ended_at?: string | null
+          host_id?: string
+          id?: string
+          phase_ends_at?: string | null
+          room_code?: string
+          scheduled_study_id?: string | null
+          started_at?: string
+          status?: string
+          total_insights?: number
+          total_votes?: number
+        }
+        Relationships: []
+      }
       guesthouse_events: {
         Row: {
           access_code: string | null
@@ -8665,6 +8719,38 @@ export type Database = {
           theme?: string
         }
         Relationships: []
+      }
+      insight_votes: {
+        Row: {
+          created_at: string
+          id: string
+          insight_id: string
+          user_id: string
+          vote: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          insight_id: string
+          user_id: string
+          vote?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          insight_id?: string
+          user_id?: string
+          vote?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insight_votes_insight_id_fkey"
+            columns: ["insight_id"]
+            isOneToOne: false
+            referencedRelation: "study_insights"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       interest_study_sessions: {
         Row: {
@@ -16421,6 +16507,60 @@ export type Database = {
           },
         ]
       }
+      study_insights: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          insight_type: string | null
+          participant_id: string
+          room_code: string | null
+          score: number
+          session_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          insight_type?: string | null
+          participant_id: string
+          room_code?: string | null
+          score?: number
+          session_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          insight_type?: string | null
+          participant_id?: string
+          room_code?: string | null
+          score?: number
+          session_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_insights_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "study_session_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_insights_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "group_study_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       study_partners: {
         Row: {
           accepted_at: string | null
@@ -16589,6 +16729,56 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      study_session_participants: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          id: string
+          insights_shared: number
+          is_connected: boolean
+          joined_at: string
+          last_seen_at: string | null
+          score: number
+          session_id: string
+          user_id: string
+          votes_cast: number
+        }
+        Insert: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id?: string
+          insights_shared?: number
+          is_connected?: boolean
+          joined_at?: string
+          last_seen_at?: string | null
+          score?: number
+          session_id: string
+          user_id: string
+          votes_cast?: number
+        }
+        Update: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id?: string
+          insights_shared?: number
+          is_connected?: boolean
+          joined_at?: string
+          last_seen_at?: string | null
+          score?: number
+          session_id?: string
+          user_id?: string
+          votes_cast?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "group_study_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       study_sessions: {
         Row: {
