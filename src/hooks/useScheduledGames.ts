@@ -69,9 +69,28 @@ export type ScheduledEventType =
   | 'escape-dragon'
   | 'escape-room'
   | 'treasure-hunt'
+  | 'story-room'
+  | 'parallels-match'
+  | 'speed-verse'
+  | 'observation-flux'
+  | 'symbol-decoder'
+  | 'chef-challenge'
+  | 'concentration-room'
+  | 'five-dimensions'
+  | 'sanctuary-blueprint'
+  | 'chain-war'
+  | 'biblical-parallels'
+  | 'sanctuary-run'
+  | 'prophecy-timeline'
+  | 'time-zone-invasion'
+  | 'christ-lock'
+  | 'principle-sprint'
+  | 'pt-jeopardy'
+  | 'pt-family-feud'
   | 'group-study'
   | 'live-study-room'
-  | 'branch-study';
+  | 'branch-study'
+  | 'live-demo';
 
 // Game options for studies (features, PT focus, topic)
 interface GameOptions {
