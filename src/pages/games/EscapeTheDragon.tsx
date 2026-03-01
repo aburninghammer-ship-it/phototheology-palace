@@ -29,19 +29,23 @@ const DRAGON_ATTACKS = [
 ];
 
 const DEFENSE_CARDS = [
-  "Ep", "Ef", "|GC", "|TP", "|S", "⚖", "ALTAR", "LAMP", "ARK"
+  "CR", "ST", "PR", "BL", "3A", "GC", "TP", "S", "FRt", "P‖", "PRm", "TZ", "DR"
 ];
 
 const CARD_EXPLANATIONS: Record<string, string> = {
-  "Ep": "Epistles Prophecy - Prophetic teachings in New Testament letters",
-  "Ef": "Epistles Faith - Faith and doctrine from New Testament letters",
-  "|GC": "Great Controversy - Cosmic conflict between Christ and Satan",
-  "|TP": "Time Prophecy - Daniel/Revelation prophetic timelines",
-  "|S": "Sanctuary - Hebrew sanctuary system pointing to Christ",
-  "⚖": "Judgment - God's righteous judgment and justice",
-  "ALTAR": "Altar - Sacrifice of Christ on the cross",
-  "LAMP": "Lampstand - Light of truth, witness, Holy Spirit",
-  "ARK": "Ark of Covenant - God's law, mercy seat, His presence"
+  "CR": "Concentration Room — Every text must reveal Christ (John 5:39)",
+  "ST": "Symbols/Types Room — God's symbolic language: lamb, rock, light, water",
+  "PR": "Prophecy Room — Daniel & Revelation prophetic timelines and constellations",
+  "BL": "Blue Room (Sanctuary) — The sanctuary blueprint: altar, laver, lampstand, ark",
+  "3A": "Three Angels' Room — The final gospel appeal of Revelation 14:6-12",
+  "GC": "Great Controversy Wall — The cosmic conflict between Christ and Satan",
+  "TP": "Time Prophecy Wall — 2300 days, 70 weeks, 1260 years",
+  "S": "Sanctuary Wall — Every text connected to the sanctuary system",
+  "FRt": "Fruit Room — Does this produce love, joy, peace? (Galatians 5:22-23)",
+  "P‖": "Parallels Room — Mirrored actions across time (Babel/Pentecost, Exodus/Return)",
+  "PRm": "Patterns Room — God's recurring motifs: 40 days, 3 days, deliverer stories",
+  "TZ": "Time Zone Room — Past, present, future × heaven and earth",
+  "DR": "Dimensions Room — Literal, Christ, Me, Church, Heaven",
 };
 
 export default function EscapeTheDragon() {
