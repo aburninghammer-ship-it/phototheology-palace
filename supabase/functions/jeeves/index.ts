@@ -6204,7 +6204,7 @@ ${conversationHistory.map((msg: any) => `${msg.role === 'user' ? 'Student' : 'Je
 
 CRITICAL: Pay close attention to corrections, clarifications, and specific details the student mentions. Build on this conversation - don't ignore what was said.` : '';
       
-      userPrompt = `${greeting} asks: "${question}"${contextSection}${historySection}
+      userPrompt = `${greeting} asks: "${question || message}"${contextSection}${historySection}
 
 RESPOND DIRECTLY to what they're asking. If they're correcting you or asking about specifics from their study, address that directly.
 
@@ -9652,7 +9652,7 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     }
 
     // Extract principles used from commentary mode
-    let responseData: any = { content };
+    let responseData: any = { content, response: content };
 
     // Defense coach mode: extract score from response
     if (mode === "defense-coach" || mode === "defense-coach-continue") {

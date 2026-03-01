@@ -128,6 +128,7 @@ export const JeevesWidget = () => {
 
       const reply =
         data?.response ||
+        data?.content ||
         data?.answer ||
         "My apologies — I seem to have lost my train of thought. Do try again.";
 
