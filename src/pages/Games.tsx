@@ -88,7 +88,7 @@ const Games = () => {
       floor: 4,
       timed: false,
       rooms: ["P‖"],
-      modes: ["solo"],
+      modes: ["solo", "2p"],
       difficulties: ["medium", "hard"],
       route: "/games/palace-cards"
     },
@@ -208,7 +208,7 @@ const Games = () => {
       floor: 4,
       timed: false,
       rooms: ["ST", "P‖", "CR"],
-      modes: ["solo", "vs-ai"],
+      modes: ["solo", "vs-ai", "2p"],
       difficulties: ["easy", "medium", "hard"],
       route: "/games/concentration"
     },
