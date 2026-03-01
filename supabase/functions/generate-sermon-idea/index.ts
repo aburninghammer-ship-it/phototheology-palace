@@ -8,21 +8,19 @@ const corsHeaders = {
 // The complete list of allowed Palace rooms
 const ALLOWED_ROOMS = [
   // Floor 1 - Furnishing
-  "Story Room", "Imagination Room", "24FPS Room", "Bible Rendered", "Translation Room", "Gems Room",
+  "Story Room (SR)", "Imagination Room (IR)", "24FPS Room (24)", "Bible Rendered (BR)", "Translation Room (TR)", "Gems Room (GR)",
   // Floor 2 - Investigation
-  "Observation Room", "Def-Com Room", "Symbols Room", "Types Room", "Questions Room", "Q&A Chains Room",
+  "Observation Room (OR)", "Def-Com Room (DC)", "Symbols/Types Room (ST)", "Questions Room (QR)", "Q&A Chains (QA)",
   // Floor 3 - Freestyle
-  "Nature Freestyle", "Personal Freestyle", "Bible Freestyle", "History Freestyle", "Listening Room",
+  "Nature Freestyle (NF)", "Personal Freestyle (PF)", "Bible Freestyle (BF)", "History Freestyle (HF)", "Listening Room (LR)",
   // Floor 4 - Next Level
-  "Concentration Room", "Dimensions Room", "Connect-6", "Theme Room", "Time Zone", "Patterns Room", "Parallels Room", "Fruit Room",
+  "Concentration Room (CR)", "Dimensions Room (DR)", "Connect-6 (C6)", "Theme Room (TRm)", "Time Zone (TZ)", "Patterns Room (PRm)", "Parallels Room (P‖)", "Fruit Room (FRt)", "Christ in Every Chapter (CEC)", "Room 66 (R66)",
   // Floor 5 - Vision
-  "Blue Room", "Sanctuary Room", "Prophecy Room", "Three Angels Room", "Feasts Room", "Room 66",
+  "Blue Room / Sanctuary (BL)", "Prophecy Room (PR)", "Three Angels Room (3A)", "Feasts Room (FE)", "Mathematics Room (MATH)",
   // Floor 6 - Three Heavens & Cycles
-  "Three Heavens Room", "Eight Cycles Room", "Mathematics Room", "Juice Room",
+  "Three Heavens (1H/2H/3H)", "Cycles (@Ad-@Re)", "Juice Room (JR)",
   // Floor 7 - Spiritual
-  "Fire Room", "Meditation Room", "Speed Room",
-  // Sanctuary specific
-  "Altar Room", "Laver Room", "Table Room", "Lampstand Room", "Incense Room", "Ark Room", "Veil Room"
+  "Fire Room (FRm)", "Meditation Room (MR)", "Speed Room (SRm)",
 ];
 
 // Room data with principles
@@ -35,15 +33,11 @@ const ROOM_DATA: Record<string, { summary: string; principles: string[] }> = {
     summary: "Examine text details - who, what, when, where, why",
     principles: ["5W Questions", "Repeated Words", "Contrasts", "Progressions", "Literary Structure"]
   },
-  "Symbols Room": {
-    summary: "Decode Bible symbols using Scripture's own definitions",
-    principles: ["Scripture Interprets Scripture", "First Mention", "Symbol Consistency", "Context Priority"]
+  "Symbols/Types Room": {
+    summary: "Decode Bible symbols and connect OT types to NT antitypes",
+    principles: ["Scripture Interprets Scripture", "First Mention", "Symbol Consistency", "Type-Antitype", "Shadow to Substance"]
   },
-  "Types Room": {
-    summary: "Connect Old Testament types to New Testament antitypes",
-    principles: ["Type-Antitype", "Shadow to Substance", "Lesser to Greater", "Christ as Fulfillment"]
-  },
-  "Sanctuary Room": {
+  "Blue Room / Sanctuary": {
     summary: "Use the sanctuary blueprint to understand salvation",
     principles: ["Furniture Typology", "Priestly Ministry", "Two Apartments", "Day of Atonement", "Christ's Ministry"]
   },
@@ -59,9 +53,9 @@ const ROOM_DATA: Record<string, { summary: string; principles: string[] }> = {
     summary: "Find Christ in every passage",
     principles: ["Christ Anticipated", "Christ Present", "Christ Fulfilled", "Christ Central", "Luke 24:27 Lens"]
   },
-  "Three Heavens Room": {
-    summary: "Understand heaven's three-phase drama",
-    principles: ["Creation Perspective", "Fall Conflict", "Redemption Plan", "Cosmic Controversy"]
+  "Three Heavens (1H/2H/3H)": {
+    summary: "Understand the three Day-of-the-LORD cycles: 1H (Babylon/Restoration), 2H (70AD/New Covenant), 3H (Final New Creation)",
+    principles: ["DoL¹/NE¹ Horizon", "DoL²/NE² Horizon", "DoL³/NE³ Horizon", "Cycle Placement"]
   },
   "Prophecy Room": {
     summary: "Interpret prophecy through proper hermeneutics",

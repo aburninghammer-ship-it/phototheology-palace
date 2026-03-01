@@ -16,13 +16,13 @@ const CATEGORY_RULES: Record<string, {
   "end-time": {
     name: "End-Time Discernment",
     rules: [
-      "Must include Time Room OR Three Heavens Room",
+      "Must include Three Heavens (1H/2H/3H) OR Prophecy Room",
       "Include present deception warning",
       "Christ as refuge (never fear-bait)",
       "No date-setting or speculation"
     ],
-    mandatoryRooms: ["Three Heavens Room", "Time Room", "Beasts Room"],
-    palaceAnchors: ["Floor 6 – Three Heavens Room", "Floor 6 – Time Room", "Sanctuary – Most Holy Place"]
+    mandatoryRooms: ["Three Heavens (1H/2H/3H)", "Prophecy Room (PR)", "Symbols/Types Room (ST)"],
+    palaceAnchors: ["Floor 6 – Three Heavens", "Floor 5 – Prophecy Room", "Sanctuary – Most Holy Place"]
   },
   "current-events": {
     name: "Current Events (Non-Reactionary)",
@@ -32,8 +32,8 @@ const CATEGORY_RULES: Record<string, {
       "Focus on moral shift, war, religious pressure, economic tightening, or technological imitation",
       "Must keep sermon timeless"
     ],
-    mandatoryRooms: ["Pattern Room", "Cycle Room", "False Center Room"],
-    palaceAnchors: ["Floor 4 – Pattern Room", "Floor 6 – Cycle Room"]
+    mandatoryRooms: ["Patterns Room (PRm)", "Cycles (@Ad-@Re)", "Concentration Room (CR)"],
+    palaceAnchors: ["Floor 4 – Patterns Room", "Floor 6 – Cycles"]
   },
   "righteousness-by-faith": {
     name: "Righteousness by Faith",
@@ -43,8 +43,8 @@ const CATEGORY_RULES: Record<string, {
       "Christ as both substitute AND source",
       "Balance imputed and imparted righteousness"
     ],
-    mandatoryRooms: ["Sanctuary – Altar", "Sanctuary – Laver", "Veil Room"],
-    palaceAnchors: ["Sanctuary – Altar & Laver", "Flesh / Veil typology"]
+    mandatoryRooms: ["Blue Room / Sanctuary (BL)", "Concentration Room (CR)", "Dimensions Room (DR)"],
+    palaceAnchors: ["Sanctuary – Altar & Laver", "Blue Room typology"]
   },
   "prophecy": {
     name: "Prophecy (Daniel & Revelation)",
@@ -54,8 +54,8 @@ const CATEGORY_RULES: Record<string, {
       "Christological fulfillment required",
       "No speculation beyond Scripture"
     ],
-    mandatoryRooms: ["Time Room", "Math Room", "Beasts Room", "Christ Resolution Room"],
-    palaceAnchors: ["Floor 5 – Time Room", "Floor 5 – Math Room", "Floor 5 – Beasts Room"]
+    mandatoryRooms: ["Prophecy Room (PR)", "Mathematics Room (MATH)", "Symbols/Types Room (ST)", "Concentration Room (CR)"],
+    palaceAnchors: ["Floor 5 – Prophecy Room", "Floor 5 – Mathematics Room", "Floor 2 – Symbols/Types"]
   },
   "sanctuary": {
     name: "Sanctuary Theology",
@@ -64,8 +64,8 @@ const CATEGORY_RULES: Record<string, {
       "Connect articles of furniture to Christ's ministry",
       "Day of Atonement as present reality"
     ],
-    mandatoryRooms: ["Articles Room", "Veil Room", "Day of Atonement Room"],
-    palaceAnchors: ["Sanctuary – All Articles", "Sanctuary – Veil", "Sanctuary – Most Holy Place"]
+    mandatoryRooms: ["Blue Room / Sanctuary (BL)", "Feasts Room (FE)", "Concentration Room (CR)"],
+    palaceAnchors: ["Sanctuary – All Articles", "Floor 5 – Blue Room", "Sanctuary – Most Holy Place"]
   },
   "everlasting-gospel": {
     name: "Everlasting Gospel",
@@ -74,7 +74,7 @@ const CATEGORY_RULES: Record<string, {
       "Rev 14 gospel, not Romans-only gospel",
       "Three Angels' Message framework"
     ],
-    mandatoryRooms: ["Creation Room", "Cross Room", "Judgment Room", "Sabbath Room"],
+    mandatoryRooms: ["Three Angels Room (3A)", "Blue Room / Sanctuary (BL)", "Concentration Room (CR)"],
     palaceAnchors: ["Floor 5 – Three Angels Room", "Sanctuary – Most Holy Place"]
   },
   "series-builder": {
@@ -85,8 +85,8 @@ const CATEGORY_RULES: Record<string, {
       "Advances same thesis throughout",
       "Climaxes Christologically"
     ],
-    mandatoryRooms: ["Cycle Room", "Pattern Room", "Dimension Room"],
-    palaceAnchors: ["Floor 4 – Pattern Room", "Floor 6 – Cycle Room", "Floor 4 – Dimension Room"]
+    mandatoryRooms: ["Cycles (@Ad-@Re)", "Patterns Room (PRm)", "Dimensions Room (DR)"],
+    palaceAnchors: ["Floor 4 – Patterns Room", "Floor 6 – Cycles", "Floor 4 – Dimensions Room"]
   }
 };
 
@@ -250,43 +250,43 @@ Respond ONLY with valid JSON in this exact format:
   "illustrationHooks": ["hook1", "hook2"],
   "floors": {
     "floor1": {
-      "roomUsed": "Observation Room",
+      "roomUsed": "Observation Room (OR)",
       "keyWords": ["word1", "word2", "word3", "word4", "word5"],
       "observationQuestions": ["question1", "question2", "question3", "question4"],
       "historicalNotes": "string or null"
     },
     "floor2": {
-      "roomUsed": "Symbol Room",
+      "roomUsed": "Symbols/Types Room (ST)",
       "symbols": [
         {"symbol": "name", "definition": "one-line biblical definition", "crossRefs": ["ref1", "ref2"]}
       ]
     },
     "floor3": {
-      "roomUsed": "Sanctuary Room",
+      "roomUsed": "Blue Room / Sanctuary (BL)",
       "article": "sanctuary article name or null",
       "connection": "how it connects patternally",
       "explanation": "brief explanation or null if no connection"
     },
     "floor4": {
-      "roomUsed": "Story Room",
+      "roomUsed": "Story Room (SR)",
       "stories": [
         {"reference": "story reference", "parallels": "what parallels", "contrasts": "what contrasts", "caution": "what not to over-connect"}
       ]
     },
     "floor5": {
-      "roomsUsed": ["Time Room", "Cycles Room"],
+      "roomsUsed": ["Prophecy Room (PR)", "Cycles (@Ad-@Re)"],
       "propheticConnections": [
         {"type": "Confirmed Fulfillment | Typological Echo | Thematic Pattern", "description": "description"}
       ]
     },
     "floor6": {
-      "roomUsed": "Christ-Finding Room",
+      "roomUsed": "Concentration Room (CR)",
       "guidedQuestions": ["question1", "question2"],
       "christPresence": "fulfillment | anticipation | contrast | future resolution",
       "ntReferences": ["NT reference"]
     },
     "floor7": {
-      "roomUsed": "Application Room",
+      "roomUsed": "Fire Room (FRm)",
       "applicationAngles": [
         {"area": "Personal", "question": "question framed as question not command"},
         {"area": "Community", "question": "question"},
@@ -294,7 +294,7 @@ Respond ONLY with valid JSON in this exact format:
       ]
     },
     "floor8": {
-      "roomUsed": "Worship Room",
+      "roomUsed": "Meditation Room (MR)",
       "responseMovements": ["repentance", "trust", "hope", "surrender", "mission"],
       "songThemes": ["theme1", "theme2"],
       "prayerFocus": "prayer focus description",

@@ -47,7 +47,7 @@ const MEMORY_TEMPLATES: MemoryTemplate[] = [
     color: "from-purple-500 to-purple-600",
     verseCount: 12,
     difficulty: "hard",
-    palaceRooms: ["Prophecy Room", "Symbols Room"],
+    palaceRooms: ["Prophecy Room", "Symbols/Types Room"],
     exampleVerse: "Daniel 2:44 - The Stone Kingdom",
   },
   {
@@ -80,7 +80,7 @@ const MEMORY_TEMPLATES: MemoryTemplate[] = [
     color: "from-slate-500 to-slate-600",
     verseCount: 7,
     difficulty: "medium",
-    palaceRooms: ["Translation Room", "Types Room"],
+    palaceRooms: ["Translation Room", "Symbols/Types Room"],
     exampleVerse: "Ephesians 6:14 - Belt of Truth",
   },
   {
