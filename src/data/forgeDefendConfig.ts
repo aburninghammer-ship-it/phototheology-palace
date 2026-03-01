@@ -98,6 +98,11 @@ export const AI_ENEMY_SQUADS: Record<string, { name: string; opponents: string[]
     opponents: ["progressive-christian", "new-age", "internet-skeptic"],
     description: "Progressive theology + New Age spirituality + viral skepticism",
   },
+  "charismatic-trio": {
+    name: "The Charismatic Front",
+    opponents: ["pentecostal", "evangelical", "progressive-christian"],
+    description: "Pentecostal fire + evangelical grace-alone + progressive inclusion",
+  },
   "prophecy-trio": {
     name: "The Prophecy Tribunal",
     opponents: ["preterist", "futurist", "secular-scholar"],
