@@ -58,12 +58,12 @@ interface Connection {
 }
 
 const GAME_WIDTH = 360;
-const GAME_HEIGHT = 500;
-const ANCHOR_RADIUS = 50;
-const ELEMENT_RADIUS = 35;
-const LOCK_DISTANCE = 60;
+const GAME_HEIGHT = 540;
+const ANCHOR_RADIUS = 55;
+const ELEMENT_RADIUS = 40;
+const LOCK_DISTANCE = 70;
 const REPEL_DISTANCE = 100;
-const DRIFT_SPEED = 0.3;
+const DRIFT_SPEED = 0.2;
 
 const getAnchorIcon = (icon: string) => {
   switch (icon) {
@@ -115,7 +115,7 @@ export default function ChristInFocus() {
   const [gameState, setGameState] = useState<GameState>('menu');
   const [selectedCategory, setSelectedCategory] = useState<LevelCategory | null>(null);
   const [currentLevel, setCurrentLevel] = useState<CRLevel | null>(null);
-  const [unlockedLevels, setUnlockedLevels] = useState<Set<string>>(new Set(['exodus_12_13', 'john_1_29']));
+  const [unlockedLevels, setUnlockedLevels] = useState<Set<string>>(() => new Set(allCRLevels.map(l => l.id)));
 
   // Playing state
   const [elements, setElements] = useState<DraggableElement[]>([]);
@@ -135,6 +135,7 @@ export default function ChristInFocus() {
   // Stability meter (100 = fully stable)
   const [stability, setStability] = useState(0);
   const [isShaking, setIsShaking] = useState(false);
+  const [hintElementId, setHintElementId] = useState<string | null>(null);
 
   // High scores
   const [highScores, setHighScores] = useState<Record<string, number>>({});
@@ -584,16 +585,31 @@ export default function ChristInFocus() {
         </div>
 
         <Card className="bg-white/10 border-purple-500/30 mb-6">
-          <CardContent className="p-6 text-center">
-            <Target className="h-12 w-12 mx-auto mb-4 text-purple-300" />
-            <h2 className="text-xl font-bold text-white mb-2">{t('games.common.howToPlay')}</h2>
-            <ul className="text-purple-200 text-sm space-y-2 text-left">
-              <li>{t('games.christInFocus.instructions.elementsFloat')}</li>
-              <li>{t('games.christInFocus.instructions.dragElements')}</li>
-              <li>{t('games.christInFocus.instructions.christConnections')}</li>
-              <li>{t('games.christInFocus.instructions.avoidFalseCenters')}</li>
-              <li>{t('games.christInFocus.instructions.completeConnections')}</li>
-            </ul>
+          <CardContent className="p-6">
+            <Target className="h-10 w-10 mx-auto mb-3 text-purple-300" />
+            <h2 className="text-xl font-bold text-white mb-3 text-center">How to Play</h2>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-start gap-3">
+                <span className="text-lg">1.</span>
+                <p className="text-purple-200">A <span className="text-yellow-400 font-bold">gold circle</span> in the center represents Christ. Floating <span className="text-purple-400 font-bold">purple circles</span> are verse words.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-lg">2.</span>
+                <p className="text-purple-200"><span className="font-bold text-white">Drag</span> each word toward Christ (gold center) or toward another word it connects to. If correct, it locks in place and turns <span className="text-green-400 font-bold">green</span>.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-lg">3.</span>
+                <p className="text-purple-200">Some words connect to Christ directly. Others connect through another word first. <span className="text-white font-bold">Tap a word</span> to see a hint about its target.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-lg">4.</span>
+                <p className="text-purple-200"><span className="text-red-400 font-bold">Avoid</span> the gray circles in the corners — those are <span className="text-red-400">false centers</span> (wrong interpretations).</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-lg">5.</span>
+                <p className="text-purple-200">Connect all words correctly to complete the level and reveal the Christ-centered lesson.</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -876,31 +892,50 @@ export default function ChristInFocus() {
             </svg>
 
             {/* Draggable elements */}
-            {elements.map(element => (
-              <motion.div
-                key={element.id}
-                className={`absolute flex items-center justify-center rounded-full cursor-grab active:cursor-grabbing select-none ${
-                  element.isLocked
-                    ? 'bg-green-600 border-2 border-green-400'
-                    : 'bg-purple-600 border-2 border-purple-400 hover:bg-purple-500'
-                }`}
-                style={{
-                  left: element.position.x - ELEMENT_RADIUS,
-                  top: element.position.y - ELEMENT_RADIUS,
-                  width: ELEMENT_RADIUS * 2,
-                  height: ELEMENT_RADIUS * 2,
-                  zIndex: draggingId === element.id ? 100 : 10,
-                }}
-                animate={element.isLocked ? { scale: [1, 1.1, 1] } : {}}
-                transition={element.isLocked ? { duration: 0.3 } : {}}
-                onMouseDown={(e) => handleDragStart(e, element.id)}
-                onTouchStart={(e) => handleDragStart(e, element.id)}
-              >
-                <span className="text-white text-[10px] font-bold text-center px-1 leading-tight">
-                  {element.label}
-                </span>
-              </motion.div>
-            ))}
+            {elements.map(element => {
+              const isHinted = hintElementId === element.id;
+              const targetLabel = element.correctTarget === currentLevel.christAnchor.id
+                ? currentLevel.christAnchor.label
+                : elements.find(el => el.id === element.correctTarget)?.label || '?';
+
+              return (
+                <motion.div
+                  key={element.id}
+                  className={`absolute flex flex-col items-center justify-center rounded-full cursor-grab active:cursor-grabbing select-none ${
+                    element.isLocked
+                      ? 'bg-green-600 border-2 border-green-400'
+                      : isHinted
+                        ? 'bg-purple-500 border-2 border-yellow-400 shadow-lg shadow-yellow-400/30'
+                        : 'bg-purple-600 border-2 border-purple-400 hover:bg-purple-500'
+                  }`}
+                  style={{
+                    left: element.position.x - ELEMENT_RADIUS,
+                    top: element.position.y - ELEMENT_RADIUS,
+                    width: ELEMENT_RADIUS * 2,
+                    height: ELEMENT_RADIUS * 2,
+                    zIndex: draggingId === element.id ? 100 : isHinted ? 50 : 10,
+                  }}
+                  animate={element.isLocked ? { scale: [1, 1.1, 1] } : {}}
+                  transition={element.isLocked ? { duration: 0.3 } : {}}
+                  onMouseDown={(e) => handleDragStart(e, element.id)}
+                  onTouchStart={(e) => handleDragStart(e, element.id)}
+                  onClick={() => {
+                    if (!element.isLocked && !draggingId) {
+                      setHintElementId(prev => prev === element.id ? null : element.id);
+                    }
+                  }}
+                >
+                  <span className="text-white text-xs font-bold text-center px-1 leading-tight">
+                    {element.label}
+                  </span>
+                  {isHinted && !element.isLocked && (
+                    <span className="text-yellow-300 text-[8px] text-center leading-tight mt-0.5">
+                      → {targetLabel.length > 10 ? targetLabel.slice(0, 10) + '…' : targetLabel}
+                    </span>
+                  )}
+                </motion.div>
+              );
+            })}
 
             {/* Feedback message */}
             <AnimatePresence>

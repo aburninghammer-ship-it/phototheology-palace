@@ -407,7 +407,7 @@ const Games = () => {
     {
       id: "christ_in_focus",
       name: "✝️ Christ in Focus",
-      description: "Concentration Room motion game! Drag verse elements toward Christ to reveal the true center. Only Christ-consistent connections stabilize. Avoid false centers!",
+      description: "Drag verse words to the center anchor (Christ) to build connections. Each word must link to the right target — connect them all to complete the verse. Watch out for false centers in the corners!",
       icon: "✝️",
       floor: 4,
       timed: false,
