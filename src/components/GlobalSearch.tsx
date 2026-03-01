@@ -57,7 +57,7 @@ const searchItems = [
   // Games - Popular
   { title: "BranchStudy", path: "/branch-study", icon: Gamepad2, category: "Games - Popular", badge: "New" },
   { title: "Principle Sprint", path: "/games/principle-sprint", icon: Gamepad2, category: "Games - Popular", badge: "New" },
-  { title: "Connection Dash", path: "/games/connection-dash", icon: Gamepad2, category: "Games - Popular", badge: "New" },
+  
   { title: "Chain Chess", path: "/games/chain-chess/new", icon: Gamepad2, category: "Games - Popular" },
   { title: "Escape Rooms", path: "/escape-room", icon: Gamepad2, category: "Games - Popular" },
   { title: "Treasure Hunt", path: "/treasure-hunt", icon: Gamepad2, category: "Games - Popular" },

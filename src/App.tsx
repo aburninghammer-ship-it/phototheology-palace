@@ -200,7 +200,7 @@ const EscapeTheDragon = lazy(() => import("./pages/games/EscapeTheDragon"));
 const EquationBuilder = lazy(() => import("./pages/games/EquationBuilder"));
 const WitnessTrial = lazy(() => import("./pages/games/WitnessTrial"));
 const PrincipleSprint = lazy(() => import("./pages/games/PrincipleSprint"));
-const ConnectionDash = lazy(() => import("./pages/games/ConnectionDash"));
+
 const PhototheologyUno = lazy(() => import("./pages/PhototheologyUno"));
 const BranchStudy = lazy(() => import("./pages/BranchStudy"));
 const FrameSnapshot = lazy(() => import("./pages/games/FrameSnapshot"));
@@ -516,7 +516,7 @@ function App() {
             <Route path="/games/equation-builder" element={<ProtectedRoute><EquationBuilder /></ProtectedRoute>} />
             <Route path="/games/witness-trial" element={<ProtectedRoute><WitnessTrial /></ProtectedRoute>} />
             <Route path="/games/principle-sprint" element={<ProtectedRoute><PrincipleSprint /></ProtectedRoute>} />
-            <Route path="/games/connection-dash" element={<ProtectedRoute><ConnectionDash /></ProtectedRoute>} />
+            
             <Route path="/games/phototheology-uno" element={<ProtectedRoute><PhototheologyUno /></ProtectedRoute>} />
             <Route path="/games/frame-snapshot" element={<ProtectedRoute><FrameSnapshot /></ProtectedRoute>} />
             <Route path="/games/story-room" element={<ProtectedRoute><StoryRoomGame /></ProtectedRoute>} />
