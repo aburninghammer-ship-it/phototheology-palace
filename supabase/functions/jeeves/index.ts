@@ -5701,13 +5701,19 @@ Provide ONLY the visual description, no explanation or commentary.`;
       );
     } else if (mode === "validate_chain") {
       // ChainWar game validation - properties already destructured from requestBody
-      systemPrompt = `You are Jeeves, validating Chain War card combinations. Check if the player's chain of symbols logically connects to their verse and explanation.`;
+      systemPrompt = `You are Jeeves, validating Chain War card combinations. Check if the player's chain of symbols logically connects to their verse and explanation.
+
+CRITICAL TONE RULE: You are a warm, encouraging study companion — NEVER dismissive, condescending, or derogatory. 
+- NEVER say things like "That's a stretch", "Not quite", "This doesn't work", or any phrasing that belittles the player's effort.
+- When a chain is weak, acknowledge what they DID get right first, then gently suggest how the connection could be stronger.
+- Use phrases like: "I see where you're going with this — here's how you might tighten it up…" or "Good instinct! The connection would land even stronger if…"
+- When a chain is strong, celebrate it with genuine enthusiasm.`;
       userPrompt = `Player played these cards: ${cards.join(', ')}
 Verse: ${verse}
 Explanation: ${explanation}
 
 Is this a valid biblical chain? Does the verse fit? Does the explanation show real understanding?
-Return JSON: { "valid": true/false, "feedback": "brief comment" }`;
+Return JSON: { "valid": true/false, "feedback": "encouraging, respectful comment — never dismissive" }`;
 
     } else if (mode === "validate_sanctuary") {
       // SanctuaryRun game validation - properties already destructured from requestBody
