@@ -12,7 +12,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   CheckCircle2, ArrowLeft, Trophy, Users, Plus, LogIn,
   Send, Heart, Flame, BookOpen, MessageSquare, Copy, Check,
-  AlertTriangle, Lock, ChevronDown, ChevronUp, HandHeart, Landmark
+  AlertTriangle, Lock, ChevronDown, ChevronUp, HandHeart, Landmark,
+  Timer, Play, Pause, Square, TrendingUp
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,6 +76,14 @@ export const DeathChamber = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
 
+  // Timer state
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerGoalMinutes, setTimerGoalMinutes] = useState(15);
+  const [sessionMeditationMinutes, setSessionMeditationMinutes] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [meditationHistory, setMeditationHistory] = useState<{ day: number; minutes: number }[]>([]);
+
   // Group state
   const [groupInfo, setGroupInfo] = useState<GroupInfo | null>(null);
   const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
@@ -117,6 +126,67 @@ export const DeathChamber = () => {
       return () => { supabase.removeChannel(channel); };
     }
   }, [groupInfo?.id, view]);
+
+  // Timer effect
+  useEffect(() => {
+    if (timerRunning) {
+      timerRef.current = setInterval(() => {
+        setTimerSeconds(prev => prev + 1);
+      }, 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [timerRunning]);
+
+  // Load meditation history from localStorage
+  useEffect(() => {
+    if (userId) {
+      const stored = localStorage.getItem(`dc_meditation_history_${userId}`);
+      if (stored) {
+        try { setMeditationHistory(JSON.parse(stored)); } catch {}
+      }
+    }
+  }, [userId]);
+
+  const formatTime = (totalSeconds: number) => {
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    if (hrs > 0) return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const startTimer = () => setTimerRunning(true);
+  const pauseTimer = () => setTimerRunning(false);
+  const stopTimer = () => {
+    setTimerRunning(false);
+    const minutes = Math.round(timerSeconds / 60);
+    if (minutes > 0) {
+      setSessionMeditationMinutes(prev => prev + minutes);
+    }
+    setTimerSeconds(0);
+  };
+
+  const saveMeditationTime = (minutes: number) => {
+    if (!userId || minutes === 0) return;
+    const updated = [...meditationHistory.filter(h => h.day !== currentDay), { day: currentDay, minutes }];
+    setMeditationHistory(updated);
+    localStorage.setItem(`dc_meditation_history_${userId}`, JSON.stringify(updated));
+  };
+
+  const totalMeditationMinutes = meditationHistory.reduce((sum, h) => sum + h.minutes, 0);
+  const averageMeditationMinutes = meditationHistory.length > 0
+    ? Math.round(totalMeditationMinutes / meditationHistory.length)
+    : 0;
+  const longestSession = meditationHistory.length > 0
+    ? Math.max(...meditationHistory.map(h => h.minutes))
+    : 0;
+  const timerGoalReached = timerSeconds >= timerGoalMinutes * 60;
+  const timerProgress = Math.min((timerSeconds / (timerGoalMinutes * 60)) * 100, 100);
 
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -168,9 +238,13 @@ export const DeathChamber = () => {
       return;
     }
     if (!surrenderDone) {
-      toast.error("Complete the surrender exercise first");
+      toast.error("Complete your meditation time first");
       return;
     }
+
+    // Save meditation time
+    const totalMinutes = sessionMeditationMinutes + Math.round(timerSeconds / 60);
+    saveMeditationTime(totalMinutes > 0 ? totalMinutes : 15); // default 15 if timer wasn't used
 
     setIsLoading(true);
     try {
@@ -199,6 +273,9 @@ export const DeathChamber = () => {
       toast.success(`Day ${currentDay} complete. The tomb deepens.`);
       setReflection("");
       setSurrenderDone(false);
+      setTimerSeconds(0);
+      setTimerRunning(false);
+      setSessionMeditationMinutes(0);
       await fetchProgress();
 
       if (currentDay === 30) {
@@ -1032,14 +1109,123 @@ export const DeathChamber = () => {
             <p className="text-sm font-semibold italic text-gray-300">"{currentDayData.tombAffirmation}"</p>
           </div>
 
-          <label className="flex items-center gap-2 cursor-pointer pt-1 border-t border-border pt-3">
+          {/* Meditation Timer */}
+          <div className="border-t border-border pt-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold flex items-center gap-2">
+                <Timer className="w-4 h-4 text-primary" />
+                Meditation Timer
+              </h4>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Goal:</span>
+                <select
+                  value={timerGoalMinutes}
+                  onChange={(e) => setTimerGoalMinutes(Number(e.target.value))}
+                  className="text-xs bg-muted border border-border rounded px-2 py-1"
+                  disabled={timerRunning}
+                >
+                  {[5, 10, 15, 20, 25, 30, 45, 60, 90].map(m => (
+                    <option key={m} value={m}>{m} min</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Timer Display */}
+            <div className="text-center space-y-3">
+              <div className={cn(
+                "text-5xl font-mono font-bold tracking-wider transition-colors",
+                timerGoalReached ? "text-green-400" : timerRunning ? "text-primary" : "text-foreground"
+              )}>
+                {formatTime(timerSeconds)}
+              </div>
+              <Progress
+                value={timerProgress}
+                className={cn("h-2", timerGoalReached && "[&>div]:bg-green-500")}
+              />
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>0 min</span>
+                {timerGoalReached && (
+                  <span className="text-green-400 font-semibold">Goal reached!</span>
+                )}
+                <span>{timerGoalMinutes} min</span>
+              </div>
+
+              {/* Timer Controls */}
+              <div className="flex items-center justify-center gap-3">
+                {!timerRunning && timerSeconds === 0 && (
+                  <Button onClick={startTimer} size="lg" className="gap-2">
+                    <Play className="w-5 h-5" /> Begin Meditation
+                  </Button>
+                )}
+                {timerRunning && (
+                  <Button onClick={pauseTimer} variant="outline" size="lg" className="gap-2">
+                    <Pause className="w-5 h-5" /> Pause
+                  </Button>
+                )}
+                {!timerRunning && timerSeconds > 0 && (
+                  <>
+                    <Button onClick={startTimer} size="lg" className="gap-2">
+                      <Play className="w-5 h-5" /> Resume
+                    </Button>
+                    <Button onClick={stopTimer} variant="outline" size="lg" className="gap-2">
+                      <Square className="w-4 h-4" /> End Session
+                    </Button>
+                  </>
+                )}
+              </div>
+
+              {sessionMeditationMinutes > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Total today: {sessionMeditationMinutes} min recorded
+                  {timerSeconds > 0 && ` + ${formatTime(timerSeconds)} current`}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Meditation Growth Stats */}
+          {meditationHistory.length > 1 && (
+            <div className="border-t border-border pt-3">
+              <h4 className="text-xs font-semibold text-muted-foreground flex items-center gap-1 mb-2">
+                <TrendingUp className="w-3 h-3" /> Your Growth in the Tomb
+              </h4>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="bg-muted/30 rounded-lg p-2">
+                  <p className="text-lg font-bold text-primary">{totalMeditationMinutes}</p>
+                  <p className="text-[10px] text-muted-foreground">Total Minutes</p>
+                </div>
+                <div className="bg-muted/30 rounded-lg p-2">
+                  <p className="text-lg font-bold text-primary">{averageMeditationMinutes}</p>
+                  <p className="text-[10px] text-muted-foreground">Avg / Day</p>
+                </div>
+                <div className="bg-muted/30 rounded-lg p-2">
+                  <p className="text-lg font-bold text-primary">{longestSession}</p>
+                  <p className="text-[10px] text-muted-foreground">Longest (min)</p>
+                </div>
+              </div>
+              {averageMeditationMinutes > 0 && (
+                <p className="text-xs text-muted-foreground mt-2 text-center italic">
+                  {averageMeditationMinutes < 15
+                    ? "Push deeper. Aim for at least 15 minutes in the tomb."
+                    : averageMeditationMinutes < 25
+                    ? "Good discipline. Can you push to 25 minutes? The deeper you go, the more you die."
+                    : averageMeditationMinutes < 40
+                    ? "Strong. You are learning to dwell in the tomb. Keep pressing in."
+                    : "Warrior-level meditation. The tomb is becoming your home. Christ is being formed in you."}
+                </p>
+              )}
+            </div>
+          )}
+
+          <label className="flex items-center gap-2 cursor-pointer border-t border-border pt-3">
             <input
               type="checkbox"
               checked={surrenderDone}
               onChange={(e) => setSurrenderDone(e.target.checked)}
               className="rounded border-gray-600"
             />
-            <span className="text-sm">I have completed my meditation time (15+ minutes)</span>
+            <span className="text-sm">I have completed my meditation time</span>
           </label>
         </CardContent>
       </Card>
