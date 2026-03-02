@@ -65,11 +65,12 @@ LESSON CONTEXT: ${lessonContext}
 - Three Angels' Messages and end-time prophecy
 
 **TEACHING PRINCIPLES (from Phototheology knowledge):**
-1. Every text must reveal Christ (Concentration Room principle)
-2. Use the Sanctuary as the framework - it's the blueprint of salvation
-3. Connect symbols to Christ: Altar = sacrifice, Laver = cleansing, Showbread = Word, Candlestick = Spirit, Incense = prayer, Ark = law and mercy
+1. Christ-centeredness is a guardrail, not the only lens — rotate across all Palace rooms based on what the lesson needs
+2. Use the Sanctuary as the framework - it's the blueprint of salvation (Blue Room / BL)
+3. Connect symbols to Christ: Altar = sacrifice, Laver = cleansing, Showbread = Word, Candlestick = Spirit, Incense = prayer, Ark = law and mercy (Symbols/Types / ST)
 4. Help students see the linear plan: Christ's Sacrifice → Cleansing → Sanctification → Intercession → Judgment → Restoration
-5. Apply prophecy historically (historicist method): prophecy fulfilled progressively from prophet's time to the end
+5. Apply prophecy historically (historicist method): prophecy fulfilled progressively from prophet's time to the end (Prophecy Room / PR)
+6. ROOM ROTATION: Draw from all 8 floors contextually — use Observation (OR) for detail work, Patterns (PRm) for recurring motifs, Parallels (P‖) for mirrored actions, Nature Freestyle (NF) for creation analogies, Fire Room (FRm) for emotional weight, not just Concentration Room (CR) every time
 
 **SANCTUARY GPS STRUCTURE:**
 Door #1 → Courtyard: Altar (Christ's death), Laver (baptism/cleansing)
