@@ -13,7 +13,7 @@ import {
   CheckCircle2, ArrowLeft, Trophy, Users, Plus, LogIn,
   Send, Heart, Flame, BookOpen, MessageSquare, Copy, Check,
   AlertTriangle, Lock, ChevronDown, ChevronUp, HandHeart, Landmark,
-  Timer, Play, Pause, Square, TrendingUp
+  Timer, Play, Pause, Square, TrendingUp, Ear, PenLine
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -72,6 +72,7 @@ export const DeathChamber = () => {
   const [currentDay, setCurrentDay] = useState(1);
   const [progress, setProgress] = useState<DayProgress[]>([]);
   const [reflection, setReflection] = useState("");
+  const [spiritJournal, setSpiritJournal] = useState("");
   const [surrenderDone, setSurrenderDone] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
@@ -237,6 +238,10 @@ export const DeathChamber = () => {
       toast.error("Write your reflection before completing this day");
       return;
     }
+    if (!spiritJournal.trim()) {
+      toast.error("Write down what the Spirit said to you before completing this day");
+      return;
+    }
     if (!surrenderDone) {
       toast.error("Complete your meditation time first");
       return;
@@ -254,7 +259,7 @@ export const DeathChamber = () => {
           user_id: userId,
           group_id: groupInfo?.id || null,
           day_number: currentDay,
-          reflection,
+          reflection: `${reflection}\n\n--- What the Spirit Said ---\n${spiritJournal}`,
           tomb_affirmation_accepted: true,
           surrender_exercise_completed: true,
         });
@@ -272,6 +277,7 @@ export const DeathChamber = () => {
 
       toast.success(`Day ${currentDay} complete. The tomb deepens.`);
       setReflection("");
+      setSpiritJournal("");
       setSurrenderDone(false);
       setTimerSeconds(0);
       setTimerRunning(false);
@@ -1103,6 +1109,18 @@ export const DeathChamber = () => {
             </div>
           </div>
 
+          {/* Listening Focus — Holy Spirit's Classroom */}
+          <div className="bg-indigo-950/20 border border-indigo-800/30 rounded-lg p-4 space-y-3">
+            <h4 className="text-sm font-semibold flex items-center gap-2 text-indigo-300">
+              <Ear className="w-4 h-4" />
+              Now Listen — The Holy Spirit is the Teacher
+            </h4>
+            <p className="text-xs text-indigo-200/70 italic">
+              You are a student. He is the Divine Teacher. Stop talking. Stop striving. Be still and listen. He will bring Scriptures to mind, lay impressions on your heart, and speak into your situation. Receive what He gives.
+            </p>
+            <p className="text-sm leading-relaxed">{currentDayData.listeningFocus}</p>
+          </div>
+
           {/* Tomb Affirmation */}
           <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-center">
             <p className="text-xs text-muted-foreground mb-1">Today's Tomb Affirmation</p>
@@ -1250,6 +1268,37 @@ export const DeathChamber = () => {
         </CardContent>
       </Card>
 
+      {/* What the Spirit Said — Journal */}
+      <Card className="border-2 border-indigo-800/30 bg-gradient-to-b from-indigo-950/20 to-background">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center">
+              <PenLine className="w-4 h-4 text-indigo-400" />
+            </div>
+            <div>
+              <CardTitle className="text-base">What the Spirit Said</CardTitle>
+              <CardDescription>Write down the verses, impressions, and words the Holy Spirit spoke to you during your time in the tomb. Only record what is confirmed by Scripture.</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="bg-indigo-950/10 border border-indigo-900/20 rounded-lg p-3">
+            <p className="text-xs text-indigo-300/80 italic">
+              "My sheep hear my voice, and I know them, and they follow me." — John 10:27
+            </p>
+          </div>
+          <Textarea
+            value={spiritJournal}
+            onChange={(e) => setSpiritJournal(e.target.value)}
+            placeholder="What Scriptures did the Spirit bring to mind? What impressions did He lay on your heart? What did He say about your situation today? Write it here..."
+            className="min-h-[140px] border-indigo-800/20"
+          />
+          <p className="text-[10px] text-muted-foreground italic">
+            Remember: test everything against Scripture (1 Thessalonians 5:21). The Spirit will never contradict the Word.
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Reflection */}
       <Card className="border-gray-800">
         <CardHeader>
@@ -1266,7 +1315,7 @@ export const DeathChamber = () => {
 
           <Button
             onClick={handleCompleteDay}
-            disabled={isLoading || !reflection.trim() || !surrenderDone}
+            disabled={isLoading || !reflection.trim() || !spiritJournal.trim() || !surrenderDone}
             className="w-full bg-gray-800 hover:bg-gray-700 text-white"
             size="lg"
           >

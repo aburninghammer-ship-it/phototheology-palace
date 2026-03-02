@@ -11,6 +11,7 @@ export interface DeathChamberDay {
   tombMeditation: string; // PRIMARY — the guided 15+ min meditation/prayer focus
   confessionFocus: string; // What to confess during meditation
   meditationPrompts: string[]; // Guided questions to sit with before God
+  listeningFocus: string; // What to listen for from the Holy Spirit — Scripture, impressions, words
   restOfDay: string; // Brief instruction for how to carry it through the day
   practicalActions: string[];
   reflectionPrompt: string;
@@ -62,10 +63,16 @@ For the next 30 days, you will die. Not physically — but the old man, the fles
 
 Each day begins with a guided meditation — at least 15 minutes in the presence of God, inside the tomb. This is the heart of the program. You will be told what to meditate on, what to confess, what to ask God to search, and what to surrender. The meditation is not optional — it IS the Death Chamber. Everything else flows from what happens in those minutes with God.
 
+But here is the key: you are not here to talk. You are here to LISTEN. Think of yourself as a student sitting in the classroom of the Holy Spirit — the Divine Teacher. He will speak. He will bring Scriptures to mind. He will impress truths on your heart. He will convict, comfort, correct, and reveal. Your job is not to fill the silence with your words. Your job is to be still, listen, and receive what He gives you.
+
+At the end of each session, you will be asked to write down what the Spirit said to you — specific verses He brought to mind, impressions He laid on your heart, words He spoke into your situation. Test everything against Scripture. If it aligns with God's Word, write it down. This is how you learn to hear His voice. The Death Chamber trains not only your will to die, but your ears to hear.
+
 Every great warrior in the Kingdom learned this one truth: you cannot fight for God until you have died to yourself. The Death Chamber is where that death happens — systematically, intentionally, and completely.`,
   rules: [
     "You must complete each day before moving to the next. No skipping.",
     "The meditation is the main event. Give it at least 15 minutes. More is better.",
+    "Listen more than you talk. You are a student. The Holy Spirit is the Teacher.",
+    "Write down what the Spirit says — verses, impressions, convictions. Test everything by Scripture.",
     "Write your reflection honestly. This is between you and God.",
     "If you are doing this with others, the Tomb Space is for mutual encouragement, not performance.",
     "Expect resistance. Your flesh will fight this program. That means it's working."
@@ -117,6 +124,7 @@ Sit with this. Let the Holy Spirit illuminate every corner where the old man hid
       "If God showed me the full truth about my flesh right now, what would I see?",
       "What am I most afraid of admitting about myself?"
     ],
+    listeningFocus: "Now be still. You have confessed and you have asked — now stop talking and listen. The Holy Spirit, your Divine Teacher, wants to reveal something specific about the old man that you have not yet seen. Sit as a student in His classroom. Listen for a Scripture, an impression, or a word He brings to your mind about what the old man has been hiding. Write down exactly what He shows you — test it against Scripture, and record it.",
     restOfDay: "Carry the awareness of the old man with you today. Every time you notice him acting — in a reaction, a thought, a desire — whisper: 'I see you. You are coming to the tomb.' Write a letter to your old self tonight, naming everything God showed you.",
     practicalActions: [
       "Write a letter to your old self naming every flesh pattern God revealed",
@@ -151,6 +159,7 @@ What is left in your hands? Nothing. And that is exactly where God can begin to 
       "Can I genuinely say 'I deserve nothing but the cross, and everything beyond that is grace'?",
       "What would my relationships look like if I stopped demanding my rights?"
     ],
+    listeningFocus: "After you have unclenched your fists in prayer, become still before the Holy Spirit. He is the Divine Teacher, and you are the student. Listen — do not speak. Ask Him to show you which specific right He is asking you to release today. Wait for the Scripture, the impression, or the quiet knowing that He brings. When He speaks, write it down immediately and confirm it by His Word.",
     restOfDay: "Every time you feel your rights being violated today — someone cuts you off, someone disrespects you, something doesn't go your way — practice releasing it. Whisper: 'I am dead. Dead men have no rights.' Do one act of service today that costs you your comfort.",
     practicalActions: [
       "List every personal right you cling to and pray the surrender prayer over each",
@@ -187,6 +196,7 @@ After you have sat in silence, ask God one question and then listen — not for 
       "What has noise been protecting me from hearing — from God or from my own heart?",
       "Can I be at peace with God without producing, performing, or planning?"
     ],
+    listeningFocus: "This entire day is about listening. You have entered the silence — now stay in it. Do not fill it with your words. You are a student seated before the Holy Spirit, the Divine Teacher, and He speaks in the stillness. Listen for the one thing your noise has been drowning out — a Scripture, a conviction, an impression, a single word. When it comes, write it down. This is how you learn to hear His voice.",
     restOfDay: "Fast from all entertainment media for the remainder of the day. No social media, no TV, no music, no podcasts. Let the silence of the tomb follow you. When you reach for distraction, stop and ask: 'What am I running from right now?'",
     practicalActions: [
       "Complete the full silent meditation — no shortcuts",
@@ -221,6 +231,7 @@ Now imagine pulling each idol off its throne. It will resist. You will feel pani
       "What would I be terrified to have God take away from me?",
       "If everything was stripped from me except God, would He be enough?"
     ],
+    listeningFocus: "Now be still before the Holy Spirit. You have named what you think your idols are — but He sees deeper. Sit as a student before the Divine Teacher and let Him name the idols you have missed or mislabeled. Listen for what He brings to the surface — a name, a habit, a desire you thought was innocent. When He speaks, write it down. His diagnosis is always confirmed by Scripture.",
     restOfDay: "Write each idol on a piece of paper. Tear it up or burn it as a physical act of dethroning. For the rest of the day, every time you feel the pull toward an idol, redirect: 'You are not my god. Only God is my god.'",
     practicalActions: [
       "Complete the 'I cannot be okay without' exercise for every area of life",
@@ -261,6 +272,7 @@ Sit with the weight of the stone. Feel it. It is supposed to be heavy. The cross
       "Is there a cost I am secretly unwilling to pay? What is it?",
       "What would full surrender actually look like in my specific life?"
     ],
+    listeningFocus: "After you have counted the cost in your own mind, be still. The Holy Spirit knows what the cost is for you specifically — not generically, but personally. Sit as a student before your Divine Teacher. Listen for what He says the cross will cost you that you have not yet considered. He may bring a Scripture, an impression, or a clear word. Write it down and test it against His Word.",
     restOfDay: "Write down everything following Christ 'all the way' will cost you. Be painfully specific. Beside each cost, write 'He is worth it' — but only if you mean it. If you can't write it honestly for any item, spend extra time tonight praying over that one.",
     practicalActions: [
       "Make your honest 'cost of discipleship' list with specific items",
@@ -297,6 +309,7 @@ Receive His forgiveness. He is faithful and just. Not "faithful and understandin
       "If God played a highlight reel of my secret life, what would I be most ashamed of?",
       "What sin have I made peace with — stopped fighting and started accommodating?"
     ],
+    listeningFocus: "After you have confessed, be completely still. The Holy Spirit is not finished — He wants to bring hidden sins into the light that you have not yet seen or named. Sit as a student before the Divine Teacher. Do not defend yourself. Do not explain. Just listen. He may bring a memory, a pattern, a Scripture that exposes what darkness has concealed. Write down everything He reveals and confirm it by His Word.",
     restOfDay: "Write a thorough confession — everything. Hold nothing back. Read it aloud to God. If the Spirit leads and it is safe, confess to a trusted believer (James 5:16). For the rest of the day, walk in the freedom of confession. When shame whispers, respond: 'It is in the light. The blood covers it.'",
     practicalActions: [
       "Write a thorough, specific confession — hold nothing back",
@@ -335,6 +348,7 @@ Sign your death certificate today. Make it formal. Make it real.`,
       "How does formally declaring 'I am dead' change how I see tomorrow?",
       "What shifts when I truly believe I have died with Christ?"
     ],
+    listeningFocus: "Before you sign your death declaration, be still and listen. The Holy Spirit has a word to speak over this moment — a Scripture, a confirmation, a seal on what you are about to declare. Sit as a student before the Divine Teacher. This is not your declaration alone; He wants to co-sign it. Wait for what He brings to mind and write it down. His word over your death will anchor you in the days ahead.",
     restOfDay: "Write and sign your personal death certificate. Include: your name, today's date, cause of death (the cross of Christ), and a list of what is being buried. Read Galatians 2:20 aloud as your creed. Keep the certificate — you will reference it again.",
     practicalActions: [
       "Write and sign your personal death certificate",
@@ -375,6 +389,7 @@ Pray Luke 22:42 over each area of your life. Mean it. If you cannot mean it for 
       "If God said 'change everything,' what would I refuse to release?",
       "Can I honestly pray 'not my will' over my career, relationships, finances, and future?"
     ],
+    listeningFocus: "After you have laid your plans before God, stop talking and listen. The Holy Spirit wants to show you the difference between your plans and His. Sit as a student before the Divine Teacher. He may bring a Scripture that redirects you, an impression of a door He is opening that you have not considered, or a quiet knowing about a plan He wants you to release. Write down what He reveals — His plans are always confirmed by His Word.",
     restOfDay: "Write down your top 5 life plans. For each one, pray: 'Father, if this is not Your will, I release it completely.' Do one thing today that isn't in your plan but serves God's purposes.",
     practicalActions: [
       "List your top 5 life plans and pray the Gethsemane prayer over each",
@@ -409,6 +424,7 @@ Die to the need to be seen. Die to the need to be credited. Die to the need to b
       "Can I genuinely rejoice when someone else gets the recognition I wanted?",
       "What would change if I worked exclusively for an audience of One?"
     ],
+    listeningFocus: "Now be still. You have examined your ambitions — but the Holy Spirit sees motives you cannot. Sit as a student before the Divine Teacher and listen for where He says your ambition has been self-serving, even in ministry, even in good works. He may bring a specific memory, a conviction, or a Scripture that pierces through the spiritual disguise. Write down what He reveals. Do not perform in this moment — just receive.",
     restOfDay: "Do one excellent thing today and tell absolutely no one. Serve anonymously. Give without recognition. Watch how your flesh reacts to the absence of applause.",
     practicalActions: [
       "Test each ambition with the 'Would I do it anonymously?' question",
@@ -443,6 +459,7 @@ Confess your intellectual pride. Confess the times you used knowledge to feel su
       "Can I let someone be wrong without intervening — unless their soul is at stake?",
       "Would I rather be right or be righteous?"
     ],
+    listeningFocus: "Now close your mouth and open your ears. You are the student — the Holy Spirit is the Teacher. Today of all days, listen rather than teach. Ask Him to show you where your knowledge has puffed you up rather than built others up. Wait for His impression, His Scripture, His still small voice. He may convict you of a specific conversation, a pattern of correction, or an attitude you disguised as zeal for truth. Write down what He teaches you.",
     restOfDay: "In every conversation today, let someone else have the last word. If someone says something wrong, don't correct them unless it involves sin or genuine harm. Hold your tongue when you desperately want to prove your point.",
     practicalActions: [
       "Let others have the last word in every conversation today",
@@ -477,6 +494,7 @@ God works best when you stop working. His power flows through surrender, not man
       "What would happen if I truly let go of every outcome today?",
       "Do I believe God is sovereign, or do I believe He needs my help?"
     ],
+    listeningFocus: "With your fists unclenched, be still and listen. The Holy Spirit wants to speak to you about trust — not in theory, but in the specific situation you are gripping tightest. Sit as a student before the Divine Teacher. Listen for what He says about the outcome you are trying to manage. He may bring a Scripture of assurance, an impression of peace, or a word that redefines the situation entirely. Write down what He speaks and anchor it in His Word.",
     restOfDay: "Identify 3 situations you are currently trying to control. Physically open your clenched fists as you release each one. When anxiety about outcomes rises today, pray 'I trust You' instead of strategizing.",
     practicalActions: [
       "Name 3 situations you're trying to control and physically release them",
@@ -515,6 +533,7 @@ Today in the tomb, surrender your comfort. Tell your flesh: "You are not in char
       "If comfort were removed from my life completely, would my faith survive?",
       "What has my addiction to ease cost me spiritually?"
     ],
+    listeningFocus: "Now be still in the discomfort. Do not rush to relief. The Holy Spirit speaks most clearly when the flesh is uncomfortable and cannot distract you. Sit as a student before the Divine Teacher and listen for where He is calling you to embrace discomfort for the Kingdom — a specific act of obedience, a conversation you have avoided, a sacrifice He is requesting. Write down what He impresses upon you and confirm it by Scripture.",
     restOfDay: "Choose one act of intentional discomfort today — a cold shower, skipping a meal, sleeping on the floor, or giving up your most-used comfort. As you endure it, pray: 'My body does not rule me. Christ does.'",
     practicalActions: [
       "Choose and complete one act of intentional physical discomfort",
@@ -553,6 +572,7 @@ God may give your Isaac back — as He did for Abraham. Or He may not. Either wa
       "How would my walk with God change if this person were removed from my life?",
       "Can I honestly say 'God alone is enough' — or do I need God plus someone?"
     ],
+    listeningFocus: "After you have placed your Isaac on the altar, be still. The Holy Spirit wants to speak to you about His peace replacing your emotional reactions and relational dependencies. Sit as a student before the Divine Teacher. Listen for how He defines love differently than you have been defining it — not as clinging, but as open-handed blessing. He may bring a Scripture, a new perspective on a relationship, or a word of comfort. Write down what He speaks.",
     restOfDay: "After your meditation, spend time praying for the person you placed on the altar. Not clinging — blessing. Ask God to make Himself your primary attachment.",
     practicalActions: [
       "Identify your 'Isaac' — the person you cling to most — and pray the altar prayer",
@@ -589,6 +609,7 @@ Write your Last Will and Testament of the Old Man. Bequeath your self-will to th
       "What has two weeks of dying revealed about how alive my flesh really was?",
       "Can I say 'I have no will of my own' and mean it?"
     ],
+    listeningFocus: "Before you write your last will, be still and listen. The Holy Spirit wants to confirm this burial — to speak His word over the death of your self-will. Sit as a student before the Divine Teacher. Listen for His confirmation that the burial is real, not performative. He may bring a Scripture of assurance, an impression of finality, or a word that seals what two weeks of dying have accomplished. Write it down. His confirmation will sustain you.",
     restOfDay: "Write and sign your 'Last Will and Testament of the Old Man.' Review your death certificate from Day 7. Spend 20 minutes in silent surrender, asking for nothing — just yielding.",
     practicalActions: [
       "Write and sign your 'Last Will and Testament of the Old Man'",
@@ -627,6 +648,7 @@ Sit before God and ask: "Where has the world's system shaped me more than Your W
       "What would I reach for first if the world offered it — fame, money, beauty, power?",
       "If every worldly comfort were stripped away, what would be left of my faith?"
     ],
+    listeningFocus: "Now be still and listen. The Holy Spirit wants to show you the opinion that matters — His, not the crowd's. Sit as a student before the Divine Teacher. The world has been whispering its definitions of success, beauty, and worth into your ears for years. Now listen for His voice cutting through. He may bring a Scripture that redefines your value, an impression of who you truly are in Him, or a word that exposes a worldly belief you mistook for truth. Write it down.",
     restOfDay: "Fast from all social media, news, and entertainment for 24 hours. Each time you feel the pull, pray: 'The world is crucified to me. I am crucified to the world.'",
     practicalActions: [
       "Complete a 24-hour media fast — no social media, news, entertainment",
@@ -663,6 +685,7 @@ Where is your identity rooted? In the tomb, find out.`,
       "What image have I been protecting that is not the real me?",
       "What would I do differently if I truly didn't care what people thought?"
     ],
+    listeningFocus: "Now be still. You have been listening to the crowd your whole life — now listen to the One whose opinion actually matters. Sit as a student before the Holy Spirit, the Divine Teacher. Ask Him: 'What do You think of me?' and then wait. He may bring a Scripture of identity, an impression of how He sees you apart from your reputation, or a word that frees you from the audience. Write down what He says — His assessment is the only one that counts.",
     restOfDay: "Do something today that risks your reputation for the sake of obedience. Serve in a lowly position. Admit a weakness to someone who respects you. Let people see the real you.",
     practicalActions: [
       "Do one thing today that risks your reputation for Christ's sake",
@@ -701,6 +724,7 @@ In the tomb, you own nothing. Practice that reality today.`,
       "Am I a steward (holding for God) or an owner (clinging for myself)?",
       "If I lost everything material tonight, would I still say 'God is good'?"
     ],
+    listeningFocus: "Now be still and listen. The Holy Spirit wants to speak to you about treasure — where your real treasure is and what He wants to fill you with instead of material security. Sit as a student before the Divine Teacher. Listen for what He says about your relationship with money and possessions — not what you think, but what He reveals. He may bring a Scripture about provision, an impression of radical generosity, or a specific instruction about something He wants you to release. Write it down.",
     restOfDay: "Give away something valuable today — not something you don't need, but something that costs you. Feel the resistance. That resistance is the grip. Give until it hurts, then pray through the pain.",
     practicalActions: [
       "Give away something genuinely valuable to someone in need",
@@ -739,6 +763,7 @@ This may be the hardest meditation of the 30 days. Do not rush it. Some names wi
       "Is there someone I want to see punished rather than restored?",
       "How does holding this grudge affect my own relationship with God?"
     ],
+    listeningFocus: "After you have spoken the names and released the debts, be still. The Holy Spirit may have more names to surface — ones buried so deep you forgot them. Sit as a student before the Divine Teacher. Listen for His assessment of your digital life, your inner life, the places where bitterness has been hiding behind justified anger. He may bring a face to mind, a Scripture about freedom, or an impression of the weight He is lifting. Write down everything He reveals.",
     restOfDay: "Write every name and offense on paper. Tear it up or burn it as a physical act of release. For the rest of the day, when a grudge resurfaces, declare: 'That debt is canceled. I released it in the tomb.'",
     practicalActions: [
       "Write your complete forgiveness list — leave no one out",
@@ -777,6 +802,7 @@ Die to the need for human applause. Live for an audience of One.`,
       "What decisions have I made solely because of what people would think?",
       "What would change if God's 'well done' was the only approval I sought?"
     ],
+    listeningFocus: "Now be still. You have been performing for people — now sit before the only audience that matters. The Holy Spirit, your Divine Teacher, wants to give you a Kingdom identity that replaces the one the crowd has built for you. Listen for who He says you are when no one is watching. He may bring a Scripture of identity, an impression of freedom from approval, or a specific word about a relationship where you have been performing. Write it down — His identity for you is the only real one.",
     restOfDay: "Say 'no' to at least one request you would normally say 'yes' to out of people-pleasing. Let someone be disappointed in you today. Practice being honest instead of agreeable.",
     practicalActions: [
       "Identify your top 3 people-pleasing relationships",
@@ -815,6 +841,7 @@ In the tomb, fear has no power. You are dead. And the dead have nothing left to 
       "What has fear prevented me from doing that God has asked?",
       "If I truly feared only God, how different would my life look?"
     ],
+    listeningFocus: "Now be still in the place where your fears live. The Holy Spirit wants to speak directly to each fear — not with your logic, but with His Word. Sit as a student before the Divine Teacher. Listen for the Scripture He brings to mind for your specific fear, the impression of safety He places over your anxiety, the word of love that casts out the fear. Do not rush past this. Write down every Scripture and impression He gives — these are your weapons.",
     restOfDay: "Write your top 5 fears and find a Scripture that directly counters each one. Do one thing today that your fear has been preventing. Memorize one fear-destroying verse.",
     practicalActions: [
       "List your top 5 fears and find a counter-Scripture for each",
@@ -849,6 +876,7 @@ You are no longer a citizen of the world's kingdom. You are hidden with Christ i
       "What worldly attachment is still clinging even after three weeks?",
       "Can I genuinely say the world is dead to me?"
     ],
+    listeningFocus: "Before you write your divorce decree, be still and listen for the Holy Spirit's freedom declaration over you. Sit as a student before the Divine Teacher. Three weeks of dying have brought you here — and He has a word of release to speak. Listen for the Scripture He seals this moment with, the impression of freedom He places in your spirit, the declaration He makes over your separation from the world's system. Write it down. His freedom is permanent.",
     restOfDay: "Write and sign your 'Divorce Decree from the World.' Review your death certificate and last will from previous weeks. Spend 30 minutes in worship — not asking for anything, just glorifying God.",
     practicalActions: [
       "Write and sign your 'Divorce Decree from the World'",
@@ -891,6 +919,7 @@ This is the mystery of the gospel: death produces life. The tomb is not an endin
       "Am I afraid of the new person God is creating? Why?",
       "What is one thing the 'new me' would do that the old me never could?"
     ],
+    listeningFocus: "Now be still and listen for the new life the Holy Spirit is breathing into you. Something has shifted in the tomb — and He wants to name it. Sit as a student before the Divine Teacher. Listen for what He is building in the spaces where the old man died. He may bring a Scripture of new creation, an impression of who you are becoming, or a specific word about the first fruit of resurrection in your life. Write it down. This is the beginning of something new.",
     restOfDay: "Do one thing today that only the 'new you' would do — something the old man would never have attempted. Act from resurrection, not obligation.",
     practicalActions: [
       "Journal what 'newness of life' looks like specifically for you",
@@ -929,6 +958,7 @@ This is what Paul means by "walk" — step by step, moment by moment, in the Spi
       "What would change if I paused before every action and asked the Spirit first?",
       "Can I live in moment-by-moment sensitivity, or do I always revert to autopilot?"
     ],
+    listeningFocus: "Now practice what this entire day is about: listening for the Holy Spirit's guidance moment by moment. Be still. Ask Him one question: 'What is on Your agenda for me right now?' Then wait. Do not fill the silence. He is the Divine Teacher and you are the student learning to hear His voice in real time. He may impress a name, a task, a Scripture, or a direction. Write it down and obey it. This is the rhythm of Spirit-led living.",
     restOfDay: "Before every decision today — no matter how small — pause and ask: 'Holy Spirit, what do You want me to do?' Obey immediately. Journal every Spirit-prompt and whether you obeyed or resisted.",
     practicalActions: [
       "Ask the Holy Spirit for direction before EVERY decision today",
@@ -965,6 +995,7 @@ The strongest warrior in the Kingdom is not the one with no weaknesses. It is th
       "What would change if I stopped hiding my weakness and started offering it to God?",
       "Can I genuinely 'glory' in my weakness — thank God for it — or do I still resent it?"
     ],
+    listeningFocus: "Now be still and listen. The Holy Spirit wants to tell you who He says you are — not the weak version you are ashamed of, but the vessel through which His power flows. Sit as a student before the Divine Teacher. Listen for where He wants to manifest His strength through your specific weakness. He may bring a Scripture of sufficiency, an impression of power resting on your limitation, or a word about how He plans to use what you tried to hide. Write it down.",
     restOfDay: "Share a genuine weakness with a trusted person today. Not for sympathy — as testimony that God's power works through brokenness. When you feel inadequate, pray: 'Your strength is made perfect here.'",
     practicalActions: [
       "Share a genuine weakness with a trusted person",
@@ -1001,6 +1032,7 @@ You are becoming that person.`,
       "What area of my surrender could minister to someone struggling right now?",
       "Am I willing to be vulnerable about my tomb experience for someone else's freedom?"
     ],
+    listeningFocus: "Now be still and listen. The Holy Spirit wants to show you how He wants you to walk differently — and who He wants you to carry this death-life message to. Sit as a student before the Divine Teacher. Listen for a specific name, a face, a situation where your death can produce life in someone else. He may bring a Scripture of ministry, an impression of someone who needs your testimony, or a word about the power flowing through your surrender. Write down who He names.",
     restOfDay: "Share something the Death Chamber has taught you with someone who needs it. Encourage a fellow believer struggling with a specific area you've surrendered. Pray for someone by name.",
     practicalActions: [
       "Share a Death Chamber lesson with a fellow believer",
@@ -1039,6 +1071,7 @@ This is how you fight from now on. Not from fear. Not from desperation. From dea
       "How does fighting from a position of death change the entire battle?",
       "Can I genuinely say 'there is nothing you can threaten me with'?"
     ],
+    listeningFocus: "Now be still and listen. The Holy Spirit, the Divine Teacher, wants to show you which piece of armor you need most for the battles ahead. Sit as a student. Listen for the specific area of warfare He highlights — is it the belt of truth, the breastplate of righteousness, the shield of faith, the helmet of salvation, or the sword of the Spirit? He may bring an Ephesians 6 Scripture directly to mind or impress upon you the exact vulnerability the enemy has been exploiting. Write it down.",
     restOfDay: "Identify the area where the enemy attacks you most. Confront it from your position of death: 'I am dead. You cannot threaten a dead man. Christ in me is your opponent, not my flesh.' Pray warfare prayers from this position.",
     practicalActions: [
       "Identify your primary spiritual battleground",
@@ -1077,6 +1110,7 @@ Sit in gratitude today. Not striving. Not performing. Just grateful. Thank God f
       "What area still needs more dying before fruit can grow?",
       "Can I rest in God's fruitfulness rather than manufacturing my own?"
     ],
+    listeningFocus: "Now be still and listen. The Holy Spirit wants to show you who He wants you to pray for — not out of obligation, but out of the overflow of resurrection life. Sit as a student before the Divine Teacher. Listen for names, faces, or situations He lays on your heart. He may bring a Scripture of intercession, an impression of someone carrying a burden, or a specific prayer request He wants you to take up. Write down every name and every impression. Intercession from the tomb carries power.",
     restOfDay: "Journal all the changes — internal and external — from the past 27 days. Ask a trusted person if they've noticed changes. Thank God specifically for each piece of fruit.",
     practicalActions: [
       "Journal all changes — internal and external — from 27 days in the tomb",
@@ -1113,6 +1147,7 @@ Are you willing to be that vulnerable? Are you willing to let others see what st
       "Who in my life do I trust enough to help me see my blind spots?",
       "Am I willing to be vulnerable enough to let others unwrap me?"
     ],
+    listeningFocus: "Now be still and listen. The Holy Spirit wants to give you His assessment of your 30-day journey — what has truly died, what still clings, and what He is pleased with. Sit as a student before the Divine Teacher. This is not your self-evaluation; it is His. Listen for the honest, loving truth He speaks — a Scripture of encouragement, an impression of what remains to be unwrapped, a word of affirmation for the death you have endured. Write down His full assessment.",
     restOfDay: "Ask a trusted friend or accountability partner to identify grave clothes they still see in you. Create an accountability plan for the patterns that remain. Be willing to hear hard truth.",
     practicalActions: [
       "List the old patterns that still cling despite transformation",
@@ -1153,6 +1188,7 @@ This is your Daily Death Protocol. Practice it right now. And commit to it for t
       "How will I prevent the old man from slowly resurrecting over weeks and months?",
       "Am I committed to dying daily, or was this a temporary experiment?"
     ],
+    listeningFocus: "Now be still and listen one more time as a student in the classroom. The Holy Spirit, your Divine Teacher, has walked with you for 29 days. He has a final inspection word — not condemnation, but commissioning. Listen for His assessment of your readiness: are you truly dead? Are you truly alive? He may bring a Scripture that defines your next season, an impression of the daily rhythm He wants with you, or a word about what daily death will look like going forward. Write it all down.",
     restOfDay: "Write your personal 'Daily Death Protocol' in detail. Practice it today. Show it to an accountability partner. Commit to it going forward.",
     practicalActions: [
       "Write your personal 'Daily Death Protocol' for ongoing daily use",
@@ -1197,6 +1233,7 @@ The tomb is empty. Christ lives in you. Go fight as one who has already died. Th
       "What has risen that did not exist before?",
       "How will I carry the tomb with me — not as a memory, but as a daily reality?"
     ],
+    listeningFocus: "For the final time in this program, be still and listen. The Holy Spirit has a commissioning word over your life — a word for the person walking out of the tomb. Sit as a student before the Divine Teacher one last time. Listen for His sending word: the Scripture He seals your journey with, the impression of purpose He places on your new life, the specific calling or direction He speaks over you as you emerge. Write it down carefully. This is His word over your resurrection. Carry it with you always.",
     restOfDay: "Read and sign the Completion Covenant. Share your journey with your Tomb Space group or a trusted friend. Declare Romans 8:11 over your life. Then step out of the tomb — and fight.",
     practicalActions: [
       "Read and sign the Completion Covenant",
