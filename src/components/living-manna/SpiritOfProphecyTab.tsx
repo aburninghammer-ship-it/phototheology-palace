@@ -465,6 +465,12 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   const [gcTag, setGcTag] = useState<GCConflictTagType | null>(null);
   const [loadingGcTag, setLoadingGcTag] = useState(false);
 
+  // Read-aloud state (plain text, no commentary)
+  const [readAloudActive, setReadAloudActive] = useState(false);
+  const readAloudSectionsRef = useRef<string[]>([]);
+  const readAloudIdxRef = useRef(0);
+  const readAloudSpeakRef = useRef<((text: string) => Promise<void>) | null>(null);
+
   // Cross-reference state
   const [crossRefs, setCrossRefs] = useState<Record<number, { reference: string; text: string; connection: string }[]>>({});
   const [loadingCrossRef, setLoadingCrossRef] = useState<number | null>(null);
@@ -490,7 +496,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
     setCurrentSection(idx);
   }, []);
 
-  // OpenAI TTS hook
+  // OpenAI TTS hook (for commentary)
   const {
     speak: ttsSpeak,
     stop: ttsStop,
@@ -508,7 +514,6 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
         const nextIdx = idx + 1;
         updateCurrentSection(nextIdx);
         ttsSpeakRef.current?.(sections[nextIdx]);
-        // Preload the section after next for seamless flow
         if (nextIdx + 1 < sections.length) {
           ttsPreloadRef.current?.(sections[nextIdx + 1]);
         }
@@ -517,6 +522,56 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
       }
     },
   });
+
+  // Read-aloud TTS hook (plain text reading, no commentary)
+  const {
+    speak: readAloudSpeak,
+    stop: readAloudStop,
+    preload: readAloudPreload,
+    isLoading: readAloudLoading,
+    isPlaying: readAloudPlaying,
+    selectedVoice: readAloudVoice,
+    setSelectedVoice: setReadAloudVoice,
+  } = useTextToSpeechEnhanced({
+    defaultVoice: 'nova',
+    onEnd: () => {
+      const idx = readAloudIdxRef.current;
+      const sections = readAloudSectionsRef.current;
+      if (readAloudActive && idx < sections.length - 1) {
+        const nextIdx = idx + 1;
+        readAloudIdxRef.current = nextIdx;
+        setReadAloudActive(true); // keep state fresh
+        readAloudSpeakRef.current?.(sections[nextIdx]);
+        if (nextIdx + 1 < sections.length) {
+          readAloudPreload(sections[nextIdx + 1]);
+        }
+      } else {
+        setReadAloudActive(false);
+      }
+    },
+  });
+  readAloudSpeakRef.current = readAloudSpeak;
+
+  const startReadAloud = useCallback(() => {
+    if (chapterParagraphs.length === 0) return;
+    // Stop commentary if playing
+    ttsStop();
+    autoAdvancingRef.current = false;
+    // Set up sections & start
+    readAloudSectionsRef.current = chapterParagraphs;
+    readAloudIdxRef.current = 0;
+    setReadAloudActive(true);
+    readAloudSpeak(chapterParagraphs[0]);
+    if (chapterParagraphs.length > 1) {
+      readAloudPreload(chapterParagraphs[1]);
+    }
+  }, [chapterParagraphs, readAloudSpeak, readAloudPreload, ttsStop]);
+
+  const stopReadAloud = useCallback(() => {
+    readAloudStop();
+    setReadAloudActive(false);
+    readAloudIdxRef.current = 0;
+  }, [readAloudStop]);
 
   // Keep speak ref updated
   ttsSpeakRef.current = ttsSpeak;
@@ -1127,15 +1182,39 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
             </Card>
           ) : (
             <>
-              {/* Elegant instruction banner */}
-              <div className="glass-card rounded-xl px-4 py-3 flex items-center gap-3 border border-primary/20">
-                <div className="p-1.5 rounded-lg bg-primary/10">
-                  <Telescope className="h-4 w-4 text-primary" />
+              {/* Read Aloud + Instruction banner */}
+              <div className="flex items-center gap-2">
+                <div className="glass-card rounded-xl px-4 py-3 flex items-center gap-3 border border-primary/20 flex-1">
+                  <div className="p-1.5 rounded-lg bg-primary/10">
+                    <Telescope className="h-4 w-4 text-primary" />
+                  </div>
+                  <p className="text-xs text-foreground/70">
+                    <span className="text-primary font-medium">Tap any paragraph</span> to analyze • 
+                    <span className="text-amber-400 font-medium"> Cross-Ref</span> reveals Scripture
+                  </p>
                 </div>
-                <p className="text-xs text-foreground/70">
-                  <span className="text-primary font-medium">Tap any paragraph</span> to analyze through a Palace room • 
-                  <span className="text-amber-400 font-medium"> Cross-Ref</span> reveals Scripture connections
-                </p>
+                {readAloudPlaying || readAloudLoading ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={stopReadAloud}
+                    className="gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10 shrink-0"
+                  >
+                    <Square className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Stop</span>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={startReadAloud}
+                    disabled={chapterParagraphs.length === 0}
+                    className="gap-1.5 shrink-0"
+                  >
+                    <Volume2 className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Read Aloud</span>
+                  </Button>
+                )}
               </div>
 
               {/* Reader container with book styling */}

@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { isOnline } from '@/services/offlineAudioCache';
+import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from '@/lib/mediaSessionHelper';
 
 // Available Speechify voices
 export const OPENAI_VOICES = [
@@ -203,6 +204,7 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
     speechSynthesis.cancel();
 
     setIsPlaying(false);
+    updateMediaSessionPlaybackState('none');
     // NOTE: Do NOT call onEndRef here - onEnd should only fire when audio
     // naturally completes, not when manually stopped. Calling it here causes
     // infinite loops when speak() calls stop() to clear previous audio.
@@ -321,6 +323,7 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
       audio.onended = () => {
         setIsPlaying(false);
         if (isBlobUrl) URL.revokeObjectURL(preloadedUrl);
+        updateMediaSessionPlaybackState('none');
         onEndRef.current?.();
       };
       audio.onerror = (e) => {
@@ -430,6 +433,7 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
       audio.onended = () => {
         console.log('[TTS Enhanced] Audio ended naturally');
         setIsPlaying(false);
+        updateMediaSessionPlaybackState('none');
         if (isBlobUrl) {
           URL.revokeObjectURL(audioUrl);
         }
@@ -456,6 +460,16 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
       setCurrentMode('openai');
       setIsPlaying(true);
       onStartRef.current?.();
+
+      // Register MediaSession for lock-screen / background playback on mobile
+      setupMediaSession({
+        title: 'Phototheology Audio',
+        artist: 'Phototheology Palace',
+        album: 'PT Audio',
+        onPlay: () => { audio.play(); updateMediaSessionPlaybackState('playing'); },
+        onPause: () => { audio.pause(); updateMediaSessionPlaybackState('paused'); },
+      });
+      updateMediaSessionPlaybackState('playing');
 
     } catch (error) {
       if (timeoutId) clearTimeout(timeoutId);
