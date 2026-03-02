@@ -36,7 +36,7 @@ interface WarCollegeTrackViewProps {
 export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { completeItem, isItemCompleted } = useAATSProgress();
+  const { completeItem, isItemCompleted, getMaxUnlockedDay } = useAATSProgress();
   const [selectedDay, setSelectedDay] = useState<WarCollegeDay | null>(null);
   const [generating, setGenerating] = useState(false);
   const opponent = DEFENSE_OPPONENTS.find((o) => o.id === track.avatarId);
@@ -62,12 +62,14 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
     return set;
   }, [track.avatarId, isItemCompleted, track.totalDays]);
 
+  const maxDay = useMemo(() => getMaxUnlockedDay(track.avatarId), [getMaxUnlockedDay, track.avatarId]);
+
   const nextDay = useMemo(() => {
-    for (let d = 1; d <= track.totalDays; d++) {
+    for (let d = 1; d <= Math.min(maxDay, track.totalDays); d++) {
       if (!completedDays.has(d)) return d;
     }
-    return track.totalDays;
-  }, [completedDays, track.totalDays]);
+    return Math.min(maxDay, track.totalDays);
+  }, [completedDays, maxDay, track.totalDays]);
 
   const handleOpenDay = async (dayNumber: number) => {
     setGenerating(true);
@@ -191,7 +193,7 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
           trackTitle={track.title}
           avatarId={track.avatarId}
           avatarName={track.avatarName}
-          maxUnlockedDay={nextDay}
+          maxUnlockedDay={maxDay}
           totalDays={track.totalDays}
           completedDays={completedDays}
           onLoadDay={async (dayNumber) => {
@@ -284,7 +286,7 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
                 {days.map((d) => {
                   const done = completedDays.has(d);
                   const isNext = d === nextDay;
-                  const isUnlocked = done || d <= nextDay;
+                  const isUnlocked = done || d <= maxDay;
 
                   return (
                     <motion.button

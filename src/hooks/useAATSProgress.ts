@@ -140,6 +140,22 @@ export function useAATSProgress() {
     [progressMap],
   );
 
+  /** Get the max unlocked day based on calendar days since the user started the track */
+  const getMaxUnlockedDay = useCallback(
+    (avatarId: string): number => {
+      const rec = progressMap[avatarId];
+      if (!rec) return 1; // no record yet — only Day 1 available
+      const startedAt = new Date(rec.started_at);
+      const now = new Date();
+      // Use calendar-day difference (midnight-to-midnight)
+      const startDay = new Date(startedAt.getFullYear(), startedAt.getMonth(), startedAt.getDate());
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const elapsed = Math.floor((today.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
+      return Math.min(elapsed + 1, 56);
+    },
+    [progressMap],
+  );
+
   return {
     progressMap,
     loading,
@@ -148,6 +164,7 @@ export function useAATSProgress() {
     getPhaseProgress,
     getOverallProgress,
     getAvatarProgress,
+    getMaxUnlockedDay,
     reload: loadAll,
   };
 }
