@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll, Loader2, GraduationCap, Dumbbell, Swords, Calendar, User } from "lucide-react";
+import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll, Loader2, GraduationCap, Dumbbell, Swords, Calendar, User, Skull } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +22,7 @@ import { CharacteristicTracker } from "@/components/dojo/CharacteristicTracker";
 import { WarriorProfile } from "@/components/dojo/WarriorProfile";
 import { CombatArena } from "@/components/dojo/CombatArena";
 import { DailyTraining } from "@/components/dojo/DailyTraining";
+import { DeathChamber } from "@/components/dojo/DeathChamber";
 
 const FRUITS_OF_SPIRIT = [
   { name: "Love", description: "Selfless care for others", color: "bg-red-500" },
@@ -525,6 +526,10 @@ export default function SpiritualTraining() {
                 <Sword className="w-4 h-4 mr-2" />
                 {t('training.spiritual.weapons')}
               </TabsTrigger>
+              <TabsTrigger value="death-chamber" className="flex-1">
+                <Skull className="w-4 h-4 mr-2" />
+                Death Chamber
+              </TabsTrigger>
             </TabsList>
           </ScrollArea>
 
@@ -908,6 +913,11 @@ export default function SpiritualTraining() {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          {/* Death Chamber Tab */}
+          <TabsContent value="death-chamber" className="space-y-4">
+            <DeathChamber />
           </TabsContent>
         </Tabs>
 
