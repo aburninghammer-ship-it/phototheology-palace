@@ -151,7 +151,7 @@ export function useAATSProgress() {
       const startDay = new Date(startedAt.getFullYear(), startedAt.getMonth(), startedAt.getDate());
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const elapsed = Math.floor((today.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
-      return Math.min(elapsed + 1, 56);
+      return Math.min(elapsed + 1, 40);
     },
     [progressMap],
   );

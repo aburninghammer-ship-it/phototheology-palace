@@ -305,7 +305,7 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
           <div>
             <h3 className="text-lg font-semibold mb-1 flex items-center gap-2">
               <GraduationCap className="h-5 w-5 text-primary" />
-              War College — 56-Day Formation
+              War College — 40-Day Formation
             </h3>
             <p className="text-xs text-muted-foreground">
               Ultra-immersive strategic manuscripts for every opponent. 25–30 minute deep studies that train the mind like a War College reading assignment.
@@ -474,7 +474,7 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
               <div>
                 <p className="text-sm font-semibold">Looking for Audio Playlist?</p>
                 <p className="text-xs text-muted-foreground">
-                  Open this avatar’s 56-day War College track to use Add Current Week / Add All Unlocked.
+                  Open this avatar’s 40-day War College track to use Add Current Week / Add All Unlocked.
                 </p>
               </div>
               <Button
@@ -566,22 +566,22 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
           })}
         </div>
 
-        {/* ─── 56-Day War College Manuscripts ─── */}
+        {/* ─── 40-Day War College Manuscripts ─── */}
         <div className="space-y-3">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <GraduationCap className="h-5 w-5 text-primary" />
-            Daily Manuscripts — 56-Day War College
+            Daily Manuscripts — 40-Day War College
           </h3>
           <p className="text-xs text-muted-foreground">
             Each day has a full in-depth strategic manuscript (25–30 min). Generated on first access, then cached for instant replay.
           </p>
           {(() => {
             const maxDay = getMaxUnlockedDay(selectedTraining.avatarId);
-            return Array.from({ length: 8 }, (_, wIdx) => {
+            return Array.from({ length: 6 }, (_, wIdx) => {
             const week = wIdx + 1;
             const rank = getRankForDay((week - 1) * 7 + 1);
             const ri = RANK_CONFIG[rank];
-            const days = Array.from({ length: 7 }, (_, d) => (week - 1) * 7 + d + 1).filter(d => d <= 56);
+            const days = Array.from({ length: 7 }, (_, d) => (week - 1) * 7 + d + 1).filter(d => d <= 40);
             const weekCompleted = days.filter(d => isItemCompleted(selectedTraining.avatarId, `wc-day-${d}`)).length;
             return (
               <div key={week}>
@@ -1003,7 +1003,7 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
           <Card className="border-primary/30 bg-primary/5">
             <CardContent className="p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-muted-foreground">
-                Need the playlist? Open this avatar’s 56-day War College track.
+                Need the playlist? Open this avatar’s 40-day War College track.
               </p>
               <Button
                 variant="outline"

@@ -1,5 +1,5 @@
 // ─── War College Track View ─────────────────────────────────────────────────
-// Shows the 56-day journey for a specific avatar's War College track.
+// Shows the 40-day journey for a specific avatar's War College track.
 // ALL days are AI-generated on demand. No pre-built manuscripts.
 
 import { useState, useMemo } from "react";
@@ -44,7 +44,8 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
   // Group days into weeks
   const weeks = useMemo(() => {
     const w: { week: number; rank: WarCollegeRank; days: number[] }[] = [];
-    for (let wk = 1; wk <= 8; wk++) {
+    const totalWeeks = Math.ceil(track.totalDays / 7);
+    for (let wk = 1; wk <= totalWeeks; wk++) {
       const days: number[] = [];
       for (let d = (wk - 1) * 7 + 1; d <= Math.min(wk * 7, track.totalDays); d++) {
         days.push(d);
