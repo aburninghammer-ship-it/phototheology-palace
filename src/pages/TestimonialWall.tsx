@@ -111,8 +111,8 @@ const TestimonialWall = () => {
   const fetchData = useCallback(async () => {
     try {
       const [tRes, rRes] = await Promise.all([
-        supabase.from("testimonials").select("*").eq("is_approved", true).order("created_at", { ascending: false }),
-        supabase.from("testimonial_reactions").select("testimonial_id, reaction, user_id"),
+        (supabase as any).from("testimonials").select("*").eq("is_approved", true).order("created_at", { ascending: false }),
+        (supabase as any).from("testimonial_reactions").select("testimonial_id, reaction, user_id"),
       ]);
       if (tRes.data) setDbTestimonials(tRes.data as Testimonial[]);
       if (rRes.data) setReactions(rRes.data as ReactionRow[]);
@@ -157,7 +157,7 @@ const TestimonialWall = () => {
         .eq("id", user.id)
         .single();
 
-      const { error } = await supabase.from("testimonials").insert({
+      const { error } = await (supabase as any).from("testimonials").insert({
         user_id: user.id,
         display_name: profile.data?.display_name || user.email?.split("@")[0] || "Anonymous",
         avatar_url: profile.data?.avatar_url || null,
@@ -183,21 +183,21 @@ const TestimonialWall = () => {
       (r) => r.testimonial_id === testimonialId && r.user_id === user.id && r.reaction === reactionKey,
     );
     if (existing) {
-      await supabase
+      await (supabase as any)
         .from("testimonial_reactions")
         .delete()
         .eq("testimonial_id", testimonialId)
         .eq("user_id", user.id)
         .eq("reaction", reactionKey);
     } else {
-      await supabase.from("testimonial_reactions").insert({
+      await (supabase as any).from("testimonial_reactions").insert({
         testimonial_id: testimonialId,
         user_id: user.id,
         reaction: reactionKey,
       });
     }
     // Optimistic refresh
-    const { data } = await supabase.from("testimonial_reactions").select("testimonial_id, reaction, user_id");
+    const { data } = await (supabase as any).from("testimonial_reactions").select("testimonial_id, reaction, user_id");
     if (data) setReactions(data as ReactionRow[]);
   };
 
