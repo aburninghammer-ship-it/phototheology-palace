@@ -10,9 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Skull, CheckCircle2, ArrowLeft, Trophy, Users, Plus, LogIn,
+  CheckCircle2, ArrowLeft, Trophy, Users, Plus, LogIn,
   Send, Heart, Flame, BookOpen, MessageSquare, Copy, Check,
-  AlertTriangle, Lock, ChevronDown, ChevronUp, HandHeart
+  AlertTriangle, Lock, ChevronDown, ChevronUp, HandHeart, Landmark
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -416,7 +416,7 @@ export const DeathChamber = () => {
           className="text-center space-y-4"
         >
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-gray-900 to-black border-2 border-gray-600 mx-auto">
-            <Skull className="w-10 h-10 text-gray-300" />
+            <Landmark className="w-10 h-10 text-gray-300" />
           </div>
           <h1 className="text-4xl font-bold text-foreground">{DEATH_CHAMBER_WELCOME.title}</h1>
           <p className="text-lg text-muted-foreground italic">{DEATH_CHAMBER_WELCOME.subtitle}</p>
@@ -458,7 +458,7 @@ export const DeathChamber = () => {
               className="w-full bg-gray-800 hover:bg-gray-700 text-white"
               size="lg"
             >
-              <Skull className="w-4 h-4 mr-2" />
+              <Landmark className="w-4 h-4 mr-2" />
               Enter the Death Chamber
             </Button>
           </CardContent>
@@ -503,7 +503,7 @@ export const DeathChamber = () => {
             <CardHeader>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center">
-                  <Skull className="w-6 h-6 text-gray-300" />
+                  <Landmark className="w-6 h-6 text-gray-300" />
                 </div>
                 <div>
                   <CardTitle className="text-lg">Solo — Enter Alone</CardTitle>
@@ -658,7 +658,7 @@ export const DeathChamber = () => {
                 className="w-full bg-gray-800 hover:bg-gray-700"
                 size="lg"
               >
-                <Skull className="w-4 h-4 mr-2" />
+                <Landmark className="w-4 h-4 mr-2" />
                 Begin the 30-Day Death Chamber
               </Button>
             )}
@@ -993,7 +993,7 @@ export const DeathChamber = () => {
           {/* Surrender Exercise */}
           <div className="bg-red-950/10 border border-red-900/20 rounded-lg p-4 space-y-3">
             <h4 className="text-sm font-semibold flex items-center gap-2">
-              <Skull className="w-4 h-4 text-red-400" />
+              <Landmark className="w-4 h-4 text-red-400" />
               Surrender Exercise
             </h4>
             <p className="text-sm">{currentDayData.surrenderExercise}</p>

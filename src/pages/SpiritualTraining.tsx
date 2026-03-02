@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll, Loader2, GraduationCap, Dumbbell, Swords, Calendar, User, Skull } from "lucide-react";
+import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll, Loader2, GraduationCap, Dumbbell, Swords, Calendar, User, Landmark } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -527,7 +527,7 @@ export default function SpiritualTraining() {
                 {t('training.spiritual.weapons')}
               </TabsTrigger>
               <TabsTrigger value="death-chamber" className="flex-1">
-                <Skull className="w-4 h-4 mr-2" />
+                <Landmark className="w-4 h-4 mr-2" />
                 Death Chamber
               </TabsTrigger>
             </TabsList>
