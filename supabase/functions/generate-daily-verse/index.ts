@@ -348,6 +348,20 @@ For EACH room, provide a JSON object with:
 - key_insight: One striking insight revealed through this lens
 - practical_takeaway: One actionable application for daily life
 
+═══════════════════════════════════════════════════════════════
+⚠️ SPECIAL RULE FOR GEMS ROOM (GR) — CRITICAL ⚠️
+═══════════════════════════════════════════════════════════════
+If "GR" (Gems Room) is one of your assigned rooms, do NOT simply apply the daily verse.
+Instead, the Gems Room produces a GEM: select 2-3 seemingly UNRELATED verses from different books of the Bible (NOT the daily verse itself) and reveal a powerful, unexpected connection between them — a hidden thread that ties them together and points to Christ.
+
+For the GR entry:
+- "application": State the 2-3 verses you chose (with full references), then explain the hidden connection that unites them into a single striking insight.
+- "key_insight": The gem itself — the surprising theological thread revealed.
+- "practical_takeaway": How this hidden connection deepens the believer's understanding or walk with Christ.
+
+The gem must feel like a discovery — not an obvious cross-reference. Think: verses from different genres, eras, and contexts that share a buried link only visible through careful study.
+═══════════════════════════════════════════════════════════════
+
 Also identify the verse_genre using Connect-6: Gospel, Law, History, Poetry, Prophecy, or Epistle.
 
 Return ONLY valid JSON in this format:
