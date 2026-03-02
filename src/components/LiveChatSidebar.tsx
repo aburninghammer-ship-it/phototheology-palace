@@ -81,6 +81,7 @@ function MessageBubble({
       className={`group flex gap-2.5 ${isOwn ? 'flex-row-reverse' : ''}`}
       onMouseEnter={() => setShowReactions(true)}
       onMouseLeave={() => setShowReactions(false)}
+      onTouchStart={() => setShowReactions(prev => !prev)}
     >
       {!isOwn && (
         <Avatar className="h-9 w-9 shrink-0 ring-2 ring-primary/20 ring-offset-1 ring-offset-background">
