@@ -966,7 +966,7 @@ export const DeathChamber = () => {
         </CardContent>
       </Card>
 
-      {/* Today's Challenge */}
+      {/* Day Header */}
       <Card className="border-gray-700 bg-gradient-to-b from-gray-950/30 to-background">
         <CardHeader>
           <div className="space-y-2">
@@ -977,44 +977,53 @@ export const DeathChamber = () => {
             <CardTitle className="text-xl">{currentDayData.title}</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent>
           {/* Scripture */}
           <div className="bg-muted/50 border border-border rounded-lg p-4">
             <p className="text-xs font-semibold text-muted-foreground mb-1">{currentDayData.scripture}</p>
             <p className="text-sm italic">"{currentDayData.scriptureText}"</p>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Instruction */}
-          <div>
-            <h4 className="text-sm font-semibold mb-2">Today's Instruction</h4>
-            <p className="text-sm leading-relaxed">{currentDayData.instruction}</p>
+      {/* PRIMARY: Tomb Meditation (15+ minutes) */}
+      <Card className="border-2 border-primary/30 bg-gradient-to-b from-gray-950/50 to-background">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+              <Landmark className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Tomb Meditation</CardTitle>
+              <CardDescription>At least 15 minutes. This is the heart of the Death Chamber.</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="prose prose-sm dark:prose-invert max-w-none">
+            <p className="text-sm leading-relaxed whitespace-pre-line">{currentDayData.tombMeditation}</p>
           </div>
 
-          {/* Surrender Exercise */}
-          <div className="bg-red-950/10 border border-red-900/20 rounded-lg p-4 space-y-3">
-            <h4 className="text-sm font-semibold flex items-center gap-2">
-              <Landmark className="w-4 h-4 text-red-400" />
-              Surrender Exercise
+          {/* Confession Focus */}
+          <div className="bg-red-950/10 border border-red-900/20 rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-semibold flex items-center gap-2 text-red-300">
+              <Landmark className="w-4 h-4" />
+              What to Confess
             </h4>
-            <p className="text-sm">{currentDayData.surrenderExercise}</p>
+            <p className="text-sm leading-relaxed">{currentDayData.confessionFocus}</p>
+          </div>
+
+          {/* Meditation Prompts */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold">Sit with These Questions Before God:</h4>
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground">Practical Actions:</p>
-              {currentDayData.practicalActions.map((action, i) => (
-                <div key={i} className="flex gap-2 items-start">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                  <p className="text-xs">{action}</p>
+              {currentDayData.meditationPrompts.map((prompt, i) => (
+                <div key={i} className="flex gap-3 items-start bg-muted/30 rounded-lg p-3">
+                  <span className="text-primary font-mono text-xs mt-0.5">{i + 1}.</span>
+                  <p className="text-sm italic">{prompt}</p>
                 </div>
               ))}
             </div>
-            <label className="flex items-center gap-2 cursor-pointer pt-1">
-              <input
-                type="checkbox"
-                checked={surrenderDone}
-                onChange={(e) => setSurrenderDone(e.target.checked)}
-                className="rounded border-gray-600"
-              />
-              <span className="text-sm">I have completed the surrender exercise</span>
-            </label>
           </div>
 
           {/* Tomb Affirmation */}
@@ -1023,17 +1032,51 @@ export const DeathChamber = () => {
             <p className="text-sm font-semibold italic text-gray-300">"{currentDayData.tombAffirmation}"</p>
           </div>
 
-          {/* Reflection */}
-          <div>
-            <h4 className="text-sm font-semibold mb-1">Your Reflection</h4>
-            <p className="text-xs text-muted-foreground mb-2 italic">{currentDayData.reflectionPrompt}</p>
-            <Textarea
-              value={reflection}
-              onChange={(e) => setReflection(e.target.value)}
-              placeholder="Write your honest reflection here..."
-              className="min-h-[120px]"
+          <label className="flex items-center gap-2 cursor-pointer pt-1 border-t border-border pt-3">
+            <input
+              type="checkbox"
+              checked={surrenderDone}
+              onChange={(e) => setSurrenderDone(e.target.checked)}
+              className="rounded border-gray-600"
             />
+            <span className="text-sm">I have completed my meditation time (15+ minutes)</span>
+          </label>
+        </CardContent>
+      </Card>
+
+      {/* SECONDARY: Rest of Day Instructions */}
+      <Card className="border-gray-800">
+        <CardHeader>
+          <CardTitle className="text-base">For the Rest of Your Day</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm leading-relaxed">{currentDayData.restOfDay}</p>
+
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground">Practical Actions:</p>
+            {currentDayData.practicalActions.map((action, i) => (
+              <div key={i} className="flex gap-2 items-start">
+                <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                <p className="text-xs">{action}</p>
+              </div>
+            ))}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Reflection */}
+      <Card className="border-gray-800">
+        <CardHeader>
+          <CardTitle className="text-base">Your Reflection</CardTitle>
+          <CardDescription className="italic">{currentDayData.reflectionPrompt}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea
+            value={reflection}
+            onChange={(e) => setReflection(e.target.value)}
+            placeholder="Write your honest reflection here..."
+            className="min-h-[120px]"
+          />
 
           <Button
             onClick={handleCompleteDay}
