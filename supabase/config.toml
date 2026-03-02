@@ -300,3 +300,6 @@ verify_jwt = true
 
 [functions.get-subscriber-stats]
 verify_jwt = false
+
+[functions.get-pdf-purchases]
+verify_jwt = false

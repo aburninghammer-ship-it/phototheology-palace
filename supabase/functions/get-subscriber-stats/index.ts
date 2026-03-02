@@ -132,17 +132,22 @@ serve(async (req) => {
       throw new Error("Authorization required");
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Create user-context client for auth verification
+    const supabaseAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const userClient = createClient(supabaseUrl, supabaseAnon, {
+      global: { headers: { Authorization: authHeader } },
+    });
 
-    // Verify user via auth header
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      logStep("Auth failed", { error: authError?.message });
+    const { data: claimsData, error: claimsError } = await userClient.auth.getUser(token);
+    if (claimsError || !claimsData?.user) {
+      logStep("Auth failed", { error: claimsError?.message });
       throw new Error("Invalid authorization");
     }
 
-    const userId = user.id;
+    const userId = claimsData.user.id;
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Check if user is admin (using admin_users table)
     const { data: adminCheck } = await supabase
