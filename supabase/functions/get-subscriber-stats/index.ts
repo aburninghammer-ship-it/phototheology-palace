@@ -136,12 +136,7 @@ serve(async (req) => {
 
     // Verify user via auth header
     const token = authHeader.replace("Bearer ", "");
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
-
-    const { data: { user }, error: authError } = await userClient.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
       logStep("Auth failed", { error: authError?.message });
       throw new Error("Invalid authorization");
