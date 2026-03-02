@@ -133,7 +133,7 @@ export const DeathChamber = () => {
 
   const fetchProgress = async () => {
     if (!userId) return;
-    const query = supabase
+    const query = (supabase as any)
       .from('death_chamber_progress')
       .select('day_number, completed_at, reflection')
       .eq('user_id', userId)
@@ -174,7 +174,7 @@ export const DeathChamber = () => {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('death_chamber_progress')
         .insert({
           user_id: userId,
@@ -189,7 +189,7 @@ export const DeathChamber = () => {
 
       // Update group member progress
       if (groupInfo?.id) {
-        await supabase
+        await (supabase as any)
           .from('death_chamber_group_members')
           .update({ days_completed: progress.length + 1 })
           .eq('group_id', groupInfo.id)
@@ -227,7 +227,7 @@ export const DeathChamber = () => {
     setIsLoading(true);
     try {
       const roomCode = generateRoomCode();
-      const { data: group, error: groupError } = await supabase
+      const { data: group, error: groupError } = await (supabase as any)
         .from('death_chamber_groups')
         .insert({
           name: groupName.trim(),
@@ -240,7 +240,7 @@ export const DeathChamber = () => {
       if (groupError) throw groupError;
 
       // Add creator as first member
-      await supabase.from('death_chamber_group_members').insert({
+      await (supabase as any).from('death_chamber_group_members').insert({
         group_id: group.id,
         user_id: userId,
         display_name: userProfile.display_name || 'Anonymous',
@@ -266,7 +266,7 @@ export const DeathChamber = () => {
 
     setIsLoading(true);
     try {
-      const { data: group, error: groupError } = await supabase
+      const { data: group, error: groupError } = await (supabase as any)
         .from('death_chamber_groups')
         .select('*')
         .eq('room_code', joinCode.trim().toUpperCase())
@@ -279,7 +279,7 @@ export const DeathChamber = () => {
       }
 
       // Check if already a member
-      const { data: existing } = await supabase
+      const { data: existing } = await (supabase as any)
         .from('death_chamber_group_members')
         .select('id')
         .eq('group_id', group.id)
@@ -287,7 +287,7 @@ export const DeathChamber = () => {
         .single();
 
       if (!existing) {
-        await supabase.from('death_chamber_group_members').insert({
+        await (supabase as any).from('death_chamber_group_members').insert({
           group_id: group.id,
           user_id: userId,
           display_name: userProfile.display_name || 'Anonymous',
@@ -310,18 +310,18 @@ export const DeathChamber = () => {
   const fetchGroupMembers = async (gId?: string) => {
     const id = gId || groupInfo?.id;
     if (!id) return;
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('death_chamber_group_members')
       .select('*')
       .eq('group_id', id)
       .eq('is_active', true)
       .order('joined_at');
-    if (data) setGroupMembers(data);
+    if (data) setGroupMembers(data as GroupMember[]);
   };
 
   const startGroupChallenge = async () => {
     if (!groupInfo?.id) return;
-    await supabase
+    await (supabase as any)
       .from('death_chamber_groups')
       .update({ current_day: 1, started_at: new Date().toISOString() })
       .eq('id', groupInfo.id);
@@ -340,20 +340,20 @@ export const DeathChamber = () => {
   // Tomb Space functions
   const fetchTombMessages = async () => {
     if (!groupInfo?.id) return;
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('tomb_space_messages')
       .select('*')
       .eq('group_id', groupInfo.id)
       .order('created_at', { ascending: true })
       .limit(100);
-    if (data) setTombMessages(data);
+    if (data) setTombMessages(data as TombMessage[]);
   };
 
   const sendTombMessage = async () => {
     if (!userId || !userProfile || !groupInfo?.id || !newMessage.trim()) return;
 
     try {
-      await supabase.from('tomb_space_messages').insert({
+      await (supabase as any).from('tomb_space_messages').insert({
         group_id: groupInfo.id,
         user_id: userId,
         display_name: userProfile.display_name || 'Anonymous',
@@ -372,14 +372,14 @@ export const DeathChamber = () => {
   const reactToMessage = async (messageId: string, reaction: string) => {
     if (!userId) return;
     try {
-      const { error } = await supabase.from('tomb_space_reactions').insert({
+      const { error } = await (supabase as any).from('tomb_space_reactions').insert({
         message_id: messageId,
         user_id: userId,
         reaction,
       });
       if (error?.code === '23505') {
         // Already reacted, remove it
-        await supabase.from('tomb_space_reactions')
+        await (supabase as any).from('tomb_space_reactions')
           .delete()
           .eq('message_id', messageId)
           .eq('user_id', userId)
