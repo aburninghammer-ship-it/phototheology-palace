@@ -1,7 +1,8 @@
-import { useRef, useCallback, useEffect, type ReactNode } from "react";
-import { GripVertical } from "lucide-react";
+import { useRef, useState, useCallback, useEffect, type ReactNode } from "react";
+import { GripVertical, Minimize2, Maximize2 } from "lucide-react";
 
 const STORAGE_KEY = "widget-stack-position-v6";
+const MINIMIZED_KEY = "widget-stack-minimized";
 
 function getInitialPosition() {
   const w = window.innerWidth || 800;
@@ -19,6 +20,13 @@ function getInitialPosition() {
   return fallback;
 }
 
+function getInitialMinimized(): boolean {
+  try {
+    return localStorage.getItem(MINIMIZED_KEY) === "true";
+  } catch {}
+  return false;
+}
+
 function clamp(val: number, min: number, max: number) {
   return Math.max(min, Math.min(max, val));
 }
@@ -27,6 +35,15 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
   const stackRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLDivElement>(null);
   const posRef = useRef(getInitialPosition());
+  const [minimized, setMinimized] = useState(getInitialMinimized);
+
+  const toggleMinimized = useCallback(() => {
+    setMinimized((prev) => {
+      const next = !prev;
+      try { localStorage.setItem(MINIMIZED_KEY, String(next)); } catch {}
+      return next;
+    });
+  }, []);
 
   const applyPos = useCallback(() => {
     if (stackRef.current) {
@@ -121,18 +138,32 @@ export function DraggableWidgetStack({ children }: { children: ReactNode }) {
       className="fixed z-[9999] flex items-end gap-1 select-none pointer-events-auto"
       style={{ left: 0, top: 0, willChange: "left, top", touchAction: "none" }}
     >
-      {/* Drag handle */}
+      {/* Drag handle + minimize toggle */}
       <div
         ref={handleRef}
-        className="flex items-center justify-center h-10 w-7 rounded-lg bg-muted/70 backdrop-blur-sm border border-border/50 cursor-grab active:cursor-grabbing hover:bg-muted/90 transition-colors self-center"
+        className="flex flex-col items-center justify-center gap-1 rounded-lg bg-muted/70 backdrop-blur-sm border border-border/50 cursor-grab active:cursor-grabbing hover:bg-muted/90 transition-colors self-center px-1 py-1.5"
         style={{ touchAction: "none" }}
         title="Drag to move widgets"
       >
         <GripVertical className="h-4 w-4 text-muted-foreground" />
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleMinimized(); }}
+          className="h-5 w-5 flex items-center justify-center rounded hover:bg-background/60 transition-colors cursor-pointer"
+          title={minimized ? "Show widgets" : "Hide widgets"}
+          data-no-widget-drag="true"
+        >
+          {minimized ? (
+            <Maximize2 className="h-3 w-3 text-muted-foreground" />
+          ) : (
+            <Minimize2 className="h-3 w-3 text-muted-foreground" />
+          )}
+        </button>
       </div>
-      <div className="flex flex-col items-end gap-2">
-        {children}
-      </div>
+      {!minimized && (
+        <div className="flex flex-col items-end gap-2">
+          {children}
+        </div>
+      )}
     </div>
   );
 }
