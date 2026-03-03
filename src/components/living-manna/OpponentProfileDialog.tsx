@@ -400,7 +400,7 @@ export function OpponentProfileDialog({
                     <Eye className="h-4 w-4" /> Worldview Profile
                   </h3>
                   <p className="text-sm leading-relaxed text-foreground/80">
-                    {toThirdPerson(opponent.worldview, opponent.pronouns).slice(0, 400)}...
+                    {toThirdPerson(opponent.worldview, opponent.pronouns)}
                   </p>
                 </section>
 
