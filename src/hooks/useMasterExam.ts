@@ -122,7 +122,7 @@ export function useMasterExam() {
     if (!user) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("master_exam_attempts")
         .select("id, score, total_correct, total_questions, category_scores, status, attempt_number, time_used_seconds, created_at, started_at")
         .eq("user_id", user.id)
@@ -170,12 +170,12 @@ export function useMasterExam() {
     setPhase("generating");
 
     try {
-      const { data: exam, error } = await supabase
-        .from("master_exam_attempts")
+      const { data: exam, error } = await (supabase
+        .from("master_exam_attempts" as any)
         .select("*")
         .eq("id", attemptId)
         .eq("user_id", user.id)
-        .single();
+        .single() as any);
 
       if (error || !exam) throw new Error("Exam not found");
       if (exam.status !== "in_progress") throw new Error("Exam is not resumable");
@@ -219,13 +219,13 @@ export function useMasterExam() {
     const timeUsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
 
     try {
-      await supabase
-        .from("master_exam_attempts")
+      await (supabase
+        .from("master_exam_attempts" as any)
         .update({
           user_answers: answers,
           time_used_seconds: timeUsed,
         })
-        .eq("id", examId);
+        .eq("id", examId) as any);
     } catch (err) {
       console.error("Auto-save failed:", err);
     }
@@ -291,14 +291,14 @@ export function useMasterExam() {
     if (autoSaveRef.current) clearInterval(autoSaveRef.current);
 
     try {
-      await supabase
-        .from("master_exam_attempts")
+      await (supabase
+        .from("master_exam_attempts" as any)
         .update({
           status: "abandoned",
           user_answers: answers,
           time_used_seconds: timeUsed,
         })
-        .eq("id", examId);
+        .eq("id", examId) as any);
     } catch (err) {
       console.error("Failed to abandon exam:", err);
     }
