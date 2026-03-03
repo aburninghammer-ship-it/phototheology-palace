@@ -14,7 +14,7 @@ interface StudyProgressPanelProps {
 }
 
 export function StudyProgressPanel({ entries, seedVerse, className }: StudyProgressPanelProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <motion.div

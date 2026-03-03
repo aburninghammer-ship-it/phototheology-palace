@@ -134,6 +134,13 @@ export default function PTScrabble() {
     }
   }, [mpGame, multiplayerGameId, gamePhase, seedVerse]);
 
+  // Auto-refresh hand if player enters playing phase with empty hand
+  useEffect(() => {
+    if (gamePhase === 'multiplayer-playing' && mpMyPlayer && mpMyHand.length === 0 && mpGame?.status === 'playing') {
+      mpRefreshHand();
+    }
+  }, [gamePhase, mpMyPlayer, mpMyHand.length, mpGame?.status]);
+
   // Solo mode state
   const [connectionModal, setConnectionModal] = useState<{
     isOpen: boolean;
@@ -930,10 +937,19 @@ export default function PTScrabble() {
             </div>
           </header>
 
-          {/* Study Progress Panel - always visible so all players see the seed verse and can race to submit */}
-          <div className="px-3 pt-2">
-            <StudyProgressPanel entries={mpStudyLogEntries} seedVerse={activeSeedVerse} />
-          </div>
+          {/* Seed verse - always visible to all players */}
+          {activeSeedVerse && (
+            <div className="px-3 pt-2">
+              <SeedVerseDisplay verse={activeSeedVerse} compact />
+            </div>
+          )}
+
+          {/* Study progress - collapsed by default, expandable */}
+          {mpStudyLogEntries.length > 0 && (
+            <div className="px-3">
+              <StudyProgressPanel entries={mpStudyLogEntries} seedVerse={activeSeedVerse} />
+            </div>
+          )}
 
           {/* Game board */}
           <div className="flex-1 min-h-0 pb-40">
@@ -1128,10 +1144,10 @@ export default function PTScrabble() {
 
         {/* Seed Verse Display */}
         {seedVerse && (
-          <SeedVerseDisplay verse={seedVerse} />
+          <SeedVerseDisplay verse={seedVerse} compact />
         )}
 
-        {/* Study Progress Panel */}
+        {/* Study Progress - collapsed by default */}
         {studyLogEntries.length > 0 && (
           <StudyProgressPanel entries={studyLogEntries} seedVerse={seedVerse} />
         )}

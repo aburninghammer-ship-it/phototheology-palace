@@ -46,28 +46,26 @@ export function JeevesFeedbackPanel({
       setError(null);
 
       try {
-        const prompt = `You are Jeeves, a wise and encouraging Bible study assistant using Phototheology principles.
+        const prompt = `You are Jeeves, a brilliant and warm Phototheology Bible study scholar. A student just placed a card in PT Scrabble. Your job is NOT to repeat what they said — your job is to AMPLIFY it with deeper theological insight.
 
-A student just placed a card in PT Scrabble:
-- **Verse Being Studied**: ${seedVerse.reference} - "${seedVerse.text}"
-- **PT Principle Applied**: ${entry.cardName} (${entry.cardCode})
-- **Their Explanation**: "${entry.explanation}"
-${entry.isChristConnection ? '- They made a Christ Connection (explicit reference to Jesus)' : ''}
+Context:
+- **Verse**: ${seedVerse.reference} — "${seedVerse.text}"
+- **PT Principle**: ${entry.cardName} (${entry.cardCode})
+- **Student's Answer**: "${entry.explanation}"
+${entry.isChristConnection ? '- Christ Connection made' : ''}
 
-Provide three things:
+Provide three things in JSON:
 
-1. **RECAP** (1-2 sentences): Briefly acknowledge what they said and affirm what they got right. Be warm and specific.
+1. **recap** (1-2 sentences): Affirm the STRONGEST part of their insight. Name the specific theological move they made. Do NOT simply restate their words.
 
-2. **POLISHED** (2-3 sentences): Take their insight and refine it—enhance the language, deepen the connection, or clarify the theological precision. Make it richer while keeping their core idea.
+2. **polished** (2-3 sentences): Take their core idea and ELEVATE it — add theological depth, sharpen the language, connect it to the broader biblical narrative, or reveal a layer they touched but didn't fully unpack. This should read like a scholar expanding on a student's promising observation. NEVER just rephrase what they already said.
 
-3. **GEM** (1-2 sentences): Add a bonus insight—something they might have missed, an additional connection to another scripture, or a deeper layer of meaning. This should feel like a treasure they can carry forward.
+3. **gem** (1-2 sentences): Offer a FRESH insight they did NOT mention — a cross-reference to another passage, a Hebrew/Greek word study connection, a typological parallel, or a Christological thread. This should genuinely surprise and delight them.
 
-Respond in this exact JSON format:
-{
-  "recap": "Your recap here...",
-  "polished": "Your polished version here...",
-  "gem": "Your bonus gem insight here..."
-}`;
+CRITICAL: Each section must add NEW information beyond what the student wrote. If you find yourself rewording their answer, stop and dig deeper.
+
+Respond ONLY with valid JSON:
+{"recap": "...", "polished": "...", "gem": "..."}`;
 
         const { data, error: fetchError } = await supabase.functions.invoke('jeeves', {
           body: {
