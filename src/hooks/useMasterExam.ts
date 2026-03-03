@@ -122,7 +122,7 @@ export function useMasterExam() {
     if (!user) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("master_exam_attempts")
         .select("id, score, total_correct, total_questions, category_scores, status, attempt_number, time_used_seconds, created_at, started_at")
         .eq("user_id", user.id)
