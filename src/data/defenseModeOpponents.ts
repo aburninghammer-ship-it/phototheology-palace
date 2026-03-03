@@ -804,6 +804,36 @@ export const DEFENSE_TOPICS: DefenseTopic[] = [
     description:
       "Who is Israel in prophecy? Literal ethnic Israel restored vs. spiritual Israel — the church as the covenant people, against dispensationalism and Christian Zionism",
   },
+  {
+    id: "three-angels",
+    name: "Three Angels' Messages",
+    description:
+      "Revelation 14:6-12 — the everlasting gospel, the fall of Babylon, and the warning against the mark of the beast as God's final message to humanity before the Second Coming",
+  },
+  {
+    id: "mark-of-the-beast",
+    name: "Mark of the Beast",
+    description:
+      "Revelation 13 — identifying the beast power, the image of the beast, and the mark vs. the seal of God in the final conflict over worship and authority",
+  },
+  {
+    id: "investigative-judgment",
+    name: "Investigative Judgment",
+    description:
+      "Daniel 7:9-10, 8:14 — the pre-advent judgment in the heavenly sanctuary beginning in 1844, vindicating God's people and cleansing the sanctuary before Christ returns",
+  },
+  {
+    id: "millennium",
+    name: "The Millennium",
+    description:
+      "Revelation 20 — the 1,000-year period following the Second Coming: earth desolate, saints in heaven reviewing the records, final judgment and eradication of sin at the end",
+  },
+  {
+    id: "new-covenant",
+    name: "New Covenant",
+    description:
+      "Hebrews 8, Jeremiah 31:31-34 — the new covenant writes God's law on the heart rather than abolishing it, establishing a deeper relationship with God through Christ's mediation",
+  },
   // ── Cross-Opponent "Positive Case" Topics ─────────────────
   {
     id: "muhammad-in-bible",

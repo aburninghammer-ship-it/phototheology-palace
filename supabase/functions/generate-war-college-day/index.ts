@@ -15,6 +15,79 @@ const RANK_DESCRIPTIONS: Record<string, string> = {
   commander: "Elite Command — comprehensive battlefield dominance across all dimensions of the debate",
 };
 
+// ── Avatar-specific 56-day curriculum maps ────────────────────────────────────
+// These provide focused day-by-day topics so the AI generates targeted content
+// rather than generic apologetics material.
+
+const AVATAR_CURRICULUM: Record<string, string[]> = {
+  "anti-prophet": [
+    // WEEK 1 — INITIATE: Foundations of Prophetic Authority
+    "Day 1: What makes a prophet? Biblical criteria from Deuteronomy 13, 18; Isaiah 8:20; Matthew 7:15-20 — establishing the testing framework before examining Ellen White",
+    "Day 2: Thought inspiration vs. verbal dictation — the SDA inspiration model and why it matters for every accusation that follows",
+    "Day 3: How biblical prophets used sources — Luke's research (Luke 1:1-4), the Chronicler, Jude quoting 1 Enoch, Paul quoting pagan poets",
+    "Day 4: The fruit test applied — 150 years, 200 countries, 900+ languages, health reform, education system, global mission. What are the actual fruits?",
+    "Day 5: Who are the critics? Walter Rea, Dirk Anderson, Canright, Ronald Numbers — understanding their backgrounds, methods, and motivations",
+    "Day 6: The emotional battlefield — why Ellen White criticism hits differently than other theological debates. Handling personal attachment and detachment",
+    "Day 7: Review and synthesis — building your foundational defense framework for the weeks ahead",
+    // WEEK 2 — INITIATE: The Plagiarism Charge
+    "Day 8: Walter Rea's 'The White Lie' — what he actually claimed, his methodology, and his personal history with the church",
+    "Day 9: The Fred Veltman 'Life of Christ Research Project' — the church-commissioned study of Desire of Ages. What it actually found vs. what critics claim it found",
+    "Day 10: 19th-century literary conventions — how authors, preachers, and editors used sources in Ellen White's era. The presentism fallacy",
+    "Day 11: Side-by-side analysis — examining the most commonly cited 'plagiarism' passages (Great Controversy / J.A. Wylie, Desire of Ages / William Hanna). What's borrowed and what's transformed",
+    "Day 12: Ellen White's own statements about her use of sources — 'I do not write one article...' (Review & Herald 1903) in full context. What did she actually claim?",
+    "Day 13: The scaffolding vs. the cathedral — distinguishing borrowed historical narrative from unique prophetic-interpretive framework (Great Controversy theme, sanctuary Christology)",
+    "Day 14: Debate simulation — defending against a rapid-fire plagiarism assault with documented evidence",
+    // WEEK 3 — APPRENTICE: Failed Prophecies
+    "Day 15: The 1856 vision (Testimonies vol. 1, pp. 131-132) — 'some in this room will be food for worms, some will be translated.' Full context and conditional prophecy framework",
+    "Day 16: Conditional prophecy in Scripture — Jeremiah 18:7-10, Jonah 3:4, Jesus' 'this generation' (Matthew 24:34), Paul's 'we who are alive' (1 Thessalonians 4:15)",
+    "Day 17: The 'shut door' controversy — October 22, 1844 through the mid-1850s. What early Adventists actually believed and how understanding evolved",
+    "Day 18: The Peter parallel — how the apostolic church's theology on Gentile inclusion (Acts 10-11, 15) mirrors Adventism's shut-door development",
+    "Day 19: The 'Walled City' vision, 'old Jerusalem' statement, and other allegedly failed predictions — examining each in context",
+    "Day 20: Prophetic delay as biblical theme — 2 Peter 3:9-12, the 'already/not yet' tension in all eschatological prophecy",
+    "Day 21: Debate simulation — defending Ellen White's prophetic record against the Deuteronomy 18:22 challenge",
+    // WEEK 4 — APPRENTICE: Health Visions and Science
+    "Day 22: The June 6, 1863 Otsego health vision — what was revealed and its historical context",
+    "Day 23: Sylvester Graham, James Caleb Jackson, Russell Trall — what Ellen White took, what she rejected, and what she uniquely contributed",
+    "Day 24: The genetic fallacy — why similar ideas existing in culture does not disprove divine guidance. Joseph used Egyptian agriculture (Genesis 41)",
+    "Day 25: The Adventist Health Studies (AHS-1 and AHS-2) — NIH-funded, 96,000+ participants, Loma Linda Blue Zone. The empirical verdict",
+    "Day 26: The difficult health statements — amalgamation, wigs causing brain disease, masturbation warnings. Honest engagement without dismissal",
+    "Day 27: Body-temple theology — how Ellen White uniquely embedded health reform within 1 Corinthians 6:19-20 framework. No secular reformer did this",
+    "Day 28: Debate simulation — defending the health message against 'she just copied 19th-century health fads'",
+    // WEEK 5 — STRATEGIST: Literary Dependency and the Great Controversy
+    "Day 29: The Great Controversy and its sources — J.A. Wylie's 'History of Protestantism,' Merle d'Aubigne, Uriah Smith. Mapping the actual dependency",
+    "Day 30: The Desire of Ages and its sources — William Hanna, John Harris, Daniel March, Alfred Edersheim. The Veltman findings in detail",
+    "Day 31: Patriarchs and Prophets, Acts of the Apostles, Sketches from the Life of Paul — the broader literary dependency landscape",
+    "Day 32: The 1911 revision of The Great Controversy — what was changed and why. Proof of dishonesty or responsible editorial stewardship?",
+    "Day 33: The Synoptic Problem as parallel — Matthew, Mark, Luke share massive literary dependency. Does this disqualify them as inspired?",
+    "Day 34: The unique prophetic contribution — Great Controversy theme, sanctuary Christology, health-education-mission integration. What no source provided",
+    "Day 35: Debate simulation — confronting the 'it's all borrowed' argument with the cathedral vs. scaffolding framework",
+    // WEEK 6 — STRATEGIST: The White Estate and Institutional Trust
+    "Day 36: The White Estate — its history, purpose, and the accusation of controlling access to unpublished materials",
+    "Day 37: The Investigative Judgment — was it invented to salvage the Great Disappointment? Daniel 7:9-10, 8:14 examined independently",
+    "Day 38: Ellen White and Sola Scriptura — does her prophetic authority contradict the Protestant principle? The 'lesser light' framework",
+    "Day 39: The 'amalgamation' statements — what she actually wrote, historical context, and why this remains the most difficult passage",
+    "Day 40: Ellen White's contradictions — cataloguing the allegedly contradictory statements and providing honest, contextual responses",
+    "Day 41: The testimony of former critics who returned — case studies of people who investigated, left, and came back. What changed their minds?",
+    "Day 42: Debate simulation — multi-layered defense combining plagiarism, failed prophecy, and institutional trust challenges simultaneously",
+    // WEEK 7 — TACTICIAN: Turning the Critic's Framework Against Itself
+    "Day 43: The critic's hidden presuppositions — what standards of 'prophet testing' are they actually applying? Are those standards biblical or modern?",
+    "Day 44: Applying the critic's standard to biblical prophets — if Ellen White fails, do Nathan, Jonah, Peter, and Paul also fail?",
+    "Day 45: The Canright case study — D.M. Canright, the first major Ellen White critic. His arguments, his psychology, and the trajectory of his life",
+    "Day 46: The psychology of deconstruction — why former SDAs attack Ellen White with particular intensity. Understanding the emotional dynamics",
+    "Day 47: Offensive apologetics — proactively presenting the positive case for Ellen White's prophetic gift before critics frame the narrative",
+    "Day 48: The 'tests of a prophet' applied comprehensively — walking through every biblical test with both Ellen White's successes AND honest acknowledgment of difficulties",
+    "Day 49: Debate simulation — going on offense. Making the positive case so compelling that the critic must respond to YOUR evidence",
+    // WEEK 8 — TACTICIAN: Comprehensive Mastery
+    "Day 50: The Great Controversy vision of 1858 — the Lovett's Grove experience. Original testimony and its significance for the cosmic conflict framework",
+    "Day 51: Ellen White's Christology — how her writings consistently point to Christ above all else. The concentration room principle across 100,000+ pages",
+    "Day 52: The sanctuary and Ellen White — how her prophetic ministry is inseparable from the sanctuary message. Remove one and the other collapses",
+    "Day 53: Modern scholarship and Ellen White — academic treatments beyond the critics: George Knight, Denis Fortin, Jerry Moon. The balanced scholarly view",
+    "Day 54: The role of the Spirit of Prophecy in the Remnant — Revelation 12:17, 19:10. Theological necessity, not optional accessory",
+    "Day 55: Full-spectrum defense — integrating all 8 weeks into a comprehensive, confident, honest apologetic for Ellen White's prophetic ministry",
+    "Day 56: Final examination — the ultimate multi-vector debate combining every major criticism in a single engagement. War College graduation",
+  ],
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -101,14 +174,26 @@ You MUST return valid JSON with this exact structure:
   }
 }`;
 
+    // Inject avatar-specific curriculum if available
+    const avatarCurriculum = AVATAR_CURRICULUM[avatarId];
+    let curriculumContext = "";
+    if (avatarCurriculum && avatarCurriculum[dayNumber - 1]) {
+      const dayTopic = avatarCurriculum[dayNumber - 1];
+      // Also include surrounding days for context
+      const prevDay = dayNumber > 1 ? avatarCurriculum[dayNumber - 2] : null;
+      const nextDay = dayNumber < avatarCurriculum.length ? avatarCurriculum[dayNumber] : null;
+      curriculumContext = `\n\nSPECIFIC CURRICULUM FOR THIS DAY:\n${dayTopic}\n${prevDay ? `\nPrevious day covered: ${prevDay}` : ""}${nextDay ? `\nNext day will cover: ${nextDay}` : ""}\n\nYou MUST follow this specific topic for today's manuscript. Do not deviate to a different subject.`;
+    }
+
     const userPrompt = `Generate War College Day ${dayNumber} study for the ${trackTitle} track.
 
 Opponent: ${avatarName} (${avatarId})
 Week: ${weekNumber}
 Rank: ${rank}
 Day in week: ${((dayNumber - 1) % 7) + 1}
+${curriculumContext}
 
-This is day ${dayNumber} of a 56-day formation system. Build on progressive depth — each day should advance the intellectual warfare deeper than the last. The topic should organically flow from what a student at day ${dayNumber} would need next in their training against ${avatarName}'s worldview.
+This is day ${dayNumber} of a 56-day formation system. Build on progressive depth — each day should advance the intellectual warfare deeper than the last.${!curriculumContext ? ` The topic should organically flow from what a student at day ${dayNumber} would need next in their training against ${avatarName}'s worldview.` : ""}
 
 Produce the complete War College manuscript now.`;
 
