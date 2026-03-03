@@ -137,14 +137,13 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      logStep("Auth failed", { error: claimsError?.message });
+    const { data: { user: authUser }, error: authError } = await userClient.auth.getUser();
+    if (authError || !authUser) {
+      logStep("Auth failed", { error: authError?.message });
       throw new Error("Invalid authorization");
     }
 
-    const userId = claimsData.claims.sub as string;
+    const userId = authUser.id;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
