@@ -24,6 +24,7 @@ import { SocialMediaConnect } from "@/components/SocialMediaConnect";
 import { PatreonConnect } from "@/components/PatreonConnect";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { TeachableVerification } from "@/components/settings/TeachableVerification";
+import { FontSizeSettings } from "@/components/settings/FontSizeSettings";
 import { useTranslation } from "react-i18next";
 import { UserAiUsageWidget } from "@/components/profile/UserAiUsageWidget";
 
