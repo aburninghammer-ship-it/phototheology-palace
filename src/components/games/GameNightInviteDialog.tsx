@@ -124,129 +124,143 @@ export function GameNightInviteDialog() {
           </DialogTitle>
         </DialogHeader>
 
-        {!active ? (
-          <div className="text-center py-8 space-y-4">
-            <div className="text-6xl">🌙</div>
-            <h3 className="text-lg font-semibold">Game Night Opens Every Friday</h3>
-            <p className="text-muted-foreground">6:00 PM – 1:00 AM Eastern Time</p>
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>Next: {nextGameNight.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span>
+        {/* Schedule banner when not active */}
+        {!active && step === "select" && (
+          <div className="bg-muted/30 rounded-lg p-3 flex items-center gap-3 text-sm">
+            <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <div>
+              <span className="text-muted-foreground">Next Game Night: </span>
+              <span className="font-medium">
+                {nextGameNight.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
+              </span>
+              <span className="text-muted-foreground"> at 6:00 PM ET</span>
             </div>
-            {stats.totalGuests > 0 && (
-              <Card className="mt-4">
-                <CardContent className="p-4 grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div className="text-2xl font-bold text-primary">{stats.totalGuests}</div>
-                    <div className="text-xs text-muted-foreground">Total Guests</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-purple-500">{stats.uniqueEmails}</div>
-                    <div className="text-xs text-muted-foreground">Unique Emails</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-green-500">{stats.converted}</div>
-                    <div className="text-xs text-muted-foreground">Converted</div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
-        ) : (
-          <AnimatePresence mode="wait">
-            {step === "select" && (
-              <motion.div key="select" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">Choose which games your guest can play:</p>
-                  <Button variant="ghost" size="sm" onClick={selectEasyGames} className="text-xs">
-                    Select Easy Games
-                  </Button>
-                </div>
-                <ScrollArea className="h-[300px] pr-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    {AVAILABLE_GAMES.map(game => (
-                      <div
-                        key={game.id}
-                        onClick={() => toggleGame(game.id)}
-                        className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all ${
-                          selectedGames.includes(game.id)
-                            ? "border-primary bg-primary/10 shadow-sm"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                      >
-                        <Checkbox checked={selectedGames.includes(game.id)} className="pointer-events-none" />
-                        <span className="text-lg">{game.icon}</span>
-                        <span className="text-sm font-medium truncate">{game.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">{selectedGames.length} game{selectedGames.length !== 1 ? "s" : ""} selected</span>
-                  <Button onClick={() => setStep("details")} disabled={selectedGames.length === 0}>
-                    Next →
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === "details" && (
-              <motion.div key="details" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                <p className="text-sm text-muted-foreground">Who are you inviting? (optional — you can share the link with anyone)</p>
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="guestName">Guest Name</Label>
-                    <Input id="guestName" placeholder="e.g. John" value={guestName} onChange={e => setGuestName(e.target.value)} />
-                  </div>
-                  <div>
-                    <Label htmlFor="guestEmail">Guest Email</Label>
-                    <Input id="guestEmail" type="email" placeholder="e.g. john@email.com" value={guestEmail} onChange={e => setGuestEmail(e.target.value)} />
-                  </div>
-                </div>
-                <div className="flex justify-between">
-                  <Button variant="ghost" onClick={() => setStep("select")}>← Back</Button>
-                  <Button onClick={handleCreate} disabled={creating}>
-                    {creating ? "Creating..." : "🌙 Create Invite"}
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === "done" && (
-              <motion.div key="done" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-4 py-4">
-                <div className="text-5xl">🎉</div>
-                <h3 className="text-xl font-bold">Invite Ready!</h3>
-                <div className="bg-muted/50 rounded-xl p-4">
-                  <p className="text-sm text-muted-foreground mb-1">Invite Code</p>
-                  <p className="text-3xl font-mono font-bold tracking-wider text-primary">{createdCode}</p>
-                </div>
-                <div className="flex gap-2 justify-center">
-                  <Button onClick={copyInviteLink} variant="outline" className="gap-2">
-                    <Copy className="h-4 w-4" /> Copy Link
-                  </Button>
-                  <Button onClick={shareInvite} className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-                    <Share2 className="h-4 w-4" /> Share
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Expires at 1:00 AM ET tonight
-                </p>
-                <Button variant="ghost" onClick={resetDialog} className="text-sm">
-                  Create Another Invite
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
         )}
 
-        {/* Active invites summary */}
-        {active && myInvites.filter(i => i.is_active).length > 0 && step !== "done" && (
+        <AnimatePresence mode="wait">
+          {step === "select" && (
+            <motion.div key="select" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  {active ? "Choose which games your guest can play:" : "Schedule an invite for this Friday — choose games:"}
+                </p>
+                <Button variant="ghost" size="sm" onClick={selectEasyGames} className="text-xs">
+                  Select Easy Games
+                </Button>
+              </div>
+              <ScrollArea className="h-[300px] pr-2">
+                <div className="grid grid-cols-2 gap-2">
+                  {AVAILABLE_GAMES.map(game => (
+                    <div
+                      key={game.id}
+                      onClick={() => toggleGame(game.id)}
+                      className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all ${
+                        selectedGames.includes(game.id)
+                          ? "border-primary bg-primary/10 shadow-sm"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <Checkbox checked={selectedGames.includes(game.id)} className="pointer-events-none" />
+                      <span className="text-lg">{game.icon}</span>
+                      <span className="text-sm font-medium truncate">{game.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">{selectedGames.length} game{selectedGames.length !== 1 ? "s" : ""} selected</span>
+                <Button onClick={() => setStep("details")} disabled={selectedGames.length === 0}>
+                  Next →
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === "details" && (
+            <motion.div key="details" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+              <p className="text-sm text-muted-foreground">Who are you inviting? (optional — you can share the link with anyone)</p>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="guestName">Guest Name</Label>
+                  <Input id="guestName" placeholder="e.g. John" value={guestName} onChange={e => setGuestName(e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="guestEmail">Guest Email</Label>
+                  <Input id="guestEmail" type="email" placeholder="e.g. john@email.com" value={guestEmail} onChange={e => setGuestEmail(e.target.value)} />
+                </div>
+              </div>
+              {!active && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-sm text-amber-700 dark:text-amber-400 flex items-start gap-2">
+                  <Clock className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <span>This invite will be active starting Friday at 6:00 PM ET and expires at 1:00 AM ET Saturday.</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <Button variant="ghost" onClick={() => setStep("select")}>← Back</Button>
+                <Button onClick={handleCreate} disabled={creating}>
+                  {creating ? "Creating..." : active ? "🌙 Create Invite" : "🌙 Schedule Invite"}
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === "done" && (
+            <motion.div key="done" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-4 py-4">
+              <div className="text-5xl">🎉</div>
+              <h3 className="text-xl font-bold">{active ? "Invite Ready!" : "Invite Scheduled!"}</h3>
+              <div className="bg-muted/50 rounded-xl p-4">
+                <p className="text-sm text-muted-foreground mb-1">Invite Code</p>
+                <p className="text-3xl font-mono font-bold tracking-wider text-primary">{createdCode}</p>
+              </div>
+              <div className="flex gap-2 justify-center">
+                <Button onClick={copyInviteLink} variant="outline" className="gap-2">
+                  <Copy className="h-4 w-4" /> Copy Link
+                </Button>
+                <Button onClick={shareInvite} className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                  <Share2 className="h-4 w-4" /> Share
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {active
+                  ? "Expires at 1:00 AM ET tonight"
+                  : `Active this Friday ${nextGameNight.toLocaleDateString("en-US", { month: "short", day: "numeric" })} at 6:00 PM ET`}
+              </p>
+              <Button variant="ghost" onClick={resetDialog} className="text-sm">
+                Create Another Invite
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Stats & active invites summary */}
+        {step !== "done" && (stats.totalGuests > 0 || myInvites.filter(i => i.is_active).length > 0) && (
           <div className="border-t pt-3 mt-3">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-              <Users className="h-4 w-4" />
-              <span>{stats.activeInvites} active invite{stats.activeInvites !== 1 ? "s" : ""} tonight</span>
-              <span className="ml-auto">{stats.totalGuests} guest{stats.totalGuests !== 1 ? "s" : ""} joined</span>
-            </div>
+            {stats.totalGuests > 0 && (
+              <div className="grid grid-cols-3 gap-4 text-center mb-3">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{stats.totalGuests}</div>
+                  <div className="text-xs text-muted-foreground">Total Guests</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-purple-500">{stats.uniqueEmails}</div>
+                  <div className="text-xs text-muted-foreground">Unique Emails</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-green-500">{stats.converted}</div>
+                  <div className="text-xs text-muted-foreground">Converted</div>
+                </div>
+              </div>
+            )}
+            {myInvites.filter(i => i.is_active).length > 0 && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Users className="h-4 w-4" />
+                <span>{stats.activeInvites} active invite{stats.activeInvites !== 1 ? "s" : ""}</span>
+                {stats.totalGuests > 0 && (
+                  <span className="ml-auto">{stats.totalGuests} guest{stats.totalGuests !== 1 ? "s" : ""} joined</span>
+                )}
+              </div>
+            )}
           </div>
         )}
       </DialogContent>

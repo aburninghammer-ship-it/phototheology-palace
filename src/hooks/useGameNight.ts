@@ -76,13 +76,23 @@ export function getNextGameNight(): Date {
 function getGameNightEndTime(): string {
   const now = new Date();
   const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
-  
-  // If it's Friday after 6pm, end is Saturday 1am
-  // If it's Saturday before 1am, end is Saturday 1am
+  const day = et.getDay();
+  const hour = et.getHours();
+
   const end = new Date(et);
-  if (et.getDay() === 5) {
+
+  if (day === 5 && hour >= GAME_NIGHT_START_HOUR) {
+    // Friday after 6pm → end is Saturday 1am
     end.setDate(end.getDate() + 1);
+  } else if (day === 6 && hour < GAME_NIGHT_END_HOUR) {
+    // Saturday before 1am → end is later today at 1am
+  } else {
+    // Not during game night — calculate next Saturday 1am
+    let daysUntilSaturday = (6 - day + 7) % 7;
+    if (daysUntilSaturday === 0) daysUntilSaturday = 7;
+    end.setDate(end.getDate() + daysUntilSaturday);
   }
+
   end.setHours(GAME_NIGHT_END_HOUR, 0, 0, 0);
   return end.toISOString();
 }

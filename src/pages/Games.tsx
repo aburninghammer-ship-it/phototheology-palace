@@ -70,6 +70,18 @@ const Games = () => {
 
   const allGames = [
     {
+      id: "master_exam",
+      name: "Test Me: Master Exam",
+      description: "50 AI-generated questions across all Palace domains. Timed 90-minute comprehensive assessment with AI grading. Never the same twice!",
+      icon: "\uD83C\uDF93",
+      floor: 0,
+      timed: true,
+      rooms: ["All"],
+      modes: ["solo"],
+      difficulties: ["hard", "expert"],
+      route: "/games/master-exam"
+    },
+    {
       id: "story_room",
       name: "Story Room Challenge",
       description: "Arrange biblical stories in sequence. Master the Story Room by turning events into vivid mental movies!",
