@@ -501,32 +501,32 @@ export default function SpiritualTraining() {
         {/* Training Tabs */}
         <Tabs defaultValue="arena" className="w-full">
           <ScrollArea className="w-full">
-            <TabsList className="inline-flex w-full">
-              <TabsTrigger value="arena" className="flex-1">
+            <TabsList className="inline-flex w-max min-w-full">
+              <TabsTrigger value="arena" className="whitespace-nowrap px-3">
                 <Swords className="w-4 h-4 mr-2" />
                 {t('training.spiritual.combatArena')}
               </TabsTrigger>
-              <TabsTrigger value="lessons" className="flex-1">
+              <TabsTrigger value="lessons" className="whitespace-nowrap px-3">
                 <GraduationCap className="w-4 h-4 mr-2" />
                 {t('training.spiritual.lessons')}
               </TabsTrigger>
-              <TabsTrigger value="challenges" className="flex-1">
+              <TabsTrigger value="challenges" className="whitespace-nowrap px-3">
                 <Dumbbell className="w-4 h-4 mr-2" />
                 {t('training.spiritual.thirtyDayChallenge')}
               </TabsTrigger>
-              <TabsTrigger value="characteristics" className="flex-1">
+              <TabsTrigger value="characteristics" className="whitespace-nowrap px-3">
                 <Target className="w-4 h-4 mr-2" />
                 {t('training.spiritual.characterTracker')}
               </TabsTrigger>
-              <TabsTrigger value="scenarios" className="flex-1">
+              <TabsTrigger value="scenarios" className="whitespace-nowrap px-3">
                 <Shield className="w-4 h-4 mr-2" />
                 {t('training.spiritual.battleScenarios')}
               </TabsTrigger>
-              <TabsTrigger value="weapons" className="flex-1">
+              <TabsTrigger value="weapons" className="whitespace-nowrap px-3">
                 <Sword className="w-4 h-4 mr-2" />
                 {t('training.spiritual.weapons')}
               </TabsTrigger>
-              <TabsTrigger value="death-chamber" className="flex-1">
+              <TabsTrigger value="death-chamber" className="whitespace-nowrap px-3">
                 <Landmark className="w-4 h-4 mr-2" />
                 Death Chamber
               </TabsTrigger>
