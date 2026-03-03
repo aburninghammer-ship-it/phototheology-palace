@@ -18,7 +18,7 @@ import { Share2, X, Plus } from "lucide-react";
 import { sanitizeHtml } from "@/lib/sanitize";
 
 export interface SharedContent {
-  type: "gem" | "study" | "deck" | "palace" | "series" | "sermon";
+  type: "gem" | "study" | "deck" | "palace" | "series" | "sermon" | "audio_commentary";
   id: string;
   title: string;
   preview: string;
@@ -69,13 +69,21 @@ export const ShareToCommunity = ({
       const sanitizedDescription = sanitizeHtml(description);
 
       // Sanitize shared content - only include safe, non-private fields
-      const safeSharedContent = {
+      const safeSharedContent: Record<string, any> = {
         type: content.type,
         id: content.id,
         title: sanitizeHtml(content.title),
         preview: sanitizeHtml(content.preview.substring(0, 500)), // Limit preview length
         // Explicitly exclude any private metadata like session IDs, personal notes, etc.
       };
+
+      // Include audioUrl for audio commentary posts
+      if (content.type === "audio_commentary" && content.metadata?.audioUrl) {
+        safeSharedContent.metadata = {
+          audioUrl: content.metadata.audioUrl,
+          chapters: content.metadata.chapters,
+        };
+      }
 
       const { error } = await supabase
         .from("community_posts")
@@ -111,7 +119,8 @@ export const ShareToCommunity = ({
       deck: "🃏 Study Deck",
       palace: "🏛️ Palace Mapping",
       series: "📚 Bible Study Series",
-      sermon: "🎤 Sermon"
+      sermon: "🎤 Sermon",
+      audio_commentary: "🎙️ Audio Commentary"
     };
     return labels[type] || type;
   };

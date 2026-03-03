@@ -19,12 +19,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Download, Music, ListPlus, Plus, X, GripVertical, MessageSquare, Copy, Check } from "lucide-react";
+import { Loader2, Download, Music, ListPlus, Plus, X, GripVertical, MessageSquare, Copy, Check, Share2 } from "lucide-react";
 import { useAudioMixer } from "@/hooks/useAudioMixer";
 import { AMBIENT_TRACKS, downloadAudioFile } from "@/components/bible/ExportBibleAudioDialog";
 import { useEpicPlaylists } from "@/hooks/useEpicPlaylists";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ShareToCommunity, type SharedContent } from "@/components/community/ShareToCommunity";
+import { useAuth } from "@/hooks/useAuth";
 
 const MAX_CHAPTERS = 5;
 const MUSIC_TRACKS = AMBIENT_TRACKS.filter((t) => t.id !== "none");
@@ -73,6 +75,9 @@ export const ExportEpicAudioDialog = ({
   const [exportedFilename, setExportedFilename] = useState("");
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
+  const [communityShareContent, setCommunityShareContent] = useState<SharedContent | null>(null);
+  const [uploadingToCommunity, setUploadingToCommunity] = useState(false);
+  const { user } = useAuth();
 
   // Reset to the current chapter whenever the dialog opens or the primary chapter changes
   useEffect(() => {
@@ -232,6 +237,40 @@ export const ExportEpicAudioDialog = ({
 
   const handleWhatsApp = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(buildShareMessage())}`, "_blank");
+  };
+
+  // ── Share to community ──────────────────────────────────────────────
+  const handleShareToCommunity = async () => {
+    if (!exportedBlob || !user) return;
+    setUploadingToCommunity(true);
+    try {
+      const timestamp = Date.now();
+      const path = `${user.id}/${timestamp}-${exportedFilename}`;
+      const { error: uploadError } = await supabase.storage
+        .from("community-audio")
+        .upload(path, exportedBlob, { contentType: "audio/wav" });
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("community-audio")
+        .getPublicUrl(path);
+
+      const chapterList = selectedChapters.map((c) => `${c.book} ${c.chapter}`).join(", ");
+      setCommunityShareContent({
+        type: "audio_commentary",
+        id: `${timestamp}`,
+        title: `Epic Commentary — ${chapterList}`,
+        preview: `Cinematic audio commentary covering ${chapterList}`,
+        metadata: {
+          audioUrl: urlData.publicUrl,
+          chapters: selectedChapters.map((c) => ({ book: c.book, chapter: c.chapter })),
+        },
+      });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload audio");
+    } finally {
+      setUploadingToCommunity(false);
+    }
   };
 
   // ── Save to playlist ─────────────────────────────────────────────────────
@@ -521,6 +560,37 @@ export const ExportEpicAudioDialog = ({
                 </svg>
                 Send via WhatsApp
               </Button>
+              {user && !communityShareContent && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start gap-2 border-orange-500/30 text-orange-600 hover:bg-orange-500/10"
+                  onClick={handleShareToCommunity}
+                  disabled={uploadingToCommunity}
+                >
+                  {uploadingToCommunity ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /><span>Uploading…</span></>
+                  ) : (
+                    <><Share2 className="h-4 w-4" /><span>Share to Community</span></>
+                  )}
+                </Button>
+              )}
+              {communityShareContent && user && (
+                <ShareToCommunity
+                  content={communityShareContent}
+                  userId={user.id}
+                  trigger={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start gap-2 border-green-500/30 text-green-600 hover:bg-green-500/10"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      Post to Community Feed
+                    </Button>
+                  }
+                />
+              )}
             </div>
           </div>
         )}

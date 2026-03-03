@@ -19,6 +19,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { QuickShareButton } from "@/components/social/QuickShareButton";
+import { ShareToCommunity } from "@/components/community/ShareToCommunity";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -169,11 +170,25 @@ export function GemsLibrary({ onClose }: GemsLibraryProps) {
               <ChevronRight className="h-4 w-4 rotate-180 mr-1" />
               Back to My Gems
             </Button>
-            <QuickShareButton
-              title={`${selectedSavedGem.gem_title}`}
-              content={selectedSavedGem.gem_notes}
-              type="gem"
-            />
+            <div className="flex items-center gap-2">
+              {user && (
+                <ShareToCommunity
+                  content={{
+                    type: "gem",
+                    id: selectedSavedGem.id,
+                    title: selectedSavedGem.gem_title,
+                    preview: selectedSavedGem.gem_notes,
+                    metadata: { verses: selectedSavedGem.verse_reference },
+                  }}
+                  userId={user.id}
+                />
+              )}
+              <QuickShareButton
+                title={`${selectedSavedGem.gem_title}`}
+                content={selectedSavedGem.gem_notes}
+                type="gem"
+              />
+            </div>
           </div>
           <CardTitle className="text-xl mt-2">{selectedSavedGem.gem_title}</CardTitle>
           <CardDescription className="flex items-center gap-2 flex-wrap">

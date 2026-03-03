@@ -57,6 +57,30 @@ export function useAATSProgress() {
     if (user) loadAll();
   }, [user, loadAll]);
 
+  /** Ensure an enrollment record exists for the avatar (creates started_at for calendar gating) */
+  const ensureEnrolled = useCallback(
+    async (avatarId: string) => {
+      if (!user) return;
+      if (progressMap[avatarId]) return; // already enrolled
+      const key = courseKey(avatarId);
+      try {
+        await supabase.from("course_progress").upsert(
+          {
+            user_id: user.id,
+            course_name: key,
+            completed_lessons: [],
+            progress_percentage: 0,
+          },
+          { onConflict: "user_id,course_name" },
+        );
+        await loadAll();
+      } catch (err) {
+        console.error("AATS ensureEnrolled error:", err);
+      }
+    },
+    [user, progressMap, loadAll],
+  );
+
   /** Mark a single item complete for an avatar */
   const completeItem = useCallback(
     async (avatarId: string, itemId: string, totalItems: number) => {
@@ -66,16 +90,20 @@ export function useAATSProgress() {
 
       try {
         if (!existing) {
-          // Create new record
+          // Create new record with completion
           const completed = [itemId];
           const pct = Math.round((1 / totalItems) * 100);
-          await supabase.from("course_progress").insert({
-            user_id: user.id,
-            course_name: key,
-            completed_lessons: completed,
-            progress_percentage: pct,
-            current_lesson: itemId,
-          });
+          await supabase.from("course_progress").upsert(
+            {
+              user_id: user.id,
+              course_name: key,
+              completed_lessons: completed,
+              progress_percentage: pct,
+              current_lesson: itemId,
+              last_accessed_at: new Date().toISOString(),
+            },
+            { onConflict: "user_id,course_name" },
+          );
         } else {
           const completed = [...(existing.completed_lessons || [])];
           if (!completed.includes(itemId)) completed.push(itemId);
@@ -140,21 +168,35 @@ export function useAATSProgress() {
     [progressMap],
   );
 
-  /** Get the max unlocked day: calendar-based (1 new day per calendar day since start), capped at 56 */
+  /** Get the max unlocked day: requires BOTH calendar date AND previous-day completion.
+   *  Day 1: unlocked immediately on enrollment.
+   *  Day N (2-56): unlocked only if Day N-1 is completed AND calendar date >= start + (N-1) days.
+   */
   const getMaxUnlockedDay = useCallback(
     (avatarId: string): number => {
       const rec = progressMap[avatarId];
-      if (!rec) return 1;
+      if (!rec) return 1; // not enrolled yet — Day 1 only
 
-      // Calendar-based: max 1 new day per calendar day since start
+      // Calendar cap: how many days have elapsed since start
       const startedAt = new Date(rec.started_at);
       const now = new Date();
       const startDay = new Date(startedAt.getFullYear(), startedAt.getMonth(), startedAt.getDate());
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const elapsed = Math.floor((today.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
-      const calendarCap = elapsed + 1;
+      const calendarCap = Math.min(elapsed + 1, 56);
 
-      return Math.min(calendarCap, 56);
+      // Sequential completion cap: can only unlock Day N if Day N-1 is completed
+      const completed = new Set(rec.completed_lessons ?? []);
+      let completionCap = 1; // Day 1 always accessible
+      for (let d = 1; d < 56; d++) {
+        if (completed.has(`wc-day-${d}`)) {
+          completionCap = d + 1; // Day d done → Day d+1 potentially unlockable
+        } else {
+          break; // previous day not done, can't go further
+        }
+      }
+
+      return Math.min(calendarCap, completionCap);
     },
     [progressMap],
   );
@@ -162,6 +204,7 @@ export function useAATSProgress() {
   return {
     progressMap,
     loading,
+    ensureEnrolled,
     completeItem,
     isItemCompleted,
     getPhaseProgress,

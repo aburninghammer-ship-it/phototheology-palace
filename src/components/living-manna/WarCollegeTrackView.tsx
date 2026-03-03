@@ -2,7 +2,7 @@
 // Shows the 56-day journey for a specific avatar's War College track.
 // ALL days are AI-generated on demand. No pre-built manuscripts.
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, CheckCircle2, BookOpen, Swords, Clock,
@@ -36,10 +36,15 @@ interface WarCollegeTrackViewProps {
 export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { completeItem, isItemCompleted, getMaxUnlockedDay } = useAATSProgress();
+  const { ensureEnrolled, completeItem, isItemCompleted, getMaxUnlockedDay } = useAATSProgress();
   const [selectedDay, setSelectedDay] = useState<WarCollegeDay | null>(null);
   const [generating, setGenerating] = useState(false);
   const opponent = DEFENSE_OPPONENTS.find((o) => o.id === track.avatarId);
+
+  // Ensure enrollment record exists when the track view loads (starts the calendar)
+  useEffect(() => {
+    ensureEnrolled(track.avatarId);
+  }, [track.avatarId, ensureEnrolled]);
 
   // Group days into weeks
   const weeks = useMemo(() => {

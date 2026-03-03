@@ -18,12 +18,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { StyledMarkdown } from "@/components/ui/styled-markdown";
 import { useTextToSpeechEnhanced, OPENAI_VOICES } from "@/hooks/useTextToSpeechEnhanced";
 import type { VoiceId } from "@/hooks/useTextToSpeechEnhanced";
 import { GCConflictTag } from "@/components/cota/GCConflictTag";
 import type { GCConflictTag as GCConflictTagType } from "@/types/gcConflictTag";
 import { DefenseMode } from "@/components/living-manna/DefenseMode";
+import { ShareToCommunity } from "@/components/community/ShareToCommunity";
 
 // ─── EGW Book Library ───────────────────────────────────────────────
 interface EGWBook {
@@ -579,6 +581,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   ttsPreloadRef.current = ttsPreload;
   
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Generate audio commentary
   const generateCommentary = useCallback(async () => {
@@ -1664,8 +1667,19 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                     </Select>
                   </div>
 
-                  {/* Regenerate */}
-                  <div className="flex justify-end">
+                  {/* Regenerate + Share */}
+                  <div className="flex justify-end gap-2">
+                    {user && selectedBook && selectedChapter && (
+                      <ShareToCommunity
+                        content={{
+                          type: "study",
+                          id: `egw-${selectedBook.id}-${selectedChapter.number}`,
+                          title: `EGW Commentary — ${selectedBook.shortTitle} Ch. ${selectedChapter.number} (${commentaryMode})`,
+                          preview: commentarySections.join(" ").substring(0, 500),
+                        }}
+                        userId={user.id}
+                      />
+                    )}
                     <Button
                       variant="outline"
                       size="sm"

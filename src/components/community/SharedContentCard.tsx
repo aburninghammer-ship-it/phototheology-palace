@@ -2,18 +2,19 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Gem, 
-  BookOpen, 
-  Layers, 
-  Building2, 
-  Library, 
+import {
+  Gem,
+  BookOpen,
+  Layers,
+  Building2,
+  Library,
   Mic,
-  ExternalLink 
+  Headphones,
+  ExternalLink
 } from "lucide-react";
 
 interface SharedContent {
-  type: "gem" | "study" | "deck" | "palace" | "series" | "sermon";
+  type: "gem" | "study" | "deck" | "palace" | "series" | "sermon" | "audio_commentary";
   id: string;
   title: string;
   preview: string;
@@ -57,11 +58,17 @@ export const SharedContentCard = ({ content }: SharedContentCardProps) => {
         label: "Bible Study Series",
         link: `/bible-study-series` 
       },
-      sermon: { 
-        icon: Mic, 
-        color: "text-rose-500 bg-rose-500/10", 
+      sermon: {
+        icon: Mic,
+        color: "text-rose-500 bg-rose-500/10",
         label: "Sermon",
-        link: `/sermon-builder` 
+        link: `/sermon-builder`
+      },
+      audio_commentary: {
+        icon: Headphones,
+        color: "text-orange-500 bg-orange-500/10",
+        label: "Audio Commentary",
+        link: `/audio-bible`
       }
     };
     return configs[type] || configs.study;
@@ -105,6 +112,24 @@ export const SharedContentCard = ({ content }: SharedContentCardProps) => {
                     📝 {content.metadata.lessons} lessons
                   </Badge>
                 )}
+                {content.metadata.chapters && Array.isArray(content.metadata.chapters) && (
+                  content.metadata.chapters.map((ch: { book: string; chapter: number }, i: number) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      📖 {ch.book} {ch.chapter}
+                    </Badge>
+                  ))
+                )}
+              </div>
+            )}
+
+            {content.metadata?.audioUrl && (
+              <div className="mt-3">
+                <audio
+                  controls
+                  preload="none"
+                  className="w-full h-10 rounded-lg"
+                  src={content.metadata.audioUrl}
+                />
               </div>
             )}
           </div>
