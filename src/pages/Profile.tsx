@@ -377,7 +377,10 @@ export default function Profile() {
             <CardContent>
               <LanguageSelector />
             </CardContent>
-          </Card>
+           </Card>
+
+          {/* Font Size / Accessibility */}
+          <FontSizeSettings />
 
           {/* Patreon Connection */}
           <PatreonConnect />
