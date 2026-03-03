@@ -57,6 +57,33 @@ export function useAATSProgress() {
     if (user) loadAll();
   }, [user, loadAll]);
 
+  // Polling fallback for mobile devices that may miss realtime updates
+  useEffect(() => {
+    if (!user) return;
+    let isActive = true;
+    const POLL_INTERVAL = 15000; // 15 seconds
+
+    const interval = setInterval(() => {
+      if (isActive && !document.hidden) {
+        loadAll();
+      }
+    }, POLL_INTERVAL);
+
+    // Also reload when app regains focus (common mobile pattern)
+    const handleVisibility = () => {
+      if (!document.hidden && isActive) {
+        loadAll();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      isActive = false;
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [user, loadAll]);
+
   /** Ensure an enrollment record exists for the avatar (creates started_at for calendar gating) */
   const ensureEnrolled = useCallback(
     async (avatarId: string) => {
