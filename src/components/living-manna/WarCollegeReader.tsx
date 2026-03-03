@@ -1,7 +1,7 @@
 // ─── War College Manuscript Reader ──────────────────────────────────────────
 // Immersive, long-form reader for War College Strategic Manuscripts.
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, BookOpen, Swords, Target, CheckCircle2,
@@ -37,6 +37,11 @@ export function WarCollegeReader({
   const [masteryAnswers, setMasteryAnswers] = useState<Record<number, boolean>>({});
   const [activePanel, setActivePanel] = useState<"read" | "audio" | "qa">("read");
   const rankInfo = RANK_CONFIG[study.rank];
+  const [autoMarkedComplete, setAutoMarkedComplete] = useState(false);
+
+  useEffect(() => {
+    setAutoMarkedComplete(false);
+  }, [study.dayNumber]);
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -121,6 +126,12 @@ export function WarCollegeReader({
             title={`🎧 Listen — Day ${study.dayNumber}: ${study.title}`}
             voice="onyx"
             showVoiceSelector={true}
+            onEnded={() => {
+              if (!isCompleted && onComplete && !autoMarkedComplete) {
+                setAutoMarkedComplete(true);
+                onComplete();
+              }
+            }}
           />
         </TabsContent>
 

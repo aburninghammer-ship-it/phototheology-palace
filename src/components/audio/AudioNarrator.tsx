@@ -36,6 +36,7 @@ interface AudioNarratorProps {
   autoPlay?: boolean;
   voice?: VoiceId;
   showVoiceSelector?: boolean;
+  onEnded?: () => void;
 }
 
 export const AudioNarrator = ({ 
@@ -44,7 +45,8 @@ export const AudioNarrator = ({
   className,
   autoPlay = false,
   voice: initialVoice = "onyx",
-  showVoiceSelector = true
+  showVoiceSelector = true,
+  onEnded,
 }: AudioNarratorProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -202,6 +204,7 @@ export const AudioNarrator = ({
         setProgress(0);
         notifyTTSStopped();
         clearMediaSession();
+        onEnded?.();
       };
 
       audio.onerror = (e) => {
