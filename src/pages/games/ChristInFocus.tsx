@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
@@ -1095,20 +1096,22 @@ export default function ChristInFocus() {
   };
 
   // Main render
-  switch (gameState) {
-    case 'menu':
-      return renderMenu();
-    case 'categorySelect':
-      return renderCategorySelect();
-    case 'levelSelect':
-      return renderLevelSelect();
-    case 'playing':
-      return renderPlaying();
-    case 'paused':
-      return renderPaused();
-    case 'levelComplete':
-      return renderLevelComplete();
-    default:
-      return renderMenu();
-  }
+  const content = (() => {
+    switch (gameState) {
+      case 'menu': return renderMenu();
+      case 'categorySelect': return renderCategorySelect();
+      case 'levelSelect': return renderLevelSelect();
+      case 'playing': return renderPlaying();
+      case 'paused': return renderPaused();
+      case 'levelComplete': return renderLevelComplete();
+      default: return renderMenu();
+    }
+  })();
+
+  return (
+    <>
+      {content}
+      <FloatingGameChat gameType="christ-in-focus" />
+    </>
+  );
 }

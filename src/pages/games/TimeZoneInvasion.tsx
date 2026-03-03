@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
@@ -261,6 +262,7 @@ export default function TimeZoneInvasion() {
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="time-zone-invasion" />
     </div>
   );
 }

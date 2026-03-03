@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -958,6 +959,7 @@ export default function SpeedVerse3D() {
           </>
         )}
       </div>
+      <FloatingGameChat gameType="speed-verse-3d" />
     </div>
   );
 }

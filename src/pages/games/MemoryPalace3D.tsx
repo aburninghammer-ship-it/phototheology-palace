@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, Suspense } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -630,6 +631,7 @@ export default function MemoryPalace3D() {
           <p>{t('games.memoryPalace.controlsHelp')}</p>
         </Card>
       </div>
+      <FloatingGameChat gameType="memory-palace-3d" />
     </div>
   );
 }
