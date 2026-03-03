@@ -199,7 +199,13 @@ export function useAATSProgress() {
       const startDay = new Date(startedAt.getFullYear(), startedAt.getMonth(), startedAt.getDate());
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const elapsed = Math.floor((today.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
-      const calendarCap = Math.min(elapsed + 1, 56);
+      let calendarCap = Math.min(elapsed + 1, 56);
+
+      // TEMPORARY OVERRIDE: Allow up to Day 3 if Day 1 is done (expires 2026-03-04)
+      const overrideExpiry = new Date('2026-03-04T23:59:59');
+      if (now <= overrideExpiry && calendarCap < 3) {
+        calendarCap = 3;
+      }
 
       // Sequential completion cap: can only unlock Day N if Day N-1 is completed
       const completed = new Set(rec.completed_lessons ?? []);
