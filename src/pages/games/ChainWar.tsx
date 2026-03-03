@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Trophy, Link as LinkIcon, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 import { useAuth } from "@/hooks/useAuth";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
@@ -276,6 +277,7 @@ export default function ChainWar() {
           </CardContent>
         </Card>
       </div>
+      <FloatingGameChat gameType="chain-war" />
     </div>
   );
 }

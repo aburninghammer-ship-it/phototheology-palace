@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Scale } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 const STREET_OBJECTIONS = [
   "Why should I care about Jesus?",
@@ -101,6 +102,7 @@ export default function WitnessTrial() {
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="witness-trial" />
     </div>
   );
 }

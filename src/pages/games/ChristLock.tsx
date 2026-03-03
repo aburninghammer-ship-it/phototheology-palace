@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Crown, Timer, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useAuth } from "@/hooks/useAuth";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
 
@@ -301,6 +302,7 @@ export default function ChristLock() {
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="christ-lock" />
     </div>
   );
 }

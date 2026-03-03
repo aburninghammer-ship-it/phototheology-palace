@@ -14,6 +14,7 @@ import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
 import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion } from "framer-motion";
 import { Footer } from "@/components/Footer";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 type PieceColor = 'red' | 'black';
 
@@ -591,6 +592,7 @@ export default function PhototheologyCheckers() {
       </main>
 
       <Footer />
+      <FloatingGameChat roomId={multiplayer.room?.id} gameType="checkers" />
     </div>
   );
 }

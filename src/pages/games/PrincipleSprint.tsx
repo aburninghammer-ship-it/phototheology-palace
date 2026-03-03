@@ -14,6 +14,7 @@ import { useGameSession } from "@/hooks/useGameSession";
 import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
 import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion, AnimatePresence } from "framer-motion";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 interface Question {
   verse: string;
@@ -593,6 +594,7 @@ export default function PrincipleSprint() {
           </Button>
         </Card>
       </div>
+      <FloatingGameChat roomId={multiplayer.room?.id} gameType="principle-sprint" />
     </div>
   );
 }

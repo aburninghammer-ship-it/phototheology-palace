@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -837,6 +838,7 @@ const ObservationFlux = () => {
           </div>
         </div>
       </main>
+      <FloatingGameChat gameType="observation-flux" />
     </div>
   );
 };

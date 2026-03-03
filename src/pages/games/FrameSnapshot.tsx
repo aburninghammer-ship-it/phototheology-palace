@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Film } from "lucide-react";
 import { toast } from "sonner";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { supabase } from "@/integrations/supabase/client";
 
 const FRAMES = ["F01", "F07", "F12", "F24"];
@@ -68,6 +69,7 @@ export default function FrameSnapshot() {
           <Card><CardContent className="pt-6 space-y-4"><Textarea value={narrative} onChange={(e) => setNarrative(e.target.value)} placeholder={t('games.frameSnapshot.narrativePlaceholder')} className="min-h-48" /><Button onClick={handleSubmit} disabled={isSubmitting} className="w-full">{t('games.frameSnapshot.lockFrame')}</Button></CardContent></Card>
         </div>
       </div>
+      <FloatingGameChat gameType="frame-snapshot" />
     </div>
   );
 }

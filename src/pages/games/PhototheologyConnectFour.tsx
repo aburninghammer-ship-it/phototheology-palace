@@ -14,6 +14,7 @@ import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
 import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/Footer";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 type Player = 'red' | 'yellow' | null;
 
@@ -480,6 +481,7 @@ export default function PhototheologyConnectFour() {
       </main>
 
       <Footer />
+      <FloatingGameChat roomId={multiplayer.room?.id} gameType="connect-four" />
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
 import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/Footer";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 // Chess piece types
 type PieceType = 'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn';
@@ -666,6 +667,7 @@ export default function PhototheologyChess() {
       </main>
 
       <Footer />
+      <FloatingGameChat roomId={multiplayer.room?.id} gameType="chess" />
     </div>
   );
 }

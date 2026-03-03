@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Trophy, Zap, Heart, Target, CheckCircle2, XCircle, Sparkles, Timer, RotateCcw } from 'lucide-react';
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 interface Symbol {
   id: string;
@@ -829,6 +830,7 @@ const SymbolDecoder: React.FC = () => {
           </>
         )}
       </div>
+      <FloatingGameChat gameType="symbol-decoder" />
     </div>
   );
 };

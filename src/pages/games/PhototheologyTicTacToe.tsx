@@ -14,6 +14,7 @@ import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
 import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/Footer";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 type Player = 'X' | 'O' | null;
 
@@ -449,6 +450,7 @@ export default function PhototheologyTicTacToe() {
       </main>
 
       <Footer />
+      <FloatingGameChat roomId={multiplayer.room?.id} gameType="tic-tac-toe" />
     </div>
   );
 }

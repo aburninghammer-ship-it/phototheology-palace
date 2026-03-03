@@ -16,6 +16,7 @@ import { useGameMultiplayer } from "@/hooks/useGameMultiplayer";
 import { MultiplayerLobby } from "@/components/games/MultiplayerLobby";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/Footer";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 
 interface Clue {
   id: string;
@@ -947,6 +948,7 @@ export default function PhototheologyJeopardy() {
       </main>
 
       <Footer />
+      <FloatingGameChat roomId={multiplayer.room?.id} gameType="jeopardy" />
     </div>
   );
 }

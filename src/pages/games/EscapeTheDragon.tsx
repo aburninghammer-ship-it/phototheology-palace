@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Heart, Skull, Trophy, Bot, Lightbulb, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useAuth } from "@/hooks/useAuth";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
 import {
@@ -425,6 +426,7 @@ export default function EscapeTheDragon() {
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="escape-the-dragon" />
     </div>
   );
 }
