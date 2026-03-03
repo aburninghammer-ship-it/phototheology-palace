@@ -301,12 +301,12 @@ export const VerseView = ({
           "group cursor-pointer transition-all duration-300 p-3 rounded-lg",
           isAudioPlaying
             ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30 backdrop-blur-md"
+            : highlightColor && !isSelected
+            ? `${getHighlightBgClass()} border-2 border-transparent hover:border-muted`
             : isSelected
             ? "bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
             : isHighlighted
             ? "bg-accent/20 border-2 border-accent shadow-md animate-pulse-glow"
-            : highlightColor
-            ? `${getHighlightBgClass()} border-2 border-transparent hover:border-muted`
             : "hover:bg-white/5 border-2 border-transparent"
         )}
         onClick={onSelect}
@@ -323,7 +323,7 @@ export const VerseView = ({
             </span>
             
             {/* Highlight, Note & Ask Jeeves buttons */}
-            <div className="flex gap-0.5">
+            <div className="flex gap-0.5" onClick={(e) => e.stopPropagation()}>
               {onHighlight && onRemoveHighlight && (
                 <VerseHighlightMenu
                   verse={verse.verse}
