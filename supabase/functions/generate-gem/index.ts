@@ -22,37 +22,39 @@ function hashContent(content: string): string {
 const GEM_STYLES = {
   typology: {
     name: "Typology Gem",
-    focus: "Christ-centered connections between Old Testament types and New Testament antitypes",
-    instructions: `Focus on TYPOLOGY:
-- Find a powerful type/shadow in the OT that points to Christ in the NT
+    focus: "Christ-centered connections between Old Testament types and New Testament antitypes that are NOT already well-known",
+    instructions: `Focus on TYPOLOGY — but DEEP, NON-OBVIOUS typology:
+- Find a type/shadow connection that is NOT already catalogued in standard study Bibles
 - Use the 5 Christ Tracers: Innocent Sufferer, Substitute, Deliverer, Covenant Mediator, Restorer/Bridegroom/King
-- Show how the type was fulfilled, often with precise details the original audience couldn't have known
-- Examples: Joseph sold for silver → Christ sold for silver; Passover lamb → Lamb of God; Bronze serpent → Christ lifted up`
+- The type MUST come from a passage NOT commonly associated with Christ
+- FORBIDDEN obvious examples: Joseph sold for silver, Passover lamb = Lamb of God, Bronze serpent, Isaac on Moriah, Jonah 3 days — these are too well-known
+- Instead: find types in unexpected places — Levitical laws, obscure narratives, Wisdom literature, geographic details, architectural specifications`
   },
   hebrew_greek: {
     name: "Word Study Gem",
-    focus: "Hebrew or Greek word insights revealing deeper meaning",
-    instructions: `Focus on ORIGINAL LANGUAGE INSIGHT:
-- Choose a Hebrew (OT) or Greek (NT) word with rich theological depth
-- Show how the original word reveals meaning lost in translation
-- Connect the word's usage across multiple passages
-- Include etymology, related words, or wordplay when relevant
-- Examples: "Hesed" (covenant love), "Shalom" (wholeness), "Logos" (Word), "Agape" (divine love)`
+    focus: "Hebrew or Greek word insights revealing meaning that transforms understanding of a passage",
+    instructions: `Focus on ORIGINAL LANGUAGE INSIGHT — but go DEEPER than vocabulary lists:
+- Do NOT just define a well-known word (hesed, shalom, agape, logos — these are overdone)
+- Instead: find a word whose Hebrew/Greek meaning INVERTS or TRANSFORMS a familiar passage
+- Show how the same root word creates an invisible thread between passages no one connects
+- Look for: wordplay the English hides, grammatical forms that change meaning, words used ONCE that echo another book
+- The insight must make the reader say "I've read that verse 100 times and never saw that"`
   },
   prophecy: {
     name: "Prophecy Gem",
-    focus: "Prophetic patterns, fulfillments, and Daniel/Revelation connections",
-    instructions: `Focus on PROPHECY:
-- Connect prophetic texts from Daniel, Revelation, or OT prophets
-- Show prophetic patterns: prediction → fulfillment across time
+    focus: "Prophetic patterns and structural connections that go beyond standard prophecy charts",
+    instructions: `Focus on PROPHECY — but NOT standard prophecy-fulfillment charts:
+- Do NOT use: Isaiah 53 = Jesus, Daniel 2 statue, Micah 5:2 = Bethlehem — these are basic
+- Instead: find prophetic STRUCTURAL patterns — mathematical symmetry, narrative inversion, covenant progression
 - Use the 8 Prophetic Cycles: @Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re
 - Apply the 3 Heavens framework when relevant (1H, 2H, 3H)
-- CRITICAL: Day of Atonement = 1844 judgment, NOT the cross (Passover = cross)`
+- CRITICAL: Day of Atonement = 1844 judgment, NOT the cross (Passover = cross)
+- Show how prophecy creates a HIDDEN ARCHITECTURE across books that different human authors couldn't have coordinated`
   },
   palace: {
     name: "Palace Gem",
-    focus: "Connection to a specific PhotoTheology Palace room methodology",
-    instructions: `Focus on PALACE METHODOLOGY:
+    focus: "Connection to PhotoTheology Palace methodology that unlocks a non-obvious insight",
+    instructions: `Focus on PALACE METHODOLOGY — applied to SURPRISING material:
 - Tie the gem to a specific Palace room/floor
 - Reference the room's unique approach:
   * Story Room (narrative structure)
@@ -63,37 +65,39 @@ const GEM_STYLES = {
   * Prophecy Room (prophetic overlay)
   * Parallels Room (mirrored actions)
   * Concentration Room (Christ in every verse)
-- Show how the room's method unlocks the insight`
+- The room's method must unlock something INVISIBLE to casual reading
+- Apply the method to a passage that seems barren of deeper meaning — show it's actually rich`
   },
   chiasm: {
     name: "Chiasm Gem",
-    focus: "Literary structures, chiastic patterns, and Hebrew parallelism",
-    instructions: `Focus on LITERARY STRUCTURE:
-- Identify a chiastic structure (ABCBA pattern) or parallel construction
-- Show how the structure emphasizes the central point
-- Reveal meaning hidden in the literary artistry
-- Examples: Genesis 1 structure, Psalm 23 chiasm, John's Gospel inversions
-- Point out how the center of the chiasm reveals the author's main emphasis`
+    focus: "Literary structures that reveal hidden theological emphasis",
+    instructions: `Focus on LITERARY STRUCTURE — but find UNDISCOVERED patterns:
+- Do NOT use well-known chiasms (Genesis 1, Psalm 23, Flood narrative — these are catalogued)
+- Instead: find a chiastic structure or parallel construction that reveals a SHOCKING center point
+- Look in: minor prophets, Levitical laws, epistles, genealogies, travel narratives
+- Show how the structure was INVISIBLE until you map it — then it changes the entire passage's meaning
+- The center of the chiasm must reveal something theologically explosive`
   },
   number: {
     name: "Number Gem",
-    focus: "Biblical numerology and symbolic number patterns",
-    instructions: `Focus on BIBLICAL NUMBERS:
-- Explore the significance of a biblical number pattern
-- Key numbers: 3 (divine), 7 (completion), 12 (governance), 40 (testing), 70 (fullness), 144 (heavenly order)
-- Show how numbers create intentional connections across Scripture
-- Examples: 40 days/years patterns, 7 churches/seals/trumpets, 12 tribes/apostles
-- Avoid arbitrary numerology — focus on clear patterns the text emphasizes`
+    focus: "Biblical number patterns that reveal divine intentionality across distant texts",
+    instructions: `Focus on BIBLICAL NUMBERS — but NOT the standard list:
+- Do NOT just say: 7 = completion, 12 = governance, 40 = testing — that's a chart, not a gem
+- Instead: find a NUMBER that creates an invisible connection between passages no one links
+- Show mathematical precision across books written centuries apart
+- Look for: timing patterns, counting structures, dimensional ratios, generational sequences
+- The number pattern must feel like discovering a hidden code — not reading a reference table`
   },
   story: {
     name: "Story Gem",
-    focus: "Narrative parallels between two Bible stories",
-    instructions: `Focus on STORY PARALLELS:
-- Find two stories from different books that mirror each other
-- Show how one story illuminates the other
-- Use the Christ-Church parallel pattern when applicable
-- Examples: Joseph/Christ, Elijah/John the Baptist, Exodus/Redemption
-- Highlight 3-5 specific parallel elements between the narratives`
+    focus: "Narrative parallels between stories that appear to have NOTHING in common",
+    instructions: `Focus on STORY PARALLELS — but between UNLIKELY pairs:
+- FORBIDDEN obvious pairs: Joseph/Christ, Moses/Christ, Elijah/John Baptist, Adam/Christ, Exodus/Redemption
+- Instead: connect stories from DIFFERENT GENRES that share a hidden structural pattern
+- Pair Law with Epistle, Wisdom with Apocalyptic, Poetry with Narrative
+- The reader's first reaction should be: "What could these possibly have in common?"
+- Then the parallels should be undeniable once revealed
+- Look for: reversal patterns, death→life movements, exile→return arcs, garden→mountain progressions`
   }
 };
 
@@ -303,14 +307,54 @@ DEPTH LEVEL: ${depthConfig.name}
 ${depthConfig.instructions}
 ${passageFocus}
 
-GOAL OF A GEM:
+═══════════════════════════════════════════════════════════════
+ANTI-OBVIOUS FILTER — READ THIS FIRST
+═══════════════════════════════════════════════════════════════
+
+A Gem is NOT:
+- A collection of obvious cross-references
+- Verses that share the same nouns or keywords
+- Parallel passages already linked in study Bibles
+- Prophecy → fulfillment chains that are already explicit
+- Anything a marginal-reference Bible already connects
+
+BEFORE generating, apply this disqualification test:
+1. Do these verses already reference each other? → DISCARD
+2. Are they connected by shared keywords or nouns? → DISCARD
+3. Would a standard study Bible margin already link them? → DISCARD
+4. Is this a well-known sermon illustration? → DISCARD
+If any answer is YES, choose different verses and try again.
+
+A Gem MUST:
+- Use 2–4 verses that appear UNRELATED on the surface
+- Cross biblical genres (Law / Wisdom / Prophets / Gospel / Epistle / Apocalyptic)
+- Require conceptual reasoning to connect — not keyword matching
+- Produce intellectual TENSION before clarity
+- Create a "How did I never see that?" reaction
+- Be Christ-centered without forcing typology artificially
+
+INSTEAD of keywords, search for:
+- Shared structural patterns (death→life, exile→return, water→Spirit, garden→mountain)
+- Mathematical symmetry across books
+- Narrative inversion (one story mirrors another in reverse)
+- Covenant progression hidden across genres
+- Hidden metaphors that link distant texts
+- Judgment-to-mercy movements
+- First mention vs final fulfillment (but NOT obvious ones)
+- Sanctuary patterns embedded in non-sanctuary texts
+- Psychological/emotional states mirrored across covenants
+
+═══════════════════════════════════════════════════════════════
+GOAL OF A GEM
+═══════════════════════════════════════════════════════════════
+
 A Gem must feel like a "hidden facet of Scripture suddenly turning in the light."
 It must be:
-- Unexpected (non-obvious, not a cliché)
-- Deep (rich theology, not superficial)
-- Elegant (simple but profound insight)
-- Grounded in sound biblical theology (no offshoot errors)
-- Accurate + defensible (with references)
+- SURPRISING (an advanced Bible student would say "I've never noticed that")
+- STRUCTURALLY ELEGANT (the connection is precise, not forced)
+- DEEP (rich theology, not superficial)
+- GROUNDED in sound biblical theology (no offshoot errors)
+- ACCURATE + DEFENSIBLE (with references)
 
 ═══════════════════════════════════════════════════════════════
 CRITICAL THEOLOGICAL GUARDRAILS
@@ -341,16 +385,30 @@ Required GEM Structure (use these exact headers):
 A poetic 3–7 word title capturing the insight.
 
 🔹 THE VERSES
-List the chosen verses in full (KJV).
+List 2–4 chosen verses in full (KJV). These verses must appear to have NOTHING in common at first glance.
+
+🔹 THE QUESTION
+"What could these possibly have in common?" — Frame the tension. Let the reader feel the disconnect before revealing the connection.
 
 🔹 THE THREAD
-A ${depth === 'quick' ? '2-3' : depth === 'study' ? '3-4' : '4-5'} sentence explanation revealing the unexpected connection.
+A ${depth === 'quick' ? '2-3' : depth === 'study' ? '3-4' : '4-5'} sentence explanation that slowly reveals the unexpected connection. Build from tension to clarity.
 
 🔹 THE GEM
-A ${depth === 'quick' ? '3-4' : depth === 'study' ? '5-6' : '6-8'} sentence paragraph showing the beauty of the connection with a stunning "hit line" at the end.
+A ${depth === 'quick' ? '3-4' : depth === 'study' ? '5-6' : '6-8'} sentence paragraph showing the beauty of the connection. End with ONE unforgettable sentence that compresses the entire insight — the "hit line."
 
 🔹 BIBLICAL ALIGNMENT
 2-3 sentences confirming alignment with redemption, sanctuary, and sound biblical theology. NEVER use the word "Adventist" or any denominational label.
+
+═══════════════════════════════════════════════════════════════
+QUALITY GATE — SELF-CHECK BEFORE OUTPUTTING
+═══════════════════════════════════════════════════════════════
+
+Before finalizing, evaluate your gem:
+- Is this SURPRISING? Would an advanced student say "I never noticed that"?
+- Is this NON-OBVIOUS? Could someone find this with a concordance? If yes → regenerate.
+- Is this STRUCTURALLY ELEGANT? Is the connection precise, not forced?
+- Do the verses come from DIFFERENT genres? If they're all from the same genre → reconsider.
+If the answer to any check is NO → start over with different verses.
 
 FORMATTING: Use emojis sparingly (📖 ✨ 💎). NO markdown bold/italic. Clean, readable format.
 
@@ -366,7 +424,7 @@ Unique seed: ${uniqueSeed}`;
       systemPrompt += ragResult.corpusContext;
     }
 
-    const userPrompt = `Produce a ${styleConfig.name} at ${depthConfig.name} depth. ${passage ? `Focus on ${passage}.` : 'Select unusual verse combinations.'} Follow the Gem structure exactly. Make it deep, elegant, unexpected, and revelation-like. Seed: ${uniqueSeed}`;
+    const userPrompt = `Produce a ${styleConfig.name} at ${depthConfig.name} depth. ${passage ? `Connect to ${passage} but pair it with a verse from a COMPLETELY DIFFERENT genre that shares NO obvious keywords.` : 'Select verses from DIFFERENT genres (Law/Wisdom/Prophets/Gospel/Epistle) that appear to have NOTHING in common on the surface.'} Apply the Anti-Obvious Filter — disqualify any connection a study Bible margin would already make. The reader should feel intellectual tension before clarity. Follow the Gem structure exactly. Include THE QUESTION section. Seed: ${uniqueSeed}`;
 
     console.log('Generating gem with Lovable AI...');
 
