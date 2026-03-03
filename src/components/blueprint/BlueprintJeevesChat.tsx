@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Sparkles, Trash2 } from "lucide-react";
+import { CopyButton } from "@/components/ui/copy-button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SaveJeevesResponseButton } from "@/components/jeeves/SaveJeevesResponseButton";
@@ -134,6 +135,11 @@ export function BlueprintJeevesChat({ lessonId, lessonTitle, lessonContent }: Bl
                   }`}
                 >
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  {msg.role === "assistant" && (
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <CopyButton text={msg.content} size="sm" className="h-6 text-[10px] text-muted-foreground" />
+                    </div>
+                  )}
                   {msg.role === "assistant" && idx > 0 && (
                     <div className="mt-2 pt-2 border-t border-border/50">
                       <SaveJeevesResponseButton

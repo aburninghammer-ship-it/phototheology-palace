@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Send, Loader2, ChevronDown, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
+import { CopyButton } from "@/components/ui/copy-button";
 
 interface Message {
   role: "user" | "assistant";
@@ -285,13 +286,18 @@ export const JeevesWidget = () => {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[88%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                    className={`max-w-[88%] px-3 py-2 rounded-2xl text-sm leading-relaxed group/msg ${
                       msg.role === "user"
                         ? "bg-primary text-primary-foreground rounded-br-sm"
                         : "bg-muted text-foreground border border-border rounded-bl-sm"
                     }`}
                   >
                     {msg.content}
+                    {msg.role === "assistant" && (
+                      <div className="mt-1 opacity-0 group-hover/msg:opacity-100 transition-opacity">
+                        <CopyButton text={msg.content} size="sm" className="h-6 text-[10px] text-muted-foreground" />
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

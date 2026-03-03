@@ -8,6 +8,7 @@ import { Flame, Send, Loader2, Sparkles, Lightbulb, MessageCircle } from "lucide
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { CopyButton } from "@/components/ui/copy-button";
 
 interface Message {
   id: string;
@@ -209,12 +210,17 @@ Share your raw thoughts — I'll help you find the gems hidden in them.`,
                     <p className="text-sm whitespace-pre-wrap leading-relaxed">
                       {message.content}
                     </p>
-                    <span className="text-xs text-orange-200/40 mt-2 block">
-                      {message.timestamp.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-orange-200/40">
+                        {message.timestamp.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      {message.role === "jeeves" && (
+                        <CopyButton text={message.content} size="sm" className="h-6 text-[10px] text-orange-200/60 hover:text-white" />
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               ))}

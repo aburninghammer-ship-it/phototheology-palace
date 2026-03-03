@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { CopyButton } from "@/components/ui/copy-button";
 
 // Gem style types
 const GEM_STYLES = [
@@ -756,14 +757,15 @@ export default function GiveMeAGem() {
                     </div>
                   </div>
 
-                  {/* Selection Hint */}
-                  <div className="mt-4 pt-4 border-t border-emerald-100 dark:border-emerald-900/30">
+                  {/* Copy + Selection Hint */}
+                  <div className="mt-4 pt-4 border-t border-emerald-100 dark:border-emerald-900/30 flex items-center justify-between">
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <MessageCircle className="h-4 w-4" />
                       {selectedText
                         ? `${t('gems.selected', 'Selected')}: "${selectedText.substring(0, 50)}${selectedText.length > 50 ? "..." : ""}"`
                         : t('gems.highlightHint', 'Highlight any text above to ask Jeeves to expound on it')}
                     </p>
+                    <CopyButton text={`${gem.title}\n\n${gem.content}`} size="sm" className="text-xs text-muted-foreground" />
                   </div>
                 </CardContent>
               </Card>
@@ -861,11 +863,14 @@ export default function GiveMeAGem() {
                                 key={i}
                                 className="p-4 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/20 space-y-2"
                               >
-                                <div className="text-xs text-muted-foreground">
-                                  <span className="font-medium">
-                                    On: "{exp.selectedText.substring(0, 60)}
-                                    {exp.selectedText.length > 60 ? "..." : ""}"
-                                  </span>
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="text-xs text-muted-foreground">
+                                    <span className="font-medium">
+                                      On: "{exp.selectedText.substring(0, 60)}
+                                      {exp.selectedText.length > 60 ? "..." : ""}"
+                                    </span>
+                                  </div>
+                                  <CopyButton text={`Q: ${exp.question}\n\n${exp.response}`} size="sm" className="h-6 text-[10px] text-muted-foreground flex-shrink-0" />
                                 </div>
                                 <div className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
                                   Q: {exp.question}

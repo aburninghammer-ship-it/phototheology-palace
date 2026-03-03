@@ -18,6 +18,7 @@ import {
   Building2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CopyButton } from "@/components/ui/copy-button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { JeevesModeSelector } from "./JeevesModeSelector";
@@ -366,12 +367,17 @@ export function JeevesChat({
                     <p className="text-sm whitespace-pre-wrap leading-relaxed">
                       {message.content}
                     </p>
-                    <span className="text-xs text-slate-500 mt-2 block">
-                      {message.timestamp.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-slate-500">
+                        {message.timestamp.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      {message.role === "jeeves" && (
+                        <CopyButton text={message.content} size="sm" className="h-6 text-[10px] text-slate-400 hover:text-white" />
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               ))}

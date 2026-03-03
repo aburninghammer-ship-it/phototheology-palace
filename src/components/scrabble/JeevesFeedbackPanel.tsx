@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { StudyLogEntry } from './StudyLog';
 import type { SelectedVerse } from './VerseSelectionScreen';
 import { cn } from '@/lib/utils';
+import { CopyButton } from '@/components/ui/copy-button';
 
 interface JeevesFeedbackPanelProps {
   entry: StudyLogEntry | null;
@@ -192,6 +193,17 @@ Respond ONLY with valid JSON:
                 <p className="text-sm italic">"{entry.explanation}"</p>
               </div>
 
+              {/* Copy All */}
+              <div className="flex justify-end">
+                <CopyButton
+                  text={`What you got right:\n${feedback.recap}\n\nPolished insight:\n${feedback.polished}\n\nBonus gem:\n${feedback.gem}`}
+                  label="Copy All"
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs"
+                />
+              </div>
+
               {/* Jeeves Recap */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -199,9 +211,12 @@ Respond ONLY with valid JSON:
                 transition={{ delay: 0.1 }}
                 className="p-3 bg-green-500/10 rounded-lg border border-green-500/20"
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span className="text-sm font-medium text-green-600 dark:text-green-400">What you got right</span>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="text-sm font-medium text-green-600 dark:text-green-400">What you got right</span>
+                  </div>
+                  <CopyButton text={feedback.recap} size="sm" className="h-6 text-[10px] text-muted-foreground" />
                 </div>
                 <p className="text-sm leading-relaxed">{feedback.recap}</p>
               </motion.div>
@@ -213,9 +228,12 @@ Respond ONLY with valid JSON:
                 transition={{ delay: 0.2 }}
                 className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20"
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Polished insight</span>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Polished insight</span>
+                  </div>
+                  <CopyButton text={feedback.polished} size="sm" className="h-6 text-[10px] text-muted-foreground" />
                 </div>
                 <p className="text-sm leading-relaxed">{feedback.polished}</p>
               </motion.div>
@@ -227,9 +245,12 @@ Respond ONLY with valid JSON:
                 transition={{ delay: 0.3 }}
                 className="p-3 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 rounded-lg border border-yellow-500/30"
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <Gem className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Bonus gem</span>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Gem className="h-4 w-4 text-yellow-500" />
+                    <span className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Bonus gem</span>
+                  </div>
+                  <CopyButton text={feedback.gem} size="sm" className="h-6 text-[10px] text-muted-foreground" />
                 </div>
                 <p className="text-sm leading-relaxed">{feedback.gem}</p>
               </motion.div>
