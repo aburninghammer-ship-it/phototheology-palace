@@ -57,7 +57,17 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<VoiceId>(defaultVoice);
+  const [selectedVoice, _setSelectedVoice] = useState<VoiceId>(() => {
+    try {
+      const saved = localStorage.getItem(`tts_voice_${defaultVoice}`);
+      if (saved && OPENAI_VOICES.some(v => v.id === saved)) return saved as VoiceId;
+    } catch {}
+    return defaultVoice;
+  });
+  const setSelectedVoice = useCallback((voice: VoiceId) => {
+    _setSelectedVoice(voice);
+    try { localStorage.setItem(`tts_voice_${defaultVoice}`, voice); } catch {}
+  }, [defaultVoice]);
   const [wasCached, setWasCached] = useState(false);
   const [currentMode, setCurrentMode] = useState<'openai' | 'browser'>('openai');
   const [networkStatus, setNetworkStatus] = useState<'online' | 'offline' | 'slow'>('online');
@@ -302,9 +312,10 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
   // OpenAI TTS with timeout
   const speakWithElevenLabs = useCallback(async (text: string, speakOptions?: SpeakOptions) => {
     const opts: SpeakOptions = speakOptions || {};
+    const voiceForCache = (opts.voice || selectedVoice) as string;
 
     // Check preloaded cache first — instant playback for preloaded sections
-    const cacheKey = text.slice(0, 120);
+    const cacheKey = `${voiceForCache}:${text.slice(0, 120)}`;
     const preloadedUrl = preloadedAudioRef.current.get(cacheKey);
     if (preloadedUrl) {
       console.log('[TTS] Using preloaded audio — zero gap!');
@@ -531,12 +542,12 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
   const preload = useCallback(async (text: string, speakOptions?: SpeakOptions) => {
     if (!text.trim()) return;
     const cleanText = sanitizeTextForTTS(text);
-    const cacheKey = cleanText.slice(0, 120);
+    const opts: SpeakOptions = speakOptions || {};
+    const requestedVoice = (opts.voice || selectedVoice) as unknown as string;
+    const cacheKey = `${requestedVoice}:${cleanText.slice(0, 120)}`;
     if (preloadedAudioRef.current.has(cacheKey)) return; // already preloaded
 
     try {
-      const opts: SpeakOptions = speakOptions || {};
-      const requestedVoice = (opts.voice || selectedVoice) as unknown as string;
       const normalizedVoice = (requestedVoice === 'ballad'
         ? 'sage'
         : requestedVoice === 'verse'

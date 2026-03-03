@@ -140,19 +140,13 @@ export function useAATSProgress() {
     [progressMap],
   );
 
-  /** Get the max unlocked day: completion-based, but also capped by calendar days since start */
+  /** Get the max unlocked day: calendar-based (1 new day per calendar day since start), capped at 56 */
   const getMaxUnlockedDay = useCallback(
     (avatarId: string): number => {
       const rec = progressMap[avatarId];
       if (!rec) return 1;
 
-      // Completion-based: next day after all completed days
-      const completedDays = (rec.completed_lessons ?? []).filter((id) =>
-        id.startsWith("wc-day-")
-      ).length;
-      const completionBased = completedDays + 1;
-
-      // Calendar-based cap: max 1 new day per calendar day since start
+      // Calendar-based: max 1 new day per calendar day since start
       const startedAt = new Date(rec.started_at);
       const now = new Date();
       const startDay = new Date(startedAt.getFullYear(), startedAt.getMonth(), startedAt.getDate());
@@ -160,8 +154,7 @@ export function useAATSProgress() {
       const elapsed = Math.floor((today.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
       const calendarCap = elapsed + 1;
 
-      // Use whichever is lower to prevent rushing ahead, capped at 56
-      return Math.min(completionBased, calendarCap, 56);
+      return Math.min(calendarCap, 56);
     },
     [progressMap],
   );
