@@ -7528,6 +7528,139 @@ export type Database = {
           },
         ]
       }
+      game_night_follow_ups: {
+        Row: {
+          created_at: string
+          follow_up_type: string
+          guest_id: string
+          id: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          follow_up_type: string
+          guest_id: string
+          id?: string
+          scheduled_for: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          follow_up_type?: string
+          guest_id?: string
+          id?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_night_follow_ups_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "game_night_guests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_night_guests: {
+        Row: {
+          converted_at: string | null
+          converted_to_user: boolean
+          converted_user_id: string | null
+          first_played_at: string
+          games_played: string[]
+          guest_email: string
+          guest_name: string | null
+          id: string
+          invite_id: string
+          last_active_at: string
+          session_token: string
+          total_play_time_minutes: number
+        }
+        Insert: {
+          converted_at?: string | null
+          converted_to_user?: boolean
+          converted_user_id?: string | null
+          first_played_at?: string
+          games_played?: string[]
+          guest_email: string
+          guest_name?: string | null
+          id?: string
+          invite_id: string
+          last_active_at?: string
+          session_token: string
+          total_play_time_minutes?: number
+        }
+        Update: {
+          converted_at?: string | null
+          converted_to_user?: boolean
+          converted_user_id?: string | null
+          first_played_at?: string
+          games_played?: string[]
+          guest_email?: string
+          guest_name?: string | null
+          id?: string
+          invite_id?: string
+          last_active_at?: string
+          session_token?: string
+          total_play_time_minutes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_night_guests_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "game_night_invites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_night_invites: {
+        Row: {
+          allowed_games: string[]
+          created_at: string
+          expires_at: string | null
+          guest_email: string | null
+          guest_name: string | null
+          host_user_id: string
+          id: string
+          invite_code: string
+          is_active: boolean
+          max_uses: number
+          times_used: number
+        }
+        Insert: {
+          allowed_games?: string[]
+          created_at?: string
+          expires_at?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
+          host_user_id: string
+          id?: string
+          invite_code: string
+          is_active?: boolean
+          max_uses?: number
+          times_used?: number
+        }
+        Update: {
+          allowed_games?: string[]
+          created_at?: string
+          expires_at?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
+          host_user_id?: string
+          id?: string
+          invite_code?: string
+          is_active?: boolean
+          max_uses?: number
+          times_used?: number
+        }
+        Relationships: []
+      }
       game_ratings: {
         Row: {
           created_at: string | null
@@ -19832,6 +19965,7 @@ export type Database = {
       encrypt_token: { Args: { plain_token: string }; Returns: string }
       expire_stale_trials: { Args: never; Returns: undefined }
       generate_challenge_share_code: { Args: never; Returns: string }
+      generate_game_night_invite_code: { Args: never; Returns: string }
       generate_guesthouse_access_code: { Args: never; Returns: string }
       generate_profile_invite_token: { Args: never; Returns: string }
       generate_referral_code: { Args: { user_id: string }; Returns: string }
@@ -20018,6 +20152,7 @@ export type Database = {
         Args: { _church_id: string; _user_id: string }
         Returns: boolean
       }
+      is_game_night_active: { Args: never; Returns: boolean }
       is_ministry_leader: {
         Args: { _church_id: string; _user_id: string }
         Returns: boolean
