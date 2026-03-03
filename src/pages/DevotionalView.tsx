@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2, ExternalLink, Lock, AlertCircle, RefreshCw, Highlighter } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2, ExternalLink, Lock, AlertCircle, RefreshCw, Highlighter, Save, Edit } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -57,7 +57,7 @@ export default function DevotionalView() {
   const queryClient = useQueryClient();
 
   const { preferences } = useUserPreferences();
-  const { plan, days, completedDayIds, completeDay, planLoading, isCompleting, isDayUnlocked, unlockedDayNumber } = useDevotionalPlan(planId || "");
+  const { plan, days, progress, completedDayIds, completeDay, planLoading, isCompleting, isDayUnlocked, unlockedDayNumber } = useDevotionalPlan(planId || "");
   const { generateDevotional, isGenerating } = useDevotionals();
 
   const { toast } = useToast();
@@ -67,6 +67,8 @@ export default function DevotionalView() {
   const [hasInitializedDay, setHasInitializedDay] = useState(false);
   const [isRegeneratingDay, setIsRegeneratingDay] = useState(false);
   const [isAutoGenerating, setIsAutoGenerating] = useState(false);
+  const [isEditingJournal, setIsEditingJournal] = useState(false);
+  const [isSavingJournal, setIsSavingJournal] = useState(false);
   const autoGenerateTriggered = useRef(false);
 
   // Sparks integration
