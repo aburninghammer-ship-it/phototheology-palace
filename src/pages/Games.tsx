@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Gamepad2, MapPin, UsersRound, Search, Trophy, Users, BookOpen } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
+import { GameNightInviteDialog } from "@/components/games/GameNightInviteDialog";
 import { gamesSteps } from "@/config/howItWorksSteps";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -468,7 +469,10 @@ const Games = () => {
               <p className="text-sm md:text-base text-muted-foreground">Learn through play</p>
             </div>
           </div>
-          <HowItWorksDialog title="How to Use Games" steps={gamesSteps} />
+          <div className="flex items-center gap-2">
+            <GameNightInviteDialog />
+            <HowItWorksDialog title="How to Use Games" steps={gamesSteps} />
+          </div>
         </motion.div>
         
         {/* Search and Filter Header */}

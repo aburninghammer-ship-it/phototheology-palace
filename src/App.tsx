@@ -80,6 +80,7 @@ const DailyVerse = lazy(() => import("./pages/DailyVerse"));
 const GrowthJournal = lazy(() => import("./pages/GrowthJournal"));
 const EquationsChallenge = lazy(() => import("./pages/EquationsChallenge"));
 const Games = lazy(() => import("./pages/Games"));
+const GameNightGuest = lazy(() => import("./pages/GameNightGuest"));
 const PTScrabble = lazy(() => import("./pages/PTScrabble"));
 const GroupStudySession = lazy(() => import("./pages/GroupStudySession"));
 const ChainChess = lazy(() => import("./pages/ChainChess"));
@@ -504,6 +505,7 @@ function App() {
             <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
+            <Route path="/game-night" element={<GameNightGuest />} />
             <Route path="/pt-scrabble" element={<ProtectedRoute><PTScrabble /></ProtectedRoute>} />
             <Route path="/group-study" element={<ProtectedRoute><GroupStudySession /></ProtectedRoute>} />
             <Route path="/games/chef-challenge" element={<ProtectedRoute><ChefChallenge /></ProtectedRoute>} />
