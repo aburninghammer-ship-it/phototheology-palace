@@ -160,8 +160,8 @@ export function useAATSProgress() {
       const elapsed = Math.floor((today.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
       const calendarCap = elapsed + 1;
 
-      // Use whichever is lower to prevent rushing ahead, capped at 40
-      return Math.min(completionBased, calendarCap, 40);
+      // Use whichever is lower to prevent rushing ahead, capped at 56
+      return Math.min(completionBased, calendarCap, 56);
     },
     [progressMap],
   );

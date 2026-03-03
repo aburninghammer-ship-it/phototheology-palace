@@ -211,7 +211,7 @@ export const WAR_COLLEGE_TRACKS: WarCollegeTrack[] = AATS_AVATAR_IDS.map((avatar
     avatarId,
     avatarName: training.avatarName,
     description: meta.description,
-    totalDays: 40,
+    totalDays: 56,
     emoji: training.emoji,
     ringId: getRingId(avatarId),
   };

@@ -1,5 +1,5 @@
 // ─── War College Track View ─────────────────────────────────────────────────
-// Shows the 40-day journey for a specific avatar's War College track.
+// Shows the 56-day journey for a specific avatar's War College track.
 // ALL days are AI-generated on demand. No pre-built manuscripts.
 
 import { useState, useMemo } from "react";
