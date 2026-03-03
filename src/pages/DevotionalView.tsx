@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2, ExternalLink, Lock, AlertCircle, RefreshCw, Highlighter } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2, ExternalLink, Lock, AlertCircle, RefreshCw, Highlighter, Save, Edit } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -57,7 +57,7 @@ export default function DevotionalView() {
   const queryClient = useQueryClient();
 
   const { preferences } = useUserPreferences();
-  const { plan, days, completedDayIds, completeDay, planLoading, isCompleting, isDayUnlocked, unlockedDayNumber } = useDevotionalPlan(planId || "");
+  const { plan, days, progress, completedDayIds, completeDay, planLoading, isCompleting, isDayUnlocked, unlockedDayNumber } = useDevotionalPlan(planId || "");
   const { generateDevotional, isGenerating } = useDevotionals();
 
   const { toast } = useToast();
@@ -67,6 +67,8 @@ export default function DevotionalView() {
   const [hasInitializedDay, setHasInitializedDay] = useState(false);
   const [isRegeneratingDay, setIsRegeneratingDay] = useState(false);
   const [isAutoGenerating, setIsAutoGenerating] = useState(false);
+  const [isEditingJournal, setIsEditingJournal] = useState(false);
+  const [isSavingJournal, setIsSavingJournal] = useState(false);
   const autoGenerateTriggered = useRef(false);
 
   // Sparks integration
@@ -137,6 +139,21 @@ export default function DevotionalView() {
       setHasInitializedDay(true);
     }
   }, [days, unlockedDayNumber, completedDayIds, isDayUnlocked, hasInitializedDay]);
+
+  // Load existing journal entry when switching to a completed day
+  useEffect(() => {
+    if (!days || !progress) return;
+    const currentDay = days[selectedDayIndex];
+    if (!currentDay) return;
+    
+    const existingProgress = progress.find(p => p.day_id === currentDay.id);
+    if (existingProgress?.journal_entry) {
+      setJournalEntry(existingProgress.journal_entry);
+    } else {
+      setJournalEntry("");
+    }
+    setIsEditingJournal(false);
+  }, [selectedDayIndex, days, progress]);
 
   const handleCrossReferenceClick = (ref: string) => {
     navigator.clipboard.writeText(ref);
@@ -349,6 +366,35 @@ export default function DevotionalView() {
     });
     setJournalEntry("");
     setRating(0);
+  };
+
+  const handleSaveJournal = async () => {
+    if (!currentDay || !planId) return;
+    setIsSavingJournal(true);
+    try {
+      const { error } = await supabase
+        .from("devotional_progress")
+        .update({ journal_entry: journalEntry })
+        .eq("plan_id", planId)
+        .eq("day_id", currentDay.id);
+      
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["devotional-progress", planId] });
+      setIsEditingJournal(false);
+      toast({
+        title: "Journal Updated",
+        description: "Your reflection has been saved.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save journal entry.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingJournal(false);
+    }
   };
 
   const goToPrevDay = () => setSelectedDayIndex(Math.max(0, selectedDayIndex - 1));
@@ -622,10 +668,23 @@ export default function DevotionalView() {
               {/* Journal Section - Always visible */}
               <Card className="border-pink-200 dark:border-pink-800 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/30 dark:to-rose-950/30">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2 text-pink-700 dark:text-pink-300">
-                    <MessageSquare className="h-4 w-4" />
-                    {currentDay.journal_prompt ? t('devotionalView.reflectionQuestion') : t('devotionalView.yourJournal')}
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm flex items-center gap-2 text-pink-700 dark:text-pink-300">
+                      <MessageSquare className="h-4 w-4" />
+                      {currentDay.journal_prompt ? t('devotionalView.reflectionQuestion') : t('devotionalView.yourJournal')}
+                    </CardTitle>
+                    {isCompleted && !isEditingJournal && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs text-pink-600 hover:text-pink-700"
+                        onClick={() => setIsEditingJournal(true)}
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {currentDay.journal_prompt && (
@@ -636,8 +695,36 @@ export default function DevotionalView() {
                     value={journalEntry}
                     onChange={(e) => setJournalEntry(e.target.value)}
                     className="min-h-[150px] border-pink-200 dark:border-pink-800 focus:ring-pink-500"
-                    disabled={isCompleted}
+                    disabled={isCompleted && !isEditingJournal}
                   />
+                  {isCompleted && isEditingJournal && (
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        onClick={handleSaveJournal}
+                        disabled={isSavingJournal}
+                        className="bg-pink-600 hover:bg-pink-700 text-white"
+                      >
+                        {isSavingJournal ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Save className="h-3 w-3 mr-1" />
+                        )}
+                        Save Journal
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const existingProgress = progress?.find(p => p.day_id === currentDay.id);
+                          setJournalEntry(existingProgress?.journal_entry || "");
+                          setIsEditingJournal(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
