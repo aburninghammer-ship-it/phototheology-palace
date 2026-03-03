@@ -64,6 +64,7 @@ export function useAATSProgress() {
       if (progressMap[avatarId]) return; // already enrolled
       const key = courseKey(avatarId);
       try {
+        // IMPORTANT: avoid overwriting existing progress if local state hasn't loaded yet
         await supabase.from("course_progress").upsert(
           {
             user_id: user.id,
@@ -71,7 +72,7 @@ export function useAATSProgress() {
             completed_lessons: [],
             progress_percentage: 0,
           },
-          { onConflict: "user_id,course_name" },
+          { onConflict: "user_id,course_name", ignoreDuplicates: true },
         );
         await loadAll();
       } catch (err) {
@@ -90,16 +91,31 @@ export function useAATSProgress() {
 
       try {
         if (!existing) {
-          // Create new record with completion
-          const completed = [itemId];
-          const pct = Math.round((1 / totalItems) * 100);
+          // Local state may be stale; merge against server state to avoid wiping prior completions
+          const { data: serverRow, error: serverError } = await supabase
+            .from("course_progress")
+            .select("completed_lessons")
+            .eq("user_id", user.id)
+            .eq("course_name", key)
+            .maybeSingle();
+
+          if (serverError) throw serverError;
+
+          const completed = [
+            ...(((serverRow?.completed_lessons as string[]) ?? []).filter(Boolean)),
+          ];
+          if (!completed.includes(itemId)) completed.push(itemId);
+          const pct = Math.round((completed.length / totalItems) * 100);
+          const done = pct >= 100;
+
           await supabase.from("course_progress").upsert(
             {
               user_id: user.id,
               course_name: key,
               completed_lessons: completed,
-              progress_percentage: pct,
+              progress_percentage: Math.min(pct, 100),
               current_lesson: itemId,
+              completed_at: done ? new Date().toISOString() : null,
               last_accessed_at: new Date().toISOString(),
             },
             { onConflict: "user_id,course_name" },
