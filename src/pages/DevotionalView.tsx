@@ -668,10 +668,23 @@ export default function DevotionalView() {
               {/* Journal Section - Always visible */}
               <Card className="border-pink-200 dark:border-pink-800 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/30 dark:to-rose-950/30">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2 text-pink-700 dark:text-pink-300">
-                    <MessageSquare className="h-4 w-4" />
-                    {currentDay.journal_prompt ? t('devotionalView.reflectionQuestion') : t('devotionalView.yourJournal')}
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm flex items-center gap-2 text-pink-700 dark:text-pink-300">
+                      <MessageSquare className="h-4 w-4" />
+                      {currentDay.journal_prompt ? t('devotionalView.reflectionQuestion') : t('devotionalView.yourJournal')}
+                    </CardTitle>
+                    {isCompleted && !isEditingJournal && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs text-pink-600 hover:text-pink-700"
+                        onClick={() => setIsEditingJournal(true)}
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {currentDay.journal_prompt && (
@@ -682,8 +695,36 @@ export default function DevotionalView() {
                     value={journalEntry}
                     onChange={(e) => setJournalEntry(e.target.value)}
                     className="min-h-[150px] border-pink-200 dark:border-pink-800 focus:ring-pink-500"
-                    disabled={isCompleted}
+                    disabled={isCompleted && !isEditingJournal}
                   />
+                  {isCompleted && isEditingJournal && (
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        onClick={handleSaveJournal}
+                        disabled={isSavingJournal}
+                        className="bg-pink-600 hover:bg-pink-700 text-white"
+                      >
+                        {isSavingJournal ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Save className="h-3 w-3 mr-1" />
+                        )}
+                        Save Journal
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const existingProgress = progress?.find(p => p.day_id === currentDay.id);
+                          setJournalEntry(existingProgress?.journal_entry || "");
+                          setIsEditingJournal(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
