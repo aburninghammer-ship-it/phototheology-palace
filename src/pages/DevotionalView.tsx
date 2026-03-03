@@ -368,6 +368,35 @@ export default function DevotionalView() {
     setRating(0);
   };
 
+  const handleSaveJournal = async () => {
+    if (!currentDay || !planId) return;
+    setIsSavingJournal(true);
+    try {
+      const { error } = await supabase
+        .from("devotional_progress")
+        .update({ journal_entry: journalEntry })
+        .eq("plan_id", planId)
+        .eq("day_id", currentDay.id);
+      
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["devotional-progress", planId] });
+      setIsEditingJournal(false);
+      toast({
+        title: "Journal Updated",
+        description: "Your reflection has been saved.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save journal entry.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingJournal(false);
+    }
+  };
+
   const goToPrevDay = () => setSelectedDayIndex(Math.max(0, selectedDayIndex - 1));
   const goToNextDay = () => setSelectedDayIndex(Math.min((days?.length || 1) - 1, selectedDayIndex + 1));
 
