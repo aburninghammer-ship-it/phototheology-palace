@@ -82,7 +82,6 @@ export function SaveJeevesResponseButton({
           title: studyTitle,
           content,
           tags: [...new Set(tags)],
-          category: "jeeves_response",
         });
 
       if (error) throw error;
