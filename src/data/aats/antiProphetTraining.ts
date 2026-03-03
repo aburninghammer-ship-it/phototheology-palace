@@ -1,4 +1,4 @@
-// ─── AATS: Anti-Prophet Critic Avatar Training Data ──────────────────────────
+// ─── AATS: Ellen White's Critic Avatar Training Data ─────────────────────────
 // Comprehensive training curriculum for defending Ellen G. White's prophetic
 // ministry against critics who specifically target her credibility, writings,
 // and role within the Seventh-day Adventist Church.
@@ -481,7 +481,7 @@ const modules = [
 
 export const antiProphetTraining: AATSAvatarTraining = {
   avatarId: "anti-prophet",
-  avatarName: "The Anti-Prophet Critic",
+  avatarName: "Ellen White's Critic",
   emoji: "\u{1F4E2}",
   color: "border-orange-600",
   subjects,

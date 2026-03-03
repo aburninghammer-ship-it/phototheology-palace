@@ -528,11 +528,11 @@ export const DEFENSE_OPPONENTS: DefenseOpponent[] = [
   },
   {
     id: "anti-prophet",
-    name: "Dirk Harmon — The Anti-Prophet Critic",
+    name: "Dirk Harmon — Ellen White's Critic",
     emoji: "📋",
     avatar: antiProphetAvatar,
     color: "border-amber-800",
-    description: "Specialist in Ellen White criticism — plagiarism, false prophecies, and prophetic authority challenges",
+    description: "Specialist in Ellen White criticism — plagiarism charges, false prophecy claims, and challenges to her prophetic authority",
     pronouns: "he/him",
     worldview:
       "You are a dedicated researcher who has spent years investigating Ellen White's writings, life, and prophetic claims. You may be a former SDA, a counter-cult researcher, or an evangelical critic. You have read Walter Rea's 'The White Lie,' Ronald Numbers' 'Prophetess of Health,' Dirk Anderson's 'White Out,' and numerous comparative studies showing Ellen White's literary dependence on contemporary sources. You hold that Ellen White plagiarized extensively from authors like John Harris, J.N. Andrews, Uriah Smith, Conybeare & Howson, and others — often without attribution and while claiming divine revelation. You document false prophecies (the 'Walled City' vision, the 'old Jerusalem' statement, predictions about specific individuals), health counsel contradictions (vinegar, oysters, cheese inconsistencies), and statements that contradict Scripture (the 'shut door' doctrine, the 'amalgamation' statements). You argue that the SDA Church has systematically covered up these problems, that the White Estate controls access to unpublished materials, and that the Investigative Judgment was invented specifically to salvage the Great Disappointment and justify Ellen White's authority. You are thorough, document-driven, and relentless.",
@@ -1240,26 +1240,26 @@ export const DEFENSE_TOPICS: DefenseTopic[] = [
       "The New Age Spiritualist argues FOR: God is not a personal being who judges — God is universal consciousness, love energy, and Source. Religion has personified and limited the infinite",
     isSignature: true,
   },
-  // ── Anti-Prophet Critic Signature Topics ───────────────────
+  // ── Ellen White's Critic Signature Topics ──────────────────
   {
     id: "ew-plagiarism",
     name: "Ellen White Plagiarism",
     description:
-      "The Anti-Prophet Critic argues FOR: Side-by-side comparison proves Ellen White copied extensively from contemporary authors while claiming divine revelation",
+      "Ellen White's Critic argues FOR: Side-by-side comparison proves Ellen White copied extensively from contemporary authors while claiming divine revelation",
     isSignature: true,
   },
   {
     id: "ew-false-prophecies",
     name: "Ellen White False Prophecies",
     description:
-      "The Anti-Prophet Critic argues FOR: Ellen White made specific predictions that did not come true — failing the Deuteronomy 18:22 test of a prophet",
+      "Ellen White's Critic argues FOR: Ellen White made specific predictions that did not come true — failing the Deuteronomy 18:22 test of a prophet",
     isSignature: true,
   },
   {
     id: "ew-authority-test",
     name: "Ellen White Authority Test",
     description:
-      "The Anti-Prophet Critic argues FOR: When tested by the biblical criteria for a true prophet (Deut 13, 18; Isa 8:20; Matt 7:15-20), Ellen White fails on multiple counts",
+      "Ellen White's Critic argues FOR: When tested by the biblical criteria for a true prophet (Deut 13, 18; Isa 8:20; Matt 7:15-20), Ellen White fails on multiple counts",
     isSignature: true,
   },
   // ── Pentecostal Signature Topics ────────────────────────────

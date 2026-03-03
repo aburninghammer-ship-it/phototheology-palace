@@ -121,7 +121,7 @@ Include:
 - The strongest biblical answer (not strawman)
 - A "steelman + rebuttal" structure
 - If relevant, name which critic type this addresses:
-  (Atheist | Evangelical | Catholic | Muslim | Mormon | Jehovah's Witness | BHI | Secular Scholar | Progressive Christian | Philosopher | New Age Spiritualist | Anti-Prophet Critic | Internet Skeptic)
+  (Atheist | Evangelical | Catholic | Muslim | Mormon | Jehovah's Witness | BHI | Secular Scholar | Progressive Christian | Philosopher | New Age Spiritualist | Ellen White's Critic | Internet Skeptic)
 Avoid:
 - Mockery, ranting, quoting imaginary opponents
 
