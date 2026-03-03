@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
@@ -186,6 +187,7 @@ export default function Connect6Draft() {
           </Card>
         </div>
       </div>
+      <FloatingGameChat gameType="connect6-draft" />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -210,6 +211,7 @@ export default function MemoryPalacePractice() {
           </CardContent>
         </Card>
       </div>
+      <FloatingGameChat gameType="memory-palace-practice" />
     </div>
   );
 }

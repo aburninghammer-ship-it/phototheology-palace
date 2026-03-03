@@ -1,4 +1,5 @@
 import { useState, useRef, Suspense, useEffect } from "react";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -1054,6 +1055,7 @@ export default function EscapeRoom3D() {
           </div>
         </DialogContent>
       </Dialog>
+      <FloatingGameChat gameType="escape-room-3d" />
     </div>
   );
 }
