@@ -140,6 +140,21 @@ export default function DevotionalView() {
     }
   }, [days, unlockedDayNumber, completedDayIds, isDayUnlocked, hasInitializedDay]);
 
+  // Load existing journal entry when switching to a completed day
+  useEffect(() => {
+    if (!days || !progress) return;
+    const currentDay = days[selectedDayIndex];
+    if (!currentDay) return;
+    
+    const existingProgress = progress.find(p => p.day_id === currentDay.id);
+    if (existingProgress?.journal_entry) {
+      setJournalEntry(existingProgress.journal_entry);
+    } else {
+      setJournalEntry("");
+    }
+    setIsEditingJournal(false);
+  }, [selectedDayIndex, days, progress]);
+
   const handleCrossReferenceClick = (ref: string) => {
     navigator.clipboard.writeText(ref);
     toast({
