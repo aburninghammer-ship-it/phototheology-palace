@@ -179,7 +179,7 @@ export const ExportEpicAudioDialog = ({
     for (const ch of selectedChapters) {
       const url = await resolveAudioUrl(ch);
       if (!url) {
-        toast.error(`No Epic audio available for ${ch.book} ${ch.chapter}`);
+        toast.error(`No ${modeName} audio available for ${ch.book} ${ch.chapter}`);
         return;
       }
       resolvedUrls.push(url);
