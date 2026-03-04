@@ -386,20 +386,24 @@ export function useDevotionalPlan(planId: string) {
       if (error) throw error;
 
       // Recalculate completed count from actual progress
-      const { count } = await supabase
+      const { count, error: countError } = await supabase
         .from("devotional_progress")
         .select("*", { count: "exact", head: true })
         .eq("plan_id", planId)
         .eq("user_id", user?.id);
-      
+
+      if (countError) throw countError;
+
       const completedCount = count || 0;
-      await supabase
+      const { error: updateError } = await supabase
         .from("devotional_plans")
         .update({
           current_day: completedCount,
           ...(completedCount >= (plan?.duration || 0) ? { status: "completed", completed_at: new Date().toISOString() } : {}),
         })
         .eq("id", planId);
+
+      if (updateError) throw updateError;
 
       return data;
     },

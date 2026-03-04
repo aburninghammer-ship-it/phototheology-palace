@@ -126,8 +126,7 @@ export const JeevesVerseAssistant = ({ book, chapter, verse, verseText, onClose 
         user_id: user.id,
         title: `${book} ${chapter}:${verse} — ${question.slice(0, 40)}${question.length > 40 ? '...' : ''}`,
         content,
-        tags,
-        category: 'jeeves_response',
+        tags: [...tags, 'jeeves_response'],
       });
 
       if (error) throw error;

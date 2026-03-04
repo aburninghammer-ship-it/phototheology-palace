@@ -363,9 +363,12 @@ export default function DevotionalView() {
       dayId: currentDay.id,
       journalEntry: journalEntry || undefined,
       rating: rating || undefined,
+    }, {
+      onSuccess: () => {
+        setJournalEntry("");
+        setRating(0);
+      },
     });
-    setJournalEntry("");
-    setRating(0);
   };
 
   const handleSaveJournal = async () => {

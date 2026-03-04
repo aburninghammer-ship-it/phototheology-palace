@@ -152,8 +152,7 @@ export const JeevesStudyAssistant = ({
         user_id: user.id,
         title: `Jeeves: ${userQuestion.slice(0, 50)}${userQuestion.length > 50 ? '...' : ''}`,
         content,
-        tags: ['jeeves', ...tags],
-        category: 'jeeves_response',
+        tags: ['jeeves', 'jeeves_response', ...tags],
       });
 
       if (error) throw error;
