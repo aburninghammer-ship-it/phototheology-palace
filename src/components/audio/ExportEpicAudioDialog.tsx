@@ -303,7 +303,7 @@ export const ExportEpicAudioDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Download className="h-5 w-5" />
-            Export Epic Audio
+            Export {modeName} Audio
           </DialogTitle>
           <DialogDescription>
             Export up to {MAX_CHAPTERS} chapters with a custom background music playlist

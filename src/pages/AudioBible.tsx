@@ -2357,6 +2357,7 @@ export default function AudioBible() {
         book={epicNowPlayingBook || selectedBook}
         chapter={epicNowPlayingChapter || selectedChapter}
         queue={epicQueueRef.current.map((q) => ({ book: q.book, chapter: q.chapter }))}
+        modeName={activeModeMeta.label}
       />
       <ImmersiveCommentaryView
         isOpen={showImmersiveView}
