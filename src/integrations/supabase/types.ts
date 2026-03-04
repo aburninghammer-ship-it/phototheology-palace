@@ -11962,6 +11962,7 @@ export type Database = {
           focused_room_id: string | null
           focused_room_set_at: string | null
           gamma_api_key: string | null
+          gamma_api_key_encrypted: string | null
           gem_creation_streak: number | null
           guided_path_completed_at: string | null
           guided_path_step: number | null
@@ -12043,6 +12044,7 @@ export type Database = {
           focused_room_id?: string | null
           focused_room_set_at?: string | null
           gamma_api_key?: string | null
+          gamma_api_key_encrypted?: string | null
           gem_creation_streak?: number | null
           guided_path_completed_at?: string | null
           guided_path_step?: number | null
@@ -12124,6 +12126,7 @@ export type Database = {
           focused_room_id?: string | null
           focused_room_set_at?: string | null
           gamma_api_key?: string | null
+          gamma_api_key_encrypted?: string | null
           gem_creation_streak?: number | null
           guided_path_completed_at?: string | null
           guided_path_step?: number | null
@@ -20037,6 +20040,7 @@ export type Database = {
           pastoral_notes: Json
         }[]
       }
+      get_decrypted_gamma_key: { Args: { _user_id: string }; Returns: string }
       get_decrypted_patreon_tokens: {
         Args: { _user_id: string }
         Returns: {
