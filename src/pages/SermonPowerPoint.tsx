@@ -182,14 +182,11 @@ export default function SermonPowerPoint() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("gamma_api_key")
-        .eq("id", user.id)
-        .single();
+      const { data, error } = await supabase
+        .rpc("get_decrypted_gamma_key", { _user_id: user.id });
       
-      if (profile?.gamma_api_key) {
-        setGammaApiKey(profile.gamma_api_key);
+      if (!error && data) {
+        setGammaApiKey(data);
         setGammaKeySaved(true);
       }
     };

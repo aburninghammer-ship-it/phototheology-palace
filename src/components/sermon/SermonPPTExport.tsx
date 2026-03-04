@@ -85,18 +85,15 @@ export function SermonPPTExport({ sermon, variant = "outline", size = "sm" }: Se
   const [gammaImageStyle, setGammaImageStyle] = useState<"photorealistic" | "illustration" | "none">("photorealistic");
   const [gammaTextAmount, setGammaTextAmount] = useState<"brief" | "medium" | "detailed">("medium");
 
-  // Load Gamma API key from Supabase profile on mount (not localStorage)
+  // Load Gamma API key from encrypted storage on mount
   useEffect(() => {
     const loadGammaKey = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("gamma_api_key")
-        .eq("id", user.id)
-        .single();
-      if (profile?.gamma_api_key) {
-        setGammaApiKey(profile.gamma_api_key);
+      const { data, error } = await supabase
+        .rpc("get_decrypted_gamma_key", { _user_id: user.id });
+      if (!error && data) {
+        setGammaApiKey(data);
       }
     };
     loadGammaKey();
