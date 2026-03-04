@@ -195,7 +195,7 @@ export const ExportEpicAudioDialog = ({
         ? `${selectedChapters[0].book}-${selectedChapters[0].chapter}`
         : `${selectedChapters[0].book}-${selectedChapters[0].chapter}_plus${selectedChapters.length - 1}more`;
 
-    const filename = `Epic-${chapterLabel}.wav`;
+    const filename = `${modeName}-${chapterLabel}.wav`;
 
     const blob = await mixAndDownload(resolvedUrls, activeMusicUrls, musicVolume / 100, filename);
 
@@ -207,7 +207,7 @@ export const ExportEpicAudioDialog = ({
     const downloaded = await downloadAudioFile(blob, filename);
 
     if (downloaded) {
-      toast.success(`Downloaded Epic audio (${selectedChapters.length} chapter${selectedChapters.length > 1 ? "s" : ""})!`);
+      toast.success(`Downloaded ${modeName} audio (${selectedChapters.length} chapter${selectedChapters.length > 1 ? "s" : ""})!`);
       setExportedBlob(blob);
       setExportedFilename(filename);
       setShowSharePanel(true);
@@ -220,7 +220,7 @@ export const ExportEpicAudioDialog = ({
   const buildShareMessage = () => {
     const appUrl = window.location.origin;
     const chapterList = selectedChapters.map((c) => `${c.book} ${c.chapter}`).join(", ");
-    return `🎙️ Epic Bible Commentary — ${chapterList}\n\nI just exported a cinematic audio Bible study using the Phototheology Palace method!\n\n✨ Try it yourself: ${appUrl}/audio-bible\n\n🏰 Phototheology — Turn your mind into a Bible palace!`;
+    return `🎙️ ${modeName} Bible Commentary — ${chapterList}\n\nI just exported a cinematic audio Bible study using the Phototheology Palace method!\n\n✨ Try it yourself: ${appUrl}/audio-bible\n\n🏰 Phototheology — Turn your mind into a Bible palace!`;
   };
 
   const handleCopyShareMessage = async () => {
@@ -262,8 +262,8 @@ export const ExportEpicAudioDialog = ({
       setCommunityShareContent({
         type: "audio_commentary",
         id: `${timestamp}`,
-        title: `Epic Commentary — ${chapterList}`,
-        preview: `Cinematic audio commentary covering ${chapterList}`,
+        title: `${modeName} Commentary — ${chapterList}`,
+        preview: `${modeName} audio commentary covering ${chapterList}`,
         metadata: {
           audioUrl: urlData.publicUrl,
           chapters: selectedChapters.map((c) => ({ book: c.book, chapter: c.chapter })),
