@@ -452,7 +452,7 @@ const Games = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-background relative overflow-x-hidden overflow-y-auto">
+    <div className="min-h-screen bg-background relative overflow-x-hidden">
       {/* Animated Background - Simplified on mobile */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-48 md:w-72 h-48 md:h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
