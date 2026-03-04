@@ -47,6 +47,8 @@ interface ExportEpicAudioDialogProps {
   chapter: number;
   /** Full queue of chapters currently loaded (optional) */
   queue?: EpicChapter[];
+  /** The active commentary mode name (e.g. "Epic", "Urban", "Counselor") */
+  modeName?: string;
 }
 
 export const ExportEpicAudioDialog = ({
@@ -56,6 +58,7 @@ export const ExportEpicAudioDialog = ({
   book,
   chapter,
   queue = [],
+  modeName = "Epic",
 }: ExportEpicAudioDialogProps) => {
   // ── Chapter selection ───────────────────────────────────────────────────
   const [selectedChapters, setSelectedChapters] = useState<EpicChapter[]>([
