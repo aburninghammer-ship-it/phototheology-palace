@@ -30,9 +30,9 @@ export const ShareChallenge: React.FC<ShareChallengeProps> = ({
   const challengeUrl = challengeType === "treasure-hunt"
     ? `${baseUrl}/treasure-hunt/${challengeId}`
     : `${baseUrl}/escape-room/play/${challengeId}`;
-  const shareUrl = `${challengeUrl}?ref=share&trial=30days`;
+  const shareUrl = `${challengeUrl}?ref=share&trial=14days`;
 
-  const shareText = `Join me in this biblical challenge: ${challengeTitle}! 🏆\n\nGet 30 days free full access to try it out.\n\n${shareUrl}`;
+  const shareText = `Join me in this biblical challenge: ${challengeTitle}! 🏆\n\nGet 14 days free full access to try it out.\n\n${shareUrl}`;
   
   const copyToClipboard = async () => {
     try {
