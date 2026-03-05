@@ -125,7 +125,7 @@ export const usePath = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const trialEndsAt = addDays(new Date(), 30).toISOString();
+      const trialEndsAt = addDays(new Date(), 14).toISOString();
 
       const { data, error } = await supabase
         .from("user_paths")
@@ -153,7 +153,7 @@ export const usePath = () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       toast({
         title: `${PATH_INFO[data.path_type as PathType].icon} Path Selected!`,
-        description: `You've chosen the ${PATH_INFO[data.path_type as PathType].name}. Your 30-day trial begins now.`,
+        description: `You've chosen the ${PATH_INFO[data.path_type as PathType].name}. Your 14-day trial begins now.`,
       });
     },
     onError: (error) => {
@@ -176,7 +176,7 @@ export const usePath = () => {
 
       // Check if in trial period
       const daysSinceStart = differenceInDays(new Date(), new Date(activePath.started_at));
-      if (daysSinceStart > 30) {
+      if (daysSinceStart > 14) {
         throw new Error("Trial period has ended. You cannot switch paths.");
       }
 
@@ -191,7 +191,7 @@ export const usePath = () => {
         .eq("id", activePath.id);
 
       // Create new path
-      const trialEndsAt = addDays(new Date(), 30 - daysSinceStart).toISOString();
+      const trialEndsAt = addDays(new Date(), 14 - daysSinceStart).toISOString();
 
       const { data, error } = await supabase
         .from("user_paths")
@@ -236,7 +236,7 @@ export const usePath = () => {
   const canSwitchPath = () => {
     if (!activePath) return false;
     const daysSinceStart = differenceInDays(new Date(), new Date(activePath.started_at));
-    return daysSinceStart <= 30 && activePath.path_switches_used === 0;
+    return daysSinceStart <= 14 && activePath.path_switches_used === 0;
   };
 
   const getDaysUntilTrialEnds = () => {

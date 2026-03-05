@@ -154,7 +154,7 @@ export default function Paths() {
           <p className="text-muted-foreground mb-8">
             {user 
               ? "Choose your path and start your 2-year journey to biblical mastery."
-              : "Start your free trial and choose your path. You'll have 30 days to explore before committing to your 2-year journey."
+              : "Start your free trial and choose your path. You'll have 14 days to explore before committing to your 2-year journey."
             }
           </p>
           <Button 

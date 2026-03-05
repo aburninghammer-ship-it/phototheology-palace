@@ -224,16 +224,14 @@ export function EmailCampaignManager() {
         ]
       },
       trial: {
-        title: "30-Day Trial Guidance (8 Emails)",
+        title: "14-Day Trial Guidance (6 Emails)",
         emails: [
-          { day: "Day 0", subject: "Welcome to Your 30-Day Orientation", preview: "Orientation begins — learn how to study here" },
+          { day: "Day 0", subject: "Welcome to Your 14-Day Orientation", preview: "Orientation begins — learn how to study here" },
           { day: "Day 3", subject: "Your First Sessions Matter Most", preview: "Foundation is being laid — Story Room, 24FPS" },
-          { day: "Day 7", subject: "Week 1 Complete!", preview: "Rooms start connecting — try Daily Challenge" },
-          { day: "Day 14", subject: "Halfway Through — You're Building", preview: "Integration exercise — see how rooms connect" },
-          { day: "Day 21", subject: "Three Weeks In — The Palace is Taking Shape", preview: "Depth is forming — try Freestyle Floor" },
-          { day: "Day 25", subject: "You May Feel the Stretch", preview: "Discomfort is normal — slow down" },
-          { day: "Day 28", subject: "What Changes After You Subscribe", preview: "Continuity, not completion — full access details" },
-          { day: "Day 30", subject: "Continue Your Training", preview: "Trial ends — invitation to extend" },
+          { day: "Day 7", subject: "Week 1 Complete — Halfway There!", preview: "Rooms start connecting — try Daily Challenge" },
+          { day: "Day 10", subject: "The Palace is Taking Shape", preview: "Depth is forming — try Freestyle Floor" },
+          { day: "Day 12", subject: "What Changes After You Subscribe", preview: "Continuity, not completion — full access details" },
+          { day: "Day 14", subject: "Continue Your Training", preview: "Trial ends — invitation to extend" },
         ]
       },
       engagement: {
