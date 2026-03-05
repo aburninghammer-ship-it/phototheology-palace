@@ -134,6 +134,41 @@ function generateBoardKey(categoryId: string, points: PointValue): string {
   return `${categoryId}-${points}`;
 }
 
+function normalizeJeopardyAnswer(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/^(what|who|where|when|why|how)\s+(is|are|was|were)\s+(the\s+|a\s+|an\s+)?/i, '')
+    .replace(/[^\w\s&/,-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isLikelyCorrectAnswer(expected: string, player: string): boolean {
+  const expectedNorm = normalizeJeopardyAnswer(expected);
+  const playerNorm = normalizeJeopardyAnswer(player);
+
+  if (!expectedNorm || !playerNorm) return false;
+  if (expectedNorm === playerNorm) return true;
+  if (expectedNorm.includes(playerNorm) || playerNorm.includes(expectedNorm)) return true;
+
+  const splitParts = (value: string) =>
+    value
+      .split(/\s*(?:,|and|&|\/)\s*/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+  const expectedParts = splitParts(expectedNorm);
+  const playerParts = splitParts(playerNorm);
+
+  if (expectedParts.length > 1) {
+    return expectedParts.every((part) =>
+      playerParts.some((playerPart) => playerPart.includes(part) || part.includes(playerPart))
+    );
+  }
+
+  return false;
+}
+
 export function useJeopardyGame() {
   const [state, setState] = useState<JeopardyGameState>({
     phase: 'setup',
@@ -288,7 +323,7 @@ export function useJeopardyGame() {
     setState(prev => ({ ...prev, phase: 'judging', currentAnswer: answer }));
 
     try {
-      const { data } = await callJeeves({
+      const { data, error } = await callJeeves({
         mode: 'jeopardy_judge',
         message: `Judge this Jeopardy answer. Clue: "${state.currentTile.clue}". Expected answer: "${state.currentTile.answer}". Player's answer: "${answer}". Is it correct or close enough? Also check: 1) Did they cite specific Scripture? 2) Did they reference a PT Principle? 3) Did they make a Christ connection? Return JSON: {"correct": true/false, "explanation": "...", "scriptureBonus": true/false, "ptPrincipleBonus": true/false, "christBonus": true/false}`,
         clue: state.currentTile.clue,
@@ -298,22 +333,40 @@ export function useJeopardyGame() {
 
       let result = { correct: false, explanation: 'Could not judge answer', scriptureBonus: false, ptPrincipleBonus: false, christBonus: false };
 
+      if (error) {
+        console.warn('Jeopardy judge error, using local fallback:', error.message);
+      }
+
       if (data) {
         try {
-          const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-          // Server now returns judgment fields directly
-          if (parsed.correct !== undefined) {
+          const parsed = typeof data === 'string' ? JSON.parse(data) : (data as Record<string, any>);
+          // Server may return judgment either directly or nested under data
+          if (parsed?.correct !== undefined) {
             result = { ...result, ...parsed };
+          } else if (parsed?.data?.correct !== undefined) {
+            result = { ...result, ...parsed.data };
           } else {
-            const responseText = parsed.response || parsed.message || (typeof parsed === 'string' ? parsed : JSON.stringify(parsed));
+            const responseText = parsed?.response || parsed?.message || (typeof parsed === 'string' ? parsed : JSON.stringify(parsed));
             const jsonMatch = responseText.match(/\{[\s\S]*"correct"[\s\S]*\}/);
             if (jsonMatch) {
-              result = { ...result, ...JSON.parse(jsonMatch[0]) };
+              const extracted = JSON.parse(jsonMatch[0]);
+              if (extracted?.correct !== undefined) {
+                result = { ...result, ...extracted };
+              }
             }
           }
         } catch {
-          // Keep default
+          // Keep default and use local fallback below
         }
+      }
+
+      if (result.explanation === 'Could not judge answer') {
+        const localCorrect = isLikelyCorrectAnswer(state.currentTile.answer, answer);
+        result = {
+          ...result,
+          correct: localCorrect,
+          explanation: localCorrect ? 'Answer accepted (local match).' : 'Answer did not match expected answer.',
+        };
       }
 
       // Calculate points

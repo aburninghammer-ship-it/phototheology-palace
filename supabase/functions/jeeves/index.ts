@@ -8773,9 +8773,9 @@ CRITICAL RULES:
       userPrompt = message || "Please help me with this Bible study question.";
     } else if (mode === "jeopardy_question") {
       // PT Jeopardy - Generate a question for a category and difficulty
-      const category = body.category || "General Bible";
-      const difficulty = body.difficulty || "medium";
-      const points = body.points || 300;
+      const category = requestBody.category || "General Bible";
+      const difficulty = requestBody.difficulty || "medium";
+      const points = requestBody.points || 300;
 
       systemPrompt = `You are a Jeopardy game host for PHOTOTHEOLOGY Jeopardy — NOT regular Bible trivia. Every clue must test deep Phototheology (PT) Palace principles, typological thinking, dimensional reasoning, or sanctuary theology. Clues should make players THINK, not just recall facts.
 
@@ -8819,9 +8819,9 @@ Return ONLY valid JSON: {"clue": "...", "answer": "..."}`;
       userPrompt = `Generate a ${difficulty} difficulty (${points} points) Jeopardy clue for the category: "${category}". Return ONLY valid JSON.`;
     } else if (mode === "jeopardy_judge") {
       // PT Jeopardy - Judge a player's answer
-      const clue = body.clue || "";
-      const expectedAnswer = body.expectedAnswer || "";
-      const playerAnswer = body.playerAnswer || "";
+      const clue = requestBody.clue || "";
+      const expectedAnswer = requestBody.expectedAnswer || "";
+      const playerAnswer = requestBody.playerAnswer || "";
 
       systemPrompt = `You are a VERY generous Jeopardy judge. Your default should be to accept the answer unless it is clearly, fundamentally wrong.
 
@@ -8858,8 +8858,8 @@ Return ONLY valid JSON: {"question": "..."}`;
       userPrompt = message || `Generate a Final Jeopardy "Forge a Weapon" question. Return ONLY valid JSON.`;
     } else if (mode === "family_feud_round") {
       // PT Family Feud - Generate a survey-style round
-      const category = body.category || "General Bible";
-      const isDefense = body.isDefense || false;
+      const category = requestBody.category || "General Bible";
+      const isDefense = requestBody.isDefense || false;
 
       systemPrompt = `You are a Family Feud game host for PHOTOTHEOLOGY Family Feud — NOT regular Bible trivia. Every question must test deep PT Palace principles, typological thinking, dimensional reasoning, sanctuary theology, or cycle awareness.
 
