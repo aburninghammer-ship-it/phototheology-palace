@@ -138,7 +138,6 @@ function normalizeJeopardyAnswer(value: string): string {
   return value
     .toLowerCase()
     .replace(/^(what|who|where|when|why|how)\s+(is|are|was|were)\s+(the\s+|a\s+|an\s+)?/i, '')
-    .replace(/[^ -\w\s&/,-]/g, ' ')
     .replace(/[^\w\s&/,-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
