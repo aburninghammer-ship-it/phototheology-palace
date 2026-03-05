@@ -1,0 +1,2 @@
+UPDATE user_subscriptions SET subscription_status = 'active', subscription_tier = 'premium' WHERE user_id = '658f1433-ad7a-41c4-a2bd-4500649f8aae';
+UPDATE profiles SET subscription_status = 'active', subscription_tier = 'premium' WHERE id = '658f1433-ad7a-41c4-a2bd-4500649f8aae';
