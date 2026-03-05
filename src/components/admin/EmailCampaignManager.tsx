@@ -305,7 +305,7 @@ export function EmailCampaignManager() {
               <p className="font-medium text-sm">Eligible Recipients</p>
               <p className="text-xs text-muted-foreground">
                 {campaignType === 'winback' && "Users who tried but didn't subscribe"}
-                {campaignType === 'trial' && "Users currently in 30-day trial"}
+                {campaignType === 'trial' && "Users currently in 14-day trial"}
                 {campaignType === 'engagement' && "Active paid subscribers"}
               </p>
             </div>

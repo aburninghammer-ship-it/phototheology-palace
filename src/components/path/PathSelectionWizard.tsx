@@ -87,11 +87,11 @@ export function PathSelectionWizard({ onComplete, onCancel, showCancel = true }:
 
               <div className="bg-muted/30 rounded-lg p-4 space-y-2">
                 <h4 className="font-semibold flex items-center gap-2">
-                  <Badge variant="secondary">30-Day Trial</Badge>
+                  <Badge variant="secondary">14-Day Trial</Badge>
                   Try before you commit
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  You can switch paths once within the first 30 days if you find a different style suits you better.
+                  You can switch paths once within the first 14 days if you find a different style suits you better.
                   After the trial, you're committed to your chosen path for the 2-year journey.
                 </p>
               </div>
