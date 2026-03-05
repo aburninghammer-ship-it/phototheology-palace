@@ -9281,23 +9281,53 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
 
     if (mode === "jeopardy_judge") {
       try {
-        const rawContent = data.choices[0]?.message?.content || "";
-        const cleanedRaw = rawContent.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
-        const jsonMatch = cleanedRaw.match(/\{[\s\S]*"correct"[\s\S]*\}/);
+        const rawContent = data.choices[0]?.message?.content || content || "";
+        console.log("jeopardy_judge raw AI response:", rawContent.substring(0, 500));
+        const cleanedRaw = rawContent
+          .replace(/^```json\s*/i, '').replace(/\s*```$/i, '')
+          .replace(/^```\s*/i, '').replace(/\s*```$/i, '')
+          .trim();
+        
+        // Try multiple JSON extraction strategies
+        let parsed: any = null;
+        
+        // Strategy 1: Find JSON object with "correct" key
+        const jsonMatch = cleanedRaw.match(/\{[\s\S]*?"correct"\s*:\s*(true|false)[\s\S]*?\}/);
         if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          return new Response(
-            JSON.stringify({
-              correct: !!parsed.correct,
-              explanation: parsed.explanation || "",
-              scriptureBonus: !!parsed.scriptureBonus,
-              ptPrincipleBonus: !!parsed.ptPrincipleBonus,
-              christBonus: !!parsed.christBonus,
-            }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+          try { parsed = JSON.parse(jsonMatch[0]); } catch {}
         }
-        const parsed = JSON.parse(cleanedRaw);
+        
+        // Strategy 2: Parse the whole cleaned string
+        if (!parsed) {
+          try { parsed = JSON.parse(cleanedRaw); } catch {}
+        }
+        
+        // Strategy 3: Find any JSON object
+        if (!parsed) {
+          const anyJson = cleanedRaw.match(/\{[^{}]*\}/g);
+          if (anyJson) {
+            for (const candidate of anyJson) {
+              try {
+                const p = JSON.parse(candidate);
+                if (p.correct !== undefined) { parsed = p; break; }
+              } catch {}
+            }
+          }
+        }
+        
+        // Strategy 4: Look for true/false keywords in the raw text as last resort
+        if (!parsed) {
+          const hasTrue = /\bcorrect["'\s:]+true\b/i.test(cleanedRaw) || /\btrue\b/i.test(cleanedRaw.substring(0, 100));
+          parsed = {
+            correct: hasTrue,
+            explanation: cleanedRaw.substring(0, 200),
+            scriptureBonus: false,
+            ptPrincipleBonus: false,
+            christBonus: false,
+          };
+          console.log("jeopardy_judge: used text fallback, correct =", hasTrue);
+        }
+        
         return new Response(
           JSON.stringify({
             correct: !!parsed.correct,
@@ -9310,8 +9340,16 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
         );
       } catch (e) {
         console.error("jeopardy_judge parse error:", e);
+        // Local fallback: do a generous string comparison
+        const expectedAnswer = (requestBody.expectedAnswer || "").toLowerCase().trim();
+        const playerAnswer = (requestBody.playerAnswer || "").toLowerCase().trim();
+        const isLocallyCorrect = expectedAnswer && playerAnswer && (
+          playerAnswer.includes(expectedAnswer) ||
+          expectedAnswer.includes(playerAnswer) ||
+          playerAnswer.replace(/^(what|who|where|when) (is|are|was|were) (the |a |an )?/i, '').trim() === expectedAnswer.replace(/^(what|who|where|when) (is|are|was|were) (the |a |an )?/i, '').trim()
+        );
         return new Response(
-          JSON.stringify({ correct: false, explanation: "Could not judge answer", scriptureBonus: false, ptPrincipleBonus: false, christBonus: false }),
+          JSON.stringify({ correct: isLocallyCorrect, explanation: isLocallyCorrect ? "Answer accepted!" : "Answer did not match.", scriptureBonus: false, ptPrincipleBonus: false, christBonus: false }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
