@@ -7,42 +7,90 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Twilio configuration
-const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
-const twilioAuthToken = Deno.env.get('TWILIO_AUTH_TOKEN');
-const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
+// AWS SNS configuration
+const awsAccessKeyId = Deno.env.get('AWS_ACCESS_KEY_ID');
+const awsSecretAccessKey = Deno.env.get('AWS_SECRET_ACCESS_KEY');
+const awsRegion = Deno.env.get('AWS_REGION') || 'us-east-1';
 
-// Check if Twilio is configured (no SDK import - use REST API directly)
-const twilioConfigured = !!(twilioAccountSid && twilioAuthToken && twilioPhoneNumber);
+const snsConfigured = !!(awsAccessKeyId && awsSecretAccessKey);
 
 /**
- * Send SMS via Twilio REST API (no SDK needed)
+ * AWS Signature V4 helper for SNS
  */
-async function sendTwilioSMS(to: string, body: string): Promise<{ sid: string; status: string }> {
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
-  const auth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
-  
-  const params = new URLSearchParams();
-  params.append('To', to);
-  params.append('From', twilioPhoneNumber!);
-  params.append('Body', body);
+function hmacSha256(key: Uint8Array, message: string): Promise<ArrayBuffer> {
+  return crypto.subtle.sign(
+    'HMAC',
+    // @ts-ignore: importKey accepts Uint8Array
+    crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
+    new TextEncoder().encode(message)
+  ).then(sig => sig);
+}
 
-  const response = await fetch(url, {
+async function getSignatureKey(key: string, dateStamp: string, region: string, service: string): Promise<Uint8Array> {
+  const kDate = new Uint8Array(await hmacSha256(new TextEncoder().encode('AWS4' + key), dateStamp));
+  const kRegion = new Uint8Array(await hmacSha256(kDate, region));
+  const kService = new Uint8Array(await hmacSha256(kRegion, service));
+  const kSigning = new Uint8Array(await hmacSha256(kService, 'aws4_request'));
+  return kSigning;
+}
+
+async function sha256Hash(message: string): Promise<string> {
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(message));
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Send SMS via AWS SNS REST API (no SDK needed)
+ */
+async function sendSNSSMS(to: string, body: string): Promise<{ messageId: string; status: string }> {
+  const service = 'sns';
+  const host = `sns.${awsRegion}.amazonaws.com`;
+  const endpoint = `https://${host}/`;
+  const now = new Date();
+  const amzDate = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const dateStamp = amzDate.slice(0, 8);
+
+  const params = new URLSearchParams();
+  params.append('Action', 'Publish');
+  params.append('PhoneNumber', to);
+  params.append('Message', body);
+  params.append('MessageAttributes.entry.1.Name', 'AWS.SNS.SMS.SMSType');
+  params.append('MessageAttributes.entry.1.Value.DataType', 'String');
+  params.append('MessageAttributes.entry.1.Value.StringValue', 'Transactional');
+  params.sort();
+
+  const requestBody = params.toString();
+  const payloadHash = await sha256Hash(requestBody);
+  const canonicalHeaders = `content-type:application/x-www-form-urlencoded\nhost:${host}\nx-amz-date:${amzDate}\n`;
+  const signedHeaders = 'content-type;host;x-amz-date';
+  const canonicalRequest = `POST\n/\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+  const credentialScope = `${dateStamp}/${awsRegion}/${service}/aws4_request`;
+  const stringToSign = `AWS4-HMAC-SHA256\n${amzDate}\n${credentialScope}\n${await sha256Hash(canonicalRequest)}`;
+  const signingKey = await getSignatureKey(awsSecretAccessKey!, dateStamp, awsRegion, service);
+  const signature = Array.from(new Uint8Array(await hmacSha256(signingKey, stringToSign))).map(b => b.toString(16).padStart(2, '0')).join('');
+  const authHeader = `AWS4-HMAC-SHA256 Credential=${awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
-      'Authorization': `Basic ${auth}`,
       'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Amz-Date': amzDate,
+      'Authorization': authHeader,
     },
-    body: params.toString(),
+    body: requestBody,
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Twilio API error ${response.status}: ${errorText}`);
+    throw new Error(`AWS SNS error ${response.status}: ${errorText}`);
   }
 
-  const data = await response.json();
-  return { sid: data.sid, status: data.status };
+  const responseText = await response.text();
+  // Extract MessageId from XML response
+  const messageIdMatch = responseText.match(/<MessageId>(.*?)<\/MessageId>/);
+  const messageId = messageIdMatch ? messageIdMatch[1] : 'unknown';
+
+  return { messageId, status: 'sent' };
 }
 
 /**
@@ -528,10 +576,10 @@ serve(async (req) => {
         }
 
         // Send SMS to opted-in recipients
-        if (!twilioConfigured) {
-          console.warn(`[SMS] Twilio not configured (missing TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_PHONE_NUMBER). Skipping SMS for plan ${plan.id}.`);
+        if (!snsConfigured) {
+          console.warn(`[SMS] AWS SNS not configured (missing AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY). Skipping SMS for plan ${plan.id}.`);
         }
-        if (twilioConfigured) {
+        if (snsConfigured) {
           try {
             // Get profiles with SMS enabled for this plan (include timezone)
             const { data: profilesWithSMS } = await supabase
@@ -569,7 +617,7 @@ serve(async (req) => {
                 const fullPhone = `${recipient.phone_country_code || '+1'}${recipient.phone_number.replace(/\D/g, '')}`;
                 const smsBody = generateSMSMessage(dayContent, plan.id, currentDayNumber, recipient.name);
 
-                const message = await sendTwilioSMS(fullPhone, smsBody);
+                const message = await sendSNSSMS(fullPhone, smsBody);
 
                 await supabase.from('sms_send_log').insert({
                   user_id: plan.user_id,
@@ -579,7 +627,7 @@ serve(async (req) => {
                   plan_id: plan.id,
                   day_number: currentDayNumber,
                   message_body: smsBody,
-                  twilio_sid: message.sid,
+                  twilio_sid: message.messageId,
                   status: message.status,
                 });
 
