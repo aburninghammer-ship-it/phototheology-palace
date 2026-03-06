@@ -255,6 +255,29 @@ export default function ChefChallenge() {
           {t('challenges.backToGames')}
         </Button>
 
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="solo" className="gap-2">
+              <ChefHat className="h-4 w-4" />
+              Solo Kitchen
+            </TabsTrigger>
+            <TabsTrigger value="multiplayer" className="gap-2">
+              <Users className="h-4 w-4" />
+              Multiplayer Kitchen
+            </TabsTrigger>
+          </TabsList>
+
+          {/* MULTIPLAYER TAB */}
+          <TabsContent value="multiplayer" className="space-y-6">
+            {chefMultiplayer.room?.status === "active" ? (
+              <ChefMultiplayerGame game={chefMultiplayer} />
+            ) : (
+              <ChefMultiplayerLobby game={chefMultiplayer} />
+            )}
+          </TabsContent>
+
+          {/* SOLO TAB */}
+          <TabsContent value="solo">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
