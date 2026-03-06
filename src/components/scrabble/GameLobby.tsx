@@ -13,6 +13,7 @@ import {
   Loader2,
   Gamepad2,
   Megaphone,
+  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +27,7 @@ import { getTotalCardCount } from '@/data/scrabbleCards';
 import { cn } from '@/lib/utils';
 import { CallToPlayButton } from './CallToPlayButton';
 import { QuickShareCode } from './QuickShareCode';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface GameLobbyProps {
   game?: ScrabbleGame | null;
@@ -57,6 +59,8 @@ export function GameLobby({
   const [gameMode, setGameMode] = useState<'ffa' | 'team'>('ffa');
   const [maxPlayers, setMaxPlayers] = useState(20);
   const [joinCode, setJoinCode] = useState('');
+  const { subscription } = useSubscription();
+  const isSubscriber = subscription.hasAccess;
 
   const handleCreate = async () => {
     await onCreateGame(gameMode, maxPlayers);
@@ -306,18 +310,25 @@ export function GameLobby({
                 />
               </div>
 
+              {!isSubscriber && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive">
+                  <Lock className="h-4 w-4 flex-shrink-0" />
+                  <span>Only subscribers can create games. You can still join games!</span>
+                </div>
+              )}
+
               <Button
                 className="w-full"
                 size="lg"
                 onClick={handleCreate}
-                disabled={isLoading}
+                disabled={isLoading || !isSubscriber}
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
                   <Play className="h-4 w-4 mr-2" />
                 )}
-                Create Game
+                {isSubscriber ? 'Create Game' : 'Subscribe to Create'}
               </Button>
             </div>
           ) : (
