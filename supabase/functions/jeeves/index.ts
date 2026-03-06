@@ -5715,6 +5715,32 @@ Explanation: ${explanation}
 Is this a valid biblical chain? Does the verse fit? Does the explanation show real understanding?
 Return JSON: { "valid": true/false, "feedback": "encouraging, respectful comment — never dismissive" }`;
 
+    } else if (mode === "scrabble-amplify") {
+      // PT Scrabble — Jeeves amplifies an accepted answer for all players
+      const sv = requestBody.seedVerse || {};
+      const cn = requestBody.cardName || "";
+      const cc = requestBody.cardCode || "";
+      const expl = requestBody.explanation || explanation || "";
+      const icc = requestBody.isChristConnection || false;
+
+      systemPrompt = `You are Jeeves, the Phototheology study companion, watching a live PT Scrabble game. A player just placed a card and gave an explanation connecting it to the study verse. Your job is to AMPLIFY their insight — show all players how the connection deepens the study.
+
+RULES:
+- Keep it to 2-3 sentences MAX. Punchy, vivid, insightful.
+- Build on what the player said — don't repeat it, EXTEND it.
+- Connect the Phototheology principle (${cc} — ${cn}) to the seed verse in a way that makes everyone go "Whoa, I didn't see that!"
+- If it's a Christ connection, highlight how Christ is uniquely revealed.
+- Use present tense. Be warm but substantive — this is a teaching moment disguised as game commentary.
+- Never be preachy. Think ESPN analyst meets Bible scholar.`;
+
+      userPrompt = `Seed Verse: ${sv.reference || ""} — "${sv.text || ""}"
+
+Card Played: ${cc} (${cn})
+Player's Explanation: "${expl}"
+${icc ? "🔥 This was marked as a CHRIST CONNECTION." : ""}
+
+Amplify this insight for all players. Show them what makes this connection powerful and how it deepens the study of this verse.`;
+
     } else if (mode === "validate_sanctuary") {
       // SanctuaryRun game validation - properties already destructured from requestBody
       systemPrompt = `You are Jeeves, validating Sanctuary Run narratives. Check if the player's gospel story flows coherently through the sanctuary items.`;
@@ -8944,6 +8970,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
       "strongs-lookup", "translate-verse",
       "jeopardy_question", "jeopardy_judge", "jeopardy_final",
       "family_feud_round", "family_feud_judge", "family_feud_forge", "family_feud_judge_forge",
+      "scrabble-amplify",
     ]);
 
     if (!RAG_EXCLUDED_MODES.has(mode)) {
@@ -9979,6 +10006,11 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
 
     // Extract principles used from commentary mode
     let responseData: any = { content, response: content };
+
+    // Scrabble amplify mode: return amplification text
+    if (mode === "scrabble-amplify") {
+      responseData.amplification = content.trim();
+    }
 
     // Defense coach mode: extract score from response
     if (mode === "defense-coach" || mode === "defense-coach-continue") {

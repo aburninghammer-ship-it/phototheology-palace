@@ -742,6 +742,46 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       }));
 
       toast.success(`+${pointsAwarded} points!`);
+
+      // Fire-and-forget: Ask Jeeves to amplify the answer for all players
+      const seedRef = game.seedVerse?.reference || '';
+      const seedText = game.seedVerse?.text || '';
+      const gameId = game.id;
+      (async () => {
+        try {
+          const { data } = await supabase.functions.invoke('jeeves', {
+            body: {
+              mode: 'scrabble-amplify',
+              cardCode: card.code,
+              cardName: card.name,
+              explanation,
+              seedVerse: { reference: seedRef, text: seedText },
+              isChristConnection,
+            },
+          });
+          const amplification = data?.amplification || data?.response;
+          if (amplification && typeof amplification === 'string') {
+            // Update board_state with amplification so all players see it via realtime
+            const { data: freshGame } = await supabase
+              .from('pt_scrabble_games')
+              .select('board_state')
+              .eq('id', gameId)
+              .single();
+            if (freshGame?.board_state) {
+              const freshBoard = freshGame.board_state as Record<string, any>;
+              if (freshBoard[posKey]) {
+                freshBoard[posKey].jeevesAmplification = amplification;
+                await supabase
+                  .from('pt_scrabble_games')
+                  .update({ board_state: freshBoard as unknown as Json })
+                  .eq('id', gameId);
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[Scrabble] Jeeves amplification failed (non-blocking):', err);
+        }
+      })();
       return true;
     } catch (err: any) {
       console.error('Error placing card:', err);

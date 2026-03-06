@@ -35,6 +35,7 @@ export interface PlacedCard {
   connections: Connection[];
   timestamp: string;
   moveId: string;
+  jeevesAmplification?: string; // Jeeves' commentary amplifying the player's answer
 }
 
 export type GameStatus = 'waiting' | 'playing' | 'completed';
