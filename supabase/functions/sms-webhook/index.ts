@@ -7,17 +7,13 @@ const corsHeaders = {
 };
 
 /**
- * SMS Webhook Handler
+ * SMS Webhook Handler (AWS SNS)
  *
- * Handles incoming SMS messages and status callbacks from Twilio.
- * 
- * Two webhook types:
- * 1. Incoming SMS (opt-out keywords: STOP, UNSUBSCRIBE, etc.)
- * 2. Status callbacks (delivery confirmations/failures)
+ * Handles incoming SNS notifications for:
+ * 1. Delivery status notifications (success/failure from SNS delivery status logging)
+ * 2. Incoming SMS via Amazon Pinpoint/SNS (if configured)
  *
- * Configure these webhook URLs in your Twilio phone number settings:
- * - Messaging webhook: https://[project].supabase.co/functions/v1/sms-webhook
- * - Status callback: Set in code when sending (or add to number settings)
+ * Configure an SNS subscription to point to this endpoint for delivery receipts.
  */
 
 serve(async (req) => {
@@ -30,178 +26,146 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse Twilio webhook data (form-urlencoded)
-    const formData = await req.formData();
+    const contentType = req.headers.get('content-type') || '';
+
+    // Handle SNS subscription confirmation
+    const snsMessageType = req.headers.get('x-amz-sns-message-type');
     
-    // Check if this is a status callback or incoming message
-    const messageStatus = formData.get('MessageStatus')?.toString();
-    const messageSid = formData.get('MessageSid')?.toString() || formData.get('SmsSid')?.toString() || '';
-    
-    // STATUS CALLBACK HANDLING
-    if (messageStatus) {
-      console.log(`[SMS Status] SID: ${messageSid}, Status: ${messageStatus}`);
+    if (snsMessageType === 'SubscriptionConfirmation') {
+      const body = await req.json();
+      console.log(`[SNS Webhook] Subscription confirmation received. SubscribeURL: ${body.SubscribeURL}`);
       
-      const errorCode = formData.get('ErrorCode')?.toString();
-      const errorMessage = formData.get('ErrorMessage')?.toString();
-      
-      // Update the send log with delivery status
-      const updateData: any = {
-        status: messageStatus,
-      };
-      
-      if (messageStatus === 'delivered') {
-        updateData.delivered_at = new Date().toISOString();
+      // Auto-confirm by visiting the SubscribeURL
+      if (body.SubscribeURL) {
+        await fetch(body.SubscribeURL);
+        console.log('[SNS Webhook] Subscription confirmed');
       }
-      
-      if (errorCode) {
-        updateData.error_code = errorCode;
-        updateData.error_message = errorMessage || `Error code: ${errorCode}`;
-        console.log(`[SMS Status] Error: ${errorCode} - ${errorMessage}`);
-      }
-      
-      // Also update recipient's last_delivery_status
-      const { data: logEntry } = await supabase
-        .from('sms_send_log')
-        .update(updateData)
-        .eq('twilio_sid', messageSid)
-        .select('recipient_id, recipient_type')
-        .single();
-      
-      if (logEntry?.recipient_id && logEntry.recipient_type === 'standalone') {
-        await supabase
-          .from('sms_devotional_recipients')
-          .update({ last_delivery_status: messageStatus })
-          .eq('id', logEntry.recipient_id);
-      }
-      
-      // Return empty TwiML (no response needed for status callbacks)
-      return new Response('<?xml version="1.0" encoding="UTF-8"?><Response></Response>', {
-        headers: { ...corsHeaders, "Content-Type": "text/xml" },
+
+      return new Response(JSON.stringify({ success: true, message: 'Subscription confirmed' }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // INCOMING MESSAGE HANDLING
-    const body = formData.get('Body')?.toString().toUpperCase().trim() || '';
-    const from = formData.get('From')?.toString() || '';
-
-    console.log(`[SMS Webhook] Received from ${from}: "${body}" (SID: ${messageSid})`);
-
-    // Clean phone number (remove country code formatting variations)
-    const cleanPhone = from.replace(/^\+/, '').replace(/\D/g, '');
-    const phoneVariants = [
-      from,
-      `+${cleanPhone}`,
-      cleanPhone,
-      cleanPhone.slice(-10), // Last 10 digits (US number without country code)
-    ];
-
-    // Check for opt-out keywords
-    const optOutKeywords = ['STOP', 'UNSUBSCRIBE', 'CANCEL', 'QUIT', 'END', 'STOPALL', 'STOP ALL'];
-    const optInKeywords = ['START', 'YES', 'UNSTOP', 'SUBSCRIBE'];
-
-    let responseMessage = '';
-
-    if (optOutKeywords.includes(body)) {
-      // Opt-out: Update both profile and standalone recipients
-      console.log(`[SMS Webhook] Processing opt-out for ${from}`);
-
-      // Update devotional_profiles
-      for (const phoneVariant of phoneVariants) {
-        await supabase
-          .from('devotional_profiles')
-          .update({
-            sms_opt_in: false,
-          })
-          .or(`phone_number.eq.${phoneVariant},phone_number.ilike.%${cleanPhone.slice(-10)}`);
+    // Handle SNS notification (delivery status or incoming message)
+    if (snsMessageType === 'Notification') {
+      const body = await req.json();
+      let message: any;
+      
+      try {
+        message = JSON.parse(body.Message);
+      } catch {
+        message = { body: body.Message };
       }
 
-      // Update sms_devotional_recipients
-      for (const phoneVariant of phoneVariants) {
-        await supabase
-          .from('sms_devotional_recipients')
-          .update({
-            opted_out_at: new Date().toISOString(),
-            opt_out_reason: 'user_reply_stop',
-            is_active: false,
-          })
-          .or(`phone_number.eq.${phoneVariant},phone_number.ilike.%${cleanPhone.slice(-10)}`);
+      console.log(`[SNS Webhook] Notification received:`, JSON.stringify(message).slice(0, 200));
+
+      // Handle delivery status notification
+      if (message.notificationType === 'Delivery' || message.status) {
+        const messageId = message.providerResponse?.id || message.messageId || '';
+        const status = message.status === 'SUCCESS' ? 'delivered' : 'failed';
+
+        if (messageId) {
+          const updateData: any = { status };
+          if (status === 'delivered') {
+            updateData.delivered_at = new Date().toISOString();
+          }
+          if (status === 'failed') {
+            updateData.error_message = message.providerResponse?.statusMessage || 'Delivery failed';
+          }
+
+          const { data: logEntry } = await supabase
+            .from('sms_send_log')
+            .update(updateData)
+            .eq('twilio_sid', messageId)
+            .select('recipient_id, recipient_type')
+            .single();
+
+          if (logEntry?.recipient_id && logEntry.recipient_type === 'standalone') {
+            await supabase
+              .from('sms_devotional_recipients')
+              .update({ last_delivery_status: status })
+              .eq('id', logEntry.recipient_id);
+          }
+        }
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
-      // Log the opt-out
-      await supabase.from('sms_send_log').insert({
-        phone_number: from,
-        message_type: 'opt_out_confirm',
-        message_body: body,
-        twilio_sid: messageSid,
-        status: 'received',
-      });
+      // Handle incoming SMS (if using Amazon Pinpoint two-way SMS)
+      if (message.messageBody || message.body) {
+        const incomingBody = (message.messageBody || message.body || '').toUpperCase().trim();
+        const from = message.originationNumber || message.from || '';
 
-      responseMessage = 'You have been unsubscribed. Reply START to resubscribe.';
-      console.log(`[SMS Webhook] Opt-out processed for ${from}`);
+        console.log(`[SNS Webhook] Incoming SMS from ${from}: "${incomingBody}"`);
 
-    } else if (optInKeywords.includes(body)) {
-      // Opt-in: Reactivate recipients
-      console.log(`[SMS Webhook] Processing opt-in for ${from}`);
+        const cleanPhone = from.replace(/^\+/, '').replace(/\D/g, '');
+        const phoneVariants = [from, `+${cleanPhone}`, cleanPhone, cleanPhone.slice(-10)];
 
-      // Reactivate devotional_profiles
-      for (const phoneVariant of phoneVariants) {
-        await supabase
-          .from('devotional_profiles')
-          .update({
-            sms_opt_in: true,
-          })
-          .or(`phone_number.eq.${phoneVariant},phone_number.ilike.%${cleanPhone.slice(-10)}`);
+        const optOutKeywords = ['STOP', 'UNSUBSCRIBE', 'CANCEL', 'QUIT', 'END', 'STOPALL', 'STOP ALL'];
+        const optInKeywords = ['START', 'YES', 'UNSTOP', 'SUBSCRIBE'];
+
+        if (optOutKeywords.includes(incomingBody)) {
+          console.log(`[SNS Webhook] Processing opt-out for ${from}`);
+          for (const phoneVariant of phoneVariants) {
+            await supabase
+              .from('devotional_profiles')
+              .update({ sms_opt_in: false })
+              .or(`phone_number.eq.${phoneVariant},phone_number.ilike.%${cleanPhone.slice(-10)}`);
+
+            await supabase
+              .from('sms_devotional_recipients')
+              .update({
+                opted_out_at: new Date().toISOString(),
+                opt_out_reason: 'user_reply_stop',
+                is_active: false,
+              })
+              .or(`phone_number.eq.${phoneVariant},phone_number.ilike.%${cleanPhone.slice(-10)}`);
+          }
+
+          await supabase.from('sms_send_log').insert({
+            phone_number: from,
+            message_type: 'opt_out_confirm',
+            message_body: incomingBody,
+            status: 'received',
+          });
+
+          console.log(`[SNS Webhook] Opt-out processed for ${from}`);
+        } else if (optInKeywords.includes(incomingBody)) {
+          console.log(`[SNS Webhook] Processing opt-in for ${from}`);
+          for (const phoneVariant of phoneVariants) {
+            await supabase
+              .from('devotional_profiles')
+              .update({ sms_opt_in: true })
+              .or(`phone_number.eq.${phoneVariant},phone_number.ilike.%${cleanPhone.slice(-10)}`);
+
+            await supabase
+              .from('sms_devotional_recipients')
+              .update({ opted_out_at: null, opt_out_reason: null, is_active: true })
+              .or(`phone_number.eq.${phoneVariant},phone_number.ilike.%${cleanPhone.slice(-10)}`);
+          }
+          console.log(`[SNS Webhook] Opt-in processed for ${from}`);
+        } else {
+          console.log(`[SNS Webhook] Unknown message from ${from}: ${incomingBody}`);
+        }
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
-
-      // Reactivate sms_devotional_recipients
-      for (const phoneVariant of phoneVariants) {
-        await supabase
-          .from('sms_devotional_recipients')
-          .update({
-            opted_out_at: null,
-            opt_out_reason: null,
-            is_active: true,
-          })
-          .or(`phone_number.eq.${phoneVariant},phone_number.ilike.%${cleanPhone.slice(-10)}`);
-      }
-
-      responseMessage = 'Welcome back! You are resubscribed. Reply STOP to unsubscribe.';
-      console.log(`[SMS Webhook] Opt-in processed for ${from}`);
-
-    } else {
-      // Unknown message - provide help
-      responseMessage = 'Reply STOP to unsubscribe or visit phototheology.app';
-      console.log(`[SMS Webhook] Unknown message from ${from}: ${body}`);
     }
 
-    // Return TwiML response
-    const twimlResponse = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>${responseMessage}</Message>
-</Response>`;
-
-    return new Response(twimlResponse, {
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "text/xml",
-      },
+    // Fallback for unrecognized requests
+    return new Response(JSON.stringify({ success: true, message: 'No action taken' }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (error: any) {
     console.error("Error in sms-webhook:", error);
-
-    // Return error TwiML
-    const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>Sorry, an error occurred. Visit phototheology.app</Message>
-</Response>`;
-
-    return new Response(errorTwiml, {
-      status: 200, // Twilio expects 200 even for errors
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "text/xml",
-      },
-    });
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
 });

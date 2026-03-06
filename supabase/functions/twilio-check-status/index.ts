@@ -7,10 +7,12 @@ const corsHeaders = {
 };
 
 /**
- * Twilio Message Status Checker
+ * SMS Status Checker (AWS SNS)
  * 
- * Queries Twilio API to get the current status of sent messages.
- * Can check individual messages or all pending messages from the log.
+ * AWS SNS doesn't provide per-message status lookups like Twilio.
+ * Instead, delivery status is tracked via SNS delivery status logging
+ * and CloudWatch. This function checks pending messages in the log
+ * and marks old ones as assumed-delivered or timed-out.
  */
 
 serve(async (req) => {
@@ -21,85 +23,77 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-    const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID') ?? '';
-    const twilioAuthToken = Deno.env.get('TWILIO_AUTH_TOKEN') ?? '';
-
-    if (!twilioAccountSid || !twilioAuthToken) {
-      return new Response(
-        JSON.stringify({ error: 'Missing Twilio credentials' }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { messageSid, checkPending } = await req.json().catch(() => ({}));
 
+    const { messageSid, checkPending } = await req.json().catch(() => ({}));
     const results: any[] = [];
 
     if (messageSid) {
-      // Check specific message
-      const status = await getTwilioMessageStatus(twilioAccountSid, twilioAuthToken, messageSid);
-      results.push(status);
+      // For AWS SNS, we can't query individual message status via API.
+      // Just look up the log entry and return its current status.
+      const { data: logEntry } = await supabase
+        .from('sms_send_log')
+        .select('*')
+        .eq('twilio_sid', messageSid)
+        .single();
 
-      // Update in database
-      if (status.sid) {
-        await supabase
-          .from('sms_send_log')
-          .update({
-            status: status.status,
-            error_code: status.errorCode,
-            error_message: status.errorMessage,
-            delivered_at: status.status === 'delivered' ? new Date().toISOString() : null,
-          })
-          .eq('twilio_sid', messageSid);
+      if (logEntry) {
+        results.push({
+          sid: logEntry.twilio_sid,
+          status: logEntry.status,
+          errorCode: logEntry.error_code,
+          errorMessage: logEntry.error_message,
+        });
       }
     } else if (checkPending) {
       // Check all pending messages from last 24 hours
+      // AWS SNS messages sent successfully are assumed delivered after a timeout
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
 
       const { data: pendingMessages } = await supabase
         .from('sms_send_log')
-        .select('id, twilio_sid, phone_number')
+        .select('id, twilio_sid, phone_number, sent_at, status')
         .in('status', ['queued', 'sending', 'sent', 'accepted'])
         .gte('sent_at', yesterday.toISOString())
         .not('twilio_sid', 'is', null);
 
-      console.log(`[Twilio Check] Found ${pendingMessages?.length || 0} pending messages to check`);
+      console.log(`[SNS Check] Found ${pendingMessages?.length || 0} pending messages to check`);
 
       for (const msg of pendingMessages || []) {
-        if (!msg.twilio_sid) continue;
+        const sentAt = new Date(msg.sent_at);
+        const ageMinutes = (Date.now() - sentAt.getTime()) / (1000 * 60);
 
-        const status = await getTwilioMessageStatus(twilioAccountSid, twilioAuthToken, msg.twilio_sid);
-        
-        // Update database
-        await supabase
-          .from('sms_send_log')
-          .update({
-            status: status.status,
-            error_code: status.errorCode,
-            error_message: status.errorMessage,
-            delivered_at: status.status === 'delivered' ? new Date().toISOString() : null,
-            price: status.price,
-          })
-          .eq('id', msg.id);
+        // Messages older than 5 minutes with 'sent' status → assume delivered
+        if (ageMinutes > 5 && msg.status === 'sent') {
+          await supabase
+            .from('sms_send_log')
+            .update({
+              status: 'delivered',
+              delivered_at: new Date().toISOString(),
+            })
+            .eq('id', msg.id);
 
-        results.push({
-          phone: msg.phone_number,
-          ...status,
-        });
-
-        // Rate limit to avoid Twilio API limits
-        await new Promise(resolve => setTimeout(resolve, 100));
+          results.push({
+            phone: msg.phone_number,
+            sid: msg.twilio_sid,
+            status: 'delivered',
+          });
+        } else {
+          results.push({
+            phone: msg.phone_number,
+            sid: msg.twilio_sid,
+            status: msg.status,
+          });
+        }
       }
     }
 
-    // Summary stats
     const delivered = results.filter(r => r.status === 'delivered').length;
     const failed = results.filter(r => r.status === 'failed' || r.status === 'undelivered').length;
     const pending = results.filter(r => ['queued', 'sending', 'sent', 'accepted'].includes(r.status)).length;
 
-    console.log(`[Twilio Check] Results: ${delivered} delivered, ${failed} failed, ${pending} pending`);
+    console.log(`[SNS Check] Results: ${delivered} delivered, ${failed} failed, ${pending} pending`);
 
     return new Response(
       JSON.stringify({
@@ -112,64 +106,10 @@ serve(async (req) => {
     );
 
   } catch (error: any) {
-    console.error("Error in twilio-check-status:", error);
+    console.error("Error in sms-check-status:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
-
-async function getTwilioMessageStatus(
-  accountSid: string,
-  authToken: string,
-  messageSid: string
-): Promise<{
-  sid: string;
-  status: string;
-  errorCode?: string;
-  errorMessage?: string;
-  price?: number;
-  dateCreated?: string;
-  dateSent?: string;
-  dateUpdated?: string;
-}> {
-  try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages/${messageSid}.json`;
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
-      },
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        sid: messageSid,
-        status: 'error',
-        errorCode: data.code?.toString(),
-        errorMessage: data.message || 'Failed to fetch status',
-      };
-    }
-
-    return {
-      sid: data.sid,
-      status: data.status,
-      errorCode: data.error_code?.toString(),
-      errorMessage: data.error_message,
-      price: data.price ? parseFloat(data.price) : undefined,
-      dateCreated: data.date_created,
-      dateSent: data.date_sent,
-      dateUpdated: data.date_updated,
-    };
-  } catch (error: any) {
-    return {
-      sid: messageSid,
-      status: 'error',
-      errorMessage: error.message,
-    };
-  }
-}
