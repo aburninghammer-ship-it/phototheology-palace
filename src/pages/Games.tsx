@@ -681,6 +681,18 @@ const Games = () => {
           ))}
         </div>
 
+        {/* Leaderboards Section - Below games */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="grid md:grid-cols-3 gap-6 mt-8 mb-8"
+        >
+          <UnifiedGameRankings />
+          <ChainChessLeaderboard />
+          <GroupEscapeRoom />
+        </motion.div>
+
         {filteredGames.length === 0 && (
           <motion.div 
             initial={{ opacity: 0 }}
