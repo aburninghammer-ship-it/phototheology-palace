@@ -191,21 +191,21 @@ Valid difficulties: intermediate, advanced, master`;
       console.warn(`Model ${model} failed with status ${response.status}`);
     }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+    if (!response || !response.ok) {
+      const errorText = response ? await response.text() : "All models failed";
+      console.error("AI gateway error:", response?.status, errorText);
       await supabaseClient
         .from("master_exam_attempts")
         .update({ status: "abandoned" })
         .eq("id", examRow.id);
 
-      if (response.status === 429) {
+      if (response?.status === 429) {
         throw new Error("Rate limit exceeded. Please wait a moment and try again.");
       }
-      if (response.status === 402) {
+      if (response?.status === 402) {
         throw new Error("AI credits exhausted.");
       }
-      throw new Error(`AI generation failed (${response.status})`);
+      throw new Error("Failed to generate exam questions");
     }
 
     const aiResult = await response.json();
