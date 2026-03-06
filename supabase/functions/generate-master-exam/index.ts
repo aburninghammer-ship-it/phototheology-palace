@@ -38,11 +38,16 @@ serve(async (req) => {
       .select("id")
       .single();
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error("Insert error:", insertError);
+      throw new Error(`DB insert failed: ${insertError.message}`);
+    }
 
     const entropySeed = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
     const systemPrompt = `You are the Phototheology Palace Master Examiner. Generate a comprehensive master exam of EXACTLY 50 unique questions testing knowledge across the entire Phototheology system.
+
+You MUST return ONLY a valid JSON object with a "questions" array. No markdown, no code blocks, no commentary — just raw JSON.
 
 ENTROPY SEED: ${entropySeed} — Use this to ensure unique question selection every time.
 
@@ -115,7 +120,49 @@ CRITICAL RULES:
 - SA questions must have a grading_rubric listing 2-4 key points worth partial credit
 - Vary questions — do NOT repeat similar questions
 - Use specific Scripture references where applicable
-- Questions should test UNDERSTANDING, not just recall`;
+- Questions should test UNDERSTANDING, not just recall
+
+OUTPUT FORMAT — return ONLY this JSON (no markdown, no code fences):
+{
+  "questions": [
+    {
+      "id": 1,
+      "category": "palace_rooms",
+      "type": "mc",
+      "difficulty": "intermediate",
+      "question": "Which floor of the Phototheology Palace focuses on...",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correct_answer": "Option B",
+      "explanation": "Floor 2 focuses on...",
+      "scripture_ref": "John 5:39"
+    },
+    {
+      "id": 2,
+      "category": "apologetics",
+      "type": "tf",
+      "difficulty": "advanced",
+      "question": "The Anti-Prophet Critic avatar belongs to Ring 2...",
+      "correct_answer": "False",
+      "explanation": "The Anti-Prophet Critic belongs to Ring 3..."
+    },
+    {
+      "id": 3,
+      "category": "gems_typology",
+      "type": "sa",
+      "difficulty": "master",
+      "question": "Explain how Joseph serves as a type of Christ...",
+      "correct_answer": "Joseph was betrayed by his brothers, sold for silver...",
+      "explanation": "The Joseph-Christ typology includes...",
+      "grading_rubric": ["Mentions betrayal parallel", "Notes exaltation after suffering", "Cites specific Scripture"]
+    }
+  ]
+}
+
+Valid categories: palace_rooms, apologetics, gems_typology, prophecy, sanctuary, christ_types, patterns_themes, memorization_courses
+Valid types: mc, tf, sa
+Valid difficulties: intermediate, advanced, master`;
+
+    console.log("Calling AI gateway for exam generation...");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -127,83 +174,43 @@ CRITICAL RULES:
         model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: "Generate the 50-question master exam now. Ensure variety and rigor." },
+          { role: "user", content: "Generate the 50-question master exam now. Return ONLY raw JSON — no markdown code blocks, no commentary. Ensure variety and rigor." },
         ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "submit_master_exam",
-              description: "Submit the complete 50-question master exam",
-              parameters: {
-                type: "object",
-                properties: {
-                  questions: {
-                    type: "array",
-                    minItems: 50,
-                    maxItems: 50,
-                    items: {
-                      type: "object",
-                      properties: {
-                        id: { type: "number", description: "Question number 1-50" },
-                        category: {
-                          type: "string",
-                          enum: [
-                            "palace_rooms",
-                            "apologetics",
-                            "gems_typology",
-                            "prophecy",
-                            "sanctuary",
-                            "christ_types",
-                            "patterns_themes",
-                            "memorization_courses",
-                          ],
-                        },
-                        type: { type: "string", enum: ["mc", "tf", "sa"] },
-                        difficulty: { type: "string", enum: ["intermediate", "advanced", "master"] },
-                        question: { type: "string" },
-                        options: {
-                          type: "array",
-                          items: { type: "string" },
-                          description: "4 options for MC, omit for TF and SA",
-                        },
-                        correct_answer: { type: "string" },
-                        explanation: { type: "string" },
-                        grading_rubric: {
-                          type: "array",
-                          items: { type: "string" },
-                          description: "Key points for SA grading, omit for MC/TF",
-                        },
-                        scripture_ref: { type: "string", description: "Related Scripture reference if applicable" },
-                      },
-                      required: ["id", "category", "type", "difficulty", "question", "correct_answer", "explanation"],
-                    },
-                  },
-                },
-                required: ["questions"],
-                additionalProperties: false,
-              },
-            },
-          },
-        ],
-        tool_choice: { type: "function", function: { name: "submit_master_exam" } },
+        max_tokens: 32768,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
-      // Mark as abandoned on generation failure
       await supabaseClient
         .from("master_exam_attempts")
         .update({ status: "abandoned" })
         .eq("id", examRow.id);
-      throw new Error("Failed to generate exam questions");
+
+      if (response.status === 429) {
+        throw new Error("Rate limit exceeded. Please wait a moment and try again.");
+      }
+      if (response.status === 402) {
+        throw new Error("AI credits exhausted.");
+      }
+      throw new Error(`AI generation failed (${response.status})`);
     }
 
     const aiResult = await response.json();
-    const toolCall = aiResult.choices[0]?.message?.tool_calls?.[0];
-    if (!toolCall) {
+    console.log("AI response received, parsing...");
+
+    // Extract content — support both tool call and direct text responses
+    let rawContent: string;
+    const toolCall = aiResult.choices?.[0]?.message?.tool_calls?.[0];
+    if (toolCall) {
+      rawContent = toolCall.function.arguments;
+    } else {
+      rawContent = aiResult.choices?.[0]?.message?.content || "";
+    }
+
+    if (!rawContent) {
+      console.error("No content in AI response:", JSON.stringify(aiResult).slice(0, 500));
       await supabaseClient
         .from("master_exam_attempts")
         .update({ status: "abandoned" })
@@ -211,22 +218,67 @@ CRITICAL RULES:
       throw new Error("No exam data returned from AI");
     }
 
-    const examData = JSON.parse(toolCall.function.arguments);
+    // Clean markdown code blocks if present
+    let cleanContent = rawContent.trim();
+    if (cleanContent.startsWith("```")) {
+      cleanContent = cleanContent.replace(/```json?\n?/g, "").replace(/```\s*$/g, "").trim();
+    }
+
+    let examData: { questions: any[] };
+    try {
+      examData = JSON.parse(cleanContent);
+    } catch (parseErr) {
+      console.error("JSON parse error:", (parseErr as Error).message, "Content preview:", cleanContent.slice(0, 200));
+      await supabaseClient
+        .from("master_exam_attempts")
+        .update({ status: "abandoned" })
+        .eq("id", examRow.id);
+      throw new Error("Failed to parse exam data");
+    }
+
+    if (!examData.questions || !Array.isArray(examData.questions) || examData.questions.length === 0) {
+      console.error("Invalid exam structure:", Object.keys(examData));
+      await supabaseClient
+        .from("master_exam_attempts")
+        .update({ status: "abandoned" })
+        .eq("id", examRow.id);
+      throw new Error("Invalid exam structure from AI");
+    }
+
+    console.log(`Parsed ${examData.questions.length} questions`);
+
+    // Ensure each question has required fields and normalize IDs
+    const questions = examData.questions.map((q: any, i: number) => ({
+      id: i + 1,
+      category: q.category || "palace_rooms",
+      type: q.type || "mc",
+      difficulty: q.difficulty || "intermediate",
+      question: q.question || "",
+      options: q.type === "mc" ? (q.options || []) : undefined,
+      correct_answer: q.correct_answer || "",
+      explanation: q.explanation || "",
+      grading_rubric: q.type === "sa" ? (q.grading_rubric || []) : undefined,
+      scripture_ref: q.scripture_ref || undefined,
+    }));
 
     // Store full questions (with answers) in DB
     const { error: updateError } = await supabaseClient
       .from("master_exam_attempts")
       .update({
-        questions_data: examData.questions,
+        questions_data: questions,
+        total_questions: questions.length,
         status: "in_progress",
         started_at: new Date().toISOString(),
       })
       .eq("id", examRow.id);
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error("DB update error:", updateError);
+      throw new Error(`Failed to save exam: ${updateError.message}`);
+    }
 
     // Strip correct answers, explanations, and rubrics before sending to client
-    const clientQuestions = examData.questions.map((q: any) => ({
+    const clientQuestions = questions.map((q: any) => ({
       id: q.id,
       category: q.category,
       type: q.type,
@@ -235,6 +287,8 @@ CRITICAL RULES:
       options: q.options,
       scripture_ref: q.scripture_ref,
     }));
+
+    console.log(`Exam ${examRow.id} generated successfully with ${clientQuestions.length} questions`);
 
     return new Response(
       JSON.stringify({
