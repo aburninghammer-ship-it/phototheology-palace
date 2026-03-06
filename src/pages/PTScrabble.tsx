@@ -623,23 +623,30 @@ export default function PTScrabble() {
 
     return sorted.map((placed, index) => {
       const prev = index > 0 ? sorted[index - 1] : undefined;
+      // Use corrected explanation if available (spelling/grammar cleaned by Jeeves)
+      const displayExplanation = (placed as any).correctedExplanation
+        || placed.connections.map(c => c.explanation).join(' | ')
+        || '';
+      const prevExplanation = prev
+        ? ((prev as any).correctedExplanation || prev.connections.map(c => c.explanation).join(' | ') || undefined)
+        : undefined;
       return {
         id: placed.moveId,
         playerName: placed.playerName,
         cardCode: placed.card.code,
         cardName: placed.card.name,
-        explanation: placed.connections.map(c => c.explanation).join(' | ') || '',
+        explanation: displayExplanation,
         isChristConnection: placed.connections.some(c => c.isChristConnection),
         points: placed.connections.length > 0
           ? (placed.connections.length === 1 ? 1 : placed.connections.length === 2 ? 3 : placed.connections.length === 3 ? 6 : 10)
             * (placed.connections.some(c => c.isChristConnection) ? 2 : 1)
           : 0,
         timestamp: placed.timestamp,
-        jeevesJudgment: placed.jeevesAmplification, // Show Jeeves amplification to all players
+        jeevesJudgment: placed.jeevesAmplification,
         connectingTo: index === 0 ? 'verse' as const : 'previous' as const,
         previousPlayerName: prev?.playerName,
         previousCardName: prev?.card.name,
-        previousExplanation: prev?.connections.map(c => c.explanation).join(' | ') || undefined,
+        previousExplanation: prevExplanation,
       };
     });
   }, [mpGame?.boardState]);
