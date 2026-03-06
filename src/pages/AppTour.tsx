@@ -72,7 +72,7 @@ const AppTour = () => {
         "Compete on the leaderboard"
       ],
       features: [
-        { name: "PT Card Games", detail: "Chain War, Christ Lock, Controversy Raid" },
+        { name: "PT Card Games", detail: "Quick Play, Christ Lock, Controversy Raid" },
         { name: "Memory Games", detail: "Concentration, Verse Match, Frame Snapshot" },
         { name: "Strategy Games", detail: "Sanctuary Run, Time Zone Invasion" },
         { name: "VS Jeeves Mode", detail: "AI opponent adapts to your skill" }

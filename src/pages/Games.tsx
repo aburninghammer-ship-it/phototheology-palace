@@ -203,15 +203,15 @@ const Games = () => {
     },
     {
       id: "chain_war",
-      name: "⛓️ CHAIN WAR",
-      description: "Build biblical commentary chains using PT symbols. Jeeves validates your connections!",
-      icon: "⛓️",
+      name: "⚡ QUICK PLAY",
+      description: "Fast card-based rounds — pick PT symbols, cite a verse, explain the chain. Reach 15 points to win!",
+      icon: "⚡",
       floor: 4,
       timed: true,
       rooms: ["QR", "QA", "CR", "DR"],
       modes: ["solo", "vs-ai", "2p"],
       difficulties: ["medium", "hard", "expert"],
-      route: "/games/chain-war"
+      route: "/pt-scrabble?mode=quick"
     },
     {
       id: "concentration",

@@ -6,10 +6,15 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe, Megaphone, Calendar } from "lucide-react";
+import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe, Megaphone, Calendar, Zap, Send, Link as LinkIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useAuth } from "@/hooks/useAuth";
 import { useScrabbleGame } from "@/hooks/useScrabbleGame";
 import { useGamePresence, type GameInvitation } from "@/hooks/useGamePresence";
@@ -41,7 +46,24 @@ import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/type
 import { positionKey, isValidPlacement, assignCardsToPositions, getValidPlacements } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
 
-type GamePhase = "menu" | "verse-selection" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-verse-selection" | "multiplayer-playing";
+type GamePhase = "menu" | "verse-selection" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-verse-selection" | "multiplayer-playing" | "quick-play" | "quick-play-won";
+
+const QUICK_PLAY_SYMBOLS = [
+  { code: "1D", name: "Literal Dimension" },
+  { code: "2D", name: "Christ Dimension" },
+  { code: "3D", name: "Me Dimension" },
+  { code: "4D", name: "Church Dimension" },
+  { code: "5D", name: "Heaven Dimension" },
+  { code: "|S", name: "Sanctuary Wall" },
+  { code: "|LC", name: "Life of Christ Wall" },
+  { code: "|GC", name: "Great Controversy Wall" },
+  { code: "|TP", name: "Time Prophecy Wall" },
+  { code: "+", name: "Add Link" },
+  { code: "∥", name: "Parallel" },
+  { code: "≅", name: "Type/Antitype" },
+  { code: "⊙", name: "Center in Christ" },
+  { code: "⚖", name: "Integrity Sweep" },
+];
 
 export default function PTScrabble() {
   const { user, loading } = useAuth();
@@ -64,6 +86,100 @@ export default function PTScrabble() {
   // Jeeves assist tracking - max 3 per player
   const [jeevesAssistsUsed, setJeevesAssistsUsed] = useState(0);
   const MAX_JEEVES_ASSISTS = 3;
+
+  // Quick Play state (merged from Chain War)
+  const [qpHand, setQpHand] = useState<typeof QUICK_PLAY_SYMBOLS>([]);
+  const [qpSelectedCards, setQpSelectedCards] = useState<string[]>([]);
+  const [qpVerse, setQpVerse] = useState("");
+  const [qpExplanation, setQpExplanation] = useState("");
+  const [qpScore, setQpScore] = useState(0);
+  const [qpIsSubmitting, setQpIsSubmitting] = useState(false);
+  const qpTargetScore = 15;
+
+  const dealQpHand = useCallback(() => {
+    const shuffled = [...QUICK_PLAY_SYMBOLS].sort(() => Math.random() - 0.5);
+    setQpHand(shuffled.slice(0, 5));
+    setQpSelectedCards([]);
+    setQpVerse("");
+    setQpExplanation("");
+  }, []);
+
+  const startQuickPlay = useCallback(() => {
+    setQpScore(0);
+    dealQpHand();
+    setGamePhase("quick-play");
+  }, [dealQpHand, setGamePhase]);
+
+  // Save quick play score
+  useEffect(() => {
+    const saveScore = async () => {
+      if (gamePhase === 'quick-play-won' && user) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "chain_war",
+            score: qpScore,
+            mode: "solo",
+          });
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [gamePhase, user, qpScore]);
+
+  const toggleQpCard = useCallback((code: string) => {
+    setQpSelectedCards(prev =>
+      prev.includes(code)
+        ? prev.filter(c => c !== code)
+        : prev.length < 3 ? [...prev, code] : prev
+    );
+  }, []);
+
+  const handleQpSubmit = useCallback(async () => {
+    if (qpSelectedCards.length < 2) {
+      toast.error("Select at least 2 cards");
+      return;
+    }
+    if (!qpVerse.trim() || !qpExplanation.trim()) {
+      toast.error("Please provide a verse and explanation");
+      return;
+    }
+    setQpIsSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('jeeves', {
+        body: { mode: "validate_chain", cards: qpSelectedCards, verse: qpVerse, explanation: qpExplanation },
+      });
+      if (error) throw error;
+      const { isValid, feedback, points } = data;
+      if (isValid) {
+        const newScore = qpScore + points;
+        setQpScore(newScore);
+        toast.success(`+${points} points! ${feedback}`);
+        if (newScore >= qpTargetScore) {
+          setGamePhase("quick-play-won");
+          toast.success("🏆 You reached the target score!");
+        }
+        const remaining = qpHand.filter(s => !qpSelectedCards.includes(s.code));
+        const newCards = QUICK_PLAY_SYMBOLS
+          .filter(s => !remaining.find(r => r.code === s.code))
+          .sort(() => Math.random() - 0.5)
+          .slice(0, qpSelectedCards.length);
+        setQpHand([...remaining, ...newCards]);
+        setQpSelectedCards([]);
+        setQpVerse("");
+        setQpExplanation("");
+      } else {
+        toast.error(`Not quite: ${feedback}`);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error validating chain");
+    } finally {
+      setQpIsSubmitting(false);
+    }
+  }, [qpSelectedCards, qpVerse, qpExplanation, qpScore, qpHand, setGamePhase]);
 
   // Multiplayer state
   const gameIdFromUrl = searchParams.get('game');
@@ -134,7 +250,13 @@ export default function PTScrabble() {
     }
   }, [mpGame, multiplayerGameId, gamePhase, seedVerse]);
 
-  // Auto-refresh hand if player enters playing phase with empty hand
+  // Auto-start quick play from URL param ?mode=quick
+  useEffect(() => {
+    if (searchParams.get('mode') === 'quick' && gamePhase === 'menu') {
+      startQuickPlay();
+    }
+  }, [searchParams, gamePhase, startQuickPlay]);
+
   useEffect(() => {
     if (gamePhase === 'multiplayer-playing' && mpMyPlayer && mpMyHand.length === 0 && mpGame?.status === 'playing') {
       mpRefreshHand();
@@ -616,6 +738,14 @@ export default function PTScrabble() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                     <Button
                       size="lg"
+                      onClick={startQuickPlay}
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                    >
+                      <Zap className="mr-2 h-5 w-5" />
+                      Quick Play
+                    </Button>
+                    <Button
+                      size="lg"
                       onClick={() => setGamePhase("verse-selection")}
                       className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                     >
@@ -637,6 +767,10 @@ export default function PTScrabble() {
                       )}
                     </Button>
                   </div>
+
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    <strong>Quick Play:</strong> Pick cards, cite a verse, explain the connection — fast rounds to {qpTargetScore} points
+                  </p>
 
                   {/* Scoring info */}
                   <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-6">
@@ -681,7 +815,147 @@ export default function PTScrabble() {
   }
 
 
-  // ========== MULTIPLAYER LOBBY VIEW ==========
+  // ========== QUICK PLAY WON VIEW ==========
+  if (gamePhase === "quick-play-won") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-amber-500/50 text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl text-amber-300">Victory!</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-amber-400">{qpScore} points</div>
+                <p className="text-amber-200/80">You mastered the PT symbol chains!</p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => setGamePhase("menu")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Menu
+                  </Button>
+                  <Button onClick={startQuickPlay} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="chain_war" currentScore={qpScore} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ========== QUICK PLAY VIEW ==========
+  if (gamePhase === "quick-play") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <Button variant="ghost" onClick={() => setGamePhase("menu")} className="text-white">
+              <ArrowLeft className="mr-2" />
+              Back
+            </Button>
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-amber-400 mb-2" style={{ fontFamily: "'Cinzel', serif" }}>
+                Quick Play
+              </h1>
+              <p className="text-amber-200/80">Build chains with PT symbols</p>
+            </div>
+            <div className="text-right">
+              <div className="text-amber-400 text-3xl font-bold">{qpScore} / {qpTargetScore}</div>
+              <div className="text-amber-200/60 text-sm">Points</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-amber-500/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-amber-300">
+                  <LinkIcon className="w-5 h-5" />
+                  Your Hand
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {qpHand.map(symbol => (
+                    <Button
+                      key={symbol.code}
+                      variant={qpSelectedCards.includes(symbol.code) ? "default" : "outline"}
+                      onClick={() => toggleQpCard(symbol.code)}
+                      className="h-20 flex-col gap-1"
+                    >
+                      <div className="text-2xl font-bold">{symbol.code}</div>
+                      <div className="text-xs">{symbol.name}</div>
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Select 2–3 cards to build your chain
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black/40 border-amber-500/50">
+              <CardHeader>
+                <CardTitle className="text-amber-300">Build Your Chain</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm text-amber-200 mb-2 block">Verse Reference</label>
+                  <input
+                    type="text"
+                    value={qpVerse}
+                    onChange={(e) => setQpVerse(e.target.value)}
+                    placeholder="e.g., John 3:16"
+                    className="w-full px-4 py-2 bg-black/60 border border-amber-500/30 rounded text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-amber-200 mb-2 block">
+                    Explain how your {qpSelectedCards.length} card(s) connect
+                  </label>
+                  <Textarea
+                    value={qpExplanation}
+                    onChange={(e) => setQpExplanation(e.target.value)}
+                    placeholder="Explain how these PT principles connect to your verse..."
+                    className="bg-black/60 border-amber-500/30 text-white min-h-32"
+                  />
+                </div>
+                <Button
+                  onClick={handleQpSubmit}
+                  disabled={qpIsSubmitting || qpSelectedCards.length < 2}
+                  className="w-full gap-2"
+                >
+                  <Send className="w-4 h-4" />
+                  {qpIsSubmitting ? "Validating..." : "Submit Chain"}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="mt-6 bg-black/40 border-amber-500/50">
+            <CardHeader>
+              <CardTitle className="text-amber-300">How to Play</CardTitle>
+            </CardHeader>
+            <CardContent className="text-amber-100/80 space-y-2">
+              <p>1. You get 5 PT symbol cards each round</p>
+              <p>2. Select 2–3 cards that form a theological chain</p>
+              <p>3. Provide a Bible verse that supports your chain</p>
+              <p>4. Explain how the symbols connect to the verse</p>
+              <p>5. Jeeves validates — reach {qpTargetScore} points to win!</p>
+            </CardContent>
+          </Card>
+        </div>
+        <FloatingGameChat gameType="quick-play" />
+      </div>
+    );
+  }
+
+
   if (gamePhase === "multiplayer-lobby") {
     // If we have an active game in waiting status, show GameLobby
     if (mpGame && mpGame.status === 'waiting') {

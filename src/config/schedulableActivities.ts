@@ -46,7 +46,7 @@ export type ScheduledActivityType =
   | 'concentration-room'
   | 'five-dimensions'
   | 'sanctuary-blueprint'
-  | 'chain-war'
+  | 'quick-play'
   | 'biblical-parallels'
   | 'sanctuary-run'
   | 'prophecy-timeline'
@@ -197,12 +197,12 @@ export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
     gradient: 'from-blue-500 to-indigo-600',
   },
   {
-    id: 'chain-war',
-    name: 'Chain War',
-    description: 'Build biblical commentary chains using PT symbols',
+    id: 'quick-play',
+    name: 'Quick Play',
+    description: 'Fast PT symbol chain rounds inside PT Scrabble',
     icon: Flame,
     category: 'games',
-    route: '/games/chain-war',
+    route: '/pt-scrabble?mode=quick',
     minPlayers: 1,
     maxPlayers: 4,
     supportsVerse: true,

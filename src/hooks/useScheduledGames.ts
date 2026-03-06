@@ -78,7 +78,7 @@ export type ScheduledEventType =
   | 'concentration-room'
   | 'five-dimensions'
   | 'sanctuary-blueprint'
-  | 'chain-war'
+  | 'quick-play'
   | 'biblical-parallels'
   | 'sanctuary-run'
   | 'prophecy-timeline'
