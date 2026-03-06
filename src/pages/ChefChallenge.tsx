@@ -6,13 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw, Users } from "lucide-react";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { TextShareButton } from "@/components/TextShareButton";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { ChefMultiplayerLobby } from "@/components/chef/ChefMultiplayerLobby";
+import { ChefMultiplayerGame } from "@/components/chef/ChefMultiplayerGame";
+import { useChefMultiplayer } from "@/hooks/useChefMultiplayer";
 interface Verse {
   reference: string;
   text: string;
