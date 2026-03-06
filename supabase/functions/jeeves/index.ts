@@ -9037,7 +9037,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
     }
 
     // Use lower temperature for structured JSON modes to improve reliability
-    const modelTemperature = (mode === "research") ? 0.4 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : (mode.startsWith("jeopardy_") || mode.startsWith("family_feud_")) ? 0.7 : 0.9;
+    const modelTemperature = (mode === "research") ? 0.4 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : (mode && (mode.startsWith("jeopardy_") || mode.startsWith("family_feud_"))) ? 0.7 : 0.9;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -9128,7 +9128,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
 
     // Global cleanup for Jeeves text responses (skip for JSON analysis modes to avoid corrupting JSON)
     // Remove all markdown bold/italic markers and discourage theatrical openings
-    if (mode !== "analyze-thoughts" && mode !== "analyze-thoughts-scholar" && !mode.startsWith("jeopardy_") && !mode.startsWith("family_feud_")) {
+    if (mode !== "analyze-thoughts" && mode !== "analyze-thoughts-scholar" && !(mode && mode.startsWith("jeopardy_")) && !(mode && mode.startsWith("family_feud_"))) {
       content = content
         .replace(/\*\*/g, '')
         .replace(/__([^_]+)__/g, '$1')
