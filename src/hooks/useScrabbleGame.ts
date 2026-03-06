@@ -65,6 +65,58 @@ function generateRoomCode(): string {
   return code;
 }
 
+function normalizeSeedVerse(raw: unknown): { reference: string; text: string } | undefined {
+  if (!raw) return undefined;
+
+  let parsed: unknown = raw;
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      return undefined;
+    }
+  }
+
+  if (!parsed || typeof parsed !== 'object') return undefined;
+
+  const reference = typeof (parsed as any).reference === 'string' ? (parsed as any).reference : '';
+  const text = typeof (parsed as any).text === 'string' ? (parsed as any).text : '';
+
+  if (!reference && !text) return undefined;
+  return { reference, text };
+}
+
+function normalizeBoardState(raw: unknown): Record<string, PlacedCard> {
+  if (!raw) return {};
+
+  let parsed: unknown = raw;
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      return {};
+    }
+  }
+
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+  return parsed as Record<string, PlacedCard>;
+}
+
+function normalizeDeck(raw: unknown): any[] {
+  if (!raw) return [];
+
+  let parsed: unknown = raw;
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      return [];
+    }
+  }
+
+  return Array.isArray(parsed) ? parsed : [];
+}
+
 export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
   const { user } = useAuth();
   const [game, setGame] = useState<ScrabbleGame | null>(null);
@@ -103,9 +155,9 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
             setGame(prev => prev ? {
               ...prev,
               status: updated.status,
-              seedVerse: updated.seed_verse || prev.seedVerse,
-              boardState: updated.board_state || {},
-              deckRemaining: updated.deck_remaining || [],
+              seedVerse: normalizeSeedVerse(updated.seed_verse) || prev.seedVerse,
+              boardState: normalizeBoardState(updated.board_state),
+              deckRemaining: normalizeDeck(updated.deck_remaining),
               startedAt: updated.started_at,
               endedAt: updated.ended_at,
             } : null);
@@ -160,9 +212,9 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         gameMode: data.game_mode as any,
         maxPlayers: data.max_players,
         seedCardId: data.seed_card_id,
-        seedVerse: data.seed_verse ? (typeof data.seed_verse === 'string' ? JSON.parse(data.seed_verse) : data.seed_verse as unknown as { reference: string; text: string }) : undefined,
-        boardState: (data.board_state as unknown as Record<string, PlacedCard>) || {},
-        deckRemaining: data.deck_remaining || [],
+        seedVerse: normalizeSeedVerse(data.seed_verse),
+        boardState: normalizeBoardState(data.board_state),
+        deckRemaining: normalizeDeck(data.deck_remaining),
         voteTimeoutSeconds: data.vote_timeout_seconds,
         createdAt: data.created_at,
         startedAt: data.started_at || undefined,
