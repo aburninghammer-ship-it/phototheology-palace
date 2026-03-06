@@ -20,7 +20,7 @@ import { ActiveGameSessions } from "@/components/games/ActiveGameSessions";
 import { usePreservePageState, usePreserveFormState } from "@/contexts/PageStateContext";
 
 // Games with special badges
-const NEW_GAMES = ["pt_tetris", "symbol_decoder", "speed_verse", "gideon_300"]; // Completely new games
+const NEW_GAMES = ["pt_tetris", "symbol_decoder", "speed_verse"]; // Completely new games
 const RENOVATED_GAMES = ["chain_chess", "escape_room"]; // Rebuilt/improved games
 
 // Bible translations available for games
@@ -404,18 +404,6 @@ const Games = () => {
       modes: ["multiplayer"],
       difficulties: ["easy", "medium"],
       route: "/games/pt-family-feud"
-    },
-    {
-      id: "gideon_300",
-      name: "Gideon 300 Tournament",
-      description: "Live multiplayer Bible refinement tournament! 6-8 progressive rounds with two-strike elimination. Only the remnant survives to the synthesis round.",
-      icon: "\u2694\uFE0F",
-      floor: 7,
-      timed: true,
-      rooms: ["All"],
-      modes: ["multiplayer"],
-      difficulties: ["hard", "expert"],
-      route: "/games/gideon-300"
     },
   ];
 

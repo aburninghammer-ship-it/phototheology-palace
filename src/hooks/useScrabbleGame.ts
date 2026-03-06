@@ -707,16 +707,30 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       // Remove played card from hand (no auto-draw; use refresh to get new cards)
       const newHand = myPlayer.hand.filter(c => c.id !== card.id);
 
-      // Update game board
-      await supabase
+      // Update game board — use fresh read-then-write to avoid overwriting other players' moves
+      const { data: freshGameData } = await supabase
+        .from('pt_scrabble_games')
+        .select('board_state')
+        .eq('id', game.id)
+        .single();
+
+      const freshBoard = normalizeBoardState(freshGameData?.board_state);
+      freshBoard[posKey] = placedCard;
+
+      const { error: boardError } = await supabase
         .from('pt_scrabble_games')
         .update({
-          board_state: JSON.parse(JSON.stringify(newBoard)) as Json,
+          board_state: JSON.parse(JSON.stringify(freshBoard)) as Json,
         })
         .eq('id', game.id);
 
+      if (boardError) {
+        console.error('[Scrabble] Failed to update board_state:', boardError);
+        throw boardError;
+      }
+
       // Update player's hand and score
-      await supabase
+      const { error: playerError } = await supabase
         .from('pt_scrabble_players')
         .update({
           hand: newHand.map(c => ({ id: c.id, code: c.code, name: c.name, floor: c.floor })),
@@ -725,10 +739,14 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         })
         .eq('id', myPlayer.id);
 
+      if (playerError) {
+        console.error('[Scrabble] Failed to update player:', playerError);
+      }
+
       // Update local state
       setGame(prev => prev ? {
         ...prev,
-        boardState: newBoard,
+        boardState: freshBoard,
       } : null);
 
       setPlayers(prev => prev.map(p => {
