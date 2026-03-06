@@ -777,25 +777,27 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
               isChristConnection,
             },
           });
-          const amplification = data?.amplification || data?.response;
-          if (amplification && typeof amplification === 'string') {
-            // Update board_state with amplification so all players see it via realtime
-            const { data: freshGame } = await supabase
-              .from('pt_scrabble_games')
-              .select('board_state')
-              .eq('id', gameId)
-              .single();
-            if (freshGame?.board_state) {
-              const freshBoard = freshGame.board_state as Record<string, any>;
-              if (freshBoard[posKey]) {
-                freshBoard[posKey].jeevesAmplification = amplification;
-                await supabase
-                  .from('pt_scrabble_games')
-                  .update({ board_state: freshBoard as unknown as Json })
-                  .eq('id', gameId);
+            const amplification = data?.amplification || data?.response;
+            const correctedExplanation = data?.correctedExplanation || null;
+            if ((amplification && typeof amplification === 'string') || correctedExplanation) {
+              // Update board_state with amplification + corrected text so all players see it via realtime
+              const { data: freshGame } = await supabase
+                .from('pt_scrabble_games')
+                .select('board_state')
+                .eq('id', gameId)
+                .single();
+              if (freshGame?.board_state) {
+                const freshBoard = freshGame.board_state as Record<string, any>;
+                if (freshBoard[posKey]) {
+                  if (amplification) freshBoard[posKey].jeevesAmplification = amplification;
+                  if (correctedExplanation) freshBoard[posKey].correctedExplanation = correctedExplanation;
+                  await supabase
+                    .from('pt_scrabble_games')
+                    .update({ board_state: freshBoard as unknown as Json })
+                    .eq('id', gameId);
+                }
               }
             }
-          }
         } catch (err) {
           console.error('[Scrabble] Jeeves amplification failed (non-blocking):', err);
         }

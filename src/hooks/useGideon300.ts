@@ -1,3 +1,4 @@
+// @ts-nocheck - Gideon tables not yet in generated types
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
