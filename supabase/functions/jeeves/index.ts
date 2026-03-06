@@ -10001,7 +10001,7 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     if (["validate_chain", "validate_sanctuary", "validate_time_zones", "validate_connect6",
          "validate_christ", "validate_controversy", "validate_dragon_defense", "dragon_defense_hint", "validate_equation",
          "validate_witness", "validate_frame", "validate_chef_recipe", "generate_chef_verses",
-         "check_chef_recipe", "get_chef_model_answer", "study_suggestion"].includes(mode)) {
+         "check_chef_recipe", "get_chef_model_answer", "study_suggestion", "scrabble-feedback"].includes(mode)) {
       try {
         console.log(`=== ${mode.toUpperCase()} RESPONSE ===`);
         console.log("Raw content:", content);
