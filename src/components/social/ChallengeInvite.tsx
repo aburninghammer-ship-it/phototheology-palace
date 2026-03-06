@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Share2, Copy, Check, Users, Swords, Trophy, Link as LinkIcon, Loader2 } from "lucide-react";
+import { QRCodeDisplay } from "@/components/ui/qr-code-display";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -134,6 +135,15 @@ export const ChallengeInvite = ({
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               {copied ? "Copied!" : "Copy Link"}
             </Button>
+          </div>
+
+          {/* QR Code */}
+          <div className="flex justify-center">
+            <QRCodeDisplay
+              value={getInviteLink()}
+              variant="compact"
+              label={`Scan to join ${getChallengeTitle()}`}
+            />
           </div>
 
           {/* Link preview */}
