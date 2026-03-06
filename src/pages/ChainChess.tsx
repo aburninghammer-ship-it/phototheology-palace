@@ -188,6 +188,16 @@ const ChainChess = () => {
     };
 
     await mp.startGame(initialState, firstPlayer.user_id);
+
+    // Immediately transition UI to in_progress (don't wait for realtime)
+    setGameState(prev => ({
+      ...prev,
+      status: "in_progress",
+      moves: [],
+      roundNumber: 1,
+      playerScore: 0,
+      jeevesScore: 0,
+    }));
   };
 
   // ===== MULTIPLAYER: Submit move =====
