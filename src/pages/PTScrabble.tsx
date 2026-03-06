@@ -635,6 +635,7 @@ export default function PTScrabble() {
             * (placed.connections.some(c => c.isChristConnection) ? 2 : 1)
           : 0,
         timestamp: placed.timestamp,
+        jeevesJudgment: placed.jeevesAmplification, // Show Jeeves amplification to all players
         connectingTo: index === 0 ? 'verse' as const : 'previous' as const,
         previousPlayerName: prev?.playerName,
         previousCardName: prev?.card.name,
