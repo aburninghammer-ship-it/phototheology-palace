@@ -5742,6 +5742,34 @@ ${icc ? "🔥 CHRIST CONNECTION — reveal an additional Christological layer th
 
 Give a fresh insight that EXTENDS beyond what the player already said. Start with a specific biblical detail they missed.`;
 
+    } else if (mode === "scrabble-feedback") {
+      // PT Scrabble side-panel feedback: recap + polished + gem
+      const sv = requestBody.seedVerse || {};
+      const cn = requestBody.cardName || "";
+      const cc = requestBody.cardCode || "";
+      const expl = requestBody.explanation || explanation || "";
+      const icc = requestBody.isChristConnection || false;
+
+      systemPrompt = `You are Jeeves, a warm but rigorous Phototheology coach in PT Scrabble.
+
+Your response MUST be valid JSON with exactly these keys:
+{"recap":"...","polished":"...","gem":"..."}
+
+Rules:
+- recap: 1-2 sentences, affirm the strongest theological move the player made.
+- polished: 2-3 sentences, ELEVATE the idea with deeper theology.
+- gem: 1-2 sentences, add one fresh cross-reference, typology, language nuance, or Christ thread.
+- NEVER repeat or closely paraphrase the player's wording in polished.
+- Every field must add NEW information the player did not explicitly state.
+- No markdown, no code fences, no extra keys.`;
+
+      userPrompt = `Verse: ${sv.reference || ""} — "${sv.text || ""}"
+Card: ${cc} (${cn})
+Player answer: "${expl}"
+${icc ? "Christ connection was declared." : ""}
+
+Return valid JSON only.`;
+
     } else if (mode === "validate_sanctuary") {
       // SanctuaryRun game validation - properties already destructured from requestBody
       systemPrompt = `You are Jeeves, validating Sanctuary Run narratives. Check if the player's gospel story flows coherently through the sanctuary items.`;
