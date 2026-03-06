@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import DOMPurify from "dompurify";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -358,7 +359,7 @@ CRITICAL: The quarterly's content must appear first and complete. PT principles 
               [&_pre]:font-sans [&_pre]:bg-transparent [&_pre]:whitespace-pre-wrap
               [&_table]:w-full [&_table]:border-collapse [&_td]:p-2 [&_td]:border [&_td]:border-border/40
               [&_img]:rounded-lg [&_img]:shadow-sm [&_img]:my-4"
-            dangerouslySetInnerHTML={{ __html: cleaned }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cleaned, { ALLOWED_TAGS: ['h1','h2','h3','h4','h5','h6','p','br','strong','em','b','i','ul','ol','li','blockquote','a','table','thead','tbody','tr','td','th','img','span','div','code','pre'], ALLOWED_ATTR: ['class','href','src','alt','target','rel'] }) }}
           />
         </>
       );

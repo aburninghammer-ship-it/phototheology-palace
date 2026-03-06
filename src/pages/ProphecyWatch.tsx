@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import DOMPurify from "dompurify";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -279,8 +280,8 @@ const ProphecyWatch = () => {
             "bg-slate-500/10"
           }`}>
             <p className="text-sm" dangerouslySetInnerHTML={{
-              __html: section.content
-                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-foreground">$1</strong>')
+              __html: DOMPurify.sanitize(section.content
+                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-foreground">$1</strong>'), { ALLOWED_TAGS: ['strong', 'em', 'b', 'i', 'br', 'p'], ALLOWED_ATTR: ['class'] })
             }} />
           </div>
         );
@@ -305,8 +306,8 @@ const ProphecyWatch = () => {
         return (
           <div key={idx} className="my-3 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
             <p className="text-sm" dangerouslySetInnerHTML={{
-              __html: section.content
-                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-cyan-400">$1</strong>')
+              __html: DOMPurify.sanitize(section.content
+                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-cyan-400">$1</strong>'), { ALLOWED_TAGS: ['strong', 'em', 'b', 'i', 'br', 'p'], ALLOWED_ATTR: ['class'] })
             }} />
           </div>
         );
@@ -316,7 +317,7 @@ const ProphecyWatch = () => {
           <div key={idx} className="flex items-start gap-3 ml-4 my-2">
             <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-indigo-400 mt-2 flex-shrink-0" />
             <p className="text-foreground/80 leading-relaxed" dangerouslySetInnerHTML={{
-              __html: section.content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+              __html: DOMPurify.sanitize(section.content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>'), { ALLOWED_TAGS: ['strong', 'em', 'b', 'i', 'br', 'p'], ALLOWED_ATTR: ['class'] })
             }} />
           </div>
         );
@@ -325,7 +326,7 @@ const ProphecyWatch = () => {
       default:
         return (
           <p key={idx} className="text-foreground/75 leading-relaxed my-3" dangerouslySetInnerHTML={{
-            __html: section.content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            __html: DOMPurify.sanitize(section.content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>'), { ALLOWED_TAGS: ['strong', 'em', 'b', 'i', 'br', 'p'], ALLOWED_ATTR: ['class'] })
           }} />
         );
     }
