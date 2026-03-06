@@ -155,9 +155,9 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
             setGame(prev => prev ? {
               ...prev,
               status: updated.status,
-              seedVerse: updated.seed_verse || prev.seedVerse,
-              boardState: updated.board_state || {},
-              deckRemaining: updated.deck_remaining || [],
+              seedVerse: normalizeSeedVerse(updated.seed_verse) || prev.seedVerse,
+              boardState: normalizeBoardState(updated.board_state),
+              deckRemaining: normalizeDeck(updated.deck_remaining),
               startedAt: updated.started_at,
               endedAt: updated.ended_at,
             } : null);

@@ -1160,10 +1160,18 @@ export default function PTScrabble() {
 
     // Active multiplayer game
     if (mpGame) {
-      // Use seedVerse from state OR fallback to mpGame.seedVerse directly
-      const activeSeedVerse: SelectedVerse | null = seedVerse || (mpGame.seedVerse
-        ? { reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text, book: '', chapter: 0, verseStart: 0 }
-        : null);
+      // Use seedVerse from state OR fallback to normalized mpGame.seedVerse
+      const activeSeedVerse: SelectedVerse | null = seedVerse || (
+        mpGame.seedVerse && typeof mpGame.seedVerse === 'object'
+          ? {
+              reference: typeof (mpGame.seedVerse as any).reference === 'string' ? (mpGame.seedVerse as any).reference : '',
+              text: typeof (mpGame.seedVerse as any).text === 'string' ? (mpGame.seedVerse as any).text : '',
+              book: '',
+              chapter: 0,
+              verseStart: 0,
+            }
+          : null
+      );
 
       return (
         <div className="h-screen flex flex-col overflow-hidden">
