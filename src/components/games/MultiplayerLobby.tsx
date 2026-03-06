@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Copy, Check, Loader2, Crown, Wifi, ArrowLeft } from "lucide-react";
+import { Users, Copy, Check, Loader2, Crown, Wifi, ArrowLeft, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { GameRoom, GameRoomPlayer } from "@/hooks/useGameMultiplayer";
 import { motion } from "framer-motion";
 import { QuickShareCode } from "@/components/scrabble/QuickShareCode";
 import { CallToPlayButton } from "@/components/scrabble/CallToPlayButton";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface MultiplayerLobbyProps {
   room: GameRoom | null;
@@ -48,6 +49,8 @@ export function MultiplayerLobby({
 }: MultiplayerLobbyProps) {
   const [joinCode, setJoinCode] = useState("");
   const [copied, setCopied] = useState(false);
+  const { subscription } = useSubscription();
+  const isSubscriber = subscription.hasAccess;
 
   const copyRoomCode = () => {
     if (!room) return;
@@ -81,13 +84,19 @@ export function MultiplayerLobby({
                 <p className="text-sm text-purple-200/70 text-center">
                   Create a room and invite friends with a code
                 </p>
+                {!isSubscriber && (
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-200 text-sm">
+                    <Lock className="h-4 w-4 flex-shrink-0" />
+                    <span>Only subscribers can create games. You can still join games!</span>
+                  </div>
+                )}
                 <Button
                   onClick={() => onCreateRoom(maxPlayers)}
-                  disabled={loading}
+                  disabled={loading || !isSubscriber}
                   className="w-full bg-purple-600 hover:bg-purple-700"
                 >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Users className="h-4 w-4 mr-2" />}
-                  Create Room
+                  {isSubscriber ? 'Create Room' : 'Subscribe to Create'}
                 </Button>
               </TabsContent>
               <TabsContent value="join" className="space-y-4 pt-4">

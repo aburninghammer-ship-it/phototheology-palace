@@ -294,7 +294,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
   // Create a new game
   const createGame = useCallback(async (
     gameMode: 'ffa' | 'team',
-    maxPlayers: number = 10
+    maxPlayers: number = 20
   ): Promise<string | null> => {
     if (!user) {
       toast.error('Please sign in to create a game');
