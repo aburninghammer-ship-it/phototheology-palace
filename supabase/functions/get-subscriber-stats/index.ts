@@ -131,13 +131,10 @@ Deno.serve(async (req) => {
       throw new Error("Authorization required");
     }
 
-    // Create user-context client for auth verification
-    const supabaseAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-    const userClient = createClient(supabaseUrl, supabaseAnon, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user: authUser }, error: authError } = await userClient.auth.getUser();
+    // Use service role client to verify user token (ES256 compatible)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !authUser) {
       logStep("Auth failed", { error: authError?.message });
       throw new Error("Invalid authorization");
@@ -145,7 +142,7 @@ Deno.serve(async (req) => {
 
     const userId = authUser.id;
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // (supabase is already the service role client from above)
 
     // Check if user is admin (using admin_users table)
     const { data: adminCheck } = await supabase

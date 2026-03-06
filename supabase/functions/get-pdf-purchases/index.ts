@@ -1,6 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4?target=deno";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,7 +33,7 @@ const PRODUCT_CONFIG = {
   }
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -42,35 +41,36 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    // Verify admin access
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    if (!authHeader?.startsWith("Bearer ")) {
       throw new Error("No authorization header provided");
     }
 
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
+    // Use service role client to verify the user token (ES256 compatible)
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError || !userData?.user) {
+    const { data: { user: authUser }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    if (userError || !authUser) {
       logStep("Auth failed", { error: userError?.message });
       throw new Error("Authentication failed");
     }
 
     // Check if user is admin using user_roles table
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
     const { data: isAdmin, error: roleError } = await supabaseClient
-      .rpc('has_role', { _user_id: userData.user.id, _role: 'admin' });
+      .rpc('has_role', { _user_id: authUser.id, _role: 'admin' });
 
     if (roleError || !isAdmin) {
       throw new Error("Admin access required");
     }
 
-    logStep("Admin verified", { userId: userData.user.id });
+    logStep("Admin verified", { userId: authUser.id });
 
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -88,9 +88,7 @@ serve(async (req) => {
 
     logStep("Got checkout sessions", { count: sessions.data.length });
 
-    // Get email logs from database
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
+    // Get email logs from database (reuse supabaseAdmin from above)
     
     const { data: emailLogs } = await supabaseAdmin
       .from("pdf_email_logs")
