@@ -8970,6 +8970,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
       "strongs-lookup", "translate-verse",
       "jeopardy_question", "jeopardy_judge", "jeopardy_final",
       "family_feud_round", "family_feud_judge", "family_feud_forge", "family_feud_judge_forge",
+      "scrabble-amplify",
     ]);
 
     if (!RAG_EXCLUDED_MODES.has(mode)) {
