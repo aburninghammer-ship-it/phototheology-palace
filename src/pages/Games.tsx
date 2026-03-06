@@ -20,7 +20,7 @@ import { ActiveGameSessions } from "@/components/games/ActiveGameSessions";
 import { usePreservePageState, usePreserveFormState } from "@/contexts/PageStateContext";
 
 // Games with special badges
-const NEW_GAMES = ["pt_tetris", "symbol_decoder", "speed_verse"]; // Completely new games
+const NEW_GAMES = ["pt_tetris", "symbol_decoder", "speed_verse", "gideon_300"]; // Completely new games
 const RENOVATED_GAMES = ["chain_chess", "escape_room"]; // Rebuilt/improved games
 
 // Bible translations available for games
@@ -69,6 +69,18 @@ const Games = () => {
   };
 
   const allGames = [
+    {
+      id: "gideon_300",
+      name: "Gideon 300 Tournament",
+      description: "Live multiplayer elimination tournament. Start with 300, refine to the remnant through progressive rounds. Two strikes and you're in Camp Mode!",
+      icon: "⚔️",
+      floor: 0,
+      timed: true,
+      rooms: ["All"],
+      modes: ["multiplayer"],
+      difficulties: ["medium", "hard", "expert"],
+      route: "/games/gideon-300"
+    },
     {
       id: "master_exam",
       name: "Test Me: Master Exam",

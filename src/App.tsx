@@ -225,6 +225,7 @@ const EscapeRoom3D = lazy(() => import("./pages/games/EscapeRoom3D"));
 
 const SpeedVerse3D = lazy(() => import("./pages/games/SpeedVerse3D"));
 const MasterExam = lazy(() => import("./pages/MasterExam"));
+const Gideon300 = lazy(() => import("./pages/games/Gideon300"));
 
 const PublicImageLibrary = lazy(() => import("./pages/PublicImageLibrary"));
 const SharedBaptismAudio = lazy(() => import("./pages/SharedBaptismAudio"));
@@ -553,6 +554,7 @@ function App() {
             <Route path="/games/palace_quiz/:mode?" element={<ProtectedRoute><PalaceQuiz /></ProtectedRoute>} />
             <Route path="/games/principle_puzzle/:mode?" element={<ProtectedRoute><PrinciplePuzzle /></ProtectedRoute>} />
             <Route path="/games/master-exam" element={<ProtectedRoute><MasterExam /></ProtectedRoute>} />
+            <Route path="/games/gideon-300" element={<ProtectedRoute><Gideon300 /></ProtectedRoute>} />
             <Route path="/games/room-game/:gameId" element={<ProtectedRoute><RoomGamePlay /></ProtectedRoute>} />
             <Route path="/games/:gameId/:mode?" element={<ProtectedRoute><GamePlay /></ProtectedRoute>} />
             <Route path="/kids-games" element={<ProtectedRoute><KidsGames /></ProtectedRoute>} />
