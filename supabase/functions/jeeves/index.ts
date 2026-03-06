@@ -5716,31 +5716,36 @@ Is this a valid biblical chain? Does the verse fit? Does the explanation show re
 Return JSON: { "valid": true/false, "feedback": "encouraging, respectful comment — never dismissive" }`;
 
     } else if (mode === "scrabble-amplify") {
-      // PT Scrabble — Jeeves amplifies an accepted answer for all players
+      // PT Scrabble — Jeeves amplifies an accepted answer for all players + corrects spelling
       const sv = requestBody.seedVerse || {};
       const cn = requestBody.cardName || "";
       const cc = requestBody.cardCode || "";
       const expl = requestBody.explanation || explanation || "";
       const icc = requestBody.isChristConnection || false;
 
-      systemPrompt = `You are Jeeves, the Phototheology study companion, watching a live PT Scrabble game. A player just placed a card and gave an explanation. Your job is to ADD NEW INSIGHT that the player DID NOT mention.
+      systemPrompt = `You are Jeeves, the Phototheology study companion, watching a live PT Scrabble game. A player just placed a card and gave an explanation. You have TWO jobs:
 
-ABSOLUTE RULES:
-- NEVER repeat, rephrase, or summarize what the player said. They already said it — everyone read it.
-- Instead, reveal a FRESH angle: a cross-reference they missed, a typological layer, a Hebrew/Greek nuance, a sanctuary connection, a cycle echo, or a Christ-centered dimension they didn't explicitly name.
-- Keep it to 2-3 sentences MAX. Punchy, vivid, surprising.
-- Start with a specific biblical detail (verse, name, event, Greek/Hebrew word) that EXTENDS the player's point into new territory.
-- Think: "What would make the whole table lean in and say 'Whoa, I didn't see that!'"
+JOB 1 — CORRECTED TEXT: Fix ALL spelling, grammar, and capitalization errors in the player's explanation. Keep their exact meaning and words, just clean it up. Proper nouns and biblical terms should be capitalized correctly.
+
+JOB 2 — FRESH INSIGHT: ADD NEW insight the player DID NOT mention.
+
+ABSOLUTE RULES FOR INSIGHT:
+- NEVER repeat, rephrase, or summarize what the player said.
+- Reveal a FRESH angle: cross-reference, typological layer, Hebrew/Greek nuance, sanctuary connection, cycle echo, or Christ-centered dimension.
+- 2-3 sentences MAX. Punchy, vivid, surprising.
+- Start with a specific biblical detail they missed.
 - Use present tense. Warm but substantive — ESPN analyst meets Bible scholar.
-- If it's a Christ connection, show an additional layer of how Christ is revealed that the player didn't mention.`;
+
+Return JSON ONLY: {"corrected":"<cleaned up version of player's text>","insight":"<your fresh insight>"}
+No markdown, no code fences.`;
 
       userPrompt = `Seed Verse: ${sv.reference || ""} — "${sv.text || ""}"
 
 Card Played: ${cc} (${cn})
-Player's Explanation (DO NOT REPEAT THIS — add something NEW): "${expl}"
+Player's Explanation: "${expl}"
 ${icc ? "🔥 CHRIST CONNECTION — reveal an additional Christological layer the player didn't mention." : ""}
 
-Give a fresh insight that EXTENDS beyond what the player already said. Start with a specific biblical detail they missed.`;
+Return JSON only.`;
 
     } else if (mode === "scrabble-feedback") {
       // PT Scrabble side-panel feedback: recap + polished + gem
