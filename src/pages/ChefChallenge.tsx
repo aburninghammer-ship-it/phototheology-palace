@@ -462,8 +462,10 @@ export default function ChefChallenge() {
                     </Button>
                   </div>}
               </>}
-          </CardContent>
+           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>;
 }
