@@ -1230,12 +1230,6 @@ export default function PTScrabble() {
             </div>
           </header>
 
-          {/* Seed verse - always visible to all players */}
-          {activeSeedVerse && (
-            <div className="px-3 pt-2">
-              <SeedVerseDisplay verse={activeSeedVerse} compact />
-            </div>
-          )}
 
           {/* Study progress - collapsed by default, expandable */}
           {mpStudyLogEntries.length > 0 && (
