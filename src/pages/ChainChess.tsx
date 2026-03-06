@@ -131,14 +131,19 @@ const ChainChess = () => {
   useEffect(() => {
     if (gameMode !== "multiplayer" || !mp.room) return;
 
-    if (mp.room.status === "active" && mp.room.game_state) {
-      const rs = mp.room.game_state as any;
-      if (rs.moves) {
-        const lastMove = rs.moves[rs.moves.length - 1];
-        setGameState(prev => ({
+    // When room becomes active, transition ALL clients to in_progress
+    if (mp.room.status === "active") {
+      const rs = (mp.room.game_state as any) || {};
+      const moves: Move[] = rs.moves || [];
+      const lastMove = moves.length > 0 ? moves[moves.length - 1] : null;
+
+      setGameState(prev => {
+        // Only update if we're not already in_progress or if game_state changed
+        const newStatus = "in_progress";
+        return {
           ...prev,
-          status: mp.room!.status === "completed" ? "completed" : "in_progress",
-          moves: rs.moves || [],
+          status: newStatus,
+          moves,
           settings: rs.settings || prev.settings,
           currentChallenge: lastMove ? {
             type: lastMove.challengeType,
@@ -147,12 +152,14 @@ const ChainChess = () => {
           } : undefined,
           playerScore: rs.scores?.[user?.id || ""] || 0,
           jeevesScore: 0,
-          roundNumber: rs.roundNumber || Math.ceil((rs.moves?.length || 0) / 2),
-          currentTurn: "user", // managed by room.current_turn_user_id
-        }));
-      }
+          roundNumber: rs.roundNumber || Math.ceil(moves.length / 2) || 1,
+          currentTurn: "user",
+        };
+      });
+    } else if (mp.room.status === "completed") {
+      setGameState(prev => ({ ...prev, status: "completed" }));
     }
-  }, [mp.room?.game_state, mp.room?.status, gameMode]);
+  }, [mp.room?.game_state, mp.room?.status, gameMode, user?.id]);
 
   // Get available challenge options based on enabled categories
   const getAvailableChallengeTypes = useCallback(() => {
