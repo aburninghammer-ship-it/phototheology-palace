@@ -9546,6 +9546,54 @@ export type Database = {
         }
         Relationships: []
       }
+      master_exam_attempts: {
+        Row: {
+          answers_data: Json | null
+          attempt_number: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          questions_data: Json | null
+          results: Json | null
+          score: number | null
+          started_at: string | null
+          status: string
+          total_questions: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers_data?: Json | null
+          attempt_number?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          questions_data?: Json | null
+          results?: Json | null
+          score?: number | null
+          started_at?: string | null
+          status?: string
+          total_questions?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers_data?: Json | null
+          attempt_number?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          questions_data?: Json | null
+          results?: Json | null
+          score?: number | null
+          started_at?: string | null
+          status?: string
+          total_questions?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mastery_streaks: {
         Row: {
           created_at: string
