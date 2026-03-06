@@ -87,6 +87,100 @@ export default function PTScrabble() {
   const [jeevesAssistsUsed, setJeevesAssistsUsed] = useState(0);
   const MAX_JEEVES_ASSISTS = 3;
 
+  // Quick Play state (merged from Chain War)
+  const [qpHand, setQpHand] = useState<typeof QUICK_PLAY_SYMBOLS>([]);
+  const [qpSelectedCards, setQpSelectedCards] = useState<string[]>([]);
+  const [qpVerse, setQpVerse] = useState("");
+  const [qpExplanation, setQpExplanation] = useState("");
+  const [qpScore, setQpScore] = useState(0);
+  const [qpIsSubmitting, setQpIsSubmitting] = useState(false);
+  const qpTargetScore = 15;
+
+  const dealQpHand = useCallback(() => {
+    const shuffled = [...QUICK_PLAY_SYMBOLS].sort(() => Math.random() - 0.5);
+    setQpHand(shuffled.slice(0, 5));
+    setQpSelectedCards([]);
+    setQpVerse("");
+    setQpExplanation("");
+  }, []);
+
+  const startQuickPlay = useCallback(() => {
+    setQpScore(0);
+    dealQpHand();
+    setGamePhase("quick-play");
+  }, [dealQpHand, setGamePhase]);
+
+  // Save quick play score
+  useEffect(() => {
+    const saveScore = async () => {
+      if (gamePhase === 'quick-play-won' && user) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "chain_war",
+            score: qpScore,
+            mode: "solo",
+          });
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [gamePhase, user, qpScore]);
+
+  const toggleQpCard = useCallback((code: string) => {
+    setQpSelectedCards(prev =>
+      prev.includes(code)
+        ? prev.filter(c => c !== code)
+        : prev.length < 3 ? [...prev, code] : prev
+    );
+  }, []);
+
+  const handleQpSubmit = useCallback(async () => {
+    if (qpSelectedCards.length < 2) {
+      toast.error("Select at least 2 cards");
+      return;
+    }
+    if (!qpVerse.trim() || !qpExplanation.trim()) {
+      toast.error("Please provide a verse and explanation");
+      return;
+    }
+    setQpIsSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('jeeves', {
+        body: { mode: "validate_chain", cards: qpSelectedCards, verse: qpVerse, explanation: qpExplanation },
+      });
+      if (error) throw error;
+      const { isValid, feedback, points } = data;
+      if (isValid) {
+        const newScore = qpScore + points;
+        setQpScore(newScore);
+        toast.success(`+${points} points! ${feedback}`);
+        if (newScore >= qpTargetScore) {
+          setGamePhase("quick-play-won");
+          toast.success("🏆 You reached the target score!");
+        }
+        const remaining = qpHand.filter(s => !qpSelectedCards.includes(s.code));
+        const newCards = QUICK_PLAY_SYMBOLS
+          .filter(s => !remaining.find(r => r.code === s.code))
+          .sort(() => Math.random() - 0.5)
+          .slice(0, qpSelectedCards.length);
+        setQpHand([...remaining, ...newCards]);
+        setQpSelectedCards([]);
+        setQpVerse("");
+        setQpExplanation("");
+      } else {
+        toast.error(`Not quite: ${feedback}`);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error validating chain");
+    } finally {
+      setQpIsSubmitting(false);
+    }
+  }, [qpSelectedCards, qpVerse, qpExplanation, qpScore, qpHand, setGamePhase]);
+
   // Multiplayer state
   const gameIdFromUrl = searchParams.get('game');
   const [multiplayerGameId, setMultiplayerGameId] = useState<string | undefined>(gameIdFromUrl || undefined);
