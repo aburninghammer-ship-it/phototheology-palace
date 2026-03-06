@@ -310,19 +310,7 @@ export function WarCollegeReader({
               </CardContent>
             </Card>
 
-            {/* Complete Button */}
-            {!isCompleted && onComplete && (
-              <div className="text-center pt-2">
-                <Button
-                  size="lg"
-                  onClick={onComplete}
-                  className="gap-2 bg-gradient-to-r from-primary to-primary/80"
-                >
-                  <CheckCircle2 className="h-5 w-5" />
-                  Mark Day {study.dayNumber} Complete
-                </Button>
-              </div>
-            )}
+            {/* Complete button removed — now always visible above drills */}
           </motion.div>
         )}
       </AnimatePresence>
