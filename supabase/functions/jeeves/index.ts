@@ -6210,6 +6210,58 @@ Return ONLY valid JSON:
       
       userPrompt = `Create a ${difficulty}-level Bible study connecting these random verses: ${verseRefs}`;
 
+    } else if (mode === "chef_round_setup") {
+      // Generate verses + MC ingredient options for multiplayer Chef Challenge round
+      const { theme, round, difficulty: roundDifficulty } = requestBody;
+      
+      console.log(`=== CHEF ROUND SETUP: Round ${round}, Theme: ${theme} ===`);
+      
+      const verseCount = 4 + Math.min(round, 3); // 5-7 verses as rounds progress
+      
+      systemPrompt = `You are setting up a multiplayer Bible cooking challenge round.
+
+Theme: "${theme}"
+Round: ${round}
+Difficulty: ${roundDifficulty}
+
+Generate ${verseCount} random Bible verses related to the theme (KJV text).
+Also generate 10-12 multiple-choice "ingredient" options. These are theological connections, types, symbols, or principles that players must select from. Mix correct connections with plausible-but-wrong options.
+
+Return ONLY valid JSON:
+{
+  "verses": [{"reference":"Book Ch:V","text":"KJV text here"}],
+  "ingredientOptions": [["Connection to Christ as High Priest","Passover lamb typology","Babel's confusion of tongues","David's sling as faith symbol","Sanctuary lampstand as Holy Spirit","Rainbow covenant with Noah","Joseph's coat as election","Red Sea crossing as baptism","Manna as daily bread","Tree of life in Eden","Elijah's mantle transfer","Jonah's whale as resurrection type"]]
+}`;
+      
+      userPrompt = `Set up Round ${round} of the Chef Challenge with theme "${theme}" at ${roundDifficulty} difficulty. Generate ${verseCount} verses and 12 ingredient options.`;
+
+    } else if (mode === "chef_judge") {
+      // AI judging panel for multiplayer Chef Challenge
+      const { theme: judgeTheme, verses: judgeVerses, teamName, submission, round: judgeRound } = requestBody;
+      
+      console.log(`=== CHEF JUDGE: Team ${teamName}, Round ${judgeRound} ===`);
+      
+      const verseRefs = (judgeVerses || []).map((v: any) => `${v.reference}: "${v.text}"`).join("\n");
+      
+      systemPrompt = `You are THREE judges evaluating a multiplayer Bible Chef Challenge submission.
+
+**Judge Solomon** 👑 evaluates BIBLICAL ACCURACY (1-10): Are verses correctly applied? Are theological claims sound?
+**Judge Miriam** 🎨 evaluates CREATIVITY & CONNECTIONS (1-10): How original are the cross-references? Are unexpected parallels found?
+**Judge Paul** ✝️ evaluates CHRIST-CENTEREDNESS (1-10): Is Christ visible in the interpretation? Does it pass the Concentration Room test?
+**All Judges** 📋 evaluate COMPLETENESS (1-10): Were all ingredients used well? Is the "dish" fully developed?
+
+Be fair but rigorous. Score honestly — do NOT give everyone high scores. Differentiate clearly between weak and strong submissions. A team with no submission should score 1-2 across the board.
+
+Theme: "${judgeTheme}"
+Round: ${judgeRound}
+Verses provided:
+${verseRefs}
+
+Return ONLY valid JSON:
+{"accuracy":N,"creativity":N,"christCenter":N,"completeness":N,"total":N,"feedback":"2-3 sentence combined judge verdict using all three judge voices"}`;
+      
+      userPrompt = `Team "${teamName}" submitted this recipe:\n\n${submission}\n\nJudge this submission. Be specific and fair.`;
+
     } else if (mode === "validate_chef_recipe") {
       // Legacy Chef Challenge validation - properties already destructured from requestBody
       systemPrompt = `You are Jeeves, the head chef validating biblical recipes. Check creativity, biblical accuracy, and thematic fit.`;
@@ -9001,6 +9053,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
       "forge-defend-draft", "forge-defend-team-coach",
       "check-commentary-availability", "check_chef_recipe",
       "get_chef_model_answer", "generate_chef_verses",
+      "chef_round_setup", "chef_judge",
       "strongs-lookup", "translate-verse",
       "jeopardy_question", "jeopardy_judge", "jeopardy_final",
       "family_feud_round", "family_feud_judge", "family_feud_forge", "family_feud_judge_forge",
@@ -10006,7 +10059,8 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     if (["validate_chain", "validate_sanctuary", "validate_time_zones", "validate_connect6",
          "validate_christ", "validate_controversy", "validate_dragon_defense", "dragon_defense_hint", "validate_equation",
          "validate_witness", "validate_frame", "validate_chef_recipe", "generate_chef_verses",
-         "check_chef_recipe", "get_chef_model_answer", "study_suggestion", "scrabble-feedback"].includes(mode)) {
+         "check_chef_recipe", "get_chef_model_answer", "chef_round_setup", "chef_judge",
+         "study_suggestion", "scrabble-feedback"].includes(mode)) {
       try {
         console.log(`=== ${mode.toUpperCase()} RESPONSE ===`);
         console.log("Raw content:", content);
