@@ -144,7 +144,21 @@ export function useMasterExam() {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-master-exam");
-      if (error) throw error;
+
+      if (error) {
+        console.error("Edge function error:", error);
+        // Try to extract the real error message
+        const msg = (error as any)?.message || (error as any)?.context?.body || String(error);
+        throw new Error(msg);
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      if (!data?.questions || !data?.exam_id) {
+        throw new Error("Invalid response from server");
+      }
 
       setExamId(data.exam_id);
       setQuestions(data.questions);
@@ -154,11 +168,11 @@ export function useMasterExam() {
       setTimeRemaining(data.time_limit_seconds || 5400);
       startTimeRef.current = Date.now();
       setPhase("active");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to generate exam:", err);
       toast({
         title: "Generation Failed",
-        description: "Could not generate the exam. Please try again.",
+        description: err?.message || "Could not generate the exam. Please try again.",
         variant: "destructive",
       });
       setPhase("intro");
