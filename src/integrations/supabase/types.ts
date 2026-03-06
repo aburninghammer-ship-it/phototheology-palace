@@ -9550,6 +9550,7 @@ export type Database = {
         Row: {
           answers_data: Json | null
           attempt_number: number
+          category_scores: Json | null
           completed_at: string | null
           created_at: string
           id: string
@@ -9558,6 +9559,8 @@ export type Database = {
           score: number | null
           started_at: string | null
           status: string
+          time_used_seconds: number | null
+          total_correct: number | null
           total_questions: number | null
           updated_at: string
           user_id: string
@@ -9565,6 +9568,7 @@ export type Database = {
         Insert: {
           answers_data?: Json | null
           attempt_number?: number
+          category_scores?: Json | null
           completed_at?: string | null
           created_at?: string
           id?: string
@@ -9573,6 +9577,8 @@ export type Database = {
           score?: number | null
           started_at?: string | null
           status?: string
+          time_used_seconds?: number | null
+          total_correct?: number | null
           total_questions?: number | null
           updated_at?: string
           user_id: string
@@ -9580,6 +9586,7 @@ export type Database = {
         Update: {
           answers_data?: Json | null
           attempt_number?: number
+          category_scores?: Json | null
           completed_at?: string | null
           created_at?: string
           id?: string
@@ -9588,6 +9595,8 @@ export type Database = {
           score?: number | null
           started_at?: string | null
           status?: string
+          time_used_seconds?: number | null
+          total_correct?: number | null
           total_questions?: number | null
           updated_at?: string
           user_id?: string

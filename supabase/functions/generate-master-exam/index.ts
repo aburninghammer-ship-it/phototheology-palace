@@ -164,37 +164,48 @@ Valid difficulties: intermediate, advanced, master`;
 
     console.log("Calling AI gateway for exam generation...");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: "Generate the 50-question master exam now. Return ONLY raw JSON — no markdown code blocks, no commentary. Ensure variety and rigor." },
-        ],
-        max_tokens: 32768,
-      }),
-    });
+    const aiMessages = [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: "Generate the 50-question master exam now. Return ONLY raw JSON — no markdown code blocks, no commentary. Ensure variety and rigor." },
+    ];
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+    // Try GPT-5 first, fallback to Gemini Flash
+    const modelsToTry = ["openai/gpt-5", "google/gemini-2.5-flash"];
+    let response: Response | null = null;
+
+    for (const model of modelsToTry) {
+      console.log(`Trying model: ${model}`);
+      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: aiMessages,
+          max_tokens: 32768,
+        }),
+      });
+      if (response.ok) break;
+      console.warn(`Model ${model} failed with status ${response.status}`);
+    }
+
+    if (!response || !response.ok) {
+      const errorText = response ? await response.text() : "All models failed";
+      console.error("AI gateway error:", response?.status, errorText);
       await supabaseClient
         .from("master_exam_attempts")
         .update({ status: "abandoned" })
         .eq("id", examRow.id);
 
-      if (response.status === 429) {
+      if (response?.status === 429) {
         throw new Error("Rate limit exceeded. Please wait a moment and try again.");
       }
-      if (response.status === 402) {
+      if (response?.status === 402) {
         throw new Error("AI credits exhausted.");
       }
-      throw new Error(`AI generation failed (${response.status})`);
+      throw new Error("Failed to generate exam questions");
     }
 
     const aiResult = await response.json();
