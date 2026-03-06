@@ -10041,9 +10041,18 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     // Extract principles used from commentary mode
     let responseData: any = { content, response: content };
 
-    // Scrabble amplify mode: return amplification text
+    // Scrabble amplify mode: parse JSON for corrected text + insight
     if (mode === "scrabble-amplify") {
-      responseData.amplification = content.trim();
+      try {
+        const cleaned = content.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        const parsed = JSON.parse(cleaned);
+        responseData.amplification = parsed.insight || content.trim();
+        responseData.correctedExplanation = parsed.corrected || null;
+      } catch {
+        // Fallback: treat entire response as amplification
+        responseData.amplification = content.trim();
+        responseData.correctedExplanation = null;
+      }
     }
 
     // Defense coach mode: extract score from response
