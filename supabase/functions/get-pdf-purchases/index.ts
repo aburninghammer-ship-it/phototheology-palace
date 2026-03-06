@@ -71,7 +71,7 @@ serve(async (req) => {
       throw new Error("Admin access required");
     }
 
-    logStep("Admin verified", { userId: userData.user.id });
+    logStep("Admin verified", { userId: authUser.id });
 
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -89,9 +89,7 @@ serve(async (req) => {
 
     logStep("Got checkout sessions", { count: sessions.data.length });
 
-    // Get email logs from database
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
+    // Get email logs from database (reuse supabaseAdmin from above)
     
     const { data: emailLogs } = await supabaseAdmin
       .from("pdf_email_logs")
