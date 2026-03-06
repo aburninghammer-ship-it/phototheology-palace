@@ -250,7 +250,13 @@ export default function PTScrabble() {
     }
   }, [mpGame, multiplayerGameId, gamePhase, seedVerse]);
 
-  // Auto-refresh hand if player enters playing phase with empty hand
+  // Auto-start quick play from URL param ?mode=quick
+  useEffect(() => {
+    if (searchParams.get('mode') === 'quick' && gamePhase === 'menu') {
+      startQuickPlay();
+    }
+  }, [searchParams, gamePhase, startQuickPlay]);
+
   useEffect(() => {
     if (gamePhase === 'multiplayer-playing' && mpMyPlayer && mpMyHand.length === 0 && mpGame?.status === 'playing') {
       mpRefreshHand();
