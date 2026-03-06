@@ -65,6 +65,58 @@ function generateRoomCode(): string {
   return code;
 }
 
+function normalizeSeedVerse(raw: unknown): { reference: string; text: string } | undefined {
+  if (!raw) return undefined;
+
+  let parsed: unknown = raw;
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      return undefined;
+    }
+  }
+
+  if (!parsed || typeof parsed !== 'object') return undefined;
+
+  const reference = typeof (parsed as any).reference === 'string' ? (parsed as any).reference : '';
+  const text = typeof (parsed as any).text === 'string' ? (parsed as any).text : '';
+
+  if (!reference && !text) return undefined;
+  return { reference, text };
+}
+
+function normalizeBoardState(raw: unknown): Record<string, PlacedCard> {
+  if (!raw) return {};
+
+  let parsed: unknown = raw;
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      return {};
+    }
+  }
+
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+  return parsed as Record<string, PlacedCard>;
+}
+
+function normalizeDeck(raw: unknown): any[] {
+  if (!raw) return [];
+
+  let parsed: unknown = raw;
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      return [];
+    }
+  }
+
+  return Array.isArray(parsed) ? parsed : [];
+}
+
 export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
   const { user } = useAuth();
   const [game, setGame] = useState<ScrabbleGame | null>(null);

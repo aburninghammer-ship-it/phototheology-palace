@@ -225,9 +225,20 @@ export default function PTScrabble() {
 
     console.log('[PTScrabble] Game loaded from URL:', mpGame.status, 'current phase:', gamePhase);
 
+    const normalizedSeedVerse: SelectedVerse | null =
+      mpGame.seedVerse && typeof mpGame.seedVerse === 'object'
+        ? {
+            reference: typeof (mpGame.seedVerse as any).reference === 'string' ? (mpGame.seedVerse as any).reference : '',
+            text: typeof (mpGame.seedVerse as any).text === 'string' ? (mpGame.seedVerse as any).text : '',
+            book: '',
+            chapter: 0,
+            verseStart: 0,
+          }
+        : null;
+
     // Sync seed verse from DB for non-host players
-    if (mpGame.seedVerse && !seedVerse) {
-      setSeedVerse({ reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text, book: '', chapter: 0, verseStart: 0 });
+    if (normalizedSeedVerse?.text && !seedVerse) {
+      setSeedVerse(normalizedSeedVerse);
     }
 
     // Only auto-navigate if we're on the menu
@@ -243,8 +254,8 @@ export default function PTScrabble() {
 
     // Non-host: auto-transition from lobby to playing when host starts game
     if (gamePhase === 'multiplayer-lobby' && mpGame.status === 'playing') {
-      if (mpGame.seedVerse) {
-        setSeedVerse({ reference: mpGame.seedVerse.reference, text: mpGame.seedVerse.text, book: '', chapter: 0, verseStart: 0 });
+      if (normalizedSeedVerse?.text) {
+        setSeedVerse(normalizedSeedVerse);
       }
       setGamePhaseInternal('multiplayer-playing');
     }
