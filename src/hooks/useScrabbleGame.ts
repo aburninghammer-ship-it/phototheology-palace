@@ -160,7 +160,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         gameMode: data.game_mode as any,
         maxPlayers: data.max_players,
         seedCardId: data.seed_card_id,
-        seedVerse: data.seed_verse ? (data.seed_verse as unknown as { reference: string; text: string }) : undefined,
+        seedVerse: data.seed_verse ? (typeof data.seed_verse === 'string' ? JSON.parse(data.seed_verse) : data.seed_verse as unknown as { reference: string; text: string }) : undefined,
         boardState: (data.board_state as unknown as Record<string, PlacedCard>) || {},
         deckRemaining: data.deck_remaining || [],
         voteTimeoutSeconds: data.vote_timeout_seconds,
