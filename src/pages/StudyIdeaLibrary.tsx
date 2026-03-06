@@ -80,6 +80,10 @@ export default function StudyIdeaLibrary() {
     loading: generatedLoading,
     getTodaysCards,
   } = useGeneratedSparkCards(30);
+  const {
+    paths: generatedPaths,
+    loading: pathsLoading,
+  } = useGeneratedStudyPaths(60);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
