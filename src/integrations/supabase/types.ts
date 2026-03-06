@@ -8021,6 +8021,54 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_study_paths: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          estimated_sessions: number
+          generation_date: string
+          icon: string
+          id: string
+          is_active: boolean
+          steps: Json
+          theme_keyword: string
+          theme_type: string
+          title: string
+          view_count: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description: string
+          estimated_sessions?: number
+          generation_date?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          steps?: Json
+          theme_keyword: string
+          theme_type: string
+          title: string
+          view_count?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          estimated_sessions?: number
+          generation_date?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          steps?: Json
+          theme_keyword?: string
+          theme_type?: string
+          title?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       genesis_challenge_daily_progress: {
         Row: {
           completed_at: string | null
@@ -16864,6 +16912,33 @@ export type Database = {
           updated_at?: string
           user1_id?: string
           user2_id?: string | null
+        }
+        Relationships: []
+      }
+      study_path_generation_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          generation_date: string
+          id: string
+          paths_generated: number
+          success: boolean
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          generation_date: string
+          id?: string
+          paths_generated?: number
+          success?: boolean
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          generation_date?: string
+          id?: string
+          paths_generated?: number
+          success?: boolean
         }
         Relationships: []
       }

@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserShelf } from "@/hooks/useUserShelf";
 import { usePathProgress } from "@/hooks/usePathProgress";
 import { useGeneratedSparkCards, GeneratedSparkCard } from "@/hooks/useGeneratedSparkCards";
+import { useGeneratedStudyPaths } from "@/hooks/useGeneratedStudyPaths";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import {
 import {
   SparkCardComponent,
   StudyPathCard,
+  GeneratedPathCard,
   IdeaGeneratorPanel,
   MyShelfDrawer,
 } from "@/components/study-ideas";
@@ -78,6 +80,10 @@ export default function StudyIdeaLibrary() {
     loading: generatedLoading,
     getTodaysCards,
   } = useGeneratedSparkCards(30);
+  const {
+    paths: generatedPaths,
+    loading: pathsLoading,
+  } = useGeneratedStudyPaths(60);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
@@ -85,12 +91,6 @@ export default function StudyIdeaLibrary() {
   const [showSource, setShowSource] = useState<"all" | "curated" | "daily">("all");
 
   const navigate = useNavigate();
-
-  // Redirect to auth if not logged in
-  if (!authLoading && !user) {
-    navigate("/auth");
-    return null;
-  }
 
   // Convert generated cards to SparkCard format
   const convertedGeneratedCards = useMemo(() =>
@@ -108,9 +108,15 @@ export default function StudyIdeaLibrary() {
   const allCards = useMemo(() => {
     if (showSource === "curated") return sparkCards;
     if (showSource === "daily") return convertedGeneratedCards;
-    // Combine with generated cards first (newest)
     return [...convertedGeneratedCards, ...sparkCards];
   }, [showSource, convertedGeneratedCards]);
+
+  // Redirect to auth if not logged in
+  if (!authLoading && !user) {
+    navigate("/auth");
+    return null;
+  }
+
 
   // Filter cards
   const filteredCards = allCards.filter((card) => {
@@ -353,6 +359,7 @@ export default function StudyIdeaLibrary() {
 
           {/* Guided Paths Tab */}
           <TabsContent value="paths" className="space-y-6">
+            {/* Curated Paths */}
             <div className="space-y-2">
               <h2 className="text-xl font-semibold text-amber-900 dark:text-amber-100">
                 {t('studyIdeas.guidedStudyPaths')}
@@ -374,6 +381,42 @@ export default function StudyIdeaLibrary() {
                 />
               ))}
             </div>
+
+            {/* AI Generated Paths */}
+            {generatedPaths.length > 0 && (
+              <>
+                <div className="space-y-2 pt-4 border-t border-border/50">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-amber-500" />
+                    <h2 className="text-xl font-semibold text-amber-900 dark:text-amber-100">
+                      Daily Generated Paths
+                    </h2>
+                    <Badge variant="outline" className="text-xs">
+                      {generatedPaths.length} paths
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Fresh thematic study paths generated daily — trace one symbol, person, number, or concept through all of Scripture.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {generatedPaths.map((path) => (
+                    <GeneratedPathCard
+                      key={path.id}
+                      path={path}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {pathsLoading && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                <span className="ml-2 text-sm text-muted-foreground">Loading generated paths...</span>
+              </div>
+            )}
           </TabsContent>
 
           {/* Generate Tab */}
