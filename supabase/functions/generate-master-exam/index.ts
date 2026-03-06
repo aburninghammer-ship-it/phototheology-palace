@@ -45,118 +45,97 @@ serve(async (req) => {
 
     const entropySeed = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
-    const systemPrompt = `You are the Phototheology Palace Master Examiner. Generate a comprehensive master exam of EXACTLY 50 unique questions testing knowledge across the entire Phototheology system.
+    const systemPrompt = `You are the Phototheology Palace Master Examiner. Generate EXACTLY 50 unique questions. Return ONLY valid JSON with a "questions" array. No markdown, no code blocks.
 
-You MUST return ONLY a valid JSON object with a "questions" array. No markdown, no code blocks, no commentary — just raw JSON.
+ENTROPY SEED: ${entropySeed}
 
-ENTROPY SEED: ${entropySeed} — Use this to ensure unique question selection every time.
+CRITICAL ACCURACY REQUIREMENT: Every question and answer MUST be 100% accurate according to the definitions below. If a room belongs to Floor 2, do NOT list it among Floor 1 options. Double-check every answer against these exact definitions.
 
-CONTENT DOMAINS & QUESTION DISTRIBUTION:
+=== PALACE ROOMS (EXACT DEFINITIONS) ===
 
-1. PALACE ROOMS & METHODOLOGY (10 questions)
-Palace has 8 floors with rooms:
-- Floor 1 (Furnishing): Story Room (SR), Imagination Room (IR), 24FPS Room (24), Bible Rendered (BR), Translation Room (TR), Gems Room (GR)
-- Floor 2 (Investigation): Observation Room (OR), Def-Com Room (DC), Symbols/Types Room (ST), Questions Room (QR), Q&A Room (QA)
-- Floor 3 (Freestyle): Nature Freestyle (NF), Personal Freestyle (PF), Bible Freestyle (BF), History/Social Freestyle (HF), Listening Room (LR)
-- Floor 4 (Next Level): Concentration Room (CR), Dimensions Room (DR), Connect 6 (C6), Theme Room (TRm), Time Zone (TZ), Patterns Room (PRm), Parallels Room (P‖), Fruit Room (FRt), Christ in Every Chapter (CEC), Room 66 (R66)
-- Floor 5 (Vision): Blue Room/Sanctuary (BL), Prophecy Room (PR), Three Angels' Room (3A), Feasts Room
-- Floor 6 (Three Heavens): 1H, 2H, 3H, Cycles, Judgment Room, Frameworks, Mathematics, Summary, Master Eight
-- Floor 7 (Spiritual/Emotional Transformation)
-- Floor 8 (Master/Reflexive Mastery)
-Test: room purposes, methodologies, core questions, which floor/room for which skill.
+FLOOR 1 — FURNISHING (Memory & Visualization for Width):
+- Story Room (SR): Collect and memorize Bible stories in sequence as vivid mental movies. NOT interpretation — just collecting stories.
+- Imagination Room (IR): Step INSIDE the story as if you were there. Sanctified empathy — feel the sand, hear the crowd.
+- 24FPS Room (24): One symbolic mnemonic image per chapter. Turns Scripture into a mental film strip.
+- Bible Rendered (BR): One master image per 24-chapter block. Scan entire Bible in ~51 images.
+- Translation Room (TR): Convert abstract text into concrete images. Verses become pictures.
+- Gems Room (GR): Store striking insights. Select 2-3 random unrelated verses and find hidden theological connections.
 
-2. APOLOGETICS / AATS (8 questions)
-22 War College avatars across 3 rings:
-- Ring 1 (Non-belief): atheist, scientist, agnostic, secular-scholar, philosopher, internet-skeptic, new-age
-- Ring 2 (Non-Christian): muslim, jewish, bhi, mormon
-- Ring 3 (Intra-Christian): evangelical, catholic, jw, progressive-christian, former-sda, offshoot-sda, skeptical-exsda, anti-prophet, preterist, futurist, pentecostal
-Test: avatar arguments, SDA distinctive responses, ring classifications, apologetics strategies.
+FLOOR 2 — INVESTIGATION (Detective Work for Width):
+- Observation Room (OR): Log details like a detective's notebook. 30-50 observations per passage without interpreting.
+- Def-Com Room (DC): The forensic lab. Greek/Hebrew definitions + historical/cultural commentary. Linguistic analysis and cultural context.
+- Symbols/Types Room (ST): Build profiles of God's imagery. Symbols = universal language (Lamb=Christ). Types = OT shadows pointing to Christ.
+- Questions Room (QR): Interrogate text with 3×75 questions: intratextual, intertextual, Phototheological.
+- Q&A Room (QA): Cross-examine witnesses. Scripture answers Scripture.
 
-3. GEMS & TYPOLOGY (7 questions)
-7 gem categories: typology, parallel, prophecy, wordplay, numerics, chiasm, symbol
-Depths: beginner, intermediate, advanced
-Examples: Passover Lamb, Bronze Serpent, Isaac's Sacrifice, Joseph as Christ type, Babel→Pentecost parallel
-Test: identify gem types, match OT→NT connections, explain typological significance.
+FLOOR 3 — FREESTYLE (Spontaneous Connections for Time):
+- Nature Freestyle (NF): See God's truth in creation (Rom 1:20).
+- Personal Freestyle (PF): Life experiences become object lessons.
+- Bible Freestyle / Verse Genetics (BF): Every verse related to every other — trace genealogies of thought.
+- History/Social Freestyle (HF): Bible interprets secular history, culture, current events.
+- Listening Room (LR): Listen to sermons/conversations, instantly connect to Scripture.
 
-4. PROPHECY (6 questions)
-6 time prophecies: @120 (120 years, probation), @400 (400 years, affliction), @70y (70 years, captivity), @490 (490 days/years, messianic), @1260 (1260 days/years, persecution), @2300 (2300 days/years, judgment)
-Principles: Day-Year Principle, Recapitulation, Starting Points, Prophetic Time Units
-Test: calculations, historical fulfillments, starting/ending points, spiritual significance.
+FLOOR 4 — NEXT LEVEL (Christ-Centered Depth):
+- Concentration Room (CR): Every text MUST reveal Christ (John 5:39).
+- Dimensions Room (DR): 5 dimensions: Literal, Christ, Me, Church, Heaven.
+- Connect 6 (C6): 6 genres: Prophecy, Poetry, History, Gospels, Epistles, Parables.
+- Theme Room (TRm): Structural walls: Sanctuary, Life of Christ, Great Controversy, Time Prophecy, Gospel Floor, Heaven Ceiling.
+- Time Zone (TZ): 6 zones: Heaven/Earth × Past/Present/Future.
+- Patterns Room (PRm): Recurring motifs: 40 days, 3 days, deliverer stories.
+- Parallels Room (P‖): Mirrored ACTIONS across time. Babel↔Pentecost.
+- Fruit Room (FRt): Interpretation must produce Gal 5:22-23 fruit.
+- Christ in Every Chapter (CEC): Name Christ's thread in every chapter explicitly.
+- Room 66 (R66): Trace one theme through all 66 books.
 
-5. SANCTUARY (5 questions)
-Furniture: Altar of Sacrifice (courtyard, Christ's death), Laver (courtyard, baptism), Table of Shewbread (holy place, Bread of Life), Lampstand/Menorah (holy place, Light), Altar of Incense (holy place, intercession), Ark of Covenant (most holy, law/righteousness), Veil (between rooms, access through Christ)
-Test: furniture meanings, gospel progression, Christ connections, personal/church applications.
+FLOOR 5 — VISION (Prophecy & Sanctuary):
+- Blue Room / Sanctuary (BL): Sanctuary blueprint. Altar=cross, Laver=baptism, Lampstand=Spirit, Shewbread=Word, Incense=intercession, Ark=law/mercy/throne, Veil=access, Gate=entry.
+- Prophecy Room (PR): Daniel & Revelation telescope. Historicist method.
+- Three Angels' Room (3A): Rev 14:6-12 capstone.
+- Feasts Room: Connect texts to Israel's feasts as prophetic markers.
 
-6. CHRIST TYPES (5 questions)
-Christ revealed in every book of the Bible. Categories: type, prophecy, title, symbol, theme, appearance.
-Examples: Seed of the Woman (Gen 3:15), Ark of Salvation, Isaac the Beloved Son, Melchizedek Priest-King, Passover Lamb (Exod 12)
-Test: identify Christ in specific books, match types to fulfillments, explain category distinctions.
+FLOOR 6 — THREE HEAVENS & CYCLES:
+- 1H (DoL¹/NE¹) = Babylon destroys Jerusalem 586BC → post-exilic restoration.
+- 2H (DoL²/NE²) = Rome destroys Jerusalem 70AD → New Covenant order.
+- 3H (DoL³/NE³) = Final cosmic judgment → new creation Rev 21-22.
+- Eight Cycles: @Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re. Pattern: Fall→Covenant→Sanctuary→Enemy→Restoration.
+- Juice Room (JR): Squeeze one book through ALL principles.
 
-7. PATTERNS & THEMES (5 questions)
-Pattern categories: testing, election, deliverance, covenant, judgment, provision, encounter, course, structure, typology
-Course patterns: Waters Course, Mountains Course
-Three Heavens as Day-of-the-Lord cycles: 1H=Babylon destroys Jerusalem (586BC), 2H=Rome destroys Jerusalem (70AD), 3H=Final cosmic judgment
-Test: identify pattern types, trace patterns across Scripture, explain DoL cycles.
+FLOOR 7 — SPIRITUAL/EMOTIONAL:
+- Fire Room (FRm): Feel Scripture's emotional weight.
+- Meditation Room (MR): Slow marination in truth.
+- Speed Room (SRm): Rapid application drills.
 
-8. MEMORIZATION & COURSES (4 questions)
-5 Dimensions: Literal, Christ, Me, Church, Heaven
-Room methodologies, study techniques, verse chain building
-Test: apply dimensions to passages, identify correct methodology for scenarios.
+FLOOR 8 — MASTER: No rooms. Reflexive Phototheological thought.
 
-QUESTION TYPE DISTRIBUTION:
-- Multiple Choice (MC): ~20 questions — 4 options each, only one correct
-- True/False (TF): ~15 questions — include nuanced statements that test real understanding
-- Sentence (SA): ~15 questions — require 1-3 sentence answers; include a grading_rubric with key points
+=== FIVE ASCENSIONS ===
+Asc-1 (Text) → Asc-2 (Chapter) → Asc-3 (Book) → Asc-4 (Cycle) → Asc-5 (Heaven). Static=anchored. Dynamic=creative.
 
-DIFFICULTY DISTRIBUTION:
-- 30% Intermediate (15 questions)
-- 50% Advanced (25 questions)
-- 20% Master (10 questions)
+=== FOUR EXPANSIONS ===
+Width (Floors 1-2), Time (Floor 3), Depth (Floors 4-5-6), Height (Floors 7-8)
 
-CRITICAL RULES:
-- Every question MUST have a correct_answer and explanation
-- MC questions must have exactly 4 options
-- TF correct_answer must be exactly "True" or "False"
-- SA questions must have a grading_rubric listing 2-4 key points worth partial credit
-- Vary questions — do NOT repeat similar questions
-- Use specific Scripture references where applicable
-- Questions should test UNDERSTANDING, not just recall
+=== QUESTION DISTRIBUTION ===
+1. PALACE ROOMS (10 questions): Test exact room purposes, floor assignments, methodology distinctions. VERIFY every room-floor mapping before finalizing.
+2. APOLOGETICS/AATS (8 questions): 22 avatars, 3 rings. Ring 1 (Non-belief), Ring 2 (Non-Christian), Ring 3 (Intra-Christian).
+3. GEMS & TYPOLOGY (7 questions): 7 categories: typology, parallel, prophecy, wordplay, numerics, chiasm, symbol.
+4. PROPHECY (6 questions): @120, @400, @70y, @490, @1260, @2300. Day-Year Principle.
+5. SANCTUARY (5 questions): Furniture meanings, gospel progression.
+6. CHRIST TYPES (5 questions): Categories: type, prophecy, title, symbol, theme, appearance.
+7. PATTERNS & THEMES (5 questions): DoL cycles, pattern categories.
+8. MEMORIZATION & COURSES (4 questions): 5 Dimensions, Ascensions, Expansions.
 
-OUTPUT FORMAT — return ONLY this JSON (no markdown, no code fences):
-{
-  "questions": [
-    {
-      "id": 1,
-      "category": "palace_rooms",
-      "type": "mc",
-      "difficulty": "intermediate",
-      "question": "Which floor of the Phototheology Palace focuses on...",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correct_answer": "Option B",
-      "explanation": "Floor 2 focuses on...",
-      "scripture_ref": "John 5:39"
-    },
-    {
-      "id": 2,
-      "category": "apologetics",
-      "type": "tf",
-      "difficulty": "advanced",
-      "question": "The Anti-Prophet Critic avatar belongs to Ring 2...",
-      "correct_answer": "False",
-      "explanation": "The Anti-Prophet Critic belongs to Ring 3..."
-    },
-    {
-      "id": 3,
-      "category": "gems_typology",
-      "type": "sa",
-      "difficulty": "master",
-      "question": "Explain how Joseph serves as a type of Christ...",
-      "correct_answer": "Joseph was betrayed by his brothers, sold for silver...",
-      "explanation": "The Joseph-Christ typology includes...",
-      "grading_rubric": ["Mentions betrayal parallel", "Notes exaltation after suffering", "Cites specific Scripture"]
-    }
-  ]
-}
+TYPES: ~20 MC (4 options), ~15 TF, ~15 SA (with grading_rubric).
+DIFFICULTY: 30% intermediate, 50% advanced, 20% master.
+
+RULES:
+- correct_answer and explanation required for every question
+- MC: exactly 4 options, correct_answer must match one option exactly
+- TF: correct_answer "True" or "False"
+- SA: grading_rubric array of 2-4 key points
+- NEVER attribute a room to the wrong floor
+- Use KJV Scripture references where applicable
+
+OUTPUT: raw JSON only, no markdown:
+{"questions":[{"id":1,"category":"palace_rooms","type":"mc","difficulty":"intermediate","question":"...","options":["A","B","C","D"],"correct_answer":"B","explanation":"...","scripture_ref":"John 5:39"}]}
 
 Valid categories: palace_rooms, apologetics, gems_typology, prophecy, sanctuary, christ_types, patterns_themes, memorization_courses
 Valid types: mc, tf, sa
