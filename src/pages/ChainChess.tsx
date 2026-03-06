@@ -184,27 +184,36 @@ const ChainChess = () => {
   const handleMpStartGame = async () => {
     if (!mp.room || mp.players.length < 2) return;
 
-    const firstPlayer = mp.players[0];
-    const initialState = {
-      version: 3,
-      settings: gameState.settings,
-      moves: [],
-      scores: Object.fromEntries(mp.players.map(p => [p.user_id, 0])),
-      roundNumber: 1,
-      phase: "waiting_for_move",
-    };
+    try {
+      const firstPlayer = mp.players[0];
+      const initialState = {
+        version: 3,
+        settings: gameState.settings,
+        moves: [],
+        scores: Object.fromEntries(mp.players.map(p => [p.user_id, 0])),
+        roundNumber: 1,
+        phase: "waiting_for_move",
+      };
 
-    await mp.startGame(initialState, firstPlayer.user_id);
+      await mp.startGame(initialState, firstPlayer.user_id);
 
-    // Immediately transition UI to in_progress (don't wait for realtime)
-    setGameState(prev => ({
-      ...prev,
-      status: "in_progress",
-      moves: [],
-      roundNumber: 1,
-      playerScore: 0,
-      jeevesScore: 0,
-    }));
+      // Immediately transition host UI (opponent will sync via realtime/polling)
+      setGameState(prev => ({
+        ...prev,
+        status: "in_progress",
+        moves: [],
+        roundNumber: 1,
+        playerScore: 0,
+        jeevesScore: 0,
+      }));
+    } catch (error: any) {
+      console.error("Error starting multiplayer game:", error);
+      toast({
+        title: "Could not start game",
+        description: error?.message || "Please try again",
+        variant: "destructive",
+      });
+    }
   };
 
   // ===== MULTIPLAYER: Submit move =====
