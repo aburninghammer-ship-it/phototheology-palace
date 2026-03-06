@@ -10006,6 +10006,11 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     // Extract principles used from commentary mode
     let responseData: any = { content, response: content };
 
+    // Scrabble amplify mode: return amplification text
+    if (mode === "scrabble-amplify") {
+      responseData.amplification = content.trim();
+    }
+
     // Defense coach mode: extract score from response
     if (mode === "defense-coach" || mode === "defense-coach-continue") {
       const scoreMatch = content.match(/TOTAL SCORE:\s*(\d+)\s*\/\s*40/i);
