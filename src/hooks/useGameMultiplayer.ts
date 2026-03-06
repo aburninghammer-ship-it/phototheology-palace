@@ -165,12 +165,34 @@ export function useGameMultiplayer(gameType: string) {
   }, [user, gameType, getDisplayName]);
 
   const fetchPlayers = useCallback(async (roomId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("game_room_players")
       .select("*")
       .eq("room_id", roomId)
       .order("player_index");
+
+    if (error) {
+      console.error("[useGameMultiplayer] Failed to fetch players:", error);
+      return;
+    }
+
     if (data) setPlayers(data as GameRoomPlayer[]);
+  }, []);
+
+  const fetchRoom = useCallback(async (roomId: string) => {
+    const { data, error } = await supabase
+      .from("game_rooms")
+      .select("*")
+      .eq("id", roomId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("[useGameMultiplayer] Failed to fetch room:", error);
+      return null;
+    }
+
+    if (data) setRoom(data as GameRoom);
+    return (data as GameRoom) ?? null;
   }, []);
 
   const updateGameState = useCallback(async (
@@ -180,11 +202,21 @@ export function useGameMultiplayer(gameType: string) {
     winnerUserId?: string | null
   ) => {
     if (!room) return;
+
     const update: any = { game_state: newState, updated_at: new Date().toISOString() };
     if (currentTurnUserId !== undefined) update.current_turn_user_id = currentTurnUserId;
     if (status) update.status = status;
     if (winnerUserId !== undefined) update.winner_user_id = winnerUserId;
-    await supabase.from("game_rooms").update(update).eq("id", room.id);
+
+    const { data, error } = await supabase
+      .from("game_rooms")
+      .update(update)
+      .eq("id", room.id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (data) setRoom(data as GameRoom);
   }, [room]);
 
   const updatePlayerData = useCallback(async (playerId: string, playerData: any, score?: number) => {
@@ -195,12 +227,21 @@ export function useGameMultiplayer(gameType: string) {
 
   const startGame = useCallback(async (initialState: any, firstPlayerUserId: string) => {
     if (!room) return;
-    await supabase.from("game_rooms").update({
-      status: "active",
-      game_state: initialState,
-      current_turn_user_id: firstPlayerUserId,
-      updated_at: new Date().toISOString(),
-    }).eq("id", room.id);
+
+    const { data, error } = await supabase
+      .from("game_rooms")
+      .update({
+        status: "active",
+        game_state: initialState,
+        current_turn_user_id: firstPlayerUserId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", room.id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (data) setRoom(data as GameRoom);
   }, [room]);
 
   const leaveRoom = useCallback(async () => {
@@ -210,13 +251,18 @@ export function useGameMultiplayer(gameType: string) {
     setPlayers([]);
   }, [room, user]);
 
-  // Realtime subscriptions
+  // Realtime subscriptions + polling fallback for missed events
   useEffect(() => {
     if (!room?.id) return;
 
-    fetchPlayers(room.id);
-
     const roomId = room.id;
+
+    const syncRoomSnapshot = async () => {
+      await Promise.all([fetchRoom(roomId), fetchPlayers(roomId)]);
+    };
+
+    void syncRoomSnapshot();
+
     const channel = supabase
       .channel(`game-room-${roomId}`)
       .on("postgres_changes", {
@@ -233,18 +279,24 @@ export function useGameMultiplayer(gameType: string) {
         table: "game_room_players",
         filter: `room_id=eq.${roomId}`,
       }, () => {
-        fetchPlayers(roomId);
+        void syncRoomSnapshot();
       })
       .subscribe((status) => {
-        if (status === "CHANNEL_ERROR") {
-          console.error("[useGameMultiplayer] Realtime subscription error for room", roomId);
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          console.error("[useGameMultiplayer] Realtime status issue for room", roomId, status);
+          void syncRoomSnapshot();
         }
       });
 
+    const pollInterval = setInterval(() => {
+      void syncRoomSnapshot();
+    }, 2500);
+
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
-  }, [room?.id, fetchPlayers]);
+  }, [room?.id, fetchPlayers, fetchRoom]);
 
   const isHost = user?.id === room?.host_id;
   const isMyTurn = user?.id === room?.current_turn_user_id;
