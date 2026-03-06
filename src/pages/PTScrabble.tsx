@@ -815,7 +815,147 @@ export default function PTScrabble() {
   }
 
 
-  // ========== MULTIPLAYER LOBBY VIEW ==========
+  // ========== QUICK PLAY WON VIEW ==========
+  if (gamePhase === "quick-play-won") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-amber-500/50 text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl text-amber-300">Victory!</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-amber-400">{qpScore} points</div>
+                <p className="text-amber-200/80">You mastered the PT symbol chains!</p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => setGamePhase("menu")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Menu
+                  </Button>
+                  <Button onClick={startQuickPlay} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="chain_war" currentScore={qpScore} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ========== QUICK PLAY VIEW ==========
+  if (gamePhase === "quick-play") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <Button variant="ghost" onClick={() => setGamePhase("menu")} className="text-white">
+              <ArrowLeft className="mr-2" />
+              Back
+            </Button>
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-amber-400 mb-2" style={{ fontFamily: "'Cinzel', serif" }}>
+                Quick Play
+              </h1>
+              <p className="text-amber-200/80">Build chains with PT symbols</p>
+            </div>
+            <div className="text-right">
+              <div className="text-amber-400 text-3xl font-bold">{qpScore} / {qpTargetScore}</div>
+              <div className="text-amber-200/60 text-sm">Points</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-amber-500/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-amber-300">
+                  <LinkIcon className="w-5 h-5" />
+                  Your Hand
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {qpHand.map(symbol => (
+                    <Button
+                      key={symbol.code}
+                      variant={qpSelectedCards.includes(symbol.code) ? "default" : "outline"}
+                      onClick={() => toggleQpCard(symbol.code)}
+                      className="h-20 flex-col gap-1"
+                    >
+                      <div className="text-2xl font-bold">{symbol.code}</div>
+                      <div className="text-xs">{symbol.name}</div>
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Select 2–3 cards to build your chain
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black/40 border-amber-500/50">
+              <CardHeader>
+                <CardTitle className="text-amber-300">Build Your Chain</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm text-amber-200 mb-2 block">Verse Reference</label>
+                  <input
+                    type="text"
+                    value={qpVerse}
+                    onChange={(e) => setQpVerse(e.target.value)}
+                    placeholder="e.g., John 3:16"
+                    className="w-full px-4 py-2 bg-black/60 border border-amber-500/30 rounded text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-amber-200 mb-2 block">
+                    Explain how your {qpSelectedCards.length} card(s) connect
+                  </label>
+                  <Textarea
+                    value={qpExplanation}
+                    onChange={(e) => setQpExplanation(e.target.value)}
+                    placeholder="Explain how these PT principles connect to your verse..."
+                    className="bg-black/60 border-amber-500/30 text-white min-h-32"
+                  />
+                </div>
+                <Button
+                  onClick={handleQpSubmit}
+                  disabled={qpIsSubmitting || qpSelectedCards.length < 2}
+                  className="w-full gap-2"
+                >
+                  <Send className="w-4 h-4" />
+                  {qpIsSubmitting ? "Validating..." : "Submit Chain"}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="mt-6 bg-black/40 border-amber-500/50">
+            <CardHeader>
+              <CardTitle className="text-amber-300">How to Play</CardTitle>
+            </CardHeader>
+            <CardContent className="text-amber-100/80 space-y-2">
+              <p>1. You get 5 PT symbol cards each round</p>
+              <p>2. Select 2–3 cards that form a theological chain</p>
+              <p>3. Provide a Bible verse that supports your chain</p>
+              <p>4. Explain how the symbols connect to the verse</p>
+              <p>5. Jeeves validates — reach {qpTargetScore} points to win!</p>
+            </CardContent>
+          </Card>
+        </div>
+        <FloatingGameChat gameType="quick-play" />
+      </div>
+    );
+  }
+
+
   if (gamePhase === "multiplayer-lobby") {
     // If we have an active game in waiting status, show GameLobby
     if (mpGame && mpGame.status === 'waiting') {
