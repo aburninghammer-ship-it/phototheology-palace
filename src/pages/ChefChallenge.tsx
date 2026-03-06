@@ -53,6 +53,8 @@ export default function ChefChallenge() {
   const {
     user
   } = useAuth();
+  const chefMultiplayer = useChefMultiplayer();
+  const [activeTab, setActiveTab] = useState<string>("solo");
   const [difficulty, setDifficulty] = useState<keyof typeof difficultyConfig>("intermediate");
   const [verses, setVerses] = useState<Verse[]>([]);
   const [recipe, setRecipe] = useState("");
