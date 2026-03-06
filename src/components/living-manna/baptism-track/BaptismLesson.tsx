@@ -1045,7 +1045,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                 <ScrollArea className="h-[700px] pr-4">
                   <div 
                     className="baptism-study-content rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5 p-6 backdrop-blur-sm shadow-lg shadow-primary/5"
-                    dangerouslySetInnerHTML={{ __html: teachingContent || lesson.description || '' }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(teachingContent || lesson.description || '', { ALLOWED_TAGS: ['h1','h2','h3','h4','h5','h6','p','br','strong','em','b','i','ul','ol','li','blockquote','a','span','div'], ALLOWED_ATTR: ['class','href','target','rel'] }) }}
                   />
                 </ScrollArea>
               )}
@@ -1137,7 +1137,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                 <ScrollArea className="h-[700px] pr-4">
                   <div 
                     className="baptism-study-content rounded-xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-background to-cyan-500/5 p-6 backdrop-blur-sm shadow-lg shadow-blue-500/5"
-                    dangerouslySetInnerHTML={{ __html: objectionsContent || "<p>Content is loading...</p>" }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(objectionsContent || "<p>Content is loading...</p>", { ALLOWED_TAGS: ['h1','h2','h3','h4','h5','h6','p','br','strong','em','b','i','ul','ol','li','blockquote','a','span','div'], ALLOWED_ATTR: ['class','href','target','rel'] }) }}
                   />
                 </ScrollArea>
               )}
@@ -1210,7 +1210,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                 <ScrollArea className="h-[700px] pr-4">
                   <div 
                     className="baptism-study-content rounded-xl border border-green-500/20 bg-gradient-to-br from-green-500/5 via-background to-emerald-500/5 p-6 backdrop-blur-sm shadow-lg shadow-green-500/5"
-                    dangerouslySetInnerHTML={{ __html: historyContent || "<p>Content is loading...</p>" }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(historyContent || "<p>Content is loading...</p>", { ALLOWED_TAGS: ['h1','h2','h3','h4','h5','h6','p','br','strong','em','b','i','ul','ol','li','blockquote','a','span','div'], ALLOWED_ATTR: ['class','href','target','rel'] }) }}
                   />
                 </ScrollArea>
               )}
@@ -1265,7 +1265,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                 <ScrollArea className="h-[700px] pr-4">
                   <div 
                     className="baptism-study-content rounded-xl border border-purple-500/20 bg-gradient-to-br from-purple-500/5 via-background to-violet-500/5 p-6 backdrop-blur-sm shadow-lg shadow-purple-500/5"
-                    dangerouslySetInnerHTML={{ __html: egwContent || "<p>Content is loading...</p>" }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(egwContent || "<p>Content is loading...</p>", { ALLOWED_TAGS: ['h1','h2','h3','h4','h5','h6','p','br','strong','em','b','i','ul','ol','li','blockquote','a','span','div'], ALLOWED_ATTR: ['class','href','target','rel'] }) }}
                   />
                 </ScrollArea>
               )}
