@@ -47,64 +47,58 @@ export function JeevesFeedbackPanel({
       setError(null);
 
       try {
-        const prompt = `You are Jeeves, a brilliant and warm Phototheology Bible study scholar. A student just placed a card in PT Scrabble. Your job is NOT to repeat what they said — your job is to AMPLIFY it with deeper theological insight.
-
-Context:
-- **Verse**: ${seedVerse.reference} — "${seedVerse.text}"
-- **PT Principle**: ${entry.cardName} (${entry.cardCode})
-- **Student's Answer**: "${entry.explanation}"
-${entry.isChristConnection ? '- Christ Connection made' : ''}
-
-Provide three things in JSON:
-
-1. **recap** (1-2 sentences): Affirm the STRONGEST part of their insight. Name the specific theological move they made. Do NOT simply restate their words.
-
-2. **polished** (2-3 sentences): Take their core idea and ELEVATE it — add theological depth, sharpen the language, connect it to the broader biblical narrative, or reveal a layer they touched but didn't fully unpack. This should read like a scholar expanding on a student's promising observation. NEVER just rephrase what they already said.
-
-3. **gem** (1-2 sentences): Offer a FRESH insight they did NOT mention — a cross-reference to another passage, a Hebrew/Greek word study connection, a typological parallel, or a Christological thread. This should genuinely surprise and delight them.
-
-CRITICAL: Each section must add NEW information beyond what the student wrote. If you find yourself rewording their answer, stop and dig deeper.
-
-Respond ONLY with valid JSON:
-{"recap": "...", "polished": "...", "gem": "..."}`;
-
         const { data, error: fetchError } = await supabase.functions.invoke('jeeves', {
           body: {
-            message: prompt,
-            context: 'scrabble_feedback',
+            mode: 'scrabble-feedback',
+            seedVerse: {
+              reference: seedVerse.reference,
+              text: seedVerse.text,
+            },
+            cardName: entry.cardName,
+            cardCode: entry.cardCode,
+            explanation: entry.explanation,
+            isChristConnection: entry.isChristConnection,
           },
         });
 
         if (fetchError) throw fetchError;
 
-        // Parse response - handle both direct JSON and string response
-        // Jeeves edge function returns { content: "..." } format
-        let parsedFeedback: JeevesFeedback;
+        // Parse response - support both parsed JSON and stringified JSON
+        let parsedFeedback: Partial<JeevesFeedback>;
         const response = data?.content || data?.response || data?.message || data;
 
         if (typeof response === 'string') {
-          // Try to extract JSON from the response
           const jsonMatch = response.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            parsedFeedback = JSON.parse(jsonMatch[0]);
-          } else {
-            throw new Error('Could not parse Jeeves response');
-          }
-        } else if (typeof response === 'object' && response.recap) {
+          if (!jsonMatch) throw new Error('Could not parse Jeeves response');
+          parsedFeedback = JSON.parse(jsonMatch[0]);
+        } else if (typeof response === 'object' && response) {
           parsedFeedback = response;
         } else {
           throw new Error('Invalid response format');
         }
 
-        setFeedback(parsedFeedback);
+        const recap = typeof parsedFeedback.recap === 'string' ? parsedFeedback.recap.trim() : '';
+        let polished = typeof parsedFeedback.polished === 'string' ? parsedFeedback.polished.trim() : '';
+        const gem = typeof parsedFeedback.gem === 'string' ? parsedFeedback.gem.trim() : '';
+
+        const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+        if (polished && normalize(polished) === normalize(entry.explanation)) {
+          polished = `You identified a real ${entry.cardName} thread; now strengthen it by naming one confirming cross-reference and showing how it expands the Christ-centered arc of ${seedVerse.reference}.`;
+        }
+
+        if (!recap || !polished || !gem) {
+          throw new Error('Incomplete feedback payload');
+        }
+
+        setFeedback({ recap, polished, gem });
       } catch (err) {
         console.error('Error getting Jeeves feedback:', err);
         setError('Jeeves is thinking deeply... try again in a moment.');
-        // Provide fallback feedback
+        // Non-repetitive fallback feedback
         setFeedback({
-          recap: `You applied the ${entry.cardName} principle to ${seedVerse.reference}. Good connection!`,
-          polished: entry.explanation,
-          gem: `Keep exploring how ${entry.cardName} reveals Christ in this passage.`,
+          recap: `You made a valid ${entry.cardName} connection in ${seedVerse.reference}.`,
+          polished: `Push this insight one layer deeper by anchoring a second supporting text and clarifying how the same pattern advances the redemptive storyline in this verse.`,
+          gem: `Bonus angle: trace one matching pattern from another biblical scene and show how Christ fulfills both threads in a unified way.`,
         });
       } finally {
         setIsLoading(false);
