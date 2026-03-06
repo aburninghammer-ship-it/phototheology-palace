@@ -596,17 +596,6 @@ const Games = () => {
           </Button>
         </motion.div>
 
-        {/* Leaderboards Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="grid md:grid-cols-3 gap-6 mb-8"
-        >
-          <UnifiedGameRankings />
-          <ChainChessLeaderboard />
-          <GroupEscapeRoom />
-        </motion.div>
 
         {/* Games Grid - Responsive with 1 col on mobile */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
@@ -691,6 +680,18 @@ const Games = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Leaderboards Section - Below games */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="grid md:grid-cols-3 gap-6 mt-8 mb-8"
+        >
+          <UnifiedGameRankings />
+          <ChainChessLeaderboard />
+          <GroupEscapeRoom />
+        </motion.div>
 
         {filteredGames.length === 0 && (
           <motion.div 
