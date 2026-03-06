@@ -303,3 +303,6 @@ verify_jwt = false
 
 [functions.get-pdf-purchases]
 verify_jwt = false
+
+[functions.generate-daily-paths]
+verify_jwt = false
