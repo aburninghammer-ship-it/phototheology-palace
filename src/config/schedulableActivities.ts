@@ -72,6 +72,8 @@ export interface SchedulableActivity {
   maxPlayers: number;
   supportsVerse: boolean;
   gradient: string;
+  /** If true, this game is available for free during Friday Night Game Night (Fri 6-11:59 PM) */
+  fridayNightFreePass?: boolean;
 }
 
 export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
@@ -159,6 +161,7 @@ export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
     maxPlayers: 8,
     supportsVerse: true,
     gradient: 'from-orange-500 to-red-500',
+    fridayNightFreePass: true,
   },
   {
     id: 'concentration-room',
@@ -279,6 +282,7 @@ export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
     maxPlayers: 2,
     supportsVerse: false,
     gradient: 'from-amber-500 to-orange-500',
+    fridayNightFreePass: true,
   },
   {
     id: 'escape-dragon',
@@ -303,6 +307,7 @@ export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
     maxPlayers: 4,
     supportsVerse: false,
     gradient: 'from-indigo-500 to-purple-600',
+    fridayNightFreePass: true,
   },
   {
     id: 'treasure-hunt',
@@ -339,6 +344,7 @@ export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
     maxPlayers: 8,
     supportsVerse: false,
     gradient: 'from-red-500 to-yellow-500',
+    fridayNightFreePass: true,
   },
   {
     id: 'scrabble-pt',
@@ -348,9 +354,10 @@ export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
     category: 'games',
     route: '/pt-scrabble',
     minPlayers: 2,
-    maxPlayers: 10,
+    maxPlayers: 20,
     supportsVerse: true,
     gradient: 'from-purple-500 to-blue-500',
+    fridayNightFreePass: true,
   },
   {
     id: 'pt-jeopardy',
@@ -363,6 +370,7 @@ export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
     maxPlayers: 8,
     supportsVerse: false,
     gradient: 'from-blue-600 to-purple-600',
+    fridayNightFreePass: true,
   },
   {
     id: 'pt-family-feud',
@@ -443,3 +451,13 @@ export function getGameActivities(): SchedulableActivity[] {
 export function getStudyActivities(): SchedulableActivity[] {
   return getActivitiesByCategory('studies');
 }
+
+/** Games eligible for free day passes on Friday Night Game Night */
+export function getFridayNightFreePassGames(): SchedulableActivity[] {
+  return SCHEDULABLE_ACTIVITIES.filter((a) => a.fridayNightFreePass);
+}
+
+/** IDs of games that allow Friday Night free passes */
+export const FRIDAY_NIGHT_FREE_PASS_IDS: Set<ScheduledActivityType> = new Set(
+  SCHEDULABLE_ACTIVITIES.filter((a) => a.fridayNightFreePass).map((a) => a.id)
+);

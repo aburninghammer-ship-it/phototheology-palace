@@ -55,7 +55,7 @@ export function GameLobby({
 }: GameLobbyProps) {
   const [mode, setMode] = useState<'create' | 'join'>('create');
   const [gameMode, setGameMode] = useState<'ffa' | 'team'>('ffa');
-  const [maxPlayers, setMaxPlayers] = useState(10);
+  const [maxPlayers, setMaxPlayers] = useState(20);
   const [joinCode, setJoinCode] = useState('');
 
   const handleCreate = async () => {
@@ -300,9 +300,9 @@ export function GameLobby({
                   id="maxPlayers"
                   type="number"
                   min={2}
-                  max={60}
+                  max={20}
                   value={maxPlayers}
-                  onChange={(e) => setMaxPlayers(parseInt(e.target.value) || 10)}
+                  onChange={(e) => setMaxPlayers(Math.min(20, parseInt(e.target.value) || 20))}
                 />
               </div>
 
@@ -353,7 +353,7 @@ export function GameLobby({
           {/* Info */}
           <div className="text-center text-sm text-muted-foreground space-y-1">
             <p>{getTotalCardCount()} Phototheology principle cards</p>
-            <p>Supports 2-60 players</p>
+            <p>Supports 2-20 players</p>
           </div>
         </CardContent>
       </Card>
