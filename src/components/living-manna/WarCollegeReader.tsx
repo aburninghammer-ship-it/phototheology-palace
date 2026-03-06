@@ -165,6 +165,32 @@ export function WarCollegeReader({
         </TabsContent>
       </Tabs>
 
+      {/* ─── Mark Complete (always visible) ─── */}
+      {!isCompleted && onComplete && (
+        <div className="text-center py-2">
+          <Button
+            size="lg"
+            onClick={() => {
+              if (!autoMarkedComplete) {
+                setAutoMarkedComplete(true);
+                onComplete();
+              }
+            }}
+            className="gap-2 bg-gradient-to-r from-primary to-primary/80"
+          >
+            <CheckCircle2 className="h-5 w-5" />
+            Mark Day {study.dayNumber} Complete
+          </Button>
+        </div>
+      )}
+      {isCompleted && (
+        <div className="text-center py-2">
+          <p className="text-sm text-green-500 flex items-center justify-center gap-2">
+            <CheckCircle2 className="h-4 w-4" /> Day {study.dayNumber} Complete
+          </p>
+        </div>
+      )}
+
       {/* ─── Post-Manuscript Tactical Section Toggle ─── */}
       <div className="text-center">
         <Button
