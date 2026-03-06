@@ -55,16 +55,15 @@ serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError || !userData?.user) {
+    const { data: { user: authUser }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !authUser) {
       logStep("Auth failed", { error: userError?.message });
       throw new Error("Authentication failed");
     }
 
     // Check if user is admin using user_roles table
     const { data: isAdmin, error: roleError } = await supabaseClient
-      .rpc('has_role', { _user_id: userData.user.id, _role: 'admin' });
+      .rpc('has_role', { _user_id: authUser.id, _role: 'admin' });
 
     if (roleError || !isAdmin) {
       throw new Error("Admin access required");
