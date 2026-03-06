@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserShelf } from "@/hooks/useUserShelf";
 import { usePathProgress } from "@/hooks/usePathProgress";
 import { useGeneratedSparkCards, GeneratedSparkCard } from "@/hooks/useGeneratedSparkCards";
+import { useGeneratedStudyPaths } from "@/hooks/useGeneratedStudyPaths";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import {
 import {
   SparkCardComponent,
   StudyPathCard,
+  GeneratedPathCard,
   IdeaGeneratorPanel,
   MyShelfDrawer,
 } from "@/components/study-ideas";
