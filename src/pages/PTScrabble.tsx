@@ -6,10 +6,15 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe, Megaphone, Calendar } from "lucide-react";
+import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe, Megaphone, Calendar, Zap, Send, Link as LinkIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
+import { FloatingGameChat } from "@/components/games/FloatingGameChat";
 import { useAuth } from "@/hooks/useAuth";
 import { useScrabbleGame } from "@/hooks/useScrabbleGame";
 import { useGamePresence, type GameInvitation } from "@/hooks/useGamePresence";
@@ -41,7 +46,24 @@ import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/type
 import { positionKey, isValidPlacement, assignCardsToPositions, getValidPlacements } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
 
-type GamePhase = "menu" | "verse-selection" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-verse-selection" | "multiplayer-playing";
+type GamePhase = "menu" | "verse-selection" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-verse-selection" | "multiplayer-playing" | "quick-play" | "quick-play-won";
+
+const QUICK_PLAY_SYMBOLS = [
+  { code: "1D", name: "Literal Dimension" },
+  { code: "2D", name: "Christ Dimension" },
+  { code: "3D", name: "Me Dimension" },
+  { code: "4D", name: "Church Dimension" },
+  { code: "5D", name: "Heaven Dimension" },
+  { code: "|S", name: "Sanctuary Wall" },
+  { code: "|LC", name: "Life of Christ Wall" },
+  { code: "|GC", name: "Great Controversy Wall" },
+  { code: "|TP", name: "Time Prophecy Wall" },
+  { code: "+", name: "Add Link" },
+  { code: "∥", name: "Parallel" },
+  { code: "≅", name: "Type/Antitype" },
+  { code: "⊙", name: "Center in Christ" },
+  { code: "⚖", name: "Integrity Sweep" },
+];
 
 export default function PTScrabble() {
   const { user, loading } = useAuth();
