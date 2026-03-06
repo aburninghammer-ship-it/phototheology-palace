@@ -6,13 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw, Users } from "lucide-react";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { TextShareButton } from "@/components/TextShareButton";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { ChefMultiplayerLobby } from "@/components/chef/ChefMultiplayerLobby";
+import { ChefMultiplayerGame } from "@/components/chef/ChefMultiplayerGame";
+import { useChefMultiplayer } from "@/hooks/useChefMultiplayer";
 interface Verse {
   reference: string;
   text: string;
@@ -49,6 +53,8 @@ export default function ChefChallenge() {
   const {
     user
   } = useAuth();
+  const chefMultiplayer = useChefMultiplayer();
+  const [activeTab, setActiveTab] = useState<string>("solo");
   const [difficulty, setDifficulty] = useState<keyof typeof difficultyConfig>("intermediate");
   const [verses, setVerses] = useState<Verse[]>([]);
   const [recipe, setRecipe] = useState("");
@@ -249,6 +255,29 @@ export default function ChefChallenge() {
           {t('challenges.backToGames')}
         </Button>
 
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="solo" className="gap-2">
+              <ChefHat className="h-4 w-4" />
+              Solo Kitchen
+            </TabsTrigger>
+            <TabsTrigger value="multiplayer" className="gap-2">
+              <Users className="h-4 w-4" />
+              Multiplayer Kitchen
+            </TabsTrigger>
+          </TabsList>
+
+          {/* MULTIPLAYER TAB */}
+          <TabsContent value="multiplayer" className="space-y-6">
+            {chefMultiplayer.room?.status === "active" ? (
+              <ChefMultiplayerGame game={chefMultiplayer} />
+            ) : (
+              <ChefMultiplayerLobby game={chefMultiplayer} />
+            )}
+          </TabsContent>
+
+          {/* SOLO TAB */}
+          <TabsContent value="solo">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -433,8 +462,10 @@ export default function ChefChallenge() {
                     </Button>
                   </div>}
               </>}
-          </CardContent>
+           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>;
 }
