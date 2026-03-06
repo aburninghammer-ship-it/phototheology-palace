@@ -164,21 +164,32 @@ Valid difficulties: intermediate, advanced, master`;
 
     console.log("Calling AI gateway for exam generation...");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: "Generate the 50-question master exam now. Return ONLY raw JSON — no markdown code blocks, no commentary. Ensure variety and rigor." },
-        ],
-        max_tokens: 32768,
-      }),
-    });
+    const aiMessages = [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: "Generate the 50-question master exam now. Return ONLY raw JSON — no markdown code blocks, no commentary. Ensure variety and rigor." },
+    ];
+
+    // Try GPT-5 first, fallback to Gemini Flash
+    const modelsToTry = ["openai/gpt-5", "google/gemini-2.5-flash"];
+    let response: Response | null = null;
+
+    for (const model of modelsToTry) {
+      console.log(`Trying model: ${model}`);
+      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: aiMessages,
+          max_tokens: 32768,
+        }),
+      });
+      if (response.ok) break;
+      console.warn(`Model ${model} failed with status ${response.status}`);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
