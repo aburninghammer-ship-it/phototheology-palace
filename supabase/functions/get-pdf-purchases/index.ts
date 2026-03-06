@@ -42,26 +42,28 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    // Verify admin access
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    if (!authHeader?.startsWith("Bearer ")) {
       throw new Error("No authorization header provided");
     }
 
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user: authUser }, error: userError } = await supabaseClient.auth.getUser();
+    // Use service role client to verify the user token (ES256 compatible)
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user: authUser }, error: userError } = await supabaseAdmin.auth.getUser(token);
     if (userError || !authUser) {
       logStep("Auth failed", { error: userError?.message });
       throw new Error("Authentication failed");
     }
 
     // Check if user is admin using user_roles table
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
     const { data: isAdmin, error: roleError } = await supabaseClient
       .rpc('has_role', { _user_id: authUser.id, _role: 'admin' });
 
