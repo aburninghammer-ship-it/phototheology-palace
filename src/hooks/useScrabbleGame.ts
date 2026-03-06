@@ -746,7 +746,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       // Update local state
       setGame(prev => prev ? {
         ...prev,
-        boardState: newBoard,
+        boardState: freshBoard,
       } : null);
 
       setPlayers(prev => prev.map(p => {
