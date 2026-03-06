@@ -191,7 +191,7 @@ const MemoryPalaceBuilder = lazy(() => import("./pages/games/MemoryPalaceBuilder
 const MemoryPalacePractice = lazy(() => import("./pages/games/MemoryPalacePractice"));
 const MemoryPalace3D = lazy(() => import("./pages/games/MemoryPalace3D"));
 const ChefChallenge = lazy(() => import("./pages/ChefChallenge"));
-const ChainWar = lazy(() => import("./pages/games/ChainWar"));
+// ChainWar removed — merged into PT Scrabble as Quick Play
 const SanctuaryRun = lazy(() => import("./pages/games/SanctuaryRun"));
 const TimeZoneInvasion = lazy(() => import("./pages/games/TimeZoneInvasion"));
 const Connect6Draft = lazy(() => import("./pages/games/Connect6Draft"));
@@ -510,7 +510,7 @@ function App() {
             <Route path="/pt-scrabble" element={<ProtectedRoute><PTScrabble /></ProtectedRoute>} />
             <Route path="/group-study" element={<ProtectedRoute><GroupStudySession /></ProtectedRoute>} />
             <Route path="/games/chef-challenge" element={<ProtectedRoute><ChefChallenge /></ProtectedRoute>} />
-            <Route path="/games/chain-war" element={<ProtectedRoute><ChainWar /></ProtectedRoute>} />
+            {/* Chain War removed — merged into PT Scrabble Quick Play */}
             <Route path="/games/sanctuary-run" element={<ProtectedRoute><SanctuaryRun /></ProtectedRoute>} />
             <Route path="/games/time-zone-invasion" element={<ProtectedRoute><TimeZoneInvasion /></ProtectedRoute>} />
             <Route path="/games/connect6-draft" element={<ProtectedRoute><Connect6Draft /></ProtectedRoute>} />

@@ -732,6 +732,14 @@ export default function PTScrabble() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                     <Button
                       size="lg"
+                      onClick={startQuickPlay}
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                    >
+                      <Zap className="mr-2 h-5 w-5" />
+                      Quick Play
+                    </Button>
+                    <Button
+                      size="lg"
                       onClick={() => setGamePhase("verse-selection")}
                       className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                     >
@@ -753,6 +761,10 @@ export default function PTScrabble() {
                       )}
                     </Button>
                   </div>
+
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    <strong>Quick Play:</strong> Pick cards, cite a verse, explain the connection — fast rounds to {qpTargetScore} points
+                  </p>
 
                   {/* Scoring info */}
                   <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-6">
