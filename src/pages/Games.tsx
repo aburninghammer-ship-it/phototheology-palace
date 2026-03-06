@@ -173,7 +173,7 @@ const Games = () => {
       floor: 3,
       timed: true,
       rooms: ["SR", "CR", "QA", "BF"],
-      modes: ["solo"],
+      modes: ["solo", "multiplayer"],
       difficulties: ["medium", "hard"],
       route: "/games/chef-challenge"
     },
