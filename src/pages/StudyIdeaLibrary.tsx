@@ -92,6 +92,25 @@ export default function StudyIdeaLibrary() {
 
   const navigate = useNavigate();
 
+  // Convert generated cards to SparkCard format
+  const convertedGeneratedCards = useMemo(() =>
+    generatedCards.map(convertGeneratedCard),
+    [generatedCards]
+  );
+
+  // Get today's new cards
+  const todaysCards = useMemo(() =>
+    getTodaysCards().map(convertGeneratedCard),
+    [getTodaysCards, generatedCards]
+  );
+
+  // Combine all cards based on source filter
+  const allCards = useMemo(() => {
+    if (showSource === "curated") return sparkCards;
+    if (showSource === "daily") return convertedGeneratedCards;
+    return [...convertedGeneratedCards, ...sparkCards];
+  }, [showSource, convertedGeneratedCards]);
+
   // Redirect to auth if not logged in
   if (!authLoading && !user) {
     navigate("/auth");
