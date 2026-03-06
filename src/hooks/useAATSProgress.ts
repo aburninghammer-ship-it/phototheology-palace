@@ -226,14 +226,7 @@ export function useAATSProgress() {
       const startDay = new Date(startedAt.getFullYear(), startedAt.getMonth(), startedAt.getDate());
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const elapsed = Math.floor((today.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
-      let calendarCap = Math.min(elapsed + 1, 56);
-
-      // TEMPORARY OVERRIDE: Remove calendar gating for early adopters (expires 2026-03-31)
-      // This lets users progress as fast as they complete days, without waiting 1 real day per day.
-      const overrideExpiry = new Date('2026-03-31T23:59:59');
-      if (now <= overrideExpiry) {
-        calendarCap = 56; // No calendar restriction during override period
-      }
+      const calendarCap = Math.min(elapsed + 1, 56);
 
       // Sequential completion cap: can only unlock Day N if Day N-1 is completed
       const completed = new Set(rec.completed_lessons ?? []);
