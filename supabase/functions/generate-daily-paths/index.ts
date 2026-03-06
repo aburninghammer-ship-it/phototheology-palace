@@ -230,10 +230,10 @@ Respond with ONLY a JSON array:
     const generatedPaths = [];
 
     for (const pathData of pathsData) {
-      const themeIndex = pathData.theme_index ?? generatedPaths.length;
-      const theme = selected[themeIndex] || selected[0];
-      const icons = ICONS_BY_TYPE[theme.type] || ["Route"];
-      const icon = icons[Math.floor(Math.random() * icons.length)];
+      const themeIndex: number = pathData.theme_index ?? generatedPaths.length;
+      const theme: any = selected[themeIndex] || selected[0];
+      const icons: string[] = ICONS_BY_TYPE[theme.type] || ["Route"];
+      const icon: string = icons[Math.floor(Math.random() * icons.length)];
 
       const { data: inserted, error } = await supabase
         .from("generated_study_paths")
