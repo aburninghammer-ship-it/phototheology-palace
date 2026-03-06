@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Copy, Check, Loader2, Crown, Wifi, ArrowLeft, Lock } from "lucide-react";
+import { QRCodeDisplay } from "@/components/ui/qr-code-display";
 import { toast } from "sonner";
 import { GameRoom, GameRoomPlayer } from "@/hooks/useGameMultiplayer";
 import { motion } from "framer-motion";
@@ -152,6 +153,15 @@ export function MultiplayerLobby({
             <Button variant="outline" size="icon" onClick={copyRoomCode} className="border-purple-500/50">
               {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
             </Button>
+          </div>
+
+          {/* QR Code for instant join */}
+          <div className="flex justify-center">
+            <QRCodeDisplay
+              value={`${window.location.origin}/games?join=${room.room_code}`}
+              variant="compact"
+              label="Scan to join this game instantly"
+            />
           </div>
 
           {/* Share buttons */}

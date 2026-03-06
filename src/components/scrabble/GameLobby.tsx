@@ -28,6 +28,7 @@ import { cn } from '@/lib/utils';
 import { CallToPlayButton } from './CallToPlayButton';
 import { QuickShareCode } from './QuickShareCode';
 import { useSubscription } from '@/hooks/useSubscription';
+import { QRCodeDisplay } from '@/components/ui/qr-code-display';
 
 interface GameLobbyProps {
   game?: ScrabbleGame | null;
@@ -111,6 +112,15 @@ export function GameLobby({
               <p className="text-sm text-muted-foreground">
                 Share this code with other players to join
               </p>
+            </div>
+
+            {/* QR Code for instant join */}
+            <div className="flex justify-center">
+              <QRCodeDisplay
+                value={`${window.location.origin}/scrabble?join=${game.roomCode}`}
+                variant="compact"
+                label="Scan to join PT Scrabble"
+              />
             </div>
 
             {/* Quick share via DM */}
