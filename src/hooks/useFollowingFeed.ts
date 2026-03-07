@@ -132,10 +132,10 @@ export function useFollowingFeed() {
         }
 
         // Get reposter profiles
-        const reposterIds = [...new Set(repostData.map((r: any) => r.user_id))];
+        const reposterIds = [...new Set(repostData.map((r: any) => r.user_id))] as string[];
         let reposterMap = new Map();
         if (reposterIds.length > 0) {
-          const { data: rProfiles } = await supabase.from("profiles").select("id, display_name").in("id", reposterIds);
+          const { data: rProfiles } = await supabase.from("profiles").select("id, display_name").in("id", reposterIds as string[]);
           reposterMap = new Map((rProfiles || []).map((p) => [p.id, p]));
         }
 
