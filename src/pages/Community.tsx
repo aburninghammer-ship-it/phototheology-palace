@@ -239,6 +239,9 @@ const Community = () => {
     try {
       const sanitizedContent = sanitizeHtml(content);
       
+      // Moderate comment content
+      const isAllowed = await moderateContent(sanitizedContent);
+      if (!isAllowed) return;
       const { data, error } = await supabase
         .from("community_comments")
         .insert({
