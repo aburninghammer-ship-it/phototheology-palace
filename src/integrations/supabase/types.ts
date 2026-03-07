@@ -14678,6 +14678,109 @@ export type Database = {
           },
         ]
       }
+      sermon_discipleship_packets: {
+        Row: {
+          church_id: string
+          claim_ladder: Json | null
+          controversy_question: string | null
+          created_at: string
+          created_by: string
+          debate_prep: Json | null
+          discussion_questions: string[] | null
+          evangelism_script: string | null
+          executive_summary: string | null
+          house_fire_guide: Json | null
+          id: string
+          key_verses: string[] | null
+          micro_study_plan: Json | null
+          obedience_challenge: string | null
+          prayer_focus: string | null
+          preacher: string | null
+          prophetic_map: Json | null
+          sermon_amplified_study_id: string | null
+          sermon_date: string | null
+          sermon_title: string
+          shareable_quote: string | null
+          status: string
+          theological_map: Json | null
+          updated_at: string
+        }
+        Insert: {
+          church_id: string
+          claim_ladder?: Json | null
+          controversy_question?: string | null
+          created_at?: string
+          created_by: string
+          debate_prep?: Json | null
+          discussion_questions?: string[] | null
+          evangelism_script?: string | null
+          executive_summary?: string | null
+          house_fire_guide?: Json | null
+          id?: string
+          key_verses?: string[] | null
+          micro_study_plan?: Json | null
+          obedience_challenge?: string | null
+          prayer_focus?: string | null
+          preacher?: string | null
+          prophetic_map?: Json | null
+          sermon_amplified_study_id?: string | null
+          sermon_date?: string | null
+          sermon_title: string
+          shareable_quote?: string | null
+          status?: string
+          theological_map?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          church_id?: string
+          claim_ladder?: Json | null
+          controversy_question?: string | null
+          created_at?: string
+          created_by?: string
+          debate_prep?: Json | null
+          discussion_questions?: string[] | null
+          evangelism_script?: string | null
+          executive_summary?: string | null
+          house_fire_guide?: Json | null
+          id?: string
+          key_verses?: string[] | null
+          micro_study_plan?: Json | null
+          obedience_challenge?: string | null
+          prayer_focus?: string | null
+          preacher?: string | null
+          prophetic_map?: Json | null
+          sermon_amplified_study_id?: string | null
+          sermon_date?: string | null
+          sermon_title?: string
+          shareable_quote?: string | null
+          status?: string
+          theological_map?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sermon_discipleship_packets_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sermon_discipleship_packets_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sermon_discipleship_packets_sermon_amplified_study_id_fkey"
+            columns: ["sermon_amplified_study_id"]
+            isOneToOne: false
+            referencedRelation: "sermon_amplified_studies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sermon_ideas: {
         Row: {
           analysis_result: Json | null
@@ -14713,6 +14816,56 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      sermon_micro_study_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          day_number: number
+          evangelistic_question: string | null
+          id: string
+          one_sentence_compression: string | null
+          packet_id: string
+          strongest_argument: string | null
+          summary_response: string | null
+          user_id: string
+          weakest_argument: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          day_number: number
+          evangelistic_question?: string | null
+          id?: string
+          one_sentence_compression?: string | null
+          packet_id: string
+          strongest_argument?: string | null
+          summary_response?: string | null
+          user_id: string
+          weakest_argument?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          day_number?: number
+          evangelistic_question?: string | null
+          id?: string
+          one_sentence_compression?: string | null
+          packet_id?: string
+          strongest_argument?: string | null
+          summary_response?: string | null
+          user_id?: string
+          weakest_argument?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sermon_micro_study_progress_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "sermon_discipleship_packets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sermon_simmer_sessions: {
         Row: {
