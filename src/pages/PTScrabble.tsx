@@ -35,6 +35,7 @@ import {
   JeevesFeedbackPanel,
   InGameChat,
   StudyProgressPanel,
+  GameTimer,
   type SelectedVerse,
   type StudyLogEntry,
   type CardWithPosition,
