@@ -116,6 +116,7 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
   const [savedStudies, setSavedStudies] = useState<SavedStudy[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isParsingFile, setIsParsingFile] = useState(false);
+  const [discipleshipPacketId, setDiscipleshipPacketId] = useState<string | null>(null);
 
   const canManage = userRole === "admin" || userRole === "leader";
 
