@@ -384,6 +384,10 @@ const Community = () => {
       const sanitizedTitle = sanitizeHtml(editPostTitle);
       const sanitizedContent = sanitizeHtml(editPostContent);
 
+      // Moderate edited content
+      const isAllowed = await moderateContent(`${sanitizedTitle} ${sanitizedContent}`);
+      if (!isAllowed) return;
+
       const { error } = await supabase
         .from("community_posts")
         .update({
