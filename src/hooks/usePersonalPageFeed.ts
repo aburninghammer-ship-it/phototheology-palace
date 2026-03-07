@@ -142,13 +142,5 @@ export function usePersonalPageFeed(targetUserId: string) {
     } catch (err) { console.error(err); }
   }, [user, targetUserId, loadFeed]);
 
-  const pinnedEntryIds = useCallback(async (): Promise<Set<string>> => {
-    const { data } = await (supabase as any)
-      .from("pinned_posts")
-      .select("entry_id")
-      .eq("user_id", targetUserId);
-    return new Set((data || []).map((p: any) => p.entry_id));
-  }, [targetUserId]);
-
-  return { entries, loading, hasMore, likedEntries, comments, loadFeed, toggleLike, loadComments, addComment, togglePin, pinnedEntryIds };
+  return { entries, loading, hasMore, likedEntries, comments, pinnedIds, loadFeed, toggleLike, loadComments, addComment, togglePin };
 }

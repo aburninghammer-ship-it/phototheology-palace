@@ -201,7 +201,7 @@ export function useFollowingFeed() {
       }
 
       // 8. Check which entries the user has already reposted
-      const allIds = enriched.map((e) => e.id);
+      const allIds = enriched.map((e) => e.id) as string[];
       if (allIds.length > 0) {
         const { data: myReposts } = await (supabase as any)
           .from("feed_reposts")
