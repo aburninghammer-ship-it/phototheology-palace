@@ -1224,7 +1224,7 @@ export default function PTScrabble() {
               size="sm"
               onClick={async () => {
                 if (mpGame?.id) {
-                  await supabase.from('scrabble_games').update({ status: 'completed' }).eq('id', mpGame.id);
+                  await supabase.from('pt_scrabble_games').update({ status: 'completed' }).eq('id', mpGame.id);
                 }
               }}
               disabled={mpStudyLogEntries.length === 0}
