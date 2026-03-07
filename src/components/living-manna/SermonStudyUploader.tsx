@@ -33,6 +33,7 @@ import {
   Home
 } from "lucide-react";
 import { ShareSermonButton } from "./ShareSermonButton";
+import { SermonDiscipleshipPacket } from "./SermonDiscipleshipPacket";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -562,7 +563,7 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
               Upload
@@ -574,6 +575,10 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
             <TabsTrigger value="saved" className="flex items-center gap-2">
               <Save className="h-4 w-4" />
               Saved ({savedStudies.length})
+            </TabsTrigger>
+            <TabsTrigger value="discipleship" className="flex items-center gap-2" disabled={!discipleshipPacketId}>
+              <Layers className="h-4 w-4" />
+              Discipleship
             </TabsTrigger>
           </TabsList>
 
