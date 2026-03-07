@@ -4,11 +4,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FileText, Download, Loader2, Sparkles, Copy, Check, Map, BookOpen, ArrowRight } from 'lucide-react';
+import { FileText, Download, Loader2, Sparkles, Copy, Check, Map, BookOpen, ArrowRight, ScrollText, Crown, Cross } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { formatJeevesResponse } from '@/lib/formatJeevesResponse';
 import type { StudyLogEntry } from './StudyLog';
 import type { SelectedVerse } from './VerseSelectionScreen';
 
@@ -42,7 +43,6 @@ export function StudyTranscript({
     setIsGenerating(true);
 
     try {
-      // Build the prompt for Jeeves
       const entriesText = entries.map((e, i) => {
         const connectionLabel = i === 0
           ? '(Connected to the verse)'
@@ -68,8 +68,8 @@ Your task: Create a POLISHED STUDY DOCUMENT that:
 6. **CHRIST CONNECTION** — ensure the study culminates in how the passage points to Jesus
 7. **PHOTOTHEOLOGY CODES** — at the end, list the PT room codes used (e.g., @No, CR, BL) with brief explanations
 
-Format the document with clear sections, flowing paragraphs, and a concluding synthesis. Make it something the students would be proud to save and revisit.`
-        : `Create a polished study document from these Phototheology principle connections (each answer built on the previous one, including Jeeves commentary):\n\n${entriesText}\n\nWeave all contributions into a flowing narrative, polish each insight, integrate Jeeves commentary, show how the chain of understanding grew, and add 2-3 bonus gems.`;
+Format the document with clear markdown sections (## headings), flowing paragraphs, Scripture references in **bold**, and a concluding synthesis. Make it something the students would be proud to save and revisit.`
+        : `Create a polished study document from these Phototheology principle connections (each answer built on the previous one, including Jeeves commentary):\n\n${entriesText}\n\nWeave all contributions into a flowing narrative with ## headings, **bold** Scripture references, polish each insight, integrate Jeeves commentary, show how the chain of understanding grew, and add 2-3 bonus gems.`;
 
       const { data, error } = await supabase.functions.invoke('jeeves', {
         body: {
@@ -82,8 +82,7 @@ Format the document with clear sections, flowing paragraphs, and a concluding sy
 
       const generatedTranscript = data?.content || data?.response || data?.message || 'Unable to generate transcript.';
 
-      // Add header and footer
-      const fullTranscript = `# Phototheology Study: ${seedVerse ? seedVerse.reference : 'Scrabble PT Session'}
+      const fullTranscript = `## Phototheology Study: ${seedVerse ? seedVerse.reference : 'Scrabble PT Session'}
 ${seedVerse ? `\n> "${seedVerse.text}"\n> — ${seedVerse.reference}\n` : ''}
 *${playerCount} ${playerCount === 1 ? 'student' : 'students'} | ${entries.length} insights chained | ${totalScore} points earned*
 
@@ -99,8 +98,6 @@ ${generatedTranscript}
       setTranscript(fullTranscript);
     } catch (err: any) {
       console.error('Error generating transcript:', err);
-
-      // Fallback: create a simple transcript without AI
       const fallbackTranscript = createFallbackTranscript();
       setTranscript(fallbackTranscript);
       toast.info('Created basic transcript (AI unavailable)');
@@ -109,7 +106,6 @@ ${generatedTranscript}
     }
   };
 
-  // Fallback transcript without AI
   const createFallbackTranscript = (): string => {
     const entriesText = entries.map((e, i) =>
       `### ${i + 1}. ${e.cardName} (${e.cardCode}) - by ${e.playerName}${e.isChristConnection ? ' ✝️' : ''}
@@ -119,8 +115,8 @@ ${e.jeevesJudgment ? `\n**Jeeves:** ${e.jeevesJudgment}` : ''}
 *+${e.points} points*`
     ).join('\n\n---\n\n');
 
-    return `# Scrabble PT Study Transcript
-${seedVerse ? `\n## ${seedVerse.reference}\n> "${seedVerse.text}"\n` : ''}
+    return `## Scrabble PT Study Transcript
+${seedVerse ? `\n### ${seedVerse.reference}\n> "${seedVerse.text}"\n` : ''}
 **Players:** ${playerCount} | **Total Score:** ${totalScore} | **Contributions:** ${entries.length}
 
 ---
@@ -133,10 +129,8 @@ ${entriesText}
 *${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}*`;
   };
 
-  // Copy to clipboard
   const handleCopy = async () => {
     if (!transcript) return;
-
     try {
       await navigator.clipboard.writeText(transcript);
       setCopied(true);
@@ -147,10 +141,8 @@ ${entriesText}
     }
   };
 
-  // Download as file
   const handleDownload = () => {
     if (!transcript) return;
-
     const blob = new Blob([transcript], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -163,11 +155,9 @@ ${entriesText}
     toast.success('Downloaded!');
   };
 
-  // Navigate to Mind Map with transcript content
   const handleTakeToMindMap = () => {
     if (!transcript) return;
     const verseRef = seedVerse?.reference || 'Scrabble PT Study';
-    // Store in sessionStorage for mind map to pick up
     sessionStorage.setItem('scrabble_study_import', JSON.stringify({
       type: 'scrabble_transcript',
       title: `PT Scrabble: ${verseRef}`,
@@ -186,7 +176,6 @@ ${entriesText}
     toast.success('Study loaded into Mind Map!');
   };
 
-  // Navigate to Study Suite
   const handleTakeToStudy = () => {
     if (!transcript) return;
     sessionStorage.setItem('scrabble_study_import', JSON.stringify({
@@ -198,14 +187,12 @@ ${entriesText}
     toast.success('Study loaded into Suite!');
   };
 
-  // Save to suite
   const handleSave = () => {
     if (!transcript || !onSave) return;
     onSave(transcript);
     toast.success('Saved to your studies!');
   };
 
-  // Auto-generate on mount if we have entries
   useEffect(() => {
     if (entries.length > 0 && !transcript && !isGenerating) {
       generateTranscript();
@@ -213,79 +200,98 @@ ${entriesText}
   }, [entries.length]);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5 text-primary" />
+    <Card className="w-full max-w-3xl mx-auto border-2 border-primary/20 shadow-xl bg-gradient-to-br from-card via-card to-primary/5">
+      <CardHeader className="text-center pb-2">
+        <div className="flex justify-center mb-3">
+          <div className="p-3 rounded-full bg-primary/10 border border-primary/20">
+            <ScrollText className="h-7 w-7 text-primary" />
+          </div>
+        </div>
+        <CardTitle className="text-2xl font-bold tracking-tight">
           Polished Study Transcript
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-base">
           Your complete study session — polished by Jeeves with all insights woven together
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+
+      <CardContent className="space-y-5">
         {/* Generate button */}
         {!transcript && !isGenerating && (
-          <Button onClick={generateTranscript} className="w-full">
-            <Sparkles className="mr-2 h-4 w-4" />
-            Generate Polished Transcript
-          </Button>
+          <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }}>
+            <Button onClick={generateTranscript} className="w-full h-12 text-base gap-2" size="lg">
+              <Sparkles className="h-5 w-5" />
+              Generate Polished Transcript
+            </Button>
+          </motion.div>
         )}
 
         {/* Loading state */}
         {isGenerating && (
-          <div className="flex flex-col items-center justify-center py-8 gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">Jeeves is polishing your study transcript...</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-12 gap-4"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+              <Loader2 className="h-10 w-10 animate-spin text-primary relative z-10" />
+            </div>
+            <p className="text-sm text-muted-foreground animate-pulse">
+              Jeeves is polishing your study transcript...
+            </p>
+          </motion.div>
         )}
 
-        {/* Transcript display */}
+        {/* Beautified transcript display */}
         {transcript && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
+            transition={{ duration: 0.4 }}
+            className="space-y-5"
           >
-            {/* Transcript content */}
-            <div className="p-4 bg-muted rounded-lg max-h-96 overflow-y-auto">
-              <pre className="whitespace-pre-wrap text-sm font-sans leading-relaxed">
-                {transcript}
-              </pre>
+            {/* Rendered transcript using formatJeevesResponse */}
+            <div className="rounded-xl border border-border/60 bg-background/80 shadow-inner max-h-[500px] overflow-y-auto">
+              <div className="p-6 space-y-4 jeeves-response">
+                {formatJeevesResponse(transcript)}
+              </div>
             </div>
 
-            {/* Primary actions - save/copy/download */}
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={handleCopy}>
-                {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+            {/* Primary actions */}
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
+                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                 {copied ? 'Copied!' : 'Copy'}
               </Button>
-              <Button variant="outline" onClick={handleDownload}>
-                <Download className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm" onClick={handleDownload} className="gap-1.5">
+                <Download className="h-4 w-4" />
                 Download
               </Button>
               {onSave && (
-                <Button onClick={handleSave} variant="outline">
-                  <BookOpen className="mr-2 h-4 w-4" />
+                <Button onClick={handleSave} variant="outline" size="sm" className="gap-1.5">
+                  <BookOpen className="h-4 w-4" />
                   Save to Suite
                 </Button>
               )}
-              <Button variant="ghost" onClick={generateTranscript}>
-                <Sparkles className="mr-2 h-4 w-4" />
+              <Button variant="ghost" size="sm" onClick={generateTranscript} className="gap-1.5">
+                <Sparkles className="h-4 w-4" />
                 Regenerate
               </Button>
             </div>
 
-            {/* Continue studying - take to other parts of the palace */}
-            <div className="border-t pt-4">
-              <p className="text-sm font-medium text-muted-foreground mb-3">Continue exploring this study:</p>
-              <div className="flex flex-wrap gap-2">
-                <Button onClick={handleTakeToMindMap} className="gap-2">
+            {/* Continue studying */}
+            <div className="border-t border-border/50 pt-5">
+              <p className="text-sm font-semibold text-muted-foreground mb-3 text-center">
+                Continue exploring this study
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Button onClick={handleTakeToMindMap} size="sm" className="gap-2">
                   <Map className="h-4 w-4" />
                   Take to Mind Map
                   <ArrowRight className="h-3 w-3" />
                 </Button>
-                <Button variant="outline" onClick={handleTakeToStudy} className="gap-2">
+                <Button variant="outline" size="sm" onClick={handleTakeToStudy} className="gap-2">
                   <BookOpen className="h-4 w-4" />
                   Take to Study Suite
                   <ArrowRight className="h-3 w-3" />
@@ -295,11 +301,19 @@ ${entriesText}
           </motion.div>
         )}
 
-        {/* Stats */}
-        <div className="flex items-center justify-center gap-6 pt-4 border-t text-sm text-muted-foreground">
-          <span>{entries.length} contributions</span>
-          <span>{playerCount} player{playerCount !== 1 ? 's' : ''}</span>
-          <span className="text-yellow-500 font-medium">{totalScore} total points</span>
+        {/* Stats bar */}
+        <div className="flex items-center justify-center gap-6 pt-4 border-t border-border/50 text-sm">
+          <span className="flex items-center gap-1.5 text-muted-foreground">
+            <FileText className="h-3.5 w-3.5" />
+            {entries.length} contributions
+          </span>
+          <span className="text-muted-foreground">
+            {playerCount} player{playerCount !== 1 ? 's' : ''}
+          </span>
+          <span className="flex items-center gap-1 text-yellow-500 font-semibold">
+            <Crown className="h-3.5 w-3.5" />
+            {totalScore} pts
+          </span>
         </div>
       </CardContent>
     </Card>
