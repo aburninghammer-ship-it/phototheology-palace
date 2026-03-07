@@ -38,6 +38,7 @@ const Community = () => {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { activeCount, activeUsers } = useActiveUsers();
+  const { moderateContent, moderating } = useContentModeration();
   const [posts, setPosts] = useState<any[]>([]);
   const [showNewPost, setShowNewPost] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -181,6 +182,11 @@ const Community = () => {
       // Sanitize content before storing
       const sanitizedTitle = sanitizeHtml(validatedData.title);
       const sanitizedContent = sanitizeHtml(validatedData.content);
+
+      // Moderate content before posting
+      const contentToCheck = `${sanitizedTitle} ${sanitizedContent}`;
+      const isAllowed = await moderateContent(contentToCheck);
+      if (!isAllowed) return;
 
       const { error } = await supabase
         .from("community_posts")
