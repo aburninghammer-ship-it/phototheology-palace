@@ -1219,6 +1219,17 @@ export default function PTScrabble() {
               </div>
             </div>
 
+            {/* 20-minute game timer */}
+            <GameTimer
+              durationMinutes={20}
+              onTimeUp={async () => {
+                if (mpGame?.id) {
+                  toast.info('⏰ Time is up! Ending the game...');
+                  await supabase.from('pt_scrabble_games').update({ status: 'completed' }).eq('id', mpGame.id);
+                }
+              }}
+            />
+
             {/* End Game button */}
             <Button
               variant="outline"
