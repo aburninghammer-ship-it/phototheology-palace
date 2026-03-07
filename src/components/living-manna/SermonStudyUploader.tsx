@@ -33,6 +33,7 @@ import {
   Home
 } from "lucide-react";
 import { ShareSermonButton } from "./ShareSermonButton";
+import { SermonDiscipleshipPacket } from "./SermonDiscipleshipPacket";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -116,6 +117,7 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
   const [savedStudies, setSavedStudies] = useState<SavedStudy[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isParsingFile, setIsParsingFile] = useState(false);
+  const [discipleshipPacketId, setDiscipleshipPacketId] = useState<string | null>(null);
 
   const canManage = userRole === "admin" || userRole === "leader";
 
@@ -401,18 +403,52 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
         sermon_date: sermonDate || null,
         sermon_outline: sermonOutline || "",
         study_content: generatedStudy as any,
-        key_passages: generatedStudy.sections?.flatMap(s => s.biblicalBasis?.primaryTexts || []) || [],
-        discussion_questions: generatedStudy.discussionQuestions?.map(q => q.question) || [],
+        key_passages: generatedStudy.sections?.flatMap((s: any) => s.biblicalBasis?.primaryTexts || []) || [],
+        discussion_questions: generatedStudy.discussionQuestions?.map((q: any) => q.question) || [],
         christ_synthesis: generatedStudy.christSynthesis || null,
         action_challenge: generatedStudy.actionChallenge || null,
         prayer_focus: generatedStudy.prayerFocus || null,
         status,
       };
-      const { error } = await supabase.from("sermon_amplified_studies").insert(insertData as any);
+      const { data: savedData, error } = await (supabase as any)
+        .from("sermon_amplified_studies")
+        .insert(insertData)
+        .select("id")
+        .single();
 
       if (error) throw error;
 
       toast.success(`Study ${status === "published" ? "published" : "saved as draft"}!`);
+
+      // AUTO-TRIGGER: When publishing, fire the discipleship factory
+      if (status === "published" && sermonOutline.trim()) {
+        toast.info("🔥 Generating discipleship factory packet...");
+        try {
+          const { data: packetResult, error: packetError } = await supabase.functions.invoke("generate-discipleship-packet", {
+            body: {
+              sermonText: sermonOutline,
+              sermonTitle: sermonTitle || generatedStudy.studyTitle || "Untitled",
+              preacher: preacher || null,
+              sermonDate: sermonDate || null,
+              churchId,
+              userId: user.id,
+              amplifiedStudyId: savedData?.id || null,
+            },
+          });
+
+          if (packetError) {
+            console.error("Discipleship packet trigger error:", packetError);
+            toast.warning("Sermon saved, but discipleship packet generation failed. You can retry later.");
+          } else if (packetResult?.packetId) {
+            toast.success("Discipleship factory is building! Check the Discipleship tab in a moment.");
+            setDiscipleshipPacketId(packetResult.packetId);
+          }
+        } catch (factoryErr) {
+          console.error("Factory error:", factoryErr);
+          toast.warning("Sermon saved successfully. Discipleship packet will be available shortly.");
+        }
+      }
+
       fetchSavedStudies();
       setActiveTab("saved");
     } catch (error: any) {
@@ -527,7 +563,7 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
               Upload
@@ -539,6 +575,10 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
             <TabsTrigger value="saved" className="flex items-center gap-2">
               <Save className="h-4 w-4" />
               Saved ({savedStudies.length})
+            </TabsTrigger>
+            <TabsTrigger value="discipleship" className="flex items-center gap-2" disabled={!discipleshipPacketId}>
+              <Layers className="h-4 w-4" />
+              Discipleship
             </TabsTrigger>
           </TabsList>
 
@@ -1130,6 +1170,26 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                 </div>
               )}
             </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="discipleship" className="mt-4">
+            {discipleshipPacketId ? (
+              <SermonDiscipleshipPacket
+                packetId={discipleshipPacketId}
+                onClose={() => {
+                  setDiscipleshipPacketId(null);
+                  setActiveTab("saved");
+                }}
+              />
+            ) : (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <p className="text-muted-foreground">
+                    Publish a sermon study to automatically generate a discipleship factory packet.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </CardContent>
