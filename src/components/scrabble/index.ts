@@ -17,3 +17,4 @@ export { StudyTranscript } from './StudyTranscript';
 export { JeevesFeedbackPanel } from './JeevesFeedbackPanel';
 export { InGameChat } from './InGameChat';
 export { StudyProgressPanel } from './StudyProgressPanel';
+export { GameTimer } from './GameTimer';
