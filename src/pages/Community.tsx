@@ -15,6 +15,7 @@ import { MessageSquare, Plus, Heart, Users, Reply, Send, Sparkles, Pencil, Trash
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { communityPostSchema } from "@/lib/validationSchemas";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { useContentModeration } from "@/hooks/useContentModeration";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
