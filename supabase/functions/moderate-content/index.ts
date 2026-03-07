@@ -20,40 +20,55 @@ serve(async (req) => {
       );
     }
 
-    // Use Lovable AI for content moderation
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
     const moderationPrompt = type === "image" 
-      ? `Analyze this image generation prompt for inappropriate content. Check for:
-- Violence, gore, or graphic content
-- Sexual or explicit content
-- Hate speech or discriminatory language
-- Profanity or offensive language
-- Harmful or dangerous content
+      ? `You are a content moderator for a Bible study platform called Phototheology Palace. This platform is strictly for Bible study, theological reflection, devotional content, and Phototheology method discussions.
+
+Analyze this image generation prompt and determine:
+1. Is it safe (no violence, sexual content, hate speech, profanity)?
+2. Is it relevant to Bible study, theology, Scripture, devotional life, or the Phototheology method?
+
+Reject anything political, controversial (abortion, partisan politics, culture war topics), or unrelated to Bible study.
 
 Prompt: "${content}"
 
-Respond with ONLY a JSON object with this exact format:
+Respond with ONLY a JSON object:
 {
   "safe": true/false,
-  "reason": "brief explanation if unsafe, empty string if safe"
+  "reason": "brief explanation if rejected, empty string if safe"
 }`
-      : `Analyze this text for inappropriate content. Check for:
-- Violence, gore, or graphic content
-- Sexual or explicit content
-- Hate speech or discriminatory language
-- Profanity or offensive language
-- Harmful or dangerous content
+      : `You are a content moderator for a Bible study platform called Phototheology Palace. This platform is strictly for Bible study, theological reflection, devotional content, prayer, and Phototheology method discussions.
+
+Analyze this text and determine:
+1. Is it safe (no violence, sexual content, hate speech, profanity, harmful content)?
+2. Is it relevant to Bible study, theology, Scripture, Christian devotional life, prayer, spiritual growth, or the Phototheology method?
+
+REJECT content that is:
+- Political (partisan politics, political candidates, government policy debates)
+- Controversial social topics not directly addressed by Scripture study
+- Secular entertainment, sports, or pop culture unrelated to Bible study
+- Promotional or spam content
+- Personal attacks or gossip
+
+ALLOW content that is:
+- Bible verse analysis, commentary, or reflection
+- Phototheology room/floor exercises and findings
+- Prayer requests and spiritual encouragement
+- Theological questions and discussions
+- Devotional insights and personal spiritual growth stories
+- Sanctuary, prophecy, or typology discussions
+- Christian fellowship and testimony related to faith
 
 Text: "${content}"
 
-Respond with ONLY a JSON object with this exact format:
+Respond with ONLY a JSON object:
 {
   "safe": true/false,
-  "reason": "brief explanation if unsafe, empty string if safe"
+  "reason": "brief explanation if rejected, empty string if safe"
 }`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -63,7 +78,7 @@ Respond with ONLY a JSON object with this exact format:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           {
             role: "user",
@@ -74,6 +89,12 @@ Respond with ONLY a JSON object with this exact format:
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limit exceeded, please try again later.", safe: true, reason: "" }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       throw new Error(`Moderation API error: ${response.statusText}`);
     }
 
@@ -84,10 +105,8 @@ Respond with ONLY a JSON object with this exact format:
       throw new Error("Invalid moderation response");
     }
 
-    // Parse the JSON response
     let result;
     try {
-      // Extract JSON from markdown code blocks if present
       const jsonMatch = moderationResponse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         result = JSON.parse(jsonMatch[0]);
@@ -96,7 +115,6 @@ Respond with ONLY a JSON object with this exact format:
       }
     } catch (parseError) {
       console.error("Failed to parse moderation response:", moderationResponse);
-      // Default to safe if parsing fails
       result = { safe: true, reason: "" };
     }
 
@@ -109,7 +127,8 @@ Respond with ONLY a JSON object with this exact format:
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : "Unknown error",
-        safe: true // Default to safe on error to avoid blocking legitimate content
+        safe: true,
+        reason: ""
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

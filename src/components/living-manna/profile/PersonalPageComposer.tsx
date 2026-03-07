@@ -10,6 +10,7 @@ import { Plus, Loader2, PenLine } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { useContentModeration } from "@/hooks/useContentModeration";
 
 interface PersonalPageComposerProps {
   onPostCreated: () => void;
@@ -19,6 +20,7 @@ const ENTRY_TYPES = ["note", "reflection", "question", "insight", "prayer", "gem
 
 export function PersonalPageComposer({ onPostCreated }: PersonalPageComposerProps) {
   const { user } = useAuth();
+  const { moderateContent, moderating } = useContentModeration();
   const [myThreads, setMyThreads] = useState<any[]>([]);
   const [selectedThreadId, setSelectedThreadId] = useState("");
   const [showNewThread, setShowNewThread] = useState(false);
@@ -51,6 +53,10 @@ export function PersonalPageComposer({ onPostCreated }: PersonalPageComposerProp
     setSaving(true);
 
     try {
+      // Moderate content before posting
+      const contentToCheck = `${title} ${content} ${verseReference}`;
+      const isAllowed = await moderateContent(contentToCheck);
+      if (!isAllowed) { setSaving(false); return; }
       let threadId = selectedThreadId;
 
       // Create new thread if needed
@@ -190,9 +196,9 @@ export function PersonalPageComposer({ onPostCreated }: PersonalPageComposerProp
             <Input value={verseReference} onChange={(e) => setVerseReference(e.target.value)} placeholder="e.g., John 3:16" />
           </div>
 
-          <Button onClick={handlePost} disabled={saving || !content.trim()} className="w-full">
-            {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Publish Post
+          <Button onClick={handlePost} disabled={saving || moderating || !content.trim()} className="w-full">
+            {(saving || moderating) ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            {moderating ? "Checking content..." : "Publish Post"}
           </Button>
         </div>
       </DialogContent>
