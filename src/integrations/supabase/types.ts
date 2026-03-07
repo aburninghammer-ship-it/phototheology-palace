@@ -7318,6 +7318,33 @@ export type Database = {
         }
         Relationships: []
       }
+      feed_reposts: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          original_entry_id: string
+          original_type: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          original_entry_id: string
+          original_type: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          original_entry_id?: string
+          original_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           category: string | null
@@ -11358,6 +11385,33 @@ export type Database = {
           total_uses?: number | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      pinned_posts: {
+        Row: {
+          created_at: string
+          entry_id: string
+          entry_type: string
+          id: string
+          pin_order: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_id: string
+          entry_type: string
+          id?: string
+          pin_order?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entry_id?: string
+          entry_type?: string
+          id?: string
+          pin_order?: number
+          user_id?: string
         }
         Relationships: []
       }
