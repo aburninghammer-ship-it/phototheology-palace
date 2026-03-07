@@ -12,10 +12,20 @@ export function usePersonalPageFeed(targetUserId: string) {
   const [likedEntries, setLikedEntries] = useState<Set<string>>(new Set());
   const [comments, setComments] = useState<Record<string, any[]>>({});
 
+  const [pinnedIds, setPinnedIds] = useState<Set<string>>(new Set());
+
   const loadFeed = useCallback(async (reset = true) => {
     if (!targetUserId) return;
     setLoading(true);
     try {
+      // Load pinned post IDs
+      const { data: pins } = await (supabase as any)
+        .from("pinned_posts")
+        .select("entry_id")
+        .eq("user_id", targetUserId);
+      const pinSet = new Set<string>((pins || []).map((p: any) => p.entry_id));
+      setPinnedIds(pinSet);
+
       const offset = reset ? 0 : entries.length;
       const { data, error } = await (supabase as any)
         .from("user_study_entries")
@@ -103,5 +113,34 @@ export function usePersonalPageFeed(targetUserId: string) {
     await loadComments(entryId);
   }, [user, loadComments]);
 
-  return { entries, loading, hasMore, likedEntries, comments, loadFeed, toggleLike, loadComments, addComment };
+  const togglePin = useCallback(async (entryId: string, entryType: string = "study_entry") => {
+    if (!user || user.id !== targetUserId) return;
+    try {
+      const { data: existing } = await (supabase as any)
+        .from("pinned_posts")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("entry_id", entryId)
+        .eq("entry_type", entryType)
+        .maybeSingle();
+
+      if (existing) {
+        await (supabase as any).from("pinned_posts").delete().eq("id", existing.id);
+      } else {
+        // Limit to 3 pins
+        const { count } = await (supabase as any)
+          .from("pinned_posts")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id);
+        if ((count || 0) >= 3) {
+          console.warn("Max 3 pinned posts allowed");
+          return;
+        }
+        await (supabase as any).from("pinned_posts").insert({ user_id: user.id, entry_id: entryId, entry_type: entryType, pin_order: 0 });
+      }
+      await loadFeed(true);
+    } catch (err) { console.error(err); }
+  }, [user, targetUserId, loadFeed]);
+
+  return { entries, loading, hasMore, likedEntries, comments, pinnedIds, loadFeed, toggleLike, loadComments, addComment, togglePin };
 }

@@ -5,9 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, Loader2, BookOpen, Users, Rss, MessageCircle } from "lucide-react";
+import { Heart, Loader2, BookOpen, Users, Rss, MessageCircle, Repeat2 } from "lucide-react";
 import { useFollowingFeed, FeedEntry } from "@/hooks/useFollowingFeed";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const TYPE_COLORS: Record<string, string> = {
   note: "bg-blue-500/10 text-blue-600 border-blue-500/30",
@@ -20,11 +21,18 @@ const TYPE_COLORS: Record<string, string> = {
 
 export default function FollowingFeed() {
   const { user } = useAuth();
-  const { entries, loading, hasMore, likedEntries, loadFeed, toggleLike } = useFollowingFeed();
+  const { entries, loading, hasMore, likedEntries, repostedEntries, loadFeed, toggleLike, toggleRepost } = useFollowingFeed();
 
   useEffect(() => {
     if (user) loadFeed(true);
   }, [user]);
+
+  const handleRepost = async (entry: FeedEntry) => {
+    const success = await toggleRepost(entry.id, entry.type);
+    if (success) {
+      toast.success(repostedEntries.has(entry.id) ? "Repost removed" : "Shared to your followers!");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,7 +83,10 @@ export default function FollowingFeed() {
               key={`${entry.type}-${entry.id}`}
               entry={entry}
               isLiked={likedEntries.has(entry.id)}
+              isReposted={repostedEntries.has(entry.id)}
               onLike={() => toggleLike(entry.id)}
+              onRepost={() => handleRepost(entry)}
+              currentUserId={user?.id}
             />
           ))}
         </div>
@@ -97,15 +108,34 @@ export default function FollowingFeed() {
 function FeedCard({
   entry,
   isLiked,
+  isReposted,
   onLike,
+  onRepost,
+  currentUserId,
 }: {
   entry: FeedEntry;
   isLiked: boolean;
+  isReposted: boolean;
   onLike: () => void;
+  onRepost: () => void;
+  currentUserId?: string;
 }) {
+  const isOwnPost = entry.user_id === currentUserId;
+
   return (
     <Card>
       <CardContent className="p-4 space-y-2">
+        {/* Repost indicator */}
+        {entry.reposted_by && (
+          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+            <Repeat2 className="h-3 w-3" />
+            <Link to={`/user/${entry.reposted_by.id}`} className="hover:underline font-medium">
+              {entry.reposted_by.display_name}
+            </Link>
+            <span>shared this</span>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <Link to={`/user/${entry.user_id}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -159,6 +189,12 @@ function FeedCard({
             <Heart className={`h-3.5 w-3.5 ${isLiked ? "fill-red-500 text-red-500" : ""}`} />
             {entry.likes_count || 0}
           </Button>
+          {!isOwnPost && (
+            <Button variant="ghost" size="sm" className={`h-7 text-xs gap-1 ${isReposted ? "text-emerald-500" : ""}`} onClick={onRepost}>
+              <Repeat2 className={`h-3.5 w-3.5 ${isReposted ? "text-emerald-500" : ""}`} />
+              {isReposted ? "Shared" : "Share"}
+            </Button>
+          )}
           <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" asChild>
             <Link to={`/user/${entry.user_id}`}>
               <MessageCircle className="h-3.5 w-3.5" />

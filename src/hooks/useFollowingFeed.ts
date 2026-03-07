@@ -21,6 +21,10 @@ export interface FeedEntry {
     display_name: string | null;
     avatar_url: string | null;
   };
+  reposted_by?: {
+    id: string;
+    display_name: string | null;
+  } | null;
 }
 
 export function useFollowingFeed() {
@@ -29,6 +33,7 @@ export function useFollowingFeed() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [likedEntries, setLikedEntries] = useState<Set<string>>(new Set());
+  const [repostedEntries, setRepostedEntries] = useState<Set<string>>(new Set());
 
   const loadFeed = useCallback(async (reset = true) => {
     if (!user) return;
@@ -69,7 +74,15 @@ export function useFollowingFeed() {
         .order("created_at", { ascending: false })
         .range(offset, offset + PAGE_SIZE - 1);
 
-      // 4. Merge & sort
+      // 4. Fetch reposts from followed users
+      const { data: repostData } = await (supabase as any)
+        .from("feed_reposts")
+        .select("id, user_id, original_entry_id, original_type, created_at")
+        .in("user_id", followedIds)
+        .order("created_at", { ascending: false })
+        .range(offset, offset + PAGE_SIZE - 1);
+
+      // 5. Merge & sort
       const studyEntries: FeedEntry[] = (studyData || []).map((e: any) => ({
         id: e.id,
         type: "study_entry" as const,
@@ -94,11 +107,63 @@ export function useFollowingFeed() {
         likes_count: p.likes || 0,
       }));
 
-      const merged = [...studyEntries, ...communityEntries]
+      // For reposts, we need to fetch the original content
+      let repostEntries: FeedEntry[] = [];
+      if (repostData && repostData.length > 0) {
+        const studyRepostIds = repostData.filter((r: any) => r.original_type === "study_entry").map((r: any) => r.original_entry_id);
+        const communityRepostIds = repostData.filter((r: any) => r.original_type === "community_post").map((r: any) => r.original_entry_id);
+
+        let repostStudyMap = new Map();
+        let repostCommunityMap = new Map();
+
+        if (studyRepostIds.length > 0) {
+          const { data: rStudy } = await (supabase as any)
+            .from("user_study_entries")
+            .select("id, user_id, title, content, entry_type, verse_reference, created_at, likes_count")
+            .in("id", studyRepostIds);
+          (rStudy || []).forEach((e: any) => repostStudyMap.set(e.id, e));
+        }
+        if (communityRepostIds.length > 0) {
+          const { data: rComm } = await supabase
+            .from("community_posts")
+            .select("id, user_id, title, content, category, created_at, likes")
+            .in("id", communityRepostIds);
+          (rComm || []).forEach((p: any) => repostCommunityMap.set(p.id, p));
+        }
+
+        // Get reposter profiles
+        const reposterIds = [...new Set(repostData.map((r: any) => r.user_id))] as string[];
+        let reposterMap = new Map();
+        if (reposterIds.length > 0) {
+          const { data: rProfiles } = await supabase.from("profiles").select("id, display_name").in("id", reposterIds as string[]);
+          reposterMap = new Map((rProfiles || []).map((p) => [p.id, p]));
+        }
+
+        repostEntries = repostData.map((r: any) => {
+          const orig = r.original_type === "study_entry" ? repostStudyMap.get(r.original_entry_id) : repostCommunityMap.get(r.original_entry_id);
+          if (!orig) return null;
+          const reposter = reposterMap.get(r.user_id);
+          return {
+            id: orig.id,
+            type: r.original_type as "study_entry" | "community_post",
+            user_id: orig.user_id,
+            title: orig.title,
+            content: orig.content,
+            entry_type: orig.entry_type,
+            verse_reference: orig.verse_reference,
+            category: orig.category,
+            created_at: r.created_at, // Use repost time for sorting
+            likes_count: orig.likes_count || orig.likes || 0,
+            reposted_by: reposter ? { id: reposter.id, display_name: reposter.display_name } : null,
+          } as FeedEntry;
+        }).filter(Boolean) as FeedEntry[];
+      }
+
+      const merged = [...studyEntries, ...communityEntries, ...repostEntries]
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
         .slice(0, PAGE_SIZE);
 
-      // 5. Enrich with profiles
+      // 6. Enrich with profiles
       const userIds = [...new Set(merged.map((e) => e.user_id))];
       let profileMap = new Map();
       if (userIds.length > 0) {
@@ -118,7 +183,7 @@ export function useFollowingFeed() {
         setEntries((prev) => [...prev, ...enriched]);
       }
 
-      // 6. Check liked study entries
+      // 7. Check liked study entries
       const studyIds = enriched.filter((e) => e.type === "study_entry").map((e) => e.id);
       if (studyIds.length > 0) {
         const { data: likes } = await (supabase as any)
@@ -130,6 +195,23 @@ export function useFollowingFeed() {
           setLikedEntries((prev) => {
             const next = new Set(prev);
             likes.forEach((l: any) => next.add(l.entry_id));
+            return next;
+          });
+        }
+      }
+
+      // 8. Check which entries the user has already reposted
+      const allIds = enriched.map((e) => e.id) as string[];
+      if (allIds.length > 0) {
+        const { data: myReposts } = await (supabase as any)
+          .from("feed_reposts")
+          .select("original_entry_id")
+          .eq("user_id", user.id)
+          .in("original_entry_id", allIds);
+        if (myReposts) {
+          setRepostedEntries((prev) => {
+            const next = new Set(prev);
+            myReposts.forEach((r: any) => next.add(r.original_entry_id));
             return next;
           });
         }
@@ -156,5 +238,29 @@ export function useFollowingFeed() {
     } catch (err) { console.error(err); }
   }, [user, likedEntries]);
 
-  return { entries, loading, hasMore, likedEntries, loadFeed, toggleLike };
+  const toggleRepost = useCallback(async (entryId: string, entryType: string): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      if (repostedEntries.has(entryId)) {
+        await (supabase as any).from("feed_reposts").delete()
+          .eq("user_id", user.id)
+          .eq("original_entry_id", entryId)
+          .eq("original_type", entryType);
+        setRepostedEntries((prev) => { const next = new Set(prev); next.delete(entryId); return next; });
+      } else {
+        await (supabase as any).from("feed_reposts").insert({
+          user_id: user.id,
+          original_entry_id: entryId,
+          original_type: entryType,
+        });
+        setRepostedEntries((prev) => new Set([...prev, entryId]));
+      }
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }, [user, repostedEntries]);
+
+  return { entries, loading, hasMore, likedEntries, repostedEntries, loadFeed, toggleLike, toggleRepost };
 }
