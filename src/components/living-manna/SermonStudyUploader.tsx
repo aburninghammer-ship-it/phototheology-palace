@@ -1182,7 +1182,11 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
               ) : (
                 <div className="space-y-3">
                   {savedStudies.map((study) => (
-                    <Card key={`${study.source}-${study.id}`} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <Card 
+                      key={`${study.source}-${study.id}`} 
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => handleOpenSavedSermon(study)}
+                    >
                       <CardContent className="py-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -1196,6 +1200,9 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
+                            {loadingPacketFor === study.id && (
+                              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                            )}
                             {study.source === 'personal' && (
                               <Badge variant="outline" className="text-xs">My Study</Badge>
                             )}
