@@ -160,6 +160,7 @@ const EscapeRoom = lazy(() => import("./pages/EscapeRoomRenovated"));
 const EscapeRoomPlay = lazy(() => import("./pages/EscapeRoomPlayRenovated"));
 const Profile = lazy(() => import("./pages/Profile"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
+const FollowingFeed = lazy(() => import("./pages/FollowingFeed"));
 const PrincipleCards = lazy(() => import("./pages/PrincipleCards"));
 const PrincipleCardsGame = lazy(() => import("./pages/PrincipleCardsGame"));
 const PrincipleTournaments = lazy(() => import("./pages/PrincipleTournaments"));
@@ -649,6 +650,7 @@ function App() {
             <Route path="/notes" element={<ProtectedRoute><Notes /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/user/:userId" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+            <Route path="/following-feed" element={<ProtectedRoute><FollowingFeed /></ProtectedRoute>} />
             <Route path="/critics-analysis" element={<ProtectedRoute><CriticsAnalysis /></ProtectedRoute>} />
             <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
             <Route path="/student-verify" element={<ProtectedRoute><StudentVerification /></ProtectedRoute>} />
