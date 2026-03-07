@@ -13,10 +13,11 @@ import {
   Loader2, BookOpen, Shield, Calendar, Flame, Share2,
   MessageSquare, Target, Heart, Telescope, Swords,
   Quote, CheckCircle2, Users, Sparkles, ChevronRight,
-  Copy, Megaphone, Home
+  Copy, Megaphone, Home, Castle
 } from "lucide-react";
 import { MicroStudyDay } from "./MicroStudyDay";
 import { ClaimLadderView } from "./ClaimLadderView";
+import { PalaceAnalysisTab } from "./PalaceAnalysisTab";
 
 interface SermonDiscipleshipPacketProps {
   packetId: string;
@@ -43,6 +44,7 @@ interface PacketData {
   prayer_focus: string | null;
   obedience_challenge: string | null;
   house_fire_guide: any;
+  sermon_amplified_study_id: string | null;
 }
 
 export function SermonDiscipleshipPacket({ packetId, onClose }: SermonDiscipleshipPacketProps) {
@@ -51,11 +53,26 @@ export function SermonDiscipleshipPacket({ packetId, onClose }: SermonDisciplesh
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [dayProgress, setDayProgress] = useState<Record<number, boolean>>({});
+  const [sermonText, setSermonText] = useState("");
 
   useEffect(() => {
     loadPacket();
     if (user) loadProgress();
   }, [packetId, user]);
+
+  // Load sermon text for Palace analysis
+  useEffect(() => {
+    if (packet?.sermon_amplified_study_id) {
+      (supabase as any)
+        .from("sermon_amplified_studies")
+        .select("sermon_outline")
+        .eq("id", packet.sermon_amplified_study_id)
+        .single()
+        .then(({ data }: any) => {
+          if (data?.sermon_outline) setSermonText(data.sermon_outline);
+        });
+    }
+  }, [packet?.sermon_amplified_study_id]);
 
   // Poll while generating
   useEffect(() => {
@@ -178,14 +195,18 @@ export function SermonDiscipleshipPacket({ packetId, onClose }: SermonDisciplesh
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full">
+        <TabsList className="grid grid-cols-6 w-full">
           <TabsTrigger value="overview" className="text-xs">
             <BookOpen className="h-3.5 w-3.5 mr-1" />
             Overview
           </TabsTrigger>
           <TabsTrigger value="study" className="text-xs">
             <Calendar className="h-3.5 w-3.5 mr-1" />
-            5-Day Study
+            5-Day
+          </TabsTrigger>
+          <TabsTrigger value="palace" className="text-xs">
+            <Castle className="h-3.5 w-3.5 mr-1" />
+            Palace
           </TabsTrigger>
           <TabsTrigger value="defend" className="text-xs">
             <Shield className="h-3.5 w-3.5 mr-1" />
