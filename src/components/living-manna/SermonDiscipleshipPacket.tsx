@@ -384,6 +384,15 @@ export function SermonDiscipleshipPacket({ packetId, onClose }: SermonDisciplesh
           ))}
         </TabsContent>
 
+        {/* PALACE ANALYSIS TAB */}
+        <TabsContent value="palace" className="space-y-4">
+          <PalaceAnalysisTab
+            packetId={packetId}
+            sermonText={sermonText}
+            sermonTitle={packet.sermon_title}
+          />
+        </TabsContent>
+
         {/* DEFEND TAB */}
         <TabsContent value="defend" className="space-y-4">
           <ClaimLadderView
