@@ -309,3 +309,6 @@ verify_jwt = false
 
 [functions.generate-discipleship-packet]
 verify_jwt = false
+
+[functions.analyze-sermon-palace]
+verify_jwt = false

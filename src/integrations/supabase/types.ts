@@ -14867,6 +14867,56 @@ export type Database = {
           },
         ]
       }
+      sermon_palace_analyses: {
+        Row: {
+          analysis_mode: string
+          analysis_result: Json | null
+          created_at: string
+          id: string
+          packet_id: string
+          selected_floor: number | null
+          selected_rooms: string[] | null
+          sermon_text: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_mode: string
+          analysis_result?: Json | null
+          created_at?: string
+          id?: string
+          packet_id: string
+          selected_floor?: number | null
+          selected_rooms?: string[] | null
+          sermon_text?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_mode?: string
+          analysis_result?: Json | null
+          created_at?: string
+          id?: string
+          packet_id?: string
+          selected_floor?: number | null
+          selected_rooms?: string[] | null
+          sermon_text?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sermon_palace_analyses_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "sermon_discipleship_packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sermon_simmer_sessions: {
         Row: {
           artifact_hashes: string[] | null
