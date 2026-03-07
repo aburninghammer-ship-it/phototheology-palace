@@ -136,12 +136,19 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
     }
     
     if (fileType === 'pdf') {
-      // For PDF, we'll use a simpler text extraction approach
       const arrayBuffer = await file.arrayBuffer();
       const pdfjsLib = await import('pdfjs-dist');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
       
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      // pdfjs-dist v5 uses a different worker setup
+      try {
+        const workerModule = await import('pdfjs-dist/build/pdf.worker.min.mjs');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerModule.default || workerModule;
+      } catch {
+        // Fallback: disable worker (runs on main thread but still works)
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      }
+      
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
       let fullText = '';
       
       for (let i = 1; i <= pdf.numPages; i++) {
