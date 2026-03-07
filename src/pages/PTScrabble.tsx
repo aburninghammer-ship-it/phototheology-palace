@@ -1218,6 +1218,20 @@ export default function PTScrabble() {
               </div>
             </div>
 
+            {/* End Game button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                if (mpGame?.id) {
+                  await supabase.from('scrabble_games').update({ status: 'completed' }).eq('id', mpGame.id);
+                }
+              }}
+              disabled={mpStudyLogEntries.length === 0}
+            >
+              End Game
+            </Button>
+
             {/* Mini scoreboard */}
             <div className="flex gap-2">
               {mpPlayers.slice(0, 3).map((player) => (
