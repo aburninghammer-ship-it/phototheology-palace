@@ -118,6 +118,39 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
   const [isDragOver, setIsDragOver] = useState(false);
   const [isParsingFile, setIsParsingFile] = useState(false);
   const [discipleshipPacketId, setDiscipleshipPacketId] = useState<string | null>(null);
+  const [loadingPacketFor, setLoadingPacketFor] = useState<string | null>(null);
+
+  const handleOpenSavedSermon = async (study: SavedStudy) => {
+    if (study.source === 'personal') {
+      toast.info("Personal studies don't have discipleship packets yet. Use church-published sermons.");
+      return;
+    }
+    
+    setLoadingPacketFor(study.id);
+    try {
+      // Find the discipleship packet linked to this sermon_amplified_study
+      const { data: packets, error } = await (supabase as any)
+        .from("sermon_discipleship_packets")
+        .select("id, status")
+        .eq("sermon_amplified_study_id", study.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+
+      if (packets && packets.length > 0) {
+        setDiscipleshipPacketId(packets[0].id);
+        setActiveTab("discipleship");
+      } else {
+        toast.info("No discipleship packet found for this sermon. It may still be generating.");
+      }
+    } catch (err: any) {
+      console.error("Error finding packet:", err);
+      toast.error("Failed to load sermon packet");
+    } finally {
+      setLoadingPacketFor(null);
+    }
+  };
 
   const canManage = userRole === "admin" || userRole === "leader";
 
@@ -1149,7 +1182,11 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
               ) : (
                 <div className="space-y-3">
                   {savedStudies.map((study) => (
-                    <Card key={`${study.source}-${study.id}`} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <Card 
+                      key={`${study.source}-${study.id}`} 
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => handleOpenSavedSermon(study)}
+                    >
                       <CardContent className="py-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -1163,6 +1200,9 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
+                            {loadingPacketFor === study.id && (
+                              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                            )}
                             {study.source === 'personal' && (
                               <Badge variant="outline" className="text-xs">My Study</Badge>
                             )}
