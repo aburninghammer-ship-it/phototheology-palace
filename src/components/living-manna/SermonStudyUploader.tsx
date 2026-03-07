@@ -1171,6 +1171,26 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
               )}
             </ScrollArea>
           </TabsContent>
+
+          <TabsContent value="discipleship" className="mt-4">
+            {discipleshipPacketId ? (
+              <SermonDiscipleshipPacket
+                packetId={discipleshipPacketId}
+                onClose={() => {
+                  setDiscipleshipPacketId(null);
+                  setActiveTab("saved");
+                }}
+              />
+            ) : (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <p className="text-muted-foreground">
+                    Publish a sermon study to automatically generate a discipleship factory packet.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
         </Tabs>
       </CardContent>
     </Card>
