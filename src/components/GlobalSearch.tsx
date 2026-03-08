@@ -514,6 +514,57 @@ export const GlobalSearch = () => {
             </CommandGroup>
           )}
 
+          {/* Bookmarks */}
+          {user && groupedItems.bookmarks.length > 0 && (
+            <CommandGroup heading="Bookmarks">
+              {groupedItems.bookmarks.slice(0, 5).map((item) => {
+                const Icon = getTypeIcon(item.type);
+                return (
+                  <CommandItem
+                    key={`bookmark-${item.id}`}
+                    onSelect={() => handleSelect(item.path)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4 text-primary" />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="truncate">{item.title}</span>
+                    </div>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      Bookmark
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+
+          {/* Encyclopedia */}
+          {groupedItems.encyclopedia.length > 0 && searchQuery.length > 0 && (
+            <CommandGroup heading="Encyclopedia">
+              {groupedItems.encyclopedia.slice(0, 5).map((item) => {
+                const Icon = getTypeIcon(item.type);
+                return (
+                  <CommandItem
+                    key={`enc-${item.id}`}
+                    onSelect={() => handleSelect(item.path)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4 text-primary" />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="truncate">{item.title}</span>
+                      {item.subtitle && (
+                        <span className="text-xs text-muted-foreground truncate">{item.subtitle}</span>
+                      )}
+                    </div>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      Encyclopedia
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+
           {/* App Pages */}
           {[
             "Study & Bible", 
