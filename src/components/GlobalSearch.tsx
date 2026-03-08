@@ -8,7 +8,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Search, BookOpen, Gamepad2, Users, Trophy, BookMarked, Sparkles, Calendar, Image, FileText, Zap, Star, Gem, Scroll, MessageSquare } from "lucide-react";
+import { Search, BookOpen, Gamepad2, Users, Trophy, BookMarked, Sparkles, Calendar, Image, FileText, Zap, Star, Gem, Scroll, MessageSquare, BookText, Bookmark } from "lucide-react";
 import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,10 +16,10 @@ import { useAuth } from "@/hooks/useAuth";
 interface SavedItem {
   id: string;
   title: string;
-  type: "study" | "deck" | "gem" | "sermon" | "session" | "thought";
+  type: "study" | "deck" | "gem" | "sermon" | "session" | "thought" | "encyclopedia" | "bookmark";
   path: string;
-  content?: string; // For searching within content
-  subtitle?: string; // Additional context
+  content?: string;
+  subtitle?: string;
 }
 
 const searchItems = [
@@ -127,7 +127,9 @@ export const GlobalSearch = () => {
           deckStudiesResult,
           studySessionsResult,
           sermonSessionsResult,
-          thoughtAnalysesResult
+          thoughtAnalysesResult,
+          encyclopediaResult,
+          bookmarksResult,
         ] = await Promise.all([
           // User studies
           supabase
@@ -167,7 +169,23 @@ export const GlobalSearch = () => {
             .select("id, summary, categories, deeper_insights")
             .eq("user_id", user.id)
             .order("created_at", { ascending: false })
-            .limit(20)
+            .limit(20),
+
+          // Encyclopedia articles (public, searchable)
+          supabase
+            .from("encyclopedia_articles")
+            .select("id, slug, title, summary_1d, topic_type, pt_floors")
+            .eq("is_published", true)
+            .order("title", { ascending: true })
+            .limit(50),
+
+          // Bookmarks
+          supabase
+            .from("bookmarks")
+            .select("id, book, chapter, verse, note")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(30),
         ]);
 
         // Process user studies
@@ -245,6 +263,35 @@ export const GlobalSearch = () => {
           });
         }
 
+        // Process encyclopedia articles
+        if (encyclopediaResult.data) {
+          encyclopediaResult.data.forEach((article: any) => {
+            items.push({
+              id: article.id,
+              title: article.title,
+              type: "encyclopedia" as any,
+              path: `/encyclopedia/${article.slug}`,
+              content: article.summary_1d || "",
+              subtitle: (article.pt_floors || []).join(", ") || undefined,
+            });
+          });
+        }
+
+        // Process bookmarks
+        if (bookmarksResult.data) {
+          bookmarksResult.data.forEach((bm: any) => {
+            const ref = `${bm.book} ${bm.chapter}${bm.verse ? `:${bm.verse}` : ""}`;
+            items.push({
+              id: bm.id,
+              title: bm.note ? `${ref} — ${bm.note.slice(0, 40)}` : ref,
+              type: "bookmark" as any,
+              path: `/bible/${bm.book}/${bm.chapter}`,
+              content: bm.note || "",
+              subtitle: ref,
+            });
+          });
+        }
+
         setSavedItems(items);
       } catch (error) {
         console.error("Error fetching saved items:", error);
@@ -279,42 +326,35 @@ export const GlobalSearch = () => {
     studies: filteredSavedItems.filter(item => item.type === "study"),
     gems: filteredSavedItems.filter(item => item.type === "gem" || item.type === "deck"),
     thoughts: filteredSavedItems.filter(item => item.type === "thought"),
+    encyclopedia: filteredSavedItems.filter(item => item.type === "encyclopedia"),
+    bookmarks: filteredSavedItems.filter(item => item.type === "bookmark"),
   };
 
   const getTypeIcon = (type: SavedItem["type"]) => {
     switch (type) {
-      case "study":
-        return FileText;
+      case "study": return FileText;
       case "gem":
-      case "deck":
-        return Gem;
-      case "sermon":
-        return Scroll;
-      case "session":
-        return MessageSquare;
-      case "thought":
-        return Sparkles;
-      default:
-        return Star;
+      case "deck": return Gem;
+      case "sermon": return Scroll;
+      case "session": return MessageSquare;
+      case "thought": return Sparkles;
+      case "encyclopedia": return BookText;
+      case "bookmark": return Bookmark;
+      default: return Star;
     }
   };
 
   const getTypeLabel = (type: SavedItem["type"]) => {
     switch (type) {
-      case "study":
-        return "Study";
-      case "gem":
-        return "Gem";
-      case "deck":
-        return "Deck";
-      case "sermon":
-        return "Sermon";
-      case "session":
-        return "Session";
-      case "thought":
-        return "Thought";
-      default:
-        return type;
+      case "study": return "Study";
+      case "gem": return "Gem";
+      case "deck": return "Deck";
+      case "sermon": return "Sermon";
+      case "session": return "Session";
+      case "thought": return "Thought";
+      case "encyclopedia": return "Encyclopedia";
+      case "bookmark": return "Bookmark";
+      default: return type;
     }
   };
 
@@ -467,6 +507,57 @@ export const GlobalSearch = () => {
                     </div>
                     <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
                       {getTypeLabel(item.type)}
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+
+          {/* Bookmarks */}
+          {user && groupedItems.bookmarks.length > 0 && (
+            <CommandGroup heading="Bookmarks">
+              {groupedItems.bookmarks.slice(0, 5).map((item) => {
+                const Icon = getTypeIcon(item.type);
+                return (
+                  <CommandItem
+                    key={`bookmark-${item.id}`}
+                    onSelect={() => handleSelect(item.path)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4 text-primary" />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="truncate">{item.title}</span>
+                    </div>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      Bookmark
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+
+          {/* Encyclopedia */}
+          {groupedItems.encyclopedia.length > 0 && searchQuery.length > 0 && (
+            <CommandGroup heading="Encyclopedia">
+              {groupedItems.encyclopedia.slice(0, 5).map((item) => {
+                const Icon = getTypeIcon(item.type);
+                return (
+                  <CommandItem
+                    key={`enc-${item.id}`}
+                    onSelect={() => handleSelect(item.path)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4 text-primary" />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="truncate">{item.title}</span>
+                      {item.subtitle && (
+                        <span className="text-xs text-muted-foreground truncate">{item.subtitle}</span>
+                      )}
+                    </div>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      Encyclopedia
                     </span>
                   </CommandItem>
                 );
