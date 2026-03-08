@@ -302,6 +302,7 @@ const CreditPurchaseSuccess = lazy(() => import("./pages/CreditPurchaseSuccess")
 const LiveDemo = lazy(() => import("./pages/LiveDemo"));
 const PublicChat = lazy(() => import("./pages/PublicChat"));
 const Schedule = lazy(() => import("./pages/Schedule"));
+const DiscoverPeople = lazy(() => import("./pages/DiscoverPeople"));
 const Workspace = lazy(() => import("./pages/Workspace"));
 const TestimonialWall = lazy(() => import("./pages/TestimonialWall"));
 
@@ -575,6 +576,7 @@ function App() {
             <Route path="/drill-drill" element={<ProtectedRoute><DrillDrill /></ProtectedRoute>} />
             <Route path="/live-study" element={<ProtectedRoute><LiveStudy /></ProtectedRoute>} />
             <Route path="/live-study/:roomId" element={<ProtectedRoute><LiveStudyRoom /></ProtectedRoute>} />
+            <Route path="/discover" element={<ProtectedRoute><DiscoverPeople /></ProtectedRoute>} />
             <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
             <Route path="/community-optimized" element={<ProtectedRoute><CommunityOptimized /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />

@@ -606,6 +606,7 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     },
     dropdownItems: [
       { to: "/community", label: "Community Feed", icon: Users },
+      { to: "/discover", label: "Discover People", icon: Search },
       { to: "/pt-multiplayer", label: "PT Multiplayer", icon: Gamepad2 },
       { to: "/guilds", label: "Guilds", icon: Shield }
     ]

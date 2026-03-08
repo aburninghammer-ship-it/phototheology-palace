@@ -1,4 +1,4 @@
-import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle, User } from "lucide-react";
+import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle, User, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ const moreNavItems = [
   { icon: Crown, label: "COTA Series", path: "/cota-series" },
   { icon: Microscope, label: "Research Mode", path: "/research-mode" },
   { icon: BrainCircuit, label: "Analyze My Thoughts", path: "/analyze-my-thoughts" },
+  { icon: Users, label: "Discover", path: "/discover" },
   { icon: MessageCircle, label: "Public Chat", path: "/public-chat" },
   { icon: Scroll, label: "Bible Studies", path: "/bible-study-series" },
 ];

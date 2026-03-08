@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { User, Mail, Trophy, Star, Calendar, Upload, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { SubscriptionBanner } from "@/components/SubscriptionBanner";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
 import { SubscriptionRenewal } from "@/components/SubscriptionRenewal";
@@ -169,6 +170,7 @@ export default function Profile() {
           bio: profile?.bio,
           location: profile?.location,
           website: profile?.website,
+          is_profile_public: profile?.is_profile_public ?? true,
         })
         .eq("id", user.id);
 
@@ -339,6 +341,19 @@ export default function Profile() {
                 <p className="text-xs text-muted-foreground">
                   {t('profile.editProfile.emailNote')}
                 </p>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Public Profile</Label>
+                  <p className="text-xs text-muted-foreground">
+                    When enabled, other users can find you on the Discover page
+                  </p>
+                </div>
+                <Switch
+                  checked={profile?.is_profile_public ?? true}
+                  onCheckedChange={(checked) => setProfile({ ...profile, is_profile_public: checked })}
+                />
               </div>
               <Button onClick={updateProfile} className="w-full gradient-palace">
                 {t('profile.editProfile.saveChanges')}
