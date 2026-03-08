@@ -125,7 +125,15 @@
       "Bash(pdfinfo:*)",
       "Bash(textutil:*)",
       "Bash(cd:*)",
-      "Bash(supabase:*)"
+      "Bash(supabase:*)",
+      "Bash(read f:*)",
+      "WebFetch(domain:a.egwwritings.org)",
+      "WebFetch(domain:text.egwwritings.org)",
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_f615f45f07e41e2eee16d4df49e1f53d13e83891\" npx supabase:*)",
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_f615528a68ef7d0309c5cc8d8a612473588c3891\" npx supabase:*)",
+      "Bash(done)",
+      "Bash(do grep:*)",
+      "Bash(git:*)"
     ],
     "deny": [],
     "ask": []

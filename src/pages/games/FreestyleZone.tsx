@@ -86,11 +86,21 @@ function SetupScreen({ onStart, hasExisting, onResume }: {
 
       {/* Difficulty Selection */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-center">Choose Your Difficulty</h2>
+        <h2 className="text-lg font-semibold text-center flex items-center justify-center gap-2">
+          <Flame className="h-5 w-5 text-orange-500" />
+          Choose Your Fire Level
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {difficulties.map((diff, i) => {
             const config = DIFFICULTY_CONFIG[diff];
             const Icon = icons[i];
+            const fireColors = [
+              "hover:border-green-500/50 hover:shadow-green-500/10",
+              "hover:border-yellow-500/50 hover:shadow-yellow-500/10",
+              "hover:border-orange-500/50 hover:shadow-orange-500/10",
+              "hover:border-red-500/50 hover:shadow-red-500/10",
+            ];
+            const flameCount = i + 1;
             return (
               <motion.div
                 key={diff}
@@ -98,13 +108,18 @@ function SetupScreen({ onStart, hasExisting, onResume }: {
                 whileTap={{ scale: 0.98 }}
               >
                 <Card
-                  className="cursor-pointer hover:border-primary/50 transition-colors"
+                  className={`cursor-pointer transition-all shadow-md hover:shadow-lg ${fireColors[i]}`}
                   onClick={() => onStart(diff)}
                 >
                   <CardContent className="p-4 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-5 w-5 text-primary" />
-                      <Badge className={config.color}>{config.label}</Badge>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-5 w-5 text-primary" />
+                        <Badge className={config.color}>{config.label}</Badge>
+                      </div>
+                      <span className="text-sm" title={`${flameCount} fire${flameCount > 1 ? 's' : ''}`}>
+                        {"🔥".repeat(flameCount)}
+                      </span>
                     </div>
                     <p className="text-sm text-muted-foreground">{config.description}</p>
                   </CardContent>
@@ -180,18 +195,33 @@ function ActiveSession({
       {/* Header Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Badge variant="outline" className={DIFFICULTY_CONFIG[gameState.difficulty].color}>
-            {DIFFICULTY_CONFIG[gameState.difficulty].label}
-          </Badge>
-          <span className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <Flame className={`h-4 w-4 ${momentum >= 70 ? 'text-orange-500 animate-pulse' : 'text-muted-foreground'}`} />
+            <Badge variant="outline" className={DIFFICULTY_CONFIG[gameState.difficulty].color}>
+              {DIFFICULTY_CONFIG[gameState.difficulty].label}
+            </Badge>
+          </div>
+          <Badge variant="secondary" className="font-mono text-xs">
             Drop #{currentDropIndex + 1}
-          </span>
+          </Badge>
+          {/* Streak indicator */}
+          {gameState.consecutivePasses === 0 && gameState.scores.length > 0 && (
+            <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20 text-[10px]">
+              {gameState.scores.length - gameState.passCount} streak
+            </Badge>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
           {/* Timer */}
-          <div className={`flex items-center gap-1 text-sm font-mono ${timeRemaining < 300 ? "text-red-500" : "text-muted-foreground"}`}>
-            <Clock className="h-4 w-4" />
+          <div className={`flex items-center gap-1.5 text-sm font-mono px-2 py-1 rounded-md ${
+            timeRemaining < 300
+              ? "text-red-500 bg-red-500/10 animate-pulse"
+              : timeRemaining < 600
+              ? "text-amber-500 bg-amber-500/10"
+              : "text-muted-foreground bg-muted/50"
+          }`}>
+            <Clock className="h-3.5 w-3.5" />
             {formatTime(timeRemaining)}
           </div>
 
@@ -262,10 +292,13 @@ function ActiveSession({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <Card className="border-dashed">
+            <Card className="border-dashed border-orange-500/30">
               <CardContent className="p-8 flex flex-col items-center gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-muted-foreground">Jeeves is preparing your next drop...</p>
+                <div className="relative">
+                  <Flame className="h-10 w-10 text-orange-500/50 animate-pulse" />
+                  <Loader2 className="h-5 w-5 animate-spin text-orange-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                </div>
+                <p className="text-muted-foreground text-sm">Jeeves is preparing your next drop...</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -342,38 +375,56 @@ function ActiveSession({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="border-primary/30 bg-primary/5">
+          <Card className="border-orange-500/30 bg-gradient-to-br from-orange-500/5 to-red-500/5">
             <CardContent className="p-4 space-y-3">
+              {/* Score Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Flame className={`h-5 w-5 ${currentFeedback.totalScore >= 30 ? 'text-orange-500' : currentFeedback.totalScore >= 20 ? 'text-yellow-500' : 'text-muted-foreground'}`} />
+                  <span className="text-lg font-bold font-mono">{currentFeedback.totalScore}/40</span>
+                </div>
+                {currentFeedback.totalScore >= 35 && (
+                  <Badge className="bg-orange-500 text-white animate-pulse">Blazing!</Badge>
+                )}
+                {currentFeedback.totalScore >= 28 && currentFeedback.totalScore < 35 && (
+                  <Badge className="bg-yellow-500 text-white">Strong</Badge>
+                )}
+              </div>
+
               {/* Score Bars */}
               <div className="grid grid-cols-2 gap-2 text-sm">
                 {[
-                  { label: "Christ Connection", value: currentFeedback.christConnection },
-                  { label: "Depth", value: currentFeedback.depth },
-                  { label: "Creativity", value: currentFeedback.creativity },
-                  { label: "Chain Link", value: currentFeedback.chainLink },
-                ].map(({ label, value }) => (
+                  { label: "Christ Connection", value: currentFeedback.christConnection, emoji: "✝️" },
+                  { label: "Depth", value: currentFeedback.depth, emoji: "🔍" },
+                  { label: "Creativity", value: currentFeedback.creativity, emoji: "💡" },
+                  { label: "Chain Link", value: currentFeedback.chainLink, emoji: "🔗" },
+                ].map(({ label, value, emoji }, idx) => (
                   <div key={label} className="space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">{label}</span>
-                      <span className="font-mono font-bold">{value}/10</span>
+                      <span className="text-muted-foreground text-xs">{emoji} {label}</span>
+                      <span className="font-mono font-bold text-xs">{value}/10</span>
                     </div>
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <motion.div
-                        className="h-full rounded-full bg-primary"
+                        className="h-full rounded-full"
+                        style={{
+                          background: value >= 8
+                            ? "linear-gradient(90deg, #f97316, #ef4444)"
+                            : value >= 5
+                            ? "linear-gradient(90deg, #eab308, #f97316)"
+                            : "linear-gradient(90deg, #6b7280, #9ca3af)"
+                        }}
                         initial={{ width: 0 }}
                         animate={{ width: `${value * 10}%` }}
-                        transition={{ duration: 0.5, delay: 0.1 }}
+                        transition={{ duration: 0.5, delay: idx * 0.1 }}
                       />
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="pt-2 border-t">
-                <p className="text-sm font-medium">
-                  Total: {currentFeedback.totalScore}/40
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
+              <div className="pt-2 border-t border-orange-500/10">
+                <p className="text-sm text-muted-foreground">
                   {currentFeedback.feedback}
                 </p>
                 {currentFeedback.suggestion && (
@@ -383,7 +434,7 @@ function ActiveSession({
                 )}
               </div>
 
-              <Button onClick={handleNext} className="w-full gap-1">
+              <Button onClick={handleNext} className="w-full gap-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
                 Next Drop <ChevronRight className="h-4 w-4" />
               </Button>
             </CardContent>
@@ -440,11 +491,21 @@ function CompletionScreen({
         <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 via-red-500 to-yellow-500 bg-clip-text text-transparent">
           Session Complete!
         </h1>
-        <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-          <span>{gameState.drops.length} drops</span>
-          <span>{answeredCount} answered</span>
-          <span>{gameState.passCount} passed</span>
-          <span>Avg: {avgScore}/40</span>
+        <div className="flex justify-center gap-3 flex-wrap">
+          <Badge variant="outline" className="gap-1 px-3 py-1">
+            <Target className="h-3 w-3" /> {gameState.drops.length} drops
+          </Badge>
+          <Badge variant="outline" className="gap-1 px-3 py-1 border-green-500/30 text-green-600 dark:text-green-400">
+            <Send className="h-3 w-3" /> {answeredCount} answered
+          </Badge>
+          {gameState.passCount > 0 && (
+            <Badge variant="outline" className="gap-1 px-3 py-1 border-muted-foreground/30">
+              <SkipForward className="h-3 w-3" /> {gameState.passCount} passed
+            </Badge>
+          )}
+          <Badge className="gap-1 px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white">
+            <Flame className="h-3 w-3" /> Avg: {avgScore}/40
+          </Badge>
         </div>
       </div>
 
