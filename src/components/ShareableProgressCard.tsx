@@ -43,12 +43,13 @@ export const ShareableProgressCard = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const [profileRes, masteryRes, streakRes, gemsRes, readingRes] = await Promise.all([
+      const [profileRes, masteryRes, streakRes, gemsRes, readingRes, roomsRes] = await Promise.all([
         supabase.from("profiles").select("display_name, avatar_url, master_title").eq("id", user.id).single(),
-        supabase.from("global_master_titles").select("total_xp, floors_completed, current_floor, rooms_mastered").eq("user_id", user.id).maybeSingle(),
+        supabase.from("global_master_titles").select("total_xp, floors_completed, current_floor").eq("user_id", user.id).maybeSingle(),
         supabase.from("mastery_streaks").select("current_streak").eq("user_id", user.id).maybeSingle(),
         supabase.from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", user.id),
         supabase.from("reading_streaks").select("total_chapters_read").eq("user_id", user.id).maybeSingle(),
+        supabase.from("room_mastery_levels").select("id", { count: "exact", head: true }).eq("user_id", user.id).gte("mastery_level", 5),
       ]);
 
       setData({
@@ -58,7 +59,7 @@ export const ShareableProgressCard = () => {
         totalXp: masteryRes.data?.total_xp || 0,
         floorsCompleted: masteryRes.data?.floors_completed || 0,
         currentFloor: masteryRes.data?.current_floor || 1,
-        roomsMastered: masteryRes.data?.rooms_mastered || 0,
+        roomsMastered: roomsRes.count || 0,
         streakDays: streakRes.data?.current_streak || 0,
         gemsCount: gemsRes.count || 0,
         chaptersRead: readingRes.data?.total_chapters_read || 0,
