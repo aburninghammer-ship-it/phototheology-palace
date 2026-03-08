@@ -9194,6 +9194,8 @@ Return ONLY valid JSON:
       "jeopardy_question", "jeopardy_judge", "jeopardy_final",
       "family_feud_round", "family_feud_judge", "family_feud_forge", "family_feud_judge_forge",
       "scrabble-amplify", "scrabble-feedback",
+      "freestyle_generate_drop", "freestyle_evaluate", "freestyle_session_summary",
+      "freestyle_jeeves_demo", "freestyle_polish",
     ]);
 
     if (!RAG_EXCLUDED_MODES.has(mode)) {
