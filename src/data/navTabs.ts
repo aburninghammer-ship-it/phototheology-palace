@@ -5,7 +5,8 @@ import {
   CalendarDays,
   Film,
   LayoutGrid,
-  GraduationCap
+  GraduationCap,
+  User
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -30,6 +31,19 @@ export interface NavTab {
 
 // Default tab order - users can customize this
 export const DEFAULT_NAV_TABS: NavTab[] = [
+  {
+    id: "my-profile",
+    to: "/my-profile",
+    label: "My Profile",
+    icon: User,
+    gradient: {
+      from: "from-violet-500/10",
+      to: "to-purple-500/10",
+      border: "border-violet-500/20",
+      text: "from-violet-600 to-purple-600",
+      glow: "rgba(139,92,246,0.5)"
+    }
+  },
   {
     id: "palace",
     to: "/palace",

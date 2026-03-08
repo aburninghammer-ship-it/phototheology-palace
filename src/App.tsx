@@ -228,6 +228,7 @@ const SpeedVerse3D = lazy(() => import("./pages/games/SpeedVerse3D"));
 const MasterExam = lazy(() => import("./pages/MasterExam"));
 const Gideon300 = lazy(() => import("./pages/games/Gideon300"));
 const FreestyleZone = lazy(() => import("./pages/games/FreestyleZone"));
+const MyProfileRedirect = lazy(() => import("./pages/MyProfileRedirect"));
 
 const PublicImageLibrary = lazy(() => import("./pages/PublicImageLibrary"));
 const SharedBaptismAudio = lazy(() => import("./pages/SharedBaptismAudio"));
@@ -654,6 +655,7 @@ function App() {
             <Route path="/offline-content" element={<ProtectedRoute><OfflineContent /></ProtectedRoute>} />
             <Route path="/notes" element={<ProtectedRoute><Notes /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/my-profile" element={<ProtectedRoute><MyProfileRedirect /></ProtectedRoute>} />
             <Route path="/user/:userId" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/following-feed" element={<ProtectedRoute><FollowingFeed /></ProtectedRoute>} />
             <Route path="/critics-analysis" element={<ProtectedRoute><CriticsAnalysis /></ProtectedRoute>} />

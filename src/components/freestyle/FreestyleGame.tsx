@@ -11,6 +11,7 @@ import { Loader2, Sparkles, Swords, Trophy, Star, Zap, Target, Plus, X, Link2, A
 import { Progress } from "@/components/ui/progress";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ShareToProfileButton } from "@/components/social/ShareToProfileButton";
 
 // ... keep existing code (interfaces)
 interface FreestyleGameProps {
@@ -417,9 +418,21 @@ export const FreestyleGame = ({ roomId, roomName }: FreestyleGameProps) => {
                         </div>
                       )}
                     </div>
-                    <Button onClick={generateChallenge} className="w-full gap-2">
-                      <Sparkles className="h-4 w-4" />Try Another Challenge
-                    </Button>
+                    <div className="flex gap-2">
+                      <ShareToProfileButton
+                        sharedContent={{
+                          source_type: "freestyle_quote",
+                          source_title: `Freestyle: ${challenge?.objects?.join(", ") || "Challenge"}`,
+                          source_excerpt: userResponse.slice(0, 300),
+                          verse_reference: evaluation.relatedVerses?.[0],
+                          source_metadata: { score: evaluation.score, breakdown: evaluation.breakdown },
+                        }}
+                        className="flex-1"
+                      />
+                      <Button onClick={generateChallenge} className="flex-1 gap-2">
+                        <Sparkles className="h-4 w-4" />Try Another Challenge
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>

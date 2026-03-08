@@ -36,8 +36,27 @@ export function usePersonalPageFeed(targetUserId: string) {
 
       if (error) throw error;
 
-      const newEntries = data || [];
-      setHasMore(newEntries.length === PAGE_SIZE);
+      // Fetch profile-shared community posts
+      const { data: sharedPosts } = await supabase
+        .from("community_posts")
+        .select("id, user_id, title, content, category, created_at, likes, shared_content")
+        .eq("user_id", targetUserId)
+        .eq("category", "profile_share")
+        .order("created_at", { ascending: false })
+        .range(offset, offset + PAGE_SIZE - 1);
+
+      const studyEntries = (data || []).map((e: any) => ({ ...e, type: "study_entry" }));
+      const profileShares = (sharedPosts || []).map((p: any) => ({
+        ...p,
+        type: "profile_share",
+        likes_count: p.likes || 0,
+      }));
+
+      const merged = [...studyEntries, ...profileShares]
+        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      const newEntries = merged;
+      setHasMore(newEntries.length >= PAGE_SIZE);
 
       // Enrich with profiles
       const userIds = [...new Set(newEntries.map((e: any) => e.user_id))];

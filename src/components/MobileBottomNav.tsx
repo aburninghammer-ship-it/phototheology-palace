@@ -1,4 +1,4 @@
-import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle } from "lucide-react";
+import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ const primaryNavItems = [
 ];
 
 const moreNavItems = [
+  { icon: User, label: "My Profile", path: "/my-profile" },
   { icon: Zap, label: "Freestyle", path: "/palace/freestyle" },
   { icon: Crown, label: "COTA Series", path: "/cota-series" },
   { icon: Microscope, label: "Research Mode", path: "/research-mode" },

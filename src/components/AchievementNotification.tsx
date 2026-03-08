@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Confetti from "react-confetti";
 import { ShareAchievementDialog } from "./ShareAchievementDialog";
 import { AchievementCertificate } from "./AchievementCertificate";
+import { ShareToProfileButton } from "@/components/social/ShareToProfileButton";
 
 interface Achievement {
   id: string;
@@ -211,6 +212,20 @@ export function AchievementNotification({ achievement, onClose }: AchievementNot
                         <Printer className="h-3.5 w-3.5" />
                         Print
                       </Button>
+                      {achievement && (
+                        <ShareToProfileButton
+                          sharedContent={{
+                            source_type: "achievement",
+                            source_id: achievement.id,
+                            source_title: achievement.name,
+                            source_excerpt: achievement.description,
+                            source_icon: achievement.icon,
+                            source_metadata: { points: achievement.points },
+                          }}
+                          size="sm"
+                          variant="outline"
+                        />
+                      )}
                     </motion.div>
                   </div>
                 </div>

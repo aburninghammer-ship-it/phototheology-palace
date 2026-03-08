@@ -9,6 +9,7 @@ import { Heart, Loader2, BookOpen, Users, Rss, MessageCircle, Repeat2 } from "lu
 import { useFollowingFeed, FeedEntry } from "@/hooks/useFollowingFeed";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { SharedContentCard } from "@/components/social/SharedContentCard";
 
 const TYPE_COLORS: Record<string, string> = {
   note: "bg-blue-500/10 text-blue-600 border-blue-500/30",
@@ -167,6 +168,11 @@ function FeedCard({
 
         {/* Title */}
         {entry.title && <h4 className="font-medium text-sm">{entry.title}</h4>}
+
+        {/* Shared Content Card */}
+        {entry.shared_content && (
+          <SharedContentCard sharedContent={entry.shared_content} />
+        )}
 
         {/* Content */}
         <p className="text-sm whitespace-pre-wrap line-clamp-6">{entry.content}</p>

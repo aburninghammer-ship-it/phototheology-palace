@@ -16,6 +16,7 @@ export interface FeedEntry {
   created_at: string;
   likes_count: number;
   thread_title?: string | null;
+  shared_content?: any;
   profile?: {
     id: string;
     display_name: string | null;
@@ -69,7 +70,7 @@ export function useFollowingFeed() {
       // 3. Fetch community posts from followed users
       const { data: communityData } = await supabase
         .from("community_posts")
-        .select("id, user_id, title, content, category, created_at, likes")
+        .select("id, user_id, title, content, category, created_at, likes, shared_content")
         .in("user_id", followedIds)
         .order("created_at", { ascending: false })
         .range(offset, offset + PAGE_SIZE - 1);
@@ -105,6 +106,7 @@ export function useFollowingFeed() {
         category: p.category,
         created_at: p.created_at,
         likes_count: p.likes || 0,
+        shared_content: p.shared_content,
       }));
 
       // For reposts, we need to fetch the original content

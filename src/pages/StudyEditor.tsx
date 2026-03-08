@@ -45,6 +45,7 @@ import { useCollaborativeStudy } from "@/hooks/useCollaborativeStudy";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { RichTextEditor } from "@/components/studies/RichTextEditor";
 import { FormattedStudyView } from "@/components/studies/FormattedStudyView";
+import { ShareToProfileButton } from "@/components/social/ShareToProfileButton";
 
 interface JeevesMessage {
   role: "user" | "assistant";
@@ -551,7 +552,15 @@ const StudyEditor = () => {
             </DropdownMenu>
             
             <ShareStudyDialog title={title} content={content} />
-            
+            <ShareToProfileButton
+              sharedContent={{
+                source_type: "bible_study",
+                source_id: id,
+                source_title: title || "Untitled Study",
+                source_excerpt: content.replace(/<[^>]*>/g, "").slice(0, 300),
+              }}
+            />
+
             {/* Admin-only: Add to Knowledge Bank */}
             {isAdmin && (
               <Button

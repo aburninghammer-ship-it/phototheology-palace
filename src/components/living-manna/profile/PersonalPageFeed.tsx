@@ -8,6 +8,8 @@ import { Heart, MessageCircle, Loader2, Send, BookOpen, Pin, PinOff } from "luci
 import { usePersonalPageFeed } from "@/hooks/usePersonalPageFeed";
 import { useAuth } from "@/hooks/useAuth";
 import { PersonalPageComposer } from "./PersonalPageComposer";
+import { SharedContentCard } from "@/components/social/SharedContentCard";
+import { SHARE_SOURCE_CONFIG } from "@/types/sharedContent";
 
 interface PersonalPageFeedProps {
   userId: string;
@@ -103,15 +105,26 @@ export function PersonalPageFeed({ userId }: PersonalPageFeedProps) {
                       <AvatarFallback className="text-xs">{(entry.profile?.display_name || "?")[0]}</AvatarFallback>
                     </Avatar>
                     <span className="text-xs text-muted-foreground">{entry.profile?.display_name}</span>
-                    <Badge variant="outline" className={`text-[10px] ${TYPE_COLORS[entry.entry_type] || ""}`}>
-                      {entry.entry_type}
-                    </Badge>
+                    {entry.type === "profile_share" && entry.shared_content ? (
+                      <Badge variant="outline" className={`text-[10px] ${SHARE_SOURCE_CONFIG[entry.shared_content.source_type as keyof typeof SHARE_SOURCE_CONFIG]?.badgeClass || ""}`}>
+                        Shared
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className={`text-[10px] ${TYPE_COLORS[entry.entry_type] || ""}`}>
+                        {entry.entry_type}
+                      </Badge>
+                    )}
                   </div>
                   <span className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleDateString()}</span>
                 </div>
 
                 {/* Title */}
                 {entry.title && <h4 className="font-medium text-sm">{entry.title}</h4>}
+
+                {/* Shared Content Card */}
+                {entry.shared_content && (
+                  <SharedContentCard sharedContent={entry.shared_content} />
+                )}
 
                 {/* Content */}
                 <p className="text-sm whitespace-pre-wrap">{entry.content}</p>

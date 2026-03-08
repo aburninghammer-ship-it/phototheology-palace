@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useSparks } from "@/hooks/useSparks";
 import { SparkContainer, SparkSettings } from "@/components/sparks";
+import { ShareToProfileButton } from "@/components/social/ShareToProfileButton";
 
 import {
   Tooltip,
@@ -460,15 +461,29 @@ export default function DevotionalView() {
                 )}
               </Button>
               {plan && currentDay && (
-                <ShareDevotionalDialog 
-                  plan={plan} 
-                  day={currentDay}
-                  trigger={
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
-                      <Share2 className="h-5 w-5" />
-                    </Button>
-                  }
-                />
+                <>
+                  <ShareDevotionalDialog
+                    plan={plan}
+                    day={currentDay}
+                    trigger={
+                      <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+                        <Share2 className="h-5 w-5" />
+                      </Button>
+                    }
+                  />
+                  <ShareToProfileButton
+                    sharedContent={{
+                      source_type: "devotional",
+                      source_id: plan.id,
+                      source_title: `${plan.title} - Day ${selectedDayIndex + 1}`,
+                      source_excerpt: (currentDay.content || currentDay.reflection || "").slice(0, 300),
+                      verse_reference: currentDay.scripture_reference,
+                    }}
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20"
+                  />
+                </>
               )}
               <Button variant="ghost" size="icon" onClick={goToPrevDay} disabled={selectedDayIndex === 0} className="text-white hover:bg-white/20 disabled:opacity-30">
                 <ChevronLeft className="h-5 w-5" />

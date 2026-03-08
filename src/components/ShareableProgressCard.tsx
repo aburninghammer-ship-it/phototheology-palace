@@ -6,6 +6,7 @@ import { Share2, Download, Copy, Check, Flame, Trophy, Gem, BookOpen, Swords, Cr
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { ShareToProfileButton } from "@/components/social/ShareToProfileButton";
 
 const BELT_INFO: Record<string, { label: string; emoji: string; gradient: string; textColor: string }> = {
   white: { label: "White Belt", emoji: "🥋", gradient: "from-gray-200 to-gray-400", textColor: "text-gray-800" },
@@ -202,6 +203,24 @@ export const ShareableProgressCard = () => {
                 Save Image
               </Button>
             </div>
+            {data && (
+              <ShareToProfileButton
+                sharedContent={{
+                  source_type: "progress_card",
+                  source_title: `${data.displayName}'s Progress`,
+                  source_excerpt: `${data.beltTitle} • ${data.totalXp.toLocaleString()} XP • ${data.streakDays} day streak • ${data.floorsCompleted} floors completed`,
+                  source_metadata: {
+                    beltTitle: data.beltTitle,
+                    totalXp: data.totalXp,
+                    streakDays: data.streakDays,
+                    floorsCompleted: data.floorsCompleted,
+                    roomsMastered: data.roomsMastered,
+                  },
+                }}
+                className="w-full"
+                label="Share to Profile"
+              />
+            )}
           </div>
         )}
       </DialogContent>
