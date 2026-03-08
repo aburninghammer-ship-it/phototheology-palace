@@ -295,7 +295,7 @@ export default function AppUpdateIdeas() {
                           <h4 className="font-semibold">{idea.title}</h4>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground line-clamp-3 mb-2">
+                      <p className="text-sm text-muted-foreground mb-2 whitespace-pre-wrap">
                         {idea.description}
                       </p>
                       <p className="text-xs text-muted-foreground">
