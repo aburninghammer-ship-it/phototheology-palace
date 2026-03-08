@@ -466,6 +466,7 @@ function App() {
             <Route path="/card-deck" element={<ProtectedRoute><CardDeck /></ProtectedRoute>} />
             <Route path="/jeeves" element={<ProtectedRoute><CardDeck /></ProtectedRoute>} />
             <Route path="/gems-room" element={<Navigate to="/give-me-a-gem" replace />} />
+            <Route path="/gems" element={<Navigate to="/give-me-a-gem" replace />} />
             <Route path="/pt-multiplayer" element={<ProtectedRoute><PTMultiplayerLobby /></ProtectedRoute>} />
             <Route path="/pt-multiplayer/:gameId" element={<ProtectedRoute><PTMultiplayerGame /></ProtectedRoute>} />
             <Route path="/analyze-thoughts" element={<ProtectedRoute><AnalyzeThoughts /></ProtectedRoute>} />
