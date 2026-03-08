@@ -263,6 +263,35 @@ export const GlobalSearch = () => {
           });
         }
 
+        // Process encyclopedia articles
+        if (encyclopediaResult.data) {
+          encyclopediaResult.data.forEach((article: any) => {
+            items.push({
+              id: article.id,
+              title: article.title,
+              type: "encyclopedia" as any,
+              path: `/encyclopedia/${article.slug}`,
+              content: article.summary_1d || "",
+              subtitle: (article.pt_floors || []).join(", ") || undefined,
+            });
+          });
+        }
+
+        // Process bookmarks
+        if (bookmarksResult.data) {
+          bookmarksResult.data.forEach((bm: any) => {
+            const ref = `${bm.book} ${bm.chapter}${bm.verse ? `:${bm.verse}` : ""}`;
+            items.push({
+              id: bm.id,
+              title: bm.note ? `${ref} — ${bm.note.slice(0, 40)}` : ref,
+              type: "bookmark" as any,
+              path: `/bible/${bm.book}/${bm.chapter}`,
+              content: bm.note || "",
+              subtitle: ref,
+            });
+          });
+        }
+
         setSavedItems(items);
       } catch (error) {
         console.error("Error fetching saved items:", error);
