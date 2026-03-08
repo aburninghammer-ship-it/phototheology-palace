@@ -1419,6 +1419,20 @@ export function FortyDayChallenge() {
                 </div>
               )}
 
+              {verdict.killer_argument && (
+                <div className="text-left bg-red-500/5 rounded-lg p-3 border border-red-500/20">
+                  <p className="text-xs font-bold text-red-300 mb-1">⚔️ Debate Ender — The Killer Argument</p>
+                  <p className="text-xs text-muted-foreground">{verdict.killer_argument}</p>
+                </div>
+              )}
+
+              {verdict.debate_ender_tip && (
+                <div className="text-left bg-blue-500/5 rounded-lg p-3 border border-blue-500/20">
+                  <p className="text-xs font-bold text-blue-300 mb-1">🎯 Stop the Circles</p>
+                  <p className="text-xs text-muted-foreground">{verdict.debate_ender_tip}</p>
+                </div>
+              )}
+
               {/* Sealed Scrolls CTA */}
               {currentSession && (
                 <Button

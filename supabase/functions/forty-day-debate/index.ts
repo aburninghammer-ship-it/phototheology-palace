@@ -373,6 +373,8 @@ Return JSON:
   "verdict": "<2-3 sentence Jeeves-style analysis — scholarly, direct, with a touch of warmth>",
   "strengths": ["<strength 1>", "<strength 2>"],
   "improvements": ["<specific actionable area 1>", "<specific actionable area 2>"],
+  "killer_argument": "<The single most devastating argument the defender could have used to shut down the opponent's position decisively. Be specific: cite the exact scripture(s), the logical move, and how to deliver it in 2-3 sentences. This should be the kind of argument that ends the debate — no circles, no back-and-forth. Think: what would Pastor Myers say to close this case?>",
+  "debate_ender_tip": "<A short tactical tip (1-2 sentences) on how to avoid going in circles in debates like this one — e.g., 'Pin them to Daniel 8:14 early and refuse to leave the sanctuary until they address the text directly.'>",
   "jeeves_note": "<1-2 sentence personal encouragement or sharp observation from Jeeves>",
   "badge": null | { "type": "<badge_type>", "name": "<badge_name>", "icon": "<emoji>", "description": "<why earned>" }
 }
@@ -402,7 +404,7 @@ XP Guide: 50-80 (loss), 80-120 (draw), 120-200 (win). Bonus for scripture densit
         const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         parsed = JSON.parse(cleaned);
       } catch {
-        parsed = { outcome: "draw", xp: 100, verdict: "A commendable effort. Jeeves notes room for sharper scriptural engagement.", strengths: ["Participation"], improvements: ["Continue studying"], jeeves_note: "Every debate sharpens the sword. Press on.", badge: null };
+        parsed = { outcome: "draw", xp: 100, verdict: "A commendable effort. Jeeves notes room for sharper scriptural engagement.", strengths: ["Participation"], improvements: ["Continue studying"], killer_argument: "Review the key scriptures for this topic and identify the single text your opponent cannot explain away.", debate_ender_tip: "Anchor early on one decisive text and hold your ground until the opponent addresses it directly.", jeeves_note: "Every debate sharpens the sword. Press on.", badge: null };
       }
 
       return new Response(JSON.stringify(parsed), {
