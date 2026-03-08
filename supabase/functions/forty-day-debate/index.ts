@@ -455,7 +455,7 @@ RULES:
 1. Never write the defender's response for them — coach, don't play.
 2. Use SDA theological framework (sanctuary, historicist prophecy, covenant continuity).
 3. Keep coaching concise — max 100 words.
-4. Reference specific Phototheology rooms when relevant (e.g., "This is a Concentration Room moment — find Christ here").`;
+4. Vary your coaching style and framing. Do NOT repeatedly use the same label or phrase. Tailor each coaching response to the specific argument being made — identify the opponent's exact logical move, name the fallacy or tactic if applicable, then provide the scripture anchor and counter-angle.`;
 
   const conversationSummary = messages.map((m: any) =>
     `[${m.role === 'opponent' ? opponentName : 'Defender'}]: ${m.content}`
