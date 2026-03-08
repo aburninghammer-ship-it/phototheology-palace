@@ -79,6 +79,51 @@ export function FortyDayChallenge() {
   const [sealedTurns, setSealedTurns] = useState<Set<number>>(new Set());
   const [turnAnalyses, setTurnAnalyses] = useState<TurnAnalysis[]>([]);
   const [expandedTurnAnalysis, setExpandedTurnAnalysis] = useState<number | null>(null);
+  const [sharingSessionId, setSharingSessionId] = useState<string | null>(null);
+
+  const togglePublicDebate = async (sessionId: string, currentlyPublic: boolean) => {
+    setSharingSessionId(sessionId);
+    try {
+      if (currentlyPublic) {
+        // Make private
+        await (supabase as any).from("debate_challenge_sessions").update({ is_public: false }).eq("id", sessionId);
+        toast.success("Debate is now private.");
+        // Update local state
+        setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, is_public: false } : s));
+        if (reviewSession?.id === sessionId) setReviewSession((prev: any) => ({ ...prev, is_public: false }));
+        if (currentSession?.id === sessionId) setCurrentSession((prev: any) => ({ ...prev, is_public: false }));
+      } else {
+        // Generate share token and make public
+        const shareToken = 'DB' + crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
+        await (supabase as any).from("debate_challenge_sessions").update({ is_public: true, share_token: shareToken }).eq("id", sessionId);
+        const shareUrl = `${window.location.origin}/shared/debate/${shareToken}`;
+        
+        // Update local state
+        setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, is_public: true, share_token: shareToken } : s));
+        if (reviewSession?.id === sessionId) setReviewSession((prev: any) => ({ ...prev, is_public: true, share_token: shareToken }));
+        if (currentSession?.id === sessionId) setCurrentSession((prev: any) => ({ ...prev, is_public: true, share_token: shareToken }));
+        
+        // Copy to clipboard or share
+        if (typeof navigator.share === "function") {
+          await navigator.share({
+            title: `40 Days of Smoke Debate`,
+            text: `🔥 Check out this theological debate!`,
+            url: shareUrl,
+          });
+        } else {
+          await navigator.clipboard.writeText(shareUrl);
+          toast.success("Public link copied to clipboard!");
+        }
+      }
+    } catch (err: any) {
+      if (err?.name !== "AbortError") {
+        console.error("Share error:", err);
+        toast.error("Failed to update sharing settings.");
+      }
+    } finally {
+      setSharingSessionId(null);
+    }
+  };
 
   // Load enrollment data
   useEffect(() => {
