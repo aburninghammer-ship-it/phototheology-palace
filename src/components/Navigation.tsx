@@ -17,6 +17,7 @@ import { NotificationCenter } from "@/components/NotificationCenter";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { ShareableProgressCard } from "@/components/ShareableProgressCard";
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
 import { ReturnToPathBanner } from "@/components/path/ReturnToPathBanner";
 import { SessionModeIndicator } from "@/components/session/SessionModeIndicator";
@@ -154,6 +155,7 @@ export const Navigation = () => {
 
             <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end">
               <GlobalSearch />
+              {user && <ShareableProgressCard />}
               <PWAInstallButton />
               <ThemeToggle />
 
