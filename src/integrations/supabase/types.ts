@@ -3953,12 +3953,14 @@ export type Database = {
           difficulty: string
           enrollment_id: string
           id: string
+          is_public: boolean | null
           messages: Json
           opponent_id: string
           opponent_name: string
           outcome: string | null
           rounds_completed: number
           session_date: string
+          share_token: string | null
           started_at: string
           topic_id: string
           topic_name: string
@@ -3973,12 +3975,14 @@ export type Database = {
           difficulty: string
           enrollment_id: string
           id?: string
+          is_public?: boolean | null
           messages?: Json
           opponent_id: string
           opponent_name: string
           outcome?: string | null
           rounds_completed?: number
           session_date?: string
+          share_token?: string | null
           started_at?: string
           topic_id: string
           topic_name: string
@@ -3993,12 +3997,14 @@ export type Database = {
           difficulty?: string
           enrollment_id?: string
           id?: string
+          is_public?: boolean | null
           messages?: Json
           opponent_id?: string
           opponent_name?: string
           outcome?: string | null
           rounds_completed?: number
           session_date?: string
+          share_token?: string | null
           started_at?: string
           topic_id?: string
           topic_name?: string
