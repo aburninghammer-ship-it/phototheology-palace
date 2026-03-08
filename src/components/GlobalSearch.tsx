@@ -326,42 +326,35 @@ export const GlobalSearch = () => {
     studies: filteredSavedItems.filter(item => item.type === "study"),
     gems: filteredSavedItems.filter(item => item.type === "gem" || item.type === "deck"),
     thoughts: filteredSavedItems.filter(item => item.type === "thought"),
+    encyclopedia: filteredSavedItems.filter(item => item.type === "encyclopedia"),
+    bookmarks: filteredSavedItems.filter(item => item.type === "bookmark"),
   };
 
   const getTypeIcon = (type: SavedItem["type"]) => {
     switch (type) {
-      case "study":
-        return FileText;
+      case "study": return FileText;
       case "gem":
-      case "deck":
-        return Gem;
-      case "sermon":
-        return Scroll;
-      case "session":
-        return MessageSquare;
-      case "thought":
-        return Sparkles;
-      default:
-        return Star;
+      case "deck": return Gem;
+      case "sermon": return Scroll;
+      case "session": return MessageSquare;
+      case "thought": return Sparkles;
+      case "encyclopedia": return BookText;
+      case "bookmark": return Bookmark;
+      default: return Star;
     }
   };
 
   const getTypeLabel = (type: SavedItem["type"]) => {
     switch (type) {
-      case "study":
-        return "Study";
-      case "gem":
-        return "Gem";
-      case "deck":
-        return "Deck";
-      case "sermon":
-        return "Sermon";
-      case "session":
-        return "Session";
-      case "thought":
-        return "Thought";
-      default:
-        return type;
+      case "study": return "Study";
+      case "gem": return "Gem";
+      case "deck": return "Deck";
+      case "sermon": return "Sermon";
+      case "session": return "Session";
+      case "thought": return "Thought";
+      case "encyclopedia": return "Encyclopedia";
+      case "bookmark": return "Bookmark";
+      default: return type;
     }
   };
 
