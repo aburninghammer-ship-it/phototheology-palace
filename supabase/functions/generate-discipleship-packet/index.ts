@@ -286,10 +286,8 @@ ${sermonText.substring(0, 15000)}`;
       }
     })();
 
-    // @ts-ignore - EdgeRuntime.waitUntil exists in Supabase edge runtime
-    if (typeof EdgeRuntime !== "undefined" && EdgeRuntime.waitUntil) {
-      EdgeRuntime.waitUntil(generatePromise);
-    }
+    // Fire-and-forget: the promise runs in the background
+    generatePromise.catch(err => console.error("Background task failed:", err));
 
     return new Response(
       JSON.stringify(responsePayload),

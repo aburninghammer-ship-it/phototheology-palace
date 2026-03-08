@@ -6,7 +6,7 @@ import {
   Shield, Swords, Send, Loader2, Trophy, Flame, Calendar,
   ChevronRight, ArrowLeft, Star, Lock, CheckCircle2, XCircle,
   Target, Zap, Crown, Award, RotateCcw, MessageSquare, Eye,
-  ScrollText, Unlock, RefreshCw, AlertTriangle,
+  ScrollText, Unlock, RefreshCw, AlertTriangle, Share2, Globe,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -79,6 +79,51 @@ export function FortyDayChallenge() {
   const [sealedTurns, setSealedTurns] = useState<Set<number>>(new Set());
   const [turnAnalyses, setTurnAnalyses] = useState<TurnAnalysis[]>([]);
   const [expandedTurnAnalysis, setExpandedTurnAnalysis] = useState<number | null>(null);
+  const [sharingSessionId, setSharingSessionId] = useState<string | null>(null);
+
+  const togglePublicDebate = async (sessionId: string, currentlyPublic: boolean) => {
+    setSharingSessionId(sessionId);
+    try {
+      if (currentlyPublic) {
+        // Make private
+        await (supabase as any).from("debate_challenge_sessions").update({ is_public: false }).eq("id", sessionId);
+        toast.success("Debate is now private.");
+        // Update local state
+        setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, is_public: false } : s));
+        if (reviewSession?.id === sessionId) setReviewSession((prev: any) => ({ ...prev, is_public: false }));
+        if (currentSession?.id === sessionId) setCurrentSession((prev: any) => ({ ...prev, is_public: false }));
+      } else {
+        // Generate share token and make public
+        const shareToken = 'DB' + crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
+        await (supabase as any).from("debate_challenge_sessions").update({ is_public: true, share_token: shareToken }).eq("id", sessionId);
+        const shareUrl = `${window.location.origin}/shared/debate/${shareToken}`;
+        
+        // Update local state
+        setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, is_public: true, share_token: shareToken } : s));
+        if (reviewSession?.id === sessionId) setReviewSession((prev: any) => ({ ...prev, is_public: true, share_token: shareToken }));
+        if (currentSession?.id === sessionId) setCurrentSession((prev: any) => ({ ...prev, is_public: true, share_token: shareToken }));
+        
+        // Copy to clipboard or share
+        if (typeof navigator.share === "function") {
+          await navigator.share({
+            title: `40 Days of Smoke Debate`,
+            text: `🔥 Check out this theological debate!`,
+            url: shareUrl,
+          });
+        } else {
+          await navigator.clipboard.writeText(shareUrl);
+          toast.success("Public link copied to clipboard!");
+        }
+      }
+    } catch (err: any) {
+      if (err?.name !== "AbortError") {
+        console.error("Share error:", err);
+        toast.error("Failed to update sharing settings.");
+      }
+    } finally {
+      setSharingSessionId(null);
+    }
+  };
 
   // Load enrollment data
   useEffect(() => {
@@ -1400,6 +1445,24 @@ export function FortyDayChallenge() {
                 <Eye className="h-4 w-4 mr-2" />
                 Review Full Debate
               </Button>
+              {/* Share as Public */}
+              {currentSession?.completed_at && (
+                <Button
+                  onClick={() => togglePublicDebate(currentSession.id, currentSession.is_public)}
+                  variant="outline"
+                  className="w-full mt-2"
+                  disabled={sharingSessionId === currentSession.id}
+                >
+                  {sharingSessionId === currentSession.id ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : currentSession.is_public ? (
+                    <Globe className="h-4 w-4 mr-2 text-green-400" />
+                  ) : (
+                    <Share2 className="h-4 w-4 mr-2" />
+                  )}
+                  {currentSession.is_public ? "Debate is Public — Tap to Make Private" : "Make Debate Public & Share"}
+                </Button>
+              )}
               <Button onClick={() => setPhase("daily-map")} className="w-full mt-2">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Return to Progress Map
@@ -1807,7 +1870,24 @@ export function FortyDayChallenge() {
           </div>
         </ScrollArea>
 
-        <div className="p-3 border-t border-border">
+        <div className="p-3 border-t border-border space-y-2">
+          {reviewSession.completed_at && (
+            <Button
+              onClick={() => togglePublicDebate(reviewSession.id, reviewSession.is_public)}
+              variant="outline"
+              className="w-full"
+              disabled={sharingSessionId === reviewSession.id}
+            >
+              {sharingSessionId === reviewSession.id ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : reviewSession.is_public ? (
+                <Globe className="h-4 w-4 mr-2 text-green-400" />
+              ) : (
+                <Share2 className="h-4 w-4 mr-2" />
+              )}
+              {reviewSession.is_public ? "Public — Tap to Make Private" : "Make Public & Share"}
+            </Button>
+          )}
           <Button onClick={() => { setPhase("daily-map"); setReviewSession(null); setJeevesRecap(null); }} className="w-full">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Progress Map

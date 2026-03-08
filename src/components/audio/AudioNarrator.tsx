@@ -237,8 +237,8 @@ export const AudioNarrator = ({
           notifyTTSStopped();
           updateMediaSessionPlaybackState('paused');
         },
-        onSeekBackward: () => skip(-10),
-        onSeekForward: () => skip(10),
+        onSeekBackward: () => skip(-15),
+        onSeekForward: () => skip(15),
       });
       updateMediaSessionPlaybackState('playing');
     } catch (error) {
@@ -399,7 +399,7 @@ export const AudioNarrator = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => skip(-10)}
+            onClick={() => skip(-15)}
             disabled={!audioUrl || isLoading}
             className="h-8 w-8"
           >
@@ -426,7 +426,7 @@ export const AudioNarrator = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => skip(10)}
+            onClick={() => skip(15)}
             disabled={!audioUrl || isLoading}
             className="h-8 w-8"
           >
