@@ -9019,6 +9019,142 @@ Return ONLY valid JSON: {"matched": true/false, "matchedAnswer": "exact text or 
 Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' : '{"score": 75, "feedback": "..."}'}`;
 
       userPrompt = message || "Generate/judge a Forge a Weapon round.";
+    } else if (mode === "freestyle_generate_drop") {
+      // Freestyle Zone - Generate a random drop prompt
+      const difficulty = body.difficulty || "intermediate";
+      const previousDrops = body.previousDrops || [];
+      const dropCount = body.dropCount || 0;
+
+      systemPrompt = `You are Jeeves, a Phototheology freestyle training coach. Generate a random "drop" — a short prompt (5-15 words) that the student must connect to Christ using Phototheology principles.
+
+CATEGORIES (pick one that HASN'T been used recently):
+- "scripture": A Bible scene, verse reference, or biblical event
+- "nature": Something from the natural world (animals, weather, plants, seasons)
+- "everyday": A common life experience or object
+- "history": A historical event, figure, or cultural moment
+- "human_experience": An emotion, relationship dynamic, or life stage
+- "symbolic": A number, color, material, or abstract symbol from Scripture
+
+DIFFICULTY LEVELS:
+- beginner: Obvious biblical scenes (e.g., "David and Goliath", "The burning bush")
+- intermediate: Less obvious prompts requiring creative connections (e.g., "A broken mirror", "The smell of rain")
+- advanced: Abstract or challenging prompts (e.g., "The weight of silence", "A door that opens inward")
+- master: Deeply abstract or paradoxical (e.g., "The sound of light", "Absence as presence")
+
+RULES:
+- Each drop must be unique and different from previous drops
+- Vary categories — don't repeat the same category twice in a row
+- The "hint" field is optional — only include for advanced/master difficulty
+- Keep drops evocative but concise
+
+Return ONLY valid JSON: {"category": "scripture|nature|everyday|history|human_experience|symbolic", "drop": "the prompt text", "hint": "optional hint for harder drops"}`;
+
+      userPrompt = `Generate drop #${dropCount + 1} at ${difficulty} difficulty. Previous drops: ${previousDrops.length > 0 ? previousDrops.join(', ') : 'none yet'}. Return ONLY valid JSON.`;
+
+    } else if (mode === "freestyle_evaluate") {
+      // Freestyle Zone - Evaluate a user's response to a drop
+      const drop = body.drop || {};
+      const userResponse = body.userResponse || "";
+      const chainHistory = body.chainHistory || [];
+      const difficulty = body.difficulty || "intermediate";
+
+      systemPrompt = `You are Jeeves, a Phototheology freestyle evaluator. Score the student's attempt to connect a random prompt ("drop") to Christ using Phototheology principles.
+
+SCORING (each 1-10, total out of 40):
+1. christConnection: How well did they connect the drop to Christ? (Direct Scripture references score higher)
+2. depth: How deep is the theological insight? (Surface-level = 1-3, moderate = 4-6, profound = 7-10)
+3. creativity: How creative/unexpected is the connection? (Obvious = 1-3, surprising = 7-10)
+4. chainLink: How well does this connect to previous drops in the chain? (First drop always gets 5; strong thematic links score higher)
+
+DIFFICULTY EXPECTATIONS:
+- beginner: Be encouraging, score generously (5+ for any reasonable attempt)
+- intermediate: Balanced scoring, expect some Scripture references
+- advanced: Expect multiple cross-references and PT room awareness
+- master: Expect deep typological connections, cycle awareness, and sanctuary links
+
+FEEDBACK: 2-3 sentences. Be warm but honest. Highlight what was strong. 
+SUGGESTION: Optional 1 sentence showing how they could deepen the connection.
+
+Return ONLY valid JSON: {"christConnection": 7, "depth": 6, "creativity": 8, "chainLink": 5, "totalScore": 26, "feedback": "...", "suggestion": "..."}`;
+
+      userPrompt = `DROP: "${drop.drop}" (Category: ${drop.category})
+USER RESPONSE: "${userResponse}"
+DIFFICULTY: ${difficulty}
+CHAIN HISTORY: ${chainHistory.length > 0 ? JSON.stringify(chainHistory) : 'First drop'}
+
+Evaluate this response. Return ONLY valid JSON.`;
+
+    } else if (mode === "freestyle_session_summary") {
+      // Freestyle Zone - Generate session summary
+      const sessionData = body.sessionData || {};
+
+      systemPrompt = `You are Jeeves, summarizing a Phototheology freestyle training session. Analyze the student's performance across all drops and provide an encouraging, insightful summary.
+
+GRADING SCALE: S (exceptional), A (excellent), B (good), C (developing), D (needs work)
+
+Generate a creative session title that captures the theme of their responses.
+
+Return ONLY valid JSON:
+{
+  "overallGrade": "A",
+  "title": "A creative title for this session",
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "growthAreas": ["area 1", "area 2"],
+  "bestMoment": "Description of their strongest response",
+  "bestMomentDrop": 2,
+  "patternNoticed": "A pattern you noticed in their thinking",
+  "encouragement": "A warm, personalized encouragement",
+  "streakHighlight": "Something about their momentum or consistency",
+  "totalDrops": 10,
+  "totalPasses": 1,
+  "averageScore": 25.5,
+  "recommendedNextDifficulty": "advanced"
+}`;
+
+      userPrompt = `Session data: ${JSON.stringify(sessionData)}. Analyze and summarize. Return ONLY valid JSON.`;
+
+    } else if (mode === "freestyle_jeeves_demo") {
+      // Freestyle Zone - Jeeves demonstrates how he'd handle the drops
+      const drops = body.drops || [];
+      const difficulty = body.difficulty || "intermediate";
+
+      systemPrompt = `You are Jeeves, demonstrating masterful Phototheology freestyle connections. For each drop the student received, show how YOU would connect it to Christ — modeling depth, creativity, and PT awareness.
+
+For each drop, write 2-4 sentences showing a rich, Christ-centered connection. Use PT room codes where relevant (e.g., CR, ST, PRm, BL). Show cross-references. Be brilliant but accessible.
+
+Return ONLY valid JSON:
+{
+  "title": "A creative title for the demo",
+  "responses": [
+    {"drop": "the drop text", "response": "Jeeves's model response", "roomCodes": ["CR", "ST"]}
+  ],
+  "closingInsight": "A brief synthesis connecting all the drops together through one unifying thread"
+}`;
+
+      userPrompt = `Demonstrate masterful freestyle responses for these drops at ${difficulty} level: ${JSON.stringify(drops)}. Return ONLY valid JSON.`;
+
+    } else if (mode === "freestyle_polish") {
+      // Freestyle Zone - Polish session into a formatted document
+      const sessionData = body.sessionData || {};
+      const format = body.format || "devotional";
+
+      systemPrompt = `You are Jeeves, transforming a freestyle training session into a polished ${format}. Take the raw drops and responses and craft them into a beautiful, publishable piece.
+
+FORMATS:
+- "devotional": A warm, meditative devotional with Scripture references
+- "study_notes": Structured theological study notes with PT room tags
+- "sermon_outline": A preachable sermon outline with points and illustrations
+- "poem": A creative poem weaving the session themes together
+
+Return ONLY valid JSON:
+{
+  "title": "Polished title",
+  "content": "The full polished content in markdown format",
+  "format": "${format}",
+  "versesReferenced": ["John 3:16", "Genesis 22:8"]
+}`;
+
+      userPrompt = `Polish this freestyle session into a ${format}: ${JSON.stringify(sessionData)}. Return ONLY valid JSON.`;
     }
 
     // Guard: if no prompt was set for this mode, return a helpful error instead of sending empty content
