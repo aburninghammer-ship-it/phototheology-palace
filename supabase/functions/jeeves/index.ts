@@ -9115,8 +9115,8 @@ Return ONLY valid JSON:
 
     } else if (mode === "freestyle_jeeves_demo") {
       // Freestyle Zone - Jeeves demonstrates how he'd handle the drops
-      const drops = body.drops || [];
-      const difficulty = body.difficulty || "intermediate";
+      const drops = requestBody.drops || [];
+      const difficulty = requestBody.difficulty || "intermediate";
 
       systemPrompt = `You are Jeeves, demonstrating masterful Phototheology freestyle connections. For each drop the student received, show how YOU would connect it to Christ — modeling depth, creativity, and PT awareness.
 
