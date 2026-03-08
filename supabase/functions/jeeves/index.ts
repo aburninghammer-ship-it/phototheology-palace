@@ -9021,9 +9021,9 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
       userPrompt = message || "Generate/judge a Forge a Weapon round.";
     } else if (mode === "freestyle_generate_drop") {
       // Freestyle Zone - Generate a random drop prompt
-      const difficulty = body.difficulty || "intermediate";
-      const previousDrops = body.previousDrops || [];
-      const dropCount = body.dropCount || 0;
+      const difficulty = requestBody.difficulty || "intermediate";
+      const previousDrops = requestBody.previousDrops || [];
+      const dropCount = requestBody.dropCount || 0;
 
       systemPrompt = `You are Jeeves, a Phototheology freestyle training coach. Generate a random "drop" — a short prompt (5-15 words) that the student must connect to Christ using Phototheology principles.
 
@@ -9053,10 +9053,10 @@ Return ONLY valid JSON: {"category": "scripture|nature|everyday|history|human_ex
 
     } else if (mode === "freestyle_evaluate") {
       // Freestyle Zone - Evaluate a user's response to a drop
-      const drop = body.drop || {};
-      const userResponse = body.userResponse || "";
-      const chainHistory = body.chainHistory || [];
-      const difficulty = body.difficulty || "intermediate";
+      const drop = requestBody.drop || {};
+      const userResponse = requestBody.userResponse || "";
+      const chainHistory = requestBody.chainHistory || [];
+      const difficulty = requestBody.difficulty || "intermediate";
 
       systemPrompt = `You are Jeeves, a Phototheology freestyle evaluator. Score the student's attempt to connect a random prompt ("drop") to Christ using Phototheology principles.
 
@@ -9086,7 +9086,7 @@ Evaluate this response. Return ONLY valid JSON.`;
 
     } else if (mode === "freestyle_session_summary") {
       // Freestyle Zone - Generate session summary
-      const sessionData = body.sessionData || {};
+      const sessionData = requestBody.sessionData || {};
 
       systemPrompt = `You are Jeeves, summarizing a Phototheology freestyle training session. Analyze the student's performance across all drops and provide an encouraging, insightful summary.
 
@@ -9115,8 +9115,8 @@ Return ONLY valid JSON:
 
     } else if (mode === "freestyle_jeeves_demo") {
       // Freestyle Zone - Jeeves demonstrates how he'd handle the drops
-      const drops = body.drops || [];
-      const difficulty = body.difficulty || "intermediate";
+      const drops = requestBody.drops || [];
+      const difficulty = requestBody.difficulty || "intermediate";
 
       systemPrompt = `You are Jeeves, demonstrating masterful Phototheology freestyle connections. For each drop the student received, show how YOU would connect it to Christ — modeling depth, creativity, and PT awareness.
 
@@ -9135,8 +9135,8 @@ Return ONLY valid JSON:
 
     } else if (mode === "freestyle_polish") {
       // Freestyle Zone - Polish session into a formatted document
-      const sessionData = body.sessionData || {};
-      const format = body.format || "devotional";
+      const sessionData = requestBody.sessionData || {};
+      const format = requestBody.format || "devotional";
 
       systemPrompt = `You are Jeeves, transforming a freestyle training session into a polished ${format}. Take the raw drops and responses and craft them into a beautiful, publishable piece.
 
