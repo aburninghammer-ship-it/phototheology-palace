@@ -9053,10 +9053,10 @@ Return ONLY valid JSON: {"category": "scripture|nature|everyday|history|human_ex
 
     } else if (mode === "freestyle_evaluate") {
       // Freestyle Zone - Evaluate a user's response to a drop
-      const drop = body.drop || {};
-      const userResponse = body.userResponse || "";
-      const chainHistory = body.chainHistory || [];
-      const difficulty = body.difficulty || "intermediate";
+      const drop = requestBody.drop || {};
+      const userResponse = requestBody.userResponse || "";
+      const chainHistory = requestBody.chainHistory || [];
+      const difficulty = requestBody.difficulty || "intermediate";
 
       systemPrompt = `You are Jeeves, a Phototheology freestyle evaluator. Score the student's attempt to connect a random prompt ("drop") to Christ using Phototheology principles.
 
