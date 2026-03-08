@@ -20,7 +20,7 @@ import { ActiveGameSessions } from "@/components/games/ActiveGameSessions";
 import { usePreservePageState, usePreserveFormState } from "@/contexts/PageStateContext";
 
 // Games with special badges
-const NEW_GAMES = ["pt_tetris", "symbol_decoder", "speed_verse", "gideon_300"]; // Completely new games
+const NEW_GAMES = ["pt_tetris", "symbol_decoder", "speed_verse", "gideon_300", "freestyle_zone"]; // Completely new games
 const RENOVATED_GAMES = ["chain_chess", "escape_room"]; // Rebuilt/improved games
 
 // Bible translations available for games
@@ -392,6 +392,18 @@ const Games = () => {
       modes: ["multiplayer"],
       difficulties: ["easy"],
       route: "/group-study"
+    },
+    {
+      id: "freestyle_zone",
+      name: "The Freestyler Training Zone",
+      description: "Train your theological reflexes! Jeeves drops random prompts from Scripture, nature, history, and everyday life. Connect each drop to Christ and build chains under pressure. Features momentum scoring, difficulty tiers, and session export.",
+      icon: "🎤",
+      floor: 3,
+      timed: true,
+      rooms: ["FR", "All"],
+      modes: ["solo"],
+      difficulties: ["easy", "medium", "hard", "expert"],
+      route: "/games/freestyle-zone"
     },
     {
       id: "pt_jeopardy",

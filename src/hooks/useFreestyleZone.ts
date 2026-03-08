@@ -1,0 +1,553 @@
+import { useState, useCallback, useRef, useEffect } from "react";
+import { callJeeves } from "@/lib/jeevesClient";
+import { useGameSession } from "@/hooks/useGameSession";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+
+// ── Types ──────────────────────────────────────────────────────────────
+
+export type Difficulty = "beginner" | "intermediate" | "advanced" | "master";
+export type GamePhase = "setup" | "active" | "complete";
+
+export type DropCategory = "scripture" | "nature" | "everyday" | "history" | "human_experience" | "symbolic";
+
+export interface Drop {
+  category: DropCategory;
+  drop: string;
+  hint?: string;
+}
+
+export interface EvaluationScores {
+  christConnection: number;
+  depth: number;
+  creativity: number;
+  chainLink: number;
+  totalScore: number;
+  feedback: string;
+  suggestion?: string;
+}
+
+export interface ChainEntry {
+  drop: Drop;
+  response: string | null; // null = passed
+  scores: EvaluationScores | null;
+  timestamp: number;
+}
+
+export interface SessionSummary {
+  overallGrade: string;
+  title: string;
+  strengths: string[];
+  growthAreas: string[];
+  bestMoment: string;
+  bestMomentDrop: number;
+  patternNoticed: string;
+  encouragement: string;
+  streakHighlight: string;
+  totalDrops: number;
+  totalPasses: number;
+  averageScore: number;
+  recommendedNextDifficulty: Difficulty;
+}
+
+export interface JeevesDemo {
+  title: string;
+  chain: Array<{ drop: string; category: string; connection: string }>;
+  conclusion: string;
+  closingVerse: string;
+}
+
+export interface PolishedContent {
+  title: string;
+  content: string;
+  keyVerses: string[];
+  format: string;
+}
+
+export interface FreestyleGameState {
+  phase: GamePhase;
+  difficulty: Difficulty;
+  drops: Drop[];
+  userResponses: string[];
+  scores: EvaluationScores[];
+  momentum: number;
+  passCount: number;
+  consecutivePasses: number;
+  startTime: number;
+  elapsedSeconds: number;
+}
+
+const INITIAL_STATE: FreestyleGameState = {
+  phase: "setup",
+  difficulty: "beginner",
+  drops: [],
+  userResponses: [],
+  scores: [],
+  momentum: 50,
+  passCount: 0,
+  consecutivePasses: 0,
+  startTime: 0,
+  elapsedSeconds: 0,
+};
+
+const SESSION_DURATION = 60 * 60; // 60 minutes in seconds
+const MOMENTUM_DECAY_ON_PASS = 15;
+const MOMENTUM_CONSECUTIVE_PASS_PENALTY = 5;
+
+// Category display info
+export const CATEGORY_CONFIG: Record<DropCategory, { label: string; color: string; emoji: string }> = {
+  scripture: { label: "Scripture", color: "bg-blue-500", emoji: "📖" },
+  nature: { label: "Nature", color: "bg-green-500", emoji: "🌿" },
+  everyday: { label: "Everyday", color: "bg-yellow-500", emoji: "☀️" },
+  history: { label: "History", color: "bg-amber-700", emoji: "🏛️" },
+  human_experience: { label: "Human Experience", color: "bg-purple-500", emoji: "💭" },
+  symbolic: { label: "Symbolic", color: "bg-red-500", emoji: "🔮" },
+};
+
+export const DIFFICULTY_CONFIG: Record<Difficulty, { label: string; description: string; color: string }> = {
+  beginner: {
+    label: "Beginner",
+    description: "Familiar drops with clear Christ connections. Scripture, nature, and everyday life.",
+    color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  },
+  intermediate: {
+    label: "Intermediate",
+    description: "Broader categories, more nuanced prompts. Expects specific Scripture references.",
+    color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  },
+  advanced: {
+    label: "Advanced",
+    description: "Obscure and surprising drops. Expects typological depth and chain awareness.",
+    color: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+  },
+  master: {
+    label: "Master",
+    description: "Abstract, paradoxical, culturally complex. Only for seasoned Phototheologists.",
+    color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  },
+};
+
+// ── Hook ───────────────────────────────────────────────────────────────
+
+export function useFreestyleZone() {
+  const { user } = useAuth();
+
+  // Game session persistence
+  const {
+    gameState,
+    setGameState,
+    saveSession,
+    startNewGame,
+    completeGame,
+    session,
+    hasExistingSession,
+    resumeGame,
+    isLoading: sessionLoading,
+  } = useGameSession<FreestyleGameState>({
+    gameType: "freestyle_zone",
+    initialState: INITIAL_STATE,
+    autoSaveInterval: 15000,
+  });
+
+  // Transient UI state (not persisted)
+  const [isGeneratingDrop, setIsGeneratingDrop] = useState(false);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [isGeneratingDemo, setIsGeneratingDemo] = useState(false);
+  const [isPolishing, setIsPolishing] = useState(false);
+  const [currentFeedback, setCurrentFeedback] = useState<EvaluationScores | null>(null);
+  const [sessionSummary, setSessionSummary] = useState<SessionSummary | null>(null);
+  const [jeevesDemo, setJeevesDemo] = useState<JeevesDemo | null>(null);
+  const [polishedContent, setPolishedContent] = useState<PolishedContent | null>(null);
+  const [prefetchedDrop, setPrefetchedDrop] = useState<Drop | null>(null);
+
+  // Timer ref
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Timer effect
+  useEffect(() => {
+    if (gameState.phase !== "active") {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    timerRef.current = setInterval(() => {
+      setGameState(prev => {
+        const elapsed = Math.floor((Date.now() - prev.startTime) / 1000);
+        if (elapsed >= SESSION_DURATION) {
+          // Auto-end session
+          if (timerRef.current) clearInterval(timerRef.current);
+          return { ...prev, phase: "complete", elapsedSeconds: SESSION_DURATION };
+        }
+        return { ...prev, elapsedSeconds: elapsed };
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [gameState.phase, gameState.startTime, setGameState]);
+
+  // Auto-complete when timer expires
+  useEffect(() => {
+    if (gameState.phase === "active" && gameState.elapsedSeconds >= SESSION_DURATION) {
+      endSession();
+    }
+  }, [gameState.elapsedSeconds]);
+
+  // ── Helpers ────────────────────────────────────────────────────────
+
+  const buildChainHistory = useCallback((): ChainEntry[] => {
+    return gameState.drops.map((drop, i) => ({
+      drop,
+      response: gameState.userResponses[i] ?? null,
+      scores: gameState.scores[i] ?? null,
+      timestamp: 0,
+    }));
+  }, [gameState.drops, gameState.userResponses, gameState.scores]);
+
+  const updateMomentum = useCallback((newScore: number, wasPassed: boolean) => {
+    setGameState(prev => {
+      let momentum = prev.momentum;
+
+      if (wasPassed) {
+        momentum -= MOMENTUM_DECAY_ON_PASS + (prev.consecutivePasses * MOMENTUM_CONSECUTIVE_PASS_PENALTY);
+      } else {
+        // Weighted moving average: 70% old momentum, 30% new score (mapped to 0-100)
+        const scorePercent = (newScore / 40) * 100;
+        momentum = momentum * 0.7 + scorePercent * 0.3;
+      }
+
+      return { ...prev, momentum: Math.max(0, Math.min(100, momentum)) };
+    });
+  }, [setGameState]);
+
+  // ── Actions ────────────────────────────────────────────────────────
+
+  const startSession = useCallback(async (difficulty: Difficulty) => {
+    await startNewGame();
+    const startTime = Date.now();
+    setGameState({
+      ...INITIAL_STATE,
+      phase: "active",
+      difficulty,
+      startTime,
+      momentum: 50,
+    });
+    setCurrentFeedback(null);
+    setSessionSummary(null);
+    setJeevesDemo(null);
+    setPolishedContent(null);
+    setPrefetchedDrop(null);
+
+    // Generate first drop
+    await generateNextDrop(difficulty, [], 0);
+  }, [startNewGame, setGameState]);
+
+  const generateNextDrop = useCallback(async (
+    difficulty?: Difficulty,
+    previousDrops?: Drop[],
+    dropCount?: number
+  ) => {
+    const diff = difficulty || gameState.difficulty;
+    const prevDrops = previousDrops || gameState.drops;
+    const count = dropCount ?? gameState.drops.length;
+
+    // Use prefetched drop if available
+    if (prefetchedDrop && !difficulty) {
+      const drop = prefetchedDrop;
+      setPrefetchedDrop(null);
+      setGameState(prev => ({
+        ...prev,
+        drops: [...prev.drops, drop],
+      }));
+      // Pre-fetch next one
+      prefetchNextDrop(diff, [...prevDrops, drop], count + 1);
+      return;
+    }
+
+    setIsGeneratingDrop(true);
+    try {
+      const { data } = await callJeeves({
+        mode: "freestyle_generate_drop",
+        difficulty: diff,
+        previousDrops: prevDrops.slice(-5).map(d => d.drop),
+        dropCount: count,
+      }, "freestyle-zone");
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      const drop: Drop = {
+        category: parsed.category || "scripture",
+        drop: parsed.drop || "The cross of Calvary",
+        hint: parsed.hint,
+      };
+
+      setGameState(prev => ({
+        ...prev,
+        drops: [...prev.drops, drop],
+      }));
+
+      // Pre-fetch next drop
+      prefetchNextDrop(diff, [...prevDrops, drop], count + 1);
+    } catch (error) {
+      console.error("Failed to generate drop:", error);
+      // Fallback drop
+      const fallback: Drop = {
+        category: "scripture",
+        drop: "The empty tomb on resurrection morning",
+      };
+      setGameState(prev => ({
+        ...prev,
+        drops: [...prev.drops, fallback],
+      }));
+    } finally {
+      setIsGeneratingDrop(false);
+    }
+  }, [gameState.difficulty, gameState.drops, prefetchedDrop, setGameState]);
+
+  const prefetchNextDrop = useCallback(async (
+    difficulty: Difficulty,
+    previousDrops: Drop[],
+    dropCount: number
+  ) => {
+    try {
+      const { data } = await callJeeves({
+        mode: "freestyle_generate_drop",
+        difficulty,
+        previousDrops: previousDrops.slice(-5).map(d => d.drop),
+        dropCount,
+      }, "freestyle-zone");
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      setPrefetchedDrop({
+        category: parsed.category || "scripture",
+        drop: parsed.drop || "Living water flowing from the rock",
+        hint: parsed.hint,
+      });
+    } catch {
+      // Silently fail on prefetch
+    }
+  }, []);
+
+  const submitResponse = useCallback(async (response: string) => {
+    if (!response.trim() || gameState.phase !== "active") return;
+
+    const currentDrop = gameState.drops[gameState.drops.length - 1];
+    if (!currentDrop) return;
+
+    setIsEvaluating(true);
+    setCurrentFeedback(null);
+
+    try {
+      const chainHistory = buildChainHistory().slice(-10);
+
+      const { data } = await callJeeves({
+        mode: "freestyle_evaluate",
+        drop: currentDrop,
+        userResponse: response,
+        chainHistory,
+        difficulty: gameState.difficulty,
+      }, "freestyle-zone");
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      const scores: EvaluationScores = {
+        christConnection: parsed.christConnection ?? 5,
+        depth: parsed.depth ?? 5,
+        creativity: parsed.creativity ?? 5,
+        chainLink: parsed.chainLink ?? 5,
+        totalScore: parsed.totalScore ?? 20,
+        feedback: parsed.feedback || "Keep going!",
+        suggestion: parsed.suggestion,
+      };
+
+      setCurrentFeedback(scores);
+      updateMomentum(scores.totalScore, false);
+
+      setGameState(prev => ({
+        ...prev,
+        userResponses: [...prev.userResponses, response],
+        scores: [...prev.scores, scores],
+        consecutivePasses: 0,
+      }));
+
+      // Save to session
+      await saveSession({
+        userResponses: [...gameState.userResponses, response],
+        scores: [...gameState.scores, scores],
+      });
+    } catch (error) {
+      console.error("Failed to evaluate response:", error);
+      // Still record the response
+      setGameState(prev => ({
+        ...prev,
+        userResponses: [...prev.userResponses, response],
+        consecutivePasses: 0,
+      }));
+    } finally {
+      setIsEvaluating(false);
+    }
+  }, [gameState, buildChainHistory, updateMomentum, setGameState, saveSession]);
+
+  const passDrop = useCallback(async () => {
+    if (gameState.phase !== "active") return;
+
+    updateMomentum(0, true);
+
+    setGameState(prev => ({
+      ...prev,
+      userResponses: [...prev.userResponses, ""],
+      passCount: prev.passCount + 1,
+      consecutivePasses: prev.consecutivePasses + 1,
+    }));
+
+    setCurrentFeedback(null);
+    await generateNextDrop();
+  }, [gameState.phase, updateMomentum, setGameState, generateNextDrop]);
+
+  const advanceToNextDrop = useCallback(async () => {
+    setCurrentFeedback(null);
+    await generateNextDrop();
+  }, [generateNextDrop]);
+
+  const endSession = useCallback(async () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    setGameState(prev => ({
+      ...prev,
+      phase: "complete",
+      elapsedSeconds: Math.floor((Date.now() - prev.startTime) / 1000),
+    }));
+
+    // Calculate final score
+    const totalScore = gameState.scores.reduce((sum, s) => sum + s.totalScore, 0);
+    const avgScore = gameState.scores.length > 0 ? totalScore / gameState.scores.length : 0;
+    const finalScore = Math.round(avgScore * 2.5); // Scale to 0-100
+
+    await completeGame(finalScore);
+
+    // Save to game_scores table
+    if (user) {
+      try {
+        await supabase.from("game_scores").insert({
+          user_id: user.id,
+          game_type: "freestyle_zone",
+          score: finalScore,
+          metadata: {
+            difficulty: gameState.difficulty,
+            totalDrops: gameState.drops.length,
+            passCount: gameState.passCount,
+            duration: Math.floor((Date.now() - gameState.startTime) / 1000),
+            momentum: gameState.momentum,
+          } as any,
+        });
+      } catch {
+        // Non-critical
+      }
+    }
+  }, [gameState, completeGame, setGameState, user]);
+
+  const generateSessionSummary = useCallback(async () => {
+    setIsGeneratingSummary(true);
+    try {
+      const { data } = await callJeeves({
+        mode: "freestyle_session_summary",
+        sessionData: {
+          drops: gameState.drops,
+          responses: gameState.userResponses,
+          scores: gameState.scores,
+          difficulty: gameState.difficulty,
+          passCount: gameState.passCount,
+          duration: gameState.elapsedSeconds,
+        },
+      }, "freestyle-zone");
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      setSessionSummary(parsed as SessionSummary);
+    } catch (error) {
+      console.error("Failed to generate summary:", error);
+    } finally {
+      setIsGeneratingSummary(false);
+    }
+  }, [gameState]);
+
+  const generateJeevesDemo = useCallback(async () => {
+    setIsGeneratingDemo(true);
+    try {
+      const { data } = await callJeeves({
+        mode: "freestyle_jeeves_demo",
+        drops: gameState.drops,
+        difficulty: gameState.difficulty,
+      }, "freestyle-zone");
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      setJeevesDemo(parsed as JeevesDemo);
+    } catch (error) {
+      console.error("Failed to generate Jeeves demo:", error);
+    } finally {
+      setIsGeneratingDemo(false);
+    }
+  }, [gameState.drops, gameState.difficulty]);
+
+  const polishSession = useCallback(async (format: string) => {
+    setIsPolishing(true);
+    setPolishedContent(null);
+    try {
+      const { data } = await callJeeves({
+        mode: "freestyle_polish",
+        sessionData: {
+          drops: gameState.drops,
+          responses: gameState.userResponses,
+        },
+        format,
+      }, "freestyle-zone");
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      setPolishedContent(parsed as PolishedContent);
+    } catch (error) {
+      console.error("Failed to polish session:", error);
+    } finally {
+      setIsPolishing(false);
+    }
+  }, [gameState.drops, gameState.userResponses]);
+
+  // Computed values
+  const timeRemaining = SESSION_DURATION - gameState.elapsedSeconds;
+  const currentDropIndex = gameState.drops.length - 1;
+  const currentDrop = gameState.drops[currentDropIndex] || null;
+  const answeredCount = gameState.userResponses.filter(r => r !== "").length;
+
+  return {
+    // State
+    gameState,
+    currentDrop,
+    currentDropIndex,
+    currentFeedback,
+    sessionSummary,
+    jeevesDemo,
+    polishedContent,
+    timeRemaining,
+    answeredCount,
+
+    // Loading states
+    isGeneratingDrop,
+    isEvaluating,
+    isGeneratingSummary,
+    isGeneratingDemo,
+    isPolishing,
+    sessionLoading,
+
+    // Session management
+    hasExistingSession,
+    resumeGame,
+
+    // Actions
+    startSession,
+    submitResponse,
+    passDrop,
+    advanceToNextDrop,
+    endSession,
+    generateSessionSummary,
+    generateJeevesDemo,
+    polishSession,
+  };
+}
