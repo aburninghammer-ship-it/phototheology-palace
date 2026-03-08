@@ -6,7 +6,7 @@ import {
   Shield, Swords, Send, Loader2, Trophy, Flame, Calendar,
   ChevronRight, ArrowLeft, Star, Lock, CheckCircle2, XCircle,
   Target, Zap, Crown, Award, RotateCcw, MessageSquare, Eye,
-  ScrollText, Unlock, RefreshCw, AlertTriangle,
+  ScrollText, Unlock, RefreshCw, AlertTriangle, Share2, Globe,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
