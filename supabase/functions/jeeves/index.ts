@@ -9023,7 +9023,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
       // Freestyle Zone - Generate a random drop prompt
       const difficulty = requestBody.difficulty || "intermediate";
       const previousDrops = requestBody.previousDrops || [];
-      const dropCount = body.dropCount || 0;
+      const dropCount = requestBody.dropCount || 0;
 
       systemPrompt = `You are Jeeves, a Phototheology freestyle training coach. Generate a random "drop" — a short prompt (5-15 words) that the student must connect to Christ using Phototheology principles.
 
