@@ -231,6 +231,7 @@ const FreestyleZone = lazy(() => import("./pages/games/FreestyleZone"));
 
 const PublicImageLibrary = lazy(() => import("./pages/PublicImageLibrary"));
 const SharedBaptismAudio = lazy(() => import("./pages/SharedBaptismAudio"));
+const SharedDebate = lazy(() => import("./pages/SharedDebate"));
 const BibleStudySeriesBuilder = lazy(() => import("./pages/BibleStudySeriesBuilder"));
 const SeriesLessonEditor = lazy(() => import("./pages/SeriesLessonEditor"));
 const SeriesPresenter = lazy(() => import("./pages/SeriesPresenter"));
