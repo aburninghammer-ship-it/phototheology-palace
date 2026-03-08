@@ -47,15 +47,9 @@ export const MessagingSidebar = () => {
   const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
   const isCollapsed = state === 'collapsed';
 
-  // Log sidebar state changes
-  useEffect(() => {
-    console.log('📊 Sidebar state:', { state, isCollapsed, isMobile, open });
-  }, [state, isCollapsed, isMobile, open]);
-
   // Auto-expand sidebar when a conversation is set (e.g., from notification)
   useEffect(() => {
     if (activeConversationId && isCollapsed) {
-      console.log('Auto-expanding sidebar due to active conversation:', activeConversationId);
       setOpen?.(true);
       setActiveTab('conversations');
       if (isMobile) {
@@ -74,31 +68,16 @@ export const MessagingSidebar = () => {
   // Listen for window event to force sidebar open (for deep-linked notifications)
   // IMPORTANT: This must run even when collapsed, so we can open from notifications
   useEffect(() => {
-    console.log('📬 MessagingSidebar: Setting up event listener for open-chat-sidebar');
-    
     const handleOpenChat = async (e: CustomEvent) => {
-      console.log('📬 MessagingSidebar: Event received!', {
-        type: e.type,
-        detail: e.detail,
-        conversationId: e.detail?.conversationId,
-        userId: e.detail?.userId,
-        isMobile,
-        isCollapsed: state === 'collapsed'
-      });
-      
       // Handle conversationId (from notifications)
       if (e.detail?.conversationId) {
-        console.log('📬 MessagingSidebar: Setting conversation:', e.detail.conversationId);
         setActiveConversationId(e.detail.conversationId);
         
         // Force open the sidebar - use correct method for mobile vs desktop
-        console.log('📬 MessagingSidebar: Opening sidebar (isMobile:', isMobile, ')');
         if (isMobile) {
-          console.log('📬 MessagingSidebar: Using setOpenMobile(true) for mobile');
           setOpenMobile(true);
           setMobileShowChat(true); // Show chat view directly on mobile
         } else {
-          console.log('📬 MessagingSidebar: Using setOpen(true) for desktop');
           if (setOpen) {
             setOpen(true);
           }
@@ -118,10 +97,8 @@ export const MessagingSidebar = () => {
       
       // Handle userId (from community page)
       if (e.detail?.userId) {
-        console.log('📬 MessagingSidebar: Starting conversation with user:', e.detail.userId);
         const convId = await startConversation(e.detail.userId);
         if (convId) {
-          console.log('📬 MessagingSidebar: Conversation started:', convId);
           setActiveConversationId(convId);
           if (isMobile) {
             setOpenMobile(true);
@@ -141,10 +118,8 @@ export const MessagingSidebar = () => {
     };
     
     window.addEventListener('open-chat-sidebar' as any, handleOpenChat);
-    console.log('📬 MessagingSidebar: Event listener registered');
-    
+
     return () => {
-      console.log('📬 MessagingSidebar: Removing event listener');
       window.removeEventListener('open-chat-sidebar' as any, handleOpenChat);
     };
   }, [setActiveConversationId, setOpen, setOpenMobile, state, startConversation, setActiveTab, isMobile]);
@@ -155,10 +130,8 @@ export const MessagingSidebar = () => {
   }, [messages]);
 
   const handleStartChat = async (userId: string) => {
-    console.log('👤 Starting chat with user:', userId);
     const convId = await startConversation(userId);
     if (convId) {
-      console.log('✅ Conversation created/found:', convId);
       setActiveConversationId(convId);
       if (isMobile) {
         setMobileShowChat(true);
@@ -170,7 +143,6 @@ export const MessagingSidebar = () => {
 
   // When a conversation is selected on mobile, show chat view
   const handleConversationClick = (convId: string) => {
-    console.log('📱 Conversation clicked:', convId);
     setActiveConversationId(convId);
     if (isMobile) {
       setMobileShowChat(true);
@@ -196,7 +168,6 @@ export const MessagingSidebar = () => {
         <div 
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={() => {
-            console.log('🎭 Backdrop clicked - closing sidebar');
             if (setOpen) {
               setOpen(false);
             } else {
@@ -220,7 +191,6 @@ export const MessagingSidebar = () => {
               size="icon"
               onClick={(e) => {
                 e.stopPropagation();
-                console.log('❌ Closing sidebar via back button');
                 setActiveConversationId(null);
                 if (isMobile) {
                   setOpenMobile(false);

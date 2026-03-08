@@ -243,11 +243,11 @@ export const EnhancedMobileDrawer = () => {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden h-10 w-10">
-          <Menu className="h-6 w-6" />
+        <Button variant="ghost" size="icon" className="md:hidden h-10 w-10" aria-label="Open navigation menu">
+          <Menu className="h-6 w-6" aria-hidden="true" />
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="h-[85vh] max-h-[85vh] flex flex-col overflow-hidden">
+      <DrawerContent className="h-[85vh] max-h-[85vh] flex flex-col overflow-hidden" role="navigation" aria-label="Mobile navigation">
         <DrawerHeader className="border-b px-4 py-3 flex-shrink-0">
           <DrawerTitle className="flex items-center justify-between">
             <Link
@@ -393,8 +393,9 @@ export const EnhancedMobileDrawer = () => {
                         size="sm"
                         onClick={clearRecentPages}
                         className="h-7 px-2"
+                        aria-label="Clear recent pages"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3 w-3" aria-hidden="true" />
                       </Button>
                     </div>
                     <div className="space-y-1">
@@ -418,6 +419,7 @@ export const EnhancedMobileDrawer = () => {
                           <button
                             type="button"
                             className="h-11 w-11 flex items-center justify-center -mr-2 active:scale-95"
+                            aria-label={isBookmarked(page.path) ? `Remove ${page.title} from bookmarks` : `Bookmark ${page.title}`}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -427,10 +429,11 @@ export const EnhancedMobileDrawer = () => {
                             <Star
                               className={cn(
                                 "h-4 w-4",
-                                isBookmarked(page.path) 
-                                  ? "fill-yellow-500 text-yellow-500" 
+                                isBookmarked(page.path)
+                                  ? "fill-yellow-500 text-yellow-500"
                                   : "text-muted-foreground"
                               )}
+                              aria-hidden="true"
                             />
                           </button>
                         </div>
@@ -470,13 +473,14 @@ export const EnhancedMobileDrawer = () => {
                           <button
                             type="button"
                             className="h-11 w-11 flex items-center justify-center -mr-2 active:scale-95"
+                            aria-label={`Remove ${bookmark.title} from bookmarks`}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
                               toggleBookmark(bookmark);
                             }}
                           >
-                            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" aria-hidden="true" />
                           </button>
                         </div>
                       ))}
@@ -495,6 +499,8 @@ export const EnhancedMobileDrawer = () => {
                     <div key={key} className="rounded-xl border border-border/50 overflow-hidden">
                       <button
                         onClick={() => toggleCategory(key)}
+                        aria-expanded={isExpanded}
+                        aria-controls={`nav-category-${key}`}
                         className="w-full flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 active:bg-muted/70 transition-colors"
                       >
                         <div className="flex items-center gap-2">
@@ -514,7 +520,7 @@ export const EnhancedMobileDrawer = () => {
                         </svg>
                       </button>
                       {isExpanded && (
-                        <div className="p-2 space-y-1 bg-background/50">
+                        <div id={`nav-category-${key}`} className="p-2 space-y-1 bg-background/50">
                           {category.links.map((link) => (
                             <Link
                               key={link.to}
@@ -535,6 +541,7 @@ export const EnhancedMobileDrawer = () => {
                                   e.stopPropagation();
                                   toggleBookmark({ path: link.to, title: link.label, icon: link.icon });
                                 }}
+                                aria-label={isBookmarked(link.to) ? `Remove ${link.label} from bookmarks` : `Bookmark ${link.label}`}
                                 className="p-1.5 rounded-full hover:bg-muted active:bg-muted/80"
                               >
                                 <Star
@@ -544,6 +551,7 @@ export const EnhancedMobileDrawer = () => {
                                       ? "fill-yellow-500 text-yellow-500"
                                       : "text-muted-foreground"
                                   )}
+                                  aria-hidden="true"
                                 />
                               </button>
                             </Link>

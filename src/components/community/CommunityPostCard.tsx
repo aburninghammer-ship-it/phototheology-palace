@@ -43,6 +43,7 @@ interface CommunityPostCardProps {
   commentCount?: number;
   currentUserId?: string;
   isExpanded?: boolean;
+  isLiked?: boolean;
   onExpand?: () => void;
   onLike?: () => void;
   onEdit?: () => void;
@@ -88,13 +89,13 @@ export const CommunityPostCard = ({
   commentCount = 0,
   currentUserId,
   isExpanded = false,
+  isLiked = false,
   onExpand,
   onLike,
   onEdit,
   onDelete,
   children,
 }: CommunityPostCardProps) => {
-  const [isLiked, setIsLiked] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
 
   const isAuthor = currentUserId === post.user_id;
@@ -109,7 +110,6 @@ export const CommunityPostCard = ({
       : post.content;
 
   const handleLike = () => {
-    setIsLiked(!isLiked);
     onLike?.();
   };
 

@@ -47,6 +47,7 @@ const CommunityOptimized = () => {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
 
   // Use our optimized hooks
   const {
@@ -89,6 +90,21 @@ const CommunityOptimized = () => {
       }, 500);
     }
   }, [searchParams]);
+
+  // Fetch user's liked post IDs
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchLikes = async () => {
+      const { data } = await supabase
+        .from("community_post_likes")
+        .select("post_id")
+        .eq("user_id", user.id);
+      if (data) {
+        setLikedPostIds(new Set(data.map((d: any) => d.post_id)));
+      }
+    };
+    fetchLikes();
+  }, [user?.id]);
 
   // Real-time subscriptions - optimized to update specific posts only
   useEffect(() => {
@@ -273,8 +289,54 @@ const CommunityOptimized = () => {
   };
 
   const handleLikePost = async (postId: string) => {
-    // TODO: Implement like functionality
-    console.log("Like post:", postId);
+    if (!user) return;
+    const alreadyLiked = likedPostIds.has(postId);
+    const post = posts.find(p => p.id === postId);
+    const currentLikes = post?.likes ?? 0;
+
+    if (alreadyLiked) {
+      // Optimistic unlike
+      setLikedPostIds(prev => { const next = new Set(prev); next.delete(postId); return next; });
+      updatePost(postId, { likes: Math.max(0, currentLikes - 1) } as any);
+
+      const { error } = await supabase
+        .from("community_post_likes")
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", user.id);
+
+      if (error) {
+        // Revert on failure
+        setLikedPostIds(prev => new Set(prev).add(postId));
+        updatePost(postId, { likes: currentLikes } as any);
+      } else {
+        // Update the denormalized count
+        await supabase
+          .from("community_posts")
+          .update({ likes: Math.max(0, currentLikes - 1) })
+          .eq("id", postId);
+      }
+    } else {
+      // Optimistic like
+      setLikedPostIds(prev => new Set(prev).add(postId));
+      updatePost(postId, { likes: currentLikes + 1 } as any);
+
+      const { error } = await supabase
+        .from("community_post_likes")
+        .insert({ post_id: postId, user_id: user.id });
+
+      if (error) {
+        // Revert on failure
+        setLikedPostIds(prev => { const next = new Set(prev); next.delete(postId); return next; });
+        updatePost(postId, { likes: currentLikes } as any);
+      } else {
+        // Update the denormalized count
+        await supabase
+          .from("community_posts")
+          .update({ likes: currentLikes + 1 })
+          .eq("id", postId);
+      }
+    }
   };
 
   if (!user) return null;
@@ -479,6 +541,7 @@ const CommunityOptimized = () => {
                     commentCount={post.id === expandedPostId ? comments.length : 0}
                     currentUserId={user?.id}
                     isExpanded={expandedPostId === post.id}
+                    isLiked={likedPostIds.has(post.id)}
                     onExpand={() => setExpandedPostId(
                       expandedPostId === post.id ? null : post.id
                     )}

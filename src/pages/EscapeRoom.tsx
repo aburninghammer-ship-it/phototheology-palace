@@ -89,8 +89,6 @@ export default function EscapeRoom() {
     setIsGenerating(true);
     
     try {
-      console.log('Starting escape room generation with:', { mode, category, scenario });
-      
       const { data, error } = await supabase.functions.invoke('generate-escape-room', {
         body: { 
           mode, 
@@ -99,8 +97,6 @@ export default function EscapeRoom() {
           difficulty: mode === 'floor_race' ? difficulty : 'pro'
         }
       });
-
-      console.log('Escape room response:', { data, error });
 
       if (error) {
         console.error('Escape room error:', error);

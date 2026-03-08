@@ -469,7 +469,6 @@ export default function StudyBuddy() {
   };
 
   useEffect(() => {
-    console.log("[StudyBuddy] Auth state:", { authLoading, user: !!user });
     if (!authLoading && !user) {
       navigate("/auth");
     }
@@ -557,36 +556,27 @@ export default function StudyBuddy() {
   };
 
   const handleResumeSession = (session: SavedSession) => {
-    console.log("[StudyBuddy] Resuming session:", session.id, session.title);
-    
     // Load the session data
     setCurrentSessionId(session.id);
     setSessionTitle(session.title || "");
 
     const ctx = session.jeeves_context as { book?: string; chapter?: number; notes?: string; analysis?: JeevesAnalysis } | null;
-    console.log("[StudyBuddy] Session context:", ctx);
-    
+
     if (ctx) {
       // Set book and chapter first - this triggers verse loading via useEffect
       if (ctx.book) {
-        console.log("[StudyBuddy] Setting book:", ctx.book);
         setSelectedBook(ctx.book);
       }
       if (ctx.chapter) {
-        console.log("[StudyBuddy] Setting chapter:", ctx.chapter);
         setSelectedChapter(ctx.chapter);
       }
       // Then set notes and analysis
       if (ctx.notes) {
-        console.log("[StudyBuddy] Setting notes:", ctx.notes.length, "chars");
         setNotes(ctx.notes);
       }
       if (ctx.analysis) {
-        console.log("[StudyBuddy] Setting analysis");
         setAnalysis(ctx.analysis);
       }
-    } else {
-      console.warn("[StudyBuddy] No jeeves_context found in session");
     }
 
     // Switch to study tab
@@ -843,7 +833,6 @@ export default function StudyBuddy() {
           throw new Error("Session not found or you don't have permission to update it");
         }
 
-        console.log("[StudyBuddy] Session updated:", data.id, "Notes length:", notes.length);
         toast.success(t('studyBuddy.sessionSaved'));
       } else {
         // Create new session
@@ -865,7 +854,6 @@ export default function StudyBuddy() {
           throw new Error("Failed to create session");
         }
 
-        console.log("[StudyBuddy] New session created:", newSession.id, "Notes length:", notes.length);
         setCurrentSessionId(newSession.id);
         toast.success(t('studyBuddy.sessionSaved'));
       }

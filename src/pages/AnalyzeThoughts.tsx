@@ -237,7 +237,6 @@ const AnalyzeThoughts = () => {
   useEffect(() => {
     if (input.length > 200 && !isAnalyzing) {
       const timer = setTimeout(() => {
-        console.log('[AnalyzeThoughts] Generating spark from typing content');
         generateSpark(input.slice(-500), undefined);
       }, 45000); // 45 seconds after typing stops
       return () => clearTimeout(timer);
@@ -419,12 +418,9 @@ const AnalyzeThoughts = () => {
     const analysisMode = scholarMode ? 'analyze-thoughts-scholar' : 'analyze-thoughts';
     
     try {
-      console.log(`[AnalyzeThoughts] Invoking jeeves with mode: ${analysisMode}`);
       const { data, error } = await supabase.functions.invoke('jeeves', {
         body: { mode: analysisMode, message: input }
       });
-
-      console.log('[AnalyzeThoughts] Response:', { data, error });
 
       if (error) {
         console.error('[AnalyzeThoughts] Edge function error:', error);
@@ -446,17 +442,11 @@ const AnalyzeThoughts = () => {
         return;
       }
 
-      // Log the raw score for debugging
-      console.log('[AnalyzeThoughts] Raw overallScore from API:', analysisResult.overallScore, typeof analysisResult.overallScore);
-      console.log('[AnalyzeThoughts] Full analysis result:', JSON.stringify(analysisResult, null, 2).substring(0, 1000));
-
       // Ensure overallScore is a valid number (AI might return string or null)
       const rawScore = analysisResult.overallScore;
       const parsedScore = typeof rawScore === 'string' ? parseFloat(rawScore) : (typeof rawScore === 'number' ? rawScore : 0);
       analysisResult.overallScore = !isNaN(parsedScore) ? parsedScore : 0;
       
-      console.log('[AnalyzeThoughts] Parsed overallScore:', analysisResult.overallScore);
-
       setResult(analysisResult);
       
       // Auto-save to history and get the saved ID

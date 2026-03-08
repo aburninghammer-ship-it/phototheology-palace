@@ -502,16 +502,10 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
   };
 
   const handleJeevesPlay = async (jeevesId: string) => {
-    console.log(`🤖 ${jeevesId} Play button clicked!`);
-    console.log('Players:', players);
-
     // Find the specific Jeeves player
     const jeevesPlayer = players.find(p => p.player_id === jeevesId);
-
-    console.log('Selected Jeeves player:', jeevesPlayer);
     
     if (!jeevesPlayer) {
-      console.log('❌ Jeeves player not found');
       toast({
         title: "Error",
         description: "No Jeeves player available in this battle",
@@ -521,7 +515,6 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
     }
     
     if (jeevesPlayer.cards_in_hand.length === 0) {
-      console.log('❌ Jeeves has no cards left');
       toast({
         title: "Game Over",
         description: `${jeevesPlayer.display_name} has no cards left to play!`,
@@ -529,7 +522,6 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       return;
     }
 
-    console.log(`✅ ${jeevesPlayer.display_name} starting to play...`);
     toast({
       title: `${jeevesPlayer.display_name} is Thinking...`,
       description: "Selecting a card and preparing a response...",
@@ -541,10 +533,7 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       const randomCard = jeevesPlayer.cards_in_hand[
         Math.floor(Math.random() * jeevesPlayer.cards_in_hand.length)
       ];
-      console.log('🎴 Jeeves selected card:', randomCard);
-
       // Generate a quality response from Jeeves using AI
-      console.log('🤖 Generating Jeeves response via AI...');
       
       // Determine opponent name
       const opponentPlayer = players.find(p => p.player_id !== jeevesPlayer.player_id);
@@ -566,9 +555,6 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       }
 
       const randomResponse = aiData.response;
-      console.log('📝 Jeeves response:', randomResponse);
-
-      console.log('🎯 Calling judge-card-battle edge function...');
       const { data, error } = await supabase.functions.invoke('judge-card-battle', {
         body: {
           battleId: battle.id,
@@ -584,8 +570,6 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         console.error('❌ Edge function error:', error);
         throw error;
       }
-
-      console.log('✅ Judgment received:', data);
 
       await loadPlayers();
       await loadMoves();
@@ -616,7 +600,6 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       // Even on error, switch back to user's turn so they're not stuck
       setIsUserTurn(true);
     } finally {
-      console.log('✅ Jeeves turn complete');
       setIsSubmitting(false);
     }
   };

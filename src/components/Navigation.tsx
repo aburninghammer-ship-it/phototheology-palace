@@ -104,6 +104,8 @@ export const Navigation = () => {
       <>
         <nav
           ref={navRef}
+          role="navigation"
+          aria-label="Main navigation"
           style={{ top: "var(--app-top-banner-height, 0px)" }}
           className="fixed left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-b border-border shadow-sm pt-[env(safe-area-inset-top)]"
         >
@@ -133,6 +135,8 @@ export const Navigation = () => {
     <>
       <nav
         ref={navRef}
+        role="navigation"
+        aria-label="Main navigation"
         style={{ top: "var(--app-top-banner-height, 0px)" }}
         className="fixed left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-b border-border shadow-sm pt-[env(safe-area-inset-top)]"
       >
@@ -140,10 +144,10 @@ export const Navigation = () => {
           <div className="flex items-center justify-between h-16 max-w-7xl mx-auto">
             <div className="flex items-center gap-2">
               <BackButton />
-              <Link to="/" className="flex items-center gap-2 group">
+              <Link to="/" className="flex items-center gap-2 group" aria-label="Phototheology home">
                 <div className="relative">
-                  <Building2 className="h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110" />
-                  <Sparkles className="h-3 w-3 text-accent absolute -top-1 -right-1 animate-pulse-glow" />
+                  <Building2 className="h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110" aria-hidden="true" />
+                  <Sparkles className="h-3 w-3 text-accent absolute -top-1 -right-1 animate-pulse-glow" aria-hidden="true" />
                 </div>
                 <span className="font-serif text-xl font-semibold bg-gradient-palace bg-clip-text text-transparent">
                   Phototheology
@@ -190,12 +194,12 @@ export const Navigation = () => {
               )}
 
               {/* Live User Count - Always Visible */}
-              <div className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded-full bg-green-500/10 border border-green-500/20">
-                <span className="relative flex h-2 w-2">
+              <div className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded-full bg-green-500/10 border border-green-500/20" aria-label={`${activeCount} users online`}>
+                <span className="relative flex h-2 w-2" aria-hidden="true">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                <Users className="h-4 w-4 text-green-600" />
+                <Users className="h-4 w-4 text-green-600" aria-hidden="true" />
                 <span className="text-sm font-semibold text-green-600">{activeCount}</span>
                 <span className="text-xs text-green-600/80">{t('nav.online')}</span>
               </div>

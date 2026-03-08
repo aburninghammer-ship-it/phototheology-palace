@@ -232,7 +232,6 @@ export function AmbientMusicPlayer({
 
   // Audio ducking - reduce volume when TTS is playing
   const handleDuckChange = useCallback((ducked: boolean, duckRatio: number) => {
-    console.log(`[AmbientMusic] Duck event: ducked=${ducked}, ratio=${duckRatio}`);
     setDuckMultiplier(duckRatio);
   }, []);
 
@@ -254,7 +253,7 @@ export function AmbientMusicPlayer({
       try {
         await ctx.resume();
       } catch (err) {
-        console.warn("[AmbientMusic] Failed to resume AudioContext:", err);
+        // Failed to resume AudioContext
       }
     }
 
@@ -280,7 +279,6 @@ export function AmbientMusicPlayer({
       audioRef.current.volume = effectiveVolume;
     }
     
-    console.log(`[AmbientMusic] Volume: base=${volume}, duck=${duckMultiplier}, effective=${effectiveVolume}`);
   }, [volume, isMuted, duckMultiplier]);
 
   // Track failed URLs to avoid retrying them
@@ -354,8 +352,6 @@ export function AmbientMusicPlayer({
   // Function to play next track - extracted for reuse
   const playNextTrackFromState = useCallback(() => {
     const state = playbackStateRef.current;
-    console.log('[AmbientMusic] Playing next track, loopMode:', state.loopMode, 'currentTrackId:', state.currentTrackId);
-
     // Get playable tracks in custom order
     const selectedList = state.allTracks.filter(t => state.selectedTracks.has(t.id));
     const playableTracks = selectedList.sort((a, b) => {
@@ -367,12 +363,9 @@ export function AmbientMusicPlayer({
     });
 
     if (playableTracks.length === 0) {
-      console.log('[AmbientMusic] No playable tracks');
       setIsPlaying(false);
       return;
     }
-
-    console.log('[AmbientMusic] Playable tracks (ordered):', playableTracks.map(t => t.id));
 
     let nextTrackToPlay;
     if (state.shuffleMode) {
@@ -388,12 +381,9 @@ export function AmbientMusicPlayer({
       const currentIndex = playableTracks.findIndex(t => t.id === state.currentTrackId);
       const nextIndex = (currentIndex + 1) % playableTracks.length;
       nextTrackToPlay = playableTracks[nextIndex];
-      console.log('[AmbientMusic] Sequential next: currentIdx=', currentIndex, 'nextIdx=', nextIndex, 'track=', nextTrackToPlay?.name);
     }
     
     if (nextTrackToPlay && audioRef.current) {
-      console.log('[AmbientMusic] Auto-playing next track:', nextTrackToPlay.name, nextTrackToPlay.url);
-      
       // CRITICAL: Update the ref SYNCHRONOUSLY before React state update
       // This prevents race conditions where onended fires before ref is updated
       playbackStateRef.current = {
@@ -415,7 +405,6 @@ export function AmbientMusicPlayer({
         audio.currentTime = 0;
         audio.play()
           .then(() => {
-            console.log('[AmbientMusic] Same track restarted:', nextTrackToPlay.name);
             setIsPlaying(true);
           })
           .catch((err) => {
@@ -431,7 +420,6 @@ export function AmbientMusicPlayer({
           if (audioRef.current) {
             audioRef.current.play()
               .then(() => {
-                console.log('[AmbientMusic] Next track started successfully:', nextTrackToPlay.name);
                 setIsPlaying(true);
               })
               .catch((err) => {
@@ -454,14 +442,11 @@ export function AmbientMusicPlayer({
       // Handle track ended - use ref for latest state to avoid stale closures
       audioRef.current.onended = () => {
         const state = playbackStateRef.current;
-        console.log('[AmbientMusic] Track ended, loopMode:', state.loopMode, 'audio.loop:', audioRef.current?.loop);
-        
         // If loop is set on the audio element (loopMode === "one"), it will auto-repeat
         // We only need to handle "all" and "none" modes here
         if (state.loopMode === "all") {
           playNextTrackFromState();
         } else if (state.loopMode === "none") {
-          console.log('[AmbientMusic] Loop mode none, stopping');
           setIsPlaying(false);
         }
         // loopMode === "one" is handled by audio.loop = true (browser handles it)
@@ -477,13 +462,10 @@ export function AmbientMusicPlayer({
         // Only try to resume if we think we should still be playing
         // and the track hasn't naturally ended
         if (isPlayingRef.current && !userPausedRef.current && !audio.ended && audio.currentTime > 0) {
-          console.log('[AmbientMusic] Unexpected pause detected, scheduling resume...');
           // Small delay to avoid fighting with the browser
           setTimeout(() => {
             if (audioRef.current && isPlayingRef.current && !userPausedRef.current && audioRef.current.paused && !audioRef.current.ended) {
-              console.log('[AmbientMusic] Resuming after unexpected pause');
-              audioRef.current.play().catch((err) => {
-                console.warn('[AmbientMusic] Could not resume after pause:', err);
+              audioRef.current.play().catch(() => {
               });
             }
           }, 300);
@@ -511,9 +493,7 @@ export function AmbientMusicPlayer({
         audioRef.current = null;
       }
       if (audioContextRef.current) {
-        audioContextRef.current.close().catch(err => {
-          console.warn('[AmbientMusic] Error closing AudioContext:', err);
-        });
+        audioContextRef.current.close().catch(() => {});
         audioContextRef.current = null;
         gainNodeRef.current = null;
         sourceNodeRef.current = null;
@@ -528,15 +508,11 @@ export function AmbientMusicPlayer({
 
       if (document.hidden && isPlaying && !userPausedRef.current) {
         // App went to background - try to keep music playing
-        console.log('[AmbientMusic] Tab hidden - keeping music alive');
         if (audioRef.current.paused) {
-          audioRef.current.play().catch(() => {
-            console.log('[AmbientMusic] Could not resume music in background');
-          });
+          audioRef.current.play().catch(() => {});
         }
       } else if (!document.hidden && isPlaying && !userPausedRef.current) {
         // App came back to foreground - ensure music is still playing
-        console.log('[AmbientMusic] Tab visible - ensuring music continues');
         if (audioRef.current.paused) {
           audioRef.current.play().catch(() => {});
         }
@@ -553,7 +529,6 @@ export function AmbientMusicPlayer({
 
     const keepAlive = () => {
       if (audioRef.current && isPlaying && !userPausedRef.current && audioRef.current.paused) {
-        console.log('[AmbientMusic] Keep-alive: resuming paused music');
         audioRef.current.play().catch(() => {});
       }
     };
@@ -616,7 +591,6 @@ export function AmbientMusicPlayer({
       }
       // Convert from 0-100 scale to 0-0.5 (capped to match slider max)
       const normalizedVolume = Math.min(newVolume, 50) / 100;
-      console.log('[AmbientMusic] Global volume update:', newVolume, '-> normalized:', normalizedVolume);
       setVolume(normalizedVolume);
     });
     return unsubscribe;
@@ -626,12 +600,11 @@ export function AmbientMusicPlayer({
   useEffect(() => {
     const unsubscribe = subscribeToMusicRequests((action) => {
       if (action === 'start' && !isPlaying && audioRef.current && getAutoMusicEnabled()) {
-        console.log('[AmbientMusic] Commentary requested music start (user-enabled)');
         setIsEnabled(true);
         audioRef.current.play().then(() => {
           setIsPlaying(true);
         }).catch((err) => {
-          console.warn('[AmbientMusic] Could not auto-start music for commentary:', err);
+          // Could not auto-start music for commentary
         });
       }
     });
@@ -670,7 +643,6 @@ export function AmbientMusicPlayer({
         
         // Check if current track URL is valid and not previously failed
         if (!isValidAudioUrl(currentTrack.url) || failedUrlsRef.current.has(currentTrack.url)) {
-          console.log("[Music] Skipping invalid/failed URL:", currentTrack.url);
           findNextWorkingTrack();
           return;
         }
@@ -702,10 +674,8 @@ export function AmbientMusicPlayer({
           audioRef.current.volume = effectiveVolume;
         }
         
-        console.log("Attempting to play:", currentTrack.url);
         userPausedRef.current = false;
         await audioRef.current.play();
-        console.log("Audio playing successfully");
         setIsPlaying(true);
         retryCountRef.current = 0; // Reset retry count on success
         
@@ -776,7 +746,6 @@ export function AmbientMusicPlayer({
     
     const currentIndex = playableTracks.findIndex(t => t.id === currentTrackId);
     const nextIndex = (currentIndex + 1) % playableTracks.length;
-    console.log("[Music] Trying next working track:", playableTracks[nextIndex].name);
     setCurrentTrackId(playableTracks[nextIndex].id);
   }, [allTracks, selectedTracks, currentTrackId, isValidAudioUrl]);
 
@@ -827,7 +796,6 @@ export function AmbientMusicPlayer({
     }
 
     if (nextTrackToPlay && audioRef.current) {
-      console.log('[AmbientMusic] Skipping to track:', nextTrackToPlay.name);
       // Directly set src and play to avoid state timing issues
       audioRef.current.src = nextTrackToPlay.url;
       const wasPlaying = isPlaying;
@@ -888,7 +856,6 @@ export function AmbientMusicPlayer({
 
   const handleVolumeChange = useCallback((value: number[]) => {
     const newVolume = value[0];
-    console.log('[AmbientMusic] handleVolumeChange called:', newVolume);
     setVolume(newVolume);
     if (newVolume > 0 && isMuted) {
       setIsMuted(false);
@@ -897,7 +864,6 @@ export function AmbientMusicPlayer({
     const effectiveVolume = newVolume * duckMultiplier;
     if (audioRef.current) {
       audioRef.current.volume = effectiveVolume;
-      console.log('[AmbientMusic] Volume set:', effectiveVolume);
     }
   }, [isMuted, duckMultiplier]);
 
@@ -911,8 +877,6 @@ export function AmbientMusicPlayer({
     };
     const newVolume = presetValues[preset];
     const effectiveVolume = newVolume * duckMultiplier;
-    console.log('[AmbientMusic] setVolumePreset:', preset, newVolume, 'effective:', effectiveVolume);
-    
     // Apply volume directly to audio element
     if (audioRef.current) {
       audioRef.current.volume = effectiveVolume;

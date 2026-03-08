@@ -75,9 +75,7 @@ export default function PTScrabble() {
   const [score, setScore] = useState(0);
   const [seedVerse, setSeedVerse] = useState<SelectedVerse | null>(null);
 
-  // Wrapper to log gamePhase changes
   const setGamePhase = useCallback((newPhase: GamePhase) => {
-    console.log('[PTScrabble] Phase change:', gamePhase, '→', newPhase);
     setGamePhaseInternal(newPhase);
   }, [gamePhase]);
 
@@ -224,8 +222,6 @@ export default function PTScrabble() {
   useEffect(() => {
     if (!mpGame || !multiplayerGameId) return;
 
-    console.log('[PTScrabble] Game loaded from URL:', mpGame.status, 'current phase:', gamePhase);
-
     const normalizedSeedVerse: SelectedVerse | null =
       mpGame.seedVerse && typeof mpGame.seedVerse === 'object'
         ? {
@@ -245,10 +241,8 @@ export default function PTScrabble() {
     // Only auto-navigate if we're on the menu
     if (gamePhase === 'menu') {
       if (mpGame.status === 'waiting') {
-        console.log('[PTScrabble] Auto-navigating to lobby for waiting game');
         setGamePhaseInternal('multiplayer-lobby');
       } else if (mpGame.status === 'playing') {
-        console.log('[PTScrabble] Auto-navigating to playing for active game');
         setGamePhaseInternal('multiplayer-playing');
       }
     }
@@ -1145,8 +1139,31 @@ export default function PTScrabble() {
               seedVerse={null}
               totalScore={totalMpScore}
               playerCount={mpPlayers.length}
-              onSave={(transcript) => {
-                console.log('Save multiplayer transcript:', transcript);
+              onSave={async (transcript) => {
+                if (!user) {
+                  toast.error("Please sign in to save studies");
+                  return;
+                }
+                try {
+                  const { error } = await supabase
+                    .from("user_studies")
+                    .insert({
+                      user_id: user.id,
+                      title: `Scrabble PT Multiplayer: ${mpPlayers.length} Players`,
+                      content: transcript,
+                      tags: ["scrabble-pt", "multiplayer"],
+                    });
+                  if (error) throw error;
+                  toast.success("Saved to My Studies!", {
+                    action: {
+                      label: "View",
+                      onClick: () => navigate("/my-studies"),
+                    },
+                  });
+                } catch (err) {
+                  console.error("Error saving study:", err);
+                  toast.error("Failed to save. Please try again.");
+                }
               }}
             />
 
@@ -1414,9 +1431,31 @@ export default function PTScrabble() {
               seedVerse={seedVerse}
               totalScore={score}
               playerCount={1}
-              onSave={(transcript) => {
-                // TODO: Save to user's saved studies in Supabase
-                console.log('Save transcript:', transcript);
+              onSave={async (transcript) => {
+                if (!user) {
+                  toast.error("Please sign in to save studies");
+                  return;
+                }
+                try {
+                  const { error } = await supabase
+                    .from("user_studies")
+                    .insert({
+                      user_id: user.id,
+                      title: `Scrabble PT: ${seedVerse?.reference || "Study Session"}`,
+                      content: transcript,
+                      tags: ["scrabble-pt", seedVerse?.reference?.split(" ")[0]?.toLowerCase()].filter(Boolean),
+                    });
+                  if (error) throw error;
+                  toast.success("Saved to My Studies!", {
+                    action: {
+                      label: "View",
+                      onClick: () => navigate("/my-studies"),
+                    },
+                  });
+                } catch (err) {
+                  console.error("Error saving study:", err);
+                  toast.error("Failed to save. Please try again.");
+                }
               }}
             />
 

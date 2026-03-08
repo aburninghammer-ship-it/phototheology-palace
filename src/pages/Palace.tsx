@@ -7,6 +7,7 @@ import { PalaceTour } from "@/components/onboarding/PalaceTour";
 import { palaceFloors } from "@/data/palaceData";
 import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Building2, Award, TrendingUp, BookOpen, Target, LayoutGrid, List, Box } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { palaceSteps } from "@/config/howItWorksSteps";
 import { Button } from "@/components/ui/button";
@@ -135,6 +136,19 @@ const Palace = () => {
             <div className="flex justify-center mb-4 md:mb-6">
               <HowItWorksDialog title={t('palace.howToUse')} steps={palaceSteps} />
             </div>
+
+            {user && loading && (
+              <Card variant="glass" className="max-w-md mx-auto mb-4 md:mb-6">
+                <CardContent className="p-4 md:pt-6 relative z-10">
+                  <div className="flex items-center justify-between mb-2">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                  <Skeleton className="h-2.5 w-full mb-2" />
+                  <Skeleton className="h-4 w-24" />
+                </CardContent>
+              </Card>
+            )}
 
             {user && !loading && (
               <Card variant="glass" className="max-w-md mx-auto mb-4 md:mb-6">
@@ -304,7 +318,7 @@ const Palace = () => {
                         {translatedFloors.map((floor, index) => {
                           const floorRoomsTotal = floor.rooms.length;
                           const floorRoomsCompleted = floor.rooms.filter(room =>
-                            false
+                            completedRoomIds.includes(room.id)
                           ).length;
                           const floorProgress = floorRoomsTotal > 0 ? (floorRoomsCompleted / floorRoomsTotal) * 100 : 0;
 

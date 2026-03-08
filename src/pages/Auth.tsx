@@ -165,7 +165,6 @@ export default function Auth() {
     const email = normalizeEmail(loginEmail);
 
     setLoading(true);
-    console.log("[Auth] Attempting login for:", email);
 
     // Check and clear storage if needed before login
     const storageCheck = ensureStorageSpace();
@@ -174,17 +173,11 @@ export default function Auth() {
       setLoading(false);
       return;
     }
-    if (storageCheck.cleared > 0) {
-      console.log(`[Auth] Cleared ${storageCheck.cleared} cached items to free storage`);
-    }
-
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password: loginPassword,
       });
-
-      console.log("[Auth] Login response - User:", data?.user?.email ?? "none", "Session:", data?.session ? "exists" : "none", "Error:", error?.message ?? "none");
 
       if (error) {
         if (error.message.includes("Invalid login credentials")) {
@@ -195,14 +188,6 @@ export default function Auth() {
           setError(error.message);
         }
         return;
-      }
-
-      // Verify session was created
-      try {
-        const { data: sessionCheck } = await supabase.auth.getSession();
-        console.log("[Auth] Post-login session check:", sessionCheck?.session?.user?.email ?? "NO SESSION");
-      } catch (sessionErr) {
-        console.warn("[Auth] Session check failed (non-critical):", sessionErr);
       }
 
       // Save email only if remember me is checked (never store passwords)
@@ -376,7 +361,6 @@ export default function Auth() {
 
           if (freshProfile?.has_lifetime_access || 
               (freshProfile?.subscription_status === "active" && freshProfile?.subscription_tier)) {
-            console.log("[Auth] Pre-approved access detected via trigger:", freshProfile);
             trackExternalMembershipDetected('patreon'); // pre-approved via trigger
             toast.success("Welcome! Your access has been activated automatically.");
             navigate("/gatehouse", { replace: true });
@@ -404,7 +388,6 @@ export default function Auth() {
 
           // Grant access if church membership found (pre-approved member auto-joined by trigger)
           if (churchResult.data && churchResult.data.length > 0 && churchResult.data[0].has_access) {
-            console.log("[Auth] Church membership detected, granting access");
             await supabase.from("profiles").update({
               subscription_status: "active",
               subscription_tier: churchResult.data[0].church_tier || "premium",

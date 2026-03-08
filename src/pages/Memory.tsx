@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Plus, Users, Trophy, Book, Sparkles, Gamepad2, Play, ArrowRight, Target, ArrowLeft } from "lucide-react";
+import { Brain, Plus, Users, Trophy, Book, Sparkles, Gamepad2, Play, ArrowRight, Target, ArrowLeft, Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { memoryPalaceSteps } from "@/config/howItWorksSteps";
 import { toast } from "sonner";
@@ -41,7 +42,27 @@ export default function Memory() {
     checkAuth();
   }, [navigate]);
 
-  if (!userId) return null;
+  if (!userId) return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-palace-purple/5">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8 text-center">
+          <Skeleton className="h-10 w-10 rounded-full mx-auto mb-4" />
+          <Skeleton className="h-8 w-64 mx-auto mb-2" />
+          <Skeleton className="h-4 w-96 mx-auto" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {[1,2,3,4].map(i => (
+            <Card key={i}><CardContent className="p-4"><Skeleton className="h-16 w-full" /></CardContent></Card>
+          ))}
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1,2,3].map(i => (
+            <Card key={i}><CardContent className="p-6"><Skeleton className="h-32 w-full" /></CardContent></Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-palace-purple/5 relative overflow-x-hidden">
