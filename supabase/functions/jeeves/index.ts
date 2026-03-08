@@ -9021,7 +9021,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
       userPrompt = message || "Generate/judge a Forge a Weapon round.";
     } else if (mode === "freestyle_generate_drop") {
       // Freestyle Zone - Generate a random drop prompt
-      const difficulty = body.difficulty || "intermediate";
+      const difficulty = requestBody.difficulty || "intermediate";
       const previousDrops = body.previousDrops || [];
       const dropCount = body.dropCount || 0;
 
