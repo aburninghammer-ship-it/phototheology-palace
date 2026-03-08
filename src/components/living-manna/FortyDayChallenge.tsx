@@ -1445,6 +1445,24 @@ export function FortyDayChallenge() {
                 <Eye className="h-4 w-4 mr-2" />
                 Review Full Debate
               </Button>
+              {/* Share as Public */}
+              {currentSession?.completed_at && (
+                <Button
+                  onClick={() => togglePublicDebate(currentSession.id, currentSession.is_public)}
+                  variant="outline"
+                  className="w-full mt-2"
+                  disabled={sharingSessionId === currentSession.id}
+                >
+                  {sharingSessionId === currentSession.id ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : currentSession.is_public ? (
+                    <Globe className="h-4 w-4 mr-2 text-green-400" />
+                  ) : (
+                    <Share2 className="h-4 w-4 mr-2" />
+                  )}
+                  {currentSession.is_public ? "Debate is Public — Tap to Make Private" : "Make Debate Public & Share"}
+                </Button>
+              )}
               <Button onClick={() => setPhase("daily-map")} className="w-full mt-2">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Return to Progress Map
