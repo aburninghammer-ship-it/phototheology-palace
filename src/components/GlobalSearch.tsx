@@ -127,7 +127,9 @@ export const GlobalSearch = () => {
           deckStudiesResult,
           studySessionsResult,
           sermonSessionsResult,
-          thoughtAnalysesResult
+          thoughtAnalysesResult,
+          encyclopediaResult,
+          bookmarksResult,
         ] = await Promise.all([
           // User studies
           supabase
@@ -167,7 +169,23 @@ export const GlobalSearch = () => {
             .select("id, summary, categories, deeper_insights")
             .eq("user_id", user.id)
             .order("created_at", { ascending: false })
-            .limit(20)
+            .limit(20),
+
+          // Encyclopedia articles (public, searchable)
+          supabase
+            .from("encyclopedia_articles")
+            .select("id, slug, title, summary_1d, topic_type, pt_floors")
+            .eq("is_published", true)
+            .order("title", { ascending: true })
+            .limit(50),
+
+          // Bookmarks
+          supabase
+            .from("bookmarks")
+            .select("id, book, chapter, verse, note")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(30),
         ]);
 
         // Process user studies
