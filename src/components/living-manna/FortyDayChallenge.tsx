@@ -1870,7 +1870,24 @@ export function FortyDayChallenge() {
           </div>
         </ScrollArea>
 
-        <div className="p-3 border-t border-border">
+        <div className="p-3 border-t border-border space-y-2">
+          {reviewSession.completed_at && (
+            <Button
+              onClick={() => togglePublicDebate(reviewSession.id, reviewSession.is_public)}
+              variant="outline"
+              className="w-full"
+              disabled={sharingSessionId === reviewSession.id}
+            >
+              {sharingSessionId === reviewSession.id ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : reviewSession.is_public ? (
+                <Globe className="h-4 w-4 mr-2 text-green-400" />
+              ) : (
+                <Share2 className="h-4 w-4 mr-2" />
+              )}
+              {reviewSession.is_public ? "Public — Tap to Make Private" : "Make Public & Share"}
+            </Button>
+          )}
           <Button onClick={() => { setPhase("daily-map"); setReviewSession(null); setJeevesRecap(null); }} className="w-full">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Progress Map
