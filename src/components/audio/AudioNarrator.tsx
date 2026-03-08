@@ -399,7 +399,7 @@ export const AudioNarrator = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => skip(-10)}
+            onClick={() => skip(-15)}
             disabled={!audioUrl || isLoading}
             className="h-8 w-8"
           >
