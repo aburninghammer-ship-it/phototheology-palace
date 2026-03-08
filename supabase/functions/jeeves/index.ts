@@ -9086,7 +9086,7 @@ Evaluate this response. Return ONLY valid JSON.`;
 
     } else if (mode === "freestyle_session_summary") {
       // Freestyle Zone - Generate session summary
-      const sessionData = body.sessionData || {};
+      const sessionData = requestBody.sessionData || {};
 
       systemPrompt = `You are Jeeves, summarizing a Phototheology freestyle training session. Analyze the student's performance across all drops and provide an encouraging, insightful summary.
 
