@@ -94,6 +94,25 @@ export default function AuthCallback() {
           const encryptedAccessToken = btoa(providerToken);
           const encryptedRefreshToken = providerRefreshToken ? btoa(providerRefreshToken) : null;
 
+          // Fetch platform user profile to store username/ID
+          let platformUserId: string | null = null;
+          let platformUsername: string | null = null;
+
+          if (platform === 'facebook') {
+            try {
+              const fbRes = await fetch(
+                `https://graph.facebook.com/me?fields=id,name&access_token=${providerToken}`
+              );
+              if (fbRes.ok) {
+                const fbUser = await fbRes.json();
+                platformUserId = fbUser.id || null;
+                platformUsername = fbUser.name || null;
+              }
+            } catch (fbError) {
+              console.error('Failed to fetch Facebook profile:', fbError);
+            }
+          }
+
           const { error: insertError } = await supabase
             .from('social_media_connections')
             .upsert({
@@ -101,6 +120,8 @@ export default function AuthCallback() {
               platform,
               access_token_encrypted: encryptedAccessToken,
               refresh_token_encrypted: encryptedRefreshToken,
+              platform_user_id: platformUserId,
+              platform_username: platformUsername,
               is_active: true,
             }, {
               onConflict: 'user_id,platform'
@@ -110,7 +131,7 @@ export default function AuthCallback() {
 
           toast({
             title: "Connected Successfully",
-            description: `Your ${platform} account has been connected.`,
+            description: `Your ${platform} account has been connected${platformUsername ? ` as ${platformUsername}` : ''}.`,
           });
 
           // Navigate back to profile

@@ -128,6 +128,8 @@ export function NotificationPreferences() {
           user_id: user.id,
           [key]: value,
           updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id',
         });
 
       if (error) throw error;
