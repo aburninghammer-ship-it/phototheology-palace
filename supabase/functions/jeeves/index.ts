@@ -9135,8 +9135,8 @@ Return ONLY valid JSON:
 
     } else if (mode === "freestyle_polish") {
       // Freestyle Zone - Polish session into a formatted document
-      const sessionData = body.sessionData || {};
-      const format = body.format || "devotional";
+      const sessionData = requestBody.sessionData || {};
+      const format = requestBody.format || "devotional";
 
       systemPrompt = `You are Jeeves, transforming a freestyle training session into a polished ${format}. Take the raw drops and responses and craft them into a beautiful, publishable piece.
 
