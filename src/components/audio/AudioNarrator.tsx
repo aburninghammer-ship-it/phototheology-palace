@@ -237,8 +237,8 @@ export const AudioNarrator = ({
           notifyTTSStopped();
           updateMediaSessionPlaybackState('paused');
         },
-        onSeekBackward: () => skip(-10),
-        onSeekForward: () => skip(10),
+        onSeekBackward: () => skip(-15),
+        onSeekForward: () => skip(15),
       });
       updateMediaSessionPlaybackState('playing');
     } catch (error) {
