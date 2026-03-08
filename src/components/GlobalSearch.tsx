@@ -8,7 +8,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Search, BookOpen, Gamepad2, Users, Trophy, BookMarked, Sparkles, Calendar, Image, FileText, Zap, Star, Gem, Scroll, MessageSquare } from "lucide-react";
+import { Search, BookOpen, Gamepad2, Users, Trophy, BookMarked, Sparkles, Calendar, Image, FileText, Zap, Star, Gem, Scroll, MessageSquare, BookText, Bookmark } from "lucide-react";
 import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,10 +16,10 @@ import { useAuth } from "@/hooks/useAuth";
 interface SavedItem {
   id: string;
   title: string;
-  type: "study" | "deck" | "gem" | "sermon" | "session" | "thought";
+  type: "study" | "deck" | "gem" | "sermon" | "session" | "thought" | "encyclopedia" | "bookmark";
   path: string;
-  content?: string; // For searching within content
-  subtitle?: string; // Additional context
+  content?: string;
+  subtitle?: string;
 }
 
 const searchItems = [
