@@ -94,6 +94,20 @@ const SESSION_DURATION = 60 * 60; // 60 minutes in seconds
 const MOMENTUM_DECAY_ON_PASS = 15;
 const MOMENTUM_CONSECUTIVE_PASS_PENALTY = 5;
 
+// Fallback drops used when Jeeves is unreachable — cycled through, never repeated back-to-back
+const FALLBACK_DROPS: Drop[] = [
+  { category: "scripture", drop: "The empty tomb on resurrection morning" },
+  { category: "nature", drop: "A seed that must die before it can grow" },
+  { category: "everyday", drop: "A mirror that only shows what stands before it" },
+  { category: "history", drop: "The walls of Jericho falling without a sword" },
+  { category: "human_experience", drop: "A child learning to walk by falling" },
+  { category: "symbolic", drop: "The lamb led silently to slaughter" },
+  { category: "scripture", drop: "Moses striking the rock at Horeb" },
+  { category: "nature", drop: "Lightning illuminating an entire landscape in an instant" },
+  { category: "everyday", drop: "Bread rising in the oven" },
+  { category: "symbolic", drop: "A door that opens from one side only" },
+];
+
 // Category display info
 export const CATEGORY_CONFIG: Record<DropCategory, { label: string; color: string; emoji: string }> = {
   scripture: { label: "Scripture", color: "bg-blue-500", emoji: "📖" },
@@ -253,18 +267,22 @@ export function useFreestyleZone() {
     const prevDrops = previousDrops || gameState.drops;
     const count = dropCount ?? gameState.drops.length;
 
-    // Use prefetched drop if available
-    if (prefetchedDrop && !difficulty) {
+    const lastDropText = prevDrops[prevDrops.length - 1]?.drop;
+
+    // Use prefetched drop if available AND not a duplicate of the last drop
+    if (prefetchedDrop && !difficulty && prefetchedDrop.drop !== lastDropText) {
       const drop = prefetchedDrop;
       setPrefetchedDrop(null);
       setGameState(prev => ({
         ...prev,
         drops: [...prev.drops, drop],
       }));
-      // Pre-fetch next one
       prefetchNextDrop(diff, [...prevDrops, drop], count + 1);
       return;
     }
+
+    // Clear stale/duplicate prefetch
+    if (prefetchedDrop) setPrefetchedDrop(null);
 
     setIsGeneratingDrop(true);
     try {
@@ -276,26 +294,28 @@ export function useFreestyleZone() {
       }, "freestyle-zone");
 
       const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      if (!parsed.drop) throw new Error("Empty drop from Jeeves");
+
       const drop: Drop = {
         category: parsed.category || "scripture",
-        drop: parsed.drop || "The cross of Calvary",
+        drop: parsed.drop,
         hint: parsed.hint,
       };
+
+      // Guard against Jeeves returning the same drop
+      if (drop.drop === lastDropText) throw new Error("Duplicate drop");
 
       setGameState(prev => ({
         ...prev,
         drops: [...prev.drops, drop],
       }));
 
-      // Pre-fetch next drop
       prefetchNextDrop(diff, [...prevDrops, drop], count + 1);
     } catch (error) {
       console.error("Failed to generate drop:", error);
-      // Fallback drop
-      const fallback: Drop = {
-        category: "scripture",
-        drop: "The empty tomb on resurrection morning",
-      };
+      // Pick a fallback that wasn't used recently
+      const usedTexts = new Set(prevDrops.slice(-5).map(d => d.drop));
+      const fallback = FALLBACK_DROPS.find(f => !usedTexts.has(f.drop)) || FALLBACK_DROPS[0];
       setGameState(prev => ({
         ...prev,
         drops: [...prev.drops, fallback],
@@ -319,13 +339,15 @@ export function useFreestyleZone() {
       }, "freestyle-zone");
 
       const parsed = typeof data === "string" ? JSON.parse(data) : data;
-      setPrefetchedDrop({
-        category: parsed.category || "scripture",
-        drop: parsed.drop || "Living water flowing from the rock",
-        hint: parsed.hint,
-      });
+      if (parsed.drop) {
+        setPrefetchedDrop({
+          category: parsed.category || "scripture",
+          drop: parsed.drop,
+          hint: parsed.hint,
+        });
+      }
     } catch {
-      // Silently fail on prefetch
+      // Silently fail on prefetch — generateNextDrop will use fallback pool
     }
   }, []);
 

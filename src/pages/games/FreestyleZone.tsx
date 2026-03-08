@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Clock, Zap, SkipForward, Send, Trophy,
   BookOpen, Sparkles, FileText, ChevronRight, Loader2,
-  Play, Flame, Target, Crown, Eye,
+  Play, Flame, Target, Crown, Eye, Swords,
 } from "lucide-react";
 import {
   useFreestyleZone,
@@ -28,12 +28,18 @@ function SetupScreen({ onStart, hasExisting, onResume }: {
   onResume: () => void;
 }) {
   const difficulties: Difficulty[] = ["beginner", "intermediate", "advanced", "master"];
-  const icons = [Play, Target, Flame, Crown];
+  const icons = [Play, Target, Swords, Crown];
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div className="text-center space-y-3">
-        <h1 className="text-3xl font-bold">The Freestyler Training Zone</h1>
+        <div className="relative inline-flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-t from-orange-500/20 via-red-500/10 to-transparent rounded-full blur-2xl scale-150" />
+          <Flame className="h-16 w-16 text-orange-500 relative animate-pulse" />
+        </div>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-500 via-red-500 to-yellow-500 bg-clip-text text-transparent">
+          The Freestyler Training Zone
+        </h1>
         <p className="text-muted-foreground text-lg">
           Train your theological reflexes. Connect random drops to Christ. Build chains under pressure.
         </p>
@@ -159,12 +165,12 @@ function ActiveSession({
     }
   }, [currentDrop, hasSubmitted]);
 
-  // Momentum glow color
+  // Momentum glow color — fire-themed
   const getGlowColor = () => {
-    if (momentum >= 80) return "shadow-green-500/30";
-    if (momentum >= 60) return "shadow-blue-500/20";
-    if (momentum >= 40) return "shadow-yellow-500/20";
-    return "shadow-red-500/20";
+    if (momentum >= 80) return "shadow-lg shadow-orange-500/30 border-orange-400/40";
+    if (momentum >= 60) return "shadow-lg shadow-yellow-500/20 border-yellow-400/30";
+    if (momentum >= 40) return "shadow-md shadow-amber-500/20 border-amber-400/20";
+    return "shadow-md shadow-red-500/20 border-red-400/20";
   };
 
   const catConfig = currentDrop ? CATEGORY_CONFIG[currentDrop.category] : null;
@@ -195,18 +201,37 @@ function ActiveSession({
         </div>
       </div>
 
-      {/* Momentum Bar */}
-      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+      {/* Momentum Bar — fire gradient */}
+      <div className="relative h-2.5 bg-muted rounded-full overflow-hidden">
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
           style={{
-            background: momentum >= 80 ? "#22c55e" :
-              momentum >= 60 ? "#3b82f6" :
-              momentum >= 40 ? "#eab308" : "#ef4444",
+            background: momentum >= 80
+              ? "linear-gradient(90deg, #f97316, #ef4444, #f59e0b)"
+              : momentum >= 60
+              ? "linear-gradient(90deg, #f97316, #eab308)"
+              : momentum >= 40
+              ? "linear-gradient(90deg, #eab308, #d97706)"
+              : "linear-gradient(90deg, #dc2626, #991b1b)",
           }}
           animate={{ width: `${momentum}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         />
+        {momentum >= 70 && (
+          <motion.div
+            className="absolute inset-y-0 left-0 rounded-full opacity-50"
+            style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)" }}
+            animate={{ width: `${momentum}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+        )}
+      </div>
+      <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <Flame className={`h-3 w-3 ${momentum >= 70 ? 'text-orange-500' : 'text-muted-foreground'}`} />
+          {momentum >= 80 ? "On Fire!" : momentum >= 60 ? "Heating Up" : momentum >= 40 ? "Warming" : "Cold"}
+        </span>
+        <span>{Math.round(momentum)}%</span>
       </div>
 
       {/* Chain Breadcrumbs */}
@@ -407,10 +432,14 @@ function CompletionScreen({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 10 }}
+          className="relative inline-flex"
         >
-          <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
+          <div className="absolute inset-0 bg-gradient-to-t from-orange-500/20 via-red-500/10 to-transparent rounded-full blur-xl scale-150" />
+          <Flame className="h-16 w-16 text-orange-500 mx-auto relative" />
         </motion.div>
-        <h1 className="text-2xl font-bold">Session Complete!</h1>
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 via-red-500 to-yellow-500 bg-clip-text text-transparent">
+          Session Complete!
+        </h1>
         <div className="flex justify-center gap-4 text-sm text-muted-foreground">
           <span>{gameState.drops.length} drops</span>
           <span>{answeredCount} answered</span>
@@ -648,7 +677,7 @@ function CompletionScreen({
 
       <div className="flex justify-center">
         <Button onClick={onPlayAgain} variant="outline" className="gap-1">
-          <Zap className="h-4 w-4" /> Play Again
+          <Flame className="h-4 w-4 text-orange-500" /> Light Another Fire
         </Button>
       </div>
     </div>
