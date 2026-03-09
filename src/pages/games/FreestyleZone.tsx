@@ -405,7 +405,7 @@ function ActiveSession({
                       <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Jeeves Shows the Way</span>
                     </div>
                     <p className="text-sm leading-relaxed">{jeevesAssist}</p>
-                    <p className="text-xs text-muted-foreground italic">Now try your own connection — use this as inspiration!</p>
+                    <p className="text-xs text-muted-foreground italic">Next drop loading automatically...</p>
                   </CardContent>
                 </Card>
               </motion.div>

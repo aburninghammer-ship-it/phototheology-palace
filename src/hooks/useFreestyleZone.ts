@@ -521,13 +521,30 @@ export function useFreestyleZone() {
       const connection = parsed.connection || parsed.response || "Jeeves is thinking...";
       const keyInsight = parsed.keyInsight ? `\n\n💡 ${parsed.keyInsight}` : "";
       setJeevesAssist(connection + keyInsight);
+
+      // Record Jeeves' assist as the response for this drop (so it appears in chain history)
+      setGameState(prev => ({
+        ...prev,
+        userResponses: [...prev.userResponses, `[Jeeves freestyled] ${connection}`],
+        scores: [...prev.scores, {
+          christConnection: 0, depth: 0, creativity: 0, chainLink: 0,
+          totalScore: 0, feedback: "Jeeves handled this one.",
+        }],
+      }));
+
+      // Auto-advance to next drop after a delay so the player can read Jeeves' response
+      setTimeout(() => {
+        setJeevesAssist(null);
+        setCurrentFeedback(null);
+        generateNextDrop();
+      }, 5000);
     } catch (err) {
       console.error("Jeeves assist error:", err);
       setJeevesAssist("Jeeves couldn't connect to this one right now. Try your best or pass!");
     } finally {
       setIsAskingJeeves(false);
     }
-  }, [gameState, buildChainHistory]);
+  }, [gameState, buildChainHistory, generateNextDrop, setGameState]);
 
   const endSession = useCallback(async () => {
     if (timerRef.current) clearInterval(timerRef.current);
