@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Clock, Zap, SkipForward, Send, Trophy,
   BookOpen, Sparkles, FileText, ChevronRight, ChevronDown, ChevronUp, Loader2,
-  Play, Flame, Target, Crown, Eye, Swords,
+  Play, Flame, Target, Crown, Eye, Swords, HelpCircle, Lightbulb,
 } from "lucide-react";
 import {
   useFreestyleZone,
@@ -137,8 +137,8 @@ function SetupScreen({ onStart, hasExisting, onResume }: {
 
 function ActiveSession({
   gameState, currentDrop, currentDropIndex, currentFeedback, timeRemaining,
-  momentum, isGeneratingDrop, isEvaluating,
-  onSubmit, onPass, onNext, onEnd,
+  momentum, isGeneratingDrop, isEvaluating, isAskingJeeves, jeevesAssist,
+  onSubmit, onPass, onNext, onEnd, onAskJeeves,
 }: {
   gameState: ReturnType<typeof useFreestyleZone>["gameState"];
   currentDrop: ReturnType<typeof useFreestyleZone>["currentDrop"];
@@ -148,10 +148,13 @@ function ActiveSession({
   momentum: number;
   isGeneratingDrop: boolean;
   isEvaluating: boolean;
+  isAskingJeeves: boolean;
+  jeevesAssist: string | null;
   onSubmit: (response: string) => void;
   onPass: () => void;
   onNext: () => void;
   onEnd: () => void;
+  onAskJeeves: () => void;
 }) {
   const [input, setInput] = useState("");
   const [showChainHistory, setShowChainHistory] = useState(true);
@@ -387,6 +390,28 @@ function ActiveSession({
       {/* Response Area */}
       {!hasSubmitted ? (
         <div className="space-y-3">
+          {/* Jeeves Assist Display */}
+          <AnimatePresence>
+            {jeevesAssist && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <Card className="border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-indigo-500/5">
+                  <CardContent className="p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Jeeves Shows the Way</span>
+                    </div>
+                    <p className="text-sm leading-relaxed">{jeevesAssist}</p>
+                    <p className="text-xs text-muted-foreground italic">Now try your own connection — use this as inspiration!</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <Textarea
             ref={textareaRef}
             value={input}
@@ -401,14 +426,30 @@ function ActiveSession({
             }}
           />
           <div className="flex gap-2 justify-between">
-            <Button
-              variant="outline"
-              onClick={onPass}
-              disabled={isEvaluating || isGeneratingDrop}
-              className="gap-1"
-            >
-              <SkipForward className="h-4 w-4" /> PASS
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={onPass}
+                disabled={isEvaluating || isGeneratingDrop || isAskingJeeves}
+                className="gap-1"
+              >
+                <SkipForward className="h-4 w-4" /> PASS
+              </Button>
+              <Button
+                variant="outline"
+                onClick={onAskJeeves}
+                disabled={isEvaluating || isGeneratingDrop || isAskingJeeves || !!jeevesAssist}
+                className="gap-1 text-blue-600 dark:text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
+              >
+                {isAskingJeeves ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" /> Asking Jeeves...</>
+                ) : jeevesAssist ? (
+                  <><Lightbulb className="h-4 w-4" /> Jeeves Helped</>
+                ) : (
+                  <><HelpCircle className="h-4 w-4" /> Ask Jeeves</>
+                )}
+              </Button>
+            </div>
             <Button
               onClick={handleSubmit}
               disabled={!input.trim() || isEvaluating || isGeneratingDrop}
@@ -842,10 +883,13 @@ export default function FreestyleZone() {
             momentum={game.gameState.momentum}
             isGeneratingDrop={game.isGeneratingDrop}
             isEvaluating={game.isEvaluating}
+            isAskingJeeves={game.isAskingJeeves}
+            jeevesAssist={game.jeevesAssist}
             onSubmit={game.submitResponse}
             onPass={game.passDrop}
             onNext={game.advanceToNextDrop}
             onEnd={game.endSession}
+            onAskJeeves={game.askJeevesForHelp}
           />
         ) : (
           <CompletionScreen

@@ -9047,13 +9047,13 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
 
       systemPrompt = `You are Jeeves, the Phototheology Palace study mentor. You are generating "drops" for the Freestyler Training Zone — a theological reflex training exercise where students must connect random subjects to Christ.
 
-A "drop" is a short, evocative prompt from one of these categories:
-- scripture: A Bible verse, passage, or biblical concept (e.g. "The bronze serpent in the wilderness", "Psalm 23:4")
-- nature: Something from the natural world (e.g. "A caterpillar becoming a butterfly", "The way water finds the lowest point")
-- everyday: An ordinary life experience (e.g. "Waiting in traffic", "A child learning to walk")
-- history: A historical event or figure (e.g. "The fall of the Berlin Wall", "Florence Nightingale's lamp")
-- human_experience: An emotion, relationship, or universal experience (e.g. "The grief of losing a parent", "The thrill of forgiveness")
-- symbolic: A symbol, archetype, or abstract concept (e.g. "A locked door", "The color white", "Mirrors")
+A "drop" is a short, evocative prompt from one of these categories. Drops can range from a SINGLE WORD to a short phrase (1-2 sentences max). Mix it up — sometimes drop just one word, sometimes a vivid image, sometimes a brief scenario:
+- scripture: A Bible verse, passage, or biblical concept (e.g. "Psalm 23:4", "The bronze serpent", "Manna")
+- nature: Something from the natural world (e.g. "Water", "A caterpillar becoming a butterfly", "Lightning")
+- everyday: An ordinary life experience (e.g. "Traffic", "A child learning to walk", "Keys")
+- history: A historical event or figure (e.g. "Mexico", "The Berlin Wall", "Florence Nightingale")
+- human_experience: An emotion, relationship, or universal experience (e.g. "Nostalgia", "Forgiveness", "A scar")
+- symbolic: A symbol, archetype, or abstract concept (e.g. "Fire", "Mirrors", "A locked door")
 
 DIFFICULTY RULES:
 - beginner: Simple, familiar drops with obvious Christ connections. Categories: scripture, nature, everyday.
@@ -9225,6 +9225,36 @@ Return ONLY valid JSON:
       userPrompt = `Here are ALL the drops from the student's session. Build your freestyle chain:
 ${JSON.stringify(drops)}`;
 
+    } else if (mode === "freestyle_jeeves_assist") {
+      const drop = requestBody.drop || {};
+      const chainHistory = requestBody.chainHistory || [];
+      const difficulty = requestBody.difficulty || "beginner";
+
+      systemPrompt = `You are Jeeves, the master Phototheologist. A student is stuck on a freestyle drop and has asked you to demonstrate how YOU would connect it to Christ.
+
+This is a teaching moment. Show them a brilliant, accessible connection that helps them learn HOW to think this way. Your response should make them say "Oh! I see it now!"
+
+RULES:
+- Connect this drop to Christ with 3-5 sentences
+- Use plain, vivid language — no academic jargon
+- Reference at least one specific Scripture (KJV)
+- If there are previous drops in the chain, weave a connection to at least one of them
+- Show the PROCESS: briefly hint at how you spotted the connection (e.g. "The key word here is..." or "Notice how this mirrors...")
+- Be warm and encouraging — they asked for help, not a lecture
+
+${chainHistory.length > 0 ? `CHAIN HISTORY (previous drops and responses):
+${JSON.stringify(chainHistory.slice(-6))}` : "This is the first drop — no chain history yet."}
+
+Return ONLY valid JSON:
+{
+  "connection": "Your 3-5 sentence freestyle connection to Christ",
+  "keyInsight": "One sentence about HOW you spotted this connection (teaching the student to see patterns)"
+}`;
+
+      userPrompt = `The student is stuck on this drop: [${drop.category}] "${drop.drop}"
+
+Show them how a master Phototheologist would connect this to Christ at ${difficulty} level.`;
+
     } else if (mode === "freestyle_polish") {
       const sessionData = requestBody.sessionData || {};
       const format = requestBody.format || "devotional";
@@ -9296,7 +9326,7 @@ ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[
       "family_feud_round", "family_feud_judge", "family_feud_forge", "family_feud_judge_forge",
       "scrabble-amplify", "scrabble-feedback",
       "freestyle_generate_drop", "freestyle_evaluate", "freestyle_session_summary",
-      "freestyle_jeeves_demo", "freestyle_polish",
+      "freestyle_jeeves_demo", "freestyle_jeeves_assist", "freestyle_polish",
     ]);
 
     if (!RAG_EXCLUDED_MODES.has(mode)) {
@@ -10301,7 +10331,7 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
          "check_chef_recipe", "get_chef_model_answer", "chef_round_setup", "chef_judge",
          "study_suggestion", "scrabble-feedback",
          "freestyle_generate_drop", "freestyle_evaluate", "freestyle_session_summary",
-         "freestyle_jeeves_demo", "freestyle_polish"].includes(mode)) {
+         "freestyle_jeeves_demo", "freestyle_jeeves_assist", "freestyle_polish"].includes(mode)) {
       try {
         console.log(`=== ${mode.toUpperCase()} RESPONSE ===`);
         console.log("Raw content:", content);

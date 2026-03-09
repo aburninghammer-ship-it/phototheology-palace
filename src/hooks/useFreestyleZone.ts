@@ -169,6 +169,8 @@ export function useFreestyleZone() {
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [isGeneratingDemo, setIsGeneratingDemo] = useState(false);
   const [isPolishing, setIsPolishing] = useState(false);
+  const [isAskingJeeves, setIsAskingJeeves] = useState(false);
+  const [jeevesAssist, setJeevesAssist] = useState<string | null>(null);
   const [currentFeedback, setCurrentFeedback] = useState<EvaluationScores | null>(null);
   const [sessionSummary, setSessionSummary] = useState<SessionSummary | null>(null);
   const [jeevesDemo, setJeevesDemo] = useState<JeevesDemo | null>(null);
@@ -453,8 +455,44 @@ export function useFreestyleZone() {
 
   const advanceToNextDrop = useCallback(async () => {
     setCurrentFeedback(null);
+    setJeevesAssist(null);
     await generateNextDrop();
   }, [generateNextDrop]);
+
+  const askJeevesForHelp = useCallback(async () => {
+    if (gameState.phase !== "active") return;
+
+    const currentDrop = gameState.drops[gameState.drops.length - 1];
+    if (!currentDrop) return;
+
+    setIsAskingJeeves(true);
+    setJeevesAssist(null);
+
+    try {
+      const chainHistory = buildChainHistory().slice(-10);
+
+      const { data, error } = await callJeeves({
+        mode: "freestyle_jeeves_assist",
+        drop: currentDrop,
+        chainHistory,
+        difficulty: gameState.difficulty,
+      }, "freestyle-zone");
+
+      if (error || !data) {
+        throw new Error("Jeeves couldn't assist right now");
+      }
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      const connection = parsed.connection || parsed.response || "Jeeves is thinking...";
+      const keyInsight = parsed.keyInsight ? `\n\n💡 ${parsed.keyInsight}` : "";
+      setJeevesAssist(connection + keyInsight);
+    } catch (err) {
+      console.error("Jeeves assist error:", err);
+      setJeevesAssist("Jeeves couldn't connect to this one right now. Try your best or pass!");
+    } finally {
+      setIsAskingJeeves(false);
+    }
+  }, [gameState, buildChainHistory]);
 
   const endSession = useCallback(async () => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -578,6 +616,7 @@ export function useFreestyleZone() {
     // Loading states
     isGeneratingDrop,
     isEvaluating,
+    isAskingJeeves,
     isGeneratingSummary,
     isGeneratingDemo,
     isPolishing,
@@ -587,11 +626,15 @@ export function useFreestyleZone() {
     hasExistingSession,
     resumeGame,
 
+    // Jeeves assist
+    jeevesAssist,
+
     // Actions
     startSession,
     submitResponse,
     passDrop,
     advanceToNextDrop,
+    askJeevesForHelp,
     endSession,
     generateSessionSummary,
     generateJeevesDemo,
