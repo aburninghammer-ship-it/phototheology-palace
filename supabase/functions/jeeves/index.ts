@@ -9039,13 +9039,13 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
 
       const categories = categoryPool[difficulty] || categoryPool.beginner;
 
+      const recentCategories = previousDrops.slice(-categories.length).map((d: any) => d.category);
       let preferredCategory: string;
       if (dropFocus && dropFocus !== "random") {
         // User locked a specific category — always use it
         preferredCategory = dropFocus;
       } else {
         // Determine which category to use next — enforce diversity by rotating through all available categories
-        const recentCategories = previousDrops.slice(-categories.length).map((d: any) => d.category);
         const underusedCategories = categories.filter((c: string) => !recentCategories.includes(c));
         preferredCategory = underusedCategories.length > 0
           ? underusedCategories[Math.floor(Math.random() * underusedCategories.length)]
