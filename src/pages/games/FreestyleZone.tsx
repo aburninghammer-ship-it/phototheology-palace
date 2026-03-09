@@ -442,11 +442,11 @@ function ActiveSession({
                 className="gap-1 text-blue-600 dark:text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
               >
                 {isAskingJeeves ? (
-                  <><Loader2 className="h-4 w-4 animate-spin" /> Asking Jeeves...</>
+                  <><Loader2 className="h-4 w-4 animate-spin" /> Jeeves is freestyling...</>
                 ) : jeevesAssist ? (
-                  <><Lightbulb className="h-4 w-4" /> Jeeves Helped</>
+                  <><Lightbulb className="h-4 w-4" /> Jeeves Freestyled</>
                 ) : (
-                  <><HelpCircle className="h-4 w-4" /> Ask Jeeves</>
+                  <><Sparkles className="h-4 w-4" /> Jeeves! Freestyle!</>
                 )}
               </Button>
             </div>

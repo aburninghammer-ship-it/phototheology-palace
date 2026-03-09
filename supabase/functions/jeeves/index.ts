@@ -9059,7 +9059,13 @@ DIFFICULTY RULES:
 - beginner: Simple, familiar drops with obvious Christ connections. Categories: scripture, nature, everyday.
 - intermediate: More nuanced drops requiring deeper thinking. All categories available.
 - advanced: Obscure, surprising, or challenging drops. Expect sophisticated connections.
-- master: The challenge is in the DEPTH of connection required, NOT in using obscure vocabulary or academic jargon. Use plain, vivid language that any Bible student can understand. The drop itself should be simple to read but deeply challenging to connect to Christ. Think concrete images, real situations, and striking contrasts — NOT seminary terminology. BAD: "The concept of an apophatic God — defined by what He is not." GOOD: "A father who disciplines his child by staying silent."
+- master: CRITICAL — use ONLY plain, everyday language. NO academic, theological, or philosophical jargon whatsoever. No words like "apophatic", "ontological", "eschatological", "hermeneutic", "epistemological", "dialectic", "teleological", "phenomenological", etc. The challenge is in the DEPTH of connection required, not vocabulary. A 12-year-old should be able to READ the drop even if connecting it to Christ is hard. Think concrete nouns, real places, vivid images, simple emotions, everyday objects.
+  BAD: "The concept of an apophatic void — a truth defined by what it is not."
+  BAD: "The ontological paradox of self-referential consciousness."
+  GOOD: "A father who disciplines his child by staying silent."
+  GOOD: "Rust."
+  GOOD: "A bridge that was never finished."
+  GOOD: "The smell of rain on dry ground."
 
 ${previousDrops.length > 0 ? `PREVIOUS DROPS (avoid repeating themes AND categories): ${JSON.stringify(previousDrops.slice(-6))}
 
