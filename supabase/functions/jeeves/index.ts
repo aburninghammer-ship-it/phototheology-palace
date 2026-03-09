@@ -9086,69 +9086,58 @@ Return ONLY valid JSON:
       const chainHistory = requestBody.chainHistory || [];
       const difficulty = requestBody.difficulty || "beginner";
 
-      systemPrompt = `You are Jeeves, evaluating a student's freestyle connection in the Phototheology Freestyler Training Zone.
+      systemPrompt = `You are Jeeves, evaluating ${greeting}'s freestyle connection in the Phototheology Freestyler Training Zone.
 
-The student was given a "drop" (a random prompt) and must connect it to Christ AND ideally to previous drops in their chain.
+${greeting} was given a "drop" (a random prompt) and must connect it to Christ AND ideally to previous drops in their chain.
 
-EVALUATION DIMENSIONS (score each 0-10):
-1. **christConnection** — How clearly and authentically does the response connect the drop to Christ? (Not just mentioning Jesus, but showing a genuine theological/typological/symbolic link)
-   - 0-2: No real Christ connection, just vague spirituality
-   - 3-4: Mentions Jesus/God but the connection is generic or forced
-   - 5-6: A solid, legitimate connection but could go deeper
-   - 7-8: Clear typological or symbolic depth showing real biblical understanding
-   - 9-10: Stunning insight — the kind of connection that makes people stop and think
+SCORING RULES — READ CAREFULLY:
+You must score each of the 4 dimensions on a 0-10 scale. The scores MUST reflect the ACTUAL quality of the response. Do NOT cluster all scores in the 5-7 range. Use the FULL range.
 
-2. **depth** — How deep is the theological reasoning?
-   - 0-2: One sentence, surface-level, no Scripture
-   - 3-4: Shows some thought but stays at a devotional level
-   - 5-6: Solid reasoning with at least one specific biblical reference
-   - 7-8: Multi-layered, references cross-Testament patterns, shows systematic understanding
-   - 9-10: Seminary-level insight with precise exegetical grounding
+A mediocre response should get 2s and 3s, not 6s. An excellent response should get 8s and 9s, not 7s. A mixed response might get a 9 in one area and a 2 in another. NEVER give all four dimensions the same score or within 1 point of each other unless the response truly warrants it.
 
-3. **creativity** — How original and unexpected is the connection?
-   - 0-2: The first thing anyone would think of
-   - 3-4: Predictable but expressed well
-   - 5-6: An angle most people wouldn't immediately see
-   - 7-8: Genuinely surprising connection that still holds up theologically
-   - 9-10: Paradigm-shifting — connects things no one has connected before
+DIMENSIONS:
+1. christConnection (0-10): How clearly does the response connect the drop to Christ?
+   0-1: No connection at all. 2-3: Vague or forced mention of God/Jesus. 4-5: A valid but surface-level link. 6-7: Shows real biblical understanding. 8-9: Typological depth that surprises. 10: Revelatory.
 
-4. **chainLink** — How well does it connect to previous drops in the chain?
-   - 0-2: Ignores all previous drops entirely
-   - 3-4: Vaguely related to the overall theme but no explicit linking
-   - 5-6: References or builds on one previous drop
-   - 7-8: Weaves together multiple previous drops into a flowing argument
-   - 9-10: Creates a tapestry where this drop and all previous ones form one unified theology
-   - (If first drop, score based on how chainable this response is: does it plant seeds for future connections?)
+2. depth (0-10): How deep is the theological reasoning?
+   0-1: Empty or meaningless. 2-3: One generic sentence. 4-5: Some thought, maybe a Scripture reference. 6-7: Multi-layered with specific biblical grounding. 8-9: Cross-Testament patterns, systematic insight. 10: Seminary-level exegesis.
 
-CRITICAL: Each dimension MUST be scored INDEPENDENTLY based on the actual content. Do NOT default to similar numbers across dimensions. A response can be very creative (8) but shallow in depth (3). It can have a strong Christ connection (9) but zero chain linking (1). Differentiate aggressively.
+3. creativity (0-10): How original is the connection?
+   0-1: No thought at all. 2-3: The obvious first answer anyone gives. 4-5: Slightly unexpected. 6-7: An angle most wouldn't see. 8-9: Genuinely surprising yet theologically sound. 10: Paradigm-shifting.
+
+4. chainLink (0-10): How well does it connect to previous drops?
+   0-1: Completely ignores chain. 2-3: No explicit linking. 4-5: Vague thematic similarity. 6-7: References a specific previous drop. 8-9: Weaves multiple drops together. 10: Perfect tapestry.
+   (If first drop: score how chainable this response is — does it plant seeds?)
+
+ANTI-PATTERN WARNING: If you find yourself giving scores like 6,7,6,7 or 7,6,7,6 — STOP. That means you are being lazy. Re-read the response and ask: is the creativity REALLY the same quality as the depth? Is the chain linking REALLY comparable to the Christ connection? Score each one fresh.
 
 DIFFICULTY EXPECTATIONS:
-- beginner: Be encouraging but still honest. A generic "Jesus loves us" response gets christConnection 3-4, not 7-8.
-- intermediate: Expect specificity. Vague responses without Scripture cap at 5 in depth.
-- advanced: Expect typological depth, multiple layers, and chain awareness. Generic responses score 2-4.
-- master: Be rigorous. Only give 8+ for truly exceptional connections.
+- beginner: Be encouraging. A generic "Jesus loves us" still only gets christConnection 3.
+- intermediate: Expect specificity. Vague responses cap at 4-5 in depth.
+- advanced: Expect layers and chain awareness. Generic = 2-3.
+- master: Be rigorous. Only 8+ for truly exceptional work.
 
-totalScore = christConnection + depth + creativity + chainLink (must equal the sum, not a separate judgment)
+totalScore = christConnection + depth + creativity + chainLink (the arithmetic sum — not a separate judgment)
 
 ${chainHistory.length > 0 ? `CHAIN HISTORY (last ${Math.min(chainHistory.length, 10)} entries):
-${JSON.stringify(chainHistory.slice(-10))}` : "This is the first response in the chain."}
+${JSON.stringify(chainHistory.slice(-10))}` : "This is the first response in the chain — score chainLink based on how chainable this response is."}
 
-Return ONLY valid JSON:
+Return ONLY valid JSON (no markdown, no backticks):
 {
-  "christConnection": <0-10>,
-  "depth": <0-10>,
-  "creativity": <0-10>,
-  "chainLink": <0-10>,
-  "totalScore": <sum of above four>,
-  "feedback": "2-3 sentences of Jeeves-style feedback — warm, specific, instructive. Reference what they ACTUALLY said.",
-  "suggestion": "1 sentence suggesting how they could deepen the connection (optional, skip if totalScore > 32)"
+  "christConnection": <integer 0-10>,
+  "depth": <integer 0-10>,
+  "creativity": <integer 0-10>,
+  "chainLink": <integer 0-10>,
+  "totalScore": <integer sum of above four>,
+  "feedback": "2-3 sentences addressing ${greeting} by name — warm, specific, instructive. Reference what they ACTUALLY said.",
+  "suggestion": "1 sentence suggesting how they could deepen the connection (omit this field entirely if totalScore > 32)"
 }`;
 
       userPrompt = `DROP: [${drop.category}] "${drop.drop}"
 
-STUDENT'S RESPONSE: "${userResponse}"
+${greeting.toUpperCase()}'S RESPONSE: "${userResponse}"
 
-Evaluate this response at ${difficulty} difficulty level.`;
+Evaluate this ${difficulty}-level response. Remember: use the FULL 0-10 range. Do NOT default to middle scores.`;
 
     } else if (mode === "freestyle_session_summary") {
       const sessionData = requestBody.sessionData || {};
@@ -9161,7 +9150,7 @@ Evaluate this response at ${difficulty} difficulty level.`;
 
       systemPrompt = `You are Jeeves, writing an end-of-session evaluation report for the Freestyler Training Zone.
 
-Analyze the student's entire session and provide a comprehensive but warm evaluation.
+Analyze ${greeting}'s entire session and provide a comprehensive but warm evaluation. Address ${greeting} by name throughout.
 
 Return ONLY valid JSON:
 {
@@ -9199,7 +9188,7 @@ Generate a comprehensive session evaluation that accounts for EVERY drop and res
       const drops = requestBody.drops || [];
       const difficulty = requestBody.difficulty || "beginner";
 
-      systemPrompt = `You are Jeeves, the master Phototheologist. A student just finished a Freestyler Training Zone session and wants to see YOU freestyle.
+      systemPrompt = `You are Jeeves, the master Phototheologist. ${greeting} just finished a Freestyler Training Zone session and wants to see YOU freestyle.
 
 Take ALL the drops from their session and build your own freestyle chain — connecting each drop to Christ AND to the previous drops, creating one flowing theological tapestry.
 
@@ -9213,6 +9202,7 @@ RULES:
 - Make the chain feel like one unified sermon illustration
 - Keep each drop's connection to 2-4 sentences
 - End with a powerful Christ-centered conclusion that ties everything together
+- Address ${greeting} warmly in your conclusion
 
 Return ONLY valid JSON:
 {
@@ -9224,11 +9214,11 @@ Return ONLY valid JSON:
       "connection": "Jeeves's connection (2-4 sentences)"
     }
   ],
-  "conclusion": "A powerful 2-3 sentence conclusion tying it all to Christ",
+  "conclusion": "A powerful 2-3 sentence conclusion tying it all to Christ, addressing ${greeting} by name",
   "closingVerse": "A Scripture reference that captures the whole chain"
 }`;
 
-      userPrompt = `Here are ALL the drops from the student's session. Build your freestyle chain:
+      userPrompt = `Here are ALL the drops from ${greeting}'s session. Build your freestyle chain:
 ${JSON.stringify(drops)}`;
 
     } else if (mode === "freestyle_jeeves_assist") {
@@ -9236,9 +9226,9 @@ ${JSON.stringify(drops)}`;
       const chainHistory = requestBody.chainHistory || [];
       const difficulty = requestBody.difficulty || "beginner";
 
-      systemPrompt = `You are Jeeves, the master Phototheologist. A student is stuck on a freestyle drop and has asked you to demonstrate how YOU would connect it to Christ.
+      systemPrompt = `You are Jeeves, the master Phototheologist. ${greeting} is stuck on a freestyle drop and has asked you to demonstrate how YOU would connect it to Christ.
 
-This is a teaching moment. Show them a brilliant, accessible connection that helps them learn HOW to think this way. Your response should make them say "Oh! I see it now!"
+This is a teaching moment. Show ${greeting} a brilliant, accessible connection that helps them learn HOW to think this way. Your response should make them say "Oh! I see it now!"
 
 RULES:
 - Connect this drop to Christ with 3-5 sentences
@@ -9246,7 +9236,7 @@ RULES:
 - Reference at least one specific Scripture (KJV)
 - If there are previous drops in the chain, weave a connection to at least one of them
 - Show the PROCESS: briefly hint at how you spotted the connection (e.g. "The key word here is..." or "Notice how this mirrors...")
-- Be warm and encouraging — they asked for help, not a lecture
+- Be warm and encouraging — address ${greeting} by name. They asked for help, not a lecture
 
 ${chainHistory.length > 0 ? `CHAIN HISTORY (previous drops and responses):
 ${JSON.stringify(chainHistory.slice(-6))}` : "This is the first drop — no chain history yet."}
@@ -9257,9 +9247,9 @@ Return ONLY valid JSON:
   "keyInsight": "One sentence about HOW you spotted this connection (teaching the student to see patterns)"
 }`;
 
-      userPrompt = `The student is stuck on this drop: [${drop.category}] "${drop.drop}"
+      userPrompt = `${greeting} is stuck on this drop: [${drop.category}] "${drop.drop}"
 
-Show them how a master Phototheologist would connect this to Christ at ${difficulty} level.`;
+Show ${greeting} how a master Phototheologist would connect this to Christ at ${difficulty} level.`;
 
     } else if (mode === "freestyle_polish") {
       const sessionData = requestBody.sessionData || {};
@@ -9274,7 +9264,7 @@ Show them how a master Phototheologist would connect this to Christ at ${difficu
         script: "Convert this into a compelling script for a short video or podcast segment (3-5 minutes). Include speaker notes, pacing cues, and dramatic moments."
       };
 
-      systemPrompt = `You are Jeeves, helping a student transform their Freestyler Training Zone session into polished content.
+      systemPrompt = `You are Jeeves, helping ${greeting} transform their Freestyler Training Zone session into polished content.
 
 ${formatInstructions[format] || formatInstructions.devotional}
 
@@ -9365,7 +9355,7 @@ ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[
     }
 
     // Use lower temperature for structured JSON modes to improve reliability
-    const modelTemperature = (mode === "research") ? 0.4 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : (mode && (mode.startsWith("jeopardy_") || mode.startsWith("family_feud_"))) ? 0.7 : 0.9;
+    const modelTemperature = (mode === "research") ? 0.4 : (mode === "freestyle_evaluate") ? 0.3 : (mode === "analyze-thoughts" || mode === "analyze-thoughts-scholar") ? 0.6 : (mode && (mode.startsWith("jeopardy_") || mode.startsWith("family_feud_"))) ? 0.7 : 0.9;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
