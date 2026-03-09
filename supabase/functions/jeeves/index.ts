@@ -9059,7 +9059,7 @@ DIFFICULTY RULES:
 - beginner: Simple, familiar drops with obvious Christ connections. Categories: scripture, nature, everyday.
 - intermediate: More nuanced drops requiring deeper thinking. All categories available.
 - advanced: Obscure, surprising, or challenging drops. Expect sophisticated connections.
-- master: Deliberately difficult — abstract, paradoxical, or culturally complex. Push the student hard.
+- master: The challenge is in the DEPTH of connection required, NOT in using obscure vocabulary or academic jargon. Use plain, vivid language that any Bible student can understand. The drop itself should be simple to read but deeply challenging to connect to Christ. Think concrete images, real situations, and striking contrasts — NOT seminary terminology. BAD: "The concept of an apophatic God — defined by what He is not." GOOD: "A father who disciplines his child by staying silent."
 
 ${previousDrops.length > 0 ? `PREVIOUS DROPS (avoid repeating themes AND categories): ${JSON.stringify(previousDrops.slice(-6))}
 
