@@ -9037,6 +9037,14 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
 
       const categories = categoryPool[difficulty] || categoryPool.beginner;
 
+      // Determine which category to use next — enforce diversity by rotating through all available categories
+      const recentCategories = previousDrops.slice(-categories.length).map((d: any) => d.category);
+      // Find categories that haven't been used recently
+      const underusedCategories = categories.filter((c: string) => !recentCategories.includes(c));
+      const preferredCategory = underusedCategories.length > 0
+        ? underusedCategories[Math.floor(Math.random() * underusedCategories.length)]
+        : categories[Math.floor(Math.random() * categories.length)];
+
       systemPrompt = `You are Jeeves, the Phototheology Palace study mentor. You are generating "drops" for the Freestyler Training Zone — a theological reflex training exercise where students must connect random subjects to Christ.
 
 A "drop" is a short, evocative prompt from one of these categories:
@@ -9053,7 +9061,9 @@ DIFFICULTY RULES:
 - advanced: Obscure, surprising, or challenging drops. Expect sophisticated connections.
 - master: Deliberately difficult — abstract, paradoxical, or culturally complex. Push the student hard.
 
-${previousDrops.length > 0 ? `PREVIOUS DROPS (avoid repeating themes): ${JSON.stringify(previousDrops.slice(-5))}` : "This is the first drop of the session."}
+${previousDrops.length > 0 ? `PREVIOUS DROPS (avoid repeating themes AND categories): ${JSON.stringify(previousDrops.slice(-6))}
+
+Recent categories used: ${recentCategories.join(", ")}. You MUST use a DIFFERENT category this time.` : "This is the first drop of the session."}
 
 Return ONLY valid JSON:
 {
@@ -9062,7 +9072,7 @@ Return ONLY valid JSON:
   "hint": "A subtle hint for beginners (1 sentence, only for beginner/intermediate difficulty)"
 }`;
 
-      userPrompt = `Generate a ${difficulty}-level drop from one of these categories: ${categories.join(", ")}. This is drop #${dropCount + 1} of the session.`;
+      userPrompt = `Generate a ${difficulty}-level drop. Use the category "${preferredCategory}" for this drop. This is drop #${dropCount + 1} of the session.`;
 
     } else if (mode === "freestyle_evaluate") {
       const drop = requestBody.drop || {};
@@ -9076,28 +9086,56 @@ The student was given a "drop" (a random prompt) and must connect it to Christ A
 
 EVALUATION DIMENSIONS (score each 0-10):
 1. **christConnection** — How clearly and authentically does the response connect the drop to Christ? (Not just mentioning Jesus, but showing a genuine theological/typological/symbolic link)
-2. **depth** — How deep is the theological reasoning? Surface-level = 1-3, solid = 4-6, profound = 7-10
-3. **creativity** — How original and unexpected is the connection? Obvious = 1-3, thoughtful = 4-6, brilliant = 7-10
-4. **chainLink** — How well does it connect to previous drops in the chain? (If first drop, score based on potential chain-ability. If they reference previous drops, score higher.)
+   - 0-2: No real Christ connection, just vague spirituality
+   - 3-4: Mentions Jesus/God but the connection is generic or forced
+   - 5-6: A solid, legitimate connection but could go deeper
+   - 7-8: Clear typological or symbolic depth showing real biblical understanding
+   - 9-10: Stunning insight — the kind of connection that makes people stop and think
+
+2. **depth** — How deep is the theological reasoning?
+   - 0-2: One sentence, surface-level, no Scripture
+   - 3-4: Shows some thought but stays at a devotional level
+   - 5-6: Solid reasoning with at least one specific biblical reference
+   - 7-8: Multi-layered, references cross-Testament patterns, shows systematic understanding
+   - 9-10: Seminary-level insight with precise exegetical grounding
+
+3. **creativity** — How original and unexpected is the connection?
+   - 0-2: The first thing anyone would think of
+   - 3-4: Predictable but expressed well
+   - 5-6: An angle most people wouldn't immediately see
+   - 7-8: Genuinely surprising connection that still holds up theologically
+   - 9-10: Paradigm-shifting — connects things no one has connected before
+
+4. **chainLink** — How well does it connect to previous drops in the chain?
+   - 0-2: Ignores all previous drops entirely
+   - 3-4: Vaguely related to the overall theme but no explicit linking
+   - 5-6: References or builds on one previous drop
+   - 7-8: Weaves together multiple previous drops into a flowing argument
+   - 9-10: Creates a tapestry where this drop and all previous ones form one unified theology
+   - (If first drop, score based on how chainable this response is: does it plant seeds for future connections?)
+
+CRITICAL: Each dimension MUST be scored INDEPENDENTLY based on the actual content. Do NOT default to similar numbers across dimensions. A response can be very creative (8) but shallow in depth (3). It can have a strong Christ connection (9) but zero chain linking (1). Differentiate aggressively.
 
 DIFFICULTY EXPECTATIONS:
-- beginner: Be encouraging. Score generously. Focus on whether they found ANY Christ connection.
-- intermediate: Expect more specificity. Scripture references matter.
-- advanced: Expect typological depth, multiple layers, and chain awareness.
+- beginner: Be encouraging but still honest. A generic "Jesus loves us" response gets christConnection 3-4, not 7-8.
+- intermediate: Expect specificity. Vague responses without Scripture cap at 5 in depth.
+- advanced: Expect typological depth, multiple layers, and chain awareness. Generic responses score 2-4.
 - master: Be rigorous. Only give 8+ for truly exceptional connections.
+
+totalScore = christConnection + depth + creativity + chainLink (must equal the sum, not a separate judgment)
 
 ${chainHistory.length > 0 ? `CHAIN HISTORY (last ${Math.min(chainHistory.length, 10)} entries):
 ${JSON.stringify(chainHistory.slice(-10))}` : "This is the first response in the chain."}
 
 Return ONLY valid JSON:
 {
-  "christConnection": 7,
-  "depth": 6,
-  "creativity": 8,
-  "chainLink": 5,
-  "totalScore": 26,
-  "feedback": "2-3 sentences of Jeeves-style feedback — warm, specific, instructive",
-  "suggestion": "1 sentence suggesting how they could deepen the connection (optional, skip if score > 32)"
+  "christConnection": <0-10>,
+  "depth": <0-10>,
+  "creativity": <0-10>,
+  "chainLink": <0-10>,
+  "totalScore": <sum of above four>,
+  "feedback": "2-3 sentences of Jeeves-style feedback — warm, specific, instructive. Reference what they ACTUALLY said.",
+  "suggestion": "1 sentence suggesting how they could deepen the connection (optional, skip if totalScore > 32)"
 }`;
 
       userPrompt = `DROP: [${drop.category}] "${drop.drop}"
@@ -9141,13 +9179,15 @@ Return ONLY valid JSON:
 - Duration: ${Math.round(duration / 60)} minutes
 - Total Drops: ${drops.length}
 - Passes: ${passCount}
-- Drops & Responses: ${JSON.stringify(drops.map((d: any, i: number) => ({
+- ALL Drops & Responses (you must reference ALL of these in your evaluation):
+${JSON.stringify(drops.map((d: any, i: number) => ({
+        dropNumber: i + 1,
         drop: d,
         response: responses[i] || "(PASSED)",
         scores: scores[i] || null
-      })).slice(-30))}
+      })))}
 
-Generate a comprehensive session evaluation.`;
+Generate a comprehensive session evaluation that accounts for EVERY drop and response above. The "bestMoment" should quote or reference a specific response. The "streakHighlight" should reference specific drop numbers.`;
 
     } else if (mode === "freestyle_jeeves_demo") {
       const drops = requestBody.drops || [];

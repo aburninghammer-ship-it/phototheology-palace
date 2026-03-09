@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Clock, Zap, SkipForward, Send, Trophy,
-  BookOpen, Sparkles, FileText, ChevronRight, Loader2,
+  BookOpen, Sparkles, FileText, ChevronRight, ChevronDown, ChevronUp, Loader2,
   Play, Flame, Target, Crown, Eye, Swords,
 } from "lucide-react";
 import {
@@ -154,6 +154,7 @@ function ActiveSession({
   onEnd: () => void;
 }) {
   const [input, setInput] = useState("");
+  const [showChainHistory, setShowChainHistory] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hasSubmitted = currentFeedback !== null;
 
@@ -264,22 +265,74 @@ function ActiveSession({
         <span>{Math.round(momentum)}%</span>
       </div>
 
-      {/* Chain Breadcrumbs */}
+      {/* Chain History — full previous answers */}
       {gameState.drops.length > 1 && (
-        <div className="flex gap-1 overflow-x-auto pb-1">
-          {gameState.drops.slice(0, -1).map((d, i) => {
-            const cat = CATEGORY_CONFIG[d.category];
-            const wasPassed = gameState.userResponses[i] === "";
-            return (
-              <div
-                key={i}
-                className={`shrink-0 text-xs px-2 py-1 rounded-full ${wasPassed ? "bg-muted text-muted-foreground line-through" : "bg-primary/10 text-primary"}`}
-                title={d.drop}
+        <div className="space-y-2">
+          <button
+            onClick={() => setShowChainHistory(!showChainHistory)}
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            <span>Your Chain ({gameState.drops.length - 1} previous)</span>
+            {showChainHistory ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+          </button>
+
+          <AnimatePresence>
+            {showChainHistory && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
               >
-                {cat.emoji} {i + 1}
-              </div>
-            );
-          })}
+                <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
+                  {gameState.drops.slice(0, -1).map((d, i) => {
+                    const cat = CATEGORY_CONFIG[d.category];
+                    const wasPassed = gameState.userResponses[i] === "";
+                    const response = gameState.userResponses[i];
+                    const scores = gameState.scores[i];
+                    return (
+                      <Card key={i} className={`${wasPassed ? "opacity-50" : ""} border-border/40`}>
+                        <CardContent className="p-3 space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <Badge className={`${cat.color} text-white text-[10px] px-1.5 py-0`}>{cat.emoji} {cat.label}</Badge>
+                            <span className="text-[10px] text-muted-foreground">Drop #{i + 1}</span>
+                            {wasPassed && <Badge variant="outline" className="text-[10px] px-1 py-0">PASSED</Badge>}
+                            {scores && (
+                              <span className="ml-auto text-[10px] font-mono font-bold text-foreground">{scores.totalScore}/40</span>
+                            )}
+                          </div>
+                          <p className="text-xs font-medium">{d.drop}</p>
+                          {!wasPassed && response && (
+                            <p className="text-xs text-muted-foreground border-l-2 border-primary/30 pl-2">{response}</p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Compact breadcrumb when collapsed */}
+          {!showChainHistory && (
+            <div className="flex gap-1 overflow-x-auto pb-1">
+              {gameState.drops.slice(0, -1).map((d, i) => {
+                const cat = CATEGORY_CONFIG[d.category];
+                const wasPassed = gameState.userResponses[i] === "";
+                return (
+                  <div
+                    key={i}
+                    className={`shrink-0 text-xs px-2 py-1 rounded-full ${wasPassed ? "bg-muted text-muted-foreground line-through" : "bg-primary/10 text-primary"}`}
+                    title={d.drop}
+                  >
+                    {cat.emoji} {i + 1}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

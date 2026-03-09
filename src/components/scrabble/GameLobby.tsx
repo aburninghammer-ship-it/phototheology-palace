@@ -58,7 +58,7 @@ export function GameLobby({
 }: GameLobbyProps) {
   const [mode, setMode] = useState<'create' | 'join'>('create');
   const [gameMode, setGameMode] = useState<'ffa' | 'team'>('ffa');
-  const [maxPlayers, setMaxPlayers] = useState(20);
+  const [maxPlayers, setMaxPlayers] = useState(60);
   const [joinCode, setJoinCode] = useState('');
   const { subscription } = useSubscription();
   const isSubscriber = subscription.hasAccess;
@@ -314,9 +314,9 @@ export function GameLobby({
                   id="maxPlayers"
                   type="number"
                   min={2}
-                  max={20}
+                  max={60}
                   value={maxPlayers}
-                  onChange={(e) => setMaxPlayers(Math.min(20, parseInt(e.target.value) || 20))}
+                  onChange={(e) => setMaxPlayers(Math.min(60, parseInt(e.target.value) || 60))}
                 />
               </div>
 
