@@ -45,6 +45,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { CopyButton } from "@/components/ui/copy-button";
+import { SocialShareButton } from "@/components/SocialShareButton";
+
+const SUITE_URL = "https://phototheologybible.com";
 
 // Gem style types
 const GEM_STYLES = [
@@ -757,7 +760,7 @@ export default function GiveMeAGem() {
                     </div>
                   </div>
 
-                  {/* Copy + Selection Hint */}
+                  {/* Copy + Share + Selection Hint */}
                   <div className="mt-4 pt-4 border-t border-emerald-100 dark:border-emerald-900/30 flex items-center justify-between">
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <MessageCircle className="h-4 w-4" />
@@ -765,7 +768,17 @@ export default function GiveMeAGem() {
                         ? `${t('gems.selected', 'Selected')}: "${selectedText.substring(0, 50)}${selectedText.length > 50 ? "..." : ""}"`
                         : t('gems.highlightHint', 'Highlight any text above to ask Jeeves to expound on it')}
                     </p>
-                    <CopyButton text={`${gem.title}\n\n${gem.content}`} size="sm" className="text-xs text-muted-foreground" />
+                    <div className="flex items-center gap-1">
+                      <CopyButton text={`${gem.title}\n\n${gem.content}\n\n— Shared from Phototheology Palace\n✨ Explore more: ${SUITE_URL}`} size="sm" className="text-xs text-muted-foreground" />
+                      <SocialShareButton
+                        title={gem.title}
+                        description={`${gem.content.substring(0, 300)}${gem.content.length > 300 ? "..." : ""}\n\n— Shared from Phototheology Palace\n✨ Explore more: ${SUITE_URL}`}
+                        url={SUITE_URL}
+                        variant="dropdown"
+                        size="sm"
+                        buttonText="Share"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>

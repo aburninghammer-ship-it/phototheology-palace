@@ -26,8 +26,9 @@ export const QuickShareButton = ({
   variant = "outline"
 }: QuickShareButtonProps) => {
   const [copied, setCopied] = useState(false);
+  const suiteUrl = "https://phototheologybible.com";
   const shareUrl = url || window.location.href;
-  const shareText = `${content}\n\n#Phototheology #BibleStudy`;
+  const shareText = `${content}\n\n#Phototheology #BibleStudy\n✨ Explore more: ${suiteUrl}`;
 
   const handleTwitter = () => {
     const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
@@ -64,7 +65,7 @@ export const QuickShareButton = ({
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`${title}\n\n${content}\n\n${shareUrl}`);
+      await navigator.clipboard.writeText(`${title}\n\n${content}\n\n— Shared from Phototheology Palace\n✨ Explore more: ${suiteUrl}`);
       setCopied(true);
       toast.success("Copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);

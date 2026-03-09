@@ -27,7 +27,8 @@ export const EnhancedSocialShare = ({
   buttonVariant = "outline"
 }: EnhancedSocialShareProps) => {
   const [open, setOpen] = useState(false);
-  const [customMessage, setCustomMessage] = useState(defaultMessage || `${title}\n\n${content}`);
+  const suiteUrl = "https://phototheologybible.com";
+  const [customMessage, setCustomMessage] = useState(defaultMessage || `${title}\n\n${content}\n\n— Shared from Phototheology Palace\n✨ Explore more: ${suiteUrl}`);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

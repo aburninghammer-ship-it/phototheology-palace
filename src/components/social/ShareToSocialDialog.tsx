@@ -45,6 +45,8 @@ const SOCIAL_PLATFORMS = [
   },
 ] as const;
 
+const SUITE_URL = "https://phototheologybible.com";
+
 function buildShareText(content: SharedContent, caption: string): string {
   const config = SHARE_SOURCE_CONFIG[content.source_type];
   const parts: string[] = [];
@@ -53,7 +55,7 @@ function buildShareText(content: SharedContent, caption: string): string {
   parts.push(`📖 ${config.label}: ${content.source_title}`);
   if (content.source_excerpt) parts.push(content.source_excerpt.slice(0, 200));
   if (content.verse_reference) parts.push(`🔖 ${content.verse_reference}`);
-  parts.push("\n— Shared from Phototheology Palace");
+  parts.push(`\n— Shared from Phototheology Palace\n✨ Explore more: ${SUITE_URL}`);
 
   return parts.join("\n\n");
 }

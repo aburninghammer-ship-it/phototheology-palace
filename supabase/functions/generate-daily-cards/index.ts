@@ -168,12 +168,27 @@ Respond with ONLY a JSON array:
       throw new Error("Failed to parse AI response as JSON array");
     }
 
-    const cardsData = JSON.parse(jsonMatch[0]);
+    let cardsData: any[];
+    try {
+      cardsData = JSON.parse(jsonMatch[0]);
+    } catch (parseErr) {
+      console.error("JSON parse error:", parseErr, "Raw:", jsonMatch[0].substring(0, 300));
+      throw new Error("Failed to parse AI JSON response");
+    }
+
     const generatedCards = [];
+    const debugInfo = {
+      ai_cards_count: cardsData.length,
+      duplicates_skipped: 0,
+      insert_errors: [] as string[],
+      existing_titles_count: existingTitles.length,
+      existing_today: existingCount || 0,
+    };
 
     for (const cardData of cardsData) {
       // Skip duplicates
-      if (existingTitles.includes(cardData.title.toLowerCase())) {
+      if (existingTitles.includes(cardData.title?.toLowerCase())) {
+        debugInfo.duplicates_skipped++;
         continue;
       }
 
@@ -200,6 +215,7 @@ Respond with ONLY a JSON array:
 
       if (error) {
         console.error("Insert error:", error);
+        debugInfo.insert_errors.push(`${cardData.title}: ${error.message}`);
         continue;
       }
 
@@ -213,16 +229,20 @@ Respond with ONLY a JSON array:
       .insert({
         generation_date: today,
         cards_generated: generatedCards.length,
-        success: true,
+        success: generatedCards.length > 0,
+        error_message: generatedCards.length === 0
+          ? `AI returned ${debugInfo.ai_cards_count} cards, ${debugInfo.duplicates_skipped} duplicates skipped, ${debugInfo.insert_errors.length} insert errors`
+          : null,
       });
 
-    console.log(`Successfully generated ${generatedCards.length} spark cards for ${today}`);
+    console.log(`Generated ${generatedCards.length} spark cards for ${today}. Debug:`, JSON.stringify(debugInfo));
 
     return new Response(
       JSON.stringify({
         success: true,
         generated_count: generatedCards.length,
         cards: generatedCards,
+        debug: debugInfo,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
