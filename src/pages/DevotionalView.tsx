@@ -476,7 +476,7 @@ export default function DevotionalView() {
                       source_type: "devotional",
                       source_id: plan.id,
                       source_title: `${plan.title} - Day ${selectedDayIndex + 1}`,
-                      source_excerpt: (currentDay.content || currentDay.reflection || "").slice(0, 300),
+                      source_excerpt: (currentDay.devotional_text || currentDay.application || "").slice(0, 300),
                       verse_reference: currentDay.scripture_reference,
                     }}
                     variant="ghost"

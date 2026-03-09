@@ -16,7 +16,7 @@ const BibleChapter = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
   const { exercises, fromReadingPlan, planName, dayNumber } = location.state || {};
 
   // Check for research mode
@@ -132,11 +132,18 @@ const BibleChapter = () => {
 
           <div className="flex gap-0 relative">
             {sidebarOpen && (
-              <div className="w-56 lg:w-64 shrink-0 h-[calc(100vh-220px)] sticky top-24 rounded-xl border border-border/50 overflow-hidden shadow-lg">
-                <AtAGlanceSidebar onClose={() => setSidebarOpen(false)} />
-              </div>
+              <>
+                {/* Mobile: full-screen overlay */}
+                <div className="fixed inset-0 z-50 bg-background md:hidden">
+                  <AtAGlanceSidebar onClose={() => setSidebarOpen(false)} />
+                </div>
+                {/* Desktop: inline sidebar */}
+                <div className="hidden md:block w-56 lg:w-64 shrink-0 h-[calc(100vh-220px)] sticky top-24 rounded-xl border border-border/50 overflow-hidden shadow-lg">
+                  <AtAGlanceSidebar onClose={() => setSidebarOpen(false)} />
+                </div>
+              </>
             )}
-            <div className={`flex-1 min-w-0 ${sidebarOpen ? 'pl-4' : ''}`}>
+            <div className={`flex-1 min-w-0 ${sidebarOpen ? 'md:pl-4' : ''}`}>
               <BibleReader />
             </div>
           </div>
