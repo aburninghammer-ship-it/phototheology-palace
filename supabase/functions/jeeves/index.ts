@@ -9026,6 +9026,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
     } else if (mode === "freestyle_generate_drop") {
       const difficulty = requestBody.difficulty || "beginner";
       const previousDrops = requestBody.previousDrops || [];
+      const recentDropHistory = requestBody.recentDropHistory || [];
       const dropCount = requestBody.dropCount || 0;
 
       const categoryPool: Record<string, string[]> = {
@@ -9045,30 +9046,40 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
         ? underusedCategories[Math.floor(Math.random() * underusedCategories.length)]
         : categories[Math.floor(Math.random() * categories.length)];
 
+      // Generate entropy to push the LLM away from its defaults
+      const entropySeeds = [
+        Math.random().toString(36).substring(2, 8),
+        Date.now() % 10000,
+        Math.floor(Math.random() * 1000),
+      ];
+
+      // Build the exclusion list from both current session AND cross-session history
+      const allRecentDrops = [...new Set([...previousDrops, ...recentDropHistory])];
+      const exclusionBlock = allRecentDrops.length > 0
+        ? `\nDROPS ALREADY USED (you MUST NOT repeat ANY of these or anything similar — find something completely different):\n${JSON.stringify(allRecentDrops.slice(-50))}\n`
+        : "";
+
       systemPrompt = `You are Jeeves, the Phototheology Palace study mentor. You are generating "drops" for the Freestyler Training Zone — a theological reflex training exercise where students must connect random subjects to Christ.
 
-A "drop" is a short, evocative prompt from one of these categories. Drops can range from a SINGLE WORD to a short phrase (1-2 sentences max). Mix it up — sometimes drop just one word, sometimes a vivid image, sometimes a brief scenario, sometimes a specific Bible story or parable:
-- scripture: A Bible verse, passage, parable, or biblical event (e.g. "The parable of the sheep and the goats", "Adam's deep sleep", "Manna", "The bronze serpent", "Psalm 23:4", "Jacob wrestling the angel", "The valley of dry bones", "Elijah's chariot of fire", "The handwriting on the wall")
-- nature: Something from the natural world (e.g. "Water", "A caterpillar becoming a butterfly", "Lightning", "A seed buried in soil", "The tide")
-- everyday: An ordinary life experience or personal memory (e.g. "Traffic", "A child learning to walk", "Keys", "A memory of your childhood", "Your first day at a new school", "Losing something valuable and finding it again", "The sound of your mother's voice")
-- history: A historical event or figure (e.g. "Mexico", "The Berlin Wall", "Florence Nightingale", "The Underground Railroad", "The first moon landing")
-- human_experience: An emotion, relationship, or universal experience (e.g. "Nostalgia", "Forgiveness", "A scar", "Waiting for someone who never comes", "The moment you realize you were wrong")
-- symbolic: A symbol, archetype, or abstract concept (e.g. "Fire", "Mirrors", "A locked door", "An empty chair at the table", "A road that splits in two")
+UNIQUENESS IS PARAMOUNT. The Bible has 66 books, 1,189 chapters, and thousands of stories, characters, objects, places, and themes. The natural world has millions of species, phenomena, and landscapes. Human history spans thousands of years across every continent. There is NO reason to ever repeat a drop. Every single drop you generate must be something the player has NEVER seen before.
+
+A "drop" is a short, evocative prompt. Drops can range from a SINGLE WORD to a short phrase (1-2 sentences max). Mix it up — sometimes drop just one word, sometimes a vivid image, sometimes a brief scenario, sometimes a specific Bible story or parable.
+
+CATEGORIES AND VAST EXAMPLE POOLS (do NOT reuse these examples — generate your OWN original drops):
+- scripture: ANY Bible verse, passage, parable, character, object, event, law, prophecy, miracle, or concept from ANY of the 66 books. Think beyond the famous ones. Examples of the RANGE (not to be reused): "The parable of the sheep and the goats", "Adam's deep sleep", "Ehud's left-handed assassination", "The ax head that floated", "Balaam's donkey", "The scarlet cord in Rahab's window", "Lot's wife", "The urim and thummim", "Melchizedek's bread and wine", "The 153 fish", "Jael and the tent peg", "Nathan's parable to David", "The potter's wheel in Jeremiah", "Ezekiel lying on his side 390 days", "The widow's two mites", "Achan's hidden gold", "The cities of refuge", "Mephibosheth at David's table"
+- nature: ANY natural phenomenon, animal, plant, weather event, geological feature, ecosystem, season, celestial body. Examples of the RANGE: "Bioluminescence", "A venus flytrap", "The migration of monarch butterflies", "Permafrost thawing", "A spider rebuilding its web after rain", "The rings inside a tree trunk", "Coral bleaching", "A volcano under the ocean", "The sound of crickets at night", "Mycelium networks underground", "A hawk circling", "Quicksand", "Northern lights", "The dark side of the moon"
+- everyday: ANY ordinary life experience, memory, sensation, routine, object, moment. Examples of the RANGE: "The smell of a hospital", "Forgetting why you walked into a room", "A sticky note reminder", "Parallel parking", "The last page of a book", "A power outage", "Finding money in an old jacket", "The taste of medicine as a child", "A voicemail from someone who passed away", "Ironing a shirt", "The first paycheck", "A cancelled flight", "Trying to stay awake in class", "The junk drawer"
+- history: ANY historical event, person, invention, battle, movement, discovery, civilization, era. Examples of the RANGE: "The Library of Alexandria burning", "Harriet Tubman", "The invention of the printing press", "The Titanic's last orchestra", "The Rosetta Stone", "Pompeii", "The Wright brothers' first flight", "The Trail of Tears", "Galileo's telescope", "The fall of the Soviet Union", "Cleopatra", "The Silk Road", "The Irish potato famine", "Magellan's circumnavigation"
+- human_experience: ANY emotion, relationship dynamic, life stage, internal experience, social interaction. Examples of the RANGE: "The guilt of an unanswered phone call", "Learning your parents are imperfect", "Being the new kid", "The silence after an argument", "Outgrowing a friendship", "Stage fright", "Homesickness", "The pride of teaching someone something", "Jealousy you're ashamed of", "A promise you couldn't keep", "Déjà vu", "The grief no one sees", "Second chances"
+- symbolic: ANY symbol, archetype, paradox, visual image, metaphorical concept. Examples of the RANGE: "A mirror with no reflection", "The last domino", "A clock with no hands", "Scaffolding around a building", "A ship in a bottle", "The eye of a needle", "A white flag", "Quicksilver", "A maze with no exit", "The tip of an iceberg", "A revolving door", "Ashes", "An anchor", "A cocoon"
 
 DIFFICULTY RULES:
 - beginner: Simple, familiar drops with obvious Christ connections. Categories: scripture, nature, everyday.
 - intermediate: More nuanced drops requiring deeper thinking. All categories available.
 - advanced: Obscure, surprising, or challenging drops. Expect sophisticated connections.
-- master: CRITICAL — use ONLY plain, everyday language. NO academic, theological, or philosophical jargon whatsoever. No words like "apophatic", "ontological", "eschatological", "hermeneutic", "epistemological", "dialectic", "teleological", "phenomenological", etc. The challenge is in the DEPTH of connection required, not vocabulary. A 12-year-old should be able to READ the drop even if connecting it to Christ is hard. Think concrete nouns, real places, vivid images, simple emotions, everyday objects.
-  BAD: "The concept of an apophatic void — a truth defined by what it is not."
-  BAD: "The ontological paradox of self-referential consciousness."
-  GOOD: "A father who disciplines his child by staying silent."
-  GOOD: "Rust."
-  GOOD: "A bridge that was never finished."
-  GOOD: "The smell of rain on dry ground."
-
-${previousDrops.length > 0 ? `PREVIOUS DROPS (avoid repeating themes AND categories): ${JSON.stringify(previousDrops.slice(-6))}
-
+- master: CRITICAL — use ONLY plain, everyday language. NO academic or philosophical jargon. The challenge is DEPTH, not vocabulary. A 12-year-old should be able to READ the drop.
+${exclusionBlock}
+${previousDrops.length > 0 ? `CURRENT SESSION DROPS (avoid repeating themes AND categories): ${JSON.stringify(previousDrops.slice(-6))}
 Recent categories used: ${recentCategories.join(", ")}. You MUST use a DIFFERENT category this time.` : "This is the first drop of the session."}
 
 Return ONLY valid JSON:
@@ -9078,7 +9089,7 @@ Return ONLY valid JSON:
   "hint": "A subtle hint for beginners (1 sentence, only for beginner/intermediate difficulty)"
 }`;
 
-      userPrompt = `Generate a ${difficulty}-level drop. Use the category "${preferredCategory}" for this drop. This is drop #${dropCount + 1} of the session.`;
+      userPrompt = `Generate a ${difficulty}-level drop. Use the category "${preferredCategory}" for this drop. This is drop #${dropCount + 1} of the session. Entropy seed: ${entropySeeds.join("-")}. Be wildly original — surprise the player.`;
 
     } else if (mode === "freestyle_evaluate") {
       const drop = requestBody.drop || {};

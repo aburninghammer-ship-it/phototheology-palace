@@ -94,6 +94,35 @@ const SESSION_DURATION = 60 * 60; // 60 minutes in seconds
 const MOMENTUM_DECAY_ON_PASS = 15;
 const MOMENTUM_CONSECUTIVE_PASS_PENALTY = 5;
 
+// ── Cross-session drop history (localStorage) ──────────────────────────
+const DROP_HISTORY_KEY = "freestyle_drop_history";
+const DROP_HISTORY_MAX = 200; // remember last 200 drops across all sessions
+const DROP_HISTORY_EXPIRY_DAYS = 7;
+
+function getDropHistory(): string[] {
+  try {
+    const raw = localStorage.getItem(DROP_HISTORY_KEY);
+    if (!raw) return [];
+    const { drops, timestamp } = JSON.parse(raw);
+    // Expire after 7 days
+    if (Date.now() - timestamp > DROP_HISTORY_EXPIRY_DAYS * 86400000) {
+      localStorage.removeItem(DROP_HISTORY_KEY);
+      return [];
+    }
+    return drops || [];
+  } catch {
+    return [];
+  }
+}
+
+function addToDropHistory(dropText: string) {
+  try {
+    const existing = getDropHistory();
+    const updated = [...existing, dropText].slice(-DROP_HISTORY_MAX);
+    localStorage.setItem(DROP_HISTORY_KEY, JSON.stringify({ drops: updated, timestamp: Date.now() }));
+  } catch { /* localStorage full or unavailable */ }
+}
+
 // Fallback drops used when Jeeves is unreachable — cycled through, never repeated back-to-back
 const FALLBACK_DROPS: Drop[] = [
   { category: "scripture", drop: "The empty tomb on resurrection morning" },
@@ -288,10 +317,12 @@ export function useFreestyleZone() {
 
     setIsGeneratingDrop(true);
     try {
+      const crossSessionHistory = getDropHistory();
       const { data } = await callJeeves({
         mode: "freestyle_generate_drop",
         difficulty: diff,
         previousDrops: prevDrops.slice(-5).map(d => d.drop),
+        recentDropHistory: crossSessionHistory.slice(-50),
         dropCount: count,
       }, "freestyle-zone");
 
@@ -306,6 +337,8 @@ export function useFreestyleZone() {
 
       // Guard against Jeeves returning the same drop
       if (drop.drop === lastDropText) throw new Error("Duplicate drop");
+
+      addToDropHistory(drop.drop);
 
       setGameState(prev => ({
         ...prev,
@@ -333,10 +366,12 @@ export function useFreestyleZone() {
     dropCount: number
   ) => {
     try {
+      const crossSessionHistory = getDropHistory();
       const { data } = await callJeeves({
         mode: "freestyle_generate_drop",
         difficulty,
         previousDrops: previousDrops.slice(-5).map(d => d.drop),
+        recentDropHistory: crossSessionHistory.slice(-50),
         dropCount,
       }, "freestyle-zone");
 
