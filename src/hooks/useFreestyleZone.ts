@@ -10,6 +10,7 @@ export type Difficulty = "beginner" | "intermediate" | "advanced" | "master";
 export type GamePhase = "setup" | "active" | "complete";
 
 export type DropCategory = "scripture" | "nature" | "everyday" | "history" | "human_experience" | "symbolic";
+export type DropFocus = DropCategory | "random";
 
 export interface Drop {
   category: DropCategory;
@@ -67,6 +68,7 @@ export interface PolishedContent {
 export interface FreestyleGameState {
   phase: GamePhase;
   difficulty: Difficulty;
+  dropFocus: DropFocus;
   drops: Drop[];
   userResponses: string[];
   scores: EvaluationScores[];
@@ -80,6 +82,7 @@ export interface FreestyleGameState {
 const INITIAL_STATE: FreestyleGameState = {
   phase: "setup",
   difficulty: "beginner",
+  dropFocus: "random",
   drops: [],
   userResponses: [],
   scores: [],
@@ -269,13 +272,14 @@ export function useFreestyleZone() {
 
   // ── Actions ────────────────────────────────────────────────────────
 
-  const startSession = useCallback(async (difficulty: Difficulty) => {
+  const startSession = useCallback(async (difficulty: Difficulty, dropFocus: DropFocus = "random") => {
     await startNewGame();
     const startTime = Date.now();
     setGameState({
       ...INITIAL_STATE,
       phase: "active",
       difficulty,
+      dropFocus,
       startTime,
       momentum: 50,
     });
@@ -318,12 +322,14 @@ export function useFreestyleZone() {
     setIsGeneratingDrop(true);
     try {
       const crossSessionHistory = getDropHistory();
+      const focus = gameState.dropFocus || "random";
       const { data } = await callJeeves({
         mode: "freestyle_generate_drop",
         difficulty: diff,
         previousDrops: prevDrops.slice(-5).map(d => d.drop),
         recentDropHistory: crossSessionHistory.slice(-50),
         dropCount: count,
+        dropFocus: focus !== "random" ? focus : undefined,
       }, "freestyle-zone");
 
       const parsed = typeof data === "string" ? JSON.parse(data) : data;
@@ -358,7 +364,7 @@ export function useFreestyleZone() {
     } finally {
       setIsGeneratingDrop(false);
     }
-  }, [gameState.difficulty, gameState.drops, prefetchedDrop, setGameState]);
+  }, [gameState.difficulty, gameState.drops, gameState.dropFocus, prefetchedDrop, setGameState]);
 
   const prefetchNextDrop = useCallback(async (
     difficulty: Difficulty,
@@ -367,12 +373,14 @@ export function useFreestyleZone() {
   ) => {
     try {
       const crossSessionHistory = getDropHistory();
+      const focus = gameState.dropFocus || "random";
       const { data } = await callJeeves({
         mode: "freestyle_generate_drop",
         difficulty,
         previousDrops: previousDrops.slice(-5).map(d => d.drop),
         recentDropHistory: crossSessionHistory.slice(-50),
         dropCount,
+        dropFocus: focus !== "random" ? focus : undefined,
       }, "freestyle-zone");
 
       const parsed = typeof data === "string" ? JSON.parse(data) : data;
@@ -386,7 +394,7 @@ export function useFreestyleZone() {
     } catch {
       // Silently fail on prefetch — generateNextDrop will use fallback pool
     }
-  }, []);
+  }, [gameState.dropFocus]);
 
   const submitResponse = useCallback(async (response: string) => {
     if (!response.trim() || gameState.phase !== "active") return;

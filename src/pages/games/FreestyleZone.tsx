@@ -18,15 +18,27 @@ import {
   DIFFICULTY_CONFIG,
   type Difficulty,
   type DropCategory,
+  type DropFocus,
 } from "@/hooks/useFreestyleZone";
 
 // ── Setup Phase ────────────────────────────────────────────────────────
 
+const DROP_FOCUS_OPTIONS: { value: DropFocus; label: string; icon: string; description: string }[] = [
+  { value: "random", label: "Random Mix", icon: "🎲", description: "A diverse mix of all categories" },
+  { value: "scripture", label: "Scripture", icon: "📖", description: "Bible verses, parables, events, and characters" },
+  { value: "nature", label: "Nature", icon: "🌿", description: "Natural world phenomena, animals, and landscapes" },
+  { value: "everyday", label: "Everyday Life", icon: "🏠", description: "Ordinary experiences, memories, and objects" },
+  { value: "history", label: "History", icon: "🏛️", description: "Historical events, people, and movements" },
+  { value: "human_experience", label: "Human Experience", icon: "💭", description: "Emotions, relationships, and universal moments" },
+  { value: "symbolic", label: "Symbolic", icon: "🔮", description: "Symbols, archetypes, and abstract concepts" },
+];
+
 function SetupScreen({ onStart, hasExisting, onResume }: {
-  onStart: (d: Difficulty) => void;
+  onStart: (d: Difficulty, focus: DropFocus) => void;
   hasExisting: boolean;
   onResume: () => void;
 }) {
+  const [selectedFocus, setSelectedFocus] = useState<DropFocus>("random");
   const difficulties: Difficulty[] = ["beginner", "intermediate", "advanced", "master"];
   const icons = [Play, Target, Swords, Crown];
 
@@ -84,6 +96,35 @@ function SetupScreen({ onStart, hasExisting, onResume }: {
         </CardContent>
       </Card>
 
+      {/* Drop Category Selection */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-center flex items-center justify-center gap-2">
+          <Target className="h-5 w-5 text-blue-500" />
+          Choose Your Drop Category
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+          {DROP_FOCUS_OPTIONS.map((opt) => (
+            <Card
+              key={opt.value}
+              className={`cursor-pointer transition-all text-center ${
+                selectedFocus === opt.value
+                  ? "border-primary bg-primary/10 shadow-md ring-2 ring-primary/30"
+                  : "hover:border-primary/40 hover:bg-primary/5"
+              }`}
+              onClick={() => setSelectedFocus(opt.value)}
+            >
+              <CardContent className="p-3 space-y-1">
+                <span className="text-2xl">{opt.icon}</span>
+                <p className="text-xs font-semibold">{opt.label}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <p className="text-xs text-center text-muted-foreground">
+          {DROP_FOCUS_OPTIONS.find(o => o.value === selectedFocus)?.description}
+        </p>
+      </div>
+
       {/* Difficulty Selection */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-center flex items-center justify-center gap-2">
@@ -109,7 +150,7 @@ function SetupScreen({ onStart, hasExisting, onResume }: {
               >
                 <Card
                   className={`cursor-pointer transition-all shadow-md hover:shadow-lg ${fireColors[i]}`}
-                  onClick={() => onStart(diff)}
+                  onClick={() => onStart(diff, selectedFocus)}
                 >
                   <CardContent className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
@@ -205,6 +246,11 @@ function ActiveSession({
               {DIFFICULTY_CONFIG[gameState.difficulty].label}
             </Badge>
           </div>
+          {gameState.dropFocus && gameState.dropFocus !== "random" && (
+            <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-600 dark:text-blue-400">
+              {DROP_FOCUS_OPTIONS.find(o => o.value === gameState.dropFocus)?.icon} {DROP_FOCUS_OPTIONS.find(o => o.value === gameState.dropFocus)?.label}
+            </Badge>
+          )}
           <Badge variant="secondary" className="font-mono text-xs">
             Drop #{currentDropIndex + 1}
           </Badge>

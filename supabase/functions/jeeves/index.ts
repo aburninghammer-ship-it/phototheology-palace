@@ -9028,6 +9028,7 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
       const previousDrops = requestBody.previousDrops || [];
       const recentDropHistory = requestBody.recentDropHistory || [];
       const dropCount = requestBody.dropCount || 0;
+      const dropFocus = requestBody.dropFocus || null; // specific category lock, or null for random
 
       const categoryPool: Record<string, string[]> = {
         beginner: ["scripture", "nature", "everyday"],
@@ -9038,13 +9039,18 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
 
       const categories = categoryPool[difficulty] || categoryPool.beginner;
 
-      // Determine which category to use next — enforce diversity by rotating through all available categories
-      const recentCategories = previousDrops.slice(-categories.length).map((d: any) => d.category);
-      // Find categories that haven't been used recently
-      const underusedCategories = categories.filter((c: string) => !recentCategories.includes(c));
-      const preferredCategory = underusedCategories.length > 0
-        ? underusedCategories[Math.floor(Math.random() * underusedCategories.length)]
-        : categories[Math.floor(Math.random() * categories.length)];
+      let preferredCategory: string;
+      if (dropFocus && dropFocus !== "random") {
+        // User locked a specific category — always use it
+        preferredCategory = dropFocus;
+      } else {
+        // Determine which category to use next — enforce diversity by rotating through all available categories
+        const recentCategories = previousDrops.slice(-categories.length).map((d: any) => d.category);
+        const underusedCategories = categories.filter((c: string) => !recentCategories.includes(c));
+        preferredCategory = underusedCategories.length > 0
+          ? underusedCategories[Math.floor(Math.random() * underusedCategories.length)]
+          : categories[Math.floor(Math.random() * categories.length)];
+      }
 
       // Generate entropy to push the LLM away from its defaults
       const entropySeeds = [
