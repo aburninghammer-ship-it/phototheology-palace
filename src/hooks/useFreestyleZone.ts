@@ -363,7 +363,7 @@ export function useFreestyleZone() {
     try {
       const chainHistory = buildChainHistory().slice(-10);
 
-      const { data } = await callJeeves({
+      const { data, error } = await callJeeves({
         mode: "freestyle_evaluate",
         drop: currentDrop,
         userResponse: response,
@@ -371,7 +371,17 @@ export function useFreestyleZone() {
         difficulty: gameState.difficulty,
       }, "freestyle-zone");
 
+      if (error || !data) {
+        console.error("Jeeves evaluation error:", error);
+        throw new Error(error?.message || "No response from evaluator");
+      }
+
       const parsed = typeof data === "string" ? JSON.parse(data) : data;
+
+      if (!parsed || typeof parsed !== "object") {
+        throw new Error("Invalid evaluation response format");
+      }
+
       const scores: EvaluationScores = {
         christConnection: parsed.christConnection ?? 5,
         depth: parsed.depth ?? 5,
@@ -399,10 +409,25 @@ export function useFreestyleZone() {
       });
     } catch (error) {
       console.error("Failed to evaluate response:", error);
-      // Still record the response
+
+      // Provide fallback feedback so the user isn't stuck
+      const fallbackScores: EvaluationScores = {
+        christConnection: 5,
+        depth: 5,
+        creativity: 5,
+        chainLink: 5,
+        totalScore: 20,
+        feedback: "Jeeves couldn't evaluate this one — your response was recorded. Keep going!",
+        suggestion: "Try the next drop while Jeeves warms back up.",
+      };
+
+      setCurrentFeedback(fallbackScores);
+      updateMomentum(fallbackScores.totalScore, false);
+
       setGameState(prev => ({
         ...prev,
         userResponses: [...prev.userResponses, response],
+        scores: [...prev.scores, fallbackScores],
         consecutivePasses: 0,
       }));
     } finally {
