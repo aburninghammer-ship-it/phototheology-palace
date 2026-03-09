@@ -16,7 +16,7 @@ const BibleChapter = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
   const { exercises, fromReadingPlan, planName, dayNumber } = location.state || {};
 
   // Check for research mode
