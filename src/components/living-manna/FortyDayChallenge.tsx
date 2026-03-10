@@ -724,20 +724,27 @@ export function FortyDayChallenge() {
     }
   };
 
-  // Rematch on a draw — reset the session and replay the same opponent/topic
+  // Rematch on a draw — keep the drawn session, create a fresh one (max 1 rematch per day)
   const startRematch = async () => {
     if (!currentSession || !enrollment || !user) return;
 
     const dayNumber = currentSession.day_number;
+    const dayConfig = schedule[dayNumber - 1];
+    if (!dayConfig) return;
+
+    const opponent = DEFENSE_OPPONENTS.find(o => o.id === dayConfig.opponentId);
+    const topic = DEFENSE_TOPICS.find(t => t.id === dayConfig.topicId);
+    if (!opponent || !topic) return;
+
+    // Guard: only one rematch allowed per day
+    const sessionsForDay = sessions.filter(s => s.day_number === dayNumber);
+    if (sessionsForDay.length >= 2) {
+      toast.error("You've already used your rematch for this day.");
+      return;
+    }
 
     setIsAiLoading(true);
     try {
-      // Delete the drawn session so startDayDebate can create a fresh one
-      await supabase
-        .from("debate_challenge_sessions")
-        .delete()
-        .eq("id", currentSession.id);
-
       // Roll back enrollment progress that endDebate advanced
       await supabase
         .from("debate_challenge_enrollments")
@@ -748,18 +755,57 @@ export function FortyDayChallenge() {
         })
         .eq("id", enrollment.id);
 
+      // Create a new session for the rematch (drawn session stays as history)
+      const { data: newSession, error: sessionError } = await supabase
+        .from("debate_challenge_sessions")
+        .insert({
+          enrollment_id: enrollment.id,
+          user_id: user.id,
+          day_number: dayNumber,
+          opponent_id: opponent.id,
+          opponent_name: opponent.name,
+          topic_id: topic.id,
+          topic_name: topic.name,
+          difficulty: enrollment.difficulty,
+        })
+        .select()
+        .single();
+      if (sessionError) throw sessionError;
+
       // Reset local state
       setMessages([]);
       setVerdict(null);
-      setCurrentSession(null);
+      setCurrentSession(newSession);
       setSealedTurns(new Set());
       setTurnAnalyses([]);
 
-      // Reload enrollment/sessions so startDayDebate sees clean state
-      await loadData();
+      // Get opponent's opening attack
+      const { data: aiData, error: aiError } = await supabase.functions.invoke("forty-day-debate", {
+        body: {
+          action: "open",
+          opponentWorldview: opponent.worldview,
+          opponentStyle: opponent.argumentStyle,
+          opponentName: opponent.name,
+          opponentPronouns: opponent.pronouns,
+          topicName: topic.name,
+          topicDescription: topic.description,
+          difficulty: enrollment.difficulty,
+        },
+      });
+      if (aiError) throw aiError;
 
-      // Restart the same day's debate
-      await startDayDebate(dayNumber);
+      const opening: ChatMessage = { role: "opponent", content: aiData.response };
+      setMessages([opening]);
+      setPhase("debating");
+
+      await supabase
+        .from("debate_challenge_sessions")
+        .update({ messages: [opening] as unknown as any })
+        .eq("id", newSession.id);
+
+      triggerTurnAnalysis(newSession.id, 0, "opponent", [opening], opponent.name, topic.name);
+
+      await loadData();
     } catch (err: any) {
       console.error("Rematch error:", err);
       toast.error("Failed to start rematch. Try again.");
@@ -1521,22 +1567,30 @@ export function FortyDayChallenge() {
                   {currentSession.is_public ? "Debate is Public — Tap to Make Private" : "Make Debate Public & Share"}
                 </Button>
               )}
-              {/* Rematch button — only on draws */}
-              {verdict.outcome === "draw" && (
-                <Button
-                  onClick={startRematch}
-                  disabled={isAiLoading}
-                  className="w-full mt-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold"
-                  size="lg"
-                >
-                  {isAiLoading ? (
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  ) : (
-                    <Swords className="h-5 w-5 mr-2" />
-                  )}
-                  Rematch — Settle the Score!
-                </Button>
-              )}
+              {/* Rematch button — only on draws, max 1 rematch per day */}
+              {verdict.outcome === "draw" && (() => {
+                const sessionsForDay = sessions.filter(s => s.day_number === currentSession?.day_number);
+                const rematchAvailable = sessionsForDay.length < 2;
+                return rematchAvailable ? (
+                  <Button
+                    onClick={startRematch}
+                    disabled={isAiLoading}
+                    className="w-full mt-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold"
+                    size="lg"
+                  >
+                    {isAiLoading ? (
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    ) : (
+                      <Swords className="h-5 w-5 mr-2" />
+                    )}
+                    Rematch — Settle the Score!
+                  </Button>
+                ) : (
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    Rematch already used for this day.
+                  </p>
+                );
+              })()}
               <Button onClick={() => setPhase("daily-map")} className="w-full mt-2">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Return to Progress Map
