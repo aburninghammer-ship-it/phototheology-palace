@@ -633,11 +633,12 @@ export function useFreestyleZone() {
 
   const generateJeevesDemo = useCallback(async () => {
     setIsGeneratingDemo(true);
+    const gs = gameStateRef.current;
     try {
       const { data } = await callJeeves({
         mode: "freestyle_jeeves_demo",
-        drops: gameState.drops,
-        difficulty: gameState.difficulty,
+        drops: gs.drops,
+        difficulty: gs.difficulty,
       }, "freestyle-zone");
 
       const parsed = typeof data === "string" ? JSON.parse(data) : data;
@@ -647,7 +648,7 @@ export function useFreestyleZone() {
     } finally {
       setIsGeneratingDemo(false);
     }
-  }, [gameState.drops, gameState.difficulty]);
+  }, []);
 
   const polishSession = useCallback(async (format: string) => {
     setIsPolishing(true);
