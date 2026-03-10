@@ -98,7 +98,7 @@ const SermonIdeas = () => {
       toast.success("Research complete!");
     } catch (err: any) {
       console.error("Research error:", err);
-      toast.error(err.message || "Failed to get research from Jeeves");
+      toast.error(err.message || "Failed to activate Research Assistant");
     } finally {
       setResearchingId(null);
     }
