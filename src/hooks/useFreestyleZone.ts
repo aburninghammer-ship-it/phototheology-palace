@@ -692,7 +692,7 @@ export function useFreestyleZone() {
     } finally {
       setIsPolishing(false);
     }
-  }, [gameState.drops, gameState.userResponses, user]);
+  }, [user]);
 
   // Computed values
   const timeRemaining = SESSION_DURATION - gameState.elapsedSeconds;
