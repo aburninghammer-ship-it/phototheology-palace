@@ -209,8 +209,9 @@ export function useFreestyleZone() {
   const [polishedContent, setPolishedContent] = useState<PolishedContent | null>(null);
   const [prefetchedDrop, setPrefetchedDrop] = useState<Drop | null>(null);
 
-  // Timer ref
+  // Refs
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const savedSessionIdRef = useRef<string | null>(null);
 
   // Timer effect
   useEffect(() => {
@@ -570,21 +571,26 @@ export function useFreestyleZone() {
 
     await completeGame(finalScore);
 
-    // Save to game_scores table
+    // Save to game_scores table with full session data for later viewing
     if (user) {
       try {
-        await supabase.from("game_scores").insert({
+        const { data: inserted } = await supabase.from("game_scores").insert({
           user_id: user.id,
           game_type: "freestyle_zone",
           score: finalScore,
           metadata: {
             difficulty: gameState.difficulty,
+            dropFocus: gameState.dropFocus || "random",
             totalDrops: gameState.drops.length,
             passCount: gameState.passCount,
             duration: Math.floor((Date.now() - gameState.startTime) / 1000),
             momentum: gameState.momentum,
+            drops: gameState.drops,
+            responses: gameState.userResponses,
+            scores: gameState.scores,
           } as any,
-        });
+        }).select("id").single();
+        if (inserted) savedSessionIdRef.current = inserted.id;
       } catch {
         // Non-critical
       }
@@ -648,12 +654,34 @@ export function useFreestyleZone() {
 
       const parsed = typeof data === "string" ? JSON.parse(data) : data;
       setPolishedContent(parsed as PolishedContent);
+
+      // Save polished content to the game_scores row
+      if (savedSessionIdRef.current && user) {
+        try {
+          const { data: existing } = await supabase
+            .from("game_scores")
+            .select("metadata")
+            .eq("id", savedSessionIdRef.current)
+            .single();
+          if (existing) {
+            const meta = (existing.metadata as Record<string, unknown>) || {};
+            await supabase
+              .from("game_scores")
+              .update({
+                metadata: { ...meta, polishedContent: parsed } as any,
+              })
+              .eq("id", savedSessionIdRef.current);
+          }
+        } catch {
+          // Non-critical
+        }
+      }
     } catch (error) {
       console.error("Failed to polish session:", error);
     } finally {
       setIsPolishing(false);
     }
-  }, [gameState.drops, gameState.userResponses]);
+  }, [gameState.drops, gameState.userResponses, user]);
 
   // Computed values
   const timeRemaining = SESSION_DURATION - gameState.elapsedSeconds;

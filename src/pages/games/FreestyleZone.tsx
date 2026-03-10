@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,8 +10,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Clock, Zap, SkipForward, Send, Trophy,
   BookOpen, Sparkles, FileText, ChevronRight, ChevronDown, ChevronUp, Loader2,
-  Play, Flame, Target, Crown, Eye, Swords, HelpCircle, Lightbulb,
+  Play, Flame, Target, Crown, Eye, Swords, HelpCircle, Lightbulb, History, X,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import {
   useFreestyleZone,
   CATEGORY_CONFIG,
@@ -20,6 +22,179 @@ import {
   type DropCategory,
   type DropFocus,
 } from "@/hooks/useFreestyleZone";
+
+// ── Saved Session Types ────────────────────────────────────────────────
+
+interface SavedSessionRow {
+  id: string;
+  score: number;
+  metadata: {
+    difficulty?: string;
+    dropFocus?: string;
+    totalDrops?: number;
+    passCount?: number;
+    duration?: number;
+    drops?: Array<{ category: string; drop: string }>;
+    responses?: string[];
+    scores?: Array<{ christConnection: number; depth: number; creativity: number; chainLink: number; totalScore: number; feedback: string }>;
+    polishedContent?: { title: string; content: string; keyVerses: string[]; format: string };
+  };
+  created_at: string;
+}
+
+// ── Past Sessions Viewer ───────────────────────────────────────────────
+
+function PastSessionDetail({ session, onClose }: { session: SavedSessionRow; onClose: () => void }) {
+  const meta = session.metadata;
+  const drops = meta.drops || [];
+  const responses = meta.responses || [];
+  const scores = meta.scores || [];
+  const polished = meta.polishedContent;
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-4">
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" size="sm" onClick={onClose} className="gap-1">
+          <ArrowLeft className="h-4 w-4" /> Back to Sessions
+        </Button>
+        <Badge variant="outline" className="font-mono">{session.score}/100</Badge>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Flame className="h-5 w-5 text-orange-500" />
+            Session — {new Date(session.created_at).toLocaleDateString()}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-1 text-sm text-muted-foreground">
+          <p>Difficulty: <Badge variant="outline" className="ml-1">{meta.difficulty || "beginner"}</Badge></p>
+          <p>Category: {meta.dropFocus || "Random Mix"}</p>
+          <p>Drops: {meta.totalDrops || drops.length} | Answered: {responses.filter(r => r && !r.startsWith("[Jeeves")).length} | Passes: {meta.passCount || 0}</p>
+          {meta.duration && <p>Duration: {Math.round(meta.duration / 60)} min</p>}
+        </CardContent>
+      </Card>
+
+      {/* Drops & Responses */}
+      {drops.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Drops & Responses</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 max-h-[400px] overflow-y-auto">
+            {drops.map((drop, i) => (
+              <div key={i} className="border-b border-border/40 pb-3 last:border-0">
+                <div className="flex items-start gap-2">
+                  <Badge variant="secondary" className="text-[10px] shrink-0">#{i + 1}</Badge>
+                  <div className="space-y-1 flex-1">
+                    <p className="text-sm font-medium">[{drop.category}] {drop.drop}</p>
+                    {responses[i] ? (
+                      <p className="text-sm text-muted-foreground">{responses[i]}</p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground italic">Passed</p>
+                    )}
+                    {scores[i] && (
+                      <div className="flex gap-2 text-[10px] text-muted-foreground">
+                        <span>Christ: {scores[i].christConnection}</span>
+                        <span>Depth: {scores[i].depth}</span>
+                        <span>Creative: {scores[i].creativity}</span>
+                        <span>Chain: {scores[i].chainLink}</span>
+                        <span className="font-bold">{scores[i].totalScore}/40</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Polished Content */}
+      {polished && (
+        <Card className="border-primary/30">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <FileText className="h-4 w-4" /> {polished.title}
+              <Badge variant="outline" className="text-[10px] ml-auto">{polished.format}</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap text-sm">
+              {polished.content}
+            </div>
+            {polished.keyVerses?.length > 0 && (
+              <p className="text-xs text-muted-foreground">Key verses: {polished.keyVerses.join(", ")}</p>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigator.clipboard.writeText(polished.content)}
+            >
+              Copy Content
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {!polished && (
+        <Card className="border-dashed">
+          <CardContent className="p-4 text-center text-sm text-muted-foreground">
+            No polished content saved for this session.
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function PastSessionsList({ sessions, onSelect }: { sessions: SavedSessionRow[]; onSelect: (s: SavedSessionRow) => void }) {
+  if (sessions.length === 0) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="p-6 text-center text-sm text-muted-foreground">
+          No saved sessions yet. Complete a freestyle game to see it here!
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {sessions.map((s) => {
+        const meta = s.metadata;
+        return (
+          <Card
+            key={s.id}
+            className="cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all"
+            onClick={() => onSelect(s)}
+          >
+            <CardContent className="p-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="text-center min-w-[44px]">
+                  <p className="text-lg font-bold text-primary">{s.score}</p>
+                  <p className="text-[10px] text-muted-foreground">/100</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">
+                    {new Date(s.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                  <div className="flex gap-2 text-[10px] text-muted-foreground">
+                    <span>{meta.difficulty || "beginner"}</span>
+                    <span>{meta.totalDrops || 0} drops</span>
+                    {meta.duration && <span>{Math.round(meta.duration / 60)}m</span>}
+                    {meta.polishedContent && <Badge variant="outline" className="text-[8px] px-1 py-0">Polished</Badge>}
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
 
 // ── Setup Phase ────────────────────────────────────────────────────────
 
@@ -33,10 +208,12 @@ const DROP_FOCUS_OPTIONS: { value: DropFocus; label: string; icon: string; descr
   { value: "symbolic", label: "Symbolic", icon: "🔮", description: "Symbols, archetypes, and abstract concepts" },
 ];
 
-function SetupScreen({ onStart, hasExisting, onResume }: {
+function SetupScreen({ onStart, hasExisting, onResume, pastSessions, onViewSession }: {
   onStart: (d: Difficulty, focus: DropFocus) => void;
   hasExisting: boolean;
   onResume: () => void;
+  pastSessions: SavedSessionRow[];
+  onViewSession: (s: SavedSessionRow) => void;
 }) {
   const [selectedFocus, setSelectedFocus] = useState<DropFocus>("random");
   const difficulties: Difficulty[] = ["beginner", "intermediate", "advanced", "master"];
@@ -170,6 +347,17 @@ function SetupScreen({ onStart, hasExisting, onResume }: {
           })}
         </div>
       </div>
+
+      {/* Past Sessions */}
+      {pastSessions.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold text-center flex items-center justify-center gap-2">
+            <History className="h-5 w-5 text-muted-foreground" />
+            Past Sessions
+          </h2>
+          <PastSessionsList sessions={pastSessions} onSelect={onViewSession} />
+        </div>
+      )}
     </div>
   );
 }
@@ -890,10 +1078,40 @@ function CompletionScreen({
 export default function FreestyleZone() {
   const navigate = useNavigate();
   const game = useFreestyleZone();
+  const { user } = useAuth();
+  const [pastSessions, setPastSessions] = useState<SavedSessionRow[]>([]);
+  const [viewingSession, setViewingSession] = useState<SavedSessionRow | null>(null);
+
+  // Fetch past sessions
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("game_scores")
+      .select("id, score, metadata, created_at")
+      .eq("user_id", user.id)
+      .eq("game_type", "freestyle_zone")
+      .order("created_at", { ascending: false })
+      .limit(50)
+      .then(({ data }) => {
+        if (data) setPastSessions(data as unknown as SavedSessionRow[]);
+      });
+  }, [user, game.gameState.phase]); // re-fetch when phase changes (after completing a game)
 
   const handlePlayAgain = () => {
     window.location.reload();
   };
+
+  // If viewing a past session detail
+  if (viewingSession) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-6 pb-24">
+          <PastSessionDetail session={viewingSession} onClose={() => setViewingSession(null)} />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -918,6 +1136,8 @@ export default function FreestyleZone() {
             onStart={game.startSession}
             hasExisting={game.hasExistingSession}
             onResume={game.resumeGame}
+            pastSessions={pastSessions}
+            onViewSession={setViewingSession}
           />
         ) : game.gameState.phase === "active" ? (
           <ActiveSession
