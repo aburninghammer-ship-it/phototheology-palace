@@ -152,9 +152,9 @@ const SermonIdeas = () => {
             <div className="flex items-start gap-3">
               <Info className="h-5 w-5 text-primary mt-0.5" />
               <div>
-                <h3 className="font-semibold text-sm">Offline Available</h3>
+                <h3 className="font-semibold text-sm">Cloud Saved</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your sermon ideas are saved locally and available anytime — even without internet.
+                  Your sermon ideas are saved to the cloud and available on any device you sign in to.
                 </p>
               </div>
             </div>
