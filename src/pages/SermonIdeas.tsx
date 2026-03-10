@@ -372,7 +372,7 @@ const SermonIdeas = () => {
                     {isResearching && (
                       <div className="mt-4 border-t pt-4 flex items-center justify-center gap-3 text-amber-600">
                         <Loader2 className="h-5 w-5 animate-spin" />
-                        <span className="text-sm font-medium">Jeeves is researching...</span>
+                        <span className="text-sm font-medium">Research Assistant is working...</span>
                       </div>
                     )}
                   </CardContent>
