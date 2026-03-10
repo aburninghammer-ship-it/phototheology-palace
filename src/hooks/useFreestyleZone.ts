@@ -652,12 +652,13 @@ export function useFreestyleZone() {
   const polishSession = useCallback(async (format: string) => {
     setIsPolishing(true);
     setPolishedContent(null);
+    const gs = gameStateRef.current;
     try {
       const { data } = await callJeeves({
         mode: "freestyle_polish",
         sessionData: {
-          drops: gameState.drops,
-          responses: gameState.userResponses,
+          drops: gs.drops,
+          responses: gs.userResponses,
         },
         format,
       }, "freestyle-zone");
