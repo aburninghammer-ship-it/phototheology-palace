@@ -133,7 +133,8 @@
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_f615528a68ef7d0309c5cc8d8a612473588c3891\" npx supabase:*)",
       "Bash(done)",
       "Bash(do grep:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "WebFetch(domain:tdjtumtdkjicnhlpqqzd.supabase.co)"
     ],
     "deny": [],
     "ask": []

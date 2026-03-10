@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export type Difficulty = "beginner" | "intermediate" | "advanced" | "master";
 export type GamePhase = "setup" | "active" | "complete";
+export type FreestyleMode = "partial" | "whole";
 
 export type DropCategory = "scripture" | "nature" | "everyday" | "history" | "human_experience" | "symbolic";
 export type DropFocus = DropCategory | "random";
@@ -69,6 +70,7 @@ export interface FreestyleGameState {
   phase: GamePhase;
   difficulty: Difficulty;
   dropFocus: DropFocus;
+  freestyleMode: FreestyleMode;
   drops: Drop[];
   userResponses: string[];
   scores: EvaluationScores[];
@@ -77,12 +79,16 @@ export interface FreestyleGameState {
   consecutivePasses: number;
   startTime: number;
   elapsedSeconds: number;
+  players: string[];           // player names, empty = solo mode
+  currentPlayerIndex: number;  // whose turn it is (index into players[])
+  playerResponses: number[];   // maps each drop index → player index who responded
 }
 
 const INITIAL_STATE: FreestyleGameState = {
   phase: "setup",
   difficulty: "beginner",
   dropFocus: "random",
+  freestyleMode: "whole",
   drops: [],
   userResponses: [],
   scores: [],
@@ -91,6 +97,9 @@ const INITIAL_STATE: FreestyleGameState = {
   consecutivePasses: 0,
   startTime: 0,
   elapsedSeconds: 0,
+  players: [],
+  currentPlayerIndex: 0,
+  playerResponses: [],
 };
 
 const SESSION_DURATION = 60 * 60; // 60 minutes in seconds
@@ -279,7 +288,7 @@ export function useFreestyleZone() {
 
   // ── Actions ────────────────────────────────────────────────────────
 
-  const startSession = useCallback(async (difficulty: Difficulty, dropFocus: DropFocus = "random") => {
+  const startSession = useCallback(async (difficulty: Difficulty, dropFocus: DropFocus = "random", players: string[] = [], freestyleMode: FreestyleMode = "whole") => {
     await startNewGame();
     const startTime = Date.now();
     setGameState({
@@ -287,8 +296,12 @@ export function useFreestyleZone() {
       phase: "active",
       difficulty,
       dropFocus,
+      freestyleMode,
       startTime,
       momentum: 50,
+      players,
+      currentPlayerIndex: 0,
+      playerResponses: [],
     });
     setCurrentFeedback(null);
     setSessionSummary(null);
@@ -419,8 +432,9 @@ export function useFreestyleZone() {
         mode: "freestyle_evaluate",
         drop: currentDrop,
         userResponse: response,
-        chainHistory,
+        chainHistory: gameState.freestyleMode === "whole" ? chainHistory : [],
         difficulty: gameState.difficulty,
+        freestyleMode: gameState.freestyleMode,
       }, "freestyle-zone");
 
       if (error || !data) {
@@ -452,6 +466,7 @@ export function useFreestyleZone() {
         userResponses: [...prev.userResponses, response],
         scores: [...prev.scores, scores],
         consecutivePasses: 0,
+        playerResponses: [...prev.playerResponses, prev.currentPlayerIndex],
       }));
 
       // Save to session
@@ -481,6 +496,7 @@ export function useFreestyleZone() {
         userResponses: [...prev.userResponses, response],
         scores: [...prev.scores, fallbackScores],
         consecutivePasses: 0,
+        playerResponses: [...prev.playerResponses, prev.currentPlayerIndex],
       }));
     } finally {
       setIsEvaluating(false);
@@ -497,17 +513,29 @@ export function useFreestyleZone() {
       userResponses: [...prev.userResponses, ""],
       passCount: prev.passCount + 1,
       consecutivePasses: prev.consecutivePasses + 1,
+      playerResponses: [...prev.playerResponses, prev.currentPlayerIndex],
     }));
 
     setCurrentFeedback(null);
+    rotatePlayer();
     await generateNextDrop();
-  }, [gameState.phase, updateMomentum, setGameState, generateNextDrop]);
+  }, [gameState.phase, updateMomentum, setGameState, generateNextDrop, rotatePlayer]);
+
+  const rotatePlayer = useCallback(() => {
+    if (gameState.players.length > 0) {
+      setGameState(prev => ({
+        ...prev,
+        currentPlayerIndex: (prev.currentPlayerIndex + 1) % prev.players.length,
+      }));
+    }
+  }, [gameState.players.length, setGameState]);
 
   const advanceToNextDrop = useCallback(async () => {
     setCurrentFeedback(null);
     setJeevesAssist(null);
+    rotatePlayer();
     await generateNextDrop();
-  }, [generateNextDrop]);
+  }, [generateNextDrop, rotatePlayer]);
 
   const askJeevesForHelp = useCallback(async () => {
     if (gameState.phase !== "active") return;
@@ -524,8 +552,9 @@ export function useFreestyleZone() {
       const { data, error } = await callJeeves({
         mode: "freestyle_jeeves_assist",
         drop: currentDrop,
-        chainHistory,
+        chainHistory: gameState.freestyleMode === "whole" ? chainHistory : [],
         difficulty: gameState.difficulty,
+        freestyleMode: gameState.freestyleMode,
       }, "freestyle-zone");
 
       if (error || !data) {
@@ -545,12 +574,14 @@ export function useFreestyleZone() {
           christConnection: 0, depth: 0, creativity: 0, chainLink: 0,
           totalScore: 0, feedback: "Jeeves handled this one.",
         }],
+        playerResponses: [...prev.playerResponses, prev.currentPlayerIndex],
       }));
 
       // Auto-advance to next drop after a delay so the player can read Jeeves' response
       setTimeout(() => {
         setJeevesAssist(null);
         setCurrentFeedback(null);
+        rotatePlayer();
         generateNextDrop();
       }, 5000);
     } catch (err) {
@@ -559,7 +590,7 @@ export function useFreestyleZone() {
     } finally {
       setIsAskingJeeves(false);
     }
-  }, [gameState, buildChainHistory, generateNextDrop, setGameState]);
+  }, [gameState, buildChainHistory, generateNextDrop, setGameState, rotatePlayer]);
 
   const endSession = useCallback(async () => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -590,6 +621,7 @@ export function useFreestyleZone() {
           metadata: {
             difficulty: gs.difficulty,
             dropFocus: gs.dropFocus || "random",
+            freestyleMode: gs.freestyleMode,
             totalDrops: gs.drops.length,
             passCount: gs.passCount,
             duration: Math.floor((Date.now() - gs.startTime) / 1000),
@@ -597,6 +629,10 @@ export function useFreestyleZone() {
             drops: gs.drops,
             responses: gs.userResponses,
             scores: gs.scores,
+            ...(gs.players.length > 0 ? {
+              players: gs.players,
+              playerResponses: gs.playerResponses,
+            } : {}),
           } as any,
         }).select("id").single();
         if (inserted) savedSessionIdRef.current = inserted.id;
@@ -638,6 +674,7 @@ export function useFreestyleZone() {
       const { data } = await callJeeves({
         mode: "freestyle_jeeves_demo",
         drops: gs.drops,
+        responses: gs.userResponses,
         difficulty: gs.difficulty,
       }, "freestyle-zone");
 

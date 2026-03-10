@@ -9039,18 +9039,39 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
 
       const categories = categoryPool[difficulty] || categoryPool.beginner;
 
-      const recentCategories = previousDrops.slice(-categories.length).map((d: any) => d.category);
       let preferredCategory: string;
       if (dropFocus && dropFocus !== "random") {
         // User locked a specific category — always use it
         preferredCategory = dropFocus;
       } else {
-        // Determine which category to use next — enforce diversity by rotating through all available categories
-        const underusedCategories = categories.filter((c: string) => !recentCategories.includes(c));
-        preferredCategory = underusedCategories.length > 0
-          ? underusedCategories[Math.floor(Math.random() * underusedCategories.length)]
-          : categories[Math.floor(Math.random() * categories.length)];
+        // STRICT ROUND-ROBIN: cycle through all categories in order, never back-to-back
+        // Determine which categories have been used in the current cycle
+        const lastCategory = previousDrops.length > 0 ? previousDrops[previousDrops.length - 1]?.category : null;
+
+        // Find how far back the last full cycle started
+        const usedInCurrentCycle: string[] = [];
+        for (let i = previousDrops.length - 1; i >= 0; i--) {
+          const cat = previousDrops[i]?.category;
+          if (usedInCurrentCycle.includes(cat)) break; // hit a repeat = start of previous cycle
+          usedInCurrentCycle.push(cat);
+        }
+
+        // Categories not yet used in this cycle AND not the same as the last drop
+        const remaining = categories.filter((c: string) =>
+          !usedInCurrentCycle.includes(c) && c !== lastCategory
+        );
+
+        if (remaining.length > 0) {
+          // Pick from remaining categories in this cycle
+          preferredCategory = remaining[Math.floor(Math.random() * remaining.length)];
+        } else {
+          // Cycle complete — start a new cycle, but exclude the last category to prevent back-to-back
+          const available = categories.filter((c: string) => c !== lastCategory);
+          preferredCategory = available[Math.floor(Math.random() * available.length)];
+        }
       }
+
+      const recentCategories = previousDrops.slice(-categories.length).map((d: any) => d.category);
 
       // Generate entropy to push the LLM away from its defaults
       const entropySeeds = [
@@ -9086,7 +9107,7 @@ DIFFICULTY RULES:
 - master: CRITICAL — use ONLY plain, everyday language. NO academic or philosophical jargon. The challenge is DEPTH, not vocabulary. A 12-year-old should be able to READ the drop.
 ${exclusionBlock}
 ${previousDrops.length > 0 ? `CURRENT SESSION DROPS (avoid repeating themes AND categories): ${JSON.stringify(previousDrops.slice(-6))}
-Recent categories used: ${recentCategories.join(", ")}. You MUST use a DIFFERENT category this time.` : "This is the first drop of the session."}
+Recent categories used: ${recentCategories.join(", ")}. You MUST use the category "${preferredCategory}" for this drop — this is enforced by the round-robin system.` : "This is the first drop of the session."}
 
 Return ONLY valid JSON:
 {
@@ -9102,15 +9123,27 @@ Return ONLY valid JSON:
       const userResponse = requestBody.userResponse || "";
       const chainHistory = requestBody.chainHistory || [];
       const difficulty = requestBody.difficulty || "beginner";
+      const freestyleMode = requestBody.freestyleMode || "whole";
+
+      const isPartial = freestyleMode === "partial";
 
       systemPrompt = `You are Jeeves, evaluating ${greeting}'s freestyle connection in the Phototheology Freestyler Training Zone.
 
-${greeting} was given a "drop" (a random prompt) and must connect it to Christ AND ideally to previous drops in their chain.
+${greeting} was given a "drop" (a random prompt) and must connect it to Christ.${isPartial ? "" : " In Whole Freestyle mode, they should also connect to previous drops in their chain."}
 
-SCORING RULES — READ CAREFULLY:
-You must score each of the 4 dimensions on a 0-10 scale. The scores MUST reflect the ACTUAL quality of the response. Do NOT cluster all scores in the 5-7 range. Use the FULL range.
+MODE: ${isPartial ? "PARTIAL FREESTYLE — Each drop stands alone. The student only needs to connect the drop to Christ. Do NOT penalize for lack of chain linking." : "WHOLE FREESTYLE — The student should connect the drop to Christ AND link to previous drops."}
 
-A mediocre response should get 2s and 3s, not 6s. An excellent response should get 8s and 9s, not 7s. A mixed response might get a 9 in one area and a 2 in another. NEVER give all four dimensions the same score or within 1 point of each other unless the response truly warrants it.
+SCORING PHILOSOPHY — GENEROUS BUT HONEST:
+You are a COACH, not a harsh judge. Your goal is to encourage growth while being honest. Score generously for effort and insight. A student who makes a genuine, thoughtful connection — even if imperfect — deserves credit.
+
+${isPartial ? "Score on 3 dimensions (christConnection, depth, creativity). Set chainLink to 0." : "Score on 4 dimensions (christConnection, depth, creativity, chainLink)."}
+
+CALIBRATION GUIDE (use the FULL 0-10 range but lean encouraging):
+- A response that shows genuine thought and makes a real connection = 6-8 range
+- A surface-level but valid connection = 4-6 range
+- A truly lazy or empty response = 1-3 range
+- A brilliant, surprising, deeply biblical connection = 8-10 range
+- Reserve 0-1 for complete non-answers only
 
 DIMENSIONS:
 1. christConnection (0-10): How clearly does the response connect the drop to Christ?
@@ -9122,22 +9155,22 @@ DIMENSIONS:
 3. creativity (0-10): How original is the connection?
    0-1: No thought at all. 2-3: The obvious first answer anyone gives. 4-5: Slightly unexpected. 6-7: An angle most wouldn't see. 8-9: Genuinely surprising yet theologically sound. 10: Paradigm-shifting.
 
-4. chainLink (0-10): How well does it connect to previous drops?
+${isPartial ? "4. chainLink: Set to 0 (not scored in Partial Freestyle mode)." : `4. chainLink (0-10): How well does it connect to previous drops?
    0-1: Completely ignores chain. 2-3: No explicit linking. 4-5: Vague thematic similarity. 6-7: References a specific previous drop. 8-9: Weaves multiple drops together. 10: Perfect tapestry.
-   (If first drop: score how chainable this response is — does it plant seeds?)
+   (If first drop: score how chainable this response is — does it plant seeds?)`}
 
-ANTI-PATTERN WARNING: If you find yourself giving scores like 6,7,6,7 or 7,6,7,6 — STOP. That means you are being lazy. Re-read the response and ask: is the creativity REALLY the same quality as the depth? Is the chain linking REALLY comparable to the Christ connection? Score each one fresh.
+SCORING INTEGRITY: Each dimension should be scored independently. A response CAN have high creativity but low depth, or high Christ connection but low creativity. Score each one fresh.
 
 DIFFICULTY EXPECTATIONS:
-- beginner: Be encouraging. A generic "Jesus loves us" still only gets christConnection 3.
-- intermediate: Expect specificity. Vague responses cap at 4-5 in depth.
-- advanced: Expect layers and chain awareness. Generic = 2-3.
-- master: Be rigorous. Only 8+ for truly exceptional work.
+- beginner: Be encouraging and generous. Reward effort. A genuine attempt at connecting to Christ = 5+ in christConnection.
+- intermediate: Expect some specificity, but still reward solid effort generously.
+- advanced: Expect layers and sophistication. Generic responses cap at 5.
+- master: Be more rigorous, but still reward genuine insight.
 
 totalScore = christConnection + depth + creativity + chainLink (the arithmetic sum — not a separate judgment)
 
-${chainHistory.length > 0 ? `CHAIN HISTORY (last ${Math.min(chainHistory.length, 10)} entries):
-${JSON.stringify(chainHistory.slice(-10))}` : "This is the first response in the chain — score chainLink based on how chainable this response is."}
+${!isPartial && chainHistory.length > 0 ? `CHAIN HISTORY (last ${Math.min(chainHistory.length, 10)} entries):
+${JSON.stringify(chainHistory.slice(-10))}` : isPartial ? "Partial Freestyle mode — no chain history needed." : "This is the first response in the chain — score chainLink based on how chainable this response is."}
 
 Return ONLY valid JSON (no markdown, no backticks):
 {
@@ -9146,15 +9179,15 @@ Return ONLY valid JSON (no markdown, no backticks):
   "creativity": <integer 0-10>,
   "chainLink": <integer 0-10>,
   "totalScore": <integer sum of above four>,
-  "feedback": "2-3 sentences addressing ${greeting} by name — warm, specific, instructive. Reference what they ACTUALLY said.",
-  "suggestion": "1 sentence suggesting how they could deepen the connection (omit this field entirely if totalScore > 32)"
+  "feedback": "2-3 sentences addressing ${greeting} by name — warm, specific, instructive. Reference what they ACTUALLY said. Celebrate what they got right.",
+  "suggestion": "1 sentence suggesting how they could deepen the connection (omit this field entirely if totalScore > 28)"
 }`;
 
       userPrompt = `DROP: [${drop.category}] "${drop.drop}"
 
 ${greeting.toUpperCase()}'S RESPONSE: "${userResponse}"
 
-Evaluate this ${difficulty}-level response. Remember: use the FULL 0-10 range. Do NOT default to middle scores.`;
+Evaluate this ${difficulty}-level response in ${freestyleMode.toUpperCase()} FREESTYLE mode. Be generous with genuine effort. Reward insight and creativity.`;
 
     } else if (mode === "freestyle_session_summary") {
       const sessionData = requestBody.sessionData || {};
@@ -9204,69 +9237,83 @@ Generate a comprehensive session evaluation that accounts for EVERY drop and res
     } else if (mode === "freestyle_jeeves_demo") {
       const drops = requestBody.drops || [];
       const difficulty = requestBody.difficulty || "beginner";
+      const responses = requestBody.responses || [];
 
-      systemPrompt = `You are Jeeves, the master Phototheologist. ${greeting} just finished a Freestyler Training Zone session and wants to see YOU freestyle.
+      systemPrompt = `You are Jeeves, the master Phototheologist. ${greeting} just finished a Freestyler Training Zone session and wants to see YOU freestyle the same drops.
 
-Take ALL the drops from their session and build your own freestyle chain — connecting each drop to Christ AND to the previous drops, creating one flowing theological tapestry.
+CRITICAL: You must take a COMPLETELY DIFFERENT APPROACH than the student. Do NOT repeat, rephrase, or echo their connections. You've seen what ${greeting} said — now show them ENTIRELY DIFFERENT angles, DIFFERENT Scriptures, DIFFERENT typological layers, DIFFERENT sanctuary connections. If they went with an obvious connection, you go obscure. If they used the New Testament, you reach into the Old. If they focused on a parable, you draw from prophecy. SURPRISE THEM.
 
-This is your chance to SHOW, not tell. Demonstrate master-level Phototheology freestyle. Be brilliant, warm, and instructive. The student should read this and think "WOW, I want to think like that."
+Take ALL the drops and build your own ORIGINAL freestyle chain — connecting each drop to Christ AND to the previous drops, creating one flowing theological tapestry that shows ${greeting} connections they NEVER would have thought of.
+
+This is your chance to BLOW THEIR MIND. Demonstrate master-level Phototheology freestyle. Be brilliant, deep, and passionate. The student should read this and think "I never would have seen THAT."
 
 RULES:
 - Use EVERY drop they received (in order)
-- Each connection should flow naturally into the next
-- Show typological depth, sanctuary connections, Christ-centered thinking
-- Reference specific Scripture
-- Make the chain feel like one unified sermon illustration
-- Keep each drop's connection to 2-4 sentences
-- End with a powerful Christ-centered conclusion that ties everything together
-- Address ${greeting} warmly in your conclusion
+- For EACH drop, take a DIFFERENT angle than the student took — different Scripture, different typology, different lens entirely
+- Each connection should flow naturally into the next, building a unified theological narrative
+- Show typological depth, sanctuary connections, prophetic parallels, Hebrew word studies
+- Reference specific Scripture (KJV) — at least one per drop, and DIFFERENT from any the student used
+- Make the chain feel like one unified, flowing sermon that builds to a climax
+- Give each drop's connection 3-5 rich sentences (not just 2)
+- Build momentum — each connection should be deeper and more surprising than the last
+- End with a powerful, passionate Christ-centered conclusion that ties the ENTIRE chain together
+- Address ${greeting} warmly in your conclusion — celebrate their session AND show what more is possible
 
 Return ONLY valid JSON:
 {
-  "title": "A creative title for Jeeves's freestyle",
+  "title": "A creative, evocative title for Jeeves's freestyle (not generic — make it memorable)",
   "chain": [
     {
       "drop": "the drop text",
       "category": "the category",
-      "connection": "Jeeves's connection (2-4 sentences)"
+      "connection": "Jeeves's ORIGINAL connection (3-5 sentences) — MUST be different from the student's approach"
     }
   ],
-  "conclusion": "A powerful 2-3 sentence conclusion tying it all to Christ, addressing ${greeting} by name",
-  "closingVerse": "A Scripture reference that captures the whole chain"
+  "conclusion": "A powerful 3-4 sentence conclusion tying the ENTIRE chain to Christ as one unified revelation, addressing ${greeting} by name",
+  "closingVerse": "A specific Scripture reference (with verse text) that captures the whole chain"
 }`;
 
-      userPrompt = `Here are ALL the drops from ${greeting}'s session. Build your freestyle chain:
-${JSON.stringify(drops)}`;
+      userPrompt = `Here are ALL the drops from ${greeting}'s session, along with what ${greeting} said (so you can take a DIFFERENT approach):
+${JSON.stringify(drops.map((d: any, i: number) => ({
+  drop: d,
+  studentResponse: responses[i] || "(passed)"
+})))}
+
+Build your freestyle chain. For EVERY drop, take a completely DIFFERENT angle than ${greeting} took. Show them connections they never saw.`;
 
     } else if (mode === "freestyle_jeeves_assist") {
       const drop = requestBody.drop || {};
       const chainHistory = requestBody.chainHistory || [];
       const difficulty = requestBody.difficulty || "beginner";
+      const freestyleMode = requestBody.freestyleMode || "whole";
 
-      systemPrompt = `You are Jeeves, the master Phototheologist. ${greeting} is stuck on a freestyle drop and has asked you to demonstrate how YOU would connect it to Christ.
+      systemPrompt = `You are Jeeves, the master Phototheologist. ${greeting} is stuck on a freestyle drop and has asked you to freestyle it yourself.
 
-This is a teaching moment. Show ${greeting} a brilliant, accessible connection that helps them learn HOW to think this way. Your response should make them say "Oh! I see it now!"
+This is YOUR moment to SHINE. Don't just explain — PERFORM. Show ${greeting} a dazzling, multi-layered connection that makes them say "WOW." Go DEEP. Be BRILLIANT. This should feel like watching a master musician improvise.
 
 RULES:
-- Connect this drop to Christ with 3-5 sentences
-- Use plain, vivid language — no academic jargon
-- Reference at least one specific Scripture (KJV)
-- If there are previous drops in the chain, weave a connection to at least one of them
-- Show the PROCESS: briefly hint at how you spotted the connection (e.g. "The key word here is..." or "Notice how this mirrors...")
-- Be warm and encouraging — address ${greeting} by name. They asked for help, not a lecture
+- Freestyle this drop with 5-8 rich sentences — go bigger and deeper than a student would
+- Open with a vivid hook that grabs attention
+- Layer MULTIPLE Christ connections — typological, prophetic, sanctuary imagery, Gospel parallels
+- Reference 2-3 specific Scriptures (KJV) woven naturally into the flow
+- Draw surprising connections the student wouldn't think of — cross-Testament patterns, Hebrew word meanings, sanctuary furniture parallels, prophetic timelines
+- Show theological brilliance but keep the language vivid and accessible
+${freestyleMode === "whole" && chainHistory.length > 0 ? "- Since this is Whole Freestyle mode, weave connections to previous drops in the chain — show how it all fits together" : ""}
+- End with a statement that makes the student see Christ in this drop forever
+- Be passionate and warm — address ${greeting} by name
 
 ${chainHistory.length > 0 ? `CHAIN HISTORY (previous drops and responses):
 ${JSON.stringify(chainHistory.slice(-6))}` : "This is the first drop — no chain history yet."}
 
 Return ONLY valid JSON:
 {
-  "connection": "Your 3-5 sentence freestyle connection to Christ",
-  "keyInsight": "One sentence about HOW you spotted this connection (teaching the student to see patterns)"
+  "connection": "Your 5-8 sentence BRILLIANT freestyle connection to Christ — go deep, go wide, amaze them",
+  "keyInsight": "One sentence teaching ${greeting} the PATTERN you used to spot this connection (e.g. 'Whenever you see X in Scripture, look for Y')"
 }`;
 
       userPrompt = `${greeting} is stuck on this drop: [${drop.category}] "${drop.drop}"
 
-Show ${greeting} how a master Phototheologist would connect this to Christ at ${difficulty} level.`;
+Show ${greeting} how a MASTER Phototheologist freestyles. Don't hold back — go deep, layer connections, reference Scripture, and make this drop UNFORGETTABLE. This is ${difficulty} level.`;
 
     } else if (mode === "freestyle_polish") {
       const sessionData = requestBody.sessionData || {};
@@ -9275,27 +9322,70 @@ Show ${greeting} how a master Phototheologist would connect this to Christ at ${
       const responses = sessionData.responses || [];
 
       const formatInstructions: Record<string, string> = {
-        devotional: "Convert this into a warm, personal devotional (500-800 words). Include Scripture references, personal application questions, and a prayer.",
-        sermon_outline: "Convert this into a structured sermon outline with: Title, Key Text, Introduction hook, 3-4 main points with sub-points, illustrations from the drops, application, and altar call/conclusion.",
-        bible_study: "Convert this into a group Bible study guide with: Opening question, 5-7 discussion questions, Scripture readings, key insights from the drops, and a closing activity.",
-        script: "Convert this into a compelling script for a short video or podcast segment (3-5 minutes). Include speaker notes, pacing cues, and dramatic moments."
+        devotional: `Create a rich, moving devotional (800-1200 words) that AMPLIFIES the student's connections into something publishable. Don't just restate what they said — take their seed ideas and grow them into full theological flowers. Add:
+- A compelling opening illustration or story that draws the reader in
+- 2-3 additional Scripture references (KJV) beyond what the student mentioned, with brief exposition
+- Deeper typological connections the student may not have seen
+- Personal application that makes the reader examine their own life
+- Thoughtful reflection questions that go beyond surface level
+- A heartfelt prayer that ties all the themes together
+- A closing thought that lingers in the reader's mind
+The student's ideas are the STARTING POINT, not the ceiling. Build something they'd be proud to share.`,
+        sermon_outline: `Create a full, preachable sermon outline that takes the student's connections and EXPANDS them into a structured message. Don't just organize what they said — add depth, illustrations, and theological layers. Include:
+- A memorable, catchy title
+- Key Text (with full verse quotation, KJV)
+- A gripping introduction with a story or illustration
+- 3-4 main points, each with: a clear statement, 2-3 sub-points, at least one Scripture reference with exposition, a real-world illustration or application
+- Transitions between points that build momentum
+- Additional Scriptures and cross-references the student didn't mention
+- Practical application section with specific action steps
+- A powerful altar call/conclusion that brings it all to Christ
+The student planted seeds — you're growing them into a sermon garden.`,
+        bible_study: `Create a comprehensive group Bible study guide that takes the student's connections and AMPLIFIES them into rich discussion material. Don't just repeat their points — expand, deepen, and add layers. Include:
+- An engaging opening icebreaker question related to the theme
+- Context-setting paragraph that frames the study
+- 7-10 meaty discussion questions that go DEEPER than the student went — questions that make people think, not just recall
+- For each question: a "dig deeper" follow-up and a relevant Scripture to read together
+- Key insights section with 3-4 theological observations that build on the student's ideas but add NEW depth
+- A "what the scholars say" sidebar with a brief historical or linguistic insight
+- Personal reflection prompts for individual journaling
+- A closing prayer activity or group exercise
+- Take-home challenge for the week
+The student's connections are the raw material — build something a small group leader would love to teach.`,
+        script: `Create a compelling, professional script for a 5-7 minute video or podcast that AMPLIFIES the student's connections into engaging content. Don't just narrate what they said — transform it into compelling storytelling. Include:
+- A hook that grabs attention in the first 10 seconds
+- Speaker notes with tone, pacing, and emphasis cues (e.g. [pause for effect], [lean in], [speak slowly])
+- Vivid storytelling that brings the theological concepts to life
+- Dramatic moments and emotional beats
+- Additional depth and connections beyond what the student offered
+- Natural transitions that keep the audience engaged
+- A powerful closing that leaves the audience thinking
+- A call to action
+Write it like a TED talk meets a passionate sermon — accessible but profound.`
       };
 
-      systemPrompt = `You are Jeeves, helping ${greeting} transform their Freestyler Training Zone session into polished content.
+      systemPrompt = `You are Jeeves, helping ${greeting} transform their Freestyler Training Zone session into polished, AMPLIFIED content.
 
 ${formatInstructions[format] || formatInstructions.devotional}
 
-Use the student's actual connections and insights as the raw material. Elevate their thinking, don't replace it. Give credit to their best moments.
+CRITICAL INSTRUCTION: Do NOT just restate or reorganize the student's words. Their connections are your STARTING POINT. Your job is to:
+1. Take their best ideas and expand them with deeper theology, additional Scriptures, and richer language
+2. Add connections and insights they DIDN'T mention — show them what more is possible
+3. Weave everything into a cohesive, flowing piece that feels professionally written
+4. Include your own theological observations that build on their foundation
+5. Make it something ${greeting} would be genuinely excited to share with others
+
+The result should feel like a collaboration where ${greeting}'s ideas were the spark and you fanned them into a flame.
 
 Return ONLY valid JSON:
 {
-  "title": "A compelling title",
-  "content": "The full polished content in markdown format",
-  "keyVerses": ["verse references used"],
+  "title": "A compelling, memorable title",
+  "content": "The full polished content in markdown format — rich, deep, amplified",
+  "keyVerses": ["verse references used (include ALL verses, both student's and your additions)"],
   "format": "${format}"
 }`;
 
-      userPrompt = `Transform this freestyle session into a ${format}:
+      userPrompt = `Transform this freestyle session into a ${format}. AMPLIFY — don't just repeat. Add depth, new Scriptures, fresh insights, and professional polish:
 
 DROPS & RESPONSES:
 ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[i] || "(skipped)"}`).join("\n")}`;

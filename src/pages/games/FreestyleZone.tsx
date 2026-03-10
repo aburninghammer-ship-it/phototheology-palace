@@ -4,6 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,6 +12,7 @@ import {
   ArrowLeft, Clock, Zap, SkipForward, Send, Trophy,
   BookOpen, Sparkles, FileText, ChevronRight, ChevronDown, ChevronUp, Loader2,
   Play, Flame, Target, Crown, Eye, Swords, HelpCircle, Lightbulb, History, X,
+  Users, Plus, Minus, Link2, Unlink,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +23,7 @@ import {
   type Difficulty,
   type DropCategory,
   type DropFocus,
+  type FreestyleMode,
 } from "@/hooks/useFreestyleZone";
 
 // ── Saved Session Types ────────────────────────────────────────────────
@@ -37,10 +40,24 @@ interface SavedSessionRow {
     drops?: Array<{ category: string; drop: string }>;
     responses?: string[];
     scores?: Array<{ christConnection: number; depth: number; creativity: number; chainLink: number; totalScore: number; feedback: string }>;
+    freestyleMode?: FreestyleMode;
     polishedContent?: { title: string; content: string; keyVerses: string[]; format: string };
+    players?: string[];
+    playerResponses?: number[];
   };
   created_at: string;
 }
+
+const PLAYER_COLORS = [
+  { bg: "bg-blue-500", text: "text-blue-600 dark:text-blue-400", border: "border-blue-500/40", light: "bg-blue-500/10" },
+  { bg: "bg-green-500", text: "text-green-600 dark:text-green-400", border: "border-green-500/40", light: "bg-green-500/10" },
+  { bg: "bg-purple-500", text: "text-purple-600 dark:text-purple-400", border: "border-purple-500/40", light: "bg-purple-500/10" },
+  { bg: "bg-orange-500", text: "text-orange-600 dark:text-orange-400", border: "border-orange-500/40", light: "bg-orange-500/10" },
+  { bg: "bg-pink-500", text: "text-pink-600 dark:text-pink-400", border: "border-pink-500/40", light: "bg-pink-500/10" },
+  { bg: "bg-teal-500", text: "text-teal-600 dark:text-teal-400", border: "border-teal-500/40", light: "bg-teal-500/10" },
+  { bg: "bg-red-500", text: "text-red-600 dark:text-red-400", border: "border-red-500/40", light: "bg-red-500/10" },
+  { bg: "bg-indigo-500", text: "text-indigo-600 dark:text-indigo-400", border: "border-indigo-500/40", light: "bg-indigo-500/10" },
+];
 
 // ── Past Sessions Viewer ───────────────────────────────────────────────
 
@@ -67,11 +84,38 @@ function PastSessionDetail({ session, onClose }: { session: SavedSessionRow; onC
             Session — {new Date(session.created_at).toLocaleDateString()}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-1 text-sm text-muted-foreground">
+        <CardContent className="space-y-2 text-sm text-muted-foreground">
           <p>Difficulty: <Badge variant="outline" className="ml-1">{meta.difficulty || "beginner"}</Badge></p>
-          <p>Category: {meta.dropFocus || "Random Mix"}</p>
+          <p>Category: {meta.dropFocus || "Random Mix"} · Mode: {meta.freestyleMode === "partial" ? "Partial" : "Whole"} Freestyle</p>
           <p>Drops: {meta.totalDrops || drops.length} | Answered: {responses.filter(r => r && !r.startsWith("[Jeeves")).length} | Passes: {meta.passCount || 0}</p>
           {meta.duration && <p>Duration: {Math.round(meta.duration / 60)} min</p>}
+          {meta.players && meta.players.length > 0 && (
+            <div className="pt-2 border-t border-border/40">
+              <p className="font-medium text-foreground flex items-center gap-1 mb-2">
+                <Users className="h-3.5 w-3.5" /> Multiplayer — {meta.players.length} Players
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {meta.players.map((name, pi) => {
+                  const color = PLAYER_COLORS[pi % PLAYER_COLORS.length];
+                  const playerDropIndices = (meta.playerResponses || [])
+                    .map((pIdx, di) => pIdx === pi ? di : -1)
+                    .filter(di => di >= 0);
+                  const playerScores = playerDropIndices
+                    .map(di => scores[di])
+                    .filter(s => s && s.totalScore > 0);
+                  const avg = playerScores.length > 0
+                    ? Math.round(playerScores.reduce((sum, s) => sum + s.totalScore, 0) / playerScores.length)
+                    : 0;
+                  return (
+                    <div key={pi} className={`p-2 rounded-lg ${color.light} ${color.border} border`}>
+                      <p className={`font-semibold text-xs ${color.text}`}>{name}</p>
+                      <p className="text-[10px]">{playerDropIndices.length} drops · Avg: {avg}/40</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -88,6 +132,11 @@ function PastSessionDetail({ session, onClose }: { session: SavedSessionRow; onC
                   <Badge variant="secondary" className="text-[10px] shrink-0">#{i + 1}</Badge>
                   <div className="space-y-1 flex-1">
                     <p className="text-sm font-medium">[{drop.category}] {drop.drop}</p>
+                    {meta.players && meta.playerResponses && meta.playerResponses[i] !== undefined && (
+                      <Badge variant="outline" className={`text-[10px] ${PLAYER_COLORS[meta.playerResponses[i] % PLAYER_COLORS.length].text}`}>
+                        {meta.players[meta.playerResponses[i]]}
+                      </Badge>
+                    )}
                     {responses[i] ? (
                       <p className="text-sm text-muted-foreground">{responses[i]}</p>
                     ) : (
@@ -183,6 +232,14 @@ function PastSessionsList({ sessions, onSelect }: { sessions: SavedSessionRow[];
                     <span>{meta.difficulty || "beginner"}</span>
                     <span>{meta.totalDrops || 0} drops</span>
                     {meta.duration && <span>{Math.round(meta.duration / 60)}m</span>}
+                    {meta.freestyleMode === "partial" && (
+                      <Badge variant="outline" className="text-[8px] px-1 py-0 border-amber-500/30 text-amber-600 dark:text-amber-400">Partial</Badge>
+                    )}
+                    {meta.players && meta.players.length > 0 && (
+                      <Badge variant="outline" className="text-[8px] px-1 py-0 border-blue-500/30 text-blue-600 dark:text-blue-400">
+                        <Users className="h-2.5 w-2.5 mr-0.5" />{meta.players.length}P
+                      </Badge>
+                    )}
                     {meta.polishedContent && <Badge variant="outline" className="text-[8px] px-1 py-0">Polished</Badge>}
                   </div>
                 </div>
@@ -209,15 +266,32 @@ const DROP_FOCUS_OPTIONS: { value: DropFocus; label: string; icon: string; descr
 ];
 
 function SetupScreen({ onStart, hasExisting, onResume, pastSessions, onViewSession }: {
-  onStart: (d: Difficulty, focus: DropFocus) => void;
+  onStart: (d: Difficulty, focus: DropFocus, players: string[], freestyleMode: FreestyleMode) => void;
   hasExisting: boolean;
   onResume: () => void;
   pastSessions: SavedSessionRow[];
   onViewSession: (s: SavedSessionRow) => void;
 }) {
   const [selectedFocus, setSelectedFocus] = useState<DropFocus>("random");
+  const [selectedMode, setSelectedMode] = useState<FreestyleMode>("whole");
+  const [isMultiplayer, setIsMultiplayer] = useState(false);
+  const [playerNames, setPlayerNames] = useState<string[]>(["", ""]);
   const difficulties: Difficulty[] = ["beginner", "intermediate", "advanced", "master"];
   const icons = [Play, Target, Swords, Crown];
+
+  const addPlayer = () => {
+    if (playerNames.length < 8) setPlayerNames([...playerNames, ""]);
+  };
+  const removePlayer = (index: number) => {
+    if (playerNames.length > 2) setPlayerNames(playerNames.filter((_, i) => i !== index));
+  };
+  const updatePlayerName = (index: number, name: string) => {
+    const updated = [...playerNames];
+    updated[index] = name;
+    setPlayerNames(updated);
+  };
+  const validPlayers = playerNames.filter(n => n.trim());
+  const canStartMultiplayer = !isMultiplayer || validPlayers.length >= 2;
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -273,6 +347,105 @@ function SetupScreen({ onStart, hasExisting, onResume, pastSessions, onViewSessi
         </CardContent>
       </Card>
 
+      {/* Freestyle Mode Selection */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-center flex items-center justify-center gap-2">
+          <Link2 className="h-5 w-5 text-purple-500" />
+          Freestyle Mode
+        </h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Card
+            className={`cursor-pointer transition-all ${
+              selectedMode === "partial"
+                ? "border-primary bg-primary/10 shadow-md ring-2 ring-primary/30"
+                : "hover:border-primary/40 hover:bg-primary/5"
+            }`}
+            onClick={() => setSelectedMode("partial")}
+          >
+            <CardContent className="p-4 space-y-2 text-center">
+              <Unlink className="h-6 w-6 mx-auto text-amber-500" />
+              <p className="font-semibold text-sm">Partial Freestyle</p>
+              <p className="text-xs text-muted-foreground">
+                Each drop stands alone. Connect it to Christ without needing to link to previous drops.
+              </p>
+            </CardContent>
+          </Card>
+          <Card
+            className={`cursor-pointer transition-all ${
+              selectedMode === "whole"
+                ? "border-primary bg-primary/10 shadow-md ring-2 ring-primary/30"
+                : "hover:border-primary/40 hover:bg-primary/5"
+            }`}
+            onClick={() => setSelectedMode("whole")}
+          >
+            <CardContent className="p-4 space-y-2 text-center">
+              <Link2 className="h-6 w-6 mx-auto text-purple-500" />
+              <p className="font-semibold text-sm">Whole Freestyle</p>
+              <p className="text-xs text-muted-foreground">
+                Build a chain. Each response must connect to Christ AND link to the previous drops.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Players Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Users className="h-5 w-5" /> Players
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={isMultiplayer ? "default" : "outline"}
+                size="sm"
+                className="text-xs h-7"
+                onClick={() => setIsMultiplayer(!isMultiplayer)}
+              >
+                {isMultiplayer ? "Multiplayer" : "Solo"}
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        {isMultiplayer && (
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Add 2-8 players. Everyone takes turns on the same device — round-robin style.
+            </p>
+            <div className="space-y-2">
+              {playerNames.map((name, i) => {
+                const color = PLAYER_COLORS[i % PLAYER_COLORS.length];
+                return (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${color.bg} shrink-0`} />
+                    <Input
+                      value={name}
+                      onChange={(e) => updatePlayerName(i, e.target.value)}
+                      placeholder={`Player ${i + 1}`}
+                      className="h-8 text-sm"
+                    />
+                    {playerNames.length > 2 && (
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 shrink-0" onClick={() => removePlayer(i)}>
+                        <Minus className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {playerNames.length < 8 && (
+              <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={addPlayer}>
+                <Plus className="h-3.5 w-3.5" /> Add Player
+              </Button>
+            )}
+            {isMultiplayer && !canStartMultiplayer && (
+              <p className="text-xs text-red-500">At least 2 player names required.</p>
+            )}
+          </CardContent>
+        )}
+      </Card>
+
       {/* Drop Category Selection */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-center flex items-center justify-center gap-2">
@@ -326,8 +499,8 @@ function SetupScreen({ onStart, hasExisting, onResume, pastSessions, onViewSessi
                 whileTap={{ scale: 0.98 }}
               >
                 <Card
-                  className={`cursor-pointer transition-all shadow-md hover:shadow-lg ${fireColors[i]}`}
-                  onClick={() => onStart(diff, selectedFocus)}
+                  className={`cursor-pointer transition-all shadow-md hover:shadow-lg ${fireColors[i]} ${!canStartMultiplayer ? 'opacity-50 pointer-events-none' : ''}`}
+                  onClick={() => canStartMultiplayer && onStart(diff, selectedFocus, isMultiplayer ? validPlayers : [], selectedMode)}
                 >
                   <CardContent className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
@@ -368,6 +541,7 @@ function ActiveSession({
   gameState, currentDrop, currentDropIndex, currentFeedback, timeRemaining,
   momentum, isGeneratingDrop, isEvaluating, isAskingJeeves, jeevesAssist,
   onSubmit, onPass, onNext, onEnd, onAskJeeves,
+  players, currentPlayerIndex,
 }: {
   gameState: ReturnType<typeof useFreestyleZone>["gameState"];
   currentDrop: ReturnType<typeof useFreestyleZone>["currentDrop"];
@@ -384,6 +558,8 @@ function ActiveSession({
   onNext: () => void;
   onEnd: () => void;
   onAskJeeves: () => void;
+  players: string[];
+  currentPlayerIndex: number;
 }) {
   const [input, setInput] = useState("");
   const [showChainHistory, setShowChainHistory] = useState(true);
@@ -439,9 +615,17 @@ function ActiveSession({
               {DROP_FOCUS_OPTIONS.find(o => o.value === gameState.dropFocus)?.icon} {DROP_FOCUS_OPTIONS.find(o => o.value === gameState.dropFocus)?.label}
             </Badge>
           )}
+          <Badge variant="outline" className={`text-[10px] ${gameState.freestyleMode === "partial" ? "border-amber-500/30 text-amber-600 dark:text-amber-400" : "border-purple-500/30 text-purple-600 dark:text-purple-400"}`}>
+            {gameState.freestyleMode === "partial" ? "Partial" : "Whole"}
+          </Badge>
           <Badge variant="secondary" className="font-mono text-xs">
             Drop #{currentDropIndex + 1}
           </Badge>
+          {players.length > 0 && (
+            <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-600 dark:text-blue-400">
+              <Users className="h-2.5 w-2.5 mr-0.5" />{players.length}P
+            </Badge>
+          )}
           {/* Streak indicator */}
           {gameState.consecutivePasses === 0 && gameState.scores.length > 0 && (
             <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20 text-[10px]">
@@ -502,6 +686,28 @@ function ActiveSession({
         <span>{Math.round(momentum)}%</span>
       </div>
 
+      {/* Current Player Indicator */}
+      {players.length > 0 && (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentPlayerIndex}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className={`${PLAYER_COLORS[currentPlayerIndex % PLAYER_COLORS.length].border} ${PLAYER_COLORS[currentPlayerIndex % PLAYER_COLORS.length].light}`}>
+              <CardContent className="p-3 flex items-center justify-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${PLAYER_COLORS[currentPlayerIndex % PLAYER_COLORS.length].bg}`} />
+                <span className={`font-bold ${PLAYER_COLORS[currentPlayerIndex % PLAYER_COLORS.length].text}`}>
+                  {players[currentPlayerIndex]}'s Turn
+                </span>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </AnimatePresence>
+      )}
+
       {/* Chain History — full previous answers */}
       {gameState.drops.length > 1 && (
         <div className="space-y-2">
@@ -534,6 +740,11 @@ function ActiveSession({
                           <div className="flex items-center gap-2">
                             <Badge className={`${cat.color} text-white text-[10px] px-1.5 py-0`}>{cat.emoji} {cat.label}</Badge>
                             <span className="text-[10px] text-muted-foreground">Drop #{i + 1}</span>
+                            {players.length > 0 && gameState.playerResponses[i] !== undefined && (
+                              <Badge variant="outline" className={`text-[10px] px-1 py-0 ${PLAYER_COLORS[gameState.playerResponses[i] % PLAYER_COLORS.length].text}`}>
+                                {players[gameState.playerResponses[i]]}
+                              </Badge>
+                            )}
                             {wasPassed && <Badge variant="outline" className="text-[10px] px-1 py-0">PASSED</Badge>}
                             {scores && (
                               <span className="ml-auto text-[10px] font-mono font-bold text-foreground">{scores.totalScore}/40</span>
@@ -650,7 +861,10 @@ function ActiveSession({
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Connect this drop to Christ... How does it point to Him? Can you link it to previous drops?"
+            placeholder={gameState.freestyleMode === "partial"
+              ? "Connect this drop to Christ... How does it point to Him?"
+              : "Connect this drop to Christ... How does it point to Him? Can you link it to previous drops?"
+            }
             className="min-h-[120px] resize-none"
             disabled={isEvaluating || isGeneratingDrop}
             onKeyDown={(e) => {
@@ -725,7 +939,7 @@ function ActiveSession({
                   { label: "Christ Connection", value: currentFeedback.christConnection, emoji: "✝️" },
                   { label: "Depth", value: currentFeedback.depth, emoji: "🔍" },
                   { label: "Creativity", value: currentFeedback.creativity, emoji: "💡" },
-                  { label: "Chain Link", value: currentFeedback.chainLink, emoji: "🔗" },
+                  ...(gameState.freestyleMode === "whole" ? [{ label: "Chain Link", value: currentFeedback.chainLink, emoji: "🔗" }] : []),
                 ].map(({ label, value, emoji }, idx) => (
                   <div key={label} className="space-y-1">
                     <div className="flex justify-between">
@@ -779,6 +993,7 @@ function CompletionScreen({
   gameState, sessionSummary, jeevesDemo, polishedContent,
   isGeneratingSummary, isGeneratingDemo, isPolishing,
   onGenerateSummary, onGenerateDemo, onPolish, onPlayAgain,
+  players,
 }: {
   gameState: ReturnType<typeof useFreestyleZone>["gameState"];
   sessionSummary: ReturnType<typeof useFreestyleZone>["sessionSummary"];
@@ -791,6 +1006,7 @@ function CompletionScreen({
   onGenerateDemo: () => void;
   onPolish: (format: string) => void;
   onPlayAgain: () => void;
+  players: string[];
 }) {
   const answeredCount = gameState.userResponses.filter(r => r !== "").length;
   const avgScore = gameState.scores.length > 0
@@ -836,6 +1052,58 @@ function CompletionScreen({
           </Badge>
         </div>
       </div>
+
+      {/* Per-Player Scorecards */}
+      {players.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Users className="h-4 w-4" /> Player Scorecards
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              const playerStats = players.map((name, pi) => {
+                const dropIndices = gameState.playerResponses
+                  .map((pIdx, di) => pIdx === pi ? di : -1)
+                  .filter(di => di >= 0);
+                const playerScores = dropIndices
+                  .map(di => gameState.scores[di])
+                  .filter(s => s && s.totalScore > 0);
+                const avg = playerScores.length > 0
+                  ? Math.round(playerScores.reduce((sum, s) => sum + s.totalScore, 0) / playerScores.length)
+                  : 0;
+                const best = playerScores.length > 0
+                  ? Math.max(...playerScores.map(s => s.totalScore))
+                  : 0;
+                return { name, pi, dropCount: dropIndices.length, answered: playerScores.length, avg, best };
+              });
+              const winner = playerStats.reduce((best, p) => p.avg > best.avg ? p : best, playerStats[0]);
+              return (
+                <div className="grid grid-cols-2 gap-3">
+                  {playerStats.map((p) => {
+                    const color = PLAYER_COLORS[p.pi % PLAYER_COLORS.length];
+                    const isWinner = p === winner && players.length > 1;
+                    return (
+                      <div key={p.pi} className={`p-3 rounded-lg border ${color.border} ${color.light} ${isWinner ? 'ring-2 ring-yellow-400' : ''}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={`w-3 h-3 rounded-full ${color.bg}`} />
+                          <span className={`font-bold text-sm ${color.text}`}>{p.name}</span>
+                          {isWinner && <Crown className="h-3.5 w-3.5 text-yellow-500" />}
+                        </div>
+                        <div className="space-y-1 text-xs text-muted-foreground">
+                          <p>Drops: {p.dropCount} · Answered: {p.answered}</p>
+                          <p className="font-mono font-bold text-foreground">Avg: {p.avg}/40 · Best: {p.best}/40</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs defaultValue="summary" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
@@ -914,6 +1182,11 @@ function CompletionScreen({
                   <div className="flex items-center gap-2">
                     <Badge className={`${cat.color} text-white text-xs`}>{cat.emoji} {cat.label}</Badge>
                     <span className="text-xs text-muted-foreground">Drop #{i + 1}</span>
+                    {players.length > 0 && gameState.playerResponses[i] !== undefined && (
+                      <Badge variant="outline" className={`text-[10px] ${PLAYER_COLORS[gameState.playerResponses[i] % PLAYER_COLORS.length].text}`}>
+                        {players[gameState.playerResponses[i]]}
+                      </Badge>
+                    )}
                     {wasPassed && <Badge variant="outline" className="text-xs">PASSED</Badge>}
                   </div>
                   <p className="text-sm font-medium">{drop.drop}</p>
@@ -925,7 +1198,7 @@ function CompletionScreen({
                       <span>Christ: {scores.christConnection}</span>
                       <span>Depth: {scores.depth}</span>
                       <span>Creative: {scores.creativity}</span>
-                      <span>Chain: {scores.chainLink}</span>
+                      {gameState.freestyleMode === "whole" && <span>Chain: {scores.chainLink}</span>}
                       <span className="font-bold text-foreground">{scores.totalScore}/40</span>
                     </div>
                   )}
@@ -1133,7 +1406,7 @@ export default function FreestyleZone() {
           </div>
         ) : game.gameState.phase === "setup" ? (
           <SetupScreen
-            onStart={game.startSession}
+            onStart={(d, f, p, m) => game.startSession(d, f, p, m)}
             hasExisting={game.hasExistingSession}
             onResume={game.resumeGame}
             pastSessions={pastSessions}
@@ -1156,6 +1429,8 @@ export default function FreestyleZone() {
             onNext={game.advanceToNextDrop}
             onEnd={game.endSession}
             onAskJeeves={game.askJeevesForHelp}
+            players={game.gameState.players}
+            currentPlayerIndex={game.gameState.currentPlayerIndex}
           />
         ) : (
           <CompletionScreen
@@ -1170,6 +1445,7 @@ export default function FreestyleZone() {
             onGenerateDemo={game.generateJeevesDemo}
             onPolish={game.polishSession}
             onPlayAgain={handlePlayAgain}
+            players={game.gameState.players}
           />
         )}
       </main>
