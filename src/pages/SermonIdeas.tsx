@@ -74,7 +74,7 @@ const SermonIdeas = () => {
   const handleResearch = async (idea: SermonIdea) => {
     if (researchingId) return;
     setResearchingId(idea.id);
-    toast.info("Jeeves is researching your sermon idea...");
+    toast.info("Activating Research Assistant...");
 
     try {
       const { data, error } = await supabase.functions.invoke("sermon-idea-research", {
