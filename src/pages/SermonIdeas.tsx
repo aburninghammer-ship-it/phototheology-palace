@@ -5,22 +5,26 @@ import { SEO } from "@/components/SEO";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useSermonIdeas, SermonIdea } from "@/hooks/useSermonIdeas";
 import { usePreservePage } from "@/hooks/usePreservePage";
+import { supabase } from "@/integrations/supabase/client";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Cloud, CloudOff, Info, Lightbulb, Plus, Trash2, Edit3, X, Check, Search } from "lucide-react";
+import { Cloud, CloudOff, Info, Lightbulb, Plus, Trash2, Edit3, X, Check, Search, Sparkles, ChevronDown, ChevronUp, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 const SermonIdeas = () => {
   const { preferences } = useUserPreferences();
-  const { ideas, addIdea, updateIdea, deleteIdea, isOnline } = useSermonIdeas();
+  const { ideas, addIdea, updateIdea, deleteIdea, saveResearch, isOnline } = useSermonIdeas();
   usePreservePage();
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [researchingId, setResearchingId] = useState<string | null>(null);
+  const [expandedResearch, setExpandedResearch] = useState<Set<string>>(new Set());
 
   // Form state
   const [title, setTitle] = useState("");
@@ -65,6 +69,48 @@ const SermonIdeas = () => {
   const handleDelete = (id: string) => {
     deleteIdea(id);
     toast.success("Sermon idea deleted");
+  };
+
+  const handleResearch = async (idea: SermonIdea) => {
+    if (researchingId) return;
+    setResearchingId(idea.id);
+    toast.info("Jeeves is researching your sermon idea...");
+
+    try {
+      const { data, error } = await supabase.functions.invoke("sermon-idea-research", {
+        body: {
+          title: idea.title,
+          scripture: idea.scripture,
+          keyPoints: idea.keyPoints,
+          notes: idea.notes,
+          userName: preferences.display_name || undefined,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const research = data?.research;
+      if (!research) throw new Error("No research returned");
+
+      saveResearch(idea.id, research);
+      setExpandedResearch(prev => new Set(prev).add(idea.id));
+      toast.success("Research complete!");
+    } catch (err: any) {
+      console.error("Research error:", err);
+      toast.error(err.message || "Failed to get research from Jeeves");
+    } finally {
+      setResearchingId(null);
+    }
+  };
+
+  const toggleResearch = (id: string) => {
+    setExpandedResearch(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   const filteredIdeas = ideas.filter(idea => {
@@ -221,57 +267,118 @@ const SermonIdeas = () => {
           </Card>
         ) : (
           <div className="space-y-4">
-            {filteredIdeas.map((idea) => (
-              <Card key={idea.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="pt-5 pb-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="font-semibold text-lg">{idea.title}</h3>
-                        {idea.scripture && (
-                          <Badge variant="secondary" className="text-xs">
-                            {idea.scripture}
-                          </Badge>
+            {filteredIdeas.map((idea) => {
+              const isResearching = researchingId === idea.id;
+              const hasResearch = !!idea.jeevesResearch;
+              const isExpanded = expandedResearch.has(idea.id);
+
+              return (
+                <Card key={idea.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="pt-5 pb-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h3 className="font-semibold text-lg">{idea.title}</h3>
+                          {idea.scripture && (
+                            <Badge variant="secondary" className="text-xs">
+                              {idea.scripture}
+                            </Badge>
+                          )}
+                        </div>
+                        {idea.keyPoints && (
+                          <p className="text-sm text-muted-foreground mb-1 line-clamp-2">
+                            <span className="font-medium text-foreground/80">Key Points:</span> {idea.keyPoints}
+                          </p>
+                        )}
+                        {idea.notes && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {idea.notes}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-2 mt-2">
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(idea.updated_at).toLocaleDateString()}
+                          </p>
+                          {hasResearch && (
+                            <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">
+                              <Sparkles className="h-3 w-3 mr-1" />
+                              Researched
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                          onClick={() => handleResearch(idea)}
+                          disabled={isResearching}
+                          title={hasResearch ? "Re-research with Jeeves" : "Research with Jeeves"}
+                        >
+                          {isResearching ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : hasResearch ? (
+                            <RefreshCw className="h-4 w-4" />
+                          ) : (
+                            <Sparkles className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={() => handleEdit(idea)}
+                          title="Edit idea"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          onClick={() => handleDelete(idea.id)}
+                          title="Delete idea"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Jeeves Research Panel */}
+                    {hasResearch && (
+                      <div className="mt-4 border-t pt-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full flex items-center justify-between text-amber-700 hover:bg-amber-50 px-2"
+                          onClick={() => toggleResearch(idea.id)}
+                        >
+                          <span className="flex items-center gap-2 text-sm font-medium">
+                            <Sparkles className="h-4 w-4" />
+                            Jeeves Research
+                          </span>
+                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </Button>
+                        {isExpanded && (
+                          <div className="mt-3 p-4 bg-muted/30 rounded-lg max-h-[600px] overflow-y-auto">
+                            {formatJeevesResponse(idea.jeevesResearch!)}
+                          </div>
                         )}
                       </div>
-                      {idea.keyPoints && (
-                        <p className="text-sm text-muted-foreground mb-1 line-clamp-2">
-                          <span className="font-medium text-foreground/80">Key Points:</span> {idea.keyPoints}
-                        </p>
-                      )}
-                      {idea.notes && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {idea.notes}
-                        </p>
-                      )}
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {new Date(idea.updated_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-1 shrink-0">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                        onClick={() => handleEdit(idea)}
-                        title="Edit idea"
-                      >
-                        <Edit3 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        onClick={() => handleDelete(idea.id)}
-                        title="Delete idea"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    )}
+
+                    {/* Loading indicator */}
+                    {isResearching && (
+                      <div className="mt-4 border-t pt-4 flex items-center justify-center gap-3 text-amber-600">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span className="text-sm font-medium">Jeeves is researching...</span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

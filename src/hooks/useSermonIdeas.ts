@@ -8,6 +8,7 @@ export interface SermonIdea {
   notes: string;
   created_at: string;
   updated_at: string;
+  jeevesResearch?: string;
 }
 
 const STORAGE_KEY = "phototheology_sermon_ideas";
@@ -83,11 +84,22 @@ export const useSermonIdeas = () => {
     });
   }, []);
 
+  const saveResearch = useCallback((id: string, research: string) => {
+    setIdeas(prev => {
+      const updated = prev.map(idea =>
+        idea.id === id ? { ...idea, jeevesResearch: research } : idea
+      );
+      saveToStorage(updated);
+      return updated;
+    });
+  }, []);
+
   return {
     ideas,
     addIdea,
     updateIdea,
     deleteIdea,
+    saveResearch,
     isOnline,
   };
 };
