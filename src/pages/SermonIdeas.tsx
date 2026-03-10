@@ -141,17 +141,8 @@ const SermonIdeas = () => {
             </p>
           </div>
           <Badge variant="outline" className="flex items-center gap-2">
-            {isOnline ? (
-              <>
-                <Cloud className="h-4 w-4 text-green-500" />
-                Online
-              </>
-            ) : (
-              <>
-                <CloudOff className="h-4 w-4" />
-                Offline Mode
-              </>
-            )}
+            <Cloud className="h-4 w-4 text-green-500" />
+            Cloud Synced
           </Badge>
         </div>
 
