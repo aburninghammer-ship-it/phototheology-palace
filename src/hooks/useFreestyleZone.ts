@@ -212,6 +212,12 @@ export function useFreestyleZone() {
   // Refs
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const savedSessionIdRef = useRef<string | null>(null);
+  const gameStateRef = useRef<FreestyleGameState>(gameState);
+
+  // Keep ref in sync with state to avoid stale closures
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   // Timer effect
   useEffect(() => {
@@ -564,9 +570,12 @@ export function useFreestyleZone() {
       elapsedSeconds: Math.floor((Date.now() - prev.startTime) / 1000),
     }));
 
+    // Read from ref to avoid stale closure
+    const gs = gameStateRef.current;
+
     // Calculate final score
-    const totalScore = gameState.scores.reduce((sum, s) => sum + s.totalScore, 0);
-    const avgScore = gameState.scores.length > 0 ? totalScore / gameState.scores.length : 0;
+    const totalScore = gs.scores.reduce((sum, s) => sum + s.totalScore, 0);
+    const avgScore = gs.scores.length > 0 ? totalScore / gs.scores.length : 0;
     const finalScore = Math.round(avgScore * 2.5); // Scale to 0-100
 
     await completeGame(finalScore);
@@ -579,15 +588,15 @@ export function useFreestyleZone() {
           game_type: "freestyle_zone",
           score: finalScore,
           metadata: {
-            difficulty: gameState.difficulty,
-            dropFocus: gameState.dropFocus || "random",
-            totalDrops: gameState.drops.length,
-            passCount: gameState.passCount,
-            duration: Math.floor((Date.now() - gameState.startTime) / 1000),
-            momentum: gameState.momentum,
-            drops: gameState.drops,
-            responses: gameState.userResponses,
-            scores: gameState.scores,
+            difficulty: gs.difficulty,
+            dropFocus: gs.dropFocus || "random",
+            totalDrops: gs.drops.length,
+            passCount: gs.passCount,
+            duration: Math.floor((Date.now() - gs.startTime) / 1000),
+            momentum: gs.momentum,
+            drops: gs.drops,
+            responses: gs.userResponses,
+            scores: gs.scores,
           } as any,
         }).select("id").single();
         if (inserted) savedSessionIdRef.current = inserted.id;
@@ -595,20 +604,21 @@ export function useFreestyleZone() {
         // Non-critical
       }
     }
-  }, [gameState, completeGame, setGameState, user]);
+  }, [completeGame, setGameState, user]);
 
   const generateSessionSummary = useCallback(async () => {
     setIsGeneratingSummary(true);
+    const gs = gameStateRef.current;
     try {
       const { data } = await callJeeves({
         mode: "freestyle_session_summary",
         sessionData: {
-          drops: gameState.drops,
-          responses: gameState.userResponses,
-          scores: gameState.scores,
-          difficulty: gameState.difficulty,
-          passCount: gameState.passCount,
-          duration: gameState.elapsedSeconds,
+          drops: gs.drops,
+          responses: gs.userResponses,
+          scores: gs.scores,
+          difficulty: gs.difficulty,
+          passCount: gs.passCount,
+          duration: gs.elapsedSeconds,
         },
       }, "freestyle-zone");
 
@@ -619,15 +629,16 @@ export function useFreestyleZone() {
     } finally {
       setIsGeneratingSummary(false);
     }
-  }, [gameState]);
+  }, []);
 
   const generateJeevesDemo = useCallback(async () => {
     setIsGeneratingDemo(true);
+    const gs = gameStateRef.current;
     try {
       const { data } = await callJeeves({
         mode: "freestyle_jeeves_demo",
-        drops: gameState.drops,
-        difficulty: gameState.difficulty,
+        drops: gs.drops,
+        difficulty: gs.difficulty,
       }, "freestyle-zone");
 
       const parsed = typeof data === "string" ? JSON.parse(data) : data;
@@ -637,17 +648,18 @@ export function useFreestyleZone() {
     } finally {
       setIsGeneratingDemo(false);
     }
-  }, [gameState.drops, gameState.difficulty]);
+  }, []);
 
   const polishSession = useCallback(async (format: string) => {
     setIsPolishing(true);
     setPolishedContent(null);
+    const gs = gameStateRef.current;
     try {
       const { data } = await callJeeves({
         mode: "freestyle_polish",
         sessionData: {
-          drops: gameState.drops,
-          responses: gameState.userResponses,
+          drops: gs.drops,
+          responses: gs.userResponses,
         },
         format,
       }, "freestyle-zone");
@@ -681,7 +693,7 @@ export function useFreestyleZone() {
     } finally {
       setIsPolishing(false);
     }
-  }, [gameState.drops, gameState.userResponses, user]);
+  }, [user]);
 
   // Computed values
   const timeRemaining = SESSION_DURATION - gameState.elapsedSeconds;
