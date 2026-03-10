@@ -139,6 +139,7 @@ export const SermonTextEditor = ({
     editorProps: {
       attributes: {
         class: 'prose prose-invert prose-sm sm:prose lg:prose-lg max-w-none focus:outline-none min-h-[400px] px-4 py-3',
+        spellcheck: 'true',
       },
     },
   });

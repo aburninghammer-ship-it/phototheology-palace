@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Send, Loader2, ChevronDown, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
 // Web Speech API TTS helper
 function speakText(text: string, onEnd?: () => void) {
@@ -296,7 +297,13 @@ export const ReginaldButler = () => {
                         : "bg-muted text-foreground border border-border rounded-bl-sm"
                     }`}
                   >
-                    {msg.content}
+                    {msg.role === "assistant" ? (
+                      <div className="space-y-2 [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&>div]:mb-2 text-sm">
+                        {formatJeevesResponse(msg.content)}
+                      </div>
+                    ) : (
+                      msg.content
+                    )}
                   </div>
                 </div>
               ))}

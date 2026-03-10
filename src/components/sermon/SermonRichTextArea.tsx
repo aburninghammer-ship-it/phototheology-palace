@@ -169,6 +169,7 @@ export const SermonRichTextArea = forwardRef<SermonRichTextAreaHandle, SermonRic
       attributes: {
         class: `prose prose-sm max-w-none focus:outline-none px-3 py-2 h-full overflow-y-auto`,
         style: `min-height: ${minHeight}`,
+        spellcheck: 'true',
       },
     },
   });
