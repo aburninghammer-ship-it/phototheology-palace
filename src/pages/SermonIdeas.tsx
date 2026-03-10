@@ -66,8 +66,8 @@ const SermonIdeas = () => {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteIdea(id);
+  const handleDelete = async (id: string) => {
+    await deleteIdea(id);
     toast.success("Sermon idea deleted");
   };
 
