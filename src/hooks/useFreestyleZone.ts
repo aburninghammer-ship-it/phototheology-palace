@@ -503,6 +503,15 @@ export function useFreestyleZone() {
     }
   }, [gameState, buildChainHistory, updateMomentum, setGameState, saveSession]);
 
+  const rotatePlayer = useCallback(() => {
+    if (gameState.players.length > 0) {
+      setGameState(prev => ({
+        ...prev,
+        currentPlayerIndex: (prev.currentPlayerIndex + 1) % prev.players.length,
+      }));
+    }
+  }, [gameState.players.length, setGameState]);
+
   const passDrop = useCallback(async () => {
     if (gameState.phase !== "active") return;
 
@@ -520,15 +529,6 @@ export function useFreestyleZone() {
     rotatePlayer();
     await generateNextDrop();
   }, [gameState.phase, updateMomentum, setGameState, generateNextDrop, rotatePlayer]);
-
-  const rotatePlayer = useCallback(() => {
-    if (gameState.players.length > 0) {
-      setGameState(prev => ({
-        ...prev,
-        currentPlayerIndex: (prev.currentPlayerIndex + 1) % prev.players.length,
-      }));
-    }
-  }, [gameState.players.length, setGameState]);
 
   const advanceToNextDrop = useCallback(async () => {
     setCurrentFeedback(null);
