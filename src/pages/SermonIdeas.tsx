@@ -74,7 +74,7 @@ const SermonIdeas = () => {
   const handleResearch = async (idea: SermonIdea) => {
     if (researchingId) return;
     setResearchingId(idea.id);
-    toast.info("Jeeves is researching your sermon idea...");
+    toast.info("Activating Research Assistant...");
 
     try {
       const { data, error } = await supabase.functions.invoke("sermon-idea-research", {
@@ -98,7 +98,7 @@ const SermonIdeas = () => {
       toast.success("Research complete!");
     } catch (err: any) {
       console.error("Research error:", err);
-      toast.error(err.message || "Failed to get research from Jeeves");
+      toast.error(err.message || "Failed to activate Research Assistant");
     } finally {
       setResearchingId(null);
     }
@@ -314,7 +314,7 @@ const SermonIdeas = () => {
                           className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                           onClick={() => handleResearch(idea)}
                           disabled={isResearching}
-                          title={hasResearch ? "Re-research with Jeeves" : "Research with Jeeves"}
+                          title={hasResearch ? "Re-activate Research Assistant" : "Activate Research Assistant"}
                         >
                           {isResearching ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -356,7 +356,7 @@ const SermonIdeas = () => {
                         >
                           <span className="flex items-center gap-2 text-sm font-medium">
                             <Sparkles className="h-4 w-4" />
-                            Jeeves Research
+                            Jeeves Research Brief
                           </span>
                           {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                         </Button>
@@ -372,7 +372,7 @@ const SermonIdeas = () => {
                     {isResearching && (
                       <div className="mt-4 border-t pt-4 flex items-center justify-center gap-3 text-amber-600">
                         <Loader2 className="h-5 w-5 animate-spin" />
-                        <span className="text-sm font-medium">Jeeves is researching...</span>
+                        <span className="text-sm font-medium">Research Assistant is working...</span>
                       </div>
                     )}
                   </CardContent>
