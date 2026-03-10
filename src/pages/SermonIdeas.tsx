@@ -17,7 +17,7 @@ import { toast } from "sonner";
 
 const SermonIdeas = () => {
   const { preferences } = useUserPreferences();
-  const { ideas, addIdea, updateIdea, deleteIdea, saveResearch, isOnline } = useSermonIdeas();
+  const { ideas, addIdea, updateIdea, deleteIdea, saveResearch, isOnline, loading } = useSermonIdeas();
   usePreservePage();
 
   const [showForm, setShowForm] = useState(false);
