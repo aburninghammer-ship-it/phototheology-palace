@@ -83,7 +83,7 @@ const SermonIdeas = () => {
           scripture: idea.scripture,
           keyPoints: idea.keyPoints,
           notes: idea.notes,
-          userName: preferences.display_name || undefined,
+          userName: undefined,
         },
       });
 
