@@ -41,17 +41,17 @@ const SermonIdeas = () => {
     setEditingId(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim()) {
       toast.error("Please enter a title for your sermon idea");
       return;
     }
 
     if (editingId) {
-      updateIdea(editingId, { title: title.trim(), scripture: scripture.trim(), keyPoints: keyPoints.trim(), notes: notes.trim() });
+      await updateIdea(editingId, { title: title.trim(), scripture: scripture.trim(), keyPoints: keyPoints.trim(), notes: notes.trim() });
       toast.success("Sermon idea updated");
     } else {
-      addIdea({ title: title.trim(), scripture: scripture.trim(), keyPoints: keyPoints.trim(), notes: notes.trim() });
+      await addIdea({ title: title.trim(), scripture: scripture.trim(), keyPoints: keyPoints.trim(), notes: notes.trim() });
       toast.success("Sermon idea saved");
     }
     resetForm();
