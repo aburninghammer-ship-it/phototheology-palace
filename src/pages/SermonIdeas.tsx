@@ -314,7 +314,7 @@ const SermonIdeas = () => {
                           className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                           onClick={() => handleResearch(idea)}
                           disabled={isResearching}
-                          title={hasResearch ? "Re-research with Jeeves" : "Research with Jeeves"}
+                          title={hasResearch ? "Re-activate Research Assistant" : "Activate Research Assistant"}
                         >
                           {isResearching ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
