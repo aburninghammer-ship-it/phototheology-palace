@@ -11729,6 +11729,36 @@ export type Database = {
           },
         ]
       }
+      pre_approved_emails: {
+        Row: {
+          access_type: string
+          created_at: string
+          email: string
+          granted_by: string | null
+          id: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+        }
+        Insert: {
+          access_type?: string
+          created_at?: string
+          email: string
+          granted_by?: string | null
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Update: {
+          access_type?: string
+          created_at?: string
+          email?: string
+          granted_by?: string | null
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Relationships: []
+      }
       principle_card_games: {
         Row: {
           created_at: string
