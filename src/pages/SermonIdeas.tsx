@@ -356,7 +356,7 @@ const SermonIdeas = () => {
                         >
                           <span className="flex items-center gap-2 text-sm font-medium">
                             <Sparkles className="h-4 w-4" />
-                            Jeeves Research
+                            Jeeves Research Brief
                           </span>
                           {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                         </Button>
