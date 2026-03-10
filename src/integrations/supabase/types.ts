@@ -14795,6 +14795,10 @@ export type Database = {
           id: string
           idea: string | null
           is_favorite: boolean | null
+          jeeves_research: string | null
+          key_points: string | null
+          notes: string | null
+          scripture: string | null
           title: string | null
           updated_at: string
           user_id: string
@@ -14806,6 +14810,10 @@ export type Database = {
           id?: string
           idea?: string | null
           is_favorite?: boolean | null
+          jeeves_research?: string | null
+          key_points?: string | null
+          notes?: string | null
+          scripture?: string | null
           title?: string | null
           updated_at?: string
           user_id: string
@@ -14817,6 +14825,10 @@ export type Database = {
           id?: string
           idea?: string | null
           is_favorite?: boolean | null
+          jeeves_research?: string | null
+          key_points?: string | null
+          notes?: string | null
+          scripture?: string | null
           title?: string | null
           updated_at?: string
           user_id?: string

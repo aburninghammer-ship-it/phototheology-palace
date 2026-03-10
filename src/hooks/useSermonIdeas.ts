@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface SermonIdea {
   id: string;
@@ -11,88 +13,144 @@ export interface SermonIdea {
   jeevesResearch?: string;
 }
 
-const STORAGE_KEY = "phototheology_sermon_ideas";
-
 export const useSermonIdeas = () => {
+  const { user } = useAuth();
   const [ideas, setIdeas] = useState<SermonIdea[]>([]);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [loading, setLoading] = useState(true);
+
+  const loadIdeas = useCallback(async () => {
+    if (!user) {
+      setIdeas([]);
+      setLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("sermon_ideas")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Failed to load sermon ideas:", error);
+    } else if (data) {
+      setIdeas(
+        data.map((row) => ({
+          id: row.id,
+          title: row.title || "",
+          scripture: (row as any).scripture || "",
+          keyPoints: (row as any).key_points || "",
+          notes: (row as any).notes || "",
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          jeevesResearch: (row as any).jeeves_research || undefined,
+        }))
+      );
+    }
+    setLoading(false);
+  }, [user]);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setIdeas(JSON.parse(stored));
+    loadIdeas();
+  }, [loadIdeas]);
+
+  const addIdea = useCallback(
+    async (idea: Omit<SermonIdea, "id" | "created_at" | "updated_at">) => {
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from("sermon_ideas")
+        .insert([
+          {
+            user_id: user.id,
+            title: idea.title || null,
+            scripture: idea.scripture || null,
+            key_points: idea.keyPoints || null,
+            notes: idea.notes || null,
+          } as any,
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Failed to add sermon idea:", error);
+        return null;
       }
-    } catch (e) {
-      console.error("Failed to load sermon ideas from localStorage:", e);
-    }
-  }, []);
 
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
+      await loadIdeas();
+      return data;
+    },
+    [user, loadIdeas]
+  );
 
-  const saveToStorage = (updated: SermonIdea[]) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch (e) {
-      console.error("Failed to save sermon ideas to localStorage:", e);
-    }
-  };
+  const updateIdea = useCallback(
+    async (
+      id: string,
+      fields: Partial<Omit<SermonIdea, "id" | "created_at" | "updated_at">>
+    ) => {
+      if (!user) return;
 
-  const addIdea = useCallback((idea: Omit<SermonIdea, "id" | "created_at" | "updated_at">) => {
-    const newIdea: SermonIdea = {
-      ...idea,
-      id: crypto.randomUUID(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+      const updatePayload: any = {};
+      if (fields.title !== undefined) updatePayload.title = fields.title || null;
+      if (fields.scripture !== undefined) updatePayload.scripture = fields.scripture || null;
+      if (fields.keyPoints !== undefined) updatePayload.key_points = fields.keyPoints || null;
+      if (fields.notes !== undefined) updatePayload.notes = fields.notes || null;
 
-    setIdeas(prev => {
-      const updated = [newIdea, ...prev];
-      saveToStorage(updated);
-      return updated;
-    });
+      const { error } = await supabase
+        .from("sermon_ideas")
+        .update(updatePayload)
+        .eq("id", id)
+        .eq("user_id", user.id);
 
-    return newIdea;
-  }, []);
+      if (error) {
+        console.error("Failed to update sermon idea:", error);
+        return;
+      }
 
-  const updateIdea = useCallback((id: string, fields: Partial<Omit<SermonIdea, "id" | "created_at" | "updated_at">>) => {
-    setIdeas(prev => {
-      const updated = prev.map(idea =>
-        idea.id === id
-          ? { ...idea, ...fields, updated_at: new Date().toISOString() }
-          : idea
-      );
-      saveToStorage(updated);
-      return updated;
-    });
-  }, []);
+      await loadIdeas();
+    },
+    [user, loadIdeas]
+  );
 
-  const deleteIdea = useCallback((id: string) => {
-    setIdeas(prev => {
-      const updated = prev.filter(idea => idea.id !== id);
-      saveToStorage(updated);
-      return updated;
-    });
-  }, []);
+  const deleteIdea = useCallback(
+    async (id: string) => {
+      if (!user) return;
 
-  const saveResearch = useCallback((id: string, research: string) => {
-    setIdeas(prev => {
-      const updated = prev.map(idea =>
-        idea.id === id ? { ...idea, jeevesResearch: research } : idea
-      );
-      saveToStorage(updated);
-      return updated;
-    });
-  }, []);
+      const { error } = await supabase
+        .from("sermon_ideas")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("Failed to delete sermon idea:", error);
+        return;
+      }
+
+      await loadIdeas();
+    },
+    [user, loadIdeas]
+  );
+
+  const saveResearch = useCallback(
+    async (id: string, research: string) => {
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("sermon_ideas")
+        .update({ jeeves_research: research } as any)
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("Failed to save research:", error);
+        return;
+      }
+
+      await loadIdeas();
+    },
+    [user, loadIdeas]
+  );
 
   return {
     ideas,
@@ -100,6 +158,7 @@ export const useSermonIdeas = () => {
     updateIdea,
     deleteIdea,
     saveResearch,
-    isOnline,
+    loading,
+    isOnline: true,
   };
 };

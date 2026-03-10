@@ -17,7 +17,7 @@ import { toast } from "sonner";
 
 const SermonIdeas = () => {
   const { preferences } = useUserPreferences();
-  const { ideas, addIdea, updateIdea, deleteIdea, saveResearch, isOnline } = useSermonIdeas();
+  const { ideas, addIdea, updateIdea, deleteIdea, saveResearch, isOnline, loading } = useSermonIdeas();
   usePreservePage();
 
   const [showForm, setShowForm] = useState(false);
@@ -41,17 +41,17 @@ const SermonIdeas = () => {
     setEditingId(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim()) {
       toast.error("Please enter a title for your sermon idea");
       return;
     }
 
     if (editingId) {
-      updateIdea(editingId, { title: title.trim(), scripture: scripture.trim(), keyPoints: keyPoints.trim(), notes: notes.trim() });
+      await updateIdea(editingId, { title: title.trim(), scripture: scripture.trim(), keyPoints: keyPoints.trim(), notes: notes.trim() });
       toast.success("Sermon idea updated");
     } else {
-      addIdea({ title: title.trim(), scripture: scripture.trim(), keyPoints: keyPoints.trim(), notes: notes.trim() });
+      await addIdea({ title: title.trim(), scripture: scripture.trim(), keyPoints: keyPoints.trim(), notes: notes.trim() });
       toast.success("Sermon idea saved");
     }
     resetForm();
@@ -66,8 +66,8 @@ const SermonIdeas = () => {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteIdea(id);
+  const handleDelete = async (id: string) => {
+    await deleteIdea(id);
     toast.success("Sermon idea deleted");
   };
 
@@ -141,17 +141,8 @@ const SermonIdeas = () => {
             </p>
           </div>
           <Badge variant="outline" className="flex items-center gap-2">
-            {isOnline ? (
-              <>
-                <Cloud className="h-4 w-4 text-green-500" />
-                Online
-              </>
-            ) : (
-              <>
-                <CloudOff className="h-4 w-4" />
-                Offline Mode
-              </>
-            )}
+            <Cloud className="h-4 w-4 text-green-500" />
+            Cloud Synced
           </Badge>
         </div>
 
@@ -161,9 +152,9 @@ const SermonIdeas = () => {
             <div className="flex items-start gap-3">
               <Info className="h-5 w-5 text-primary mt-0.5" />
               <div>
-                <h3 className="font-semibold text-sm">Offline Available</h3>
+                <h3 className="font-semibold text-sm">Cloud Saved</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your sermon ideas are saved locally and available anytime — even without internet.
+                  Your sermon ideas are saved to the cloud and available on any device you sign in to.
                 </p>
               </div>
             </div>
