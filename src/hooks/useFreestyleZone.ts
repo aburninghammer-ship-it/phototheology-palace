@@ -608,16 +608,17 @@ export function useFreestyleZone() {
 
   const generateSessionSummary = useCallback(async () => {
     setIsGeneratingSummary(true);
+    const gs = gameStateRef.current;
     try {
       const { data } = await callJeeves({
         mode: "freestyle_session_summary",
         sessionData: {
-          drops: gameState.drops,
-          responses: gameState.userResponses,
-          scores: gameState.scores,
-          difficulty: gameState.difficulty,
-          passCount: gameState.passCount,
-          duration: gameState.elapsedSeconds,
+          drops: gs.drops,
+          responses: gs.userResponses,
+          scores: gs.scores,
+          difficulty: gs.difficulty,
+          passCount: gs.passCount,
+          duration: gs.elapsedSeconds,
         },
       }, "freestyle-zone");
 
@@ -628,7 +629,7 @@ export function useFreestyleZone() {
     } finally {
       setIsGeneratingSummary(false);
     }
-  }, [gameState]);
+  }, []);
 
   const generateJeevesDemo = useCallback(async () => {
     setIsGeneratingDemo(true);
