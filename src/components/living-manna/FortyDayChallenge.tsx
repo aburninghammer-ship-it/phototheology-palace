@@ -724,6 +724,50 @@ export function FortyDayChallenge() {
     }
   };
 
+  // Rematch on a draw — reset the session and replay the same opponent/topic
+  const startRematch = async () => {
+    if (!currentSession || !enrollment || !user) return;
+
+    const dayNumber = currentSession.day_number;
+
+    setIsAiLoading(true);
+    try {
+      // Delete the drawn session so startDayDebate can create a fresh one
+      await supabase
+        .from("debate_challenge_sessions")
+        .delete()
+        .eq("id", currentSession.id);
+
+      // Roll back enrollment progress that endDebate advanced
+      await supabase
+        .from("debate_challenge_enrollments")
+        .update({
+          completed_days: Math.max(0, enrollment.completed_days - 1),
+          current_day: Math.max(1, enrollment.current_day - 1),
+          total_xp: Math.max(0, enrollment.total_xp - (verdict?.xp || 0)),
+        })
+        .eq("id", enrollment.id);
+
+      // Reset local state
+      setMessages([]);
+      setVerdict(null);
+      setCurrentSession(null);
+      setSealedTurns(new Set());
+      setTurnAnalyses([]);
+
+      // Reload enrollment/sessions so startDayDebate sees clean state
+      await loadData();
+
+      // Restart the same day's debate
+      await startDayDebate(dayNumber);
+    } catch (err: any) {
+      console.error("Rematch error:", err);
+      toast.error("Failed to start rematch. Try again.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
   // Load sealed turn analyses for a session (for debrief)
   const loadTurnAnalyses = async (sessionId: string) => {
     try {
@@ -1475,6 +1519,22 @@ export function FortyDayChallenge() {
                     <Share2 className="h-4 w-4 mr-2" />
                   )}
                   {currentSession.is_public ? "Debate is Public — Tap to Make Private" : "Make Debate Public & Share"}
+                </Button>
+              )}
+              {/* Rematch button — only on draws */}
+              {verdict.outcome === "draw" && (
+                <Button
+                  onClick={startRematch}
+                  disabled={isAiLoading}
+                  className="w-full mt-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold"
+                  size="lg"
+                >
+                  {isAiLoading ? (
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  ) : (
+                    <Swords className="h-5 w-5 mr-2" />
+                  )}
+                  Rematch — Settle the Score!
                 </Button>
               )}
               <Button onClick={() => setPhase("daily-map")} className="w-full mt-2">
