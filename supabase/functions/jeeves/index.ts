@@ -9471,7 +9471,7 @@ ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: mode === "defense-analyze-weapon" || mode === "defense-refine-weapon" || mode === "defense-sharpen-weapon" || mode === "defense-jeeves-generate" ? "google/gemini-2.5-flash" : (mode && (mode.startsWith("defense-") || mode.startsWith("forge-defend-"))) ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
         max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-coach" ? 16384 : mode === "defense-coach-continue" ? 16384 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : mode === "defense-jeeves-generate" ? 8192 : 4096),
