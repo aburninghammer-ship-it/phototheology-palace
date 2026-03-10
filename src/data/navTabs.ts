@@ -565,6 +565,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     }
   },
   {
+    id: "sermon-ideas",
+    to: "/sermon-ideas",
+    label: "My Sermon Ideas",
+    shortLabel: "Sermon Ideas",
+    icon: Lightbulb,
+    gradient: {
+      from: "from-orange-500/10",
+      to: "to-amber-500/10",
+      border: "border-orange-500/20",
+      text: "from-orange-600 to-amber-600",
+      glow: "rgba(249,115,22,0.5)"
+    }
+  },
+  {
     id: "pricing",
     to: "/pricing",
     label: "Pricing",

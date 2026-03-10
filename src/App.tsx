@@ -113,6 +113,7 @@ const BibleLexicon = lazy(() => import("./pages/BibleLexicon"));
 const ResearchAssistant = lazy(() => import("./pages/ResearchAssistant"));
 const BibleImageLibrary = lazy(() => import("./pages/BibleImageLibrary"));
 const SermonBuilder = lazy(() => import("./pages/SermonBuilder"));
+const SermonIdeas = lazy(() => import("./pages/SermonIdeas"));
 const SermonSimmer = lazy(() => import("./pages/SermonSimmer"));
 const SermonWriter = lazy(() => import("./pages/SermonWriter"));
 const SermonArchive = lazy(() => import("./pages/SermonArchive"));
@@ -594,6 +595,7 @@ function App() {
           <Route path="/research-assistant" element={<ProtectedRoute><ResearchAssistant /></ProtectedRoute>} />
             <Route path="/bible-image-library" element={<ProtectedRoute><BibleImageLibrary /></ProtectedRoute>} />
           <Route path="/sermon-builder" element={<ProtectedRoute><SermonBuilder /></ProtectedRoute>} />
+          <Route path="/sermon-ideas" element={<ProtectedRoute><SermonIdeas /></ProtectedRoute>} />
           <Route path="/sermon-simmer" element={<ProtectedRoute><SermonSimmer /></ProtectedRoute>} />
           <Route path="/sermon-writer" element={<ProtectedRoute><SermonWriter /></ProtectedRoute>} />
           <Route path="/sermon-archive" element={<ProtectedRoute><SermonArchive /></ProtectedRoute>} />
