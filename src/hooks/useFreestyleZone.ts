@@ -212,6 +212,12 @@ export function useFreestyleZone() {
   // Refs
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const savedSessionIdRef = useRef<string | null>(null);
+  const gameStateRef = useRef<FreestyleGameState>(gameState);
+
+  // Keep ref in sync with state to avoid stale closures
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   // Timer effect
   useEffect(() => {
