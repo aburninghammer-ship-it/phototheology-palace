@@ -286,7 +286,7 @@ export const RoomInsightChat = ({
   const isClassicCommentary = roomCode === "GEN" && roomName === "General Insights";
 
   return (
-    <div className={`${isClassicCommentary ? 'border-l-4 border-amber-500/50' : 'border-l-4 border-primary/30'} pl-4 mt-4`}>
+    <div className={`${isClassicCommentary ? 'border-l-4 border-amber-500/50' : 'border-l-4 border-primary/30'} pl-3 mt-4 min-w-0 overflow-hidden`}>
       <div className="mb-3">
         {isClassicCommentary ? (
           // Beautiful classic commentary header
