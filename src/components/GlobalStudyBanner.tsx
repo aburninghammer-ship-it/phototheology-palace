@@ -247,32 +247,38 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
           )}
         </div>
 
-        {/* Stats chips — expanded with more data */}
-        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 flex-wrap justify-end">
-          <div className="flex items-center gap-1 text-xs" title="XP">
+        {/* Stats chips — labeled with words */}
+        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0 flex-wrap justify-end">
+          <div className="flex items-center gap-1.5 text-xs" title="Total XP earned">
             <Zap className="h-3.5 w-3.5 text-amber-400" />
             <span className="font-semibold text-foreground">{stats.totalXp.toLocaleString()}</span>
+            <span className="text-[10px] text-muted-foreground hidden sm:inline">XP</span>
           </div>
-          <div className="flex items-center gap-1 text-xs" title="Gems Collected">
+          <div className="flex items-center gap-1.5 text-xs" title="Gems Collected">
             <Gem className="h-3.5 w-3.5 text-cyan-400" />
             <span className="font-semibold text-foreground">{stats.gemsCount}</span>
+            <span className="text-[10px] text-muted-foreground hidden sm:inline">Gems</span>
           </div>
-          <div className="flex items-center gap-1 text-xs" title="Rooms Explored">
+          <div className="flex items-center gap-1.5 text-xs" title="Palace Rooms Explored">
             <BookOpen className="h-3.5 w-3.5 text-emerald-400" />
             <span className="font-semibold text-foreground">{stats.roomsExplored}</span>
+            <span className="text-[10px] text-muted-foreground hidden sm:inline">Rooms</span>
           </div>
-          <div className="hidden sm:flex items-center gap-1 text-xs" title="Chapters Read">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs" title="Bible Chapters Read">
             <Eye className="h-3.5 w-3.5 text-purple-400" />
             <span className="font-semibold text-foreground">{stats.chaptersRead}</span>
+            <span className="text-[10px] text-muted-foreground">Chapters</span>
           </div>
-          <div className="hidden sm:flex items-center gap-1 text-xs" title={`${stats.floorsUnlocked}/8 Floors Unlocked`}>
+          <div className="hidden sm:flex items-center gap-1.5 text-xs" title="Palace Floors Unlocked">
             <Star className="h-3.5 w-3.5 text-yellow-400" />
             <span className="font-semibold text-foreground">{stats.floorsUnlocked}/8</span>
+            <span className="text-[10px] text-muted-foreground">Floors</span>
           </div>
           {stats.currentStreak > 0 && (
-            <div className="flex items-center gap-1 text-xs" title="Streak">
+            <div className="flex items-center gap-1.5 text-xs" title="Study Streak">
               <Flame className="h-3.5 w-3.5 text-orange-400" />
               <span className="font-semibold text-foreground">{stats.currentStreak}d</span>
+              <span className="text-[10px] text-muted-foreground hidden sm:inline">Streak</span>
             </div>
           )}
         </div>
