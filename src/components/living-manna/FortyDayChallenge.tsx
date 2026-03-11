@@ -273,6 +273,14 @@ export function FortyDayChallenge() {
     return `${hours}h ${mins}m`;
   };
 
+  // Get the calendar date for a specific day number based on enrollment start
+  const getDayDate = (dayNum: number): string => {
+    if (!enrollment?.started_at) return "";
+    const started = new Date(enrollment.started_at);
+    const dayDate = new Date(started.getTime() + (dayNum - 1) * 24 * 60 * 60 * 1000);
+    return dayDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
   const [smokeAlertShown, setSmokeAlertShown] = useState(false);
   useEffect(() => {
     if (!enrollment || smokeAlertShown) return;
@@ -1071,7 +1079,7 @@ export function FortyDayChallenge() {
             </div>
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Day {todayNumber} / 40</span>
+                <span>Day {todayNumber} / 40 {getDayDate(todayNumber) && `· ${getDayDate(todayNumber)}`}</span>
                 <span>{Math.round((completedDays.length / 40) * 100)}% complete</span>
               </div>
               <Progress value={(completedDays.length / 40) * 100} className="h-2" />
@@ -1109,6 +1117,7 @@ export function FortyDayChallenge() {
               <CardContent className="p-4 text-center">
                 <p className="text-sm font-bold text-red-300 mb-1">
                   {isInProgress ? "Day " + todayNumber + " — Debate In Progress" : "🔥 Day " + todayNumber + " — Today's Smoke Is Ready"}
+                  {getDayDate(todayNumber) && <span className="text-red-300/60 ml-1">({getDayDate(todayNumber)})</span>}
                 </p>
                 <p className="text-xs text-muted-foreground mb-1">
                   {isInProgress
@@ -1158,6 +1167,7 @@ export function FortyDayChallenge() {
                 return (
                   <button
                     key={dayNum}
+                    title={`Day ${dayNum}${getDayDate(dayNum) ? ` · ${getDayDate(dayNum)}` : ""}${won ? " — Win" : lost ? " — Loss" : isExpired ? " — Expired" : ""}`}
                     onClick={() => {
                       if (isCurrent || isSessionInProgress) startDayDebate(dayNum);
                       else if (isCompleted && session) reviewDebate(session);

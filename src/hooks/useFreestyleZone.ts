@@ -19,6 +19,18 @@ export interface Drop {
   hint?: string;
 }
 
+export interface FactCheckIssue {
+  claim: string;
+  correction: string;
+  severity: "minor" | "moderate" | "major";
+}
+
+export interface FactCheckResult {
+  verified: boolean;
+  issues: FactCheckIssue[];
+  note: string;
+}
+
 export interface EvaluationScores {
   christConnection: number;
   depth: number;
@@ -27,6 +39,7 @@ export interface EvaluationScores {
   totalScore: number;
   feedback: string;
   suggestion?: string;
+  factCheck?: FactCheckResult;
 }
 
 export interface ChainEntry {
@@ -468,6 +481,36 @@ export function useFreestyleZone() {
         consecutivePasses: 0,
         playerResponses: [...prev.playerResponses, prev.currentPlayerIndex],
       }));
+
+      // Background fact-check — fire and forget, updates feedback when done
+      callJeeves({
+        mode: "freestyle_fact_check",
+        drop: currentDrop,
+        userResponse: response,
+      }, "freestyle-zone").then(({ data: fcData }) => {
+        if (fcData) {
+          const fcParsed = typeof fcData === "string" ? JSON.parse(fcData) : fcData;
+          if (fcParsed && typeof fcParsed === "object") {
+            const factCheck: FactCheckResult = {
+              verified: fcParsed.verified ?? true,
+              issues: fcParsed.issues || [],
+              note: fcParsed.note || "Verified.",
+            };
+            setCurrentFeedback(prev => prev ? { ...prev, factCheck } : prev);
+            // Also update the scores array in game state
+            setGameState(prev => {
+              const updatedScores = [...prev.scores];
+              if (updatedScores.length > 0) {
+                updatedScores[updatedScores.length - 1] = {
+                  ...updatedScores[updatedScores.length - 1],
+                  factCheck,
+                };
+              }
+              return { ...prev, scores: updatedScores };
+            });
+          }
+        }
+      }).catch(err => console.error("Fact-check failed (non-blocking):", err));
 
       // Save to session
       await saveSession({

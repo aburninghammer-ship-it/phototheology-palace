@@ -491,7 +491,7 @@ serve(async (req) => {
           <div style="font-family: 'Georgia', serif; max-width: 600px; margin: 0 auto; background: #1a1a2e; color: #ffffff; border-radius: 12px; overflow: hidden;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
               <h1 style="margin: 0; font-size: 24px; color: white;">📖 ${plan.title}</h1>
-              <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">Day ${currentDayNumber} of ${plan.duration}</p>
+              <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">Day ${currentDayNumber} of ${plan.duration} · ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
             </div>
             
             <div style="padding: 30px;">
@@ -542,7 +542,7 @@ serve(async (req) => {
         const { error: emailError } = await resend.emails.send({
           from: "Phototheology Devotionals <support@thephototheologyapp.com>",
           to: userEmail,
-          subject: `📖 Day ${currentDayNumber}: ${dayContent.title} - ${plan.title}`,
+          subject: `📖 Day ${currentDayNumber}: ${dayContent.title} - ${plan.title} (${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })})`,
           html: emailHtml,
         });
 

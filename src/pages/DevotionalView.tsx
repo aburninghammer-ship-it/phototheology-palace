@@ -38,6 +38,13 @@ const formatGradients: Record<string, string> = {
   "verse-genetics": "from-rose-500 via-pink-500 to-purple-500",
 };
 
+// Helper to get the calendar date for a devotional day
+const getDayDate = (startedAt: string, dayNumber: number): string => {
+  const started = new Date(startedAt);
+  const dayDate = new Date(started.getTime() + (dayNumber - 1) * 24 * 60 * 60 * 1000);
+  return dayDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+};
+
 // Helper to format time until unlock
 const getTimeUntilUnlock = (startedAt: string, dayNumber: number): string => {
   const started = new Date(startedAt);
@@ -442,7 +449,10 @@ export default function DevotionalView() {
               </Button>
               <div>
                 <h1 className="font-bold text-white text-lg truncate max-w-[200px] md:max-w-none">{plan.title}</h1>
-                <p className="text-white/80 text-sm">{t('devotionalView.dayOfTotal', { day: selectedDayIndex + 1, total: plan.duration })}</p>
+                <p className="text-white/80 text-sm">
+                  {t('devotionalView.dayOfTotal', { day: selectedDayIndex + 1, total: plan.duration })}
+                  {plan.started_at && <span className="text-white/60 ml-2">· {getDayDate(plan.started_at, selectedDayIndex + 1)}</span>}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">

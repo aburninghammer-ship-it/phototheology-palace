@@ -9189,6 +9189,43 @@ ${greeting.toUpperCase()}'S RESPONSE: "${userResponse}"
 
 Evaluate this ${difficulty}-level response in ${freestyleMode.toUpperCase()} FREESTYLE mode. Be generous with genuine effort. Reward insight and creativity.`;
 
+    } else if (mode === "freestyle_fact_check") {
+      const drop = requestBody.drop || {};
+      const userResponse = requestBody.userResponse || "";
+
+      systemPrompt = `You are Jeeves, performing a background FACT CHECK on a Freestyler submission in the Phototheology Training Zone.
+
+${greeting} was given a "drop" (a random prompt) and wrote a response connecting it to Christ. Your job is to VERIFY the accuracy of their claims.
+
+CHECK FOR:
+1. **Scripture References**: If they cite a Bible verse or passage, verify it exists and says what they claim. Flag misquotes, wrong references, or fabricated verses.
+2. **Theological Claims**: If they make doctrinal or theological statements, verify they are orthodox and biblically supported. Flag heterodox or unsupported claims.
+3. **Historical/Factual Claims**: If they reference historical events, people, or facts, verify accuracy. Flag errors.
+4. **Connection Validity**: Is the connection to Christ genuine and logically sound, or is it a stretch/non-sequitur?
+
+Be FAIR — not every response will have checkable facts. If the response is purely reflective/devotional with no specific claims, mark it as verified.
+
+Return ONLY valid JSON (no markdown, no backticks):
+{
+  "verified": <boolean — true if all claims check out or no specific claims made>,
+  "issues": [
+    {
+      "claim": "<what the student claimed>",
+      "correction": "<the accurate information>",
+      "severity": "minor|moderate|major"
+    }
+  ],
+  "note": "<1 sentence summary: either 'All references check out' or a brief note about what needs attention>"
+}
+
+If no issues found, return: {"verified": true, "issues": [], "note": "All references and claims check out."}`;
+
+      userPrompt = `DROP: [${drop.category}] "${drop.drop}"
+
+${greeting.toUpperCase()}'S RESPONSE: "${userResponse}"
+
+Fact-check this response. Verify all Scripture references, theological claims, and factual statements.`;
+
     } else if (mode === "freestyle_session_summary") {
       const sessionData = requestBody.sessionData || {};
       const drops = sessionData.drops || [];

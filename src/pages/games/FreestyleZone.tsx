@@ -12,7 +12,7 @@ import {
   ArrowLeft, Clock, Zap, SkipForward, Send, Trophy,
   BookOpen, Sparkles, FileText, ChevronRight, ChevronDown, ChevronUp, Loader2,
   Play, Flame, Target, Crown, Eye, Swords, HelpCircle, Lightbulb, History, X,
-  Users, Plus, Minus, Link2, Unlink,
+  Users, Plus, Minus, Link2, Unlink, ShieldCheck, AlertTriangle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +24,7 @@ import {
   type DropCategory,
   type DropFocus,
   type FreestyleMode,
+  type FactCheckResult,
 } from "@/hooks/useFreestyleZone";
 
 // ── Saved Session Types ────────────────────────────────────────────────
@@ -975,6 +976,42 @@ function ActiveSession({
                   </p>
                 )}
               </div>
+
+              {/* Background Fact Check */}
+              {currentFeedback.factCheck ? (
+                <div className={`p-2 rounded-lg text-xs border ${
+                  currentFeedback.factCheck.verified
+                    ? "bg-green-500/5 border-green-500/20"
+                    : "bg-amber-500/5 border-amber-500/20"
+                }`}>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    {currentFeedback.factCheck.verified ? (
+                      <ShieldCheck className="h-3.5 w-3.5 text-green-400" />
+                    ) : (
+                      <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
+                    )}
+                    <span className={`font-medium ${currentFeedback.factCheck.verified ? "text-green-400" : "text-amber-400"}`}>
+                      {currentFeedback.factCheck.verified ? "Fact Check: Verified" : "Fact Check: Issues Found"}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground">{currentFeedback.factCheck.note}</p>
+                  {currentFeedback.factCheck.issues.length > 0 && (
+                    <div className="mt-1.5 space-y-1">
+                      {currentFeedback.factCheck.issues.map((issue, i) => (
+                        <div key={i} className="p-1.5 rounded bg-amber-500/5 border border-amber-500/10">
+                          <p className="text-amber-300"><strong>Claim:</strong> {issue.claim}</p>
+                          <p className="text-muted-foreground"><strong>Correction:</strong> {issue.correction}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground/50">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Fact-checking in background...</span>
+                </div>
+              )}
 
               <Button onClick={handleNext} className="w-full gap-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
                 Next Drop <ChevronRight className="h-4 w-4" />
