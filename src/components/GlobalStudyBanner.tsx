@@ -95,10 +95,14 @@ interface UserStats {
   masterTitle: string | null;
 }
 
-function useUserBannerStats() {
-  const { user } = useAuth();
+interface GlobalStudyBannerProps {
+  userId?: string | null;
+  userEmail?: string | null;
+}
+
+function useUserBannerStats(userId: string | null, fallbackDisplayName: string) {
   const [stats, setStats] = useState<UserStats>({
-    displayName: "",
+    displayName: fallbackDisplayName,
     avatarUrl: null,
     currentStreak: 0,
     totalXp: 0,
@@ -107,16 +111,18 @@ function useUserBannerStats() {
   });
 
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
+
     const load = async () => {
       const [profileRes, streakRes, progressRes, gemsRes] = await Promise.all([
-        supabase.from("profiles").select("display_name, avatar_url").eq("id", user.id).maybeSingle(),
-        (supabase as any).from("mastery_streaks").select("current_streak").eq("user_id", user.id).maybeSingle(),
-        (supabase as any).from("palace_progress").select("total_xp, master_title").eq("user_id", user.id).maybeSingle(),
-        (supabase as any).from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("profiles").select("display_name, avatar_url").eq("id", userId).maybeSingle(),
+        (supabase as any).from("mastery_streaks").select("current_streak").eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("palace_progress").select("total_xp, master_title").eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", userId),
       ]);
+
       setStats({
-        displayName: profileRes.data?.display_name || user.email?.split("@")[0] || "Scholar",
+        displayName: profileRes.data?.display_name || fallbackDisplayName,
         avatarUrl: profileRes.data?.avatar_url || null,
         currentStreak: streakRes.data?.current_streak || 0,
         totalXp: progressRes.data?.total_xp || 0,
@@ -124,8 +130,9 @@ function useUserBannerStats() {
         masterTitle: progressRes.data?.master_title || null,
       });
     };
+
     load().catch(() => {});
-  }, [user]);
+  }, [userId, fallbackDisplayName]);
 
   return stats;
 }
@@ -147,13 +154,16 @@ function getXpRank(xp: number): { label: string; color: string } {
   return { label: "Beginner", color: "bg-muted text-muted-foreground" };
 }
 
-export function GlobalStudyBanner() {
-  const { user } = useAuth();
+export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
+  const { user: authUser } = useAuth();
+  const resolvedUserId = userId ?? authUser?.id ?? null;
+  const fallbackDisplayName = (userEmail ?? authUser?.email)?.split("@")[0] || "Scholar";
+
   const [dismissed, setDismissed] = useState(false);
   const [promptIdx, setPromptIdx] = useState(() =>
     Math.floor(Date.now() / ROTATE_INTERVAL_MS) % ALL_PROMPTS.length
   );
-  const stats = useUserBannerStats();
+  const stats = useUserBannerStats(resolvedUserId, fallbackDisplayName);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -166,13 +176,13 @@ export function GlobalStudyBanner() {
     setPromptIdx(prev => (prev + 1) % ALL_PROMPTS.length);
   }, []);
 
-  if (!user) return null;
+  if (!resolvedUserId) return null;
 
   const prompt = ALL_PROMPTS[promptIdx];
   const style = CATEGORY_STYLES[prompt.category];
   const rank = getXpRank(stats.totalXp);
   const streakMsg = getStreakMessage(stats.currentStreak);
-  const initials = stats.displayName.slice(0, 2).toUpperCase();
+  const initials = (stats.displayName || fallbackDisplayName).slice(0, 2).toUpperCase();
 
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5">

@@ -18,6 +18,7 @@ import { NavigationStyleToggle } from "./NavigationStyleToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { BackButton } from "@/components/BackButton";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { GlobalStudyBanner } from "@/components/GlobalStudyBanner";
 
 export const SimplifiedNav = () => {
   const { user, signOut } = useAuth();
@@ -382,6 +383,7 @@ export const SimplifiedNav = () => {
         </div>
       </div>
     </nav>
+    {user && <GlobalStudyBanner userId={user.id} userEmail={user.email ?? null} />}
     {/* Spacer for sticky nav */}
     <div className="h-16" />
     </>
