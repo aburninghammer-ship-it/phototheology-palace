@@ -178,13 +178,25 @@ You MUST return valid JSON with this exact structure:
 
     // High school reading level adjustments
     const highSchoolModifier = isHighSchool
-      ? `\n\nREADING LEVEL ADJUSTMENT — HIGH SCHOOL:
-- Write at a 9th–10th grade reading level with shorter sentences and plain language
-- Define theological terms in parentheses on first use (e.g., "eschatology (the study of end-time events)")
-- Use relatable analogies from school, sports, everyday life to illustrate complex concepts
-- Target 1,500–2,000 words (shorter than the scholar version)
-- Simplify language, NOT ideas — maintain full intellectual rigor and depth of argument
-- Set "estimatedMinutes": 18 in the JSON output`
+      ? `\n\nCRITICAL OVERRIDE — SIMPLIFIED READING LEVEL:
+This manuscript MUST be written at a 9th–10th grade reading level. This is NON-NEGOTIABLE. Every sentence must follow these rules:
+- Use SHORT, CLEAR sentences (max 20-25 words each). Break long sentences into two or three.
+- Replace ALL academic/philosophical vocabulary with everyday equivalents:
+  • "epistemology" → "how we know what we know"
+  • "presupposition" → "starting assumption"
+  • "materialism/physicalism" → "the belief that only physical stuff is real"
+  • "metaphysical" → "beyond what we can touch or measure"
+  • "ontological" → "about what really exists"
+  • "axiom" → "basic starting belief"
+  • "empirical" → "based on observation and experiments"
+  • "reductionist" → "shrinking everything down to just one explanation"
+  • Define ANY technical term in parentheses on first use
+- Use relatable analogies from everyday life, school, sports, technology, social media
+- Keep the SAME depth of argument, the SAME number of points, the SAME Scripture citations
+- Keep the SAME length (2,000–3,000 words) — do NOT shorten the manuscript. Simpler words take more space, not less.
+- The tone should feel like a smart older brother or mentor explaining things, NOT a textbook
+- Set "estimatedMinutes": 25 in the JSON output
+DO NOT write a scholar-level manuscript. If a 15-year-old would need a dictionary, rewrite the sentence.`
       : "";
 
     // Inject avatar-specific curriculum if available
