@@ -465,7 +465,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   setAnalysisMode("revealed");
                   setCommentary(null);
                 }}
-                className="flex-1 min-w-[120px]"
+                className="flex-1 min-w-[80px]"
                 size="sm"
               >
                 Revealed
