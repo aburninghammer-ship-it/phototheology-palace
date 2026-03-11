@@ -111,17 +111,23 @@ function useUserBannerStats(userId: string | null, fallbackDisplayName: string) 
     totalXp: 0,
     gemsCount: 0,
     masterTitle: null,
+    roomsExplored: 0,
+    chaptersRead: 0,
+    floorsUnlocked: 1,
   });
 
   useEffect(() => {
     if (!userId) return;
 
     const load = async () => {
-      const [profileRes, streakRes, progressRes, gemsRes] = await Promise.all([
+      const [profileRes, streakRes, progressRes, gemsRes, roomsRes, readingRes, floorsRes] = await Promise.all([
         supabase.from("profiles").select("display_name, avatar_url, master_title, level, points").eq("id", userId).maybeSingle(),
         (supabase as any).from("mastery_streaks").select("current_streak").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("palace_progress").select("total_xp, master_title").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", userId),
+        (supabase as any).from("room_mastery_levels").select("room_id", { count: "exact", head: true }).eq("user_id", userId),
+        (supabase as any).from("reading_streaks").select("total_chapters_read").eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("user_floor_progress").select("floor_number", { count: "exact", head: true }).eq("user_id", userId).eq("is_unlocked", true),
       ]);
 
       const profileTitle = profileRes.data?.master_title;
@@ -135,6 +141,9 @@ function useUserBannerStats(userId: string | null, fallbackDisplayName: string) 
         totalXp,
         gemsCount: gemsRes.count || 0,
         masterTitle: palaceTitle || profileTitle || null,
+        roomsExplored: roomsRes.count || 0,
+        chaptersRead: readingRes.data?.total_chapters_read || 0,
+        floorsUnlocked: floorsRes.count || 1,
       });
     };
 
@@ -210,13 +219,13 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
 
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5">
-      {/* Row 1: Identity + Stats */}
-      <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm px-3 py-2.5 flex items-center gap-3">
+      {/* Row 1: Identity + Stats — colored gradient background */}
+      <div className="rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
         {/* Avatar */}
         <Link to="/profile" className="flex-shrink-0">
-          <Avatar className="h-9 w-9 ring-2 ring-primary/30">
+          <Avatar className="h-10 w-10 ring-2 ring-blue-400/40 shadow-[0_0_8px_rgba(59,130,246,0.25)]">
             <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
-            <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">{initials}</AvatarFallback>
+            <AvatarFallback className="text-xs bg-blue-500/20 text-blue-300 font-bold">{initials}</AvatarFallback>
           </Avatar>
         </Link>
 
@@ -231,26 +240,38 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
             </Badge>
           </div>
           {streakMsg && (
-            <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+            <p className="text-[10px] text-blue-300/70 flex items-center gap-1 mt-0.5">
               <TrendingUp className="h-2.5 w-2.5" />
               {streakMsg}
             </p>
           )}
         </div>
 
-        {/* Stats chips */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        {/* Stats chips — expanded with more data */}
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 flex-wrap justify-end">
           <div className="flex items-center gap-1 text-xs" title="XP">
-            <Zap className="h-3.5 w-3.5 text-amber-500" />
+            <Zap className="h-3.5 w-3.5 text-amber-400" />
             <span className="font-semibold text-foreground">{stats.totalXp.toLocaleString()}</span>
           </div>
-          <div className="flex items-center gap-1 text-xs" title="Gems">
-            <Gem className="h-3.5 w-3.5 text-cyan-500" />
+          <div className="flex items-center gap-1 text-xs" title="Gems Collected">
+            <Gem className="h-3.5 w-3.5 text-cyan-400" />
             <span className="font-semibold text-foreground">{stats.gemsCount}</span>
+          </div>
+          <div className="flex items-center gap-1 text-xs" title="Rooms Explored">
+            <BookOpen className="h-3.5 w-3.5 text-emerald-400" />
+            <span className="font-semibold text-foreground">{stats.roomsExplored}</span>
+          </div>
+          <div className="hidden sm:flex items-center gap-1 text-xs" title="Chapters Read">
+            <Eye className="h-3.5 w-3.5 text-purple-400" />
+            <span className="font-semibold text-foreground">{stats.chaptersRead}</span>
+          </div>
+          <div className="hidden sm:flex items-center gap-1 text-xs" title={`${stats.floorsUnlocked}/8 Floors Unlocked`}>
+            <Star className="h-3.5 w-3.5 text-yellow-400" />
+            <span className="font-semibold text-foreground">{stats.floorsUnlocked}/8</span>
           </div>
           {stats.currentStreak > 0 && (
             <div className="flex items-center gap-1 text-xs" title="Streak">
-              <Flame className="h-3.5 w-3.5 text-orange-500" />
+              <Flame className="h-3.5 w-3.5 text-orange-400" />
               <span className="font-semibold text-foreground">{stats.currentStreak}d</span>
             </div>
           )}
