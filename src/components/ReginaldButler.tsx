@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Send, Loader2, ChevronDown, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
+import { Send, Loader2, ChevronDown, Volume2, VolumeX, Mic, MicOff, ExternalLink } from "lucide-react";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import React from "react";
 
 // Web Speech API TTS helper
 function speakText(text: string, onEnd?: () => void) {
@@ -104,8 +105,7 @@ export const ReginaldButler = () => {
     if (open) setTimeout(() => inputRef.current?.focus(), 200);
   }, [open]);
 
-  // Don't render for unauthenticated users (after all hooks)
-  if (!user) return null;
+  // Moved after all hooks — see renderReginaldMessage useCallback below
 
   const sendMessage = async (text?: string) => {
     const content = (text || input).trim();
@@ -196,6 +196,73 @@ export const ReginaldButler = () => {
     recognition.onend = () => setListening(false);
     recognition.start();
   };
+
+  /** Parse Reginald's response, converting [text](/path) into clickable nav links */
+  const renderReginaldMessage = useCallback((content: string): React.ReactNode => {
+    // First use the standard formatter to get base formatting
+    const formatted = formatJeevesResponse(content);
+    
+    // Now we need to walk the formatted output and inject navigation links
+    // Instead, let's parse the raw content for [text](/path) patterns before formatting
+    const linkPattern = /\[([^\]]+)\]\((\/[^\s)]+)\)/g;
+    
+    if (!linkPattern.test(content)) {
+      return formatted; // No links, use standard formatting
+    }
+    
+    // Split content into segments: text and links
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    linkPattern.lastIndex = 0;
+    let match;
+    let keyIdx = 0;
+    
+    while ((match = linkPattern.exec(content)) !== null) {
+      // Add text before this link
+      if (match.index > lastIndex) {
+        const textBefore = content.slice(lastIndex, match.index);
+        parts.push(
+          <React.Fragment key={`text-${keyIdx++}`}>
+            {formatJeevesResponse(textBefore)}
+          </React.Fragment>
+        );
+      }
+      
+      // Add the clickable link
+      const linkText = match[1];
+      const linkPath = match[2];
+      parts.push(
+        <button
+          key={`link-${keyIdx++}`}
+          onClick={() => {
+            navigate(linkPath);
+            setOpen(false);
+          }}
+          className="inline-flex items-center gap-1 text-amber-400 hover:text-amber-300 underline underline-offset-2 font-medium transition-colors cursor-pointer"
+        >
+          {linkText}
+          <ExternalLink className="h-3 w-3 inline-block flex-shrink-0" />
+        </button>
+      );
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Add remaining text after last link
+    if (lastIndex < content.length) {
+      const remaining = content.slice(lastIndex);
+      parts.push(
+        <React.Fragment key={`text-${keyIdx++}`}>
+          {formatJeevesResponse(remaining)}
+        </React.Fragment>
+      );
+    }
+    
+    return <>{parts}</>;
+  }, [navigate]);
+
+  // Don't render for unauthenticated users (after all hooks)
+  if (!user) return null;
 
   return (
     <>
@@ -299,7 +366,7 @@ export const ReginaldButler = () => {
                   >
                     {msg.role === "assistant" ? (
                       <div className="space-y-2 [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&>div]:mb-2 text-sm">
-                        {formatJeevesResponse(msg.content)}
+                        {renderReginaldMessage(msg.content)}
                       </div>
                     ) : (
                       msg.content
