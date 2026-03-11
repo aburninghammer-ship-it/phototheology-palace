@@ -261,6 +261,9 @@ export const ReginaldButler = () => {
     return <>{parts}</>;
   }, [navigate]);
 
+  // Don't render for unauthenticated users (after all hooks)
+  if (!user) return null;
+
   return (
     <>
       {/* Floating trigger button */}
