@@ -315,7 +315,7 @@ export const RoomInsightChat = ({
             {formatClassicCommentary(roomContent)}
           </div>
         ) : (
-          <div className="text-sm leading-relaxed text-foreground/90">
+          <div className="text-sm leading-relaxed text-foreground/90 break-words overflow-hidden">
             {formatJeevesResponse(roomContent)}
           </div>
         )}
