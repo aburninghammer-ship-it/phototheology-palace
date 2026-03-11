@@ -487,7 +487,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   setAnalysisMode("deep-palace");
                   setCommentary(null);
                 }}
-                className="flex-1 min-w-[120px] gradient-palace text-white"
+                className="flex-1 min-w-[80px] gradient-palace text-white"
                 size="sm"
               >
                 <Crown className="h-3 w-3 mr-1" />
