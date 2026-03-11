@@ -14,7 +14,7 @@ import { OfflineIndicator } from "@/components/bible/OfflineIndicator";
 import { usePreservePage } from "@/hooks/usePreservePage";
 import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { PersonalizedStudyBanner } from "@/components/bible/PersonalizedStudyBanner";
+
 
 const Bible = () => {
   const { t } = useTranslation();
@@ -52,8 +52,6 @@ const Bible = () => {
       
       <div className="pt-4 pb-24 md:pb-16 px-3 sm:px-4 md:px-6">
         <div className="container mx-auto max-w-7xl">
-          {/* Personalized Identity Banner */}
-          {user && <PersonalizedStudyBanner />}
 
           {/* Header - Glass Card */}
           <div className="glass-card mb-8 p-6 rounded-2xl">
