@@ -206,23 +206,23 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5">
       {/* Row 1: Identity + Stats */}
-      <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm px-3 py-2 flex items-center gap-3">
+      <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm px-3 py-2.5 flex items-center gap-3">
         {/* Avatar */}
         <Link to="/profile" className="flex-shrink-0">
-          <Avatar className="h-8 w-8 ring-2 ring-primary/30">
+          <Avatar className="h-9 w-9 ring-2 ring-primary/30">
             <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
             <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">{initials}</AvatarFallback>
           </Avatar>
         </Link>
 
-        {/* Name + rank */}
+        {/* Name + rank + streak */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-none">
+            <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none">
               {stats.displayName}
             </span>
-            <Badge className={cn("text-[10px] border-0 font-semibold", rank.color)}>
-              {stats.masterTitle || rank.label}
+            <Badge className={cn("text-[10px] border-0 font-bold uppercase tracking-wider px-2", titleBadgeStyle)}>
+              {displayTitle}
             </Badge>
           </div>
           {streakMsg && (
@@ -234,19 +234,19 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
         </div>
 
         {/* Stats chips */}
-        <div className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground" title="XP">
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1 text-xs" title="XP">
             <Zap className="h-3.5 w-3.5 text-amber-500" />
-            <span className="font-medium text-foreground">{stats.totalXp.toLocaleString()}</span>
+            <span className="font-semibold text-foreground">{stats.totalXp.toLocaleString()}</span>
           </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground" title="Gems">
+          <div className="flex items-center gap-1 text-xs" title="Gems">
             <Gem className="h-3.5 w-3.5 text-cyan-500" />
-            <span className="font-medium text-foreground">{stats.gemsCount}</span>
+            <span className="font-semibold text-foreground">{stats.gemsCount}</span>
           </div>
           {stats.currentStreak > 0 && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground" title="Streak">
+            <div className="flex items-center gap-1 text-xs" title="Streak">
               <Flame className="h-3.5 w-3.5 text-orange-500" />
-              <span className="font-medium text-foreground">{stats.currentStreak}d</span>
+              <span className="font-semibold text-foreground">{stats.currentStreak}d</span>
             </div>
           )}
         </div>
