@@ -22,7 +22,7 @@ interface MinistryLeadershipManagerProps {
   churchId: string;
 }
 
-type MinistryRole = 'site_admin' | 'small_group_leader' | 'evangelism_lead' | 'prayer_lead' | 'sabbath_school_lead' | 'youth_lead';
+type MinistryRole = 'site_admin' | 'small_group_leader' | 'evangelism_lead' | 'prayer_lead' | 'sabbath_school_lead' | 'youth_lead' | 'personal_ministry_admin' | 'bible_worker' | 'announcements_lead' | 'events_lead' | 'community_lead' | 'livestream_lead' | 'discipleship_lead';
 
 interface MinistryLeader {
   id: string;
@@ -51,6 +51,36 @@ const ROLE_CONFIG: Record<MinistryRole, { label: string; icon: typeof Shield; co
     icon: Shield, 
     color: "text-yellow-500",
     description: "Full access to all Living Manna features"
+  },
+  announcements_lead: {
+    label: "Announcements Lead",
+    icon: Flame,
+    color: "text-amber-500",
+    description: "Post and manage church announcements"
+  },
+  events_lead: {
+    label: "Events Coordinator",
+    icon: Users,
+    color: "text-cyan-500",
+    description: "Create and manage church events & campaigns"
+  },
+  community_lead: {
+    label: "Community Moderator",
+    icon: Users,
+    color: "text-indigo-500",
+    description: "Moderate community posts, chat rooms, and engagement"
+  },
+  livestream_lead: {
+    label: "Livestream Host",
+    icon: Flame,
+    color: "text-red-500",
+    description: "Manage sermon broadcasts and live commentary"
+  },
+  discipleship_lead: {
+    label: "Discipleship Coach",
+    icon: GraduationCap,
+    color: "text-teal-500",
+    description: "Guide members through Palace journey & training programs"
   },
   small_group_leader: { 
     label: "Small Group Leader", 
@@ -81,6 +111,18 @@ const ROLE_CONFIG: Record<MinistryRole, { label: string; icon: typeof Shield; co
     icon: GraduationCap, 
     color: "text-purple-500",
     description: "Oversee youth programs and activities"
+  },
+  personal_ministry_admin: {
+    label: "Personal Ministries",
+    icon: Heart,
+    color: "text-rose-500",
+    description: "Coordinate personal ministries and outreach"
+  },
+  bible_worker: {
+    label: "Bible Worker",
+    icon: BookOpen,
+    color: "text-emerald-500",
+    description: "Conduct Bible studies and follow up with interests"
   }
 };
 
