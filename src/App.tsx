@@ -270,6 +270,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const COTASeries = lazy(() => import("./pages/COTASeries"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 const PatreonCallback = lazy(() => import("./pages/PatreonCallback"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const PalaceExplorer = lazy(() => import("./pages/PalaceExplorer"));
 const CardDeck = lazy(() => import("./pages/CardDeck"));
 const PTMultiplayerLobby = lazy(() => import("./pages/PTMultiplayerLobby"));
