@@ -692,11 +692,11 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
 
         {commentary && (
           <ScrollArea className="h-[500px] mt-4">
-            <div className="p-6 rounded-lg bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border-2 border-primary/20 shadow-lg">
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-primary/10">
+            <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border-2 border-primary/20 shadow-lg">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-primary/10 flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-                  <span className="font-bold text-lg bg-gradient-palace bg-clip-text text-transparent">Room Insights</span>
+                  <span className="font-bold text-base bg-gradient-palace bg-clip-text text-transparent">Room Insights</span>
                 </div>
                 {usedPrinciples.length > 0 && (
                   <div className="flex gap-1 flex-wrap">
@@ -709,7 +709,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                 )}
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 break-words overflow-hidden">
                 {parseRoomInsights(commentary).map((room, idx) => (
                   <RoomInsightChat
                     key={idx}
