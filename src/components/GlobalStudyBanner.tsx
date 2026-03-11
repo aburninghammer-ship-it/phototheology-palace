@@ -4,11 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Flame, Zap, Crown, BookOpen,
   ChevronRight, Sparkles, Lightbulb, Target,
   Eye, Heart, RefreshCw, Brain,
-  Star, Rocket, X, TrendingUp
+  Star, Rocket, X, TrendingUp, Gem
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -85,24 +86,51 @@ const CATEGORY_STYLES: Record<string, { accent: string; iconColor: string; badge
 
 const ROTATE_INTERVAL_MS = 10 * 60 * 1000;
 
-function useStreakMessage() {
-  const [streak, setStreak] = useState<number>(0);
+interface UserStats {
+  displayName: string;
+  avatarUrl: string | null;
+  currentStreak: number;
+  totalXp: number;
+  gemsCount: number;
+  masterTitle: string | null;
+}
+
+function useUserBannerStats() {
   const { user } = useAuth();
+  const [stats, setStats] = useState<UserStats>({
+    displayName: "",
+    avatarUrl: null,
+    currentStreak: 0,
+    totalXp: 0,
+    gemsCount: 0,
+    masterTitle: null,
+  });
 
   useEffect(() => {
     if (!user) return;
-    // Try to get streak from user stats
-    (supabase as any)
-      .from("user_streaks")
-      .select("current_streak")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }: any) => {
-        if (data?.current_streak) setStreak(data.current_streak);
-      })
-      .catch(() => {});
+    const load = async () => {
+      const [profileRes, streakRes, progressRes, gemsRes] = await Promise.all([
+        supabase.from("profiles").select("display_name, avatar_url").eq("id", user.id).maybeSingle(),
+        (supabase as any).from("mastery_streaks").select("current_streak").eq("user_id", user.id).maybeSingle(),
+        (supabase as any).from("palace_progress").select("total_xp, master_title").eq("user_id", user.id).maybeSingle(),
+        (supabase as any).from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+      ]);
+      setStats({
+        displayName: profileRes.data?.display_name || user.email?.split("@")[0] || "Scholar",
+        avatarUrl: profileRes.data?.avatar_url || null,
+        currentStreak: streakRes.data?.current_streak || 0,
+        totalXp: progressRes.data?.total_xp || 0,
+        gemsCount: gemsRes.count || 0,
+        masterTitle: progressRes.data?.master_title || null,
+      });
+    };
+    load().catch(() => {});
   }, [user]);
 
+  return stats;
+}
+
+function getStreakMessage(streak: number): string | null {
   if (streak >= 30) return `🔥 ${streak}-day streak — you're on fire!`;
   if (streak >= 14) return `⚡ ${streak}-day streak — unstoppable momentum!`;
   if (streak >= 7) return `✨ ${streak}-day streak — building momentum!`;
@@ -111,13 +139,21 @@ function useStreakMessage() {
   return null;
 }
 
+function getXpRank(xp: number): { label: string; color: string } {
+  if (xp >= 10000) return { label: "Master", color: "bg-yellow-500/20 text-yellow-400" };
+  if (xp >= 5000) return { label: "Scholar", color: "bg-purple-500/20 text-purple-400" };
+  if (xp >= 2000) return { label: "Apprentice", color: "bg-blue-500/20 text-blue-400" };
+  if (xp >= 500) return { label: "Student", color: "bg-emerald-500/20 text-emerald-400" };
+  return { label: "Beginner", color: "bg-muted text-muted-foreground" };
+}
+
 export function GlobalStudyBanner() {
   const { user } = useAuth();
   const [dismissed, setDismissed] = useState(false);
   const [promptIdx, setPromptIdx] = useState(() =>
     Math.floor(Date.now() / ROTATE_INTERVAL_MS) % ALL_PROMPTS.length
   );
-  const streakMsg = useStreakMessage();
+  const stats = useUserBannerStats();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -130,67 +166,109 @@ export function GlobalStudyBanner() {
     setPromptIdx(prev => (prev + 1) % ALL_PROMPTS.length);
   }, []);
 
-  if (!user || dismissed) return null;
+  if (!user) return null;
 
   const prompt = ALL_PROMPTS[promptIdx];
   const style = CATEGORY_STYLES[prompt.category];
+  const rank = getXpRank(stats.totalXp);
+  const streakMsg = getStreakMessage(stats.currentStreak);
+  const initials = stats.displayName.slice(0, 2).toUpperCase();
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={promptIdx}
-        initial={{ opacity: 0, y: -4 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 4 }}
-        transition={{ duration: 0.3 }}
-        className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2"
-      >
-        <div className={cn(
-          "rounded-xl border bg-gradient-to-r backdrop-blur-sm px-3 py-2 flex items-center gap-2.5 transition-all",
-          style.accent
-        )}>
-          {/* Category icon */}
-          <div className={cn("flex-shrink-0", style.iconColor)}>
-            {prompt.icon}
+    <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5">
+      {/* Row 1: Identity + Stats */}
+      <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm px-3 py-2 flex items-center gap-3">
+        {/* Avatar */}
+        <Link to="/profile" className="flex-shrink-0">
+          <Avatar className="h-8 w-8 ring-2 ring-primary/30">
+            <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
+            <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">{initials}</AvatarFallback>
+          </Avatar>
+        </Link>
+
+        {/* Name + rank */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-none">
+              {stats.displayName}
+            </span>
+            <Badge className={cn("text-[10px] border-0 font-semibold", rank.color)}>
+              {stats.masterTitle || rank.label}
+            </Badge>
           </div>
-
-          {/* Category badge */}
-          <Badge className={cn("text-[10px] border-0 font-semibold flex-shrink-0 hidden sm:inline-flex", style.badgeBg)}>
-            {prompt.label}
-          </Badge>
-
-          {/* Prompt text + streak */}
-          <div className="flex-1 min-w-0">
-            <p className="text-xs text-foreground/85 leading-snug truncate sm:whitespace-normal sm:line-clamp-1">
-              {prompt.text}
+          {streakMsg && (
+            <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+              <TrendingUp className="h-2.5 w-2.5" />
+              {streakMsg}
             </p>
-            {streakMsg && (
-              <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                <TrendingUp className="h-2.5 w-2.5" />
-                {streakMsg}
-              </p>
-            )}
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex items-center gap-1 flex-shrink-0">
-            {prompt.actionLink && (
-              <Button asChild size="sm" variant="ghost" className="text-[11px] h-6 px-2 hover:bg-background/50">
-                <Link to={prompt.actionLink}>
-                  {prompt.actionLabel}
-                  <ChevronRight className="h-3 w-3 ml-0.5" />
-                </Link>
-              </Button>
-            )}
-            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={shuffle} title="Shuffle">
-              <RefreshCw className="h-3 w-3" />
-            </Button>
-            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={() => setDismissed(true)} title="Dismiss">
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
+          )}
         </div>
-      </motion.div>
-    </AnimatePresence>
+
+        {/* Stats chips */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground" title="XP">
+            <Zap className="h-3.5 w-3.5 text-amber-500" />
+            <span className="font-medium text-foreground">{stats.totalXp.toLocaleString()}</span>
+          </div>
+          <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground" title="Gems">
+            <Gem className="h-3.5 w-3.5 text-cyan-500" />
+            <span className="font-medium text-foreground">{stats.gemsCount}</span>
+          </div>
+          {stats.currentStreak > 0 && (
+            <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground" title="Streak">
+              <Flame className="h-3.5 w-3.5 text-orange-500" />
+              <span className="font-medium text-foreground">{stats.currentStreak}d</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Row 2: Rotating Prompt Card */}
+      {!dismissed && (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={promptIdx}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className={cn(
+              "rounded-xl border bg-gradient-to-r backdrop-blur-sm px-3 py-2 flex items-center gap-2.5 transition-all",
+              style.accent
+            )}>
+              <div className={cn("flex-shrink-0", style.iconColor)}>
+                {prompt.icon}
+              </div>
+
+              <Badge className={cn("text-[10px] border-0 font-semibold flex-shrink-0 hidden sm:inline-flex", style.badgeBg)}>
+                {prompt.label}
+              </Badge>
+
+              <p className="text-xs text-foreground/85 leading-snug flex-1 min-w-0 truncate sm:whitespace-normal sm:line-clamp-1">
+                {prompt.text}
+              </p>
+
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {prompt.actionLink && (
+                  <Button asChild size="sm" variant="ghost" className="text-[11px] h-6 px-2 hover:bg-background/50">
+                    <Link to={prompt.actionLink}>
+                      {prompt.actionLabel}
+                      <ChevronRight className="h-3 w-3 ml-0.5" />
+                    </Link>
+                  </Button>
+                )}
+                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={shuffle} title="Shuffle">
+                  <RefreshCw className="h-3 w-3" />
+                </Button>
+                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={() => setDismissed(true)} title="Dismiss">
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      )}
+    </div>
   );
 }
