@@ -198,6 +198,70 @@ export const ReginaldButler = () => {
     recognition.start();
   };
 
+  /** Parse Reginald's response, converting [text](/path) into clickable nav links */
+  const renderReginaldMessage = useCallback((content: string): React.ReactNode => {
+    // First use the standard formatter to get base formatting
+    const formatted = formatJeevesResponse(content);
+    
+    // Now we need to walk the formatted output and inject navigation links
+    // Instead, let's parse the raw content for [text](/path) patterns before formatting
+    const linkPattern = /\[([^\]]+)\]\((\/[^\s)]+)\)/g;
+    
+    if (!linkPattern.test(content)) {
+      return formatted; // No links, use standard formatting
+    }
+    
+    // Split content into segments: text and links
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    linkPattern.lastIndex = 0;
+    let match;
+    let keyIdx = 0;
+    
+    while ((match = linkPattern.exec(content)) !== null) {
+      // Add text before this link
+      if (match.index > lastIndex) {
+        const textBefore = content.slice(lastIndex, match.index);
+        parts.push(
+          <React.Fragment key={`text-${keyIdx++}`}>
+            {formatJeevesResponse(textBefore)}
+          </React.Fragment>
+        );
+      }
+      
+      // Add the clickable link
+      const linkText = match[1];
+      const linkPath = match[2];
+      parts.push(
+        <button
+          key={`link-${keyIdx++}`}
+          onClick={() => {
+            navigate(linkPath);
+            setOpen(false);
+          }}
+          className="inline-flex items-center gap-1 text-amber-400 hover:text-amber-300 underline underline-offset-2 font-medium transition-colors cursor-pointer"
+        >
+          {linkText}
+          <ExternalLink className="h-3 w-3 inline-block flex-shrink-0" />
+        </button>
+      );
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Add remaining text after last link
+    if (lastIndex < content.length) {
+      const remaining = content.slice(lastIndex);
+      parts.push(
+        <React.Fragment key={`text-${keyIdx++}`}>
+          {formatJeevesResponse(remaining)}
+        </React.Fragment>
+      );
+    }
+    
+    return <>{parts}</>;
+  }, [navigate]);
+
   return (
     <>
       {/* Floating trigger button */}
