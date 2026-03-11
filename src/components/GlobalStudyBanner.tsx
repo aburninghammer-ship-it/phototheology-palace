@@ -93,6 +93,9 @@ interface UserStats {
   totalXp: number;
   gemsCount: number;
   masterTitle: string | null;
+  roomsExplored: number;
+  chaptersRead: number;
+  floorsUnlocked: number;
 }
 
 interface GlobalStudyBannerProps {
