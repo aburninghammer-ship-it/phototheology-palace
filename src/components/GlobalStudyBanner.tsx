@@ -115,19 +115,23 @@ function useUserBannerStats(userId: string | null, fallbackDisplayName: string) 
 
     const load = async () => {
       const [profileRes, streakRes, progressRes, gemsRes] = await Promise.all([
-        supabase.from("profiles").select("display_name, avatar_url").eq("id", userId).maybeSingle(),
+        supabase.from("profiles").select("display_name, avatar_url, master_title, level, points").eq("id", userId).maybeSingle(),
         (supabase as any).from("mastery_streaks").select("current_streak").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("palace_progress").select("total_xp, master_title").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", userId),
       ]);
 
+      const profileTitle = profileRes.data?.master_title;
+      const palaceTitle = progressRes.data?.master_title;
+      const totalXp = progressRes.data?.total_xp || profileRes.data?.points || 0;
+
       setStats({
         displayName: profileRes.data?.display_name || fallbackDisplayName,
         avatarUrl: profileRes.data?.avatar_url || null,
         currentStreak: streakRes.data?.current_streak || 0,
-        totalXp: progressRes.data?.total_xp || 0,
+        totalXp,
         gemsCount: gemsRes.count || 0,
-        masterTitle: progressRes.data?.master_title || null,
+        masterTitle: palaceTitle || profileTitle || null,
       });
     };
 
@@ -151,7 +155,7 @@ function getXpRank(xp: number): { label: string; color: string } {
   if (xp >= 5000) return { label: "Scholar", color: "bg-purple-500/20 text-purple-400" };
   if (xp >= 2000) return { label: "Apprentice", color: "bg-blue-500/20 text-blue-400" };
   if (xp >= 500) return { label: "Student", color: "bg-emerald-500/20 text-emerald-400" };
-  return { label: "Beginner", color: "bg-muted text-muted-foreground" };
+  return { label: "Explorer", color: "bg-sky-500/20 text-sky-400" };
 }
 
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
@@ -215,17 +219,17 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
         </div>
 
         {/* Stats chips */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2.5 flex-shrink-0">
           <div className="flex items-center gap-1 text-xs text-muted-foreground" title="XP">
             <Zap className="h-3.5 w-3.5 text-amber-500" />
             <span className="font-medium text-foreground">{stats.totalXp.toLocaleString()}</span>
           </div>
-          <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground" title="Gems">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground" title="Gems">
             <Gem className="h-3.5 w-3.5 text-cyan-500" />
             <span className="font-medium text-foreground">{stats.gemsCount}</span>
           </div>
           {stats.currentStreak > 0 && (
-            <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground" title="Streak">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground" title="Streak">
               <Flame className="h-3.5 w-3.5 text-orange-500" />
               <span className="font-medium text-foreground">{stats.currentStreak}d</span>
             </div>
