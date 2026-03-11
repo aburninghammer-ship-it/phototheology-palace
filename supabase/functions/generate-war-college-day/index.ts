@@ -94,7 +94,9 @@ serve(async (req) => {
   }
 
   try {
-    const { avatarId, avatarName, trackTitle, dayNumber, rank, weekNumber } = await req.json();
+    const { avatarId, avatarName, trackTitle, dayNumber, rank, weekNumber, readingLevel } = await req.json();
+    const isHighSchool = readingLevel === "high-school";
+    const cacheAvatarId = isHighSchool ? `${avatarId}__hs` : avatarId;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -107,12 +109,12 @@ serve(async (req) => {
     const { data: cached } = await supabase
       .from("war_college_manuscripts")
       .select("manuscript_data")
-      .eq("avatar_id", avatarId)
+      .eq("avatar_id", cacheAvatarId)
       .eq("day_number", dayNumber)
       .maybeSingle();
 
     if (cached?.manuscript_data) {
-      console.log(`Cache hit: ${avatarId} day ${dayNumber}`);
+      console.log(`Cache hit: ${cacheAvatarId} day ${dayNumber}`);
       return new Response(JSON.stringify(cached.manuscript_data), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -174,6 +176,17 @@ You MUST return valid JSON with this exact structure:
   }
 }`;
 
+    // High school reading level adjustments
+    const highSchoolModifier = isHighSchool
+      ? `\n\nREADING LEVEL ADJUSTMENT — HIGH SCHOOL:
+- Write at a 9th–10th grade reading level with shorter sentences and plain language
+- Define theological terms in parentheses on first use (e.g., "eschatology (the study of end-time events)")
+- Use relatable analogies from school, sports, everyday life to illustrate complex concepts
+- Target 1,500–2,000 words (shorter than the scholar version)
+- Simplify language, NOT ideas — maintain full intellectual rigor and depth of argument
+- Set "estimatedMinutes": 18 in the JSON output`
+      : "";
+
     // Inject avatar-specific curriculum if available
     const avatarCurriculum = AVATAR_CURRICULUM[avatarId];
     let curriculumContext = "";
@@ -206,7 +219,7 @@ Produce the complete War College manuscript now.`;
       body: JSON.stringify({
         model: "google/gemini-2.5-pro",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemPrompt + highSchoolModifier },
           { role: "user", content: userPrompt },
         ],
         temperature: 0.7,
@@ -256,14 +269,14 @@ Produce the complete War College manuscript now.`;
     supabase
       .from("war_college_manuscripts")
       .upsert({
-        avatar_id: avatarId,
+        avatar_id: cacheAvatarId,
         day_number: dayNumber,
         rank,
         manuscript_data: parsed,
       }, { onConflict: "avatar_id,day_number" })
       .then(({ error }) => {
         if (error) console.error("Cache write error:", error);
-        else console.log(`Cached: ${avatarId} day ${dayNumber}`);
+        else console.log(`Cached: ${cacheAvatarId} day ${dayNumber}`);
       });
 
     return new Response(JSON.stringify(parsed), {

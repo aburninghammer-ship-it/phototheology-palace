@@ -95,7 +95,7 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
   };
 
   /** Shared loader for both direct open and playlist use */
-  const loadDayStudy = async (dayNumber: number, overrideAvatarId?: string): Promise<WarCollegeDay> => {
+  const loadDayStudy = async (dayNumber: number, overrideAvatarId?: string, readingLevel?: string): Promise<WarCollegeDay> => {
     const aId = overrideAvatarId || track.avatarId;
     const aTrack = WAR_COLLEGE_TRACKS.find(t => t.avatarId === aId) || track;
     const { data, error } = await supabase.functions.invoke("generate-war-college-day", {
@@ -106,6 +106,7 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
         dayNumber,
         rank: getRankForDay(dayNumber),
         weekNumber: Math.ceil(dayNumber / 7),
+        ...(readingLevel ? { readingLevel } : {}),
       },
     });
     if (error) throw error;
@@ -137,6 +138,7 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
         onBack={() => setSelectedDay(null)}
         onComplete={handleComplete}
         isCompleted={completedDays.has(selectedDay.dayNumber)}
+        onLoadAlternateLevel={async (level) => loadDayStudy(selectedDay.dayNumber, undefined, level)}
       />
     );
   }

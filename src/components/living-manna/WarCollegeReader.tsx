@@ -1,19 +1,21 @@
 // ─── War College Manuscript Reader ──────────────────────────────────────────
 // Immersive, long-form reader for War College Strategic Manuscripts.
+// Layout: Level toggle → inline audio → manuscript → Ask Jeeves → drills + quiz
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft, ArrowRight, BookOpen, Swords, Target, CheckCircle2,
-  ChevronDown, ChevronUp, GraduationCap, Flame, Clock, Sparkles, Headphones, ListMusic,
+  ArrowLeft, BookOpen, Swords, Target, CheckCircle2,
+  ChevronDown, ChevronUp, Flame, Clock, Sparkles, Headphones,
+  Loader2, GraduationCap,
 } from "lucide-react";
 import { AudioNarrator } from "@/components/audio/AudioNarrator";
 import { ManuscriptQA } from "./ManuscriptQA";
+import { ManuscriptQuiz } from "./ManuscriptQuiz";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import type { WarCollegeDay } from "@/data/aats/warCollegeTypes";
 import { RANK_CONFIG } from "@/data/aats/warCollegeTypes";
@@ -24,6 +26,7 @@ interface WarCollegeReaderProps {
   onBack: () => void;
   onComplete?: () => void;
   isCompleted?: boolean;
+  onLoadAlternateLevel?: (level: string) => Promise<WarCollegeDay>;
 }
 
 export function WarCollegeReader({
@@ -31,17 +34,47 @@ export function WarCollegeReader({
   onBack,
   onComplete,
   isCompleted = false,
+  onLoadAlternateLevel,
 }: WarCollegeReaderProps) {
   const [showDrills, setShowDrills] = useState(false);
   const [forgeResponse, setForgeResponse] = useState("");
   const [masteryAnswers, setMasteryAnswers] = useState<Record<number, boolean>>({});
-  const [activePanel, setActivePanel] = useState<"read" | "audio" | "qa">("read");
-  const rankInfo = RANK_CONFIG[study.rank];
   const [autoMarkedComplete, setAutoMarkedComplete] = useState(false);
+
+  // New state for restructured layout
+  const [readingLevel, setReadingLevel] = useState<"scholar" | "high-school">("scholar");
+  const [hsStudy, setHsStudy] = useState<WarCollegeDay | null>(null);
+  const [hsLoading, setHsLoading] = useState(false);
+  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
+  const [showQA, setShowQA] = useState(false);
+
+  const rankInfo = RANK_CONFIG[study.rank];
+
+  // Active manuscript based on reading level
+  const activeStudy = readingLevel === "high-school" && hsStudy ? hsStudy : study;
 
   useEffect(() => {
     setAutoMarkedComplete(false);
   }, [study.dayNumber]);
+
+  const handleLevelToggle = async (level: "scholar" | "high-school") => {
+    if (level === readingLevel) return;
+    setReadingLevel(level);
+
+    // Load high school version on first toggle
+    if (level === "high-school" && !hsStudy && onLoadAlternateLevel) {
+      setHsLoading(true);
+      try {
+        const result = await onLoadAlternateLevel("high-school");
+        setHsStudy(result);
+      } catch (err) {
+        console.error("Failed to load high school manuscript:", err);
+        setReadingLevel("scholar"); // revert on failure
+      } finally {
+        setHsLoading(false);
+      }
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -66,20 +99,20 @@ export function WarCollegeReader({
 
           <div>
             <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-              🎓 Phototheology War College — {study.track}
+              🎓 Phototheology War College — {activeStudy.track}
             </p>
             <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
-              {study.title}
+              {activeStudy.title}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">{study.subtitle}</p>
+            <p className="text-sm text-muted-foreground mt-1">{activeStudy.subtitle}</p>
           </div>
 
           <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <Swords className="h-3.5 w-3.5" /> {study.avatarName}
+              <Swords className="h-3.5 w-3.5" /> {activeStudy.avatarName}
             </span>
             <span className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5" /> ~{study.estimatedMinutes} min
+              <Clock className="h-3.5 w-3.5" /> ~{activeStudy.estimatedMinutes} min
             </span>
           </div>
 
@@ -93,77 +126,138 @@ export function WarCollegeReader({
         <Separator />
       </div>
 
-      {/* ─── Reader Panels ─── */}
-      <Tabs
-        value={activePanel}
-        onValueChange={(value) => setActivePanel(value as "read" | "audio" | "qa")}
-        className="w-full"
-      >
-        <TabsList className="w-full">
-          <TabsTrigger value="read" className="gap-2">
-            <BookOpen className="h-4 w-4" /> Read
-          </TabsTrigger>
-          <TabsTrigger value="audio" className="gap-2">
-            <Headphones className="h-4 w-4" /> Audio
-          </TabsTrigger>
-          <TabsTrigger value="qa" className="gap-2">
-            <Sparkles className="h-4 w-4" /> Ask Jeeves
-          </TabsTrigger>
-        </TabsList>
+      {/* ─── Reading Level Toggle ─── */}
+      {onLoadAlternateLevel && (
+        <div className="flex items-center justify-center gap-1 p-1 rounded-lg bg-muted/50 w-fit mx-auto">
+          <button
+            onClick={() => handleLevelToggle("scholar")}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
+              readingLevel === "scholar"
+                ? "bg-background shadow-sm text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <GraduationCap className="h-4 w-4" /> Scholar
+          </button>
+          <button
+            onClick={() => handleLevelToggle("high-school")}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
+              readingLevel === "high-school"
+                ? "bg-background shadow-sm text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <BookOpen className="h-4 w-4" /> Simplified
+          </button>
+        </div>
+      )}
 
-        <TabsContent value="audio" className="mt-4 space-y-3">
-          <Card className="border-primary/20 bg-primary/5">
-            <CardContent className="p-3 flex items-center justify-between gap-3">
-              <p className="text-xs text-muted-foreground">Playlist controls live in the track view.</p>
-              <Button variant="outline" size="sm" className="h-8" onClick={onBack}>
-                <ListMusic className="h-3.5 w-3.5 mr-1.5" /> Open Playlist
-              </Button>
-            </CardContent>
-          </Card>
+      {/* ─── Loading indicator for HS manuscript ─── */}
+      {hsLoading && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="p-6 text-center space-y-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+            <p className="text-sm font-medium">Generating simplified manuscript...</p>
+            <p className="text-xs text-muted-foreground">Simplifying language while preserving depth.</p>
+          </CardContent>
+        </Card>
+      )}
 
-          <AudioNarrator
-            text={study.manuscript}
-            title={`🎧 Listen — Day ${study.dayNumber}: ${study.title}`}
-            voice="onyx"
-            showVoiceSelector={true}
-            onEnded={() => {
-              if (!isCompleted && onComplete && !autoMarkedComplete) {
-                setAutoMarkedComplete(true);
-                onComplete();
-              }
-            }}
-          />
-        </TabsContent>
+      {/* ─── Inline Audio Player Toggle ─── */}
+      {!hsLoading && (
+        <div className="text-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAudioPlayer(!showAudioPlayer)}
+            className="gap-2"
+          >
+            <Headphones className="h-4 w-4" />
+            {showAudioPlayer ? "Hide Audio Player" : "Listen While Reading"}
+          </Button>
+        </div>
+      )}
 
-        <TabsContent value="read" className="mt-4">
-          {/* ─── Manuscript Body ─── */}
-          <Card className="border-primary/10 shadow-lg">
-            <CardContent className="p-6 sm:p-8 md:p-10">
-              <div className="prose prose-lg dark:prose-invert max-w-none
-                prose-p:text-foreground/90 prose-p:leading-[1.85] prose-p:mb-6
-                prose-blockquote:border-l-primary prose-blockquote:bg-primary/5
-                prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
-                prose-blockquote:not-italic
-                prose-strong:text-primary prose-em:text-foreground/80
-                prose-headings:text-foreground
-                [&>blockquote_strong]:text-primary [&>blockquote_em]:text-foreground/70
-                text-[15px] sm:text-base">
-                <ReactMarkdown>{study.manuscript}</ReactMarkdown>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+      {/* ─── Audio Player (collapsible) ─── */}
+      <AnimatePresence>
+        {showAudioPlayer && !hsLoading && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <AudioNarrator
+              key={readingLevel}
+              text={activeStudy.manuscript}
+              title={`🎧 Listen — Day ${activeStudy.dayNumber}: ${activeStudy.title}`}
+              voice="onyx"
+              showVoiceSelector={true}
+              onEnded={() => {
+                if (!isCompleted && onComplete && !autoMarkedComplete) {
+                  setAutoMarkedComplete(true);
+                  onComplete();
+                }
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <TabsContent value="qa" className="mt-4">
-          <ManuscriptQA
-            manuscript={study.manuscript}
-            dayNumber={study.dayNumber}
-            title={study.title}
-            track={study.track}
-            avatarName={study.avatarName}
-          />
-        </TabsContent>
-      </Tabs>
+      {/* ─── Manuscript Body (always visible) ─── */}
+      {!hsLoading && (
+        <Card className="border-primary/10 shadow-lg">
+          <CardContent className="p-6 sm:p-8 md:p-10">
+            <div className="prose prose-lg dark:prose-invert max-w-none
+              prose-p:text-foreground/90 prose-p:leading-[1.85] prose-p:mb-6
+              prose-blockquote:border-l-primary prose-blockquote:bg-primary/5
+              prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
+              prose-blockquote:not-italic
+              prose-strong:text-primary prose-em:text-foreground/80
+              prose-headings:text-foreground
+              [&>blockquote_strong]:text-primary [&>blockquote_em]:text-foreground/70
+              text-[15px] sm:text-base">
+              <ReactMarkdown>{activeStudy.manuscript}</ReactMarkdown>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ─── Ask Jeeves (collapsible) ─── */}
+      {!hsLoading && (
+        <>
+          <div className="text-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowQA(!showQA)}
+              className="gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              {showQA ? "Hide Ask Jeeves" : "Ask Jeeves"}
+            </Button>
+          </div>
+
+          <AnimatePresence>
+            {showQA && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <ManuscriptQA
+                  manuscript={activeStudy.manuscript}
+                  dayNumber={activeStudy.dayNumber}
+                  title={activeStudy.title}
+                  track={activeStudy.track}
+                  avatarName={activeStudy.avatarName}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
 
       {/* ─── Mark Complete (always visible) ─── */}
       {!isCompleted && onComplete && (
@@ -229,7 +323,7 @@ export function WarCollegeReader({
                     Common Objection:
                   </p>
                   <p className="text-sm italic p-3 rounded-lg bg-red-500/5 border border-red-500/15">
-                    "{study.defenseApplication.commonObjection}"
+                    "{activeStudy.defenseApplication.commonObjection}"
                   </p>
                 </div>
                 <div>
@@ -237,7 +331,7 @@ export function WarCollegeReader({
                     Elite Strategic Response:
                   </p>
                   <p className="text-sm p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/15">
-                    "{study.defenseApplication.eliteResponse}"
+                    "{activeStudy.defenseApplication.eliteResponse}"
                   </p>
                 </div>
               </CardContent>
@@ -249,7 +343,7 @@ export function WarCollegeReader({
                 <h3 className="font-bold flex items-center gap-2 text-amber-400">
                   <Flame className="h-4 w-4" /> Forge a Weapon Exercise
                 </h3>
-                <p className="text-sm">{study.forgeExercise}</p>
+                <p className="text-sm">{activeStudy.forgeExercise}</p>
                 <Textarea
                   placeholder="Write your forged weapon here..."
                   value={forgeResponse}
@@ -267,7 +361,7 @@ export function WarCollegeReader({
                   <Target className="h-4 w-4" /> Mastery Check
                 </h3>
                 <div className="space-y-2">
-                  {study.masteryChecks.map((q, i) => (
+                  {activeStudy.masteryChecks.map((q, i) => (
                     <button
                       key={i}
                       className="w-full text-left flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-all"
@@ -298,6 +392,16 @@ export function WarCollegeReader({
               </CardContent>
             </Card>
 
+            {/* Manuscript Quiz */}
+            <ManuscriptQuiz
+              key={readingLevel}
+              manuscript={activeStudy.manuscript}
+              dayNumber={activeStudy.dayNumber}
+              title={activeStudy.title}
+              track={activeStudy.track}
+              avatarName={activeStudy.avatarName}
+            />
+
             {/* Tomorrow's Teaser */}
             <Card className="border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-transparent">
               <CardContent className="p-5 space-y-2">
@@ -305,12 +409,10 @@ export function WarCollegeReader({
                   <Sparkles className="h-4 w-4" /> Tomorrow's Unlock
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {study.tomorrowTeaser}
+                  {activeStudy.tomorrowTeaser}
                 </p>
               </CardContent>
             </Card>
-
-            {/* Complete button removed — now always visible above drills */}
           </motion.div>
         )}
       </AnimatePresence>
