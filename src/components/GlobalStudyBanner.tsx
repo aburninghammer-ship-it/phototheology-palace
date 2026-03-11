@@ -202,6 +202,8 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const rank = getXpRank(stats.totalXp);
   const streakMsg = getStreakMessage(stats.currentStreak);
   const initials = (stats.displayName || fallbackDisplayName).slice(0, 2).toUpperCase();
+  const displayTitle = stats.masterTitle || rank.label;
+  const titleBadgeStyle = stats.masterTitle ? getTitleBadgeStyle(stats.masterTitle) : rank.color;
 
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5">
