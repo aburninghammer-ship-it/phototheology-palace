@@ -22,9 +22,24 @@ import {
   Swords,
   Share2,
   ExternalLink,
+  Shield,
+  BookMarked,
+  HandHeart,
+  Activity,
+  FileText,
+  Sparkles,
 } from "lucide-react";
 import { UserMasterySword } from "@/components/mastery/UserMasterySword";
 import { PersonalPageFeed } from "@/components/living-manna/profile/PersonalPageFeed";
+import { MemberPalaceProgress } from "@/components/living-manna/profile/MemberPalaceProgress";
+import { MemberActivityHeatmap } from "@/components/living-manna/profile/MemberActivityHeatmap";
+import { MemberGemGallery } from "@/components/living-manna/profile/MemberGemGallery";
+import { MemberAchievementsWall } from "@/components/living-manna/profile/MemberAchievementsWall";
+import { MemberStudyThreadsList } from "@/components/living-manna/profile/MemberStudyThreadsList";
+import { MemberPrayerWall } from "@/components/living-manna/profile/MemberPrayerWall";
+import { FeaturedGem } from "@/components/profile/FeaturedGem";
+import { DebateRecord } from "@/components/profile/DebateRecord";
+import { useMemberProfileEnhanced } from "@/hooks/useMemberProfileEnhanced";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useFollow } from "@/hooks/useFollow";
@@ -53,6 +68,8 @@ interface UserProfileData {
   master_title: string | null;
   is_profile_public: boolean;
   ministry_tags: string[] | null;
+  interests: string[] | null;
+  primary_role: string | null;
 }
 
 interface MasteryData {
@@ -90,8 +107,8 @@ export default function UserProfile() {
   const [reading, setReading] = useState<ReadingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [sharedChallenges, setSharedChallenges] = useState<any[]>([]);
-  const [achievements, setAchievements] = useState<any[]>([]);
-  const [gemsCount, setGemsCount] = useState(0);
+
+  const enhanced = useMemberProfileEnhanced(userId || "");
 
   const {
     isFollowing,
@@ -116,8 +133,6 @@ export default function UserProfile() {
       fetchMastery(),
       fetchReading(),
       fetchSharedChallenges(),
-      fetchAchievements(),
-      fetchGemsCount(),
     ]);
     setLoading(false);
   };
@@ -126,7 +141,7 @@ export default function UserProfile() {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, display_name, username, avatar_url, cover_photo_url, bio, location, website, social_links, points, level, daily_study_streak, longest_study_streak, total_gems_saved, total_studies_saved, created_at, current_floor, master_title, is_profile_public, ministry_tags")
+        .select("id, display_name, username, avatar_url, cover_photo_url, bio, location, website, social_links, points, level, daily_study_streak, longest_study_streak, total_gems_saved, total_studies_saved, created_at, current_floor, master_title, is_profile_public, ministry_tags, interests, primary_role")
         .eq("id", userId!)
         .single();
       if (error) throw error;
@@ -162,18 +177,6 @@ export default function UserProfile() {
     }
   };
 
-  const fetchGemsCount = async () => {
-    try {
-      const { count } = await supabase
-        .from("user_gems")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", userId!);
-      setGemsCount(count || 0);
-    } catch (error) {
-      console.error("Error fetching gems:", error);
-    }
-  };
-
   const fetchSharedChallenges = async () => {
     try {
       const { data } = await supabase
@@ -186,19 +189,6 @@ export default function UserProfile() {
       setSharedChallenges(data || []);
     } catch (error) {
       console.error("Error fetching challenges:", error);
-    }
-  };
-
-  const fetchAchievements = async () => {
-    try {
-      const { data } = await supabase
-        .from("user_achievements")
-        .select(`unlocked_at, achievements (id, name, description, icon, points)`)
-        .eq("user_id", userId!)
-        .order("unlocked_at", { ascending: false });
-      setAchievements(data || []);
-    } catch (error) {
-      console.error("Error fetching achievements:", error);
     }
   };
 
@@ -250,11 +240,10 @@ export default function UserProfile() {
           ) : (
             <div className={`w-full h-full bg-gradient-to-br ${beltGradient} opacity-60`} />
           )}
-          {/* Overlay gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
         </div>
 
-        {/* Profile Header — overlaps banner */}
+        {/* Profile Header */}
         <div className="relative px-4 md:px-8 -mt-20">
           <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start">
             {/* Avatar */}
@@ -277,7 +266,6 @@ export default function UserProfile() {
                       size="md"
                       isOwner={profile.id === "a0e64f17-c9f0-4f71-ac72-d1ca52c8b99b"}
                     />
-                    {/* Belt Badge */}
                     <Badge className={`bg-gradient-to-r ${beltGradient} border-0 text-xs font-semibold`}>
                       {beltTitle === "black_candidate" ? "Black Candidate" : `${beltTitle.charAt(0).toUpperCase() + beltTitle.slice(1)} Belt`}
                     </Badge>
@@ -285,10 +273,13 @@ export default function UserProfile() {
                   {profile.username && (
                     <p className="text-sm text-muted-foreground">@{profile.username}</p>
                   )}
+                  {profile.primary_role && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{profile.primary_role}</p>
+                  )}
                 </div>
 
                 <div className="flex gap-2 flex-wrap">
-                  {!isOwnProfile && currentUser && (
+                  {!isOwnProfile && (
                     <Button
                       onClick={toggleFollow}
                       disabled={followLoading}
@@ -357,6 +348,15 @@ export default function UserProfile() {
                   ))}
                 </div>
               )}
+
+              {/* Interests */}
+              {profile.interests && profile.interests.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  {profile.interests.map((interest) => (
+                    <Badge key={interest} variant="outline" className="text-[10px]">{interest}</Badge>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -366,66 +366,72 @@ export default function UserProfile() {
             <StatCard icon={<Users className="w-4 h-4 text-primary" />} value={followingCount} label="Following" />
             <StatCard icon={<Trophy className="w-4 h-4 text-amber-500" />} value={mastery?.total_xp || profile.points || 0} label="XP" />
             <StatCard icon={<Flame className="w-4 h-4 text-orange-500" />} value={profile.daily_study_streak || 0} label="Day Streak" />
-            <StatCard icon={<Gem className="w-4 h-4 text-cyan-500" />} value={gemsCount || profile.total_gems_saved || 0} label="Gems" />
+            <StatCard icon={<Gem className="w-4 h-4 text-cyan-500" />} value={enhanced.gemsCount || profile.total_gems_saved || 0} label="Gems" />
             <StatCard icon={<BookOpen className="w-4 h-4 text-emerald-500" />} value={reading?.total_chapters_read || 0} label="Chapters" />
           </div>
+        </div>
+
+        {/* Palace Progress + Heatmap + Featured Gem (Above Tabs) */}
+        <div className="px-4 md:px-8">
+          {enhanced.loading ? (
+            <div className="space-y-4 mt-6 animate-pulse">
+              <div className="h-24 rounded-lg bg-muted/50" />
+              <div className="h-32 rounded-lg bg-muted/50" />
+            </div>
+          ) : (
+            <div className="space-y-4 mt-6">
+              <MemberPalaceProgress floorProgress={enhanced.floorProgress} currentFloor={enhanced.currentFloor} />
+              <MemberActivityHeatmap activityDates={enhanced.activityDates} />
+              {enhanced.gems.length > 0 && <FeaturedGem gems={enhanced.gems} />}
+            </div>
+          )}
         </div>
 
         {/* Content Tabs */}
         <div className="px-4 md:px-8 mt-8 pb-28 sm:pb-12">
           <Tabs defaultValue="feed" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="feed">
-                <MessageCircle className="w-4 h-4 mr-1.5 hidden sm:inline" />
+            <TabsList className="bg-card/50 backdrop-blur h-auto gap-1 p-1 border border-border/50 flex-wrap justify-start">
+              <TabsTrigger value="feed" className="gap-1.5 text-xs">
+                <MessageCircle className="w-3.5 h-3.5 hidden sm:inline" />
                 Feed
               </TabsTrigger>
-              <TabsTrigger value="challenges">
-                <Swords className="w-4 h-4 mr-1.5 hidden sm:inline" />
-                Challenges
+              <TabsTrigger value="gems" className="gap-1.5 text-xs">
+                <Sparkles className="w-3.5 h-3.5 hidden sm:inline" />
+                Gems
               </TabsTrigger>
-              <TabsTrigger value="achievements">
-                <Trophy className="w-4 h-4 mr-1.5 hidden sm:inline" />
+              <TabsTrigger value="achievements" className="gap-1.5 text-xs">
+                <Trophy className="w-3.5 h-3.5 hidden sm:inline" />
                 Achievements
               </TabsTrigger>
-              <TabsTrigger value="about">
-                <ExternalLink className="w-4 h-4 mr-1.5 hidden sm:inline" />
+              <TabsTrigger value="studies" className="gap-1.5 text-xs">
+                <BookMarked className="w-3.5 h-3.5 hidden sm:inline" />
+                Studies
+              </TabsTrigger>
+              <TabsTrigger value="defense" className="gap-1.5 text-xs">
+                <Shield className="w-3.5 h-3.5 hidden sm:inline" />
+                Defense
+              </TabsTrigger>
+              <TabsTrigger value="about" className="gap-1.5 text-xs">
+                <ExternalLink className="w-3.5 h-3.5 hidden sm:inline" />
                 About
+              </TabsTrigger>
+              <TabsTrigger value="prayers" className="gap-1.5 text-xs">
+                <HandHeart className="w-3.5 h-3.5 hidden sm:inline" />
+                Prayers
               </TabsTrigger>
             </TabsList>
 
-            {/* ─── Feed Tab ─── */}
+            {/* Feed Tab */}
             <TabsContent value="feed">
               <PersonalPageFeed userId={userId!} />
             </TabsContent>
 
-            {/* ─── Challenges Tab ─── */}
-            <TabsContent value="challenges" className="space-y-4">
-              {sharedChallenges.length === 0 ? (
-                <Card className="p-8 text-center">
-                  <p className="text-muted-foreground">No shared challenges yet.</p>
-                </Card>
-              ) : (
-                sharedChallenges.map((challenge) => (
-                  <Card key={challenge.id} className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold mb-2">{challenge.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-3">{challenge.explanation}</p>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary">{challenge.difficulty}</Badge>
-                          <span className="text-sm text-muted-foreground">{challenge.solve_count} solves</span>
-                        </div>
-                      </div>
-                      <Button asChild variant="outline" size="sm">
-                        <Link to={`/equations?code=${challenge.share_code}`}>Try it</Link>
-                      </Button>
-                    </div>
-                  </Card>
-                ))
-              )}
+            {/* Gems Tab */}
+            <TabsContent value="gems">
+              <MemberGemGallery gems={enhanced.gems} />
             </TabsContent>
 
-            {/* ─── Achievements Tab ─── */}
+            {/* Achievements Tab */}
             <TabsContent value="achievements" className="space-y-4">
               {/* Mastery Card */}
               <Card className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
@@ -455,34 +461,20 @@ export default function UserProfile() {
                 </div>
               </Card>
 
-              {achievements.length === 0 ? (
-                <Card className="p-8 text-center">
-                  <p className="text-muted-foreground">No achievements unlocked yet.</p>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {achievements.map((a: any) => (
-                    <Card key={a.achievements.id} className="p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="text-4xl">{a.achievements.icon}</div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold mb-1">{a.achievements.name}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">{a.achievements.description}</p>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="secondary">{a.achievements.points} pts</Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {format(new Date(a.unlocked_at), "MMM d, yyyy")}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              )}
+              <MemberAchievementsWall achievements={enhanced.achievements} />
             </TabsContent>
 
-            {/* ─── About Tab ─── */}
+            {/* Studies Tab */}
+            <TabsContent value="studies">
+              <MemberStudyThreadsList userId={userId!} />
+            </TabsContent>
+
+            {/* Defense Tab */}
+            <TabsContent value="defense">
+              <DebateRecord userId={userId!} />
+            </TabsContent>
+
+            {/* About Tab */}
             <TabsContent value="about">
               <Card className="p-6 space-y-6">
                 <div>
@@ -492,12 +484,24 @@ export default function UserProfile() {
                     <MiniStat label="Longest Streak" value={`${profile.longest_study_streak || reading?.longest_streak || 0} days`} />
                     <MiniStat label="Chapters Read" value={(reading?.total_chapters_read || 0).toLocaleString()} />
                     <MiniStat label="Verses Read" value={(reading?.total_verses_read || 0).toLocaleString()} />
-                    <MiniStat label="Gems Collected" value={(gemsCount || profile.total_gems_saved || 0).toLocaleString()} />
+                    <MiniStat label="Gems Collected" value={(enhanced.gemsCount || profile.total_gems_saved || 0).toLocaleString()} />
                     <MiniStat label="Studies Saved" value={(profile.total_studies_saved || 0).toLocaleString()} />
                     <MiniStat label="Floor" value={`${mastery?.current_floor || profile.current_floor || 1}`} />
-                    <MiniStat label="Rooms Mastered" value={`${mastery?.rooms_mastered || 0}`} />
+                    <MiniStat label="Rooms Mastered" value={`${enhanced.roomsCompleted || mastery?.rooms_mastered || 0}`} />
                   </div>
                 </div>
+
+                {/* Interests */}
+                {profile.interests && profile.interests.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold mb-3">Interests</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {profile.interests.map((interest) => (
+                        <Badge key={interest} variant="outline">{interest}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {profile.social_links && Object.keys(profile.social_links).length > 0 && (
                   <div>
@@ -521,7 +525,38 @@ export default function UserProfile() {
                     </div>
                   </div>
                 )}
+
+                {/* Shared Equation Challenges */}
+                {sharedChallenges.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold mb-3">Shared Challenges</h3>
+                    <div className="space-y-2">
+                      {sharedChallenges.map((challenge) => (
+                        <Card key={challenge.id} className="p-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-sm truncate">{challenge.title}</h4>
+                              <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{challenge.explanation}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="secondary" className="text-[10px]">{challenge.difficulty}</Badge>
+                                <span className="text-[10px] text-muted-foreground">{challenge.solve_count} solves</span>
+                              </div>
+                            </div>
+                            <Button asChild variant="outline" size="sm" className="shrink-0 ml-2">
+                              <Link to={`/equations?code=${challenge.share_code}`}>Try it</Link>
+                            </Button>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </Card>
+            </TabsContent>
+
+            {/* Prayers Tab */}
+            <TabsContent value="prayers">
+              <MemberPrayerWall prayerRequests={enhanced.prayerRequests} targetUserId={userId!} />
             </TabsContent>
           </Tabs>
         </div>
