@@ -105,8 +105,7 @@ export const ReginaldButler = () => {
     if (open) setTimeout(() => inputRef.current?.focus(), 200);
   }, [open]);
 
-  // Don't render for unauthenticated users (after all hooks)
-  if (!user) return null;
+  // Moved after all hooks — see renderReginaldMessage useCallback below
 
   const sendMessage = async (text?: string) => {
     const content = (text || input).trim();
