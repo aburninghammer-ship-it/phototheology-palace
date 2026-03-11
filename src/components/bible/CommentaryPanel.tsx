@@ -444,7 +444,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         </div>
       </CardHeader>
 
-      <CardContent className="pt-6">
+      <CardContent className="pt-6 overflow-hidden">
         <div className="space-y-4">
           {/* Dimension Filter */}
           <DimensionFilter
