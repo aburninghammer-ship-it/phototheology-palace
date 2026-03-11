@@ -19278,39 +19278,6 @@ export type Database = {
         }
         Relationships: []
       }
-      war_college_weapons: {
-        Row: {
-          avatar_id: string
-          day_number: number
-          forged_at: string
-          id: string
-          score: number
-          sharpening_history: Json
-          user_id: string
-          weapon_text: string
-        }
-        Insert: {
-          avatar_id: string
-          day_number: number
-          forged_at?: string
-          id?: string
-          score: number
-          sharpening_history?: Json
-          user_id: string
-          weapon_text: string
-        }
-        Update: {
-          avatar_id?: string
-          day_number?: number
-          forged_at?: string
-          id?: string
-          score?: number
-          sharpening_history?: Json
-          user_id?: string
-          weapon_text?: string
-        }
-        Relationships: []
-      }
       warrior_characteristics: {
         Row: {
           characteristic_name: string
