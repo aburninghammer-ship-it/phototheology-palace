@@ -230,7 +230,7 @@ export const MessagingSidebar = () => {
           </div>
 
         {/* Split Layout */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden min-w-0">
           {/* Left Panel - User List - Show on mobile when not in chat view */}
           <div className={`w-full md:w-72 lg:w-80 md:border-r flex flex-col ${isMobile && mobileShowChat ? 'hidden' : 'flex'} ${!isMobile ? '' : ''}`}>
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex flex-col h-full">
@@ -351,7 +351,7 @@ export const MessagingSidebar = () => {
           </div>
 
           {/* Right Panel - Chat Window - Hide on mobile when showing list */}
-          <div className={`flex-1 flex flex-col ${isMobile && !mobileShowChat ? 'hidden' : 'flex'}`}>
+          <div className={`flex-1 flex flex-col min-w-0 ${isMobile && !mobileShowChat ? 'hidden' : 'flex'}`}>
             {activeConversationId ? (
               activeConversation ? (
                 <>
@@ -406,8 +406,8 @@ export const MessagingSidebar = () => {
                 </div>
 
                  {/* Messages */}
-                <ScrollArea className="flex-1 p-4 md:p-6">
-                  <div className="space-y-4">
+                <ScrollArea className="flex-1 p-4 md:p-6 min-w-0">
+                  <div className="space-y-4 min-w-0 w-full">
                     {messages.map((message) => {
                       const isOwn = message.sender_id === user?.id;
                       const isRead = message.read_by && message.read_by.length > 1;
@@ -415,10 +415,10 @@ export const MessagingSidebar = () => {
                       return (
                          <div
                           key={message.id}
-                          className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                          className={`flex min-w-0 ${isOwn ? 'justify-end' : 'justify-start'}`}
                         >
                           <div
-                            className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-3 ${
+                            className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-3 overflow-hidden ${
                               isOwn
                                 ? 'bg-primary text-primary-foreground shadow-md'
                                 : 'bg-muted shadow-sm'
@@ -437,7 +437,7 @@ export const MessagingSidebar = () => {
                               </div>
                             )}
                             {message.content && (
-                              <p className="text-base break-words leading-relaxed">{message.content}</p>
+                              <p className="text-base leading-relaxed" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{message.content}</p>
                             )}
                             <div className="flex items-center gap-1 mt-1">
                               <span className="text-[10px] opacity-70">
