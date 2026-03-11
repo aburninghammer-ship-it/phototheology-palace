@@ -426,7 +426,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   };
 
   return (
-    <Card className="sticky top-24 shadow-elegant animate-scale-in max-h-[calc(100vh-8rem)] overflow-y-auto">
+    <Card className="lg:sticky lg:top-24 shadow-elegant animate-scale-in lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
       <CardHeader className="gradient-ocean text-white">
         <div className="flex items-start justify-between">
           <div>
