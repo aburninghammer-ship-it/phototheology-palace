@@ -386,5 +386,6 @@ export const SimplifiedNav = () => {
     {user && <GlobalStudyBanner userId={user.id} userEmail={user.email ?? null} />}
     {/* Spacer for sticky nav */}
     <div className="h-16" />
+    </>
   );
 };
