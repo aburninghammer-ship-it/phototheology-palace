@@ -158,6 +158,21 @@ function getXpRank(xp: number): { label: string; color: string } {
   return { label: "Explorer", color: "bg-sky-500/20 text-sky-400" };
 }
 
+function getTitleBadgeStyle(title: string | null): string {
+  if (!title) return "bg-sky-500/20 text-sky-400";
+  const t = title.toLowerCase();
+  if (t.includes("master") || t.includes("gold")) return "bg-yellow-500/20 text-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.3)]";
+  if (t.includes("black")) return "bg-gradient-to-r from-cyan-500/25 to-blue-500/25 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.35)]";
+  if (t.includes("red")) return "bg-red-500/20 text-red-400 shadow-[0_0_8px_rgba(239,68,68,0.3)]";
+  if (t.includes("purple")) return "bg-purple-500/20 text-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.3)]";
+  if (t.includes("blue")) return "bg-blue-500/20 text-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.3)]";
+  if (t.includes("green")) return "bg-emerald-500/20 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.3)]";
+  if (t.includes("brown") || t.includes("orange")) return "bg-orange-500/20 text-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.3)]";
+  if (t.includes("white")) return "bg-slate-200/20 text-slate-300 shadow-[0_0_8px_rgba(148,163,184,0.3)]";
+  if (t.includes("yellow")) return "bg-yellow-500/20 text-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.3)]";
+  return "bg-primary/20 text-primary shadow-[0_0_8px_hsl(var(--primary)/0.3)]";
+}
+
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
   const { user: authUser } = useAuth();
   const resolvedUserId = userId ?? authUser?.id ?? null;
