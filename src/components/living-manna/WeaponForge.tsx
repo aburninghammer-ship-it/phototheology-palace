@@ -148,7 +148,7 @@ ${draft}`;
 
       // If score >= 9, save to DB
       if (parsed.score >= 9) {
-        await supabase.from("war_college_weapons").upsert({
+        await (supabase as any).from("war_college_weapons").upsert({
           user_id: user.id,
           avatar_id: avatarId,
           day_number: dayNumber,
