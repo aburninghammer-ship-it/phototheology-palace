@@ -646,9 +646,9 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
                 )}
               </h4>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2">
                 <Select value={selectedCommentary} onValueChange={setSelectedCommentary}>
-                  <SelectTrigger className="flex-1">
+                  <SelectTrigger className="w-full min-w-0">
                     <SelectValue placeholder="Select a commentary" />
                   </SelectTrigger>
                   <SelectContent>
@@ -676,14 +676,14 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   onClick={() => generateCommentary(false, true)}
                   disabled={loading}
                   variant="outline"
-                  className="whitespace-nowrap"
+                  className="w-full whitespace-nowrap"
                 >
                   {loading ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
                     <BookOpen className="h-4 w-4 mr-2" />
                   )}
-                  Load
+                  Load Commentary
                 </Button>
               </div>
             </div>
