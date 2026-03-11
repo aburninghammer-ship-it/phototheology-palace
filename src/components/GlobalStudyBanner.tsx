@@ -158,6 +158,21 @@ function getXpRank(xp: number): { label: string; color: string } {
   return { label: "Explorer", color: "bg-sky-500/20 text-sky-400" };
 }
 
+function getTitleBadgeStyle(title: string | null): string {
+  if (!title) return "bg-sky-500/20 text-sky-400";
+  const t = title.toLowerCase();
+  if (t.includes("master") || t.includes("gold")) return "bg-yellow-500/20 text-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.3)]";
+  if (t.includes("black")) return "bg-gradient-to-r from-cyan-500/25 to-blue-500/25 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.35)]";
+  if (t.includes("red")) return "bg-red-500/20 text-red-400 shadow-[0_0_8px_rgba(239,68,68,0.3)]";
+  if (t.includes("purple")) return "bg-purple-500/20 text-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.3)]";
+  if (t.includes("blue")) return "bg-blue-500/20 text-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.3)]";
+  if (t.includes("green")) return "bg-emerald-500/20 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.3)]";
+  if (t.includes("brown") || t.includes("orange")) return "bg-orange-500/20 text-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.3)]";
+  if (t.includes("white")) return "bg-slate-200/20 text-slate-300 shadow-[0_0_8px_rgba(148,163,184,0.3)]";
+  if (t.includes("yellow")) return "bg-yellow-500/20 text-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.3)]";
+  return "bg-primary/20 text-primary shadow-[0_0_8px_hsl(var(--primary)/0.3)]";
+}
+
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
   const { user: authUser } = useAuth();
   const resolvedUserId = userId ?? authUser?.id ?? null;
@@ -187,27 +202,29 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const rank = getXpRank(stats.totalXp);
   const streakMsg = getStreakMessage(stats.currentStreak);
   const initials = (stats.displayName || fallbackDisplayName).slice(0, 2).toUpperCase();
+  const displayTitle = stats.masterTitle || rank.label;
+  const titleBadgeStyle = stats.masterTitle ? getTitleBadgeStyle(stats.masterTitle) : rank.color;
 
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5">
       {/* Row 1: Identity + Stats */}
-      <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm px-3 py-2 flex items-center gap-3">
+      <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm px-3 py-2.5 flex items-center gap-3">
         {/* Avatar */}
         <Link to="/profile" className="flex-shrink-0">
-          <Avatar className="h-8 w-8 ring-2 ring-primary/30">
+          <Avatar className="h-9 w-9 ring-2 ring-primary/30">
             <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
             <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">{initials}</AvatarFallback>
           </Avatar>
         </Link>
 
-        {/* Name + rank */}
+        {/* Name + rank + streak */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-none">
+            <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none">
               {stats.displayName}
             </span>
-            <Badge className={cn("text-[10px] border-0 font-semibold", rank.color)}>
-              {stats.masterTitle || rank.label}
+            <Badge className={cn("text-[10px] border-0 font-bold uppercase tracking-wider px-2", titleBadgeStyle)}>
+              {displayTitle}
             </Badge>
           </div>
           {streakMsg && (
@@ -219,19 +236,19 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
         </div>
 
         {/* Stats chips */}
-        <div className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground" title="XP">
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1 text-xs" title="XP">
             <Zap className="h-3.5 w-3.5 text-amber-500" />
-            <span className="font-medium text-foreground">{stats.totalXp.toLocaleString()}</span>
+            <span className="font-semibold text-foreground">{stats.totalXp.toLocaleString()}</span>
           </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground" title="Gems">
+          <div className="flex items-center gap-1 text-xs" title="Gems">
             <Gem className="h-3.5 w-3.5 text-cyan-500" />
-            <span className="font-medium text-foreground">{stats.gemsCount}</span>
+            <span className="font-semibold text-foreground">{stats.gemsCount}</span>
           </div>
           {stats.currentStreak > 0 && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground" title="Streak">
+            <div className="flex items-center gap-1 text-xs" title="Streak">
               <Flame className="h-3.5 w-3.5 text-orange-500" />
-              <span className="font-medium text-foreground">{stats.currentStreak}d</span>
+              <span className="font-semibold text-foreground">{stats.currentStreak}d</span>
             </div>
           )}
         </div>
