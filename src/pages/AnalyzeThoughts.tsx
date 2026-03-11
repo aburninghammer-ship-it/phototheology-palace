@@ -1401,10 +1401,10 @@ const AnalyzeThoughts = () => {
                         {result.furtherStudy.map((item, i) => {
                           const study = normalizeFurtherStudy(item);
                           return (
-                            <a
+                            <button
                               key={i}
-                              href={`/encyclopedia?search=${encodeURIComponent(study.topic)}`}
-                              className="block p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group active:scale-[0.98]"
+                              onClick={() => navigate(`/encyclopedia?search=${encodeURIComponent(study.topic)}`)}
+                              className="block w-full text-left p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group active:scale-[0.98]"
                             >
                               <div className="flex items-center justify-between gap-2">
                                 <p className="font-medium text-sm sm:text-base text-purple-200 group-hover:text-purple-100 flex-1">{study.topic}</p>
@@ -1413,7 +1413,7 @@ const AnalyzeThoughts = () => {
                               {study.whyItMatters && (
                                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">{study.whyItMatters}</p>
                               )}
-                            </a>
+                            </button>
                           );
                         })}
                       </div>

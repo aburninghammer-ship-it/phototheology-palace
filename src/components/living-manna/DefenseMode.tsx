@@ -949,7 +949,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
     } catch (err) {
       console.error("Sparring error:", err);
       addMessage({ role: "system", content: "Failed to start sparring. Please try again." });
-      setPhase("setup");
+      setPhase("review");
     } finally {
       setIsLoading(false);
     }
@@ -1042,7 +1042,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
   };
 
   const continueSparring = async () => {
-    if (!selectedOpponent || !selectedTopic) return;
+    if (!selectedOpponent) return;
 
     const nextRound = roundCount + 1;
     setRoundCount(nextRound);
@@ -1059,8 +1059,8 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
         body: {
           mode: "defense-sparring",
           opponent: selectedOpponent.id,
-          defenseTopicId: selectedTopic.id,
-          defenseTopicName: selectedTopic.name,
+          defenseTopicId: isGoliath && !selectedTopic ? "__goliath_blind__" : selectedTopic?.id,
+          defenseTopicName: isGoliath && !selectedTopic ? "Unknown — Goliath chooses" : selectedTopic?.name,
           difficulty: selectedDifficulty,
           temperament: selectedTemperaments,
           opponentWorldview: selectedOpponent.worldview,
@@ -1069,7 +1069,8 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
           opponentEndPrompt: selectedOpponent.endPrompt,
           opponentSteelmanRules: selectedOpponent.steelmanRules,
           opponentPronouns: selectedOpponent.pronouns,
-          isSignatureTopic: !!selectedTopic?.isSignature,
+          isSignatureTopic: selectedTopic ? !!selectedTopic.isSignature : false,
+          isGoliathBlindMode: isGoliath && !selectedTopic,
           phase: "follow-up",
           conversationHistory: buildConversationHistory(),
         },
@@ -2524,9 +2525,9 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
             </div>
           )}
           <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={continueSparring}>
+            <Button variant="outline" className="flex-1" onClick={messages.some(m => m.role === "opponent") ? continueSparring : startSparring}>
               <ArrowRight className="h-4 w-4 mr-1" />
-              Continue Sparring
+              {messages.some(m => m.role === "opponent") ? "Continue Sparring" : "Retry"}
             </Button>
             <Button variant="outline" className="flex-1" onClick={resetMatch}>
               <RotateCcw className="h-4 w-4 mr-1" />

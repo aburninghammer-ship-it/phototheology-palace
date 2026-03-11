@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -52,11 +53,13 @@ const categories = [
 const BibleEncyclopedia = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [urlSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState<string>("themes");
   const [searchResults, setSearchResults] = useState("");
   const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [initialSearchDone, setInitialSearchDone] = useState(false);
 
   const handleRandomEntry = () => {
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
@@ -115,6 +118,36 @@ const BibleEncyclopedia = () => {
       setIsSearching(false);
     }
   };
+
+  // Auto-search from URL params (e.g., /encyclopedia?search=topic)
+  useEffect(() => {
+    if (initialSearchDone) return;
+    const searchParam = urlSearchParams.get("search");
+    if (searchParam) {
+      setSearchQuery(searchParam);
+      setInitialSearchDone(true);
+      // Trigger search after state updates
+      setTimeout(async () => {
+        setIsSearching(true);
+        setSearchResults("");
+        setMapImageUrl(null);
+        try {
+          const { data, error } = await supabase.functions.invoke("jeeves", {
+            body: { mode: "encyclopedia", category: searchCategory, query: searchParam },
+          });
+          if (error) throw error;
+          trackJeevesInteraction(searchParam, `encyclopedia-${searchCategory}`, data.content?.substring(0, 200), "Bible Encyclopedia");
+          setSearchResults(data.content || "No results found.");
+          if (data.mapImageUrl) setMapImageUrl(data.mapImageUrl);
+        } catch (error: any) {
+          console.error("Encyclopedia search error:", error);
+          toast({ title: "Search Failed", description: error.message || "Failed to search encyclopedia", variant: "destructive" });
+        } finally {
+          setIsSearching(false);
+        }
+      }, 100);
+    }
+  }, [urlSearchParams, initialSearchDone]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-palace-purple/5 relative overflow-x-hidden">
