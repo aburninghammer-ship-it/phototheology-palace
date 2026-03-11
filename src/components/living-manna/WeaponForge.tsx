@@ -160,7 +160,7 @@ ${draft}`;
         setForged(true);
       } else {
         // Save progress even if not yet forged
-        await supabase.from("war_college_weapons").upsert({
+        await (supabase as any).from("war_college_weapons").upsert({
           user_id: user.id,
           avatar_id: avatarId,
           day_number: dayNumber,
