@@ -20,7 +20,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { ShareableProgressCard } from "@/components/ShareableProgressCard";
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
-import { ReturnToPathBanner } from "@/components/path/ReturnToPathBanner";
+
 import { SessionModeIndicator } from "@/components/session/SessionModeIndicator";
 import { BackButton } from "@/components/BackButton";
 import { SessionStartButton } from "@/components/session/SessionStartButton";
