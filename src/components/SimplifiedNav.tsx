@@ -18,6 +18,7 @@ import { NavigationStyleToggle } from "./NavigationStyleToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { BackButton } from "@/components/BackButton";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { GlobalStudyBanner } from "@/components/GlobalStudyBanner";
 
 export const SimplifiedNav = () => {
   const { user, signOut } = useAuth();
