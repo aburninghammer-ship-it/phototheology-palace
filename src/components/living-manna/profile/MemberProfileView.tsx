@@ -16,7 +16,6 @@ import { MemberAboutSection } from "./MemberAboutSection";
 import { MemberGemGallery } from "./MemberGemGallery";
 import { MemberAchievementsWall } from "./MemberAchievementsWall";
 import { MemberPrayerWall } from "./MemberPrayerWall";
-import { GlobalStudyBanner } from "@/components/GlobalStudyBanner";
 
 interface MemberProfileViewProps {
   userId: string;
@@ -74,7 +73,7 @@ export function MemberProfileView({ userId, churchId, onBack }: MemberProfileVie
         <ArrowLeft className="h-4 w-4 mr-1" /> Back to Directory
       </Button>
 
-      <GlobalStudyBanner />
+      
 
       <MemberProfileHeader
         profile={profile}
