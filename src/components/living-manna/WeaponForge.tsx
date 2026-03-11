@@ -60,11 +60,11 @@ export function WeaponForge({
 
       if (data && data.score >= 9) {
         setForgedWeapon({ text: data.weapon_text, score: data.score });
-        setHistory((data.sharpening_history as SharpeningEntry[]) || []);
+        setHistory((data.sharpening_history as unknown as SharpeningEntry[]) || []);
         setForged(true);
       } else if (data) {
         setDraft(data.weapon_text);
-        setHistory((data.sharpening_history as SharpeningEntry[]) || []);
+        setHistory((data.sharpening_history as unknown as SharpeningEntry[]) || []);
       }
       setChecking(false);
     })();
