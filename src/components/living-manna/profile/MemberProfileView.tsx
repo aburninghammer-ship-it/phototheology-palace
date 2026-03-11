@@ -16,6 +16,7 @@ import { MemberAboutSection } from "./MemberAboutSection";
 import { MemberGemGallery } from "./MemberGemGallery";
 import { MemberAchievementsWall } from "./MemberAchievementsWall";
 import { MemberPrayerWall } from "./MemberPrayerWall";
+import { GlobalStudyBanner } from "@/components/GlobalStudyBanner";
 
 interface MemberProfileViewProps {
   userId: string;
