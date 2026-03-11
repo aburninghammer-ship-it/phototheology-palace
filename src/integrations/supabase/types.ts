@@ -20708,6 +20708,11 @@ export type Database = {
         | "youth_lead"
         | "personal_ministry_admin"
         | "bible_worker"
+        | "announcements_lead"
+        | "events_lead"
+        | "community_lead"
+        | "livestream_lead"
+        | "discipleship_lead"
       pt_mastery_level: "beginner" | "intermediate" | "master"
       pt_pain_point_type: "diagnostic" | "symptomatic"
       pt_study_burden:
@@ -20910,6 +20915,11 @@ export const Constants = {
         "youth_lead",
         "personal_ministry_admin",
         "bible_worker",
+        "announcements_lead",
+        "events_lead",
+        "community_lead",
+        "livestream_lead",
+        "discipleship_lead",
       ],
       pt_mastery_level: ["beginner", "intermediate", "master"],
       pt_pain_point_type: ["diagnostic", "symptomatic"],
