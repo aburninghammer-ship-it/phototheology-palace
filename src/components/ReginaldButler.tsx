@@ -300,7 +300,7 @@ export const ReginaldButler = () => {
                   >
                     {msg.role === "assistant" ? (
                       <div className="space-y-2 [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&>div]:mb-2 text-sm">
-                        {formatJeevesResponse(msg.content)}
+                        {renderReginaldMessage(msg.content)}
                       </div>
                     ) : (
                       msg.content
