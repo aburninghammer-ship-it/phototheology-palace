@@ -74,6 +74,8 @@ export function MemberProfileView({ userId, churchId, onBack }: MemberProfileVie
         <ArrowLeft className="h-4 w-4 mr-1" /> Back to Directory
       </Button>
 
+      <GlobalStudyBanner />
+
       <MemberProfileHeader
         profile={profile}
         memberInfo={memberInfo}
