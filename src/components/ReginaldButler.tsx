@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Send, Loader2, ChevronDown, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
+import { Send, Loader2, ChevronDown, Volume2, VolumeX, Mic, MicOff, ExternalLink } from "lucide-react";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import React from "react";
 
 // Web Speech API TTS helper
 function speakText(text: string, onEnd?: () => void) {
