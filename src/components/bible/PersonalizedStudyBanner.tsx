@@ -49,14 +49,22 @@ export function PersonalizedStudyBanner() {
 
     const load = async () => {
       try {
-        const [profileRes, masteryRes, streakRes, gemsRes, roomsRes, readingRes] = await Promise.all([
+        const [profileRes, masteryRes, streakRes, gemsRes, roomsRes] = await Promise.all([
           supabase.from("profiles").select("display_name, avatar_url, master_title").eq("id", user.id).single(),
-          supabase.from("global_master_titles").select("total_xp, current_floor, rooms_mastered").eq("user_id", user.id).maybeSingle(),
+          supabase.from("global_master_titles").select("total_xp, current_floor").eq("user_id", user.id).maybeSingle(),
           supabase.from("mastery_streaks").select("current_streak").eq("user_id", user.id).maybeSingle(),
           supabase.from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", user.id),
           supabase.from("room_mastery_levels").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("mastery_level", 5),
-          supabase.from("user_reading_progress").select("book, chapter").eq("user_id", user.id).order("updated_at", { ascending: false }).limit(1).maybeSingle(),
         ]);
+
+        // Get last study from bookmarks as a proxy for "continue reading"
+        const { data: lastBookmark } = await supabase
+          .from("bookmarks")
+          .select("book, chapter")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
         setStats({
           displayName: profileRes.data?.display_name || "Scholar",
@@ -67,8 +75,8 @@ export function PersonalizedStudyBanner() {
           currentFloor: masteryRes.data?.current_floor || 1,
           gemsCount: gemsRes.count || 0,
           roomsMastered: roomsRes.count || 0,
-          lastBook: readingRes.data?.book || null,
-          lastChapter: readingRes.data?.chapter || null,
+          lastBook: lastBookmark?.book || null,
+          lastChapter: lastBookmark?.chapter || null,
         });
       } catch (err) {
         console.error("Error loading study banner:", err);
