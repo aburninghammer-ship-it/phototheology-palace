@@ -160,6 +160,7 @@ const DrillDrill = lazy(() => import("./pages/DrillDrill"));
 const EscapeRoom = lazy(() => import("./pages/EscapeRoomRenovated"));
 const EscapeRoomPlay = lazy(() => import("./pages/EscapeRoomPlayRenovated"));
 const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const FollowingFeed = lazy(() => import("./pages/FollowingFeed"));
 const PrincipleCards = lazy(() => import("./pages/PrincipleCards"));
@@ -661,6 +662,7 @@ function App() {
             <Route path="/offline-content" element={<ProtectedRoute><OfflineContent /></ProtectedRoute>} />
             <Route path="/notes" element={<ProtectedRoute><Notes /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/my-profile" element={<ProtectedRoute><MyProfileRedirect /></ProtectedRoute>} />
             <Route path="/user/:userId" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/following-feed" element={<ProtectedRoute><FollowingFeed /></ProtectedRoute>} />

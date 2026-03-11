@@ -310,7 +310,7 @@ export default function UserProfile() {
                   )}
                   {isOwnProfile && (
                     <Button asChild variant="outline">
-                      <Link to="/profile">Edit Profile</Link>
+                      <Link to="/settings">Edit Profile</Link>
                     </Button>
                   )}
                   <Button variant="ghost" size="icon" onClick={handleShare}>
@@ -372,7 +372,7 @@ export default function UserProfile() {
         </div>
 
         {/* Content Tabs */}
-        <div className="px-4 md:px-8 mt-8 pb-12">
+        <div className="px-4 md:px-8 mt-8 pb-28 sm:pb-12">
           <Tabs defaultValue="feed" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="feed">
@@ -428,18 +428,18 @@ export default function UserProfile() {
             {/* ─── Achievements Tab ─── */}
             <TabsContent value="achievements" className="space-y-4">
               {/* Mastery Card */}
-              <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">Palace Mastery</h3>
-                    <p className="text-sm text-muted-foreground">
+              <Card className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base sm:text-lg font-semibold mb-1">Palace Mastery</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       {beltTitle === "black_candidate"
                         ? "Black Belt Candidate"
                         : `${beltTitle.charAt(0).toUpperCase() + beltTitle.slice(1)} Belt`}{" "}
                       — Floor {mastery?.current_floor || profile.current_floor || 1}
                     </p>
                     {mastery && (
-                      <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[10px] sm:text-xs text-muted-foreground">
                         <span>{mastery.floors_completed} floors completed</span>
                         <span>{mastery.rooms_mastered || 0} rooms mastered</span>
                         <span>{mastery.total_xp.toLocaleString()} total XP</span>
