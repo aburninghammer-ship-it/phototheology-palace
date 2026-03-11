@@ -413,6 +413,7 @@ function App() {
             <Route path="/genesis-challenge" element={<GenesisHighRise />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/patreon-callback" element={<PatreonCallback />} />
             <Route path="/interactive-demo" element={<InteractiveDemo />} />
             <Route path="/comparison" element={<Comparison />} />
