@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Plus, Heart, Users, Reply, Send, Sparkles, Pencil, Trash2, Filter } from "lucide-react";
+import { MessageSquare, Plus, Users, Reply, Send, Sparkles, Pencil, Trash2, Filter, Flame, TrendingUp } from "lucide-react";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { communityPostSchema } from "@/lib/validationSchemas";
 import { sanitizeHtml } from "@/lib/sanitize";
@@ -27,8 +27,11 @@ import { CommunityNotifications } from "@/components/community/CommunityNotifica
 import { SharedContentCard } from "@/components/community/SharedContentCard";
 import { TagInput } from "@/components/community/TagInput";
 import { CommunityPostCard } from "@/components/community/CommunityPostCard";
+import { QuickPostBar } from "@/components/community/QuickPostBar";
+import { DailyChallengeBanner } from "@/components/community/DailyChallengeBanner";
+import { WeeklySpotlight } from "@/components/community/WeeklySpotlight";
 
-type SortOption = "latest" | "most_commented" | "needs_feedback";
+type SortOption = "latest" | "most_commented" | "needs_feedback" | "trending";
 type CategoryFilter = "all" | "general" | "prayer" | "study" | "questions";
 
 const Community = () => {
@@ -58,6 +61,8 @@ const Community = () => {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
+  const [firstComments, setFirstComments] = useState<Record<string, any>>({});
 
   // Extract all unique tags from posts
   const availableTags = useMemo(() => {
@@ -75,6 +80,21 @@ const Community = () => {
       setExpandedPosts(prev => ({ ...prev, [highlightPostId]: true }));
     }
   }, [searchParams]);
+
+  // Fetch user's existing likes on mount
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchLikes = async () => {
+      const { data } = await supabase
+        .from("community_post_likes")
+        .select("post_id")
+        .eq("user_id", user.id);
+      if (data) {
+        setLikedPostIds(new Set(data.map(d => d.post_id)));
+      }
+    };
+    fetchLikes();
+  }, [user?.id]);
 
   useEffect(() => {
     if (user && user.id) {
@@ -107,10 +127,10 @@ const Community = () => {
         .from("community_posts")
         .select(`
           *,
-          profiles:user_id(username, display_name, avatar_url)
+          profiles:user_id(username, display_name, avatar_url, master_title, current_floor, daily_study_streak)
         `)
         .order("created_at", { ascending: false });
-      
+
       if (error) {
         console.error('Error fetching posts:', error);
         toast({
@@ -120,10 +140,9 @@ const Community = () => {
         });
         return;
       }
-      
-      console.log('Fetched posts with profiles:', data);
+
       setPosts(data || []);
-      
+
       // Fetch comments for all posts
       if (data && data.length > 0) {
         const postIds = data.map(p => p.id);
@@ -135,9 +154,7 @@ const Community = () => {
           `)
           .in("post_id", postIds)
           .order("created_at", { ascending: true });
-        
-        console.log('Fetched comments with profiles:', commentsData);
-        
+
         if (commentsError) {
           console.error('Error fetching comments:', commentsError);
           toast({
@@ -147,17 +164,22 @@ const Community = () => {
           });
           return;
         }
-        
+
         if (commentsData) {
           const commentsByPost: Record<string, any[]> = {};
+          const firstByPost: Record<string, any> = {};
           commentsData.forEach(comment => {
             if (!commentsByPost[comment.post_id]) {
               commentsByPost[comment.post_id] = [];
             }
             commentsByPost[comment.post_id].push(comment);
+            // Track first top-level comment per post
+            if (!comment.parent_comment_id && !firstByPost[comment.post_id]) {
+              firstByPost[comment.post_id] = comment;
+            }
           });
-          console.log('Comments organized by post:', commentsByPost);
           setComments(commentsByPost);
+          setFirstComments(firstByPost);
         }
       }
     } catch (error: any) {
@@ -168,6 +190,54 @@ const Community = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleLikePost = async (postId: string) => {
+    if (!user?.id) return;
+    const isCurrentlyLiked = likedPostIds.has(postId);
+
+    // Optimistic update
+    setLikedPostIds(prev => {
+      const next = new Set(prev);
+      if (isCurrentlyLiked) {
+        next.delete(postId);
+      } else {
+        next.add(postId);
+      }
+      return next;
+    });
+
+    try {
+      if (isCurrentlyLiked) {
+        await supabase
+          .from("community_post_likes")
+          .delete()
+          .eq("post_id", postId)
+          .eq("user_id", user.id);
+      } else {
+        await supabase
+          .from("community_post_likes")
+          .insert({ post_id: postId, user_id: user.id, reaction_type: "love" });
+      }
+    } catch (error) {
+      // Revert on error
+      setLikedPostIds(prev => {
+        const next = new Set(prev);
+        if (isCurrentlyLiked) {
+          next.add(postId);
+        } else {
+          next.delete(postId);
+        }
+        return next;
+      });
+      console.error("Error toggling like:", error);
+    }
+  };
+
+  const handleQuickPost = (category: string, tags?: string[]) => {
+    setNewCategory(category);
+    if (tags) setNewTags(tags);
+    setShowNewPost(true);
   };
 
   const createPost = async () => {
@@ -213,7 +283,6 @@ const Community = () => {
       setNewTags([]);
       setShowNewPost(false);
 
-      // Ensure the new post appears immediately even if realtime is delayed
       fetchPosts();
     } catch (error: any) {
       if (error.name === "ZodError") {
@@ -238,8 +307,7 @@ const Community = () => {
 
     try {
       const sanitizedContent = sanitizeHtml(content);
-      
-      // Moderate comment content
+
       const isAllowed = await moderateContent(sanitizedContent);
       if (!isAllowed) return;
       const { data, error } = await supabase
@@ -260,8 +328,7 @@ const Community = () => {
 
       setNewComment({ ...newComment, [postId]: "" });
       setReplyingTo({ ...replyingTo, [postId]: null });
-      
-      // Wait a moment for realtime to propagate, then refetch
+
       setTimeout(() => {
         fetchPosts();
       }, 500);
@@ -276,28 +343,19 @@ const Community = () => {
   };
 
   const deleteComment = async (commentId: string) => {
-    console.log('Delete button clicked for comment:', commentId);
-    console.log('Current user ID:', user?.id);
-    
     if (!confirm('Are you sure you want to delete this comment?')) {
       return;
     }
-    
+
     try {
       const { error } = await supabase
         .from("community_comments")
         .delete()
         .eq("id", commentId);
 
-      if (error) {
-        console.error('Delete error details:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      toast({
-        title: t('community.commentDeleted'),
-      });
-
+      toast({ title: t('community.commentDeleted') });
       fetchPosts();
     } catch (error: any) {
       console.error('Error deleting comment:', error);
@@ -310,8 +368,6 @@ const Community = () => {
   };
 
   const startEditComment = (commentId: string, content: string) => {
-    console.log('Edit button clicked for comment:', commentId);
-    console.log('Current user ID:', user?.id);
     setEditingComment(commentId);
     setEditContent(content);
   };
@@ -333,21 +389,15 @@ const Community = () => {
 
     try {
       const sanitizedContent = sanitizeHtml(editContent);
-      
+
       const { error } = await supabase
         .from("community_comments")
         .update({ content: sanitizedContent })
         .eq("id", commentId);
 
-      if (error) {
-        console.error('Update error details:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      toast({
-        title: t('community.commentUpdated'),
-      });
-
+      toast({ title: t('community.commentUpdated') });
       setEditingComment(null);
       setEditContent("");
       fetchPosts();
@@ -387,7 +437,6 @@ const Community = () => {
       const sanitizedTitle = sanitizeHtml(editPostTitle);
       const sanitizedContent = sanitizeHtml(editPostContent);
 
-      // Moderate edited content
       const isAllowed = await moderateContent(`${sanitizedTitle} ${sanitizedContent}`);
       if (!isAllowed) return;
 
@@ -455,19 +504,19 @@ const Community = () => {
   const organizeComments = (comments: any[]) => {
     const topLevel = comments.filter(c => !c.parent_comment_id);
     const replies = comments.filter(c => c.parent_comment_id);
-    
+
     const commentMap = new Map();
     topLevel.forEach(c => {
       commentMap.set(c.id, { ...c, replies: [] });
     });
-    
+
     replies.forEach(reply => {
       const parent = commentMap.get(reply.parent_comment_id);
       if (parent) {
         parent.replies.push(reply);
       }
     });
-    
+
     return Array.from(commentMap.values());
   };
 
@@ -477,7 +526,7 @@ const Community = () => {
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         p.title?.toLowerCase().includes(query) ||
         p.content?.toLowerCase().includes(query)
       );
@@ -485,7 +534,7 @@ const Community = () => {
 
     // Filter by selected tags
     if (selectedTags.length > 0) {
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         selectedTags.some(tag => (p.tags || []).includes(tag))
       );
     }
@@ -495,7 +544,6 @@ const Community = () => {
       filtered = filtered.filter(
         (p) =>
           p.category === categoryFilter ||
-          // Support legacy posts that used singular "question" as category
           (categoryFilter === "questions" && p.category === "question")
       );
     }
@@ -505,13 +553,21 @@ const Community = () => {
       switch (sortBy) {
         case "most_commented":
           return (comments[b.id]?.length || 0) - (comments[a.id]?.length || 0);
-        case "needs_feedback":
+        case "needs_feedback": {
           const aHasComments = (comments[a.id]?.length || 0) > 0;
           const bHasComments = (comments[b.id]?.length || 0) > 0;
           if (aHasComments === bHasComments) {
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
           }
           return aHasComments ? 1 : -1;
+        }
+        case "trending": {
+          // Sort by likes count (most liked first), then recency
+          const aLikes = a.likes_count ?? a.likes ?? 0;
+          const bLikes = b.likes_count ?? b.likes ?? 0;
+          if (bLikes !== aLikes) return bLikes - aLikes;
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        }
         case "latest":
         default:
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -523,7 +579,6 @@ const Community = () => {
 
   const handleNavigateToPost = (postId: string) => {
     setExpandedPosts(prev => ({ ...prev, [postId]: true }));
-    // Scroll to post
     setTimeout(() => {
       const element = document.getElementById(`post-${postId}`);
       element?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -534,37 +589,60 @@ const Community = () => {
 
   const filteredPosts = getFilteredAndSortedPosts();
   const needsFeedbackCount = posts.filter(p => (comments[p.id]?.length || 0) === 0).length;
+  const unansweredPrayers = posts.filter(p => p.category === "prayer" && (comments[p.id]?.length || 0) === 0).length;
+  const unansweredQuestions = posts.filter(p => (p.category === "questions" || p.category === "question") && (comments[p.id]?.length || 0) === 0).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Background gradient orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 right-10 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-1/3 w-72 h-72 bg-amber-500/5 rounded-full blur-3xl" />
+      </div>
+
       <Navigation />
       {user && <CommunityGuidelines userId={user.id} />}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-5xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-accent/10 to-background p-8 border">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+          {/* Header — Palace Lounge */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-purple-500/10 to-amber-500/10 p-8 border border-border/50 backdrop-blur-sm">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
             <div className="relative z-10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <img 
-                    src="/pwa-192x192.png" 
-                    alt="Phototheology" 
+                  <img
+                    src="/pwa-192x192.png"
+                    alt="Phototheology"
                     className="h-14 w-14 rounded-xl shadow-lg shadow-primary/20"
                   />
                   <div>
                     <h1 className="text-5xl font-bold flex items-center gap-3 mb-2">
                       <Sparkles className="h-10 w-10 text-primary" />
-                      {t('community.title')}
+                      The Palace Lounge
                     </h1>
                   <p className="text-muted-foreground text-lg">
-                    {t('community.description')}
+                    Where iron sharpens iron
                   </p>
-                  <div className="flex items-center gap-2 mt-3">
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
                     {needsFeedbackCount > 0 && (
                       <Badge variant="secondary" className="flex items-center gap-1">
                         <Sparkles className="h-3 w-3" />
                         {t('community.postsNeedFeedback', { count: needsFeedbackCount })}
+                      </Badge>
+                    )}
+                    {unansweredPrayers > 0 && (
+                      <Badge variant="outline" className="flex items-center gap-1 border-purple-400/40 text-purple-500 bg-purple-500/5">
+                        <span className="text-xs">{"\uD83D\uDD6F"}</span>
+                        {unansweredPrayers} unanswered {unansweredPrayers === 1 ? "prayer" : "prayers"}
+                      </Badge>
+                    )}
+                    {unansweredQuestions > 0 && (
+                      <Badge variant="outline" className="flex items-center gap-1 border-amber-400/40 text-amber-500 bg-amber-500/5">
+                        <span className="text-xs">{"\uD83D\uDC8E"}</span>
+                        {unansweredQuestions} unanswered {unansweredQuestions === 1 ? "question" : "questions"}
                       </Badge>
                     )}
                     <Badge variant="outline" className="flex items-center gap-1">
@@ -576,8 +654,8 @@ const Community = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   {user && (
-                    <CommunityNotifications 
-                      userId={user.id} 
+                    <CommunityNotifications
+                      userId={user.id}
                       onNavigateToPost={handleNavigateToPost}
                     />
                   )}
@@ -585,8 +663,6 @@ const Community = () => {
                     onClick={() => {
                       const next = !showNewPost;
                       setShowNewPost(next);
-
-                      // When opening the form, align the default category with the current filter
                       if (next) {
                         setNewCategory(
                           categoryFilter === "all" ? "general" : categoryFilter
@@ -604,6 +680,9 @@ const Community = () => {
             </div>
           </div>
 
+          {/* Quick Post Bar */}
+          <QuickPostBar onQuickPost={handleQuickPost} />
+
           {/* Search & Tags */}
           <CommunitySearch
             onSearch={setSearchQuery}
@@ -614,7 +693,7 @@ const Community = () => {
 
           {/* Who's Online Section */}
           {activeUsers.length > 0 && (
-            <Card className="border-primary/20">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
@@ -633,7 +712,7 @@ const Community = () => {
                     <button
                       key={activeUser.id}
                       onClick={() => {
-                        if (isCurrentUser) return; // Prevent clicking on own profile
+                        if (isCurrentUser) return;
                         window.dispatchEvent(
                           new CustomEvent('open-chat-sidebar', {
                             detail: { userId: activeUser.id }
@@ -645,8 +724,8 @@ const Community = () => {
                         });
                       }}
                       className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all duration-300 border border-primary/10 ${
-                        isCurrentUser 
-                          ? 'bg-primary/20 cursor-default' 
+                        isCurrentUser
+                          ? 'bg-primary/20 cursor-default'
                           : 'bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 cursor-pointer'
                       }`}
                     >
@@ -656,8 +735,8 @@ const Community = () => {
                           {(activeUser.display_name || activeUser.username).charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <UserMasterySword 
-                        masterTitle={activeUser.master_title} 
+                      <UserMasterySword
+                        masterTitle={activeUser.master_title}
                         currentFloor={activeUser.current_floor}
                         size="sm"
                         isOwner={activeUser.id === 'a0e64f17-c9f0-4f71-ac72-d1ca52c8b99b'}
@@ -674,8 +753,14 @@ const Community = () => {
             </Card>
           )}
 
+          {/* Daily Challenge Banner */}
+          <DailyChallengeBanner />
+
+          {/* Weekly Spotlight */}
+          <WeeklySpotlight />
+
           {showNewPost && (
-            <Card className="border-primary/20 shadow-lg">
+            <Card className="border-primary/20 shadow-lg bg-card/60 backdrop-blur-sm">
               <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
@@ -719,7 +804,7 @@ const Community = () => {
                     <p className="text-xs text-muted-foreground">
                       {newContent.length}/10,000 characters
                     </p>
-                    <EmojiPicker 
+                    <EmojiPicker
                       onEmojiSelect={(emoji) => setNewContent(newContent + emoji)}
                     />
                   </div>
@@ -738,7 +823,7 @@ const Community = () => {
           )}
 
           {/* Filters and Sort */}
-          <Card className="border-primary/20">
+          <Card className="border-primary/20 bg-card/40 backdrop-blur-md border-border/40">
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -763,6 +848,12 @@ const Community = () => {
                       <SelectItem value="latest">{t('community.sortLatestFirst')}</SelectItem>
                       <SelectItem value="most_commented">{t('community.sortMostCommented')}</SelectItem>
                       <SelectItem value="needs_feedback">{t('community.sortNeedsFeedback')}</SelectItem>
+                      <SelectItem value="trending">
+                        <span className="flex items-center gap-1">
+                          <TrendingUp className="h-3 w-3" />
+                          Trending
+                        </span>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -773,7 +864,7 @@ const Community = () => {
           {/* Posts List */}
           <div className="space-y-3">
             {filteredPosts.length === 0 ? (
-              <Card className="border-dashed">
+              <Card className="border-dashed bg-card/60 backdrop-blur-sm">
                 <CardContent className="pt-12 pb-12 text-center">
                   <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <p className="text-lg font-medium mb-2">{t('community.noPostsYet')}</p>
@@ -846,14 +937,22 @@ const Community = () => {
                         commentCount={postComments.length}
                         currentUserId={user?.id}
                         isExpanded={isExpanded}
+                        isLiked={likedPostIds.has(post.id)}
                         onExpand={() =>
                           setExpandedPosts({
                             ...expandedPosts,
                             [post.id]: !isExpanded,
                           })
                         }
+                        onLike={() => handleLikePost(post.id)}
                         onEdit={() => startEditPost(post)}
                         onDelete={() => deletePost(post.id)}
+                        authorBadge={{
+                          masterTitle: post.profiles?.master_title,
+                          currentFloor: post.profiles?.current_floor,
+                          streakDays: post.profiles?.daily_study_streak,
+                        }}
+                        firstReply={firstComments[post.id] || null}
                       >
                     {/* Comments Section */}
                     {postComments.length > 0 && (
@@ -892,6 +991,11 @@ const Community = () => {
                                         day: "numeric",
                                       })}
                                     </span>
+                                    {comment.replies && comment.replies.length >= 2 && (
+                                      <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-primary/30 text-primary/70">
+                                        Sparked {comment.replies.length} replies
+                                      </Badge>
+                                    )}
                                   </div>
                                   {editingComment === comment.id ? (
                                     <div className="space-y-2">
@@ -1123,7 +1227,7 @@ const Community = () => {
                                       })
                                     }
                                   >
-                                    ✕
+                                    {"\u2715"}
                                   </Button>
                                 </div>
                               </div>
@@ -1173,7 +1277,7 @@ const Community = () => {
           </div>
 
           {posts.length === 0 && !showNewPost && (
-            <Card className="text-center py-16 border-dashed">
+            <Card className="text-center py-16 border-dashed bg-card/60 backdrop-blur-sm">
               <CardContent>
                 <MessageSquare className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{t('community.noPostsYet')}</h3>

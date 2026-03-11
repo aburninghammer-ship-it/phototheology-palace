@@ -426,7 +426,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   };
 
   return (
-    <Card className="sticky top-24 shadow-elegant animate-scale-in">
+    <Card className="sticky top-24 shadow-elegant animate-scale-in max-h-[calc(100vh-8rem)] overflow-y-auto">
       <CardHeader className="gradient-ocean text-white">
         <div className="flex items-start justify-between">
           <div>
@@ -444,7 +444,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         </div>
       </CardHeader>
 
-      <CardContent className="pt-6 overflow-hidden">
+      <CardContent className="p-6">
         <div className="space-y-4">
           {/* Dimension Filter */}
           <DimensionFilter
@@ -576,7 +576,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
           {analysisMode === "applied" && (
             <div>
               <h4 className="text-sm font-semibold mb-3">Select Analysis Lenses:</h4>
-              <ScrollArea className="h-[300px]">
+              <ScrollArea className="max-h-[40vh]">
                 <div className="space-y-2 pr-4">
                   {PRINCIPLE_OPTIONS.map((option) => (
                     <label
@@ -691,7 +691,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         </div>
 
         {commentary && (
-          <ScrollArea className="h-[500px] mt-4">
+          <ScrollArea className="max-h-[60vh] mt-4">
             <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border-2 border-primary/20 shadow-lg">
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-primary/10 flex-wrap gap-2">
                 <div className="flex items-center gap-2">
@@ -709,7 +709,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                 )}
               </div>
 
-              <div className="space-y-6 break-words overflow-hidden">
+              <div className="space-y-6 break-words overflow-x-hidden">
                 {parseRoomInsights(commentary).map((room, idx) => (
                   <RoomInsightChat
                     key={idx}
