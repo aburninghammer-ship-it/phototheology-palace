@@ -912,6 +912,9 @@ export const Navigation = () => {
       {/* Return to Path Banner - appears when user has active path */}
       {user && <ReturnToPathBanner />}
       
+      {/* Global rotating study/encouragement banner */}
+      {user && <GlobalStudyBanner />}
+      
       {/* Spacer div - matches the actual fixed header height */}
       <div aria-hidden style={{ height: headerHeight }} />
     </>
