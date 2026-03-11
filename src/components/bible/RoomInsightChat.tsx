@@ -310,7 +310,7 @@ export const RoomInsightChat = ({
 
         {/* Content display - use special formatting for classic commentaries */}
         {isClassicCommentary ? (
-          <div className="bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10 rounded-lg p-5 border border-amber-200/50 dark:border-amber-800/30 shadow-sm">
+          <div className="bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10 rounded-lg p-4 border border-amber-200/50 dark:border-amber-800/30 shadow-sm break-words overflow-hidden">
             <Quote className="h-8 w-8 text-amber-400/40 mb-3 -ml-1" />
             {formatClassicCommentary(roomContent)}
           </div>
