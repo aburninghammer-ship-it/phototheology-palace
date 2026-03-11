@@ -909,8 +909,7 @@ export const Navigation = () => {
           )}
         </div>
         
-        {/* Return to Path Banner - appears when user has active path */}
-        {user && <ReturnToPathBanner />}
+        {/* Global profile banner with rotating prompts */}
         
         {/* Global rotating study/encouragement banner */}
         {user && <GlobalStudyBanner />}
