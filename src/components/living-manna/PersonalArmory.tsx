@@ -39,7 +39,7 @@ export function PersonalArmory({ avatarId, avatarName, onBack }: PersonalArmoryP
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("war_college_weapons")
         .select("*")
         .eq("user_id", user.id)

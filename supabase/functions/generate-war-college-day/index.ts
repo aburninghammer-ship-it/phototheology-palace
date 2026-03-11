@@ -97,6 +97,7 @@ serve(async (req) => {
     const { avatarId, avatarName, trackTitle, dayNumber, rank, weekNumber, readingLevel } = await req.json();
     const isHighSchool = readingLevel === "high-school";
     const cacheAvatarId = isHighSchool ? `${avatarId}__simplified` : avatarId;
+    console.log(`Request: avatar=${avatarId}, day=${dayNumber}, readingLevel=${readingLevel || "scholar"}, cacheKey=${cacheAvatarId}`);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");

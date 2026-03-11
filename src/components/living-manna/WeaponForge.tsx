@@ -50,7 +50,7 @@ export function WeaponForge({
   useEffect(() => {
     if (!user) { setChecking(false); return; }
     (async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("war_college_weapons")
         .select("weapon_text, score, sharpening_history")
         .eq("user_id", user.id)
@@ -58,13 +58,13 @@ export function WeaponForge({
         .eq("day_number", dayNumber)
         .maybeSingle();
 
-      if (data && data.score >= 9) {
-        setForgedWeapon({ text: data.weapon_text, score: data.score });
-        setHistory((data.sharpening_history as unknown as SharpeningEntry[]) || []);
+      if (data && (data as any).score >= 9) {
+        setForgedWeapon({ text: (data as any).weapon_text, score: (data as any).score });
+        setHistory(((data as any).sharpening_history as unknown as SharpeningEntry[]) || []);
         setForged(true);
       } else if (data) {
-        setDraft(data.weapon_text);
-        setHistory((data.sharpening_history as unknown as SharpeningEntry[]) || []);
+        setDraft((data as any).weapon_text);
+        setHistory(((data as any).sharpening_history as unknown as SharpeningEntry[]) || []);
       }
       setChecking(false);
     })();
@@ -148,7 +148,7 @@ ${draft}`;
 
       // If score >= 9, save to DB
       if (parsed.score >= 9) {
-        await supabase.from("war_college_weapons").upsert({
+        await (supabase as any).from("war_college_weapons").upsert({
           user_id: user.id,
           avatar_id: avatarId,
           day_number: dayNumber,
@@ -160,7 +160,7 @@ ${draft}`;
         setForged(true);
       } else {
         // Save progress even if not yet forged
-        await supabase.from("war_college_weapons").upsert({
+        await (supabase as any).from("war_college_weapons").upsert({
           user_id: user.id,
           avatar_id: avatarId,
           day_number: dayNumber,
