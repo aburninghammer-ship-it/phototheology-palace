@@ -219,17 +219,17 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
         </div>
 
         {/* Stats chips */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2.5 flex-shrink-0">
           <div className="flex items-center gap-1 text-xs text-muted-foreground" title="XP">
             <Zap className="h-3.5 w-3.5 text-amber-500" />
             <span className="font-medium text-foreground">{stats.totalXp.toLocaleString()}</span>
           </div>
-          <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground" title="Gems">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground" title="Gems">
             <Gem className="h-3.5 w-3.5 text-cyan-500" />
             <span className="font-medium text-foreground">{stats.gemsCount}</span>
           </div>
           {stats.currentStreak > 0 && (
-            <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground" title="Streak">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground" title="Streak">
               <Flame className="h-3.5 w-3.5 text-orange-500" />
               <span className="font-medium text-foreground">{stats.currentStreak}d</span>
             </div>
