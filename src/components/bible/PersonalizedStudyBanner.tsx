@@ -243,8 +243,8 @@ export function PersonalizedStudyBanner() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         {/* Identity Cluster */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="relative">
-            <Avatar className="h-11 w-11 ring-2 ring-primary/30 shadow-lg">
+          <Link to={`/user/${user.id}`} className="relative block">
+            <Avatar className="h-11 w-11 ring-2 ring-primary/30 shadow-lg cursor-pointer hover:ring-primary/60 transition-all">
               <AvatarImage src={stats.avatarUrl || undefined} />
               <AvatarFallback className="bg-primary/20 text-primary font-bold text-lg">
                 {stats.displayName.charAt(0).toUpperCase()}
@@ -255,11 +255,14 @@ export function PersonalizedStudyBanner() {
                 {stats.streak}
               </div>
             )}
-          </div>
+          </Link>
           <div className="min-w-0">
-            <p className="font-semibold text-sm text-foreground truncate">
+            <Link
+              to={`/user/${user.id}`}
+              className="font-semibold text-sm text-foreground truncate hover:text-primary transition-colors cursor-pointer block"
+            >
               {stats.displayName.split(" ")[0]}
-            </p>
+            </Link>
             <div className="flex items-center gap-2 flex-wrap">
               <Badge className={`${belt.bg} ${belt.text} text-[10px] capitalize border-0 shadow-sm ${belt.glow}`}>
                 <Crown className="h-2.5 w-2.5 mr-1" />
