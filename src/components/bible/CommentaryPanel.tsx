@@ -444,7 +444,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         </div>
       </CardHeader>
 
-      <CardContent className="pt-6">
+      <CardContent className="pt-6 overflow-hidden">
         <div className="space-y-4">
           {/* Dimension Filter */}
           <DimensionFilter
@@ -465,7 +465,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   setAnalysisMode("revealed");
                   setCommentary(null);
                 }}
-                className="flex-1 min-w-[120px]"
+                className="flex-1 min-w-[80px]"
                 size="sm"
               >
                 Revealed
@@ -476,7 +476,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   setAnalysisMode("applied");
                   setCommentary(null);
                 }}
-                className="flex-1 min-w-[120px]"
+                className="flex-1 min-w-[80px]"
                 size="sm"
               >
                 Applied
@@ -487,7 +487,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   setAnalysisMode("deep-palace");
                   setCommentary(null);
                 }}
-                className="flex-1 min-w-[120px] gradient-palace text-white"
+                className="flex-1 min-w-[80px] gradient-palace text-white"
                 size="sm"
               >
                 <Crown className="h-3 w-3 mr-1" />
@@ -646,9 +646,9 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
                 )}
               </h4>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2">
                 <Select value={selectedCommentary} onValueChange={setSelectedCommentary}>
-                  <SelectTrigger className="flex-1">
+                  <SelectTrigger className="w-full min-w-0">
                     <SelectValue placeholder="Select a commentary" />
                   </SelectTrigger>
                   <SelectContent>
@@ -676,14 +676,14 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   onClick={() => generateCommentary(false, true)}
                   disabled={loading}
                   variant="outline"
-                  className="whitespace-nowrap"
+                  className="w-full whitespace-nowrap"
                 >
                   {loading ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
                     <BookOpen className="h-4 w-4 mr-2" />
                   )}
-                  Load
+                  Load Commentary
                 </Button>
               </div>
             </div>
@@ -692,11 +692,11 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
 
         {commentary && (
           <ScrollArea className="h-[500px] mt-4">
-            <div className="p-6 rounded-lg bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border-2 border-primary/20 shadow-lg">
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-primary/10">
+            <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border-2 border-primary/20 shadow-lg">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-primary/10 flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-                  <span className="font-bold text-lg bg-gradient-palace bg-clip-text text-transparent">Room Insights</span>
+                  <span className="font-bold text-base bg-gradient-palace bg-clip-text text-transparent">Room Insights</span>
                 </div>
                 {usedPrinciples.length > 0 && (
                   <div className="flex gap-1 flex-wrap">
@@ -709,7 +709,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                 )}
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 break-words overflow-hidden">
                 {parseRoomInsights(commentary).map((room, idx) => (
                   <RoomInsightChat
                     key={idx}
