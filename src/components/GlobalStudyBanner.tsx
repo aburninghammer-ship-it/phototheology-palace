@@ -13,6 +13,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  XpPopover, GemsPopover, RoomsPopover,
+  ChaptersPopover, FloorsPopover, StreakPopover
+} from "@/components/banner/StatPopovers";
+import { StudyHealthRing } from "@/components/banner/StudyHealthRing";
+import { MissionDropdown } from "@/components/banner/MissionDropdown";
+import { AccountabilityBar } from "@/components/banner/AccountabilityBar";
 
 interface DailyPrompt {
   category: "motivation" | "action" | "spiritual" | "try_this";
@@ -24,7 +31,6 @@ interface DailyPrompt {
 }
 
 const ALL_PROMPTS: DailyPrompt[] = [
-  // 🔥 Motivation — amber accent
   { category: "motivation", icon: <Flame className="h-3.5 w-3.5" />, label: "Daily Fire",
     text: "Every chapter hides Christ. Don't close the Book until you've found Him.", actionLabel: "Palace", actionLink: "/palace" },
   { category: "motivation", icon: <Crown className="h-3.5 w-3.5" />, label: "Rise Up",
@@ -38,7 +44,6 @@ const ALL_PROMPTS: DailyPrompt[] = [
   { category: "motivation", icon: <Crown className="h-3.5 w-3.5" />, label: "Warrior",
     text: "The Word is your sword and your shield. Every session sharpens it. Stay in the fight." },
 
-  // 🎯 Action — blue accent
   { category: "action", icon: <Eye className="h-3.5 w-3.5" />, label: "Detective Drill",
     text: "Pick any passage — write 20 observations without commentary. Train your eye like a detective.", actionLabel: "Start", actionLink: "/palace" },
   { category: "action", icon: <Target className="h-3.5 w-3.5" />, label: "Speed Drill",
@@ -50,7 +55,6 @@ const ALL_PROMPTS: DailyPrompt[] = [
   { category: "action", icon: <Target className="h-3.5 w-3.5" />, label: "Juice Drill",
     text: "Take one book — run it through every PT room: story, observation, concentration, prophecy, cycle. Squeeze it dry.", actionLabel: "Palace", actionLink: "/palace" },
 
-  // 💜 Spiritual — purple accent
   { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Fire Room",
     text: "Read Isaiah 53 slowly. Pause after every verse. Pray until it pierces.", actionLabel: "Read", actionLink: "/bible?book=Isaiah&chapter=53" },
   { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Meditate",
@@ -62,7 +66,6 @@ const ALL_PROMPTS: DailyPrompt[] = [
   { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Calvary",
     text: "Stand beneath the cross. Hear the mocking crowd. See the sky darken. Feel the ground tremble. He did this for you.", actionLabel: "John 19", actionLink: "/bible?book=John&chapter=19" },
 
-  // 💡 Try This — green accent
   { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Try This",
     text: "Map Daniel 2 → 7 → 8. See how each prophecy 'enlarges' the last — like constellations aligning.", actionLabel: "Daniel 2", actionLink: "/bible?book=Daniel&chapter=2" },
   { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Try This",
@@ -86,6 +89,14 @@ const CATEGORY_STYLES: Record<string, { accent: string; iconColor: string; badge
 
 const ROTATE_INTERVAL_MS = 10 * 60 * 1000;
 
+// ─── Behavioral Nudge Messages ──────────────────────────────
+const NUDGE_MESSAGES: Record<string, string> = {
+  inactive_3d: "Your Palace misses you. Come back and build.",
+  streak_14: "Consistency is becoming identity.",
+  streak_30: "You're not just studying — you're being transformed.",
+  first_visit: "Welcome to the Palace. Your journey begins now.",
+};
+
 interface UserStats {
   displayName: string;
   avatarUrl: string | null;
@@ -96,6 +107,7 @@ interface UserStats {
   roomsExplored: number;
   chaptersRead: number;
   floorsUnlocked: number;
+  lastActivityDaysAgo: number;
 }
 
 interface GlobalStudyBannerProps {
@@ -114,25 +126,35 @@ function useUserBannerStats(userId: string | null, fallbackDisplayName: string) 
     roomsExplored: 0,
     chaptersRead: 0,
     floorsUnlocked: 1,
+    lastActivityDaysAgo: 0,
   });
 
   useEffect(() => {
     if (!userId) return;
 
     const load = async () => {
-      const [profileRes, streakRes, progressRes, gemsRes, roomsRes, readingRes, floorsRes] = await Promise.all([
+      const [profileRes, streakRes, progressRes, gemsRes, roomsRes, readingRes, floorsRes, masteryStreakRes] = await Promise.all([
         supabase.from("profiles").select("display_name, avatar_url, master_title, level, points").eq("id", userId).maybeSingle(),
-        (supabase as any).from("mastery_streaks").select("current_streak").eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("mastery_streaks").select("current_streak, last_activity_date").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("palace_progress").select("total_xp, master_title").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", userId),
         (supabase as any).from("room_mastery_levels").select("room_id", { count: "exact", head: true }).eq("user_id", userId),
         (supabase as any).from("reading_streaks").select("total_chapters_read").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("user_floor_progress").select("floor_number", { count: "exact", head: true }).eq("user_id", userId).eq("is_unlocked", true),
+        (supabase as any).from("mastery_streaks").select("last_activity_date").eq("user_id", userId).maybeSingle(),
       ]);
 
       const profileTitle = profileRes.data?.master_title;
       const palaceTitle = progressRes.data?.master_title;
       const totalXp = progressRes.data?.total_xp || profileRes.data?.points || 0;
+
+      // Calculate days since last activity
+      let lastActivityDaysAgo = 0;
+      const lastDate = masteryStreakRes.data?.last_activity_date;
+      if (lastDate) {
+        const diff = Date.now() - new Date(lastDate).getTime();
+        lastActivityDaysAgo = Math.floor(diff / (1000 * 60 * 60 * 24));
+      }
 
       setStats({
         displayName: profileRes.data?.display_name || fallbackDisplayName,
@@ -144,6 +166,7 @@ function useUserBannerStats(userId: string | null, fallbackDisplayName: string) 
         roomsExplored: roomsRes.count || 0,
         chaptersRead: readingRes.data?.total_chapters_read || 0,
         floorsUnlocked: floorsRes.count || 1,
+        lastActivityDaysAgo,
       });
     };
 
@@ -151,15 +174,6 @@ function useUserBannerStats(userId: string | null, fallbackDisplayName: string) 
   }, [userId, fallbackDisplayName]);
 
   return stats;
-}
-
-function getStreakMessage(streak: number): string | null {
-  if (streak >= 30) return `🔥 ${streak}-day streak — you're on fire!`;
-  if (streak >= 14) return `⚡ ${streak}-day streak — unstoppable momentum!`;
-  if (streak >= 7) return `✨ ${streak}-day streak — building momentum!`;
-  if (streak >= 3) return `🌱 ${streak}-day streak — keep it growing!`;
-  if (streak === 1) return `👣 Day 1 — every palace starts with one brick.`;
-  return null;
 }
 
 function getXpRank(xp: number): { label: string; color: string } {
@@ -185,6 +199,14 @@ function getTitleBadgeStyle(title: string | null): string {
   return "bg-primary/20 text-primary shadow-[0_0_8px_hsl(var(--primary)/0.3)]";
 }
 
+function getBehavioralNudge(stats: UserStats): string | null {
+  if (stats.lastActivityDaysAgo >= 3) return NUDGE_MESSAGES.inactive_3d;
+  if (stats.currentStreak >= 30) return NUDGE_MESSAGES.streak_30;
+  if (stats.currentStreak >= 14) return NUDGE_MESSAGES.streak_14;
+  if (stats.totalXp === 0) return NUDGE_MESSAGES.first_visit;
+  return null;
+}
+
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
   const { user: authUser } = useAuth();
   const resolvedUserId = userId ?? authUser?.id ?? null;
@@ -194,6 +216,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const [promptIdx, setPromptIdx] = useState(() =>
     Math.floor(Date.now() / ROTATE_INTERVAL_MS) % ALL_PROMPTS.length
   );
+  const [xpFlash, setXpFlash] = useState(false);
   const stats = useUserBannerStats(resolvedUserId, fallbackDisplayName);
 
   useEffect(() => {
@@ -202,6 +225,16 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
     }, ROTATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, []);
+
+  // Micro-animation: XP flash when totalXp changes
+  const [prevXp, setPrevXp] = useState(0);
+  useEffect(() => {
+    if (stats.totalXp > prevXp && prevXp > 0) {
+      setXpFlash(true);
+      setTimeout(() => setXpFlash(false), 1200);
+    }
+    setPrevXp(stats.totalXp);
+  }, [stats.totalXp]);
 
   const shuffle = useCallback(() => {
     setPromptIdx(prev => (prev + 1) % ALL_PROMPTS.length);
@@ -212,75 +245,104 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const prompt = ALL_PROMPTS[promptIdx];
   const style = CATEGORY_STYLES[prompt.category];
   const rank = getXpRank(stats.totalXp);
-  const streakMsg = getStreakMessage(stats.currentStreak);
   const initials = (stats.displayName || fallbackDisplayName).slice(0, 2).toUpperCase();
   const displayTitle = stats.masterTitle || rank.label;
   const titleBadgeStyle = stats.masterTitle ? getTitleBadgeStyle(stats.masterTitle) : rank.color;
+  const nudge = getBehavioralNudge(stats);
+  const isInactive = stats.lastActivityDaysAgo >= 3;
 
   return (
-    <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5">
-      {/* Row 1: Identity + Stats — colored gradient background */}
-      <div className="rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
-        {/* Avatar */}
+    <div className={cn(
+      "mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5 transition-opacity duration-700",
+      isInactive && "opacity-80"
+    )}>
+      {/* Nudge bar */}
+      <AnimatePresence>
+        {nudge && !dismissed && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className={cn(
+              "rounded-lg px-3 py-1.5 text-center text-xs font-medium",
+              isInactive
+                ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+            )}>
+              {nudge}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Row 1: Identity + Clickable Stats + Health Ring + Accountability */}
+      <div className={cn(
+        "rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)] transition-all duration-500",
+        xpFlash && "shadow-[0_0_30px_rgba(234,179,8,0.25)]"
+      )}>
+        {/* Avatar with Health Ring */}
         <Link to="/profile" className="flex-shrink-0">
-          <Avatar className="h-10 w-10 ring-2 ring-blue-400/40 shadow-[0_0_8px_rgba(59,130,246,0.25)]">
-            <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
-            <AvatarFallback className="text-xs bg-blue-500/20 text-blue-300 font-bold">{initials}</AvatarFallback>
-          </Avatar>
+          <StudyHealthRing
+            roomsExplored={stats.roomsExplored}
+            chaptersRead={stats.chaptersRead}
+            currentStreak={stats.currentStreak}
+            totalXp={stats.totalXp}
+            gemsCount={stats.gemsCount}
+          >
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
+              <AvatarFallback className="text-xs bg-blue-500/20 text-blue-300 font-bold">{initials}</AvatarFallback>
+            </Avatar>
+          </StudyHealthRing>
         </Link>
 
-        {/* Name + rank + streak */}
+        {/* Name (clickable → Mission Dropdown) + rank */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none">
-              {stats.displayName}
-            </span>
+            <MissionDropdown displayName={stats.displayName}>
+              <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none hover:text-blue-300 transition-colors">
+                {stats.displayName}
+              </span>
+            </MissionDropdown>
             <Badge className={cn("text-[10px] border-0 font-bold uppercase tracking-wider px-2", titleBadgeStyle)}>
               {displayTitle}
             </Badge>
           </div>
-          {streakMsg && (
-            <p className="text-[10px] text-blue-300/70 flex items-center gap-1 mt-0.5">
-              <TrendingUp className="h-2.5 w-2.5" />
-              {streakMsg}
-            </p>
-          )}
+          {/* Accountability indicators */}
+          <div className="mt-0.5">
+            <AccountabilityBar
+              currentStreak={stats.currentStreak}
+              chaptersRead={stats.chaptersRead}
+              roomsExplored={stats.roomsExplored}
+            />
+          </div>
         </div>
 
-        {/* Stats chips — labeled with words */}
-        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0 flex-wrap justify-end">
-          <div className="flex items-center gap-1.5 text-xs" title="Total XP earned">
-            <Zap className="h-3.5 w-3.5 text-amber-400" />
-            <span className="font-semibold text-foreground">{stats.totalXp.toLocaleString()}</span>
-            <span className="text-[10px] text-muted-foreground hidden sm:inline">XP</span>
+        {/* Clickable Stats chips — each opens mini-dashboard */}
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap justify-end">
+          <motion.div animate={xpFlash ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.4 }}>
+            <XpPopover
+              totalXp={stats.totalXp}
+              roomsExplored={stats.roomsExplored}
+              chaptersRead={stats.chaptersRead}
+              currentStreak={stats.currentStreak}
+              gemsCount={stats.gemsCount}
+            />
+          </motion.div>
+
+          <GemsPopover gemsCount={stats.gemsCount} />
+          <RoomsPopover roomsExplored={stats.roomsExplored} />
+
+          <div className="hidden sm:block">
+            <ChaptersPopover chaptersRead={stats.chaptersRead} />
           </div>
-          <div className="flex items-center gap-1.5 text-xs" title="Gems Collected">
-            <Gem className="h-3.5 w-3.5 text-cyan-400" />
-            <span className="font-semibold text-foreground">{stats.gemsCount}</span>
-            <span className="text-[10px] text-muted-foreground hidden sm:inline">Gems</span>
+          <div className="hidden sm:block">
+            <FloorsPopover floorsUnlocked={stats.floorsUnlocked} />
           </div>
-          <div className="flex items-center gap-1.5 text-xs" title="Palace Rooms Explored">
-            <BookOpen className="h-3.5 w-3.5 text-emerald-400" />
-            <span className="font-semibold text-foreground">{stats.roomsExplored}</span>
-            <span className="text-[10px] text-muted-foreground hidden sm:inline">Rooms</span>
-          </div>
-          <div className="hidden sm:flex items-center gap-1.5 text-xs" title="Bible Chapters Read">
-            <Eye className="h-3.5 w-3.5 text-purple-400" />
-            <span className="font-semibold text-foreground">{stats.chaptersRead}</span>
-            <span className="text-[10px] text-muted-foreground">Chapters</span>
-          </div>
-          <div className="hidden sm:flex items-center gap-1.5 text-xs" title="Palace Floors Unlocked">
-            <Star className="h-3.5 w-3.5 text-yellow-400" />
-            <span className="font-semibold text-foreground">{stats.floorsUnlocked}/8</span>
-            <span className="text-[10px] text-muted-foreground">Floors</span>
-          </div>
-          {stats.currentStreak > 0 && (
-            <div className="flex items-center gap-1.5 text-xs" title="Study Streak">
-              <Flame className="h-3.5 w-3.5 text-orange-400" />
-              <span className="font-semibold text-foreground">{stats.currentStreak}d</span>
-              <span className="text-[10px] text-muted-foreground hidden sm:inline">Streak</span>
-            </div>
-          )}
+          
+          <StreakPopover currentStreak={stats.currentStreak} />
         </div>
       </div>
 
