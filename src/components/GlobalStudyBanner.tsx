@@ -155,7 +155,7 @@ function getXpRank(xp: number): { label: string; color: string } {
   if (xp >= 5000) return { label: "Scholar", color: "bg-purple-500/20 text-purple-400" };
   if (xp >= 2000) return { label: "Apprentice", color: "bg-blue-500/20 text-blue-400" };
   if (xp >= 500) return { label: "Student", color: "bg-emerald-500/20 text-emerald-400" };
-  return { label: "Beginner", color: "bg-muted text-muted-foreground" };
+  return { label: "Explorer", color: "bg-sky-500/20 text-sky-400" };
 }
 
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
