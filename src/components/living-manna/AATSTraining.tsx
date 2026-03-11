@@ -423,6 +423,25 @@ export function AATSTraining({ churchId, onNavigateToDefense, initialAvatarId }:
             toast({ title: `Day ${phaseManuscript.dayNumber} Complete! 🎓` });
           }}
           isCompleted={isItemCompleted(selectedTraining.avatarId, `wc-day-${phaseManuscript.dayNumber}`)}
+          avatarId={selectedTraining.avatarId}
+          onLoadAlternateLevel={async (level) => {
+            const trackTitle = WAR_COLLEGE_TRACKS.find(t => t.avatarId === selectedTraining.avatarId)?.title
+              || `${selectedTraining.avatarName} Warfare`;
+            const { data, error } = await supabase.functions.invoke("generate-war-college-day", {
+              body: {
+                avatarId: selectedTraining.avatarId,
+                avatarName: selectedTraining.avatarName,
+                trackTitle,
+                dayNumber: phaseManuscript.dayNumber,
+                rank: getRankForDay(phaseManuscript.dayNumber),
+                weekNumber: Math.ceil(phaseManuscript.dayNumber / 7),
+                readingLevel: level,
+              },
+            });
+            if (error) throw error;
+            if (!data?.study) throw new Error("No study returned");
+            return data.study;
+          }}
         />
       );
     }

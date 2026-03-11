@@ -6,17 +6,17 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, BookOpen, Swords, Target, CheckCircle2,
-  ChevronDown, ChevronUp, Flame, Clock, Sparkles, Headphones,
+  Flame, Clock, Sparkles, Headphones,
   Loader2, GraduationCap,
 } from "lucide-react";
 import { AudioNarrator } from "@/components/audio/AudioNarrator";
 import { ManuscriptQA } from "./ManuscriptQA";
 import { ManuscriptQuiz } from "./ManuscriptQuiz";
+import { WeaponForge } from "./WeaponForge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
 import type { WarCollegeDay } from "@/data/aats/warCollegeTypes";
 import { RANK_CONFIG } from "@/data/aats/warCollegeTypes";
 import ReactMarkdown from "react-markdown";
@@ -27,6 +27,7 @@ interface WarCollegeReaderProps {
   onComplete?: () => void;
   isCompleted?: boolean;
   onLoadAlternateLevel?: (level: string) => Promise<WarCollegeDay>;
+  avatarId?: string;
 }
 
 export function WarCollegeReader({
@@ -35,9 +36,8 @@ export function WarCollegeReader({
   onComplete,
   isCompleted = false,
   onLoadAlternateLevel,
+  avatarId,
 }: WarCollegeReaderProps) {
-  const [showDrills, setShowDrills] = useState(false);
-  const [forgeResponse, setForgeResponse] = useState("");
   const [masteryAnswers, setMasteryAnswers] = useState<Record<number, boolean>>({});
   const [autoMarkedComplete, setAutoMarkedComplete] = useState(false);
 
@@ -285,137 +285,120 @@ export function WarCollegeReader({
         </div>
       )}
 
-      {/* ─── Post-Manuscript Tactical Section Toggle ─── */}
-      <div className="text-center">
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => setShowDrills(!showDrills)}
-          className="gap-2 border-primary/30"
-        >
-          {showDrills ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-          {showDrills ? "Hide" : "Open"} Post-Manuscript Drills
-          <Target className="h-4 w-4" />
-        </Button>
+      {/* ─── Post-Manuscript Training ─── */}
+      <div className="flex items-center gap-2 pt-2">
+        <Target className="h-5 w-5 text-primary" />
+        <h2 className="text-lg font-bold">Post-Manuscript Training</h2>
       </div>
 
-      {/* ─── Post-Manuscript Drills ─── */}
-      <AnimatePresence>
-        {showDrills && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="space-y-5 overflow-hidden"
-          >
-            {/* Defense Application */}
-            <Card className="border-red-500/20 bg-gradient-to-br from-red-500/5 to-transparent">
-              <CardContent className="p-5 space-y-3">
-                <h3 className="font-bold flex items-center gap-2 text-red-400">
-                  <Swords className="h-4 w-4" /> Defense Mode Application
-                </h3>
-                <div>
-                  <p className="text-xs uppercase text-muted-foreground font-semibold mb-1">
-                    Common Objection:
-                  </p>
-                  <p className="text-sm italic p-3 rounded-lg bg-red-500/5 border border-red-500/15">
-                    "{activeStudy.defenseApplication.commonObjection}"
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs uppercase text-muted-foreground font-semibold mb-1">
-                    Elite Strategic Response:
-                  </p>
-                  <p className="text-sm p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/15">
-                    "{activeStudy.defenseApplication.eliteResponse}"
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+      <div className="space-y-5">
+        {/* Defense Application */}
+        <Card className="border-red-500/20 bg-gradient-to-br from-red-500/5 to-transparent">
+          <CardContent className="p-5 space-y-3">
+            <h3 className="font-bold flex items-center gap-2 text-red-400">
+              <Swords className="h-4 w-4" /> Defense Mode Application
+            </h3>
+            <div>
+              <p className="text-xs uppercase text-muted-foreground font-semibold mb-1">
+                Common Objection:
+              </p>
+              <p className="text-sm italic p-3 rounded-lg bg-red-500/5 border border-red-500/15">
+                "{activeStudy.defenseApplication.commonObjection}"
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase text-muted-foreground font-semibold mb-1">
+                Elite Strategic Response:
+              </p>
+              <p className="text-sm p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/15">
+                "{activeStudy.defenseApplication.eliteResponse}"
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Forge Exercise */}
-            <Card className="border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-transparent">
-              <CardContent className="p-5 space-y-3">
-                <h3 className="font-bold flex items-center gap-2 text-amber-400">
-                  <Flame className="h-4 w-4" /> Forge a Weapon Exercise
-                </h3>
-                <p className="text-sm">{activeStudy.forgeExercise}</p>
-                <Textarea
-                  placeholder="Write your forged weapon here..."
-                  value={forgeResponse}
-                  onChange={(e) => setForgeResponse(e.target.value)}
-                  rows={5}
-                  className="bg-background/50"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Mastery Checks */}
-            <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent">
-              <CardContent className="p-5 space-y-3">
-                <h3 className="font-bold flex items-center gap-2 text-blue-400">
-                  <Target className="h-4 w-4" /> Mastery Check
-                </h3>
-                <div className="space-y-2">
-                  {activeStudy.masteryChecks.map((q, i) => (
-                    <button
-                      key={i}
-                      className="w-full text-left flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-all"
-                      onClick={() =>
-                        setMasteryAnswers((prev) => ({
-                          ...prev,
-                          [i]: !prev[i],
-                        }))
-                      }
-                    >
-                      <div
-                        className={`mt-0.5 ${
-                          masteryAnswers[i]
-                            ? "text-green-500"
-                            : "text-muted-foreground"
-                        }`}
-                      >
-                        {masteryAnswers[i] ? (
-                          <CheckCircle2 className="h-4 w-4" />
-                        ) : (
-                          <div className="h-4 w-4 rounded-full border-2 border-current" />
-                        )}
-                      </div>
-                      <p className="text-sm">{q}</p>
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Manuscript Quiz */}
-            <ManuscriptQuiz
-              key={readingLevel}
-              manuscript={activeStudy.manuscript}
-              dayNumber={activeStudy.dayNumber}
-              title={activeStudy.title}
-              track={activeStudy.track}
-              avatarName={activeStudy.avatarName}
-            />
-
-            {/* Tomorrow's Teaser */}
-            <Card className="border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-transparent">
-              <CardContent className="p-5 space-y-2">
-                <h3 className="font-bold flex items-center gap-2 text-violet-400">
-                  <Sparkles className="h-4 w-4" /> Tomorrow's Unlock
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {activeStudy.tomorrowTeaser}
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+        {/* Weapon Forge */}
+        {avatarId ? (
+          <WeaponForge
+            manuscript={activeStudy.manuscript}
+            forgeExercise={activeStudy.forgeExercise}
+            dayNumber={activeStudy.dayNumber}
+            avatarId={avatarId}
+            avatarName={activeStudy.avatarName}
+            track={activeStudy.track}
+            title={activeStudy.title}
+          />
+        ) : (
+          <Card className="border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-transparent">
+            <CardContent className="p-5 space-y-3">
+              <h3 className="font-bold flex items-center gap-2 text-amber-400">
+                <Flame className="h-4 w-4" /> Forge a Weapon Exercise
+              </h3>
+              <p className="text-sm">{activeStudy.forgeExercise}</p>
+            </CardContent>
+          </Card>
         )}
-      </AnimatePresence>
+
+        {/* Mastery Checks */}
+        <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent">
+          <CardContent className="p-5 space-y-3">
+            <h3 className="font-bold flex items-center gap-2 text-blue-400">
+              <Target className="h-4 w-4" /> Mastery Check
+            </h3>
+            <div className="space-y-2">
+              {activeStudy.masteryChecks.map((q, i) => (
+                <button
+                  key={i}
+                  className="w-full text-left flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-all"
+                  onClick={() =>
+                    setMasteryAnswers((prev) => ({
+                      ...prev,
+                      [i]: !prev[i],
+                    }))
+                  }
+                >
+                  <div
+                    className={`mt-0.5 ${
+                      masteryAnswers[i]
+                        ? "text-green-500"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {masteryAnswers[i] ? (
+                      <CheckCircle2 className="h-4 w-4" />
+                    ) : (
+                      <div className="h-4 w-4 rounded-full border-2 border-current" />
+                    )}
+                  </div>
+                  <p className="text-sm">{q}</p>
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Manuscript Quiz */}
+        <ManuscriptQuiz
+          key={readingLevel}
+          manuscript={activeStudy.manuscript}
+          dayNumber={activeStudy.dayNumber}
+          title={activeStudy.title}
+          track={activeStudy.track}
+          avatarName={activeStudy.avatarName}
+        />
+
+        {/* Tomorrow's Teaser */}
+        <Card className="border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-transparent">
+          <CardContent className="p-5 space-y-2">
+            <h3 className="font-bold flex items-center gap-2 text-violet-400">
+              <Sparkles className="h-4 w-4" /> Tomorrow's Unlock
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {activeStudy.tomorrowTeaser}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -18,6 +18,7 @@ import { useAATSProgress } from "@/hooks/useAATSProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { WarCollegeReader } from "./WarCollegeReader";
+import { PersonalArmory } from "./PersonalArmory";
 import {
   RANK_CONFIG,
   getRankForDay,
@@ -39,6 +40,7 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
   const { ensureEnrolled, completeItem, isItemCompleted, getMaxUnlockedDay } = useAATSProgress();
   const [selectedDay, setSelectedDay] = useState<WarCollegeDay | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [showArmory, setShowArmory] = useState(false);
   const opponent = DEFENSE_OPPONENTS.find((o) => o.id === track.avatarId);
 
   // Ensure enrollment record exists when the track view loads (starts the calendar)
@@ -130,6 +132,17 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
     toast({ title: `Day ${selectedDay.dayNumber} Complete! 🎓` });
   };
 
+  // ─── Personal Armory View ────────────────────────────────────────────────
+  if (showArmory) {
+    return (
+      <PersonalArmory
+        avatarId={track.avatarId}
+        avatarName={track.avatarName}
+        onBack={() => setShowArmory(false)}
+      />
+    );
+  }
+
   // ─── Day Reader View ─────────────────────────────────────────────────────
   if (selectedDay) {
     return (
@@ -139,6 +152,7 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
         onComplete={handleComplete}
         isCompleted={completedDays.has(selectedDay.dayNumber)}
         onLoadAlternateLevel={async (level) => loadDayStudy(selectedDay.dayNumber, undefined, level)}
+        avatarId={track.avatarId}
       />
     );
   }
@@ -168,6 +182,14 @@ export function WarCollegeTrackView({ track, onBack }: WarCollegeTrackViewProps)
             <p className="text-xs text-muted-foreground">{track.description}</p>
           </div>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowArmory(true)}
+          className="gap-2 border-amber-500/30 text-amber-400 hover:bg-amber-500/10 flex-shrink-0"
+        >
+          <Shield className="h-4 w-4" /> My Armory
+        </Button>
       </div>
 
       {/* Playlist visibility helper */}
