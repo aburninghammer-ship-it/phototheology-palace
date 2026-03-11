@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Building2, Columns2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen, Globe, Settings } from "lucide-react";
 import { DraggableNavTabs } from "@/components/navigation/DraggableNavTabs";
-import { GlobalStudyBanner } from "@/components/GlobalStudyBanner";
+
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -912,8 +912,7 @@ export const Navigation = () => {
         {/* Return to Path Banner - appears when user has active path */}
         {user && <ReturnToPathBanner />}
         
-        {/* Global rotating study/encouragement banner */}
-        {user && <GlobalStudyBanner />}
+        {/* GlobalStudyBanner moved to MemberProfileView */}
       </nav>
       
       {/* Spacer div - matches the actual fixed header height */}
