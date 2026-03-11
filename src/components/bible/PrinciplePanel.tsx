@@ -425,7 +425,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
   }
 
   return (
-    <Card className="lg:sticky lg:top-24 shadow-elegant hover:shadow-hover transition-smooth animate-scale-in max-h-[85vh] lg:max-h-none overflow-hidden flex flex-col">
+    <Card className="lg:sticky lg:top-24 shadow-elegant hover:shadow-hover transition-smooth animate-scale-in overflow-hidden flex flex-col">
       <CardHeader className="pb-2 sm:pb-4 flex-shrink-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
