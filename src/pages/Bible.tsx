@@ -14,6 +14,7 @@ import { OfflineIndicator } from "@/components/bible/OfflineIndicator";
 import { usePreservePage } from "@/hooks/usePreservePage";
 import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { PersonalizedStudyBanner } from "@/components/bible/PersonalizedStudyBanner";
 
 const Bible = () => {
   const { t } = useTranslation();
