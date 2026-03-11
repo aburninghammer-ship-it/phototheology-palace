@@ -912,7 +912,7 @@ export const Navigation = () => {
         {/* Global profile banner with rotating prompts */}
         
         {/* Global rotating study/encouragement banner */}
-        {user && <GlobalStudyBanner />}
+        {user && <GlobalStudyBanner userId={user.id} userEmail={user.email ?? null} />}
       </nav>
       
       {/* Spacer div - matches the actual fixed header height */}
