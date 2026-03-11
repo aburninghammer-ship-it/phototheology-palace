@@ -115,19 +115,23 @@ function useUserBannerStats(userId: string | null, fallbackDisplayName: string) 
 
     const load = async () => {
       const [profileRes, streakRes, progressRes, gemsRes] = await Promise.all([
-        supabase.from("profiles").select("display_name, avatar_url").eq("id", userId).maybeSingle(),
+        supabase.from("profiles").select("display_name, avatar_url, master_title, level, points").eq("id", userId).maybeSingle(),
         (supabase as any).from("mastery_streaks").select("current_streak").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("palace_progress").select("total_xp, master_title").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", userId),
       ]);
 
+      const profileTitle = profileRes.data?.master_title;
+      const palaceTitle = progressRes.data?.master_title;
+      const totalXp = progressRes.data?.total_xp || profileRes.data?.points || 0;
+
       setStats({
         displayName: profileRes.data?.display_name || fallbackDisplayName,
         avatarUrl: profileRes.data?.avatar_url || null,
         currentStreak: streakRes.data?.current_streak || 0,
-        totalXp: progressRes.data?.total_xp || 0,
+        totalXp,
         gemsCount: gemsRes.count || 0,
-        masterTitle: progressRes.data?.master_title || null,
+        masterTitle: palaceTitle || profileTitle || null,
       });
     };
 
