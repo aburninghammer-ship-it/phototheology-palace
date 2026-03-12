@@ -1536,7 +1536,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                 </div>
 
                 <Button
-                  onClick={generateCommentary}
+                  onClick={() => generateCommentary()}
                   className="gap-2 px-6"
                   size="lg"
                   disabled={chapterParagraphs.length === 0}
