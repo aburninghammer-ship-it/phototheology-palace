@@ -1571,16 +1571,9 @@ async function generateEpicAudio(
   let useElevenLabs = !!ELEVENLABS_API_KEY;
   const processedText = addPauseMarkers(text);
 
-  // ── Credit Guard: check ElevenLabs balance before burning credits ──
+  // ── Usage-based billing enabled (1M credit limit) — always use ElevenLabs when key is present ──
   if (useElevenLabs) {
-    const creditCheck = await checkElevenLabsCredits();
-    if (creditCheck) {
-      const estimatedChars = processedText.length;
-      if (!creditCheck.hasCredits || creditCheck.remaining < estimatedChars) {
-        console.warn(`[EpicCommentary] ⚠️ ElevenLabs credits insufficient (${creditCheck.remaining} remaining, need ~${estimatedChars}). Falling back to OpenAI TTS.`);
-        useElevenLabs = false;
-      }
-    }
+    console.log(`[EpicCommentary] ElevenLabs usage-based billing active — proceeding with ElevenLabs voice (${mode}:${voiceId})`);
   }
 
   // ── Smaller chunks (600 chars) for ElevenLabs to reduce credit spikes ──
