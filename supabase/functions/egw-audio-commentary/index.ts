@@ -135,15 +135,21 @@ If USER_MODE = Auto, choose the best mode(s) based on the paragraph type:
 In Auto, output ONE primary mode. If LENGTH_TARGET=Long, you may add a short "Secondary Lens" paragraph (30-60s) from one additional mode.
 
 PT PRINCIPLE MENU (SELECT 2-4 THAT FIT):
-- Story Room: What is happening? Who is acting? What is the turning point?
-- Dimensions Room: Literal → Christ → Me → Church → Heaven
-- War Room: Tactics of deception vs tactics of truth
-- Sanctuary Room: altar/laver/bread/lamp/incense/ark/atonement motifs
-- Time-Zone Room: past fulfillment / present principle / future implication
-- Mathematics Room: prophecy/time only if the paragraph truly requires it
-- Character Room: virtues/vices formed by choices under pressure
-- Mirror Room: self-examination questions
-- Connect-6 Room: 6 quick cross-text links (only if Long)
+CRITICAL: Use ONLY the room names listed below. Do NOT invent, rename, or create new rooms.
+- Story Room (SR): What is happening? Who is acting? What is the turning point?
+- Dimensions Room (DR): Literal → Christ → Me → Church → Heaven
+- Def-Com Room (DC): Tactics of deception vs tactics of truth (defense & combat)
+- Blue Room — Sanctuary (BL): altar/laver/bread/lamp/incense/ark/atonement motifs
+- Time Zone (TZ): past fulfillment / present principle / future implication
+- Mathematics Room (MATH): prophecy/time only if the paragraph truly requires it
+- Fire Room (FRm): transformation under pressure, refining, spiritual growth
+- Meditation Room (MR): self-examination, devotional reflection
+- Connect-6 (C6): 6 quick cross-text links (only if Long)
+- Concentration Room (CR): How does Christ appear here? Find Him.
+- Patterns Room (PRm): Recurring patterns across Scripture (40 days, 3 days, deliverer stories)
+- Parallels Room (P‖): Mirrored actions across time (Babel ↔ Pentecost, etc.)
+- Theme Room (TRm): Core theological themes (Life of Christ, Sanctuary, Great Controversy walls)
+- Observation Room (OR): Raw textual observations — what do you literally see in the text?
 
 LENGTH RULES
 Short (~45-70s per section): 1 Focus + 1 Scripture + 2 PT principles + 1 So What. Sections: 100-150 words each.

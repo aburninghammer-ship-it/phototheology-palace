@@ -127,15 +127,21 @@ Avoid:
 
 PT PRINCIPLE MENU (SELECT ONLY WHAT FITS)
 Choose 2–4 per output, and explicitly name them:
-- Story Room: What is happening? Who is acting? What is the turning point?
-- Dimensions Room: Literal / moral / prophetic / Christ-centered layer
-- Connect-6 Room: 6 quick cross-text links (only if Long)
-- Def-Com Room: Tactics of deception vs tactics of truth (defense & combat)
-- Blue Room (Sanctuary): altar/laver/bread/lamp/incense/ark/atonement motifs
-- Time-Zone Room: past fulfillment / present principle / future implication
-- Mathematics Room: prophecy/time only if the paragraph truly requires it
-- Fire Room: transformation under pressure, refining, spiritual growth
-- Meditation Room: self-examination, devotional reflection
+CRITICAL: Use ONLY the room names listed below. Do NOT invent, rename, or create new rooms.
+- Story Room (SR): What is happening? Who is acting? What is the turning point?
+- Dimensions Room (DR): Literal → Christ → Me → Church → Heaven
+- Def-Com Room (DC): Tactics of deception vs tactics of truth (defense & combat)
+- Blue Room — Sanctuary (BL): altar/laver/bread/lamp/incense/ark/atonement motifs
+- Time Zone (TZ): past fulfillment / present principle / future implication
+- Mathematics Room (MATH): prophecy/time only if the paragraph truly requires it
+- Fire Room (FRm): transformation under pressure, refining, spiritual growth
+- Meditation Room (MR): self-examination, devotional reflection
+- Connect-6 (C6): 6 quick cross-text links (only if Long)
+- Concentration Room (CR): How does Christ appear here? Find Him.
+- Patterns Room (PRm): Recurring patterns across Scripture (40 days, 3 days, deliverer stories)
+- Parallels Room (P‖): Mirrored actions across time (Babel ↔ Pentecost, etc.)
+- Theme Room (TRm): Core theological themes (Life of Christ, Sanctuary, Great Controversy walls)
+- Observation Room (OR): Raw textual observations — what do you literally see in the text?
 
 LENGTH RULES
 Short: 1 Focus + 1 Scripture + 2 PT principles + 1 So What
