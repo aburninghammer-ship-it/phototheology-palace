@@ -544,7 +544,15 @@ export default function AudioBible() {
     } catch (err: any) {
       console.error(`[${modeName} Mode] Error:`, err);
       const msg = err?.message || err?.error_description || String(err);
-      toast.error(`${modeName} commentary error: ${msg}`);
+      if (msg.includes("non-2xx") || msg.includes("500") || msg.includes("Generation failed")) {
+        toast.error(`${modeName} commentary generation failed. The AI service may be temporarily busy — please try again in a moment.`);
+      } else if (msg.includes("429") || msg.includes("rate")) {
+        toast.error("Rate limited. Please wait a moment before trying again.");
+      } else if (msg.includes("402") || msg.includes("credits")) {
+        toast.error("AI credits exhausted. Commentary generation is temporarily unavailable.");
+      } else {
+        toast.error(`${modeName} commentary error: ${msg}`);
+      }
       setIsEpicLoading(false);
     }
   }, [stop, volume, epicMode]);
