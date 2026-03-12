@@ -318,8 +318,8 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
             : formData.preferred_themes[0] || "Walking with Christ");
 
         const plan = await createPlan.mutateAsync({
-          title: `${formData.name}'s Devotional Journey`,
-          description: `A personalized ${formData.duration}-day devotional for ${formData.name}. Tones: ${tonesString}`,
+          title: `My Devotional Journey`,
+          description: `A personalized ${formData.duration}-day devotional. Tones: ${tonesString}`,
           theme,
           format: "room-driven",
           duration: formData.duration,

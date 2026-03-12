@@ -490,7 +490,7 @@ serve(async (req) => {
         const emailHtml = `
           <div style="font-family: 'Georgia', serif; max-width: 600px; margin: 0 auto; background: #1a1a2e; color: #ffffff; border-radius: 12px; overflow: hidden;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
-              <h1 style="margin: 0; font-size: 24px; color: white;">📖 ${plan.title}</h1>
+              <h1 style="margin: 0; font-size: 24px; color: white;">📖 Your Devotional Journey</h1>
               <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">Day ${currentDayNumber} of ${plan.duration} · ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
             </div>
             
@@ -533,16 +533,19 @@ serve(async (req) => {
                 Phototheology - Master Scripture Through Visual Memory
               </p>
               <p style="margin: 8px 0 0 0; color: #71717a; font-size: 11px;">
-                <a href="https://phototheology.app/devotionals" style="color: #71717a;">Send devotionals to a friend</a>
+                <a href="https://phototheologybible.com/devotionals" style="color: #71717a;">Send devotionals to a friend</a>
+                &nbsp;·&nbsp;
+                <a href="https://phototheologybible.com/devotionals?unsubscribe=${plan.id}" style="color: #71717a;">Unsubscribe from this devotional</a>
               </p>
             </div>
           </div>
         `;
 
         const { error: emailError } = await resend.emails.send({
-          from: "Phototheology Devotionals <support@thephototheologyapp.com>",
+          from: "Phototheology Devotionals <devotionals@thephototheologyapp.com>",
+          reply_to: "support@phototheologybible.com",
           to: userEmail,
-          subject: `📖 Day ${currentDayNumber}: ${dayContent.title} - ${plan.title} (${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })})`,
+          subject: `📖 Day ${currentDayNumber}: ${dayContent.title} — Your Devotional Journey (${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })})`,
           html: emailHtml,
         });
 
@@ -560,7 +563,7 @@ serve(async (req) => {
             user_id: plan.user_id,
             type: 'daily_devotional',
             title: `📖 Day ${currentDayNumber}: ${dayContent.title}`,
-            message: `Your devotional for today is ready! "${plan.title}"`,
+            message: `Your devotional for today is ready!`,
             link: `/devotionals/${plan.id}`,
             metadata: {
               plan_id: plan.id,
