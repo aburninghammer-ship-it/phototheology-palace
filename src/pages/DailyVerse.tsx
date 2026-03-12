@@ -49,7 +49,6 @@ export default function DailyVerse() {
     imageBase64: string;
     appUrl: string;
   } | null>(null);
-  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
   const [activeTab, setActiveTab] = useState<"today" | "archive">("today");
   const [selectedArchiveVerse, setSelectedArchiveVerse] = useState<DailyVerse | null>(null);
   const [archiveMonth, setArchiveMonth] = useState(new Date());
@@ -178,28 +177,24 @@ export default function DailyVerse() {
 
   const handleShare = async () => {
     if (!todayVerse) return;
-    
-    setIsGeneratingShare(true);
-    setShareDialogOpen(true);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-daily-verse-share', {
-        body: {
-          verseReference: todayVerse.verse_reference,
-          verseText: todayVerse.verse_text,
-          breakdown: todayVerse.breakdown.breakdown,
-        },
-      });
 
-      if (error) throw error;
-      setShareData(data);
-    } catch (error) {
-      console.error('Error generating share content:', error);
-      toast.error(t('dailyVerse.shareGenerationFailed'));
-      setShareDialogOpen(false);
-    } finally {
-      setIsGeneratingShare(false);
+    // Build share text directly from the actual verse and principles — no AI rewriting
+    const verse = todayVerse.verse_text;
+    const ref = todayVerse.verse_reference;
+    const breakdown = todayVerse.breakdown?.breakdown;
+
+    let principlesText = "";
+    if (breakdown && Array.isArray(breakdown)) {
+      principlesText = breakdown
+        .map((item: any, idx: number) => `Floor ${idx + 1} — ${item.principle_name || item.principle_applied}: ${item.key_insight}`)
+        .join("\n");
     }
+
+    const appUrl = "https://phototheologybible.com/daily-verse";
+    const summary = `"${verse}"\n— ${ref}\n\n7-Floor Phototheology Analysis:\n${principlesText}\n\nExplore the full analysis:`;
+
+    setShareData({ summary, imageBase64: "", appUrl });
+    setShareDialogOpen(true);
   };
 
   const copyToClipboard = async (text: string) => {
@@ -216,14 +211,26 @@ export default function DailyVerse() {
 
   const shareToTwitter = () => {
     if (!shareData) return;
-    const text = encodeURIComponent(`${shareData.summary}\n\n${shareData.appUrl}`);
-    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+    // Twitter has a 280 char limit — share a shorter version
+    const shortText = todayVerse
+      ? `"${todayVerse.verse_text}"\n— ${todayVerse.verse_reference}\n\n7-Floor Phototheology Analysis\n${shareData.appUrl}`
+      : `${shareData.summary}\n\n${shareData.appUrl}`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shortText)}`, '_blank');
   };
 
   const shareToWhatsApp = () => {
     if (!shareData) return;
     const text = encodeURIComponent(`${shareData.summary}\n\n${shareData.appUrl}`);
     window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
+  const shareToInstagram = () => {
+    if (!shareData) return;
+    // Instagram doesn't support direct link sharing — copy to clipboard for pasting
+    const text = `${shareData.summary}\n\n${shareData.appUrl}`;
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success("Copied to clipboard! Paste into your Instagram caption.");
+    });
   };
 
   const goToPreviousMonth = () => {
@@ -616,32 +623,16 @@ export default function DailyVerse() {
             <DialogTitle>{t('dailyVerse.shareDailyVerse')}</DialogTitle>
           </DialogHeader>
           
-          {isGeneratingShare ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-center space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="text-muted-foreground">{t('dailyVerse.generatingShareContent')}</p>
-              </div>
-            </div>
-          ) : shareData ? (
+          {shareData ? (
             <div className="space-y-6">
-              {/* Generated Image */}
-              <div className="rounded-lg overflow-hidden border">
-                <img 
-                  src={shareData.imageBase64} 
-                  alt="Daily Verse" 
-                  className="w-full h-auto"
-                />
-              </div>
-
-              {/* Share Text */}
+              {/* Share Text Preview */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">{t('dailyVerse.shareText')}</label>
-                <div className="p-4 bg-muted rounded-lg">
+                <div className="p-4 bg-muted rounded-lg whitespace-pre-line">
                   <p className="text-sm">{shareData.summary}</p>
                   <p className="text-sm text-primary mt-2">{shareData.appUrl}</p>
                 </div>
-                <Button 
+                <Button
                   onClick={() => copyToClipboard(`${shareData.summary}\n\n${shareData.appUrl}`)}
                   variant="outline"
                   size="sm"
@@ -652,9 +643,12 @@ export default function DailyVerse() {
               </div>
 
               {/* Social Media Buttons */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <Button onClick={shareToFacebook} className="w-full">
                   Facebook
+                </Button>
+                <Button onClick={shareToInstagram} variant="outline" className="w-full">
+                  Instagram
                 </Button>
                 <Button onClick={shareToTwitter} className="w-full">
                   Twitter
