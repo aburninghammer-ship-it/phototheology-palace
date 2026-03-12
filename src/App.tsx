@@ -39,7 +39,6 @@ import { LiveChatProvider } from "@/contexts/LiveChatContext";
 import { LiveChatSidebar } from "@/components/LiveChatSidebar";
 import { LiveChatToggle } from "@/components/LiveChatToggle";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
-import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
 import { usePresenceTracker } from "@/hooks/usePresenceTracker";
 import { PresenceTracker } from "@/components/PresenceTracker";
@@ -387,7 +386,6 @@ function App() {
                     <ChangeManagerProvider>
                       <div className="min-h-screen flex flex-col w-full pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
                         {!isWorkspacePane && <>
-                        <DonationBanner />
                         <FontSizeControl />
                         <AnnouncementBanner />
                         <TrialUpgradePrompt variant="banner" />
