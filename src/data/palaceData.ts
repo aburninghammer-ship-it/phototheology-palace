@@ -11,7 +11,7 @@ export interface Room {
   examples: string[];
   pitfalls: string[];
   deliverable: string;
-  estimatedTime?: "quick" | "standard" | "deep"; // 5min / 15min / 30+min
+  estimatedTime?: "quick" | "standard" | "deep" | "extended"; // 5min / 15min / 30+min / 45+min
   quickMode?: string[]; // Optional quick steps for fast learners
   prerequisites?: { floor: number; room: string }[];
 }
