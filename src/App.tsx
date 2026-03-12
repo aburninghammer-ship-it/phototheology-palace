@@ -386,7 +386,6 @@ function App() {
                     <ChangeManagerProvider>
                       <div className="min-h-screen flex flex-col w-full pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
                         {!isWorkspacePane && <>
-                        <DonationBanner />
                         <FontSizeControl />
                         <AnnouncementBanner />
                         <TrialUpgradePrompt variant="banner" />
