@@ -1585,36 +1585,32 @@ async function generateEpicAudio(
   const audioBuffers: ArrayBuffer[] = [];
 
   if (useElevenLabs) {
-    // Sequential for ElevenLabs (needs stitching context)
+    // Sequential for ElevenLabs (needs stitching context) — NO OpenAI fallback
+    // Usage-based billing is enabled, so ElevenLabs should always work
     for (let i = 0; i < chunks.length; i++) {
-      try {
-        const buffer = await generateEpicAudioChunkElevenLabs(
-          chunks[i], i, chunks.length,
-          i > 0 ? chunks[i - 1] : undefined,
-          i < chunks.length - 1 ? chunks[i + 1] : undefined,
-          voiceId,
-        );
-        audioBuffers.push(buffer);
-      } catch (elevenErr) {
-        const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
-        console.warn(`[EpicCommentary] ElevenLabs error on chunk ${i + 1}/${chunks.length}: ${errMsg}`);
-
-        if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429") || errMsg.includes("insufficient")) {
-          console.warn(`[EpicCommentary] ElevenLabs quota/auth issue — switching ALL remaining chunks to OpenAI TTS (parallel)`);
-        }
-
-        // Rebuild remaining chunks for OpenAI and process in parallel
-        const remainingText = chunks.slice(i).join(" ");
-        const openAIChunks = splitTextIntoChunks(remainingText, 3900);
-        const BATCH_SIZE = 4;
-        for (let b = 0; b < openAIChunks.length; b += BATCH_SIZE) {
-          const batch = openAIChunks.slice(b, b + BATCH_SIZE);
-          const results = await Promise.all(
-            batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, openAIChunks.length))
+      // Retry up to 3 times on transient errors
+      let lastErr: Error | null = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const buffer = await generateEpicAudioChunkElevenLabs(
+            chunks[i], i, chunks.length,
+            i > 0 ? chunks[i - 1] : undefined,
+            i < chunks.length - 1 ? chunks[i + 1] : undefined,
+            voiceId,
           );
-          audioBuffers.push(...results);
+          audioBuffers.push(buffer);
+          lastErr = null;
+          break;
+        } catch (elevenErr) {
+          lastErr = elevenErr instanceof Error ? elevenErr : new Error(String(elevenErr));
+          console.warn(`[EpicCommentary] ElevenLabs attempt ${attempt + 1}/3 failed on chunk ${i + 1}/${chunks.length}: ${lastErr.message}`);
+          if (attempt < 2) {
+            await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // backoff
+          }
         }
-        break; // All remaining chunks handled
+      }
+      if (lastErr) {
+        throw new Error(`ElevenLabs TTS failed after 3 retries on chunk ${i + 1}: ${lastErr.message}`);
       }
     }
   } else {
