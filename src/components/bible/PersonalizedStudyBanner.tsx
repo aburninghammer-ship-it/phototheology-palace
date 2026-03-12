@@ -56,30 +56,30 @@ const PT_PROMPTS: Omit<DailyPrompt, "accent">[] = [
   // Motivation
   { category: "motivation", icon: <Flame className="h-4 w-4" />, label: "Daily Fire",
     text: "Every chapter hides Christ. Today, refuse to close the Book until you've found Him.",
-    actionLabel: "Open Palace", actionLink: "/palace" },
+    actionLabel: "Concentration Room", actionLink: "/palace?room=CR" },
   { category: "motivation", icon: <Crown className="h-4 w-4" />, label: "Rise Up",
     text: "You're building a palace in your mind — brick by brick, verse by verse. Don't stop climbing.",
-    actionLabel: "View Progress", actionLink: "/palace" },
+    actionLabel: "Palace", actionLink: "/palace" },
   { category: "motivation", icon: <Trophy className="h-4 w-4" />, label: "Keep Going",
     text: "The 8th Floor is reflexive mastery — where the palace lives inside you. Every study gets you closer.",
-    actionLabel: "Palace", actionLink: "/palace" },
+    actionLabel: "Infinity Room", actionLink: "/palace?room=∞" },
   { category: "motivation", icon: <Zap className="h-4 w-4" />, label: "Ignite",
     text: "A gem you discover today could be the weapon you need tomorrow. Mine the Word relentlessly.",
-    actionLabel: "Gem Room", actionLink: "/palace" },
+    actionLabel: "Gem Room", actionLink: "/palace?room=GR" },
 
   // Action
   { category: "action", icon: <Eye className="h-4 w-4" />, label: "Detective Drill",
     text: "Pick any passage and write 20 observations without commentary. Train your eye like a detective.",
-    actionLabel: "Start Drill", actionLink: "/palace" },
+    actionLabel: "Investigation Room", actionLink: "/palace?room=IR" },
   { category: "action", icon: <Target className="h-4 w-4" />, label: "Speed Drill",
     text: "Flip through a Gospel — list 5 Christ connections in 3 minutes. Train your reflex.",
-    actionLabel: "Try It", actionLink: "/palace" },
+    actionLabel: "Concentration Room", actionLink: "/palace?room=CR" },
   { category: "action", icon: <Brain className="h-4 w-4" />, label: "Freestyle Challenge",
     text: "Connect your last verse to something you saw in nature today. The 3rd Floor trains spontaneous thought.",
-    actionLabel: "Freestyle", actionLink: "/palace" },
+    actionLabel: "Freestyle Room", actionLink: "/palace?room=NF" },
   { category: "action", icon: <Compass className="h-4 w-4" />, label: "Christ Hunt",
     text: "Open any Old Testament chapter. Don't close it until you've named how Christ appears there.",
-    actionLabel: "Begin", actionLink: "/bible" },
+    actionLabel: "Concentration Room", actionLink: "/palace?room=CR" },
 
   // Spiritual
   { category: "spiritual", icon: <Heart className="h-4 w-4" />, label: "Fire Room",
@@ -93,7 +93,7 @@ const PT_PROMPTS: Omit<DailyPrompt, "accent">[] = [
     actionLabel: "John 15", actionLink: "/bible?book=John&chapter=15" },
   { category: "spiritual", icon: <Heart className="h-4 w-4" />, label: "Surrender",
     text: "The system trains the mind, but the Spirit gives life. Pause now. Ask the Spirit to open your eyes today.",
-    actionLabel: "Begin Study", actionLink: "/bible" },
+    actionLabel: "Open Bible", actionLink: "/bible" },
 
   // Try This
   { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Try This",
@@ -107,13 +107,13 @@ const PT_PROMPTS: Omit<DailyPrompt, "accent">[] = [
     actionLabel: "Exodus 12", actionLink: "/bible?book=Exodus&chapter=12" },
   { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Try This",
     text: "Babel scattered languages. Pentecost united them. Find 3 more parallel actions that mirror across time.",
-    actionLabel: "Explore", actionLink: "/palace" },
+    actionLabel: "Parallels Room", actionLink: "/palace?room=P‖" },
   { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Try This",
     text: "Pick one verse and run it through all Five Ascensions: Text → Chapter → Book → Cycle → Heaven.",
-    actionLabel: "Try Now", actionLink: "/palace" },
+    actionLabel: "Five Ascensions", actionLink: "/palace?room=FE" },
   { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Try This",
     text: "Which sanctuary furniture does your current passage connect to? Altar, Laver, Lampstand, Table, Incense, or Ark?",
-    actionLabel: "Blue Room", actionLink: "/palace" },
+    actionLabel: "Blue Room", actionLink: "/palace?room=BL" },
 ];
 
 const CATEGORY_ACCENTS: Record<string, string> = {
