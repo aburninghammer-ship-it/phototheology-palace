@@ -129,7 +129,7 @@ serve(async (req) => {
   }
 
   try {
-    const { bookId, chapterNumber, chapterTitle, bookTitle } = await req.json();
+    const { bookId, chapterNumber, chapterTitle, bookTitle, forceRefresh } = await req.json();
 
     if (!bookId || !chapterNumber || !chapterTitle || !bookTitle) {
       return new Response(
@@ -142,29 +142,45 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Check cache first — serve if we have a complete chapter (10+ paragraphs)
-    const { data: cached } = await supabase
-      .from("egw_chapter_cache")
-      .select("paragraphs")
-      .eq("book_id", bookId)
-      .eq("chapter_number", chapterNumber)
-      .maybeSingle();
-
-    if (cached?.paragraphs && Array.isArray(cached.paragraphs) && cached.paragraphs.length >= 10) {
-      return new Response(
-        JSON.stringify({ paragraphs: cached.paragraphs, cached: true }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // If cache exists but is too short, delete it
-    if (cached?.paragraphs && Array.isArray(cached.paragraphs) && cached.paragraphs.length > 0 && cached.paragraphs.length < 10) {
-      console.log(`Cache hit but only ${cached.paragraphs.length} paragraphs — regenerating`);
+    // If forceRefresh, delete cached chapter AND any associated commentary
+    if (forceRefresh) {
+      console.log(`Force refresh requested for ${bookId} ch${chapterNumber}`);
       await supabase
         .from("egw_chapter_cache")
         .delete()
         .eq("book_id", bookId)
         .eq("chapter_number", chapterNumber);
+      // Also clear any cached commentary for this chapter (stored with chapter_number=0 and composite book_id key)
+      await supabase
+        .from("egw_chapter_cache")
+        .delete()
+        .like("book_id", `${bookId}_ch${chapterNumber}_%`)
+        .eq("chapter_number", 0);
+    } else {
+      // Check cache first — serve if we have a complete chapter (10+ paragraphs)
+      const { data: cached } = await supabase
+        .from("egw_chapter_cache")
+        .select("paragraphs")
+        .eq("book_id", bookId)
+        .eq("chapter_number", chapterNumber)
+        .maybeSingle();
+
+      if (cached?.paragraphs && Array.isArray(cached.paragraphs) && cached.paragraphs.length >= 10) {
+        return new Response(
+          JSON.stringify({ paragraphs: cached.paragraphs, cached: true }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // If cache exists but is too short, delete it
+      if (cached?.paragraphs && Array.isArray(cached.paragraphs) && cached.paragraphs.length > 0 && cached.paragraphs.length < 10) {
+        console.log(`Cache hit but only ${cached.paragraphs.length} paragraphs — regenerating`);
+        await supabase
+          .from("egw_chapter_cache")
+          .delete()
+          .eq("book_id", bookId)
+          .eq("chapter_number", chapterNumber);
+      }
     }
 
     // PRIMARY SOURCE: Fetch from EGW Writings (authoritative, public domain text)

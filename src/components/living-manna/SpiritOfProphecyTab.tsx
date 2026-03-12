@@ -584,7 +584,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   const { user } = useAuth();
 
   // Generate audio commentary
-  const generateCommentary = useCallback(async () => {
+  const generateCommentary = useCallback(async (forceRefresh = false) => {
     if (!selectedBook || !selectedChapter) return;
     setLoadingCommentary(true);
     setCommentarySections([]);
@@ -601,6 +601,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
           commentaryMode,
           commentaryLength,
           commentaryLevel,
+          forceRefresh,
         },
       });
       if (error) throw error;
@@ -639,7 +640,7 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
   }, [ttsStop, updateCurrentSection]);
 
   // Fetch chapter text
-  const fetchChapterText = async (book: EGWBook, chapter: EGWChapter) => {
+  const fetchChapterText = async (book: EGWBook, chapter: EGWChapter, forceRefresh = false) => {
     setLoadingChapter(true);
     try {
       const { data, error } = await supabase.functions.invoke("fetch-egw-chapter", {
@@ -648,11 +649,18 @@ export function SpiritOfProphecyTab({ churchId }: SpiritOfProphecyTabProps = {})
           chapterNumber: chapter.number,
           chapterTitle: chapter.title,
           bookTitle: book.title,
+          forceRefresh,
         },
       });
 
       if (error) throw error;
       setChapterParagraphs(data?.paragraphs || []);
+      if (forceRefresh) {
+        toast({
+          title: "Chapter Refreshed",
+          description: `Reloaded from authoritative source (${data?.paragraphs?.length || 0} paragraphs).`,
+        });
+      }
     } catch (err) {
       console.error("Fetch chapter error:", err);
       toast({
@@ -1192,10 +1200,24 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                     <Telescope className="h-4 w-4 text-primary" />
                   </div>
                   <p className="text-xs text-foreground/70">
-                    <span className="text-primary font-medium">Tap any paragraph</span> to analyze • 
+                    <span className="text-primary font-medium">Tap any paragraph</span> to analyze •
                     <span className="text-amber-400 font-medium"> Cross-Ref</span> reveals Scripture
                   </p>
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 shrink-0 text-muted-foreground hover:text-primary"
+                  title="Re-fetch chapter from source"
+                  onClick={() => {
+                    if (selectedBook && selectedChapter) {
+                      fetchChapterText(selectedBook, selectedChapter, true);
+                    }
+                  }}
+                  disabled={loadingChapter}
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${loadingChapter ? 'animate-spin' : ''}`} />
+                </Button>
                 {readAloudPlaying || readAloudLoading ? (
                   <Button
                     variant="outline"
@@ -1687,7 +1709,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
                       onClick={() => {
                         stopCommentary();
                         setCommentarySections([]);
-                        generateCommentary();
+                        generateCommentary(true);
                       }}
                     >
                       <RefreshCw className="h-3 w-3" />

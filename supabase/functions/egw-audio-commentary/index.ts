@@ -22,7 +22,8 @@ serve(async (req) => {
       mode,
       commentaryMode = "Epic",
       commentaryLength = "Medium",
-      commentaryLevel = "Intermediate"
+      commentaryLevel = "Intermediate",
+      forceRefresh = false,
     } = await req.json();
 
     if (!bookId || !chapterNumber || !chapterTitle || !bookTitle) {
@@ -38,18 +39,28 @@ serve(async (req) => {
 
     // Check cache (include mode, length, and level in cache key)
     const cacheKey = `${bookId}_ch${chapterNumber}_${mode || 'chapter'}_${commentaryMode}_${commentaryLength}_${commentaryLevel}`;
-    const { data: cached } = await supabase
-      .from("egw_chapter_cache")
-      .select("paragraphs")
-      .eq("book_id", cacheKey)
-      .eq("chapter_number", 0) // use 0 for commentary entries
-      .maybeSingle();
 
-    if (cached?.paragraphs && Array.isArray(cached.paragraphs) && cached.paragraphs.length > 0) {
-      return new Response(
-        JSON.stringify({ commentary: cached.paragraphs, cached: true }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (forceRefresh) {
+      console.log(`Force refresh: deleting commentary cache for ${cacheKey}`);
+      await supabase
+        .from("egw_chapter_cache")
+        .delete()
+        .eq("book_id", cacheKey)
+        .eq("chapter_number", 0);
+    } else {
+      const { data: cached } = await supabase
+        .from("egw_chapter_cache")
+        .select("paragraphs")
+        .eq("book_id", cacheKey)
+        .eq("chapter_number", 0) // use 0 for commentary entries
+        .maybeSingle();
+
+      if (cached?.paragraphs && Array.isArray(cached.paragraphs) && cached.paragraphs.length > 0) {
+        return new Response(
+          JSON.stringify({ commentary: cached.paragraphs, cached: true }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -161,10 +172,17 @@ QUALITY CHECK (SILENT, BEFORE YOU OUTPUT)
 - Did I keep SDA guardrails intact?
 - Did I avoid invented facts?
 - Did I make it audio-friendly?
-- Did I apply PT principles concretely?`;
+- Did I apply PT principles concretely?
+- Did I cover EVERY paragraph without gaps or skips?
+- Did I avoid repeating the same words, phrases, or sentences across sections?
+- Does each section have unique content and smooth transitions to the next?`;
+
+    // Determine how many commentary sections to produce based on paragraph count
+    const paraCount = paragraphs?.length || 0;
+    const sectionCount = paraCount <= 10 ? paraCount : Math.max(10, Math.ceil(paraCount / 3));
 
     const userPrompt = isChapterMode
-      ? `Create audio commentary for this entire EGW chapter. Divide into 6-10 flowing sections that walk through the chapter sequentially.
+      ? `Create audio commentary for this entire EGW chapter. You MUST cover EVERY paragraph sequentially — no gaps, no skipping.
 
 INPUTS:
 - BOOK: ${bookTitle}
@@ -172,16 +190,24 @@ INPUTS:
 - USER_MODE: ${commentaryMode}
 - USER_LEVEL: ${commentaryLevel}
 - LENGTH_TARGET: ${commentaryLength}
+- TOTAL PARAGRAPHS: ${paraCount}
 
 CHAPTER CONTENT:
 ${chapterContext}
 
-Return a JSON array of 6-10 commentary strings. Each string is one complete section.
-Follow the CORE WORKFLOW for each major theme/paragraph cluster:
-1. Paragraph Focus (summary)
-2. Scripture Frame (KJV verses)
-3. PT Lens (2-4 principles)
-4. So What? (application)
+CRITICAL INSTRUCTIONS:
+1. Produce ${sectionCount} commentary sections that cover ALL ${paraCount} paragraphs in order.
+2. Each section should reference which paragraph(s) it covers (e.g., "In paragraphs 3-5, Ellen White describes...").
+3. Do NOT skip any paragraphs. Every paragraph must be addressed in at least one section.
+4. Do NOT repeat the same phrases or sentences across sections. Each section must have unique content.
+5. Keep transitions smooth and audio-friendly — short sentences, no dense citations.
+6. Follow the CORE WORKFLOW for each section:
+   - Paragraph Focus (1 sentence summary of what EGW says)
+   - Scripture Frame (1-3 KJV verse references)
+   - PT Lens (2-4 Palace room principles)
+   - So What? (1-2 application points)
+
+Return a JSON array of exactly ${sectionCount} commentary strings. Each string is one complete audio section.
 
 ${commentaryMode === "Auto"
   ? "Walk through the chapter sequentially, using Auto mode to adapt your approach to each paragraph's content."
@@ -200,12 +226,14 @@ INPUTS:
 PARAGRAPH:
 ${chapterContext}
 
+CRITICAL: Do NOT repeat words or phrases. Each section must have unique content with smooth transitions.
+
 Return a JSON array of 2-4 commentary strings.
 Follow the CORE WORKFLOW:
-1. Paragraph Focus
-2. Scripture Frame
-3. PT Lens
-4. So What?
+1. Paragraph Focus (faithful 1-sentence summary)
+2. Scripture Frame (1-3 KJV verses)
+3. PT Lens (2-4 Palace room principles)
+4. So What? (1-2 application points)
 
 ${commentaryMode === "Auto"
   ? "Use Auto mode to select the best approach for this paragraph's content."
@@ -231,12 +259,12 @@ ${commentaryMode === "Auto"
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: isChapterMode ? "google/gemini-2.5-pro" : "google/gemini-2.5-flash",
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
-          max_tokens: 8000,
+          max_tokens: isChapterMode ? 16000 : 8000,
         }),
       }
     );
