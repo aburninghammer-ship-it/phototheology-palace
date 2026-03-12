@@ -1529,6 +1529,30 @@ function addPauseMarkers(text: string): string {
     .replace(/:\s*\n/g, ": ...\n");
 }
 
+/**
+ * Check ElevenLabs credit balance before generating audio.
+ * Returns { hasCredits, remaining } or null if check fails.
+ */
+async function checkElevenLabsCredits(): Promise<{ hasCredits: boolean; remaining: number } | null> {
+  if (!ELEVENLABS_API_KEY) return null;
+  try {
+    const resp = await fetch("https://api.elevenlabs.io/v1/user/subscription", {
+      headers: { "xi-api-key": ELEVENLABS_API_KEY },
+    });
+    if (!resp.ok) {
+      console.warn(`[EpicCommentary] Credit check failed: ${resp.status}`);
+      return null;
+    }
+    const data = await resp.json();
+    const remaining = (data.character_limit || 0) - (data.character_count || 0);
+    console.log(`[EpicCommentary] ElevenLabs credits: ${remaining} chars remaining (${data.character_count}/${data.character_limit})`);
+    return { hasCredits: remaining > 500, remaining };
+  } catch (e) {
+    console.warn("[EpicCommentary] Credit check error:", e);
+    return null;
+  }
+}
+
 async function generateEpicAudio(
   text: string,
   book: string,
@@ -1537,18 +1561,33 @@ async function generateEpicAudio(
   mode: string = "epic",
 ): Promise<{ storagePath: string; durationMs: number; fileSizeBytes: number }> {
   const voiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
-  const useElevenLabs = !!ELEVENLABS_API_KEY;
+  let useElevenLabs = !!ELEVENLABS_API_KEY;
   const processedText = addPauseMarkers(text);
-  const chunkSize = useElevenLabs ? 5000 : 3900;
+
+  // ── Credit Guard: check ElevenLabs balance before burning credits ──
+  if (useElevenLabs) {
+    const creditCheck = await checkElevenLabsCredits();
+    if (creditCheck) {
+      const estimatedChars = processedText.length;
+      if (!creditCheck.hasCredits || creditCheck.remaining < estimatedChars) {
+        console.warn(`[EpicCommentary] ⚠️ ElevenLabs credits insufficient (${creditCheck.remaining} remaining, need ~${estimatedChars}). Falling back to OpenAI TTS.`);
+        useElevenLabs = false;
+      }
+    }
+  }
+
+  // ── Smaller chunks (600 chars) for ElevenLabs to reduce credit spikes ──
+  const chunkSize = useElevenLabs ? 600 : 3900;
   const chunks = splitTextIntoChunks(processedText, chunkSize);
 
   console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? `ElevenLabs (${mode}:${voiceId})` : "OpenAI (onyx)"}`);
 
   const audioBuffers: ArrayBuffer[] = [];
+  let elevenLabsFailed = false;
 
   for (let i = 0; i < chunks.length; i++) {
     let buffer: ArrayBuffer;
-    if (useElevenLabs) {
+    if (useElevenLabs && !elevenLabsFailed) {
       try {
         buffer = await generateEpicAudioChunkElevenLabs(
           chunks[i], i, chunks.length,
@@ -1558,22 +1597,22 @@ async function generateEpicAudio(
         );
       } catch (elevenErr) {
         const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
-        // For Epic mode, NEVER fall back to OpenAI — William voice is essential
-        if (mode === "epic") {
-          console.error(`[EpicCommentary] ElevenLabs error on chunk ${i + 1} in Epic mode (no fallback): ${errMsg}`);
-          throw new Error(`ElevenLabs Epic voice unavailable: ${errMsg}. Please try again later.`);
+        console.warn(`[EpicCommentary] ElevenLabs error on chunk ${i + 1}/${chunks.length}: ${errMsg}`);
+
+        // Mark ElevenLabs as failed so remaining chunks use OpenAI
+        elevenLabsFailed = true;
+
+        if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429") || errMsg.includes("insufficient")) {
+          console.warn(`[EpicCommentary] ElevenLabs quota/auth issue — switching ALL remaining chunks to OpenAI TTS`);
         }
-        if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429")) {
-          console.warn(`[EpicCommentary] ElevenLabs error on chunk ${i + 1}, falling back to OpenAI TTS: ${errMsg}`);
-          const openAISubChunks = splitTextIntoChunks(chunks[i], 3900);
-          for (let j = 0; j < openAISubChunks.length; j++) {
-            const subBuf = await generateEpicAudioChunkOpenAI(openAISubChunks[j], i * 10 + j, chunks.length * 10);
-            audioBuffers.push(subBuf);
-          }
-          continue;
-        } else {
-          throw elevenErr;
+
+        // Fall back to OpenAI for this chunk (including Epic mode — better than nothing)
+        const openAISubChunks = splitTextIntoChunks(chunks[i], 3900);
+        for (let j = 0; j < openAISubChunks.length; j++) {
+          const subBuf = await generateEpicAudioChunkOpenAI(openAISubChunks[j], i * 10 + j, chunks.length * 10);
+          audioBuffers.push(subBuf);
         }
+        continue;
       }
     } else {
       buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
