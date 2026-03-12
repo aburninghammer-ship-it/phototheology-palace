@@ -39,7 +39,6 @@ import { LiveChatProvider } from "@/contexts/LiveChatContext";
 import { LiveChatSidebar } from "@/components/LiveChatSidebar";
 import { LiveChatToggle } from "@/components/LiveChatToggle";
 import { SessionPromptDialog } from "@/components/session/SessionPromptDialog";
-import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
 import { usePresenceTracker } from "@/hooks/usePresenceTracker";
 import { PresenceTracker } from "@/components/PresenceTracker";
