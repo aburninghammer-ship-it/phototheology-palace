@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -280,6 +280,7 @@ function getDayOfYear(): number {
 
 export function PersonalizedStudyBanner() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<StudyStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [studyPath, setStudyPath] = useState<{ title: string; description: string } | null>(null);
@@ -450,10 +451,14 @@ export function PersonalizedStudyBanner() {
       </div>
 
       {/* Row 2: Daily Prompt Card */}
-      <div className={cn(
-        "relative rounded-xl border bg-gradient-to-r p-3 transition-all duration-500",
-        dailyPrompt.accent
-      )}>
+      <div
+        className={cn(
+          "relative rounded-xl border bg-gradient-to-r p-3 transition-all duration-500",
+          dailyPrompt.accent,
+          dailyPrompt.actionLink && "cursor-pointer active:opacity-80"
+        )}
+        onClick={() => { if (dailyPrompt.actionLink) navigate(dailyPrompt.actionLink); }}
+      >
         <div className="flex items-start gap-3">
           {/* Category Icon */}
           <div className={cn(
@@ -480,7 +485,7 @@ export function PersonalizedStudyBanner() {
               <div className="mt-1.5 flex items-center gap-2 text-[11px] text-muted-foreground">
                 <Compass className="h-3 w-3 text-emerald-500 flex-shrink-0" />
                 <span>Today's Path: <span className="font-medium text-foreground/70">{studyPath.title}</span></span>
-                <Button asChild size="sm" variant="ghost" className="h-5 px-2 text-[10px]">
+                <Button asChild size="sm" variant="ghost" className="h-5 px-2 text-[10px]" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                   <Link to="/study-ideas">Explore →</Link>
                 </Button>
               </div>
@@ -491,7 +496,7 @@ export function PersonalizedStudyBanner() {
           <div className="flex items-center gap-1.5 flex-shrink-0">
             {dailyPrompt.actionLink && (
               <Button asChild size="sm" variant="outline" className="text-xs h-7 bg-background/50 hover:bg-background/80 border-border/50">
-                <Link to={dailyPrompt.actionLink}>
+                <Link to={dailyPrompt.actionLink} onClick={(e) => e.stopPropagation()}>
                   {dailyPrompt.actionLabel}
                   <ChevronRight className="h-3 w-3 ml-0.5" />
                 </Link>
@@ -501,7 +506,7 @@ export function PersonalizedStudyBanner() {
               size="sm"
               variant="ghost"
               className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-              onClick={shufflePrompt}
+              onClick={(e) => { e.stopPropagation(); shufflePrompt(); }}
               title="Show another prompt"
             >
               <RefreshCw className="h-3.5 w-3.5" />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -302,6 +302,7 @@ function getBehavioralNudge(stats: UserStats): string | null {
 
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
   const { user: authUser } = useAuth();
+  const navigate = useNavigate();
   const resolvedUserId = userId ?? authUser?.id ?? null;
   const fallbackDisplayName = (userEmail ?? authUser?.email)?.split("@")[0] || "Scholar";
 
@@ -451,8 +452,11 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
           >
             <div className={cn(
               "rounded-xl border bg-gradient-to-r backdrop-blur-sm px-3 py-2 flex items-center gap-2.5 transition-all",
-              style.accent
-            )}>
+              style.accent,
+              prompt.actionLink && "cursor-pointer active:opacity-80"
+            )}
+              onClick={() => { if (prompt.actionLink) navigate(prompt.actionLink); }}
+            >
               <div className={cn("flex-shrink-0", style.iconColor)}>
                 {prompt.icon}
               </div>
@@ -468,16 +472,16 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
               <div className="flex items-center gap-1 flex-shrink-0">
                 {prompt.actionLink && (
                   <Button asChild size="sm" variant="ghost" className="text-[11px] h-6 px-2 hover:bg-background/50">
-                    <Link to={prompt.actionLink}>
+                    <Link to={prompt.actionLink} onClick={(e) => e.stopPropagation()}>
                       {prompt.actionLabel}
                       <ChevronRight className="h-3 w-3 ml-0.5" />
                     </Link>
                   </Button>
                 )}
-                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={shuffle} title="Shuffle">
+                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); shuffle(); }} title="Shuffle">
                   <RefreshCw className="h-3 w-3" />
                 </Button>
-                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={() => setDismissed(true)} title="Dismiss">
+                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); setDismissed(true); }} title="Dismiss">
                   <X className="h-3 w-3" />
                 </Button>
               </div>
