@@ -36,12 +36,19 @@ const Leaderboard = () => {
   }, [user, sortBy, timePeriod, viewMode]);
 
   const fetchUserStats = async () => {
-    // Get user profile data
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("points, daily_study_streak")
-      .eq("id", user!.id)
-      .single();
+    // Get real XP from global_master_titles (actively updated by all activities)
+    const { data: masterTitle } = await (supabase as any)
+      .from("global_master_titles")
+      .select("total_xp")
+      .eq("user_id", user!.id)
+      .maybeSingle();
+
+    // Get real streak from mastery_streaks (actively updated)
+    const { data: streak } = await (supabase as any)
+      .from("mastery_streaks")
+      .select("current_streak")
+      .eq("user_id", user!.id)
+      .maybeSingle();
 
     // Get challenges completed
     const { data: challenges } = await supabase
@@ -62,24 +69,26 @@ const Leaderboard = () => {
       .eq("user_id", user!.id)
       .not("completed_at", "is", null);
 
+    const userXp = masterTitle?.total_xp || 0;
+
     setUserStats({
-      points: profile?.points || 0,
+      points: userXp,
       challenges: challenges?.length || 0,
       achievements: achievements?.length || 0,
       rooms: rooms?.length || 0,
-      streak: profile?.daily_study_streak || 0,
+      streak: streak?.current_streak || 0,
     });
 
-    // Calculate user rank based on current sort and time period
-    const { data: allProfiles } = await supabase
-      .from("profiles")
-      .select("id, points")
-      .order("points", { ascending: false });
+    // Calculate user rank from global_master_titles (real XP source)
+    const { data: allXp } = await (supabase as any)
+      .from("global_master_titles")
+      .select("user_id, total_xp")
+      .order("total_xp", { ascending: false });
 
-    const rank = allProfiles?.findIndex(p => p.id === user!.id) ?? -1;
+    const rank = allXp?.findIndex((r: any) => r.user_id === user!.id) ?? -1;
     const userPosition = rank + 1;
     setUserRank(userPosition);
-    
+
     // Check if user is in top 100 but not in top 50
     setIsInTop100(userPosition > 50 && userPosition <= 100);
   };
@@ -98,13 +107,37 @@ const Leaderboard = () => {
     }
 
     if (sortBy === 'points') {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, username, display_name, points, level, daily_study_streak")
-        .order("points", { ascending: false })
+      // Use global_master_titles for real XP (actively updated by all activities)
+      const { data: xpData } = await (supabase as any)
+        .from("global_master_titles")
+        .select("user_id, total_xp")
+        .order("total_xp", { ascending: false })
         .limit(50);
-      
-      leaderData = data || [];
+
+      if (xpData && xpData.length > 0) {
+        const userIds = xpData.map((r: any) => r.user_id);
+        const xpMap: Record<string, number> = {};
+        xpData.forEach((r: any) => { xpMap[r.user_id] = r.total_xp; });
+
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, username, display_name, level")
+          .in("id", userIds);
+
+        // Get streaks for display
+        const { data: streaks } = await (supabase as any)
+          .from("mastery_streaks")
+          .select("user_id, current_streak")
+          .in("user_id", userIds);
+        const streakMap: Record<string, number> = {};
+        (streaks || []).forEach((s: any) => { streakMap[s.user_id] = s.current_streak; });
+
+        leaderData = (profiles || []).map(p => ({
+          ...p,
+          points: xpMap[p.id] || 0,
+          daily_study_streak: streakMap[p.id] || 0,
+        })).sort((a, b) => b.points - a.points);
+      }
     } else if (sortBy === 'challenges') {
       // Use aggregation approach: get challenge counts grouped by user
       let submissionsQuery = supabase
@@ -133,23 +166,64 @@ const Leaderboard = () => {
         if (topUserIds.length > 0) {
           const { data: profiles } = await supabase
             .from("profiles")
-            .select("id, username, display_name, points, level, daily_study_streak")
+            .select("id, username, display_name, level")
             .in("id", topUserIds);
-          
+
+          // Get real XP and streaks
+          const { data: xpData } = await (supabase as any)
+            .from("global_master_titles")
+            .select("user_id, total_xp")
+            .in("user_id", topUserIds);
+          const xpMap: Record<string, number> = {};
+          (xpData || []).forEach((r: any) => { xpMap[r.user_id] = r.total_xp; });
+
+          const { data: streaks } = await (supabase as any)
+            .from("mastery_streaks")
+            .select("user_id, current_streak")
+            .in("user_id", topUserIds);
+          const streakMap: Record<string, number> = {};
+          (streaks || []).forEach((s: any) => { streakMap[s.user_id] = s.current_streak; });
+
           leaderData = (profiles || []).map(p => ({
             ...p,
+            points: xpMap[p.id] || 0,
+            daily_study_streak: streakMap[p.id] || 0,
             challengeCount: userCounts[p.id] || 0,
           })).sort((a, b) => b.challengeCount - a.challengeCount);
         }
       }
     } else if (sortBy === 'studies') {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, username, display_name, points, level, daily_study_streak")
-        .order("daily_study_streak", { ascending: false })
+      // Use mastery_streaks for real streak data (actively updated)
+      const { data: streakData } = await (supabase as any)
+        .from("mastery_streaks")
+        .select("user_id, current_streak")
+        .order("current_streak", { ascending: false })
         .limit(50);
-      
-      leaderData = data || [];
+
+      if (streakData && streakData.length > 0) {
+        const userIds = streakData.map((s: any) => s.user_id);
+        const streakMap: Record<string, number> = {};
+        streakData.forEach((s: any) => { streakMap[s.user_id] = s.current_streak; });
+
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, username, display_name, level")
+          .in("id", userIds);
+
+        // Get XP for display
+        const { data: xpData } = await (supabase as any)
+          .from("global_master_titles")
+          .select("user_id, total_xp")
+          .in("user_id", userIds);
+        const xpMap: Record<string, number> = {};
+        (xpData || []).forEach((r: any) => { xpMap[r.user_id] = r.total_xp; });
+
+        leaderData = (profiles || []).map(p => ({
+          ...p,
+          points: xpMap[p.id] || 0,
+          daily_study_streak: streakMap[p.id] || 0,
+        })).sort((a, b) => (streakMap[b.id] || 0) - (streakMap[a.id] || 0));
+      }
     } else if (sortBy === 'rooms') {
       // Use aggregation approach: get room completions grouped by user
       let roomsQuery = supabase
@@ -179,11 +253,28 @@ const Leaderboard = () => {
         if (topUserIds.length > 0) {
           const { data: profiles } = await supabase
             .from("profiles")
-            .select("id, username, display_name, points, level, daily_study_streak")
+            .select("id, username, display_name, level")
             .in("id", topUserIds);
-          
+
+          // Get real XP and streaks
+          const { data: xpData } = await (supabase as any)
+            .from("global_master_titles")
+            .select("user_id, total_xp")
+            .in("user_id", topUserIds);
+          const xpMap: Record<string, number> = {};
+          (xpData || []).forEach((r: any) => { xpMap[r.user_id] = r.total_xp; });
+
+          const { data: streaks } = await (supabase as any)
+            .from("mastery_streaks")
+            .select("user_id, current_streak")
+            .in("user_id", topUserIds);
+          const streakMap: Record<string, number> = {};
+          (streaks || []).forEach((s: any) => { streakMap[s.user_id] = s.current_streak; });
+
           leaderData = (profiles || []).map(p => ({
             ...p,
+            points: xpMap[p.id] || 0,
+            daily_study_streak: streakMap[p.id] || 0,
             roomsCount: userCounts[p.id] || 0,
           })).sort((a, b) => b.roomsCount - a.roomsCount);
         }
