@@ -1589,7 +1589,7 @@ async function generateEpicAudio(
 
   console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? `ElevenLabs (${mode}:${voiceId})` : "OpenAI (onyx)"}`);
 
-
+  const audioBuffers: ArrayBuffer[] = [];
 
   if (useElevenLabs) {
     // Sequential for ElevenLabs (needs stitching context)
