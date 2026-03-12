@@ -1592,39 +1592,49 @@ async function generateEpicAudio(
   const audioBuffers: ArrayBuffer[] = [];
   let elevenLabsFailed = false;
 
-  for (let i = 0; i < chunks.length; i++) {
-    let buffer: ArrayBuffer;
-    if (useElevenLabs && !elevenLabsFailed) {
+  if (useElevenLabs) {
+    // Sequential for ElevenLabs (needs stitching context)
+    for (let i = 0; i < chunks.length; i++) {
       try {
-        buffer = await generateEpicAudioChunkElevenLabs(
+        const buffer = await generateEpicAudioChunkElevenLabs(
           chunks[i], i, chunks.length,
           i > 0 ? chunks[i - 1] : undefined,
           i < chunks.length - 1 ? chunks[i + 1] : undefined,
           voiceId,
         );
+        audioBuffers.push(buffer);
       } catch (elevenErr) {
         const errMsg = elevenErr instanceof Error ? elevenErr.message : String(elevenErr);
         console.warn(`[EpicCommentary] ElevenLabs error on chunk ${i + 1}/${chunks.length}: ${errMsg}`);
 
-        // Mark ElevenLabs as failed so remaining chunks use OpenAI
-        elevenLabsFailed = true;
-
         if (errMsg.includes("quota_exceeded") || errMsg.includes("401") || errMsg.includes("429") || errMsg.includes("insufficient")) {
-          console.warn(`[EpicCommentary] ElevenLabs quota/auth issue — switching ALL remaining chunks to OpenAI TTS`);
+          console.warn(`[EpicCommentary] ElevenLabs quota/auth issue — switching ALL remaining chunks to OpenAI TTS (parallel)`);
         }
 
-        // Fall back to OpenAI for this chunk (including Epic mode — better than nothing)
-        const openAISubChunks = splitTextIntoChunks(chunks[i], 3900);
-        for (let j = 0; j < openAISubChunks.length; j++) {
-          const subBuf = await generateEpicAudioChunkOpenAI(openAISubChunks[j], i * 10 + j, chunks.length * 10);
-          audioBuffers.push(subBuf);
+        // Rebuild remaining chunks for OpenAI and process in parallel
+        const remainingText = chunks.slice(i).join(" ");
+        const openAIChunks = splitTextIntoChunks(remainingText, 3900);
+        const BATCH_SIZE = 4;
+        for (let b = 0; b < openAIChunks.length; b += BATCH_SIZE) {
+          const batch = openAIChunks.slice(b, b + BATCH_SIZE);
+          const results = await Promise.all(
+            batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, openAIChunks.length))
+          );
+          audioBuffers.push(...results);
         }
-        continue;
+        break; // All remaining chunks handled
       }
-    } else {
-      buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
     }
-    audioBuffers.push(buffer);
+  } else {
+    // OpenAI: process in parallel batches of 4
+    const BATCH_SIZE = 4;
+    for (let b = 0; b < chunks.length; b += BATCH_SIZE) {
+      const batch = chunks.slice(b, b + BATCH_SIZE);
+      const results = await Promise.all(
+        batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, chunks.length))
+      );
+      audioBuffers.push(...results);
+    }
   }
 
   // Concatenate all audio buffers
