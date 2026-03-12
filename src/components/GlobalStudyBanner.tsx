@@ -171,6 +171,70 @@ const ALL_PROMPTS: DailyPrompt[] = [
   // ─── Community ───────────────────────────────────────────────
   { category: "motivation", icon: <Users className="h-3.5 w-3.5" />, label: "Palace Lounge",
     text: "Iron sharpens iron. Share what you're studying, ask questions, encourage someone.", actionLabel: "Go", actionLink: "/community" },
+
+  // ─── More Try This — Unique Verse Challenges ───────────────
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Type Trail",
+    text: "Trace the word 'blood' from Abel → Passover → Day of Atonement → Calvary → Revelation 12:11.", actionLabel: "Start", actionLink: "/bible?book=Genesis&chapter=4" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Hidden Christ",
+    text: "Joseph was sold for silver, falsely accused, imprisoned, then exalted to save his family. Sound familiar?", actionLabel: "Genesis 37", actionLink: "/bible?book=Genesis&chapter=37" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Mirror Text",
+    text: "Genesis 1 creates. Revelation 21 re-creates. Compare them side by side — the bookends of the Bible.", actionLabel: "Compare", actionLink: "/bible?book=Revelation&chapter=21" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "40-Day Pattern",
+    text: "40 days: Flood, Moses on Sinai, spies in Canaan, Goliath's taunt, Elijah's journey, Jesus' fast. One pattern.", actionLabel: "Explore", actionLink: "/palace?room=PRm" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Garden to Garden",
+    text: "Eden lost → Gethsemane → Eden restored. Three gardens, one story. What changed between them?", actionLabel: "Genesis 3", actionLink: "/bible?book=Genesis&chapter=3" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Two Mountains",
+    text: "Sinai thundered law. Calvary whispered grace. Same God. Same love. Different volume.", actionLabel: "Hebrews 12", actionLink: "/bible?book=Hebrews&chapter=12" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Name Study",
+    text: "Look up the meaning of Abraham, Isaac, Jacob, Israel, and Jesus. Their names tell the whole gospel story.", actionLabel: "Start", actionLink: "/palace?room=SR" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "First & Last",
+    text: "The first Adam brought death. The last Adam brought life (1 Cor 15:45). Find 5 more first/last contrasts.", actionLabel: "1 Cor 15", actionLink: "/bible?book=1+Corinthians&chapter=15" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Psalm Challenge",
+    text: "Read Psalm 22 as if Jesus wrote it from the cross. Count how many prophecies you find.", actionLabel: "Psalm 22", actionLink: "/bible?book=Psalms&chapter=22" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Bread Trail",
+    text: "Manna → Showbread → Bread of Life → Lord's Supper → Marriage Supper. One thread through Scripture.", actionLabel: "John 6", actionLink: "/bible?book=John&chapter=6" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Water to Wine",
+    text: "Moses turned water to blood (judgment). Jesus turned water to wine (grace). Same power, different mission.", actionLabel: "John 2", actionLink: "/bible?book=John&chapter=2" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "7 Churches",
+    text: "Each of the 7 churches in Revelation 2-3 maps to a period of church history. Which era are we in now?", actionLabel: "Revelation 2", actionLink: "/bible?book=Revelation&chapter=2" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Armor Drill",
+    text: "Put on each piece of armor from Ephesians 6 and connect it to a sanctuary article. They match.", actionLabel: "Ephesians 6", actionLink: "/bible?book=Ephesians&chapter=6" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "3 Days",
+    text: "Jonah: 3 days in a fish. Jesus: 3 days in a tomb. Both emerged to preach repentance. Coincidence?", actionLabel: "Jonah 1", actionLink: "/bible?book=Jonah&chapter=1" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Door Study",
+    text: "Noah's ark had one door. The tabernacle had one door. Jesus said 'I am the door.' One way in.", actionLabel: "John 10", actionLink: "/bible?book=John&chapter=10" },
+
+  // ─── More Motivation ──────────────────────────────────────
+  { category: "motivation", icon: <TrendingUp className="h-3.5 w-3.5" />, label: "Level Up",
+    text: "Every room you master adds a layer to your spiritual armor. Keep training — the battle is real." },
+  { category: "motivation", icon: <Flame className="h-3.5 w-3.5" />, label: "Refiner's Fire",
+    text: "Gold is refined by fire, not by comfort. The hard passages are shaping you into something eternal." },
+  { category: "motivation", icon: <Crown className="h-3.5 w-3.5" />, label: "Royal Priesthood",
+    text: "You are a priest of the Most High. Every time you open Scripture, you enter the sanctuary of God." },
+  { category: "motivation", icon: <Star className="h-3.5 w-3.5" />, label: "Hidden Manna",
+    text: "'To him that overcometh will I give to eat of the hidden manna.' Rev 2:17. There is treasure in the text." },
+
+  // ─── More Actions & Drills ─────────────────────────────────
+  { category: "action", icon: <Target className="h-3.5 w-3.5" />, label: "Cross-Ref Sprint",
+    text: "Pick a verse. Find 5 cross-references in 2 minutes. Then find 5 more. Train your Bible radar.", actionLabel: "Go", actionLink: "/palace?room=C6" },
+  { category: "action", icon: <Brain className="h-3.5 w-3.5" />, label: "Chiasm Hunt",
+    text: "Open any psalm. Look for a mirror structure — where the beginning and end reflect each other.", actionLabel: "Psalms", actionLink: "/bible?book=Psalms&chapter=1" },
+  { category: "action", icon: <Eye className="h-3.5 w-3.5" />, label: "Word Count",
+    text: "Pick a chapter. Circle every time God speaks vs. man speaks. Who dominates the conversation?", actionLabel: "Go", actionLink: "/palace?room=OR" },
+  { category: "action", icon: <Swords className="h-3.5 w-3.5" />, label: "Debate Prep",
+    text: "Pick a doctrine (Sabbath, state of the dead, sanctuary). Build a 3-point biblical defense in 5 minutes.", actionLabel: "FORGE", actionLink: "/living-manna?tab=defense" },
+  { category: "action", icon: <BookOpen className="h-3.5 w-3.5" />, label: "Chapter Race",
+    text: "Read an entire chapter and summarize it in one sentence. Then compare with Jeeves' summary.", actionLabel: "Go", actionLink: "/palace?room=SR" },
+
+  // ─── More Spiritual ────────────────────────────────────────
+  { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Still Small Voice",
+    text: "Elijah heard God not in the earthquake or fire, but in the still small voice. Be still today.", actionLabel: "1 Kings 19", actionLink: "/bible?book=1+Kings&chapter=19" },
+  { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "The Potter",
+    text: "\"The vessel that he made of clay was marred... so he made it again.\" God is not done with you.", actionLabel: "Jeremiah 18", actionLink: "/bible?book=Jeremiah&chapter=18" },
+  { category: "spiritual", icon: <Sparkles className="h-3.5 w-3.5" />, label: "Living Water",
+    text: "Jesus told the woman at the well: 'The water I give shall be a well springing up into everlasting life.'", actionLabel: "John 4", actionLink: "/bible?book=John&chapter=4" },
+  { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Footwashing",
+    text: "The King of the universe knelt to wash dirty feet. What does that tell you about His character?", actionLabel: "John 13", actionLink: "/bible?book=John&chapter=13" },
 ];
 
 const CATEGORY_STYLES: Record<string, { accent: string; iconColor: string; badgeBg: string }> = {
@@ -181,6 +245,24 @@ const CATEGORY_STYLES: Record<string, { accent: string; iconColor: string; badge
 };
 
 const ROTATE_INTERVAL_MS = 10 * 60 * 1000;
+
+// Fisher-Yates shuffle with a daily seed so prompts appear in a fresh order each day
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0x7fffffff; // LCG
+    const j = s % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function getDailyShuffledPrompts(): DailyPrompt[] {
+  const today = new Date();
+  const daySeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  return seededShuffle(ALL_PROMPTS, daySeed);
+}
 
 // ─── Behavioral Nudge Messages ──────────────────────────────
 const NUDGE_MESSAGES: Record<string, string> = {
@@ -307,18 +389,19 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const fallbackDisplayName = (userEmail ?? authUser?.email)?.split("@")[0] || "Scholar";
 
   const [dismissed, setDismissed] = useState(false);
+  const [dailyPrompts] = useState(() => getDailyShuffledPrompts());
   const [promptIdx, setPromptIdx] = useState(() =>
-    Math.floor(Date.now() / ROTATE_INTERVAL_MS) % ALL_PROMPTS.length
+    Math.floor(Date.now() / ROTATE_INTERVAL_MS) % dailyPrompts.length
   );
   const [xpFlash, setXpFlash] = useState(false);
   const stats = useUserBannerStats(resolvedUserId, fallbackDisplayName);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPromptIdx(prev => (prev + 1) % ALL_PROMPTS.length);
+      setPromptIdx(prev => (prev + 1) % dailyPrompts.length);
     }, ROTATE_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, []);
+  }, [dailyPrompts.length]);
 
   // Micro-animation: XP flash when totalXp changes
   const [prevXp, setPrevXp] = useState(0);
@@ -331,12 +414,16 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   }, [stats.totalXp]);
 
   const shuffle = useCallback(() => {
-    setPromptIdx(prev => (prev + 1) % ALL_PROMPTS.length);
-  }, []);
+    setPromptIdx(prev => {
+      let next: number;
+      do { next = Math.floor(Math.random() * dailyPrompts.length); } while (next === prev && dailyPrompts.length > 1);
+      return next;
+    });
+  }, [dailyPrompts.length]);
 
   if (!resolvedUserId) return null;
 
-  const prompt = ALL_PROMPTS[promptIdx];
+  const prompt = dailyPrompts[promptIdx];
   const style = CATEGORY_STYLES[prompt.category];
   const rank = getXpRank(stats.totalXp);
   const initials = (stats.displayName || fallbackDisplayName).slice(0, 2).toUpperCase();

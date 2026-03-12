@@ -248,6 +248,64 @@ const PT_PROMPTS: Omit<DailyPrompt, "accent">[] = [
   { category: "motivation", icon: <Users className="h-4 w-4" />, label: "Palace Lounge",
     text: "Iron sharpens iron. Share what you're studying, ask questions, encourage someone.",
     actionLabel: "Go", actionLink: "/community" },
+
+  // ─── More Try This — Verse Challenges ──────────────────────
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Type Trail",
+    text: "Trace 'blood' from Abel → Passover → Day of Atonement → Calvary → Revelation 12:11.", actionLabel: "Start", actionLink: "/bible?book=Genesis&chapter=4" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Hidden Christ",
+    text: "Joseph was sold for silver, falsely accused, imprisoned, then exalted to save his family. Sound familiar?", actionLabel: "Genesis 37", actionLink: "/bible?book=Genesis&chapter=37" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Mirror Text",
+    text: "Genesis 1 creates. Revelation 21 re-creates. Compare them side by side — the bookends of the Bible.", actionLabel: "Compare", actionLink: "/bible?book=Revelation&chapter=21" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "40-Day Pattern",
+    text: "40 days: Flood, Moses on Sinai, spies in Canaan, Goliath's taunt, Elijah's journey, Jesus' fast. One pattern.", actionLabel: "Explore", actionLink: "/palace?room=PRm" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Garden to Garden",
+    text: "Eden lost → Gethsemane → Eden restored. Three gardens, one story. What changed between them?", actionLabel: "Genesis 3", actionLink: "/bible?book=Genesis&chapter=3" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Two Mountains",
+    text: "Sinai thundered law. Calvary whispered grace. Same God. Same love. Different volume.", actionLabel: "Hebrews 12", actionLink: "/bible?book=Hebrews&chapter=12" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Name Study",
+    text: "Look up the meaning of Abraham, Isaac, Jacob, Israel, and Jesus. Their names tell the gospel.", actionLabel: "Start", actionLink: "/palace?room=SR" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "First & Last",
+    text: "The first Adam brought death. The last Adam brought life (1 Cor 15:45). Find 5 more contrasts.", actionLabel: "1 Cor 15", actionLink: "/bible?book=1+Corinthians&chapter=15" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Psalm Challenge",
+    text: "Read Psalm 22 as if Jesus wrote it from the cross. Count how many prophecies you find.", actionLabel: "Psalm 22", actionLink: "/bible?book=Psalms&chapter=22" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Bread Trail",
+    text: "Manna → Showbread → Bread of Life → Lord's Supper → Marriage Supper. One thread.", actionLabel: "John 6", actionLink: "/bible?book=John&chapter=6" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Water to Wine",
+    text: "Moses turned water to blood (judgment). Jesus turned water to wine (grace). Same power.", actionLabel: "John 2", actionLink: "/bible?book=John&chapter=2" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "7 Churches",
+    text: "Each of the 7 churches in Revelation 2-3 maps to a period of church history. Which era now?", actionLabel: "Revelation 2", actionLink: "/bible?book=Revelation&chapter=2" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Armor Drill",
+    text: "Put on each piece of armor from Ephesians 6 and connect it to a sanctuary article.", actionLabel: "Ephesians 6", actionLink: "/bible?book=Ephesians&chapter=6" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "3 Days",
+    text: "Jonah: 3 days in a fish. Jesus: 3 days in a tomb. Both emerged to preach repentance.", actionLabel: "Jonah 1", actionLink: "/bible?book=Jonah&chapter=1" },
+  { category: "try_this", icon: <Lightbulb className="h-4 w-4" />, label: "Door Study",
+    text: "Noah's ark had one door. The tabernacle had one door. Jesus said 'I am the door.' One way.", actionLabel: "John 10", actionLink: "/bible?book=John&chapter=10" },
+
+  // ─── More Motivation ──────────────────────────────────────
+  { category: "motivation", icon: <Flame className="h-4 w-4" />, label: "Refiner's Fire",
+    text: "Gold is refined by fire, not by comfort. The hard passages are shaping you into something eternal." },
+  { category: "motivation", icon: <Crown className="h-4 w-4" />, label: "Royal Priesthood",
+    text: "You are a priest of the Most High. Every time you open Scripture, you enter the sanctuary of God." },
+  { category: "motivation", icon: <Star className="h-4 w-4" />, label: "Hidden Manna",
+    text: "'To him that overcometh will I give to eat of the hidden manna.' Rev 2:17. Treasure in the text." },
+
+  // ─── More Actions ──────────────────────────────────────────
+  { category: "action", icon: <Target className="h-4 w-4" />, label: "Cross-Ref Sprint",
+    text: "Pick a verse. Find 5 cross-references in 2 minutes. Train your Bible radar.", actionLabel: "Go", actionLink: "/palace?room=C6" },
+  { category: "action", icon: <Brain className="h-4 w-4" />, label: "Chiasm Hunt",
+    text: "Open any psalm. Look for mirror structure — where the beginning and end reflect each other.", actionLabel: "Psalms", actionLink: "/bible?book=Psalms&chapter=1" },
+  { category: "action", icon: <Swords className="h-4 w-4" />, label: "Debate Prep",
+    text: "Pick a doctrine. Build a 3-point biblical defense in 5 minutes.", actionLabel: "FORGE", actionLink: "/living-manna?tab=defense" },
+
+  // ─── More Spiritual ────────────────────────────────────────
+  { category: "spiritual", icon: <Heart className="h-4 w-4" />, label: "Still Small Voice",
+    text: "Elijah heard God not in the earthquake or fire, but in the still small voice. Be still today.", actionLabel: "1 Kings 19", actionLink: "/bible?book=1+Kings&chapter=19" },
+  { category: "spiritual", icon: <Heart className="h-4 w-4" />, label: "The Potter",
+    text: "\"The vessel that he made of clay was marred... so he made it again.\" God is not done with you.", actionLabel: "Jeremiah 18", actionLink: "/bible?book=Jeremiah&chapter=18" },
+  { category: "spiritual", icon: <Sparkles className="h-4 w-4" />, label: "Living Water",
+    text: "Jesus told the woman at the well: 'The water I give shall be a well springing up into everlasting life.'", actionLabel: "John 4", actionLink: "/bible?book=John&chapter=4" },
+  { category: "spiritual", icon: <Heart className="h-4 w-4" />, label: "Footwashing",
+    text: "The King of the universe knelt to wash dirty feet. What does that tell you about His character?", actionLabel: "John 13", actionLink: "/bible?book=John&chapter=13" },
 ];
 
 const CATEGORY_ACCENTS: Record<string, string> = {
@@ -278,23 +336,43 @@ function getDayOfYear(): number {
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
+// Fisher-Yates shuffle with a daily seed so prompts appear in a fresh order each day
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0x7fffffff;
+    const j = s % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function getDailyShuffledPrompts() {
+  const today = new Date();
+  const daySeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  return seededShuffle(PT_PROMPTS, daySeed);
+}
+
 export function PersonalizedStudyBanner() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState<StudyStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [studyPath, setStudyPath] = useState<{ title: string; description: string } | null>(null);
-  const [promptIndex, setPromptIndex] = useState(0);
+  const [dailyPrompts] = useState(() => getDailyShuffledPrompts());
+  const [promptIndex, setPromptIndex] = useState(() =>
+    Math.floor(Date.now() / (10 * 60 * 1000)) % dailyPrompts.length
+  );
 
-  // Select daily prompt based on day of year
+  // Select daily prompt from shuffled array
   const dailyPrompt = useMemo<DailyPrompt>(() => {
-    const day = getDayOfYear() + promptIndex;
-    const prompt = PT_PROMPTS[day % PT_PROMPTS.length];
+    const prompt = dailyPrompts[promptIndex % dailyPrompts.length];
     return {
       ...prompt,
       accent: CATEGORY_ACCENTS[prompt.category],
     };
-  }, [promptIndex]);
+  }, [promptIndex, dailyPrompts]);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
@@ -370,7 +448,11 @@ export function PersonalizedStudyBanner() {
     ? `🔥 ${stats.streak}-day streak — you're on fire!`
     : `🏆 ${stats.streak}-day streak — legendary!`;
 
-  const shufflePrompt = () => setPromptIndex(prev => prev + 1);
+  const shufflePrompt = () => setPromptIndex(prev => {
+    let next: number;
+    do { next = Math.floor(Math.random() * dailyPrompts.length); } while (next === prev && dailyPrompts.length > 1);
+    return next;
+  });
 
   return (
     <div className="rounded-2xl border border-border/50 bg-gradient-to-br from-card/90 via-card/70 to-card/80 backdrop-blur-xl p-4 mb-6 shadow-lg space-y-3">
