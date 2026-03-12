@@ -627,12 +627,6 @@ const Community = () => {
                     Where iron sharpens iron
                   </p>
                   <div className="flex items-center gap-2 mt-3 flex-wrap">
-                    {needsFeedbackCount > 0 && (
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Sparkles className="h-3 w-3" />
-                        {t('community.postsNeedFeedback', { count: needsFeedbackCount })}
-                      </Badge>
-                    )}
                     {unansweredPrayers > 0 && (
                       <Badge variant="outline" className="flex items-center gap-1 border-purple-400/40 text-purple-500 bg-purple-500/5">
                         <span className="text-xs">{"\uD83D\uDD6F"}</span>
