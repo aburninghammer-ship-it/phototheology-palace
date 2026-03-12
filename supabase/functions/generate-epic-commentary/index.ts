@@ -1544,9 +1544,16 @@ async function checkElevenLabsCredits(): Promise<{ hasCredits: boolean; remainin
       return null;
     }
     const data = await resp.json();
-    const remaining = (data.character_limit || 0) - (data.character_count || 0);
-    console.log(`[EpicCommentary] ElevenLabs credits: ${remaining} chars remaining (${data.character_count}/${data.character_limit})`);
-    return { hasCredits: remaining > 500, remaining };
+    // Check both standard character limits AND usage-based billing thresholds
+    const standardRemaining = (data.character_limit || 0) - (data.character_count || 0);
+    // Usage-based billing has a separate threshold tracked via the API
+    // If the API recently returned quota_exceeded, trust that over our calculation
+    const usageBasedLimit = data.usage_based_character_limit || 0;
+    const usageBasedCount = data.usage_based_character_count || 0;
+    const usageBasedRemaining = usageBasedLimit > 0 ? usageBasedLimit - usageBasedCount : Infinity;
+    const remaining = Math.min(standardRemaining, usageBasedRemaining);
+    console.log(`[EpicCommentary] ElevenLabs credits: standard=${standardRemaining}, usage-based=${usageBasedRemaining === Infinity ? 'N/A' : usageBasedRemaining}, effective=${remaining}`);
+    return { hasCredits: remaining > 1000, remaining };
   } catch (e) {
     console.warn("[EpicCommentary] Credit check error:", e);
     return null;
