@@ -82,6 +82,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const topicSectionRef = useRef<HTMLDivElement>(null);
 
   // Sub-mode: sparring arena vs 3AM library
   const [subMode, setSubMode] = useState<DefenseSubMode>("sparring");
@@ -1935,6 +1936,9 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
           </div>
         </div>
 
+        {/* Scroll target after opponent selection */}
+        <div ref={topicSectionRef} />
+
         {/* Goliath Blind Mode Banner */}
         {isGoliath && !goliathScoutMode && (
           <motion.div
@@ -2163,6 +2167,10 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
           onSelectOpponent={(opp) => {
             setSelectedOpponent(opp);
             setProfileOpponent(null);
+            // Auto-scroll to topic section on mobile after opponent selection
+            setTimeout(() => {
+              topicSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 150);
           }}
           onNavigateToAATS={onNavigateToAATS}
         />

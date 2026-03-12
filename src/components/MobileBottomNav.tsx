@@ -18,7 +18,7 @@ const moreNavItems = [
   { icon: Zap, label: "Freestyle", path: "/palace/freestyle" },
   { icon: Crown, label: "COTA Series", path: "/cota-series" },
   { icon: Microscope, label: "Research Mode", path: "/research-mode" },
-  { icon: BrainCircuit, label: "Analyze My Thoughts", path: "/analyze-my-thoughts" },
+  { icon: BrainCircuit, label: "Analyze My Thoughts", path: "/analyze-thoughts" },
   { icon: Users, label: "Discover", path: "/discover" },
   { icon: MessageCircle, label: "Public Chat", path: "/public-chat" },
   { icon: Scroll, label: "Bible Studies", path: "/bible-study-series" },
