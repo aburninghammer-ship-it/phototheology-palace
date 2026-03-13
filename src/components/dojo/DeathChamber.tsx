@@ -253,11 +253,42 @@ export const DeathChamber = () => {
 
     setIsLoading(true);
     try {
+      // Refresh session before save — meditation sessions can be long
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (!session || sessionError) {
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          toast.error("Your session expired. Please log in again.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Check if this day was already completed (guard against double-save)
+      const groupId = groupInfo?.id || null;
+      const existingQuery = (supabase as any)
+        .from('death_chamber_progress')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('day_number', currentDay);
+      if (groupId) {
+        existingQuery.eq('group_id', groupId);
+      } else {
+        existingQuery.is('group_id', null);
+      }
+      const { data: existing } = await existingQuery;
+      if (existing && existing.length > 0) {
+        toast.success(`Day ${currentDay} was already completed.`);
+        await fetchProgress();
+        setIsLoading(false);
+        return;
+      }
+
       const { error } = await (supabase as any)
         .from('death_chamber_progress')
         .insert({
           user_id: userId,
-          group_id: groupInfo?.id || null,
+          group_id: groupId,
           day_number: currentDay,
           reflection: `${reflection}\n\n--- What the Spirit Said ---\n${spiritJournal}`,
           tomb_affirmation_accepted: true,
@@ -287,9 +318,16 @@ export const DeathChamber = () => {
       if (currentDay === 30) {
         setView("completion");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error completing day:", error);
-      toast.error("Failed to save progress");
+      if (error?.code === '42501' || error?.message?.includes('policy')) {
+        toast.error("Session error — please refresh the page and try again.");
+      } else if (error?.code === '23505') {
+        toast.success(`Day ${currentDay} was already saved.`);
+        await fetchProgress();
+      } else {
+        toast.error("Failed to save progress. Please check your connection and try again.");
+      }
     } finally {
       setIsLoading(false);
     }
