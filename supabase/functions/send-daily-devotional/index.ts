@@ -543,7 +543,7 @@ serve(async (req) => {
 
         const { error: emailError } = await resend.emails.send({
           from: "Phototheology Devotionals <devotionals@thephototheologyapp.com>",
-          reply_to: "support@phototheologybible.com",
+          replyTo: "support@phototheologybible.com",
           to: userEmail,
           subject: `📖 Day ${currentDayNumber}: ${dayContent.title} — Your Devotional Journey (${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })})`,
           html: emailHtml,
