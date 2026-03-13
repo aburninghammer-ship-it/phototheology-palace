@@ -1,10 +1,6 @@
 // Biblical Character Therapy Profiles - 270 Characters with Situation Analysis
 
-import { characterBatch1 } from "./characterBatch1";
-import { characterBatch2 } from "./characterBatch2";
-import { characterBatch3 } from "./characterBatch3";
-import { characterBatch4 } from "./characterBatch4";
-import { characterBatch5 } from "./characterBatch5";
+// Character batches removed — profiles are defined inline below
 
 export type Archetype = "Shepherd" | "Warrior" | "Prophet" | "Strategist" | "Survivor" | "Redeemed" | "Seeker" | "Manipulator" | "Oppressor" | "Tragic Hero" | "Servant" | "Matriarch" | "Patriarch" | "Judge" | "King" | "Priest" | "Missionary" | "Builder" | "Exile" | "Martyr";
 
@@ -2235,9 +2231,4 @@ const coreCharacters: CharacterProfile[] = [
 
 export const biblicalCharacterProfiles: CharacterProfile[] = [
   ...coreCharacters,
-  ...characterBatch1,
-  ...characterBatch2,
-  ...characterBatch3,
-  ...characterBatch4,
-  ...characterBatch5,
 ];

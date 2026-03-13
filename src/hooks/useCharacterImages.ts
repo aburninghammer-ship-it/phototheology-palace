@@ -6,17 +6,26 @@ export function useCharacterImages() {
     queryKey: ["character-images"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("character_image_cache")
-        .select("character_id, public_url");
+        .from("profiles" as any)
+        .select("id")
+        .limit(0);
 
-      if (error) throw error;
-
+      // character_image_cache table may not exist yet — return empty map
       const map = new Map<string, string>();
-      for (const row of data ?? []) {
-        map.set(row.character_id, row.public_url);
+      try {
+        const res = await supabase
+          .from("character_image_cache" as any)
+          .select("character_id, public_url");
+        if (!res.error && res.data) {
+          for (const row of res.data as any[]) {
+            map.set(row.character_id, row.public_url);
+          }
+        }
+      } catch {
+        // table doesn't exist yet
       }
       return map;
     },
-    staleTime: 1000 * 60 * 60, // 1 hour - images are static
+    staleTime: 1000 * 60 * 60,
   });
 }

@@ -79,6 +79,10 @@ const ALL_PROMPTS: DailyPrompt[] = [
     text: "Which sanctuary furniture does your current passage connect to? Altar, Laver, Lampstand, Ark?", actionLabel: "Blue Room", actionLink: "/palace?room=BL" },
   { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Five Ascensions",
     text: "Run any verse through Text → Chapter → Book → Cycle → Heaven. Watch it expand at every level.", actionLabel: "Five Ascensions", actionLink: "/palace?room=FE" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Commentary Suite",
+    text: "Listen to a COTA chapter analyzed by 6 unique voices — Epic Narrator, Urban Preacher, Ancient Scholar, Fiery Preacher, Academic, or Counselor.", actionLabel: "COTA Series", actionLink: "/cota-series" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Counselor Mode",
+    text: "The Counselor commentary connects Scripture to your personal growth with a warm, therapeutic voice. Try it on your favorite chapter.", actionLabel: "Listen Now", actionLink: "/cota-series" },
 
   // ─── Games ───────────────────────────────────────────────────
   { category: "action", icon: <Gamepad2 className="h-3.5 w-3.5" />, label: "Chain Chess",
