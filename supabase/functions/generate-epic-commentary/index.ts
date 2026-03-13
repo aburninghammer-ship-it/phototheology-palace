@@ -1585,9 +1585,16 @@ async function generateEpicAudio(
   const audioBuffers: ArrayBuffer[] = [];
 
   if (useElevenLabs) {
-    // Sequential for ElevenLabs (needs stitching context) — NO OpenAI fallback
-    // Usage-based billing is enabled, so ElevenLabs should always work
+    // Sequential for ElevenLabs (needs stitching context)
+    // Falls back to OpenAI if ElevenLabs fails (e.g. quota exceeded)
+    let fallbackToOpenAI = false;
     for (let i = 0; i < chunks.length; i++) {
+      if (fallbackToOpenAI) {
+        // Already fell back — use OpenAI for remaining chunks
+        const buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
+        audioBuffers.push(buffer);
+        continue;
+      }
       // Retry up to 3 times on transient errors
       let lastErr: Error | null = null;
       for (let attempt = 0; attempt < 3; attempt++) {
@@ -1604,13 +1611,20 @@ async function generateEpicAudio(
         } catch (elevenErr) {
           lastErr = elevenErr instanceof Error ? elevenErr : new Error(String(elevenErr));
           console.warn(`[EpicCommentary] ElevenLabs attempt ${attempt + 1}/3 failed on chunk ${i + 1}/${chunks.length}: ${lastErr.message}`);
+          // If quota exceeded or auth error, don't retry — fall back immediately
+          if (lastErr.message.includes("quota_exceeded") || lastErr.message.includes("401")) {
+            break;
+          }
           if (attempt < 2) {
             await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // backoff
           }
         }
       }
       if (lastErr) {
-        throw new Error(`ElevenLabs TTS failed after 3 retries on chunk ${i + 1}: ${lastErr.message}`);
+        console.warn(`[EpicCommentary] ElevenLabs failed on chunk ${i + 1}, falling back to OpenAI TTS for remaining chunks: ${lastErr.message}`);
+        fallbackToOpenAI = true;
+        const buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
+        audioBuffers.push(buffer);
       }
     }
   } else {
