@@ -115,6 +115,16 @@ const studyTools = [
     gradient: "from-blue-500 to-indigo-500",
     badge: "AI",
     tip: "Search by Strong's number, English, Hebrew, or Greek"
+  },
+  {
+    id: "character-profiles",
+    name: "Character Profiles",
+    description: "Explore biblical characters with historically accurate profiles and images",
+    icon: BookMarked,
+    path: "/character-profiles",
+    gradient: "from-emerald-500 to-teal-500",
+    badge: null,
+    tip: "Discover archetypes, situations, and lessons from biblical figures"
   }
 ];
 

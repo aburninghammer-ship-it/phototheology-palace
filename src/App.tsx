@@ -153,6 +153,7 @@ const BibleEncyclopedia = lazy(() => import("./pages/BibleEncyclopedia"));
 const EncyclopediaArticle = lazy(() => import("./pages/EncyclopediaArticle"));
 const DailyReading = lazy(() => import("./pages/DailyReading"));
 const TreasureHunt = lazy(() => import("./pages/TreasureHunt"));
+const CharacterProfiles = lazy(() => import("./pages/CharacterProfiles"));
 const TreasureHuntPlay = lazy(() => import("./pages/TreasureHuntPlay"));
 const TrainingDrills = lazy(() => import("./pages/TrainingDrills"));
 const DrillDrill = lazy(() => import("./pages/DrillDrill"));
@@ -496,6 +497,7 @@ function App() {
             <Route path="/ascensions-expansions" element={<ProtectedRoute><AscensionsExpansions /></ProtectedRoute>} />
             <Route path="/encyclopedia" element={<ProtectedRoute><BibleEncyclopedia /></ProtectedRoute>} />
             <Route path="/encyclopedia/:slug" element={<ProtectedRoute><EncyclopediaArticle /></ProtectedRoute>} />
+            <Route path="/character-profiles" element={<ProtectedRoute><CharacterProfiles /></ProtectedRoute>} />
             <Route path="/video-training" element={<ProtectedRoute><VideoTraining /></ProtectedRoute>} />
             <Route path="/video_admin" element={<ProtectedRoute><VideoTraining /></ProtectedRoute>} />
             <Route path="/music" element={<ProtectedRoute><MusicCategories /></ProtectedRoute>} />
