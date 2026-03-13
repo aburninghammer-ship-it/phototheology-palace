@@ -43,7 +43,7 @@ export function CharacterImageGenerator() {
       while (true) {
         const to = from + pageSize - 1;
         const { data, error } = await supabase
-          .from("character_image_cache")
+          .from("character_image_cache" as any)
           .select("character_id, public_url, generated_at")
           .order("character_id", { ascending: true })
           .range(from, to);
