@@ -12,6 +12,7 @@ import { EmailCampaignManager } from "@/components/admin/EmailCampaignManager";
 import { SubscriptionMismatches } from "@/components/admin/SubscriptionMismatches";
 import { BulkEmailSender } from "@/components/admin/BulkEmailSender";
 import { ImageBibleGenerator } from "@/components/admin/ImageBibleGenerator";
+import { CharacterImageGenerator } from "@/components/admin/CharacterImageGenerator";
 import { PatreonOutreach } from "@/components/admin/PatreonOutreach";
 import { PatreonManualLink } from "@/components/admin/PatreonManualLink";
 import { PickaxeImport } from "@/components/admin/PickaxeImport";
@@ -613,6 +614,7 @@ export default function AdminSubscriptions() {
           <TabsTrigger value="campaigns">Email Campaigns</TabsTrigger>
           <TabsTrigger value="email">Quick Email</TabsTrigger>
           <TabsTrigger value="image-bible">Image Bible</TabsTrigger>
+          <TabsTrigger value="character-images">Character Images</TabsTrigger>
           <TabsTrigger value="patreon">Patreon</TabsTrigger>
           <TabsTrigger value="teachable">Teachable</TabsTrigger>
           <TabsTrigger value="pickaxe">Pickaxe</TabsTrigger>
@@ -976,6 +978,10 @@ export default function AdminSubscriptions() {
 
         <TabsContent value="image-bible">
           <ImageBibleGenerator />
+        </TabsContent>
+
+        <TabsContent value="character-images">
+          <CharacterImageGenerator />
         </TabsContent>
 
         <TabsContent value="patreon" className="space-y-6">
