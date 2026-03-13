@@ -22,6 +22,7 @@ const moreNavItems = [
   { icon: Users, label: "Discover", path: "/discover" },
   { icon: MessageCircle, label: "Public Chat", path: "/public-chat" },
   { icon: Scroll, label: "Bible Studies", path: "/bible-study-series" },
+  { icon: UserRound, label: "Characters", path: "/character-profiles" },
 ];
 
 export function MobileBottomNav() {
