@@ -50,7 +50,7 @@ export function CharacterImageGenerator() {
 
         if (error) throw error;
 
-        const rows = (data as CachedCharacterImage[]) ?? [];
+        const rows = ((data as unknown) as CachedCharacterImage[]) ?? [];
         rows.forEach((item) => {
           cache.set(item.character_id, {
             url: item.public_url,
