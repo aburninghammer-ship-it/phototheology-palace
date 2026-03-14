@@ -1571,12 +1571,18 @@ async function generateEpicAudio(
   let useElevenLabs = !!ELEVENLABS_API_KEY;
   const processedText = addPauseMarkers(text);
 
-  // ── Usage-based billing enabled (1M credit limit) — always use ElevenLabs when key is present ──
+  // ── Check ElevenLabs credits upfront to avoid mid-generation failures ──
   if (useElevenLabs) {
-    console.log(`[EpicCommentary] ElevenLabs usage-based billing active — proceeding with ElevenLabs voice (${mode}:${voiceId})`);
+    const creditCheck = await checkElevenLabsCredits();
+    if (creditCheck && !creditCheck.hasCredits) {
+      console.warn(`[EpicCommentary] ElevenLabs credits exhausted (${creditCheck.remaining} remaining). Using OpenAI TTS directly.`);
+      useElevenLabs = false;
+    } else {
+      console.log(`[EpicCommentary] ElevenLabs credits OK (${creditCheck?.remaining ?? 'unknown'} remaining) — proceeding with ElevenLabs voice (${mode}:${voiceId})`);
+    }
   }
 
-  // ── Smaller chunks (600 chars) for ElevenLabs to reduce credit spikes ──
+  // ── Smaller chunks (600 chars) for ElevenLabs to reduce credit spikes; larger for OpenAI ──
   const chunkSize = useElevenLabs ? 600 : 3900;
   const chunks = splitTextIntoChunks(processedText, chunkSize);
 
