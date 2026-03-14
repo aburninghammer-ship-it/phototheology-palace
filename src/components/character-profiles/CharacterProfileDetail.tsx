@@ -99,18 +99,23 @@ const situationCategoryColors: Record<string, string> = {
 function DNAChart({ dna }: { dna: CharacterDNA }) {
   return (
     <div className="space-y-2">
-      {traitLabels.map(({ key, label, positive }) => (
-        <div key={key} className="flex items-center gap-3">
-          <span className="text-sm w-24 text-right font-medium">{label}</span>
-          <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-            <div
-              className={cn("h-full rounded-full transition-all", traitBarColor(positive, dna[key]))}
-              style={{ width: `${(dna[key] / 5) * 100}%` }}
-            />
+      {traitLabels.map(({ key, label, positive }) => {
+        // Clamp all values to 0-5 range — Jesus is the standard at 5/5
+        const rawValue = dna[key];
+        const value = Math.max(0, Math.min(5, rawValue));
+        return (
+          <div key={key} className="flex items-center gap-3">
+            <span className="text-sm w-24 text-right font-medium">{label}</span>
+            <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+              <div
+                className={cn("h-full rounded-full transition-all", traitBarColor(positive, value))}
+                style={{ width: `${(value / 5) * 100}%` }}
+              />
+            </div>
+            <span className="text-sm w-6 text-muted-foreground">{value}/5</span>
           </div>
-          <span className="text-sm w-6 text-muted-foreground">{dna[key]}/5</span>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
