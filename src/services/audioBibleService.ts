@@ -175,7 +175,7 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
     const session = await supabase.auth.getSession();
     const token = session.data.session?.access_token;
     const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "";
-    const anonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "";
+    const anonKey = (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -291,7 +291,7 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
     const session = await supabase.auth.getSession();
     const token = session.data.session?.access_token;
     const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "";
-    const anonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "";
+    const anonKey = (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -392,7 +392,7 @@ export async function generateCounselorCommentary(options: CommentaryOptions): P
     const session = await supabase.auth.getSession();
     const token = session.data.session?.access_token;
     const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "";
-    const anonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "";
+    const anonKey = (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -555,7 +555,7 @@ export async function generatePassageCommentary(options: PassageCommentaryOption
     const session = await supabase.auth.getSession();
     const token = session.data.session?.access_token;
     const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "";
-    const anonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "";
+    const anonKey = (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

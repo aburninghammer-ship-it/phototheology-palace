@@ -76,7 +76,7 @@ export const PreacherMentorCard = ({
 
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
-        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY || "",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "",
       };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
