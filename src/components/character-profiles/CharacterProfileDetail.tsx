@@ -35,6 +35,7 @@ import type {
   CharacterDNA,
 } from "@/data/biblicalCharacterProfiles";
 import { cn } from "@/lib/utils";
+import { CharacterDeepAnalysis } from "./CharacterDeepAnalysis";
 
 interface CharacterProfileDetailProps {
   character: CharacterProfile;
