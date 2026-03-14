@@ -311,19 +311,27 @@ export const VerseView = ({
         )}
         onClick={onSelect}
       >
-        <div className="flex gap-3">
-          <div className="flex flex-col items-center gap-1">
-            <span
-              className={cn(
-                "font-serif font-bold text-sm flex-shrink-0 transition-colors",
-                isSelected ? "text-primary" : "text-muted-foreground group-hover:text-primary"
-              )}
-            >
-              {verse.verse}
-            </span>
+        <div className="flex gap-2 sm:gap-3">
+          <span
+            className={cn(
+              "font-serif font-bold text-sm flex-shrink-0 transition-colors pt-0.5",
+              isSelected ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+            )}
+          >
+            {verse.verse}
+          </span>
+          
+          <div className="flex-1 min-w-0">
+            <p className="text-foreground leading-relaxed">
+              {renderVerseText(verse.text)}
+            </p>
             
-            {/* Highlight, Note & Ask Jeeves buttons */}
-            <div className="flex gap-0.5" onClick={(e) => e.stopPropagation()}>
+            {/* Highlight, Note & Ask Jeeves buttons - below text on mobile, inline on desktop */}
+            <div className={cn(
+              "flex flex-wrap gap-0.5 mt-1",
+              !isSelected && "sm:opacity-0 sm:group-hover:opacity-100 transition-opacity",
+              !isSelected && "hidden sm:flex"
+            )} onClick={(e) => e.stopPropagation()}>
               {onHighlight && onRemoveHighlight && (
                 <VerseHighlightMenu
                   verse={verse.verse}
@@ -345,7 +353,7 @@ export const VerseView = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-6 w-6 p-0"
                 onClick={handleCopyVerse}
                 title="Copy verse"
               >
@@ -355,7 +363,7 @@ export const VerseView = ({
                   <Copy className="h-3 w-3 text-blue-500" />
                 )}
               </Button>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+              <div onClick={(e) => e.stopPropagation()}>
                 <QuickAudioButton
                   text={`${book || ''} chapter ${chapter || ''}, verse ${verse.verse}. ${verse.text}`}
                   variant="ghost"
@@ -367,7 +375,7 @@ export const VerseView = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-6 w-6 p-0"
                   onClick={(e) => {
                     e.stopPropagation();
                     onAskJeeves(verse.verse, verse.text);
@@ -380,7 +388,7 @@ export const VerseView = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-6 w-6 p-0"
                 onClick={handleExplainVerse}
                 title="Explain this verse"
               >
@@ -389,19 +397,13 @@ export const VerseView = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-6 w-6 p-0"
                 onClick={handleSermonStarter}
                 title="Generate sermon starter from this verse"
               >
                 <Mic className="h-3 w-3 text-amber-500" />
               </Button>
             </div>
-          </div>
-          
-          <div className="flex-1">
-            <p className="text-foreground leading-relaxed">
-              {renderVerseText(verse.text)}
-            </p>
             
             {showPrinciples && (
               <div className="flex gap-2 mt-2 flex-wrap items-center">
