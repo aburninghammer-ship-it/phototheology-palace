@@ -125,6 +125,7 @@ const PublicSeriesBrowser = lazy(() => import("./pages/PublicSeriesBrowser"));
 const Flashcards = lazy(() => import("./pages/Flashcards"));
 const PhototheologyImageBible = lazy(() => import("./pages/PhototheologyImageBible"));
 const PowerOfTheLamb = lazy(() => import("./pages/PowerOfTheLamb"));
+const CharacterProfiles = lazy(() => import("./pages/CharacterProfiles"));
 const SpiritualTraining = lazy(() => import("./pages/SpiritualTraining"));
 const AppTour = lazy(() => import("./pages/AppTour"));
 const Courses = lazy(() => import("./pages/Courses"));
@@ -645,6 +646,7 @@ function App() {
           <Route path="/infographics" element={<ProtectedRoute><InfographicGenerator /></ProtectedRoute>} />
           <Route path="/study-series" element={<ProtectedRoute><StudySeriesGenerator /></ProtectedRoute>} />
            <Route path="/bible-study-series" element={<ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute>} />
+           <Route path="/character-profiles" element={<ProtectedRoute><CharacterProfiles /></ProtectedRoute>} />
            <Route path="/devotionals" element={<ProtectedRoute><Devotionals /></ProtectedRoute>} />
            <Route path="/devotionals/:planId" element={<ProtectedRoute><DevotionalView /></ProtectedRoute>} />
            <Route path="/devotionals/profile/:profileId" element={<ProtectedRoute><DevotionalProfileDetail /></ProtectedRoute>} />

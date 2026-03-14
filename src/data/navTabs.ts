@@ -6,7 +6,8 @@ import {
   Film,
   LayoutGrid,
   GraduationCap,
-  User
+  User,
+  PersonStanding
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -219,6 +220,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
       border: "border-pink-500/20",
       text: "from-pink-600 to-rose-600",
       glow: "rgba(236,72,153,0.5)"
+    }
+  },
+  {
+    id: "character-profiles",
+    to: "/character-profiles",
+    label: "Character Profiles",
+    shortLabel: "Characters",
+    icon: PersonStanding,
+    gradient: {
+      from: "from-indigo-500/10",
+      to: "to-purple-500/10",
+      border: "border-indigo-500/20",
+      text: "from-indigo-600 to-purple-600",
+      glow: "rgba(99,102,241,0.5)"
     }
   },
   {
