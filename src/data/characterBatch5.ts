@@ -14,7 +14,7 @@ export const characterBatch5: CharacterProfile[] = [
     testament: "NT",
     keyScriptures: ["Matthew 1-28", "Mark 1-16", "Luke 1-24", "John 1-21"],
     archetypes: ["Shepherd", "Priest", "Prophet", "King", "Servant", "Martyr"],
-    dna: { faith: 5, humility: 5, courage: 5, wisdom: 5, compassion: 5, fear: 1, pride: 1, greed: 1 },
+    dna: { faith: 5, humility: 5, courage: 5, wisdom: 5, compassion: 5, fear: 0, pride: 0, greed: 0 },
     quickCard: {
       archetype: "Shepherd",
       strength: "Perfect love and obedience to the Father",
