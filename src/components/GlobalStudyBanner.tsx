@@ -556,7 +556,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
                 {prompt.label}
               </Badge>
 
-              <p className="text-xs text-foreground/85 leading-snug flex-1 min-w-0 truncate sm:whitespace-normal sm:line-clamp-1">
+              <p className="text-xs text-foreground/85 leading-snug flex-1 min-w-0 line-clamp-2 sm:line-clamp-1">
                 {prompt.text}
               </p>
 
