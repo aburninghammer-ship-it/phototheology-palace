@@ -1592,15 +1592,8 @@ async function generateEpicAudio(
 
   if (useElevenLabs) {
     // Sequential for ElevenLabs (needs stitching context)
-    // Falls back to OpenAI if ElevenLabs fails (e.g. quota exceeded)
-    let fallbackToOpenAI = false;
+    // Falls back to OpenAI with re-chunking if ElevenLabs fails (e.g. quota exceeded)
     for (let i = 0; i < chunks.length; i++) {
-      if (fallbackToOpenAI) {
-        // Already fell back — use OpenAI for remaining chunks
-        const buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
-        audioBuffers.push(buffer);
-        continue;
-      }
       // Retry up to 3 times on transient errors
       let lastErr: Error | null = null;
       for (let attempt = 0; attempt < 3; attempt++) {
