@@ -8936,6 +8936,33 @@ export type Database = {
         }
         Relationships: []
       }
+      character_image_cache: {
+        Row: {
+          id: string
+          character_id: string
+          storage_path: string
+          public_url: string
+          prompt_used: string | null
+          generated_at: string | null
+        }
+        Insert: {
+          id?: string
+          character_id: string
+          storage_path: string
+          public_url: string
+          prompt_used?: string | null
+          generated_at?: string | null
+        }
+        Update: {
+          id?: string
+          character_id?: string
+          storage_path?: string
+          public_url?: string
+          prompt_used?: string | null
+          generated_at?: string | null
+        }
+        Relationships: []
+      }
       image_bible_cache: {
         Row: {
           book: string
