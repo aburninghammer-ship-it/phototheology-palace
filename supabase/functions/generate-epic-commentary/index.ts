@@ -1628,9 +1628,19 @@ async function generateEpicAudio(
       }
       if (lastErr) {
         console.warn(`[EpicCommentary] ElevenLabs failed on chunk ${i + 1}, falling back to OpenAI TTS for remaining chunks: ${lastErr.message}`);
-        fallbackToOpenAI = true;
-        const buffer = await generateEpicAudioChunkOpenAI(chunks[i], i, chunks.length);
-        audioBuffers.push(buffer);
+        // Re-chunk remaining text into larger OpenAI-friendly chunks to avoid timeout
+        const remainingText = chunks.slice(i).join(" ");
+        const openaiChunks = splitTextIntoChunks(remainingText, 3900);
+        console.log(`[EpicCommentary] Re-chunked ${chunks.length - i} ElevenLabs chunks into ${openaiChunks.length} OpenAI chunks`);
+        const BATCH_SIZE = 4;
+        for (let b = 0; b < openaiChunks.length; b += BATCH_SIZE) {
+          const batch = openaiChunks.slice(b, b + BATCH_SIZE);
+          const results = await Promise.all(
+            batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, openaiChunks.length))
+          );
+          audioBuffers.push(...results);
+        }
+        break; // Exit the ElevenLabs loop — all remaining chunks handled
       }
     }
   } else {
