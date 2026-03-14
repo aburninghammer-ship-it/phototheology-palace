@@ -1337,6 +1337,30 @@ export type Database = {
         }
         Relationships: []
       }
+      character_deep_analyses: {
+        Row: {
+          analysis_text: string
+          character_id: string
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          analysis_text: string
+          character_id: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          analysis_text?: string
+          character_id?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       christ_chapter_findings: {
         Row: {
           book: string
