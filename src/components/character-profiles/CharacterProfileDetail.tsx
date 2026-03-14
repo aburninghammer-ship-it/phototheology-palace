@@ -411,7 +411,10 @@ export function CharacterProfileDetail({
           </AccordionContent>
         </AccordionItem>
 
-        {/* Strengths & Weaknesses */}
+        {/* Deep Character Analysis (AI-generated) */}
+        <div className="my-2">
+          <CharacterDeepAnalysis character={character} />
+        </div>
         <AccordionItem value="strengths" className="border rounded-lg px-4">
           <AccordionTrigger className="text-base font-semibold">
             <span className="flex items-center gap-2">
