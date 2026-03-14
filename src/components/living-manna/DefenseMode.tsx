@@ -956,11 +956,60 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
     }
   };
 
-  const submitDefense = () => {
+  const submitDefense = async () => {
     if (userInput.trim().length < 50) return;
-    addMessage({ role: "disciple", content: userInput.trim() });
+    const response = userInput.trim();
+    addMessage({ role: "disciple", content: response });
     setUserInput("");
+
+    // Automatically get opponent's next response
+    const nextRound = roundCount + 1;
+    setRoundCount(nextRound);
     setPhase("sparring");
+    setIsLoading(true);
+
+    addMessage({
+      role: "system",
+      content: `Round ${nextRound} — ${selectedOpponent?.name} responds...`,
+    });
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-sparring",
+          opponent: selectedOpponent?.id,
+          defenseTopicId: isGoliath && !selectedTopic ? "__goliath_blind__" : selectedTopic?.id,
+          defenseTopicName: isGoliath && !selectedTopic ? "Unknown — Goliath chooses" : selectedTopic?.name,
+          difficulty: selectedDifficulty,
+          temperament: selectedTemperaments,
+          opponentWorldview: selectedOpponent?.worldview,
+          opponentStyle: selectedOpponent?.argumentStyle,
+          opponentTargets: selectedOpponent?.attackTargets,
+          opponentEndPrompt: selectedOpponent?.endPrompt,
+          opponentSteelmanRules: selectedOpponent?.steelmanRules,
+          opponentPronouns: selectedOpponent?.pronouns,
+          isSignatureTopic: selectedTopic ? !!selectedTopic.isSignature : false,
+          isGoliathBlindMode: isGoliath && !selectedTopic,
+          phase: "follow-up",
+          conversationHistory: buildConversationHistory() + `\n\n[Disciple]: ${response}`,
+        },
+      });
+
+      if (error) throw error;
+
+      const opponentContent = data.content || "The opponent could not continue.";
+      addMessage({ role: "opponent", content: opponentContent });
+      setPhase("responding");
+
+      // Trigger real-time assist for follow-up
+      triggerAssist(opponentContent);
+    } catch (err) {
+      console.error("Follow-up sparring error:", err);
+      addMessage({ role: "system", content: "Opponent failed to respond. You can request coaching or continue." });
+      setPhase("review");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const requestCoaching = async () => {
