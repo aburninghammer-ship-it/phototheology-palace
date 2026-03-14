@@ -2235,4 +2235,9 @@ const coreCharacters: CharacterProfile[] = [
 
 export const biblicalCharacterProfiles: CharacterProfile[] = [
   ...coreCharacters,
+  ...characterBatch1,
+  ...characterBatch2,
+  ...characterBatch3,
+  ...characterBatch4,
+  ...characterBatch5,
 ];
