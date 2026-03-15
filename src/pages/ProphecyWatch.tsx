@@ -26,6 +26,7 @@ const SIGNAL_TYPES = {
   DECEPTION_PROPAGANDA: { label: "Deception/Propaganda", color: "bg-rose-500", textColor: "text-rose-400" },
   ECONOMIC_COERCION: { label: "Economic Coercion", color: "bg-yellow-500", textColor: "text-yellow-400" },
   RELIGIOUS_LIBERTY_WEAPONIZED: { label: "Religious Liberty Weaponized", color: "bg-indigo-500", textColor: "text-indigo-400" },
+  COUNTERFEIT_CHRIST: { label: "Counterfeit Christ/False Messiah", color: "bg-fuchsia-500", textColor: "text-fuchsia-400" },
 };
 
 // Intensity score colors

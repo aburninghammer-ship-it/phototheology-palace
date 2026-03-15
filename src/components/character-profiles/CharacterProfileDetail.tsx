@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +28,9 @@ import {
   Flame,
   ChevronRight,
   AlertTriangle,
+  Volume2,
+  Square,
+  Loader2,
 } from "lucide-react";
 import type {
   CharacterProfile,
@@ -36,6 +39,7 @@ import type {
 } from "@/data/biblicalCharacterProfiles";
 import { cn } from "@/lib/utils";
 import { CharacterDeepAnalysis } from "./CharacterDeepAnalysis";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 interface CharacterProfileDetailProps {
   character: CharacterProfile;
@@ -95,6 +99,87 @@ const situationCategoryColors: Record<string, string> = {
   Calling: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300",
   Persecution: "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300",
 };
+
+/**
+ * Build a narrative text from character data for TTS narration
+ */
+function buildCharacterNarrative(character: CharacterProfile): string {
+  const parts: string[] = [];
+
+  // Introduction
+  parts.push(
+    `${character.name}. ${character.meaning}. ${character.role}.`
+  );
+  parts.push(
+    `Key verse: ${character.quickCard.keyVerse}.`
+  );
+
+  // Quick Card summary
+  parts.push(
+    `Archetype: ${character.quickCard.archetype}. ` +
+    `Greatest strength: ${character.quickCard.strength}. ` +
+    `Greatest weakness: ${character.quickCard.weakness}. ` +
+    `Mindset: ${character.quickCard.mindset}. ` +
+    `Key lesson: ${character.quickCard.keyLesson}.`
+  );
+
+  // Story Arc
+  parts.push(`Story Arc. ${character.storyArc}`);
+
+  // Therapy View
+  const tv = character.therapyView;
+  parts.push(
+    `Therapy View. ` +
+    `Driving fears: ${tv.drivingFears.join(", ")}. ` +
+    `Core motivations: ${tv.coreMotivations.join(", ")}. ` +
+    `Relational style: ${tv.relationalStyle}. ` +
+    `Blind spots: ${tv.blindSpots.join(". ")}. ` +
+    `Healing moments: ${tv.healingMoments.join(". ")}.`
+  );
+
+  // Strengths & Weaknesses
+  parts.push(
+    `Strengths: ${character.strengths.join(", ")}. ` +
+    `Weaknesses: ${character.weaknesses.join(", ")}.`
+  );
+
+  // Journey
+  parts.push(
+    `Journey. ` +
+    character.journey
+      .map((p) => `${p.phase}: ${p.description}`)
+      .join(". ") +
+    "."
+  );
+
+  // Top situations (limit to 3 to keep audio reasonable)
+  const topSituations = character.situations.slice(0, 3);
+  if (topSituations.length > 0) {
+    parts.push(`Key Situations.`);
+    for (const sit of topSituations) {
+      parts.push(
+        `${sit.title}. ${sit.reference}. ` +
+        `${sit.situation} ` +
+        `The pressure: ${sit.pressure} ` +
+        `The inner battle: ${sit.innerBattle} ` +
+        `The response: ${sit.response} ` +
+        `The outcome: ${sit.outcome} ` +
+        `Spiritual principle: ${sit.spiritualPrinciple}.`
+      );
+    }
+  }
+
+  // Lessons
+  if (character.lessonsAndReflection.length > 0) {
+    parts.push(
+      `Lessons and Reflection. ` +
+      character.lessonsAndReflection.join(". ") +
+      "."
+    );
+  }
+
+  return parts.join("\n\n");
+}
 
 function DNAChart({ dna }: { dna: CharacterDNA }) {
   return (
@@ -287,6 +372,28 @@ export function CharacterProfileDetail({
   onNavigateToCharacter,
   allCharacters,
 }: CharacterProfileDetailProps) {
+  const narrativeText = useMemo(() => buildCharacterNarrative(character), [character]);
+
+  const {
+    speak,
+    stop,
+    unlockAudio,
+    isLoading: ttsLoading,
+    isPlaying: ttsPlaying,
+  } = useTextToSpeech({
+    defaultVoice: "onyx",
+    defaultProvider: "openai",
+  });
+
+  const handleListenToggle = () => {
+    if (ttsPlaying) {
+      stop();
+    } else {
+      unlockAudio();
+      speak(narrativeText, { provider: "openai", voice: "onyx" });
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Back button */}
@@ -338,6 +445,31 @@ export function CharacterProfileDetail({
           — {character.quickCard.keyVerseRef}
         </footer>
       </blockquote>
+
+      {/* Listen to Analysis Button */}
+      <Button
+        onClick={handleListenToggle}
+        disabled={ttsLoading}
+        variant={ttsPlaying ? "destructive" : "default"}
+        className="w-full sm:w-auto gap-2"
+      >
+        {ttsLoading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Generating Audio...
+          </>
+        ) : ttsPlaying ? (
+          <>
+            <Square className="h-4 w-4" />
+            Stop Listening
+          </>
+        ) : (
+          <>
+            <Volume2 className="h-4 w-4" />
+            Listen to Deep Analysis
+          </>
+        )}
+      </Button>
 
       {/* Character DNA */}
       <Card>

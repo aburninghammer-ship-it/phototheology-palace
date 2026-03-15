@@ -261,15 +261,17 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
       return generateCommentary({ ...options, tier: "intermediate" });
     }
 
-    // Generate audio if requested
-    let audioUrl: string | null = null;
+    // Fire-and-forget TTS: start generating audio in background, return text immediately
+    // The player will generate TTS itself if audioUrl is null
     if (generateAudio && commentaryText) {
-      audioUrl = await generateTTSAudio({ text: commentaryText, voice });
+      generateTTSAudio({ text: commentaryText, voice }).catch((e) =>
+        console.warn("[Preacher Mentor] Background TTS failed:", e)
+      );
     }
 
     return {
       commentary: commentaryText,
-      audioUrl,
+      audioUrl: null,
       cached: false,
     };
   } catch (error) {
@@ -361,15 +363,16 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
       return generateCommentary({ ...options, tier: "surface" });
     }
 
-    // Generate audio if requested — default to "fable" voice for narrative feel
-    let audioUrl: string | null = null;
+    // Fire-and-forget TTS: start generating audio in background, return text immediately
     if (generateAudio && commentaryText) {
-      audioUrl = await generateTTSAudio({ text: commentaryText, voice });
+      generateTTSAudio({ text: commentaryText, voice }).catch((e) =>
+        console.warn("[Story Mode] Background TTS failed:", e)
+      );
     }
 
     return {
       commentary: commentaryText,
-      audioUrl,
+      audioUrl: null,
       cached: false,
     };
   } catch (error) {
