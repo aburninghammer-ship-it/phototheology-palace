@@ -500,8 +500,7 @@ export default function SpiritualTraining() {
 
         {/* Training Tabs */}
         <Tabs defaultValue="arena" className="w-full">
-          <ScrollArea className="w-full">
-            <TabsList className="inline-flex w-max min-w-full">
+            <TabsList>
               <TabsTrigger value="arena" className="whitespace-nowrap px-3">
                 <Swords className="w-4 h-4 mr-2" />
                 {t('training.spiritual.combatArena')}
@@ -531,7 +530,6 @@ export default function SpiritualTraining() {
                 Death Chamber
               </TabsTrigger>
             </TabsList>
-          </ScrollArea>
 
           {/* Combat Arena Tab */}
           <TabsContent value="arena" className="space-y-4">
