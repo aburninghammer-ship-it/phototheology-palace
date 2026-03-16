@@ -211,6 +211,22 @@ export const THEOLOGICAL_GUARDRAILS = `
    - Daniel 8 little horn = Rome (pagan then papal) attacking the sanctuary
    - NEVER identify little horn as Antiochus Epiphanes - that is preterism
 
+3. DANIEL 11 PROPHETIC SEQUENCE (NON-NEGOTIABLE):
+   - Daniel 11:14-22 = PAGAN ROME, NOT Antiochus Epiphanes or Greece
+     * v.14 "robbers of thy people" = Rome rising to fulfill vision
+     * v.16 "glorious land" = Rome conquers Palestine (Pompey 63 BC)
+     * v.17 "daughter of women" = Cleopatra given to Antony (Roman political maneuvering)
+     * v.20 "raiser of taxes" = Caesar Augustus (Luke 2:1)
+     * v.21 "vile person" = Tiberius Caesar (not Antiochus!)
+     * v.22 "prince of the covenant" = Christ crucified under Rome
+   - Daniel 11:23-30 = PAPAL ROME (the league, deceitful rise, small people)
+     * v.23 "the league" = church-state alliance (Clovis/Justinian)
+     * v.23-30 = Papal military/political expansion phase
+   - Daniel 11:31-39 = Papal spiritual conquests (abomination, flatteries)
+   - Daniel 11:40-45 = End-time crisis
+   - NEVER assign Daniel 11:14-22 to Antiochus or the Grecian Empire
+   - NEVER say Papal Rome begins only at verse 36 — it begins at verse 23
+
 3. TWO-PHASE SANCTUARY MINISTRY:
    - Christ entered HOLY PLACE (first apartment) at ASCENSION in 31 AD
    - Christ entered MOST HOLY PLACE (second apartment) in 1844
