@@ -35,6 +35,33 @@ export interface NavTab {
 // Default tab order - users can customize this
 export const DEFAULT_NAV_TABS: NavTab[] = [
   {
+    id: "prophecy-watch",
+    to: "/prophecy-watch",
+    label: "Prophecy Watch",
+    icon: Eye,
+    gradient: {
+      from: "from-indigo-500/10",
+      to: "to-blue-500/10",
+      border: "border-indigo-500/20",
+      text: "from-indigo-600 to-blue-600",
+      glow: "rgba(99,102,241,0.5)"
+    }
+  },
+  {
+    id: "culture-controversy",
+    to: "/culture-controversy",
+    label: "Christ & Culture",
+    shortLabel: "Culture",
+    icon: Scale,
+    gradient: {
+      from: "from-rose-500/10",
+      to: "to-pink-500/10",
+      border: "border-rose-500/20",
+      text: "from-rose-600 to-pink-600",
+      glow: "rgba(244,63,94,0.5)"
+    }
+  },
+  {
     id: "my-profile",
     to: "/my-profile",
     label: "My Profile",
