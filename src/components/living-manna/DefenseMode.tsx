@@ -2820,6 +2820,27 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
                           <Button
                             size="sm"
                             variant="outline"
+                            className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                            disabled={extractingWeapons || debate.messages.length < 4}
+                            onClick={() => {
+                              // Set opponent/topic context for extraction
+                              const opp = DEFENSE_OPPONENTS.find(o => o.id === debate.opponent_id);
+                              const topic = DEFENSE_TOPICS.find(t => t.id === debate.topic_id);
+                              if (opp) setSelectedOpponent(opp);
+                              if (topic) setSelectedTopic(topic);
+                              extractWeaponsFromDebate(debate.messages);
+                            }}
+                            title="Extract weapons from this debate"
+                          >
+                            {extractingWeapons ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <FlaskConical className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
                             className="border-red-500/30 text-red-400 hover:bg-red-500/10"
                             onClick={() => deleteDebate(debate.id)}
                           >
