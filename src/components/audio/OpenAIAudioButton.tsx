@@ -51,16 +51,24 @@ export function OpenAIAudioButton({
 
     try {
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text: text.substring(0, 4000), voice },
+        body: { text: text.substring(0, 4000), voice, returnType: "url" },
       });
 
       if (error) throw error;
 
-      const audioBase64 = data?.audioContent || data?.audio;
-      if (!audioBase64) throw new Error("No audio returned");
+      let audioUrl: string;
+      let shouldRevoke = false;
 
-      const audioBlob = base64ToBlob(audioBase64, "audio/mpeg");
-      const audioUrl = URL.createObjectURL(audioBlob);
+      if (data?.audioUrl) {
+        audioUrl = data.audioUrl;
+      } else if (data?.audioContent) {
+        const audioBlob = base64ToBlob(data.audioContent, "audio/mpeg");
+        audioUrl = URL.createObjectURL(audioBlob);
+        shouldRevoke = true;
+      } else {
+        throw new Error("No audio returned");
+      }
+
       const audio = new Audio(audioUrl);
 
       audio.onplay = () => {
