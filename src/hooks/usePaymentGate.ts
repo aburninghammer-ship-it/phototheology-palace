@@ -209,6 +209,18 @@ export function usePaymentGate() {
             "check-stripe-subscription"
           );
 
+          if (!stripeError && stripeCheck?.payment_failed) {
+            console.log("[PaymentGate] Stripe reports PAYMENT FAILED — redirecting");
+            setPaymentFailed(true);
+            setHasAccess(false);
+            hasCheckedRef.current = true;
+            setChecking(false);
+            if (!location.pathname.startsWith("/fix-billing")) {
+              navigate("/fix-billing", { replace: true });
+            }
+            return;
+          }
+
           if (!stripeError && stripeCheck?.subscribed) {
             console.log("[PaymentGate] User has active Stripe subscription");
             setHasAccess(true);
