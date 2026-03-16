@@ -14,6 +14,8 @@ const primaryNavItems = [
 ];
 
 const moreNavItems = [
+  { icon: Eye, label: "Prophecy Watch", path: "/prophecy-watch" },
+  { icon: Scale, label: "Christ & Culture", path: "/culture-controversy" },
   { icon: User, label: "My Profile", path: "/my-profile" },
   { icon: Zap, label: "Freestyle", path: "/palace/freestyle" },
   { icon: Crown, label: "COTA Series", path: "/cota-series" },
