@@ -353,6 +353,17 @@ const SermonIdeas = () => {
                           {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                         </Button>
                         {isExpanded && (
+                          <div className="flex justify-end mb-1 mt-2">
+                            <FreeAudioButton
+                              text={idea.jeevesResearch!}
+                              variant="outline"
+                              size="sm"
+                              showLabel
+                              className="text-xs"
+                            />
+                          </div>
+                        )}
+                        {isExpanded && (
                           <div className="mt-3 p-4 bg-muted/30 rounded-lg max-h-[600px] overflow-y-auto">
                             {formatJeevesResponse(idea.jeevesResearch!)}
                           </div>
