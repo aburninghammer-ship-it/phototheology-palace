@@ -349,7 +349,7 @@ const Schedule = () => {
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Select activity type..." />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-[300px]">
                     <SelectGroup>
                       <SelectLabel className="text-xs text-muted-foreground font-semibold">Games</SelectLabel>
                       {getGameActivities().map((activity) => (
