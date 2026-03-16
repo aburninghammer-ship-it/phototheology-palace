@@ -101,6 +101,69 @@ serve(async (req) => {
       limit: 10,
     });
 
+    // Check for past_due / unpaid subscriptions (payment failed)
+    const pastDueSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "past_due",
+      limit: 10,
+    });
+
+    const unpaidSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "unpaid",
+      limit: 10,
+    });
+
+    const failedSubs = [...pastDueSubscriptions.data, ...unpaidSubscriptions.data];
+    const failedAppSubs = failedSubs.filter((sub: any) => {
+      const items = sub?.items?.data || [];
+      return items.some((item: any) => {
+        const priceId = item?.price?.id;
+        return typeof priceId === 'string' && appPriceIds.has(priceId);
+      });
+    });
+
+    // If there are past_due/unpaid subscriptions, immediately flag payment failure
+    if (failedAppSubs.length > 0) {
+      const failedSub = failedAppSubs[0];
+      logStep("PAYMENT FAILED — subscription past_due/unpaid", {
+        subscriptionId: failedSub.id,
+        status: failedSub.status,
+      });
+
+      // Update DB to reflect failed payment
+      await supabaseClient
+        .from('user_subscriptions')
+        .upsert({
+          user_id: user.id,
+          subscription_status: 'payment_failed',
+          stripe_customer_id: customerId,
+          stripe_subscription_id: failedSub.id,
+          payment_source: 'stripe',
+          is_recurring: true,
+        }, { onConflict: 'user_id' });
+
+      await supabaseClient
+        .from('profiles')
+        .update({
+          subscription_status: 'payment_failed',
+          payment_source: 'stripe',
+        })
+        .eq('id', user.id);
+
+      return new Response(JSON.stringify({
+        subscribed: false,
+        payment_failed: true,
+        status: failedSub.status,
+        tier: null,
+        subscription_end: null,
+        source: 'stripe_direct'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const allSubs = [...subscriptions.data, ...trialingSubscriptions.data];
 
     // Filter to ONLY this app's subscriptions (ignore any other Stripe products, incl. SamCart/external)
@@ -112,7 +175,6 @@ serve(async (req) => {
           return typeof priceId === 'string' && appPriceIds.has(priceId);
         });
       })
-      // Prefer the subscription that lasts the longest (more stable if there are multiple)
       .sort((a: any, b: any) => (b?.current_period_end || 0) - (a?.current_period_end || 0));
     
     if (appSubs.length === 0) {

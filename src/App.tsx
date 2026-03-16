@@ -56,6 +56,7 @@ const Index = lazy(() => import("./pages/Index"));
 
 // Lazy load pricing, demo, and donation
 const Pricing = lazy(() => import("./pages/Pricing"));
+const FixBilling = lazy(() => import("./pages/FixBilling"));
 const InteractiveDemo = lazy(() => import("./pages/InteractiveDemo"));
 const Comparison = lazy(() => import("./pages/Comparison"));
 const DonationPage = lazy(() => import("./pages/DonationPage"));
@@ -433,6 +434,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/fix-billing" element={<ProtectedRoute><FixBilling /></ProtectedRoute>} />
             <Route path="/gift" element={<GiftAndShare />} />
             <Route path="/gift/success" element={<GiftSuccess />} />
             <Route path="/gift/redeem/:token" element={<GiftRedeem />} />

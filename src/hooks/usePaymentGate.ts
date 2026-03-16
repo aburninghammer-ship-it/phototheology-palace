@@ -20,6 +20,7 @@ export function usePaymentGate() {
   const location = useLocation();
   const [checking, setChecking] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
+  const [paymentFailed, setPaymentFailed] = useState(false);
   const hasCheckedRef = useRef(false);
 
   useEffect(() => {
@@ -53,6 +54,19 @@ export function usePaymentGate() {
           .select("has_lifetime_access, subscription_status, subscription_tier, payment_source")
           .eq("id", user.id)
           .single();
+
+        // CRITICAL: Check for payment failure FIRST — immediately redirect
+        if (profile?.subscription_status === "payment_failed") {
+          console.log("[PaymentGate] PAYMENT FAILED — redirecting to fix-billing");
+          setPaymentFailed(true);
+          setHasAccess(false);
+          hasCheckedRef.current = true;
+          setChecking(false);
+          if (!location.pathname.startsWith("/fix-billing")) {
+            navigate("/fix-billing", { replace: true });
+          }
+          return;
+        }
 
         if (profile?.has_lifetime_access) {
           console.log("[PaymentGate] User has lifetime access");
@@ -195,6 +209,18 @@ export function usePaymentGate() {
             "check-stripe-subscription"
           );
 
+          if (!stripeError && stripeCheck?.payment_failed) {
+            console.log("[PaymentGate] Stripe reports PAYMENT FAILED — redirecting");
+            setPaymentFailed(true);
+            setHasAccess(false);
+            hasCheckedRef.current = true;
+            setChecking(false);
+            if (!location.pathname.startsWith("/fix-billing")) {
+              navigate("/fix-billing", { replace: true });
+            }
+            return;
+          }
+
           if (!stripeError && stripeCheck?.subscribed) {
             console.log("[PaymentGate] User has active Stripe subscription");
             setHasAccess(true);
@@ -240,7 +266,7 @@ export function usePaymentGate() {
         setChecking(false);
 
         // Only redirect if not already on auth-related pages
-        const excludedPaths = ["/pricing", "/auth", "/patreon-callback", "/stripe-success", "/stripe-cancel"];
+        const excludedPaths = ["/pricing", "/auth", "/patreon-callback", "/stripe-success", "/stripe-cancel", "/fix-billing"];
         if (!excludedPaths.some((path) => location.pathname.startsWith(path))) {
           navigate("/pricing?trial=true", { replace: true });
         }
@@ -260,5 +286,5 @@ export function usePaymentGate() {
     hasCheckedRef.current = false;
   }, [user?.id]);
 
-  return { checking, hasAccess };
+  return { checking, hasAccess, paymentFailed };
 }
