@@ -280,7 +280,7 @@ export function BibleDetectiveMode() {
                         </div>
                         <p className="text-sm text-white/90 leading-relaxed">{clue.text}</p>
                         <p className="text-xs text-amber-400/70 italic">{clue.scriptureRef}</p>
-                        <QuickAudioButton text={clue.text} size="xs" />
+                        <QuickAudioButton text={clue.text} size="sm" />
                       </CardContent>
                     </Card>
                   </motion.div>
