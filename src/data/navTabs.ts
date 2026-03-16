@@ -7,7 +7,9 @@ import {
   LayoutGrid,
   GraduationCap,
   User,
-  PersonStanding
+  PersonStanding,
+  Eye,
+  Scale
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
