@@ -80,7 +80,7 @@ export function OpenAIAudioButton({
       audio.onended = () => {
         setIsPlaying(false);
         notifyTTSStopped();
-        URL.revokeObjectURL(audioUrl);
+        if (shouldRevoke) URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
       };
 
@@ -88,7 +88,7 @@ export function OpenAIAudioButton({
         setIsPlaying(false);
         setIsLoading(false);
         notifyTTSStopped();
-        URL.revokeObjectURL(audioUrl);
+        if (shouldRevoke) URL.revokeObjectURL(audioUrl);
         toast.error("Audio playback failed");
       };
 
