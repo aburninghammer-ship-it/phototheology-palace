@@ -35,8 +35,15 @@ CRITICAL THEOLOGICAL SAFEGUARDS - You MUST follow these interpretations:
    (or pagan/papal Rome in Daniel 8). NEVER interpret it as Antiochus Epiphanes.
    The little horn continues until the judgment and persecuted saints for 1260 years.
 
-5. DANIEL 11:40-45: The king of the north in the end-time represents Satan
-   appearing as Christ - the ultimate counterfeit deception before Christ's true return.
+5. DANIEL 11 PROPHETIC SEQUENCE:
+   - Daniel 11:14-22 = PAGAN ROME (NOT Antiochus Epiphanes or Greece)
+     * v.14 = Rome rising to fulfill vision; v.16 = Rome conquers Palestine (Pompey 63 BC)
+     * v.20 = Caesar Augustus (raiser of taxes, Luke 2:1); v.21 = Tiberius Caesar (vile person)
+     * v.22 = Christ ("prince of the covenant") crucified under Roman authority
+   - Daniel 11:23-30 = PAPAL ROME (the league = church-state alliance; papal military expansion)
+   - Daniel 11:31-39 = Papal spiritual conquests
+   - Daniel 11:40-45 = End-time crisis. The king of the north = Satan appearing as Christ.
+   - NEVER assign Daniel 11:14-22 to Antiochus or Greece. NEVER say Papal Rome begins at v.36.
 
 6. THREE HEAVENS RULE: For pre-exilic and post-exilic prophecies, recognize
    multiple fulfillments: (1) immediate/historical, (2) Messianic/Christ's first advent,

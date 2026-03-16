@@ -792,6 +792,16 @@ The text says "the PEOPLE of the prince that shall come" destroy Jerusalem. The 
 • This prince continues to the end, opposes Messiah, brings desolation, and is the final adversary in Dan. 11:40
 • The prince impersonates Christ at the end (Dan. 11:40) - this is Satan appearing as Christ, not a human general
 
+**DANIEL 11:14-22 — PAGAN ROME, NOT ANTIOCHUS EPIPHANES**
+Daniel 11:14-22 describes the rise and actions of PAGAN ROME, NOT Antiochus Epiphanes or the Grecian Empire:
+• v.14 "robbers of thy people shall exalt themselves to establish the vision" = Rome rising as the power that fulfills the prophetic vision
+• v.16 "he shall stand in the glorious land" = Rome conquers Palestine (Pompey, 63 BC)
+• v.17 "daughter of women" = Cleopatra, used as a pawn in Roman political maneuvering
+• v.20 "a raiser of taxes in the glory of the kingdom" = Caesar Augustus, who decreed the census (Luke 2:1) under which Christ was born
+• v.21 "a vile person" = Tiberius Caesar, who came to power by intrigue, NOT Antiochus Epiphanes
+• v.22 "the prince of the covenant" broken = Jesus Christ crucified under Roman authority
+NEVER assign these verses to Antiochus Epiphanes or Greece. The transition from Greece to Rome occurs at verse 14. This is the historicist position and aligns with the repeat-and-enlarge structure of Daniel (chs. 2, 7, 8, 11 all follow the same sequence: Babylon → Medo-Persia → Greece → Rome → Papacy → End).
+
 **DANIEL 11:23 — THE PAPACY'S ENTRANCE VIA "THE LEAGUE"**
 "After the league made with him he shall work deceitfully: for he shall come up, and shall become strong with a small people." (Dan. 11:23)
 • "The league" = formal alliance between the Papacy and civil powers (Clovis' conversion AD 496-508; Justinian's decree AD 533)
