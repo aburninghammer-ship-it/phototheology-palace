@@ -506,7 +506,7 @@ export function BibleDetectiveMode() {
                 <ReactMarkdown>{verdictFeedback}</ReactMarkdown>
               </div>
               <div className="mt-2">
-                <QuickAudioButton text={verdictFeedback} size="xs" />
+                <QuickAudioButton text={verdictFeedback} size="sm" />
               </div>
             </CardContent>
           </Card>
