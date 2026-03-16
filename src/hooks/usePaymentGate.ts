@@ -55,6 +55,19 @@ export function usePaymentGate() {
           .eq("id", user.id)
           .single();
 
+        // CRITICAL: Check for payment failure FIRST — immediately redirect
+        if (profile?.subscription_status === "payment_failed") {
+          console.log("[PaymentGate] PAYMENT FAILED — redirecting to fix-billing");
+          setPaymentFailed(true);
+          setHasAccess(false);
+          hasCheckedRef.current = true;
+          setChecking(false);
+          if (!location.pathname.startsWith("/fix-billing")) {
+            navigate("/fix-billing", { replace: true });
+          }
+          return;
+        }
+
         if (profile?.has_lifetime_access) {
           console.log("[PaymentGate] User has lifetime access");
           setHasAccess(true);
