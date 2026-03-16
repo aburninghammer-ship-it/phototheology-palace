@@ -493,6 +493,84 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
     }
   };
 
+  // Extract weapons from a debate transcript using Jeeves
+  const extractWeaponsFromDebate = async (debateMessages?: ChatMessage[]) => {
+    const msgs = debateMessages || messages;
+    if (!user || msgs.length < 4) {
+      toast.error("Need at least a few exchanges to extract weapons.");
+      return;
+    }
+
+    setExtractingWeapons(true);
+    setExtractedWeapons([]);
+    setExtractionComplete(false);
+
+    try {
+      const transcript = msgs
+        .filter(m => m.role === "opponent" || m.role === "disciple")
+        .map(m => `[${m.role === "opponent" ? (selectedOpponent?.name || "Opponent") : "You"}]: ${m.content}`)
+        .join("\n\n");
+
+      const topicName = selectedTopic?.name || "General Apologetics";
+
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-extract-weapons",
+          transcript,
+          topicName,
+          opponentName: selectedOpponent?.name || "Unknown",
+          difficulty: selectedDifficulty,
+        },
+      });
+
+      if (error) throw error;
+
+      const content = data?.content || data?.response || "";
+      // Parse JSON array of weapons from response
+      let weapons: Array<{ argument: string; topic: string; name: string; subtitle: string }> = [];
+      
+      try {
+        const jsonMatch = content.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          weapons = JSON.parse(jsonMatch[0]);
+        }
+      } catch {
+        // If JSON parsing fails, try to extract from markdown
+        const blocks = content.split(/---|\n\n\n/).filter((b: string) => b.trim().length > 50);
+        weapons = blocks.slice(0, 5).map((block: string, i: number) => ({
+          argument: block.trim(),
+          topic: topicName,
+          name: `Debate Weapon ${i + 1}`,
+          subtitle: `Extracted from ${selectedOpponent?.name || "debate"}`,
+        }));
+      }
+
+      if (weapons.length === 0) {
+        toast.info("No strong weapons found in this debate. Keep sparring!");
+      } else {
+        setExtractedWeapons(weapons);
+        // Auto-save all extracted weapons to arsenal
+        for (const w of weapons) {
+          await saveWeaponToDB({
+            argument: w.argument,
+            analysis: `Auto-extracted from debate vs ${selectedOpponent?.name || "opponent"} on "${topicName}"`,
+            topic: w.topic || topicName,
+            name: w.name,
+            subtitle: w.subtitle,
+            savedAt: new Date().toISOString(),
+          });
+        }
+        toast.success(`${weapons.length} weapon${weapons.length > 1 ? "s" : ""} forged and added to your Arsenal!`);
+      }
+      setExtractionComplete(true);
+    } catch (e) {
+      console.error("Failed to extract weapons:", e);
+      toast.error("Failed to extract weapons. Try again.");
+    } finally {
+      setExtractingWeapons(false);
+    }
+  };
+
   // Load a saved debate back into the UI
   const loadDebate = (debate: SavedDebate) => {
     const opponent = DEFENSE_OPPONENTS.find(o => o.id === debate.opponent_id);
