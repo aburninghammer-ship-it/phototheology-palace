@@ -7,7 +7,7 @@ import {
   Trophy, ChevronRight, Volume2, Mic, Zap, X, Sparkles, BookOpen,
   FlaskConical, Target, Save, Archive, Trash2, ChevronDown, ChevronUp,
   Warehouse, ArrowLeft, Users, Share2, Crown, Flame, MessageSquare,
-  GraduationCap,
+  GraduationCap, Youtube, Link, ClipboardPaste, Search, Eye,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { CommunityArmory } from "./CommunityArmory";
@@ -17,6 +17,10 @@ import { ForgeDefendHub } from "./ForgeDefendHub";
 import { OpponentProfileDialog } from "./OpponentProfileDialog";
 import { FortyDayChallenge } from "./FortyDayChallenge";
 import { AATSTraining } from "./AATSTraining";
+import { ProphecyComparisonMode } from "./ProphecyComparisonMode";
+import { BibleDetectiveMode } from "./BibleDetectiveMode";
+import { SpiritualCharacterSimulator } from "./SpiritualCharacterSimulator";
+import { BibleDiscoveryBoard } from "./BibleDiscoveryBoard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +57,7 @@ interface ChatMessage {
   score?: number;
 }
 
-type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate" | "forge-defend" | "forty-day" | "aats";
+type DefenseSubMode = "sparring" | "library" | "analyze-weapon" | "analyze-attack" | "arsenal" | "community-armory" | "checkmate" | "forge-defend" | "forty-day" | "aats" | "bible-detective" | "character-sim" | "discovery-board" | "prophecy-compare";
 
 interface ArsenalWeapon {
   id: string;
@@ -96,6 +100,24 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
   const [selectedTemperaments, setSelectedTemperaments] = useState<string[]>(["polite"]);
   const [assistMode, setAssistMode] = useState(true);
   const [goliathScoutMode, setGoliathScoutMode] = useState(false);
+
+  // Custom Battle state
+  const [isCustomBattle, setIsCustomBattle] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [isCustomSetupLoading, setIsCustomSetupLoading] = useState(false);
+  const [customSetupError, setCustomSetupError] = useState<string | null>(null);
+  const [customOpponentData, setCustomOpponentData] = useState<DefenseOpponent | null>(null);
+  const [customTopicData, setCustomTopicData] = useState<DefenseTopic | null>(null);
+
+  // YouTube Transcript Analysis state
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [transcriptLoading, setTranscriptLoading] = useState(false);
+  const [transcriptText, setTranscriptText] = useState<string | null>(null);
+  const [transcriptAnalysis, setTranscriptAnalysis] = useState<string | null>(null);
+  const [transcriptAnalysisLoading, setTranscriptAnalysisLoading] = useState(false);
+  const [showManualTranscript, setShowManualTranscript] = useState(false);
+  const [manualTranscriptInput, setManualTranscriptInput] = useState("");
+  const [transcriptTopicFilter, setTranscriptTopicFilter] = useState("");
 
   // Master Mode Jeeves standby state
   const [jeevesPreBriefing, setJeevesPreBriefing] = useState<string | null>(null);
@@ -473,6 +495,19 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
   const saveDebate = async (title?: string) => {
     if (!user || !selectedOpponent || messages.length === 0) return;
     try {
+      // For custom battles, embed opponent/topic data in messages so we can restore without DB migration
+      const messagesToSave = isCustomBattle && customOpponentData && customTopicData
+        ? [
+            {
+              id: "__custom_meta__",
+              role: "system" as const,
+              content: JSON.stringify({ custom_opponent_data: customOpponentData, custom_topic_data: customTopicData }),
+              timestamp: new Date(),
+            },
+            ...messages,
+          ]
+        : messages;
+
       const { error } = await (supabase as any).from("defense_debates").insert({
         user_id: user.id,
         title: title || null,
@@ -482,7 +517,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
         topic_name: selectedTopic?.name || null,
         difficulty: selectedDifficulty,
         round_count: roundCount,
-        messages: messages,
+        messages: messagesToSave,
         saved_at: new Date().toISOString(),
       });
       if (error) throw error;
@@ -574,6 +609,31 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
 
   // Load a saved debate back into the UI
   const loadDebate = (debate: SavedDebate) => {
+    if (debate.opponent_id === "__custom__") {
+      // Extract custom data from embedded metadata message
+      const metaMsg = debate.messages.find(m => m.id === "__custom_meta__");
+      if (metaMsg) {
+        try {
+          const meta = JSON.parse(metaMsg.content);
+          const customOpp = meta.custom_opponent_data as DefenseOpponent;
+          const customTop = meta.custom_topic_data as DefenseTopic;
+          setCustomOpponentData(customOpp);
+          setCustomTopicData(customTop);
+          setSelectedOpponent(customOpp);
+          setSelectedTopic(customTop);
+          setIsCustomBattle(true);
+          setSelectedDifficulty(debate.difficulty);
+          setRoundCount(debate.round_count);
+          setMessages(debate.messages.filter(m => m.id !== "__custom_meta__"));
+          setPhase("sparring");
+          setSubMode("sparring");
+          return;
+        } catch (e) {
+          console.error("Failed to parse custom debate data:", e);
+        }
+      }
+    }
+
     const opponent = DEFENSE_OPPONENTS.find(o => o.id === debate.opponent_id);
     const topic = DEFENSE_TOPICS.find(t => t.id === debate.topic_id);
 
@@ -978,6 +1038,112 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
     }
   };
 
+  // ─── Custom Battle: Generate opponent from free-form prompt ─────
+  const generateCustomOpponent = async () => {
+    if (customPrompt.trim().length < 20) return;
+    setIsCustomSetupLoading(true);
+    setCustomSetupError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-custom-setup",
+          customPrompt: customPrompt.trim(),
+        },
+      });
+      if (error) throw error;
+      const content = data?.content || "";
+      const jsonMatch = content.match(/```json\s*([\s\S]*?)```/);
+      if (!jsonMatch) throw new Error("Failed to parse opponent data");
+      const parsed = JSON.parse(jsonMatch[1]);
+
+      const opponent: DefenseOpponent = {
+        id: "__custom__",
+        name: parsed.opponentName || "Custom Opponent",
+        emoji: "⚡",
+        avatar: "",
+        color: "border-cyan-500",
+        description: `Custom battle: ${parsed.topicName || "Theology"}`,
+        pronouns: (parsed.opponentPronouns || "he/him") as "he/him" | "she/her" | "they/them",
+        worldview: parsed.opponentWorldview || "",
+        argumentStyle: parsed.opponentStyle || "",
+        attackTargets: parsed.opponentTargets || [],
+        signatureTopics: [],
+        steelmanRules: parsed.opponentSteelmanRules || "",
+        endPrompt: parsed.opponentEndPrompt || "",
+      };
+      const topic: DefenseTopic = {
+        id: "__custom__",
+        name: parsed.topicName || "Custom Topic",
+        description: parsed.topicDescription || "",
+      };
+
+      setCustomOpponentData(opponent);
+      setCustomTopicData(topic);
+      setSelectedOpponent(opponent);
+      setSelectedTopic(topic);
+    } catch (err) {
+      console.error("Custom setup error:", err);
+      setCustomSetupError("Failed to generate opponent. Please try again.");
+    } finally {
+      setIsCustomSetupLoading(false);
+    }
+  };
+
+  // ─── YouTube Transcript: Extract and Analyze ───────────────────
+  const extractAndAnalyzeTranscript = async (transcriptOverride?: string) => {
+    const transcript = transcriptOverride || transcriptText;
+    if (!transcript && !youtubeUrl.trim()) return;
+
+    // Step 1: Extract transcript if we don't have one
+    if (!transcript) {
+      setTranscriptLoading(true);
+      try {
+        const { data, error } = await supabase.functions.invoke("extract-youtube-transcript", {
+          body: { youtubeUrl: youtubeUrl.trim() },
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        const extractedTranscript = data?.transcript;
+        if (!extractedTranscript) throw new Error("No transcript returned");
+        setTranscriptText(extractedTranscript);
+        setTranscriptLoading(false);
+        // Now analyze
+        await analyzeTranscript(extractedTranscript);
+      } catch (err: any) {
+        console.error("Transcript extraction error:", err);
+        setTranscriptLoading(false);
+        setShowManualTranscript(true);
+        setTranscriptAnalysis(null);
+        setCustomSetupError(err?.message || "No transcript available — captions may be disabled. Try pasting the transcript manually.");
+      }
+      return;
+    }
+
+    // Step 2: Analyze existing transcript
+    await analyzeTranscript(transcript);
+  };
+
+  const analyzeTranscript = async (transcript: string) => {
+    setTranscriptAnalysisLoading(true);
+    setTranscriptAnalysis(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-analyze-transcript",
+          transcript,
+          doctrineTopic: transcriptTopicFilter || undefined,
+        },
+      });
+      if (error) throw error;
+      setTranscriptAnalysis(data?.content || "Analysis unavailable. Please try again.");
+    } catch (err) {
+      console.error("Transcript analysis error:", err);
+      setTranscriptAnalysis("Failed to analyze transcript. Please try again.");
+    } finally {
+      setTranscriptAnalysisLoading(false);
+    }
+  };
+
   const startSparring = async () => {
     // Goliath blind mode: topic is optional
     if (!selectedOpponent) return;
@@ -1239,6 +1405,12 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
     setRoundCount(0);
     setLastScore(null);
     setAutoSpeakId(null);
+    // Clear custom battle state
+    setIsCustomBattle(false);
+    setCustomPrompt("");
+    setCustomSetupError(null);
+    setCustomOpponentData(null);
+    setCustomTopicData(null);
   };
 
   const handleVoiceTranscript = useCallback((text: string) => {
@@ -1272,7 +1444,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
         </div>
 
         {/* Sub-mode Toggle: 5 tabs */}
-        <div className={`grid ${isMobile ? "grid-cols-4" : "grid-cols-9"} gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-5xl mx-auto`}>
+        <div className="flex flex-wrap gap-1.5 p-1 rounded-lg bg-black/20 border border-border/50 max-w-5xl mx-auto justify-center">
           {([
             { id: "sparring" as const, label: "Sparring Arena", icon: Swords, gradient: "from-red-600 to-orange-600" },
             { id: "library" as const, label: "3AM Library", icon: BookOpen, gradient: "from-amber-600 to-yellow-600" },
@@ -1283,6 +1455,10 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
             { id: "forge-defend" as const, label: "Forge & Defend", icon: Trophy, gradient: "from-violet-600 to-fuchsia-600" },
             { id: "forty-day" as const, label: "40 Days of Smoke", icon: Flame, gradient: "from-red-600 to-red-800" },
             { id: "aats" as const, label: "AATS", icon: GraduationCap, gradient: "from-sky-600 to-indigo-600" },
+            { id: "prophecy-compare" as const, label: "Prophecy Compare", icon: Eye, gradient: "from-indigo-600 to-purple-600" },
+            { id: "bible-detective" as const, label: "Bible Detective", icon: Search, gradient: "from-amber-700 to-yellow-700" },
+            { id: "character-sim" as const, label: "Character Sim", icon: Users, gradient: "from-teal-600 to-cyan-600" },
+            { id: "discovery-board" as const, label: "Discovery Board", icon: Sparkles, gradient: "from-yellow-600 to-amber-600" },
           ]).map((tab) => (
             <button
               key={tab.id}
@@ -1299,7 +1475,15 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
           ))}</div>
 
         {/* Render based on sub-mode */}
-        {subMode === "aats" ? (
+        {subMode === "prophecy-compare" ? (
+          <ProphecyComparisonMode />
+        ) : subMode === "bible-detective" ? (
+          <BibleDetectiveMode />
+        ) : subMode === "character-sim" ? (
+          <SpiritualCharacterSimulator />
+        ) : subMode === "discovery-board" ? (
+          <BibleDiscoveryBoard />
+        ) : subMode === "aats" ? (
           <AATSTraining churchId={churchId} onNavigateToDefense={() => setSubMode("sparring")} />
         ) : subMode === "forty-day" ? (
           <FortyDayChallenge />
@@ -2020,6 +2204,185 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
                 </Card>
               </motion.div>
             )}
+
+            {/* ─── YOUTUBE TRANSCRIPT ANALYSIS ────────────────────────── */}
+            <div className="pt-4 border-t border-border/30 space-y-4">
+              <div className="text-center space-y-2">
+                <div className="flex items-center justify-center gap-2">
+                  <Youtube className="h-5 w-5 text-red-400" />
+                  <h3 className="text-lg font-bold">Analyze Video</h3>
+                </div>
+                <p className="text-muted-foreground text-sm max-w-lg mx-auto">
+                  Paste a YouTube link and Jeeves will extract the transcript, identify every theological argument, and arm you with a devastating rebuttal.
+                </p>
+              </div>
+
+              {/* Optional topic filter */}
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">
+                  Focus Area (optional)
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {DEFENSE_TOPICS.map((topic) => (
+                    <Badge
+                      key={topic.id}
+                      variant={transcriptTopicFilter === topic.id ? "default" : "outline"}
+                      className={`cursor-pointer text-xs py-1 px-2.5 transition-all ${
+                        transcriptTopicFilter === topic.id
+                          ? "bg-red-600 text-white border-red-600"
+                          : "hover:bg-red-600/10"
+                      }`}
+                      onClick={() => setTranscriptTopicFilter(transcriptTopicFilter === topic.id ? "" : topic.id)}
+                    >
+                      {topic.name}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* YouTube URL Input */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                  YouTube URL
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="url"
+                      placeholder="https://youtube.com/watch?v=..."
+                      className="w-full pl-9 pr-3 py-2 rounded-md bg-background/50 border border-border text-sm focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500"
+                      value={youtubeUrl}
+                      onChange={(e) => setYoutubeUrl(e.target.value)}
+                    />
+                  </div>
+                  <Button
+                    size="sm"
+                    disabled={!youtubeUrl.trim() || transcriptLoading || transcriptAnalysisLoading}
+                    onClick={() => extractAndAnalyzeTranscript()}
+                    className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
+                  >
+                    {transcriptLoading ? (
+                      <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Extracting...</>
+                    ) : transcriptAnalysisLoading ? (
+                      <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Analyzing...</>
+                    ) : (
+                      <><Youtube className="h-4 w-4 mr-1" /> Extract & Analyze</>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Manual transcript fallback */}
+              {showManualTranscript && (
+                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+                  <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-950/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <ClipboardPaste className="h-4 w-4 text-amber-400" />
+                      <span className="text-xs font-semibold text-amber-300">Manual Paste Fallback</span>
+                    </div>
+                    <p className="text-xs text-amber-200/70 mb-2">
+                      No transcript available — captions may be disabled. Paste the transcript manually below.
+                    </p>
+                    <Textarea
+                      placeholder="Paste the video transcript here... (minimum 100 characters)"
+                      className="min-h-[120px] max-h-[250px] bg-background/50 border-amber-500/30"
+                      value={manualTranscriptInput}
+                      onChange={(e) => setManualTranscriptInput(e.target.value)}
+                    />
+                    <div className="flex items-center justify-between mt-2">
+                      <span className={`text-xs ${manualTranscriptInput.trim().length >= 100 ? "text-green-500" : "text-muted-foreground"}`}>
+                        {manualTranscriptInput.trim().length}/100 min characters
+                      </span>
+                      <Button
+                        size="sm"
+                        disabled={manualTranscriptInput.trim().length < 100 || transcriptAnalysisLoading}
+                        onClick={() => {
+                          setTranscriptText(manualTranscriptInput.trim());
+                          extractAndAnalyzeTranscript(manualTranscriptInput.trim());
+                        }}
+                        className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
+                      >
+                        {transcriptAnalysisLoading ? (
+                          <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Analyzing...</>
+                        ) : (
+                          <><Target className="h-4 w-4 mr-1" /> Analyze Transcript</>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Transcript preview */}
+              {transcriptText && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <details className="rounded-lg border border-border/30 bg-black/20 overflow-hidden">
+                    <summary className="p-3 cursor-pointer text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2">
+                      <ChevronRight className="h-3 w-3" />
+                      Transcript Preview ({transcriptText.length.toLocaleString()} characters)
+                    </summary>
+                    <div className="p-3 pt-0 text-xs text-muted-foreground leading-relaxed max-h-[200px] overflow-y-auto">
+                      {transcriptText.substring(0, 1000)}{transcriptText.length > 1000 ? "..." : ""}
+                    </div>
+                  </details>
+                </motion.div>
+              )}
+
+              {/* Analysis loading */}
+              {transcriptAnalysisLoading && !transcriptAnalysis && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <Card variant="glass" className="border-red-500/30 bg-red-950/20">
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <Loader2 className="h-5 w-5 animate-spin text-red-400" />
+                      <div>
+                        <p className="text-sm font-semibold text-red-300">Jeeves is analyzing this transcript...</p>
+                        <p className="text-xs text-muted-foreground">Identifying arguments, checking Scripture usage, and building a comprehensive rebuttal.</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* Analysis result */}
+              {transcriptAnalysis && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <Card variant="glass" className="border-red-500/30 bg-gradient-to-br from-red-950/30 to-orange-950/20">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Youtube className="h-5 w-5 text-red-400" />
+                        <span className="text-sm font-bold text-red-300">Jeeves — Transcript Analysis</span>
+                        <QuickAudioButton
+                          text={transcriptAnalysis}
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 ml-auto text-red-400/60 hover:text-red-400"
+                        />
+                      </div>
+                      <div className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">
+                        {transcriptAnalysis}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setTranscriptAnalysis(null);
+                          setTranscriptText(null);
+                          setYoutubeUrl("");
+                          setShowManualTranscript(false);
+                          setManualTranscriptInput("");
+                          setTranscriptTopicFilter("");
+                        }}
+                        className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                      >
+                        <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                        Analyze Another Video
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+            </div>
           </div>
         ) : (
         <>
@@ -2066,8 +2429,142 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
                 </Card>
               </motion.div>
             ))}
+
+            {/* Custom Battle Card */}
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Card
+                variant="glass"
+                className={`cursor-pointer transition-all border-2 border-dashed ${
+                  isCustomBattle
+                    ? "border-cyan-400 ring-2 ring-cyan-400 ring-offset-2 ring-offset-background shadow-lg shadow-cyan-500/20"
+                    : "border-cyan-500/50 hover:border-cyan-400 hover:shadow-md hover:shadow-cyan-500/10"
+                }`}
+                onClick={() => {
+                  setIsCustomBattle(!isCustomBattle);
+                  if (isCustomBattle) {
+                    // Toggling off — clear custom state
+                    setCustomPrompt("");
+                    setCustomSetupError(null);
+                    setCustomOpponentData(null);
+                    setCustomTopicData(null);
+                    setSelectedOpponent(null);
+                    setSelectedTopic(null);
+                  } else {
+                    // Toggling on — clear regular selection
+                    setSelectedOpponent(null);
+                    setSelectedTopic(null);
+                  }
+                }}
+              >
+                <CardContent className="p-3 text-center space-y-1">
+                  <div className="relative mx-auto w-16 h-16 rounded-full overflow-hidden border-2 border-cyan-500 mb-1 flex items-center justify-center bg-gradient-to-br from-cyan-950/60 to-blue-950/60">
+                    <Zap className="h-8 w-8 text-cyan-400" />
+                  </div>
+                  <p className="font-semibold text-sm text-cyan-300">Custom Battle</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">Create any opponent on any topic</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         </div>
+
+        {/* Custom Battle Setup Panel */}
+        {isCustomBattle && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-3"
+          >
+            {!customOpponentData ? (
+              <div className="p-4 rounded-lg border border-cyan-500/40 bg-gradient-to-br from-cyan-950/30 to-blue-950/20 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-cyan-400" />
+                  <h3 className="text-sm font-bold text-cyan-300">Custom Battle Setup</h3>
+                </div>
+                <p className="text-xs text-cyan-200/70">
+                  Describe any debate scenario. Who do you want to spar against, and on what topic?
+                </p>
+                <Textarea
+                  placeholder='e.g. "Debate a Hebrew Israelite on the woman of Revelation 12" or "Argue with a Catholic priest about the Sabbath vs Sunday"'
+                  className="min-h-[80px] max-h-[160px] bg-background/50 border-cyan-500/30 focus:border-cyan-400"
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                />
+                <div className="flex items-center justify-between">
+                  <span className={`text-xs ${customPrompt.trim().length >= 20 ? "text-green-500" : "text-muted-foreground"}`}>
+                    {customPrompt.trim().length}/20 min characters
+                  </span>
+                  <Button
+                    size="sm"
+                    disabled={customPrompt.trim().length < 20 || isCustomSetupLoading}
+                    onClick={generateCustomOpponent}
+                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white"
+                  >
+                    {isCustomSetupLoading ? (
+                      <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Generating...</>
+                    ) : (
+                      <><Zap className="h-4 w-4 mr-1" /> Generate Scenario</>
+                    )}
+                  </Button>
+                </div>
+                {customSetupError && (
+                  <p className="text-xs text-red-400">{customSetupError}</p>
+                )}
+              </div>
+            ) : (
+              <div className="p-4 rounded-lg border border-cyan-500/40 bg-gradient-to-br from-cyan-950/30 to-blue-950/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-cyan-400" />
+                    <h3 className="text-sm font-bold text-cyan-300">Opponent Generated</h3>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setCustomOpponentData(null);
+                        setCustomTopicData(null);
+                        setSelectedOpponent(null);
+                        setSelectedTopic(null);
+                      }}
+                      className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 text-xs h-7"
+                    >
+                      <RotateCcw className="h-3 w-3 mr-1" />
+                      Regenerate
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setIsCustomBattle(false);
+                        setCustomPrompt("");
+                        setCustomOpponentData(null);
+                        setCustomTopicData(null);
+                        setSelectedOpponent(null);
+                        setSelectedTopic(null);
+                      }}
+                      className="border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs h-7"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-2 rounded bg-black/30 border border-cyan-500/20">
+                    <p className="text-[10px] text-cyan-400/60 uppercase tracking-wider">Opponent</p>
+                    <p className="text-sm font-semibold text-cyan-200">{customOpponentData.name}</p>
+                  </div>
+                  <div className="p-2 rounded bg-black/30 border border-cyan-500/20">
+                    <p className="text-[10px] text-cyan-400/60 uppercase tracking-wider">Topic</p>
+                    <p className="text-sm font-semibold text-cyan-200">{customTopicData?.name}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* Scroll target after opponent selection */}
         <div ref={topicSectionRef} />
@@ -2130,8 +2627,8 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
           </motion.div>
         )}
 
-        {/* Topic Selector — hidden for Goliath blind mode (shown for Scout Mode) */}
-        {(!isGoliath || goliathScoutMode) && (
+        {/* Topic Selector — hidden for Goliath blind mode (shown for Scout Mode) and custom battle */}
+        {!isCustomBattle && (!isGoliath || goliathScoutMode) && (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Select Topic</h3>
           <div className="flex flex-wrap gap-2">
@@ -2283,7 +2780,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
               ? "bg-gradient-to-r from-purple-700 to-fuchsia-700 hover:from-purple-800 hover:to-fuchsia-800"
               : "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
           }`}
-          disabled={!selectedOpponent || (!isGoliath && !selectedTopic) || (isGoliath && goliathScoutMode && !selectedTopic)}
+          disabled={!selectedOpponent || (!isCustomBattle && !isGoliath && !selectedTopic) || (isGoliath && goliathScoutMode && !selectedTopic)}
           onClick={startSparring}
         >
           {isGoliath && !goliathScoutMode ? (

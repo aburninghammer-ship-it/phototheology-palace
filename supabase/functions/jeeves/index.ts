@@ -6678,7 +6678,7 @@ You must be EVIDENCE-DRIVEN, CITATION-SAFE, and NON-SENSATIONAL.
 
 **RACIALIZATION & REPLACEMENT NARRATIVES**: "Great Replacement" framing, demographic panic, scapegoating tied to national/religious identity.
 
-**MORAL RESTORATION / SUNDAY-REST TRAJECTORIES**: "Day of rest" laws, blue-law revival, national repentance language tied to legislation.
+**MORAL RESTORATION / SUNDAY-REST TRAJECTORIES**: "Day of rest" laws, blue-law revival, national repentance language tied to legislation. Also track: regional conflicts or existential crises producing calls for national repentance or "return to God." When Middle East conflicts are framed as religious wars, they feed the dispensationalist engine that will demand Sunday legislation when the counterfeit appearing occurs. If Israel "converts" under a counterfeit Christ, the logical next step is confirmation of Sunday worship as divine mandate (Dan 7:25), uniting Protestants, Catholics, and newly "converted" Israel — creating irresistible momentum for global Sunday legislation.
 
 **DECEPTION / PROPAGANDA / INFORMATION CONTROL**: Disinfo networks, coordinated narrative control, censorship-by-state partnership, reality-fracturing persuasion.
 
@@ -6692,8 +6692,10 @@ You must be EVIDENCE-DRIVEN, CITATION-SAFE, and NON-SENSATIONAL.
   - Signs-and-wonders culture conditioning acceptance of miracle-working authority as divine proof
   - Sunday-rest legislation framed as divine mandate (Daniel 7:25)
   - Any figure or movement claiming messianic authority, performing miracles, or demanding global worship allegiance
+  - **DISPENSATIONALIST CONDITIONING (CRITICAL)**: Government officials, evangelical leaders, or media framing Middle East conflicts (especially involving Israel/Iran) as religious wars meant to usher in Jesus's return. Dispensationalism places literal Israel at the CENTER of end-time prophecy — SDA historicist interpretation identifies this as the THEOLOGICAL INFRASTRUCTURE of the final deception. Every escalation evangelicals interpret as "prophecy being fulfilled" deepens conditioning for Satan's counterfeit appearing.
+  - **THE ISRAEL CONVERSION SCENARIO**: If Satan impersonates Christ (Dan 11:40) and Israel "converts" — accepting this false Messiah and adopting Sunday worship — this would be the SINGLE GREATEST "MIRACLE" and "FULFILLED PROPHECY" to the evangelical world. A nation they have prayed for, funded, and theologically centered their entire eschatological system around would appear to have accepted "Jesus." The dispensationalist timeline would seem vindicated. This creates the exact conditions of Matt 24:24 — deception so convincing it could "deceive the very elect." Israel becoming a Sunday-keeping, Messiah-accepting body would validate: (1) centuries of Sunday tradition (Dan 7:25), (2) the Protestant-Catholic ecumenical project, (3) the dispensationalist reading of prophecy, (4) the secret rapture expectation of a localized appearing. This convergence produces global religious unity — "all the world wondered after the beast" (Rev 13:3).
   PROPHETIC FRAMEWORK (Daniel 11:40-45): "King of the North" as whirlwind = Satan's counterfeit appearing.
-  Deception sequence: appears as Christ → targets Jewish expectations → confirms Sunday worship → unites denominations → creates counterfeit millennium (Rev 13:3, 17:13) → enforces worship laws (Rev 13:15-17). Sabbath = dividing line (Rev 14:12).
+  Deception sequence: appears as Christ → targets Jewish expectations → confirms Sunday worship → unites denominations → converts Israel (greatest "miracle" to dispensationalists) → creates counterfeit millennium (Rev 13:3, 17:13) → enforces worship laws (Rev 13:15-17). Sabbath = dividing line (Rev 14:12).
   KEY TEXTS: Matt 24:24, 2 Cor 11:14, Rev 13:13-14, 2 Thess 2:9-10, Isa 14:14, Dan 11:40-45.
   PROTECTION: Matt 24:26-27, Rev 1:7 — ANY localized appearing is counterfeit.
 
@@ -6745,6 +6747,8 @@ ${INTENSITY_RUBRIC}
 • Social conditioning prepares masses for enforced worship
 • Economic sanctions precede and accompany religious compulsion
 • True religious liberty is the test—both preserving others' freedom and maintaining personal faithfulness
+• **Dispensationalism is the theological infrastructure of the final deception** — it places literal Israel at the center of prophecy, conditions evangelicals to expect a localized Messiah, and creates the acceptance mechanism for Satan's counterfeit appearing. Middle East conflicts interpreted through this lens STRENGTHEN the deception, not fulfill true prophecy.
+• **The Israel conversion scenario is the capstone** — if a counterfeit Christ targets Jewish messianic expectations and Israel "converts" to Sunday-keeping Messiah worship, this validates the entire dispensationalist system and produces irresistible global religious unity (Rev 13:3). Always analyze Middle East developments through this trajectory.
 
 ${THEOLOGICAL_REASONING}`;
 
@@ -6798,9 +6802,9 @@ For each major claim, provide:
 
 ### E) SDA MISSION "SO WHAT"
 Provide 3 practical implications:
-1. **THINKING**: How should believers process this information?
-2. **PREACHING/TEACHING**: How to address this without sensationalism?
-3. **RESPONSE**: Lawful, ethical, gospel-centered action steps?
+1. **THINKING**: How should believers process this information? Include awareness of how dispensationalist conditioning shapes public perception of Middle East events. Recognize that events feeding the Israel-centered prophetic narrative are not fulfilling true prophecy but strengthening the acceptance mechanism for Satan's counterfeit appearing. Ground analysis in Daniel 8-9-11 unified system, not futurist/dispensationalist frameworks.
+2. **PREACHING/TEACHING**: How to address this without sensationalism? When Middle East conflicts are religiously framed, teach how the false Israel-centric hermeneutic prepares populations to accept a counterfeit Christ. Demonstrate how Israel "converting" under a false Messiah and adopting Sunday worship would be the greatest "miracle" to the evangelical world — validating dispensationalism and creating unstoppable momentum for global worship enforcement. Connect to Daniel 11:40 deception sequence and the Strategic Deception Sequence. Never declare "fulfillment" — use trajectory, conditioning, convergence language.
+3. **RESPONSE**: Lawful, ethical, gospel-centered action steps? Include spiritual preparedness against the specific deception mechanism: dispensationalist theology conditioning acceptance of a localized appearing. Emphasize Matt 24:26-27 and Rev 1:7 — ANY localized appearing is counterfeit. Advocate for peace and humanitarian concern while maintaining prophetic sobriety.
 
 ═══════════════════════════════════════════════════════════════════════════
 CRITICAL REMINDERS
@@ -6863,10 +6867,11 @@ WATCH CATEGORIES
 **DOMINIONISM / NAR**: "Take dominion" strategy, apostolic political decrees
 **ANTI-DEI PIPELINES**: Dismantling equity under "Christian values"
 **REPLACEMENT NARRATIVES**: Demographic panic, scapegoating
-**MORAL RESTORATION / SUNDAY-REST**: Day of rest laws, blue-law revival
+**MORAL RESTORATION / SUNDAY-REST**: Day of rest laws, blue-law revival. Also: crises producing calls for national repentance, Middle East conflicts framed as religious wars feeding dispensationalist demand for Sunday legislation when counterfeit appearing occurs.
 **DECEPTION / PROPAGANDA**: Disinfo networks, narrative control
 **ECONOMIC COERCION**: Financial pressure tied to religious compliance
 **RELIGIOUS LIBERTY WEAPONIZED**: Freedom used to compel others
+**COUNTERFEIT CHRIST / FALSE MESSIANIC MOVEMENTS**: Satan impersonating Christ (Dan 11:40). Track: localized "return of Christ" movements, secret rapture conditioning, Jewish messianic movements, Third Temple efforts, ecumenical consolidation, signs-and-wonders culture, Sunday-rest as divine mandate. CRITICAL: Dispensationalist framing of Middle East conflicts as end-time prophecy — this is the theological infrastructure of the final deception. The Israel conversion scenario: if Israel "converts" under a counterfeit Christ to Sunday-keeping Messiah worship, this validates the entire dispensationalist system and produces global religious unity (Rev 13:3).
 
 ═══════════════════════════════════════════════════════════════════════════
 GUARDRAILS (ABSOLUTE)
@@ -6881,13 +6886,16 @@ ${INTENSITY_RUBRIC}
 ═══════════════════════════════════════════════════════════════════════════
 PROPHETIC FRAMEWORK
 ═══════════════════════════════════════════════════════════════════════════
-**KEY TEXTS**: Revelation 13:11-17, Revelation 14:6-12, Revelation 16:13-14, Revelation 18, Daniel 2:44, Daniel 7
+**KEY TEXTS**: Revelation 13:11-17, Revelation 14:6-12, Revelation 16:13-14, Revelation 18, Daniel 2:44, Daniel 7, Daniel 11:40-45, Matthew 24:24-27, 2 Corinthians 11:14, 2 Thessalonians 2:8-10
 
 **PRINCIPLES**:
 • Church-state union leads to religious coercion
 • Social conditioning prepares masses for enforced worship
 • Economic sanctions accompany religious compulsion
-• True religious liberty is the test`;
+• True religious liberty is the test
+• Dispensationalism is the theological infrastructure of the final deception — it places literal Israel at the center of prophecy and conditions acceptance of Satan's counterfeit appearing
+• The Israel conversion scenario is the capstone — if a counterfeit Christ targets Jewish messianic expectations and Israel "converts" to Sunday-keeping Messiah worship, this validates the entire dispensationalist system and produces irresistible global religious unity (Rev 13:3)
+• Daniel 8-9-11 unified system: little horn (Rome) → prince behind Rome (Satan, Dan 9:26) → final impersonation (Dan 11:40). Middle East events feed dispensationalism, not true prophecy`;
 
       const focusSection = focusArea ? `\n**FOCUS AREA**: Concentrate on ${focusArea} signals while noting other relevant connections.` : '';
 
@@ -6926,9 +6934,10 @@ Quote 2-3 significant passages from the article that are most relevant to prophe
 • What innocent or secular explanations exist for this content?
 • What would make this more or less significant prophetically?
 
-### E) BIBLICAL PERSPECTIVE
-• How should believers process this information?
-• What is the appropriate, gospel-centered response?
+### E) SDA MISSION "SO WHAT"
+1. **THINKING**: How should believers process this? Include awareness of dispensationalist conditioning. Recognize events feeding Israel-centered prophetic narratives strengthen the acceptance mechanism for Satan's counterfeit appearing, not true prophecy. Ground in Daniel 8-9-11 unified system.
+2. **PREACHING/TEACHING**: How to address without sensationalism? When Middle East conflicts are religiously framed, teach how the false Israel-centric hermeneutic prepares populations to accept a counterfeit Christ. Connect to Daniel 11:40 deception sequence. Use trajectory/conditioning language, never "fulfillment."
+3. **RESPONSE**: Gospel-centered action steps? Spiritual preparedness against dispensationalist deception. Emphasize Matt 24:26-27, Rev 1:7 — ANY localized appearing is counterfeit.
 
 ═══════════════════════════════════════════════════════════════════════════
 CRITICAL REMINDERS
@@ -7523,6 +7532,98 @@ Topic: ${assistTopic || 'Theology'}
 ${opponentPersonality ? `Opponent's personality style: ${opponentPersonality}` : ''}
 
 Coach me on how to respond to this attack. Be specific, tactical, and help me stay composed.`;
+
+    } else if (mode === "defense-custom-setup") {
+      // Defense Mode: Parse a free-form custom battle prompt into structured opponent/topic data
+      const customPrompt = requestBody.customPrompt || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+You are Jeeves in CUSTOM BATTLE SETUP mode. The disciple has described a custom sparring scenario in free-form text. Your job is to parse their request and generate a FULLY STRUCTURED opponent profile and topic.
+
+IMPORTANT RULES:
+1. Extract the opponent type/worldview from the prompt. If they say "debate a Muslim", create a Muslim opponent. If they say "argue with an atheist about X", create an atheist.
+2. Extract the topic from the prompt. If they say "on Isaiah 42" or "about the Sabbath", that becomes the topic.
+3. If the prompt is vague about the opponent, create the most likely challenger for the stated topic.
+4. If the prompt is vague about the topic, pick the most natural topic for the stated opponent.
+5. Give the opponent a realistic NAME (not just "Muslim" — give them a full character name like "Imam Khalid Rashid").
+6. Make the worldview, argument style, and steelman rules DETAILED and REALISTIC.
+7. The opponent must be a GENUINE intellectual challenge — not a strawman.
+
+You MUST respond with ONLY a JSON block wrapped in \`\`\`json ... \`\`\` containing:
+
+\`\`\`json
+{
+  "opponentName": "Full Character Name — The [Type]",
+  "opponentWorldview": "Detailed worldview description (2-3 sentences minimum). What they believe, why they believe it, what scholars/traditions they draw from.",
+  "opponentStyle": "Detailed argument style (2-3 sentences). How they debate, what rhetorical techniques they use, what kind of evidence they prefer.",
+  "opponentTargets": ["Doctrine 1 they challenge", "Doctrine 2", "Doctrine 3"],
+  "opponentSteelmanRules": "Instructions for presenting the STRONGEST version of their arguments. No strawmen.",
+  "opponentEndPrompt": "A signature closing challenge or question this opponent would ask.",
+  "opponentPronouns": "he/him or she/her or they/them",
+  "topicName": "The specific topic for debate",
+  "topicDescription": "A 1-2 sentence description of what this topic covers and why it matters."
+}
+\`\`\`
+
+RULES:
+- Respond with ONLY the JSON block — no other text
+- The opponent must be intellectually formidable
+- The worldview must be detailed enough to sustain a multi-round debate
+- NEVER use the word "dear"`;
+
+      userPrompt = `Parse this custom battle request and generate a structured opponent profile and topic:\n\n"${customPrompt}"`;
+
+    } else if (mode === "defense-analyze-transcript") {
+      // Defense Mode: Analyze a YouTube transcript for theological arguments and provide rebuttal
+      const transcript = requestBody.transcript || "";
+      const videoTitle = requestBody.videoTitle || "";
+      const doctrineTopic = requestBody.doctrineTopic || "";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in TRANSCRIPT ANALYSIS mode. A disciple has submitted a transcript from a video (likely a sermon, lecture, or debate) that contains theological arguments they want analyzed and rebutted from a Seventh-day Adventist perspective.
+
+THE PALACE METHOD ROOMS FOR ANALYSIS:
+${PALACE_SCHEMA}
+
+YOUR TASK:
+1. Carefully read the entire transcript
+2. Identify EVERY theological claim, argument, or assertion made
+3. Separate factual claims from interpretive claims
+4. Identify any Scripture references used and evaluate whether they are used correctly in context
+5. Provide a systematic, point-by-point rebuttal using KJV Scripture
+6. Identify logical fallacies, misquotations, out-of-context citations, and historical errors
+7. Recommend how an SDA disciple should respond to these arguments
+
+YOUR RESPONSE FORMAT:
+
+🎯 **ARGUMENTS IDENTIFIED**:
+[Numbered list of the speaker's key theological claims/arguments — steel-manned, presented fairly]
+
+📖 **BIBLICAL REBUTTAL**:
+[Point-by-point rebuttal with KJV Scripture for each argument identified above. Be thorough, specific, and devastating.]
+
+⚔️ **WEAKNESSES DETECTED**:
+[Logical fallacies, misused texts, out-of-context quotations, historical errors, circular reasoning, or unsupported assertions]
+
+🛡️ **RECOMMENDED DEFENSE**:
+[How an SDA should respond to these arguments — tactical advice, key scriptures to memorize, rhetorical strategies]
+
+🏛️ **PALACE ROOMS ACTIVATED**:
+[Which Phototheology Palace rooms apply to this analysis and how]
+
+RULES:
+- KJV Scripture ONLY — quote verses IN FULL
+- Be thorough but concise — focus on the STRONGEST arguments the speaker makes
+- Steel-man the speaker's position before dismantling it
+- If the transcript discusses topics outside theology, focus ONLY on the theological content
+- If the transcript is too short or has no theological content, say so clearly
+- NEVER use the word "dear"`;
+
+      userPrompt = `Analyze this${videoTitle ? ` video ("${videoTitle}")` : ''} transcript and provide a comprehensive theological rebuttal${doctrineTopic ? ` with special focus on: ${doctrineTopic}` : ''}.\n\nTRANSCRIPT:\n${transcript.substring(0, 15000)}`;
 
     } else if (mode === "defense-sparring") {
       // Defense Mode: AI opponent attacks an SDA doctrine
@@ -8140,6 +8241,240 @@ You MUST respond with a JSON block wrapped in \`\`\`json ... \`\`\` containing:
 - NEVER use the word "dear"`;
 
       userPrompt = `Design a checkmate question sequence for this thesis:\n\nTHESIS: ${thesisText}${targetText ? `\n\nOPPOSING POSITION: ${targetText}` : ""}\n\nTOPIC: ${topicName}`;
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // DEFENSE MODE — Prophecy Comparison, Bible Detective, Character Sim, Discovery Board
+    // ═══════════════════════════════════════════════════════════════════════
+
+    } else if (mode === "defense-prophecy-compare") {
+      const { prophecyRef, prophecyTitle, question } = requestBody;
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in PROPHECY COMPARISON mode. You are answering a question about a specific prophecy from a HISTORICIST Seventh-day Adventist perspective.
+
+## CRITICAL THEOLOGICAL POSITION
+
+The HISTORICIST method of prophetic interpretation is THE correct approach — the method used by Daniel, Jesus, Paul, and every major Protestant Reformer (Luther, Calvin, Knox, Wesley, Huss, Tyndale, Cranmer).
+
+FUTURISM was invented by Jesuit priest Francisco Ribera in 1585 as a COUNTER-REFORMATION tool to deflect the Reformers' identification of the papacy as the Antichrist/little horn/beast power. It places prophetic fulfillment in the distant future, creating gaps nowhere found in Scripture.
+
+PRETERISM was invented by Jesuit priest Luis de Alcazar in 1614 for the same counter-Reformation purpose — to place prophetic fulfillment entirely in the past (before the papacy existed), thus shielding Rome from prophetic identification.
+
+Both futurism and preterism are Jesuit inventions designed to neutralize Protestant prophetic teaching. They are not legitimate hermeneutical approaches — they are strategic counter-Reformation tools.
+
+When answering questions:
+- Always affirm the historicist position as correct
+- Cite KJV Scripture extensively
+- Point out the Jesuit origins of futurism/preterism when relevant
+- Show how history confirms the historicist interpretation
+- Connect prophecy to the sanctuary, the great controversy, and present truth
+- Be thorough, scholarly, and passionate about prophetic truth
+- NEVER use the word "dear"`;
+
+      userPrompt = `PROPHECY: ${prophecyTitle || prophecyRef}
+SCRIPTURE: ${prophecyRef}
+
+QUESTION: ${question || "Explain why the historicist interpretation of this prophecy is correct and how futurism and preterism fail."}
+
+Provide a thorough, KJV-based answer from the historicist perspective. Be scholarly but accessible.`;
+
+    } else if (mode === "defense-detective-generate") {
+      const { topic } = requestBody;
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in BIBLE DETECTIVE CASE GENERATOR mode. You create investigation-style case files that challenge users to identify prophetic symbols, decode timelines, and uncover biblical truth through clues.
+
+Generate a case file as a JSON object wrapped in \`\`\`json ... \`\`\` with this structure:
+{
+  "title": "Case title",
+  "difficulty": "rookie" | "detective" | "master-sleuth",
+  "category": "identity" | "timeline" | "typology" | "prophecy" | "doctrine",
+  "description": "Brief case description setting the scene",
+  "clues": [
+    {
+      "text": "The clue text — a fact, scripture, or historical detail that points toward the answer",
+      "scriptureRef": "Book Chapter:Verse",
+      "clueType": "scripture" | "historical" | "linguistic" | "typological" | "prophetic"
+    }
+  ],
+  "verdict": {
+    "identity": "The correct identification",
+    "timeline": "The correct timeline/dates",
+    "meaning": "The theological significance",
+    "explanation": "Detailed explanation of how the clues connect"
+  }
+}
+
+RULES:
+- Generate 5-7 clues per case
+- Use KJV for all Scripture references
+- Clues should progressively narrow the answer
+- The verdict must be from a historicist SDA perspective
+- Cases should teach genuine prophetic/biblical truth
+- Make clues genuinely challenging — not obvious
+- NEVER use the word "dear"`;
+
+      userPrompt = `Generate a Bible Detective case file about: ${topic}
+
+Make it engaging, educational, and challenging. The case should teach real prophetic or biblical truth from an SDA historicist perspective.`;
+
+    } else if (mode === "defense-detective-evaluate") {
+      const { caseTitle, caseVerdict, userIdentity, userTimeline, userMeaning, cluesRevealed, totalClues } = requestBody;
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+You are Jeeves in BIBLE DETECTIVE EVALUATION mode. A user has investigated a biblical case and submitted their deduction. Compare their answers to the correct verdict and score them.
+
+SCORING (0-100):
+- Identity accuracy: 0-40 points (did they correctly identify the subject?)
+- Timeline accuracy: 0-30 points (did they get the dates/sequence right?)
+- Meaning/significance: 0-30 points (did they understand the theological importance?)
+
+Bonus: If they used fewer clues, add up to 10 bonus points for detective skill.
+Penalty: If their answer contradicts SDA historicist teaching, deduct points and explain why.
+
+FORMAT YOUR RESPONSE AS:
+SCORE: [number]
+
+## Detective Assessment
+[Your evaluation — what they got right, what they missed, and what they should study further]
+
+## Key Takeaway
+[The most important truth from this case that they should remember]
+
+Be encouraging but honest. If they're wrong, explain why gently but clearly. Always point them to further study.
+- NEVER use the word "dear"`;
+
+      userPrompt = `CASE: ${caseTitle}
+
+CORRECT VERDICT:
+- Identity: ${caseVerdict?.identity || "N/A"}
+- Timeline: ${caseVerdict?.timeline || "N/A"}
+- Meaning: ${caseVerdict?.meaning || "N/A"}
+- Explanation: ${caseVerdict?.explanation || "N/A"}
+
+USER'S DEDUCTION:
+- Identity: ${userIdentity}
+- Timeline: ${userTimeline}
+- Meaning: ${userMeaning}
+
+Clues revealed: ${cluesRevealed}/${totalClues}
+
+Score their deduction and provide feedback.`;
+
+    } else if (mode === "defense-character-simulate") {
+      const { characterName, characterEra, characterDNA, characterSituations, characterArchetypes } = requestBody;
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+You are Jeeves in SPIRITUAL CHARACTER SIMULATOR mode. You create immersive scenarios based on real biblical characters and their actual life situations.
+
+Generate a scenario as a JSON object wrapped in \`\`\`json ... \`\`\` with this structure:
+{
+  "narrative": "A vivid, immersive 2-3 paragraph description of the situation the character faces. Write in second person ('You are ${characterName}...'). Use rich sensory detail and emotional depth. Ground it in the actual biblical context.",
+  "choices": [
+    "Choice 1 — a specific action or response",
+    "Choice 2 — a different approach",
+    "Choice 3 — yet another option",
+    "Choice 4 — the most unexpected option"
+  ]
+}
+
+RULES:
+- Base the scenario on the character's ACTUAL biblical situations when possible
+- The choices should represent genuinely different spiritual approaches (not just good/bad)
+- Include choices that reflect different DNA traits (faith vs fear, courage vs caution, wisdom vs impulsiveness)
+- Make the scenario emotionally engaging — the user should FEEL the weight of the decision
+- Use period-appropriate details (clothing, customs, geography)
+- Reference specific KJV passages that relate to the situation
+- NEVER use the word "dear"`;
+
+      userPrompt = `CHARACTER: ${characterName}
+ERA: ${characterEra}
+ARCHETYPES: ${(characterArchetypes || []).join(", ")}
+DNA PROFILE: Faith=${characterDNA?.faith || 3}, Humility=${characterDNA?.humility || 3}, Courage=${characterDNA?.courage || 3}, Wisdom=${characterDNA?.wisdom || 3}, Compassion=${characterDNA?.compassion || 3}, Fear=${characterDNA?.fear || 2}, Pride=${characterDNA?.pride || 2}, Greed=${characterDNA?.greed || 1}
+KNOWN SITUATIONS: ${(characterSituations || []).join("; ")}
+
+Generate an immersive scenario for this character with 4 meaningful choices.`;
+
+    } else if (mode === "defense-character-apply") {
+      const { characterName, characterDNA, scenario, userChoice, characterSituations } = requestBody;
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in CHARACTER ANALYSIS mode. A user has been placed in a biblical character's situation and made a choice. Now analyze their decision.
+
+YOUR ANALYSIS MUST COVER:
+
+1. **What ${characterName} Actually Did** — Based on the biblical record, what did this character actually do in this or similar situations? Cite KJV Scripture.
+
+2. **DNA Impact** — How does the user's choice reflect or contrast with the character's spiritual DNA? Would this choice strengthen faith/courage/wisdom or feed fear/pride/greed?
+
+3. **Palace Connections** — Connect this scenario to relevant Phototheology Palace rooms:
+   - Sanctuary typology (if applicable)
+   - Prophetic significance
+   - Great controversy themes
+   - Character development principles
+
+4. **Life Application** — What can the user learn from this character's experience and apply to their own spiritual journey TODAY? Be specific and practical.
+
+FORMAT: Use markdown with clear headers. Be warm, insightful, and encouraging. Show how ancient stories speak to modern life.
+- NEVER use the word "dear"`;
+
+      userPrompt = `CHARACTER: ${characterName}
+DNA: Faith=${characterDNA?.faith || 3}, Courage=${characterDNA?.courage || 3}, Wisdom=${characterDNA?.wisdom || 3}
+SCENARIO: ${scenario}
+USER'S CHOICE: ${userChoice}
+CHARACTER'S KNOWN SITUATIONS: ${JSON.stringify(characterSituations || [])}
+
+Analyze this choice compared to what the character actually did. Provide DNA impact, Palace connections, and life application.`;
+
+    } else if (mode === "defense-discovery-evaluate") {
+      const { title, discoveryText, category, scriptureRefs } = requestBody;
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in BIBLE DISCOVERY EVALUATION mode. A user has submitted a biblical discovery or insight for the community board. Evaluate it for quality, accuracy, and depth.
+
+SCORING CRITERIA (0-100):
+- Biblical Accuracy (0-35): Is the insight scripturally sound? Does it align with SDA historicist theology?
+- Novelty (0-25): Is this a fresh insight or just a commonly known fact?
+- Depth (0-25): How deep does the analysis go? Surface-level or genuinely penetrating?
+- Presentation (0-15): Is it clearly communicated and well-supported?
+
+FORMAT YOUR RESPONSE AS:
+SCORE: [number]
+
+## Evaluation
+[Your assessment of the discovery's strengths and areas for improvement]
+
+## Palace Rooms
+[Which Phototheology Palace rooms does this discovery connect to? Sanctuary, Prophecy, Great Controversy, etc.]
+
+## Enhancement Suggestions
+[How could this discovery be deepened or expanded?]
+
+Be encouraging but maintain high standards. A discovery that contradicts SDA teaching should score low on accuracy with a clear explanation of why.
+- NEVER use the word "dear"`;
+
+      userPrompt = `DISCOVERY TITLE: ${title}
+CATEGORY: ${category}
+SCRIPTURE REFERENCES: ${scriptureRefs || "None provided"}
+
+DISCOVERY TEXT:
+${discoveryText}
+
+Evaluate this biblical discovery for accuracy, novelty, depth, and presentation. Provide a score and constructive feedback.`;
 
     // ═══════════════════════════════════════════════════════════════════════
     // FORGE & DEFEND — Team-Based 6-Week Challenge Modes
@@ -9619,7 +9954,7 @@ ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[
         model: "google/gemini-2.5-flash",
         messages: finalMessages,
         temperature: modelTemperature,
-        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-coach" ? 16384 : mode === "defense-coach-continue" ? 16384 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : mode === "defense-jeeves-generate" ? 8192 : mode === "defense-extract-weapons" ? 8192 : 4096),
+        max_tokens: requestBody.maxTokens || (mode === "polish-story" ? 16384 : mode === "analyze-thoughts" ? 8192 : mode === "analyze-thoughts-scholar" ? 8192 : mode === "research" ? 2048 : mode === "forge-defend-boss-battle" ? 8192 : mode === "forge-defend-draft" ? 4096 : mode === "forge-defend-team-coach" ? 4096 : mode === "defense-coach" ? 16384 : mode === "defense-coach-continue" ? 16384 : mode === "defense-analyze-weapon" ? 4096 : mode === "defense-refine-weapon" ? 4096 : mode === "defense-sharpen-weapon" ? 4096 : mode === "defense-jeeves-generate" ? 8192 : mode === "defense-extract-weapons" ? 8192 : mode === "defense-custom-setup" ? 2048 : mode === "defense-analyze-transcript" ? 8192 : mode === "defense-prophecy-compare" ? 8192 : mode === "defense-detective-generate" ? 4096 : mode === "defense-detective-evaluate" ? 2048 : mode === "defense-character-simulate" ? 4096 : mode === "defense-character-apply" ? 4096 : mode === "defense-discovery-evaluate" ? 2048 : 4096),
       }),
     });
 
