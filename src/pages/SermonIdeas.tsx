@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Cloud, CloudOff, Info, Lightbulb, Plus, Trash2, Edit3, X, Check, Search, Sparkles, ChevronDown, ChevronUp, Loader2, RefreshCw } from "lucide-react";
-import { FreeAudioButton } from "@/components/audio/FreeAudioButton";
+import { OpenAIAudioButton } from "@/components/audio/OpenAIAudioButton";
 import { toast } from "sonner";
 
 const SermonIdeas = () => {
