@@ -266,7 +266,7 @@ export function usePaymentGate() {
         setChecking(false);
 
         // Only redirect if not already on auth-related pages
-        const excludedPaths = ["/pricing", "/auth", "/patreon-callback", "/stripe-success", "/stripe-cancel"];
+        const excludedPaths = ["/pricing", "/auth", "/patreon-callback", "/stripe-success", "/stripe-cancel", "/fix-billing"];
         if (!excludedPaths.some((path) => location.pathname.startsWith(path))) {
           navigate("/pricing?trial=true", { replace: true });
         }
