@@ -20,6 +20,7 @@ export function usePaymentGate() {
   const location = useLocation();
   const [checking, setChecking] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
+  const [paymentFailed, setPaymentFailed] = useState(false);
   const hasCheckedRef = useRef(false);
 
   useEffect(() => {
