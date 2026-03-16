@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -140,6 +141,11 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
   const [showSaveDebateDialog, setShowSaveDebateDialog] = useState(false);
   const [showLoadDebatesDialog, setShowLoadDebatesDialog] = useState(false);
   const [debateTitle, setDebateTitle] = useState("");
+
+  // Extract weapons from debate state
+  const [extractingWeapons, setExtractingWeapons] = useState(false);
+  const [extractedWeapons, setExtractedWeapons] = useState<Array<{ argument: string; topic: string; name: string; subtitle: string }>>([]);
+  const [extractionComplete, setExtractionComplete] = useState(false);
 
   // Load arsenal from DB
   const loadArsenal = useCallback(async () => {
@@ -485,6 +491,84 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
       setDebateTitle("");
     } catch (e) {
       console.error("Failed to save debate:", e);
+    }
+  };
+
+  // Extract weapons from a debate transcript using Jeeves
+  const extractWeaponsFromDebate = async (debateMessages?: ChatMessage[]) => {
+    const msgs = debateMessages || messages;
+    if (!user || msgs.length < 4) {
+      toast.error("Need at least a few exchanges to extract weapons.");
+      return;
+    }
+
+    setExtractingWeapons(true);
+    setExtractedWeapons([]);
+    setExtractionComplete(false);
+
+    try {
+      const transcript = msgs
+        .filter(m => m.role === "opponent" || m.role === "disciple")
+        .map(m => `[${m.role === "opponent" ? (selectedOpponent?.name || "Opponent") : "You"}]: ${m.content}`)
+        .join("\n\n");
+
+      const topicName = selectedTopic?.name || "General Apologetics";
+
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "defense-extract-weapons",
+          transcript,
+          topicName,
+          opponentName: selectedOpponent?.name || "Unknown",
+          difficulty: selectedDifficulty,
+        },
+      });
+
+      if (error) throw error;
+
+      const content = data?.content || data?.response || "";
+      // Parse JSON array of weapons from response
+      let weapons: Array<{ argument: string; topic: string; name: string; subtitle: string }> = [];
+      
+      try {
+        const jsonMatch = content.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          weapons = JSON.parse(jsonMatch[0]);
+        }
+      } catch {
+        // If JSON parsing fails, try to extract from markdown
+        const blocks = content.split(/---|\n\n\n/).filter((b: string) => b.trim().length > 50);
+        weapons = blocks.slice(0, 5).map((block: string, i: number) => ({
+          argument: block.trim(),
+          topic: topicName,
+          name: `Debate Weapon ${i + 1}`,
+          subtitle: `Extracted from ${selectedOpponent?.name || "debate"}`,
+        }));
+      }
+
+      if (weapons.length === 0) {
+        toast.info("No strong weapons found in this debate. Keep sparring!");
+      } else {
+        setExtractedWeapons(weapons);
+        // Auto-save all extracted weapons to arsenal
+        for (const w of weapons) {
+          await saveWeaponToDB({
+            argument: w.argument,
+            analysis: `Auto-extracted from debate vs ${selectedOpponent?.name || "opponent"} on "${topicName}"`,
+            topic: w.topic || topicName,
+            name: w.name,
+            subtitle: w.subtitle,
+            savedAt: new Date().toISOString(),
+          });
+        }
+        toast.success(`${weapons.length} weapon${weapons.length > 1 ? "s" : ""} forged and added to your Arsenal!`);
+      }
+      setExtractionComplete(true);
+    } catch (e) {
+      console.error("Failed to extract weapons:", e);
+      toast.error("Failed to extract weapons. Try again.");
+    } finally {
+      setExtractingWeapons(false);
     }
   };
 
@@ -2276,12 +2360,27 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowSaveDebateDialog(true)}
+            onClick={() => { setExtractedWeapons([]); setExtractionComplete(false); setShowSaveDebateDialog(true); }}
             disabled={messages.length === 0}
             title="Save this debate"
           >
             <Save className="h-4 w-4 mr-1" />
             Save
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => extractWeaponsFromDebate()}
+            disabled={messages.length < 4 || extractingWeapons}
+            title="Extract weapons from this debate"
+            className="text-amber-400 hover:text-amber-300"
+          >
+            {extractingWeapons ? (
+              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <FlaskConical className="h-4 w-4 mr-1" />
+            )}
+            {isMobile ? "" : "Extract"}
           </Button>
           <Button variant="ghost" size="sm" onClick={resetMatch}>
             <RotateCcw className="h-4 w-4 mr-1" />
@@ -2617,16 +2716,47 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
               <p><strong>Rounds:</strong> {roundCount}</p>
               <p><strong>Messages:</strong> {messages.length}</p>
             </div>
-            <div className="flex gap-2 justify-end">
+            {extractionComplete && extractedWeapons.length > 0 && (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-2">
+                <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
+                  <Warehouse className="h-4 w-4" />
+                  {extractedWeapons.length} weapon{extractedWeapons.length > 1 ? "s" : ""} added to Arsenal!
+                </div>
+                {extractedWeapons.map((w, i) => (
+                  <div key={i} className="text-xs text-muted-foreground pl-6">
+                    ⚔️ {w.name}{w.subtitle ? ` — ${w.subtitle}` : ""}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2 justify-end flex-wrap">
               <Button variant="outline" onClick={() => setShowSaveDebateDialog(false)}>
                 Cancel
               </Button>
               <Button
-                onClick={() => saveDebate(debateTitle || undefined)}
+                variant="outline"
+                onClick={() => extractWeaponsFromDebate()}
+                disabled={messages.length < 4 || extractingWeapons || extractionComplete}
+                className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+              >
+                {extractingWeapons ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <FlaskConical className="h-4 w-4 mr-2" />
+                )}
+                {extractionComplete ? "Weapons Extracted" : "Extract Weapons"}
+              </Button>
+              <Button
+                onClick={async () => {
+                  await saveDebate(debateTitle || undefined);
+                  if (!extractionComplete && messages.length >= 4) {
+                    await extractWeaponsFromDebate();
+                  }
+                }}
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
               >
                 <Save className="h-4 w-4 mr-2" />
-                Save Debate
+                Save & Extract
               </Button>
             </div>
           </div>
@@ -2686,6 +2816,27 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
                           >
                             <ArrowRight className="h-3.5 w-3.5 mr-1" />
                             Load
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                            disabled={extractingWeapons || debate.messages.length < 4}
+                            onClick={() => {
+                              // Set opponent/topic context for extraction
+                              const opp = DEFENSE_OPPONENTS.find(o => o.id === debate.opponent_id);
+                              const topic = DEFENSE_TOPICS.find(t => t.id === debate.topic_id);
+                              if (opp) setSelectedOpponent(opp);
+                              if (topic) setSelectedTopic(topic);
+                              extractWeaponsFromDebate(debate.messages);
+                            }}
+                            title="Extract weapons from this debate"
+                          >
+                            {extractingWeapons ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <FlaskConical className="h-3.5 w-3.5" />
+                            )}
                           </Button>
                           <Button
                             size="sm"
