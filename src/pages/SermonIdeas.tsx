@@ -354,8 +354,9 @@ const SermonIdeas = () => {
                         </Button>
                         {isExpanded && (
                           <div className="flex justify-end mb-1 mt-2">
-                            <FreeAudioButton
+                            <OpenAIAudioButton
                               text={idea.jeevesResearch!}
+                              voice="nova"
                               variant="outline"
                               size="sm"
                               showLabel
