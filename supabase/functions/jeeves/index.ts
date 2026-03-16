@@ -7945,6 +7945,45 @@ NEVER use the word "dear"`;
 
       userPrompt = `Score this theological weapon for forging. Topic: "${topicName}".\n\nWEAPON:\n${userWeaponText}${existingAnalysis ? `\n\nANALYSIS:\n${existingAnalysis}` : ""}`;
 
+    } else if (mode === "defense-extract-weapons") {
+      // Defense Mode: Extract weapons from a completed debate transcript
+      const transcript = requestBody.transcript || "";
+      const topicName = requestBody.topicName || "General Apologetics";
+      const opponentName = requestBody.opponentName || "Opponent";
+
+      systemPrompt = `${MASTER_IDENTITY}
+
+${THEOLOGICAL_REASONING}
+
+You are Jeeves in WEAPON EXTRACTION mode. You are reviewing a completed debate transcript between a disciple and an opponent (${opponentName}) on the topic "${topicName}".
+
+Your job: identify the disciple's STRONGEST arguments — the ones that landed, cornered the opponent, or demonstrated excellent theological reasoning. Extract these as standalone "weapons" that can be reused in future debates.
+
+RULES:
+- Only extract arguments the DISCIPLE made (not the opponent's points)
+- Each weapon should be a self-contained argument with Scripture references
+- Minimum quality threshold: only extract genuinely strong arguments
+- If the disciple made no strong arguments, return an empty array
+- Extract 1-5 weapons maximum
+- Give each weapon a thematic name (e.g., "Sabbath Sovereignty Argument", "Death Sleep Defense")
+
+RESPOND WITH A JSON ARRAY ONLY. No markdown, no explanation outside the array.
+
+FORMAT:
+[
+  {
+    "name": "Weapon Name",
+    "subtitle": "One-sentence summary of the argument",
+    "argument": "The full argument text, cleaned up and polished with KJV Scripture references",
+    "topic": "The doctrinal topic this weapon addresses"
+  }
+]
+
+If no weapons are worth extracting, return: []
+NEVER use the word "dear"`;
+
+      userPrompt = `Review this debate transcript and extract the disciple's strongest arguments as reusable weapons.\n\nTOPIC: ${topicName}\nOPPONENT: ${opponentName}\n\nTRANSCRIPT:\n${transcript}`;
+
     } else if (mode === "defense-jeeves-generate") {
       // Defense Mode: Jeeves generates an ORIGINAL weapon from scratch
       const topicName = requestBody.doctrineTopic || requestBody.topic || "General theology";
