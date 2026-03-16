@@ -25,6 +25,9 @@ import {
   Clock,
   Cross,
   Puzzle,
+  Mic,
+  Trophy,
+  GraduationCap,
   LucideIcon,
 } from 'lucide-react';
 
@@ -55,6 +58,9 @@ export type ScheduledActivityType =
   | 'principle-sprint'
   | 'pt-jeopardy'
   | 'pt-family-feud'
+  | 'freestyle-zone'
+  | 'gideon-300'
+  | 'master-exam'
   // Studies
   | 'group-study'
   | 'live-study-room'
