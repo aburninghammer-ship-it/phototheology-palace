@@ -141,6 +141,11 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
   const [showLoadDebatesDialog, setShowLoadDebatesDialog] = useState(false);
   const [debateTitle, setDebateTitle] = useState("");
 
+  // Extract weapons from debate state
+  const [extractingWeapons, setExtractingWeapons] = useState(false);
+  const [extractedWeapons, setExtractedWeapons] = useState<Array<{ argument: string; topic: string; name: string; subtitle: string }>>([]);
+  const [extractionComplete, setExtractionComplete] = useState(false);
+
   // Load arsenal from DB
   const loadArsenal = useCallback(async () => {
     if (!user) return;
