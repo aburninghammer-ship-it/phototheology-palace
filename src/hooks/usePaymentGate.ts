@@ -286,5 +286,5 @@ export function usePaymentGate() {
     hasCheckedRef.current = false;
   }, [user?.id]);
 
-  return { checking, hasAccess };
+  return { checking, hasAccess, paymentFailed };
 }
