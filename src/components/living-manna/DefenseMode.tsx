@@ -2367,6 +2367,21 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
             <Save className="h-4 w-4 mr-1" />
             Save
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => extractWeaponsFromDebate()}
+            disabled={messages.length < 4 || extractingWeapons}
+            title="Extract weapons from this debate"
+            className="text-amber-400 hover:text-amber-300"
+          >
+            {extractingWeapons ? (
+              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <FlaskConical className="h-4 w-4 mr-1" />
+            )}
+            {isMobile ? "" : "Extract"}
+          </Button>
           <Button variant="ghost" size="sm" onClick={resetMatch}>
             <RotateCcw className="h-4 w-4 mr-1" />
             New Match
