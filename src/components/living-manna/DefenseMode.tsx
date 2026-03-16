@@ -2716,16 +2716,47 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
               <p><strong>Rounds:</strong> {roundCount}</p>
               <p><strong>Messages:</strong> {messages.length}</p>
             </div>
-            <div className="flex gap-2 justify-end">
+            {extractionComplete && extractedWeapons.length > 0 && (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-2">
+                <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
+                  <Warehouse className="h-4 w-4" />
+                  {extractedWeapons.length} weapon{extractedWeapons.length > 1 ? "s" : ""} added to Arsenal!
+                </div>
+                {extractedWeapons.map((w, i) => (
+                  <div key={i} className="text-xs text-muted-foreground pl-6">
+                    ⚔️ {w.name}{w.subtitle ? ` — ${w.subtitle}` : ""}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2 justify-end flex-wrap">
               <Button variant="outline" onClick={() => setShowSaveDebateDialog(false)}>
                 Cancel
               </Button>
               <Button
-                onClick={() => saveDebate(debateTitle || undefined)}
+                variant="outline"
+                onClick={() => extractWeaponsFromDebate()}
+                disabled={messages.length < 4 || extractingWeapons || extractionComplete}
+                className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+              >
+                {extractingWeapons ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <FlaskConical className="h-4 w-4 mr-2" />
+                )}
+                {extractionComplete ? "Weapons Extracted" : "Extract Weapons"}
+              </Button>
+              <Button
+                onClick={async () => {
+                  await saveDebate(debateTitle || undefined);
+                  if (!extractionComplete && messages.length >= 4) {
+                    await extractWeaponsFromDebate();
+                  }
+                }}
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
               >
                 <Save className="h-4 w-4 mr-2" />
-                Save Debate
+                Save & Extract
               </Button>
             </div>
           </div>
