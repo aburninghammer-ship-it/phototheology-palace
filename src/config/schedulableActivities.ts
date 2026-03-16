@@ -25,6 +25,9 @@ import {
   Clock,
   Cross,
   Puzzle,
+  Mic,
+  Trophy,
+  GraduationCap,
   LucideIcon,
 } from 'lucide-react';
 
@@ -55,6 +58,9 @@ export type ScheduledActivityType =
   | 'principle-sprint'
   | 'pt-jeopardy'
   | 'pt-family-feud'
+  | 'freestyle-zone'
+  | 'gideon-300'
+  | 'master-exam'
   // Studies
   | 'group-study'
   | 'live-study-room'
@@ -383,6 +389,42 @@ export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
     maxPlayers: 20,
     supportsVerse: false,
     gradient: 'from-orange-500 to-red-600',
+  },
+  {
+    id: 'freestyle-zone',
+    name: 'Freestyler Training Zone',
+    description: 'Train theological reflexes with random prompts from Scripture, nature, and history',
+    icon: Mic,
+    category: 'games',
+    route: '/games/freestyle-zone',
+    minPlayers: 1,
+    maxPlayers: 6,
+    supportsVerse: false,
+    gradient: 'from-orange-500 via-red-500 to-yellow-500',
+  },
+  {
+    id: 'gideon-300',
+    name: 'Gideon 300 Tournament',
+    description: 'Live multiplayer elimination tournament — start with 300, refine to the remnant',
+    icon: Trophy,
+    category: 'games',
+    route: '/games/gideon-300',
+    minPlayers: 2,
+    maxPlayers: 300,
+    supportsVerse: false,
+    gradient: 'from-amber-600 to-red-700',
+  },
+  {
+    id: 'master-exam',
+    name: 'Test Me: Master Exam',
+    description: '50 AI-generated questions across all Palace domains — timed 90-minute assessment',
+    icon: GraduationCap,
+    category: 'games',
+    route: '/games/master-exam',
+    minPlayers: 1,
+    maxPlayers: 1,
+    supportsVerse: false,
+    gradient: 'from-slate-600 to-indigo-700',
   },
 
   // ── Studies ─────────────────────────────────────────────
