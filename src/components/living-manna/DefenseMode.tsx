@@ -2360,7 +2360,7 @@ export function DefenseMode({ churchId, onNavigateToAATS }: DefenseModeProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowSaveDebateDialog(true)}
+            onClick={() => { setExtractedWeapons([]); setExtractionComplete(false); setShowSaveDebateDialog(true); }}
             disabled={messages.length === 0}
             title="Save this debate"
           >
