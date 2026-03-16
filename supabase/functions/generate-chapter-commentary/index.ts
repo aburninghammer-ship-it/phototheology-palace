@@ -332,7 +332,7 @@ PROPHETIC FRAMEWORK FOR REVELATION — MUST SHAPE COMMENTARY:
 • Threefold union: Protestantism + Catholicism + Spiritualism (GC 588) = Dragon + Beast + False Prophet = three unclean spirits of Revelation 16.
 • Spiritualism is NOT fringe occultism — it imitates Christianity with miracles, healing, apparent resurrections. Rev 18:2 "habitation of devils" = permanent demonic manifestation, not occasional visitation. Culmination of the immortality-of-the-soul error.
 • Two great errors converge in the crowning deception: immortality of the soul → spiritualism; Sunday sacredness → false worship enforcement. Satan appearing as Christ commands Sunday worship.
-• Three frogs (Rev 16) = final counterfeit miracle movement. Frogs = last plague Egyptian magicians could counterfeit (Exodus 8:7).
+• Three frogs (Rev 16:13-14) are NOT part of the sixth plague — the sixth plague itself (drying up of Euphrates) is God's judgment. The frog verses describe Satan's miracle-working deception that gathered the world BEFORE the close of probation, culminating in the sixth plague crisis. Frogs = last plague Egyptian magicians could counterfeit (Exodus 8:7). This CANNOT be used as evidence that Satan appears after probation closes.
 • Rev 14 Three Angels' Messages go forth during the final crisis — while Satan's deception is active, while probation is still open. Loud Cry empowered by Latter Rain occurs amid persecution.
 • Satan appears BEFORE Sunday law — enforcement is initiated by supernatural appearing, not politics. When "Christ" is visibly present, democracy collapses into theocracy.
 • Image of Beast sequence: Satan appears → world deception → church-state theocracy formed → Sunday law → economic sanctions (buy/sell = Dan 11:43) → death decree → close of probation.`,

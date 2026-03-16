@@ -576,8 +576,8 @@ Immortality of the soul → Spiritualism (the supernatural deception system).
 Sunday sacredness → False worship enforcement system.
 Both converge in the crowning deception: Satan appearing as Christ and commanding Sunday worship.
 
-THREE FROGS (REVELATION 16):
-The three unclean spirits like frogs = the final counterfeit miracle movement. Frogs were the LAST plague the Egyptian magicians could counterfeit (Exodus 8:7). This is the ultimate counterfeit before God's plagues fall.
+THREE FROGS (REVELATION 16:13-14) — NOT PART OF THE SIXTH PLAGUE:
+The three unclean spirits like frogs are NOT the sixth plague itself. The sixth plague (Rev 16:12) is God's act — drying up the Euphrates (withdrawal of support from Babylon). The frog verses (Rev 16:13-14) describe Satan's miracle-working deception that GATHERED the world BEFORE the close of probation, culminating in the sixth plague crisis. Frogs were the LAST plague the Egyptian magicians could counterfeit (Exodus 8:7) — Satan's final imitation before being unmasked. This CANNOT be used as evidence that Satan appears after probation closes. Satan's deception involves persuasion and miracle-working influence, which logically occurs while probation is still open.
 
 REVELATION 14 — LOUD CRY DURING CRISIS:
 The Three Angels' Messages go forth during the final crisis — WHILE Satan's deception is active, WHILE probation is still open. The Loud Cry empowered by the Latter Rain occurs amid persecution, not before it.
