@@ -17,13 +17,11 @@ const snsConfigured = !!(awsAccessKeyId && awsSecretAccessKey);
 /**
  * AWS Signature V4 helper for SNS
  */
-function hmacSha256(key: Uint8Array, message: string): Promise<ArrayBuffer> {
-  return crypto.subtle.sign(
-    'HMAC',
-    // @ts-ignore: importKey accepts Uint8Array
-    crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
-    new TextEncoder().encode(message)
-  ).then(sig => sig);
+async function hmacSha256(key: Uint8Array, message: string): Promise<ArrayBuffer> {
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  return crypto.subtle.sign('HMAC', cryptoKey, new TextEncoder().encode(message));
 }
 
 async function getSignatureKey(key: string, dateStamp: string, region: string, service: string): Promise<Uint8Array> {
@@ -351,6 +349,16 @@ serve(async (req) => {
   }
 
   try {
+    // Parse request body for optional parameters
+    let requestBody: { force?: boolean; planId?: string } = {};
+    try {
+      requestBody = await req.json();
+    } catch {
+      // No body or invalid JSON — that's fine for cron calls
+    }
+    const forceMode = requestBody.force === true;
+    const filterPlanId = requestBody.planId || null;
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
@@ -365,10 +373,14 @@ serve(async (req) => {
     const now = new Date();
     const today = now.toISOString().split('T')[0];
 
+    if (forceMode) {
+      console.log(`[FORCE MODE] Bypassing time checks. Plan filter: ${filterPlanId || 'none'}`);
+    }
+
     console.log(`[${today}] Starting daily devotional delivery...`);
 
     // Get all active devotional plans with their users
-    const { data: activePlans, error: plansError } = await supabase
+    let plansQuery = supabase
       .from('devotional_plans')
       .select(`
         id,
@@ -381,6 +393,13 @@ serve(async (req) => {
       `)
       .eq('status', 'active')
       .not('started_at', 'is', null);
+
+    // If a specific plan is requested, filter to just that plan
+    if (filterPlanId) {
+      plansQuery = plansQuery.eq('id', filterPlanId);
+    }
+
+    const { data: activePlans, error: plansError } = await plansQuery;
 
     if (plansError) {
       console.error('Error fetching plans:', plansError);
@@ -423,7 +442,7 @@ serve(async (req) => {
           return meta?.plan_id === plan.id && meta?.day_number === currentDayNumber;
         });
 
-        if (alreadySentForThisDay) {
+        if (alreadySentForThisDay && !forceMode) {
           console.log(`Already sent devotional for plan ${plan.id} day ${currentDayNumber} today, skipping`);
           continue;
         }
@@ -604,6 +623,10 @@ serve(async (req) => {
               ...(profilesWithSMS || []).map(p => ({ ...p, recipientType: 'profile' as const })),
               ...(smsRecipients || []).map(r => ({ ...r, recipientType: 'standalone' as const }))
             ].filter(recipient => {
+              if (forceMode) {
+                console.log(`[FORCE] Including ${recipient.name} (time check bypassed)`);
+                return true;
+              }
               const tz = recipient.timezone || 'America/New_York';
               const hour = recipient.preferred_send_hour ?? 8;
               const send = shouldSendNow(tz, hour);
