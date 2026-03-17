@@ -284,7 +284,7 @@ const SanctuaryElementNode = memo(({ data, selected }: NodeProps<SanctuaryElemen
       <div className="relative flex flex-col h-full min-h-0 overflow-hidden rounded-2xl">
         {/* Header - Sticky */}
         <div 
-          className="sticky top-0 z-10 px-4 py-3 backdrop-blur-lg bg-black/20 border-b border-white/10 cursor-pointer"
+          className="flex-shrink-0 px-4 py-3 backdrop-blur-lg bg-black/20 border-b border-white/10 cursor-pointer"
           onClick={handleToggleExpand}
         >
           <div className="flex items-center gap-2">
