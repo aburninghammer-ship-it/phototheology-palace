@@ -9,6 +9,166 @@ interface UseMindMapGenerationReturn {
   reset: () => void;
 }
 
+const CANONICAL_ROOM_IDS = new Set(palaceFloors.flatMap((floor) => floor.rooms.map((room) => room.id)));
+const ROOM_FLOOR_MAP = new Map(palaceFloors.flatMap((floor) => floor.rooms.map((room) => [room.id, floor.number] as const)));
+const CANONICAL_SANCTUARY_IDS = new Set(sanctuaryElements.map((element) => element.id));
+
+const ROOM_ID_ALIASES: Record<string, string> = {
+  '24': '24fps',
+  '24fps-room': '24fps',
+  'story-room': 'sr',
+  'imagination-room': 'ir',
+  'translation-room': 'tr',
+  'gems-room': 'gr',
+  'observation-room': 'or',
+  'def-com-room': 'dc',
+  'questions-room': 'qr',
+  'q-and-a-room': 'qa',
+  'qa-room': 'qa',
+  'nature-freestyle': 'nf',
+  'personal-freestyle': 'pf',
+  'bible-freestyle': 'bf',
+  'history-social-freestyle': 'hf',
+  'listening-room': 'lr',
+  'concentration-room': 'cr',
+  'dimensions-room': 'dr',
+  'connect-6-room': 'c6',
+  'theme-room': 'trm',
+  'time-zone-room': 'tz',
+  'patterns': 'prm',
+  'patterns-room': 'prm',
+  'parallels': 'p||',
+  'parallels-room': 'p||',
+  'fruit-room': 'frt',
+  'blue': 'bl',
+  'blue-room': 'bl',
+  'blue-room-sanctuary': 'bl',
+  'prophecy-room': 'pr',
+  'three-angels': '3a',
+  'three-angels-room': '3a',
+  'feasts-room': 'fe',
+  'christ-every-chapter': 'cec',
+  'room66': 'r66',
+  'room-66': 'r66',
+  'three-heavens': '123h',
+  'three-heavens-room': '123h',
+  'heavens-room': '123h',
+  'cycles-room': 'cycles',
+  'eight-cycles': 'cycles',
+  'juice-room': 'jr',
+  'mathematics-room': 'math',
+  'fire-room': 'frm',
+  'meditation-room': 'mr',
+  'speed-room': 'srm',
+  'sanctuary-room': 'srm',
+  'infinity-room': 'infinity',
+  'reflexive-mastery': 'infinity',
+  'freestyle-master': 'freestyle',
+  'palace-freestyle': 'freestyle',
+};
+
+const SANCTUARY_ID_ALIASES: Record<string, string> = {
+  'altar-of-burnt-offering': 'altar-burnt-offering',
+  'bronze-laver': 'laver',
+  'golden-lampstand': 'lampstand',
+  'table-of-showbread': 'table-showbread',
+  'altar-of-incense': 'altar-incense',
+  'ark-of-the-covenant': 'ark-covenant',
+};
+
+const normalizeKey = (value: string) => value.trim().toLowerCase().replace(/[_\s]+/g, '-');
+
+const getCanonicalRoomId = (roomId: string) => ROOM_ID_ALIASES[normalizeKey(roomId)] ?? roomId;
+const getCanonicalSanctuaryId = (elementId: string) => SANCTUARY_ID_ALIASES[normalizeKey(elementId)] ?? elementId;
+
+function mergeUniquePrinciples(existing: PrincipleData[] = [], incoming: PrincipleData[] = []): PrincipleData[] {
+  const seen = new Set<string>();
+
+  return [...existing, ...incoming]
+    .filter(Boolean)
+    .filter((principle) => {
+      const key = [principle.id, principle.content, principle.insight].filter(Boolean).join('|');
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function normalizeMindMapAnalysis(analysis: AIMapAnalysis): AIMapAnalysis {
+  const roomAnalysis: AIMapAnalysis['roomAnalysis'] = {};
+
+  Object.entries(analysis.roomAnalysis || {}).forEach(([rawRoomId, rawRoomData]) => {
+    const canonicalRoomId = getCanonicalRoomId(rawRoomId);
+    if (!CANONICAL_ROOM_IDS.has(canonicalRoomId)) return;
+
+    const incomingRoomData = {
+      applicable: Boolean(rawRoomData?.applicable),
+      principles: Array.isArray(rawRoomData?.principles) ? rawRoomData.principles.filter(Boolean) : [],
+    };
+
+    const existingRoomData = roomAnalysis[canonicalRoomId];
+    roomAnalysis[canonicalRoomId] = existingRoomData
+      ? {
+          applicable: existingRoomData.applicable || incomingRoomData.applicable,
+          principles: mergeUniquePrinciples(existingRoomData.principles, incomingRoomData.principles),
+        }
+      : incomingRoomData;
+  });
+
+  const sanctuaryAnalysis: AIMapAnalysis['sanctuaryAnalysis'] = analysis.sanctuaryAnalysis ? {} : undefined;
+
+  if (analysis.sanctuaryAnalysis && sanctuaryAnalysis) {
+    Object.entries(analysis.sanctuaryAnalysis).forEach(([rawElementId, rawElementData]) => {
+      const canonicalElementId = getCanonicalSanctuaryId(rawElementId);
+      if (!CANONICAL_SANCTUARY_IDS.has(canonicalElementId)) return;
+
+      const incomingElementData = {
+        applicable: Boolean(rawElementData?.applicable),
+        insights: Array.isArray(rawElementData?.insights) ? rawElementData.insights.filter(Boolean) : [],
+      };
+
+      const existingElementData = sanctuaryAnalysis[canonicalElementId];
+      sanctuaryAnalysis[canonicalElementId] = existingElementData
+        ? {
+            applicable: existingElementData.applicable || incomingElementData.applicable,
+            insights: mergeUniquePrinciples(existingElementData.insights, incomingElementData.insights),
+          }
+        : incomingElementData;
+    });
+  }
+
+  const blueRoomBackfill = Object.entries(sanctuaryAnalysis || {}).flatMap(([elementId, elementData]) =>
+    elementData.applicable
+      ? (elementData.insights || []).map((insight, index) => ({
+          ...insight,
+          id: insight.id || `bl-${elementId}-${index}`,
+        }))
+      : []
+  );
+
+  if (blueRoomBackfill.length > 0) {
+    const existingBlueRoom = roomAnalysis.bl;
+    roomAnalysis.bl = {
+      applicable: true,
+      principles: mergeUniquePrinciples(existingBlueRoom?.principles || [], blueRoomBackfill),
+    };
+  }
+
+  const relevantFloors = new Set(analysis.relevantFloors || []);
+  Object.entries(roomAnalysis).forEach(([roomId, roomData]) => {
+    if (!roomData.applicable && roomData.principles.length === 0) return;
+    const floorNumber = ROOM_FLOOR_MAP.get(roomId);
+    if (floorNumber) relevantFloors.add(floorNumber);
+  });
+
+  return {
+    ...analysis,
+    relevantFloors: Array.from(relevantFloors).sort((a, b) => a - b),
+    roomAnalysis,
+    sanctuaryAnalysis,
+  };
+}
+
 export function useMindMapGeneration(): UseMindMapGenerationReturn {
   const [state, setState] = useState<GenerationState>({
     status: 'idle',
@@ -23,7 +183,6 @@ export function useMindMapGeneration(): UseMindMapGenerationReturn {
     setState({ status: 'generating', progress: 10, message: fullStudy ? 'Generating full study mind map...' : 'Preparing analysis...' });
 
     try {
-      // Call the edge function
       const { data, error } = await supabase.functions.invoke('mind-map-analyze', {
         body: { text, mode, fullStudy },
       });
@@ -40,10 +199,8 @@ export function useMindMapGeneration(): UseMindMapGenerationReturn {
 
       setState({ status: 'generating', progress: 50, message: 'Processing results...' });
 
-      // Parse the response
-      const analysis = data as AIMapAnalysis;
+      const analysis = normalizeMindMapAnalysis(data as AIMapAnalysis);
 
-      // Validate response structure
       if (!analysis.relevantFloors || !analysis.roomAnalysis) {
         throw new Error('Invalid analysis response structure');
       }
