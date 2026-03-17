@@ -410,7 +410,7 @@ function MindMapCanvasInner({
         panOnDrag={true}
         selectionOnDrag={false}
       >
-        <Background color="#4b5563" gap={30} size={1.5} variant={"dots" as any} />
+        <Background color="#374151" gap={20} size={1} />
 
         {/* Prezi-style Custom Zoom Controls */}
         <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2">
