@@ -2187,7 +2187,7 @@ Return as JSON array: [...]`;
         // Floor 6 - Three Heavens (Cycles & Cosmic Context)
         "cycles": { name: "Eight Cycles (@Ad-@Re)", description: "8 cycles: Adamic→Remnant patterns", examples: "@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re" },
         "horizons": { name: "Three Heavens (1H-3H)", description: "Day of the Lord judgment cycles", examples: "1H (Babylon), 2H (70 AD), 3H (Final)" },
-        "JR": { name: "Juice Room (JR)", description: "squeezing entire books with all principles", examples: "Full book analysis using all PT tools" },
+        "JR": { name: "Juice Room (JR)", description: "squeezing books, chapters, or passages through all principles", examples: "Full extraction using all PT tools on any scope" },
         
         // Floor 7 - Spiritual & Emotional
         "FRm": { name: "Fire Room (FRm)", description: "emotional weight and conviction", examples: "Gethsemane weight, Calvary trembling, Pentecost fire" },
