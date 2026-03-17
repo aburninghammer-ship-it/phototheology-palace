@@ -696,7 +696,9 @@ serve(async (req) => {
     ].join("\n");
 
     // Full study needs much higher token limit to fill all 35+ rooms with substantial content
-    const maxTokens = fullStudy ? 65536 : 8192;
+    // Regular mode also needs sufficient tokens — 8192 was too low and caused truncated JSON,
+    // leaving many rooms with "No insights generated yet"
+    const maxTokens = fullStudy ? 65536 : 16384;
 
     const callGateway = async (extraUserInstruction?: string) => {
       const userPrompt = [

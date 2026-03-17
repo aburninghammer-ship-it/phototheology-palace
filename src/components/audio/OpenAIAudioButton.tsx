@@ -51,7 +51,7 @@ export function OpenAIAudioButton({
 
     try {
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text: text.substring(0, 4000), voice, returnType: "url" },
+        body: { text, voice, returnType: "url" },
       });
 
       if (error) throw error;
