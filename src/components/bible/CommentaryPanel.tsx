@@ -102,7 +102,7 @@ const PRINCIPLE_OPTIONS = [
   { id: "cyc", label: "Cyrus-Christ Cycle (@CyC)", color: "gradient-sunset" },
   { id: "sp", label: "Holy Spirit Cycle (@Sp)", color: "gradient-warmth" },
   { id: "re", label: "Remnant Cycle (@Re)", color: "gradient-palace" },
-  // Note: Juice Room (JR) intentionally excluded - only for whole books, not verses
+  { id: "jr", label: "Juice Room (JR)", color: "gradient-royal" },
   
   // Time Zones (Six Zones)
   { id: "heaven-past", label: "Heaven-Past", color: "gradient-sunset" },

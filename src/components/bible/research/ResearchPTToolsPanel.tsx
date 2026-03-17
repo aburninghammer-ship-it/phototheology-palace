@@ -86,7 +86,7 @@ const PALACE_FLOORS = [
     name: "Three Heavens Floor",
     expansion: "Depth",
     rooms: [
-      { code: "JR", name: "Juice Room", desc: "Full book extraction" },
+      { code: "JR", name: "Juice Room", desc: "Full extraction through all principles" },
     ]
   },
   {
