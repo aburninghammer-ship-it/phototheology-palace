@@ -2762,22 +2762,6 @@ CRITICAL METHODOLOGY INSTRUCTIONS:
         const shuffled = [...allPrinciples].sort(() => Math.random() - 0.5);
         usedPrinciples = shuffled.slice(0, count);
       } else {
-        // Validate that Juice Room (JR) is not selected for verse analysis
-        const juiceRoomVariants = ["Juice Room (JR)", "Juice Room", "JR"];
-        const hasJuiceRoom = selectedPrinciples.some((p: string) => 
-          juiceRoomVariants.some((variant: string) => p.includes(variant))
-        );
-        
-        if (hasJuiceRoom) {
-          return new Response(
-            JSON.stringify({ 
-              error: "The Juice Room (JR) can only be applied to ENTIRE BOOKS, never to single verses or chapters. Please select other principles for verse analysis.",
-              content: "❌ **Invalid Principle Selection**\n\n🚫 The Juice Room (JR) is exclusively for comprehensive book-level analysis.\n\n💡 For verse analysis, please select from other available principles like Observation Room (OR), Concentration Room (CR), Dimensions Room (DR), etc.\n\n📖 Use Juice Room only when studying complete books like Genesis, Matthew, or Revelation." 
-            }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        
         usedPrinciples = selectedPrinciples;
       }
       
