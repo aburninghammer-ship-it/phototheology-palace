@@ -31,21 +31,21 @@ const TREE_LAYOUT = {
   rootY: 0,
   
   // Floor row
-  floorY: 200,           // Y position of floor row
-  floorSpacing: 280,     // Horizontal spacing between floors
+  floorY: 280,           // Y position of floor row
+  floorSpacing: 350,     // Horizontal spacing between floors
   
   // Room row
-  roomYOffset: 180,      // Y offset from floor to rooms
+  roomYOffset: 250,      // Y offset from floor to rooms
   roomSpacing: 200,      // Horizontal spacing between rooms within a floor
   
   // Principle row
-  principleYOffset: 160, // Y offset from room to principles
-  principleSpacing: 220, // Horizontal spacing between principles
+  principleYOffset: 200, // Y offset from room to principles
+  principleSpacing: 180, // Horizontal spacing between principles
   
   // Sanctuary section
-  sanctuaryY: 800,       // Y position of sanctuary
-  zoneSpacing: 350,      // Horizontal spacing between zones
-  elementYOffset: 150,   // Y offset from zone to elements
+  sanctuaryY: 1000,      // Y position of sanctuary
+  zoneSpacing: 400,      // Horizontal spacing between zones
+  elementYOffset: 200,   // Y offset from zone to elements
   elementSpacing: 180,   // Horizontal spacing between elements
 };
 
@@ -94,7 +94,7 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
       target: floorNode.id,
       type: 'smoothstep',
       animated: false,
-      style: { stroke: floorColor, strokeWidth: 2 },
+      style: { stroke: `${floorColor}80`, strokeWidth: 1.5 },
       data: { type: 'hierarchy' },
     });
 
@@ -117,7 +117,7 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
         target: roomNode.id,
         type: 'smoothstep',
         animated: false,
-        style: { stroke: floorColor, strokeWidth: 1.5, opacity: 0.7 },
+        style: { stroke: `${floorColor}60`, strokeWidth: 1 },
         data: { type: 'hierarchy' },
       });
     });
@@ -136,7 +136,7 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
       target: 'sanctuary',
       type: 'smoothstep',
       animated: false,
-      style: { stroke: '#a855f7', strokeWidth: 2 },
+      style: { stroke: '#a855f780', strokeWidth: 1.5 },
       data: { type: 'hierarchy' },
     });
   }
@@ -269,7 +269,7 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
       source: 'sanctuary',
       target: zoneNode.id,
       type: 'smoothstep',
-      style: { stroke: '#a855f7', strokeWidth: 1.5 },
+      style: { stroke: '#a855f760', strokeWidth: 1 },
       data: { type: 'hierarchy' },
     });
 
@@ -305,7 +305,7 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
         source: zoneNode.id,
         target: elementNode.id,
         type: 'smoothstep',
-        style: { stroke: '#9ca3af', strokeWidth: 1 },
+        style: { stroke: '#9ca3af80', strokeWidth: 0.8 },
         data: { type: 'hierarchy' },
       });
     });

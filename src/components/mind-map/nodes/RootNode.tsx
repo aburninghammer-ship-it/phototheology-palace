@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-import { FileText, Sprout, Sparkles, BookOpen, Quote } from 'lucide-react';
+import { Sprout, Sparkles, BookOpen } from 'lucide-react';
 import type { RootNodeData } from '../types';
 import { ANALYSIS_MODE_CONFIG } from '../constants';
 import { useMindMapContextSafe } from '../MindMapContext';
@@ -15,86 +15,64 @@ const RootNode = memo(({ data, selected }: NodeProps<RootNodeData>) => {
       mindMapContext.onMakeSeed(data.sourceText, label);
     }
   }, [mindMapContext, data.sourceText, data.textPreview]);
+
   const modeConfig = ANALYSIS_MODE_CONFIG[data.mode];
 
   return (
-    <div
-      className={`
-        relative rounded-2xl overflow-hidden
-        transition-all duration-300 hover:scale-105
-        ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
-        min-w-[300px] max-w-[360px]
-        hover:shadow-2xl hover:shadow-primary/30
-      `}
-    >
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/40 via-pink-500/30 to-blue-600/40" />
+    <div className="flex flex-col items-center">
+      {/* Main circle */}
+      <div
+        className={`
+          relative flex items-center justify-center
+          w-[160px] h-[160px] rounded-full
+          bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900
+          border-[3px] border-white/30
+          shadow-2xl shadow-black/40
+          transition-all duration-300 hover:scale-105
+          ${selected ? 'ring-4 ring-primary ring-offset-4 ring-offset-background' : ''}
+          cursor-pointer
+        `}
+      >
+        {/* Inner glow */}
+        <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/10 via-transparent to-transparent" />
 
-      {/* Glass layers */}
-      <div className="absolute inset-0 backdrop-blur-xl bg-black/20" />
-      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/10" />
-
-      {/* Animated shimmer */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse" />
-
-      {/* Glass border */}
-      <div className="absolute inset-0 rounded-2xl border-2 border-white/30" />
-
-      {/* Decorative elements */}
-      <div className="absolute top-3 right-3">
-        <Sparkles className="w-5 h-5 text-yellow-400/60 animate-pulse" />
-      </div>
-
-      {/* Content */}
-      <div className="relative px-5 py-4">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 rounded-xl bg-white/20 backdrop-blur-sm border border-white/20">
-            <BookOpen className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <span className="font-bold text-base text-white">Seed Text</span>
-            <span className="ml-3 text-xs px-2.5 py-1 rounded-full bg-accent/30 backdrop-blur-sm text-accent-foreground font-semibold border border-accent/30">
-              {modeConfig.label}
-            </span>
-          </div>
-        </div>
-
-        {/* Text Preview */}
-        <div className="mb-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
-          <div className="flex items-start gap-2">
-            <Quote className="w-4 h-4 text-white/60 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-white/90 leading-relaxed line-clamp-3 italic">
-              {data.textPreview}
-            </p>
-          </div>
-        </div>
-
-        {/* Stats & Actions */}
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-white/60 font-medium">
-            {data.characterCount.toLocaleString()} characters
+        {/* Content */}
+        <div className="relative text-center px-4">
+          <BookOpen className="w-6 h-6 text-white/80 mx-auto mb-1" />
+          <span className="block text-sm font-black text-white leading-tight">SEED</span>
+          <span className="block text-sm font-black text-white leading-tight">TEXT</span>
+          <span className="block text-[10px] mt-1 px-2 py-0.5 rounded-full bg-white/20 text-white/80 font-semibold">
+            {modeConfig.label}
           </span>
-          {mindMapContext && (
-            <button
-              onClick={handleMakeSeed}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl
-                         bg-green-500/30 hover:bg-green-500/50 backdrop-blur-sm border border-green-400/30
-                         text-green-200 text-sm font-semibold transition-all duration-200 hover:scale-105"
-              title="Make this the seed for a new map"
-            >
-              <Sprout className="w-4 h-4" />
-              <span>New Seed</span>
-            </button>
-          )}
         </div>
       </div>
+
+      {/* Text preview pill below circle */}
+      <div className="mt-3 max-w-[200px] px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm border border-white/10 text-center">
+        <p className="text-[10px] text-muted-foreground italic truncate">
+          "{data.textPreview.substring(0, 50)}..."
+        </p>
+      </div>
+
+      {/* Make Seed satellite */}
+      {mindMapContext && (
+        <button
+          onClick={handleMakeSeed}
+          className="absolute -right-2 -bottom-2 w-8 h-8 rounded-full
+                     bg-green-500 hover:bg-green-400 border-2 border-white/40
+                     flex items-center justify-center transition-all hover:scale-110
+                     shadow-lg shadow-green-500/30"
+          title="New Seed"
+        >
+          <Sprout className="w-4 h-4 text-white" />
+        </button>
+      )}
 
       {/* Output handle */}
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!bg-white !w-4 !h-4 !border-2 !border-primary !rounded-full"
+        className="!bg-white !w-3 !h-3 !border-2 !border-slate-600 !rounded-full !-bottom-1.5"
       />
     </div>
   );
