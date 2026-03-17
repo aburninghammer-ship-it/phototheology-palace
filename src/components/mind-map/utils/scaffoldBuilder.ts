@@ -136,7 +136,7 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
       target: 'sanctuary',
       type: 'smoothstep',
       animated: false,
-      style: { stroke: '#a855f7', strokeWidth: 2 },
+      style: { stroke: '#a855f780', strokeWidth: 1.5 },
       data: { type: 'hierarchy' },
     });
   }
