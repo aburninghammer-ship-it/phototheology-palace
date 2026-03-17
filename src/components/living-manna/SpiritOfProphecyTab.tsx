@@ -26,6 +26,7 @@ import { GCConflictTag } from "@/components/cota/GCConflictTag";
 import type { GCConflictTag as GCConflictTagType } from "@/types/gcConflictTag";
 import { DefenseMode } from "@/components/living-manna/DefenseMode";
 import { ShareToCommunity } from "@/components/community/ShareToCommunity";
+import { PalaceWalkthroughDisplay } from "@/components/living-manna/PalaceWalkthroughDisplay";
 
 // ─── EGW Book Library ───────────────────────────────────────────────
 interface EGWBook {
