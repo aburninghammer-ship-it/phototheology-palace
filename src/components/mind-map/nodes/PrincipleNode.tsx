@@ -133,7 +133,7 @@ const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) =>
         <Sparkles className="w-4 h-4 text-yellow-400/60 animate-pulse" />
       </div>
 
-      <div className="relative px-4 py-3 pt-8 max-h-[500px] overflow-y-auto">
+      <div className="relative px-4 py-3 pt-8 max-h-[500px] overflow-y-auto nowheel">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">

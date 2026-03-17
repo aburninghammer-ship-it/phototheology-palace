@@ -374,7 +374,7 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
 
         {/* Scrollable Principles List - Takes remaining height */}
         <div 
-          className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-2"
+          className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-2 nowheel"
           style={{ 
             scrollbarWidth: 'thin',
             scrollbarColor: 'rgba(255,255,255,0.2) transparent'

@@ -322,7 +322,7 @@ const SanctuaryElementNode = memo(({ data, selected }: NodeProps<SanctuaryElemen
         </div>
 
         {/* Scrollable Insights List */}
-        <div className="max-h-[350px] overflow-y-auto px-3 py-3 space-y-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+        <div className="max-h-[350px] overflow-y-auto px-3 py-3 space-y-2 nowheel scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
           {hasInsights ? (
             data.insights.map((insight, index) => (
               <InsightCard
