@@ -666,14 +666,14 @@ serve(async (req) => {
     const strictOutputInstruction = [
       `STRICT OUTPUT RULES:`,
       `- Return ONLY valid JSON (no markdown).`,
-      `- roomAnalysis MUST contain at least ${requiredRooms} room IDs (keys) — but ONLY rooms with GENUINE connections.`,
-      `- sanctuaryAnalysis MUST contain at least 1 sanctuary element (key).`,
-      `- For each included room: set applicable=true ONLY if the connection is genuine and well-supported. Include 1-3 principles with application + visualHook + KJV cross-refs.`,
-      `- Rooms without genuine connections should have applicable=false with an empty principles array.`,
+      `- roomAnalysis MUST contain at least ${requiredRooms} room IDs (keys).`,
+      `- You MUST include these rooms at minimum: sr, ir, or, cr, dr, trm, bl, pr, 123h, cycles, cec, 3a, frm.`,
+      `- sanctuaryAnalysis MUST contain all 7 sanctuary elements.`,
+      `- For each included room: set applicable=true and include 1-3 principles with application + visualHook + KJV cross-refs.`,
+      `- Only mark rooms applicable=false for 24fps and br (which require specific study types).`,
       `- Do not return empty objects for roomAnalysis or sanctuaryAnalysis.`,
-      `- QUALITY OVER QUANTITY: It is better to have ${requiredRooms} deeply connected rooms than 35 shallow ones.`,
       `- For multi-principle rooms (3a, c6, ir, dr, trm, tz, frt, bl, fe, cec, 123h, cycles, frm, mr, srm, cr, or):`,
-      `  Provide SEPARATE principles for each sub-component WHERE THE CONNECTION IS GENUINE. Skip sub-components that would be forced.`,
+      `  Provide SEPARATE principles for each sub-component.`,
     ].join("\n");
 
     // Full study needs much higher token limit to fill all 35+ rooms with substantial content
