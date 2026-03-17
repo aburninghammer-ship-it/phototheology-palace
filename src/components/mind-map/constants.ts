@@ -110,14 +110,14 @@ export const ANALYSIS_MODE_CONFIG = {
 // Layout constants - Increased spacing to prevent overlap
 export const LAYOUT_CONFIG = {
   rootPosition: { x: 0, y: 0 },
-  floorRadius: 550,      // Increased from 350 - more space between root and floors
-  roomRadius: 350,       // Increased from 200 - more space between floors and rooms
-  sanctuaryOffset: { x: 0, y: 800 },  // Moved further down
-  zoneRadius: 250,       // Increased from 180
+  floorRadius: 800,      // Generous space between root and floors
+  roomRadius: 500,       // Wide spacing between floors and rooms
+  sanctuaryOffset: { x: 0, y: 1200 },  // Well below main tree
+  zoneRadius: 350,       // Space between sanctuary zones
   nodeSpacing: {
-    floor: 150,          // Increased from 100
-    room: 120,           // Increased from 80
-    principle: 100,      // Increased from 60
+    floor: 220,          // Ample floor-to-floor spacing
+    room: 180,           // Room breathing room
+    principle: 140,      // Principle card spacing
   },
 };
 
