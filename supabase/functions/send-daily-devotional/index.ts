@@ -444,7 +444,7 @@ serve(async (req) => {
           return meta?.plan_id === plan.id && meta?.day_number === currentDayNumber;
         });
 
-        if (alreadySentForThisDay) {
+        if (alreadySentForThisDay && !forceMode) {
           console.log(`Already sent devotional for plan ${plan.id} day ${currentDayNumber} today, skipping`);
           continue;
         }
