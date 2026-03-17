@@ -94,7 +94,7 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
       target: floorNode.id,
       type: 'smoothstep',
       animated: false,
-      style: { stroke: floorColor, strokeWidth: 2 },
+      style: { stroke: `${floorColor}80`, strokeWidth: 1.5 },
       data: { type: 'hierarchy' },
     });
 
