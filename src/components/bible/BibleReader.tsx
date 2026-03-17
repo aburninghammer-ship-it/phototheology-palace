@@ -5,7 +5,7 @@ import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame, MoreHorizontal, Crown } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame, MoreHorizontal, Crown, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,6 +54,8 @@ import { CopyableVersesCard } from "./CopyableVersesCard";
 import { useSparks } from "@/hooks/useSparks";
 import { SparkContainer, SparkSettings } from "@/components/sparks";
 import { Badge } from "@/components/ui/badge";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
@@ -95,6 +97,7 @@ export const BibleReader = () => {
     setShowPreacherMentor: setPreacherMentorMode,
   } = useBibleState(book, chapterParam);
   
+  const isMobile = useIsMobile();
   const { trackReading } = useReadingHistory();
   const { addBookmark, isBookmarked } = useBookmarks();
   const { preferences, loading: preferencesLoading } = useUserPreferences();
@@ -656,146 +659,195 @@ export const BibleReader = () => {
           </div>
         </div>
 
-        {/* Right Panel - Dynamic based on mode - Floating/Sticky */}
-        <div className="lg:col-span-1 space-y-4 lg:space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto" ref={jeevesRef}>
-          {preacherMentorMode && selectedVerse ? (
-            <PreacherMentorCard
-              book={book}
-              chapter={chapter}
-              verse={selectedVerse}
-              verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-              onClose={() => setPreacherMentorMode(false)}
-            />
-          ) : chainReferenceMode ? (
-            <div className="space-y-6">
-              <PTChainReferenceBox initialVerse={selectedVerse ? `${book} ${chapter}:${selectedVerse}` : `${book} ${chapter}`} />
-              <ChainReferencePanel
-                book={book}
-                chapter={chapter}
-                verses={chapterData.verses}
-                onHighlight={setHighlightedVerses}
-              />
+        {/* Right Panel - Dynamic based on mode */}
+        {/* On mobile: opens as a bottom drawer for easy back navigation */}
+        {/* On desktop: renders inline as a sticky sidebar */}
+        {(() => {
+          const hasPanelContent = !!(
+            (preacherMentorMode && selectedVerse) ||
+            chainReferenceMode ||
+            (sermonIdeasMode && selectedVerse) ||
+            ((commentaryMode || jeevesMode) && selectedVerse) ||
+            (principleMode && selectedVerses.length > 0) ||
+            selectedVerse
+          );
+
+          const closeMobilePanel = () => {
+            setSelectedVerse(null);
+            setSelectedVerses([]);
+            setPreacherMentorMode(false);
+            setSermonIdeasMode(false);
+            setCommentaryMode(false);
+            setJeevesMode(false);
+            setPrincipleMode(false);
+            setChainReferenceMode(false);
+          };
+
+          const panelContent = (
+            <>
+              {preacherMentorMode && selectedVerse ? (
+                <PreacherMentorCard
+                  book={book}
+                  chapter={chapter}
+                  verse={selectedVerse}
+                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                  onClose={() => setPreacherMentorMode(false)}
+                />
+              ) : chainReferenceMode ? (
+                <div className="space-y-6">
+                  <PTChainReferenceBox initialVerse={selectedVerse ? `${book} ${chapter}:${selectedVerse}` : `${book} ${chapter}`} />
+                  <ChainReferencePanel
+                    book={book}
+                    chapter={chapter}
+                    verses={chapterData.verses}
+                    onHighlight={setHighlightedVerses}
+                  />
+                </div>
+              ) : sermonIdeasMode && selectedVerse ? (
+                <SermonIdeasPanel
+                  book={book}
+                  chapter={chapter}
+                  verse={selectedVerse}
+                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                  onClose={() => setSermonIdeasMode(false)}
+                />
+              ) : (commentaryMode || jeevesMode) && selectedVerse ? (
+                <>
+                  {commentaryMode && (
+                    <CommentaryPanel
+                      book={book}
+                      chapter={chapter}
+                      verse={selectedVerse}
+                      verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                      onClose={() => setCommentaryMode(false)}
+                    />
+                  )}
+                  {jeevesMode && (
+                    <JeevesVerseAssistant
+                      book={book}
+                      chapter={chapter}
+                      verse={selectedVerse}
+                      verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                      onClose={() => setJeevesMode(false)}
+                    />
+                  )}
+                </>
+              ) : principleMode && selectedVerses.length > 0 ? (
+                <CopyableVersesCard
+                  book={book}
+                  chapter={chapter}
+                  selectedVerses={selectedVerses}
+                  verses={chapterData.verses}
+                  onClear={() => setSelectedVerses([])}
+                >
+                  {selectedVerses.length === 1 && (
+                    <PrinciplePanel
+                      book={book}
+                      chapter={chapter}
+                      verse={selectedVerses[0]}
+                      verseText={chapterData.verses.find(v => v.verse === selectedVerses[0])?.text || ""}
+                      onClose={() => setSelectedVerses([])}
+                      onHighlight={setHighlightedVerses}
+                    />
+                  )}
+                </CopyableVersesCard>
+              ) : selectedVerse ? (
+                <>
+                  <MemoryToolsPanel
+                    book={book}
+                    chapter={chapter}
+                    verse={selectedVerse}
+                    verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                  />
+
+                  <PrinciplePanel
+                    book={book}
+                    chapter={chapter}
+                    verse={selectedVerse}
+                    verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                    onClose={() => setSelectedVerse(null)}
+                    onHighlight={setHighlightedVerses}
+                  />
+                  <VerseImageAttachment
+                    book={book}
+                    chapter={chapter}
+                    verse={selectedVerse}
+                    verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                  />
+
+                  {(studyMode === "apologetics" || studyMode === "advanced") && (
+                    <ApologeticsPanel
+                      book={book}
+                      chapter={chapter}
+                      verse={selectedVerse}
+                      verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                    />
+                  )}
+
+                  {(studyMode === "advanced" || studyMode === "beginner") && (
+                    <ThematicTagging
+                      book={book}
+                      chapter={chapter}
+                      verse={selectedVerse}
+                      verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                    />
+                  )}
+
+                  {studyMode === "advanced" && (
+                    <ThemeCrossReference
+                      currentVerse={`${book} ${chapter}:${selectedVerse}`}
+                    />
+                  )}
+
+                  <ThemeVerseSearch />
+                </>
+              ) : null}
+            </>
+          );
+
+          // On mobile: render panel in a bottom drawer
+          if (isMobile) {
+            return (
+              <Drawer open={hasPanelContent} onOpenChange={(open) => { if (!open) closeMobilePanel(); }}>
+                <DrawerContent className="max-h-[85vh]">
+                  <DrawerHeader className="flex items-center justify-between pb-2">
+                    <DrawerTitle className="text-sm">
+                      {book} {chapter}{selectedVerse ? `:${selectedVerse}` : ""}
+                    </DrawerTitle>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={closeMobilePanel}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </DrawerHeader>
+                  <div className="overflow-y-auto px-4 pb-6 space-y-4">
+                    {panelContent}
+                  </div>
+                </DrawerContent>
+              </Drawer>
+            );
+          }
+
+          // On desktop: render inline as sticky sidebar
+          return (
+            <div className="lg:col-span-1 space-y-4 lg:space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto" ref={jeevesRef}>
+              {hasPanelContent ? panelContent : (
+                <Card className="p-6 text-center text-muted-foreground sticky top-24">
+                  <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary/50" />
+                  <p className="text-sm">
+                    {strongsMode
+                      ? t('bible.selectVerseStrongs')
+                      : principleMode
+                      ? t('bible.selectVersePrinciple')
+                      : preacherMentorMode
+                      ? "Select a verse for Preacher Mentor analysis"
+                      : (jeevesMode || commentaryMode)
+                      ? t('bible.selectVerseAI')
+                      : t('bible.selectVerseDefault')}
+                  </p>
+                </Card>
+              )}
             </div>
-          ) : sermonIdeasMode && selectedVerse ? (
-            <SermonIdeasPanel
-              book={book}
-              chapter={chapter}
-              verse={selectedVerse}
-              verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-              onClose={() => setSermonIdeasMode(false)}
-            />
-          ) : (commentaryMode || jeevesMode) && selectedVerse ? (
-            <>
-              {commentaryMode && (
-                <CommentaryPanel
-                  book={book}
-                  chapter={chapter}
-                  verse={selectedVerse}
-                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-                  onClose={() => setCommentaryMode(false)}
-                />
-              )}
-              {jeevesMode && (
-                <JeevesVerseAssistant
-                  book={book}
-                  chapter={chapter}
-                  verse={selectedVerse}
-                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-                  onClose={() => setJeevesMode(false)}
-                />
-              )}
-            </>
-          ) : principleMode && selectedVerses.length > 0 ? (
-            <CopyableVersesCard
-              book={book}
-              chapter={chapter}
-              selectedVerses={selectedVerses}
-              verses={chapterData.verses}
-              onClear={() => setSelectedVerses([])}
-            >
-              {selectedVerses.length === 1 && (
-                <PrinciplePanel
-                  book={book}
-                  chapter={chapter}
-                  verse={selectedVerses[0]}
-                  verseText={chapterData.verses.find(v => v.verse === selectedVerses[0])?.text || ""}
-                  onClose={() => setSelectedVerses([])}
-                  onHighlight={setHighlightedVerses}
-                />
-              )}
-            </CopyableVersesCard>
-          ) : selectedVerse ? (
-            <>
-              {/* Always show Memory Tools */}
-              <MemoryToolsPanel
-                book={book}
-                chapter={chapter}
-                verse={selectedVerse}
-                verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-              />
-              
-              <PrinciplePanel
-                book={book}
-                chapter={chapter}
-                verse={selectedVerse}
-                verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-                onClose={() => setSelectedVerse(null)}
-                onHighlight={setHighlightedVerses}
-              />
-              <VerseImageAttachment
-                book={book}
-                chapter={chapter}
-                verse={selectedVerse}
-                verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-              />
-              
-              {/* Apologetics Panel (Apologetics & Advanced modes) */}
-              {(studyMode === "apologetics" || studyMode === "advanced") && (
-                <ApologeticsPanel
-                  book={book}
-                  chapter={chapter}
-                  verse={selectedVerse}
-                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-                />
-              )}
-              
-              {/* Thematic Tagging (Advanced & Beginner modes) */}
-              {(studyMode === "advanced" || studyMode === "beginner") && (
-                <ThematicTagging
-                  book={book}
-                  chapter={chapter}
-                  verse={selectedVerse}
-                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-                />
-              )}
-              
-              {/* Theme Cross-Reference (Advanced mode) */}
-              {studyMode === "advanced" && (
-                <ThemeCrossReference
-                  currentVerse={`${book} ${chapter}:${selectedVerse}`}
-                />
-              )}
-              
-              {/* Theme Verse Search (All modes) */}
-              <ThemeVerseSearch />
-            </>
-          ) : (
-            <Card className="p-6 text-center text-muted-foreground sticky top-24">
-              <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary/50" />
-              <p className="text-sm">
-                {strongsMode
-                  ? t('bible.selectVerseStrongs')
-                  : principleMode
-                  ? t('bible.selectVersePrinciple')
-                  : preacherMentorMode
-                  ? "Select a verse for Preacher Mentor analysis"
-                  : (jeevesMode || commentaryMode)
-                  ? t('bible.selectVerseAI')
-                  : t('bible.selectVerseDefault')}
-              </p>
-            </Card>
-          )}
-        </div>
+          );
+        })()}
       </div>
     </div>
   );
