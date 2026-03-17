@@ -351,6 +351,16 @@ serve(async (req) => {
   }
 
   try {
+    // Parse request body for optional parameters
+    let requestBody: { force?: boolean; planId?: string } = {};
+    try {
+      requestBody = await req.json();
+    } catch {
+      // No body or invalid JSON — that's fine for cron calls
+    }
+    const forceMode = requestBody.force === true;
+    const filterPlanId = requestBody.planId || null;
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
@@ -364,6 +374,10 @@ serve(async (req) => {
 
     const now = new Date();
     const today = now.toISOString().split('T')[0];
+
+    if (forceMode) {
+      console.log(`[FORCE MODE] Bypassing time checks. Plan filter: ${filterPlanId || 'none'}`);
+    }
 
     console.log(`[${today}] Starting daily devotional delivery...`);
 
