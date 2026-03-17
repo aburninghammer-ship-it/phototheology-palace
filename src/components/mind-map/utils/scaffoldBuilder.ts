@@ -31,21 +31,21 @@ const TREE_LAYOUT = {
   rootY: 0,
   
   // Floor row
-  floorY: 200,           // Y position of floor row
-  floorSpacing: 280,     // Horizontal spacing between floors
+  floorY: 280,           // Y position of floor row
+  floorSpacing: 350,     // Horizontal spacing between floors
   
   // Room row
-  roomYOffset: 180,      // Y offset from floor to rooms
+  roomYOffset: 250,      // Y offset from floor to rooms
   roomSpacing: 200,      // Horizontal spacing between rooms within a floor
   
   // Principle row
-  principleYOffset: 160, // Y offset from room to principles
-  principleSpacing: 220, // Horizontal spacing between principles
+  principleYOffset: 200, // Y offset from room to principles
+  principleSpacing: 180, // Horizontal spacing between principles
   
   // Sanctuary section
-  sanctuaryY: 800,       // Y position of sanctuary
-  zoneSpacing: 350,      // Horizontal spacing between zones
-  elementYOffset: 150,   // Y offset from zone to elements
+  sanctuaryY: 1000,      // Y position of sanctuary
+  zoneSpacing: 400,      // Horizontal spacing between zones
+  elementYOffset: 200,   // Y offset from zone to elements
   elementSpacing: 180,   // Horizontal spacing between elements
 };
 
