@@ -26,6 +26,7 @@ import { GCConflictTag } from "@/components/cota/GCConflictTag";
 import type { GCConflictTag as GCConflictTagType } from "@/types/gcConflictTag";
 import { DefenseMode } from "@/components/living-manna/DefenseMode";
 import { ShareToCommunity } from "@/components/community/ShareToCommunity";
+import { PalaceWalkthroughDisplay } from "@/components/living-manna/PalaceWalkthroughDisplay";
 
 // ─── EGW Book Library ───────────────────────────────────────────────
 interface EGWBook {
@@ -1791,19 +1792,7 @@ Be thorough, theological, Christ-centered, and within SDA doctrinal guardrails. 
 
               {/* Full Analysis */}
               {fullAnalysis && (
-                <Card variant="glass" className="border-primary/30">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-primary" />
-                      Full Palace Walkthrough
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap text-sm leading-relaxed">
-                      {fullAnalysis}
-                    </div>
-                  </CardContent>
-                </Card>
+                <PalaceWalkthroughDisplay content={fullAnalysis} />
               )}
 
               {/* Room-by-Room Analysis */}
