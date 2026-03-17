@@ -315,47 +315,28 @@ MODE ADJUSTMENTS:
 - PREACHER: 8-15 rooms, focus on teaching hooks, illustrations, sermon applications
 - RESEARCH: Exhaustive analysis, all applicable rooms, academic rigor
 
-CRITICAL RULE - CONNECTION QUALITY OVER QUANTITY:
-⚠️ QUALITY IS MORE IMPORTANT THAN COMPLETENESS. A genuine, well-supported connection is worth far more than a forced, superficial one.
+CRITICAL RULE - POPULATE ALL ROOMS:
+⚠️ You MUST generate principles for EVERY ROOM listed above. Every text in the Bible connects to every room — that is the entire point of the Phototheology Palace. Your job is to FIND the connection, not to skip it.
 
 ROOM APPLICABILITY:
 - "24fps" (24FPS Room) - Only applicable for chapter-by-chapter study
 - "br" (Bible Rendered Room) - Only for 24-chapter block compression
+- ALL OTHER ROOMS: Set "applicable": true and provide at least 1 principle with substantial content.
 
-For ALL OTHER ROOMS:
-- Set "applicable": true ONLY when a GENUINE, ORGANIC connection exists between the seed text and the room's methodology
-- Set "applicable": false when the connection would be forced, vague, or stretch the text beyond its natural meaning
-- A room marked applicable MUST have at least 1 principle with substantial content, evidence, insight, application, and visualHook
+ALWAYS-APPLICABLE ROOMS (NEVER skip these — they apply to EVERY text):
+- sr, ir, or, st, dc, qr, qa (Floors 1-2: Every text has a story, images, observations, symbols, definitions, questions)
+- bf, nf, pf, hf (Floor 3: Every text connects to other verses, nature, life, history)
+- cr, dr, c6, trm, tz, prm, frt, cec (Floor 4: Every text reveals Christ, has dimensions, themes, time zones, patterns, fruit)
+- bl, pr, 3a, fe (Floor 5: Every text has sanctuary shadows, prophetic placement, angel message connections, feast connections)
+- 123h, cycles, jr (Floor 6: Every text sits in a heaven horizon and redemptive cycle)
+- frm, mr, srm (Floor 7: Every text has emotional fire, meditation depth, and speed connections)
+- infinity, freestyle (Floor 8: Every text has mastery-level synthesis)
 
-⚠️ QUALITY TESTS FOR EVERY CONNECTION:
-1. TEXTUAL ANCHOR TEST: Can you point to specific words, phrases, or themes IN THE SEED TEXT that ground this connection? If you're importing meaning that isn't there, it's forced.
-2. EXPLANATORY TEST: Would a careful Bible student naturally see this connection, or does it require mental gymnastics? If it takes excessive explanation to justify, it's stretched.
-3. ILLUMINATION TEST: Does this room's methodology genuinely reveal NEW INSIGHT about the seed text? Or are you just restating the text in the room's vocabulary? If it's just relabeling, skip it.
-4. SPECIFICITY TEST: Is the insight SPECIFIC to THIS text, or could you copy-paste the same insight for any verse? Generic connections = forced connections.
-
-WHEN A ROOM GENUINELY DOESN'T APPLY:
-- It is BETTER to mark a room as "applicable": false than to fill it with shallow, stretched content
-- Example: If a text about personal prayer has no natural connection to numerical patterns, mark the Math Room as not applicable rather than inventing a forced number connection
-- The goal is ILLUMINATION, not coverage
-
-MANDATORY MULTI-PRINCIPLE ROOMS (when applicable):
-For rooms with MULTIPLE SUB-PRINCIPLES (3a=3 angels, c6=6 genres, ir=5 senses, etc.):
-- Provide SEPARATE principles for EACH sub-component ONLY where the connection is genuine
-- It is acceptable to provide fewer sub-principles if some don't genuinely connect
-- Example for c6: If the text naturally connects to 4 of 6 genres, provide 4 strong connections rather than 6 weak ones
-
-ROOMS THAT ALMOST ALWAYS APPLY (but still require genuine connections):
-- cr (Concentration): Christ is in all Scripture, but show HOW specifically
-- dr (Dimensions): Most texts have multiple dimensions, but each must be specific
-- or (Observation): Most texts yield observations, but they must be insightful
-- gr (Gems): Cross-text connections should be surprising and genuine, not obvious
-
-ABSOLUTE RULES:
-1. GENUINE CONNECTIONS ONLY. A forced connection damages credibility more than a missing room.
-2. For multi-principle rooms, provide insights for each sub-principle WHERE THE CONNECTION IS REAL
-3. Each principle must APPLY the seed text specifically, not just restate the room's methodology
-4. The goal is to ILLUMINATE the seed text through each lens — if a lens doesn't illuminate, don't use it
-5. CONFIDENCE SCORES MUST BE HONEST: If a connection is tenuous, either skip it or give it a low confidence (below 50)
+⚠️ QUALITY STANDARDS FOR EVERY CONNECTION:
+1. TEXTUAL ANCHOR: Point to specific words/themes IN THE SEED TEXT that ground the connection.
+2. SPECIFICITY: The insight must be SPECIFIC to THIS text, not generic.
+3. ILLUMINATION: The room's methodology must reveal NEW INSIGHT about the seed text.
+4. CONFIDENCE SCORES: Rate honestly (50-100). Lower confidence is fine — but STILL GENERATE the principle.
 
 Example for Isaiah 26:3 in Blue Room (bl) - EACH element gets a specific application:
 - Altar: Sacrificing anxiety and self-reliance on the altar of trust
