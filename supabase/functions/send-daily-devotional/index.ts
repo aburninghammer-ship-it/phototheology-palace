@@ -382,7 +382,7 @@ serve(async (req) => {
     console.log(`[${today}] Starting daily devotional delivery...`);
 
     // Get all active devotional plans with their users
-    const { data: activePlans, error: plansError } = await supabase
+    let plansQuery = supabase
       .from('devotional_plans')
       .select(`
         id,
@@ -395,6 +395,13 @@ serve(async (req) => {
       `)
       .eq('status', 'active')
       .not('started_at', 'is', null);
+
+    // If a specific plan is requested, filter to just that plan
+    if (filterPlanId) {
+      plansQuery = plansQuery.eq('id', filterPlanId);
+    }
+
+    const { data: activePlans, error: plansError } = await plansQuery;
 
     if (plansError) {
       console.error('Error fetching plans:', plansError);
