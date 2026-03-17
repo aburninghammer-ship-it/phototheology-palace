@@ -625,6 +625,10 @@ serve(async (req) => {
               ...(profilesWithSMS || []).map(p => ({ ...p, recipientType: 'profile' as const })),
               ...(smsRecipients || []).map(r => ({ ...r, recipientType: 'standalone' as const }))
             ].filter(recipient => {
+              if (forceMode) {
+                console.log(`[FORCE] Including ${recipient.name} (time check bypassed)`);
+                return true;
+              }
               const tz = recipient.timezone || 'America/New_York';
               const hour = recipient.preferred_send_hour ?? 8;
               const send = shouldSendNow(tz, hour);
