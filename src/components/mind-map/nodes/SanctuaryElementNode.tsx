@@ -269,22 +269,22 @@ const SanctuaryElementNode = memo(({ data, selected }: NodeProps<SanctuaryElemen
   return (
     <div
       className={`
-        relative rounded-2xl overflow-hidden
-        transition-all duration-300
+        relative rounded-2xl
+        transition-all duration-300 flex flex-col
         ${selected ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-background animate-magnify-pulse' : ''}
-        w-[320px] max-h-[500px] shadow-2xl
+        w-[320px] h-[450px] shadow-2xl
       `}
     >
       {/* Glass background */}
-      <div className="absolute inset-0 backdrop-blur-xl bg-gradient-to-br from-purple-600/40 via-violet-600/30 to-indigo-600/40" />
+      <div className="absolute inset-0 backdrop-blur-xl bg-gradient-to-br from-purple-600/40 via-violet-600/30 to-indigo-600/40 rounded-2xl" />
       <div className="absolute inset-0 rounded-2xl border border-purple-400/50" />
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10 rounded-2xl" />
 
-      {/* Content */}
-      <div className="relative">
+      {/* Content - Flex container */}
+      <div className="relative flex flex-col h-full min-h-0 overflow-hidden rounded-2xl">
         {/* Header - Sticky */}
         <div 
-          className="sticky top-0 z-10 px-4 py-3 backdrop-blur-lg bg-black/20 border-b border-white/10 cursor-pointer"
+          className="flex-shrink-0 px-4 py-3 backdrop-blur-lg bg-black/20 border-b border-white/10 cursor-pointer"
           onClick={handleToggleExpand}
         >
           <div className="flex items-center gap-2">
@@ -322,7 +322,9 @@ const SanctuaryElementNode = memo(({ data, selected }: NodeProps<SanctuaryElemen
         </div>
 
         {/* Scrollable Insights List */}
-        <div className="max-h-[350px] overflow-y-auto px-3 py-3 space-y-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+        <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-2 nowheel"
+          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) transparent' }}
+        >
           {hasInsights ? (
             data.insights.map((insight, index) => (
               <InsightCard

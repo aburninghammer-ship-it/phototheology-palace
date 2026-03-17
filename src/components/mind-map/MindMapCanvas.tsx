@@ -409,6 +409,8 @@ function MindMapCanvasInner({
         panOnScroll={true}
         panOnDrag={true}
         selectionOnDrag={false}
+        noDragClassName="nowheel"
+        noWheelClassName="nowheel"
       >
         <Background color="#374151" gap={20} size={1} />
 
