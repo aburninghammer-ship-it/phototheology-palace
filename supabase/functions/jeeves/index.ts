@@ -2751,8 +2751,8 @@ CRITICAL METHODOLOGY INSTRUCTIONS:
         "Blue Room - Sanctuary (BL)", "Prophecy Room (PR)", "Three Angels (3A)", "Feasts Room (FE)", 
         "Christ in Every Chapter (CEC)", "Room 66 (R66)",
         "Three Heavens (1H/2H/3H)", "Eight Cycles (@)",
-        "Fire Room (FRm)", "Meditation Room (MR)", "Speed Room (SRm)"
-        // Note: Juice Room (JR) intentionally excluded - only for whole books, not verses
+        "Fire Room (FRm)", "Meditation Room (MR)", "Speed Room (SRm)",
+        "Juice Room (JR)"
       ];
       let usedPrinciples: string[];
       
