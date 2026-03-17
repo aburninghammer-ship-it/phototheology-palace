@@ -17,13 +17,11 @@ const snsConfigured = !!(awsAccessKeyId && awsSecretAccessKey);
 /**
  * AWS Signature V4 helper for SNS
  */
-function hmacSha256(key: Uint8Array, message: string): Promise<ArrayBuffer> {
-  return crypto.subtle.sign(
-    'HMAC',
-    // @ts-ignore: importKey accepts Uint8Array
-    crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
-    new TextEncoder().encode(message)
-  ).then(sig => sig);
+async function hmacSha256(key: Uint8Array, message: string): Promise<ArrayBuffer> {
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  return crypto.subtle.sign('HMAC', cryptoKey, new TextEncoder().encode(message));
 }
 
 async function getSignatureKey(key: string, dateStamp: string, region: string, service: string): Promise<Uint8Array> {
