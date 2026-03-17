@@ -2187,7 +2187,7 @@ Return as JSON array: [...]`;
         // Floor 6 - Three Heavens (Cycles & Cosmic Context)
         "cycles": { name: "Eight Cycles (@Ad-@Re)", description: "8 cycles: Adamic→Remnant patterns", examples: "@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re" },
         "horizons": { name: "Three Heavens (1H-3H)", description: "Day of the Lord judgment cycles", examples: "1H (Babylon), 2H (70 AD), 3H (Final)" },
-        "JR": { name: "Juice Room (JR)", description: "squeezing entire books with all principles", examples: "Full book analysis using all PT tools" },
+        "JR": { name: "Juice Room (JR)", description: "squeezing books, chapters, or passages through all principles", examples: "Full extraction using all PT tools on any scope" },
         
         // Floor 7 - Spiritual & Emotional
         "FRm": { name: "Fire Room (FRm)", description: "emotional weight and conviction", examples: "Gethsemane weight, Calvary trembling, Pentecost fire" },
@@ -2751,8 +2751,8 @@ CRITICAL METHODOLOGY INSTRUCTIONS:
         "Blue Room - Sanctuary (BL)", "Prophecy Room (PR)", "Three Angels (3A)", "Feasts Room (FE)", 
         "Christ in Every Chapter (CEC)", "Room 66 (R66)",
         "Three Heavens (1H/2H/3H)", "Eight Cycles (@)",
-        "Fire Room (FRm)", "Meditation Room (MR)", "Speed Room (SRm)"
-        // Note: Juice Room (JR) intentionally excluded - only for whole books, not verses
+        "Fire Room (FRm)", "Meditation Room (MR)", "Speed Room (SRm)",
+        "Juice Room (JR)"
       ];
       let usedPrinciples: string[];
       
@@ -2762,22 +2762,6 @@ CRITICAL METHODOLOGY INSTRUCTIONS:
         const shuffled = [...allPrinciples].sort(() => Math.random() - 0.5);
         usedPrinciples = shuffled.slice(0, count);
       } else {
-        // Validate that Juice Room (JR) is not selected for verse analysis
-        const juiceRoomVariants = ["Juice Room (JR)", "Juice Room", "JR"];
-        const hasJuiceRoom = selectedPrinciples.some((p: string) => 
-          juiceRoomVariants.some((variant: string) => p.includes(variant))
-        );
-        
-        if (hasJuiceRoom) {
-          return new Response(
-            JSON.stringify({ 
-              error: "The Juice Room (JR) can only be applied to ENTIRE BOOKS, never to single verses or chapters. Please select other principles for verse analysis.",
-              content: "❌ **Invalid Principle Selection**\n\n🚫 The Juice Room (JR) is exclusively for comprehensive book-level analysis.\n\n💡 For verse analysis, please select from other available principles like Observation Room (OR), Concentration Room (CR), Dimensions Room (DR), etc.\n\n📖 Use Juice Room only when studying complete books like Genesis, Matthew, or Revelation." 
-            }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        
         usedPrinciples = selectedPrinciples;
       }
       
