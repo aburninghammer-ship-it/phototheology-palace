@@ -30,6 +30,82 @@ const SIGNATURE_ATTACK_TOPICS = [
   "islamic-monotheism", "joseph-smith",
 ];
 
+// Maps signature topics to the opponent who owns them.
+// Signature topics should ONLY be debated by their owning opponent.
+const SIGNATURE_TOPIC_OWNER: Record<string, string> = {
+  "naturalism": "atheist",
+  "problem-of-evil": "atheist",
+  "secular-morality": "atheist",
+  "evolution": "scientist",
+  "age-of-earth": "scientist",
+  "fossil-record": "scientist",
+  "quran-preservation": "muslim",
+  "islamic-monotheism": "muslim",
+  "prophet-muhammad": "muslim",
+  "joseph-smith": "mormon",
+  "book-of-mormon": "mormon",
+  "continuing-revelation": "mormon",
+  "jehovah-only-god": "jw",
+  "jesus-is-created": "jw",
+  "paradise-earth": "jw",
+  "sunday-resurrection": "evangelical",
+  "grace-alone": "evangelical",
+  "once-saved": "evangelical",
+  "papal-authority": "catholic",
+  "eucharist": "catholic",
+  "sacred-tradition": "catholic",
+  "true-israel-identity": "bhi",
+  "salvation-israel-only": "bhi",
+  "feast-days-required": "bhi",
+  "ellen-white-exposed": "former-sda",
+  "1844-debunked": "former-sda",
+  "sda-to-freedom": "former-sda",
+  "church-is-babylon": "offshoot-sda",
+  "anti-trinity-sda": "offshoot-sda",
+  "feast-days-mandatory": "offshoot-sda",
+  "messiah-criteria": "jewish",
+  "isaiah-53-israel": "jewish",
+  "torah-eternal": "jewish",
+  "preterism": "preterist",
+  "antiochus-epiphanes": "preterist",
+  "futurism": "futurist",
+  "rapture": "futurist",
+  "daniel-late-date": "secular-scholar",
+  "bible-as-literature": "secular-scholar",
+  "academic-criticism": "secular-scholar",
+  "progressive-gospel": "progressive-christian",
+  "inclusive-christianity": "progressive-christian",
+  "universal-reconciliation": "progressive-christian",
+  "religious-trauma": "skeptical-exsda",
+  "sda-perfectionism": "skeptical-exsda",
+  "conditional-acceptance": "skeptical-exsda",
+  "divine-hiddenness": "philosopher",
+  "free-will-paradox": "philosopher",
+  "coherence-of-judgment": "philosopher",
+  "consciousness-after-death": "new-age",
+  "all-paths-valid": "new-age",
+  "universal-energy": "new-age",
+  "ew-plagiarism": "anti-prophet",
+  "ew-false-prophecies": "anti-prophet",
+  "ew-authority-test": "anti-prophet",
+  "religion-debunked": "internet-skeptic",
+  "science-vs-faith": "internet-skeptic",
+  "bible-contradictions": "internet-skeptic",
+  "honest-doubt": "agnostic",
+  "faith-vs-evidence": "agnostic",
+  "tongues-evidence": "pentecostal",
+  "prosperity-gospel": "pentecostal",
+  "name-only-salvation": "pentecostal",
+  "sunday-is-new-sabbath": "evangelical",
+  "soul-sleep-wrong": "evangelical",
+  "eternal-hell": "evangelical",
+  "no-law-for-christians": "evangelical",
+  "secret-rapture": "evangelical",
+  "all-foods-clean": "evangelical",
+  "predestination": "evangelical",
+  "purgatory": "catholic",
+};
+
 // Seeded PRNG (Mulberry32) — produces unique deterministic sequences per seed
 function mulberry32(seed: number) {
   return () => {
@@ -59,34 +135,26 @@ export function generate40DaySchedule(seed: string): DayConfig[] {
   }
   const rand = mulberry32(hash);
 
-  // Build shuffled opponent rotation — 4 full cycles of 10 opponents
+  // Build shuffled opponent rotation — enough cycles to fill 40 days
   let opponents: string[] = [];
   for (let cycle = 0; cycle < 4; cycle++) {
     opponents = opponents.concat(seededShuffle(OPPONENT_POOL, rand));
   }
 
-  // Build shuffled topic list — mix defense (70%) and signature (30%) in varied order
-  const allTopics: { id: string; isSignature: boolean }[] = [];
+  // Build shuffled topic pools
   const shuffledDefense = seededShuffle(SDA_DEFENSE_TOPICS, rand);
   const shuffledSignature = seededShuffle(SIGNATURE_ATTACK_TOPICS, rand);
-  let dIdx = 0, sIdx = 0;
-  for (let day = 0; day < 40; day++) {
-    // Use seeded random for 70/30 split instead of fixed pattern
-    const useSignature = rand() < 0.3 && sIdx < shuffledSignature.length;
-    if (useSignature) {
-      allTopics.push({ id: shuffledSignature[sIdx % shuffledSignature.length], isSignature: true });
-      sIdx++;
-    } else {
-      allTopics.push({ id: shuffledDefense[dIdx % shuffledDefense.length], isSignature: false });
-      dIdx++;
-    }
-  }
 
-  // Assemble schedule — guarantee no back-to-back same opponent
+  // Assemble schedule — match signature topics to their owning opponent,
+  // and ensure no back-to-back same opponent
   const schedule: DayConfig[] = [];
+  let dIdx = 0;
+  let sIdx = 0;
+
   for (let day = 1; day <= 40; day++) {
     let opponentId = opponents[day - 1];
-    // If same as previous day, find the nearest different opponent and swap
+
+    // Prevent back-to-back same opponent
     if (day > 1 && opponentId === schedule[day - 2].opponentId) {
       let swapped = false;
       for (let j = day; j < opponents.length; j++) {
@@ -97,17 +165,36 @@ export function generate40DaySchedule(seed: string): DayConfig[] {
           break;
         }
       }
-      // Fallback: pick a random different opponent from the pool
       if (!swapped) {
         const alternatives = OPPONENT_POOL.filter(o => o !== opponentId);
         opponentId = alternatives[Math.floor(rand() * alternatives.length)];
       }
     }
-    schedule.push({
-      day,
-      opponentId,
-      topicId: allTopics[day - 1].id,
-    });
+
+    // Decide topic: 30% chance of a signature topic, but ONLY if it belongs
+    // to this opponent. Otherwise fall back to a neutral SDA defense topic.
+    let topicId: string;
+    const trySignature = rand() < 0.3 && sIdx < shuffledSignature.length;
+
+    if (trySignature) {
+      const sigTopic = shuffledSignature[sIdx % shuffledSignature.length];
+      const owner = SIGNATURE_TOPIC_OWNER[sigTopic];
+
+      if (owner === opponentId) {
+        // Perfect match — this opponent owns this signature topic
+        topicId = sigTopic;
+        sIdx++;
+      } else {
+        // Mismatch — give this opponent a neutral SDA defense topic instead
+        topicId = shuffledDefense[dIdx % shuffledDefense.length];
+        dIdx++;
+      }
+    } else {
+      topicId = shuffledDefense[dIdx % shuffledDefense.length];
+      dIdx++;
+    }
+
+    schedule.push({ day, opponentId, topicId });
   }
 
   return schedule;
