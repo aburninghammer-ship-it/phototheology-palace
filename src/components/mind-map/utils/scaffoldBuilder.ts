@@ -269,7 +269,7 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
       source: 'sanctuary',
       target: zoneNode.id,
       type: 'smoothstep',
-      style: { stroke: '#a855f7', strokeWidth: 1.5 },
+      style: { stroke: '#a855f760', strokeWidth: 1 },
       data: { type: 'hierarchy' },
     });
 
