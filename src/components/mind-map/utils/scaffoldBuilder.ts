@@ -117,7 +117,7 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
         target: roomNode.id,
         type: 'smoothstep',
         animated: false,
-        style: { stroke: floorColor, strokeWidth: 1.5, opacity: 0.7 },
+        style: { stroke: `${floorColor}60`, strokeWidth: 1 },
         data: { type: 'hierarchy' },
       });
     });
