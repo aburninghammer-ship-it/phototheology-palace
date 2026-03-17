@@ -13,14 +13,14 @@ const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 const requiredRoomsForMode = (mode: string): number => {
   switch (mode) {
     case "beginner":
-      return 8;
-    case "preacher":
       return 12;
+    case "preacher":
+      return 18;
     case "research":
-      return 20;
+      return 30;
     case "scholar":
     default:
-      return 15;
+      return 25;
   }
 };
 
