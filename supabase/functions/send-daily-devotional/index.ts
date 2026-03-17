@@ -19,7 +19,7 @@ const snsConfigured = !!(awsAccessKeyId && awsSecretAccessKey);
  */
 async function hmacSha256(key: Uint8Array, message: string): Promise<ArrayBuffer> {
   const cryptoKey = await crypto.subtle.importKey(
-    'raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    'raw', key as unknown as ArrayBuffer, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
   );
   return crypto.subtle.sign('HMAC', cryptoKey, new TextEncoder().encode(message));
 }
