@@ -102,7 +102,7 @@ const PrincipleCard = memo(({
           {principle.scriptures && principle.scriptures.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {principle.scriptures.slice(0, 4).map((ref, i) => (
-                <ScriptureRef key={i} reference={ref} className="px-1.5 py-0.5 rounded-full bg-white/10 text-[10px] font-medium border border-white/10" style={{ color: primaryColor }} />
+                <ScriptureRef key={i} reference={ref} className="px-1.5 py-0.5 rounded-full bg-white/10 text-[10px] font-medium border border-white/10" />
               ))}
             </div>
           )}
