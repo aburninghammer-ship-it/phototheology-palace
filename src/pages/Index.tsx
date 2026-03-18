@@ -113,7 +113,7 @@ const Index = () => {
       </Suspense>
       
       {/* Install Banner */}
-      {showInstallBanner && (
+      {showInstallBanner && !zenMode && (
         <div className="sticky top-16 z-40 bg-gradient-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg border-b border-primary/20">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between gap-3">
