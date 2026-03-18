@@ -210,6 +210,12 @@ export default function Dashboard() {
         <div className="mb-8">
           <IdentityLoopWidget />
         </div>
+
+        <LockInConversionBanner />
+
+        <div className="mb-8 mt-4">
+          <LockInMissionTracker />
+        </div>
         <PathBanner />
 
         <div className="mb-8">
