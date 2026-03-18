@@ -12,10 +12,6 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-
-// Lazy load 3D component for performance
-const Sanctuary3DViewer = lazy(() => import("@/components/sanctuary/Sanctuary3DViewer"));
 
 const sanctuaryItems = [
   {
