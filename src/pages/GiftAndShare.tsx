@@ -21,7 +21,7 @@ export default function GiftAndShare() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <SEO title="Gift the Suite | Phototheology" description="Gift the Phototheology Bible Suite or share a free day pass with someone." />
+      <SEO title="Gift & Share | Phototheology" description="Gift the Phototheology Bible Suite or share a free 5-Day Lock-In Pass with someone." />
       <Navigation />
 
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
