@@ -14,7 +14,6 @@ const primaryNavItems = [
 ];
 
 const moreNavItems = [
-  { icon: Gift, label: "Guest Passes", path: "/gift" },
   { icon: Eye, label: "Prophecy Watch", path: "/prophecy-watch" },
   { icon: Scale, label: "Christ & Culture", path: "/culture-controversy" },
   { icon: User, label: "My Profile", path: "/my-profile" },
