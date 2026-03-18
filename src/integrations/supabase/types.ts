@@ -3664,6 +3664,153 @@ export type Database = {
           },
         ]
       }
+      daily_audio_devotionals: {
+        Row: {
+          audio_duration_seconds: number | null
+          audio_storage_path: string | null
+          audio_url: string | null
+          created_at: string | null
+          day_number: number
+          devotional_text: string
+          error_message: string | null
+          id: string
+          prayer: string | null
+          scripture_reference: string
+          scripture_text: string | null
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          audio_duration_seconds?: number | null
+          audio_storage_path?: string | null
+          audio_url?: string | null
+          created_at?: string | null
+          day_number: number
+          devotional_text: string
+          error_message?: string | null
+          id?: string
+          prayer?: string | null
+          scripture_reference: string
+          scripture_text?: string | null
+          status?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          audio_duration_seconds?: number | null
+          audio_storage_path?: string | null
+          audio_url?: string | null
+          created_at?: string | null
+          day_number?: number
+          devotional_text?: string
+          error_message?: string | null
+          id?: string
+          prayer?: string | null
+          scripture_reference?: string
+          scripture_text?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      daily_devotional_sms_log: {
+        Row: {
+          day_number: number
+          devotional_id: string
+          error_message: string | null
+          id: string
+          message_body: string | null
+          phone_number: string
+          sent_at: string | null
+          sns_message_id: string | null
+          status: string
+          subscriber_id: string
+        }
+        Insert: {
+          day_number: number
+          devotional_id: string
+          error_message?: string | null
+          id?: string
+          message_body?: string | null
+          phone_number: string
+          sent_at?: string | null
+          sns_message_id?: string | null
+          status?: string
+          subscriber_id: string
+        }
+        Update: {
+          day_number?: number
+          devotional_id?: string
+          error_message?: string | null
+          id?: string
+          message_body?: string | null
+          phone_number?: string
+          sent_at?: string | null
+          sns_message_id?: string | null
+          status?: string
+          subscriber_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_devotional_sms_log_devotional_id_fkey"
+            columns: ["devotional_id"]
+            isOneToOne: false
+            referencedRelation: "daily_audio_devotionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_devotional_sms_log_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "daily_devotional_sms_subscribers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_devotional_sms_subscribers: {
+        Row: {
+          created_at: string | null
+          current_day: number
+          id: string
+          is_active: boolean
+          last_sent_at: string | null
+          phone_country_code: string
+          phone_number: string
+          preferred_send_hour: number
+          timezone: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_day?: number
+          id?: string
+          is_active?: boolean
+          last_sent_at?: string | null
+          phone_country_code?: string
+          phone_number: string
+          preferred_send_hour?: number
+          timezone?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_day?: number
+          id?: string
+          is_active?: boolean
+          last_sent_at?: string | null
+          phone_country_code?: string
+          phone_number?: string
+          preferred_send_hour?: number
+          timezone?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_reading_completions: {
         Row: {
           completed_at: string
