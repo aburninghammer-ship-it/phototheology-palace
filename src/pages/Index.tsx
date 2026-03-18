@@ -184,7 +184,7 @@ const Index = () => {
       </Suspense>
 
       {/* Language Selector for public visitors */}
-      {!zenMode && (
+      {!focusMode && (
         <div className="fixed bottom-20 right-4 z-50 md:bottom-6 zen-hideable">
           <Popover>
             <PopoverTrigger asChild>
