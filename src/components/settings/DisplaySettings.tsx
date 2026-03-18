@@ -21,7 +21,7 @@ export function DisplaySettings() {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            {zenMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {focusMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             Focus Mode
           </CardTitle>
           <CardDescription className="text-xs">
