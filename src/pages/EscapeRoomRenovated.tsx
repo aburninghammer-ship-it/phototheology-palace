@@ -371,17 +371,6 @@ export default function EscapeRoomRenovated() {
                           <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </span>
                       </Button>
-                      <Button
-                        className="bg-purple-600 hover:bg-purple-700 text-white"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/escape-room/3d/${room.id}`);
-                        }}
-                        title="Play in 3D"
-                      >
-                        <Box className="h-4 w-4" />
-                        <span className="ml-1 hidden sm:inline">3D</span>
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>

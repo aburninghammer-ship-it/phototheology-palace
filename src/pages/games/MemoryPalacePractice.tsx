@@ -122,15 +122,6 @@ export default function MemoryPalacePractice() {
             {t('common.back')}
           </Button>
           <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/memory/palace-3d/${listId}`)}
-              className="text-purple-600 border-purple-300 hover:bg-purple-50"
-            >
-              <Box className="mr-2 h-4 w-4" />
-              {t('games.memoryPalace.threeDMode')}
-            </Button>
             <div className="text-sm font-medium">
               {currentIndex + 1} / {locations.length}
             </div>
