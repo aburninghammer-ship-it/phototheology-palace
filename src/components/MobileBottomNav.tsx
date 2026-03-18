@@ -1,4 +1,4 @@
-import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle, User, Users, UserRound, Eye, Scale, Gift } from "lucide-react";
+import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle, User, Users, UserRound, Eye, Scale } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,6 @@ const primaryNavItems = [
 ];
 
 const moreNavItems = [
-  { icon: Gift, label: "Guest Passes", path: "/gift" },
   { icon: Eye, label: "Prophecy Watch", path: "/prophecy-watch" },
   { icon: Scale, label: "Christ & Culture", path: "/culture-controversy" },
   { icon: User, label: "My Profile", path: "/my-profile" },

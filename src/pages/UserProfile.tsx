@@ -38,6 +38,7 @@ import { MemberAchievementsWall } from "@/components/living-manna/profile/Member
 import { MemberStudyThreadsList } from "@/components/living-manna/profile/MemberStudyThreadsList";
 import { MemberPrayerWall } from "@/components/living-manna/profile/MemberPrayerWall";
 import { FeaturedGem } from "@/components/profile/FeaturedGem";
+import { LockInPassAllowanceWidget } from "@/components/LockInPassAllowanceWidget";
 import { DebateRecord } from "@/components/profile/DebateRecord";
 import { useMemberProfileEnhanced } from "@/hooks/useMemberProfileEnhanced";
 import { supabase } from "@/integrations/supabase/client";
@@ -370,6 +371,13 @@ export default function UserProfile() {
             <StatCard icon={<BookOpen className="w-4 h-4 text-emerald-500" />} value={reading?.total_chapters_read || 0} label="Chapters" />
           </div>
         </div>
+
+        {/* Lock-In Pass Widget (own profile only) */}
+        {isOwnProfile && (
+          <div className="px-4 md:px-8 mt-4">
+            <LockInPassAllowanceWidget />
+          </div>
+        )}
 
         {/* Palace Progress + Heatmap + Featured Gem (Above Tabs) */}
         <div className="px-4 md:px-8">
