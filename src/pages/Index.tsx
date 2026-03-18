@@ -141,7 +141,7 @@ const Index = () => {
       )}
 
       {/* Quick testimonial banner - immediate social proof */}
-      <QuickTestimonialBanner />
+      {!zenMode && <QuickTestimonialBanner />}
 
 
       {/* 1. Hero - The 10-second hook - NOT lazy loaded */}
