@@ -63,6 +63,7 @@ const Community = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
   const [firstComments, setFirstComments] = useState<Record<string, any>>({});
+  const newPostFormRef = useRef<HTMLDivElement>(null);
 
   // Extract all unique tags from posts
   const availableTags = useMemo(() => {
