@@ -42,7 +42,7 @@ export function useDisplaySettings() {
   useEffect(() => {
     applyColorTheme(colorTheme);
     applyReducedMotion(reducedMotion);
-    applyZenMode(zenMode);
+    applyFocusMode(focusMode);
   }, []);
 
   const setColorTheme = useCallback((theme: ColorTheme) => {
