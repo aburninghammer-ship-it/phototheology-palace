@@ -440,6 +440,7 @@ function App() {
             <Route path="/gift/success" element={<GiftSuccess />} />
             <Route path="/gift/redeem/:token" element={<GiftRedeem />} />
             <Route path="/day-pass/:token" element={<DayPassRedeem />} />
+            <Route path="/lock-in/:token" element={<LockInRedeem />} />
             <Route path="/shared/baptism-audio/:token" element={<SharedBaptismAudio />} />
             <Route path="/shared/debate/:token" element={<SharedDebate />} />
             <Route path="/donate" element={<DonationPage />} />
