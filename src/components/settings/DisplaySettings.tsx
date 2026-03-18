@@ -31,7 +31,7 @@ export function DisplaySettings() {
         <CardContent>
           <div className="flex items-center justify-between">
             <Label htmlFor="zen-mode" className="cursor-pointer">Enable Focus Mode</Label>
-            <Switch id="zen-mode" checked={zenMode} onCheckedChange={setZenMode} />
+            <Switch id="zen-mode" checked={focusMode} onCheckedChange={setFocusMode} />
           </div>
         </CardContent>
       </Card>

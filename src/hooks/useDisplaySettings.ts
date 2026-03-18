@@ -66,8 +66,8 @@ export function useDisplaySettings() {
   return {
     colorTheme,
     setColorTheme,
-    zenMode,
-    setZenMode,
+    focusMode,
+    setFocusMode,
     reducedMotion,
     setReducedMotion,
   };
