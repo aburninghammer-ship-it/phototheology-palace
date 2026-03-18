@@ -34,7 +34,7 @@ export default function GiftAndShare() {
             Share the Word
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Gift someone the full Phototheology Bible Suite, or share a free Day Pass so they can experience it firsthand.
+            Gift someone the full Phototheology Bible Suite, or share a free 5-Day Lock-In Pass so they can experience it firsthand.
           </p>
         </div>
 
