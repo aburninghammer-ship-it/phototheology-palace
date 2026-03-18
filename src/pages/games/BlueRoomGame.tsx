@@ -348,25 +348,7 @@ export default function BlueRoomGame() {
           {t('games.common.backToGames')}
         </Button>
 
-        {/* View Mode Toggle */}
-        <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'quiz' | '3d')} className="mb-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
-            <TabsTrigger value="quiz" className="flex items-center gap-2">
-              <LayoutGrid className="h-4 w-4" />
-              {t('games.blueRoom.quizMode')}
-            </TabsTrigger>
-            <TabsTrigger value="3d" className="flex items-center gap-2">
-              <Box className="h-4 w-4" />
-              {t('games.blueRoom.explorerMode')}
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        {viewMode === 'quiz' ? (
-          <QuizGame onComplete={handleComplete} />
-        ) : (
-          <Explorer3D />
-        )}
+        <QuizGame onComplete={handleComplete} />
       </main>
       <FloatingGameChat gameType="blue-room" />
     </div>
