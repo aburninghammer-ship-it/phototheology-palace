@@ -529,11 +529,9 @@ export default function RoomDetail() {
                 </Collapsible>
 
                 {room.id === "sr" && (
-                  <Room3DToggle roomId="sr">
-                    <RoomLibrary roomId="sr">
-                      <StoryLibrary />
-                    </RoomLibrary>
-                  </Room3DToggle>
+                  <RoomLibrary roomId="sr">
+                    <StoryLibrary />
+                  </RoomLibrary>
                 )}
 
                 {room.id === "tr" && (
