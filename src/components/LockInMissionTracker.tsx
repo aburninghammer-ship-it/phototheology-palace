@@ -105,6 +105,17 @@ export function LockInMissionTracker() {
           );
         })}
 
+        {/* Commentary Picker — always visible for pass holders */}
+        {passId && (
+          <LockInCommentaryPicker
+            passId={passId}
+            selectedBook={commentaryBook}
+            selectedChapter={commentaryChapter}
+            selectedMode={commentaryMode}
+            onSelectionSaved={() => window.location.reload()}
+          />
+        )}
+
         {completedCount === 5 && (
           <div className="text-center pt-2">
             <p className="text-sm font-medium mb-2">
