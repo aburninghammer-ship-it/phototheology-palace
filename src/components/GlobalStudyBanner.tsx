@@ -386,6 +386,32 @@ function getBehavioralNudge(stats: UserStats): string | null {
   return null;
 }
 
+function LockInPassChip() {
+  const { passesRemaining, loading } = useLockInMonthlyUsage();
+  
+  if (loading || passesRemaining <= 0) return null;
+
+  return (
+    <Link to="/gift-and-share">
+      <motion.div
+        animate={{ 
+          boxShadow: [
+            "0 0 4px rgba(251, 146, 60, 0.3)",
+            "0 0 12px rgba(251, 146, 60, 0.6)",
+            "0 0 4px rgba(251, 146, 60, 0.3)",
+          ]
+        }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        className="flex items-center gap-1.5 text-xs bg-orange-500/20 text-orange-300 rounded-full px-2.5 py-1 border border-orange-500/30 hover:bg-orange-500/30 transition-colors cursor-pointer"
+      >
+        <Flame className="h-3.5 w-3.5 text-orange-400" />
+        <span className="font-bold">{passesRemaining}</span>
+        <span className="hidden sm:inline text-orange-300/80">Passes</span>
+      </motion.div>
+    </Link>
+  );
+}
+
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
   const { user: authUser } = useAuth();
   const navigate = useNavigate();
