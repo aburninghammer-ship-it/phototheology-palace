@@ -393,21 +393,26 @@ function LockInPassChip() {
   if (loading || passesRemaining <= 0) return null;
 
   return (
-    <Link to="/gift-and-share">
+    <Link
+      to="/gift"
+      aria-label={`${passesRemaining} 5 Day Guest ${passesRemaining === 1 ? "Pass" : "Passes"}`}
+      title="Open 5 Day Guest Passes"
+    >
       <motion.div
-        animate={{ 
+        animate={{
           boxShadow: [
-            "0 0 4px rgba(251, 146, 60, 0.3)",
-            "0 0 12px rgba(251, 146, 60, 0.6)",
-            "0 0 4px rgba(251, 146, 60, 0.3)",
-          ]
+            "0 0 0px hsl(var(--primary) / 0.18)",
+            "0 0 14px hsl(var(--primary) / 0.4)",
+            "0 0 0px hsl(var(--primary) / 0.18)",
+          ],
         }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="flex items-center gap-1.5 text-xs bg-orange-500/20 text-orange-300 rounded-full px-2.5 py-1 border border-orange-500/30 hover:bg-orange-500/30 transition-colors cursor-pointer"
+        className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-primary/15 cursor-pointer"
       >
-        <Flame className="h-3.5 w-3.5 text-orange-400" />
-        <span className="font-bold">{passesRemaining}</span>
-        <span className="hidden sm:inline text-orange-300/80">Day Guest {passesRemaining === 1 ? "Pass" : "Passes"}</span>
+        <Flame className="h-3.5 w-3.5 text-primary" />
+        <span className="font-semibold">
+          {passesRemaining} 5 Day Guest {passesRemaining === 1 ? "Pass" : "Passes"}
+        </span>
       </motion.div>
     </Link>
   );
