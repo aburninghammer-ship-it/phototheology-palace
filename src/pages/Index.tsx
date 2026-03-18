@@ -202,9 +202,11 @@ const Index = () => {
       <Footer />
       
       {/* Mobile Sticky CTA Bar - deferred */}
-      <Suspense fallback={null}>
-        <MobileStickyCtaBar />
-      </Suspense>
+      {!zenMode && (
+        <Suspense fallback={null}>
+          <MobileStickyCtaBar />
+        </Suspense>
+      )}
     </div>
   );
 };
