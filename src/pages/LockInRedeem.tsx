@@ -6,14 +6,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Flame, Sparkles, ArrowRight, AlertTriangle, BookOpen, Star, Trophy, Palette } from "lucide-react";
+import { Flame, Sparkles, ArrowRight, AlertTriangle, BookOpen, Star, Trophy, Headphones } from "lucide-react";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 
 const DAILY_MISSIONS = [
   { icon: <Sparkles className="h-4 w-4 text-amber-400" />, label: "Day 1: Discover a Hidden Gem" },
   { icon: <BookOpen className="h-4 w-4 text-amber-400" />, label: "Day 2: Build Your First Study" },
-  { icon: <Palette className="h-4 w-4 text-amber-400" />, label: "Day 3: Enter the Palace" },
+  { icon: <Headphones className="h-4 w-4 text-purple-400" />, label: "Day 3: Listen to the Commentary Suite" },
   { icon: <Star className="h-4 w-4 text-amber-400" />, label: "Day 4: Freestyle Connection" },
   { icon: <Trophy className="h-4 w-4 text-amber-400" />, label: "Day 5: Create & Share" },
 ];
