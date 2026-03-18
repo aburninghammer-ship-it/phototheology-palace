@@ -1,7 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { VisualPalace } from "@/components/VisualPalace";
 import { ProgressivePalace } from "@/components/palace/ProgressivePalace";
-import { Palace3DViewer } from "@/components/palace/Palace3DViewer";
+
 import { PalaceBreadcrumbs } from "@/components/palace/PalaceBreadcrumbs";
 import { PalaceTour } from "@/components/onboarding/PalaceTour";
 import { palaceFloors } from "@/data/palaceData";
