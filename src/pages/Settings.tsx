@@ -26,6 +26,7 @@ import { PatreonConnect } from "@/components/PatreonConnect";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { TeachableVerification } from "@/components/settings/TeachableVerification";
 import { FontSizeSettings } from "@/components/settings/FontSizeSettings";
+import { DisplaySettings } from "@/components/settings/DisplaySettings";
 import { useTranslation } from "react-i18next";
 import { UserAiUsageWidget } from "@/components/profile/UserAiUsageWidget";
 
