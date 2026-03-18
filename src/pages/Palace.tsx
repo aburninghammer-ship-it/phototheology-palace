@@ -262,15 +262,6 @@ const Palace = () => {
                   <LayoutGrid className="h-4 w-4 mr-2" />
                   {t('palace.full')}
                 </Button>
-                <Button
-                  variant={viewMode === "3d" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setViewMode("3d")}
-                  className={viewMode === "3d" ? "bg-purple-600 hover:bg-purple-700" : ""}
-                >
-                  <Box className="h-4 w-4 mr-2" />
-                  {t('palace.threeD')}
-                </Button>
               </div>
 
               <div className="mb-12">
