@@ -538,15 +538,6 @@ export default function RoomDetail() {
                   <WordPictureTranslator />
                 )}
 
-                {room.id === "ir" && (
-                  <Room3DToggle roomId="ir">
-                    <Card className="p-6 text-center">
-                      <p className="text-muted-foreground">
-                        {t('roomDetail.use3DExperience')}
-                      </p>
-                    </Card>
-                  </Room3DToggle>
-                )}
 
                 {room.id === "st" && (
                   <Room3DToggle roomId="st">
