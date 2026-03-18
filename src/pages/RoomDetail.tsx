@@ -667,11 +667,9 @@ export default function RoomDetail() {
                 )}
 
                 {room.id === "pr" && (
-                  <Room3DToggle roomId="pr">
-                    <RoomLibrary roomId="pr">
-                      <ProphecyLibrary />
-                    </RoomLibrary>
-                  </Room3DToggle>
+                  <RoomLibrary roomId="pr">
+                    <ProphecyLibrary />
+                  </RoomLibrary>
                 )}
 
                 {room.id === "trm" && (

@@ -269,13 +269,6 @@ const Palace = () => {
                   <ProgressivePalace showStartHere={progressPercentage < 20} />
                 ) : viewMode === "visual" ? (
                   <VisualPalace />
-                ) : (
-                  <div className="h-[700px]">
-                    <Palace3DViewer
-                      unlockedRooms={new Set(completedRoomIds)}
-                      onClose={() => setViewMode("list")}
-                    />
-                  </div>
                 )}
               </div>
             </TabsContent>
