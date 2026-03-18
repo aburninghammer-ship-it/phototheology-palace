@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLockInMonthlyUsage } from "@/hooks/useLockInPass";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Flame, Copy, Check, Send, Sparkles, Star, BookOpen, Trophy, Palette } from "lucide-react";
+import { Flame, Copy, Check, Send, Sparkles, Star, BookOpen, Trophy, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function LockInPassCard() {
@@ -101,6 +101,10 @@ export function LockInPassCard() {
           <div className="flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-amber-400" />
             <span>All study tools, AI, and Bible features</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Headphones className="h-4 w-4 text-purple-400" />
+            <span>One Audio Commentary Suite chapter (replayable!)</span>
           </div>
         </div>
 

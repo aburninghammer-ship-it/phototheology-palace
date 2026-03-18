@@ -2,8 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, Circle, Flame, Lock, Sparkles, Star, Trophy } from "lucide-react";
+import { CheckCircle2, Circle, Flame, Headphones, Lock, Sparkles, Star, Trophy } from "lucide-react";
 import { useLockInPass } from "@/hooks/useLockInPass";
+import { LockInCommentaryPicker } from "@/components/LockInCommentaryPicker";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
@@ -11,13 +12,13 @@ import confetti from "canvas-confetti";
 const MISSION_ICONS = [
   <Sparkles className="h-4 w-4" />,
   <Star className="h-4 w-4" />,
+  <Headphones className="h-4 w-4" />,
   <Flame className="h-4 w-4" />,
-  <Sparkles className="h-4 w-4" />,
   <Trophy className="h-4 w-4" />,
 ];
 
 export function LockInMissionTracker() {
-  const { hasPass, missions, currentDay, daysLeft, completedCount, completeMission, expiresAt } = useLockInPass();
+  const { hasPass, passId, missions, currentDay, daysLeft, completedCount, completeMission, expiresAt, commentaryBook, commentaryChapter, commentaryMode } = useLockInPass();
   const navigate = useNavigate();
 
   if (!hasPass || missions.length === 0) return null;
@@ -103,6 +104,17 @@ export function LockInMissionTracker() {
             </div>
           );
         })}
+
+        {/* Commentary Picker — always visible for pass holders */}
+        {passId && (
+          <LockInCommentaryPicker
+            passId={passId}
+            selectedBook={commentaryBook}
+            selectedChapter={commentaryChapter}
+            selectedMode={commentaryMode}
+            onSelectionSaved={() => window.location.reload()}
+          />
+        )}
 
         {completedCount === 5 && (
           <div className="text-center pt-2">

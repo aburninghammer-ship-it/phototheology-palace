@@ -9695,6 +9695,9 @@ export type Database = {
       lock_in_passes: {
         Row: {
           activated_at: string | null
+          commentary_book: string | null
+          commentary_chapter: number | null
+          commentary_mode: string | null
           created_at: string
           created_by: string
           expires_at: string | null
@@ -9707,6 +9710,9 @@ export type Database = {
         }
         Insert: {
           activated_at?: string | null
+          commentary_book?: string | null
+          commentary_chapter?: number | null
+          commentary_mode?: string | null
           created_at?: string
           created_by: string
           expires_at?: string | null
@@ -9719,6 +9725,9 @@ export type Database = {
         }
         Update: {
           activated_at?: string | null
+          commentary_book?: string | null
+          commentary_chapter?: number | null
+          commentary_mode?: string | null
           created_at?: string
           created_by?: string
           expires_at?: string | null
@@ -20811,10 +20820,12 @@ export type Database = {
         Args: { _recipient_id: string; _token: string }
         Returns: Json
       }
-      redeem_lock_in_pass: {
-        Args: { _token: string; _user_id_or_fingerprint: string }
-        Returns: Json
-      }
+      redeem_lock_in_pass:
+        | { Args: { _token: string }; Returns: Json }
+        | {
+            Args: { _token: string; _user_id_or_fingerprint: string }
+            Returns: Json
+          }
       search_encyclopedia_articles: {
         Args: { limit_count?: number; search_query: string }
         Returns: {

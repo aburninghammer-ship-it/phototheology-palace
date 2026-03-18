@@ -9,6 +9,9 @@ interface LockInPassStatus {
   daysLeft: number;
   personalMessage: string | null;
   passToken: string | null;
+  commentaryBook: string | null;
+  commentaryChapter: number | null;
+  commentaryMode: string | null;
 }
 
 interface LockInMission {
@@ -29,6 +32,9 @@ export function useLockInPass() {
     daysLeft: 0,
     personalMessage: null,
     passToken: null,
+    commentaryBook: null,
+    commentaryChapter: null,
+    commentaryMode: null,
   });
   const [missions, setMissions] = useState<LockInMission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +53,17 @@ export function useLockInPass() {
 
         const result = data as any;
         if (result?.has_pass) {
+          // Fetch commentary selection from pass record
+          let commentaryData = { commentary_book: null, commentary_chapter: null, commentary_mode: null };
+          if (result.pass_id) {
+            const { data: passData } = await (supabase as any)
+              .from("lock_in_passes")
+              .select("commentary_book, commentary_chapter, commentary_mode")
+              .eq("id", result.pass_id)
+              .single();
+            if (passData) commentaryData = passData;
+          }
+
           setStatus({
             hasPass: true,
             passId: result.pass_id,
@@ -54,6 +71,9 @@ export function useLockInPass() {
             daysLeft: result.days_left || 0,
             personalMessage: result.personal_message,
             passToken: sessionToken,
+            commentaryBook: commentaryData.commentary_book,
+            commentaryChapter: commentaryData.commentary_chapter,
+            commentaryMode: commentaryData.commentary_mode,
           });
 
           // Fetch missions
