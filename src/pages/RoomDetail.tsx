@@ -575,23 +575,21 @@ export default function RoomDetail() {
                 )}
 
                 {room.id === "gr" && (
-                  <Room3DToggle roomId="gr">
-                    <RoomLibrary roomId="gr">
-                      <div className="space-y-6">
-                        <GemsLibrary />
-                        <GemGenerator
-                          floorNumber={floor.number}
-                          roomId={room.id}
-                          onGemSaved={() => {
-                            const event = new CustomEvent('gems-updated');
-                            window.dispatchEvent(event);
-                          }}
-                        />
-                        <UserGemsList floorNumber={floor.number} roomId={room.id} />
-                        <SermonTitlesList />
-                      </div>
-                    </RoomLibrary>
-                  </Room3DToggle>
+                  <RoomLibrary roomId="gr">
+                    <div className="space-y-6">
+                      <GemsLibrary />
+                      <GemGenerator
+                        floorNumber={floor.number}
+                        roomId={room.id}
+                        onGemSaved={() => {
+                          const event = new CustomEvent('gems-updated');
+                          window.dispatchEvent(event);
+                        }}
+                      />
+                      <UserGemsList floorNumber={floor.number} roomId={room.id} />
+                      <SermonTitlesList />
+                    </div>
+                  </RoomLibrary>
                 )}
 
                 {room.id === "nf" && (
