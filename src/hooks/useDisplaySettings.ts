@@ -21,8 +21,8 @@ function applyReducedMotion(enabled: boolean) {
   document.documentElement.setAttribute("data-reduced-motion", enabled ? "true" : "false");
 }
 
-function applyZenMode(enabled: boolean) {
-  document.documentElement.setAttribute("data-zen-mode", enabled ? "true" : "false");
+function applyFocusMode(enabled: boolean) {
+  document.documentElement.setAttribute("data-focus-mode", enabled ? "true" : "false");
 }
 
 export function useDisplaySettings() {
