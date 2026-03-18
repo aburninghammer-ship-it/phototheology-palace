@@ -227,9 +227,6 @@ const PTJeopardy = lazy(() => import("./pages/PTJeopardy"));
 const PTFamilyFeud = lazy(() => import("./pages/PTFamilyFeud"));
 const SymbolDecoder = lazy(() => import("./pages/games/SymbolDecoder"));
 
-const EscapeRoom3D = lazy(() => import("./pages/games/EscapeRoom3D"));
-
-const SpeedVerse3D = lazy(() => import("./pages/games/SpeedVerse3D"));
 const MasterExam = lazy(() => import("./pages/MasterExam"));
 const Gideon300 = lazy(() => import("./pages/games/Gideon300"));
 const FreestyleZone = lazy(() => import("./pages/games/FreestyleZone"));
