@@ -267,7 +267,7 @@ const Palace = () => {
               <div className="mb-12">
                 {viewMode === "list" ? (
                   <ProgressivePalace showStartHere={progressPercentage < 20} />
-                ) : viewMode === "visual" ? (
+                ) : (
                   <VisualPalace />
                 )}
               </div>
