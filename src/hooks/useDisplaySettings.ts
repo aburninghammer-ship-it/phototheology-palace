@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 
 const STORAGE_KEYS = {
   colorTheme: "pt-color-theme",
-  zenMode: "pt-zen-mode",
+  focusMode: "pt-focus-mode",
   reducedMotion: "pt-reduced-motion",
 } as const;
 
