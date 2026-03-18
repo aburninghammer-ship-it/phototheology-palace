@@ -151,16 +151,21 @@ export function useLockInMonthlyUsage() {
       return;
     }
 
-    const monthYear = new Date().toISOString().slice(0, 7); // YYYY-MM
+    // Count only passes that have been activated by a guest this month
+    // Shared-but-unused passes stay available to the user
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
 
-    supabase
-      .from("lock_in_monthly_usage")
-      .select("passes_created")
-      .eq("user_id", user.id)
-      .eq("month_year", monthYear)
-      .maybeSingle()
-      .then(({ data }) => {
-        const used = data?.passes_created || 0;
+    (supabase as any)
+      .from("lock_in_passes")
+      .select("id", { count: "exact", head: true })
+      .eq("created_by", user.id)
+      .not("activated_at", "is", null)
+      .gte("created_at", monthStart)
+      .lt("created_at", monthEnd)
+      .then(({ count }: { count: number | null }) => {
+        const used = count || 0;
         setPassesUsed(used);
         setPassesRemaining(Math.max(0, 5 - used));
         setLoading(false);

@@ -507,6 +507,8 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
 
         {/* Clickable Stats chips — each opens mini-dashboard */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap justify-end">
+          <LockInPassChip />
+
           <motion.div animate={xpFlash ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.4 }}>
             <XpPopover
               totalXp={stats.totalXp}
