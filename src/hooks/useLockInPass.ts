@@ -32,6 +32,9 @@ export function useLockInPass() {
     daysLeft: 0,
     personalMessage: null,
     passToken: null,
+    commentaryBook: null,
+    commentaryChapter: null,
+    commentaryMode: null,
   });
   const [missions, setMissions] = useState<LockInMission[]>([]);
   const [loading, setLoading] = useState(true);
