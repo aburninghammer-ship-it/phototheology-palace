@@ -1336,6 +1336,43 @@ export const DEFENSE_TOPICS: DefenseTopic[] = [
       "The Internet Skeptic argues FOR: The Bible is full of contradictions — who was at the tomb? How did Judas die? Two creation accounts? These prove it's not inspired",
     isSignature: true,
   },
+  // ── Scientist Signature Topics ──────────────────────────────
+  {
+    id: "evolution",
+    name: "Evolution",
+    description:
+      "The Scientist argues FOR: The evidence for biological evolution through natural selection is overwhelming — fossil record, DNA, observed speciation. A literal six-day creation is scientifically untenable",
+    isSignature: true,
+  },
+  {
+    id: "age-of-earth",
+    name: "Age of the Earth",
+    description:
+      "The Scientist argues FOR: Radiometric dating, ice cores, and geological strata prove the earth is 4.5 billion years old — a young-earth reading of Genesis is demonstrably false",
+    isSignature: true,
+  },
+  {
+    id: "fossil-record",
+    name: "Fossil Record",
+    description:
+      "The Scientist argues FOR: The fossil record shows a clear progression of life over billions of years with transitional forms — a global flood cannot explain the geological column",
+    isSignature: true,
+  },
+  // ── Agnostic Signature Topics ───────────────────────────────
+  {
+    id: "honest-doubt",
+    name: "Honest Doubt",
+    description:
+      "The Agnostic argues FOR: Intellectual honesty requires admitting we don't know — claiming certainty about God's existence, the afterlife, or prophecy is epistemically irresponsible",
+    isSignature: true,
+  },
+  {
+    id: "faith-vs-evidence",
+    name: "Faith vs Evidence",
+    description:
+      "The Agnostic argues FOR: Faith is belief without sufficient evidence — a truly rational person proportions belief to evidence, and the evidence for Christianity is insufficient for certainty",
+    isSignature: true,
+  },
 ];
 
 export const DIFFICULTY_LEVELS: DifficultyLevel[] = [
