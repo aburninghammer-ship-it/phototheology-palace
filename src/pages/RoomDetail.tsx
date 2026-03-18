@@ -540,11 +540,9 @@ export default function RoomDetail() {
 
 
                 {room.id === "st" && (
-                  <Room3DToggle roomId="st">
-                    <RoomLibrary roomId="st">
-                      <SymbolLibrary />
-                    </RoomLibrary>
-                  </Room3DToggle>
+                  <RoomLibrary roomId="st">
+                    <SymbolLibrary />
+                  </RoomLibrary>
                 )}
 
                 {room.id === "qa" && (
