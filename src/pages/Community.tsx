@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
@@ -63,6 +63,7 @@ const Community = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
   const [firstComments, setFirstComments] = useState<Record<string, any>>({});
+  const newPostFormRef = useRef<HTMLDivElement>(null);
 
   // Extract all unique tags from posts
   const availableTags = useMemo(() => {
@@ -238,6 +239,9 @@ const Community = () => {
     setNewCategory(category);
     if (tags) setNewTags(tags);
     setShowNewPost(true);
+    setTimeout(() => {
+      newPostFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   };
 
   const createPost = async () => {
@@ -661,6 +665,9 @@ const Community = () => {
                         setNewCategory(
                           categoryFilter === "all" ? "general" : categoryFilter
                         );
+                        setTimeout(() => {
+                          newPostFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
                       }
                     }}
                     size="lg"
@@ -754,7 +761,7 @@ const Community = () => {
           <WeeklySpotlight />
 
           {showNewPost && (
-            <Card className="border-primary/20 shadow-lg bg-card/60 backdrop-blur-sm">
+            <Card ref={newPostFormRef} className="border-primary/20 shadow-lg bg-card/60 backdrop-blur-sm">
               <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
