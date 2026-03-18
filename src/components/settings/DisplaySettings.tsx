@@ -13,7 +13,7 @@ const COLOR_THEMES = [
 ] as const;
 
 export function DisplaySettings() {
-  const { colorTheme, setColorTheme, zenMode, setZenMode, reducedMotion, setReducedMotion } = useDisplaySettings();
+  const { colorTheme, setColorTheme, focusMode, setFocusMode, reducedMotion, setReducedMotion } = useDisplaySettings();
 
   return (
     <div className="space-y-4">
