@@ -315,7 +315,7 @@ function useUserBannerStats(userId: string | null, fallbackDisplayName: string) 
       const [profileRes, streakRes, progressRes, gemsRes, roomsRes, readingRes, floorsRes, masteryStreakRes] = await Promise.all([
         supabase.from("profiles").select("display_name, avatar_url, master_title, level, points").eq("id", userId).maybeSingle(),
         (supabase as any).from("mastery_streaks").select("current_streak, last_activity_date").eq("user_id", userId).maybeSingle(),
-        (supabase as any).from("palace_progress").select("total_xp, master_title").eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("global_master_titles").select("total_xp, master_title").eq("user_id", userId).maybeSingle(),
         (supabase as any).from("user_gems").select("id", { count: "exact", head: true }).eq("user_id", userId),
         (supabase as any).from("room_mastery_levels").select("room_id", { count: "exact", head: true }).eq("user_id", userId),
         (supabase as any).from("reading_streaks").select("total_chapters_read").eq("user_id", userId).maybeSingle(),
