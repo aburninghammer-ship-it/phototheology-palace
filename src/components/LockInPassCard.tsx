@@ -102,6 +102,10 @@ export function LockInPassCard() {
             <BookOpen className="h-4 w-4 text-amber-400" />
             <span>All study tools, AI, and Bible features</span>
           </div>
+          <div className="flex items-center gap-2">
+            <Headphones className="h-4 w-4 text-purple-400" />
+            <span>One Audio Commentary Suite chapter (replayable!)</span>
+          </div>
         </div>
 
         {!shareLink ? (
