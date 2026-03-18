@@ -235,46 +235,6 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
   );
 }
 
-// 3D Explorer Component
-function Explorer3D() {
-  const { t } = useTranslation();
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <Badge variant="secondary">{t('games.blueRoom.floorBadge')}</Badge>
-            <Badge className="bg-blue-500">{t('games.blueRoom.mode3d')}</Badge>
-          </div>
-          <CardTitle className="text-3xl">{t('games.blueRoom.sanctuaryExplorer3d')}</CardTitle>
-          <CardDescription>
-            {t('games.blueRoom.explorer3dDescription')}
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      <Suspense fallback={
-        <Card className="h-[600px] flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto" />
-            <p className="text-muted-foreground">{t('games.blueRoom.loading3d')}</p>
-          </div>
-        </Card>
-      }>
-        <Sanctuary3DViewer />
-      </Suspense>
-
-      <Card className="bg-blue-50 dark:bg-blue-900/20">
-        <CardContent className="pt-6">
-          <h4 className="font-semibold mb-2">{t('games.blueRoom.journeyTitle')}</h4>
-          <p className="text-sm text-muted-foreground">
-            {t('games.blueRoom.journeyDescription')}
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 // Completion Screen
 function CompletionScreen({
