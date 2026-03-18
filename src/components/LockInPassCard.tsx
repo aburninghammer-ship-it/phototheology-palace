@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLockInMonthlyUsage } from "@/hooks/useLockInPass";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Flame, Copy, Check, Send, Sparkles, Star, BookOpen, Trophy, Palette } from "lucide-react";
+import { Flame, Copy, Check, Send, Sparkles, Star, BookOpen, Trophy, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function LockInPassCard() {
