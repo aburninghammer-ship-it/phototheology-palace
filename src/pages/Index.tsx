@@ -184,18 +184,20 @@ const Index = () => {
       </Suspense>
 
       {/* Language Selector for public visitors */}
-      <div className="fixed bottom-20 right-4 z-50 md:bottom-6">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="rounded-full shadow-lg bg-background/95 backdrop-blur-sm h-10 w-10">
-              <Globe className="h-5 w-5" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-48 p-2" align="end" side="top">
-            <LanguageSelector showLabel={false} />
-          </PopoverContent>
-        </Popover>
-      </div>
+      {!zenMode && (
+        <div className="fixed bottom-20 right-4 z-50 md:bottom-6 zen-hideable">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon" className="rounded-full shadow-lg bg-background/95 backdrop-blur-sm h-10 w-10">
+                <Globe className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="end" side="top">
+              <LanguageSelector showLabel={false} />
+            </PopoverContent>
+          </Popover>
+        </div>
+      )}
 
       <Footer />
       
