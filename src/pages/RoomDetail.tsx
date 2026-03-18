@@ -78,7 +78,7 @@ import { PatternsLibrary } from "@/components/patterns-room/PatternsLibrary";
 import { ThreeHeavensLibrary } from "@/components/three-heavens-room/ThreeHeavensLibrary";
 import { Room66Library } from "@/components/room66/Room66Library";
 import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLibrary";
-import { Room3DToggle } from "@/components/room/Room3DToggle";
+
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
 import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
 import { MobileOrientationTip } from "@/components/MobileOrientationTip";
@@ -529,33 +529,20 @@ export default function RoomDetail() {
                 </Collapsible>
 
                 {room.id === "sr" && (
-                  <Room3DToggle roomId="sr">
-                    <RoomLibrary roomId="sr">
-                      <StoryLibrary />
-                    </RoomLibrary>
-                  </Room3DToggle>
+                  <RoomLibrary roomId="sr">
+                    <StoryLibrary />
+                  </RoomLibrary>
                 )}
 
                 {room.id === "tr" && (
                   <WordPictureTranslator />
                 )}
 
-                {room.id === "ir" && (
-                  <Room3DToggle roomId="ir">
-                    <Card className="p-6 text-center">
-                      <p className="text-muted-foreground">
-                        {t('roomDetail.use3DExperience')}
-                      </p>
-                    </Card>
-                  </Room3DToggle>
-                )}
 
                 {room.id === "st" && (
-                  <Room3DToggle roomId="st">
-                    <RoomLibrary roomId="st">
-                      <SymbolLibrary />
-                    </RoomLibrary>
-                  </Room3DToggle>
+                  <RoomLibrary roomId="st">
+                    <SymbolLibrary />
+                  </RoomLibrary>
                 )}
 
                 {room.id === "qa" && (
@@ -588,23 +575,21 @@ export default function RoomDetail() {
                 )}
 
                 {room.id === "gr" && (
-                  <Room3DToggle roomId="gr">
-                    <RoomLibrary roomId="gr">
-                      <div className="space-y-6">
-                        <GemsLibrary />
-                        <GemGenerator
-                          floorNumber={floor.number}
-                          roomId={room.id}
-                          onGemSaved={() => {
-                            const event = new CustomEvent('gems-updated');
-                            window.dispatchEvent(event);
-                          }}
-                        />
-                        <UserGemsList floorNumber={floor.number} roomId={room.id} />
-                        <SermonTitlesList />
-                      </div>
-                    </RoomLibrary>
-                  </Room3DToggle>
+                  <RoomLibrary roomId="gr">
+                    <div className="space-y-6">
+                      <GemsLibrary />
+                      <GemGenerator
+                        floorNumber={floor.number}
+                        roomId={room.id}
+                        onGemSaved={() => {
+                          const event = new CustomEvent('gems-updated');
+                          window.dispatchEvent(event);
+                        }}
+                      />
+                      <UserGemsList floorNumber={floor.number} roomId={room.id} />
+                      <SermonTitlesList />
+                    </div>
+                  </RoomLibrary>
                 )}
 
                 {room.id === "nf" && (
@@ -658,11 +643,9 @@ export default function RoomDetail() {
                 )}
 
                 {room.id === "123h" && (
-                  <Room3DToggle roomId="123h">
-                    <RoomLibrary roomId="123h">
-                      <ThreeHeavensLibrary />
-                    </RoomLibrary>
-                  </Room3DToggle>
+                  <RoomLibrary roomId="123h">
+                    <ThreeHeavensLibrary />
+                  </RoomLibrary>
                 )}
 
                 {room.id === "p||" && (
@@ -684,11 +667,9 @@ export default function RoomDetail() {
                 )}
 
                 {room.id === "pr" && (
-                  <Room3DToggle roomId="pr">
-                    <RoomLibrary roomId="pr">
-                      <ProphecyLibrary />
-                    </RoomLibrary>
-                  </Room3DToggle>
+                  <RoomLibrary roomId="pr">
+                    <ProphecyLibrary />
+                  </RoomLibrary>
                 )}
 
                 {room.id === "trm" && (

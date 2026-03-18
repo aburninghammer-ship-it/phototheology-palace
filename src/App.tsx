@@ -195,7 +195,7 @@ const MemoryGame = lazy(() => import("./pages/MemoryGame"));
 const FirstLetterGame = lazy(() => import("./pages/games/FirstLetterGame"));
 const MemoryPalaceBuilder = lazy(() => import("./pages/games/MemoryPalaceBuilder"));
 const MemoryPalacePractice = lazy(() => import("./pages/games/MemoryPalacePractice"));
-const MemoryPalace3D = lazy(() => import("./pages/games/MemoryPalace3D"));
+
 const ChefChallenge = lazy(() => import("./pages/ChefChallenge"));
 // ChainWar removed — merged into PT Scrabble as Quick Play
 const SanctuaryRun = lazy(() => import("./pages/games/SanctuaryRun"));
@@ -227,9 +227,6 @@ const PTJeopardy = lazy(() => import("./pages/PTJeopardy"));
 const PTFamilyFeud = lazy(() => import("./pages/PTFamilyFeud"));
 const SymbolDecoder = lazy(() => import("./pages/games/SymbolDecoder"));
 
-const EscapeRoom3D = lazy(() => import("./pages/games/EscapeRoom3D"));
-
-const SpeedVerse3D = lazy(() => import("./pages/games/SpeedVerse3D"));
 const MasterExam = lazy(() => import("./pages/MasterExam"));
 const Gideon300 = lazy(() => import("./pages/games/Gideon300"));
 const FreestyleZone = lazy(() => import("./pages/games/FreestyleZone"));
@@ -520,7 +517,7 @@ function App() {
             <Route path="/memory/game/:listId/first-letter" element={<ProtectedRoute><FirstLetterGame /></ProtectedRoute>} />
             <Route path="/memory/palace-builder/:listId" element={<ProtectedRoute><MemoryPalaceBuilder /></ProtectedRoute>} />
             <Route path="/memory/palace-practice/:listId" element={<ProtectedRoute><MemoryPalacePractice /></ProtectedRoute>} />
-            <Route path="/memory/palace-3d/:listId" element={<ProtectedRoute><MemoryPalace3D /></ProtectedRoute>} />
+            
             <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
             <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
@@ -544,7 +541,7 @@ function App() {
             <Route path="/games/frame-snapshot" element={<ProtectedRoute><FrameSnapshot /></ProtectedRoute>} />
             <Route path="/games/story-room" element={<ProtectedRoute><StoryRoomGame /></ProtectedRoute>} />
             
-            <Route path="/games/speed-verse-3d" element={<ProtectedRoute><SpeedVerse3D /></ProtectedRoute>} />
+            
             
             <Route path="/games/observation-room" element={<ProtectedRoute><ObservationFlux /></ProtectedRoute>} />
             <Route path="/games/concentration-room" element={<ProtectedRoute><ConcentrationRoom /></ProtectedRoute>} />
@@ -582,7 +579,7 @@ function App() {
             <Route path="/treasure-hunt/:huntId" element={<ProtectedRoute><TreasureHuntPlay /></ProtectedRoute>} />
             <Route path="/escape-room" element={<ProtectedRoute><EscapeRoom /></ProtectedRoute>} />
             <Route path="/escape-room/play/:roomId" element={<ProtectedRoute><EscapeRoomPlay /></ProtectedRoute>} />
-            <Route path="/escape-room/3d/:roomId" element={<ProtectedRoute><EscapeRoom3D /></ProtectedRoute>} />
+            
             <Route path="/training-drills" element={<ProtectedRoute><TrainingDrills /></ProtectedRoute>} />
             <Route path="/drill-drill" element={<ProtectedRoute><DrillDrill /></ProtectedRoute>} />
             <Route path="/live-study" element={<ProtectedRoute><LiveStudy /></ProtectedRoute>} />

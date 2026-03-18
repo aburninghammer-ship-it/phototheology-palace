@@ -6,16 +6,12 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, ArrowLeft, Church, Box, LayoutGrid } from "lucide-react";
+import { Trophy, ArrowLeft, Church, LayoutGrid } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-
-// Lazy load 3D component for performance
-const Sanctuary3DViewer = lazy(() => import("@/components/sanctuary/Sanctuary3DViewer"));
 
 const sanctuaryItems = [
   {
@@ -239,46 +235,6 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
   );
 }
 
-// 3D Explorer Component
-function Explorer3D() {
-  const { t } = useTranslation();
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <Badge variant="secondary">{t('games.blueRoom.floorBadge')}</Badge>
-            <Badge className="bg-blue-500">{t('games.blueRoom.mode3d')}</Badge>
-          </div>
-          <CardTitle className="text-3xl">{t('games.blueRoom.sanctuaryExplorer3d')}</CardTitle>
-          <CardDescription>
-            {t('games.blueRoom.explorer3dDescription')}
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      <Suspense fallback={
-        <Card className="h-[600px] flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto" />
-            <p className="text-muted-foreground">{t('games.blueRoom.loading3d')}</p>
-          </div>
-        </Card>
-      }>
-        <Sanctuary3DViewer />
-      </Suspense>
-
-      <Card className="bg-blue-50 dark:bg-blue-900/20">
-        <CardContent className="pt-6">
-          <h4 className="font-semibold mb-2">{t('games.blueRoom.journeyTitle')}</h4>
-          <p className="text-sm text-muted-foreground">
-            {t('games.blueRoom.journeyDescription')}
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 // Completion Screen
 function CompletionScreen({
@@ -330,7 +286,7 @@ export default function BlueRoomGame() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [viewMode, setViewMode] = useState<'quiz' | '3d'>('quiz');
+  const [viewMode] = useState<'quiz'>('quiz');
   const [isComplete, setIsComplete] = useState(false);
   const [finalScore, setFinalScore] = useState({ score: 0, total: 0 });
   const [scoreSaved, setScoreSaved] = useState(false);
@@ -392,25 +348,7 @@ export default function BlueRoomGame() {
           {t('games.common.backToGames')}
         </Button>
 
-        {/* View Mode Toggle */}
-        <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'quiz' | '3d')} className="mb-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
-            <TabsTrigger value="quiz" className="flex items-center gap-2">
-              <LayoutGrid className="h-4 w-4" />
-              {t('games.blueRoom.quizMode')}
-            </TabsTrigger>
-            <TabsTrigger value="3d" className="flex items-center gap-2">
-              <Box className="h-4 w-4" />
-              {t('games.blueRoom.explorerMode')}
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        {viewMode === 'quiz' ? (
-          <QuizGame onComplete={handleComplete} />
-        ) : (
-          <Explorer3D />
-        )}
+        <QuizGame onComplete={handleComplete} />
       </main>
       <FloatingGameChat gameType="blue-room" />
     </div>

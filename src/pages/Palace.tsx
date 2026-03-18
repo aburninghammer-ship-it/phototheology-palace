@@ -1,7 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { VisualPalace } from "@/components/VisualPalace";
 import { ProgressivePalace } from "@/components/palace/ProgressivePalace";
-import { Palace3DViewer } from "@/components/palace/Palace3DViewer";
+
 import { PalaceBreadcrumbs } from "@/components/palace/PalaceBreadcrumbs";
 import { PalaceTour } from "@/components/onboarding/PalaceTour";
 import { palaceFloors } from "@/data/palaceData";
@@ -262,29 +262,13 @@ const Palace = () => {
                   <LayoutGrid className="h-4 w-4 mr-2" />
                   {t('palace.full')}
                 </Button>
-                <Button
-                  variant={viewMode === "3d" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setViewMode("3d")}
-                  className={viewMode === "3d" ? "bg-purple-600 hover:bg-purple-700" : ""}
-                >
-                  <Box className="h-4 w-4 mr-2" />
-                  {t('palace.threeD')}
-                </Button>
               </div>
 
               <div className="mb-12">
                 {viewMode === "list" ? (
                   <ProgressivePalace showStartHere={progressPercentage < 20} />
-                ) : viewMode === "visual" ? (
-                  <VisualPalace />
                 ) : (
-                  <div className="h-[700px]">
-                    <Palace3DViewer
-                      unlockedRooms={new Set(completedRoomIds)}
-                      onClose={() => setViewMode("list")}
-                    />
-                  </div>
+                  <VisualPalace />
                 )}
               </div>
             </TabsContent>
