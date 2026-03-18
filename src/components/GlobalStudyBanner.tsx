@@ -407,7 +407,7 @@ function LockInPassChip() {
       >
         <Flame className="h-3.5 w-3.5 text-orange-400" />
         <span className="font-bold">{passesRemaining}</span>
-        <span className="hidden sm:inline text-orange-300/80">Passes</span>
+        <span className="hidden sm:inline text-orange-300/80">Day Guest {passesRemaining === 1 ? "Pass" : "Passes"}</span>
       </motion.div>
     </Link>
   );
