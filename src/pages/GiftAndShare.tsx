@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Gift, Heart, Send, ArrowRight } from "lucide-react";
+import { Gift, Heart, Send, ArrowRight, Users } from "lucide-react";
 import { useSearchParams, Link } from "react-router-dom";
 import { LockInPassCard } from "@/components/LockInPassCard";
 
@@ -50,6 +50,19 @@ export default function GiftAndShare() {
           <GiftSuiteCard user={user} />
           <LockInPassCard />
         </div>
+
+        {user && (
+          <div className="mt-8 text-center">
+            <Link
+              to="/guest-pass-tracker"
+              className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+            >
+              <Users className="h-4 w-4" />
+              View Guest Pass Tracker — see who's using your passes
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
