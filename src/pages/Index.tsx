@@ -78,6 +78,7 @@ const Index = () => {
   useSyncEarlyTracking();
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
+  const { zenMode } = useDisplaySettings();
   const [showInstallBanner, setShowInstallBanner] = useState(false);
 
   useEffect(() => {
