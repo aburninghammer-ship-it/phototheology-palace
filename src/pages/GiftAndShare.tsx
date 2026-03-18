@@ -10,8 +10,9 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Gift, Share2, Clock, Music, Sparkles, Copy, Check, Heart, Send, ArrowRight, Link2 } from "lucide-react";
+import { Gift, Heart, Send, ArrowRight } from "lucide-react";
 import { useSearchParams, Link } from "react-router-dom";
+import { LockInPassCard } from "@/components/LockInPassCard";
 
 export default function GiftAndShare() {
   const { user } = useAuth();
