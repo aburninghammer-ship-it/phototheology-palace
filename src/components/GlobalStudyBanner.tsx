@@ -21,6 +21,7 @@ import {
 import { StudyHealthRing } from "@/components/banner/StudyHealthRing";
 import { MissionDropdown } from "@/components/banner/MissionDropdown";
 import { AccountabilityBar } from "@/components/banner/AccountabilityBar";
+import { useLockInMonthlyUsage } from "@/hooks/useLockInPass";
 
 interface DailyPrompt {
   category: "motivation" | "action" | "spiritual" | "try_this";
