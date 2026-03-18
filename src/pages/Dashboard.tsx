@@ -214,6 +214,10 @@ export default function Dashboard() {
 
         <LockInConversionBanner />
 
+        <div className="mb-4">
+          <LockInPassAllowanceWidget />
+        </div>
+
         <div className="mb-8 mt-4">
           <LockInMissionTracker />
         </div>
