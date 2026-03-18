@@ -113,6 +113,12 @@ VIRAL DELIVERY RULES:
 5. NO academic language. Speak like you're telling a friend the coolest thing you just discovered
 6. Target length: 130-160 words for the transcript (fits ~60 seconds spoken)
 
+CRITICAL THEOLOGICAL GUARDRAILS:
+- AZAZEL = SATAN, NOT CHRIST: The scapegoat (Azazel) in Leviticus 16 represents SATAN. The LORD's goat (slain) = Christ. NEVER identify the scapegoat as Jesus in any way.
+- Christ entered the HOLY PLACE at His ASCENSION in 31 AD; MOST HOLY PLACE in 1844
+- Spring feasts = First Advent (Passover = Cross, NOT Day of Atonement)
+- Fall feasts = Second Advent ministry (Day of Atonement = 1844 judgment)
+
 PHOTOTHEOLOGY INTEGRATION:
 - Reference Palace rooms where the insight comes from (Story Room, Observation Room, Symbols Room, etc.)
 - Connect to sanctuary typology when relevant
