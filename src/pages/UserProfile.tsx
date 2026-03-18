@@ -38,6 +38,7 @@ import { MemberAchievementsWall } from "@/components/living-manna/profile/Member
 import { MemberStudyThreadsList } from "@/components/living-manna/profile/MemberStudyThreadsList";
 import { MemberPrayerWall } from "@/components/living-manna/profile/MemberPrayerWall";
 import { FeaturedGem } from "@/components/profile/FeaturedGem";
+import { LockInPassAllowanceWidget } from "@/components/LockInPassAllowanceWidget";
 import { DebateRecord } from "@/components/profile/DebateRecord";
 import { useMemberProfileEnhanced } from "@/hooks/useMemberProfileEnhanced";
 import { supabase } from "@/integrations/supabase/client";
