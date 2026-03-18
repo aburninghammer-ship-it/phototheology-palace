@@ -48,7 +48,7 @@ export default function GiftAndShare() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <GiftSuiteCard user={user} />
-          <DayPassCard user={user} />
+          <LockInPassCard />
         </div>
       </div>
     </div>
