@@ -10,8 +10,9 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Gift, Share2, Clock, Music, Sparkles, Copy, Check, Heart, Send, ArrowRight, Link2 } from "lucide-react";
+import { Gift, Heart, Send, ArrowRight } from "lucide-react";
 import { useSearchParams, Link } from "react-router-dom";
+import { LockInPassCard } from "@/components/LockInPassCard";
 
 export default function GiftAndShare() {
   const { user } = useAuth();
@@ -20,7 +21,7 @@ export default function GiftAndShare() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <SEO title="Gift the Suite | Phototheology" description="Gift the Phototheology Bible Suite or share a free day pass with someone." />
+      <SEO title="Gift & Share | Phototheology" description="Gift the Phototheology Bible Suite or share a free 5-Day Lock-In Pass with someone." />
       <Navigation />
 
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
@@ -33,7 +34,7 @@ export default function GiftAndShare() {
             Share the Word
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Gift someone the full Phototheology Bible Suite, or share a free Day Pass so they can experience it firsthand.
+            Gift someone the full Phototheology Bible Suite, or share a free 5-Day Lock-In Pass so they can experience it firsthand.
           </p>
         </div>
 
@@ -47,7 +48,7 @@ export default function GiftAndShare() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <GiftSuiteCard user={user} />
-          <DayPassCard user={user} />
+          <LockInPassCard />
         </div>
       </div>
     </div>
@@ -161,115 +162,3 @@ function GiftSuiteCard({ user }: { user: any }) {
   );
 }
 
-function DayPassCard({ user }: { user: any }) {
-  const [shareLink, setShareLink] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleCreateDayPass = async () => {
-    if (!user) {
-      toast.error("Please sign in to create a Day Pass");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("day_passes")
-        .insert({ created_by: user.id })
-        .select("pass_token")
-        .single();
-
-      if (error) throw error;
-
-      const link = `${window.location.origin}/day-pass/${data.pass_token}`;
-      setShareLink(link);
-      toast.success("Day Pass created! Share the link below.");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to create Day Pass");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const copyLink = () => {
-    if (shareLink) {
-      navigator.clipboard.writeText(shareLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast.success("Link copied!");
-    }
-  };
-
-  return (
-    <Card className="border-2 border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 shadow-xl">
-      <CardHeader className="text-center">
-        <div className="mx-auto mb-3 p-4 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 w-fit">
-          <Share2 className="h-8 w-8 text-blue-500" />
-        </div>
-        <CardTitle className="text-2xl">Free Day Pass</CardTitle>
-        <CardDescription>
-          Share a free 24-hour pass. Recipients get full access with up to 3 audio commentaries. One per person.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-blue-400" />
-            <span>24-hour full access</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Music className="h-4 w-4 text-blue-400" />
-            <span>3 audio commentary plays included</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-blue-400" />
-            <span>All study tools & AI features</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link2 className="h-4 w-4 text-blue-400" />
-            <span>One day pass per recipient — ever</span>
-          </div>
-        </div>
-
-        {!shareLink ? (
-          <Button
-            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
-            onClick={handleCreateDayPass}
-            disabled={loading}
-          >
-            {loading ? "Creating..." : (
-              <>
-                <Send className="h-4 w-4 mr-2" />
-                Generate Day Pass Link
-              </>
-            )}
-          </Button>
-        ) : (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Input readOnly value={shareLink} className="text-xs" />
-              <Button size="icon" variant="outline" onClick={copyLink}>
-                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-              </Button>
-            </div>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => setShareLink(null)}
-            >
-              <Send className="h-4 w-4 mr-2" />
-              Create Another Pass
-            </Button>
-          </div>
-        )}
-
-        {!user && (
-          <p className="text-xs text-muted-foreground text-center">
-            <Link to="/auth" className="text-primary hover:underline">Sign in</Link> to create a Day Pass
-          </p>
-        )}
-      </CardContent>
-    </Card>
-  );
-}

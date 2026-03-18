@@ -64,6 +64,7 @@ const GiftAndShare = lazy(() => import("./pages/GiftAndShare"));
 const GiftSuccess = lazy(() => import("./pages/GiftSuccess"));
 const GiftRedeem = lazy(() => import("./pages/GiftRedeem"));
 const DayPassRedeem = lazy(() => import("./pages/DayPassRedeem"));
+const LockInRedeem = lazy(() => import("./pages/LockInRedeem"));
 
 // Lazy load all other pages
 const Palace = lazy(() => import("./pages/Palace"));
@@ -439,6 +440,7 @@ function App() {
             <Route path="/gift/success" element={<GiftSuccess />} />
             <Route path="/gift/redeem/:token" element={<GiftRedeem />} />
             <Route path="/day-pass/:token" element={<DayPassRedeem />} />
+            <Route path="/lock-in/:token" element={<LockInRedeem />} />
             <Route path="/shared/baptism-audio/:token" element={<SharedBaptismAudio />} />
             <Route path="/shared/debate/:token" element={<SharedDebate />} />
             <Route path="/donate" element={<DonationPage />} />

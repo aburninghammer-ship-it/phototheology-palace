@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { LockInMissionTracker } from "@/components/LockInMissionTracker";
+import { LockInConversionBanner } from "@/components/LockInConversionBanner";
 import { useTranslation } from "react-i18next";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { Navigation } from "@/components/Navigation";
@@ -207,6 +209,12 @@ export default function Dashboard() {
 
         <div className="mb-8">
           <IdentityLoopWidget />
+        </div>
+
+        <LockInConversionBanner />
+
+        <div className="mb-8 mt-4">
+          <LockInMissionTracker />
         </div>
         <PathBanner />
 
