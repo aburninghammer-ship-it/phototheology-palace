@@ -16,7 +16,10 @@ export default function GiftSuccess() {
   const [confirmed, setConfirmed] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const redeemLink = `${window.location.origin}/gift/redeem/${giftToken}`;
+  const prodOrigin = window.location.hostname.includes('lovable.app') || window.location.hostname === 'localhost'
+    ? 'https://phototheologybible.com'
+    : window.location.origin;
+  const redeemLink = `${prodOrigin}/gift/redeem/${giftToken}`;
 
   useEffect(() => {
     if (!giftToken) return;
