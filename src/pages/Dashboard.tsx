@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { LockInMissionTracker } from "@/components/LockInMissionTracker";
 import { LockInConversionBanner } from "@/components/LockInConversionBanner";
+import { LockInPassAllowanceWidget } from "@/components/LockInPassAllowanceWidget";
 import { useTranslation } from "react-i18next";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { Navigation } from "@/components/Navigation";
@@ -212,6 +213,10 @@ export default function Dashboard() {
         </div>
 
         <LockInConversionBanner />
+
+        <div className="mb-4">
+          <LockInPassAllowanceWidget />
+        </div>
 
         <div className="mb-8 mt-4">
           <LockInMissionTracker />
