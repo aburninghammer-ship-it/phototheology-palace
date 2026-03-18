@@ -30,8 +30,8 @@ export function useDisplaySettings() {
     return (localStorage.getItem(STORAGE_KEYS.colorTheme) as ColorTheme) || "default";
   });
 
-  const [zenMode, setZenModeState] = useState(() => {
-    return localStorage.getItem(STORAGE_KEYS.zenMode) === "true";
+  const [focusMode, setFocusModeState] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.focusMode) === "true";
   });
 
   const [reducedMotion, setReducedMotionState] = useState(() => {
