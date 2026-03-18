@@ -9621,6 +9621,116 @@ export type Database = {
           },
         ]
       }
+      lock_in_missions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          day_number: number
+          id: string
+          is_completed: boolean
+          mission_description: string
+          mission_title: string
+          pass_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          day_number: number
+          id?: string
+          is_completed?: boolean
+          mission_description: string
+          mission_title: string
+          pass_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          day_number?: number
+          id?: string
+          is_completed?: boolean
+          mission_description?: string
+          mission_title?: string
+          pass_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lock_in_missions_pass_id_fkey"
+            columns: ["pass_id"]
+            isOneToOne: false
+            referencedRelation: "lock_in_passes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lock_in_monthly_usage: {
+        Row: {
+          created_at: string
+          id: string
+          month_year: string
+          passes_created: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month_year: string
+          passes_created?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month_year?: string
+          passes_created?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lock_in_passes: {
+        Row: {
+          activated_at: string | null
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          pass_token: string
+          personal_message: string | null
+          recipient_email: string | null
+          recipient_user_id: string | null
+          status: string
+        }
+        Insert: {
+          activated_at?: string | null
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          pass_token?: string
+          personal_message?: string | null
+          recipient_email?: string | null
+          recipient_user_id?: string | null
+          status?: string
+        }
+        Update: {
+          activated_at?: string | null
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          pass_token?: string
+          personal_message?: string | null
+          recipient_email?: string | null
+          recipient_user_id?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       marriage_blueprint_progress: {
         Row: {
           article_id: number
@@ -20459,6 +20569,10 @@ export type Database = {
         Args: { p_challenge_id: string }
         Returns: Json
       }
+      create_lock_in_pass: {
+        Args: { _personal_message?: string }
+        Returns: Json
+      }
       decrypt_token: { Args: { encrypted_token: string }; Returns: string }
       delete_cancelled_user_data: { Args: never; Returns: undefined }
       encrypt_token: { Args: { plain_token: string }; Returns: string }
@@ -20470,6 +20584,10 @@ export type Database = {
       generate_referral_code: { Args: { user_id: string }; Returns: string }
       generate_session_share_token: { Args: never; Returns: string }
       generate_student_verification_code: { Args: never; Returns: string }
+      get_active_lock_in_pass: {
+        Args: { _user_id_or_fingerprint?: string }
+        Returns: Json
+      }
       get_active_user_count: { Args: never; Returns: number }
       get_available_seats: { Args: { _church_id: string }; Returns: number }
       get_church_billing_info: {
@@ -20691,6 +20809,10 @@ export type Database = {
       redeem_access_code: { Args: { code_input: string }; Returns: Json }
       redeem_day_pass: {
         Args: { _recipient_id: string; _token: string }
+        Returns: Json
+      }
+      redeem_lock_in_pass: {
+        Args: { _token: string; _user_id_or_fingerprint: string }
         Returns: Json
       }
       search_encyclopedia_articles: {
