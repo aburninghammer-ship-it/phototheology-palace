@@ -78,7 +78,7 @@ import { PatternsLibrary } from "@/components/patterns-room/PatternsLibrary";
 import { ThreeHeavensLibrary } from "@/components/three-heavens-room/ThreeHeavensLibrary";
 import { Room66Library } from "@/components/room66/Room66Library";
 import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLibrary";
-import { Room3DToggle } from "@/components/room/Room3DToggle";
+
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
 import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
 import { MobileOrientationTip } from "@/components/MobileOrientationTip";
