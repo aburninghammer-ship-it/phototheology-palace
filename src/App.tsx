@@ -437,6 +437,7 @@ function App() {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/fix-billing" element={<ProtectedRoute><FixBilling /></ProtectedRoute>} />
             <Route path="/gift" element={<GiftAndShare />} />
+            <Route path="/gift-and-share" element={<GiftAndShare />} />
             <Route path="/gift/success" element={<GiftSuccess />} />
             <Route path="/gift/redeem/:token" element={<GiftRedeem />} />
             <Route path="/day-pass/:token" element={<DayPassRedeem />} />

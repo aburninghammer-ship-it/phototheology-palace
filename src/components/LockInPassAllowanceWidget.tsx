@@ -11,7 +11,7 @@ export function LockInPassAllowanceWidget() {
   if (!user || loading) return null;
 
   return (
-    <Link to="/gift-and-share">
+    <Link to="/gift">
       <Card className="group border-primary/20 bg-gradient-to-r from-primary/5 via-orange-500/5 to-primary/5 hover:border-primary/40 transition-all cursor-pointer">
         <CardContent className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
