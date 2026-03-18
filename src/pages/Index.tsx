@@ -78,7 +78,7 @@ const Index = () => {
   useSyncEarlyTracking();
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
-  const { zenMode } = useDisplaySettings();
+  const { focusMode } = useDisplaySettings();
   const [showInstallBanner, setShowInstallBanner] = useState(false);
 
   useEffect(() => {
@@ -109,11 +109,11 @@ const Index = () => {
       {/* Deferred analytics - load after paint */}
       <Suspense fallback={null}>
         <SessionTracker />
-        {!zenMode && <ExitIntentPopup />}
+        {!focusMode && <ExitIntentPopup />}
       </Suspense>
       
       {/* Install Banner */}
-      {showInstallBanner && !zenMode && (
+      {showInstallBanner && !focusMode && (
         <div className="sticky top-16 z-40 bg-gradient-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg border-b border-primary/20">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between gap-3">
@@ -141,7 +141,7 @@ const Index = () => {
       )}
 
       {/* Quick testimonial banner - immediate social proof */}
-      {!zenMode && <QuickTestimonialBanner />}
+      {!focusMode && <QuickTestimonialBanner />}
 
 
       {/* 1. Hero - The 10-second hook - NOT lazy loaded */}
@@ -184,7 +184,7 @@ const Index = () => {
       </Suspense>
 
       {/* Language Selector for public visitors */}
-      {!zenMode && (
+      {!focusMode && (
         <div className="fixed bottom-20 right-4 z-50 md:bottom-6 zen-hideable">
           <Popover>
             <PopoverTrigger asChild>
@@ -202,7 +202,7 @@ const Index = () => {
       <Footer />
       
       {/* Mobile Sticky CTA Bar - deferred */}
-      {!zenMode && (
+      {!focusMode && (
         <Suspense fallback={null}>
           <MobileStickyCtaBar />
         </Suspense>

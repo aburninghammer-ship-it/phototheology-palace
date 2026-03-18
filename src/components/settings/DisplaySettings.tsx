@@ -13,7 +13,7 @@ const COLOR_THEMES = [
 ] as const;
 
 export function DisplaySettings() {
-  const { colorTheme, setColorTheme, zenMode, setZenMode, reducedMotion, setReducedMotion } = useDisplaySettings();
+  const { colorTheme, setColorTheme, focusMode, setFocusMode, reducedMotion, setReducedMotion } = useDisplaySettings();
 
   return (
     <div className="space-y-4">
@@ -21,7 +21,7 @@ export function DisplaySettings() {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            {zenMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {focusMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             Focus Mode
           </CardTitle>
           <CardDescription className="text-xs">
@@ -31,7 +31,7 @@ export function DisplaySettings() {
         <CardContent>
           <div className="flex items-center justify-between">
             <Label htmlFor="zen-mode" className="cursor-pointer">Enable Focus Mode</Label>
-            <Switch id="zen-mode" checked={zenMode} onCheckedChange={setZenMode} />
+            <Switch id="zen-mode" checked={focusMode} onCheckedChange={setFocusMode} />
           </div>
         </CardContent>
       </Card>

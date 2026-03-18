@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 
 const STORAGE_KEYS = {
   colorTheme: "pt-color-theme",
-  zenMode: "pt-zen-mode",
+  focusMode: "pt-focus-mode",
   reducedMotion: "pt-reduced-motion",
 } as const;
 
@@ -21,8 +21,8 @@ function applyReducedMotion(enabled: boolean) {
   document.documentElement.setAttribute("data-reduced-motion", enabled ? "true" : "false");
 }
 
-function applyZenMode(enabled: boolean) {
-  document.documentElement.setAttribute("data-zen-mode", enabled ? "true" : "false");
+function applyFocusMode(enabled: boolean) {
+  document.documentElement.setAttribute("data-focus-mode", enabled ? "true" : "false");
 }
 
 export function useDisplaySettings() {
@@ -30,8 +30,8 @@ export function useDisplaySettings() {
     return (localStorage.getItem(STORAGE_KEYS.colorTheme) as ColorTheme) || "default";
   });
 
-  const [zenMode, setZenModeState] = useState(() => {
-    return localStorage.getItem(STORAGE_KEYS.zenMode) === "true";
+  const [focusMode, setFocusModeState] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.focusMode) === "true";
   });
 
   const [reducedMotion, setReducedMotionState] = useState(() => {
@@ -42,7 +42,7 @@ export function useDisplaySettings() {
   useEffect(() => {
     applyColorTheme(colorTheme);
     applyReducedMotion(reducedMotion);
-    applyZenMode(zenMode);
+    applyFocusMode(focusMode);
   }, []);
 
   const setColorTheme = useCallback((theme: ColorTheme) => {
@@ -51,10 +51,10 @@ export function useDisplaySettings() {
     applyColorTheme(theme);
   }, []);
 
-  const setZenMode = useCallback((enabled: boolean) => {
-    setZenModeState(enabled);
-    localStorage.setItem(STORAGE_KEYS.zenMode, String(enabled));
-    applyZenMode(enabled);
+  const setFocusMode = useCallback((enabled: boolean) => {
+    setFocusModeState(enabled);
+    localStorage.setItem(STORAGE_KEYS.focusMode, String(enabled));
+    applyFocusMode(enabled);
   }, []);
 
   const setReducedMotion = useCallback((enabled: boolean) => {
@@ -66,8 +66,8 @@ export function useDisplaySettings() {
   return {
     colorTheme,
     setColorTheme,
-    zenMode,
-    setZenMode,
+    focusMode,
+    setFocusMode,
     reducedMotion,
     setReducedMotion,
   };
