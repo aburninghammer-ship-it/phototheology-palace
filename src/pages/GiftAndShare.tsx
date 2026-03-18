@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Gift, Heart, Send, ArrowRight } from "lucide-react";
+import { Gift, Heart, Send, ArrowRight, Users } from "lucide-react";
 import { useSearchParams, Link } from "react-router-dom";
 import { LockInPassCard } from "@/components/LockInPassCard";
 
