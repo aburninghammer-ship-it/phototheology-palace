@@ -283,7 +283,6 @@ export default function DimensionsRoom() {
           </CardContent>
         </Card>
         </>
-        )}
       </main>
       <FloatingGameChat gameType="dimensions-room" />
     </div>
