@@ -50,6 +50,19 @@ export default function GiftAndShare() {
           <GiftSuiteCard user={user} />
           <LockInPassCard />
         </div>
+
+        {user && (
+          <div className="mt-8 text-center">
+            <Link
+              to="/guest-pass-tracker"
+              className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+            >
+              <Users className="h-4 w-4" />
+              View Guest Pass Tracker — see who's using your passes
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
