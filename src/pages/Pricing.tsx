@@ -176,14 +176,27 @@ export default function Pricing() {
         return;
       }
 
-      // No external membership - proceed with Stripe checkout for trial
-      const { data, error } = await supabase.functions.invoke('create-trial-checkout', {
-        body: { plan, billing: billingPeriod },
-      });
+      // Check if this is a Lock-In Pass guest (skip trial, go straight to payment)
+      const skipTrial = searchParams.get('skip_trial') === 'true';
 
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
+      if (skipTrial) {
+        // Direct subscription checkout — no trial period
+        const { data, error } = await supabase.functions.invoke('create-subscription-checkout', {
+          body: { plan, billing: billingPeriod },
+        });
+        if (error) throw error;
+        if (data?.url) {
+          window.location.href = data.url;
+        }
+      } else {
+        // No external membership - proceed with Stripe checkout for trial
+        const { data, error } = await supabase.functions.invoke('create-trial-checkout', {
+          body: { plan, billing: billingPeriod },
+        });
+        if (error) throw error;
+        if (data?.url) {
+          window.location.href = data.url;
+        }
       }
     } catch (error: any) {
       console.error("Error starting trial:", error);
