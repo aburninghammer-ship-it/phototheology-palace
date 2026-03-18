@@ -758,7 +758,7 @@ const Community = () => {
           <WeeklySpotlight />
 
           {showNewPost && (
-            <Card className="border-primary/20 shadow-lg bg-card/60 backdrop-blur-sm">
+            <Card ref={newPostFormRef} className="border-primary/20 shadow-lg bg-card/60 backdrop-blur-sm">
               <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
