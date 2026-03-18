@@ -18,7 +18,7 @@ const MISSION_ICONS = [
 ];
 
 export function LockInMissionTracker() {
-  const { hasPass, missions, currentDay, daysLeft, completedCount, completeMission, expiresAt } = useLockInPass();
+  const { hasPass, passId, missions, currentDay, daysLeft, completedCount, completeMission, expiresAt, commentaryBook, commentaryChapter, commentaryMode } = useLockInPass();
   const navigate = useNavigate();
 
   if (!hasPass || missions.length === 0) return null;
