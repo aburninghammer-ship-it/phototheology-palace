@@ -19,6 +19,7 @@ import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { QuickTestimonialBanner } from "@/components/landing/QuickTestimonialBanner";
 import { LandingPageSkeleton, TestimonialsSkeleton } from "@/components/landing/LandingPageSkeleton";
 import { useSyncEarlyTracking } from "@/hooks/useSyncEarlyTracking";
+import { useDisplaySettings } from "@/hooks/useDisplaySettings";
 
 
 // Lazy load heavy below-the-fold components
