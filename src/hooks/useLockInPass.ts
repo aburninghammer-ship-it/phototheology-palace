@@ -9,6 +9,9 @@ interface LockInPassStatus {
   daysLeft: number;
   personalMessage: string | null;
   passToken: string | null;
+  commentaryBook: string | null;
+  commentaryChapter: number | null;
+  commentaryMode: string | null;
 }
 
 interface LockInMission {
