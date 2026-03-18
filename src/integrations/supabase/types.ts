@@ -9698,10 +9698,15 @@ export type Database = {
           commentary_book: string | null
           commentary_chapter: number | null
           commentary_mode: string | null
+          conversion_status: string
+          converted_at: string | null
           created_at: string
           created_by: string
           expires_at: string | null
+          follow_up_sent_at: string | null
+          guest_name: string | null
           id: string
+          last_active_at: string | null
           pass_token: string
           personal_message: string | null
           recipient_email: string | null
@@ -9713,10 +9718,15 @@ export type Database = {
           commentary_book?: string | null
           commentary_chapter?: number | null
           commentary_mode?: string | null
+          conversion_status?: string
+          converted_at?: string | null
           created_at?: string
           created_by: string
           expires_at?: string | null
+          follow_up_sent_at?: string | null
+          guest_name?: string | null
           id?: string
+          last_active_at?: string | null
           pass_token?: string
           personal_message?: string | null
           recipient_email?: string | null
@@ -9728,10 +9738,15 @@ export type Database = {
           commentary_book?: string | null
           commentary_chapter?: number | null
           commentary_mode?: string | null
+          conversion_status?: string
+          converted_at?: string | null
           created_at?: string
           created_by?: string
           expires_at?: string | null
+          follow_up_sent_at?: string | null
+          guest_name?: string | null
           id?: string
+          last_active_at?: string | null
           pass_token?: string
           personal_message?: string | null
           recipient_email?: string | null
