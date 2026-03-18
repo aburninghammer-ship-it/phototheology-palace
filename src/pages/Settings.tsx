@@ -26,6 +26,7 @@ import { PatreonConnect } from "@/components/PatreonConnect";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { TeachableVerification } from "@/components/settings/TeachableVerification";
 import { FontSizeSettings } from "@/components/settings/FontSizeSettings";
+import { DisplaySettings } from "@/components/settings/DisplaySettings";
 import { useTranslation } from "react-i18next";
 import { UserAiUsageWidget } from "@/components/profile/UserAiUsageWidget";
 
@@ -393,6 +394,17 @@ export default function Settings() {
               <LanguageSelector />
             </CardContent>
            </Card>
+
+          {/* Display & Comfort Settings */}
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle>Display & Comfort</CardTitle>
+              <CardDescription>Customize colors, focus mode, and animations for a comfortable experience.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DisplaySettings />
+            </CardContent>
+          </Card>
 
           {/* Font Size / Accessibility */}
           <FontSizeSettings />

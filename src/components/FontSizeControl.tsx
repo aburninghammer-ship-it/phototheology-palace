@@ -69,7 +69,7 @@ export const FontSizeControl = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed bottom-20 md:bottom-4 right-4 z-40 bg-background/80 backdrop-blur-sm border shadow-lg hover:bg-background"
+          className="fixed bottom-20 md:bottom-4 right-4 z-40 bg-background/80 backdrop-blur-sm border shadow-lg hover:bg-background zen-hideable"
           aria-label="Adjust font size"
         >
           <Type className="h-5 w-5" />

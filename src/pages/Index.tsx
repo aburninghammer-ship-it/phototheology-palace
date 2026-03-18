@@ -19,6 +19,7 @@ import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { QuickTestimonialBanner } from "@/components/landing/QuickTestimonialBanner";
 import { LandingPageSkeleton, TestimonialsSkeleton } from "@/components/landing/LandingPageSkeleton";
 import { useSyncEarlyTracking } from "@/hooks/useSyncEarlyTracking";
+import { useDisplaySettings } from "@/hooks/useDisplaySettings";
 
 
 // Lazy load heavy below-the-fold components
@@ -77,6 +78,7 @@ const Index = () => {
   useSyncEarlyTracking();
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
+  const { zenMode } = useDisplaySettings();
   const [showInstallBanner, setShowInstallBanner] = useState(false);
 
   useEffect(() => {
@@ -107,11 +109,11 @@ const Index = () => {
       {/* Deferred analytics - load after paint */}
       <Suspense fallback={null}>
         <SessionTracker />
-        <ExitIntentPopup />
+        {!zenMode && <ExitIntentPopup />}
       </Suspense>
       
       {/* Install Banner */}
-      {showInstallBanner && (
+      {showInstallBanner && !zenMode && (
         <div className="sticky top-16 z-40 bg-gradient-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg border-b border-primary/20">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between gap-3">
@@ -139,7 +141,7 @@ const Index = () => {
       )}
 
       {/* Quick testimonial banner - immediate social proof */}
-      <QuickTestimonialBanner />
+      {!zenMode && <QuickTestimonialBanner />}
 
 
       {/* 1. Hero - The 10-second hook - NOT lazy loaded */}
@@ -182,25 +184,29 @@ const Index = () => {
       </Suspense>
 
       {/* Language Selector for public visitors */}
-      <div className="fixed bottom-20 right-4 z-50 md:bottom-6">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="rounded-full shadow-lg bg-background/95 backdrop-blur-sm h-10 w-10">
-              <Globe className="h-5 w-5" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-48 p-2" align="end" side="top">
-            <LanguageSelector showLabel={false} />
-          </PopoverContent>
-        </Popover>
-      </div>
+      {!zenMode && (
+        <div className="fixed bottom-20 right-4 z-50 md:bottom-6 zen-hideable">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon" className="rounded-full shadow-lg bg-background/95 backdrop-blur-sm h-10 w-10">
+                <Globe className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="end" side="top">
+              <LanguageSelector showLabel={false} />
+            </PopoverContent>
+          </Popover>
+        </div>
+      )}
 
       <Footer />
       
       {/* Mobile Sticky CTA Bar - deferred */}
-      <Suspense fallback={null}>
-        <MobileStickyCtaBar />
-      </Suspense>
+      {!zenMode && (
+        <Suspense fallback={null}>
+          <MobileStickyCtaBar />
+        </Suspense>
+      )}
     </div>
   );
 };
