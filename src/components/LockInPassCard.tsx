@@ -36,7 +36,10 @@ export function LockInPassCard() {
 
       const result = data as any;
       if (result?.success) {
-        const link = `${window.location.origin}/lock-in/${result.pass_token}`;
+        const prodOrigin = window.location.hostname.includes('lovable.app') || window.location.hostname === 'localhost'
+          ? 'https://phototheologybible.com'
+          : window.location.origin;
+        const link = `${prodOrigin}/lock-in/${result.pass_token}`;
         setShareLink(link);
         toast.success(`Lock-In Pass created! ${result.passes_remaining} remaining this month.`);
       } else {
