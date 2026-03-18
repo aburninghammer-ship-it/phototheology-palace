@@ -239,6 +239,9 @@ const Community = () => {
     setNewCategory(category);
     if (tags) setNewTags(tags);
     setShowNewPost(true);
+    setTimeout(() => {
+      newPostFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   };
 
   const createPost = async () => {
