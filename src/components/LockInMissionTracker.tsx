@@ -12,8 +12,8 @@ import confetti from "canvas-confetti";
 const MISSION_ICONS = [
   <Sparkles className="h-4 w-4" />,
   <Star className="h-4 w-4" />,
+  <Headphones className="h-4 w-4" />,
   <Flame className="h-4 w-4" />,
-  <Sparkles className="h-4 w-4" />,
   <Trophy className="h-4 w-4" />,
 ];
 
