@@ -107,9 +107,9 @@ export function DailyAudioDevotional() {
 
   if (loadingDev) {
     return (
-      <Card className="border-amber-200/30 bg-gradient-to-br from-amber-950/30 to-amber-900/20">
-        <CardContent className="py-6 flex items-center justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-amber-400" />
+      <Card className="border-amber-400/40 bg-gradient-to-br from-amber-950/40 to-amber-900/30 shadow-lg shadow-amber-500/10">
+        <CardContent className="py-8 flex items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-amber-400" />
         </CardContent>
       </Card>
     );
@@ -118,54 +118,56 @@ export function DailyAudioDevotional() {
   if (!devotional) return null;
 
   return (
-    <Card className="border-amber-200/30 bg-gradient-to-br from-amber-950/30 to-amber-900/20 overflow-hidden">
+    <Card className="border-amber-400/40 bg-gradient-to-br from-amber-950/50 to-amber-900/30 overflow-hidden shadow-lg shadow-amber-500/10 ring-1 ring-amber-400/20">
       {/* Progress bar */}
       {isPlaying && (
-        <div className="h-1 bg-amber-900/30">
+        <div className="h-1.5 bg-amber-900/30">
           <div
-            className="h-full bg-amber-400 transition-all duration-300"
+            className="h-full bg-gradient-to-r from-amber-400 to-amber-300 transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
       )}
 
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-3 pt-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Volume2 className="h-4 w-4 text-amber-400" />
-            <span className="text-xs font-medium text-amber-400/80 uppercase tracking-wider">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-full bg-amber-400/20">
+              <Volume2 className="h-4 w-4 text-amber-400" />
+            </div>
+            <span className="text-xs sm:text-sm font-semibold text-amber-400 uppercase tracking-wider">
               Daily Audio Devotional
             </span>
           </div>
-          <Badge variant="outline" className="text-amber-300 border-amber-300/30 text-xs">
+          <Badge variant="outline" className="text-amber-300 border-amber-300/40 text-xs sm:text-sm bg-amber-400/10">
             Day {devotional.day_number}
           </Badge>
         </div>
-        <CardTitle className="text-base text-foreground leading-snug">
+        <CardTitle className="text-lg sm:text-xl text-foreground leading-snug pt-1">
           {devotional.title}
         </CardTitle>
         {devotional.scripture_reference && (
-          <p className="text-sm text-amber-300/70 italic">
+          <p className="text-sm sm:text-base text-amber-300/80 italic">
             {devotional.scripture_reference}
           </p>
         )}
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4 pb-5">
         {/* Play button + duration */}
         <div className="flex items-center gap-3">
           <Button
             onClick={togglePlay}
-            size="sm"
-            className="bg-amber-500 hover:bg-amber-600 text-black font-semibold gap-2"
+            size="default"
+            className="bg-amber-500 hover:bg-amber-400 text-black font-bold gap-2 px-5 py-2.5 text-sm sm:text-base shadow-md shadow-amber-500/20 transition-all hover:shadow-lg hover:shadow-amber-500/30"
             disabled={!devotional.audio_url}
           >
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            {isPlaying ? "Pause" : "Listen"}
+            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+            {isPlaying ? "Pause" : "Listen Now"}
           </Button>
 
           {devotional.audio_duration_seconds && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs sm:text-sm text-muted-foreground">
               {formatDuration(devotional.audio_duration_seconds)}
             </span>
           )}
@@ -174,50 +176,50 @@ export function DailyAudioDevotional() {
             variant="ghost"
             size="sm"
             onClick={() => setShowText(!showText)}
-            className="ml-auto text-amber-400/70 hover:text-amber-300 gap-1"
+            className="ml-auto text-amber-400/80 hover:text-amber-300 gap-1.5 text-sm"
           >
-            <BookOpen className="h-3.5 w-3.5" />
+            <BookOpen className="h-4 w-4" />
             {showText ? "Hide" : "Read"}
           </Button>
         </div>
 
         {/* Expandable text */}
         {showText && (
-          <div className="text-sm text-muted-foreground space-y-2 pt-2 border-t border-amber-200/10">
+          <div className="text-sm sm:text-base text-muted-foreground space-y-3 pt-3 border-t border-amber-200/15">
             {devotional.scripture_text && (
-              <blockquote className="border-l-2 border-amber-400/40 pl-3 italic text-amber-200/70">
+              <blockquote className="border-l-2 border-amber-400/50 pl-3 italic text-amber-200/80 leading-relaxed">
                 "{devotional.scripture_text}"
               </blockquote>
             )}
             <p className="whitespace-pre-line leading-relaxed">{devotional.devotional_text}</p>
             {devotional.prayer && (
-              <p className="italic text-amber-300/60 pt-1">🙏 {devotional.prayer}</p>
+              <p className="italic text-amber-300/70 pt-1">🙏 {devotional.prayer}</p>
             )}
           </div>
         )}
 
         {/* SMS subscription */}
         {user && (
-          <div className="pt-2 border-t border-amber-200/10">
+          <div className="pt-3 border-t border-amber-200/15">
             {loadingSub ? (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             ) : subscription?.is_active ? (
               <div className="flex items-center justify-between">
-                <span className="text-xs text-green-400 flex items-center gap-1">
-                  <Phone className="h-3 w-3" /> SMS active
+                <span className="text-xs sm:text-sm text-green-400 flex items-center gap-1.5 font-medium">
+                  <Phone className="h-3.5 w-3.5" /> SMS active
                 </span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-xs text-muted-foreground"
+                  className="text-xs sm:text-sm text-muted-foreground"
                   onClick={() => unsubscribe.mutate()}
                 >
-                  <PhoneOff className="h-3 w-3 mr-1" /> Pause SMS
+                  <PhoneOff className="h-3.5 w-3.5 mr-1" /> Pause SMS
                 </Button>
               </div>
             ) : showSmsForm ? (
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
+              <div className="space-y-2.5">
+                <Label className="text-xs sm:text-sm text-muted-foreground">
                   Get this devotional sent to your phone daily
                 </Label>
                 <div className="flex gap-2">
@@ -226,21 +228,21 @@ export function DailyAudioDevotional() {
                     placeholder="(555) 123-4567"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="text-sm h-8"
+                    className="text-sm sm:text-base h-9 sm:h-10"
                   />
-                  <Button size="sm" className="h-8" onClick={handleSubscribe} disabled={subscribe.isPending}>
-                    {subscribe.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : "Subscribe"}
+                  <Button size="sm" className="h-9 sm:h-10 px-4" onClick={handleSubscribe} disabled={subscribe.isPending}>
+                    {subscribe.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Subscribe"}
                   </Button>
                 </div>
               </div>
             ) : (
               <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs text-amber-400/70 hover:text-amber-300 w-full"
+                variant="outline"
+                size="default"
+                className="text-xs sm:text-sm text-amber-400 hover:text-amber-300 border-amber-400/30 hover:border-amber-400/50 hover:bg-amber-400/10 w-full py-2.5"
                 onClick={() => setShowSmsForm(true)}
               >
-                <Phone className="h-3 w-3 mr-1" />
+                <Phone className="h-4 w-4 mr-1.5" />
                 Get daily devotional via SMS
               </Button>
             )}
