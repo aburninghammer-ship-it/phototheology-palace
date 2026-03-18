@@ -109,7 +109,7 @@ const Index = () => {
       {/* Deferred analytics - load after paint */}
       <Suspense fallback={null}>
         <SessionTracker />
-        {!zenMode && <ExitIntentPopup />}
+        {!focusMode && <ExitIntentPopup />}
       </Suspense>
       
       {/* Install Banner */}
