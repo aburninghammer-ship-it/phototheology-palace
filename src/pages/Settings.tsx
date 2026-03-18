@@ -395,6 +395,17 @@ export default function Settings() {
             </CardContent>
            </Card>
 
+          {/* Display & Comfort Settings */}
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle>Display & Comfort</CardTitle>
+              <CardDescription>Customize colors, focus mode, and animations for a comfortable experience.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DisplaySettings />
+            </CardContent>
+          </Card>
+
           {/* Font Size / Accessibility */}
           <FontSizeSettings />
 
