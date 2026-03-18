@@ -665,6 +665,9 @@ const Community = () => {
                         setNewCategory(
                           categoryFilter === "all" ? "general" : categoryFilter
                         );
+                        setTimeout(() => {
+                          newPostFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
                       }
                     }}
                     size="lg"
