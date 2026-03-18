@@ -51,10 +51,10 @@ export function useDisplaySettings() {
     applyColorTheme(theme);
   }, []);
 
-  const setZenMode = useCallback((enabled: boolean) => {
-    setZenModeState(enabled);
-    localStorage.setItem(STORAGE_KEYS.zenMode, String(enabled));
-    applyZenMode(enabled);
+  const setFocusMode = useCallback((enabled: boolean) => {
+    setFocusModeState(enabled);
+    localStorage.setItem(STORAGE_KEYS.focusMode, String(enabled));
+    applyFocusMode(enabled);
   }, []);
 
   const setReducedMotion = useCallback((enabled: boolean) => {
