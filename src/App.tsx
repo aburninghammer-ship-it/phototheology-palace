@@ -195,7 +195,7 @@ const MemoryGame = lazy(() => import("./pages/MemoryGame"));
 const FirstLetterGame = lazy(() => import("./pages/games/FirstLetterGame"));
 const MemoryPalaceBuilder = lazy(() => import("./pages/games/MemoryPalaceBuilder"));
 const MemoryPalacePractice = lazy(() => import("./pages/games/MemoryPalacePractice"));
-const MemoryPalace3D = lazy(() => import("./pages/games/MemoryPalace3D"));
+
 const ChefChallenge = lazy(() => import("./pages/ChefChallenge"));
 // ChainWar removed — merged into PT Scrabble as Quick Play
 const SanctuaryRun = lazy(() => import("./pages/games/SanctuaryRun"));
