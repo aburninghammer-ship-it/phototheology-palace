@@ -13,9 +13,6 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-const Dimensions3DGame = lazy(() => import("@/components/games/Dimensions3DGame"));
 
 const passages = [
   {

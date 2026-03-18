@@ -286,7 +286,7 @@ export default function BlueRoomGame() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [viewMode, setViewMode] = useState<'quiz' | '3d'>('quiz');
+  const [viewMode] = useState<'quiz'>('quiz');
   const [isComplete, setIsComplete] = useState(false);
   const [finalScore, setFinalScore] = useState({ score: 0, total: 0 });
   const [scoreSaved, setScoreSaved] = useState(false);
