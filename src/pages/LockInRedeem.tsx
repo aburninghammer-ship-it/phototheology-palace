@@ -5,6 +5,8 @@ import { SEO } from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { Flame, Sparkles, ArrowRight, AlertTriangle, BookOpen, Star, Trophy, Headphones } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -25,6 +27,9 @@ export default function LockInRedeem() {
   const [errorMsg, setErrorMsg] = useState("");
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [personalMessage, setPersonalMessage] = useState<string | null>(null);
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [activating, setActivating] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -53,10 +58,26 @@ export default function LockInRedeem() {
 
   const handleActivate = async () => {
     if (!token) return;
+    if (!guestEmail.trim()) {
+      toast.error("Please enter your email to continue");
+      return;
+    }
 
+    setActivating(true);
     const fingerprint = `browser_${navigator.userAgent.length}_${screen.width}x${screen.height}_${new Date().getTimezoneOffset()}`;
 
     try {
+      // Save guest info before activating
+      await (supabase as any)
+        .from("lock_in_passes")
+        .update({
+          recipient_email: guestEmail.trim(),
+          guest_name: guestName.trim() || null,
+          conversion_status: "active",
+          last_active_at: new Date().toISOString(),
+        })
+        .eq("pass_token", token);
+
       const { data, error } = await supabase.rpc("redeem_lock_in_pass", {
         _token: token,
         _user_id_or_fingerprint: fingerprint,
@@ -89,6 +110,8 @@ export default function LockInRedeem() {
     } catch (err: any) {
       setStatus("error");
       setErrorMsg(err.message || "Failed to activate");
+    } finally {
+      setActivating(false);
     }
   };
 
@@ -145,12 +168,47 @@ export default function LockInRedeem() {
               </CardContent>
             </Card>
 
+            {/* Guest info collection */}
+            <Card className="mb-6 border-primary/20">
+              <CardContent className="p-4 space-y-3 text-left">
+                <p className="text-sm font-semibold text-foreground">Enter your info to activate:</p>
+                <div className="space-y-2">
+                  <Label htmlFor="guest-name" className="text-xs">Your Name (optional)</Label>
+                  <Input
+                    id="guest-name"
+                    placeholder="Your name"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="guest-email" className="text-xs">Your Email <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="guest-email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    required
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    We'll send you tips during your 5 days and let you know when your pass is about to expire.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             <Button
               onClick={handleActivate}
+              disabled={activating || !guestEmail.trim()}
               className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 py-6 text-lg"
             >
-              <Flame className="h-5 w-5 mr-2" />
-              Activate My Lock-In Pass
+              {activating ? "Activating..." : (
+                <>
+                  <Flame className="h-5 w-5 mr-2" />
+                  Activate My Lock-In Pass
+                </>
+              )}
             </Button>
 
             <p className="text-xs text-muted-foreground mt-4">
@@ -191,7 +249,7 @@ export default function LockInRedeem() {
             <p className="text-muted-foreground mb-6">{errorMsg}</p>
             <div className="space-y-3">
               <Button asChild className="w-full">
-                <Link to="/pricing">
+                <Link to="/pricing?skip_trial=true">
                   View Plans <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
               </Button>
