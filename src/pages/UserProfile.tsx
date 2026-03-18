@@ -372,6 +372,13 @@ export default function UserProfile() {
           </div>
         </div>
 
+        {/* Lock-In Pass Widget (own profile only) */}
+        {isOwnProfile && (
+          <div className="px-4 md:px-8 mt-4">
+            <LockInPassAllowanceWidget />
+          </div>
+        )}
+
         {/* Palace Progress + Heatmap + Featured Gem (Above Tabs) */}
         <div className="px-4 md:px-8">
           {enhanced.loading ? (
