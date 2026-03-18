@@ -329,8 +329,8 @@ All colors MUST be HSL.
   --input: 150 8% 21%;
 }
 
-/* ===== Zen / Focus Mode ===== */
-[data-zen-mode="true"] .zen-hideable {
+/* ===== Focus Mode ===== */
+[data-focus-mode="true"] .zen-hideable {
   display: none !important;
 }
 
