@@ -236,15 +236,21 @@ export function DailyAudioDevotional() {
                 </div>
               </div>
             ) : (
-              <Button
-                variant="outline"
-                size="default"
-                className="text-xs sm:text-sm text-amber-400 hover:text-amber-300 border-amber-400/30 hover:border-amber-400/50 hover:bg-amber-400/10 w-full py-2.5"
-                onClick={() => setShowSmsForm(true)}
-              >
-                <Phone className="h-4 w-4 mr-1.5" />
-                Get daily devotional via SMS
-              </Button>
+              <div className="space-y-2">
+                <div className="bg-amber-500/15 border border-amber-400/30 rounded-lg p-3 text-center">
+                  <p className="text-xs sm:text-sm text-amber-200 mb-2 font-medium">
+                    📲 Never miss a devotional — get it sent to your phone every morning!
+                  </p>
+                  <Button
+                    size="default"
+                    className="bg-amber-500 hover:bg-amber-400 text-black font-bold gap-2 px-6 py-2.5 text-sm sm:text-base shadow-md shadow-amber-500/20 w-full"
+                    onClick={() => setShowSmsForm(true)}
+                  >
+                    <Phone className="h-4 w-4" />
+                    Subscribe to Daily SMS Devotional
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
         )}

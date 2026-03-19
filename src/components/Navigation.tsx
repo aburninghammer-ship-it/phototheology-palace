@@ -163,6 +163,7 @@ export const Navigation = () => {
               <GlobalSearch />
               {user && <ShareableProgressCard />}
               <PWAInstallButton />
+              <FocusModeToggle />
               <ThemeToggle />
 
               {/* Admin-only Live Demo Link */}
