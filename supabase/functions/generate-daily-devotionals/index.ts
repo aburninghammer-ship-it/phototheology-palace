@@ -20,8 +20,20 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const body = await req.json().catch(() => ({}));
-    const batchStart = body.batchStart || 1;
-    const batchSize = body.batchSize || 10;
+    const batchSize = body.batchSize || 3;
+
+    // Auto-detect next batch: find highest existing day and start after it
+    let batchStart = body.batchStart;
+    if (!batchStart) {
+      const { data: maxRow } = await supabase
+        .from("daily_audio_devotionals")
+        .select("day_number")
+        .in("status", ["text_ready", "generating_audio", "ready"])
+        .order("day_number", { ascending: false })
+        .limit(1)
+        .single();
+      batchStart = maxRow ? maxRow.day_number + 1 : 1;
+    }
     const batchEnd = Math.min(batchStart + batchSize - 1, 365);
 
     console.log(`[DailyDevotional] Generating days ${batchStart}-${batchEnd}`);
