@@ -122,10 +122,24 @@ serve(async (req) => {
         }
 
         const data = await response.json();
+        
+        // Check if output was truncated
+        const finishReason = data.choices?.[0]?.finish_reason;
+        if (finishReason === 'length') {
+          console.warn(`[DailyDevotional] Day ${dayNum}: output truncated (finish_reason=length)`);
+        }
+        
         const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
         if (!toolCall) throw new Error("No tool call in response");
 
         const devotional = JSON.parse(toolCall.function.arguments);
+        
+        // Validate devotional text isn't truncated (must be >500 chars and end properly)
+        const devText = (devotional.devotional_text || '').trim();
+        const isTruncated = devText.length < 500 || !/[.!?"')\n]$/.test(devText);
+        if (isTruncated) {
+          throw new Error(`Devotional text appears truncated (${devText.length} chars, ending: "${devText.slice(-40)}")`);
+        }
 
         await supabase
           .from("daily_audio_devotionals")
