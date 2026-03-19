@@ -3666,14 +3666,17 @@ export type Database = {
       }
       daily_audio_devotionals: {
         Row: {
+          app_feature_cta: string | null
           audio_duration_seconds: number | null
           audio_storage_path: string | null
           audio_url: string | null
+          call_to_action: string | null
           created_at: string | null
           day_number: number
           devotional_text: string
           error_message: string | null
           id: string
+          palace_room: string | null
           prayer: string | null
           scripture_reference: string
           scripture_text: string | null
@@ -3682,14 +3685,17 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          app_feature_cta?: string | null
           audio_duration_seconds?: number | null
           audio_storage_path?: string | null
           audio_url?: string | null
+          call_to_action?: string | null
           created_at?: string | null
           day_number: number
           devotional_text: string
           error_message?: string | null
           id?: string
+          palace_room?: string | null
           prayer?: string | null
           scripture_reference: string
           scripture_text?: string | null
@@ -3698,14 +3704,17 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          app_feature_cta?: string | null
           audio_duration_seconds?: number | null
           audio_storage_path?: string | null
           audio_url?: string | null
+          call_to_action?: string | null
           created_at?: string | null
           day_number?: number
           devotional_text?: string
           error_message?: string | null
           id?: string
+          palace_room?: string | null
           prayer?: string | null
           scripture_reference?: string
           scripture_text?: string | null

@@ -71,6 +71,22 @@ serve(async (req) => {
         continue;
       }
 
+      // Get the user's display name from profiles
+      let userName = "friend";
+      if (sub.user_id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("display_name, username")
+          .eq("id", sub.user_id)
+          .single();
+        
+        if (profile) {
+          // Use first name only (split display_name on space)
+          const displayName = profile.display_name || profile.username || "";
+          userName = displayName.split(" ")[0] || "friend";
+        }
+      }
+
       // Get today's devotional
       const dayNumber = sub.current_day || 1;
       const { data: devotional } = await supabase
@@ -86,12 +102,17 @@ serve(async (req) => {
         continue;
       }
 
-      // Build SMS with audio link
+      // Build personalized SMS with CTA
       const appUrl = "https://phototheology-palace.lovable.app";
-      const smsBody = `📖 Day ${dayNumber}: ${devotional.title}\n` +
+      const cta = devotional.call_to_action 
+        ? `\n💡 ${devotional.call_to_action.replace(/\{\{name\}\}/g, userName)}`
+        : "";
+      
+      const smsBody = `📖 ${userName}, Day ${dayNumber}: ${devotional.title}\n` +
         `🎧 Listen: ${appUrl}/daily-devotional\n` +
-        `"${devotional.scripture_reference}"\n` +
-        `-Phototheology Palace`;
+        `"${devotional.scripture_reference}"` +
+        cta +
+        `\n-Phototheology Palace`;
 
       const phoneNumber = `${sub.phone_country_code}${sub.phone_number}`;
       const sendResult = await sendSNSSMS(awsAccessKeyId, awsSecretAccessKey, awsRegion, phoneNumber, smsBody);
@@ -123,6 +144,7 @@ serve(async (req) => {
       results.details.push({
         subscriber: sub.id,
         day: dayNumber,
+        userName,
         status: sendResult.success ? "sent" : "failed",
         error: sendResult.errorMessage,
       });
