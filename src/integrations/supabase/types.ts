@@ -20742,6 +20742,7 @@ export type Database = {
         Returns: undefined
       }
       can_access_youth_member: { Args: { _group_id: string }; Returns: boolean }
+      check_lock_in_pass: { Args: { _token: string }; Returns: Json }
       cleanup_abandoned_signups: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_typing_indicators: { Args: never; Returns: undefined }
@@ -20993,6 +20994,14 @@ export type Database = {
       }
       redeem_lock_in_pass:
         | { Args: { _token: string }; Returns: Json }
+        | {
+            Args: {
+              _guest_email?: string
+              _guest_name?: string
+              _token: string
+            }
+            Returns: Json
+          }
         | {
             Args: { _token: string; _user_id_or_fingerprint: string }
             Returns: Json
