@@ -27,7 +27,7 @@ export function GoalsSurveyBanner() {
       if (cancelled) return;
       // Show if survey not completed and no goals set
       const completed = (data as any)?.goals_survey_completed;
-      const hasGoals = ((data?.preferred_features as string[]) ?? []).length > 0;
+      const hasGoals = (((data as any)?.preferred_features as string[]) ?? []).length > 0;
       if (!completed && !hasGoals) {
         setShow(true);
       }

@@ -12473,7 +12473,6 @@ export type Database = {
           gamma_api_key: string | null
           gamma_api_key_encrypted: string | null
           gem_creation_streak: number | null
-          goals_survey_completed: boolean | null
           guided_path_completed_at: string | null
           guided_path_step: number | null
           has_achieved_first_win: boolean | null
@@ -12556,7 +12555,6 @@ export type Database = {
           gamma_api_key?: string | null
           gamma_api_key_encrypted?: string | null
           gem_creation_streak?: number | null
-          goals_survey_completed?: boolean | null
           guided_path_completed_at?: string | null
           guided_path_step?: number | null
           has_achieved_first_win?: boolean | null
@@ -12639,7 +12637,6 @@ export type Database = {
           gamma_api_key?: string | null
           gamma_api_key_encrypted?: string | null
           gem_creation_streak?: number | null
-          goals_survey_completed?: boolean | null
           guided_path_completed_at?: string | null
           guided_path_step?: number | null
           has_achieved_first_win?: boolean | null
