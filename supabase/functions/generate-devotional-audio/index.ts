@@ -159,7 +159,8 @@ function buildAudioScript(devotional: any): string {
   if (devotional.prayer) {
     parts.push(`Let us pray. ${devotional.prayer}`);
   }
-  return parts.join("\n");
+  // Replace {{name}} with "friend" for the generic audio version
+  return parts.join("\n").replace(/\{\{name\}\}/g, "friend");
 }
 
 function splitIntoChunks(text: string, maxLen: number): string[] {
