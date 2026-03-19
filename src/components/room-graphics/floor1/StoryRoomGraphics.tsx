@@ -3,7 +3,7 @@ import React from 'react';
 // Story Room Method Flowchart
 export function StoryRoomFlowchart() {
   return (
-    <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 800 520" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="sr-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#EFF6FF" />
@@ -30,7 +30,7 @@ export function StoryRoomFlowchart() {
         </filter>
       </defs>
 
-      <rect width="800" height="500" fill="url(#sr-bg)" rx="16" />
+      <rect width="800" height="520" fill="url(#sr-bg)" rx="16" />
 
       <text x="400" y="40" textAnchor="middle" fill="#1E40AF" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Story Room Method: Beat Mapping
@@ -71,14 +71,16 @@ export function StoryRoomFlowchart() {
 
       {/* Key Principles Box */}
       <g filter="url(#sr-shadow)">
-        <rect x="30" y="350" width="740" height="130" rx="12" fill="white" fillOpacity="0.95" stroke="#3B82F6" strokeWidth="2" />
+        <rect x="30" y="350" width="740" height="150" rx="12" fill="white" fillOpacity="0.95" stroke="#3B82F6" strokeWidth="2" />
         <rect x="30" y="350" width="740" height="35" rx="12" fill="url(#sr-header)" />
         <text x="400" y="375" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" letterSpacing="0.5">KEY PRINCIPLES</text>
-        <text x="50" y="410" fill="#374151" fontSize="13">Beats are like film shots—each freezes a distinct moment</text>
-        <text x="50" y="435" fill="#374151" fontSize="13">Use CONCRETE nouns (Altar, River) over abstractions (Crisis, Decision)</text>
-        <text x="50" y="460" fill="#374151" fontSize="13">Chronology is king—if you mix up order, you've failed</text>
-        <text x="450" y="410" fill="#374151" fontSize="13">Goal is MEMORABLE, not comprehensive</text>
-        <text x="450" y="435" fill="#374151" fontSize="13">7+ beats = covering too much ground</text>
+        <text x="50" y="410" fill="#374151" fontSize="12">Beats are like film shots—each freezes a distinct moment</text>
+        <text x="50" y="432" fill="#374151" fontSize="12">Use CONCRETE nouns (Altar, River) not abstractions</text>
+        <text x="50" y="454" fill="#374151" fontSize="12">Chronology is king—mix up order and you've failed</text>
+        <text x="430" y="410" fill="#374151" fontSize="12">Goal is MEMORABLE, not comprehensive</text>
+        <text x="430" y="432" fill="#374151" fontSize="12">7+ beats = covering too much ground</text>
+        {/* Divider line between columns */}
+        <line x1="415" y1="395" x2="415" y2="470" stroke="#CBD5E1" strokeWidth="1" />
       </g>
     </svg>
   );

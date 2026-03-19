@@ -66,6 +66,7 @@ const GiftRedeem = lazy(() => import("./pages/GiftRedeem"));
 const DayPassRedeem = lazy(() => import("./pages/DayPassRedeem"));
 const LockInRedeem = lazy(() => import("./pages/LockInRedeem"));
 const GuestPassTracker = lazy(() => import("./pages/GuestPassTracker"));
+const GoalsSurveyPage = lazy(() => import("./pages/GoalsSurveyPage"));
 
 // Lazy load all other pages
 const Palace = lazy(() => import("./pages/Palace"));
@@ -464,6 +465,7 @@ function App() {
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/gatehouse" element={<Gatehouse />} />
             <Route path="/antechamber" element={<ProtectedRoute><Antechamber /></ProtectedRoute>} />
+            <Route path="/goals-survey" element={<ProtectedRoute><GoalsSurveyPage /></ProtectedRoute>} />
             <Route path="/access" element={
               <ProtectedRoute>
                 <AccessCode />

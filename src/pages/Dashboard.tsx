@@ -47,6 +47,7 @@ import { FeatureHighlights } from "@/components/FeatureHighlights";
 import { SermonForgeWidget } from "@/components/dashboard/SermonForgeWidget";
 import { ResearchAssistantWidget } from "@/components/dashboard/ResearchAssistantWidget";
 import { WeeklyChallengeWidget, WinnerBanner } from "@/components/weekly-challenge";
+import { GoalsSurveyBanner } from "@/components/goals-survey/GoalsSurveyBanner";
 
 interface DashboardStats {
   dailyStreak: number;
@@ -208,6 +209,8 @@ export default function Dashboard() {
             <p className="text-sm md:text-base text-foreground/80">{t('dashboard.learningProgress')}</p>
           </div>
         </div>
+
+        <GoalsSurveyBanner />
 
         <div className="mb-8">
           <IdentityLoopWidget />
