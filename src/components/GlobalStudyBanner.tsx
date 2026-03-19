@@ -395,8 +395,8 @@ function LockInPassChip() {
   return (
     <Link
       to="/gift"
-      aria-label={`${passesRemaining} 5 Day Guest ${passesRemaining === 1 ? "Pass" : "Passes"}`}
-      title="Open 5 Day Guest Passes"
+      aria-label={`${passesRemaining} Five Day Guest ${passesRemaining === 1 ? "Pass" : "Passes"}`}
+      title="Open Five Day Guest Passes"
     >
       <motion.div
         animate={{
