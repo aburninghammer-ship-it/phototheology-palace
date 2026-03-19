@@ -34,8 +34,7 @@ export default function LockInRedeem() {
   useEffect(() => {
     if (!token) return;
     // Use RPC to check pass status (bypasses RLS issues for authenticated users)
-    supabase
-      .rpc("check_lock_in_pass", { _token: token })
+    (supabase.rpc as any)("check_lock_in_pass", { _token: token })
       .then(({ data, error }: any) => {
         if (error || !data) {
           // Fallback: try direct query (works for anon users)
