@@ -23,8 +23,9 @@ export function DailyAudioDevotional() {
   const [showText, setShowText] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<number>(0);
+  const hasDevotional = Boolean(devotional);
+  const hasAudio = Boolean(devotional?.audio_url);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -47,7 +48,6 @@ export function DailyAudioDevotional() {
       return;
     }
 
-    // Stop all other audio first
     globalAudioManager.stopAll();
 
     if (!audioRef.current || audioRef.current.src !== devotional.audio_url) {
@@ -115,11 +115,8 @@ export function DailyAudioDevotional() {
     );
   }
 
-  if (!devotional) return null;
-
   return (
     <Card className="border-amber-400/40 bg-gradient-to-br from-amber-950/50 to-amber-900/30 overflow-hidden shadow-lg shadow-amber-500/10 ring-1 ring-amber-400/20">
-      {/* Progress bar */}
       {isPlaying && (
         <div className="h-1.5 bg-amber-900/30">
           <div
@@ -130,7 +127,7 @@ export function DailyAudioDevotional() {
       )}
 
       <CardHeader className="pb-3 pt-5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-full bg-amber-400/20">
               <Volume2 className="h-4 w-4 text-amber-400" />
@@ -139,52 +136,62 @@ export function DailyAudioDevotional() {
               Daily Audio Devotional
             </span>
           </div>
-          <Badge variant="outline" className="text-amber-300 border-amber-300/40 text-xs sm:text-sm bg-amber-400/10">
-            Day {devotional.day_number}
-          </Badge>
+          {hasDevotional ? (
+            <Badge variant="outline" className="text-amber-300 border-amber-300/40 text-xs sm:text-sm bg-amber-400/10">
+              Day {devotional.day_number}
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-amber-300 border-amber-300/40 text-xs sm:text-sm bg-amber-400/10">
+              Coming Soon
+            </Badge>
+          )}
         </div>
         <CardTitle className="text-lg sm:text-xl text-foreground leading-snug pt-1">
-          {devotional.title}
+          {devotional?.title ?? "Get daily audio devotionals on your phone"}
         </CardTitle>
-        {devotional.scripture_reference && (
+        {devotional?.scripture_reference ? (
           <p className="text-sm sm:text-base text-amber-300/80 italic">
             {devotional.scripture_reference}
+          </p>
+        ) : (
+          <p className="text-sm sm:text-base text-amber-200/80 leading-relaxed">
+            Today’s audio is still being prepared, but you can already subscribe for daily devotional SMS delivery.
           </p>
         )}
       </CardHeader>
 
       <CardContent className="space-y-4 pb-5">
-        {/* Play button + duration */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Button
             onClick={togglePlay}
             size="default"
             className="bg-amber-500 hover:bg-amber-400 text-black font-bold gap-2 px-5 py-2.5 text-sm sm:text-base shadow-md shadow-amber-500/20 transition-all hover:shadow-lg hover:shadow-amber-500/30"
-            disabled={!devotional.audio_url}
+            disabled={!hasAudio}
           >
             {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-            {isPlaying ? "Pause" : "Listen Now"}
+            {isPlaying ? "Pause" : hasAudio ? "Listen Now" : "Audio Pending"}
           </Button>
 
-          {devotional.audio_duration_seconds && (
+          {devotional?.audio_duration_seconds && (
             <span className="text-xs sm:text-sm text-muted-foreground">
               {formatDuration(devotional.audio_duration_seconds)}
             </span>
           )}
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowText(!showText)}
-            className="ml-auto text-amber-400/80 hover:text-amber-300 gap-1.5 text-sm"
-          >
-            <BookOpen className="h-4 w-4" />
-            {showText ? "Hide" : "Read"}
-          </Button>
+          {hasDevotional && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowText(!showText)}
+              className="ml-auto text-amber-400/80 hover:text-amber-300 gap-1.5 text-sm"
+            >
+              <BookOpen className="h-4 w-4" />
+              {showText ? "Hide" : "Read"}
+            </Button>
+          )}
         </div>
 
-        {/* Expandable text */}
-        {showText && (
+        {showText && devotional && (
           <div className="text-sm sm:text-base text-muted-foreground space-y-3 pt-3 border-t border-amber-200/15">
             {devotional.scripture_text && (
               <blockquote className="border-l-2 border-amber-400/50 pl-3 italic text-amber-200/80 leading-relaxed">
@@ -198,13 +205,12 @@ export function DailyAudioDevotional() {
           </div>
         )}
 
-        {/* SMS subscription */}
         {user && (
           <div className="pt-3 border-t border-amber-200/15">
             {loadingSub ? (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             ) : subscription?.is_active ? (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <span className="text-xs sm:text-sm text-green-400 flex items-center gap-1.5 font-medium">
                   <Phone className="h-3.5 w-3.5" /> SMS active
                 </span>

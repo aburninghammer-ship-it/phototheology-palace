@@ -21,6 +21,7 @@ import { PathBanner, PathDashboardWidget } from "@/components/path";
 import { QuickNotes } from "@/components/notes/QuickNotes";
 import { CommunityHighlight } from "@/components/dashboard/CommunityHighlight";
 import { QuickAIPrompt } from "@/components/dashboard/QuickAIPrompt";
+import { DailyAudioDevotional } from "@/components/DailyAudioDevotional";
 import { Brain, Building2, Headphones, Calendar, Volume2 } from "lucide-react";
 import {
   BookOpen,
@@ -210,6 +211,10 @@ export default function Dashboard() {
 
         <div className="mb-8">
           <IdentityLoopWidget />
+        </div>
+
+        <div className="mb-8">
+          <DailyAudioDevotional />
         </div>
 
         <LockInConversionBanner />
