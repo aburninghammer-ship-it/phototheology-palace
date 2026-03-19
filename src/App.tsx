@@ -771,14 +771,16 @@ function App() {
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
                   {!isWorkspacePane && (
-                    <DraggableWidgetStack>
-                      <AmbientMusicPlayer minimal />
-                      <JeevesWidget />
-                      <ReginaldButler />
-                    </DraggableWidgetStack>
+                    <div className="zen-hideable">
+                      <DraggableWidgetStack>
+                        <AmbientMusicPlayer minimal />
+                        <JeevesWidget />
+                        <ReginaldButler />
+                      </DraggableWidgetStack>
+                    </div>
                   )}
                   {!isWorkspacePane && <LiveChatSidebar />}
-                  {!isWorkspacePane && <LiveChatToggle />}
+                  {!isWorkspacePane && <div className="zen-hideable"><LiveChatToggle /></div>}
                 </div>
               </ChangeManagerProvider>
               </SidebarProvider>
