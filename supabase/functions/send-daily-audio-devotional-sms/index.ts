@@ -15,6 +15,7 @@ serve(async (req) => {
     const awsAccessKeyId = Deno.env.get("AWS_ACCESS_KEY_ID") ?? "";
     const awsSecretAccessKey = Deno.env.get("AWS_SECRET_ACCESS_KEY") ?? "";
     const awsRegion = Deno.env.get("AWS_REGION") ?? "us-east-1";
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") ?? "";
 
     if (!awsAccessKeyId || !awsSecretAccessKey) {
       throw new Error("Missing AWS credentials");
@@ -81,7 +82,6 @@ serve(async (req) => {
           .single();
         
         if (profile) {
-          // Use first name only (split display_name on space)
           const displayName = profile.display_name || profile.username || "";
           userName = displayName.split(" ")[0] || "friend";
         }
@@ -102,14 +102,31 @@ serve(async (req) => {
         continue;
       }
 
+      // Generate personalized audio intro clip for this subscriber
+      let personalizedAudioUrl: string | null = null;
+      if (OPENAI_API_KEY && userName !== "friend") {
+        try {
+          personalizedAudioUrl = await generatePersonalizedIntro(
+            supabase, OPENAI_API_KEY, sub.id, dayNumber, userName, devotional.title
+          );
+        } catch (introErr: any) {
+          console.warn(`[AudioDevSMS] Intro generation failed for ${sub.id}: ${introErr.message}`);
+        }
+      }
+
       // Build personalized SMS with CTA
       const appUrl = "https://phototheology-palace.lovable.app";
       const cta = devotional.call_to_action 
         ? `\n💡 ${devotional.call_to_action.replace(/\{\{name\}\}/g, userName)}`
         : "";
       
+      // Link to personalized audio if available, otherwise main devotional
+      const listenUrl = personalizedAudioUrl
+        ? `${appUrl}/daily-devotional?intro=${encodeURIComponent(personalizedAudioUrl)}`
+        : `${appUrl}/daily-devotional`;
+
       const smsBody = `📖 ${userName}, Day ${dayNumber}: ${devotional.title}\n` +
-        `🎧 Listen: ${appUrl}/daily-devotional\n` +
+        `🎧 Listen: ${listenUrl}\n` +
         `"${devotional.scripture_reference}"` +
         cta +
         `\n-Phototheology Palace`;
@@ -130,7 +147,6 @@ serve(async (req) => {
       });
 
       if (sendResult.success) {
-        // Advance day (wrap at 365)
         const nextDay = dayNumber >= 365 ? 1 : dayNumber + 1;
         await supabase
           .from("daily_devotional_sms_subscribers")
@@ -145,6 +161,7 @@ serve(async (req) => {
         subscriber: sub.id,
         day: dayNumber,
         userName,
+        hasPersonalizedIntro: !!personalizedAudioUrl,
         status: sendResult.success ? "sent" : "failed",
         error: sendResult.errorMessage,
       });
@@ -163,6 +180,86 @@ serve(async (req) => {
     );
   }
 });
+
+/**
+ * Generate a short personalized intro clip (~5 seconds) with the subscriber's name.
+ * E.g. "Good morning, David! Here's your devotional for today."
+ * Cached per subscriber+day so re-runs don't regenerate.
+ */
+async function generatePersonalizedIntro(
+  supabase: any,
+  openaiKey: string,
+  subscriberId: string,
+  dayNumber: number,
+  userName: string,
+  devotionalTitle: string,
+): Promise<string | null> {
+  const storagePath = `intros/${subscriberId}/day-${String(dayNumber).padStart(3, "0")}.mp3`;
+
+  // Check if already generated
+  const { data: existing } = supabase.storage
+    .from("daily-devotional-audio")
+    .getPublicUrl(storagePath);
+
+  // Quick existence check via HEAD
+  try {
+    const headResp = await fetch(existing.publicUrl, { method: "HEAD" });
+    if (headResp.ok) {
+      console.log(`[AudioDevSMS] Intro already exists for ${subscriberId} day ${dayNumber}`);
+      return existing.publicUrl;
+    }
+  } catch { /* not found, generate */ }
+
+  // Pick a greeting based on time of day variety
+  const greetings = [
+    `Good morning, ${userName}! Here's your devotional for today.`,
+    `Hey ${userName}! Take a moment with God's Word today.`,
+    `${userName}, God has something special for you today. Let's listen.`,
+    `Welcome back, ${userName}! Day ${dayNumber}: ${devotionalTitle}.`,
+    `${userName}, pause for just a few minutes. God is speaking to you today.`,
+  ];
+  const introText = greetings[dayNumber % greetings.length];
+
+  // Generate short TTS clip
+  const ttsResponse = await fetch("https://api.openai.com/v1/audio/speech", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${openaiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "tts-1",
+      input: introText,
+      voice: "nova",
+      response_format: "mp3",
+      speed: 1.0,
+    }),
+  });
+
+  if (!ttsResponse.ok) {
+    const errText = await ttsResponse.text();
+    throw new Error(`TTS intro failed: ${ttsResponse.status} - ${errText}`);
+  }
+
+  const audioBuffer = new Uint8Array(await ttsResponse.arrayBuffer());
+
+  // Upload to storage
+  const { error: uploadError } = await supabase.storage
+    .from("daily-devotional-audio")
+    .upload(storagePath, audioBuffer, {
+      contentType: "audio/mpeg",
+      upsert: true,
+    });
+
+  if (uploadError) throw uploadError;
+
+  const { data: urlData } = supabase.storage
+    .from("daily-devotional-audio")
+    .getPublicUrl(storagePath);
+
+  console.log(`[AudioDevSMS] Generated intro for ${userName} day ${dayNumber}`);
+  return urlData.publicUrl;
+}
 
 function getHourInTimezone(date: Date, timezone: string): number {
   try {

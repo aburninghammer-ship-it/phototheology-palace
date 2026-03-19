@@ -10,45 +10,42 @@ import { useAuth } from "@/hooks/useAuth";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { globalAudioManager } from "@/lib/globalAudioManager";
 import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from "@/lib/mediaSessionHelper";
+import { useSearchParams } from "react-router-dom";
 
 export function DailyAudioDevotional() {
   const { user } = useAuth();
   const { data: devotional, isLoading: loadingDev } = useTodayDevotional();
   const { subscription, isLoading: loadingSub, subscribe, unsubscribe } = useDevotionalSmsSubscription();
+  const [searchParams] = useSearchParams();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showSmsForm, setShowSmsForm] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showText, setShowText] = useState(false);
+  const [playingIntro, setPlayingIntro] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const introAudioRef = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<number>(0);
   const hasDevotional = Boolean(devotional);
   const hasAudio = Boolean(devotional?.audio_url);
+  const introUrl = searchParams.get("intro");
 
   useEffect(() => {
     return () => {
       if (audioRef.current) {
         globalAudioManager.unregister(audioRef.current);
         audioRef.current.pause();
-        clearMediaSession();
       }
+      if (introAudioRef.current) {
+        introAudioRef.current.pause();
+      }
+      clearMediaSession();
     };
   }, []);
 
-  const togglePlay = useCallback(() => {
+  const playMainAudio = useCallback(() => {
     if (!devotional?.audio_url) return;
-
-    if (isPlaying && audioRef.current) {
-      audioRef.current.pause();
-      globalAudioManager.unregister(audioRef.current);
-      setIsPlaying(false);
-      notifyTTSStopped();
-      updateMediaSessionPlaybackState("paused");
-      return;
-    }
-
-    globalAudioManager.stopAll();
 
     if (!audioRef.current || audioRef.current.src !== devotional.audio_url) {
       audioRef.current = new Audio(devotional.audio_url);
@@ -79,8 +76,7 @@ export function DailyAudioDevotional() {
 
     audioRef.current.play().then(() => {
       globalAudioManager.register(audioRef.current!);
-      setIsPlaying(true);
-      notifyTTSStarted();
+      setPlayingIntro(false);
       setupMediaSession({
         title: devotional.title,
         artist: "Phototheology Palace",
@@ -90,7 +86,53 @@ export function DailyAudioDevotional() {
       });
       updateMediaSessionPlaybackState("playing");
     }).catch(console.error);
-  }, [devotional, isPlaying]);
+  }, [devotional]);
+
+  const togglePlay = useCallback(() => {
+    if (!devotional?.audio_url) return;
+
+    if (isPlaying && audioRef.current) {
+      audioRef.current.pause();
+      globalAudioManager.unregister(audioRef.current);
+      setIsPlaying(false);
+      notifyTTSStopped();
+      updateMediaSessionPlaybackState("paused");
+      return;
+    }
+
+    if (playingIntro && introAudioRef.current) {
+      introAudioRef.current.pause();
+      setPlayingIntro(false);
+      setIsPlaying(false);
+      notifyTTSStopped();
+      return;
+    }
+
+    globalAudioManager.stopAll();
+    setIsPlaying(true);
+    notifyTTSStarted();
+
+    // If there's a personalized intro URL, play it first
+    if (introUrl) {
+      setPlayingIntro(true);
+      introAudioRef.current = new Audio(introUrl);
+      introAudioRef.current.onended = () => {
+        setPlayingIntro(false);
+        playMainAudio();
+      };
+      introAudioRef.current.onerror = () => {
+        // If intro fails, just play the main audio
+        setPlayingIntro(false);
+        playMainAudio();
+      };
+      introAudioRef.current.play().catch(() => {
+        setPlayingIntro(false);
+        playMainAudio();
+      });
+    } else {
+      playMainAudio();
+    }
+  }, [devotional, isPlaying, playingIntro, introUrl, playMainAudio]);
 
   const handleSubscribe = () => {
     if (!phoneNumber.trim()) return;
