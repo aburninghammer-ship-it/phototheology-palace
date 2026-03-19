@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { globalAudioManager } from "@/lib/globalAudioManager";
 import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from "@/lib/mediaSessionHelper";
+import { useSearchParams } from "react-router-dom";
 
 export function DailyAudioDevotional() {
   const { user } = useAuth();
