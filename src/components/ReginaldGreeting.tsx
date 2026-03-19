@@ -112,6 +112,16 @@ export const ReginaldGreeting = () => {
     }
   }, []);
 
+  // Auto-play for returning users after a short delay
+  useEffect(() => {
+    if (!user || hasPlayed || isPlaying || isLoading) return;
+    // Small delay to let page settle and increase autoplay success
+    const timer = setTimeout(() => {
+      playGreeting();
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [user]); // intentionally only on mount
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
