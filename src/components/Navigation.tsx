@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { FocusModeToggle } from "@/components/FocusModeToggle";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { ShareableProgressCard } from "@/components/ShareableProgressCard";
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
