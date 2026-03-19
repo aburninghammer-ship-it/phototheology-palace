@@ -388,19 +388,22 @@ function App() {
                       <div className="min-h-screen flex flex-col w-full pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
                         {!isWorkspacePane && <>
                         <FontSizeControl />
-                        <AnnouncementBanner />
-                        <TrialUpgradePrompt variant="banner" />
-                        <ChangeSpineUpgradePrompt />
-                        <TrialUrgencyMessage />
-                        <VoiceChatInviteNotification />
-                        <LiveDemoNotification />
-                        <InstallPrompt />
-                        <ExitIntentPopup />
+                        <div className="zen-hideable">
+                          <AnnouncementBanner />
+                          <TrialUpgradePrompt variant="banner" />
+                          <ChangeSpineUpgradePrompt />
+                          <TrialUrgencyMessage />
+                          <VoiceChatInviteNotification />
+                          <LiveDemoNotification />
+                          <InstallPrompt />
+                          <ExitIntentPopup />
+                        </div>
                         {/* Session Mode Prompt Dialog */}
                         <SessionPromptDialog />
-                        {/* Floating Ambient Music Player - moved into widget stack */}
                         {/* Change Manager Guided Path Checklist */}
-                        <GuidedPathChecklist />
+                        <div className="zen-hideable">
+                          <GuidedPathChecklist />
+                        </div>
                         </>}
                         <div className="flex flex-1 w-full">
                           <MessagingSidebar />
@@ -768,14 +771,16 @@ function App() {
                   </div>
                   {!isWorkspacePane && <MobileBottomNav />}
                   {!isWorkspacePane && (
-                    <DraggableWidgetStack>
-                      <AmbientMusicPlayer minimal />
-                      <JeevesWidget />
-                      <ReginaldButler />
-                    </DraggableWidgetStack>
+                    <div className="zen-hideable">
+                      <DraggableWidgetStack>
+                        <AmbientMusicPlayer minimal />
+                        <JeevesWidget />
+                        <ReginaldButler />
+                      </DraggableWidgetStack>
+                    </div>
                   )}
                   {!isWorkspacePane && <LiveChatSidebar />}
-                  {!isWorkspacePane && <LiveChatToggle />}
+                  {!isWorkspacePane && <div className="zen-hideable"><LiveChatToggle /></div>}
                 </div>
               </ChangeManagerProvider>
               </SidebarProvider>
