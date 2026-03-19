@@ -36,24 +36,16 @@ export function DailyAudioDevotional() {
       if (audioRef.current) {
         globalAudioManager.unregister(audioRef.current);
         audioRef.current.pause();
-        clearMediaSession();
       }
+      if (introAudioRef.current) {
+        introAudioRef.current.pause();
+      }
+      clearMediaSession();
     };
   }, []);
 
-  const togglePlay = useCallback(() => {
+  const playMainAudio = useCallback(() => {
     if (!devotional?.audio_url) return;
-
-    if (isPlaying && audioRef.current) {
-      audioRef.current.pause();
-      globalAudioManager.unregister(audioRef.current);
-      setIsPlaying(false);
-      notifyTTSStopped();
-      updateMediaSessionPlaybackState("paused");
-      return;
-    }
-
-    globalAudioManager.stopAll();
 
     if (!audioRef.current || audioRef.current.src !== devotional.audio_url) {
       audioRef.current = new Audio(devotional.audio_url);
@@ -84,8 +76,7 @@ export function DailyAudioDevotional() {
 
     audioRef.current.play().then(() => {
       globalAudioManager.register(audioRef.current!);
-      setIsPlaying(true);
-      notifyTTSStarted();
+      setPlayingIntro(false);
       setupMediaSession({
         title: devotional.title,
         artist: "Phototheology Palace",
@@ -95,7 +86,53 @@ export function DailyAudioDevotional() {
       });
       updateMediaSessionPlaybackState("playing");
     }).catch(console.error);
-  }, [devotional, isPlaying]);
+  }, [devotional]);
+
+  const togglePlay = useCallback(() => {
+    if (!devotional?.audio_url) return;
+
+    if (isPlaying && audioRef.current) {
+      audioRef.current.pause();
+      globalAudioManager.unregister(audioRef.current);
+      setIsPlaying(false);
+      notifyTTSStopped();
+      updateMediaSessionPlaybackState("paused");
+      return;
+    }
+
+    if (playingIntro && introAudioRef.current) {
+      introAudioRef.current.pause();
+      setPlayingIntro(false);
+      setIsPlaying(false);
+      notifyTTSStopped();
+      return;
+    }
+
+    globalAudioManager.stopAll();
+    setIsPlaying(true);
+    notifyTTSStarted();
+
+    // If there's a personalized intro URL, play it first
+    if (introUrl) {
+      setPlayingIntro(true);
+      introAudioRef.current = new Audio(introUrl);
+      introAudioRef.current.onended = () => {
+        setPlayingIntro(false);
+        playMainAudio();
+      };
+      introAudioRef.current.onerror = () => {
+        // If intro fails, just play the main audio
+        setPlayingIntro(false);
+        playMainAudio();
+      };
+      introAudioRef.current.play().catch(() => {
+        setPlayingIntro(false);
+        playMainAudio();
+      });
+    } else {
+      playMainAudio();
+    }
+  }, [devotional, isPlaying, playingIntro, introUrl, playMainAudio]);
 
   const handleSubscribe = () => {
     if (!phoneNumber.trim()) return;
