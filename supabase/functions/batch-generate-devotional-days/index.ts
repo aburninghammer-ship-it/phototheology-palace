@@ -377,6 +377,12 @@ Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on t
 
   const day = days[0];
 
+  // Validate devotional text isn't truncated
+  const devText = (day.devotional_text || '').trim();
+  if (devText.length < 500 || !/[.!?"')\n]$/.test(devText)) {
+    return { success: false, error: `Devotional text appears truncated (${devText.length} chars)` };
+  }
+
   // Insert the generated day
   const { error: insertError } = await supabase.from("devotional_days").insert({
     plan_id: plan.id,
