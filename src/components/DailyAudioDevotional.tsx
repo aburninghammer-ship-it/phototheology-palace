@@ -16,16 +16,20 @@ export function DailyAudioDevotional() {
   const { user } = useAuth();
   const { data: devotional, isLoading: loadingDev } = useTodayDevotional();
   const { subscription, isLoading: loadingSub, subscribe, unsubscribe } = useDevotionalSmsSubscription();
+  const [searchParams] = useSearchParams();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showSmsForm, setShowSmsForm] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showText, setShowText] = useState(false);
+  const [playingIntro, setPlayingIntro] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const introAudioRef = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<number>(0);
   const hasDevotional = Boolean(devotional);
   const hasAudio = Boolean(devotional?.audio_url);
+  const introUrl = searchParams.get("intro");
 
   useEffect(() => {
     return () => {
