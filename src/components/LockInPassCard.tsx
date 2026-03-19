@@ -36,7 +36,7 @@ export function LockInPassCard() {
 
       const result = data as any;
       if (result?.success) {
-        const prodOrigin = window.location.hostname.includes('lovable.app') || window.location.hostname === 'localhost'
+        const prodOrigin = window.location.hostname.includes('lovable') || window.location.hostname === 'localhost'
           ? 'https://phototheologybible.com'
           : window.location.origin;
         const link = `${prodOrigin}/lock-in/${result.pass_token}`;
