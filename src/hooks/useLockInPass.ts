@@ -151,8 +151,8 @@ export function useLockInMonthlyUsage() {
       return;
     }
 
-    // Count only passes that have been activated by a guest this month
-    // Shared-but-unused passes stay available to the user
+    // Count only passes that have been ACTIVATED by a guest this month
+    // Shared-but-unused passes do NOT count against the limit
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
