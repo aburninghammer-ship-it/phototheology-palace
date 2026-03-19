@@ -33,22 +33,46 @@ export default function LockInRedeem() {
 
   useEffect(() => {
     if (!token) return;
+    // Use RPC to check pass status (bypasses RLS issues for authenticated users)
     supabase
-      .from("lock_in_passes")
-      .select("status, expires_at, personal_message")
-      .eq("pass_token", token)
-      .single()
+      .rpc("check_lock_in_pass", { _token: token })
       .then(({ data, error }: any) => {
         if (error || !data) {
+          // Fallback: try direct query (works for anon users)
+          supabase
+            .from("lock_in_passes")
+            .select("status, expires_at, personal_message")
+            .eq("pass_token", token)
+            .single()
+            .then(({ data: fallbackData, error: fallbackError }: any) => {
+              if (fallbackError || !fallbackData) {
+                setStatus("error");
+                setErrorMsg("This Lock-In Pass link is invalid.");
+              } else if (fallbackData.status === "active") {
+                setStatus("ready");
+                setPersonalMessage(fallbackData.personal_message);
+              } else if (fallbackData.status === "redeemed" && fallbackData.expires_at && new Date(fallbackData.expires_at) > new Date()) {
+                setStatus("redeemed");
+                setExpiresAt(fallbackData.expires_at);
+                setPersonalMessage(fallbackData.personal_message);
+              } else {
+                setStatus("error");
+                setErrorMsg("This Lock-In Pass has expired or already been used.");
+              }
+            });
+          return;
+        }
+        const result = data as any;
+        if (result.status === "active") {
+          setStatus("ready");
+          setPersonalMessage(result.personal_message);
+        } else if (result.status === "redeemed" && result.expires_at && new Date(result.expires_at) > new Date()) {
+          setStatus("redeemed");
+          setExpiresAt(result.expires_at);
+          setPersonalMessage(result.personal_message);
+        } else if (result.status === "not_found") {
           setStatus("error");
           setErrorMsg("This Lock-In Pass link is invalid.");
-        } else if (data.status === "active") {
-          setStatus("ready");
-          setPersonalMessage(data.personal_message);
-        } else if (data.status === "redeemed" && data.expires_at && new Date(data.expires_at) > new Date()) {
-          setStatus("redeemed");
-          setExpiresAt(data.expires_at);
-          setPersonalMessage(data.personal_message);
         } else {
           setStatus("error");
           setErrorMsg("This Lock-In Pass has expired or already been used.");
@@ -64,23 +88,13 @@ export default function LockInRedeem() {
     }
 
     setActivating(true);
-    const fingerprint = `browser_${navigator.userAgent.length}_${screen.width}x${screen.height}_${new Date().getTimezoneOffset()}`;
 
     try {
-      // Save guest info before activating
-      await (supabase as any)
-        .from("lock_in_passes")
-        .update({
-          recipient_email: guestEmail.trim(),
-          guest_name: guestName.trim() || null,
-          conversion_status: "active",
-          last_active_at: new Date().toISOString(),
-        })
-        .eq("pass_token", token);
-
+      // Use a single RPC that handles redemption + guest info saving (bypasses RLS)
       const { data, error } = await supabase.rpc("redeem_lock_in_pass", {
         _token: token,
-        _user_id_or_fingerprint: fingerprint,
+        _guest_email: guestEmail.trim(),
+        _guest_name: guestName.trim() || null,
       });
 
       if (error) throw error;
@@ -96,7 +110,7 @@ export default function LockInRedeem() {
           origin: { y: 0.5 },
           colors: ["#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"],
         });
-        toast.success("Lock-In Pass activated! 🔥");
+        toast.success("Lock-In Pass activated!");
       } else {
         if (result?.already_active) {
           setStatus("redeemed");
