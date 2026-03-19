@@ -20,129 +20,120 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const body = await req.json().catch(() => ({}));
-    const batchStart = body.batchStart || 1;
-    const batchSize = body.batchSize || 5;
-    const voice = body.voice || "nova"; // OpenAI TTS voice
-    const batchEnd = Math.min(batchStart + batchSize - 1, 365);
+    const voice = body.voice || "nova";
 
-    console.log(`[DevotionalAudio] Generating audio for days ${batchStart}-${batchEnd}, voice: ${voice}`);
-
-    // Get devotionals that have text but no audio
+    // Process ONE devotional at a time to avoid timeouts
     const { data: devotionals, error } = await supabase
       .from("daily_audio_devotionals")
       .select("*")
-      .gte("day_number", batchStart)
-      .lte("day_number", batchEnd)
-      .in("status", ["text_ready", "failed"]);
+      .in("status", ["text_ready", "failed"])
+      .order("day_number", { ascending: true })
+      .limit(1);
 
     if (error) throw error;
 
     if (!devotionals || devotionals.length === 0) {
       return new Response(
-        JSON.stringify({ message: "No devotionals need audio generation in this range" }),
+        JSON.stringify({ message: "No devotionals need audio generation" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const results: any[] = [];
+    const dev = devotionals[0];
+    console.log(`[DevotionalAudio] Generating audio for day ${dev.day_number}, voice: ${voice}`);
 
-    for (const dev of devotionals) {
+    await supabase
+      .from("daily_audio_devotionals")
+      .update({ status: "generating_audio", updated_at: new Date().toISOString() })
+      .eq("id", dev.id);
+
+    try {
+      const script = buildAudioScript(dev);
+      const chunks = splitIntoChunks(script, 4000);
+      const audioBuffers: Uint8Array[] = [];
+
+      for (const chunk of chunks) {
+        const ttsResponse = await fetch("https://api.openai.com/v1/audio/speech", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "tts-1-hd",
+            input: chunk,
+            voice: voice,
+            response_format: "mp3",
+            speed: 0.95,
+          }),
+        });
+
+        if (!ttsResponse.ok) {
+          const errText = await ttsResponse.text();
+          throw new Error(`OpenAI TTS error ${ttsResponse.status}: ${errText}`);
+        }
+
+        const arrayBuffer = await ttsResponse.arrayBuffer();
+        audioBuffers.push(new Uint8Array(arrayBuffer));
+      }
+
+      // Combine audio chunks
+      const totalLength = audioBuffers.reduce((sum, buf) => sum + buf.length, 0);
+      const combined = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const buf of audioBuffers) {
+        combined.set(buf, offset);
+        offset += buf.length;
+      }
+
+      // Upload to storage
+      const storagePath = `day-${String(dev.day_number).padStart(3, "0")}.mp3`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("daily-devotional-audio")
+        .upload(storagePath, combined, {
+          contentType: "audio/mpeg",
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("daily-devotional-audio")
+        .getPublicUrl(storagePath);
+
+      const wordCount = script.split(/\s+/).length;
+      const estimatedDuration = Math.round((wordCount / 150) * 60);
+
       await supabase
         .from("daily_audio_devotionals")
-        .update({ status: "generating_audio", updated_at: new Date().toISOString() })
+        .update({
+          audio_storage_path: storagePath,
+          audio_url: urlData.publicUrl,
+          audio_duration_seconds: estimatedDuration,
+          status: "ready",
+          error_message: null,
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", dev.id);
 
-      try {
-        // Build the full audio script
-        const script = buildAudioScript(dev);
+      console.log(`[DevotionalAudio] Day ${dev.day_number}: audio ready (${estimatedDuration}s)`);
 
-        // Split into chunks if needed (OpenAI TTS has a 4096 char limit)
-        const chunks = splitIntoChunks(script, 4000);
-        const audioBuffers: Uint8Array[] = [];
-
-        for (const chunk of chunks) {
-          const ttsResponse = await fetch("https://api.openai.com/v1/audio/speech", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${OPENAI_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "tts-1-hd",
-              input: chunk,
-              voice: voice,
-              response_format: "mp3",
-              speed: 0.95,
-            }),
-          });
-
-          if (!ttsResponse.ok) {
-            const errText = await ttsResponse.text();
-            throw new Error(`OpenAI TTS error ${ttsResponse.status}: ${errText}`);
-          }
-
-          const arrayBuffer = await ttsResponse.arrayBuffer();
-          audioBuffers.push(new Uint8Array(arrayBuffer));
-        }
-
-        // Combine audio chunks
-        const totalLength = audioBuffers.reduce((sum, buf) => sum + buf.length, 0);
-        const combined = new Uint8Array(totalLength);
-        let offset = 0;
-        for (const buf of audioBuffers) {
-          combined.set(buf, offset);
-          offset += buf.length;
-        }
-
-        // Upload to storage
-        const storagePath = `day-${String(dev.day_number).padStart(3, "0")}.mp3`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("daily-devotional-audio")
-          .upload(storagePath, combined, {
-            contentType: "audio/mpeg",
-            upsert: true,
-          });
-
-        if (uploadError) throw uploadError;
-
-        // Get public URL
-        const { data: urlData } = supabase.storage
-          .from("daily-devotional-audio")
-          .getPublicUrl(storagePath);
-
-        // Estimate duration (~150 words per minute for TTS)
-        const wordCount = script.split(/\s+/).length;
-        const estimatedDuration = Math.round((wordCount / 150) * 60);
-
-        await supabase
-          .from("daily_audio_devotionals")
-          .update({
-            audio_storage_path: storagePath,
-            audio_url: urlData.publicUrl,
-            audio_duration_seconds: estimatedDuration,
-            status: "ready",
-            error_message: null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", dev.id);
-
-        results.push({ day: dev.day_number, status: "ready", duration: estimatedDuration });
-        console.log(`[DevotionalAudio] Day ${dev.day_number}: audio ready (${estimatedDuration}s)`);
-      } catch (err: any) {
-        console.error(`[DevotionalAudio] Day ${dev.day_number} failed:`, err.message);
-        await supabase
-          .from("daily_audio_devotionals")
-          .update({ status: "failed", error_message: err.message, updated_at: new Date().toISOString() })
-          .eq("id", dev.id);
-        results.push({ day: dev.day_number, status: "failed", error: err.message });
-      }
+      return new Response(
+        JSON.stringify({ day: dev.day_number, status: "ready", duration: estimatedDuration }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    } catch (err: any) {
+      console.error(`[DevotionalAudio] Day ${dev.day_number} failed:`, err.message);
+      await supabase
+        .from("daily_audio_devotionals")
+        .update({ status: "failed", error_message: err.message, updated_at: new Date().toISOString() })
+        .eq("id", dev.id);
+      return new Response(
+        JSON.stringify({ day: dev.day_number, status: "failed", error: err.message }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
-
-    return new Response(
-      JSON.stringify({ processed: results.length, results }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
   } catch (error: any) {
     console.error("[DevotionalAudio] Error:", error);
     return new Response(
@@ -154,10 +145,8 @@ serve(async (req) => {
 
 function buildAudioScript(devotional: any): string {
   const parts: string[] = [];
-
   parts.push(`Day ${devotional.day_number}. ${devotional.title}.`);
   parts.push("");
-
   if (devotional.scripture_reference) {
     parts.push(`Today's scripture: ${devotional.scripture_reference}.`);
   }
@@ -165,24 +154,19 @@ function buildAudioScript(devotional: any): string {
     parts.push(`"${devotional.scripture_text}"`);
     parts.push("");
   }
-
   parts.push(devotional.devotional_text);
   parts.push("");
-
   if (devotional.prayer) {
     parts.push(`Let us pray. ${devotional.prayer}`);
   }
-
   return parts.join("\n");
 }
 
 function splitIntoChunks(text: string, maxLen: number): string[] {
   if (text.length <= maxLen) return [text];
-
   const chunks: string[] = [];
   const sentences = text.split(/(?<=[.!?])\s+/);
   let current = "";
-
   for (const sentence of sentences) {
     if ((current + " " + sentence).length > maxLen && current.length > 0) {
       chunks.push(current.trim());
@@ -192,6 +176,5 @@ function splitIntoChunks(text: string, maxLen: number): string[] {
     }
   }
   if (current.trim()) chunks.push(current.trim());
-
   return chunks;
 }
