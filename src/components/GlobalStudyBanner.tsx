@@ -470,7 +470,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
 
   return (
     <div className={cn(
-      "mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5 transition-opacity duration-700",
+      "mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5 transition-opacity duration-700 zen-hideable",
       isInactive && "opacity-80"
     )}>
       {/* Nudge bar */}
