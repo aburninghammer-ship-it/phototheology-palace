@@ -25,6 +25,7 @@ import { EmailCampaignHistory } from "@/components/admin/EmailCampaignHistory";
 import { RecentSubscribers } from "@/components/admin/RecentSubscribers";
 import { NewSignupsList } from "@/components/admin/NewSignupsList";
 import { DonationStats } from "@/components/admin/DonationStats";
+import { WinBackCampaignSender } from "@/components/admin/WinBackCampaignSender";
 import { SubscriptionDatabase } from "@/components/admin/SubscriptionDatabase";
 import { DailyGemMiner } from "@/components/admin/DailyGemMiner";
 import { AdminAiUsageDashboard } from "@/components/admin/AdminAiUsageDashboard";
