@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Cloud, CloudOff, Info, Lightbulb, Plus, Trash2, Edit3, X, Check, Search, Sparkles, ChevronDown, ChevronUp, Loader2, RefreshCw } from "lucide-react";
+import { Cloud, CloudOff, Info, Lightbulb, Plus, Trash2, Edit3, X, Check, Search, Sparkles, ChevronDown, ChevronUp, Loader2, RefreshCw, BookOpen } from "lucide-react";
 import { OpenAIAudioButton } from "@/components/audio/OpenAIAudioButton";
 import { toast } from "sonner";
 
@@ -414,16 +414,36 @@ const SermonIdeas = () => {
                           {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                         </Button>
                         {isExpanded && (
-                          <div className="flex justify-end mb-1 mt-2">
-                            <OpenAIAudioButton
-                              text={researchToNarration(idea.title, idea.jeevesResearch!)}
-                              voice="nova"
-                              variant="outline"
-                              size="sm"
-                              showLabel
-                              className="text-xs"
-                            />
-                          </div>
+                          <>
+                            <div className="flex items-center justify-between mb-1 mt-2 gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-xs text-muted-foreground hover:text-foreground"
+                                onClick={() => {
+                                  const el = document.getElementById(`narration_${idea.id}`);
+                                  if (el) el.classList.toggle("hidden");
+                                }}
+                              >
+                                <BookOpen className="h-3.5 w-3.5 mr-1" />
+                                Read Along
+                              </Button>
+                              <OpenAIAudioButton
+                                text={researchToNarration(idea.title, idea.jeevesResearch!)}
+                                voice="nova"
+                                variant="outline"
+                                size="sm"
+                                showLabel
+                                className="text-xs"
+                              />
+                            </div>
+                            <div
+                              id={`narration_${idea.id}`}
+                              className="hidden mt-2 p-4 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/40 rounded-lg max-h-[400px] overflow-y-auto text-sm leading-relaxed text-foreground/80 whitespace-pre-line"
+                            >
+                              {researchToNarration(idea.title, idea.jeevesResearch!)}
+                            </div>
+                          </>
                         )}
                         {isExpanded && (
                           <div className="mt-3 p-4 bg-muted/30 rounded-lg max-h-[600px] overflow-y-auto">
