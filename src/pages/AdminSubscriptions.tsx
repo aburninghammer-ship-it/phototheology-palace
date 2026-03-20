@@ -969,6 +969,31 @@ export default function AdminSubscriptions() {
         </TabsContent>
 
         <TabsContent value="campaigns" className="space-y-6">
+          {/* New Feature Highlight */}
+          <Card className="border-2 border-blue-500/60 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 relative overflow-hidden">
+            <div className="absolute top-3 right-3">
+              <Badge className="bg-blue-600 text-white text-xs px-2 py-0.5 animate-pulse">NEW</Badge>
+            </div>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                📝 Feature Highlight: Test Me — PT Diagnostic Assessment
+              </CardTitle>
+              <CardDescription>
+                Now included in the win-back email template
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm text-muted-foreground space-y-2">
+              <p>The <strong>"Test Me"</strong> diagnostic system is now highlighted in all outgoing win-back emails. Users will see:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>AI-powered assessments across 3 tiers (Master Exam, Foundation, Prophecy & Sanctuary)</li>
+                <li>Immediate per-question grading with "Lock In" mechanic</li>
+                <li>Personalized 7-day growth plans based on their diagnostic results</li>
+                <li>Competency labels and error-pattern analysis</li>
+              </ul>
+              <p className="text-xs text-muted-foreground/70 pt-1">This feature is accessible at <code>/test-me</code> for all premium users.</p>
+            </CardContent>
+          </Card>
+
           <WinBackCampaignSender />
           <EmailCampaignHistory />
           <EmailCampaignManager />
