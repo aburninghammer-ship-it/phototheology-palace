@@ -417,7 +417,7 @@ const SermonIdeas = () => {
                         {isExpanded && (
                           <div className="flex justify-end mb-1 mt-2">
                             <OpenAIAudioButton
-                              text={idea.jeevesResearch!}
+                              text={researchToNarration(idea.title, idea.jeevesResearch!)}
                               voice="nova"
                               variant="outline"
                               size="sm"
