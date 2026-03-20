@@ -1,4 +1,4 @@
-import { ExamQuestion } from "@/hooks/useMasterExam";
+import { ExamQuestion, QuestionGradeResult } from "@/hooks/useMasterExam";
 import { QuestionCard } from "./QuestionCard";
 import { QuestionNavigator } from "./QuestionNavigator";
 import { ExamTimer } from "./ExamTimer";
@@ -25,11 +25,17 @@ interface ExamActiveProps {
   flagged: Set<number>;
   timeRemaining: number;
   answeredCount: number;
+  gradedCount: number;
+  questionGrades: Record<number, QuestionGradeResult>;
+  gradingQuestionId: number | null;
+  challengingQuestionId: number | null;
   onSetCurrentIndex: (index: number) => void;
   onSetAnswer: (questionId: number, answer: string) => void;
   onToggleFlag: (questionId: number) => void;
   onSubmit: () => void;
   onAbandon: () => void;
+  onGradeQuestion: (questionId: number, answer: string) => void;
+  onChallengeQuestion: (questionId: number, reasoning: string) => void;
 }
 
 export function ExamActive({
@@ -39,11 +45,17 @@ export function ExamActive({
   flagged,
   timeRemaining,
   answeredCount,
+  gradedCount,
+  questionGrades,
+  gradingQuestionId,
+  challengingQuestionId,
   onSetCurrentIndex,
   onSetAnswer,
   onToggleFlag,
   onSubmit,
   onAbandon,
+  onGradeQuestion,
+  onChallengeQuestion,
 }: ExamActiveProps) {
   const [showNavigator, setShowNavigator] = useState(false);
   const currentQuestion = questions[currentIndex];
@@ -59,7 +71,10 @@ export function ExamActive({
         <ExamTimer timeRemaining={timeRemaining} />
 
         <div className="text-sm text-muted-foreground">
-          {answeredCount} / {questions.length} answered
+          {gradedCount > 0
+            ? `${gradedCount} graded · ${answeredCount} / ${questions.length} answered`
+            : `${answeredCount} / ${questions.length} answered`
+          }
         </div>
 
         <div className="flex gap-2">
@@ -82,13 +97,14 @@ export function ExamActive({
               <AlertDialogHeader>
                 <AlertDialogTitle>Submit Exam?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  You have answered {answeredCount} of {questions.length} questions.
+                  You have answered {answeredCount} of {questions.length} questions
+                  ({gradedCount} already graded).
                   {answeredCount < questions.length && (
                     <span className="block mt-2 text-amber-600 dark:text-amber-400">
                       {questions.length - answeredCount} questions are still unanswered.
                     </span>
                   )}
-                  This cannot be undone. Your exam will be graded by AI.
+                  This cannot be undone. Any ungraded questions will be graded now.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -109,14 +125,21 @@ export function ExamActive({
               currentIndex={currentIndex}
               answers={answers}
               flagged={flagged}
+              questionGrades={questionGrades}
               onSelect={onSetCurrentIndex}
             />
-            <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
+            <div className="flex gap-4 mt-3 text-xs text-muted-foreground flex-wrap">
               <span className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded bg-green-500/20 inline-block" /> Answered
+                <span className="w-3 h-3 rounded bg-green-500/30 inline-block" /> Correct
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded bg-amber-500/20 inline-block" /> Flagged
+                <span className="w-3 h-3 rounded bg-red-500/30 inline-block" /> Incorrect
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded bg-green-500/20 ring-2 ring-amber-400 inline-block" /> Challenged
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded bg-primary/15 inline-block" /> Answered
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 rounded bg-muted/50 inline-block" /> Unanswered
@@ -134,6 +157,12 @@ export function ExamActive({
         isFlagged={flagged.has(currentQuestion.id)}
         onToggleFlag={() => onToggleFlag(currentQuestion.id)}
         questionNumber={currentQuestion.id}
+        grade={questionGrades[currentQuestion.id]}
+        isGrading={gradingQuestionId === currentQuestion.id}
+        isChallenging={challengingQuestionId === currentQuestion.id}
+        onLockIn={() => onGradeQuestion(currentQuestion.id, answers[currentQuestion.id] || "")}
+        onChallenge={(reasoning) => onChallengeQuestion(currentQuestion.id, reasoning)}
+        onChangeAnswer={() => onSetAnswer(currentQuestion.id, answers[currentQuestion.id] || "")}
       />
 
       {/* Navigation buttons */}

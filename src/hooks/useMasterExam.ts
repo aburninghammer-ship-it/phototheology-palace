@@ -58,6 +58,15 @@ export interface GradingResults {
   exam_type?: string;
 }
 
+export interface QuestionGradeResult {
+  correct: boolean;
+  earned: number;
+  feedback: string;
+  challengeAccepted?: boolean;
+  challengeFeedback?: string;
+  challengeDenied?: boolean;
+}
+
 type ExamPhase = "intro" | "select_type" | "generating" | "active" | "submitting" | "results";
 
 export function useMasterExam() {
@@ -75,6 +84,11 @@ export function useMasterExam() {
   const [history, setHistory] = useState<ExamAttempt[]>([]);
   const [results, setResults] = useState<GradingResults | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Per-question grading state
+  const [questionGrades, setQuestionGrades] = useState<Record<number, QuestionGradeResult>>({});
+  const [gradingQuestionId, setGradingQuestionId] = useState<number | null>(null);
+  const [challengingQuestionId, setChallengingQuestionId] = useState<number | null>(null);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoSaveRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -136,7 +150,6 @@ export function useMasterExam() {
     setPhase("generating");
 
     try {
-      // Master exam uses original function, diagnostics use new one
       const functionName = examType === "master" ? "generate-master-exam" : "generate-diagnostic-exam";
       const body = examType === "master" ? undefined : { exam_type: examType };
 
@@ -156,6 +169,7 @@ export function useMasterExam() {
       setAnswers({});
       setCurrentIndex(0);
       setFlagged(new Set());
+      setQuestionGrades({});
       setTimeRemaining(data.time_limit_seconds || 5400);
       startTimeRef.current = Date.now();
       setPhase("active");
@@ -195,6 +209,25 @@ export function useMasterExam() {
       setAnswers(exam.user_answers || {});
       setCurrentIndex(0);
       setFlagged(new Set());
+
+      // Load per_question_grades from DB
+      const savedGrades = (exam.per_question_grades as Record<string, any>) || {};
+      const savedChallenges = (exam.challenge_data as Record<string, any>) || {};
+      const loadedGrades: Record<number, QuestionGradeResult> = {};
+
+      for (const [qId, grade] of Object.entries(savedGrades)) {
+        const challenge = savedChallenges[qId];
+        loadedGrades[Number(qId)] = {
+          correct: grade.correct,
+          earned: grade.earned,
+          feedback: grade.feedback,
+          challengeAccepted: challenge?.accepted === true ? true : undefined,
+          challengeFeedback: challenge?.feedback,
+          challengeDenied: challenge?.accepted === false ? true : undefined,
+        };
+      }
+      setQuestionGrades(loadedGrades);
+
       const elapsed = exam.time_used_seconds || 0;
       setTimeRemaining(Math.max(0, (exam.time_limit_seconds || 5400) - elapsed));
       startTimeRef.current = Date.now() - elapsed * 1000;
@@ -219,6 +252,73 @@ export function useMasterExam() {
     }
   }, [examId, user, answers]);
 
+  const gradeQuestion = useCallback(async (questionId: number, answer: string) => {
+    if (!examId || !user || gradingQuestionId) return;
+    setGradingQuestionId(questionId);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("grade-single-question", {
+        body: { exam_id: examId, question_id: questionId, user_answer: answer },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setQuestionGrades((prev) => ({
+        ...prev,
+        [questionId]: {
+          correct: data.correct,
+          earned: data.earned,
+          feedback: data.feedback,
+        },
+      }));
+    } catch (err: any) {
+      console.error("Failed to grade question:", err);
+      toast({
+        title: "Grading Failed",
+        description: err?.message || "Could not grade the question. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setGradingQuestionId(null);
+    }
+  }, [examId, user, gradingQuestionId]);
+
+  const challengeQuestion = useCallback(async (questionId: number, reasoning: string) => {
+    if (!examId || !user || challengingQuestionId) return;
+    setChallengingQuestionId(questionId);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("challenge-exam-question", {
+        body: { exam_id: examId, question_id: questionId, user_reasoning: reasoning },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setQuestionGrades((prev) => ({
+        ...prev,
+        [questionId]: {
+          ...prev[questionId],
+          correct: data.accepted ? true : prev[questionId].correct,
+          earned: data.accepted ? 1 : prev[questionId].earned,
+          challengeAccepted: data.accepted ? true : undefined,
+          challengeDenied: !data.accepted ? true : undefined,
+          challengeFeedback: data.feedback,
+        },
+      }));
+    } catch (err: any) {
+      console.error("Failed to challenge question:", err);
+      toast({
+        title: "Challenge Failed",
+        description: err?.message || "Could not submit the challenge. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setChallengingQuestionId(null);
+    }
+  }, [examId, user, challengingQuestionId]);
+
   const submitExam = useCallback(async () => {
     if (!examId || !user || phase === "submitting") return;
     setPhase("submitting");
@@ -228,7 +328,12 @@ export function useMasterExam() {
 
     try {
       const { data, error } = await supabase.functions.invoke("grade-master-exam", {
-        body: { exam_id: examId, answers, time_used_seconds: timeUsed },
+        body: {
+          exam_id: examId,
+          answers,
+          time_used_seconds: timeUsed,
+          mode: "finalize",
+        },
       });
       if (error) throw error;
       setResults(data);
@@ -247,6 +352,15 @@ export function useMasterExam() {
 
   const setAnswer = useCallback((questionId: number, answer: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: answer }));
+    // Clear grade if user changes answer on already-graded question
+    setQuestionGrades((prev) => {
+      if (prev[questionId]) {
+        const next = { ...prev };
+        delete next[questionId];
+        return next;
+      }
+      return prev;
+    });
   }, []);
 
   const toggleFlag = useCallback((questionId: number) => {
@@ -275,6 +389,7 @@ export function useMasterExam() {
     setExamId(null);
     setQuestions([]);
     setAnswers({});
+    setQuestionGrades({});
     fetchHistory();
   }, [examId, user, answers]);
 
@@ -286,6 +401,7 @@ export function useMasterExam() {
     setResults(null);
     setCurrentIndex(0);
     setFlagged(new Set());
+    setQuestionGrades({});
   }, []);
 
   const bestScore = history
@@ -294,6 +410,7 @@ export function useMasterExam() {
 
   const inProgressExam = history.find((h) => h.status === "in_progress");
   const answeredCount = Object.keys(answers).filter((k) => answers[Number(k)]?.trim()).length;
+  const gradedCount = Object.keys(questionGrades).length;
 
   return {
     phase,
@@ -312,6 +429,10 @@ export function useMasterExam() {
     inProgressExam,
     answeredCount,
     showTypeSelector,
+    gradedCount,
+    questionGrades,
+    gradingQuestionId,
+    challengingQuestionId,
     generateExam,
     resumeExam,
     submitExam,
@@ -320,5 +441,7 @@ export function useMasterExam() {
     toggleFlag,
     abandonExam,
     resetToIntro,
+    gradeQuestion,
+    challengeQuestion,
   };
 }

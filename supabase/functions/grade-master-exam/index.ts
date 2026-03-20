@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { exam_id, answers, time_used_seconds } = await req.json();
+    const { exam_id, answers, time_used_seconds, mode } = await req.json();
     if (!exam_id || !answers) throw new Error("Missing exam_id or answers");
 
     const supabaseClient = createClient(
@@ -52,11 +52,19 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    // Auto-grade MC/TF, collect SA for AI grading
+    // In finalize mode, read pre-graded results and only grade remaining
+    const preGradedResults = (mode === "finalize" && exam.per_question_grades)
+      ? (exam.per_question_grades as Record<string, any>)
+      : {};
+
+    // Auto-grade MC/TF, collect SA for AI grading (skipping pre-graded)
     const autoGradeResults: Record<number, { correct: boolean; feedback: string }> = {};
     const sentenceQuestions: any[] = [];
 
     for (const q of questions) {
+      // Skip questions already pre-graded in finalize mode
+      if (preGradedResults[String(q.id)]) continue;
+
       const userAnswer = answers[q.id]?.trim() || "";
       if (q.type === "mc" || q.type === "tf") {
         const isCorrect = userAnswer.toLowerCase() === q.correct_answer.toLowerCase();
@@ -75,7 +83,7 @@ serve(async (req) => {
       }
     }
 
-    // AI-grade sentence answers
+    // AI-grade sentence answers (only ungraded ones)
     let aiGradingResults: Record<number, { correct: boolean; partial_credit: number; feedback: string }> = {};
 
     if (sentenceQuestions.length > 0) {
@@ -139,7 +147,7 @@ serve(async (req) => {
       }
     }
 
-    // Compute scores
+    // Compute scores — merge pre-graded + newly graded
     let totalPoints = 0;
     let totalCorrect = 0;
     const categoryTotals: Record<string, { earned: number; possible: number }> = {};
@@ -152,7 +160,13 @@ serve(async (req) => {
 
       let earned = 0, feedback = "", correct = false;
 
-      if (q.type === "mc" || q.type === "tf") {
+      // Check if pre-graded
+      const preGrade = preGradedResults[String(q.id)];
+      if (preGrade) {
+        earned = preGrade.earned;
+        correct = preGrade.correct;
+        feedback = preGrade.feedback;
+      } else if (q.type === "mc" || q.type === "tf") {
         const result = autoGradeResults[q.id];
         earned = result.correct ? 1 : 0;
         correct = result.correct;

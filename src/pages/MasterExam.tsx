@@ -104,11 +104,17 @@ const MasterExam = () => {
               flagged={exam.flagged}
               timeRemaining={exam.timeRemaining}
               answeredCount={exam.answeredCount}
+              gradedCount={exam.gradedCount}
+              questionGrades={exam.questionGrades}
+              gradingQuestionId={exam.gradingQuestionId}
+              challengingQuestionId={exam.challengingQuestionId}
               onSetCurrentIndex={exam.setCurrentIndex}
               onSetAnswer={exam.setAnswer}
               onToggleFlag={exam.toggleFlag}
               onSubmit={exam.submitExam}
               onAbandon={exam.abandonExam}
+              onGradeQuestion={exam.gradeQuestion}
+              onChallengeQuestion={exam.challengeQuestion}
             />
           )}
 
