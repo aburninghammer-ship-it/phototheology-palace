@@ -34,6 +34,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
+import { ResearchAudioCommentary } from "@/components/audio/ResearchAudioCommentary";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
 import { toast } from "sonner";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
@@ -938,7 +939,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
                                       text={msg.content}
                                       variant="ghost"
                                       size="icon"
-                                      className="h-5 w-5 text-emerald-400/50 hover:text-emerald-400"
+                                      className="h-5 w-5 text-emerald-400/30 hover:text-emerald-400/60"
                                     />
                                   </>
                                 )}
@@ -947,6 +948,10 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
                               <div className="text-[13px] leading-relaxed text-foreground/90">
                                 {msg.role === "assistant" ? formatContent(msg.content) : msg.content}
                               </div>
+
+                              {msg.role === "assistant" && (
+                                <ResearchAudioCommentary briefText={msg.content} />
+                              )}
 
                               {msg.isWebSearch && (
                                 <div className="mt-2 flex items-center gap-1">
