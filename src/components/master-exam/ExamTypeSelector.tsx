@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Telescope, Crown, Clock, Swords } from "lucide-react";
+import { Building2, Telescope, Crown, Clock, Swords, Target } from "lucide-react";
 import { motion } from "framer-motion";
 
-export type ExamType = "master" | "foundation" | "prophecy_sanctuary" | "room_test";
+export type ExamType = "master" | "foundation" | "prophecy_sanctuary" | "room_test" | "weakest_room";
 
 interface ExamTypeConfig {
   id: ExamType;
@@ -17,6 +17,28 @@ interface ExamTypeConfig {
 }
 
 const EXAM_TYPES: ExamTypeConfig[] = [
+  {
+    id: "weakest_room",
+    name: "Train My Weakest Room",
+    subtitle: "Attack Your Blind Spot",
+    description:
+      "Automatically detects the room where you scored lowest and generates a targeted 50-question drill to strengthen it.",
+    icon: <Target className="h-7 w-7" />,
+    badges: ["Auto-Detect", "Targeted Drill", "AI Prescribed"],
+    timeMinutes: 45,
+    color: "from-red-500 to-orange-500",
+  },
+  {
+    id: "room_test",
+    name: "Room Intelligence Test",
+    subtitle: "Master One Room at a Time",
+    description:
+      "Select any of the 38 Palace rooms and take a 50-question test tailored to that specific discipline — unique question formats per room.",
+    icon: <Swords className="h-7 w-7" />,
+    badges: ["38 Rooms", "AI Tailored", "Per-Room Score"],
+    timeMinutes: 45,
+    color: "from-emerald-500 to-teal-500",
+  },
   {
     id: "master",
     name: "Master Exam",
@@ -49,17 +71,6 @@ const EXAM_TYPES: ExamTypeConfig[] = [
     badges: ["Prophecy", "Sanctuary", "60 min"],
     timeMinutes: 60,
     color: "from-purple-500 to-pink-500",
-  },
-  {
-    id: "room_test" as ExamType,
-    name: "Room Intelligence Test",
-    subtitle: "Master One Room at a Time",
-    description:
-      "Select any of the 38 Palace rooms and take a 50-question test tailored to that specific discipline — unique question formats per room.",
-    icon: <Swords className="h-7 w-7" />,
-    badges: ["38 Rooms", "AI Tailored", "Per-Room Score"],
-    timeMinutes: 45,
-    color: "from-emerald-500 to-teal-500",
   },
 ];
 

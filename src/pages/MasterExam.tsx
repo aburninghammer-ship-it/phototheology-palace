@@ -72,9 +72,14 @@ const MasterExam = () => {
 
           {exam.phase === "select_type" && (
             <div className="max-w-2xl mx-auto">
-              <ExamTypeSelector onSelect={(type) => {
+              <ExamTypeSelector onSelect={async (type) => {
                 if (type === "room_test") {
                   exam.showRoomSelector();
+                } else if (type === "weakest_room") {
+                  const weakest = await exam.findWeakestRoom();
+                  if (weakest) {
+                    exam.generateRoomExam(weakest.code, weakest.name);
+                  }
                 } else {
                   exam.generateExam(type);
                 }

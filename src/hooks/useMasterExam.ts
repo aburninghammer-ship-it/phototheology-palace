@@ -151,6 +151,74 @@ export function useMasterExam() {
     setPhase("select_room");
   }, []);
 
+  // Room code → name mapping for weakest room detection
+  const ROOM_CODE_NAMES: Record<string, string> = {
+    sr: "Story Room", ir: "Imagination Room", "24fps": "24FPS Room", br: "Bible Rendered",
+    tr: "Translation Room", gr: "Gems Room", or: "Observation Room", dc: "Def-Com Room",
+    st: "Symbols/Types Room", qr: "Questions Room", qa: "Q&A Chains Room",
+    nf: "Nature Freestyle", pf: "Personal Freestyle", bf: "Bible Freestyle",
+    hf: "History/Social Freestyle", lr: "Listening Room", cr: "Concentration Room",
+    dr: "Dimensions Room", c6: "Connect-6", trm: "Theme Room", tz: "Time Zone",
+    prm: "Patterns Room", "p||": "Parallels Room", frt: "Fruit Room",
+    cec: "Christ Every Chapter", r66: "Room 66", bl: "Blue Room (Sanctuary)",
+    pr: "Prophecy Room", "3a": "Three Angels", fe: "Feasts Room",
+    "1h": "First Heaven", "2h": "Second Heaven", "3h": "Third Heaven",
+    frm: "Fire Room", mr: "Meditation Room", srm: "Speed Room",
+  };
+
+  const findWeakestRoom = useCallback(async (): Promise<{ code: string; name: string } | null> => {
+    if (!user) return null;
+
+    try {
+      // Get all room mastery levels for this user
+      const { data: masteryData } = await supabase
+        .from("room_mastery_levels")
+        .select("room_id, mastery_level, xp_current, last_activity_at")
+        .eq("user_id", user.id) as any;
+
+      const allRoomCodes = Object.keys(ROOM_CODE_NAMES);
+
+      if (!masteryData || masteryData.length === 0) {
+        // No data at all — pick first room (Story Room) as default
+        return { code: "sr", name: "Story Room" };
+      }
+
+      // Find tested rooms and their scores
+      const testedMap = new Map<string, { level: number; xp: number }>();
+      for (const row of masteryData) {
+        testedMap.set(row.room_id, { level: row.mastery_level || 1, xp: row.xp_current || 0 });
+      }
+
+      // First priority: rooms never tested
+      const untestedRooms = allRoomCodes.filter(c => !testedMap.has(c));
+      if (untestedRooms.length > 0) {
+        // Pick a random untested room to keep it fresh
+        const pick = untestedRooms[Math.floor(Math.random() * untestedRooms.length)];
+        return { code: pick, name: ROOM_CODE_NAMES[pick] };
+      }
+
+      // Second priority: lowest mastery level, then lowest XP as tiebreaker
+      let weakestCode = allRoomCodes[0];
+      let weakestScore = { level: 999, xp: 999999 };
+
+      for (const code of allRoomCodes) {
+        const entry = testedMap.get(code) || { level: 0, xp: 0 };
+        if (
+          entry.level < weakestScore.level ||
+          (entry.level === weakestScore.level && entry.xp < weakestScore.xp)
+        ) {
+          weakestScore = entry;
+          weakestCode = code;
+        }
+      }
+
+      return { code: weakestCode, name: ROOM_CODE_NAMES[weakestCode] };
+    } catch (err) {
+      console.error("Failed to find weakest room:", err);
+      return { code: "sr", name: "Story Room" };
+    }
+  }, [user]);
+
   const generateRoomExam = useCallback(async (roomCode: string, roomName: string) => {
     if (!user) return;
     setSelectedRoomCode(roomCode);
@@ -489,6 +557,7 @@ export function useMasterExam() {
     challengingQuestionId,
     generateExam,
     generateRoomExam,
+    findWeakestRoom,
     resumeExam,
     submitExam,
     saveProgress,
