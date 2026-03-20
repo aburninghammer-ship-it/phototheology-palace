@@ -15,6 +15,68 @@ import { Textarea } from "@/components/ui/textarea";
 import { Cloud, CloudOff, Info, Lightbulb, Plus, Trash2, Edit3, X, Check, Search, Sparkles, ChevronDown, ChevronUp, Loader2, RefreshCw } from "lucide-react";
 import { OpenAIAudioButton } from "@/components/audio/OpenAIAudioButton";
 import { toast } from "sonner";
+import { useState as useStateReact, useMemo, useCallback } from "react";
+
+/**
+ * Converts raw markdown research brief into flowing prose suitable for TTS narration.
+ * Strips markdown syntax, restructures bullet points into sentences, and creates
+ * a coherent commentary that reads naturally when spoken aloud.
+ */
+function researchToNarration(title: string, research: string): string {
+  if (!research) return "";
+
+  // Strip markdown formatting
+  let text = research
+    // Remove heading markers but keep text
+    .replace(/^#{1,4}\s+/gm, "")
+    // Bold/italic → plain
+    .replace(/\*{1,3}([^*]+)\*{1,3}/g, "$1")
+    // Remove horizontal rules
+    .replace(/^[-*_]{3,}\s*$/gm, "")
+    // Remove code blocks
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/`([^`]+)`/g, "$1");
+
+  // Convert bullet lists into flowing sentences
+  const lines = text.split("\n");
+  const paragraphs: string[] = [];
+  let currentParagraph: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      if (currentParagraph.length > 0) {
+        paragraphs.push(currentParagraph.join(" "));
+        currentParagraph = [];
+      }
+      continue;
+    }
+
+    // Convert bullet points to sentences
+    const bulletMatch = trimmed.match(/^[-•*]\s+(.+)/);
+    if (bulletMatch) {
+      let sentence = bulletMatch[1].trim();
+      // Ensure it ends with punctuation
+      if (!/[.!?]$/.test(sentence)) sentence += ".";
+      currentParagraph.push(sentence);
+    } else {
+      // Regular text line
+      currentParagraph.push(trimmed);
+    }
+  }
+
+  if (currentParagraph.length > 0) {
+    paragraphs.push(currentParagraph.join(" "));
+  }
+
+  // Build narration with a natural intro
+  const intro = `Here is a research commentary for the sermon idea: "${title}".`;
+  const body = paragraphs
+    .filter(p => p.length > 10)
+    .join("\n\n");
+
+  return `${intro}\n\n${body}`;
+}
 
 const SermonIdeas = () => {
   const { preferences } = useUserPreferences();
