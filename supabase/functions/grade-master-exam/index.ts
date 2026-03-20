@@ -536,7 +536,7 @@ RULES:
         per_question: perQuestionResults,
         diagnostic: diagnosticReport,
         exam_type: examType,
-        room_name: isRoomTest ? (exam.room_name || examType.replace("room_test_", "").toUpperCase()) : undefined,
+        room_name: isRoomTest ? (clientRoomName || examType.replace("room_test_", "").toUpperCase()) : undefined,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
