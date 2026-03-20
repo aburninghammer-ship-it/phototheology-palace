@@ -56,6 +56,7 @@ export interface GradingResults {
   per_question: ExamResult[];
   diagnostic?: DiagnosticData;
   exam_type?: string;
+  room_name?: string;
 }
 
 export interface QuestionGradeResult {
