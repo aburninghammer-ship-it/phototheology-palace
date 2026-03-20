@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { exam_id, answers, time_used_seconds, mode } = await req.json();
+    const { exam_id, answers, time_used_seconds, mode, room_name: clientRoomName } = await req.json();
     if (!exam_id || !answers) throw new Error("Missing exam_id or answers");
 
     const supabaseClient = createClient(
