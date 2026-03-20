@@ -557,6 +557,7 @@ export function useMasterExam() {
     challengingQuestionId,
     generateExam,
     generateRoomExam,
+    findWeakestRoom,
     resumeExam,
     submitExam,
     saveProgress,
