@@ -425,6 +425,9 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const fallbackDisplayName = (userEmail ?? authUser?.email)?.split("@")[0] || "Scholar";
 
   const [dismissed, setDismissed] = useState(false);
+  const [newFeatureDismissed, setNewFeatureDismissed] = useState(() =>
+    localStorage.getItem("pt_new_feature_testme_dismissed") === "true"
+  );
   const [dailyPrompts] = useState(() => getDailyShuffledPrompts());
   const [promptIdx, setPromptIdx] = useState(() =>
     Math.floor(Date.now() / ROTATE_INTERVAL_MS) % dailyPrompts.length
