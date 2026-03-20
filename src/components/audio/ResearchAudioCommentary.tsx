@@ -55,6 +55,24 @@ export function ResearchAudioCommentary({ briefText, className }: ResearchAudioC
   ttsSpeakRef.current = ttsSpeak;
   ttsPreloadRef.current = ttsPreload;
 
+  const queueSectionPlayback = useCallback(
+    (idx: number) => {
+      const nextSections = sectionsRef.current;
+      const targetSection = nextSections[idx];
+
+      if (!targetSection) return;
+
+      updateCurrentSection(idx);
+      autoAdvancingRef.current = true;
+      void ttsSpeak(targetSection);
+
+      if (idx + 1 < nextSections.length) {
+        void ttsPreload(nextSections[idx + 1]);
+      }
+    },
+    [ttsSpeak, ttsPreload, updateCurrentSection]
+  );
+
   const generateAndPlay = useCallback(async () => {
     if (!briefText.trim()) {
       toast.error("No research brief to convert");
@@ -75,34 +93,21 @@ export function ResearchAudioCommentary({ briefText, className }: ResearchAudioC
       const newSections = data.sections as string[];
       setSections(newSections);
       sectionsRef.current = newSections;
-      updateCurrentSection(0);
-      autoAdvancingRef.current = true;
-
-      // Start playing first section
-      await ttsSpeak(newSections[0]);
-
-      // Preload second section
-      if (newSections.length > 1) {
-        ttsPreload(newSections[1]);
-      }
+      setIsGenerating(false);
+      queueSectionPlayback(0);
     } catch (err: any) {
       console.error("Research audio error:", err);
       toast.error(err?.message || "Failed to generate audio commentary");
     } finally {
       setIsGenerating(false);
     }
-  }, [briefText, ttsSpeak, ttsPreload, updateCurrentSection]);
+  }, [briefText, queueSectionPlayback]);
 
   const playSection = useCallback(
     (idx: number) => {
-      updateCurrentSection(idx);
-      autoAdvancingRef.current = true;
-      ttsSpeak(sectionsRef.current[idx]);
-      if (idx + 1 < sectionsRef.current.length) {
-        ttsPreload(sectionsRef.current[idx + 1]);
-      }
+      queueSectionPlayback(idx);
     },
-    [ttsSpeak, ttsPreload, updateCurrentSection]
+    [queueSectionPlayback]
   );
 
   const stopAll = useCallback(() => {
