@@ -21,9 +21,17 @@ export default function ResetPassword() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    // Check URL hash for recovery token (Supabase appends #type=recovery&access_token=...)
+    const hash = window.location.hash;
+    const hasRecoveryHash = hash.includes('type=recovery') || hash.includes('type=magiclink');
+
     // Listen for the PASSWORD_RECOVERY event from Supabase
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
+        setIsRecoverySession(true);
+        setChecking(false);
+      } else if (event === "SIGNED_IN" && hasRecoveryHash && session) {
+        // Supabase sometimes fires SIGNED_IN instead of PASSWORD_RECOVERY
         setIsRecoverySession(true);
         setChecking(false);
       }
@@ -33,13 +41,21 @@ export default function ResetPassword() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        // If there's a session and we got here via a recovery link, allow password change
         setIsRecoverySession(true);
+      } else if (hasRecoveryHash) {
+        // Hash present but session not ready yet — wait a bit longer
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const { data: { session: retrySession } } = await supabase.auth.getSession();
+        if (retrySession) {
+          setIsRecoverySession(true);
+        }
       }
       setChecking(false);
     };
 
-    // Give a moment for the auth event to fire
-    const timer = setTimeout(checkSession, 1500);
+    // Give a moment for the auth event to fire, then fallback to session check
+    const timer = setTimeout(checkSession, 2000);
 
     return () => {
       subscription.unsubscribe();
