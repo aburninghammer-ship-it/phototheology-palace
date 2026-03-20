@@ -35,6 +35,20 @@ export interface NavTab {
 // Default tab order - users can customize this
 export const DEFAULT_NAV_TABS: NavTab[] = [
   {
+    id: "test-me",
+    to: "/test-me",
+    label: "Test Me",
+    shortLabel: "Test Me",
+    icon: GraduationCap,
+    gradient: {
+      from: "from-red-500/10",
+      to: "to-orange-500/10",
+      border: "border-red-500/20",
+      text: "from-red-600 to-orange-600",
+      glow: "rgba(239,68,68,0.5)"
+    }
+  },
+  {
     id: "prophecy-watch",
     to: "/prophecy-watch",
     label: "Prophecy Watch",
