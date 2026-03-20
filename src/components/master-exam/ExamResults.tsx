@@ -94,8 +94,16 @@ export function ExamResults({ results, onRetake }: ExamResultsProps) {
         </CardContent>
       </Card>
 
-      {/* Diagnostic Report (for diagnostic exams) */}
-      {results.diagnostic && (
+      {/* Room Diagnosis Report (for room tests) */}
+      {results.diagnostic && results.exam_type?.startsWith("room_test_") && (
+        <RoomDiagnosisReport
+          diagnostic={results.diagnostic}
+          roomName={results.room_name}
+        />
+      )}
+
+      {/* Diagnostic Report (for non-room diagnostic exams) */}
+      {results.diagnostic && !results.exam_type?.startsWith("room_test_") && (
         <DiagnosticReport
           diagnostic={results.diagnostic}
           onGenerateWeeklyPlan={() => {}}
