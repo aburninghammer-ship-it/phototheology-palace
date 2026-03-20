@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Cloud, CloudOff, Info, Lightbulb, Plus, Trash2, Edit3, X, Check, Search, Sparkles, ChevronDown, ChevronUp, Loader2, RefreshCw, BookOpen } from "lucide-react";
-import { OpenAIAudioButton } from "@/components/audio/OpenAIAudioButton";
+import { ResearchAudioCommentary } from "@/components/audio/ResearchAudioCommentary";
 import { toast } from "sonner";
 
 /**
@@ -428,12 +428,8 @@ const SermonIdeas = () => {
                                 <BookOpen className="h-3.5 w-3.5 mr-1" />
                                 Read Along
                               </Button>
-                              <OpenAIAudioButton
-                                text={researchToNarration(idea.title, idea.jeevesResearch!)}
-                                voice="nova"
-                                variant="outline"
-                                size="sm"
-                                showLabel
+                              <ResearchAudioCommentary
+                                briefText={researchToNarration(idea.title, idea.jeevesResearch!)}
                                 className="text-xs"
                               />
                             </div>
