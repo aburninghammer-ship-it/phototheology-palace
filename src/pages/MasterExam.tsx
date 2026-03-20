@@ -4,6 +4,7 @@ import { ExamIntro } from "@/components/master-exam/ExamIntro";
 import { ExamActive } from "@/components/master-exam/ExamActive";
 import { ExamResults } from "@/components/master-exam/ExamResults";
 import { ExamTypeSelector } from "@/components/master-exam/ExamTypeSelector";
+import { RoomIntelligenceSelector } from "@/components/master-exam/RoomIntelligenceSelector";
 import { motion } from "framer-motion";
 
 const MasterExam = () => {
