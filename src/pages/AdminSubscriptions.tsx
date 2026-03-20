@@ -148,6 +148,7 @@ export default function AdminSubscriptions() {
   const [pickaxeLinkedCount, setPickaxeLinkedCount] = useState<number>(0);
   const [pickaxePaidCount, setPickaxePaidCount] = useState<number>(0);
   const [pickaxeMembers, setPickaxeMembers] = useState<any[]>([]);
+  const [safetyNetTrials, setSafetyNetTrials] = useState<{ email: string; expires_at: string }[]>([]);
 
   // Make refresh activity visible and avoid overlapping refresh requests.
   const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
@@ -391,6 +392,20 @@ export default function AdminSubscriptions() {
           .eq("is_paid_user", true);
 
         setPickaxePaidCount(paidPickaxe || 0);
+
+        // Get safety-net / promotional 7-day trial users
+        const { data: promoTrials } = await supabase
+          .from("profiles")
+          .select("email, promotional_access_expires_at")
+          .gt("promotional_access_expires_at", new Date().toISOString())
+          .order("promotional_access_expires_at", { ascending: true });
+
+        setSafetyNetTrials(
+          (promoTrials || []).map((p: any) => ({
+            email: p.email || "unknown",
+            expires_at: p.promotional_access_expires_at,
+          }))
+        );
 
         // Get PDF purchases stats
         try {
@@ -669,10 +684,36 @@ export default function AdminSubscriptions() {
                   <span className="text-blue-500">⏳</span>
                   7-Day Trials
                 </CardTitle>
-                <CardDescription>Currently in trial period</CardDescription>
+                <CardDescription>Stripe + Safety-net trials</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-blue-600">{stats.stripe.trialing_subscriptions || 0}</div>
+              <CardContent className="space-y-3">
+                <div className="flex items-baseline gap-3">
+                  <div className="text-4xl font-bold text-blue-600">
+                    {(stats.stripe.trialing_subscriptions || 0) + safetyNetTrials.length}
+                  </div>
+                  <span className="text-xs text-muted-foreground">total active</span>
+                </div>
+                <div className="flex gap-4 text-xs text-muted-foreground">
+                  <span>💳 {stats.stripe.trialing_subscriptions || 0} Stripe</span>
+                  <span>🛡️ {safetyNetTrials.length} Safety-net</span>
+                </div>
+                {safetyNetTrials.length > 0 && (
+                  <div className="mt-2 space-y-1 max-h-32 overflow-y-auto border-t border-border pt-2">
+                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Safety-net countdown</p>
+                    {safetyNetTrials.map((t) => {
+                      const daysLeft = Math.max(0, Math.ceil((new Date(t.expires_at).getTime() - Date.now()) / 86400000));
+                      const hoursLeft = Math.max(0, Math.ceil((new Date(t.expires_at).getTime() - Date.now()) / 3600000));
+                      return (
+                        <div key={t.email} className="flex justify-between items-center text-xs">
+                          <span className="truncate max-w-[140px]">{t.email}</span>
+                          <Badge variant={daysLeft <= 1 ? "destructive" : "secondary"} className="text-[10px] px-1.5 py-0">
+                            {daysLeft > 1 ? `${daysLeft}d left` : `${hoursLeft}h left`}
+                          </Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
