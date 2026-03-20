@@ -103,7 +103,8 @@ const MasterExam = () => {
                   AI is crafting 50 unique questions
                   {exam.selectedExamType === "foundation" && " testing your PT framework knowledge"}
                   {exam.selectedExamType === "prophecy_sanctuary" && " on prophecy & sanctuary"}
-                  {exam.selectedExamType === "master" && " across all domains"}
+                   {exam.selectedExamType === "master" && " across all domains"}
+                   {exam.selectedExamType === "room_test" && exam.selectedRoomName && ` for the ${exam.selectedRoomName}`}
                   ...
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
