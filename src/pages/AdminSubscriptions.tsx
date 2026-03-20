@@ -393,6 +393,20 @@ export default function AdminSubscriptions() {
 
         setPickaxePaidCount(paidPickaxe || 0);
 
+        // Get safety-net / promotional 7-day trial users
+        const { data: promoTrials } = await supabase
+          .from("profiles")
+          .select("email, promotional_access_expires_at")
+          .gt("promotional_access_expires_at", new Date().toISOString())
+          .order("promotional_access_expires_at", { ascending: true });
+
+        setSafetyNetTrials(
+          (promoTrials || []).map((p: any) => ({
+            email: p.email || "unknown",
+            expires_at: p.promotional_access_expires_at,
+          }))
+        );
+
         // Get PDF purchases stats
         try {
           const { data: pdfData, error: pdfError } = await supabase.functions.invoke("get-pdf-purchases");
