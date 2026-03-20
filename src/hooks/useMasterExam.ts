@@ -67,7 +67,7 @@ export interface QuestionGradeResult {
   challengeDenied?: boolean;
 }
 
-type ExamPhase = "intro" | "select_type" | "generating" | "active" | "submitting" | "results";
+type ExamPhase = "intro" | "select_type" | "select_room" | "generating" | "active" | "submitting" | "results";
 
 export function useMasterExam() {
   const { user } = useAuth();
@@ -75,6 +75,8 @@ export function useMasterExam() {
 
   const [phase, setPhase] = useState<ExamPhase>("intro");
   const [selectedExamType, setSelectedExamType] = useState<ExamType>("master");
+  const [selectedRoomCode, setSelectedRoomCode] = useState<string | null>(null);
+  const [selectedRoomName, setSelectedRoomName] = useState<string | null>(null);
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
