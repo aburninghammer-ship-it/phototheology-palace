@@ -29,17 +29,18 @@ export function useIncompleteSignup() {
       try {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("display_name, subscription_tier, subscription_status, payment_source, has_lifetime_access")
+          .select("display_name, subscription_tier, subscription_status, payment_source, has_lifetime_access, promotional_access_expires_at")
           .eq("id", user.id)
           .single();
 
         if (!profile) return;
 
-        // User completed payment or has access — don't show
+        // User completed payment, has access, or is on a no-card trial — don't show
         if (
           profile.has_lifetime_access ||
           profile.subscription_status === "active" ||
-          (profile.payment_source && profile.payment_source !== "manual")
+          (profile.payment_source && profile.payment_source !== "manual") ||
+          (profile.promotional_access_expires_at && new Date(profile.promotional_access_expires_at) > new Date())
         ) {
           setChecked(true);
           return;
