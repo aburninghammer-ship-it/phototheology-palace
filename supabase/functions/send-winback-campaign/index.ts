@@ -20,21 +20,29 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const resend = new Resend(resendApiKey);
 
-    // Verify admin
+    // Verify admin via user auth OR service key header
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Not authenticated");
+    const serviceKey = req.headers.get("X-Service-Key");
+    const expectedServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData } = await supabase.auth.getUser(token);
-    if (!userData?.user) throw new Error("Invalid auth");
+    if (serviceKey && serviceKey === expectedServiceKey) {
+      // Service key auth — trusted invocation
+      console.log("[WinBack] Authenticated via service key");
+    } else if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: userData } = await supabase.auth.getUser(token);
+      if (!userData?.user) throw new Error("Invalid auth");
 
-    const { data: adminCheck } = await supabase
-      .from("admin_users")
-      .select("id")
-      .eq("user_id", userData.user.id)
-      .maybeSingle();
+      const { data: adminCheck } = await supabase
+        .from("admin_users")
+        .select("id")
+        .eq("user_id", userData.user.id)
+        .maybeSingle();
 
-    if (!adminCheck) throw new Error("Admin access required");
+      if (!adminCheck) throw new Error("Admin access required");
+    } else {
+      throw new Error("Not authenticated");
+    }
 
     // Get unredeemed pre-approved emails
     const { data: recipients, error: fetchError } = await supabase
