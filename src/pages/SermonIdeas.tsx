@@ -428,12 +428,8 @@ const SermonIdeas = () => {
                                 <BookOpen className="h-3.5 w-3.5 mr-1" />
                                 Read Along
                               </Button>
-                              <OpenAIAudioButton
-                                text={researchToNarration(idea.title, idea.jeevesResearch!)}
-                                voice="nova"
-                                variant="outline"
-                                size="sm"
-                                showLabel
+                              <ResearchAudioCommentary
+                                briefText={researchToNarration(idea.title, idea.jeevesResearch!)}
                                 className="text-xs"
                               />
                             </div>
