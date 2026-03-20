@@ -447,6 +447,10 @@ export default function Auth() {
           
           toast.success("Welcome to the Palace! Take a look around — we'll help you set up your trial shortly.");
           navigate("/gatehouse", { replace: true });
+        } catch (checkoutErr) {
+          console.error("Failed during signup flow:", checkoutErr);
+          toast.success("Welcome! Head to the Palace to get started.");
+          navigate("/gatehouse", { replace: true });
         }
       } else if (data.user && !data.session) {
         // Celebrate with confetti!
