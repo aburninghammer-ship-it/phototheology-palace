@@ -50,6 +50,17 @@ const EXAM_TYPES: ExamTypeConfig[] = [
     timeMinutes: 60,
     color: "from-purple-500 to-pink-500",
   },
+  {
+    id: "room_test" as ExamType,
+    name: "Room Intelligence Test",
+    subtitle: "Master One Room at a Time",
+    description:
+      "Select any of the 38 Palace rooms and take a 50-question test tailored to that specific discipline — unique question formats per room.",
+    icon: <Swords className="h-7 w-7" />,
+    badges: ["38 Rooms", "AI Tailored", "Per-Room Score"],
+    timeMinutes: 45,
+    color: "from-emerald-500 to-teal-500",
+  },
 ];
 
 interface ExamTypeSelectorProps {
