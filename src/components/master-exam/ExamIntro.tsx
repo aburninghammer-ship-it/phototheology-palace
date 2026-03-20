@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExamAttempt } from "@/hooks/useMasterExam";
-import { Trophy, Clock, Play, RotateCcw, GraduationCap } from "lucide-react";
+import { Trophy, Clock, Play, RotateCcw, GraduationCap, Compass } from "lucide-react";
 
 interface ExamIntroProps {
   history: ExamAttempt[];
@@ -11,6 +11,7 @@ interface ExamIntroProps {
   loading: boolean;
   onStart: () => void;
   onResume: (examId: string) => void;
+  onShowTypeSelector?: () => void;
 }
 
 function getLetterGrade(score: number): string {
@@ -36,6 +37,7 @@ export function ExamIntro({
   loading,
   onStart,
   onResume,
+  onShowTypeSelector,
 }: ExamIntroProps) {
   const completedAttempts = history.filter((h) => h.status === "completed");
 
@@ -84,8 +86,19 @@ export function ExamIntro({
               disabled={loading}
             >
               <Play className="h-5 w-5 mr-2" />
-              {inProgressExam ? "Start New Exam" : "Begin Exam"}
+              {inProgressExam ? "Start New Exam" : "Begin Master Exam"}
             </Button>
+            {onShowTypeSelector && (
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 text-base"
+                onClick={onShowTypeSelector}
+              >
+                <Compass className="h-5 w-5 mr-2" />
+                Diagnostic Exams
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

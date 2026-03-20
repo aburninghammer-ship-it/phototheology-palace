@@ -1,5 +1,6 @@
 import { GradingResults, ExamResult } from "@/hooks/useMasterExam";
 import { CategoryBreakdown } from "./CategoryBreakdown";
+import { DiagnosticReport } from "./DiagnosticReport";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -91,6 +92,15 @@ export function ExamResults({ results, onRetake }: ExamResultsProps) {
           <CategoryBreakdown categoryScores={results.category_scores} />
         </CardContent>
       </Card>
+
+      {/* Diagnostic Report (for diagnostic exams) */}
+      {results.diagnostic && (
+        <DiagnosticReport
+          diagnostic={results.diagnostic}
+          onGenerateWeeklyPlan={() => {}}
+          isGeneratingPlan={false}
+        />
+      )}
 
       {/* Per-Question Review */}
       <Card variant="glass">

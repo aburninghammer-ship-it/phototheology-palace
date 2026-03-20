@@ -9948,6 +9948,9 @@ export type Database = {
           category_scores: Json | null
           completed_at: string | null
           created_at: string
+          diagnostic_report: Json | null
+          error_patterns: Json | null
+          exam_type: string
           id: string
           questions_data: Json | null
           results: Json | null
@@ -9959,6 +9962,7 @@ export type Database = {
           total_questions: number | null
           updated_at: string
           user_id: string
+          weekly_plan_id: string | null
         }
         Insert: {
           answers_data?: Json | null
@@ -9966,6 +9970,9 @@ export type Database = {
           category_scores?: Json | null
           completed_at?: string | null
           created_at?: string
+          diagnostic_report?: Json | null
+          error_patterns?: Json | null
+          exam_type?: string
           id?: string
           questions_data?: Json | null
           results?: Json | null
@@ -9977,6 +9984,7 @@ export type Database = {
           total_questions?: number | null
           updated_at?: string
           user_id: string
+          weekly_plan_id?: string | null
         }
         Update: {
           answers_data?: Json | null
@@ -9984,6 +9992,9 @@ export type Database = {
           category_scores?: Json | null
           completed_at?: string | null
           created_at?: string
+          diagnostic_report?: Json | null
+          error_patterns?: Json | null
+          exam_type?: string
           id?: string
           questions_data?: Json | null
           results?: Json | null
@@ -9995,6 +10006,7 @@ export type Database = {
           total_questions?: number | null
           updated_at?: string
           user_id?: string
+          weekly_plan_id?: string | null
         }
         Relationships: []
       }

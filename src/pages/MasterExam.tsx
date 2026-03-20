@@ -3,10 +3,17 @@ import { useMasterExam } from "@/hooks/useMasterExam";
 import { ExamIntro } from "@/components/master-exam/ExamIntro";
 import { ExamActive } from "@/components/master-exam/ExamActive";
 import { ExamResults } from "@/components/master-exam/ExamResults";
+import { ExamTypeSelector } from "@/components/master-exam/ExamTypeSelector";
 import { motion } from "framer-motion";
 
 const MasterExam = () => {
   const exam = useMasterExam();
+
+  const examTypeLabels: Record<string, string> = {
+    master: "Master Exam",
+    foundation: "Foundation Diagnostic",
+    prophecy_sanctuary: "Prophecy & Sanctuary",
+  };
 
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden overflow-y-auto">
@@ -34,7 +41,11 @@ const MasterExam = () => {
             <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               Test Me
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground">Master Exam</p>
+            <p className="text-sm md:text-base text-muted-foreground">
+              {exam.phase === "active" || exam.phase === "submitting"
+                ? examTypeLabels[exam.selectedExamType] || "Exam"
+                : "PT Assessment System"}
+            </p>
           </div>
         </motion.div>
 
@@ -51,9 +62,16 @@ const MasterExam = () => {
               bestScore={exam.bestScore}
               inProgressExam={exam.inProgressExam}
               loading={exam.loading}
-              onStart={exam.generateExam}
+              onStart={() => exam.generateExam("master")}
               onResume={exam.resumeExam}
+              onShowTypeSelector={exam.showTypeSelector}
             />
+          )}
+
+          {exam.phase === "select_type" && (
+            <div className="max-w-2xl mx-auto">
+              <ExamTypeSelector onSelect={(type) => exam.generateExam(type)} />
+            </div>
           )}
 
           {exam.phase === "generating" && (
@@ -65,7 +83,11 @@ const MasterExam = () => {
               <div>
                 <h2 className="text-xl font-bold mb-2">Generating Your Exam</h2>
                 <p className="text-muted-foreground">
-                  AI is crafting 50 unique questions across all domains...
+                  AI is crafting 50 unique questions
+                  {exam.selectedExamType === "foundation" && " testing your PT framework knowledge"}
+                  {exam.selectedExamType === "prophecy_sanctuary" && " on prophecy & sanctuary"}
+                  {exam.selectedExamType === "master" && " across all domains"}
+                  ...
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
                   This usually takes 15-30 seconds
@@ -97,9 +119,13 @@ const MasterExam = () => {
                 <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
               </div>
               <div>
-                <h2 className="text-xl font-bold mb-2">Grading Your Exam</h2>
+                <h2 className="text-xl font-bold mb-2">
+                  {exam.selectedExamType !== "master" ? "Analyzing & Grading" : "Grading Your Exam"}
+                </h2>
                 <p className="text-muted-foreground">
-                  AI is evaluating your written answers against rubrics...
+                  {exam.selectedExamType !== "master"
+                    ? "AI is grading your answers and generating your diagnostic report..."
+                    : "AI is evaluating your written answers against rubrics..."}
                 </p>
               </div>
             </div>
