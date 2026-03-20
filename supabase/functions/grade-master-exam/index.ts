@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -87,62 +87,83 @@ serve(async (req) => {
     let aiGradingResults: Record<number, { correct: boolean; partial_credit: number; feedback: string }> = {};
 
     if (sentenceQuestions.length > 0) {
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: "You are a strict but fair Phototheology exam grader." },
-            { role: "user", content: `Grade these sentence-answer questions:\n${JSON.stringify(sentenceQuestions, null, 2)}` },
-          ],
-          tools: [{
-            type: "function",
-            function: {
-              name: "submit_grades",
-              description: "Submit grades for sentence answers",
-              parameters: {
-                type: "object",
-                properties: {
-                  grades: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        question_id: { type: "number" },
-                        correct: { type: "boolean" },
-                        partial_credit: { type: "number", enum: [0, 0.5, 1] },
-                        feedback: { type: "string" },
+      // Retry up to 2 times for AI grading
+      let gradingAttempts = 0;
+      let gradingSuccess = false;
+      while (gradingAttempts < 2 && !gradingSuccess) {
+        gradingAttempts++;
+        try {
+          const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: gradingAttempts === 1 ? "google/gemini-2.5-flash" : "google/gemini-3-flash-preview",
+              messages: [
+                { role: "system", content: "You are a strict but fair Phototheology exam grader." },
+                { role: "user", content: `Grade these sentence-answer questions:\n${JSON.stringify(sentenceQuestions, null, 2)}` },
+              ],
+              tools: [{
+                type: "function",
+                function: {
+                  name: "submit_grades",
+                  description: "Submit grades for sentence answers",
+                  parameters: {
+                    type: "object",
+                    properties: {
+                      grades: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            question_id: { type: "number" },
+                            correct: { type: "boolean" },
+                            partial_credit: { type: "number", enum: [0, 0.5, 1] },
+                            feedback: { type: "string" },
+                          },
+                          required: ["question_id", "correct", "partial_credit", "feedback"],
+                        },
                       },
-                      required: ["question_id", "correct", "partial_credit", "feedback"],
                     },
+                    required: ["grades"],
                   },
                 },
-                required: ["grades"],
-              },
-            },
-          }],
-          tool_choice: { type: "function", function: { name: "submit_grades" } },
-        }),
-      });
+              }],
+              tool_choice: { type: "function", function: { name: "submit_grades" } },
+            }),
+          });
 
-      if (response.ok) {
-        const aiResult = await response.json();
-        const toolCall = aiResult.choices[0]?.message?.tool_calls?.[0];
-        if (toolCall) {
-          const parsed = JSON.parse(toolCall.function.arguments);
-          for (const g of parsed.grades) {
-            aiGradingResults[g.question_id] = {
-              correct: g.correct, partial_credit: g.partial_credit, feedback: g.feedback,
-            };
+          if (response.ok) {
+            const aiResult = await response.json();
+            const toolCall = aiResult.choices[0]?.message?.tool_calls?.[0];
+            if (toolCall) {
+              const parsed = JSON.parse(toolCall.function.arguments);
+              for (const g of parsed.grades) {
+                aiGradingResults[g.question_id] = {
+                  correct: g.correct, partial_credit: g.partial_credit, feedback: g.feedback,
+                };
+              }
+              gradingSuccess = true;
+            }
+          } else {
+            const errText = await response.text();
+            console.error(`AI grading attempt ${gradingAttempts} failed: ${response.status}`, errText);
+            if (response.status === 429 || response.status === 402) {
+              // Don't retry rate limits / payment issues
+              break;
+            }
           }
+        } catch (fetchErr) {
+          console.error(`AI grading fetch error attempt ${gradingAttempts}:`, fetchErr);
         }
-      } else {
+      }
+
+      if (!gradingSuccess) {
+        console.warn("All AI grading attempts failed, using fallback grades");
         for (const sq of sentenceQuestions) {
-          aiGradingResults[sq.id] = { correct: false, partial_credit: 0, feedback: "Unable to grade." };
+          aiGradingResults[sq.id] = { correct: false, partial_credit: 0, feedback: "Unable to grade — please retry." };
         }
       }
     }
@@ -350,25 +371,40 @@ RULES:
       }
 
       try {
-        const diagResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
-            messages: [{ role: "user", content: diagnosticPrompt }],
-            response_format: { type: "json_object" },
-          }),
-        });
+        // Retry diagnostic with model fallback
+        const diagModels = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
+        for (const diagModel of diagModels) {
+          try {
+            const diagResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${LOVABLE_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: diagModel,
+                messages: [{ role: "user", content: diagnosticPrompt }],
+                response_format: { type: "json_object" },
+              }),
+            });
 
-        if (diagResponse.ok) {
-          const diagResult = await diagResponse.json();
-          diagnosticReport = JSON.parse(diagResult.choices[0].message.content);
-          console.log("Diagnostic report generated successfully");
-        } else {
-          console.error("Diagnostic AI failed:", diagResponse.status);
+            if (diagResponse.ok) {
+              const diagResult = await diagResponse.json();
+              const rawContent = diagResult.choices[0].message.content;
+              let cleanContent = rawContent.trim();
+              if (cleanContent.startsWith("```")) {
+                cleanContent = cleanContent.replace(/```json?\n?/g, "").replace(/```$/g, "").trim();
+              }
+              diagnosticReport = JSON.parse(cleanContent);
+              console.log(`Diagnostic report generated with ${diagModel}`);
+              break;
+            } else {
+              const errText = await diagResponse.text();
+              console.error(`Diagnostic AI failed with ${diagModel}: ${diagResponse.status}`, errText);
+            }
+          } catch (innerDiagErr) {
+            console.error(`Diagnostic fetch error with ${diagModel}:`, innerDiagErr);
+          }
         }
       } catch (diagErr) {
         console.error("Diagnostic generation error:", diagErr);
