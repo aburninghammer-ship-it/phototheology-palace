@@ -574,6 +574,7 @@ function App() {
             <Route path="/games/palace_quiz/:mode?" element={<ProtectedRoute><PalaceQuiz /></ProtectedRoute>} />
             <Route path="/games/principle_puzzle/:mode?" element={<ProtectedRoute><PrinciplePuzzle /></ProtectedRoute>} />
             <Route path="/games/master-exam" element={<ProtectedRoute><MasterExam /></ProtectedRoute>} />
+            <Route path="/test-me" element={<ProtectedRoute><MasterExam /></ProtectedRoute>} />
             <Route path="/games/gideon-300" element={<ProtectedRoute><Gideon300 /></ProtectedRoute>} />
             <Route path="/games/freestyle-zone" element={<ProtectedRoute><FreestyleZone /></ProtectedRoute>} />
             <Route path="/games/room-game/:gameId" element={<ProtectedRoute><RoomGamePlay /></ProtectedRoute>} />

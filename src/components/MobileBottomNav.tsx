@@ -14,6 +14,7 @@ const primaryNavItems = [
 ];
 
 const moreNavItems = [
+  { icon: GraduationCap, label: "Test Me", path: "/test-me" },
   { icon: Eye, label: "Prophecy Watch", path: "/prophecy-watch" },
   { icon: Scale, label: "Christ & Culture", path: "/culture-controversy" },
   { icon: User, label: "My Profile", path: "/my-profile" },
