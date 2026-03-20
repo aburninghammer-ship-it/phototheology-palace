@@ -99,7 +99,7 @@ export const usePolishHistory = () => {
 
   const deleteStory = async (id: string) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('polish_stories')
         .delete()
         .eq('id', id);
