@@ -58,6 +58,7 @@ export function ScheduledGamesPanel({ onJoinGame, className, defaultType = 'scra
     createScheduledGame,
     updateRSVP,
     cancelScheduledGame,
+    startScheduledGame,
   } = useScheduledGames();
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -112,6 +113,15 @@ export function ScheduledGamesPanel({ onJoinGame, className, defaultType = 'scra
   const handleCancel = async (gameId: string) => {
     if (confirm('Are you sure you want to cancel this?')) {
       await cancelScheduledGame(gameId);
+    }
+  };
+
+  const handleStartGame = async (gameId: string) => {
+    // Generate a simple room code
+    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const success = await startScheduledGame(gameId, roomCode, gameId);
+    if (success && onJoinGame) {
+      onJoinGame(roomCode);
     }
   };
 
@@ -288,6 +298,7 @@ export function ScheduledGamesPanel({ onJoinGame, className, defaultType = 'scra
             onRSVP={handleRSVP}
             onCancel={handleCancel}
             onJoin={onJoinGame}
+            onStartGame={handleStartGame}
           />
         </TabsContent>
 
@@ -299,6 +310,7 @@ export function ScheduledGamesPanel({ onJoinGame, className, defaultType = 'scra
             onRSVP={handleRSVP}
             onCancel={handleCancel}
             onJoin={onJoinGame}
+            onStartGame={handleStartGame}
             emptyMessage="No games scheduled yet"
           />
         </TabsContent>
@@ -311,6 +323,7 @@ export function ScheduledGamesPanel({ onJoinGame, className, defaultType = 'scra
             onRSVP={handleRSVP}
             onCancel={handleCancel}
             onJoin={onJoinGame}
+            onStartGame={handleStartGame}
             emptyMessage="No group studies scheduled yet"
           />
         </TabsContent>
@@ -327,10 +340,11 @@ interface ScheduledListProps {
   onRSVP: (gameId: string, status: 'going' | 'maybe' | 'not_going') => void;
   onCancel: (gameId: string) => void;
   onJoin?: (roomCode: string) => void;
+  onStartGame?: (gameId: string) => void;
   emptyMessage?: string;
 }
 
-function ScheduledList({ items, isLoading, userId, onRSVP, onCancel, onJoin, emptyMessage = 'Nothing scheduled yet' }: ScheduledListProps) {
+function ScheduledList({ items, isLoading, userId, onRSVP, onCancel, onJoin, onStartGame, emptyMessage = 'Nothing scheduled yet' }: ScheduledListProps) {
   if (isLoading) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -362,6 +376,7 @@ function ScheduledList({ items, isLoading, userId, onRSVP, onCancel, onJoin, emp
             onRSVP={onRSVP}
             onCancel={onCancel}
             onJoin={onJoin}
+            onStartGame={onStartGame}
           />
         ))}
       </AnimatePresence>
@@ -376,10 +391,12 @@ interface ScheduledGameCardProps {
   onRSVP: (gameId: string, status: 'going' | 'maybe' | 'not_going') => void;
   onCancel: (gameId: string) => void;
   onJoin?: (roomCode: string) => void;
+  onStartGame?: (gameId: string) => void;
 }
 
-function ScheduledGameCard({ game, isHost, onRSVP, onCancel, onJoin }: ScheduledGameCardProps) {
+function ScheduledGameCard({ game, isHost, onRSVP, onCancel, onJoin, onStartGame }: ScheduledGameCardProps) {
   const scheduledDate = new Date(game.scheduled_at);
+  const isPastScheduledTime = scheduledDate.getTime() <= Date.now();
   const isStartingSoon = scheduledDate.getTime() - Date.now() < 15 * 60 * 1000; // Within 15 min
   const hasStarted = game.status === 'started' && game.room_code;
   const isGroupStudy = game.game_type === 'group-study';
@@ -410,10 +427,11 @@ function ScheduledGameCard({ game, isHost, onRSVP, onCancel, onJoin }: Scheduled
                 </CardTitle>
               </div>
               <CardDescription className="flex items-center gap-2 text-xs">
-                <span>by {game.host_name}</span>
+                <Users className="h-3 w-3" />
+                <span>Scheduled by <strong>{game.host_name}</strong></span>
                 {isHost && (
                   <span className="bg-primary/20 text-primary px-1.5 py-0.5 rounded text-[10px] font-medium">
-                    HOST
+                    YOU
                   </span>
                 )}
               </CardDescription>
@@ -445,7 +463,12 @@ function ScheduledGameCard({ game, isHost, onRSVP, onCancel, onJoin }: Scheduled
 
           {/* Time until */}
           <div className="text-xs text-muted-foreground">
-            {isStartingSoon ? (
+            {isPastScheduledTime ? (
+              <span className="text-orange-600 font-medium flex items-center gap-1">
+                <Bell className="h-3 w-3" />
+                Scheduled time has passed — ready to start!
+              </span>
+            ) : isStartingSoon ? (
               <span className="text-yellow-600 font-medium flex items-center gap-1">
                 <Bell className="h-3 w-3" />
                 Starting {formatDistanceToNow(scheduledDate, { addSuffix: true })}
@@ -475,6 +498,18 @@ function ScheduledGameCard({ game, isHost, onRSVP, onCancel, onJoin }: Scheduled
             <Users className="h-4 w-4 text-muted-foreground" />
             <span>{game.rsvp_count || 0} going</span>
           </div>
+
+          {/* Host: Start Game Now button */}
+          {isHost && !hasStarted && onStartGame && (
+            <Button
+              onClick={() => onStartGame(game.id)}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold"
+              size="sm"
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Start Game Now
+            </Button>
+          )}
 
           {/* Game started - Join button */}
           {hasStarted && game.room_code && onJoin && (

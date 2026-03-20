@@ -95,6 +95,7 @@ const Schedule = () => {
     createScheduledGame,
     updateRSVP,
     cancelScheduledGame,
+    startScheduledGame,
   } = useScheduledGames();
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -209,6 +210,20 @@ const Schedule = () => {
     }
   };
 
+  const handleStartGame = async (gameId: string) => {
+    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const success = await startScheduledGame(gameId, roomCode, gameId);
+    if (success) {
+      const game = scheduledGames.find(g => g.id === gameId);
+      if (game) {
+        const activity = getActivityById(game.game_type);
+        if (activity) {
+          navigate(`${activity.route}?room=${roomCode}`);
+        }
+      }
+    }
+  };
+
   const toggleFeature = (feature: keyof GroupStudyFeatures) => {
     setStudyFeatures(prev => ({ ...prev, [feature]: !prev[feature] }));
   };
@@ -283,6 +298,7 @@ const Schedule = () => {
               onRSVP={handleRSVP}
               onCancel={handleCancel}
               onJoin={handleJoin}
+              onStartGame={handleStartGame}
             />
           </TabsContent>
 
@@ -294,6 +310,7 @@ const Schedule = () => {
               onRSVP={handleRSVP}
               onCancel={handleCancel}
               onJoin={handleJoin}
+              onStartGame={handleStartGame}
               emptyMessage="No games scheduled yet"
             />
           </TabsContent>
@@ -306,6 +323,7 @@ const Schedule = () => {
               onRSVP={handleRSVP}
               onCancel={handleCancel}
               onJoin={handleJoin}
+              onStartGame={handleStartGame}
               emptyMessage="No studies scheduled yet"
             />
           </TabsContent>
@@ -318,6 +336,7 @@ const Schedule = () => {
               onRSVP={handleRSVP}
               onCancel={handleCancel}
               onJoin={handleJoin}
+              onStartGame={handleStartGame}
               emptyMessage="You haven't RSVP'd to anything yet"
             />
           </TabsContent>
@@ -663,10 +682,11 @@ interface ScheduledListProps {
   onRSVP: (gameId: string, status: 'going' | 'maybe' | 'not_going') => void;
   onCancel: (gameId: string) => void;
   onJoin: (game: ScheduledGame) => void;
+  onStartGame?: (gameId: string) => void;
   emptyMessage?: string;
 }
 
-function ScheduledList({ items, isLoading, userId, onRSVP, onCancel, onJoin, emptyMessage = 'Nothing scheduled yet' }: ScheduledListProps) {
+function ScheduledList({ items, isLoading, userId, onRSVP, onCancel, onJoin, onStartGame, emptyMessage = 'Nothing scheduled yet' }: ScheduledListProps) {
   if (isLoading) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -698,6 +718,7 @@ function ScheduledList({ items, isLoading, userId, onRSVP, onCancel, onJoin, emp
             onRSVP={onRSVP}
             onCancel={onCancel}
             onJoin={onJoin}
+            onStartGame={onStartGame}
           />
         ))}
       </AnimatePresence>
@@ -712,9 +733,10 @@ interface ScheduledActivityCardProps {
   onRSVP: (gameId: string, status: 'going' | 'maybe' | 'not_going') => void;
   onCancel: (gameId: string) => void;
   onJoin: (game: ScheduledGame) => void;
+  onStartGame?: (gameId: string) => void;
 }
 
-function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: ScheduledActivityCardProps) {
+function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin, onStartGame }: ScheduledActivityCardProps) {
   const scheduledDate = new Date(game.scheduled_at);
   const isStartingSoon = scheduledDate.getTime() - Date.now() < 15 * 60 * 1000;
   const hasStarted = game.status === 'started' && game.room_code;
@@ -784,10 +806,11 @@ function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: Sched
               <CardDescription className="flex items-center gap-2 text-xs">
                 <span className="text-muted-foreground">{activity?.name}</span>
                 <span>•</span>
-                <span>by {game.host_name}</span>
+                <Users className="h-3 w-3 text-muted-foreground" />
+                <span className="font-medium">Scheduled by {game.host_name}</span>
                 {isHost && (
                   <span className="bg-primary/20 text-primary px-1.5 py-0.5 rounded text-[10px] font-medium">
-                    HOST
+                    YOU
                   </span>
                 )}
               </CardDescription>
@@ -913,6 +936,18 @@ function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: Sched
               </span>
             )}
           </div>
+
+          {/* Start Game Now - for hosts */}
+          {isHost && !hasStarted && onStartGame && (
+            <Button
+              onClick={() => onStartGame(game.id)}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg"
+              size="sm"
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Start Game Now
+            </Button>
+          )}
 
           {/* Game started - Join button */}
           {hasStarted && (

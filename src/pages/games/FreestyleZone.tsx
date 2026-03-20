@@ -266,10 +266,11 @@ const DROP_FOCUS_OPTIONS: { value: DropFocus; label: string; icon: string; descr
   { value: "symbolic", label: "Symbolic", icon: "🔮", description: "Symbols, archetypes, and abstract concepts" },
 ];
 
-function SetupScreen({ onStart, hasExisting, onResume, pastSessions, onViewSession }: {
+function SetupScreen({ onStart, hasExisting, onResume, onAbandon, pastSessions, onViewSession }: {
   onStart: (d: Difficulty, focus: DropFocus, players: string[], freestyleMode: FreestyleMode) => void;
   hasExisting: boolean;
   onResume: () => void;
+  onAbandon: () => void;
   pastSessions: SavedSessionRow[];
   onViewSession: (s: SavedSessionRow) => void;
 }) {
@@ -292,7 +293,6 @@ function SetupScreen({ onStart, hasExisting, onResume, pastSessions, onViewSessi
     setPlayerNames(updated);
   };
   const validPlayers = playerNames.filter(n => n.trim());
-  const canStartMultiplayer = !isMultiplayer || validPlayers.length >= 2;
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -311,12 +311,15 @@ function SetupScreen({ onStart, hasExisting, onResume, pastSessions, onViewSessi
 
       {hasExisting && (
         <Card className="border-primary/50 bg-primary/5">
-          <CardContent className="p-4 flex items-center justify-between">
+          <CardContent className="p-4 flex items-center justify-between gap-3">
             <div>
               <p className="font-medium">You have an active session</p>
-              <p className="text-sm text-muted-foreground">Pick up where you left off</p>
+              <p className="text-sm text-muted-foreground">Pick up where you left off, or start fresh</p>
             </div>
-            <Button onClick={onResume}>Resume Session</Button>
+            <div className="flex gap-2 shrink-0">
+              <Button variant="outline" size="sm" onClick={onAbandon}>Start Fresh</Button>
+              <Button onClick={onResume}>Resume</Button>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -440,8 +443,8 @@ function SetupScreen({ onStart, hasExisting, onResume, pastSessions, onViewSessi
                 <Plus className="h-3.5 w-3.5" /> Add Player
               </Button>
             )}
-            {isMultiplayer && !canStartMultiplayer && (
-              <p className="text-xs text-red-500">At least 2 player names required.</p>
+            {isMultiplayer && validPlayers.length < 2 && (
+              <p className="text-xs text-muted-foreground">Add player names now, or start and let others join later.</p>
             )}
           </CardContent>
         )}
@@ -500,8 +503,8 @@ function SetupScreen({ onStart, hasExisting, onResume, pastSessions, onViewSessi
                 whileTap={{ scale: 0.98 }}
               >
                 <Card
-                  className={`cursor-pointer transition-all shadow-md hover:shadow-lg ${fireColors[i]} ${!canStartMultiplayer ? 'opacity-50 pointer-events-none' : ''}`}
-                  onClick={() => canStartMultiplayer && onStart(diff, selectedFocus, isMultiplayer ? validPlayers : [], selectedMode)}
+                  className={`cursor-pointer transition-all shadow-md hover:shadow-lg ${fireColors[i]}`}
+                  onClick={() => onStart(diff, selectedFocus, isMultiplayer ? validPlayers : [], selectedMode)}
                 >
                   <CardContent className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
@@ -1446,6 +1449,7 @@ export default function FreestyleZone() {
             onStart={(d, f, p, m) => game.startSession(d, f, p, m)}
             hasExisting={game.hasExistingSession}
             onResume={game.resumeGame}
+            onAbandon={game.abandonSession}
             pastSessions={pastSessions}
             onViewSession={setViewingSession}
           />

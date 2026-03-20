@@ -210,6 +210,7 @@ export function useFreestyleZone() {
     session,
     hasExistingSession,
     resumeGame,
+    abandonSession,
     isLoading: sessionLoading,
   } = useGameSession<FreestyleGameState>({
     gameType: "freestyle_zone",
@@ -816,6 +817,7 @@ export function useFreestyleZone() {
     advanceToNextDrop,
     askJeevesForHelp,
     endSession,
+    abandonSession,
     generateSessionSummary,
     generateJeevesDemo,
     polishSession,
