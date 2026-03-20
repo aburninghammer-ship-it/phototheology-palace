@@ -26,7 +26,6 @@ serve(async (req) => {
 
     const token = authHeader.replace("Bearer ", "");
     
-    // Check if the token is the service_role key (for direct invocation)
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const isServiceRole = token === serviceRoleKey;
     
@@ -45,15 +44,16 @@ serve(async (req) => {
     
     console.log("[WinBack] Authenticated, isServiceRole:", isServiceRole);
 
-    // Get unredeemed pre-approved emails
+    // Get unredeemed AND not-yet-emailed pre-approved emails
     const { data: recipients, error: fetchError } = await supabase
       .from("pre_approved_emails")
       .select("id, email, access_type")
-      .is("redeemed_at", null);
+      .is("redeemed_at", null)
+      .is("winback_email_sent_at", null);
 
     if (fetchError) throw new Error(`Failed to fetch recipients: ${fetchError.message}`);
     if (!recipients || recipients.length === 0) {
-      return new Response(JSON.stringify({ success: true, sent: 0, message: "No recipients found" }), {
+      return new Response(JSON.stringify({ success: true, sent: 0, failed: 0, total: 0, message: "No new recipients to email (all have already been sent or redeemed)" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -100,6 +100,9 @@ serve(async (req) => {
     .body-content p { font-size: 16px; line-height: 1.7; color: #4a4744; margin: 0 0 20px 0; }
     .highlight-box { background: #fdf8ed; border-left: 4px solid #c9a84c; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; }
     .highlight-box p { margin: 0; font-size: 15px; color: #5a5650; }
+    .new-feature { background: #eef6ff; border: 2px solid #3b82f6; padding: 20px 24px; margin: 24px 0; border-radius: 8px; text-align: center; }
+    .new-feature h3 { color: #1e40af; font-size: 18px; margin: 0 0 8px 0; }
+    .new-feature p { margin: 0; font-size: 14px; color: #3b5998; }
     .cta-wrapper { text-align: center; margin: 32px 0; }
     .cta-btn { display: inline-block; background: #c9a84c; color: #1a1a2e; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.5px; }
     .features { margin: 28px 0; }
@@ -125,6 +128,11 @@ serve(async (req) => {
           <p><strong>Your offer:</strong> ${accessDescription}. Just sign up with this email address and your access activates automatically.</p>
         </div>
 
+        <div class="new-feature">
+          <h3>🆕 New Feature: Test Me — PT Diagnostic Assessment</h3>
+          <p>Discover your Phototheology strengths and blind spots with our AI-powered diagnostic. Get a personalized 7-day growth plan tailored to your palace mastery level.</p>
+        </div>
+
         <p>Here's what's waiting for you inside the Palace:</p>
         
         <div class="features">
@@ -132,6 +140,7 @@ serve(async (req) => {
           <div class="feature"><span class="feature-icon">🔍</span> <span>Detective-style investigation rooms that sharpen your eye</span></div>
           <div class="feature"><span class="feature-icon">🎤</span> <span>Freestyle training — see Scripture in nature, life, and history</span></div>
           <div class="feature"><span class="feature-icon">✝️</span> <span>Christ in Every Chapter — trace Jesus through all 66 books</span></div>
+          <div class="feature"><span class="feature-icon">📝</span> <span><strong>NEW:</strong> Test Me diagnostic — AI-graded assessments with growth plans</span></div>
           <div class="feature"><span class="feature-icon">🎮</span> <span>Games, drills, and challenges that make Scripture stick</span></div>
           <div class="feature"><span class="feature-icon">⛪</span> <span>Church communities, live study groups, and prayer teams</span></div>
         </div>
@@ -159,6 +168,12 @@ serve(async (req) => {
           html: emailHtml,
         });
         results.push({ email: recipient.email, success: true });
+
+        // Mark as sent so we don't email them again
+        await supabase
+          .from("pre_approved_emails")
+          .update({ winback_email_sent_at: new Date().toISOString() })
+          .eq("id", recipient.id);
       } catch (sendErr: unknown) {
         const errMsg = sendErr instanceof Error ? sendErr.message : "Unknown error";
         results.push({ email: recipient.email, success: false, error: errMsg });

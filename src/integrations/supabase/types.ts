@@ -12064,6 +12064,7 @@ export type Database = {
           id: string
           redeemed_at: string | null
           redeemed_by: string | null
+          winback_email_sent_at: string | null
         }
         Insert: {
           access_type?: string
@@ -12073,6 +12074,7 @@ export type Database = {
           id?: string
           redeemed_at?: string | null
           redeemed_by?: string | null
+          winback_email_sent_at?: string | null
         }
         Update: {
           access_type?: string
@@ -12082,6 +12084,7 @@ export type Database = {
           id?: string
           redeemed_at?: string | null
           redeemed_by?: string | null
+          winback_email_sent_at?: string | null
         }
         Relationships: []
       }
