@@ -30,7 +30,7 @@ export const usePolishHistory = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('polish_stories')
         .select('*')
         .eq('user_id', user.id)
@@ -60,36 +60,46 @@ export const usePolishHistory = () => {
         return null;
       }
 
-      const { data, error } = await (supabase as any)
+      console.log('[Polish] Saving story for user:', user.id, 'title:', story.title);
+
+      const insertPayload = {
+        user_id: user.id,
+        input_text: inputText,
+        title: story.title || null,
+        tagline: story.tagline || null,
+        scenes: story.scenes ? JSON.parse(JSON.stringify(story.scenes)) : null,
+        narrative: story.narrative || null,
+        closing_reflection: story.closingReflection || null,
+        verses_used: Array.isArray(story.versesUsed) ? story.versesUsed : null,
+      };
+
+      console.log('[Polish] Insert payload:', JSON.stringify(insertPayload, null, 2));
+
+      const { data, error } = await supabase
         .from('polish_stories')
-        .insert({
-          user_id: user.id,
-          input_text: inputText,
-          title: story.title,
-          tagline: story.tagline,
-          scenes: story.scenes,
-          narrative: story.narrative,
-          closing_reflection: story.closingReflection,
-          verses_used: story.versesUsed,
-        })
+        .insert(insertPayload)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('[Polish] Supabase insert error:', error);
+        throw error;
+      }
 
+      console.log('[Polish] Story saved successfully:', data?.id);
       toast.success("Story saved!");
       fetchHistory();
       return data;
-    } catch (error) {
-      console.error('Error saving polish story:', error);
-      toast.error("Failed to save story");
+    } catch (error: any) {
+      console.error('[Polish] Error saving polish story:', error?.message || error);
+      toast.error("Failed to save story: " + (error?.message || "Unknown error"));
       return null;
     }
   };
 
   const deleteStory = async (id: string) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('polish_stories')
         .delete()
         .eq('id', id);
