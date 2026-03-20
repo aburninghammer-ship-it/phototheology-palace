@@ -14,6 +14,7 @@ const MasterExam = () => {
     master: "Master Exam",
     foundation: "Foundation Diagnostic",
     prophecy_sanctuary: "Prophecy & Sanctuary",
+    room_test: exam.selectedRoomName ? `${exam.selectedRoomName} Test` : "Room Intelligence Test",
   };
 
   return (
