@@ -29,7 +29,7 @@ export function useIncompleteSignup() {
       try {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("display_name, subscription_tier, subscription_status, payment_source, has_lifetime_access")
+          .select("display_name, subscription_tier, subscription_status, payment_source, has_lifetime_access, promotional_access_expires_at")
           .eq("id", user.id)
           .single();
 
