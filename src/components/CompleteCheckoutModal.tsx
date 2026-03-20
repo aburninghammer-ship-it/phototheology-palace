@@ -2,9 +2,8 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
-import { CreditCard, Shield, Clock, Sparkles, ChevronRight } from "lucide-react";
-import { toast } from "sonner";
+import { Sparkles, ChevronRight, Clock, Shield, CreditCard } from "lucide-react";
+import { EmbeddedCheckoutForm } from "@/components/EmbeddedCheckoutForm";
 
 interface CompleteCheckoutModalProps {
   open: boolean;
@@ -13,35 +12,39 @@ interface CompleteCheckoutModalProps {
 }
 
 export function CompleteCheckoutModal({ open, onOpenChange, userName }: CompleteCheckoutModalProps) {
-  const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<"premium_monthly" | "premium_annual">("premium_monthly");
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const plans = {
     premium_monthly: { label: "Monthly", price: "$15/mo", save: null },
     premium_annual: { label: "Annual", price: "$150/yr", save: "Save $30" },
   };
 
-  const handleCheckout = async () => {
-    setLoading(true);
-    try {
-      const plan = selectedPlan.includes("annual") ? "premium" : "premium";
-      const billing = selectedPlan.includes("annual") ? "annual" : "monthly";
+  const billing = selectedPlan.includes("annual") ? "annual" : "monthly";
 
-      const { data, error } = await supabase.functions.invoke("create-trial-checkout", {
-        body: { plan, billing },
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } catch (err) {
-      console.error("Checkout error:", err);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (showCheckout) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto border-primary/20">
+          <DialogHeader>
+            <DialogTitle className="text-lg">Complete Your Signup</DialogTitle>
+            <DialogDescription>
+              {plans[selectedPlan].label} plan — {plans[selectedPlan].price}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="min-h-[400px]">
+            <EmbeddedCheckoutForm plan="premium" billing={billing} />
+          </div>
+          <button
+            onClick={() => setShowCheckout(false)}
+            className="text-xs text-muted-foreground underline text-center mt-2"
+          >
+            ← Change plan
+          </button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -95,13 +98,12 @@ export function CompleteCheckoutModal({ open, onOpenChange, userName }: Complete
           </div>
 
           <Button
-            onClick={handleCheckout}
-            disabled={loading}
+            onClick={() => setShowCheckout(true)}
             className="w-full h-12 text-base gap-2"
             size="lg"
           >
-            {loading ? "Redirecting…" : "Start Free Trial"}
-            {!loading && <ChevronRight className="h-4 w-4" />}
+            Start Free Trial
+            <ChevronRight className="h-4 w-4" />
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">
