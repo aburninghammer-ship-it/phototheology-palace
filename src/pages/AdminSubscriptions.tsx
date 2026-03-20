@@ -968,6 +968,7 @@ export default function AdminSubscriptions() {
         </TabsContent>
 
         <TabsContent value="campaigns" className="space-y-6">
+          <WinBackCampaignSender />
           <EmailCampaignHistory />
           <EmailCampaignManager />
         </TabsContent>
