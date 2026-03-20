@@ -93,6 +93,15 @@ export function ExamResults({ results, onRetake }: ExamResultsProps) {
         </CardContent>
       </Card>
 
+      {/* Diagnostic Report (for diagnostic exams) */}
+      {results.diagnostic && (
+        <DiagnosticReport
+          diagnostic={results.diagnostic}
+          onGenerateWeeklyPlan={() => {}}
+          isGeneratingPlan={false}
+        />
+      )}
+
       {/* Per-Question Review */}
       <Card variant="glass">
         <CardContent className="p-4 md:p-6 space-y-4">
