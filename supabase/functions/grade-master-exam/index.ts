@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { exam_id, answers, time_used_seconds, mode } = await req.json();
+    const { exam_id, answers, time_used_seconds, mode, room_name: clientRoomName } = await req.json();
     if (!exam_id || !answers) throw new Error("Missing exam_id or answers");
 
     const supabaseClient = createClient(
@@ -201,14 +201,95 @@ serve(async (req) => {
     // === DIAGNOSTIC ANALYSIS (for diagnostic exam types) ===
     const examType = exam.exam_type || "master";
     let diagnosticReport: any = null;
+    const isRoomTest = examType.startsWith("room_test_");
 
     if (examType !== "master") {
       console.log("Generating diagnostic report...");
       
       const incorrectQuestions = perQuestionResults.filter((q: any) => !q.correct);
       const partialQuestions = perQuestionResults.filter((q: any) => q.earned === 0.5);
-      
-      const diagnosticPrompt = `You are the Phototheology Diagnostic Engine. Analyze this ${examType} exam result and produce a diagnostic report.
+
+      let diagnosticPrompt: string;
+
+      if (isRoomTest) {
+        const roomCode = examType.replace("room_test_", "");
+        const roomName = exam.room_name || roomCode.toUpperCase();
+        
+        diagnosticPrompt = `You are the Phototheology Room Intelligence Diagnostic Engine. Analyze this Room Test result for the "${roomName}" room and produce a mastery diagnosis.
+
+ROOM: ${roomName} (Code: ${roomCode})
+OVERALL SCORE: ${overallScore}%
+TOTAL CORRECT: ${totalCorrect}/${totalQ}
+
+CATEGORY BREAKDOWN:
+${JSON.stringify(categoryScores, null, 2)}
+
+INCORRECT ANSWERS (${incorrectQuestions.length}):
+${JSON.stringify(incorrectQuestions.map((q: any) => ({
+  category: q.category,
+  question: q.question,
+  user_answer: q.user_answer,
+  correct_answer: q.correct_answer,
+  type: q.type,
+})), null, 2)}
+
+PARTIAL CREDIT (${partialQuestions.length}):
+${JSON.stringify(partialQuestions.map((q: any) => ({
+  category: q.category,
+  question: q.question,
+  user_answer: q.user_answer,
+  correct_answer: q.correct_answer,
+})), null, 2)}
+
+Generate a JSON diagnostic report with this EXACT structure:
+{
+  "competency_level": "beginner|developing|strong|advanced|guide|strategist",
+  "competency_label": "Beginner Explorer|Developing Builder|Strong Connector|Advanced Interpreter|PT Guide|PT Strategist",
+  "mastery_level": 1-5,
+  "mastery_title": "Novice|Student|Builder|Teacher|Master",
+  "room_score_summary": "One-sentence verdict: how well does the user understand and apply this room's discipline?",
+  "strength_analysis": "2-3 sentences about what the user does well IN THIS ROOM's discipline, referencing specific question patterns",
+  "weakness_analysis": "2-3 sentences about weak areas specific to THIS ROOM's method — be direct and constructive",
+  "error_patterns": [
+    {
+      "pattern": "Description of the thinking error specific to this room's discipline",
+      "frequency": 3,
+      "examples": ["Brief example from their wrong answers"],
+      "recommendation": "Specific actionable fix using this room's method"
+    }
+  ],
+  "weakness_map": {
+    "room_application": {"score": 75, "verdict": "Solid grasp of basic application"},
+    "room_distinction": {"score": 50, "verdict": "Confuses this room with X room"},
+    "room_depth": {"score": 60, "verdict": "Surface-level only — needs deeper engagement"},
+    "room_integration": {"score": 40, "verdict": "Cannot yet connect this room to other PT principles"}
+  },
+  "weekly_plan": [
+    {
+      "day": "Monday",
+      "focus": "Specific drill for this room",
+      "activities": ["Activity 1 using this room's method", "Activity 2"],
+      "time_minutes": 20
+    },
+    {"day": "Tuesday", "focus": "...", "activities": ["..."], "time_minutes": 20},
+    {"day": "Wednesday", "focus": "...", "activities": ["..."], "time_minutes": 20},
+    {"day": "Thursday", "focus": "...", "activities": ["..."], "time_minutes": 20},
+    {"day": "Friday", "focus": "...", "activities": ["..."], "time_minutes": 20},
+    {"day": "Saturday", "focus": "Review & correct mistakes", "activities": ["..."], "time_minutes": 25},
+    {"day": "Sunday", "focus": "Mini-retest: 15 questions", "activities": ["Take targeted checkpoint quiz"], "time_minutes": 15}
+  ],
+  "focus_areas": ["Specific area 1 for this room", "Area 2", "Area 3"],
+  "next_room_recommendation": "Which related room should the user study next to strengthen this room's discipline?"
+}
+
+RULES:
+- ALL analysis must be specific to the ${roomName} room's discipline
+- Mastery level: 1 (0-30%), 2 (31-50%), 3 (51-70%), 4 (71-85%), 5 (86-100%)
+- The weekly plan should use THIS ROOM's specific exercises and methods
+- Reference PT room names and principles specifically
+- next_room_recommendation should name a complementary room`;
+      } else {
+        diagnosticPrompt = `You are the Phototheology Diagnostic Engine. Analyze this ${examType} exam result and produce a diagnostic report.
 
 EXAM TYPE: ${examType}
 OVERALL SCORE: ${overallScore}%
@@ -242,55 +323,20 @@ Generate a JSON diagnostic report with this EXACT structure:
   "weakness_analysis": "2-3 sentences about weak areas, being direct but constructive",
   "error_patterns": [
     {
-      "pattern": "Description of the thinking error, e.g. 'Confuses symbolic interpretation with freestyle connection'",
+      "pattern": "Description of the thinking error",
       "frequency": 3,
       "examples": ["Brief example from their wrong answers"],
       "recommendation": "Specific actionable fix"
     }
   ],
   "weekly_plan": [
-    {
-      "day": "Monday",
-      "focus": "Review Floor 1 room roles",
-      "activities": ["Complete 10 room-classification drills", "Re-read Palace overview"],
-      "time_minutes": 20
-    },
-    {
-      "day": "Tuesday",
-      "focus": "...",
-      "activities": ["..."],
-      "time_minutes": 20
-    },
-    {
-      "day": "Wednesday",
-      "focus": "...",
-      "activities": ["..."],
-      "time_minutes": 20
-    },
-    {
-      "day": "Thursday",
-      "focus": "...",
-      "activities": ["..."],
-      "time_minutes": 20
-    },
-    {
-      "day": "Friday",
-      "focus": "...",
-      "activities": ["..."],
-      "time_minutes": 20
-    },
-    {
-      "day": "Saturday",
-      "focus": "Review mistakes and rewrite incorrect answers",
-      "activities": ["..."],
-      "time_minutes": 25
-    },
-    {
-      "day": "Sunday",
-      "focus": "Mini-retest: 15 questions targeting weak areas",
-      "activities": ["Take targeted checkpoint quiz"],
-      "time_minutes": 15
-    }
+    {"day": "Monday", "focus": "Review Floor 1 room roles", "activities": ["Complete 10 room-classification drills", "Re-read Palace overview"], "time_minutes": 20},
+    {"day": "Tuesday", "focus": "...", "activities": ["..."], "time_minutes": 20},
+    {"day": "Wednesday", "focus": "...", "activities": ["..."], "time_minutes": 20},
+    {"day": "Thursday", "focus": "...", "activities": ["..."], "time_minutes": 20},
+    {"day": "Friday", "focus": "...", "activities": ["..."], "time_minutes": 20},
+    {"day": "Saturday", "focus": "Review mistakes and rewrite incorrect answers", "activities": ["..."], "time_minutes": 25},
+    {"day": "Sunday", "focus": "Mini-retest: 15 questions targeting weak areas", "activities": ["Take targeted checkpoint quiz"], "time_minutes": 15}
   ],
   "focus_areas": ["Area 1", "Area 2", "Area 3"]
 }
@@ -301,6 +347,7 @@ RULES:
 - Be direct in weakness analysis — don't sugarcoat
 - Reference PT room names and principles specifically
 - The plan should feel actionable, not generic`;
+      }
 
       try {
         const diagResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -325,6 +372,91 @@ RULES:
         }
       } catch (diagErr) {
         console.error("Diagnostic generation error:", diagErr);
+      }
+    }
+
+    // === UPDATE ROOM MASTERY LEVELS (for room tests) ===
+    if (isRoomTest) {
+      try {
+        const roomCode = examType.replace("room_test_", "");
+        const roomFloorMap: Record<string, number> = {
+          sr: 1, ir: 1, "24fps": 1, br: 1, tr: 1, gr: 1,
+          or: 2, dc: 2, st: 2, qr: 2, qa: 2,
+          nf: 3, pf: 3, bf: 3, hf: 3, lr: 3,
+          cr: 4, dr: 4, c6: 4, trm: 4, tz: 4, prm: 4, "p||": 4, frt: 4, cec: 4, r66: 4,
+          bl: 5, pr: 5, "3a": 5, fe: 5, feasts: 5,
+          "1h": 6, "2h": 6, "3h": 6, cycles: 6, jr: 6,
+          frm: 7, mr: 7, srm: 7,
+        };
+        const floorNumber = roomFloorMap[roomCode] || 1;
+        
+        // Calculate mastery level from score
+        let newMasteryLevel = 1;
+        if (overallScore >= 86) newMasteryLevel = 5;
+        else if (overallScore >= 71) newMasteryLevel = 4;
+        else if (overallScore >= 51) newMasteryLevel = 3;
+        else if (overallScore >= 31) newMasteryLevel = 2;
+
+        const supabaseAdmin = createClient(
+          Deno.env.get("SUPABASE_URL") ?? "",
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+        );
+
+        // Check existing mastery
+        const { data: existing } = await supabaseAdmin
+          .from("room_mastery_levels")
+          .select("id, mastery_level, total_drills_completed, perfect_scores_count, xp_current")
+          .eq("user_id", user.id)
+          .eq("room_id", roomCode)
+          .maybeSingle();
+
+        const xpEarned = Math.round(overallScore * 2); // 0-200 XP per test
+        const isPerfect = overallScore >= 95;
+
+        if (existing) {
+          // Only update level if new score is higher
+          const bestLevel = Math.max(existing.mastery_level || 1, newMasteryLevel);
+          await supabaseAdmin
+            .from("room_mastery_levels")
+            .update({
+              mastery_level: bestLevel,
+              total_drills_completed: (existing.total_drills_completed || 0) + 1,
+              perfect_scores_count: (existing.perfect_scores_count || 0) + (isPerfect ? 1 : 0),
+              xp_current: (existing.xp_current || 0) + xpEarned,
+              last_activity_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existing.id);
+        } else {
+          await supabaseAdmin
+            .from("room_mastery_levels")
+            .insert({
+              user_id: user.id,
+              room_id: roomCode,
+              floor_number: floorNumber,
+              mastery_level: newMasteryLevel,
+              total_drills_completed: 1,
+              perfect_scores_count: isPerfect ? 1 : 0,
+              xp_current: xpEarned,
+              xp_required: 500,
+              last_activity_at: new Date().toISOString(),
+            });
+        }
+
+        // Add mastery data to diagnostic report
+        if (diagnosticReport) {
+          diagnosticReport.mastery_update = {
+            room_code: roomCode,
+            floor_number: floorNumber,
+            new_level: newMasteryLevel,
+            xp_earned: xpEarned,
+            is_perfect: isPerfect,
+          };
+        }
+
+        console.log(`Room mastery updated: ${roomCode} → Level ${newMasteryLevel}, +${xpEarned} XP`);
+      } catch (masteryErr) {
+        console.error("Failed to update room mastery:", masteryErr);
       }
     }
 
@@ -404,6 +536,7 @@ RULES:
         per_question: perQuestionResults,
         diagnostic: diagnosticReport,
         exam_type: examType,
+        room_name: isRoomTest ? (clientRoomName || examType.replace("room_test_", "").toUpperCase()) : undefined,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

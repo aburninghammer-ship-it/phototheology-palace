@@ -1,6 +1,7 @@
 import { GradingResults, ExamResult } from "@/hooks/useMasterExam";
 import { CategoryBreakdown } from "./CategoryBreakdown";
 import { DiagnosticReport } from "./DiagnosticReport";
+import { RoomDiagnosisReport } from "./RoomDiagnosisReport";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -93,8 +94,16 @@ export function ExamResults({ results, onRetake }: ExamResultsProps) {
         </CardContent>
       </Card>
 
-      {/* Diagnostic Report (for diagnostic exams) */}
-      {results.diagnostic && (
+      {/* Room Diagnosis Report (for room tests) */}
+      {results.diagnostic && results.exam_type?.startsWith("room_test_") && (
+        <RoomDiagnosisReport
+          diagnostic={results.diagnostic}
+          roomName={results.room_name}
+        />
+      )}
+
+      {/* Diagnostic Report (for non-room diagnostic exams) */}
+      {results.diagnostic && !results.exam_type?.startsWith("room_test_") && (
         <DiagnosticReport
           diagnostic={results.diagnostic}
           onGenerateWeeklyPlan={() => {}}

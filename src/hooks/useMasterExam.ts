@@ -56,6 +56,7 @@ export interface GradingResults {
   per_question: ExamResult[];
   diagnostic?: DiagnosticData;
   exam_type?: string;
+  room_name?: string;
 }
 
 export interface QuestionGradeResult {
@@ -378,9 +379,14 @@ export function useMasterExam() {
           answers,
           time_used_seconds: timeUsed,
           mode: "finalize",
+          room_name: selectedRoomName || undefined,
         },
       });
       if (error) throw error;
+      // Attach room_name to results for UI
+      if (data && selectedRoomName) {
+        data.room_name = selectedRoomName;
+      }
       setResults(data);
       setPhase("results");
       fetchHistory();
