@@ -72,7 +72,22 @@ const MasterExam = () => {
 
           {exam.phase === "select_type" && (
             <div className="max-w-2xl mx-auto">
-              <ExamTypeSelector onSelect={(type) => exam.generateExam(type)} />
+              <ExamTypeSelector onSelect={(type) => {
+                if (type === "room_test") {
+                  exam.showRoomSelector();
+                } else {
+                  exam.generateExam(type);
+                }
+              }} />
+            </div>
+          )}
+
+          {exam.phase === "select_room" && (
+            <div className="max-w-3xl mx-auto">
+              <RoomIntelligenceSelector
+                onSelect={(roomCode, roomName) => exam.generateRoomExam(roomCode, roomName)}
+                onBack={exam.showTypeSelector}
+              />
             </div>
           )}
 
