@@ -619,20 +619,33 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
       }
 
       if (shouldUseBrowser || networkStatus === 'offline') {
-        // Use browser TTS
+        // Use browser TTS only when explicitly requested or offline
         console.log('[TTS] Using browser TTS (offline or requested)');
         await speakWithBrowser(cleanText);
       } else {
-        // Try ElevenLabs first, fallback to browser on error
-        try {
-          console.log('[TTS] Attempting ElevenLabs TTS');
-          await speakWithElevenLabs(cleanText, opts);
-        } catch (elevenLabsError) {
-          console.warn('[TTS] ElevenLabs failed, falling back to browser TTS:', elevenLabsError);
-          // Ensure any partially-loaded OpenAI audio is fully killed before fallback
+        // Use OpenAI TTS with one retry — never silently fall back to robotic browser voice
+        let lastError: unknown;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            console.log(`[TTS] Attempting OpenAI TTS (attempt ${attempt + 1})`);
+            await speakWithElevenLabs(cleanText, opts);
+            lastError = null;
+            break;
+          } catch (openaiError) {
+            lastError = openaiError;
+            console.warn(`[TTS] OpenAI TTS attempt ${attempt + 1} failed:`, openaiError);
+            if (attempt === 0) {
+              // Clean up before retry
+              stop();
+              await new Promise(r => setTimeout(r, 1000));
+            }
+          }
+        }
+        if (lastError) {
           stop();
-          toast.info('Using offline voice mode');
-          await speakWithBrowser(cleanText);
+          const msg = lastError instanceof Error ? lastError.message : 'Audio generation failed';
+          toast.error(`Voice generation failed: ${msg}`);
+          throw lastError;
         }
       }
 
