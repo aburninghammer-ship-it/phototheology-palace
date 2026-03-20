@@ -254,7 +254,7 @@ export function SessionLibrary() {
   ];
 
   const renderStudySessionCard = (session: StudySession) => (
-    <Card key={session.id} className="hover:shadow-md transition-shadow">
+    <Card key={session.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleResume(session.id, 'study')}>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
