@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Telescope, Crown, Clock } from "lucide-react";
+import { Building2, Telescope, Crown, Clock, Swords } from "lucide-react";
 import { motion } from "framer-motion";
 
-export type ExamType = "master" | "foundation" | "prophecy_sanctuary";
+export type ExamType = "master" | "foundation" | "prophecy_sanctuary" | "room_test";
 
 interface ExamTypeConfig {
   id: ExamType;
