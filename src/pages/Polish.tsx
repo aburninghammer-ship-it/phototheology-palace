@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, PenLine, Plus, Save, Trash2, FileText, Clock } from "lucide-react";
+import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { usePolishHistory, SavedPolishStory } from "@/hooks/usePolishHistory";
@@ -543,15 +544,24 @@ const Polish = () => {
                           </Badge>
                         )}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-primary hover:bg-primary/10"
-                        onClick={() => handleLoadStory(story)}
-                      >
-                        <PenLine className="w-3 h-3 mr-1" />
-                        Edit
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <QuickAudioButton
+                          text={[story.title, story.tagline, story.narrative].filter(Boolean).join('. ')}
+                          variant="ghost"
+                          size="sm"
+                          showLabel
+                          className="text-xs text-primary hover:bg-primary/10"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-primary hover:bg-primary/10"
+                          onClick={() => handleLoadStory(story)}
+                        >
+                          <PenLine className="w-3 h-3 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
                     </div>
                   </motion.div>
                 );
@@ -666,7 +676,14 @@ const Polish = () => {
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-3 justify-center pt-2">
+              <div className="flex gap-3 justify-center flex-wrap pt-2">
+                <QuickAudioButton
+                  text={[result.title, result.tagline, getManuscriptText()].filter(Boolean).join('. ')}
+                  variant="outline"
+                  size="default"
+                  showLabel
+                  className="border-primary/30 hover:bg-primary/10"
+                />
                 <Button
                   variant="outline"
                   onClick={handleSave}
