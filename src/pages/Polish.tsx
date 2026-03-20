@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, PenLine, Plus, Save, Trash2, FileText, Clock } from "lucide-react";
+import { QuickAudioButton } from "@/components/audio/QuickAudioButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { usePolishHistory, SavedPolishStory } from "@/hooks/usePolishHistory";
