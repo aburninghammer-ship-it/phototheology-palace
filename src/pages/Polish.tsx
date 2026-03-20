@@ -592,6 +592,16 @@ const Polish = () => {
                   "{result.tagline}"
                 </p>
                 <div className="w-16 h-0.5 mx-auto bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+                <div className="flex justify-center pt-2">
+                  <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="min-w-40"
+                  >
+                    {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                    Save Manuscript
+                  </Button>
+                </div>
               </div>
 
               {/* The Manuscript — glass sections */}
