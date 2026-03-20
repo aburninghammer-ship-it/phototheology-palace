@@ -208,6 +208,7 @@ export function SessionLibrary() {
   const handleResume = async (sessionId: string, type: SessionType) => {
     if (type === 'study') {
       await loadSession(sessionId);
+      navigate('/study-buddy');
     } else if (type === 'sermon-writer') {
       navigate(`/sermon-writer?session=${sessionId}`);
     } else if (type === 'sermon-simmer') {
