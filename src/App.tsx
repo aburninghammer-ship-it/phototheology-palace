@@ -399,6 +399,7 @@ function App() {
                           <LiveDemoNotification />
                           <InstallPrompt />
                           <ExitIntentPopup />
+                          <IncompleteSignupPrompt />
                         </div>
                         {/* Session Mode Prompt Dialog */}
                         <SessionPromptDialog />
