@@ -86,8 +86,19 @@ export function ExamIntro({
               disabled={loading}
             >
               <Play className="h-5 w-5 mr-2" />
-              {inProgressExam ? "Start New Exam" : "Begin Exam"}
+              {inProgressExam ? "Start New Exam" : "Begin Master Exam"}
             </Button>
+            {onShowTypeSelector && (
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 text-base"
+                onClick={onShowTypeSelector}
+              >
+                <Compass className="h-5 w-5 mr-2" />
+                Diagnostic Exams
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
