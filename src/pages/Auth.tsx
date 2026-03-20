@@ -439,26 +439,18 @@ export default function Auth() {
             return;
           }
 
-          // No pre-approved or external membership - redirect to Stripe checkout
-          // Track checkout redirect - STEP 2 of checkout funnel
+          // No pre-approved or external membership
+          // EXPLORE-FIRST FLOW: Let user explore the Palace before requiring payment
+          // The IncompleteSignupPrompt modal will gently prompt them to complete checkout
+          // after they've had a chance to see the value of the platform
           trackCheckoutRedirect('premium', 'monthly');
-
-          const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-trial-checkout', {
-            body: { plan: 'premium', billing: 'monthly' },
-          });
-
-          if (checkoutError) throw checkoutError;
-
-          if (checkoutData?.url) {
-            // Redirect to Stripe checkout - signup is not complete without payment info
-            window.location.href = checkoutData.url;
-            return;
-          }
+          
+          toast.success("Welcome to the Palace! Take a look around — we'll help you set up your trial shortly.");
+          navigate("/gatehouse", { replace: true });
         } catch (checkoutErr) {
-          console.error("Failed to create checkout session:", checkoutErr);
-          // Fallback to pricing page if checkout creation fails
-          toast.error(t('auth.trialStartFailed'));
-          navigate("/pricing?trial=true", { replace: true });
+          console.error("Failed during signup flow:", checkoutErr);
+          toast.success("Welcome! Head to the Palace to get started.");
+          navigate("/gatehouse", { replace: true });
         }
       } else if (data.user && !data.session) {
         // Celebrate with confetti!

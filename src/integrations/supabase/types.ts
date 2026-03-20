@@ -12522,6 +12522,7 @@ export type Database = {
           preferred_features: string[] | null
           primary_role: string | null
           promotional_access_expires_at: string | null
+          recovery_email_count: number | null
           referral_code: string | null
           selected_path: string | null
           social_links: Json | null
@@ -12604,6 +12605,7 @@ export type Database = {
           preferred_features?: string[] | null
           primary_role?: string | null
           promotional_access_expires_at?: string | null
+          recovery_email_count?: number | null
           referral_code?: string | null
           selected_path?: string | null
           social_links?: Json | null
@@ -12686,6 +12688,7 @@ export type Database = {
           preferred_features?: string[] | null
           primary_role?: string | null
           promotional_access_expires_at?: string | null
+          recovery_email_count?: number | null
           referral_code?: string | null
           selected_path?: string | null
           social_links?: Json | null
