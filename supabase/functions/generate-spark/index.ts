@@ -60,7 +60,8 @@ async function generateSpark(
   triggerType?: 'dwell' | 'output',
   outputTitle?: string,
   userName?: string,
-  recentTitles?: string[]
+  recentTitles?: string[],
+  recentInsights?: string[]
 ): Promise<{
   spark_type: 'connection' | 'pattern' | 'application';
   title: string;
@@ -92,9 +93,22 @@ async function generateSpark(
     ? `Address the user warmly by name as "Hey ${userName}" or similar in the recognition line.`
     : '';
 
-  // Deduplication instruction based on recent sparks
+  // Deduplication instruction based on recent sparks — include titles AND insight summaries
+  const insights = recentInsights || [];
   const deduplicationInstruction = recentTitles && recentTitles.length > 0
-    ? `\n⚠️ AVOID REPETITION - The user has recently seen these spark titles:\n${recentTitles.map(t => `- "${t}"`).join('\n')}\nGenerate something FRESH and DIFFERENT. Do NOT repeat similar themes, angles, or connections.`
+    ? `\n⚠️ CRITICAL — DO NOT REPEAT. The user has already seen these sparks:
+${recentTitles.slice(0, 15).map((t: string, i: number) => {
+  const insight = insights[i];
+  return insight ? `- "${t}" → ${insight.slice(0, 80)}…` : `- "${t}"`;
+}).join('\n')}
+
+HARD RULES FOR UNIQUENESS:
+1. Do NOT restate the same theological point in different words.
+2. Do NOT cover the same Scripture passage from a slightly different angle.
+3. Do NOT generate a spark whose core idea overlaps with ANY spark above.
+4. Each spark must introduce a GENUINELY NEW concept, connection, or application.
+5. If you cannot produce something truly novel, return an empty JSON object: {}
+6. Better to generate nothing than to repeat.`
     : '';
 
   let systemPrompt = `You are Jeeves, a Phototheology discovery engine. Your task is to generate ONE high-quality "Discovery Spark" based on the user's study content.
@@ -170,7 +184,7 @@ Generate ONE discovery spark that would genuinely deepen their understanding${tr
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.85,
+        temperature: 0.7,
       }),
     });
 
@@ -195,7 +209,13 @@ Generate ONE discovery spark that would genuinely deepen their understanding${tr
     }
 
     const parsed = JSON.parse(jsonStr);
-    
+
+    // If AI returned empty object (nothing novel to say), skip
+    if (!parsed.title || !parsed.insight) {
+      console.log('⏭️ AI declined to generate — no novel spark available');
+      return null;
+    }
+
     return {
       ...parsed,
       content_hash: hashContent(content)
@@ -347,7 +367,8 @@ serve(async (req) => {
       triggerType,
       outputTitle,
       userName,
-      body.recentTitles
+      body.recentTitles,
+      body.recentInsights
     );
 
     if (!generatedSpark) {

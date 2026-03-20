@@ -90,7 +90,7 @@ export function SermonSidePanel({
     staleTime: 30000, // Cache for 30 seconds
   });
 
-  // Initialize sparks for sermon context - real-time sparks in sermon mode
+  // Initialize sparks for sermon context - conservative to avoid repetition
   const {
     sparks: activeSparks,
     generateSpark,
@@ -103,19 +103,19 @@ export function SermonSidePanel({
     surface: 'study',
     contextType: 'study',
     contextId: sermonTitle || 'sermon-writing',
-    maxSparks: 20, // Allow many sparks in sermon writing mode
-    debounceMs: 15000 // Generate sparks every 15 seconds for real-time feel
+    maxSparks: 8,
+    debounceMs: 60000 // One spark per minute max — quality over quantity
   });
 
-  // Generate sparks based on sermon content changes - more aggressive for real-time
+  // Generate sparks conservatively — only when substantial new content is written
   useEffect(() => {
     if (!sermonContent || typeof sermonContent !== 'string') return;
     const plainText = sermonContent.replace(/<[^>]*>/g, '').trim();
-    // Lower threshold - trigger sparks after just 100 characters
-    if (plainText.length > 100) {
+    // Require meaningful content before triggering
+    if (plainText.length > 400) {
       const timer = setTimeout(() => {
         generateSpark(plainText, themePassage);
-      }, 2000); // Reduced from 5s to 2s for more real-time feel
+      }, 8000); // Wait 8 seconds of no typing before generating
       return () => clearTimeout(timer);
     }
   }, [sermonContent, generateSpark, themePassage]);
@@ -188,7 +188,7 @@ export function SermonSidePanel({
   return (
     <div className="h-full flex flex-col gap-3 min-h-0">
       {/* Top Section: Tabbed Panel - Takes most of the space */}
-      <Card className="flex-1 min-h-0 border-purple-200 dark:border-purple-800/50 flex flex-col overflow-visible">
+      <Card className="flex-1 min-h-0 border-purple-200 dark:border-purple-800/50 flex flex-col overflow-hidden">
         <CardHeader className="py-2 px-3 bg-purple-50 dark:bg-purple-900/20 border-b shrink-0">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full grid grid-cols-4 h-8">
@@ -211,10 +211,10 @@ export function SermonSidePanel({
             </TabsList>
           </Tabs>
         </CardHeader>
-        
-        <CardContent className="p-2 flex-1 min-h-0 overflow-visible relative">
+
+        <CardContent className="p-2 flex-1 min-h-0 overflow-hidden flex flex-col">
           {activeTab === "sparks" && (
-            <div className="h-full overflow-visible">
+            <div className="flex-1 min-h-0 overflow-auto">
               {activeSparks.length > 0 ? (
                 <div className="space-y-2 relative z-[60]">
                   <SparkContainer
@@ -263,7 +263,7 @@ export function SermonSidePanel({
           )}
 
           {activeTab === "verses" && (
-            <ScrollArea className="h-full">
+            <ScrollArea className="flex-1 min-h-0">
               {/* Context indicator - show what text the verses are based on */}
               {cursorContext && cursorContext.length > 10 && (
                 <div className="mb-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50">
@@ -335,8 +335,8 @@ export function SermonSidePanel({
           )}
 
           {activeTab === "jeeves" && (
-            <div className="h-full flex flex-col min-h-0">
-              <ScrollArea className="flex-1 pr-2 mb-2">
+            <div className="flex-1 min-h-0 flex flex-col">
+              <ScrollArea className="flex-1 min-h-0 pr-2 mb-2">
                 <div className="space-y-2">
                   {messages.length === 0 && (
                     <div className="text-center text-muted-foreground py-4">
@@ -422,7 +422,7 @@ export function SermonSidePanel({
           )}
 
           {activeTab === "saved" && (
-            <ScrollArea className="h-full">
+            <ScrollArea className="flex-1 min-h-0">
               {loadingSaved ? (
                 <div className="flex flex-col items-center justify-center h-full text-center p-4 text-muted-foreground">
                   <Loader2 className="w-6 h-6 animate-spin mb-2" />
