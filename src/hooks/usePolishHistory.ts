@@ -30,7 +30,7 @@ export const usePolishHistory = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('polish_stories')
         .select('*')
         .eq('user_id', user.id)
