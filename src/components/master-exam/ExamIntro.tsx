@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExamAttempt } from "@/hooks/useMasterExam";
-import { Trophy, Clock, Play, RotateCcw, GraduationCap } from "lucide-react";
+import { Trophy, Clock, Play, RotateCcw, GraduationCap, Compass } from "lucide-react";
 
 interface ExamIntroProps {
   history: ExamAttempt[];
@@ -11,6 +11,7 @@ interface ExamIntroProps {
   loading: boolean;
   onStart: () => void;
   onResume: (examId: string) => void;
+  onShowTypeSelector?: () => void;
 }
 
 function getLetterGrade(score: number): string {
