@@ -4,6 +4,7 @@ import { ExamIntro } from "@/components/master-exam/ExamIntro";
 import { ExamActive } from "@/components/master-exam/ExamActive";
 import { ExamResults } from "@/components/master-exam/ExamResults";
 import { ExamTypeSelector } from "@/components/master-exam/ExamTypeSelector";
+import { RoomIntelligenceSelector } from "@/components/master-exam/RoomIntelligenceSelector";
 import { motion } from "framer-motion";
 
 const MasterExam = () => {
@@ -13,6 +14,7 @@ const MasterExam = () => {
     master: "Master Exam",
     foundation: "Foundation Diagnostic",
     prophecy_sanctuary: "Prophecy & Sanctuary",
+    room_test: exam.selectedRoomName ? `${exam.selectedRoomName} Test` : "Room Intelligence Test",
   };
 
   return (
@@ -70,7 +72,22 @@ const MasterExam = () => {
 
           {exam.phase === "select_type" && (
             <div className="max-w-2xl mx-auto">
-              <ExamTypeSelector onSelect={(type) => exam.generateExam(type)} />
+              <ExamTypeSelector onSelect={(type) => {
+                if (type === "room_test") {
+                  exam.showRoomSelector();
+                } else {
+                  exam.generateExam(type);
+                }
+              }} />
+            </div>
+          )}
+
+          {exam.phase === "select_room" && (
+            <div className="max-w-3xl mx-auto">
+              <RoomIntelligenceSelector
+                onSelect={(roomCode, roomName) => exam.generateRoomExam(roomCode, roomName)}
+                onBack={exam.showTypeSelector}
+              />
             </div>
           )}
 
@@ -86,7 +103,8 @@ const MasterExam = () => {
                   AI is crafting 50 unique questions
                   {exam.selectedExamType === "foundation" && " testing your PT framework knowledge"}
                   {exam.selectedExamType === "prophecy_sanctuary" && " on prophecy & sanctuary"}
-                  {exam.selectedExamType === "master" && " across all domains"}
+                   {exam.selectedExamType === "master" && " across all domains"}
+                   {exam.selectedExamType === "room_test" && exam.selectedRoomName && ` for the ${exam.selectedRoomName}`}
                   ...
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">

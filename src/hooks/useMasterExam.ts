@@ -67,7 +67,7 @@ export interface QuestionGradeResult {
   challengeDenied?: boolean;
 }
 
-type ExamPhase = "intro" | "select_type" | "generating" | "active" | "submitting" | "results";
+type ExamPhase = "intro" | "select_type" | "select_room" | "generating" | "active" | "submitting" | "results";
 
 export function useMasterExam() {
   const { user } = useAuth();
@@ -75,6 +75,8 @@ export function useMasterExam() {
 
   const [phase, setPhase] = useState<ExamPhase>("intro");
   const [selectedExamType, setSelectedExamType] = useState<ExamType>("master");
+  const [selectedRoomCode, setSelectedRoomCode] = useState<string | null>(null);
+  const [selectedRoomName, setSelectedRoomName] = useState<string | null>(null);
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -143,6 +145,49 @@ export function useMasterExam() {
   const showTypeSelector = useCallback(() => {
     setPhase("select_type");
   }, []);
+
+  const showRoomSelector = useCallback(() => {
+    setPhase("select_room");
+  }, []);
+
+  const generateRoomExam = useCallback(async (roomCode: string, roomName: string) => {
+    if (!user) return;
+    setSelectedRoomCode(roomCode);
+    setSelectedRoomName(roomName);
+    setSelectedExamType("room_test" as ExamType);
+    setPhase("generating");
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-diagnostic-exam", {
+        body: { exam_type: "room_test", room_code: roomCode, room_name: roomName },
+      });
+
+      if (error) {
+        const msg = (error as any)?.message || String(error);
+        throw new Error(msg);
+      }
+      if (data?.error) throw new Error(data.error);
+      if (!data?.questions || !data?.exam_id) throw new Error("Invalid response from server");
+
+      setExamId(data.exam_id);
+      setQuestions(data.questions);
+      setAnswers({});
+      setCurrentIndex(0);
+      setFlagged(new Set());
+      setQuestionGrades({});
+      setTimeRemaining(data.time_limit_seconds || 2700);
+      startTimeRef.current = Date.now();
+      setPhase("active");
+    } catch (err: any) {
+      console.error("Failed to generate room exam:", err);
+      toast({
+        title: "Generation Failed",
+        description: err?.message || "Could not generate the room test. Please try again.",
+        variant: "destructive",
+      });
+      setPhase("select_room");
+    }
+  }, [user, toast]);
 
   const generateExam = useCallback(async (examType: ExamType = "master") => {
     if (!user) return;
@@ -415,6 +460,8 @@ export function useMasterExam() {
   return {
     phase,
     selectedExamType,
+    selectedRoomCode,
+    selectedRoomName,
     questions,
     answers,
     currentIndex,
@@ -429,11 +476,13 @@ export function useMasterExam() {
     inProgressExam,
     answeredCount,
     showTypeSelector,
+    showRoomSelector,
     gradedCount,
     questionGrades,
     gradingQuestionId,
     challengingQuestionId,
     generateExam,
+    generateRoomExam,
     resumeExam,
     submitExam,
     saveProgress,

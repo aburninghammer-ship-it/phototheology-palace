@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Telescope, Crown, Clock } from "lucide-react";
+import { Building2, Telescope, Crown, Clock, Swords } from "lucide-react";
 import { motion } from "framer-motion";
 
-export type ExamType = "master" | "foundation" | "prophecy_sanctuary";
+export type ExamType = "master" | "foundation" | "prophecy_sanctuary" | "room_test";
 
 interface ExamTypeConfig {
   id: ExamType;
@@ -49,6 +49,17 @@ const EXAM_TYPES: ExamTypeConfig[] = [
     badges: ["Prophecy", "Sanctuary", "60 min"],
     timeMinutes: 60,
     color: "from-purple-500 to-pink-500",
+  },
+  {
+    id: "room_test" as ExamType,
+    name: "Room Intelligence Test",
+    subtitle: "Master One Room at a Time",
+    description:
+      "Select any of the 38 Palace rooms and take a 50-question test tailored to that specific discipline — unique question formats per room.",
+    icon: <Swords className="h-7 w-7" />,
+    badges: ["38 Rooms", "AI Tailored", "Per-Room Score"],
+    timeMinutes: 45,
+    color: "from-emerald-500 to-teal-500",
   },
 ];
 
