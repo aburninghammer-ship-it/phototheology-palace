@@ -148,6 +148,7 @@ export default function AdminSubscriptions() {
   const [pickaxeLinkedCount, setPickaxeLinkedCount] = useState<number>(0);
   const [pickaxePaidCount, setPickaxePaidCount] = useState<number>(0);
   const [pickaxeMembers, setPickaxeMembers] = useState<any[]>([]);
+  const [safetyNetTrials, setSafetyNetTrials] = useState<{ email: string; expires_at: string }[]>([]);
 
   // Make refresh activity visible and avoid overlapping refresh requests.
   const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
