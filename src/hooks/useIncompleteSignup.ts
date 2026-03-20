@@ -1,20 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
+const EXPLORE_DELAY_MS = 10 * 60 * 1000; // 10 minutes of exploring before prompting
+const SESSION_KEY = "checkout_modal_dismissed";
+
 /**
  * Detects users who created an account but never completed Stripe checkout.
- * These users have payment_source = 'manual' and subscription_tier = 'free'.
- * Returns whether the checkout modal should be shown.
+ * Shows a checkout modal after a delay to let them explore first.
  */
 export function useIncompleteSignup() {
   const { user } = useAuth();
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [userName, setUserName] = useState<string | undefined>();
   const [checked, setChecked] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     if (!user || checked) return;
+
+    // Don't show if user already dismissed this session
+    if (sessionStorage.getItem(SESSION_KEY)) {
+      setChecked(true);
+      return;
+    }
 
     const checkSignupStatus = async () => {
       try {
@@ -51,7 +60,11 @@ export function useIncompleteSignup() {
           (!profile.subscription_tier || profile.subscription_tier === "free")
         ) {
           setUserName(profile.display_name || undefined);
-          setShowCheckoutModal(true);
+          
+          // Show modal after explore delay so user has time to look around
+          timerRef.current = setTimeout(() => {
+            setShowCheckoutModal(true);
+          }, EXPLORE_DELAY_MS);
         }
       } catch (err) {
         console.error("[useIncompleteSignup] Error checking status:", err);
@@ -61,9 +74,16 @@ export function useIncompleteSignup() {
     };
 
     checkSignupStatus();
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [user, checked]);
 
-  const dismissModal = () => setShowCheckoutModal(false);
+  const dismissModal = () => {
+    setShowCheckoutModal(false);
+    sessionStorage.setItem(SESSION_KEY, "true");
+  };
 
   return { showCheckoutModal, userName, dismissModal };
 }
