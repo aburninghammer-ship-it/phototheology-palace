@@ -84,9 +84,27 @@ export function SermonPolishTab({ initialSermonText = "", themePassage = "", ser
   const [searchParams] = useSearchParams();
   // Use prop first, fallback to URL param
   const sermonId = propSermonId || searchParams.get("id") || undefined;
-  
-  const [sermonText, setSermonText] = useState(initialSermonText);
+
+  // Strip HTML from rich-text editor content for the plain textarea
+  const stripHtml = (html: string) => html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+  const [sermonText, setSermonText] = useState(() => stripHtml(initialSermonText));
   const [mainText, setMainText] = useState(themePassage);
+
+  // Keep sermon text in sync when user switches from Write → Polish tab
+  useEffect(() => {
+    if (initialSermonText) {
+      const plain = stripHtml(initialSermonText);
+      if (plain.length > 0) {
+        setSermonText(plain);
+      }
+    }
+  }, [initialSermonText]);
+
+  // Keep theme passage in sync
+  useEffect(() => {
+    if (themePassage) setMainText(themePassage);
+  }, [themePassage]);
   const [centralTheme, setCentralTheme] = useState("");
   const [analysisDepth, setAnalysisDepth] = useState<"quick" | "deep" | "full">("deep");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
