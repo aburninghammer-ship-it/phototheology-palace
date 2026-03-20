@@ -1,5 +1,6 @@
 import { GradingResults, ExamResult } from "@/hooks/useMasterExam";
 import { CategoryBreakdown } from "./CategoryBreakdown";
+import { DiagnosticReport } from "./DiagnosticReport";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
