@@ -37,6 +37,7 @@ export function ExamIntro({
   loading,
   onStart,
   onResume,
+  onShowTypeSelector,
 }: ExamIntroProps) {
   const completedAttempts = history.filter((h) => h.status === "completed");
 
