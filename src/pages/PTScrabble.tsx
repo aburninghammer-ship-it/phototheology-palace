@@ -1094,6 +1094,13 @@ export default function PTScrabble() {
 
       return (
         <div className="min-h-screen bg-background overflow-y-auto p-4">
+          {/* Keep chat available so players can linger and talk */}
+          {mpGame?.id && mpMyPlayer && (
+            <InGameChat
+              gameId={mpGame.id}
+              playerName={mpMyPlayer.displayName}
+            />
+          )}
           {/* Auto-save personalized polish for every player */}
           <AutoSavePolishForPlayers
             players={sortedPlayers.map(p => ({
