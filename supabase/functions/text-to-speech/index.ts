@@ -327,22 +327,26 @@ serve(async (req) => {
       console.log(`[TTS] HASH CACHE MISS - generating audio`);
     }
 
-    // Split text and generate
+    // Split text and generate - process in parallel batches for speed
     const chunks = splitTextIntoChunks(text, MAX_CHARS);
     console.log(`[TTS] Split into ${chunks.length} chunks`);
 
-    const audioBuffers: ArrayBuffer[] = [];
+    const BATCH_SIZE = 4;
+    const audioBuffers: ArrayBuffer[] = new Array(chunks.length);
 
-    for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
-      console.log(`[TTS] Processing chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
+    for (let batchStart = 0; batchStart < chunks.length; batchStart += BATCH_SIZE) {
+      const batchEnd = Math.min(batchStart + BATCH_SIZE, chunks.length);
+      console.log(`[TTS] Processing batch ${batchStart / BATCH_SIZE + 1} (chunks ${batchStart + 1}-${batchEnd})`);
 
-      const buffer = await generateOpenAI(chunk, finalVoice, speed, apiKey);
-      audioBuffers.push(buffer);
-
-      if (i < chunks.length - 1) {
-        await delay(50);
+      const batchPromises = [];
+      for (let i = batchStart; i < batchEnd; i++) {
+        batchPromises.push(
+          generateOpenAI(chunks[i], finalVoice, speed, apiKey).then(buf => {
+            audioBuffers[i] = buf;
+          })
+        );
       }
+      await Promise.all(batchPromises);
     }
 
     // Combine audio buffers
