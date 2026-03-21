@@ -505,6 +505,12 @@ const Polish = () => {
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
+                        <QuickAudioButton
+                          text={[story.title, story.tagline, story.narrative].filter(Boolean).join('. ')}
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-primary hover:bg-primary/10"
+                        />
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Clock className="w-3 h-3" />
                           {format(new Date(story.created_at), "MMM d, yyyy")}
@@ -544,24 +550,15 @@ const Polish = () => {
                           </Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <QuickAudioButton
-                          text={[story.title, story.tagline, story.narrative].filter(Boolean).join('. ')}
-                          variant="ghost"
-                          size="sm"
-                          showLabel
-                          className="text-xs text-primary hover:bg-primary/10"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs text-primary hover:bg-primary/10"
-                          onClick={() => handleLoadStory(story)}
-                        >
-                          <PenLine className="w-3 h-3 mr-1" />
-                          Edit
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-primary hover:bg-primary/10"
+                        onClick={() => handleLoadStory(story)}
+                      >
+                        <PenLine className="w-3 h-3 mr-1" />
+                        Edit
+                      </Button>
                     </div>
                   </motion.div>
                 );
