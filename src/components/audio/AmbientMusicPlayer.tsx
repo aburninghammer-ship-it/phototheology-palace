@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// Note: useUserMusic removed - all music is either preset (public) or local (private to device)
+import { useUserMusic } from "@/hooks/useUserMusic";
 import { useLocalMusic } from "@/hooks/useLocalMusic";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -168,7 +168,7 @@ export function AmbientMusicPlayer({
   const gainNodeRef = useRef<GainNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const { user } = useAuth();
-  // Removed cloud userTracks - only preset (public) and local (private) tracks
+  const { userTracks } = useUserMusic();
   const { localTracks, uploading: localUploading, uploadLocalMusic, removeLocalTrack, toggleFavorite: toggleLocalFavorite } = useLocalMusic();
   const isMobile = useIsMobile();
   
@@ -297,9 +297,22 @@ export function AmbientMusicPlayer({
     return isAudioFile || isCdnUrl;
   }, []);
 
-  // Combine preset tracks and local tracks only (no cloud user tracks - those are private)
+  // Combine preset tracks, cloud study music, and local device tracks
   const allTracks = useMemo(() => [
     ...AMBIENT_TRACKS.map(t => ({ ...t, isUser: false, isLocal: false })),
+    ...userTracks.map(t => ({
+      id: t.id,
+      name: t.name,
+      description: t.description || t.mood || "Your uploaded study music",
+      url: t.file_url,
+      category: t.category || "custom",
+      floor: 0,
+      mood: t.mood || "custom",
+      bpm: 60,
+      isUser: true,
+      isLocal: false,
+      userTrackData: t,
+    })),
     ...localTracks.map(t => ({
       id: t.id,
       name: t.name,
@@ -313,7 +326,40 @@ export function AmbientMusicPlayer({
       isLocal: true,
       localTrackData: t
     }))
-  ], [localTracks]);
+  ], [userTracks, localTracks]);
+
+  useEffect(() => {
+    setSelectedTracks((prev) => {
+      const next = new Set(prev);
+      let changed = false;
+
+      for (const track of allTracks) {
+        if (!next.has(track.id)) {
+          next.add(track.id);
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        localStorage.setItem("pt-ambient-selected-tracks", JSON.stringify([...next]));
+      }
+
+      return changed ? next : prev;
+    });
+
+    setTrackOrder((prev) => {
+      const existing = new Set(prev);
+      const missing = allTracks
+        .map((track) => track.id)
+        .filter((id) => !existing.has(id));
+
+      if (missing.length === 0) return prev;
+
+      const next = [...prev, ...missing];
+      localStorage.setItem("pt-ambient-track-order", JSON.stringify(next));
+      return next;
+    });
+  }, [allTracks]);
 
   const currentTrack = useMemo(() => 
     allTracks.find(t => t.id === currentTrackId) || allTracks[0],
@@ -1019,8 +1065,21 @@ export function AmbientMusicPlayer({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                {localTracks.length > 0 && (
+                {(userTracks.length > 0 || localTracks.length > 0) && (
                   <>
+                    {userTracks.length > 0 && (
+                      <>
+                        <div className="px-2 py-1 text-xs font-medium text-muted-foreground">☁️ Your Uploaded Study Music</div>
+                        {allTracks.filter(t => t.isUser).map(track => (
+                          <SelectItem key={track.id} value={track.id}>
+                            <div className="flex items-center gap-2">
+                              <Music className="h-3 w-3 text-primary" />
+                              <span>{track.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
                     <div className="px-2 py-1 text-xs font-medium text-muted-foreground">🔒 Your Private Music</div>
                     {allTracks.filter(t => t.isLocal).map(track => (
                       <SelectItem key={track.id} value={track.id}>
@@ -1414,6 +1473,21 @@ export function AmbientMusicPlayer({
                           Select All
                         </Button>
                       </div>
+                      {userTracks.length > 0 && (
+                        <>
+                          <div className="text-xs font-medium text-primary px-1">☁️ Your Uploaded Study Music</div>
+                          {allTracks.filter(t => t.isUser).map(track => (
+                            <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer">
+                              <Checkbox
+                                checked={selectedTracks.has(track.id)}
+                                onCheckedChange={() => toggleTrackSelection(track.id)}
+                              />
+                              <Music className="h-3 w-3 text-primary" />
+                              <span className="text-xs truncate flex-1">{track.name}</span>
+                            </label>
+                          ))}
+                        </>
+                      )}
                       {localTracks.length > 0 && (
                         <>
                           <div className="text-xs font-medium text-primary px-1">🔒 Your Private Music</div>
