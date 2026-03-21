@@ -761,6 +761,13 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
 
       toast.success(`+${pointsAwarded} points!`);
 
+      // Check if player reached 40 points → end the game
+      const newScore = myPlayer.score + pointsAwarded;
+      if (newScore >= 40 && game.status !== 'completed') {
+        toast.info(`🏆 ${myPlayer.displayName} reached 40 points! Game over!`);
+        await supabase.from('pt_scrabble_games').update({ status: 'completed' }).eq('id', game.id);
+      }
+
       // Fire-and-forget: Ask Jeeves to amplify the answer for all players
       const seedRef = game.seedVerse?.reference || '';
       const seedText = game.seedVerse?.text || '';

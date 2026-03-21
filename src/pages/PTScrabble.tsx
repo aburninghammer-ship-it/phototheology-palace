@@ -1074,17 +1074,15 @@ export default function PTScrabble() {
 
   // ========== MULTIPLAYER PLAYING VIEW ==========
   if (gamePhase === "multiplayer-playing") {
-    // Check if any player has emptied their hand → they win!
+    // Check if any player reached 40 points → they win!
+    const scoreWinner = mpPlayers.find(p => p.score >= 40);
     const emptyHandWinner = mpPlayers.find(p => p.hand.length === 0 && p.cardsPlayed > 0);
     
-    // Game completed (either by status or by empty hand)
-    if (mpGame?.status === 'completed' || emptyHandWinner) {
-      // Sort by fewest cards remaining (winner has 0), then by score
-      const sortedPlayers = [...mpPlayers].sort((a, b) => {
-        if (a.hand.length !== b.hand.length) return a.hand.length - b.hand.length;
-        return b.score - a.score;
-      });
-      const winner = emptyHandWinner || sortedPlayers[0];
+    // Game completed (by status, 40 points, or empty hand)
+    if (mpGame?.status === 'completed' || scoreWinner || emptyHandWinner) {
+      // Sort by score descending
+      const sortedPlayers = [...mpPlayers].sort((a, b) => b.score - a.score);
+      const winner = scoreWinner || emptyHandWinner || sortedPlayers[0];
       const totalMpScore = sortedPlayers.reduce((sum, p) => sum + p.score, 0);
 
       const mpSeedRef = mpGame?.seedVerse && typeof mpGame.seedVerse === 'object'
