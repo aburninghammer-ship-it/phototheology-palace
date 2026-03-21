@@ -326,7 +326,7 @@ export default function PalaceCardGame() {
           onLeaveRoom={() => { multiplayer.leaveRoom(); setGameMode(null); }}
           onBack={() => setGameMode(null)}
           minPlayers={2}
-          gameName="Parallels Match"
+          gameName="PT Parallels Match"
         />
       </div>
     );

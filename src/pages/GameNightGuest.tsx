@@ -268,10 +268,10 @@ const GameNightGuest = () => {
 
 // Game metadata for display
 const GAME_META: Record<string, { name: string; icon: string; desc: string }> = {
-  "tic-tac-toe": { name: "Tic-Tac-Toe", icon: "❌", desc: "Classic grid game with a biblical twist" },
-  "connect-four": { name: "Connect Four", icon: "🔴", desc: "Drop pieces and connect four in a row" },
-  "checkers": { name: "Checkers", icon: "🏁", desc: "Jump and capture your opponent's pieces" },
-  "chess": { name: "Chess", icon: "♟️", desc: "Strategic chess with Scripture themes" },
+  "tic-tac-toe": { name: "PT Tic-Tac-Toe", icon: "❌", desc: "Bible trivia grid game" },
+  "connect-four": { name: "PT Connect Four", icon: "🔴", desc: "Connect four with Scripture challenges" },
+  "checkers": { name: "PT Checkers", icon: "🏁", desc: "Capture pieces by answering Bible questions" },
+  "chess": { name: "PT Chess", icon: "♟️", desc: "Strategic chess with Scripture themes" },
   "phototheology-uno": { name: "PT Uno", icon: "🃏", desc: "Biblical connections card game" },
   "pt-jeopardy": { name: "PT Jeopardy", icon: "🧠", desc: "Bible knowledge Jeopardy-style" },
   "pt-family-feud": { name: "PT Family Feud", icon: "👨‍👩‍👧‍👦", desc: "Team Bible trivia" },

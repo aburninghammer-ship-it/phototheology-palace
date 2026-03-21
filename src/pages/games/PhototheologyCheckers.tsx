@@ -450,7 +450,7 @@ export default function PhototheologyCheckers() {
             players={multiplayer.players}
             loading={multiplayer.loading}
             isHost={multiplayer.isHost}
-            gameName="Checkers"
+            gameName="PT Checkers"
             onCreateRoom={() => multiplayer.createRoom(2)}
             onJoinRoom={(code) => multiplayer.joinRoom(code)}
             onStartGame={() => {

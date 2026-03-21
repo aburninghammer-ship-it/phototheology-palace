@@ -240,7 +240,7 @@ export default function ConcentrationGame() {
           onLeaveRoom={() => { multiplayer.leaveRoom(); setGameMode(null); }}
           onBack={() => setGameMode(null)}
           minPlayers={2}
-          gameName="Biblical Parallels Match"
+          gameName="PT Biblical Parallels"
         />
       </div>
     );

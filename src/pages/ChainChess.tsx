@@ -955,7 +955,7 @@ const ChainChess = () => {
               isHost={mp.isHost}
               minPlayers={2}
               maxPlayers={2}
-              gameName="Chain Chess"
+              gameName="PT Chain Chess"
               onCreateRoom={(max) => mp.createRoom(max)}
               onJoinRoom={(code) => mp.joinRoom(code)}
               onStartGame={handleMpStartGame}

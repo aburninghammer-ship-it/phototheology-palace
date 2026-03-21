@@ -520,7 +520,7 @@ export default function PhototheologyChess() {
             players={multiplayer.players}
             loading={multiplayer.loading}
             isHost={multiplayer.isHost}
-            gameName="Chess"
+            gameName="PT Chess"
             onCreateRoom={() => multiplayer.createRoom(2)}
             onJoinRoom={(code) => multiplayer.joinRoom(code)}
             onStartGame={() => {

@@ -14,10 +14,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // Game catalog for host selection
 const AVAILABLE_GAMES = [
-  { id: "tic-tac-toe", name: "Tic-Tac-Toe", icon: "❌", easy: true },
-  { id: "connect-four", name: "Connect Four", icon: "🔴", easy: true },
-  { id: "checkers", name: "Checkers", icon: "🏁", easy: true },
-  { id: "chess", name: "Chess", icon: "♟️", easy: false },
+  { id: "tic-tac-toe", name: "PT Tic-Tac-Toe", icon: "❌", easy: true },
+  { id: "connect-four", name: "PT Connect Four", icon: "🔴", easy: true },
+  { id: "checkers", name: "PT Checkers", icon: "🏁", easy: true },
+  { id: "chess", name: "PT Chess", icon: "♟️", easy: false },
   { id: "phototheology-uno", name: "PT Uno", icon: "🃏", easy: true },
   { id: "pt-jeopardy", name: "PT Jeopardy", icon: "🧠", easy: true },
   { id: "pt-family-feud", name: "PT Family Feud", icon: "👨‍👩‍👧‍👦", easy: true },

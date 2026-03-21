@@ -342,7 +342,7 @@ export default function PhototheologyConnectFour() {
             players={multiplayer.players}
             loading={multiplayer.loading}
             isHost={multiplayer.isHost}
-            gameName="Connect Four"
+            gameName="PT Connect Four"
             onCreateRoom={() => multiplayer.createRoom(2)}
             onJoinRoom={(code) => multiplayer.joinRoom(code)}
             onStartGame={() => {

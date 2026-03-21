@@ -419,7 +419,7 @@ export default function PrincipleSprint() {
           isHost={multiplayer.isHost}
           minPlayers={2}
           maxPlayers={8}
-          gameName="Principle Sprint"
+          gameName="PT Principle Sprint"
           onCreateRoom={multiplayer.createRoom}
           onJoinRoom={multiplayer.joinRoom}
           onStartGame={handleMultiplayerStart}

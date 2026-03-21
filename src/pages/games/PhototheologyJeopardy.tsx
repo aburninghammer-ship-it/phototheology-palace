@@ -393,7 +393,7 @@ export default function PhototheologyJeopardy() {
             isHost={multiplayer.isHost}
             minPlayers={2}
             maxPlayers={6}
-            gameName="Jeopardy"
+            gameName="PT Jeopardy"
             onCreateRoom={() => multiplayer.createRoom(6)}
             onJoinRoom={(code) => multiplayer.joinRoom(code)}
             onStartGame={() => {
