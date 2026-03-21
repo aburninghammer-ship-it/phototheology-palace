@@ -177,20 +177,7 @@ export function QuickAudioButton({
         globalAudioManager.unregister(audio);
         setIsPlaying(false);
         notifyTTSStopped();
-        // Fallback to browser TTS on error
-        if ('speechSynthesis' in window) {
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'en-US'; // Force English
-          utterance.onend = () => {
-            setIsPlaying(false);
-            notifyTTSStopped();
-          };
-          speechSynthesis.speak(utterance);
-          setIsPlaying(true);
-          notifyTTSStarted();
-        } else {
-          toast.error("Audio playback failed");
-        }
+        toast.error("Audio playback failed. Please try again.");
       };
 
       try {
