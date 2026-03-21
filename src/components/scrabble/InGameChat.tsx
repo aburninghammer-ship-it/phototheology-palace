@@ -1,27 +1,29 @@
 // In-Game Chat Panel
-// Real-time chat with emojis and heart-like reactions
+// Real-time chat with emojis and emoji reactions
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Send, ChevronRight, ChevronLeft, Heart, Smile } from 'lucide-react';
+import { MessageCircle, Send, ChevronRight, ChevronLeft, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
 const QUICK_EMOJIS = ['🙏', '🔥', '💡', '📖', '✝️', '⭐', '👏', '❤️', '😊', '🎯', '💪', '🕊️'];
+const REACTION_EMOJIS = ['❤️', '🔥', '👏', '🙏', '💡', '😂'];
 
 interface ChatMessage {
   id: string;
   playerName: string;
   message: string;
   timestamp: string;
-  likes?: number;
+  reactions?: Record<string, string[]>; // emoji → list of playerNames
 }
 
-interface FloatingHeart {
+interface FloatingEmoji {
   id: string;
   x: number;
+  emoji: string;
 }
 
 interface InGameChatProps {
@@ -36,7 +38,8 @@ export function InGameChat({ gameId, playerName, className }: InGameChatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [floatingHearts, setFloatingHearts] = useState<FloatingHeart[]>([]);
+  const [floatingEmojis, setFloatingEmojis] = useState<FloatingEmoji[]>([]);
+  const [reactionPickerFor, setReactionPickerFor] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<any>(null);
 
@@ -45,15 +48,20 @@ export function InGameChat({ gameId, playerName, className }: InGameChatProps) {
     channel
       .on('broadcast', { event: 'chat-message' }, ({ payload }) => {
         const msg = payload as ChatMessage;
-        setMessages(prev => [...prev, msg]);
+        setMessages(prev => [...prev, { ...msg, reactions: msg.reactions || {} }]);
         if (!isOpen) setUnreadCount(prev => prev + 1);
       })
-      .on('broadcast', { event: 'heart-reaction' }, ({ payload }) => {
-        spawnHeart();
-        // Increment like on the target message
-        if (payload?.messageId) {
-          setMessages(prev => prev.map(m => m.id === payload.messageId ? { ...m, likes: (m.likes || 0) + 1 } : m));
-        }
+      .on('broadcast', { event: 'emoji-reaction' }, ({ payload }) => {
+        const { messageId, emoji, player } = payload as { messageId: string; emoji: string; player: string };
+        spawnFloatingEmoji(emoji);
+        setMessages(prev => prev.map(m => {
+          if (m.id !== messageId) return m;
+          const reactions = { ...(m.reactions || {}) };
+          const names = reactions[emoji] ? [...reactions[emoji]] : [];
+          if (!names.includes(player)) names.push(player);
+          reactions[emoji] = names;
+          return { ...m, reactions };
+        }));
       })
       .subscribe();
 
@@ -68,18 +76,27 @@ export function InGameChat({ gameId, playerName, className }: InGameChatProps) {
     }
   }, [isOpen, messages.length]);
 
-  const spawnHeart = useCallback(() => {
-    const heart: FloatingHeart = { id: crypto.randomUUID(), x: Math.random() * 60 + 20 };
-    setFloatingHearts(prev => [...prev, heart]);
-    setTimeout(() => setFloatingHearts(prev => prev.filter(h => h.id !== heart.id)), 2000);
+  const spawnFloatingEmoji = useCallback((emoji: string) => {
+    const item: FloatingEmoji = { id: crypto.randomUUID(), x: Math.random() * 60 + 20, emoji };
+    setFloatingEmojis(prev => [...prev, item]);
+    setTimeout(() => setFloatingEmojis(prev => prev.filter(h => h.id !== item.id)), 2000);
   }, []);
 
-  const sendLike = useCallback((messageId: string) => {
+  const sendReaction = useCallback((messageId: string, emoji: string) => {
     if (!channelRef.current) return;
-    channelRef.current.send({ type: 'broadcast', event: 'heart-reaction', payload: { messageId, playerName } });
-    spawnHeart();
-    setMessages(prev => prev.map(m => m.id === messageId ? { ...m, likes: (m.likes || 0) + 1 } : m));
-  }, [playerName, spawnHeart]);
+    channelRef.current.send({ type: 'broadcast', event: 'emoji-reaction', payload: { messageId, emoji, player: playerName } });
+    spawnFloatingEmoji(emoji);
+    // Optimistic local update
+    setMessages(prev => prev.map(m => {
+      if (m.id !== messageId) return m;
+      const reactions = { ...(m.reactions || {}) };
+      const names = reactions[emoji] ? [...reactions[emoji]] : [];
+      if (!names.includes(playerName)) names.push(playerName);
+      reactions[emoji] = names;
+      return { ...m, reactions };
+    }));
+    setReactionPickerFor(null);
+  }, [playerName, spawnFloatingEmoji]);
 
   const sendMessage = useCallback(() => {
     if (!newMessage.trim() || !channelRef.current) return;
@@ -88,7 +105,7 @@ export function InGameChat({ gameId, playerName, className }: InGameChatProps) {
       playerName,
       message: newMessage.trim(),
       timestamp: new Date().toISOString(),
-      likes: 0,
+      reactions: {},
     };
     channelRef.current.send({ type: 'broadcast', event: 'chat-message', payload: msg });
     setMessages(prev => [...prev, msg]);
@@ -100,21 +117,24 @@ export function InGameChat({ gameId, playerName, className }: InGameChatProps) {
     setNewMessage(prev => prev + emoji);
   };
 
+  const totalReactions = (reactions: Record<string, string[]>) =>
+    Object.values(reactions).reduce((sum, names) => sum + names.length, 0);
+
   return (
     <div className={cn('fixed right-0 top-20 bottom-44 z-30 flex transition-all duration-300', isOpen ? 'w-72 md:w-80' : 'w-10', className)}>
-      {/* Floating hearts */}
+      {/* Floating emojis */}
       <AnimatePresence>
-        {floatingHearts.map(heart => (
+        {floatingEmojis.map(item => (
           <motion.div
-            key={heart.id}
+            key={item.id}
             initial={{ opacity: 1, y: 0, scale: 0.5 }}
             animate={{ opacity: 0, y: -200, scale: 1.2 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.8, ease: 'easeOut' }}
             className="absolute z-50 pointer-events-none text-2xl"
-            style={{ left: `${heart.x}%`, bottom: '30%' }}
+            style={{ left: `${item.x}%`, bottom: '30%' }}
           >
-            ❤️
+            {item.emoji}
           </motion.div>
         ))}
       </AnimatePresence>
@@ -124,7 +144,7 @@ export function InGameChat({ gameId, playerName, className }: InGameChatProps) {
         variant="ghost"
         size="icon"
         className="absolute -left-3 top-4 z-50 h-6 w-6 rounded-full bg-background border shadow-sm"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { setIsOpen(!isOpen); setReactionPickerFor(null); }}
       >
         {isOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </Button>
@@ -168,25 +188,67 @@ export function InGameChat({ gameId, playerName, className }: InGameChatProps) {
                   </span>
                 </div>
                 <p className="leading-relaxed">{msg.message}</p>
-                {/* Like button */}
-                <div className="flex items-center gap-1 mt-1">
+
+                {/* Existing reactions */}
+                {msg.reactions && totalReactions(msg.reactions) > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {Object.entries(msg.reactions).map(([emoji, names]) =>
+                      names.length > 0 ? (
+                        <button
+                          key={emoji}
+                          onClick={() => sendReaction(msg.id, emoji)}
+                          className={cn(
+                            'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[11px] border transition-colors',
+                            names.includes(playerName)
+                              ? 'bg-primary/15 border-primary/30 text-primary'
+                              : 'bg-muted/50 border-border/50 hover:bg-primary/10'
+                          )}
+                          title={names.join(', ')}
+                        >
+                          <span>{emoji}</span>
+                          <span className="font-medium">{names.length}</span>
+                        </button>
+                      ) : null
+                    )}
+                  </div>
+                )}
+
+                {/* Add reaction button — visible on hover or tap */}
+                <div className="absolute -bottom-2 right-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity z-10">
                   <button
-                    onClick={() => sendLike(msg.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-primary/10"
+                    onClick={() => setReactionPickerFor(reactionPickerFor === msg.id ? null : msg.id)}
+                    className="h-5 w-5 rounded-full bg-background border shadow-sm flex items-center justify-center text-[10px] hover:bg-primary/10"
                   >
-                    <Heart className="h-3 w-3 text-primary" />
+                    <Smile className="h-3 w-3 text-muted-foreground" />
                   </button>
-                  {(msg.likes ?? 0) > 0 && (
-                    <span className="text-[10px] text-primary font-medium flex items-center gap-0.5">
-                      ❤️ {msg.likes}
-                    </span>
-                  )}
                 </div>
+
+                {/* Reaction picker popup */}
+                <AnimatePresence>
+                  {reactionPickerFor === msg.id && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8, y: 4 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, y: 4 }}
+                      className="absolute -bottom-8 right-0 z-20 bg-background border rounded-full shadow-lg px-1.5 py-1 flex gap-0.5"
+                    >
+                      {REACTION_EMOJIS.map(emoji => (
+                        <button
+                          key={emoji}
+                          onClick={() => sendReaction(msg.id, emoji)}
+                          className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors text-base hover:scale-125"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ))}
           </div>
 
-          {/* Emoji picker */}
+          {/* Emoji picker for composing */}
           <AnimatePresence>
             {showEmojiPicker && (
               <motion.div

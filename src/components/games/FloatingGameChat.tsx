@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,10 @@ import { useGameChat } from "@/hooks/useGameChat";
 import { useAuth } from "@/hooks/useAuth";
 import EmojiPickerReact, { EmojiClickData } from "emoji-picker-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+
+const REACTION_EMOJIS = ['❤️', '🔥', '👏', '🙏', '💡', '😂'];
 
 interface FloatingGameChatProps {
   /** For multiplayer rooms (DB-backed) */
@@ -29,10 +33,50 @@ export function FloatingGameChat({ roomId, gameType }: FloatingGameChatProps) {
   const [input, setInput] = useState("");
   const [unread, setUnread] = useState(0);
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [reactionPickerFor, setReactionPickerFor] = useState<string | null>(null);
+  const [reactions, setReactions] = useState<Record<string, Record<string, string[]>>>({});
   const { messages, sendMessage } = useGameChat(roomId, gameType);
   const { user } = useAuth();
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
+  const channelRef = useRef<any>(null);
+
+  // Set up reaction broadcast channel
+  useEffect(() => {
+    const channelName = roomId ? `chat-reactions-${roomId}` : gameType ? `chat-reactions-${gameType}` : null;
+    if (!channelName) return;
+
+    const channel = supabase.channel(channelName);
+    channel
+      .on('broadcast', { event: 'emoji-reaction' }, ({ payload }) => {
+        const { messageId, emoji, userName } = payload as { messageId: string; emoji: string; userName: string };
+        setReactions(prev => {
+          const msgReactions = { ...(prev[messageId] || {}) };
+          const names = msgReactions[emoji] ? [...msgReactions[emoji]] : [];
+          if (!names.includes(userName)) names.push(userName);
+          msgReactions[emoji] = names;
+          return { ...prev, [messageId]: msgReactions };
+        });
+      })
+      .subscribe();
+
+    channelRef.current = channel;
+    return () => { supabase.removeChannel(channel); };
+  }, [roomId, gameType]);
+
+  const sendReaction = useCallback((messageId: string, emoji: string) => {
+    const userName = user?.user_metadata?.display_name || 'Player';
+    channelRef.current?.send({ type: 'broadcast', event: 'emoji-reaction', payload: { messageId, emoji, userName } });
+    // Optimistic update
+    setReactions(prev => {
+      const msgReactions = { ...(prev[messageId] || {}) };
+      const names = msgReactions[emoji] ? [...msgReactions[emoji]] : [];
+      if (!names.includes(userName)) names.push(userName);
+      msgReactions[emoji] = names;
+      return { ...prev, [messageId]: msgReactions };
+    });
+    setReactionPickerFor(null);
+  }, [user]);
 
   // Track unread messages
   useEffect(() => {
@@ -106,12 +150,15 @@ export function FloatingGameChat({ roomId, gameType }: FloatingGameChatProps) {
               )}
               {messages.map((msg) => {
                 const isMe = msg.user_id === user?.id;
+                const msgReactions = reactions[msg.id] || {};
+                const hasReactions = Object.values(msgReactions).some(n => n.length > 0);
+                const currentUserName = user?.user_metadata?.display_name || 'Player';
                 return (
                   <motion.div
                     key={msg.id}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
+                    className={`flex flex-col group relative ${isMe ? "items-end" : "items-start"}`}
                   >
                     <span
                       className="text-[10px] font-medium mb-0.5 px-1"
@@ -128,6 +175,62 @@ export function FloatingGameChat({ roomId, gameType }: FloatingGameChatProps) {
                     >
                       {msg.message}
                     </div>
+
+                    {/* Reaction badges */}
+                    {hasReactions && (
+                      <div className="flex flex-wrap gap-1 mt-0.5 px-1">
+                        {Object.entries(msgReactions).map(([emoji, names]) =>
+                          names.length > 0 ? (
+                            <button
+                              key={emoji}
+                              onClick={() => sendReaction(msg.id, emoji)}
+                              className={cn(
+                                'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] border transition-colors',
+                                names.includes(currentUserName)
+                                  ? 'bg-primary/15 border-primary/30 text-primary'
+                                  : 'bg-muted/50 border-border/50 hover:bg-primary/10'
+                              )}
+                              title={names.join(', ')}
+                            >
+                              <span>{emoji}</span>
+                              <span className="font-medium">{names.length}</span>
+                            </button>
+                          ) : null
+                        )}
+                      </div>
+                    )}
+
+                    {/* Add reaction trigger */}
+                    <div className={`absolute -bottom-1 ${isMe ? 'left-0' : 'right-0'} opacity-0 group-hover:opacity-100 transition-opacity z-10`}>
+                      <button
+                        onClick={() => setReactionPickerFor(reactionPickerFor === msg.id ? null : msg.id)}
+                        className="h-5 w-5 rounded-full bg-background border shadow-sm flex items-center justify-center hover:bg-primary/10"
+                      >
+                        <Smile className="h-3 w-3 text-muted-foreground" />
+                      </button>
+                    </div>
+
+                    {/* Reaction picker */}
+                    <AnimatePresence>
+                      {reactionPickerFor === msg.id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          className={`absolute -bottom-7 ${isMe ? 'left-0' : 'right-0'} z-20 bg-background border rounded-full shadow-lg px-1.5 py-1 flex gap-0.5`}
+                        >
+                          {REACTION_EMOJIS.map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => sendReaction(msg.id, emoji)}
+                              className="h-6 w-6 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors text-sm hover:scale-125"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 );
               })}
