@@ -694,13 +694,6 @@ const Polish = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-3 justify-center flex-wrap pt-2">
-                <QuickAudioButton
-                  text={[result.title, result.tagline, getManuscriptText()].filter(Boolean).join('. ')}
-                  variant="outline"
-                  size="default"
-                  showLabel
-                  className="border-primary/30 hover:bg-primary/10"
-                />
                 <Button
                   variant="outline"
                   onClick={handleSave}
