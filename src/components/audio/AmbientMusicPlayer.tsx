@@ -1065,8 +1065,21 @@ export function AmbientMusicPlayer({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                {localTracks.length > 0 && (
+                {(userTracks.length > 0 || localTracks.length > 0) && (
                   <>
+                    {userTracks.length > 0 && (
+                      <>
+                        <div className="px-2 py-1 text-xs font-medium text-muted-foreground">☁️ Your Uploaded Study Music</div>
+                        {allTracks.filter(t => t.isUser).map(track => (
+                          <SelectItem key={track.id} value={track.id}>
+                            <div className="flex items-center gap-2">
+                              <Music className="h-3 w-3 text-primary" />
+                              <span>{track.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
                     <div className="px-2 py-1 text-xs font-medium text-muted-foreground">🔒 Your Private Music</div>
                     {allTracks.filter(t => t.isLocal).map(track => (
                       <SelectItem key={track.id} value={track.id}>
@@ -1460,6 +1473,21 @@ export function AmbientMusicPlayer({
                           Select All
                         </Button>
                       </div>
+                      {userTracks.length > 0 && (
+                        <>
+                          <div className="text-xs font-medium text-primary px-1">☁️ Your Uploaded Study Music</div>
+                          {allTracks.filter(t => t.isUser).map(track => (
+                            <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer">
+                              <Checkbox
+                                checked={selectedTracks.has(track.id)}
+                                onCheckedChange={() => toggleTrackSelection(track.id)}
+                              />
+                              <Music className="h-3 w-3 text-primary" />
+                              <span className="text-xs truncate flex-1">{track.name}</span>
+                            </label>
+                          ))}
+                        </>
+                      )}
                       {localTracks.length > 0 && (
                         <>
                           <div className="text-xs font-medium text-primary px-1">🔒 Your Private Music</div>
