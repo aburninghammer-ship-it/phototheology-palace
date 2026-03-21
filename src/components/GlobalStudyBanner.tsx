@@ -240,6 +240,59 @@ const ALL_PROMPTS: DailyPrompt[] = [
     text: "Jesus told the woman at the well: 'The water I give shall be a well springing up into everlasting life.'", actionLabel: "John 4", actionLink: "/bible?book=John&chapter=4" },
   { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Footwashing",
     text: "The King of the universe knelt to wash dirty feet. What does that tell you about His character?", actionLabel: "John 13", actionLink: "/bible?book=John&chapter=13" },
+
+  // ─── Expanded Diversity Pool ──────────────────────────────
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Veil Study",
+    text: "Moses veiled his face. The temple had a veil. Paul says the veil is on hearts today. Trace the pattern.", actionLabel: "2 Cor 3", actionLink: "/bible?book=2+Corinthians&chapter=3" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Stone Trail",
+    text: "Stone tablets → stone altar → stone rejected → living stones. Trace how God writes on harder surfaces over time.", actionLabel: "1 Peter 2", actionLink: "/bible?book=1+Peter&chapter=2" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Night Visitors",
+    text: "Nicodemus came at night. Jacob wrestled at night. Gethsemane was at night. Why does God meet people in darkness?", actionLabel: "John 3", actionLink: "/bible?book=John&chapter=3" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Shepherd Arc",
+    text: "Abel was a shepherd. David was a shepherd. Jesus is the Good Shepherd. The Lamb became the Shepherd.", actionLabel: "Psalm 23", actionLink: "/bible?book=Psalms&chapter=23" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Tree Pattern",
+    text: "Tree of life → tree of knowledge → burning bush → cross (the tree) → tree of life restored. Full circle.", actionLabel: "Revelation 22", actionLink: "/bible?book=Revelation&chapter=22" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Angel Meals",
+    text: "Abraham served angels a meal. Elijah was fed by an angel. Jesus was ministered to by angels after 40 days.", actionLabel: "Genesis 18", actionLink: "/bible?book=Genesis&chapter=18" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Well Meetings",
+    text: "Isaac's bride was found at a well. Jacob met Rachel at a well. Moses met Zipporah at a well. Jesus met the Samaritan woman at a well.", actionLabel: "John 4", actionLink: "/bible?book=John&chapter=4" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Coat Theology",
+    text: "God clothed Adam. Joseph got a special coat. Elijah's mantle passed power. Jesus' robe was gambled for. Garments tell a story.", actionLabel: "Genesis 3", actionLink: "/bible?book=Genesis&chapter=3" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Fish & Faith",
+    text: "Jonah and the great fish. Peter's coin in a fish. 153 fish in the net. Feeding 5000 with fish. What's the pattern?", actionLabel: "John 21", actionLink: "/bible?book=John&chapter=21" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Left & Right",
+    text: "Sheep on the right, goats on the left. The thief on the right was saved. Right hand of God. Direction matters in Scripture.", actionLabel: "Matthew 25", actionLink: "/bible?book=Matthew&chapter=25" },
+
+  { category: "motivation", icon: <Flame className="h-3.5 w-3.5" />, label: "Sharpened",
+    text: "Every question you wrestle with sharpens your sword. Don't avoid the hard texts — they forge the strongest faith." },
+  { category: "motivation", icon: <Star className="h-3.5 w-3.5" />, label: "Eternal Builder",
+    text: "You're not just reading a book. You're building a mansion of truth that will stand when everything else falls." },
+  { category: "motivation", icon: <Crown className="h-3.5 w-3.5" />, label: "Overcomer",
+    text: "Seven promises to overcomers in Revelation 2-3. You're fighting for a crown that never fades." },
+  { category: "motivation", icon: <Rocket className="h-3.5 w-3.5" />, label: "Deep Miner",
+    text: "The surface reading is a trail. The PT rooms take you underground — where the diamonds are." },
+  { category: "motivation", icon: <Zap className="h-3.5 w-3.5" />, label: "Armed",
+    text: "Every verse memorized is a bullet loaded. Every connection mapped is a battle plan drawn. Stay armed." },
+
+  { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Anchor",
+    text: "\"Which hope we have as an anchor of the soul.\" When life storms, your study holds you steady.", actionLabel: "Hebrews 6", actionLink: "/bible?book=Hebrews&chapter=6" },
+  { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Broken Bread",
+    text: "He took bread, broke it, and gave it. He was broken so we could be made whole. Pause and give thanks." },
+  { category: "spiritual", icon: <Sparkles className="h-3.5 w-3.5" />, label: "Morning Star",
+    text: "\"I am the bright and morning star.\" Before the sun rises, the morning star appears. He comes before the light.", actionLabel: "Revelation 22", actionLink: "/bible?book=Revelation&chapter=22" },
+  { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Tears Bottled",
+    text: "\"Thou tellest my wanderings: put thou my tears into thy bottle.\" God keeps track of every struggle.", actionLabel: "Psalm 56", actionLink: "/bible?book=Psalms&chapter=56" },
+
+  { category: "action", icon: <Eye className="h-3.5 w-3.5" />, label: "Verb Scan",
+    text: "Read a chapter and underline every verb. What is God doing? What are people doing? The verbs tell the real story.", actionLabel: "Go", actionLink: "/palace?room=OR" },
+  { category: "action", icon: <Brain className="h-3.5 w-3.5" />, label: "Question Blitz",
+    text: "Read one paragraph. Write 10 questions about it — who, what, when, where, why, how. Then answer them.", actionLabel: "Go", actionLink: "/palace?room=IR" },
+  { category: "action", icon: <Target className="h-3.5 w-3.5" />, label: "Number Hunt",
+    text: "Pick a number (3, 7, 12, 40). Find 5 places it appears in Scripture. Why does God repeat it?", actionLabel: "Go", actionLink: "/palace?room=PRm" },
+  { category: "action", icon: <BookOpen className="h-3.5 w-3.5" />, label: "One-Verse Sermon",
+    text: "Pick any single verse. Build a 3-point sermon from it in 5 minutes. This is how preachers train.", actionLabel: "Sermon Builder", actionLink: "/sermon-builder" },
+  { category: "action", icon: <Swords className="h-3.5 w-3.5" />, label: "Objection Drill",
+    text: "Think of the hardest objection to your faith. Now build a 3-step biblical response. Offense and defense.", actionLabel: "FORGE", actionLink: "/living-manna?tab=defense" },
 ];
 
 const CATEGORY_STYLES: Record<string, { accent: string; iconColor: string; badgeBg: string }> = {
@@ -249,24 +302,40 @@ const CATEGORY_STYLES: Record<string, { accent: string; iconColor: string; badge
   try_this:   { accent: "from-emerald-500/15 to-teal-500/5 border-emerald-500/25", iconColor: "text-emerald-500", badgeBg: "bg-emerald-500/20 text-emerald-400" },
 };
 
-const ROTATE_INTERVAL_MS = 10 * 60 * 1000;
+const ROTATE_INTERVAL_MS = 12 * 60 * 1000; // 12 minutes between auto-rotations
 
-// Fisher-Yates shuffle with a daily seed so prompts appear in a fresh order each day
-function seededShuffle<T>(arr: T[], seed: number): T[] {
-  const result = [...arr];
-  let s = seed;
-  for (let i = result.length - 1; i > 0; i--) {
-    s = (s * 1664525 + 1013904223) & 0x7fffffff; // LCG
-    const j = s % (i + 1);
-    [result[i], result[j]] = [result[j], result[i]];
+// Session-aware prompt tracker: ensures user sees every prompt before repeating any
+const SEEN_KEY = 'pt_banner_seen_indices';
+const SEEN_DATE_KEY = 'pt_banner_seen_date';
+
+function getUnseenIndex(): number {
+  const today = new Date().toDateString();
+  const storedDate = localStorage.getItem(SEEN_DATE_KEY);
+
+  // Reset seen list each day
+  let seen: number[] = [];
+  if (storedDate === today) {
+    try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'); } catch { seen = []; }
+  } else {
+    localStorage.setItem(SEEN_DATE_KEY, today);
+    localStorage.setItem(SEEN_KEY, '[]');
   }
-  return result;
-}
 
-function getDailyShuffledPrompts(): DailyPrompt[] {
-  const today = new Date();
-  const daySeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-  return seededShuffle(ALL_PROMPTS, daySeed);
+  // Build pool of unseen indices
+  const total = ALL_PROMPTS.length;
+  const unseenPool = Array.from({ length: total }, (_, i) => i).filter(i => !seen.includes(i));
+
+  // If all seen, reset and start fresh
+  if (unseenPool.length === 0) {
+    localStorage.setItem(SEEN_KEY, '[]');
+    return Math.floor(Math.random() * total);
+  }
+
+  // Pick a random unseen prompt
+  const pick = unseenPool[Math.floor(Math.random() * unseenPool.length)];
+  seen.push(pick);
+  localStorage.setItem(SEEN_KEY, JSON.stringify(seen));
+  return pick;
 }
 
 // ─── Behavioral Nudge Messages ──────────────────────────────
@@ -428,19 +497,16 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const [newFeatureDismissed, setNewFeatureDismissed] = useState(() =>
     localStorage.getItem("pt_new_feature_testme_dismissed") === "true"
   );
-  const [dailyPrompts] = useState(() => getDailyShuffledPrompts());
-  const [promptIdx, setPromptIdx] = useState(() =>
-    Math.floor(Date.now() / ROTATE_INTERVAL_MS) % dailyPrompts.length
-  );
+  const [promptIdx, setPromptIdx] = useState(() => getUnseenIndex());
   const [xpFlash, setXpFlash] = useState(false);
   const stats = useUserBannerStats(resolvedUserId, fallbackDisplayName);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPromptIdx(prev => (prev + 1) % dailyPrompts.length);
+      setPromptIdx(getUnseenIndex());
     }, ROTATE_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [dailyPrompts.length]);
+  }, []);
 
   // Micro-animation: XP flash when totalXp changes
   const [prevXp, setPrevXp] = useState(0);
@@ -453,16 +519,12 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   }, [stats.totalXp]);
 
   const shuffle = useCallback(() => {
-    setPromptIdx(prev => {
-      let next: number;
-      do { next = Math.floor(Math.random() * dailyPrompts.length); } while (next === prev && dailyPrompts.length > 1);
-      return next;
-    });
-  }, [dailyPrompts.length]);
+    setPromptIdx(getUnseenIndex());
+  }, []);
 
   if (!resolvedUserId) return null;
 
-  const prompt = dailyPrompts[promptIdx];
+  const prompt = ALL_PROMPTS[promptIdx];
   const style = CATEGORY_STYLES[prompt.category];
   const rank = getXpRank(stats.totalXp);
   const initials = (stats.displayName || fallbackDisplayName).slice(0, 2).toUpperCase();
