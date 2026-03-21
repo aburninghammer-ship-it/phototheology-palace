@@ -94,12 +94,9 @@ export function QuickAudioButton({
       return;
     }
 
-    // Also stop any browser speech synthesis
-    if (isPlaying && 'speechSynthesis' in window) {
+    // Stop browser speech synthesis if somehow running
+    if ('speechSynthesis' in window) {
       speechSynthesis.cancel();
-      setIsPlaying(false);
-      notifyTTSStopped();
-      return;
     }
 
     // CRITICAL: Stop all other audio before starting this one
