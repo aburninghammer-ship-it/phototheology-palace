@@ -1074,17 +1074,15 @@ export default function PTScrabble() {
 
   // ========== MULTIPLAYER PLAYING VIEW ==========
   if (gamePhase === "multiplayer-playing") {
-    // Check if any player has emptied their hand → they win!
+    // Check if any player reached 40 points → they win!
+    const scoreWinner = mpPlayers.find(p => p.score >= 40);
     const emptyHandWinner = mpPlayers.find(p => p.hand.length === 0 && p.cardsPlayed > 0);
     
-    // Game completed (either by status or by empty hand)
-    if (mpGame?.status === 'completed' || emptyHandWinner) {
-      // Sort by fewest cards remaining (winner has 0), then by score
-      const sortedPlayers = [...mpPlayers].sort((a, b) => {
-        if (a.hand.length !== b.hand.length) return a.hand.length - b.hand.length;
-        return b.score - a.score;
-      });
-      const winner = emptyHandWinner || sortedPlayers[0];
+    // Game completed (by status, 40 points, or empty hand)
+    if (mpGame?.status === 'completed' || scoreWinner || emptyHandWinner) {
+      // Sort by score descending
+      const sortedPlayers = [...mpPlayers].sort((a, b) => b.score - a.score);
+      const winner = scoreWinner || emptyHandWinner || sortedPlayers[0];
       const totalMpScore = sortedPlayers.reduce((sum, p) => sum + p.score, 0);
 
       const mpSeedRef = mpGame?.seedVerse && typeof mpGame.seedVerse === 'object'
@@ -1096,6 +1094,13 @@ export default function PTScrabble() {
 
       return (
         <div className="min-h-screen bg-background overflow-y-auto p-4">
+          {/* Keep chat available so players can linger and talk */}
+          {mpGame?.id && mpMyPlayer && (
+            <InGameChat
+              gameId={mpGame.id}
+              playerName={mpMyPlayer.displayName}
+            />
+          )}
           {/* Auto-save personalized polish for every player */}
           <AutoSavePolishForPlayers
             players={sortedPlayers.map(p => ({
@@ -1117,14 +1122,16 @@ export default function PTScrabble() {
             <div className="text-center space-y-4">
               <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
               <h1 className="text-3xl font-bold">
-                {emptyHandWinner ? `${winner?.displayName} emptied their hand!` : 'Game Over!'}
+                {scoreWinner ? `${winner?.displayName} reached 40 points!` : emptyHandWinner ? `${winner?.displayName} emptied their hand!` : 'Game Over!'}
               </h1>
               <div className="space-y-2">
                 <p className="text-xl">
                   🏆 Winner: <span className="font-bold text-yellow-500">{winner?.displayName}</span>
                 </p>
                 <p className="text-2xl font-bold">{winner?.score} points</p>
-                <p className="text-sm text-muted-foreground">First to play all their cards!</p>
+                <p className="text-sm text-muted-foreground">
+                  {scoreWinner ? 'First to 40 points!' : emptyHandWinner ? 'Played all their cards!' : 'Final standings'}
+                </p>
               </div>
             </div>
 
