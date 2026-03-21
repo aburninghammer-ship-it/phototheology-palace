@@ -197,21 +197,7 @@ export function QuickAudioButton({
           return;
         }
 
-        // For other errors, try browser TTS as fallback
-        if ('speechSynthesis' in window) {
-          console.log('[QuickAudio] Falling back to browser TTS');
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'en-US'; // Force English
-          utterance.onend = () => {
-            setIsPlaying(false);
-            notifyTTSStopped();
-          };
-          speechSynthesis.speak(utterance);
-          setIsPlaying(true);
-          notifyTTSStarted();
-        } else {
-          toast.error('Audio playback failed');
-        }
+        toast.error('Audio playback failed. Please try again.');
       }
     } catch (err) {
       console.error("TTS error:", err);
