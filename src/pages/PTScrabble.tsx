@@ -1087,8 +1087,28 @@ export default function PTScrabble() {
       const winner = emptyHandWinner || sortedPlayers[0];
       const totalMpScore = sortedPlayers.reduce((sum, p) => sum + p.score, 0);
 
+      const mpSeedRef = mpGame?.seedVerse && typeof mpGame.seedVerse === 'object'
+        ? (mpGame.seedVerse as any).reference || undefined
+        : undefined;
+      const mpSeedText = mpGame?.seedVerse && typeof mpGame.seedVerse === 'object'
+        ? (mpGame.seedVerse as any).text || undefined
+        : undefined;
+
       return (
         <div className="min-h-screen bg-background overflow-y-auto p-4">
+          {/* Auto-save personalized polish for every player */}
+          <AutoSavePolishForPlayers
+            players={sortedPlayers.map(p => ({
+              userId: p.userId,
+              displayName: p.displayName,
+              score: p.score,
+              cardsPlayed: p.cardsPlayed,
+            }))}
+            entries={mpStudyLogEntries}
+            seedVerseRef={mpSeedRef}
+            seedVerseText={mpSeedText}
+            winnerName={winner?.displayName || ''}
+          />
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
