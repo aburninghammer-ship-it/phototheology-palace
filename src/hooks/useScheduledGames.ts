@@ -134,12 +134,13 @@ export function useScheduledGames(churchId?: string): UseScheduledGamesReturn {
     try {
       setIsLoading(true);
 
-      // Get scheduled games that haven't passed
+      // Get scheduled games: future ones + recently past (within 24h) + started ones
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const { data: games, error: gamesError } = await db
         .from('scheduled_games')
         .select('*')
-        .gte('scheduled_at', new Date().toISOString())
-        .in('status', ['scheduled'])
+        .gte('scheduled_at', oneDayAgo)
+        .in('status', ['scheduled', 'started'])
         .order('scheduled_at', { ascending: true });
 
       if (gamesError) throw gamesError;
