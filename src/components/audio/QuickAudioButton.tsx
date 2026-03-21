@@ -127,7 +127,7 @@ export function QuickAudioButton({
       console.log('[QuickAudio] Calling text-to-speech, mobile:', isMobile());
 
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice: "nova", returnType: "url" }
+        body: { text: truncatedText, voice: "nova", returnType: "url" }
       });
 
       if (error) throw error;
