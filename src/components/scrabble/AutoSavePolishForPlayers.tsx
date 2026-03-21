@@ -27,10 +27,29 @@ export function AutoSavePolishForPlayers({
   winnerName,
 }: AutoSavePolishProps) {
   const hasSaved = useRef(false);
+  const attemptCount = useRef(0);
 
   useEffect(() => {
-    if (hasSaved.current || entries.length === 0 || players.length === 0) return;
+    if (hasSaved.current) return;
+    
+    console.log('[ScrabblePolish] Check — players:', players.length, 'entries:', entries.length);
+    
+    if (entries.length === 0 || players.length === 0) {
+      // Retry up to 10 times with a delay if data isn't ready yet
+      if (attemptCount.current < 10) {
+        attemptCount.current++;
+        const timer = setTimeout(() => {
+          // Force re-check by triggering a state-independent check
+          console.log('[ScrabblePolish] Retry attempt', attemptCount.current);
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+      console.warn('[ScrabblePolish] Gave up waiting for data after 10 attempts');
+      return;
+    }
+    
     hasSaved.current = true;
+    console.log('[ScrabblePolish] Triggering auto-save for', players.length, 'players with', entries.length, 'entries');
 
     // Fire and forget — generate + save for each player
     generateAndSaveForAllPlayers(players, entries, seedVerseRef, seedVerseText, winnerName);
@@ -57,6 +76,8 @@ async function generateAndSaveForAllPlayers(
 
   const playerNames = players.map(p => p.displayName).join(', ');
   const verseInfo = seedVerseRef ? `${seedVerseRef}: "${seedVerseText}"` : 'a Scrabble PT study session';
+
+  toast.info('📜 Generating personalized polishes for all players...', { duration: 5000 });
 
   // Generate one personalized polish per player in parallel
   const promises = players.map(async (player) => {
@@ -86,14 +107,22 @@ Your task: Create a POLISHED THEMATIC MANUSCRIPT addressed to ${firstName} that:
 
 Format: Use ## headings, flowing paragraphs, **bold** Scripture references (KJV). Make it something ${firstName} would treasure.`;
 
+      console.log(`[ScrabblePolish] Calling jeeves for ${firstName}...`);
+      
       const { data, error } = await supabase.functions.invoke('jeeves', {
         body: { message: prompt, context: 'scrabble_polish' },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error(`[ScrabblePolish] Jeeves error for ${firstName}:`, error);
+        throw error;
+      }
 
       const narrative = data?.content || data?.response || data?.message || '';
-      if (!narrative) return;
+      if (!narrative) {
+        console.warn(`[ScrabblePolish] Empty narrative for ${firstName}`);
+        return;
+      }
 
       const title = seedVerseRef
         ? `Scrabble PT: ${seedVerseRef}`
@@ -124,13 +153,33 @@ Format: Use ## headings, flowing paragraphs, **bold** Scripture references (KJV)
       if (insertError) {
         console.error(`[ScrabblePolish] Failed to save for ${firstName}:`, insertError);
       } else {
-        console.log(`[ScrabblePolish] Saved polish for ${firstName} (${player.userId})`);
+        console.log(`[ScrabblePolish] ✅ Saved polish for ${firstName} (${player.userId})`);
+      }
+
+      // Also send an in-app notification to the player
+      try {
+        await supabase.from('notifications').insert({
+          user_id: player.userId,
+          type: 'polish_ready',
+          title: '📜 Your Scrabble PT Polish is Ready!',
+          message: `Jeeves prepared a personalized study manuscript from your ${players.length}-player game${seedVerseRef ? ` on ${seedVerseRef}` : ''}. Check your Saved Polishes!`,
+          link: '/polish',
+          metadata: { source: 'scrabble_pt', seed_verse: seedVerseRef },
+        });
+      } catch (notifErr) {
+        console.warn(`[ScrabblePolish] Notification failed for ${firstName}:`, notifErr);
       }
     } catch (err) {
       console.error(`[ScrabblePolish] Error generating polish for ${player.displayName}:`, err);
     }
   });
 
-  await Promise.allSettled(promises);
-  toast.success('📜 Personalized polish saved for all players!', { duration: 5000 });
+  const results = await Promise.allSettled(promises);
+  const succeeded = results.filter(r => r.status === 'fulfilled').length;
+  
+  if (succeeded > 0) {
+    toast.success(`📜 Personalized polish saved for ${succeeded} player${succeeded > 1 ? 's' : ''}!`, { duration: 5000 });
+  } else {
+    toast.error('Failed to generate polishes. Check the study log for details.', { duration: 5000 });
+  }
 }
