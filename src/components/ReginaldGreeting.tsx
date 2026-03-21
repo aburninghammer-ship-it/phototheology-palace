@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,16 +17,14 @@ export const ReginaldGreeting = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const [greetingType, setGreetingType] = useState<"first_time" | "returning">("first_time");
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const autoplayAttemptedRef = useRef(false);
 
-  useEffect(() => {
-    if (!user) return;
-    // Check if user has heard the first-time greeting before
+  // Derive greeting type synchronously — no effect needed
+  const greetingType = useMemo<"first_time" | "returning">(() => {
+    if (!user) return "first_time";
     const heard = localStorage.getItem(`reginald_greeting_${user.id}`);
-    if (heard) {
-      setGreetingType("returning");
-    }
+    return heard ? "returning" : "first_time";
   }, [user]);
 
   const playGreeting = useCallback(async () => {
@@ -114,13 +112,18 @@ export const ReginaldGreeting = () => {
 
   // Auto-play for returning users after a short delay
   useEffect(() => {
-    if (!user || hasPlayed || isPlaying || isLoading) return;
-    // Small delay to let page settle and increase autoplay success
+    if (!user || autoplayAttemptedRef.current) return;
+    autoplayAttemptedRef.current = true;
+    // Small delay to let page settle
     const timer = setTimeout(() => {
-      playGreeting();
+      // Only autoplay; if browser blocks it, user can tap play manually
+      playGreeting().catch(() => {
+        // Autoplay blocked by browser — that's OK, user can tap
+        console.log("[ReginaldGreeting] Autoplay blocked, user can tap play");
+      });
     }, 1500);
     return () => clearTimeout(timer);
-  }, [user]); // intentionally only on mount
+  }, [user, playGreeting]);
 
   // Cleanup on unmount
   useEffect(() => {
