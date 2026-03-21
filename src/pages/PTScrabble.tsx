@@ -40,6 +40,7 @@ import {
   type StudyLogEntry,
   type CardWithPosition,
 } from "@/components/scrabble";
+import { AutoSavePolishForPlayers } from "@/components/scrabble/AutoSavePolishForPlayers";
 import { GameInvitationNotification } from "@/components/scrabble/GameInvitationNotification";
 import { CallToPlayButton } from "@/components/scrabble/CallToPlayButton";
 import { ScheduledGamesPanel } from "@/components/scrabble/ScheduledGamesPanel";
