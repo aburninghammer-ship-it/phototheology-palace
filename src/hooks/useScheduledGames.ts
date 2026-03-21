@@ -248,15 +248,20 @@ export function useScheduledGames(churchId?: string): UseScheduledGamesReturn {
 
       if (error) throw error;
 
-      // Auto-RSVP the host as going
-      await db
-        .from('scheduled_game_rsvps')
-        .insert({
-          scheduled_game_id: game.id,
-          user_id: user.id,
-          user_name: hostName,
-          status: 'going',
-        });
+      // --- Secondary operations: don't block game creation if these fail ---
+      try {
+        // Auto-RSVP the host as going
+        await db
+          .from('scheduled_game_rsvps')
+          .insert({
+            scheduled_game_id: game.id,
+            user_id: user.id,
+            user_name: hostName,
+            status: 'going',
+          });
+      } catch (rsvpErr) {
+        console.warn('Auto-RSVP failed (non-critical):', rsvpErr);
+      }
 
       // Build notification details
       const when = new Date(data.scheduled_at);
@@ -265,37 +270,41 @@ export function useScheduledGames(churchId?: string): UseScheduledGamesReturn {
       });
       const eventTitle = data.title || game.game_type;
 
-      // Persist notification for the scheduling user
-      await supabase.from('notifications').insert({
-        user_id: user.id,
-        type: 'event_scheduled',
-        title: '📅 Event Scheduled!',
-        message: `"${eventTitle}" scheduled for ${timeStr}`,
-        link: '/schedule',
-        is_read: false,
-      });
+      // Fire-and-forget: notifications, community post, broadcast
+      Promise.allSettled([
+        supabase.from('notifications').insert({
+          user_id: user.id,
+          type: 'event_scheduled',
+          title: '📅 Event Scheduled!',
+          message: `"${eventTitle}" scheduled for ${timeStr}`,
+          link: '/schedule',
+          is_read: false,
+        }),
+        supabase.from('community_posts').insert({
+          user_id: user.id,
+          title: `📅 New Event: ${eventTitle}`,
+          content: `I just scheduled "${eventTitle}" for ${timeStr}. Head to the Schedule page to RSVP!`,
+          category: 'general',
+        }),
+      ]).catch(err => console.warn('Post-schedule notifications failed:', err));
 
-      // Post to community feed
-      await supabase.from('community_posts').insert({
-        user_id: user.id,
-        title: `📅 New Event: ${eventTitle}`,
-        content: `I just scheduled "${eventTitle}" for ${timeStr}. Head to the Schedule page to RSVP!`,
-        category: 'general',
-      });
-
-      // Broadcast notification to other online users
-      const globalChannel = supabase.channel('global-notifications');
-      await globalChannel.send({
-        type: 'broadcast',
-        event: 'event-scheduled',
-        payload: {
-          title: eventTitle,
-          hostName: hostName,
-          scheduledAt: data.scheduled_at.toISOString(),
-          gameType: game.game_type,
-        },
-      });
-      supabase.removeChannel(globalChannel);
+      // Broadcast to online users (fire-and-forget)
+      try {
+        const globalChannel = supabase.channel('global-notifications');
+        await globalChannel.send({
+          type: 'broadcast',
+          event: 'event-scheduled',
+          payload: {
+            title: eventTitle,
+            hostName: hostName,
+            scheduledAt: data.scheduled_at.toISOString(),
+            gameType: game.game_type,
+          },
+        });
+        supabase.removeChannel(globalChannel);
+      } catch (broadcastErr) {
+        console.warn('Broadcast failed (non-critical):', broadcastErr);
+      }
 
       toast.success('Game scheduled!');
       return game.id;
