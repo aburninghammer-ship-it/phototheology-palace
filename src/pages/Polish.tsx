@@ -550,24 +550,15 @@ const Polish = () => {
                           </Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <QuickAudioButton
-                          text={[story.title, story.tagline, story.narrative].filter(Boolean).join('. ')}
-                          variant="ghost"
-                          size="sm"
-                          showLabel
-                          className="text-xs text-primary hover:bg-primary/10"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs text-primary hover:bg-primary/10"
-                          onClick={() => handleLoadStory(story)}
-                        >
-                          <PenLine className="w-3 h-3 mr-1" />
-                          Edit
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-primary hover:bg-primary/10"
+                        onClick={() => handleLoadStory(story)}
+                      >
+                        <PenLine className="w-3 h-3 mr-1" />
+                        Edit
+                      </Button>
                     </div>
                   </motion.div>
                 );
