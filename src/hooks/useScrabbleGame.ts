@@ -763,7 +763,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
 
       // Check if player reached 40 points → end the game
       const newScore = myPlayer.score + pointsAwarded;
-      if (newScore >= 40 && game.status !== 'completed') {
+      if (newScore >= 40) {
         toast.info(`🏆 ${myPlayer.displayName} reached 40 points! Game over!`);
         await supabase.from('pt_scrabble_games').update({ status: 'completed' }).eq('id', game.id);
       }

@@ -1115,14 +1115,16 @@ export default function PTScrabble() {
             <div className="text-center space-y-4">
               <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
               <h1 className="text-3xl font-bold">
-                {emptyHandWinner ? `${winner?.displayName} emptied their hand!` : 'Game Over!'}
+                {scoreWinner ? `${winner?.displayName} reached 40 points!` : emptyHandWinner ? `${winner?.displayName} emptied their hand!` : 'Game Over!'}
               </h1>
               <div className="space-y-2">
                 <p className="text-xl">
                   🏆 Winner: <span className="font-bold text-yellow-500">{winner?.displayName}</span>
                 </p>
                 <p className="text-2xl font-bold">{winner?.score} points</p>
-                <p className="text-sm text-muted-foreground">First to play all their cards!</p>
+                <p className="text-sm text-muted-foreground">
+                  {scoreWinner ? 'First to 40 points!' : emptyHandWinner ? 'Played all their cards!' : 'Final standings'}
+                </p>
               </div>
             </div>
 
