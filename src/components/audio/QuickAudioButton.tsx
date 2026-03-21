@@ -94,12 +94,9 @@ export function QuickAudioButton({
       return;
     }
 
-    // Also stop any browser speech synthesis
-    if (isPlaying && 'speechSynthesis' in window) {
+    // Stop browser speech synthesis if somehow running
+    if ('speechSynthesis' in window) {
       speechSynthesis.cancel();
-      setIsPlaying(false);
-      notifyTTSStopped();
-      return;
     }
 
     // CRITICAL: Stop all other audio before starting this one
@@ -109,6 +106,11 @@ export function QuickAudioButton({
       toast.error("No text to read");
       return;
     }
+
+    // Truncate to ~4000 chars to prevent edge function timeouts on long polishes
+    const truncatedText = text.length > 4000 
+      ? text.slice(0, 4000).replace(/\s\S*$/, '') + '...' 
+      : text;
 
     // On mobile, use cloud TTS directly (browser speechSynthesis is unreliable on iOS/Android)
     console.log('[QuickAudio] Using cloud TTS, mobile:', isMobile());
@@ -122,7 +124,7 @@ export function QuickAudioButton({
       console.log('[QuickAudio] Calling text-to-speech, mobile:', isMobile());
 
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice: "nova", returnType: "url" }
+        body: { text: truncatedText, voice: "nova", returnType: "url" }
       });
 
       if (error) throw error;
@@ -175,20 +177,7 @@ export function QuickAudioButton({
         globalAudioManager.unregister(audio);
         setIsPlaying(false);
         notifyTTSStopped();
-        // Fallback to browser TTS on error
-        if ('speechSynthesis' in window) {
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'en-US'; // Force English
-          utterance.onend = () => {
-            setIsPlaying(false);
-            notifyTTSStopped();
-          };
-          speechSynthesis.speak(utterance);
-          setIsPlaying(true);
-          notifyTTSStarted();
-        } else {
-          toast.error("Audio playback failed");
-        }
+        toast.error("Audio playback failed. Please try again.");
       };
 
       try {
@@ -208,38 +197,11 @@ export function QuickAudioButton({
           return;
         }
 
-        // For other errors, try browser TTS as fallback
-        if ('speechSynthesis' in window) {
-          console.log('[QuickAudio] Falling back to browser TTS');
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'en-US'; // Force English
-          utterance.onend = () => {
-            setIsPlaying(false);
-            notifyTTSStopped();
-          };
-          speechSynthesis.speak(utterance);
-          setIsPlaying(true);
-          notifyTTSStarted();
-        } else {
-          toast.error('Audio playback failed');
-        }
+        toast.error('Audio playback failed. Please try again.');
       }
     } catch (err) {
       console.error("TTS error:", err);
-      // Fallback to browser TTS
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US'; // Force English
-        utterance.onend = () => {
-          setIsPlaying(false);
-          notifyTTSStopped();
-        };
-        speechSynthesis.speak(utterance);
-        setIsPlaying(true);
-        notifyTTSStarted();
-      } else {
-        toast.error("Audio not available");
-      }
+      toast.error("Audio generation failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
