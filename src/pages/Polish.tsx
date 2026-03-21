@@ -592,7 +592,14 @@ const Polish = () => {
                   "{result.tagline}"
                 </p>
                 <div className="w-16 h-0.5 mx-auto bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-                <div className="flex justify-center pt-2">
+                <div className="flex justify-center gap-3 pt-2">
+                  <QuickAudioButton
+                    text={[result.title, result.tagline, getManuscriptText()].filter(Boolean).join('. ')}
+                    variant="outline"
+                    size="default"
+                    showLabel
+                    className="border-primary/30 hover:bg-primary/10"
+                  />
                   <Button
                     onClick={handleSave}
                     disabled={saving}
@@ -687,13 +694,6 @@ const Polish = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-3 justify-center flex-wrap pt-2">
-                <QuickAudioButton
-                  text={[result.title, result.tagline, getManuscriptText()].filter(Boolean).join('. ')}
-                  variant="outline"
-                  size="default"
-                  showLabel
-                  className="border-primary/30 hover:bg-primary/10"
-                />
                 <Button
                   variant="outline"
                   onClick={handleSave}
