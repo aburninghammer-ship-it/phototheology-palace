@@ -107,9 +107,9 @@ export function QuickAudioButton({
       return;
     }
 
-    // Truncate to ~4000 chars to prevent edge function timeouts on long polishes
-    const truncatedText = text.length > 4000 
-      ? text.slice(0, 4000).replace(/\s\S*$/, '') + '...' 
+    // Truncate to ~12000 chars to allow full polish narration without cutting off
+    const truncatedText = text.length > 12000 
+      ? text.slice(0, 12000).replace(/\s\S*$/, '') + '...' 
       : text;
 
     // On mobile, use cloud TTS directly (browser speechSynthesis is unreliable on iOS/Android)
