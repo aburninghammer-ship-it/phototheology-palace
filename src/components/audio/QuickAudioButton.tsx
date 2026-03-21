@@ -110,6 +110,11 @@ export function QuickAudioButton({
       return;
     }
 
+    // Truncate to ~4000 chars to prevent edge function timeouts on long polishes
+    const truncatedText = text.length > 4000 
+      ? text.slice(0, 4000).replace(/\s\S*$/, '') + '...' 
+      : text;
+
     // On mobile, use cloud TTS directly (browser speechSynthesis is unreliable on iOS/Android)
     console.log('[QuickAudio] Using cloud TTS, mobile:', isMobile());
 
