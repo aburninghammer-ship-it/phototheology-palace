@@ -735,6 +735,9 @@ export const Navigation = () => {
                         <Link to="/daily-challenges">Daily Challenges</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
+                        <Link to="/challenge-board">Public Challenge Board</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
                         <Link to="/genesis-challenge">Genesis High Rise</Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
