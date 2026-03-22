@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, Loader2, Eye, RefreshCw, Share2, Facebook, Twitter } from "lucide-react";
+import { ChefHat, Loader2, Eye, RefreshCw, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { GenericChallengeShareDialog } from "./GenericChallengeShareDialog";
 
 interface ChefRecipeChallengeProps {
   challenge: any;
@@ -24,6 +25,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   const [modelAnswer, setModelAnswer] = useState("");
   const [feedback, setFeedback] = useState<any>(null);
   const [difficulty, setDifficulty] = useState<"easy" | "intermediate" | "pro" | "master">("intermediate");
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const { toast } = useToast();
 
   const difficultyConfig = {
@@ -168,19 +170,8 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
     });
   };
 
-  const shareToFacebook = () => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent(`I just completed the Chef Challenge on Phototheology! 🍳 Can you create a Bible study from ${verses.length} random verses?`);
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank', 'width=600,height=400');
-  };
-
-  const shareToTwitter = () => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent(`I just completed the Chef Challenge on Phototheology! 🍳 Can you create a Bible study from ${verses.length} random verses? #Phototheology #BibleStudy`);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
-  };
-
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -191,12 +182,12 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
           <div className="flex items-center gap-2">
             <Badge>Quick • 5-10 min</Badge>
             <Button
-              onClick={shareToFacebook}
+              onClick={() => setShowShareDialog(true)}
               variant="outline"
               size="sm"
               className="gap-2"
             >
-              <Facebook className="h-4 w-4" />
+              <Share2 className="h-4 w-4" />
               Share
             </Button>
           </div>
@@ -395,15 +386,30 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                 </Button>
               </>
             ) : (
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-3">
                 <p className="text-green-800 dark:text-green-200">
                   ✓ Recipe Complete! Added to your Growth Journal.
                 </p>
+                <Button variant="outline" onClick={() => setShowShareDialog(true)} className="w-full gap-2">
+                  <Share2 className="h-4 w-4" />
+                  Share This Challenge
+                </Button>
               </div>
             )}
           </>
         )}
       </CardContent>
     </Card>
+
+    <GenericChallengeShareDialog
+      open={showShareDialog}
+      onOpenChange={setShowShareDialog}
+      challengeType="chef"
+      title={`Chef Challenge: ${challenge.ui_config?.theme || "Biblical Recipe"}`}
+      description={`Created a biblical recipe from ${verses.length} random verses at ${difficulty} difficulty.`}
+      difficulty={difficulty}
+      content={recipe ? `My recipe: ${recipe.slice(0, 200)}...` : undefined}
+    />
+    </>
   );
 };

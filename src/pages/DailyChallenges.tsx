@@ -9,9 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useOutputSpark } from "@/hooks/useOutputSpark";
-import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock, Share2 } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
+import { GenericChallengeShareDialog } from "@/components/challenges/GenericChallengeShareDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { DimensionDrillChallenge } from "@/components/challenges/DimensionDrillChallenge";
 import { Connect6Challenge } from "@/components/challenges/Connect6Challenge";
@@ -56,6 +57,7 @@ const DailyChallenges = () => {
   const [archiveSubmissions, setArchiveSubmissions] = useState<ChallengeSubmission[]>([]);
   const [archiveLoading, setArchiveLoading] = useState(false);
   const [archiveMonth, setArchiveMonth] = useState(new Date());
+  const [showDailyShareDialog, setShowDailyShareDialog] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -408,11 +410,10 @@ const DailyChallenges = () => {
                         {dailyChallenge.challenge_tier}
                       </Badge>
                     </div>
-                    <EnhancedSocialShare 
-                      {...getShareContent()} 
-                      buttonText="Share This Challenge"
-                      buttonVariant="default"
-                    />
+                    <Button variant="default" onClick={() => setShowDailyShareDialog(true)} className="gap-2">
+                      <Share2 className="h-4 w-4" />
+                      Share This Challenge
+                    </Button>
                   </div>
 
                   {renderChallenge()}
@@ -615,6 +616,17 @@ const DailyChallenges = () => {
             </TabsContent>
           </Tabs>
         </div>
+
+        {dailyChallenge && (
+          <GenericChallengeShareDialog
+            open={showDailyShareDialog}
+            onOpenChange={setShowDailyShareDialog}
+            challengeType="daily"
+            title={dailyChallenge.title || "Daily Challenge"}
+            description={dailyChallenge.description || "A daily Phototheology challenge"}
+            difficulty={dailyChallenge.challenge_tier}
+          />
+        )}
       </main>
     </div>
   );
