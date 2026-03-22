@@ -447,6 +447,13 @@ const DailyChallenges = () => {
                   </CardContent>
                 </Card>
               )}
+
+              <ChallengeInlineSubmissions
+                challengeType="daily"
+                challengeTitle={dailyChallenge?.title || "Daily Challenge"}
+                challengeDescription={dailyChallenge?.description || ""}
+                difficulty={dailyChallenge?.challenge_tier}
+              />
             </TabsContent>
 
             <TabsContent value="chef" className="space-y-6">
