@@ -386,15 +386,30 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                 </Button>
               </>
             ) : (
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-3">
                 <p className="text-green-800 dark:text-green-200">
                   ✓ Recipe Complete! Added to your Growth Journal.
                 </p>
+                <Button variant="outline" onClick={() => setShowShareDialog(true)} className="w-full gap-2">
+                  <Share2 className="h-4 w-4" />
+                  Share This Challenge
+                </Button>
               </div>
             )}
           </>
         )}
       </CardContent>
     </Card>
+
+    <GenericChallengeShareDialog
+      open={showShareDialog}
+      onOpenChange={setShowShareDialog}
+      challengeType="chef"
+      title={`Chef Challenge: ${challenge.ui_config?.theme || "Biblical Recipe"}`}
+      description={`Created a biblical recipe from ${verses.length} random verses at ${difficulty} difficulty.`}
+      difficulty={difficulty}
+      content={recipe ? `My recipe: ${recipe.slice(0, 200)}...` : undefined}
+    />
+    </>
   );
 };
