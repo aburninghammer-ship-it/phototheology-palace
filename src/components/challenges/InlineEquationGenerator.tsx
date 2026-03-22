@@ -206,6 +206,15 @@ export const InlineEquationGenerator = ({ onSubmit }: InlineEquationGeneratorPro
           </div>
         )}
       </CardContent>
+
+      {equation && (
+        <ChallengeShareDialog
+          open={showShareDialog}
+          onOpenChange={setShowShareDialog}
+          equation={equation}
+          difficulty={difficulty}
+        />
+      )}
     </Card>
   );
 };
