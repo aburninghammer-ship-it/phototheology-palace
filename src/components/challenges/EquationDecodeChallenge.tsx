@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Calculator, Share2 } from "lucide-react";
 import { GenericChallengeShareDialog } from "./GenericChallengeShareDialog";
+import { PostToPublicChallengeButton } from "./PostToPublicChallengeButton";
 
 interface EquationDecodeChallengeProps {
   challenge: any;
@@ -104,10 +105,16 @@ export const EquationDecodeChallenge = ({ challenge, onSubmit, hasSubmitted }: E
             </Button>
           </>
         ) : (
-          <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+          <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-3">
             <p className="text-green-800 dark:text-green-200">
               ✓ Solution Submitted! Added to your Growth Journal.
             </p>
+            <PostToPublicChallengeButton
+              challengeType="equation"
+              title={`Equation Challenge: ${challenge.title}`}
+              content={`🧮 **Equation:** \`${equation}\`\n\n📖 **Passage:** ${passageRef}\n\n${shareContent}\n\n⚡ **Challenge:** Decode what each symbol means and show the Christ-centered insight.`}
+              className="w-full"
+            />
           </div>
         )}
       </CardContent>

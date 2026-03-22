@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { GenericChallengeShareDialog } from "./GenericChallengeShareDialog";
+import { PostToPublicChallengeButton } from "./PostToPublicChallengeButton";
 
 interface ChefRecipeChallengeProps {
   challenge: any;
@@ -391,10 +392,17 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                 </Button>
               </>
             ) : (
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-3">
                 <p className="text-green-800 dark:text-green-200">
                   ✓ Recipe Complete! Added to your Growth Journal.
                 </p>
+                <PostToPublicChallengeButton
+                  challengeType="chef"
+                  title={`Chef Challenge: ${theme}`}
+                  content={verses.map((v: any) => `📖 **${v.reference}**\n> "${v.text}"`).join("\n\n") + `\n\n⚡ Challenge: Weave these random verses into a coherent Bible study recipe!`}
+                  difficulty={difficulty}
+                  className="w-full"
+                />
               </div>
             )}
           </>

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw, Users } from "lucide-react";
+import { PostToPublicChallengeButton } from "@/components/challenges/PostToPublicChallengeButton";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { TextShareButton } from "@/components/TextShareButton";
 import { toast } from "sonner";
@@ -395,6 +396,15 @@ export default function ChefChallenge() {
                         )}
                       </Button>
                     )}
+                    <PostToPublicChallengeButton
+                      challengeType="chef"
+                      title={`Chef Challenge — ${verses.length} Random Verses`}
+                      content={verses.map(v => `📖 **${v.reference}**\n> "${v.text}"`).join("\n\n") + "\n\n⚡ Challenge: These verses are intentionally random and unrelated! Your goal is to creatively weave them into a coherent Bible study."}
+                      difficulty={difficulty}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                    />
                   </div>
                 </div>
 
