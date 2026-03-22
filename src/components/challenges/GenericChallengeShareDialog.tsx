@@ -42,12 +42,18 @@ export const GenericChallengeShareDialog = ({
   const emoji = challengeType === "chef" ? "🍳" : challengeType === "equation" ? "🧮" : "🔥";
   const typeLabel = challengeType === "chef" ? "Chef Challenge" : challengeType === "equation" ? "Equation Challenge" : "Daily Challenge";
 
+  const challengeExplanation = challengeType === "chef"
+    ? "The Chef Challenge gives you random Bible verses as 'ingredients' — your job is to weave them into a mini-sermon or devotional 'recipe.' It's a creative way to practice connecting Scripture!"
+    : challengeType === "equation"
+    ? "Equation Challenges encode Bible study principles into symbolic equations using the Phototheology Palace method — a visual system for deep, Christ-centered Bible study across 8 'floors' of learning."
+    : "Daily Challenges test your Bible knowledge with fresh puzzles each day — from verse matching to thematic connections. Great for building a daily Scripture habit!";
+
   const shareUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
     title: `${emoji} ${title}`.slice(0, 120),
     description: [
       description,
       difficulty ? `Difficulty: ${difficulty}` : null,
-      content ? content.slice(0, 180) : null,
+      challengeExplanation,
     ]
       .filter(Boolean)
       .join(" • ")
@@ -56,7 +62,7 @@ export const GenericChallengeShareDialog = ({
     badge: typeLabel,
   }).toString()}`;
 
-  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${content ? `\n\n${content.slice(0, 200)}` : ""}\n\n✨ Can you do it?`;
+  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${content ? `\n\n${content.slice(0, 200)}` : ""}\n\n💡 ${challengeExplanation}\n\n✨ Try it yourself on Phototheology Palace — a free Bible learning suite!`;
 
   const postToCommunity = async () => {
     if (!user || shared) return;

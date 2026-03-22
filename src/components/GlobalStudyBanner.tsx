@@ -495,7 +495,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
 
   const [dismissed, setDismissed] = useState(false);
   const [newFeatureDismissed, setNewFeatureDismissed] = useState(() => {
-    const dismissedAt = localStorage.getItem("pt_new_feature_testme_dismissed");
+    const dismissedAt = localStorage.getItem("pt_new_feature_testme_dismissed_v2");
     if (!dismissedAt) return false;
     // Re-show after 7 days
     if (dismissedAt !== "true") {
@@ -503,7 +503,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
       return elapsed < 7 * 24 * 60 * 60 * 1000;
     }
     // Migrate old "true" value — treat as just dismissed now
-    localStorage.setItem("pt_new_feature_testme_dismissed", Date.now().toString());
+    localStorage.setItem("pt_new_feature_testme_dismissed_v2", Date.now().toString());
     return true;
   });
   const [promptIdx, setPromptIdx] = useState(() => getUnseenIndex());
@@ -599,7 +599,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
                   className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
                    onClick={() => {
                     setNewFeatureDismissed(true);
-                    localStorage.setItem("pt_new_feature_testme_dismissed", Date.now().toString());
+                    localStorage.setItem("pt_new_feature_testme_dismissed_v2", Date.now().toString());
                   }}
                   title="Dismiss"
                 >
