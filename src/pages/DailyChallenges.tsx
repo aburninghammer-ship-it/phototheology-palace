@@ -24,6 +24,7 @@ import { EquationDecodeChallenge } from "@/components/challenges/EquationDecodeC
 import { SeventyQuestionsChallenge } from "@/components/challenges/SeventyQuestionsChallenge";
 import { PrincipleStudyChallenge } from "@/components/challenges/PrincipleStudyChallenge";
 import { CommunityChallengeFeed } from "@/components/challenges/CommunityChallengeFeed";
+import { ChallengeInlineSubmissions } from "@/components/challenges/ChallengeInlineSubmissions";
 
 interface ChallengeSubmission {
   id: string;
