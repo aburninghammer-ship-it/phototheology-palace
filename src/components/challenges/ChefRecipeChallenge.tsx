@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { GenericChallengeShareDialog } from "./GenericChallengeShareDialog";
+import { PostToPublicChallengeButton } from "./PostToPublicChallengeButton";
 
 interface ChefRecipeChallengeProps {
   challenge: any;
