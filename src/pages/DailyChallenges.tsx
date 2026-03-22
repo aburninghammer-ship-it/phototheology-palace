@@ -441,6 +441,16 @@ const DailyChallenges = () => {
                   </div>
 
                   {renderChallenge()}
+                  {hasSubmitted && dailyChallenge && (
+                    <div className="flex justify-center mt-4">
+                      <PostToPublicChallengeButton
+                        challengeType="daily"
+                        title={dailyChallenge.title}
+                        content={dailyChallenge.description || dailyChallenge.title}
+                        difficulty={dailyChallenge.challenge_tier}
+                      />
+                    </div>
+                  )}
                 </>
               ) : (
                 <Card>
