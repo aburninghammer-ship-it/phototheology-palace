@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useOutputSpark } from "@/hooks/useOutputSpark";
-import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock, Trophy } from "lucide-react";
+import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock, Trophy, Globe } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
@@ -536,10 +536,14 @@ const DailyChallenges = () => {
 
             <TabsContent value="leaderboard" className="space-y-6">
               <CommunityChallengeFeed />
-              <div className="text-center">
+              <div className="flex justify-center gap-3">
                 <Button variant="outline" onClick={() => navigate("/community-challenges")} className="gap-2">
                   <Trophy className="h-4 w-4" />
                   View Full Leaderboard
+                </Button>
+                <Button onClick={() => navigate("/challenge-board")} className="gap-2">
+                  <Globe className="h-4 w-4" />
+                  Public Challenge Board
                 </Button>
               </div>
             </TabsContent>

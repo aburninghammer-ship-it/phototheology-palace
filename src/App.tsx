@@ -82,6 +82,7 @@ const BibleSearch = lazy(() => import("./pages/BibleSearch"));
 const ThematicSearch = lazy(() => import("./pages/ThematicSearch"));
 const DailyChallenges = lazy(() => import("./pages/DailyChallenges"));
 const CommunityChallengeFeedPage = lazy(() => import("./pages/CommunityChallengeFeed"));
+const ChallengeBoard = lazy(() => import("./pages/ChallengeBoard"));
 const DailyVerse = lazy(() => import("./pages/DailyVerse"));
 const GrowthJournal = lazy(() => import("./pages/GrowthJournal"));
 const EquationsChallenge = lazy(() => import("./pages/EquationsChallenge"));
@@ -530,6 +531,7 @@ function App() {
             
             <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
             <Route path="/community-challenges" element={<ProtectedRoute><CommunityChallengeFeedPage /></ProtectedRoute>} />
+            <Route path="/challenge-board" element={<ProtectedRoute><ChallengeBoard /></ProtectedRoute>} />
             <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
