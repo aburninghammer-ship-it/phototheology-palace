@@ -4583,28 +4583,31 @@ Return JSON: { "verse": "reference", "commentary": "...", "challengeCategory": "
         { name: "3 John", chapters: 1 }, { name: "Jude", chapters: 1 }, { name: "Revelation", chapters: 22 }
       ];
       
-      // Randomly select book and chapter from entire Bible
-      const randomBook = bibleBooks[Math.floor(Math.random() * bibleBooks.length)];
-      const randomChapter = Math.floor(Math.random() * randomBook.chapters) + 1;
-      
-      // Generate verse reference (single verse, verse range, or story/account)
-      const referenceType = Math.random();
       let selectedPassage: string;
       
-      if (referenceType < 0.33) {
-        // Single verse (e.g., "John 3:16")
-        const verse = Math.floor(Math.random() * 30) + 1; // Most chapters have at least 30 verses
-        selectedPassage = `${randomBook.name} ${randomChapter}:${verse}`;
-      } else if (referenceType < 0.67) {
-        // Verse range (e.g., "Genesis 22:1-14")
-        const startVerse = Math.floor(Math.random() * 20) + 1;
-        const endVerse = startVerse + Math.floor(Math.random() * 10) + 3; // Range of 3-12 verses
-        selectedPassage = `${randomBook.name} ${randomChapter}:${startVerse}-${endVerse}`;
+      // Use user-suggested verse if provided, otherwise random
+      if (requestBody.suggestedVerse && requestBody.suggestedVerse.trim()) {
+        selectedPassage = requestBody.suggestedVerse.trim();
       } else {
-        // Story/account description with verse range
-        const startVerse = Math.floor(Math.random() * 15) + 1;
-        const endVerse = startVerse + Math.floor(Math.random() * 15) + 5;
-        selectedPassage = `${randomBook.name} ${randomChapter}:${startVerse}-${endVerse}`;
+        // Randomly select book and chapter from entire Bible
+        const randomBook = bibleBooks[Math.floor(Math.random() * bibleBooks.length)];
+        const randomChapter = Math.floor(Math.random() * randomBook.chapters) + 1;
+        
+        // Generate verse reference (single verse, verse range, or story/account)
+        const referenceType = Math.random();
+        
+        if (referenceType < 0.33) {
+          const verse = Math.floor(Math.random() * 30) + 1;
+          selectedPassage = `${randomBook.name} ${randomChapter}:${verse}`;
+        } else if (referenceType < 0.67) {
+          const startVerse = Math.floor(Math.random() * 20) + 1;
+          const endVerse = startVerse + Math.floor(Math.random() * 10) + 3;
+          selectedPassage = `${randomBook.name} ${randomChapter}:${startVerse}-${endVerse}`;
+        } else {
+          const startVerse = Math.floor(Math.random() * 15) + 1;
+          const endVerse = startVerse + Math.floor(Math.random() * 15) + 5;
+          selectedPassage = `${randomBook.name} ${randomChapter}:${startVerse}-${endVerse}`;
+        }
       }
       
       systemPrompt = `You are Jeeves, the Phototheology equations master. Generate biblical equation challenges using ONLY authentic Phototheology principle codes from the official system.
