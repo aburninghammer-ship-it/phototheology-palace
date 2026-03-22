@@ -9,10 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useOutputSpark } from "@/hooks/useOutputSpark";
-import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock, Share2 } from "lucide-react";
+import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
-import { GenericChallengeShareDialog } from "@/components/challenges/GenericChallengeShareDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { DimensionDrillChallenge } from "@/components/challenges/DimensionDrillChallenge";
 import { Connect6Challenge } from "@/components/challenges/Connect6Challenge";
@@ -22,7 +21,6 @@ import { FruitCheckChallenge } from "@/components/challenges/FruitCheckChallenge
 import { SubjectConnectionChallenge } from "@/components/challenges/SubjectConnectionChallenge";
 import { ChefRecipeChallenge } from "@/components/challenges/ChefRecipeChallenge";
 import { EquationDecodeChallenge } from "@/components/challenges/EquationDecodeChallenge";
-import { InlineEquationGenerator } from "@/components/challenges/InlineEquationGenerator";
 import { SeventyQuestionsChallenge } from "@/components/challenges/SeventyQuestionsChallenge";
 import { PrincipleStudyChallenge } from "@/components/challenges/PrincipleStudyChallenge";
 
@@ -57,7 +55,6 @@ const DailyChallenges = () => {
   const [archiveSubmissions, setArchiveSubmissions] = useState<ChallengeSubmission[]>([]);
   const [archiveLoading, setArchiveLoading] = useState(false);
   const [archiveMonth, setArchiveMonth] = useState(new Date());
-  const [showDailyShareDialog, setShowDailyShareDialog] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -172,41 +169,6 @@ const DailyChallenges = () => {
     return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
   };
 
-  const flattenChallengeDetails = (value: unknown): string[] => {
-    if (!value) return [];
-    if (typeof value === "string") return [value];
-    if (Array.isArray(value)) return value.flatMap((item) => flattenChallengeDetails(item));
-    if (typeof value === "object") return Object.values(value as Record<string, unknown>).flatMap((item) => flattenChallengeDetails(item));
-    return [];
-  };
-
-  const buildDailyChallengeShareBody = () => {
-    if (!dailyChallenge) return "Join today's Phototheology daily challenge in the suite.";
-
-    const instructionLines = flattenChallengeDetails(dailyChallenge.instructions)
-      .concat(flattenChallengeDetails(dailyChallenge.ui_config))
-      .map((line) => line.replace(/\s+/g, " ").trim())
-      .filter((line, index, array) => line.length > 0 && array.indexOf(line) === index)
-      .slice(0, 6);
-
-    const verseLines = Array.isArray(dailyChallenge.verses)
-      ? dailyChallenge.verses.map((verse: string, index: number) => `${index + 1}. ${verse}`)
-      : [];
-
-    return [
-      `🔥 ${dailyChallenge.title || "Daily Challenge"}`,
-      dailyChallenge.challenge_tier ? `Level: ${dailyChallenge.challenge_tier}` : null,
-      dailyChallenge.challenge_subtype ? `Type: ${dailyChallenge.challenge_subtype.replace(/-/g, " ")}` : null,
-      dailyChallenge.description || null,
-      verseLines.length > 0 ? `Key verses:\n${verseLines.join("\n")}` : null,
-      instructionLines.length > 0
-        ? `What to do:\n${instructionLines.map((line, index) => `${index + 1}. ${line}`).join("\n")}`
-        : "What to do:\n1. Read the challenge prompt carefully.\n2. Work only with the verses and clues provided.\n3. Respond inside the suite with your best Christ-centered answer.",
-    ]
-      .filter(Boolean)
-      .join("\n\n");
-  };
-
   const handleChallengeSubmit = async (submissionData: any) => {
     if (!dailyChallenge || !user) return;
 
@@ -264,50 +226,25 @@ const DailyChallenges = () => {
   };
 
   const getShareContent = () => {
-    const sharePreviewBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/challenge-share-preview`;
-    const shareBody = buildDailyChallengeShareBody();
+    const siteUrl = 'https://phototheologybible.com';
 
-    if (!dailyChallenge) {
-      const previewUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
-        title: "Daily Phototheology Challenge",
-        description: "Join today's Bible study challenge in Phototheology Palace.",
-        content: shareBody,
-        instructions: "Open the suite, read the prompt, and respond to the challenge inside the app.",
-        path: "/daily-challenges",
-        badge: "Daily Challenge",
-      }).toString()}`;
-
-      return {
-        title: "Daily Phototheology Challenge",
-        content: "Join me in today's Bible study challenge!",
-        url: previewUrl,
-      };
-    }
+    if (!dailyChallenge) return {
+      title: 'Daily Phototheology Challenge',
+      content: 'Join me in today\'s Bible study challenge!',
+      url: `${siteUrl}/daily-challenges`
+    };
 
     const challengeTypeLabel = dailyChallenge.challenge_subtype?.replace(/-/g, ' ')
       .split(' ')
       .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ') || 'Challenge';
 
-    const previewDescription = [
-      dailyChallenge.description || `Today's challenge: ${challengeTypeLabel}.`,
-      dailyChallenge.principle_used ? `Principle: ${dailyChallenge.principle_used}` : null,
-      dailyChallenge.verses?.length ? `Key verses: ${dailyChallenge.verses.slice(0, 3).join(', ')}` : null,
-    ].filter(Boolean).join(' • ');
-
-    const previewUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
-      title: `${challengeTypeLabel}: ${dailyChallenge.title || 'Daily Phototheology Challenge'}`.slice(0, 120),
-      description: previewDescription.slice(0, 240),
-      content: shareBody.slice(0, 2200),
-      instructions: "Open the suite, read the challenge, and post your response using only the prompt and verses provided.",
-      path: '/daily-challenges',
-      badge: 'Daily Challenge',
-    }).toString()}`;
+    const principle = dailyChallenge.principle_used || 'biblical principles';
 
     return {
       title: `${challengeTypeLabel} - Daily Phototheology Challenge`,
-      content: shareBody,
-      url: previewUrl,
+      content: `I'm taking on today's ${challengeTypeLabel} challenge, training ${principle}. Can you beat it? Try the daily challenge on Phototheology Palace!`,
+      url: `${siteUrl}/daily-challenges`
     };
   };
 
@@ -474,10 +411,11 @@ const DailyChallenges = () => {
                         {dailyChallenge.challenge_tier}
                       </Badge>
                     </div>
-                    <Button variant="default" onClick={() => setShowDailyShareDialog(true)} className="gap-2">
-                      <Share2 className="h-4 w-4" />
-                      Share This Challenge
-                    </Button>
+                    <EnhancedSocialShare 
+                      {...getShareContent()} 
+                      buttonText="Share This Challenge"
+                      buttonVariant="default"
+                    />
                   </div>
 
                   {renderChallenge()}
@@ -537,13 +475,23 @@ const DailyChallenges = () => {
                   Discover how Scripture speaks in symbolic language that points to Christ.
                 </p>
               </div>
-
-              <InlineEquationGenerator onSubmit={handleChallengeSubmit} />
-
+              <EquationDecodeChallenge 
+                challenge={{
+                  title: "Equation Challenge",
+                  description: "Decode this biblical equation to discover its deeper meaning.",
+                  verses: ["John 3:16"],
+                  ui_config: {
+                    equation: "🌍 + ❤️ + 🎁 = ∞",
+                    verse_context: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
+                  }
+                }}
+                onSubmit={handleChallengeSubmit}
+                hasSubmitted={false}
+              />
               <div className="text-center">
                 <Button variant="outline" onClick={() => navigate("/equations-challenge")} className="gap-2">
                   <Calculator className="h-4 w-4" />
-                  Full Equations Mode (Create & Share)
+                  View Full Equations Challenge Mode
                 </Button>
               </div>
             </TabsContent>
@@ -680,18 +628,6 @@ const DailyChallenges = () => {
             </TabsContent>
           </Tabs>
         </div>
-
-        {dailyChallenge && (
-          <GenericChallengeShareDialog
-            open={showDailyShareDialog}
-            onOpenChange={setShowDailyShareDialog}
-            challengeType="daily"
-            title={dailyChallenge.title || "Daily Challenge"}
-            description={dailyChallenge.description || "A daily Phototheology challenge"}
-            difficulty={dailyChallenge.challenge_tier}
-            content={buildDailyChallengeShareBody()}
-          />
-        )}
       </main>
     </div>
   );

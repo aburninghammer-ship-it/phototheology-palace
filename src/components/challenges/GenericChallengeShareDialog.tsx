@@ -38,6 +38,7 @@ export const GenericChallengeShareDialog = ({
 
   const sharePreviewBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/challenge-share-preview`;
   const targetPath = challengeType === "chef" ? "/games/chef-challenge" : "/daily-challenges";
+  const siteUrl = "https://phototheologybible.com";
 
   const emoji = challengeType === "chef" ? "🍳" : challengeType === "equation" ? "🧮" : "🔥";
   const typeLabel = challengeType === "chef" ? "Chef Challenge" : challengeType === "equation" ? "Equation Challenge" : "Daily Challenge";
@@ -48,30 +49,17 @@ export const GenericChallengeShareDialog = ({
     ? "Equation Challenges encode Bible study principles into symbolic equations using the Phototheology Palace method — a visual system for deep, Christ-centered Bible study across 8 'floors' of learning."
     : "Daily Challenges test your Bible knowledge with fresh puzzles each day — from verse matching to thematic connections. Great for building a daily Scripture habit!";
 
-  const challengeInstructions = challengeType === "chef"
-    ? "Read each ingredient verse, use only those verses, and weave them into one coherent Christ-centered Bible study or devotional recipe."
-    : challengeType === "equation"
-    ? "Explain what each symbol means, how the parts connect, and what Christ-centered truth the full equation reveals."
-    : "Read the prompt carefully, work only with the verses or clues provided, and post your best response inside the suite.";
-
+  // Keep the preview URL short — only essential metadata, no full content
+  const shortDescription = description.slice(0, 160);
   const shareUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
     title: `${emoji} ${title}`.slice(0, 120),
-    description: [
-      description,
-      difficulty ? `Difficulty: ${difficulty}` : null,
-      challengeExplanation,
-    ]
-      .filter(Boolean)
-      .join(" • ")
-      .slice(0, 240),
-    content: [content, `What to do: ${challengeInstructions}`].filter(Boolean).join("\n\n").slice(0, 2200),
-    instructions: challengeInstructions,
+    description: shortDescription,
     path: targetPath,
     badge: typeLabel,
   }).toString()}`;
 
-  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${content ? `\n\n${content.slice(0, 200)}` : ""}\n\n💡 ${challengeExplanation}\n\n✨ Try it yourself on Phototheology Palace — a free Bible learning suite!`;
-  const fullSharePost = `${shareText}\n\n${shareUrl}`;
+  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}\n\n💡 ${challengeExplanation}\n\n✨ Try it yourself on Phototheology Palace — a free Bible learning suite!\n\n${siteUrl}${targetPath}`;
+  const fullSharePost = shareText;
 
   const copySharePostToClipboard = async (successMessage: string) => {
     try {

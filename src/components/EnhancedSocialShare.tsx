@@ -28,12 +28,14 @@ export const EnhancedSocialShare = ({
 }: EnhancedSocialShareProps) => {
   const [open, setOpen] = useState(false);
   const suiteUrl = "https://phototheologybible.com";
+  // Ensure we always share the production URL, not dev/supabase URLs
+  const shareUrl = url.includes('phototheologybible.com') ? url : url.replace(/https?:\/\/[^/]+/, suiteUrl);
   const [customMessage, setCustomMessage] = useState(defaultMessage || `${title}\n\n${content}\n\n— Shared from Phototheology Palace\n✨ Explore more: ${suiteUrl}`);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`${customMessage}\n\n${url}`);
+      await navigator.clipboard.writeText(`${customMessage}\n\n${shareUrl}`);
       setCopied(true);
       toast.success("Copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
@@ -43,19 +45,19 @@ export const EnhancedSocialShare = ({
   };
 
   const handleTwitter = () => {
-    openIntent(`https://twitter.com/intent/tweet?text=${encodeURIComponent(customMessage)}&url=${encodeURIComponent(url)}`);
+    openIntent(`https://twitter.com/intent/tweet?text=${encodeURIComponent(customMessage)}&url=${encodeURIComponent(shareUrl)}`);
   };
 
   const handleFacebook = () => {
-    openIntent(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(customMessage)}`);
+    openIntent(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(customMessage)}`);
   };
 
   const handleLinkedIn = () => {
-    openIntent(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`);
+    openIntent(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`);
   };
 
   const handleEmail = () => {
-    window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${customMessage}\n\n${url}`)}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${customMessage}\n\n${shareUrl}`)}`;
   };
 
   return (
@@ -93,7 +95,7 @@ export const EnhancedSocialShare = ({
 
           <div>
             <label className="text-sm font-medium mb-2 block">Share Link</label>
-            <input type="text" value={url} readOnly className="w-full px-3 py-2 text-sm border rounded-md bg-muted" />
+            <input type="text" value={shareUrl} readOnly className="w-full px-3 py-2 text-sm border rounded-md bg-muted" />
           </div>
 
           <div className="space-y-2">
