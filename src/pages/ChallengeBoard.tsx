@@ -68,8 +68,9 @@ const ChallengeBoard = () => {
     try {
       let query: any = supabase
         .from("community_posts")
-        .select("id, title, content, category, user_id, created_at, likes")
+        .select("id, title, content, category, user_id, created_at, likes, tags")
         .eq("category", "challenge")
+        .contains("tags", ["public_board"])
         .order("created_at", { ascending: false })
         .limit(50);
 
