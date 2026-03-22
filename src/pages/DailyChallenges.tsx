@@ -229,21 +229,45 @@ const DailyChallenges = () => {
   };
 
   const getShareContent = () => {
-    if (!dailyChallenge) return {
-      title: 'Daily Phototheology Challenge',
-      content: 'Join me in today\'s Bible study challenge!',
-      url: `${window.location.origin}/daily-challenges`
-    };
+    const sharePreviewBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/challenge-share-preview`;
+
+    if (!dailyChallenge) {
+      const previewUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
+        title: "Daily Phototheology Challenge",
+        description: "Join today's Bible study challenge in Phototheology Palace.",
+        path: "/daily-challenges",
+        badge: "Daily Challenge",
+      }).toString()}`;
+
+      return {
+        title: "Daily Phototheology Challenge",
+        content: "Join me in today's Bible study challenge!",
+        url: previewUrl,
+      };
+    }
 
     const challengeTypeLabel = dailyChallenge.challenge_subtype?.replace(/-/g, ' ')
       .split(' ')
       .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ') || 'Challenge';
 
+    const previewDescription = [
+      dailyChallenge.description || `Today's challenge: ${challengeTypeLabel}.`,
+      dailyChallenge.principle_used ? `Principle: ${dailyChallenge.principle_used}` : null,
+      dailyChallenge.verses?.length ? `Key verses: ${dailyChallenge.verses.slice(0, 3).join(', ')}` : null,
+    ].filter(Boolean).join(' • ');
+
+    const previewUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
+      title: `${challengeTypeLabel}: ${dailyChallenge.title || 'Daily Phototheology Challenge'}`.slice(0, 120),
+      description: previewDescription.slice(0, 240),
+      path: '/daily-challenges',
+      badge: 'Daily Challenge',
+    }).toString()}`;
+
     return {
       title: `${challengeTypeLabel} - Daily Phototheology Challenge`,
       content: dailyChallenge.description || `Today's challenge: ${challengeTypeLabel}. Training ${dailyChallenge.principle_used || 'biblical principles'}. Join me in deepening our understanding of Scripture!`,
-      url: `${window.location.origin}/daily-challenges`
+      url: previewUrl,
     };
   };
 

@@ -35,7 +35,22 @@ export const ChallengeShareDialog = ({
   const [shareUrl, setShareUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const suiteUrl = "https://phototheology-palace.lovable.app";
+  const sharePreviewBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/challenge-share-preview`;
+
+  const buildSocialShareUrl = (url: string) => {
+    const sharePath = new URL(url).pathname;
+
+    return `${sharePreviewBaseUrl}?${new URLSearchParams({
+      title: `🧮 ${equation.verse}`.slice(0, 120),
+      description: [
+        `Equation: ${equation.equation}`,
+        `Difficulty: ${difficulty}`,
+        equation.symbols.length > 0 ? `Symbols: ${equation.symbols.join(", ")}` : null,
+      ].filter(Boolean).join(" • ").slice(0, 240),
+      path: sharePath,
+      badge: "Equation Challenge",
+    }).toString()}`;
+  };
 
   const saveAndGetShareUrl = async (): Promise<string> => {
     if (!user) {
@@ -45,11 +60,9 @@ export const ChallengeShareDialog = ({
 
     setSharing(true);
     try {
-      // Generate share code
       const { data: codeData } = await supabase.rpc("generate_challenge_share_code");
       const shareCode = codeData || `EQ${Date.now().toString(36).toUpperCase()}`;
 
-      // Save to equation_challenges
       const { error } = await supabase.from("equation_challenges").insert({
         created_by: user.id,
         verse: equation.verse,
@@ -64,10 +77,9 @@ export const ChallengeShareDialog = ({
 
       if (error) throw error;
 
-      const url = `${suiteUrl}/challenge/${shareCode}`;
+      const url = `https://phototheology-palace.lovable.app/challenge/${shareCode}`;
       setShareUrl(url);
 
-      // Also post to community
       const { data: profile } = await supabase
         .from("profiles")
         .select("display_name, username")
@@ -104,7 +116,7 @@ export const ChallengeShareDialog = ({
   const copyLink = async () => {
     const url = await ensureShareUrl();
     if (!url) return;
-    await navigator.clipboard.writeText(url);
+    await navigator.clipboard.writeText(buildSocialShareUrl(url));
     setCopied(true);
     toast.success("Link copied!");
     setTimeout(() => setCopied(false), 2000);
@@ -113,26 +125,25 @@ export const ChallengeShareDialog = ({
   const shareToTwitter = async () => {
     const url = await ensureShareUrl();
     if (!url) return;
-    const text = `${shareText}\n\n${url}`;
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank", "width=600,height=400");
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(buildSocialShareUrl(url))}`, "_blank", "width=600,height=400");
   };
 
   const shareToFacebook = async () => {
     const url = await ensureShareUrl();
     if (!url) return;
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareText)}`, "_blank", "width=600,height=400");
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(buildSocialShareUrl(url))}&quote=${encodeURIComponent(shareText)}`, "_blank", "width=600,height=400");
   };
 
   const shareToLinkedIn = async () => {
     const url = await ensureShareUrl();
     if (!url) return;
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, "_blank", "width=600,height=400");
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(buildSocialShareUrl(url))}`, "_blank", "width=600,height=400");
   };
 
   const shareToWhatsApp = async () => {
     const url = await ensureShareUrl();
     if (!url) return;
-    const text = `${shareText}\n\n${url}`;
+    const text = `${shareText}\n\n${buildSocialShareUrl(url)}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -140,7 +151,7 @@ export const ChallengeShareDialog = ({
     const url = await ensureShareUrl();
     if (!url) return;
     const subject = `Can you decode this Phototheology Equation? - ${equation.verse}`;
-    const body = `${shareText}\n\n${url}`;
+    const body = `${shareText}\n\n${buildSocialShareUrl(url)}`;
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 

@@ -36,13 +36,27 @@ export const GenericChallengeShareDialog = ({
   const [shared, setShared] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const suiteUrl = "https://phototheology-palace.lovable.app";
-  const challengeUrl = `${suiteUrl}/daily-challenges`;
+  const sharePreviewBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/challenge-share-preview`;
+  const targetPath = challengeType === "chef" ? "/games/chef-challenge" : "/daily-challenges";
 
   const emoji = challengeType === "chef" ? "🍳" : challengeType === "equation" ? "🧮" : "🔥";
   const typeLabel = challengeType === "chef" ? "Chef Challenge" : challengeType === "equation" ? "Equation Challenge" : "Daily Challenge";
 
-  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${content ? `\n\n${content.slice(0, 200)}` : ""}\n\n✨ Can you do it? Try it on Phototheology Palace — the ultimate Bible learning suite!`;
+  const shareUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
+    title: `${emoji} ${title}`.slice(0, 120),
+    description: [
+      description,
+      difficulty ? `Difficulty: ${difficulty}` : null,
+      content ? content.slice(0, 180) : null,
+    ]
+      .filter(Boolean)
+      .join(" • ")
+      .slice(0, 240),
+    path: targetPath,
+    badge: typeLabel,
+  }).toString()}`;
+
+  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${content ? `\n\n${content.slice(0, 200)}` : ""}\n\n✨ Can you do it?`;
 
   const postToCommunity = async () => {
     if (!user || shared) return;
@@ -73,7 +87,7 @@ export const GenericChallengeShareDialog = ({
 
   const copyLink = async () => {
     await postToCommunity();
-    await navigator.clipboard.writeText(challengeUrl);
+    await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     toast.success("Link copied!");
     setTimeout(() => setCopied(false), 2000);
@@ -81,30 +95,29 @@ export const GenericChallengeShareDialog = ({
 
   const shareToTwitter = async () => {
     await postToCommunity();
-    const text = `${shareText}\n\n${challengeUrl}`;
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank", "width=600,height=400");
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, "_blank", "width=600,height=400");
   };
 
   const shareToFacebook = async () => {
     await postToCommunity();
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(challengeUrl)}&quote=${encodeURIComponent(shareText)}`, "_blank", "width=600,height=400");
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, "_blank", "width=600,height=400");
   };
 
   const shareToWhatsApp = async () => {
     await postToCommunity();
-    const text = `${shareText}\n\n${challengeUrl}`;
+    const text = `${shareText}\n\n${shareUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   const shareToLinkedIn = async () => {
     await postToCommunity();
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(challengeUrl)}`, "_blank", "width=600,height=400");
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, "_blank", "width=600,height=400");
   };
 
   const shareViaEmail = async () => {
     await postToCommunity();
     const subject = `Can you beat my Phototheology ${typeLabel}?`;
-    const body = `${shareText}\n\n${challengeUrl}`;
+    const body = `${shareText}\n\n${shareUrl}`;
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 

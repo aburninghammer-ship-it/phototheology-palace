@@ -312,3 +312,7 @@ verify_jwt = false
 
 [functions.analyze-sermon-palace]
 verify_jwt = false
+
+[functions.challenge-share-preview]
+verify_jwt = false
+
