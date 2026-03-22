@@ -649,6 +649,23 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                     <span className="sr-only">Enable timer</span>
                   </Label>
                 </div>
+
+                {/* Suggested Verse Input */}
+                <div className="p-4 bg-muted rounded-lg space-y-2">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-primary" />
+                    <p className="font-medium text-sm">Suggest a Verse (Optional)</p>
+                  </div>
+                  <Input
+                    placeholder="e.g. John 3:16 or Genesis 22:1-14"
+                    value={suggestedVerse}
+                    onChange={(e) => setSuggestedVerse(e.target.value)}
+                    className="bg-background"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Leave blank for a random verse, or enter a specific passage for Jeeves to build the equation around.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
