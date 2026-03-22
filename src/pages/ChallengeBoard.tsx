@@ -10,8 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft, ChefHat, Calculator, Flame, Trophy, Send, Loader2,
-  Star, ChevronDown, ChevronUp, User, Clock
+  Star, ChevronDown, ChevronUp, User, Clock, Trash2
 } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -178,6 +182,23 @@ const ChallengeBoard = () => {
     }
   };
 
+  const handleDeleteChallenge = async (challengeId: string) => {
+    try {
+      const { error } = await supabase
+        .from("community_posts")
+        .delete()
+        .eq("id", challengeId)
+        .eq("user_id", user?.id);
+      if (error) throw error;
+      setChallenges(prev => prev.filter(c => c.id !== challengeId));
+      if (expandedId === challengeId) setExpandedId(null);
+      toast.success("Challenge removed from the board");
+    } catch (err) {
+      console.error("Delete error:", err);
+      toast.error("Failed to delete challenge");
+    }
+  };
+
   const getChallengeIcon = (title: string) => {
     if (title.includes("Chef")) return <ChefHat className="h-4 w-4" />;
     if (title.includes("Equation")) return <Calculator className="h-4 w-4" />;
@@ -289,7 +310,38 @@ const ChallengeBoard = () => {
                               </div>
                               <p className="text-sm font-medium line-clamp-2">{challenge.title}</p>
                             </div>
-                            <div className="shrink-0">
+                            <div className="shrink-0 flex items-center gap-1">
+                              {user?.id === challenge.user_id && (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-destructive hover:text-destructive"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Delete this challenge?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This will remove the challenge from the public board. This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleDeleteChallenge(challenge.id)}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        Delete
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
                               {isExpanded ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
                             </div>
                           </div>
