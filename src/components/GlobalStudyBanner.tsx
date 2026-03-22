@@ -497,6 +497,9 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const [newFeatureDismissed, setNewFeatureDismissed] = useState(() =>
     localStorage.getItem("pt_new_feature_testme_dismissed") === "true"
   );
+  const [lockInHighlightDismissed, setLockInHighlightDismissed] = useState(() =>
+    localStorage.getItem("pt_new_feature_lockin_dismissed") === "true"
+  );
   const [promptIdx, setPromptIdx] = useState(() => getUnseenIndex());
   const [xpFlash, setXpFlash] = useState(false);
   const stats = useUserBannerStats(resolvedUserId, fallbackDisplayName);
