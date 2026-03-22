@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, Loader2, Eye, RefreshCw, Share2, Facebook, Twitter } from "lucide-react";
+import { ChefHat, Loader2, Eye, RefreshCw, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { GenericChallengeShareDialog } from "./GenericChallengeShareDialog";
 
 interface ChefRecipeChallengeProps {
   challenge: any;
