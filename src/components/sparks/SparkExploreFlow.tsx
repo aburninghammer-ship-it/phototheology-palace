@@ -305,7 +305,7 @@ export function SparkExploreFlow({ spark, isOpen, onClose, onSave }: SparkExplor
             </CardContent>
           </Card>
         </motion.div>
-      </motion.div>
+      </DraggableSparkOverlay>
     </AnimatePresence>
   );
 }
