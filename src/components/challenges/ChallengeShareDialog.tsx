@@ -99,7 +99,7 @@ export const ChallengeShareDialog = ({
     return await saveAndGetShareUrl();
   };
 
-  const shareText = `🧮 Can you decode this Phototheology Equation?\n\n${equation.equation}\n\nVerse: ${equation.verse} | Difficulty: ${difficulty}\n\n✨ Try it on Phototheology Palace`;
+  const shareText = `🧮 Can you decode this Phototheology Equation?\n\n📖 Verse: ${equation.verse}\n🔢 Equation: ${equation.equation}\n⚡ Difficulty: ${difficulty}\n\n🔑 Symbols: ${equation.symbols.join(", ")}\n\n✨ Try it on Phototheology Palace — the ultimate Bible learning suite!`;
 
   const copyLink = async () => {
     const url = await ensureShareUrl();

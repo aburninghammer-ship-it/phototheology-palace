@@ -42,7 +42,7 @@ export const GenericChallengeShareDialog = ({
   const emoji = challengeType === "chef" ? "🍳" : challengeType === "equation" ? "🧮" : "🔥";
   const typeLabel = challengeType === "chef" ? "Chef Challenge" : challengeType === "equation" ? "Equation Challenge" : "Daily Challenge";
 
-  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n${title}${difficulty ? ` • ${difficulty}` : ""}\n\n✨ Can you do it? Try it on Phototheology Palace`;
+  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${content ? `\n\n${content.slice(0, 200)}` : ""}\n\n✨ Can you do it? Try it on Phototheology Palace — the ultimate Bible learning suite!`;
 
   const postToCommunity = async () => {
     if (!user || shared) return;
