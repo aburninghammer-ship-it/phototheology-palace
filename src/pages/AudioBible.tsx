@@ -760,11 +760,13 @@ export default function AudioBible() {
     }
 
     // Use batch-generate-epic edge function for efficiency
+    const currentMode = epicMode || "epic";
     const { data, error } = await supabase.functions.invoke("batch-generate-epic", {
       body: {
         books: [{ book, chapters: toRegen }],
         batchSize: toRegen.length,
         regenerate: true,
+        mode: currentMode,
       },
     });
 

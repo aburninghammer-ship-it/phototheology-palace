@@ -70,7 +70,7 @@ serve(async (req) => {
       }
     }
 
-    const { startBook, startChapter, batchSize = 5, regenerate = false, books: targetBooks } = await req.json();
+    const { startBook, startChapter, batchSize = 5, regenerate = false, books: targetBooks, mode = "epic" } = await req.json();
 
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
