@@ -605,6 +605,49 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
         )}
       </AnimatePresence>
 
+      {/* Lock-In Pass Highlight */}
+      <AnimatePresence>
+        {!lockInHighlightDismissed && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="rounded-lg border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-orange-500/5 px-3 py-2 flex items-center gap-3">
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <Users className="h-4 w-4 text-amber-400" />
+                <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-[10px] font-bold uppercase tracking-wider">Share</Badge>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-foreground">Free 5-Day Lock-In Pass</p>
+                <p className="text-[11px] text-muted-foreground line-clamp-1">Give friends free 5-day access with guided daily missions. You get 5 invites/month!</p>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <Button asChild size="sm" variant="ghost" className="text-[11px] h-6 px-2 text-amber-400 hover:bg-amber-500/10">
+                  <Link to="/gift">
+                    Share
+                    <ChevronRight className="h-3 w-3 ml-0.5" />
+                  </Link>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    setLockInHighlightDismissed(true);
+                    localStorage.setItem("pt_new_feature_lockin_dismissed", "true");
+                  }}
+                  title="Dismiss"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className={cn(
         "rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)] transition-all duration-500",
         xpFlash && "shadow-[0_0_30px_rgba(234,179,8,0.25)]"
