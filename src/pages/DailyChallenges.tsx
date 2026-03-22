@@ -513,6 +513,16 @@ const DailyChallenges = () => {
               </div>
             </TabsContent>
 
+            <TabsContent value="leaderboard" className="space-y-6">
+              <CommunityChallengeFeed />
+              <div className="text-center">
+                <Button variant="outline" onClick={() => navigate("/community-challenges")} className="gap-2">
+                  <Trophy className="h-4 w-4" />
+                  View Full Leaderboard
+                </Button>
+              </div>
+            </TabsContent>
+
             <TabsContent value="archive" className="space-y-6">
               <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/5 p-4 rounded-lg border border-purple-500/20">
                 <h2 className="font-semibold mb-2 flex items-center gap-2">
