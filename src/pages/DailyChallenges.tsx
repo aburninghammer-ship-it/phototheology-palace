@@ -247,7 +247,7 @@ const DailyChallenges = () => {
     const explanation = "Daily Challenges test your Bible knowledge with fresh puzzles each day — from verse matching to thematic connections. Great for building a daily Scripture habit!";
 
     const details: string[] = [
-      `🔥 Complete this Phototheology Daily Challenge!`,
+      `🔥 Try this Phototheology Daily Challenge!`,
       `💡 ${explanation}`,
       `📖 ${challengeTypeLabel} — training ${principle}`,
     ];
@@ -441,7 +441,7 @@ const DailyChallenges = () => {
                   </div>
 
                   {renderChallenge()}
-                  {hasSubmitted && dailyChallenge && (
+                  {dailyChallenge && (
                     <div className="flex justify-center mt-4">
                       <PostToPublicChallengeButton
                         challengeType="daily"

@@ -65,7 +65,7 @@ export const GenericChallengeShareDialog = ({
   }).toString()}`;
 
   const contentBlock = content ? `\n\n${content}` : "";
-  const shareText = `${emoji} Complete this Phototheology ${typeLabel}!\n\n💡 ${challengeExplanation}\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${contentBlock}\n\n✨ Try it yourself on Phototheology Palace — a free Bible learning suite!\n\n${siteUrl}${targetPath}`;
+  const shareText = `${emoji} Try this Phototheology ${typeLabel}!\n\n💡 ${challengeExplanation}\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${contentBlock}\n\n✨ Try it yourself on Phototheology Palace — a free Bible learning suite!\n\n${siteUrl}${targetPath}`;
   const fullSharePost = shareText;
 
   const copySharePostToClipboard = async (successMessage: string) => {
@@ -92,7 +92,7 @@ export const GenericChallengeShareDialog = ({
 
       await supabase.from("community_posts").insert({
         user_id: user.id,
-        title: `${emoji} ${displayName} completed: ${title}`,
+        title: `${emoji} ${displayName} shared: ${title}`,
         content: `${description}${content ? `\n\n${content}` : ""}\n\n💬 Try it yourself on the Challenges tab!`,
         category: "challenge",
       });

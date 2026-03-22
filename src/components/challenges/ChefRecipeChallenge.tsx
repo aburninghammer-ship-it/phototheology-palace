@@ -396,14 +396,17 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                 <p className="text-green-800 dark:text-green-200">
                   ✓ Recipe Complete! Added to your Growth Journal.
                 </p>
-                <PostToPublicChallengeButton
-                  challengeType="chef"
-                  title={`Chef Challenge: ${theme}`}
-                  content={verses.map((v: any) => `📖 **${v.reference}**\n> "${v.text}"`).join("\n\n") + `\n\n⚡ Challenge: Weave these random verses into a coherent Bible study recipe!`}
-                  difficulty={difficulty}
-                  className="w-full"
-                />
               </div>
+            )}
+
+            {verses.length > 0 && (
+              <PostToPublicChallengeButton
+                challengeType="chef"
+                title={`Chef Challenge: ${theme}`}
+                content={verses.map((v: any) => `📖 **${v.reference}**\n> "${v.text}"`).join("\n\n") + `\n\n⚡ Challenge: Weave these random verses into a coherent Bible study recipe!`}
+                difficulty={difficulty}
+                className="w-full"
+              />
             )}
           </>
         )}

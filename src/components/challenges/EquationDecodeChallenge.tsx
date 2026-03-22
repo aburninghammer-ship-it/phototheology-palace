@@ -109,14 +109,15 @@ export const EquationDecodeChallenge = ({ challenge, onSubmit, hasSubmitted }: E
             <p className="text-green-800 dark:text-green-200">
               ✓ Solution Submitted! Added to your Growth Journal.
             </p>
-            <PostToPublicChallengeButton
-              challengeType="equation"
-              title={`Equation Challenge: ${challenge.title}`}
-              content={`🧮 **Equation:** \`${equation}\`\n\n📖 **Passage:** ${passageRef}\n\n${shareContent}\n\n⚡ **Challenge:** Decode what each symbol means and show the Christ-centered insight.`}
-              className="w-full"
-            />
           </div>
         )}
+
+        <PostToPublicChallengeButton
+          challengeType="equation"
+          title={`Equation Challenge: ${challenge.title}`}
+          content={`🧮 **Equation:** \`${equation}\`\n\n📖 **Passage:** ${passageRef}\n\n${shareContent}\n\n⚡ **Challenge:** Decode what each symbol means and show the Christ-centered insight.`}
+          className="w-full"
+        />
       </CardContent>
     </Card>
 
