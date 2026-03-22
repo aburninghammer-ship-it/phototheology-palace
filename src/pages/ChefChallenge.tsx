@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw, Users } from "lucide-react";
+import { PostToPublicChallengeButton } from "@/components/challenges/PostToPublicChallengeButton";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { TextShareButton } from "@/components/TextShareButton";
 import { toast } from "sonner";
