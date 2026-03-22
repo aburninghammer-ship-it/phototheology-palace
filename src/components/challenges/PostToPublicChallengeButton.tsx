@@ -66,6 +66,25 @@ export const PostToPublicChallengeButton = ({
 
       if (error) throw error;
 
+      // Notify all users about the new public challenge
+      const { data: allProfiles } = await supabase
+        .from("profiles")
+        .select("id")
+        .neq("id", user.id);
+
+      if (allProfiles && allProfiles.length > 0) {
+        const notifications = allProfiles.map((p) => ({
+          user_id: p.id,
+          type: "challenge_posted",
+          title: "New Public Challenge!",
+          message: `${displayName} posted a ${typeLabel}: "${title}" — Can you solve it?`,
+          link: "/challenge-board",
+          metadata: { challenge_type: challengeType, poster_id: user.id },
+        }));
+
+        await supabase.from("notifications").insert(notifications);
+      }
+
       setPosted(true);
       toast.success("Challenge posted to the public challenge page! Others can now attempt it.");
     } catch (err) {
