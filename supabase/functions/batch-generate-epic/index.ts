@@ -117,7 +117,8 @@ serve(async (req) => {
       const { data: existing } = await supabaseAdmin
         .from("epic_commentaries")
         .select("book, chapter")
-        .eq("status", "ready");
+        .eq("status", "ready")
+        .eq("commentary_mode", mode);
 
       const existingSet = new Set(
         (existing || []).map((e) => `${e.book}:${e.chapter}`),
