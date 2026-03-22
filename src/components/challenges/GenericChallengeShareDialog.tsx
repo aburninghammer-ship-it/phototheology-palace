@@ -92,7 +92,7 @@ export const GenericChallengeShareDialog = ({
 
       await supabase.from("community_posts").insert({
         user_id: user.id,
-        title: `${emoji} ${displayName} completed: ${title}`,
+        title: `${emoji} ${displayName} shared: ${title}`,
         content: `${description}${content ? `\n\n${content}` : ""}\n\n💬 Try it yourself on the Challenges tab!`,
         category: "challenge",
       });
