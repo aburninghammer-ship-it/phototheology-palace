@@ -67,6 +67,7 @@ const GiftRedeem = lazy(() => import("./pages/GiftRedeem"));
 const DayPassRedeem = lazy(() => import("./pages/DayPassRedeem"));
 const LockInRedeem = lazy(() => import("./pages/LockInRedeem"));
 const GuestPassTracker = lazy(() => import("./pages/GuestPassTracker"));
+const PublicChallenge = lazy(() => import("./pages/PublicChallenge"));
 const GoalsSurveyPage = lazy(() => import("./pages/GoalsSurveyPage"));
 
 // Lazy load all other pages
