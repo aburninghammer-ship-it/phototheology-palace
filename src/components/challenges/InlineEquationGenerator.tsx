@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Calculator, BookOpen, RefreshCw, Loader2, Sparkles } from "lucide-react";
+import { Calculator, BookOpen, RefreshCw, Loader2, Sparkles, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ChallengeShareDialog } from "./ChallengeShareDialog";
 import { toast } from "sonner";
 
 type Difficulty = "easy" | "intermediate" | "advanced";
