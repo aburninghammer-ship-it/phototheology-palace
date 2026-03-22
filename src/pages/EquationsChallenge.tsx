@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus, Sparkles, Loader2, Copy, Check } from "lucide-react";
+import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus, Sparkles, Loader2, Copy, Check, BookOpen } from "lucide-react";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { ChallengeShareButton } from "@/components/challenges/ChallengeShareButton";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,6 +54,7 @@ export default function EquationsChallenge() {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [mode, setMode] = useState<"solve" | "create">("solve");
+  const [suggestedVerse, setSuggestedVerse] = useState("");
   const [jeevesLoading, setJeevesLoading] = useState(false);
   const [jeevesSolution, setJeevesSolution] = useState("");
   
@@ -205,7 +206,8 @@ export default function EquationsChallenge() {
             mode: "equations-challenge",
             difficulty: difficulty,
             symbolCount: expectedCount,
-            randomSeed: Date.now() + Math.random() + attempts // Ensure unique equations each attempt
+            randomSeed: Date.now() + Math.random() + attempts,
+            suggestedVerse: suggestedVerse.trim() || undefined
           }
         });
 
@@ -646,6 +648,23 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                     />
                     <span className="sr-only">Enable timer</span>
                   </Label>
+                </div>
+
+                {/* Suggested Verse Input */}
+                <div className="p-4 bg-muted rounded-lg space-y-2">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-primary" />
+                    <p className="font-medium text-sm">Suggest a Verse (Optional)</p>
+                  </div>
+                  <Input
+                    placeholder="e.g. John 3:16 or Genesis 22:1-14"
+                    value={suggestedVerse}
+                    onChange={(e) => setSuggestedVerse(e.target.value)}
+                    className="bg-background"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Leave blank for a random verse, or enter a specific passage for Jeeves to build the equation around.
+                  </p>
                 </div>
               </CardContent>
             </Card>
