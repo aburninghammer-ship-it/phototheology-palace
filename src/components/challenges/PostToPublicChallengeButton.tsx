@@ -61,6 +61,7 @@ export const PostToPublicChallengeButton = ({
         title: `${emoji} ${displayName} shared a ${typeLabel}: ${title}`,
         content: postContent,
         category: "challenge",
+        tags: ["public_board"],
       });
 
       if (error) throw error;
