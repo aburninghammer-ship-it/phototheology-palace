@@ -4609,32 +4609,44 @@ Return JSON: { "verse": "reference", "commentary": "...", "challengeCategory": "
       
       systemPrompt = `You are Jeeves, the Phototheology equations master. Generate biblical equation challenges using ONLY authentic Phototheology principle codes from the official system.
 
-**CRITICAL: ONLY USE THESE APPROVED CODES - NEVER INVENT OR HALLUCINATE SYMBOLS:**
+**ABSOLUTE RULES — VIOLATION = FAILURE:**
+1. NEVER use emojis (🌍❤️🎁∞ etc.) in equations. ONLY use text-based Palace principle codes.
+2. NEVER invent codes. If a code is not in the list below, DO NOT USE IT.
+3. Equations must look like: "CR + ST + BL → 2D" — NOT "🌍 + ❤️ = ∞"
+4. Every code in your equation MUST appear in the symbols array with its full name.
 
-**Floor 1 (Furnishing):** 24, BR, GR, IR, SR, TR
-**Floor 2 (Investigation):** DC, OR, QA, QB, ST
-**Floor 3 (Freestyle):** BF, HF, LR, NF, PF
-**Floor 4 Rooms:** CR, C6, DR, FRT, ∥, ≈, TRM, TZ
-**Floor 4 Dimensions:** 1D, 2D, 3D, 4D, 5D
-**Floor 4 Connect-6 Genres:** Ep, Go, Hi, Pa, Po, Pr
-**Floor 4 Theme Walls:** \\G, |GC, \\H, |LC, |S, |TP
-**Floor 4 Time Zones:** Ef, En, Epa, Hf, Hpa, Hp
-**Floor 4 Fruit:** -f, -ge, -g, -j, -ls, -lv, -m, -p, -t
-**Floor 5 (Vision):** BL, CEC, FE, PR, R66, 3A
-**Floor 5 Sanctuary:** SAN-ALT, SAN-INCENSE, SAN-ARK, SAN-LAMP, SAN-LAVER, SAN-BREAD
-**Floor 5 Prophecy:** @120, @1260, @2300, @400, @70w, @70y
-**Floor 5 Angels:** 3AM-1, 3AM-2, 3AM-3
-**Floor 5 Feasts:** FE-AT, FE-FI, FE-PA, FE-PE, FE-TA, FE-TR, FE-UN
+**APPROVED CODES — USE ONLY THESE:**
+
+**Floor 1 (Furnishing):** 24 (24FPS), BR (Bible Rendered), GR (Gems), IR (Imagination), SR (Story), TR (Translation)
+**Floor 2 (Investigation):** DC (Def-Com), OR (Observation), QA (Q&A Chains), QB (Questions), ST (Symbols/Types)
+**Floor 3 (Freestyle):** BF (Bible Freestyle), HF (History Freestyle), LR (Listening), NF (Nature Freestyle), PF (Personal Freestyle)
+**Floor 4 Rooms:** CR (Concentration on Christ), C6 (Connect-6), DR (Dimensions), FRT (Fruit), ∥ (Parallels), ≈ (Patterns), TRM (Theme), TZ (Time Zone)
+**Floor 4 Dimensions:** 1D (Literal), 2D (Christ), 3D (Personal), 4D (Church), 5D (Heaven)
+**Floor 4 Genres:** Ep (Epistle), Go (Gospel), Hi (History), Pa (Parable), Po (Poetry), Pr (Prophecy)
+**Floor 4 Themes:** \\G (Gospel Floor), |GC (Great Controversy), \\H (Heaven Ceiling), |LC (Life of Christ), |S (Sanctuary), |TP (Time Prophecy)
+**Floor 4 Time Zones:** Ef (Earth Future), En (Earth Now), Epa (Earth Past), Hf (Heaven Future), Hpa (Heaven Past), Hp (Heaven Present)
+**Floor 4 Fruit:** -f (Faith), -ge (Gentleness), -g (Goodness), -j (Joy), -ls (Longsuffering), -lv (Love), -m (Meekness), -p (Peace), -t (Temperance)
+**Floor 5 (Vision):** BL (Blue Room), CEC (Christ Every Chapter), FE (Feasts), PR (Prophecy Room), R66 (Room 66), 3A (Three Angels)
+**Floor 5 Sanctuary:** SAN-ALT (Altar), SAN-INCENSE (Incense), SAN-ARK (Ark), SAN-LAMP (Lampstand), SAN-LAVER (Laver), SAN-BREAD (Showbread)
+**Floor 5 Prophecy:** @120 (120 Years), @1260 (1260 Days), @2300 (2300 Days), @400 (400 Years), @70w (70 Weeks), @70y (70 Years)
+**Floor 5 Angels:** 3AM-1 (First Angel), 3AM-2 (Second Angel), 3AM-3 (Third Angel)
+**Floor 5 Feasts:** FE-AT (Atonement), FE-FI (Firstfruits), FE-PA (Passover), FE-PE (Pentecost), FE-TA (Tabernacles), FE-TR (Trumpets), FE-UN (Unleavened Bread)
 **Floor 6 (Three Heavens):** DoL¹/NE¹, DoL²/NE², DoL³/NE³
-**Floor 6 Cycles:** @Ab, @Ad, @Cy, @Sp, @Mo, @No, @Re, @Se
-**Floor 6 Rooms:** 8C, JR
-**Floor 7 (Spiritual):** FRM, MR, SRM
+**Floor 6 Cycles:** @Ab (Abrahamic), @Ad (Adamic), @Cy (Cyrusic), @Sp (Spirit), @Mo (Mosaic), @No (Noahic), @Re (Remnant), @Se (Seth)
+**Floor 6 Rooms:** 8C (Eight Cycles), JR (Juice Room)
+**Floor 7 (Spiritual):** FRM (Fire Room), MR (Meditation), SRM (Speed Room)
 
-**NEVER USE THESE - THEY ARE NOT VALID CODES:** CH, NC, Grace, New Creation, Christ (use CR for Concentration on Christ instead)
+**OPERATORS (use between codes):** + (and/with), → (leads to/results in), = (equals/is)
+
+**NEVER USE:** emojis, CH, NC, Grace, New Creation, Christ (use CR instead), or any code not listed above.
 
 Return valid JSON only.`;
 
       userPrompt = `Create a biblical equation challenge at "${difficulty}" difficulty with EXACTLY ${symbolCount} principles.
+
+**ABSOLUTE REQUIREMENT: NO EMOJIS! Use ONLY text-based Phototheology codes like CR, ST, BL, FE-PA, @Mo, etc.**
+**BAD example (NEVER do this):** 🌍 + ❤️ + 🎁 = ∞
+**GOOD example:** CR + ST + FE-PA → 2D
 
 **CRITICAL REQUIREMENT: Your equation MUST include EXACTLY ${symbolCount} Phototheology codes - no more, no less!**
 
@@ -10172,11 +10184,27 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
       try {
         const parsed = JSON.parse(content);
         
+        // Validate: reject emoji-based equations (not Palace codes)
+        const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}]/u;
+        if (parsed.equation && emojiRegex.test(parsed.equation)) {
+          console.error("Rejected emoji-based equation:", parsed.equation);
+          return new Response(
+            JSON.stringify({
+              error: "Invalid equation format",
+              verse: "Please try regenerating...",
+              equation: "Retry needed",
+              symbols: [],
+              difficulty: difficulty || "easy",
+              explanation: "The AI generated an emoji equation instead of Palace codes. Please click Regenerate to try again."
+            }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        
         // Validate symbol count matches request
         const expectedCount = requestBody.symbolCount || 3;
         if (parsed.symbols && parsed.symbols.length !== expectedCount) {
           console.error(`Symbol count mismatch: expected ${expectedCount}, got ${parsed.symbols.length}`);
-          // Return error so frontend can retry
           return new Response(
             JSON.stringify({
               error: "Invalid symbol count",
@@ -10188,10 +10216,7 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
               difficulty: difficulty || "easy",
               explanation: "The AI generated an incorrect number of symbols. Please click Regenerate to try again."
             }),
-            { 
-              status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" } 
-            }
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
         
