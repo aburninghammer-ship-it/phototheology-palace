@@ -200,8 +200,15 @@ export const InlineEquationGenerator = ({ onSubmit }: InlineEquationGeneratorPro
                 </p>
                 <Button variant="outline" onClick={() => setShowShareDialog(true)} className="w-full gap-2">
                   <Share2 className="h-4 w-4" />
-                  Share This Challenge
+                  Share to Social Media
                 </Button>
+                <PostToPublicChallengeButton
+                  challengeType="equation"
+                  title={`Equation: ${equation.verse}`}
+                  content={`🧮 **Equation:** \`${equation.equation}\`\n\n📖 **Verse:** ${equation.verse}\n\n${equation.symbols.length > 0 ? `🔑 **Symbols:** ${equation.symbols.join(", ")}\n\n` : ""}⚡ **Challenge:** Decode what each symbol means, explain how the parts connect, and show the Christ-centered insight the full equation reveals.`}
+                  difficulty={difficulty}
+                  className="w-full"
+                />
               </div>
             )}
           </div>

@@ -396,6 +396,15 @@ export default function ChefChallenge() {
                         )}
                       </Button>
                     )}
+                    <PostToPublicChallengeButton
+                      challengeType="chef"
+                      title={`Chef Challenge — ${verses.length} Random Verses`}
+                      content={verses.map(v => `📖 **${v.reference}**\n> "${v.text}"`).join("\n\n") + "\n\n⚡ Challenge: These verses are intentionally random and unrelated! Your goal is to creatively weave them into a coherent Bible study."}
+                      difficulty={difficulty}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                    />
                   </div>
                 </div>
 
