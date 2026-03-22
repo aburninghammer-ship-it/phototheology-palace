@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { SparkIcon } from './SparkIcon';
 import { SparkCard } from './SparkCard';
 import { SparkExploreFlow } from './SparkExploreFlow';
+import { DraggableSparkOverlay } from './DraggableSparkOverlay';
 import { cn } from '@/lib/utils';
 import type { Spark } from '@/hooks/useSparks';
 interface SparkContainerProps {
@@ -95,7 +96,7 @@ export function SparkContainer({
         )}
       </div>
 
-      {/* Open Spark Card - Fixed positioning to prevent clipping */}
+      {/* Open Spark Card - Draggable overlay */}
       {openSpark && (
         <>
           {/* Backdrop */}
@@ -103,8 +104,8 @@ export function SparkContainer({
             className="fixed inset-0 bg-background/60 backdrop-blur-sm z-[9998]" 
             onClick={handleClose} 
           />
-          {/* Card - centered on mobile, positioned near sparks on desktop */}
-          <div className="fixed inset-x-4 bottom-4 z-[9999] md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
+          {/* Card - draggable container */}
+          <DraggableSparkOverlay onClose={handleClose}>
             <SparkCard
               spark={openSpark}
               onClose={handleClose}
@@ -113,7 +114,7 @@ export function SparkContainer({
               onDismiss={() => handleDismiss(openSpark.id)}
               onAddToNotes={onAddToNotes}
             />
-          </div>
+          </DraggableSparkOverlay>
         </>
       )}
 
