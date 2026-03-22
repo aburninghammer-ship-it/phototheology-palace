@@ -66,10 +66,6 @@ serve(async (req) => {
     <meta name="twitter:description" content="${escapeHtml(description)}" />
     <meta name="twitter:image" content="${escapeHtml(imageUrl.toString())}" />
 
-    <meta http-equiv="refresh" content="0;url=${escapeHtml(targetUrl)}" />
-    <script>
-      window.location.replace(${JSON.stringify(targetUrl)});
-    </script>
   </head>
   <body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:hsl(222 47% 11%);color:hsl(210 40% 98%);font-family:Georgia,ui-serif,serif;">
     <main style="max-width:860px;width:100%;text-align:left;border:1px solid hsl(215 28% 17%);border-radius:28px;padding:32px;background:linear-gradient(135deg, hsl(222 47% 11%), hsl(221 39% 17%));box-shadow:0 24px 80px rgba(0,0,0,.35);">
@@ -80,9 +76,12 @@ serve(async (req) => {
       <p style="margin:0 0 18px;font-size:18px;line-height:1.6;color:hsl(214 32% 91%);">${escapeHtml(description)}</p>
       ${content ? `<pre style="margin:0 0 18px;padding:20px;border-radius:20px;white-space:pre-wrap;word-break:break-word;background:hsl(215 28% 17%);color:hsl(210 40% 96%);font:15px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;">${escapeHtml(content)}</pre>` : ""}
       ${instructions ? `<div style="margin:0 0 18px;padding:18px 20px;border-radius:20px;background:hsl(43 96% 56% / 0.12);border:1px solid hsl(43 96% 56% / 0.28);color:hsl(48 96% 89%);font-size:15px;line-height:1.6;"><strong style="display:block;margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase;font-size:12px;color:hsl(43 96% 56%);">What to do</strong>${escapeHtml(instructions)}</div>` : ""}
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 14px;">
+        <a href="${escapeHtml(targetUrl)}" style="display:inline-block;padding:12px 18px;border-radius:999px;background:hsl(43 96% 56%);color:hsl(222 47% 11%);font-weight:700;text-decoration:none;">Open this in the Suite</a>
+        <a href="${escapeHtml(APP_URL)}" style="display:inline-block;padding:12px 18px;border-radius:999px;border:1px solid hsl(215 20% 35%);color:hsl(210 40% 98%);font-weight:700;text-decoration:none;">Visit Phototheology Palace</a>
+      </div>
       <p style="margin:0;font-size:14px;color:hsl(215 20% 65%);">
-        Redirecting to the challenge…
-        <a href="${escapeHtml(targetUrl)}" style="color:hsl(43 96% 56%);">Open it here</a>
+        This public preview explains the challenge for newcomers; use the button above to jump back into the suite and respond.
       </p>
     </main>
   </body>

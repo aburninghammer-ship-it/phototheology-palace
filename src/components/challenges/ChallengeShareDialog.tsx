@@ -47,6 +47,16 @@ export const ChallengeShareDialog = ({
     `What to do: ${challengeInstructions}`,
   ].filter(Boolean).join("\n\n");
 
+  const copySharePostToClipboard = async (url: string, successMessage: string) => {
+    try {
+      await navigator.clipboard.writeText(`${shareText}\n\n${buildSocialShareUrl(url)}`);
+      toast.success(successMessage);
+    } catch (error) {
+      console.error("Clipboard error:", error);
+      toast.error("Couldn't copy the challenge text");
+    }
+  };
+
   const buildSocialShareUrl = (url: string) => {
     const sharePath = new URL(url).pathname;
 
@@ -128,9 +138,8 @@ export const ChallengeShareDialog = ({
   const copyLink = async () => {
     const url = await ensureShareUrl();
     if (!url) return;
-    await navigator.clipboard.writeText(buildSocialShareUrl(url));
+    await copySharePostToClipboard(url, "Challenge copied!");
     setCopied(true);
-    toast.success("Link copied!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -143,12 +152,14 @@ export const ChallengeShareDialog = ({
   const shareToFacebook = async () => {
     const url = await ensureShareUrl();
     if (!url) return;
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(buildSocialShareUrl(url))}&quote=${encodeURIComponent(shareText)}`, "_blank", "width=600,height=400");
+    await copySharePostToClipboard(url, "Challenge copied — paste it into Facebook after the preview loads.");
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(buildSocialShareUrl(url))}`, "_blank", "width=600,height=400");
   };
 
   const shareToLinkedIn = async () => {
     const url = await ensureShareUrl();
     if (!url) return;
+    await copySharePostToClipboard(url, "Challenge copied — paste it into LinkedIn after the preview loads.");
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(buildSocialShareUrl(url))}`, "_blank", "width=600,height=400");
   };
 
@@ -211,7 +222,7 @@ export const ChallengeShareDialog = ({
             </Button>
             <Button variant="outline" onClick={copyLink} disabled={sharing} className="flex flex-col items-center gap-1 h-auto py-3">
               {copied ? <Check className="h-5 w-5 text-green-500" /> : <Copy className="h-5 w-5" />}
-              <span className="text-xs">{copied ? "Copied!" : "Copy Link"}</span>
+              <span className="text-xs">{copied ? "Copied!" : "Copy Post"}</span>
             </Button>
           </div>
 
