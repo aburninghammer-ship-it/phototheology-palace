@@ -15,6 +15,7 @@ serve(async (req) => {
 
   try {
     const requestUrl = new URL(req.url);
+    const previewUrl = requestUrl.toString();
     const title = sanitizeText(requestUrl.searchParams.get("title"), 120) || "Phototheology Challenge";
     const description =
       sanitizeText(requestUrl.searchParams.get("description"), 240) ||
@@ -30,12 +31,12 @@ serve(async (req) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${escapeHtml(title)} | Phototheology</title>
     <meta name="description" content="${escapeHtml(description)}" />
-    <link rel="canonical" href="${escapeHtml(targetUrl)}" />
+    <link rel="canonical" href="${escapeHtml(previewUrl)}" />
 
     <meta property="og:title" content="${escapeHtml(title)}" />
     <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="${escapeHtml(targetUrl)}" />
+    <meta property="og:url" content="${escapeHtml(previewUrl)}" />
     <meta property="og:image" content="${DEFAULT_IMAGE}" />
     <meta property="og:image:alt" content="${escapeHtml(title)}" />
     <meta property="og:image:width" content="1200" />
@@ -43,6 +44,7 @@ serve(async (req) => {
     <meta property="og:site_name" content="Phototheology Bible Learning Suite" />
 
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${escapeHtml(previewUrl)}" />
     <meta name="twitter:title" content="${escapeHtml(title)}" />
     <meta name="twitter:description" content="${escapeHtml(description)}" />
     <meta name="twitter:image" content="${DEFAULT_IMAGE}" />

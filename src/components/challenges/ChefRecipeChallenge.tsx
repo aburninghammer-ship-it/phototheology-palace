@@ -35,6 +35,19 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
     master: { min: 9, max: 10, label: "Master", icon: "👑", description: "9-10 verses" }
   };
 
+  const theme = challenge.ui_config?.theme || challenge.title || "Biblical Recipe";
+  const verseList = verses.join(", ");
+  const recipePreview = recipe.length > 220 ? `${recipe.slice(0, 217)}...` : recipe;
+  const shareDescription = verseList
+    ? `Theme: ${theme} • Ingredients: ${verseList}`
+    : `Theme: ${theme} • ${difficultyConfig[difficulty].description} challenge`;
+  const shareContent = [
+    verseList ? `Ingredients: ${verseList}` : null,
+    recipePreview ? `My recipe: ${recipePreview}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
   // Remove auto-generation - user must click the button
 
   const generateVerses = async () => {
@@ -53,7 +66,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
           minVerses: config.min,
           maxVerses: config.max,
           difficulty,
-          theme: challenge.ui_config?.theme || challenge.title,
+          theme,
         },
       });
 
@@ -94,7 +107,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "check_chef_recipe",
-          theme: challenge.ui_config?.theme || challenge.title,
+          theme,
           recipe: recipe.trim(),
           verses,
           difficulty,
@@ -131,7 +144,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "get_chef_model_answer",
-          theme: challenge.ui_config?.theme || challenge.title,
+          theme,
           verses,
           difficulty,
         },
@@ -405,10 +418,10 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
       open={showShareDialog}
       onOpenChange={setShowShareDialog}
       challengeType="chef"
-      title={`Chef Challenge: ${challenge.ui_config?.theme || "Biblical Recipe"}`}
-      description={`Created a biblical recipe from ${verses.length} random verses at ${difficulty} difficulty.`}
+      title={`Chef Challenge: ${theme}`}
+      description={shareDescription}
       difficulty={difficulty}
-      content={recipe ? `My recipe: ${recipe.slice(0, 200)}...` : undefined}
+      content={shareContent || undefined}
     />
     </>
   );
