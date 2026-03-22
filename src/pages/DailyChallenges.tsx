@@ -441,7 +441,7 @@ const DailyChallenges = () => {
                   </div>
 
                   {renderChallenge()}
-                  {hasSubmitted && dailyChallenge && (
+                  {dailyChallenge && (
                     <div className="flex justify-center mt-4">
                       <PostToPublicChallengeButton
                         challengeType="daily"
