@@ -243,20 +243,23 @@ const DailyChallenges = () => {
 
     const principle = dailyChallenge.principle_used || 'biblical principles';
 
-    // Build challenge details including verses/description
+    const explanation = "Daily Challenges test your Bible knowledge with fresh puzzles each day — from verse matching to thematic connections. Great for building a daily Scripture habit!";
+
     const details: string[] = [
-      `I'm taking on today's ${challengeTypeLabel} challenge, training ${principle}.`,
+      `🔥 Complete this Phototheology Daily Challenge!`,
+      `💡 ${explanation}`,
+      `📖 ${challengeTypeLabel} — training ${principle}`,
     ];
     if (dailyChallenge.description) {
       details.push(dailyChallenge.description);
     }
     if (dailyChallenge.verses && Array.isArray(dailyChallenge.verses) && dailyChallenge.verses.length > 0) {
-      details.push(`Key verses: ${dailyChallenge.verses.join(', ')}`);
+      details.push(dailyChallenge.verses.join('\n\n'));
     }
-    details.push('Can you beat it? Try the daily challenge on Phototheology Palace!');
+    details.push(`✨ Try it yourself on Phototheology Palace — a free Bible learning suite!\n\n${siteUrl}/daily-challenges`);
 
     return {
-      title: `${challengeTypeLabel} - Daily Phototheology Challenge`,
+      title: `🔥 Daily ${challengeTypeLabel} Challenge`,
       content: details.join('\n\n'),
       url: `${siteUrl}/daily-challenges`
     };
