@@ -97,6 +97,28 @@ export const GenericChallengeShareDialog = ({
         category: "challenge",
       });
 
+      // Rate with Jeeves and save to leaderboard
+      if (!jeevesResult) {
+        setRating(true);
+        try {
+          const { data: rateData, error: rateError } = await supabase.functions.invoke("rate-challenge", {
+            body: { challengeType, title, description, content, difficulty },
+          });
+          if (!rateError && rateData) {
+            setJeevesResult({
+              score: rateData.score,
+              highlights: rateData.highlights || [],
+              feedback: rateData.feedback || "",
+            });
+            toast.success(`Jeeves rated your submission: ${rateData.score}/100!`);
+          }
+        } catch (e) {
+          console.error("Rating error:", e);
+        } finally {
+          setRating(false);
+        }
+      }
+
       setShared(true);
     } catch (err) {
       console.error("Share error:", err);
