@@ -182,6 +182,23 @@ const ChallengeBoard = () => {
     }
   };
 
+  const handleDeleteChallenge = async (challengeId: string) => {
+    try {
+      const { error } = await supabase
+        .from("community_posts")
+        .delete()
+        .eq("id", challengeId)
+        .eq("user_id", user?.id);
+      if (error) throw error;
+      setChallenges(prev => prev.filter(c => c.id !== challengeId));
+      if (expandedId === challengeId) setExpandedId(null);
+      toast.success("Challenge removed from the board");
+    } catch (err) {
+      console.error("Delete error:", err);
+      toast.error("Failed to delete challenge");
+    }
+  };
+
   const getChallengeIcon = (title: string) => {
     if (title.includes("Chef")) return <ChefHat className="h-4 w-4" />;
     if (title.includes("Equation")) return <Calculator className="h-4 w-4" />;
