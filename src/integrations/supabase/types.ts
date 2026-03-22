@@ -9787,7 +9787,7 @@ export type Database = {
           mission_description: string
           mission_title: string
           pass_id: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           completed_at?: string | null
@@ -9798,7 +9798,7 @@ export type Database = {
           mission_description: string
           mission_title: string
           pass_id: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           completed_at?: string | null
@@ -9809,7 +9809,7 @@ export type Database = {
           mission_description?: string
           mission_title?: string
           pass_id?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
