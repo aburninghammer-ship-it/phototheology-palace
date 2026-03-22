@@ -28,6 +28,7 @@ import {
   type BibleStory,
   type BookStories
 } from "@/data/bibleStoryLibrary";
+import { ResearchAudioCommentary } from "@/components/audio/ResearchAudioCommentary";
 
 interface StoryLibraryProps {
   onClose?: () => void;
@@ -75,6 +76,15 @@ export function StoryLibrary({ onClose }: StoryLibraryProps) {
 
   // Story Detail View
   if (selectedStory) {
+    const briefText = [
+      `Title: ${selectedStory.title}`,
+      `Reference: ${selectedStory.reference}`,
+      `Summary: ${selectedStory.summary}`,
+      `Characters: ${selectedStory.characters.join(", ")}`,
+      `Themes: ${selectedStory.themes.join(", ")}`,
+      selectedStory.lessonLearned ? `Lesson: ${selectedStory.lessonLearned}` : "",
+    ].filter(Boolean).join("\n\n");
+
     return (
       <Card className="h-full">
         <CardHeader className="pb-4">
@@ -87,6 +97,7 @@ export function StoryLibrary({ onClose }: StoryLibraryProps) {
             <BookOpen className="h-4 w-4" />
             {selectedStory.reference}
           </CardDescription>
+          <ResearchAudioCommentary briefText={briefText} />
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Summary */}

@@ -78,6 +78,7 @@ import { PatternsLibrary } from "@/components/patterns-room/PatternsLibrary";
 import { ThreeHeavensLibrary } from "@/components/three-heavens-room/ThreeHeavensLibrary";
 import { Room66Library } from "@/components/room66/Room66Library";
 import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLibrary";
+import { ImageBibleBrowser } from "@/components/rooms/ImageBibleBrowser";
 
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
 import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
@@ -538,6 +539,8 @@ export default function RoomDetail() {
                     <RoomLibrary roomId="24fps">
                       <Bible24FPSBrowser />
                     </RoomLibrary>
+
+                    <ImageBibleBrowser />
 
                     <Card>
                       <CardHeader>
