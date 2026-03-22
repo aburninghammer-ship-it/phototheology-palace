@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useOutputSpark } from "@/hooks/useOutputSpark";
 import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock, Trophy, Globe } from "lucide-react";
+import { PostToPublicChallengeButton } from "@/components/challenges/PostToPublicChallengeButton";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
@@ -440,6 +441,16 @@ const DailyChallenges = () => {
                   </div>
 
                   {renderChallenge()}
+                  {hasSubmitted && dailyChallenge && (
+                    <div className="flex justify-center mt-4">
+                      <PostToPublicChallengeButton
+                        challengeType="daily"
+                        title={dailyChallenge.title}
+                        content={dailyChallenge.description || dailyChallenge.title}
+                        difficulty={dailyChallenge.challenge_tier}
+                      />
+                    </div>
+                  )}
                 </>
               ) : (
                 <Card>
