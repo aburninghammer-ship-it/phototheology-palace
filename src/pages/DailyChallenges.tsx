@@ -536,10 +536,14 @@ const DailyChallenges = () => {
 
             <TabsContent value="leaderboard" className="space-y-6">
               <CommunityChallengeFeed />
-              <div className="text-center">
+              <div className="flex justify-center gap-3">
                 <Button variant="outline" onClick={() => navigate("/community-challenges")} className="gap-2">
                   <Trophy className="h-4 w-4" />
                   View Full Leaderboard
+                </Button>
+                <Button onClick={() => navigate("/challenge-board")} className="gap-2">
+                  <Globe className="h-4 w-4" />
+                  Public Challenge Board
                 </Button>
               </div>
             </TabsContent>
