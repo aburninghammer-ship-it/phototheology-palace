@@ -25,6 +25,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   const [modelAnswer, setModelAnswer] = useState("");
   const [feedback, setFeedback] = useState<any>(null);
   const [difficulty, setDifficulty] = useState<"easy" | "intermediate" | "pro" | "master">("intermediate");
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const { toast } = useToast();
 
   const difficultyConfig = {
