@@ -4644,6 +4644,10 @@ Return valid JSON only.`;
 
       userPrompt = `Create a biblical equation challenge at "${difficulty}" difficulty with EXACTLY ${symbolCount} principles.
 
+**ABSOLUTE REQUIREMENT: NO EMOJIS! Use ONLY text-based Phototheology codes like CR, ST, BL, FE-PA, @Mo, etc.**
+**BAD example (NEVER do this):** 🌍 + ❤️ + 🎁 = ∞
+**GOOD example:** CR + ST + FE-PA → 2D
+
 **CRITICAL REQUIREMENT: Your equation MUST include EXACTLY ${symbolCount} Phototheology codes - no more, no less!**
 
 **VARIETY REQUIREMENT: Generate a completely unique equation. Random seed: ${requestBody.randomSeed || Date.now()}. Never repeat the same verse or code combination.**
