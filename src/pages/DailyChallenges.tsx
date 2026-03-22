@@ -487,14 +487,12 @@ const DailyChallenges = () => {
                   View Full Chef Challenge Mode
                 </Button>
               </div>
+              <ChallengeInlineSubmissions
+                challengeType="chef"
+                challengeTitle="Chef Challenge"
+                challengeDescription="Create a biblical recipe by connecting verses that build a complete theological thought."
+              />
             </TabsContent>
-
-            <TabsContent value="equations" className="space-y-6">
-              <div className="bg-gradient-to-r from-primary/10 to-indigo-500/5 p-4 rounded-lg border border-primary/20">
-                <h2 className="font-semibold mb-2 flex items-center gap-2">
-                  <Calculator className="h-5 w-5 text-primary" />
-                  About Equation Challenges
-                </h2>
                 <p className="text-sm text-muted-foreground">
                   Decode biblical equations using palace principles and symbols.
                   Discover how Scripture speaks in symbolic language that points to Christ.
