@@ -616,6 +616,17 @@ const DailyChallenges = () => {
             </TabsContent>
           </Tabs>
         </div>
+
+        {dailyChallenge && (
+          <GenericChallengeShareDialog
+            open={showDailyShareDialog}
+            onOpenChange={setShowDailyShareDialog}
+            challengeType="daily"
+            title={dailyChallenge.title || "Daily Challenge"}
+            description={dailyChallenge.description || "A daily Phototheology challenge"}
+            difficulty={dailyChallenge.challenge_tier}
+          />
+        )}
       </main>
     </div>
   );
