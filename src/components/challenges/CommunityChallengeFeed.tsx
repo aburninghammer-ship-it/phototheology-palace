@@ -52,7 +52,7 @@ export const CommunityChallengeFeed = ({ compact = false }: CommunityChallengeFe
     try {
       let query = supabase
         .from("challenge_leaderboard")
-        .select("*, profiles:user_id(display_name, username, avatar_url)")
+        .select("*")
         .order("jeeves_score", { ascending: false })
         .limit(compact ? 10 : 50);
 
@@ -62,7 +62,19 @@ export const CommunityChallengeFeed = ({ compact = false }: CommunityChallengeFe
 
       const { data, error } = await query;
       if (error) throw error;
-      setEntries((data as LeaderboardEntry[]) || []);
+
+      // Fetch profiles for the user IDs
+      const userIds = [...new Set((data || []).map(e => e.user_id))];
+      const { data: profiles } = userIds.length > 0
+        ? await supabase.from("profiles").select("id, display_name, username, avatar_url").in("id", userIds)
+        : { data: [] };
+
+      const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+
+      setEntries((data || []).map(e => ({
+        ...e,
+        profiles: profileMap.get(e.user_id) || undefined,
+      })) as LeaderboardEntry[]);
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
     } finally {
