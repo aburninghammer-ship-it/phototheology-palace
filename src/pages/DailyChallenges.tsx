@@ -410,11 +410,10 @@ const DailyChallenges = () => {
                         {dailyChallenge.challenge_tier}
                       </Badge>
                     </div>
-                    <EnhancedSocialShare 
-                      {...getShareContent()} 
-                      buttonText="Share This Challenge"
-                      buttonVariant="default"
-                    />
+                    <Button variant="default" onClick={() => setShowDailyShareDialog(true)} className="gap-2">
+                      <Share2 className="h-4 w-4" />
+                      Share This Challenge
+                    </Button>
                   </div>
 
                   {renderChallenge()}
