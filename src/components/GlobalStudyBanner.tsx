@@ -494,9 +494,18 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const fallbackDisplayName = (userEmail ?? authUser?.email)?.split("@")[0] || "Scholar";
 
   const [dismissed, setDismissed] = useState(false);
-  const [newFeatureDismissed, setNewFeatureDismissed] = useState(() =>
-    localStorage.getItem("pt_new_feature_testme_dismissed") === "true"
-  );
+  const [newFeatureDismissed, setNewFeatureDismissed] = useState(() => {
+    const dismissedAt = localStorage.getItem("pt_new_feature_testme_dismissed");
+    if (!dismissedAt) return false;
+    // Re-show after 7 days
+    if (dismissedAt !== "true") {
+      const elapsed = Date.now() - parseInt(dismissedAt, 10);
+      return elapsed < 7 * 24 * 60 * 60 * 1000;
+    }
+    // Migrate old "true" value — treat as just dismissed now
+    localStorage.setItem("pt_new_feature_testme_dismissed", Date.now().toString());
+    return true;
+  });
   const [promptIdx, setPromptIdx] = useState(() => getUnseenIndex());
   const [xpFlash, setXpFlash] = useState(false);
   const stats = useUserBannerStats(resolvedUserId, fallbackDisplayName);
@@ -588,9 +597,9 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
                   size="sm"
                   variant="ghost"
                   className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                  onClick={() => {
+                   onClick={() => {
                     setNewFeatureDismissed(true);
-                    localStorage.setItem("pt_new_feature_testme_dismissed", "true");
+                    localStorage.setItem("pt_new_feature_testme_dismissed", Date.now().toString());
                   }}
                   title="Dismiss"
                 >
