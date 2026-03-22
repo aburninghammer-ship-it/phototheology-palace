@@ -48,6 +48,12 @@ export const GenericChallengeShareDialog = ({
     ? "Equation Challenges encode Bible study principles into symbolic equations using the Phototheology Palace method — a visual system for deep, Christ-centered Bible study across 8 'floors' of learning."
     : "Daily Challenges test your Bible knowledge with fresh puzzles each day — from verse matching to thematic connections. Great for building a daily Scripture habit!";
 
+  const challengeInstructions = challengeType === "chef"
+    ? "Read each ingredient verse, use only those verses, and weave them into one coherent Christ-centered Bible study or devotional recipe."
+    : challengeType === "equation"
+    ? "Explain what each symbol means, how the parts connect, and what Christ-centered truth the full equation reveals."
+    : "Read the prompt carefully, work only with the verses or clues provided, and post your best response inside the suite.";
+
   const shareUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
     title: `${emoji} ${title}`.slice(0, 120),
     description: [
@@ -58,6 +64,8 @@ export const GenericChallengeShareDialog = ({
       .filter(Boolean)
       .join(" • ")
       .slice(0, 240),
+    content: [content, `What to do: ${challengeInstructions}`].filter(Boolean).join("\n\n").slice(0, 2200),
+    instructions: challengeInstructions,
     path: targetPath,
     badge: typeLabel,
   }).toString()}`;

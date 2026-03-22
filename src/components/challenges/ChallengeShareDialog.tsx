@@ -36,6 +36,16 @@ export const ChallengeShareDialog = ({
   const [copied, setCopied] = useState(false);
 
   const sharePreviewBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/challenge-share-preview`;
+  const challengeInstructions = "Decode what each symbol means, explain how the parts connect, and show the Christ-centered insight the full equation reveals.";
+  const challengeBody = [
+    "🧮 Equation Challenge",
+    `Verse: ${equation.verse}`,
+    `Difficulty: ${difficulty}`,
+    `Equation: ${equation.equation}`,
+    equation.symbols.length > 0 ? `Symbols: ${equation.symbols.join(", ")}` : null,
+    equation.explanation ? `What it is teaching: ${equation.explanation}` : null,
+    `What to do: ${challengeInstructions}`,
+  ].filter(Boolean).join("\n\n");
 
   const buildSocialShareUrl = (url: string) => {
     const sharePath = new URL(url).pathname;
@@ -47,6 +57,8 @@ export const ChallengeShareDialog = ({
         `Difficulty: ${difficulty}`,
         equation.symbols.length > 0 ? `Symbols: ${equation.symbols.join(", ")}` : null,
       ].filter(Boolean).join(" • ").slice(0, 240),
+      content: challengeBody.slice(0, 2200),
+      instructions: challengeInstructions,
       path: sharePath,
       badge: "Equation Challenge",
     }).toString()}`;
@@ -91,7 +103,7 @@ export const ChallengeShareDialog = ({
       await supabase.from("community_posts").insert({
         user_id: user.id,
         title: `🧮 ${displayName} shared: Equation Challenge on ${equation.verse}`,
-        content: `**Equation:** \`${equation.equation}\`\n\n**Difficulty:** ${difficulty}\n\n💬 Can you decode this? Try it: ${url}`,
+        content: `${challengeBody}\n\n💡 Equation Challenges teach people to decode Bible study principles in symbolic form.\n\nOpen it in the suite: ${url}`,
         category: "challenge",
       });
 
@@ -111,7 +123,7 @@ export const ChallengeShareDialog = ({
     return await saveAndGetShareUrl();
   };
 
-  const shareText = `🧮 Can you decode this Phototheology Equation?\n\n📖 Verse: ${equation.verse}\n🔢 Equation: ${equation.equation}\n⚡ Difficulty: ${difficulty}\n\n🔑 Symbols: ${equation.symbols.join(", ")}\n\n💡 Equation Challenges encode Bible study principles into symbolic equations using the Phototheology Palace method — a visual system for deep, Christ-centered Bible study across 8 "floors" of learning.\n\n✨ Try it free on Phototheology Palace!`;
+  const shareText = `${challengeBody}\n\n💡 Equation Challenges encode Bible study principles into symbolic equations using the Phototheology Palace method — a visual system for deep, Christ-centered Bible study across 8 "floors" of learning.\n\n✨ Try it free on Phototheology Palace!`;
 
   const copyLink = async () => {
     const url = await ensureShareUrl();

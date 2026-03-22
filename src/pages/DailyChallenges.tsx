@@ -172,6 +172,41 @@ const DailyChallenges = () => {
     return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
   };
 
+  const flattenChallengeDetails = (value: unknown): string[] => {
+    if (!value) return [];
+    if (typeof value === "string") return [value];
+    if (Array.isArray(value)) return value.flatMap((item) => flattenChallengeDetails(item));
+    if (typeof value === "object") return Object.values(value as Record<string, unknown>).flatMap((item) => flattenChallengeDetails(item));
+    return [];
+  };
+
+  const buildDailyChallengeShareBody = () => {
+    if (!dailyChallenge) return "Join today's Phototheology daily challenge in the suite.";
+
+    const instructionLines = flattenChallengeDetails(dailyChallenge.instructions)
+      .concat(flattenChallengeDetails(dailyChallenge.ui_config))
+      .map((line) => line.replace(/\s+/g, " ").trim())
+      .filter((line, index, array) => line.length > 0 && array.indexOf(line) === index)
+      .slice(0, 6);
+
+    const verseLines = Array.isArray(dailyChallenge.verses)
+      ? dailyChallenge.verses.map((verse: string, index: number) => `${index + 1}. ${verse}`)
+      : [];
+
+    return [
+      `🔥 ${dailyChallenge.title || "Daily Challenge"}`,
+      dailyChallenge.challenge_tier ? `Level: ${dailyChallenge.challenge_tier}` : null,
+      dailyChallenge.challenge_subtype ? `Type: ${dailyChallenge.challenge_subtype.replace(/-/g, " ")}` : null,
+      dailyChallenge.description || null,
+      verseLines.length > 0 ? `Key verses:\n${verseLines.join("\n")}` : null,
+      instructionLines.length > 0
+        ? `What to do:\n${instructionLines.map((line, index) => `${index + 1}. ${line}`).join("\n")}`
+        : "What to do:\n1. Read the challenge prompt carefully.\n2. Work only with the verses and clues provided.\n3. Respond inside the suite with your best Christ-centered answer.",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+  };
+
   const handleChallengeSubmit = async (submissionData: any) => {
     if (!dailyChallenge || !user) return;
 
@@ -230,11 +265,14 @@ const DailyChallenges = () => {
 
   const getShareContent = () => {
     const sharePreviewBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/challenge-share-preview`;
+    const shareBody = buildDailyChallengeShareBody();
 
     if (!dailyChallenge) {
       const previewUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
         title: "Daily Phototheology Challenge",
         description: "Join today's Bible study challenge in Phototheology Palace.",
+        content: shareBody,
+        instructions: "Open the suite, read the prompt, and respond to the challenge inside the app.",
         path: "/daily-challenges",
         badge: "Daily Challenge",
       }).toString()}`;
@@ -260,13 +298,15 @@ const DailyChallenges = () => {
     const previewUrl = `${sharePreviewBaseUrl}?${new URLSearchParams({
       title: `${challengeTypeLabel}: ${dailyChallenge.title || 'Daily Phototheology Challenge'}`.slice(0, 120),
       description: previewDescription.slice(0, 240),
+      content: shareBody.slice(0, 2200),
+      instructions: "Open the suite, read the challenge, and post your response using only the prompt and verses provided.",
       path: '/daily-challenges',
       badge: 'Daily Challenge',
     }).toString()}`;
 
     return {
       title: `${challengeTypeLabel} - Daily Phototheology Challenge`,
-      content: dailyChallenge.description || `Today's challenge: ${challengeTypeLabel}. Training ${dailyChallenge.principle_used || 'biblical principles'}. Join me in deepening our understanding of Scripture!`,
+      content: shareBody,
       url: previewUrl,
     };
   };
@@ -649,6 +689,7 @@ const DailyChallenges = () => {
             title={dailyChallenge.title || "Daily Challenge"}
             description={dailyChallenge.description || "A daily Phototheology challenge"}
             difficulty={dailyChallenge.challenge_tier}
+            content={buildDailyChallengeShareBody()}
           />
         )}
       </main>
