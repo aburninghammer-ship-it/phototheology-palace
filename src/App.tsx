@@ -531,6 +531,7 @@ function App() {
             
             <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
             <Route path="/community-challenges" element={<ProtectedRoute><CommunityChallengeFeedPage /></ProtectedRoute>} />
+            <Route path="/challenge-board" element={<ProtectedRoute><ChallengeBoard /></ProtectedRoute>} />
             <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
