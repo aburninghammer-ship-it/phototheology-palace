@@ -450,6 +450,7 @@ function App() {
             <Route path="/guest-pass-tracker" element={<ProtectedRoute><GuestPassTracker /></ProtectedRoute>} />
             <Route path="/shared/baptism-audio/:token" element={<SharedBaptismAudio />} />
             <Route path="/shared/debate/:token" element={<SharedDebate />} />
+            <Route path="/challenge/:shareCode" element={<PublicChallenge />} />
             <Route path="/donate" element={<DonationPage />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
             <Route path="/credit-purchase-success" element={<ProtectedRoute><CreditPurchaseSuccess /></ProtectedRoute>} />
