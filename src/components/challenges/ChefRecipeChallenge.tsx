@@ -37,8 +37,8 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   const difficultyConfig = {
     easy: { min: 3, max: 4, label: "Easy", icon: "🌱", description: "3-4 verses" },
     intermediate: { min: 5, max: 6, label: "Intermediate", icon: "🔥", description: "5-6 verses" },
-    pro: { min: 7, max: 8, label: "Pro", icon: "💎", description: "7-8 verses" },
-    master: { min: 9, max: 10, label: "Master", icon: "👑", description: "9-10 verses" }
+    pro: { min: 10, max: 10, label: "Pro", icon: "💎", description: "10 verses" },
+    master: { min: 10, max: 10, label: "Master", icon: "👑", description: "10 verses" }
   };
 
   // Remove auto-generation - user must click the button

@@ -36,13 +36,13 @@ const difficultyConfig = {
     icon: "🔥"
   },
   pro: {
-    min: 7,
-    max: 8,
+    min: 10,
+    max: 10,
     labelKey: "challenges.proVerses",
     icon: "💎"
   },
   master: {
-    min: 9,
+    min: 10,
     max: 10,
     labelKey: "challenges.masterVerses",
     icon: "👑"
