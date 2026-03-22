@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Calculator, BookOpen, RefreshCw, Loader2, Sparkles } from "lucide-react";
+import { Calculator, BookOpen, RefreshCw, Loader2, Sparkles, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ChallengeShareDialog } from "./ChallengeShareDialog";
 import { toast } from "sonner";
 
 type Difficulty = "easy" | "intermediate" | "advanced";
@@ -32,6 +33,7 @@ export const InlineEquationGenerator = ({ onSubmit }: InlineEquationGeneratorPro
   } | null>(null);
   const [solution, setSolution] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
 
   const generateEquation = async () => {
     setLoading(true);
@@ -191,15 +193,28 @@ export const InlineEquationGenerator = ({ onSubmit }: InlineEquationGeneratorPro
                 </Button>
               </>
             ) : (
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-3">
                 <p className="text-green-800 dark:text-green-200">
                   ✓ Solution Submitted! Added to your Growth Journal.
                 </p>
+                <Button variant="outline" onClick={() => setShowShareDialog(true)} className="w-full gap-2">
+                  <Share2 className="h-4 w-4" />
+                  Share This Challenge
+                </Button>
               </div>
             )}
           </div>
         )}
       </CardContent>
+
+      {equation && (
+        <ChallengeShareDialog
+          open={showShareDialog}
+          onOpenChange={setShowShareDialog}
+          equation={equation}
+          difficulty={difficulty}
+        />
+      )}
     </Card>
   );
 };

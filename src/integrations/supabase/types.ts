@@ -13687,6 +13687,47 @@ export type Database = {
         }
         Relationships: []
       }
+      public_challenge_responses: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          grade_score: number | null
+          guest_name: string | null
+          id: string
+          jeeves_feedback: string | null
+          response_text: string
+          user_id: string | null
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          grade_score?: number | null
+          guest_name?: string | null
+          id?: string
+          jeeves_feedback?: string | null
+          response_text: string
+          user_id?: string | null
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          grade_score?: number | null
+          guest_name?: string | null
+          id?: string
+          jeeves_feedback?: string | null
+          response_text?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_challenge_responses_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "equation_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_chat_messages: {
         Row: {
           content: string

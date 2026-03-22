@@ -67,6 +67,7 @@ const GiftRedeem = lazy(() => import("./pages/GiftRedeem"));
 const DayPassRedeem = lazy(() => import("./pages/DayPassRedeem"));
 const LockInRedeem = lazy(() => import("./pages/LockInRedeem"));
 const GuestPassTracker = lazy(() => import("./pages/GuestPassTracker"));
+const PublicChallenge = lazy(() => import("./pages/PublicChallenge"));
 const GoalsSurveyPage = lazy(() => import("./pages/GoalsSurveyPage"));
 
 // Lazy load all other pages
@@ -449,6 +450,7 @@ function App() {
             <Route path="/guest-pass-tracker" element={<ProtectedRoute><GuestPassTracker /></ProtectedRoute>} />
             <Route path="/shared/baptism-audio/:token" element={<SharedBaptismAudio />} />
             <Route path="/shared/debate/:token" element={<SharedDebate />} />
+            <Route path="/challenge/:shareCode" element={<PublicChallenge />} />
             <Route path="/donate" element={<DonationPage />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
             <Route path="/credit-purchase-success" element={<ProtectedRoute><CreditPurchaseSuccess /></ProtectedRoute>} />
