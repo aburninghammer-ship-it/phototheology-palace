@@ -37,7 +37,7 @@ export const GenericChallengeShareDialog = ({
   const [copied, setCopied] = useState(false);
 
   const sharePreviewBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/challenge-share-preview`;
-  const targetPath = challengeType === "chef" ? "/games/chef-challenge" : "/daily-challenges";
+  const targetPath = "/daily-challenges";
   const siteUrl = "https://phototheologybible.com";
 
   const emoji = challengeType === "chef" ? "🍳" : challengeType === "equation" ? "🧮" : "🔥";
