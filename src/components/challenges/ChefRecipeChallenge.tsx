@@ -36,17 +36,29 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   };
 
   const theme = challenge.ui_config?.theme || challenge.title || "Biblical Recipe";
-  const verseList = verses.join(", ");
-  const recipePreview = recipe.length > 220 ? `${recipe.slice(0, 217)}...` : recipe;
+  const verseList = verses.map((verse: any) => verse.reference).join(", ");
   const shareDescription = verseList
     ? `Theme: ${theme} • Ingredients: ${verseList}`
     : `Theme: ${theme} • ${difficultyConfig[difficulty].description} challenge`;
-  const shareContent = [
-    verseList ? `Ingredients: ${verseList}` : null,
-    recipePreview ? `My recipe: ${recipePreview}` : null,
-  ]
-    .filter(Boolean)
-    .join("\n\n");
+  const shareContent = verses.length > 0
+    ? [
+        `🥘 Your Ingredients (${verses.length} verses):`,
+        difficulty,
+        "",
+        ...verses.flatMap((verse: any) => [
+          verse.reference,
+          `"${verse.text}"`,
+          "",
+        ]),
+        "⚡ Challenge: These verses are intentionally random and unrelated! Your goal is to creatively weave them into a coherent Bible study.",
+        "",
+        "Write Your Recipe (Use ONLY the Ingredient Verses Above!)",
+        "",
+        `⚠️ IMPORTANT: Use ONLY the ${verses.length} ingredient verses shown above. Do NOT add any other verses!`,
+        "",
+        `✅ Use ONLY the ${verses.length} ingredient verses above • ❌ Do NOT add extra verses`,
+      ].join("\n")
+    : "";
 
   // Remove auto-generation - user must click the button
 
