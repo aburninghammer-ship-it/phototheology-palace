@@ -511,6 +511,14 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
     return () => clearInterval(interval);
   }, []);
 
+  // Rotate feature highlights every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveHighlight(prev => prev + 1);
+    }, 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Micro-animation: XP flash when totalXp changes
   const [prevXp, setPrevXp] = useState(0);
   useEffect(() => {
