@@ -23,6 +23,7 @@ import { ChefRecipeChallenge } from "@/components/challenges/ChefRecipeChallenge
 import { EquationDecodeChallenge } from "@/components/challenges/EquationDecodeChallenge";
 import { SeventyQuestionsChallenge } from "@/components/challenges/SeventyQuestionsChallenge";
 import { PrincipleStudyChallenge } from "@/components/challenges/PrincipleStudyChallenge";
+import { CommunityChallengeFeed } from "@/components/challenges/CommunityChallengeFeed";
 
 interface ChallengeSubmission {
   id: string;
