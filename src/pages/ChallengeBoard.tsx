@@ -73,7 +73,7 @@ const ChallengeBoard = () => {
       if (error) throw error;
 
       // Fetch profiles
-      const userIds = [...new Set((data || []).map((c: any) => c.user_id))];
+      const userIds = [...new Set((data || []).map((c: any) => c.user_id))] as string[];
       const { data: profiles } = userIds.length > 0
         ? await supabase.from("profiles").select("id, display_name, username, avatar_url").in("id", userIds)
         : { data: [] };
