@@ -70,7 +70,7 @@ serve(async (req) => {
       }
     }
 
-    const { startBook, startChapter, batchSize = 5, regenerate = false, books: targetBooks } = await req.json();
+    const { startBook, startChapter, batchSize = 5, regenerate = false, books: targetBooks, mode = "epic" } = await req.json();
 
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -117,7 +117,8 @@ serve(async (req) => {
       const { data: existing } = await supabaseAdmin
         .from("epic_commentaries")
         .select("book, chapter")
-        .eq("status", "ready");
+        .eq("status", "ready")
+        .eq("commentary_mode", mode);
 
       const existingSet = new Set(
         (existing || []).map((e) => `${e.book}:${e.chapter}`),
@@ -141,15 +142,17 @@ serve(async (req) => {
       );
     }
 
-    console.log(`[BatchEpic] Processing ${batch.length} chapters. ${toGenerate.length - batch.length} remaining after this batch.`);
+    console.log(`[BatchEpic] Firing off ${batch.length} chapters (mode: ${mode}). ${toGenerate.length - batch.length} remaining after this batch.`);
 
-    // Process sequentially to avoid rate limits
-    const results: { book: string; chapter: number; status: string; error?: string }[] = [];
-
-    for (const item of batch) {
+    // Fire-and-forget: kick off all chapters and return immediately
+    // Each generate-epic-commentary call handles its own DB persistence
+    const firePromises = batch.map(async (item, idx) => {
+      // Stagger requests to avoid rate limits (2s between each)
+      await new Promise((r) => setTimeout(r, idx * 2000));
+      
       try {
-        console.log(`[BatchEpic] → ${item.book} ${item.chapter}`);
-
+        console.log(`[BatchEpic] → Firing ${item.book} ${item.chapter} (mode: ${mode})`);
+        
         const response = await fetch(
           `${SUPABASE_URL}/functions/v1/generate-epic-commentary`,
           {
@@ -162,39 +165,33 @@ serve(async (req) => {
               book: item.book,
               chapter: item.chapter,
               regenerate,
+              mode,
             }),
           },
         );
 
         const data = await response.json();
-        results.push({
-          book: item.book,
-          chapter: item.chapter,
-          status: data.status || "error",
-          error: data.error,
-        });
-
-        // Brief pause between generations to respect rate limits
-        await new Promise((r) => setTimeout(r, 2000));
+        console.log(`[BatchEpic] ✅ ${item.book} ${item.chapter}: ${data.status || "done"}`);
       } catch (error) {
-        results.push({
-          book: item.book,
-          chapter: item.chapter,
-          status: "error",
-          error: error instanceof Error ? error.message : "Unknown error",
-        });
+        console.error(`[BatchEpic] ❌ ${item.book} ${item.chapter}:`, error);
       }
-    }
+    });
 
-    // Next batch starting point
-    const nextItem = toGenerate[batch.length];
+    // Fire and forget — don't await
+    Promise.all(firePromises).then(() => {
+      console.log(`[BatchEpic] All ${batch.length} chapters completed.`);
+    }).catch((err) => {
+      console.error(`[BatchEpic] Batch error:`, err);
+    });
 
+    // Return immediately with queued status
     return new Response(
       JSON.stringify({
-        processed: results,
+        message: `Queued ${batch.length} chapters for ${mode} mode generation. They will process in the background.`,
+        queued: batch.map(b => `${b.book} ${b.chapter}`),
         totalRemaining: toGenerate.length - batch.length,
-        nextBatch: nextItem
-          ? { startBook: nextItem.book, startChapter: nextItem.chapter }
+        nextBatch: toGenerate[batch.length]
+          ? { startBook: toGenerate[batch.length].book, startChapter: toGenerate[batch.length].chapter }
           : null,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },

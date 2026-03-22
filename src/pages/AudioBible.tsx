@@ -760,22 +760,23 @@ export default function AudioBible() {
     }
 
     // Use batch-generate-epic edge function for efficiency
+    const currentMode = epicMode || "epic";
     const { data, error } = await supabase.functions.invoke("batch-generate-epic", {
       body: {
         books: [{ book, chapters: toRegen }],
         batchSize: toRegen.length,
         regenerate: true,
+        mode: currentMode,
       },
     });
 
     if (error) {
       toast.error(`Book regeneration error: ${error.message}`);
     } else {
-      const processed = data?.processed || [];
-      const succeeded = processed.filter((r: any) => r.status === "ready").length;
-      toast.success(`${book}: ${succeeded}/${toRegen.length} chapters regenerated successfully.`, { duration: 6000 });
+      const queued = data?.queued || [];
+      toast.success(`${book}: ${queued.length} chapters queued for ${epicMode || 'epic'} mode regeneration. They'll process in the background.`, { duration: 8000 });
     }
-  }, []);
+  }, [epicMode]);
 
   // Regenerate the whole Bible (admin only)
   const handleRegenerateWholeBible = useCallback(async () => {
@@ -815,23 +816,23 @@ export default function AudioBible() {
     toast.info(`Starting whole-Bible regeneration: ${totalQueued} chapters queued, ${totalSkipped} skipped (recently done). This will run in batches in the background.`, { duration: 8000 });
 
     // Fire in batches of 5 books at a time using batch-generate-epic
+    const currentMode = epicMode || "epic";
     const { data, error } = await supabase.functions.invoke("batch-generate-epic", {
       body: {
         books: toRegen,
         batchSize: 10,
         regenerate: true,
+        mode: currentMode,
       },
     });
 
     if (error) {
       toast.error(`Whole-Bible regeneration error: ${error.message}`);
     } else {
-      const processed = data?.processed || [];
-      const succeeded = processed.filter((r: any) => r.status === "ready").length;
-      const remaining = data?.totalRemaining || 0;
-      toast.success(`First batch done: ${succeeded} chapters regenerated. ${remaining} chapters remaining — continue using the batch tool from admin panel.`, { duration: 10000 });
+      const queued = data?.queued || [];
+      toast.success(`${queued.length} chapters queued for ${currentMode} mode regeneration. Processing in the background.`, { duration: 10000 });
     }
-  }, []);
+  }, [epicMode]);
 
   // Play commentary for an entire book (overview)
   const handlePlayEpicBook = useCallback(async (book: string) => {
