@@ -166,8 +166,26 @@ const PublicChallenge = () => {
 
   const leaderboard = responses.filter(r => r.grade_score != null).sort((a, b) => (b.grade_score || 0) - (a.grade_score || 0));
 
+  const ogTitle = `🧮 Can You Decode This? — ${challenge.verse} | Phototheology`;
+  const ogDescription = `Equation: ${challenge.equation} • Difficulty: ${challenge.difficulty} • ${challenge.solve_count || 0} attempts so far. Try this Phototheology Equation Challenge!`;
+  const ogUrl = `https://phototheology-palace.lovable.app/challenge/${shareCode}`;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <Helmet>
+        <title>{ogTitle}</title>
+        <meta name="description" content={ogDescription} />
+        <meta property="og:title" content={ogTitle} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:url" content={ogUrl} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://phototheologybible.com/phototheology-hero-og.png" />
+        <meta property="og:site_name" content="Phototheology Bible Learning Suite" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={ogTitle} />
+        <meta name="twitter:description" content={ogDescription} />
+        <meta name="twitter:image" content="https://phototheologybible.com/phototheology-hero-og.png" />
+      </Helmet>
       {/* Hero */}
       <div className="bg-primary/5 border-b py-6 px-4">
         <div className="max-w-3xl mx-auto text-center space-y-2">
