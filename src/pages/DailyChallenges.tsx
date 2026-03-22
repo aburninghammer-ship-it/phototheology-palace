@@ -57,6 +57,7 @@ const DailyChallenges = () => {
   const [archiveSubmissions, setArchiveSubmissions] = useState<ChallengeSubmission[]>([]);
   const [archiveLoading, setArchiveLoading] = useState(false);
   const [archiveMonth, setArchiveMonth] = useState(new Date());
+  const [showDailyShareDialog, setShowDailyShareDialog] = useState(false);
 
   useEffect(() => {
     if (user) {
