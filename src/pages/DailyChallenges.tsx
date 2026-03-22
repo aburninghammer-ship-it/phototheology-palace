@@ -12,6 +12,7 @@ import { useOutputSpark } from "@/hooks/useOutputSpark";
 import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
+import { GenericChallengeShareDialog } from "@/components/challenges/GenericChallengeShareDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { DimensionDrillChallenge } from "@/components/challenges/DimensionDrillChallenge";
 import { Connect6Challenge } from "@/components/challenges/Connect6Challenge";
