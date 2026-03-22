@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect, type ReactNode } from "react";
+import { useRef, useCallback, useEffect, useState, type ReactNode } from "react";
 import { GripVertical } from "lucide-react";
 
 function clamp(val: number, min: number, max: number) {
@@ -14,22 +14,23 @@ export function DraggableSparkOverlay({ children }: DraggableSparkOverlayProps) 
   const containerRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: 0, y: 0 });
-  const initializedRef = useRef(false);
+  const [ready, setReady] = useState(false);
 
-  const applyPos = useCallback(() => {
-    if (containerRef.current) {
-      containerRef.current.style.transform = `translate(${posRef.current.x}px, ${posRef.current.y}px)`;
-    }
-  }, []);
-
-  // Center on mount
+  // Position to center of viewport on mount
   useEffect(() => {
-    if (initializedRef.current || !containerRef.current) return;
-    initializedRef.current = true;
-    // Start centered (transform 0,0 with CSS centering)
-    posRef.current = { x: 0, y: 0 };
-    applyPos();
-  }, [applyPos]);
+    if (!containerRef.current) return;
+    // Small delay to let children render and get real dimensions
+    requestAnimationFrame(() => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = Math.round((window.innerWidth - rect.width) / 2);
+      const y = Math.round(Math.max(20, (window.innerHeight - rect.height) / 2));
+      posRef.current = { x, y };
+      containerRef.current.style.left = `${x}px`;
+      containerRef.current.style.top = `${y}px`;
+      setReady(true);
+    });
+  }, []);
 
   // Drag logic
   useEffect(() => {
@@ -51,12 +52,16 @@ export function DraggableSparkOverlay({ children }: DraggableSparkOverlayProps) 
         const rect = containerRef.current?.getBoundingClientRect();
         const w = rect?.width ?? 400;
         const h = rect?.height ?? 400;
-        // Keep at least 100px visible on screen
+
         posRef.current = {
-          x: clamp(origX + dx, -(window.innerWidth / 2 - 100), window.innerWidth / 2 - 100),
-          y: clamp(origY + dy, -(window.innerHeight / 2 - 50), window.innerHeight / 2 - h * 0.2),
+          x: clamp(origX + dx, -w + 100, window.innerWidth - 100),
+          y: clamp(origY + dy, 0, window.innerHeight - 60),
         };
-        applyPos();
+
+        if (containerRef.current) {
+          containerRef.current.style.left = `${posRef.current.x}px`;
+          containerRef.current.style.top = `${posRef.current.y}px`;
+        }
       };
 
       const onUp = () => {
@@ -70,13 +75,18 @@ export function DraggableSparkOverlay({ children }: DraggableSparkOverlayProps) 
 
     handle.addEventListener("pointerdown", onPointerDown);
     return () => handle.removeEventListener("pointerdown", onPointerDown);
-  }, [applyPos]);
+  }, []);
 
   return (
     <div
       ref={containerRef}
-      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[calc(100%-2rem)] max-w-lg"
-      style={{ willChange: "transform", touchAction: "none" }}
+      className="fixed z-[9999] w-[calc(100%-2rem)] max-w-lg"
+      style={{
+        willChange: "left, top",
+        touchAction: "none",
+        opacity: ready ? 1 : 0,
+        transition: ready ? "none" : "opacity 0.15s",
+      }}
     >
       {/* Drag handle */}
       <div
