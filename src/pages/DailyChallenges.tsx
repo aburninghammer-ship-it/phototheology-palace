@@ -471,23 +471,13 @@ const DailyChallenges = () => {
                   Discover how Scripture speaks in symbolic language that points to Christ.
                 </p>
               </div>
-              <EquationDecodeChallenge 
-                challenge={{
-                  title: "Equation Challenge",
-                  description: "Decode this biblical equation to discover its deeper meaning.",
-                  verses: ["John 3:16"],
-                  ui_config: {
-                    equation: "🌍 + ❤️ + 🎁 = ∞",
-                    verse_context: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
-                  }
-                }}
-                onSubmit={handleChallengeSubmit}
-                hasSubmitted={false}
-              />
+
+              <InlineEquationGenerator onSubmit={handleChallengeSubmit} />
+
               <div className="text-center">
                 <Button variant="outline" onClick={() => navigate("/equations-challenge")} className="gap-2">
                   <Calculator className="h-4 w-4" />
-                  View Full Equations Challenge Mode
+                  Full Equations Mode (Create & Share)
                 </Button>
               </div>
             </TabsContent>
