@@ -206,7 +206,8 @@ export default function EquationsChallenge() {
             mode: "equations-challenge",
             difficulty: difficulty,
             symbolCount: expectedCount,
-            randomSeed: Date.now() + Math.random() + attempts // Ensure unique equations each attempt
+            randomSeed: Date.now() + Math.random() + attempts,
+            suggestedVerse: suggestedVerse.trim() || undefined
           }
         });
 
