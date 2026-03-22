@@ -71,6 +71,17 @@ export const GenericChallengeShareDialog = ({
   }).toString()}`;
 
   const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${content ? `\n\n${content.slice(0, 200)}` : ""}\n\n💡 ${challengeExplanation}\n\n✨ Try it yourself on Phototheology Palace — a free Bible learning suite!`;
+  const fullSharePost = `${shareText}\n\n${shareUrl}`;
+
+  const copySharePostToClipboard = async (successMessage: string) => {
+    try {
+      await navigator.clipboard.writeText(fullSharePost);
+      toast.success(successMessage);
+    } catch (error) {
+      console.error("Clipboard error:", error);
+      toast.error("Couldn't copy the challenge text");
+    }
+  };
 
   const postToCommunity = async () => {
     if (!user || shared) return;
@@ -101,9 +112,8 @@ export const GenericChallengeShareDialog = ({
 
   const copyLink = async () => {
     await postToCommunity();
-    await navigator.clipboard.writeText(shareUrl);
+    await copySharePostToClipboard("Challenge copied!");
     setCopied(true);
-    toast.success("Link copied!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -114,7 +124,8 @@ export const GenericChallengeShareDialog = ({
 
   const shareToFacebook = async () => {
     await postToCommunity();
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, "_blank", "width=600,height=400");
+    await copySharePostToClipboard("Challenge copied — paste it into Facebook after the preview loads.");
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank", "width=600,height=400");
   };
 
   const shareToWhatsApp = async () => {
@@ -125,6 +136,7 @@ export const GenericChallengeShareDialog = ({
 
   const shareToLinkedIn = async () => {
     await postToCommunity();
+    await copySharePostToClipboard("Challenge copied — paste it into LinkedIn after the preview loads.");
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, "_blank", "width=600,height=400");
   };
 
@@ -177,7 +189,7 @@ export const GenericChallengeShareDialog = ({
             </Button>
             <Button variant="outline" onClick={copyLink} disabled={sharing} className="flex flex-col items-center gap-1 h-auto py-3">
               {copied ? <Check className="h-5 w-5 text-green-500" /> : <Copy className="h-5 w-5" />}
-              <span className="text-xs">{copied ? "Copied!" : "Copy Link"}</span>
+              <span className="text-xs">{copied ? "Copied!" : "Copy Post"}</span>
             </Button>
           </div>
 
