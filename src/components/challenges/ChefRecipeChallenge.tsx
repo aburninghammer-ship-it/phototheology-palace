@@ -170,19 +170,8 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
     });
   };
 
-  const shareToFacebook = () => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent(`I just completed the Chef Challenge on Phototheology! 🍳 Can you create a Bible study from ${verses.length} random verses?`);
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank', 'width=600,height=400');
-  };
-
-  const shareToTwitter = () => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent(`I just completed the Chef Challenge on Phototheology! 🍳 Can you create a Bible study from ${verses.length} random verses? #Phototheology #BibleStudy`);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
-  };
-
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
