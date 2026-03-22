@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, BookOpen, PenLine, Layers, Bookmark, Check, Loader2 } from 'lucide-react';
+import { X, ArrowRight, BookOpen, PenLine, Layers, Bookmark, Check, Loader2, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Spark } from '@/hooks/useSparks';
+import { DraggableSparkOverlay } from './DraggableSparkOverlay';
 
 interface SparkExploreFlowProps {
   spark: Spark;
