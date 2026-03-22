@@ -35,6 +35,12 @@ export const GenericChallengeShareDialog = ({
   const [sharing, setSharing] = useState(false);
   const [shared, setShared] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [rating, setRating] = useState(false);
+  const [jeevesResult, setJeevesResult] = useState<{
+    score: number;
+    highlights: string[];
+    feedback: string;
+  } | null>(null);
 
   const sharePreviewBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/challenge-share-preview`;
   const targetPath = "/daily-challenges";
