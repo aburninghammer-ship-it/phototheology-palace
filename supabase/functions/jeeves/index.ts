@@ -6041,6 +6041,46 @@ Evaluate this response.`;
         
         return true;
       };
+
+      // Helper: decide if a verse needs surrounding context
+      const needsContext = (text: string): boolean => {
+        const t = text.trim();
+        // Starts with a conjunction / pronoun that dangles without context
+        if (/^(And |But |For |Then |Therefore |Now |So |Or |Neither |Nor |Yet |That |Which |Who |Whom |He |She |They |It |His |Her |Their |Them |Him )/i.test(t)) return true;
+        // Verse is very short (< 80 chars) and probably mid-thought
+        if (t.length < 80) return true;
+        // Ends with a comma or colon (sentence continues)
+        if (/[,:]$/.test(t)) return true;
+        return false;
+      };
+
+      // Fetch a verse range (up to 3 verses) for context
+      const fetchVerseRange = async (book: string, chapter: number, startVerse: number): Promise<{ reference: string; text: string } | null> => {
+        // Try up to 3 consecutive verses
+        for (let span = 3; span >= 1; span--) {
+          const endVerse = startVerse + span - 1;
+          const rangeRef = span === 1
+            ? `${book} ${chapter}:${startVerse}`
+            : `${book} ${chapter}:${startVerse}-${endVerse}`;
+          try {
+            const url = `https://bible-api.com/${encodeURIComponent(book)}+${chapter}:${startVerse}${span > 1 ? `-${endVerse}` : ''}?translation=kjv`;
+            const res = await fetch(url);
+            if (!res.ok) continue;
+            const data = await res.json();
+            const combinedText = (data.text ?? '').trim().replace(/\n/g, ' ');
+            if (!combinedText || !hasGoodContext(combinedText)) continue;
+            // If a single verse is fine on its own, return just the one
+            if (span === 1 && !needsContext(combinedText)) {
+              return { reference: rangeRef, text: combinedText };
+            }
+            // For multi-verse, just return as-is — it has context
+            if (span > 1) {
+              return { reference: rangeRef, text: combinedText };
+            }
+          } catch { /* try next span */ }
+        }
+        return null;
+      };
       
       // All 66 books of the Bible
       const allBibleBooks = [
@@ -6094,7 +6134,7 @@ Evaluate this response.`;
             attempts++;
             const randomVerse = validVerses[Math.floor(Math.random() * validVerses.length)];
             
-            // Fetch the actual English text from Bible API
+            // Fetch English text, expanding to a range if the verse lacks context
             try {
               const bibleApiUrl = `https://bible-api.com/${encodeURIComponent(book)}+${randomVerse.chapter}:${randomVerse.verse_num}?translation=kjv`;
               console.log(`Fetching: ${bibleApiUrl}`);
@@ -6104,17 +6144,22 @@ Evaluate this response.`;
                 const data = await response.json();
                 const verseText = data.text?.trim().replace(/\n/g, ' ');
                 
-                // Check if verse has good context
-                if (verseText && hasGoodContext(verseText)) {
-                  selectedVerses.push({
-                    reference: `${book} ${randomVerse.chapter}:${randomVerse.verse_num}`,
-                    text: verseText
-                  });
-                  usedBooks.add(book);
-                  verseAdded = true;
-                  console.log(`✓ Added verse from ${book} (attempt ${attempts})`);
-                } else {
-                  console.log(`⚠ Skipped low-context verse from ${book} ${randomVerse.chapter}:${randomVerse.verse_num}`);
+                if (verseText && hasGoodContext(verseText) && !needsContext(verseText)) {
+                  // Single verse is complete on its own
+                  selectedVerses.push({ reference: `${book} ${randomVerse.chapter}:${randomVerse.verse_num}`, text: verseText });
+                  usedBooks.add(book); verseAdded = true;
+                  console.log(`✓ Added single verse from ${book} (attempt ${attempts})`);
+                } else if (verseText) {
+                  // Verse needs context — try expanding to a 2-3 verse range
+                  console.log(`⚠ Verse from ${book} ${randomVerse.chapter}:${randomVerse.verse_num} needs context, expanding...`);
+                  const rangeResult = await fetchVerseRange(book, randomVerse.chapter, randomVerse.verse_num);
+                  if (rangeResult) {
+                    selectedVerses.push(rangeResult);
+                    usedBooks.add(book); verseAdded = true;
+                    console.log(`✓ Added range ${rangeResult.reference} (attempt ${attempts})`);
+                  } else {
+                    console.log(`⚠ Could not build good range from ${book} ${randomVerse.chapter}:${randomVerse.verse_num}`);
+                  }
                 }
               } else {
                 console.warn(`Failed to fetch ${book} ${randomVerse.chapter}:${randomVerse.verse_num}, status: ${response.status}`);
