@@ -10180,11 +10180,27 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
       try {
         const parsed = JSON.parse(content);
         
+        // Validate: reject emoji-based equations (not Palace codes)
+        const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}]/u;
+        if (parsed.equation && emojiRegex.test(parsed.equation)) {
+          console.error("Rejected emoji-based equation:", parsed.equation);
+          return new Response(
+            JSON.stringify({
+              error: "Invalid equation format",
+              verse: "Please try regenerating...",
+              equation: "Retry needed",
+              symbols: [],
+              difficulty: difficulty || "easy",
+              explanation: "The AI generated an emoji equation instead of Palace codes. Please click Regenerate to try again."
+            }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        
         // Validate symbol count matches request
         const expectedCount = requestBody.symbolCount || 3;
         if (parsed.symbols && parsed.symbols.length !== expectedCount) {
           console.error(`Symbol count mismatch: expected ${expectedCount}, got ${parsed.symbols.length}`);
-          // Return error so frontend can retry
           return new Response(
             JSON.stringify({
               error: "Invalid symbol count",
@@ -10196,10 +10212,7 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
               difficulty: difficulty || "easy",
               explanation: "The AI generated an incorrect number of symbols. Please click Regenerate to try again."
             }),
-            { 
-              status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" } 
-            }
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
         
