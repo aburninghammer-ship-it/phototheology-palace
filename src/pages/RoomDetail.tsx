@@ -320,30 +320,12 @@ export default function RoomDetail() {
               <Badge variant="outline" className="text-white border-white/70 backdrop-blur-sm bg-white/10 px-4 py-1.5 text-lg font-bold shadow-lg">
                 {room.tag}
               </Badge>
-              <Badge variant="outline" className="text-white border-white/70 backdrop-blur-sm bg-white/10 px-4 py-1.5">
-                {t('roomDetail.floorN', { floorNumber: floor.number })}
-              </Badge>
-              {isThisFocused && (
-                <Badge variant="outline" className="text-white border-amber-300 bg-amber-500/30 backdrop-blur-sm px-4 py-1.5 shadow-lg">
-                  <Target className="h-4 w-4 mr-1 animate-pulse" />
-                  {t('roomDetail.focusRoomBadge')}
-                </Badge>
-              )}
               {user && progress?.completed_at && (
                 <Badge variant="outline" className="text-white border-green-300 bg-green-500/30 backdrop-blur-sm px-4 py-1.5 shadow-lg">
                   <Trophy className="h-4 w-4 mr-1" />
                   {t('roomDetail.completedBadge')}
                 </Badge>
               )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={resetRoomTour}
-                className="text-white/70 hover:text-white hover:bg-white/10"
-              >
-                <Info className="h-4 w-4 mr-1" />
-                {t('roomDetail.roomTour')}
-              </Button>
             </div>
 
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-4">
