@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { SparkIcon } from './SparkIcon';
 import { SparkCard } from './SparkCard';
 import { SparkExploreFlow } from './SparkExploreFlow';
+import { DraggableSparkOverlay } from './DraggableSparkOverlay';
 import { cn } from '@/lib/utils';
 import type { Spark } from '@/hooks/useSparks';
 interface SparkContainerProps {
