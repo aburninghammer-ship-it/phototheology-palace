@@ -54,6 +54,7 @@ export default function EquationsChallenge() {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [mode, setMode] = useState<"solve" | "create">("solve");
+  const [suggestedVerse, setSuggestedVerse] = useState("");
   const [jeevesLoading, setJeevesLoading] = useState(false);
   const [jeevesSolution, setJeevesSolution] = useState("");
   
