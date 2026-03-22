@@ -773,11 +773,10 @@ export default function AudioBible() {
     if (error) {
       toast.error(`Book regeneration error: ${error.message}`);
     } else {
-      const processed = data?.processed || [];
-      const succeeded = processed.filter((r: any) => r.status === "ready").length;
-      toast.success(`${book}: ${succeeded}/${toRegen.length} chapters regenerated successfully.`, { duration: 6000 });
+      const queued = data?.queued || [];
+      toast.success(`${book}: ${queued.length} chapters queued for ${epicMode || 'epic'} mode regeneration. They'll process in the background.`, { duration: 8000 });
     }
-  }, []);
+  }, [epicMode]);
 
   // Regenerate the whole Bible (admin only)
   const handleRegenerateWholeBible = useCallback(async () => {
