@@ -82,6 +82,7 @@ const BibleSearch = lazy(() => import("./pages/BibleSearch"));
 const ThematicSearch = lazy(() => import("./pages/ThematicSearch"));
 const DailyChallenges = lazy(() => import("./pages/DailyChallenges"));
 const CommunityChallengeFeedPage = lazy(() => import("./pages/CommunityChallengeFeed"));
+const ChallengeBoard = lazy(() => import("./pages/ChallengeBoard"));
 const DailyVerse = lazy(() => import("./pages/DailyVerse"));
 const GrowthJournal = lazy(() => import("./pages/GrowthJournal"));
 const EquationsChallenge = lazy(() => import("./pages/EquationsChallenge"));
