@@ -33,6 +33,7 @@ export const InlineEquationGenerator = ({ onSubmit }: InlineEquationGeneratorPro
   } | null>(null);
   const [solution, setSolution] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
 
   const generateEquation = async () => {
     setLoading(true);
