@@ -529,6 +529,7 @@ function App() {
             <Route path="/memory/palace-practice/:listId" element={<ProtectedRoute><MemoryPalacePractice /></ProtectedRoute>} />
             
             <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
+            <Route path="/community-challenges" element={<ProtectedRoute><CommunityChallengeFeedPage /></ProtectedRoute>} />
             <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />

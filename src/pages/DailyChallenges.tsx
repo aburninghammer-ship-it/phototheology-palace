@@ -382,7 +382,7 @@ const DailyChallenges = () => {
           )}
 
           <Tabs defaultValue="daily" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="daily" className="gap-2">
                 <Flame className="h-4 w-4" />
                 Daily
@@ -394,6 +394,10 @@ const DailyChallenges = () => {
               <TabsTrigger value="equations" className="gap-2">
                 <Calculator className="h-4 w-4" />
                 Equations
+              </TabsTrigger>
+              <TabsTrigger value="leaderboard" className="gap-2">
+                <Trophy className="h-4 w-4" />
+                Leaderboard
               </TabsTrigger>
               <TabsTrigger value="archive" className="gap-2">
                 <Archive className="h-4 w-4" />
