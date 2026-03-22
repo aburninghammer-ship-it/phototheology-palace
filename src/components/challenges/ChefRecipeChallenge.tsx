@@ -182,12 +182,12 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
           <div className="flex items-center gap-2">
             <Badge>Quick • 5-10 min</Badge>
             <Button
-              onClick={shareToFacebook}
+              onClick={() => setShowShareDialog(true)}
               variant="outline"
               size="sm"
               className="gap-2"
             >
-              <Facebook className="h-4 w-4" />
+              <Share2 className="h-4 w-4" />
               Share
             </Button>
           </div>
