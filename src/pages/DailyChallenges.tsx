@@ -24,6 +24,7 @@ import { EquationDecodeChallenge } from "@/components/challenges/EquationDecodeC
 import { SeventyQuestionsChallenge } from "@/components/challenges/SeventyQuestionsChallenge";
 import { PrincipleStudyChallenge } from "@/components/challenges/PrincipleStudyChallenge";
 import { CommunityChallengeFeed } from "@/components/challenges/CommunityChallengeFeed";
+import { ChallengeInlineSubmissions } from "@/components/challenges/ChallengeInlineSubmissions";
 
 interface ChallengeSubmission {
   id: string;
@@ -446,6 +447,13 @@ const DailyChallenges = () => {
                   </CardContent>
                 </Card>
               )}
+
+              <ChallengeInlineSubmissions
+                challengeType="daily"
+                challengeTitle={dailyChallenge?.title || "Daily Challenge"}
+                challengeDescription={dailyChallenge?.description || ""}
+                difficulty={dailyChallenge?.challenge_tier}
+              />
             </TabsContent>
 
             <TabsContent value="chef" className="space-y-6">
@@ -479,6 +487,11 @@ const DailyChallenges = () => {
                   View Full Chef Challenge Mode
                 </Button>
               </div>
+              <ChallengeInlineSubmissions
+                challengeType="chef"
+                challengeTitle="Chef Challenge"
+                challengeDescription="Create a biblical recipe by connecting verses that build a complete theological thought."
+              />
             </TabsContent>
 
             <TabsContent value="equations" className="space-y-6">
@@ -511,6 +524,11 @@ const DailyChallenges = () => {
                   View Full Equations Challenge Mode
                 </Button>
               </div>
+              <ChallengeInlineSubmissions
+                challengeType="equation"
+                challengeTitle="Equation Challenge"
+                challengeDescription="Decode this biblical equation to discover its deeper meaning."
+              />
             </TabsContent>
 
             <TabsContent value="leaderboard" className="space-y-6">
