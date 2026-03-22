@@ -597,9 +597,9 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
                   size="sm"
                   variant="ghost"
                   className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                  onClick={() => {
+                   onClick={() => {
                     setNewFeatureDismissed(true);
-                    localStorage.setItem("pt_new_feature_testme_dismissed", "true");
+                    localStorage.setItem("pt_new_feature_testme_dismissed", Date.now().toString());
                   }}
                   title="Dismiss"
                 >
