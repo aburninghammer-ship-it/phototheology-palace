@@ -566,6 +566,7 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     },
     dropdownItems: [
       { to: "/daily-challenges", label: "Daily Challenges" },
+      { to: "/challenge-board", label: "Public Challenge Board" },
       { to: "/genesis-challenge", label: "Genesis High Rise" }
     ]
   },
