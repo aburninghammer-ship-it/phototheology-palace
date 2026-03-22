@@ -111,7 +111,7 @@ export const ChallengeShareDialog = ({
     return await saveAndGetShareUrl();
   };
 
-  const shareText = `🧮 Can you decode this Phototheology Equation?\n\n📖 Verse: ${equation.verse}\n🔢 Equation: ${equation.equation}\n⚡ Difficulty: ${difficulty}\n\n🔑 Symbols: ${equation.symbols.join(", ")}\n\n✨ Try it on Phototheology Palace — the ultimate Bible learning suite!`;
+  const shareText = `🧮 Can you decode this Phototheology Equation?\n\n📖 Verse: ${equation.verse}\n🔢 Equation: ${equation.equation}\n⚡ Difficulty: ${difficulty}\n\n🔑 Symbols: ${equation.symbols.join(", ")}\n\n💡 Equation Challenges encode Bible study principles into symbolic equations using the Phototheology Palace method — a visual system for deep, Christ-centered Bible study across 8 "floors" of learning.\n\n✨ Try it free on Phototheology Palace!`;
 
   const copyLink = async () => {
     const url = await ensureShareUrl();
