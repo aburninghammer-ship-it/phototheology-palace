@@ -210,7 +210,37 @@ export const GenericChallengeShareDialog = ({
             </Button>
           </div>
 
-          {shared && (
+          {rating && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Jeeves is rating your submission...
+            </div>
+          )}
+
+          {jeevesResult && (
+            <div className="bg-gradient-to-br from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 p-4 rounded-lg space-y-2">
+              <div className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-yellow-500" />
+                <span className="font-bold text-lg">Jeeves Score: {jeevesResult.score}/100</span>
+              </div>
+              {jeevesResult.highlights.length > 0 && (
+                <ul className="text-sm space-y-1">
+                  {jeevesResult.highlights.map((h, i) => (
+                    <li key={i} className="flex items-start gap-1">
+                      <span className="text-green-500 mt-0.5">✓</span>
+                      <span>{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {jeevesResult.feedback && (
+                <p className="text-sm italic text-muted-foreground">"{jeevesResult.feedback}"</p>
+              )}
+              <p className="text-xs text-muted-foreground">Your score is now on the community leaderboard!</p>
+            </div>
+          )}
+
+          {shared && !jeevesResult && !rating && (
             <p className="text-xs text-muted-foreground text-center">
               ✓ Also posted to Community
             </p>
