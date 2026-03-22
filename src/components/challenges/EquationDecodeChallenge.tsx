@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Calculator, Share2 } from "lucide-react";
 import { GenericChallengeShareDialog } from "./GenericChallengeShareDialog";
+import { PostToPublicChallengeButton } from "./PostToPublicChallengeButton";
 
 interface EquationDecodeChallengeProps {
   challenge: any;
