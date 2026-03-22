@@ -193,10 +193,14 @@ export const InlineEquationGenerator = ({ onSubmit }: InlineEquationGeneratorPro
                 </Button>
               </>
             ) : (
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-3">
                 <p className="text-green-800 dark:text-green-200">
                   ✓ Solution Submitted! Added to your Growth Journal.
                 </p>
+                <Button variant="outline" onClick={() => setShowShareDialog(true)} className="w-full gap-2">
+                  <Share2 className="h-4 w-4" />
+                  Share This Challenge
+                </Button>
               </div>
             )}
           </div>
