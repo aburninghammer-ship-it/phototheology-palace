@@ -1188,6 +1188,48 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_leaderboard: {
+        Row: {
+          challenge_type: string
+          content: string | null
+          created_at: string
+          description: string | null
+          difficulty: string | null
+          id: string
+          jeeves_feedback: string | null
+          jeeves_highlights: string[] | null
+          jeeves_score: number | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          challenge_type: string
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          id?: string
+          jeeves_feedback?: string | null
+          jeeves_highlights?: string[] | null
+          jeeves_score?: number | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          challenge_type?: string
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          id?: string
+          jeeves_feedback?: string | null
+          jeeves_highlights?: string[] | null
+          jeeves_score?: number | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       challenge_submissions: {
         Row: {
           ai_feedback: string | null

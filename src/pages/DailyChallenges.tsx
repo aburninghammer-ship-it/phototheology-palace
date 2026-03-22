@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useOutputSpark } from "@/hooks/useOutputSpark";
-import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock, Trophy } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
@@ -23,6 +23,7 @@ import { ChefRecipeChallenge } from "@/components/challenges/ChefRecipeChallenge
 import { EquationDecodeChallenge } from "@/components/challenges/EquationDecodeChallenge";
 import { SeventyQuestionsChallenge } from "@/components/challenges/SeventyQuestionsChallenge";
 import { PrincipleStudyChallenge } from "@/components/challenges/PrincipleStudyChallenge";
+import { CommunityChallengeFeed } from "@/components/challenges/CommunityChallengeFeed";
 
 interface ChallengeSubmission {
   id: string;
@@ -381,7 +382,7 @@ const DailyChallenges = () => {
           )}
 
           <Tabs defaultValue="daily" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="daily" className="gap-2">
                 <Flame className="h-4 w-4" />
                 Daily
@@ -393,6 +394,10 @@ const DailyChallenges = () => {
               <TabsTrigger value="equations" className="gap-2">
                 <Calculator className="h-4 w-4" />
                 Equations
+              </TabsTrigger>
+              <TabsTrigger value="leaderboard" className="gap-2">
+                <Trophy className="h-4 w-4" />
+                Leaderboard
               </TabsTrigger>
               <TabsTrigger value="archive" className="gap-2">
                 <Archive className="h-4 w-4" />
@@ -504,6 +509,16 @@ const DailyChallenges = () => {
                 <Button variant="outline" onClick={() => navigate("/equations-challenge")} className="gap-2">
                   <Calculator className="h-4 w-4" />
                   View Full Equations Challenge Mode
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="leaderboard" className="space-y-6">
+              <CommunityChallengeFeed />
+              <div className="text-center">
+                <Button variant="outline" onClick={() => navigate("/community-challenges")} className="gap-2">
+                  <Trophy className="h-4 w-4" />
+                  View Full Leaderboard
                 </Button>
               </div>
             </TabsContent>
