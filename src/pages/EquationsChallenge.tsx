@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus, Sparkles, Loader2, Copy, Check } from "lucide-react";
+import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus, Sparkles, Loader2, Copy, Check, BookOpen } from "lucide-react";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { ChallengeShareButton } from "@/components/challenges/ChallengeShareButton";
 import { supabase } from "@/integrations/supabase/client";
