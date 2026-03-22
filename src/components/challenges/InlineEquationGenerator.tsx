@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calculator, BookOpen, RefreshCw, Loader2, Sparkles, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ChallengeShareDialog } from "./ChallengeShareDialog";
+import { PostToPublicChallengeButton } from "./PostToPublicChallengeButton";
 import { toast } from "sonner";
 
 type Difficulty = "easy" | "intermediate" | "advanced";
