@@ -494,12 +494,12 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   const fallbackDisplayName = (userEmail ?? authUser?.email)?.split("@")[0] || "Scholar";
 
   const [dismissed, setDismissed] = useState(false);
-  const [newFeatureDismissed, setNewFeatureDismissed] = useState(() =>
-    localStorage.getItem("pt_new_feature_testme_dismissed") === "true"
-  );
-  const [lockInHighlightDismissed, setLockInHighlightDismissed] = useState(() =>
-    localStorage.getItem("pt_new_feature_lockin_dismissed") === "true"
-  );
+  const [highlightsDismissed, setHighlightsDismissed] = useState(() => {
+    const testMe = localStorage.getItem("pt_new_feature_testme_dismissed") === "true";
+    const lockIn = localStorage.getItem("pt_new_feature_lockin_dismissed") === "true";
+    return { testMe, lockIn };
+  });
+  const [activeHighlight, setActiveHighlight] = useState<number>(0);
   const [promptIdx, setPromptIdx] = useState(() => getUnseenIndex());
   const [xpFlash, setXpFlash] = useState(false);
   const stats = useUserBannerStats(resolvedUserId, fallbackDisplayName);
