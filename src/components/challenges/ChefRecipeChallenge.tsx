@@ -203,10 +203,6 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="bg-muted p-4 rounded-lg">
-          <p className="font-semibold mb-2">🎯 Theme:</p>
-          <p className="text-lg">{challenge.ui_config?.theme || challenge.description}</p>
-        </div>
 
         <div className="space-y-4">
           <div>
