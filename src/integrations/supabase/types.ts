@@ -19099,6 +19099,53 @@ export type Database = {
         }
         Relationships: []
       }
+      user_study_entries: {
+        Row: {
+          content: string
+          created_at: string
+          entry_type: string
+          id: string
+          likes_count: number
+          thread_id: string
+          title: string | null
+          updated_at: string
+          user_id: string
+          verse_reference: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          entry_type?: string
+          id?: string
+          likes_count?: number
+          thread_id: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          verse_reference?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          entry_type?: string
+          id?: string
+          likes_count?: number
+          thread_id?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          verse_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_study_entries_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "user_study_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_study_path_progress: {
         Row: {
           completed_at: string | null
@@ -19260,6 +19307,42 @@ export type Database = {
           updated_at?: string
           user_id?: string
           user_role?: Database["public"]["Enums"]["pt_user_role"]
+        }
+        Relationships: []
+      }
+      user_study_threads: {
+        Row: {
+          created_at: string
+          description: string | null
+          entry_count: number
+          id: string
+          is_public: boolean
+          title: string
+          updated_at: string
+          user_id: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          entry_count?: number
+          id?: string
+          is_public?: boolean
+          title: string
+          updated_at?: string
+          user_id: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          entry_count?: number
+          id?: string
+          is_public?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+          visibility?: string
         }
         Relationships: []
       }
