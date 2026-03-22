@@ -241,9 +241,21 @@ const DailyChallenges = () => {
 
     const principle = dailyChallenge.principle_used || 'biblical principles';
 
+    // Build challenge details including verses/description
+    const details: string[] = [
+      `I'm taking on today's ${challengeTypeLabel} challenge, training ${principle}.`,
+    ];
+    if (dailyChallenge.description) {
+      details.push(dailyChallenge.description);
+    }
+    if (dailyChallenge.verses && Array.isArray(dailyChallenge.verses) && dailyChallenge.verses.length > 0) {
+      details.push(`Key verses: ${dailyChallenge.verses.join(', ')}`);
+    }
+    details.push('Can you beat it? Try the daily challenge on Phototheology Palace!');
+
     return {
       title: `${challengeTypeLabel} - Daily Phototheology Challenge`,
-      content: `I'm taking on today's ${challengeTypeLabel} challenge, training ${principle}. Can you beat it? Try the daily challenge on Phototheology Palace!`,
+      content: details.join('\n\n'),
       url: `${siteUrl}/daily-challenges`
     };
   };

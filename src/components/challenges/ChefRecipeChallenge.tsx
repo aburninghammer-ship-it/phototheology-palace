@@ -28,37 +28,17 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   const [showShareDialog, setShowShareDialog] = useState(false);
   const { toast } = useToast();
 
+  const theme = challenge.ui_config?.theme || challenge.title || "Biblical Recipe";
+  const shareContent = verses.length > 0
+    ? verses.map((verse: any) => `${verse.reference}: "${verse.text}"`).join("\n\n")
+    : "";
+
   const difficultyConfig = {
     easy: { min: 3, max: 4, label: "Easy", icon: "🌱", description: "3-4 verses" },
     intermediate: { min: 5, max: 6, label: "Intermediate", icon: "🔥", description: "5-6 verses" },
     pro: { min: 7, max: 8, label: "Pro", icon: "💎", description: "7-8 verses" },
     master: { min: 9, max: 10, label: "Master", icon: "👑", description: "9-10 verses" }
   };
-
-  const theme = challenge.ui_config?.theme || challenge.title || "Biblical Recipe";
-  const verseList = verses.map((verse: any) => verse.reference).join(", ");
-  const shareDescription = verseList
-    ? `Theme: ${theme} • Ingredients: ${verseList}`
-    : `Theme: ${theme} • ${difficultyConfig[difficulty].description} challenge`;
-  const shareContent = verses.length > 0
-    ? [
-        `🥘 Your Ingredients (${verses.length} verses):`,
-        difficulty,
-        "",
-        ...verses.flatMap((verse: any) => [
-          verse.reference,
-          `"${verse.text}"`,
-          "",
-        ]),
-        "⚡ Challenge: These verses are intentionally random and unrelated! Your goal is to creatively weave them into a coherent Bible study.",
-        "",
-        "Write Your Recipe (Use ONLY the Ingredient Verses Above!)",
-        "",
-        `⚠️ IMPORTANT: Use ONLY the ${verses.length} ingredient verses shown above. Do NOT add any other verses!`,
-        "",
-        `✅ Use ONLY the ${verses.length} ingredient verses above • ❌ Do NOT add extra verses`,
-      ].join("\n")
-    : "";
 
   // Remove auto-generation - user must click the button
 
@@ -78,7 +58,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
           minVerses: config.min,
           maxVerses: config.max,
           difficulty,
-          theme,
+          theme: challenge.ui_config?.theme || challenge.title,
         },
       });
 
@@ -119,7 +99,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "check_chef_recipe",
-          theme,
+          theme: challenge.ui_config?.theme || challenge.title,
           recipe: recipe.trim(),
           verses,
           difficulty,
@@ -156,7 +136,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "get_chef_model_answer",
-          theme,
+          theme: challenge.ui_config?.theme || challenge.title,
           verses,
           difficulty,
         },
@@ -411,14 +391,10 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                 </Button>
               </>
             ) : (
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-3">
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                 <p className="text-green-800 dark:text-green-200">
                   ✓ Recipe Complete! Added to your Growth Journal.
                 </p>
-                <Button variant="outline" onClick={() => setShowShareDialog(true)} className="w-full gap-2">
-                  <Share2 className="h-4 w-4" />
-                  Share This Challenge
-                </Button>
               </div>
             )}
           </>
@@ -431,7 +407,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
       onOpenChange={setShowShareDialog}
       challengeType="chef"
       title={`Chef Challenge: ${theme}`}
-      description={shareDescription}
+      description={`Theme: ${theme} • ${verses.length} ingredient verses`}
       difficulty={difficulty}
       content={shareContent || undefined}
     />

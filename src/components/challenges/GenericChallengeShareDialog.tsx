@@ -58,7 +58,8 @@ export const GenericChallengeShareDialog = ({
     badge: typeLabel,
   }).toString()}`;
 
-  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}\n\n💡 ${challengeExplanation}\n\n✨ Try it yourself on Phototheology Palace — a free Bible learning suite!\n\n${siteUrl}${targetPath}`;
+  const contentBlock = content ? `\n\n${content}` : "";
+  const shareText = `${emoji} I just completed a Phototheology ${typeLabel}!\n\n📖 ${title}${difficulty ? `\n⚡ Difficulty: ${difficulty}` : ""}${contentBlock}\n\n💡 ${challengeExplanation}\n\n✨ Try it yourself on Phototheology Palace — a free Bible learning suite!\n\n${siteUrl}${targetPath}`;
   const fullSharePost = shareText;
 
   const copySharePostToClipboard = async (successMessage: string) => {

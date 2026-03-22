@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Calculator } from "lucide-react";
+import { Calculator, Share2 } from "lucide-react";
+import { GenericChallengeShareDialog } from "./GenericChallengeShareDialog";
 
 interface EquationDecodeChallengeProps {
   challenge: any;
@@ -13,6 +14,16 @@ interface EquationDecodeChallengeProps {
 
 export const EquationDecodeChallenge = ({ challenge, onSubmit, hasSubmitted }: EquationDecodeChallengeProps) => {
   const [solution, setSolution] = useState("");
+  const [showShareDialog, setShowShareDialog] = useState(false);
+
+  const equation = challenge.ui_config?.equation || "";
+  const verseText = challenge.verses?.[0] || challenge.ui_config?.verse_text || "";
+  const passageRef = challenge.passage_reference || "";
+  const shareContent = [
+    passageRef && verseText ? `${passageRef}: "${verseText}"` : "",
+    equation ? `Equation: ${equation}` : "",
+    ...(challenge.ui_config?.hints || []).map((h: string) => `💡 ${h}`),
+  ].filter(Boolean).join("\n\n");
 
   const handleSubmit = () => {
     if (!solution.trim()) return;
@@ -25,6 +36,7 @@ export const EquationDecodeChallenge = ({ challenge, onSubmit, hasSubmitted }: E
   };
 
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -32,7 +44,18 @@ export const EquationDecodeChallenge = ({ challenge, onSubmit, hasSubmitted }: E
             <Calculator className="h-5 w-5 text-primary" />
             <CardTitle>{challenge.title}</CardTitle>
           </div>
-          <Badge>Core • 10-15 min</Badge>
+          <div className="flex items-center gap-2">
+            <Badge>Core • 10-15 min</Badge>
+            <Button
+              onClick={() => setShowShareDialog(true)}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+          </div>
         </div>
         <CardDescription className="mt-2">
           Decode this biblical equation using palace principles and symbols
@@ -89,5 +112,15 @@ export const EquationDecodeChallenge = ({ challenge, onSubmit, hasSubmitted }: E
         )}
       </CardContent>
     </Card>
+
+    <GenericChallengeShareDialog
+      open={showShareDialog}
+      onOpenChange={setShowShareDialog}
+      challengeType="equation"
+      title={`Equation Challenge: ${challenge.title}`}
+      description={`${passageRef ? `Passage: ${passageRef}` : ""} • Equation: ${equation}`}
+      content={shareContent || undefined}
+    />
+    </>
   );
 };
