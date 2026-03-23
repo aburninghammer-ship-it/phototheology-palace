@@ -85,6 +85,7 @@ import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGrap
 import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
 import { MobileOrientationTip } from "@/components/MobileOrientationTip";
 import { useTranslation } from 'react-i18next';
+import { roomDescriptions } from "@/data/roomDescriptions";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -416,6 +417,18 @@ export default function RoomDetail() {
                       }
                     }}
                   />
+                )}
+
+                {roomDescriptions[room.id] && (
+                  <Card className="border-primary/20 bg-primary/5">
+                    <CardContent className="pt-6 space-y-3">
+                      {roomDescriptions[room.id].map((paragraph, idx) => (
+                        <p key={idx} className="text-muted-foreground leading-relaxed text-sm">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </CardContent>
+                  </Card>
                 )}
 
                 <Card variant="glass" className="relative">
