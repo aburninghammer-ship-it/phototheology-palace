@@ -359,20 +359,18 @@ export default function RoomDetail() {
                 <p className="text-lg md:text-xl lg:text-2xl leading-relaxed opacity-95 drop-shadow-lg mt-2">{room.purpose}</p>
               </div>
             </div>
+
+            {roomDescriptions[room.id] && (
+              <div className="mt-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-5 space-y-3">
+                {roomDescriptions[room.id].map((paragraph, idx) => (
+                  <p key={idx} className="text-white/90 leading-relaxed text-sm">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-
-        {roomDescriptions[room.id] && (
-          <Card className="mb-8 border-primary/20 bg-primary/5">
-            <CardContent className="pt-6 space-y-3">
-              {roomDescriptions[room.id].map((paragraph, idx) => (
-                <p key={idx} className="text-muted-foreground leading-relaxed text-sm">
-                  {paragraph}
-                </p>
-              ))}
-            </CardContent>
-          </Card>
-        )}
 
         {user && (
           <VoiceChatWidget
