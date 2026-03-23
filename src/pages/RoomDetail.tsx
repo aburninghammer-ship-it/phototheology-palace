@@ -7,7 +7,6 @@ import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trop
 import { SequentialMasteryNotice } from "@/components/palace/SequentialMasteryNotice";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { JeevesAssistant } from "@/components/JeevesAssistant";
 import { useRoomProgress } from "@/hooks/useRoomProgress";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
@@ -1527,22 +1526,13 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {showDrill && hasDrills ? (
+                {showDrill && hasDrills && (
                   <PracticeDrill
                     floorNumber={floor.number}
                     roomId={room.id}
                     roomName={room.name}
                     drillType={drillName}
                     questions={drillQuestions}
-                  />
-                ) : !mentorModeUnlocked && (
-                  <JeevesAssistant
-                    roomTag={room.tag}
-                    roomName={room.name}
-                    principle={room.purpose}
-                    floorNumber={floor.number}
-                    roomId={room.id}
-                    onExerciseComplete={markExerciseComplete}
                   />
                 )}
               </div>
