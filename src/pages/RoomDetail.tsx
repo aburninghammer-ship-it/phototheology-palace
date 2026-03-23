@@ -689,6 +689,10 @@ export default function RoomDetail() {
                 {room.id === "cr" && (
                   <ConcentrationRoomDrill />
                 )}
+
+                {/* Practice Tools - linked platform features */}
+                <Separator className="my-6" />
+                <RoomPracticeTools roomId={room.id} />
               </TabsContent>
 
               <TabsContent value="games" className="space-y-6 mt-6">
