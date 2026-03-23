@@ -850,6 +850,9 @@ export default function RoomDetail() {
                   roomName={room.name}
                   roomPrinciple={room.purpose}
                 />
+
+                {/* Saved Drill Results for this room */}
+                <SavedDrillsList roomId={room.id} limit={20} />
               </TabsContent>
 
               <TabsContent value="master" className="space-y-6 mt-6">
