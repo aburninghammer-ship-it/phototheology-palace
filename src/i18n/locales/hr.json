@@ -7670,5 +7670,15 @@
     "daysLeftTrial": "{{days}} dana preostalo u probnom razdoblju",
     "viewWeekOutline": "Pogledajte plan tjedna",
     "pathActive": "Put aktivan"
+  },
+  "sequentialMastery": {
+    "welcomeTitle": "Dobrodošli na Prvi Kat!",
+    "welcomeDesc": "Ovo je <strong>Kat Opremanja</strong> — gdje punite um pričama, slikama i dragocjenostima.",
+    "readyTitle": "Kat Otključan — Spremni za Majstorstvo!",
+    "readyDesc": "Ispunili ste preduvjete. Istražite ove sobe i produbite razumijevanje.",
+    "exploreFreely": "Prvo dovršite Kat {{floor}} za otključavanje majstorstva ovdje.",
+    "explorationTitle": "Način Istraživanja",
+    "explorationDesc1": "Možete <strong>istraživati i učiti</strong> na ovom katu, ali praćenje majstorstva zahtijeva dovršetak nižih katova.",
+    "goToFloor": "Idi na Kat {{floor}}"
   }
 }

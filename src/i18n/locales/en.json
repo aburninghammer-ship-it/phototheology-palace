@@ -7674,5 +7674,15 @@
     "daysLeftTrial": "{{days}} days left in trial",
     "viewWeekOutline": "View Week Outline",
     "pathActive": "Path Active"
+  },
+  "sequentialMastery": {
+    "welcomeTitle": "Welcome to the First Floor!",
+    "welcomeDesc": "This is the <strong>Furnishing Floor</strong> — where you stock your mind with stories, images, and gems. Complete these rooms to build your foundation.",
+    "readyTitle": "Floor Unlocked — Ready to Master!",
+    "readyDesc": "You've completed the prerequisites. Explore these rooms and apply each principle to deepen your understanding.",
+    "exploreFreely": "Complete Floor {{floor}} first to unlock mastery here.",
+    "explorationTitle": "Exploration Mode",
+    "explorationDesc1": "You can <strong>explore and learn</strong> on this floor, but mastery tracking requires completing lower floors first.",
+    "goToFloor": "Go to Floor {{floor}}"
   }
 }
