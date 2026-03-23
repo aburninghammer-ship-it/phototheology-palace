@@ -3,11 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Home, Info, Brain, Search } from "lucide-react";
+import { BookOpen, Home, Info, Brain, Search, Grid3X3, Layers, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Footer } from "@/components/Footer";
 import BibleRenderedDrill from "@/components/rooms/BibleRenderedDrill";
 import BibleRenderedBrowser from "@/components/rooms/BibleRenderedBrowser";
+import BibleRenderedGlance from "@/components/rooms/BibleRenderedGlance";
+import BibleRenderedFlashcards from "@/components/rooms/BibleRenderedFlashcards";
+import BibleRenderedSpeedScan from "@/components/rooms/BibleRenderedSpeedScan";
 import {
   Accordion,
   AccordionContent,
@@ -90,17 +93,43 @@ const BibleRenderedRoom = () => {
         </Card>
 
         {/* Main Content Tabs */}
-        <Tabs defaultValue="drill" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="drill" className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              Memorization Drill
+        <Tabs defaultValue="glance" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="glance" className="flex items-center gap-1 text-xs sm:text-sm">
+              <Grid3X3 className="h-4 w-4" />
+              <span className="hidden sm:inline">At-a-Glance</span>
+              <span className="sm:hidden">Glance</span>
             </TabsTrigger>
-            <TabsTrigger value="browse" className="flex items-center gap-2">
+            <TabsTrigger value="flashcards" className="flex items-center gap-1 text-xs sm:text-sm">
+              <Layers className="h-4 w-4" />
+              <span className="hidden sm:inline">Flashcards</span>
+              <span className="sm:hidden">Cards</span>
+            </TabsTrigger>
+            <TabsTrigger value="speed" className="flex items-center gap-1 text-xs sm:text-sm">
+              <Zap className="h-4 w-4" />
+              <span className="hidden sm:inline">Speed Scan</span>
+              <span className="sm:hidden">Speed</span>
+            </TabsTrigger>
+            <TabsTrigger value="drill" className="flex items-center gap-1 text-xs sm:text-sm">
+              <Brain className="h-4 w-4" />
+              <span className="hidden sm:inline">Quiz Drill</span>
+              <span className="sm:hidden">Quiz</span>
+            </TabsTrigger>
+            <TabsTrigger value="browse" className="flex items-center gap-1 text-xs sm:text-sm">
               <Search className="h-4 w-4" />
-              Browse All Sets
+              <span className="hidden sm:inline">Browse</span>
+              <span className="sm:hidden">Browse</span>
             </TabsTrigger>
           </TabsList>
+          <TabsContent value="glance">
+            <BibleRenderedGlance />
+          </TabsContent>
+          <TabsContent value="flashcards">
+            <BibleRenderedFlashcards />
+          </TabsContent>
+          <TabsContent value="speed">
+            <BibleRenderedSpeedScan />
+          </TabsContent>
           <TabsContent value="drill">
             <BibleRenderedDrill />
           </TabsContent>
