@@ -78,6 +78,7 @@ import { PatternsLibrary } from "@/components/patterns-room/PatternsLibrary";
 import { ThreeHeavensLibrary } from "@/components/three-heavens-room/ThreeHeavensLibrary";
 import { Room66Library } from "@/components/room66/Room66Library";
 import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLibrary";
+import { RoomPracticeTools } from "@/components/palace/RoomPracticeTools";
 import { ImageBibleBrowser } from "@/components/rooms/ImageBibleBrowser";
 
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
@@ -688,6 +689,10 @@ export default function RoomDetail() {
                 {room.id === "cr" && (
                   <ConcentrationRoomDrill />
                 )}
+
+                {/* Practice Tools - linked platform features */}
+                <Separator className="my-6" />
+                <RoomPracticeTools roomId={room.id} />
               </TabsContent>
 
               <TabsContent value="games" className="space-y-6 mt-6">
