@@ -1,5 +1,5 @@
-// Bible Rendered: 50 Canonical Render Sets
-// Each set is a true 24-chapter block (with noted exceptions)
+// Bible Rendered: 51 Canonical Render Sets
+// Each set is a 24-chapter block (with noted exceptions)
 // Following the Phototheology Bible Rendered methodology
 
 export interface BibleRenderedSet {
