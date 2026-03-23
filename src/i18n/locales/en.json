@@ -1142,7 +1142,7 @@
   },
   "roomDetail": {
     "notFound": "Room Not Found",
-    "backToFloor": "Back to Floor {{number}}",
+    "backToFloor": "Back to Floor {{floorNumber}}",
     "locked": "This Room is Locked",
     "lockMessage": "To unlock this room, you need to complete:",
     "completePreviousFloor": "Complete the previous floor to unlock this room.",
