@@ -1527,22 +1527,13 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
-                {showDrill && hasDrills ? (
+                {showDrill && hasDrills && (
                   <PracticeDrill
                     floorNumber={floor.number}
                     roomId={room.id}
                     roomName={room.name}
                     drillType={drillName}
                     questions={drillQuestions}
-                  />
-                ) : !mentorModeUnlocked && (
-                  <JeevesAssistant
-                    roomTag={room.tag}
-                    roomName={room.name}
-                    principle={room.purpose}
-                    floorNumber={floor.number}
-                    roomId={room.id}
-                    onExerciseComplete={markExerciseComplete}
                   />
                 )}
               </div>
