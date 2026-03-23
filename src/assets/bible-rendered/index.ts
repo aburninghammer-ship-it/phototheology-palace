@@ -1,4 +1,4 @@
-// Bible Rendered Room Images (50 Sets)
+// Bible Rendered Room Images (51 Sets)
 import set01 from "./set-01.jpg";
 import set02 from "./set-02.jpg";
 import set03 from "./set-03.jpg";
