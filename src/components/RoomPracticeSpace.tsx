@@ -42,6 +42,11 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
   const [practiceVerseRef, setPracticeVerseRef] = useState("");
   const [practiceBibleText, setPracticeBibleText] = useState("");
   const [loadingBibleText, setLoadingBibleText] = useState(false);
+  const [showSourcePicker, setShowSourcePicker] = useState(false);
+  const [sourceType, setSourceType] = useState<"bible" | "custom" | null>(null);
+  const [bibleRefInput, setBibleRefInput] = useState("");
+  const [customTitle, setCustomTitle] = useState("");
+  const [customContent, setCustomContent] = useState("");
 
   useEffect(() => {
     if (user) {
