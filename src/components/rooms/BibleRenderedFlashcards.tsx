@@ -138,17 +138,18 @@ const BibleRenderedFlashcards = () => {
           <Progress value={((index + 1) / total) * 100} className="h-2" />
 
           {/* Flashcard */}
-          <motion.div
-            key={`${current.number}-${side}`}
-            initial={{ rotateY: 90, opacity: 0 }}
-            animate={{ rotateY: 0, opacity: 1 }}
-            transition={{ duration: 0.25 }}
-          >
-            <Card
-              className="min-h-[320px] cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setSide(s => s === "image" ? "info" : "image")}
+          <div style={{ perspective: 1000 }}>
+            <motion.div
+              key={`${current.number}-${side}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.25 }}
             >
-              <CardContent className="flex flex-col items-center justify-center min-h-[320px] p-8">
+              <Card
+                className="min-h-[320px] cursor-pointer hover:shadow-lg transition-shadow border-2 bg-card"
+                onClick={() => setSide(s => s === "image" ? "info" : "image")}
+              >
+                <CardContent className="flex flex-col items-center justify-center min-h-[320px] p-8">
                 {side === "image" ? (
                   <div className="text-center space-y-4">
                     {img ? (
@@ -173,7 +174,8 @@ const BibleRenderedFlashcards = () => {
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+            </motion.div>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex justify-center gap-4">
