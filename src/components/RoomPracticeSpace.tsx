@@ -237,7 +237,107 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
         />
       )}
 
-      {/* Welcome Banner for Users Who Want Custom Content */}
+      {/* Inline Source Picker - replaces confirm/prompt dialogs */}
+      {showSourcePicker && (
+        <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 mb-4">
+          <CardContent className="pt-6 space-y-4">
+            <div className="text-center mb-2">
+              <h3 className="text-lg font-bold">Choose Your Source</h3>
+              <p className="text-sm text-muted-foreground">Select a Bible passage or write your own text</p>
+            </div>
+
+            {!sourceType && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Button
+                  onClick={() => setSourceType("bible")}
+                  size="lg"
+                  className="h-auto py-4 flex flex-col items-center gap-1 gradient-palace text-white"
+                >
+                  <Search className="h-5 w-5" />
+                  <span className="font-bold">Bible Verse / Chapter</span>
+                  <span className="text-xs opacity-90">e.g. John 3:16, Genesis 22</span>
+                </Button>
+                <Button
+                  onClick={() => setSourceType("custom")}
+                  size="lg"
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center gap-1 border-2"
+                >
+                  <Edit className="h-5 w-5" />
+                  <span className="font-bold">Your Own Story / Text</span>
+                  <span className="text-xs text-muted-foreground">Paste or type anything</span>
+                </Button>
+              </div>
+            )}
+
+            {sourceType === "bible" && (
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Enter verse or chapter reference</Label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="e.g. John 3:16, Genesis 22, Psalm 23"
+                    value={bibleRefInput}
+                    onChange={(e) => setBibleRefInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleBibleRefSubmit()}
+                    autoFocus
+                  />
+                  <Button
+                    onClick={handleBibleRefSubmit}
+                    disabled={!bibleRefInput.trim() || loadingBibleText}
+                  >
+                    {loadingBibleText ? <Loader2 className="h-4 w-4 animate-spin" /> : "Go"}
+                  </Button>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setSourceType(null)} className="text-xs">
+                  ← Back
+                </Button>
+              </div>
+            )}
+
+            {sourceType === "custom" && (
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-sm font-medium">Title</Label>
+                  <Input
+                    placeholder="e.g. David and Goliath, The Prodigal Son"
+                    value={customTitle}
+                    onChange={(e) => setCustomTitle(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Your text</Label>
+                  <Textarea
+                    placeholder="Paste or type any story, verse, or personal experience..."
+                    value={customContent}
+                    onChange={(e) => setCustomContent(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => setSourceType(null)} className="text-xs">
+                    ← Back
+                  </Button>
+                  <Button
+                    onClick={handleCustomSubmit}
+                    disabled={!customTitle.trim() || !customContent.trim()}
+                    size="sm"
+                  >
+                    Start Practice
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <div className="text-right">
+              <Button variant="ghost" size="sm" onClick={() => setShowSourcePicker(false)} className="text-xs text-muted-foreground">
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {exercises.length === 0 && !showForm && (
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10 mb-4">
           <CardHeader className="pb-3">
