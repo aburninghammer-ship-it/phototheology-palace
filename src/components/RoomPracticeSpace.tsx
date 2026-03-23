@@ -180,10 +180,20 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
       setLoadingBibleText(true);
       setPracticeVerseRef(bibleRefInput);
 
-      const book = bibleRefInput.split(/\s+/)[0];
-      const rest = bibleRefInput.substring(book.length).trim();
-      const [chapterStr] = rest.split(':');
+      // Parse reference: handles "John 3:16", "1 Corinthians 13:4-7", "Genesis 1"
+      const refPattern = /^((?:\d\s*)?[A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+)(?::(\d+)(?:\s*[-–—]\s*(\d+))?)?$/;
+      const match = bibleRefInput.trim().match(refPattern);
+
+      if (!match) {
+        toast.error("Invalid reference format. Try e.g. 'John 3:16' or 'Genesis 1:1-5'");
+        setLoadingBibleText(false);
+        return;
+      }
+
+      const [, book, chapterStr, verseStartStr, verseEndStr] = match;
       const chapter = parseInt(chapterStr);
+      const verseStart = verseStartStr ? parseInt(verseStartStr) : null;
+      const verseEnd = verseEndStr ? parseInt(verseEndStr) : verseStart;
 
       const { data, error } = await supabase.functions.invoke('bible-api', {
         body: { book, chapter, version: 'kjv' }
@@ -192,7 +202,20 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
       if (error) throw error;
 
       if (data?.verses) {
-        const text = data.verses.map((v: any) => `${v.verse} ${v.text}`).join('\n');
+        let filteredVerses = data.verses;
+        if (verseStart !== null) {
+          filteredVerses = data.verses.filter(
+            (v: any) => v.verse >= verseStart && v.verse <= (verseEnd ?? verseStart)
+          );
+        }
+
+        if (filteredVerses.length === 0) {
+          toast.error("No verses found for that reference.");
+          setLoadingBibleText(false);
+          return;
+        }
+
+        const text = filteredVerses.map((v: any) => `${v.verse} ${v.text}`).join('\n');
         setPracticeBibleText(text);
         setShowSourcePicker(false);
         setShowAIPractice(true);
