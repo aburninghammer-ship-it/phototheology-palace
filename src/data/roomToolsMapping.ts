@@ -33,7 +33,7 @@ export const roomToolsMap: Record<string, RoomTool[]> = {
     { id: "24-flashcards", name: "Flashcards", description: "Study chapter frames with flashcards", path: "/flashcards", icon: "🃏", category: "tool" },
   ],
   br: [
-    { id: "br-rendered", name: "Bible Rendered Room", description: "All 51 symbolic glyphs for the Bible", path: "/bible-rendered-room", icon: "🔣", category: "tool" },
+    { id: "br-rendered", name: "Bible Rendered Room", description: "All 51 symbolic glyphs for the Bible", path: "/palace/floor/1/room/br", icon: "🔣", category: "tool" },
     { id: "br-image-bible", name: "Image Bible", description: "Visual Bible panorama", path: "/phototheology-image-bible", icon: "🖼️", category: "tool" },
     { id: "br-memory", name: "Memory Games", description: "Test your 51-glyph recall", path: "/memory", icon: "🧠", category: "nav" },
   ],

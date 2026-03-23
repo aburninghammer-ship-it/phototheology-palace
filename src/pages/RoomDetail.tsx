@@ -78,6 +78,10 @@ import { RoomPracticeTools } from "@/components/palace/RoomPracticeTools";
 import { TranslationLibrary } from "@/components/translation-room/TranslationLibrary";
 import { ImageBibleBrowser } from "@/components/rooms/ImageBibleBrowser";
 import { SavedDrillsList } from "@/components/drills/SavedDrillsList";
+import BibleRenderedGlance from "@/components/rooms/BibleRenderedGlance";
+import BibleRenderedFlashcards from "@/components/rooms/BibleRenderedFlashcards";
+import BibleRenderedSpeedScan from "@/components/rooms/BibleRenderedSpeedScan";
+import BibleRenderedDrill from "@/components/rooms/BibleRenderedDrill";
 
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
 import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
@@ -200,12 +204,6 @@ export default function RoomDetail() {
     }
   };
 
-  // Redirect BR room to dedicated Bible Rendered Room page
-  useEffect(() => {
-    if (roomId === "br") {
-      navigate("/bible-rendered-room", { replace: true });
-    }
-  }, [roomId, navigate]);
 
   // Don't redirect - let users see why room is locked
 
@@ -889,14 +887,43 @@ export default function RoomDetail() {
                   </p>
                 </div>
 
+                {room.id === "br" && (
+                  <Tabs defaultValue="glance" className="space-y-4">
+                    <TabsList className="grid w-full grid-cols-4">
+                      <TabsTrigger value="glance" className="flex items-center gap-1 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">At-a-Glance</span>
+                        <span className="sm:hidden">Glance</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="flashcards" className="flex items-center gap-1 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">Flashcards</span>
+                        <span className="sm:hidden">Cards</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="speed" className="flex items-center gap-1 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">Speed Scan</span>
+                        <span className="sm:hidden">Speed</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="drill" className="flex items-center gap-1 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">Quiz Drill</span>
+                        <span className="sm:hidden">Quiz</span>
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="glance"><BibleRenderedGlance /></TabsContent>
+                    <TabsContent value="flashcards"><BibleRenderedFlashcards /></TabsContent>
+                    <TabsContent value="speed"><BibleRenderedSpeedScan /></TabsContent>
+                    <TabsContent value="drill"><BibleRenderedDrill /></TabsContent>
+                  </Tabs>
+                )}
+
                 {room.id === "tr" && <TranslationLibrary />}
 
-                <RoomPracticeSpace
-                  floorNumber={floor.number}
-                  roomId={room.id}
-                  roomName={room.name}
-                  roomPrinciple={room.purpose}
-                />
+                {room.id !== "br" && (
+                  <RoomPracticeSpace
+                    floorNumber={floor.number}
+                    roomId={room.id}
+                    roomName={room.name}
+                    roomPrinciple={room.purpose}
+                  />
+                )}
 
                 {/* Saved Drill Results for this room */}
                 <SavedDrillsList roomId={room.id} limit={20} />

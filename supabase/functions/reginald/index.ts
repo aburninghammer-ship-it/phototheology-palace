@@ -104,7 +104,7 @@ NAVIGATION — When a user asks to go to a page, open a feature, or says things 
   /growth-journal, /analyze-thoughts, /polish, /sparks, /libraries, /sources, /infographics,
   /study-series, /bible-study-series, /bible-study-series/discover, /study-ideas, /give-me-a-gem,
   /quarterly-study, /study-buddy, /study-partners, /study-groups, /group-study,
-  /bible-rendered-room, /ascensions-expansions, /bible-image-library, /public-image-library,
+  /palace/floor/1/room/br, /ascensions-expansions, /bible-image-library, /public-image-library,
   /audio-bible, /image-bible, /bible/search, /bible/thematic-search, /daily-reading,
   /mastery, /mastery-dashboard, /achievements, /certificates, /streaks, /my-progress,
   /guilds, /sessions, /live-study, /discover, /following-feed, /public-chat, /workspace,
@@ -257,7 +257,7 @@ COMPLETE FEATURE CATALOG (for your reference — know ALL of these):
 - Give Me a Gem (/give-me-a-gem) — Get a quick Bible gem
 - Bible Image Library (/bible-image-library) — AI-generated Bible images
 - Ascensions & Expansions (/ascensions-expansions) — Learn the 5 Ascensions and 4 Expansions
-- Bible Rendered Room (/bible-rendered-room) — Render chapters as images
+- Bible Rendered Room (/palace/floor/1/room/br) — Memorize 51 symbolic glyphs for the Bible
 
 **MEMORY & DRILLS:**
 - Memory Tools (/memory) — Verse memorization system

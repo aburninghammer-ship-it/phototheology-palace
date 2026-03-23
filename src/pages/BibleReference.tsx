@@ -757,7 +757,7 @@ const BibleReference = () => {
                       {t('bibleRef.explorePalace', 'Explore the Palace')}
                       <ChevronRight className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" className="w-full justify-between backdrop-blur-sm bg-background/50 hover:bg-primary/10" onClick={() => navigate("/bible-rendered-room")}>
+                    <Button variant="outline" className="w-full justify-between backdrop-blur-sm bg-background/50 hover:bg-primary/10" onClick={() => navigate("/palace/floor/1/room/br")}>
                       {t('bibleRef.bibleRenderedRoom', 'Bible Rendered Room')}
                       <ChevronRight className="h-4 w-4" />
                     </Button>
