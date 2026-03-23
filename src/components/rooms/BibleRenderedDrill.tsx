@@ -567,7 +567,7 @@ const BibleRenderedDrill = () => {
           <CardHeader>
             <CardTitle className="text-lg">Quick Reference</CardTitle>
             <CardDescription>
-              All 50 sets at a glance • {getTotalChapters()} chapters • {getTotalRenders()} renders
+              All 51 sets at a glance • {getTotalChapters()} chapters • {getTotalRenders()} renders
             </CardDescription>
           </CardHeader>
           <CardContent>

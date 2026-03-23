@@ -295,7 +295,7 @@ export function BibleRenderedBrowser() {
             Bible Rendered Browser
           </CardTitle>
           <CardDescription>
-            Explore all 50 render sets covering {getTotalChapters()} chapters with {getTotalRenders()} renders
+            Explore all 51 render sets covering {getTotalChapters()} chapters with {getTotalRenders()} renders
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

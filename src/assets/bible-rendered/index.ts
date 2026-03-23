@@ -1,4 +1,4 @@
-// Bible Rendered Room Images (50 Sets)
+// Bible Rendered Room Images (51 Sets)
 import set01 from "./set-01.jpg";
 import set02 from "./set-02.jpg";
 import set03 from "./set-03.jpg";
@@ -101,10 +101,11 @@ export const bibleRenderedImages: Record<number, string> = {
   48: set48,
   49: set49,
   50: set50,
+  51: set50, // Rev 17-22 uses the original set 50 image
 };
 
 export const getBibleRenderedImage = (setNumber: number): string | undefined => {
-  if (setNumber < 1 || setNumber > 50) {
+  if (setNumber < 1 || setNumber > 51) {
     return undefined;
   }
   return bibleRenderedImages[setNumber];

@@ -1,5 +1,5 @@
-// Bible Rendered: 50 Canonical Render Sets
-// Each set is a true 24-chapter block (with noted exceptions)
+// Bible Rendered: 51 Canonical Render Sets
+// Each set is a 24-chapter block (with noted exceptions)
 // Following the Phototheology Bible Rendered methodology
 
 export interface BibleRenderedSet {
@@ -613,18 +613,30 @@ export const bibleRenderedSets: BibleRenderedSet[] = [
   },
   {
     number: 49,
-    symbol: "🐉⚔",
-    name: "Warfare of Truth",
-    range: "1 John 1–5 + 2 John + 3 John + Jude + Revelation 1–16",
-    chapters: 24,
-    renders: 24,
-    description: "Warfare of Truth / Antichrist Spirit / Seals + Trumpets Momentum — Love-truth tests, apostasy warnings, dragon rage.",
-    category: "Revelation",
-    symbols: ["love-truth tests", "apostasy warnings", "candlesticks", "seals", "trumpets", "dragon rage rising"],
+    symbol: "📨✝",
+    name: "Final Letters",
+    range: "1 John 1–5 + 2 John + 3 John + Jude + Revelation 1–5",
+    chapters: 14,
+    renders: 14,
+    description: "Final Letters / Love-Truth Tests / Christ Among the Candlesticks — Antichrist warnings, walking in truth, apostasy alerts, seven churches, Lamb enthroned.",
+    category: "General Epistles",
+    symbols: ["love-truth tests", "apostasy warnings", "candlesticks", "seven churches", "throne room", "Lamb worthy"],
     testament: 'new'
   },
   {
     number: 50,
+    symbol: "🐉⚔",
+    name: "Warfare of Truth",
+    range: "Revelation 6–16",
+    chapters: 11,
+    renders: 11,
+    description: "Seals / Trumpets / Dragon Rage — Seven seals break, trumpets sound, two witnesses, woman and dragon, beast rises, three angels' messages.",
+    category: "Revelation",
+    symbols: ["seals", "trumpets", "two witnesses", "woman clothed with sun", "dragon rage", "beast system", "three angels"],
+    testament: 'new'
+  },
+  {
+    number: 51,
     symbol: "🏙✨",
     name: "Heaven",
     range: "Revelation 17–22",
