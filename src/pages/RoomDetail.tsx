@@ -842,6 +842,8 @@ export default function RoomDetail() {
                   </p>
                 </div>
 
+                {room.id === "tr" && <TranslationLibrary />}
+
                 <RoomPracticeSpace
                   floorNumber={floor.number}
                   roomId={room.id}
