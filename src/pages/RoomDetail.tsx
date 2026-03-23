@@ -120,7 +120,7 @@ export default function RoomDetail() {
   const [methodExpanded, setMethodExpanded] = useState(false);
   const [examplesExpanded, setExamplesExpanded] = useState(false);
   const [showOnboardingGuide, setShowOnboardingGuide] = useState(true);
-  const [activeTab, setActiveTab] = useState("learn");
+  const [activeTab, setActiveTab] = useState("practice");
 
   // Scroll to top when room changes
   useEffect(() => {
