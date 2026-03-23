@@ -7,7 +7,7 @@ import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trop
 import { SequentialMasteryNotice } from "@/components/palace/SequentialMasteryNotice";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { JeevesAssistant } from "@/components/JeevesAssistant";
+import { Separator } from "@/components/ui/separator";
 import { useRoomProgress } from "@/hooks/useRoomProgress";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
