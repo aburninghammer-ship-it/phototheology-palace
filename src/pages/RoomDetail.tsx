@@ -388,14 +388,14 @@ export default function RoomDetail() {
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-4 p-1 bg-muted/50 backdrop-blur-sm">
+                <TabsTrigger value="practice" className="data-[state=active]:shadow-glow transition-all duration-300">
+                  {t('roomDetail.practiceTab')}
+                </TabsTrigger>
                 <TabsTrigger value="learn" className="data-[state=active]:shadow-glow transition-all duration-300">
                   {t('roomDetail.learnTab')}
                 </TabsTrigger>
                 <TabsTrigger value="games" className="data-[state=active]:shadow-glow transition-all duration-300">
                   {t('roomDetail.gamesTab')}
-                </TabsTrigger>
-                <TabsTrigger value="practice" className="data-[state=active]:shadow-glow transition-all duration-300">
-                  {t('roomDetail.practiceTab')}
                 </TabsTrigger>
                 <TabsTrigger value="master" className="data-[state=active]:shadow-glow transition-all duration-300">
                   {t('roomDetail.masterTab')}
