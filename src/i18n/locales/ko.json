@@ -1142,7 +1142,7 @@
   },
   "roomDetail": {
     "notFound": "방을 찾을 수 없음",
-    "backToFloor": "{{number}}층으로 돌아가기",
+    "backToFloor": "{{floorNumber}}층으로 돌아가기",
     "locked": "이 방은 잠겨 있습니다",
     "lockMessage": "이 방을 열려면 다음을 완료해야 합니다:",
     "completePreviousFloor": "이 방을 잠금 해제하려면 이전 층을 완료하세요.",

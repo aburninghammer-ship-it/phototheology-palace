@@ -1142,7 +1142,7 @@
   },
   "roomDetail": {
     "notFound": "Соба није пронађена",
-    "backToFloor": "Назад на спрат {{number}}",
+    "backToFloor": "Назад на спрат {{floorNumber}}",
     "locked": "Ова соба је закључана",
     "lockMessage": "Да откључате ову собу, морате завршити:",
     "completePreviousFloor": "Завршите претходни спрат да откључате ову собу.",

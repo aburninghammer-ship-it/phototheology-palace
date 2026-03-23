@@ -1142,7 +1142,7 @@
   },
   "roomDetail": {
     "notFound": "Salle Non Trouvée",
-    "backToFloor": "Retour à l'Étage {{number}}",
+    "backToFloor": "Retour à l'Étage {{floorNumber}}",
     "locked": "Cette Salle est Verrouillée",
     "lockMessage": "Pour débloquer cette salle, vous devez compléter :",
     "completePreviousFloor": "Complétez l'étage précédent pour débloquer cette salle.",

@@ -1142,7 +1142,7 @@
   },
   "roomDetail": {
     "notFound": "Raum Nicht Gefunden",
-    "backToFloor": "Zurück zu Etage {{number}}",
+    "backToFloor": "Zurück zu Etage {{floorNumber}}",
     "locked": "Dieser Raum Ist Gesperrt",
     "lockMessage": "Um diesen Raum freizuschalten, musst du abschließen:",
     "completePreviousFloor": "Schließe die vorherige Etage ab, um diesen Raum freizuschalten.",
