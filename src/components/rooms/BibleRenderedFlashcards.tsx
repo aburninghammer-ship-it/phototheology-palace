@@ -1,0 +1,213 @@
+import { useState, useCallback, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Layers, Shuffle, RotateCcw, ChevronLeft, ChevronRight, Check, X, Trophy, Eye, EyeOff
+} from "lucide-react";
+import { bibleRenderedSets, BibleRenderedSet } from "@/data/bibleRenderedSets";
+import { getBibleRenderedImage } from "@/assets/bible-rendered";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+type FlashcardSide = "image" | "info";
+
+const BibleRenderedFlashcards = () => {
+  const [deck, setDeck] = useState<BibleRenderedSet[]>([...bibleRenderedSets]);
+  const [index, setIndex] = useState(0);
+  const [side, setSide] = useState<FlashcardSide>("image");
+  const [known, setKnown] = useState<Set<number>>(new Set());
+  const [unknown, setUnknown] = useState<Set<number>>(new Set());
+  const [isComplete, setIsComplete] = useState(false);
+
+  const current = deck[index];
+  const total = deck.length;
+
+  const shuffle = useCallback(() => {
+    setDeck([...bibleRenderedSets].sort(() => Math.random() - 0.5));
+    setIndex(0);
+    setSide("image");
+    setKnown(new Set());
+    setUnknown(new Set());
+    setIsComplete(false);
+  }, []);
+
+  const reset = useCallback(() => {
+    setDeck([...bibleRenderedSets]);
+    setIndex(0);
+    setSide("image");
+    setKnown(new Set());
+    setUnknown(new Set());
+    setIsComplete(false);
+  }, []);
+
+  const advance = useCallback((mark: "known" | "unknown") => {
+    if (mark === "known") {
+      setKnown(prev => new Set(prev).add(current.number));
+    } else {
+      setUnknown(prev => new Set(prev).add(current.number));
+    }
+
+    if (index < total - 1) {
+      setIndex(i => i + 1);
+      setSide("image");
+    } else {
+      setIsComplete(true);
+    }
+  }, [index, total, current]);
+
+  const retryMissed = useCallback(() => {
+    const missedSets = bibleRenderedSets.filter(s => unknown.has(s.number));
+    if (missedSets.length === 0) return;
+    setDeck(missedSets.sort(() => Math.random() - 0.5));
+    setIndex(0);
+    setSide("image");
+    setUnknown(new Set());
+    setIsComplete(false);
+  }, [unknown]);
+
+  if (isComplete) {
+    const knownCount = known.size;
+    const unknownCount = unknown.size;
+    const accuracy = Math.round((knownCount / (knownCount + unknownCount)) * 100);
+
+    return (
+      <Card className="border-2 border-primary/30">
+        <CardContent className="py-12 text-center space-y-6">
+          <Trophy className="h-16 w-16 mx-auto text-yellow-500" />
+          <h2 className="text-3xl font-bold">Flashcards Complete!</h2>
+          <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-green-600">{knownCount}</p>
+              <p className="text-sm text-muted-foreground">Knew It</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-destructive">{unknownCount}</p>
+              <p className="text-sm text-muted-foreground">Missed</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold">{accuracy}%</p>
+              <p className="text-sm text-muted-foreground">Accuracy</p>
+            </div>
+          </div>
+          <div className="flex gap-3 justify-center flex-wrap">
+            {unknownCount > 0 && (
+              <Button onClick={retryMissed} variant="default">
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Retry {unknownCount} Missed
+              </Button>
+            )}
+            <Button onClick={shuffle} variant="outline">
+              <Shuffle className="h-4 w-4 mr-2" />
+              Shuffle All
+            </Button>
+            <Button onClick={reset} variant="outline">
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const img = getBibleRenderedImage(current.number);
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2">
+            <Layers className="h-5 w-5 text-primary" />
+            Flashcard Drill
+          </CardTitle>
+          <CardDescription>
+            Flip each card, then mark whether you knew it. Retry missed cards at the end.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Progress */}
+          <div className="flex items-center justify-between text-sm">
+            <Badge variant="outline">{index + 1} / {total}</Badge>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1 text-green-600"><Check className="h-3.5 w-3.5" />{known.size}</span>
+              <span className="flex items-center gap-1 text-destructive"><X className="h-3.5 w-3.5" />{unknown.size}</span>
+            </div>
+          </div>
+          <Progress value={((index + 1) / total) * 100} className="h-2" />
+
+          {/* Flashcard */}
+          <motion.div
+            key={`${current.number}-${side}`}
+            initial={{ rotateY: 90, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            transition={{ duration: 0.25 }}
+          >
+            <Card
+              className="min-h-[320px] cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => setSide(s => s === "image" ? "info" : "image")}
+            >
+              <CardContent className="flex flex-col items-center justify-center min-h-[320px] p-8">
+                {side === "image" ? (
+                  <div className="text-center space-y-4">
+                    {img ? (
+                      <img src={img} alt={current.name} className="w-44 h-44 mx-auto rounded-xl object-cover shadow-lg" />
+                    ) : (
+                      <div className="text-8xl">{current.symbol}</div>
+                    )}
+                    <p className="text-sm text-muted-foreground flex items-center gap-1 justify-center">
+                      <Eye className="h-4 w-4" /> Tap to reveal
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-center space-y-3">
+                    <Badge className="mb-2">Set #{current.number}</Badge>
+                    <h2 className="text-2xl font-bold">{current.name}</h2>
+                    <p className="text-lg text-primary font-semibold">{current.range}</p>
+                    <p className="text-sm text-muted-foreground max-w-md">{current.description}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 justify-center mt-4">
+                      <EyeOff className="h-4 w-4" /> Tap to flip back
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-4">
+            <Button
+              variant="outline"
+              className="border-destructive/50 text-destructive hover:bg-destructive/10 flex-1 max-w-[160px]"
+              onClick={() => advance("unknown")}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Didn't Know
+            </Button>
+            <Button
+              variant="outline"
+              className="border-green-500/50 text-green-600 hover:bg-green-500/10 flex-1 max-w-[160px]"
+              onClick={() => advance("known")}
+            >
+              <Check className="h-4 w-4 mr-2" />
+              Knew It
+            </Button>
+          </div>
+
+          {/* Controls */}
+          <div className="flex justify-center gap-2 pt-2">
+            <Button variant="ghost" size="sm" onClick={shuffle}>
+              <Shuffle className="h-4 w-4 mr-1" /> Shuffle
+            </Button>
+            <Button variant="ghost" size="sm" onClick={reset}>
+              <RotateCcw className="h-4 w-4 mr-1" /> Reset
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default BibleRenderedFlashcards;
