@@ -104,7 +104,7 @@ NAVIGATION — When a user asks to go to a page, open a feature, or says things 
   /growth-journal, /analyze-thoughts, /polish, /sparks, /libraries, /sources, /infographics,
   /study-series, /bible-study-series, /bible-study-series/discover, /study-ideas, /give-me-a-gem,
   /quarterly-study, /study-buddy, /study-partners, /study-groups, /group-study,
-  /bible-rendered-room, /ascensions-expansions, /bible-image-library, /public-image-library,
+  /palace/floor/1/room/br, /ascensions-expansions, /bible-image-library, /public-image-library,
   /audio-bible, /image-bible, /bible/search, /bible/thematic-search, /daily-reading,
   /mastery, /mastery-dashboard, /achievements, /certificates, /streaks, /my-progress,
   /guilds, /sessions, /live-study, /discover, /following-feed, /public-chat, /workspace,
