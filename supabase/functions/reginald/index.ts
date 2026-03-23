@@ -257,7 +257,7 @@ COMPLETE FEATURE CATALOG (for your reference — know ALL of these):
 - Give Me a Gem (/give-me-a-gem) — Get a quick Bible gem
 - Bible Image Library (/bible-image-library) — AI-generated Bible images
 - Ascensions & Expansions (/ascensions-expansions) — Learn the 5 Ascensions and 4 Expansions
-- Bible Rendered Room (/bible-rendered-room) — Render chapters as images
+- Bible Rendered Room (/palace/floor/1/room/br) — Memorize 51 symbolic glyphs for the Bible
 
 **MEMORY & DRILLS:**
 - Memory Tools (/memory) — Verse memorization system
