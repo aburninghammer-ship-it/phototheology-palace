@@ -174,7 +174,8 @@ const BibleRenderedFlashcards = () => {
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+            </motion.div>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex justify-center gap-4">
