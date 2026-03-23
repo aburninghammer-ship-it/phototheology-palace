@@ -80,6 +80,7 @@ import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLi
 import { RoomPracticeTools } from "@/components/palace/RoomPracticeTools";
 import { TranslationLibrary } from "@/components/translation-room/TranslationLibrary";
 import { ImageBibleBrowser } from "@/components/rooms/ImageBibleBrowser";
+import { SavedDrillsList } from "@/components/drills/SavedDrillsList";
 
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
 import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
@@ -849,6 +850,9 @@ export default function RoomDetail() {
                   roomName={room.name}
                   roomPrinciple={room.purpose}
                 />
+
+                {/* Saved Drill Results for this room */}
+                <SavedDrillsList roomId={room.id} limit={20} />
               </TabsContent>
 
               <TabsContent value="master" className="space-y-6 mt-6">
