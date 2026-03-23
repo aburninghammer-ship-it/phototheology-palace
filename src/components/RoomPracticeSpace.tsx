@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { BookOpen, Plus, Trash2, Loader2, Edit, Check, X, Sparkles } from "lucide-react";
+import { BookOpen, Plus, Trash2, Loader2, Edit, Check, X, Sparkles, Search } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BiblePracticeTile } from "./BiblePracticeTile";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface RoomExercise {
   id: string;
