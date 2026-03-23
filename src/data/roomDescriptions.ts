@@ -232,4 +232,30 @@ export const roomDescriptions: Record<string, string[]> = {
     "You flip through Genesis 1–11 in 60 seconds: creation, fall, flood, Babel. You scan the Gospels, spotting Christ in parables, miracles, cross, resurrection. You rapid-fire map Revelation 12–14: woman, dragon, beast, three angels.",
     "This is like sprint training for athletes. It builds reflexes. The more you practice, the faster your brain can move through the palace. In ministry, this matters: when asked a question, you can recall connections quickly, not after hours of study.",
   ],
+
+  // ─── Floor 6: Additional Rooms ───
+
+  "123h": [
+    "The Three Heavens Room trains prophetic horizon discernment — recognizing that biblical prophecy often operates on multiple horizons of fulfillment. The First Heaven (1H) represents the Babylonian destruction and post-exilic restoration under Cyrus. The Second Heaven (2H) centers on the destruction of Jerusalem in 70 AD and the New-Covenant heavenly order. The Third Heaven (3H) is the final cosmic judgment and literal New Creation.",
+    "Many prophetic errors come from forcing a passage to live in only one time period. A trained student learns to see layers without blurring them. The fundamental principle: one prophecy can speak more than once — but not all fulfillments are equal.",
+    "Think of the Three Heavens as three crescendos of the same symphony: a historical crescendo in the Old Testament, a covenantal crescendo around the 1st century, and the final eschatological crescendo at the end of history. Every verse belongs somewhere in this map.",
+  ],
+
+  cycles: [
+    "The Eight Cycles Room trains you to locate any biblical text, story, prophecy, or experience within the correct covenant cycle of God's redemptive plan. The eight cycles are: Adamic (@Ad), Noahic (@No), Abrahamic (@Ab), Mosaic (@Mo), Cyrusic (@Cy), Cyrus-Christ (@CyC), Spirit (@Sp), and Remnant (@Re).",
+    "Every cycle follows the same five-part rhythm: Fall (human failure or crisis), Covenant (God's promise of restoration), Sanctuary (God's presence and mediation), Enemy (opposition rises), and Restoration (God intervenes and preserves a faithful seed). Think of it like the structure of a TV season: the problem appears, characters fail, help arrives, enemies fight back, the resolution closes the arc.",
+    "The goal is not memorization — it is orientation. A trained student should never feel lost in Scripture. By mastering this room, you will always know where you are in the plan of salvation. Later cycles do not cancel earlier ones; they enlarge and fulfill them.",
+  ],
+
+  jr: [
+    "The Juice Room is the exercise lab where you 'squeeze' Scripture with all Phototheology principles at once, extracting every drop of meaning. Juicing a text means expanding it as much as possible, while juicing a book means summarizing it into a single thought.",
+    "For example, take Exodus: use the Story Room to recall its narratives, apply the Observation Room to list details, translate commands into images, freestyle connections to nature and life, concentrate on Christ in every scene, place it on the Theme walls and in the Mosaic cycle, and assign its place in the Heavens.",
+    "The Juice Room is like putting an orange under a juicer. You twist and press until every drop comes out. The mantra: 'Much from little. Little from much.' This practice prevents superficial study and saturates your mind with the richness of an entire book.",
+  ],
+
+  math: [
+    "The Mathematics Room trains you to recognize time-prophecy structures embedded in Scripture. Time prophecies are treated as patterns, not merely dates. God doesn't just work through events — He works through time itself, marking pivotal moments with precise prophetic timelines.",
+    "The six time prophecies are: @120 (probation before judgment), @400 (affliction before deliverance), @70y (captivity and restoration), @490 (Messiah and covenant confirmation), @1260 (suppressed truth under counterfeit authority), and @2300 (cosmic judgment and cleansing). These aren't random numbers; they're divine timestamps revealing God's sovereignty over history.",
+    "By identifying which time prophecy a passage connects to, you situate the text within God's prophetic calendar. Every mapping must include a why (reasoning), a boundary (scope), and a limitation (what the mapping does not claim).",
+  ],
 };

@@ -362,6 +362,18 @@ export default function RoomDetail() {
           </div>
         </div>
 
+        {roomDescriptions[room.id] && (
+          <Card className="mb-8 border-primary/20 bg-primary/5">
+            <CardContent className="pt-6 space-y-3">
+              {roomDescriptions[room.id].map((paragraph, idx) => (
+                <p key={idx} className="text-muted-foreground leading-relaxed text-sm">
+                  {paragraph}
+                </p>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
         {user && (
           <VoiceChatWidget
             roomType="palace"
@@ -417,18 +429,6 @@ export default function RoomDetail() {
                       }
                     }}
                   />
-                )}
-
-                {roomDescriptions[room.id] && (
-                  <Card className="border-primary/20 bg-primary/5">
-                    <CardContent className="pt-6 space-y-3">
-                      {roomDescriptions[room.id].map((paragraph, idx) => (
-                        <p key={idx} className="text-muted-foreground leading-relaxed text-sm">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </CardContent>
-                  </Card>
                 )}
 
                 <Card variant="glass" className="relative">
