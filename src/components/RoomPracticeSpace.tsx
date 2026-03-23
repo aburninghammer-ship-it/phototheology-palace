@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { BookOpen, Plus, Trash2, Loader2, Edit, Check, X, Sparkles } from "lucide-react";
+import { BookOpen, Plus, Trash2, Loader2, Edit, Check, X, Sparkles, Search } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BiblePracticeTile } from "./BiblePracticeTile";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface RoomExercise {
   id: string;
@@ -41,6 +42,11 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
   const [practiceVerseRef, setPracticeVerseRef] = useState("");
   const [practiceBibleText, setPracticeBibleText] = useState("");
   const [loadingBibleText, setLoadingBibleText] = useState(false);
+  const [showSourcePicker, setShowSourcePicker] = useState(false);
+  const [sourceType, setSourceType] = useState<"bible" | "custom" | null>(null);
+  const [bibleRefInput, setBibleRefInput] = useState("");
+  const [customTitle, setCustomTitle] = useState("");
+  const [customContent, setCustomContent] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -159,63 +165,54 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
     }
   };
 
-  const handleStartAIPractice = async () => {
-    const choice = confirm(
-      "Would you like to:\n\n" +
-      "✅ Click OK to use a Bible verse/chapter\n" +
-      "❌ Click Cancel to input your own story"
-    );
+  const handleStartAIPractice = () => {
+    setShowSourcePicker(true);
+    setSourceType(null);
+    setBibleRefInput("");
+    setCustomTitle("");
+    setCustomContent("");
+  };
 
-    if (choice) {
-      // Bible reference option
-      const reference = prompt("Enter verse or chapter reference (e.g., John 3:16, Genesis 22):");
-      if (!reference) return;
+  const handleBibleRefSubmit = async () => {
+    if (!bibleRefInput.trim()) return;
 
-      try {
-        setLoadingBibleText(true);
-        setPracticeVerseRef(reference);
-        
-        // Fetch Bible text from the Bible API
-        const book = reference.split(/\s+/)[0];
-        const rest = reference.substring(book.length).trim();
-        const [chapterStr] = rest.split(':');
-        const chapter = parseInt(chapterStr);
+    try {
+      setLoadingBibleText(true);
+      setPracticeVerseRef(bibleRefInput);
 
-        const { data, error } = await supabase.functions.invoke('bible-api', {
-          body: { book, chapter, version: 'kjv' }
-        });
+      const book = bibleRefInput.split(/\s+/)[0];
+      const rest = bibleRefInput.substring(book.length).trim();
+      const [chapterStr] = rest.split(':');
+      const chapter = parseInt(chapterStr);
 
-        if (error) throw error;
+      const { data, error } = await supabase.functions.invoke('bible-api', {
+        body: { book, chapter, version: 'kjv' }
+      });
 
-        if (data?.verses) {
-          const text = data.verses.map((v: any) => `${v.verse} ${v.text}`).join('\n');
-          setPracticeBibleText(text);
-          setShowAIPractice(true);
-        } else {
-          throw new Error('No Bible text found');
-        }
-      } catch (error) {
-        console.error("Error fetching Bible text:", error);
-        toast.error("Could not load Bible text. Please check the reference and try again.");
-      } finally {
-        setLoadingBibleText(false);
+      if (error) throw error;
+
+      if (data?.verses) {
+        const text = data.verses.map((v: any) => `${v.verse} ${v.text}`).join('\n');
+        setPracticeBibleText(text);
+        setShowSourcePicker(false);
+        setShowAIPractice(true);
+      } else {
+        throw new Error('No Bible text found');
       }
-    } else {
-      // Custom story option
-      const storyTitle = prompt("Enter a title for your story (e.g., David and Goliath, The Prodigal Son):");
-      if (!storyTitle) return;
-
-      const storyContent = prompt(
-        "Enter your story or text:\n\n" +
-        "(You can paste any story, personal experience, or text you'd like to practice with)"
-      );
-      
-      if (!storyContent) return;
-
-      setPracticeVerseRef(storyTitle);
-      setPracticeBibleText(storyContent);
-      setShowAIPractice(true);
+    } catch (error) {
+      console.error("Error fetching Bible text:", error);
+      toast.error("Could not load Bible text. Please check the reference and try again.");
+    } finally {
+      setLoadingBibleText(false);
     }
+  };
+
+  const handleCustomSubmit = () => {
+    if (!customTitle.trim() || !customContent.trim()) return;
+    setPracticeVerseRef(customTitle);
+    setPracticeBibleText(customContent);
+    setShowSourcePicker(false);
+    setShowAIPractice(true);
   };
 
   if (!user) {
@@ -240,7 +237,107 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
         />
       )}
 
-      {/* Welcome Banner for Users Who Want Custom Content */}
+      {/* Inline Source Picker - replaces confirm/prompt dialogs */}
+      {showSourcePicker && (
+        <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 mb-4">
+          <CardContent className="pt-6 space-y-4">
+            <div className="text-center mb-2">
+              <h3 className="text-lg font-bold">Choose Your Source</h3>
+              <p className="text-sm text-muted-foreground">Select a Bible passage or write your own text</p>
+            </div>
+
+            {!sourceType && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Button
+                  onClick={() => setSourceType("bible")}
+                  size="lg"
+                  className="h-auto py-4 flex flex-col items-center gap-1 gradient-palace text-white"
+                >
+                  <Search className="h-5 w-5" />
+                  <span className="font-bold">Bible Verse / Chapter</span>
+                  <span className="text-xs opacity-90">e.g. John 3:16, Genesis 22</span>
+                </Button>
+                <Button
+                  onClick={() => setSourceType("custom")}
+                  size="lg"
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center gap-1 border-2"
+                >
+                  <Edit className="h-5 w-5" />
+                  <span className="font-bold">Your Own Story / Text</span>
+                  <span className="text-xs text-muted-foreground">Paste or type anything</span>
+                </Button>
+              </div>
+            )}
+
+            {sourceType === "bible" && (
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Enter verse or chapter reference</Label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="e.g. John 3:16, Genesis 22, Psalm 23"
+                    value={bibleRefInput}
+                    onChange={(e) => setBibleRefInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleBibleRefSubmit()}
+                    autoFocus
+                  />
+                  <Button
+                    onClick={handleBibleRefSubmit}
+                    disabled={!bibleRefInput.trim() || loadingBibleText}
+                  >
+                    {loadingBibleText ? <Loader2 className="h-4 w-4 animate-spin" /> : "Go"}
+                  </Button>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setSourceType(null)} className="text-xs">
+                  ← Back
+                </Button>
+              </div>
+            )}
+
+            {sourceType === "custom" && (
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-sm font-medium">Title</Label>
+                  <Input
+                    placeholder="e.g. David and Goliath, The Prodigal Son"
+                    value={customTitle}
+                    onChange={(e) => setCustomTitle(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Your text</Label>
+                  <Textarea
+                    placeholder="Paste or type any story, verse, or personal experience..."
+                    value={customContent}
+                    onChange={(e) => setCustomContent(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => setSourceType(null)} className="text-xs">
+                    ← Back
+                  </Button>
+                  <Button
+                    onClick={handleCustomSubmit}
+                    disabled={!customTitle.trim() || !customContent.trim()}
+                    size="sm"
+                  >
+                    Start Practice
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <div className="text-right">
+              <Button variant="ghost" size="sm" onClick={() => setShowSourcePicker(false)} className="text-xs text-muted-foreground">
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {exercises.length === 0 && !showForm && (
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10 mb-4">
           <CardHeader className="pb-3">
