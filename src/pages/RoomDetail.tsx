@@ -200,6 +200,13 @@ export default function RoomDetail() {
     }
   };
 
+  // Redirect BR room to dedicated Bible Rendered Room page
+  useEffect(() => {
+    if (roomId === "br") {
+      navigate("/bible-rendered-room", { replace: true });
+    }
+  }, [roomId, navigate]);
+
   // Don't redirect - let users see why room is locked
 
   if (!floor || !room) {
