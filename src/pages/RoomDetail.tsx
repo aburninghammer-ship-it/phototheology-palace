@@ -295,8 +295,8 @@ export default function RoomDetail() {
           </Alert>
         )}
 
-        <div className={`${gradient} rounded-2xl p-10 mb-8 text-white relative overflow-hidden shadow-2xl`}>
-          <div className="absolute inset-0 opacity-20">
+        <div className={`${gradient} rounded-2xl p-5 sm:p-7 md:p-10 mb-6 md:mb-8 text-white relative overflow-hidden shadow-2xl`}>
+          <div className="absolute inset-0 opacity-20 hidden sm:block">
             <div className="absolute top-10 right-20 w-2 h-2 bg-white rounded-full animate-pulse" />
             <div className="absolute top-32 right-40 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
             <div className="absolute top-20 left-32 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
@@ -304,7 +304,7 @@ export default function RoomDetail() {
             <div className="absolute bottom-32 right-60 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: "2s" }} />
           </div>
 
-          <div className="absolute -right-10 -top-10 text-[200px] opacity-10 select-none">
+          <div className="absolute -right-10 -top-10 text-[200px] opacity-10 select-none hidden md:block">
             {
               {sr: "📖", ir: "👁️", "24fps": "🎬", br: "🗺️", tr: "🎨", gr: "💎",
                or: "🔍", dc: "🧪", st: "🔗", qr: "❓", qa: "💬",
@@ -317,8 +317,8 @@ export default function RoomDetail() {
           </div>
 
           <div className="relative z-10">
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <Badge variant="outline" className="text-white border-white/70 backdrop-blur-sm bg-white/10 px-4 py-1.5 text-lg font-bold shadow-lg">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-6">
+              <Badge variant="outline" className="text-white border-white/70 backdrop-blur-sm bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-sm sm:text-lg font-bold shadow-lg">
                 {room.tag}
               </Badge>
               {user && progress?.completed_at && (
@@ -329,9 +329,9 @@ export default function RoomDetail() {
               )}
             </div>
 
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-3 sm:gap-6 mb-2 sm:mb-4">
               {getCardImage(room.id) ? (
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 hidden sm:block">
                   <RoomCard
                     roomId={room.id}
                     roomName={room.name}
@@ -340,7 +340,7 @@ export default function RoomDetail() {
                   />
                 </div>
               ) : (
-                <span className="text-6xl drop-shadow-2xl flex-shrink-0">
+                <span className="text-4xl sm:text-6xl drop-shadow-2xl flex-shrink-0">
                   {
                     {sr: "📖", ir: "👁️", "24fps": "🎬", br: "🗺️", tr: "🎨", gr: "💎",
                      or: "🔍", dc: "🧪", st: "🔗", qr: "❓", qa: "💬",
@@ -353,8 +353,8 @@ export default function RoomDetail() {
                 </span>
               )}
               <div className="flex-1">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-black drop-shadow-2xl tracking-tight">{room.name}</h1>
-                <p className="text-lg md:text-xl lg:text-2xl leading-relaxed opacity-95 drop-shadow-lg mt-2">{room.purpose}</p>
+                <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black drop-shadow-2xl tracking-tight">{room.name}</h1>
+                <p className="text-sm sm:text-lg md:text-xl lg:text-2xl leading-relaxed opacity-95 drop-shadow-lg mt-1 sm:mt-2">{room.purpose}</p>
               </div>
             </div>
 
@@ -370,6 +370,41 @@ export default function RoomDetail() {
           </div>
         </div>
 
+        {roomDescriptions[room.id] && (
+          <Card className="mb-6 md:mb-8 border-primary/20 bg-primary/5">
+            <CardContent className="pt-4 sm:pt-6 space-y-3">
+              <p className="text-muted-foreground leading-relaxed text-xs sm:text-sm">
+                {roomDescriptions[room.id][0]}
+              </p>
+              {roomDescriptions[room.id].length > 1 && (
+                <>
+                  <div className="hidden md:block space-y-3">
+                    {roomDescriptions[room.id].slice(1).map((paragraph, idx) => (
+                      <p key={idx} className="text-muted-foreground leading-relaxed text-sm">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                  <Collapsible className="md:hidden">
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-xs text-primary/70 hover:text-primary p-0 h-auto">
+                        <ChevronDown className="h-3 w-3 mr-1" />
+                        Read more
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-3 pt-2">
+                      {roomDescriptions[room.id].slice(1).map((paragraph, idx) => (
+                        <p key={idx} className="text-muted-foreground leading-relaxed text-xs sm:text-sm">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
         {user && (
           <VoiceChatWidget
             roomType="palace"
@@ -385,17 +420,25 @@ export default function RoomDetail() {
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-4 p-1 bg-muted/50 backdrop-blur-sm">
-                <TabsTrigger value="practice" className="data-[state=active]:shadow-glow transition-all duration-300">
-                  {t('roomDetail.practiceTab')}
+                <TabsTrigger value="practice" className="data-[state=active]:shadow-glow transition-all duration-300 text-xs sm:text-sm gap-1">
+                  <Dumbbell className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline">{t('roomDetail.practiceTab')}</span>
+                  <span className="sm:hidden">Drill</span>
                 </TabsTrigger>
-                <TabsTrigger value="learn" className="data-[state=active]:shadow-glow transition-all duration-300">
-                  {t('roomDetail.learnTab')}
+                <TabsTrigger value="learn" className="data-[state=active]:shadow-glow transition-all duration-300 text-xs sm:text-sm gap-1">
+                  <BookOpen className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline">{t('roomDetail.learnTab')}</span>
+                  <span className="sm:hidden">Learn</span>
                 </TabsTrigger>
-                <TabsTrigger value="games" className="data-[state=active]:shadow-glow transition-all duration-300">
-                  {t('roomDetail.gamesTab')}
+                <TabsTrigger value="games" className="data-[state=active]:shadow-glow transition-all duration-300 text-xs sm:text-sm gap-1">
+                  <Swords className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline">{t('roomDetail.gamesTab')}</span>
+                  <span className="sm:hidden">Games</span>
                 </TabsTrigger>
-                <TabsTrigger value="master" className="data-[state=active]:shadow-glow transition-all duration-300">
-                  {t('roomDetail.masterTab')}
+                <TabsTrigger value="master" className="data-[state=active]:shadow-glow transition-all duration-300 text-xs sm:text-sm gap-1">
+                  <Crown className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline">{t('roomDetail.masterTab')}</span>
+                  <span className="sm:hidden">Master</span>
                 </TabsTrigger>
               </TabsList>
 
