@@ -1158,7 +1158,7 @@
   },
   "roomDetail": {
     "notFound": "Sala No Encontrada",
-    "backToFloor": "Volver al Piso {{number}}",
+    "backToFloor": "Volver al Piso {{floorNumber}}",
     "locked": "Esta Sala está Bloqueada",
     "lockMessage": "Para desbloquear esta sala, necesitas completar:",
     "completePreviousFloor": "Completa el piso anterior para desbloquear esta sala.",
