@@ -179,13 +179,14 @@ const Palace = () => {
               />
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center px-4 sm:px-0">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center px-4 sm:px-0 flex-wrap">
               <Button asChild size="lg" className="gradient-palace text-white h-12 md:h-11 text-base">
                 <Link to={user ? "/games/palace_quiz" : "/auth"}>
                   <Building2 className="mr-2 h-5 w-5 md:h-4 md:w-4" />
                   {user ? t('palace.continueLearning') : t('palace.startYourJourney')}
                 </Link>
               </Button>
+              {user && <PalaceGuidedTour />}
               {completedRooms === totalRooms && (
                 <Button asChild size="lg" variant="outline" className="h-12 md:h-11 text-base">
                   <Link to="/certificates">
