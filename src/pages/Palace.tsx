@@ -4,6 +4,7 @@ import { ProgressivePalace } from "@/components/palace/ProgressivePalace";
 
 import { PalaceBreadcrumbs } from "@/components/palace/PalaceBreadcrumbs";
 import { PalaceTour } from "@/components/onboarding/PalaceTour";
+import { PalaceGuidedTour } from "@/components/palace/PalaceGuidedTour";
 import { palaceFloors } from "@/data/palaceData";
 import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Building2, Award, TrendingUp, BookOpen, Target, LayoutGrid, List, Box } from "lucide-react";
