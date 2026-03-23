@@ -8,6 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { Footer } from "@/components/Footer";
 import BibleRenderedDrill from "@/components/rooms/BibleRenderedDrill";
 import BibleRenderedBrowser from "@/components/rooms/BibleRenderedBrowser";
+import BibleRenderedGlance from "@/components/rooms/BibleRenderedGlance";
+import BibleRenderedFlashcards from "@/components/rooms/BibleRenderedFlashcards";
+import BibleRenderedSpeedScan from "@/components/rooms/BibleRenderedSpeedScan";
 import {
   Accordion,
   AccordionContent,
