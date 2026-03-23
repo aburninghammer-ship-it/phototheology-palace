@@ -625,7 +625,7 @@ function App() {
           <Route path="/weekly-challenge" element={<WeeklyChallenge />} />
           <Route path="/sermon-powerpoint" element={<ProtectedRoute><SermonPowerPoint /></ProtectedRoute>} />
           <Route path="/flashcards" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
-          <Route path="/bible-rendered-room" element={<ProtectedRoute><BibleRenderedRoom /></ProtectedRoute>} />
+          
           <Route path="/my-studies" element={<ProtectedRoute><MyStudies /></ProtectedRoute>} />
           <Route path="/my-studies/:id" element={<ProtectedRoute><StudyEditor /></ProtectedRoute>} />
           <Route path="/power-of-the-lamb" element={<ProtectedRoute><PowerOfTheLamb /></ProtectedRoute>} />
