@@ -916,7 +916,11 @@ export default function RoomDetail() {
 
                 {room.id === "tr" && <TranslationLibrary />}
 
-                {room.id !== "br" && (
+                {room.id === "24fps" && (
+                  <ImageBibleBrowser />
+                )}
+
+                {room.id !== "br" && room.id !== "24fps" && (
                   <RoomPracticeSpace
                     floorNumber={floor.number}
                     roomId={room.id}
