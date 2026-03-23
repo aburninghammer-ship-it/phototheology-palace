@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Home, Info, Brain, Search } from "lucide-react";
+import { BookOpen, Home, Info, Brain, Search, Grid3X3, Layers, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Footer } from "@/components/Footer";
 import BibleRenderedDrill from "@/components/rooms/BibleRenderedDrill";
