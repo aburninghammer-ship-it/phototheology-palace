@@ -79,6 +79,7 @@ import { ThreeHeavensLibrary } from "@/components/three-heavens-room/ThreeHeaven
 import { Room66Library } from "@/components/room66/Room66Library";
 import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLibrary";
 import { RoomPracticeTools } from "@/components/palace/RoomPracticeTools";
+import { TranslationLibrary } from "@/components/translation-room/TranslationLibrary";
 import { ImageBibleBrowser } from "@/components/rooms/ImageBibleBrowser";
 
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
@@ -840,6 +841,8 @@ export default function RoomDetail() {
                     {t('roomDetail.personalPracticeDesc', { roomName: room.name })}
                   </p>
                 </div>
+
+                {room.id === "tr" && <TranslationLibrary />}
 
                 <RoomPracticeSpace
                   floorNumber={floor.number}

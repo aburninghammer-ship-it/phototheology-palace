@@ -18127,6 +18127,39 @@ export type Database = {
         }
         Relationships: []
       }
+      translation_library: {
+        Row: {
+          created_at: string | null
+          generated_image_url: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+          user_image_description: string
+          verse_reference: string
+          verse_text: string
+        }
+        Insert: {
+          created_at?: string | null
+          generated_image_url?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+          user_image_description: string
+          verse_reference: string
+          verse_text: string
+        }
+        Update: {
+          created_at?: string | null
+          generated_image_url?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+          user_image_description?: string
+          verse_reference?: string
+          verse_text?: string
+        }
+        Relationships: []
+      }
       treasure_hunt_answers: {
         Row: {
           clue_id: string
