@@ -76,7 +76,7 @@ export const MobileNav = () => {
                   🏰 {t('nav.thePalace')}
                 </Button>
               </Link>
-              <Link to="/bible-rendered-room">
+              <Link to="/palace/floor/1/room/br">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   📚 {t('nav.bibleRendered')}
                 </Button>

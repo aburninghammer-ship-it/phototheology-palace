@@ -53,7 +53,7 @@ export const tierOrder: AchievementTier[] = ['bronze', 'silver', 'gold', 'black'
 export const requirementRoutes: Record<string, { path: string; label: string }> = {
   // Memory
   rooms_completed: { path: '/palace', label: 'Go to Palace' },
-  '24fps_chapters': { path: '/bible-rendered-room', label: 'Start 24FPS' },
+  '24fps_chapters': { path: '/palace/floor/1/room/br', label: 'Start 24FPS' },
   
   // Mastery
   floors_completed: { path: '/palace', label: 'Explore Floors' },
