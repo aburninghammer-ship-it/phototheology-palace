@@ -7670,5 +7670,15 @@
     "daysLeftTrial": "{{days}} jours restants dans la période d'essai",
     "viewWeekOutline": "Voir le programme de la semaine",
     "pathActive": "Parcours actif"
+  },
+  "sequentialMastery": {
+    "welcomeTitle": "Bienvenue au Premier Étage !",
+    "welcomeDesc": "C'est l'<strong>Étage d'Ameublement</strong> — où vous remplissez votre esprit d'histoires, d'images et de gemmes.",
+    "readyTitle": "Étage Déverrouillé — Prêt à Maîtriser !",
+    "readyDesc": "Vous avez rempli les prérequis. Explorez ces salles et approfondissez votre compréhension.",
+    "exploreFreely": "Complétez d'abord l'Étage {{floor}} pour débloquer la maîtrise ici.",
+    "explorationTitle": "Mode Exploration",
+    "explorationDesc1": "Vous pouvez <strong>explorer et apprendre</strong> à cet étage, mais le suivi de maîtrise nécessite de compléter les étages inférieurs.",
+    "goToFloor": "Aller à l'Étage {{floor}}"
   }
 }

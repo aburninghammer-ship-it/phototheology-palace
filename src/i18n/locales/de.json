@@ -7670,5 +7670,15 @@
     "daysLeftTrial": "{{days}} Tage im Testzeitraum verbleibend",
     "viewWeekOutline": "Wochenplan anzeigen",
     "pathActive": "Pfad aktiv"
+  },
+  "sequentialMastery": {
+    "welcomeTitle": "Willkommen im Ersten Stock!",
+    "welcomeDesc": "Dies ist der <strong>Einrichtungsstock</strong> — wo du deinen Geist mit Geschichten, Bildern und Edelsteinen füllst.",
+    "readyTitle": "Stock freigeschaltet — Bereit zur Meisterung!",
+    "readyDesc": "Du hast die Voraussetzungen erfüllt. Erkunde diese Räume und vertiefe dein Verständnis.",
+    "exploreFreely": "Schließe zuerst Stock {{floor}} ab, um hier die Meisterung freizuschalten.",
+    "explorationTitle": "Erkundungsmodus",
+    "explorationDesc1": "Du kannst auf diesem Stock <strong>erkunden und lernen</strong>, aber die Meisterschaftsverfolgung erfordert den Abschluss niedrigerer Stockwerke.",
+    "goToFloor": "Zu Stock {{floor}} gehen"
   }
 }

@@ -7797,5 +7797,15 @@
     "upgradeToContinue": "Mejorar para continuar",
     "daysLeftTrial": "{{days}} días restantes de prueba",
     "viewWeekOutline": "Ver esquema de la semana"
+  },
+  "sequentialMastery": {
+    "welcomeTitle": "¡Bienvenido al Primer Piso!",
+    "welcomeDesc": "Este es el <strong>Piso de Amueblamiento</strong> — donde llenas tu mente con historias, imágenes y gemas.",
+    "readyTitle": "Piso Desbloqueado — ¡Listo para Dominar!",
+    "readyDesc": "Has completado los requisitos previos. Explora estas salas y profundiza tu comprensión.",
+    "exploreFreely": "Completa primero el Piso {{floor}} para desbloquear la maestría aquí.",
+    "explorationTitle": "Modo de Exploración",
+    "explorationDesc1": "Puedes <strong>explorar y aprender</strong> en este piso, pero el seguimiento de maestría requiere completar pisos inferiores.",
+    "goToFloor": "Ir al Piso {{floor}}"
   }
 }

@@ -7670,5 +7670,15 @@
         }
       }
     }
+  },
+  "sequentialMastery": {
+    "welcomeTitle": "1층에 오신 것을 환영합니다!",
+    "welcomeDesc": "이것은 <strong>가구 층</strong>입니다 — 이야기, 이미지, 보석으로 마음을 채우는 곳입니다.",
+    "readyTitle": "층 잠금 해제 — 숙달 준비 완료!",
+    "readyDesc": "필수 조건을 완료했습니다. 이 방들을 탐험하고 이해를 심화시키세요.",
+    "exploreFreely": "여기서 숙달을 잠금 해제하려면 먼저 {{floor}}층을 완료하세요.",
+    "explorationTitle": "탐험 모드",
+    "explorationDesc1": "이 층에서 <strong>탐험하고 배울</strong> 수 있지만, 숙달 추적은 하위 층 완료가 필요합니다.",
+    "goToFloor": "{{floor}}층으로 이동"
   }
 }
