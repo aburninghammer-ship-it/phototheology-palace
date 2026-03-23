@@ -78,6 +78,10 @@ import { RoomPracticeTools } from "@/components/palace/RoomPracticeTools";
 import { TranslationLibrary } from "@/components/translation-room/TranslationLibrary";
 import { ImageBibleBrowser } from "@/components/rooms/ImageBibleBrowser";
 import { SavedDrillsList } from "@/components/drills/SavedDrillsList";
+import BibleRenderedGlance from "@/components/rooms/BibleRenderedGlance";
+import BibleRenderedFlashcards from "@/components/rooms/BibleRenderedFlashcards";
+import BibleRenderedSpeedScan from "@/components/rooms/BibleRenderedSpeedScan";
+import BibleRenderedDrill from "@/components/rooms/BibleRenderedDrill";
 
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
 import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
