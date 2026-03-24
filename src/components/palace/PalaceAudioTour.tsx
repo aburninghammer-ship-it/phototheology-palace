@@ -391,6 +391,16 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
 export function PalaceAudioTour() {
   const [selectedTour, setSelectedTour] = useState<TourDefinition | null>(null);
 
+  // Auto-select tour from URL param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tourId = params.get("tour");
+    if (tourId && !selectedTour) {
+      const found = ALL_TOURS.find(t => t.id === tourId);
+      if (found) setSelectedTour(found);
+    }
+  }, []);
+
   if (selectedTour) {
     return <TourPlayer tour={selectedTour} onBack={() => setSelectedTour(null)} />;
   }
