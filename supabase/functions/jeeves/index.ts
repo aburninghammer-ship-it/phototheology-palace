@@ -4749,6 +4749,72 @@ How should this change how we read Scripture or live our lives?
 
 Format with clear headers, bullet points, and paragraphs. Be enthusiastic and insightful!`;
 
+    } else if (mode === "equation-battle-grade") {
+      // Grade individual portions of an equation battle
+      const { playerAnswers, fullEquation, fullVerse, fullSymbols } = requestBody;
+      
+      systemPrompt = `You are Jeeves, the master Phototheology teacher. You are judging an Equation Battle where multiple players each tackled a portion of a biblical equation. Grade each player's answer fairly and then combine all answers into one unified analysis.
+
+CRITICAL RULES:
+- Score each player 0-100 based on: biblical accuracy (30%), depth of PT principle application (30%), Christ-centeredness (20%), clarity of explanation (20%)
+- Be encouraging but honest
+- When combining, weave the best elements together into a masterful unified reading
+- Always respond in valid JSON`;
+
+      userPrompt = `Grade this Equation Battle:
+
+📖 **Full Verse:** ${fullVerse}
+🔢 **Full Equation:** ${fullEquation}
+📋 **All Symbols:** ${fullSymbols?.join(', ')}
+
+**PLAYER SUBMISSIONS:**
+${playerAnswers?.map((p: any, i: number) => `
+--- Player ${i + 1}: ${p.displayName} ${p.teamName ? `(Team: ${p.teamName})` : ''} ---
+Assigned Symbols: ${p.assignedSymbols?.join(', ')}
+Assigned Portion: ${p.assignedPortion}
+Their Answer: ${p.answer}
+`).join('\n')}
+
+Respond in this exact JSON format:
+{
+  "playerGrades": [
+    {
+      "displayName": "player name",
+      "score": 85,
+      "feedback": "2-3 sentences of specific feedback",
+      "highlights": ["one strong point"]
+    }
+  ],
+  "combinedAnalysis": "A masterful 3-5 paragraph unified reading that weaves together the best insights from all players, showing how the full equation reveals Christ in this passage.",
+  "combinedScore": 82,
+  "mvpName": "name of highest scorer",
+  "closingInsight": "One powerful sentence summarizing what this equation battle revealed."
+}`;
+
+    } else if (mode === "equation-battle-split") {
+      // Split an equation among players
+      const { equation: eqStr, symbols: eqSymbols, playerCount } = requestBody;
+      
+      systemPrompt = `You are Jeeves. Split a Phototheology equation fairly among players. Each player should get roughly equal symbols to decode. Return valid JSON only.`;
+      
+      userPrompt = `Split this equation among ${playerCount} players:
+
+Equation: ${eqStr}
+Symbols: ${eqSymbols?.join(', ')}
+
+Return JSON:
+{
+  "portions": [
+    {
+      "playerIndex": 0,
+      "assignedSymbols": ["CR", "ST"],
+      "portionText": "CR + ST → ..."
+    }
+  ]
+}
+
+Split the symbols as evenly as possible. Each portion should include the relevant operators connecting their symbols.`;
+
     } else if (mode === "chain-chess-feedback") {
       // All variables already extracted from req.json() above
       const difficultyContext = difficulty === "kids"
