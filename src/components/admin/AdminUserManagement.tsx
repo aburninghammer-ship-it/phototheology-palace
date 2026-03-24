@@ -32,11 +32,24 @@ export function AdminUserManagement() {
   const [tierFilter, setTierFilter] = useState<string>("all");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [stripeActiveCount, setStripeActiveCount] = useState<number | null>(null);
   const pageSize = 50;
 
   useEffect(() => {
     loadUsers();
+    loadStripeStats();
   }, []);
+
+  const loadStripeStats = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-subscriber-stats');
+      if (!error && data?.stripe?.active_subscriptions) {
+        setStripeActiveCount(data.stripe.active_subscriptions);
+      }
+    } catch (e) {
+      console.error("Error loading Stripe stats:", e);
+    }
+  };
 
   const loadUsers = async () => {
     setLoading(true);
@@ -263,7 +276,7 @@ export function AdminUserManagement() {
             <CardDescription>Active</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+            <div className="text-2xl font-bold text-green-600">{stripeActiveCount ?? stats.active}</div>
           </CardContent>
         </Card>
         <Card className="border-blue-500/50">
@@ -287,7 +300,7 @@ export function AdminUserManagement() {
             <CardDescription>Stripe</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-indigo-600">{stats.stripe}</div>
+            <div className="text-2xl font-bold text-indigo-600">{stripeActiveCount ?? stats.stripe}</div>
           </CardContent>
         </Card>
         <Card className="border-orange-500/50">
