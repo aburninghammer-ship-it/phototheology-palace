@@ -41,6 +41,47 @@ const ROOM_ICONS: Record<string, typeof BookOpen> = {
   FRm: Flame, MR: Brain, SRm: Sparkles, "∞": Crown, OUTRO: Headphones,
 };
 
+function getShareUrl(tourId: string) {
+  return `${window.location.origin}/palace-tour?tour=${tourId}`;
+}
+
+function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?: "icon" | "sm" }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = getShareUrl(tour.id);
+    const text = `🎧 Take the "${tour.title}" Palace Tour — ${tour.subtitle}\n"${tour.verseText}"`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${tour.title} — Palace Audio Tour`, text, url });
+        return;
+      } catch { /* cancelled */ }
+    }
+
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast.success("Tour link copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (size === "sm") {
+    return (
+      <Button variant="ghost" size="sm" onClick={handleShare} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/20">
+        {copied ? <Check className="h-3.5 w-3.5" /> : <Share2 className="h-3.5 w-3.5" />}
+        {copied ? "Copied!" : "Share"}
+      </Button>
+    );
+  }
+
+  return (
+    <Button variant="ghost" size="icon" onClick={handleShare} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+      {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+    </Button>
+  );
+}
+
 function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }) {
   return (
     <div className="space-y-4">
@@ -66,8 +107,11 @@ function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }
                   "{tour.verseText}"
                 </p>
               </div>
-              <div className="text-xs text-muted-foreground whitespace-nowrap">
-                ~{Math.round(getTotalSeconds(tour) / 60)} min
+              <div className="flex items-center gap-2">
+                <ShareTourButton tour={tour} />
+                <div className="text-xs text-muted-foreground whitespace-nowrap">
+                  ~{Math.round(getTotalSeconds(tour) / 60)} min
+                </div>
               </div>
             </CardContent>
           </Card>
