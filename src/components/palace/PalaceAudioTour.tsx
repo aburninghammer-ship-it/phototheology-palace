@@ -260,6 +260,9 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
           >
             <ChevronLeft className="h-3 w-3" /> All Tours
           </button>
+          <div className="absolute top-4 right-4">
+            <ShareTourButton tour={tour} size="sm" />
+          </div>
           <div className="flex items-start gap-3">
             <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm">
               <Icon className="h-6 w-6" />
