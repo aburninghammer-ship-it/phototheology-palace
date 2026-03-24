@@ -14,6 +14,7 @@ const primaryNavItems = [
 ];
 
 const moreNavItems = [
+  { icon: Headphones, label: "Tour Palace", path: "/palace/tour" },
   { icon: GraduationCap, label: "Test Me", path: "/test-me" },
   { icon: Eye, label: "Prophecy Watch", path: "/prophecy-watch" },
   { icon: Scale, label: "Christ & Culture", path: "/culture-controversy" },
