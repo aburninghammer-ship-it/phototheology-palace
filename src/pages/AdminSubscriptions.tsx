@@ -654,8 +654,8 @@ export default function AdminSubscriptions() {
 
             <Card className="border-primary/50 bg-primary/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Current Suite Subscribers</CardTitle>
-                <CardDescription>Paid Suite monthly + annual only</CardDescription>
+                <CardTitle className="text-lg">Current Paying Subscribers</CardTitle>
+                <CardDescription>Suite + Church subscriptions only</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-primary">{stats.summary.total_paying_stripe}</div>
