@@ -54,20 +54,14 @@ function chunkScript(text: string): string[] {
 /** Generate TTS for a single chunk */
 async function generateChunkAudio(
   text: string,
-  voiceId: string,
+  voiceConfig: { id: string; settings: Record<string, unknown> },
   previousText?: string,
   nextText?: string
 ): Promise<ArrayBuffer> {
   const body: Record<string, unknown> = {
     text,
     model_id: "eleven_multilingual_v2",
-    voice_settings: {
-      stability: 0.6,
-      similarity_boost: 0.75,
-      style: 0.3,
-      use_speaker_boost: true,
-      speed: 0.95,
-    },
+    voice_settings: voiceConfig.settings,
   };
 
   // Use request stitching for multi-chunk continuity
@@ -75,7 +69,7 @@ async function generateChunkAudio(
   if (nextText) body.next_text = nextText.slice(0, 300);
 
   const resp = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceConfig.id}?output_format=mp3_44100_128`,
     {
       method: "POST",
       headers: {
