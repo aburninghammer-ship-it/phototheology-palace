@@ -86,6 +86,7 @@ const ChallengeBoard = lazy(() => import("./pages/ChallengeBoard"));
 const DailyVerse = lazy(() => import("./pages/DailyVerse"));
 const GrowthJournal = lazy(() => import("./pages/GrowthJournal"));
 const EquationsChallenge = lazy(() => import("./pages/EquationsChallenge"));
+const EquationBattle = lazy(() => import("./pages/EquationBattle"));
 const Games = lazy(() => import("./pages/Games"));
 const GameNightGuest = lazy(() => import("./pages/GameNightGuest"));
 const PTScrabble = lazy(() => import("./pages/PTScrabble"));
