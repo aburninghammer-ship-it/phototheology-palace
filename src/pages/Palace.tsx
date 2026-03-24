@@ -235,11 +235,15 @@ const Palace = () => {
             </div>
           </Card>
 
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "explore" | "progress")} className="mb-6">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "explore" | "progress" | "audio-tour")} className="mb-6">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="explore">
                 <Building2 className="h-4 w-4 mr-2" />
                 {t('palace.explorePalace')}
+              </TabsTrigger>
+              <TabsTrigger value="audio-tour">
+                <Headphones className="h-4 w-4 mr-2" />
+                Audio Tour
               </TabsTrigger>
               <TabsTrigger value="progress">
                 <Target className="h-4 w-4 mr-2" />
