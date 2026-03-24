@@ -546,8 +546,6 @@ const DailyChallenges = () => {
 
               {/* Jeeves-powered equation generator */}
               <InlineEquationGenerator onSubmit={handleChallengeSubmit} />
-                </Button>
-              </div>
               <ChallengeInlineSubmissions
                 challengeType="equation"
                 challengeTitle="Equation Challenge"
