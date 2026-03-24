@@ -9,7 +9,8 @@ import {
   User,
   PersonStanding,
   Eye,
-  Scale
+  Scale,
+  Headphones
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
