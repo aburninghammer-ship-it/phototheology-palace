@@ -10394,6 +10394,33 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
       );
     }
 
+    // For equation-battle-grade and equation-battle-split modes, parse JSON
+    if (mode === "equation-battle-grade" || mode === "equation-battle-split") {
+      try {
+        const rawContent = data.choices[0]?.message?.content || "";
+        const cleanedRaw = rawContent.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+        const jsonMatch = cleanedRaw.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return new Response(
+            JSON.stringify(parsed),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        const parsed = JSON.parse(cleanedRaw);
+        return new Response(
+          JSON.stringify(parsed),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch (e) {
+        console.error(`${mode} parse error:`, e, "content:", content.substring(0, 500));
+        return new Response(
+          JSON.stringify({ error: "Failed to parse battle results", rawContent: content.substring(0, 1000) }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     // For jeopardy modes, parse JSON directly to prevent text cleanup from corrupting responses
     if (mode === "jeopardy_question") {
       try {
