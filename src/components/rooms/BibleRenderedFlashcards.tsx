@@ -3,9 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Layers, Shuffle, RotateCcw, Check, X, Trophy, Eye, EyeOff, BookOpen, Lightbulb, Link2, LayoutGrid
+  Layers, Shuffle, RotateCcw, Check, X, Trophy, Eye, EyeOff, BookOpen
 } from "lucide-react";
 import { bibleRenderedSets, BibleRenderedSet } from "@/data/bibleRenderedSets";
 import { getFrameDetail } from "@/data/bibleRenderedFrameDetails";
