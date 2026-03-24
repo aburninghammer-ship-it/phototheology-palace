@@ -10060,7 +10060,7 @@ ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[
       "chain-chess", "chain-chess-feedback",
       "chain-chess-v2-opening", "chain-chess-v2-judge", "chain-chess-v2-response",
       "chain-chess-v3-opening", "chain-chess-v3-judge", "chain-chess-v3-response",
-      "equations-challenge", "solve-equation",
+      "equations-challenge", "solve-equation", "equation-battle-grade", "equation-battle-split",
       "generate-drills", "generate-chart", "generate-image", "generate-flashcards",
       "guesthouse_generate_prompt", "guesthouse_grade_response",
       "guesthouse_group_insight", "guesthouse_suggest_event",
