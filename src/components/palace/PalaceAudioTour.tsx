@@ -4,15 +4,16 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Play, Pause, SkipForward, SkipBack, Volume2, Loader2,
   Headphones, BookOpen, Flame, Eye, Gem, Brain, Crown,
   Telescope, Heart, Sparkles, Clock, Target, Layers, Scale,
-  Link2, Scroll, Search, Film, Image as ImageIcon
+  Link2, Scroll, Search, Film, Image as ImageIcon, ChevronLeft
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { ALL_TOUR_SEGMENTS, TourSegment, TOTAL_ESTIMATED_SECONDS } from "@/data/psalm23TourScript";
+import { ALL_TOURS, buildAllSegments, getTotalSeconds } from "@/data/tourScripts";
+import type { TourDefinition, TourSegment } from "@/data/tourScripts";
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 
 const FLOOR_COLORS: Record<number, string> = {
@@ -38,7 +39,45 @@ const ROOM_ICONS: Record<string, typeof BookOpen> = {
   FRm: Flame, MR: Brain, SRm: Sparkles, "∞": Crown, OUTRO: Headphones,
 };
 
-export function PalaceAudioTour() {
+function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }) {
+  return (
+    <div className="space-y-4">
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-bold mb-1">🎧 Palace Audio Tours</h3>
+        <p className="text-sm text-muted-foreground">
+          Jeeves &amp; Reginald guide you through every room using a single passage
+        </p>
+      </div>
+      <div className="grid gap-3">
+        {ALL_TOURS.map((tour) => (
+          <Card
+            key={tour.id}
+            className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-md"
+            onClick={() => onSelect(tour)}
+          >
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="text-3xl">{tour.emoji}</div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-base">{tour.title}</h4>
+                <p className="text-sm text-muted-foreground">{tour.subtitle}</p>
+                <p className="text-xs text-primary font-medium mt-1 italic">
+                  "{tour.verseText}"
+                </p>
+              </div>
+              <div className="text-xs text-muted-foreground whitespace-nowrap">
+                ~{Math.round(getTotalSeconds(tour) / 60)} min
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void }) {
+  const allSegments = buildAllSegments(tour);
+  const totalEstimated = getTotalSeconds(tour);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,10 +86,9 @@ export function PalaceAudioTour() {
   const [completedSegments, setCompletedSegments] = useState<Set<number>>(new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const currentSegment = ALL_TOUR_SEGMENTS[currentIndex];
-  const totalSegments = ALL_TOUR_SEGMENTS.length;
+  const currentSegment = allSegments[currentIndex];
+  const totalSegments = allSegments.length;
   const overallProgress = (completedSegments.size / totalSegments) * 100;
 
   const cleanupAudio = useCallback(() => {
@@ -72,7 +110,7 @@ export function PalaceAudioTour() {
     setIsLoading(true);
     setCurrentIndex(index);
 
-    const segment = ALL_TOUR_SEGMENTS[index];
+    const segment = allSegments[index];
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-palace-tour-audio", {
@@ -80,7 +118,7 @@ export function PalaceAudioTour() {
           segmentId: segment.id,
           guide: segment.guide,
           script: segment.script,
-          tourId: "psalm23",
+          tourId: tour.id,
         },
       });
 
@@ -92,27 +130,20 @@ export function PalaceAudioTour() {
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
 
-      audio.onloadedmetadata = () => {
-        setAudioDuration(audio.duration);
-      };
+      audio.onloadedmetadata = () => setAudioDuration(audio.duration);
 
       audio.onplay = () => {
         setIsPlaying(true);
         setIsLoading(false);
         progressIntervalRef.current = setInterval(() => {
-          if (audio) {
-            setAudioProgress(audio.currentTime);
-          }
+          if (audio) setAudioProgress(audio.currentTime);
         }, 250);
       };
 
       audio.onended = () => {
         setIsPlaying(false);
         setCompletedSegments(prev => { const next = new Set(prev); next.add(index); return next; });
-        if (progressIntervalRef.current) {
-          clearInterval(progressIntervalRef.current);
-        }
-        // Auto-advance
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
         if (index < totalSegments - 1) {
           setTimeout(() => playSegment(index + 1), 500);
         }
@@ -128,7 +159,7 @@ export function PalaceAudioTour() {
       console.error("Tour audio error:", err);
       setIsLoading(false);
     }
-  }, [cleanupAudio, totalSegments]);
+  }, [cleanupAudio, totalSegments, allSegments, tour.id]);
 
   const togglePlayPause = useCallback(() => {
     if (isLoading) return;
@@ -148,27 +179,20 @@ export function PalaceAudioTour() {
   }, [isPlaying, isLoading, currentIndex, playSegment]);
 
   const skipNext = useCallback(() => {
-    if (currentIndex < totalSegments - 1) {
-      playSegment(currentIndex + 1);
-    }
+    if (currentIndex < totalSegments - 1) playSegment(currentIndex + 1);
   }, [currentIndex, totalSegments, playSegment]);
 
   const skipPrev = useCallback(() => {
-    if (currentIndex > 0) {
-      playSegment(currentIndex - 1);
-    }
+    if (currentIndex > 0) playSegment(currentIndex - 1);
   }, [currentIndex, playSegment]);
 
   useEffect(() => {
     return () => cleanupAudio();
   }, [cleanupAudio]);
 
-  // Scroll active segment into view
   useEffect(() => {
     const activeEl = document.getElementById(`tour-seg-${currentIndex}`);
-    if (activeEl) {
-      activeEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
+    if (activeEl) activeEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [currentIndex]);
 
   const formatTime = (s: number) => {
@@ -182,8 +206,14 @@ export function PalaceAudioTour() {
   return (
     <Card className="overflow-hidden border-primary/20">
       <CardContent className="p-0">
-        {/* Now Playing Header */}
+        {/* Back button + Now Playing Header */}
         <div className={`bg-gradient-to-r ${FLOOR_COLORS[currentSegment.floor] || FLOOR_COLORS[0]} p-4 md:p-6 text-white`}>
+          <button
+            onClick={() => { cleanupAudio(); onBack(); }}
+            className="flex items-center gap-1 text-xs text-white/70 hover:text-white mb-3 transition-colors"
+          >
+            <ChevronLeft className="h-3 w-3" /> All Tours
+          </button>
           <div className="flex items-start gap-3">
             <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm">
               <Icon className="h-6 w-6" />
@@ -211,74 +241,43 @@ export function PalaceAudioTour() {
             </div>
           </div>
 
-          {/* Progress bar */}
           <div className="mt-4">
-            <Progress 
-              value={audioDuration > 0 ? (audioProgress / audioDuration) * 100 : 0} 
-              className="h-1.5 bg-white/20" 
-            />
+            <Progress value={audioDuration > 0 ? (audioProgress / audioDuration) * 100 : 0} className="h-1.5 bg-white/20" />
             <div className="flex justify-between text-xs text-white/70 mt-1">
               <span>{formatTime(audioProgress)}</span>
               <span>{formatTime(audioDuration)}</span>
             </div>
           </div>
 
-          {/* Controls */}
           <div className="flex items-center justify-center gap-4 mt-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={skipPrev}
-              disabled={currentIndex === 0 || isLoading}
-              className="text-white hover:bg-white/20 h-10 w-10"
-            >
+            <Button variant="ghost" size="icon" onClick={skipPrev} disabled={currentIndex === 0 || isLoading} className="text-white hover:bg-white/20 h-10 w-10">
               <SkipBack className="h-5 w-5" />
             </Button>
-            <Button
-              size="icon"
-              onClick={togglePlayPause}
-              disabled={isLoading}
-              className="h-14 w-14 rounded-full bg-white text-foreground hover:bg-white/90 shadow-lg"
-            >
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : isPlaying ? (
-                <Pause className="h-6 w-6" />
-              ) : (
-                <Play className="h-6 w-6 ml-0.5" />
-              )}
+            <Button size="icon" onClick={togglePlayPause} disabled={isLoading} className="h-14 w-14 rounded-full bg-white text-foreground hover:bg-white/90 shadow-lg">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={skipNext}
-              disabled={currentIndex === totalSegments - 1 || isLoading}
-              className="text-white hover:bg-white/20 h-10 w-10"
-            >
+            <Button variant="ghost" size="icon" onClick={skipNext} disabled={currentIndex === totalSegments - 1 || isLoading} className="text-white hover:bg-white/20 h-10 w-10">
               <SkipForward className="h-5 w-5" />
             </Button>
           </div>
 
-          {/* Overall progress */}
           <div className="flex items-center justify-center gap-2 mt-3 text-xs text-white/70">
             <Volume2 className="h-3 w-3" />
             <span>{currentIndex + 1} of {totalSegments} segments</span>
             <span>•</span>
-            <span>~{Math.round(TOTAL_ESTIMATED_SECONDS / 60)} min total</span>
+            <span>~{Math.round(totalEstimated / 60)} min total</span>
           </div>
         </div>
 
-        {/* Script text */}
         <div className="p-4 bg-muted/30 border-b">
           <p className="text-sm text-muted-foreground italic leading-relaxed">
             "{currentSegment.script.substring(0, 200)}..."
           </p>
         </div>
 
-        {/* Segment list */}
-        <ScrollArea className="h-[320px]" ref={scrollRef}>
+        <ScrollArea className="h-[320px]">
           <div className="p-2 space-y-1">
-            {ALL_TOUR_SEGMENTS.map((seg, i) => {
+            {allSegments.map((seg, i) => {
               const SegIcon = ROOM_ICONS[seg.roomCode] || BookOpen;
               const isActive = i === currentIndex;
               const isCompleted = completedSegments.has(i);
@@ -289,11 +288,9 @@ export function PalaceAudioTour() {
                   id={`tour-seg-${i}`}
                   onClick={() => playSegment(i)}
                   className={`w-full text-left p-3 rounded-lg flex items-center gap-3 transition-all ${
-                    isActive
-                      ? "bg-primary/10 border border-primary/30"
-                      : isCompleted
-                      ? "bg-muted/50 opacity-70"
-                      : "hover:bg-muted/30"
+                    isActive ? "bg-primary/10 border border-primary/30"
+                    : isCompleted ? "bg-muted/50 opacity-70"
+                    : "hover:bg-muted/30"
                   }`}
                 >
                   <div className={`p-1.5 rounded-lg bg-gradient-to-br ${FLOOR_COLORS[seg.floor] || FLOOR_COLORS[0]} text-white flex-shrink-0`}>
@@ -330,7 +327,6 @@ export function PalaceAudioTour() {
           </div>
         </ScrollArea>
 
-        {/* Overall Progress Footer */}
         <div className="p-3 border-t bg-muted/20">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
             <span>Tour Progress</span>
@@ -341,4 +337,14 @@ export function PalaceAudioTour() {
       </CardContent>
     </Card>
   );
+}
+
+export function PalaceAudioTour() {
+  const [selectedTour, setSelectedTour] = useState<TourDefinition | null>(null);
+
+  if (selectedTour) {
+    return <TourPlayer tour={selectedTour} onBack={() => setSelectedTour(null)} />;
+  }
+
+  return <TourSelector onSelect={setSelectedTour} />;
 }
