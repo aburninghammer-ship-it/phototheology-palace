@@ -671,7 +671,7 @@ export default function AdminSubscriptions() {
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
                   Stripe Active
                 </CardTitle>
-                <CardDescription>Paid Suite subscribers only (live)</CardDescription>
+                <CardDescription>Paid subscribers only — Suite + Church (live)</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-green-600">{stats.stripe.active_subscriptions}</div>
