@@ -166,7 +166,14 @@ const BibleRenderedFlashcards = () => {
                     <Badge className="mb-2">Set #{current.number}</Badge>
                     <h2 className="text-2xl font-bold">{current.name}</h2>
                     <p className="text-lg text-primary font-semibold">{current.range}</p>
-                    <p className="text-sm text-muted-foreground max-w-md">{current.description}</p>
+                    <p className="text-sm text-muted-foreground max-w-md leading-relaxed">{current.description}</p>
+                    {current.symbols.length > 0 && (
+                      <div className="flex flex-wrap gap-1 justify-center pt-1">
+                        {current.symbols.slice(0, 4).map((s, i) => (
+                          <Badge key={i} variant="outline" className="text-[10px]">{s}</Badge>
+                        ))}
+                      </div>
+                    )}
                     <p className="text-xs text-muted-foreground flex items-center gap-1 justify-center mt-4">
                       <EyeOff className="h-4 w-4" /> Tap to flip back
                     </p>
