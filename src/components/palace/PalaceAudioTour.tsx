@@ -108,7 +108,7 @@ export function PalaceAudioTour() {
 
       audio.onended = () => {
         setIsPlaying(false);
-        setCompletedSegments(prev => new Set([...prev, index]));
+        setCompletedSegments(prev => { const next = new Set(prev); next.add(index); return next; });
         if (progressIntervalRef.current) {
           clearInterval(progressIntervalRef.current);
         }
