@@ -529,14 +529,15 @@ const DailyChallenges = () => {
                   description: "Decode this PT equation to discover how Palace principles reveal Christ in this verse.",
                   verses: ["For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."],
                   ui_config: {
-                    equation: "CR(🌍) + ST(🐑→✝️) + @CyC + DR(5D) = FRt(∞)",
+                    equation: "CR + ST + @CyC + DR + BL = FRt",
                     verse_text: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
                     hints: [
-                      "CR(🌍) = Concentration Room — Christ is the center of God's love for the world",
-                      "ST(🐑→✝️) = Symbols/Types Room — The Lamb (type) points to the Cross (antitype)",
-                      "@CyC = Cyrus–Christ Cycle — The ultimate Deliverer fulfills covenant promise",
-                      "DR(5D) = Dimensions Room — Literal gift, Christ as sacrifice, personal faith, church salvation, heavenly life",
-                      "FRt(∞) = Fruit Room — Everlasting life is the fruit of believing"
+                      "CR = Concentration Room — Where is Christ? He is the gift given for the world",
+                      "ST = Symbols/Types Room — 'Only begotten Son' is the antitype of the Passover lamb sacrificed for deliverance",
+                      "@CyC = Cyrus–Christ Cycle — The ultimate Deliverer fulfills the covenant promise of Genesis 3:15",
+                      "DR = Dimensions Room — Literal (God gave), Christ (the Son), Me (whosoever believeth), Church (the world), Heaven (everlasting life)",
+                      "BL = Blue Room (Sanctuary) — The gift follows the sanctuary pattern: altar (sacrifice), mercy seat (grace), ark (covenant)",
+                      "FRt = Fruit Room — The fruit of this truth is love, assurance, and everlasting life"
                     ]
                   }
                 }}
