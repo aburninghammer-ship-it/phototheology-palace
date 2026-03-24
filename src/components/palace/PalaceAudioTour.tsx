@@ -133,6 +133,8 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const activeRequestRef = useRef(0);
+  const segmentAudioCacheRef = useRef<Map<number, string>>(new Map());
+  const segmentAudioRequestRef = useRef<Map<number, Promise<string>>>(new Map());
 
   const currentSegment = allSegments[currentIndex];
   const totalSegments = allSegments.length;
@@ -147,6 +149,8 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
       audio.pause();
       audio.src = "";
       audioRef.current = null;
+      segmentAudioCacheRef.current.clear();
+      segmentAudioRequestRef.current.clear();
     };
   }, []);
 
@@ -164,11 +168,56 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
     setAudioDuration(0);
   }, []);
 
+  const fetchSegmentAudioUrl = useCallback(async (index: number, regenerate = false) => {
+    if (index < 0 || index >= allSegments.length) {
+      throw new Error(`Invalid tour segment index: ${index}`);
+    }
+
+    if (!regenerate) {
+      const cachedUrl = segmentAudioCacheRef.current.get(index);
+      if (cachedUrl) return cachedUrl;
+
+      const inFlightRequest = segmentAudioRequestRef.current.get(index);
+      if (inFlightRequest) return inFlightRequest;
+    }
+
+    const segment = allSegments[index];
+    const request = supabase.functions.invoke("generate-palace-tour-audio", {
+      body: {
+        segmentId: segment.id,
+        guide: segment.guide,
+        script: segment.script,
+        tourId: tour.id,
+        regenerate,
+      },
+    }).then(({ data, error }) => {
+      if (error) throw error;
+      const audioUrl = data?.audioUrl;
+      if (!audioUrl) throw new Error("No audio URL returned");
+      segmentAudioCacheRef.current.set(index, audioUrl);
+      return audioUrl as string;
+    }).finally(() => {
+      segmentAudioRequestRef.current.delete(index);
+    });
+
+    segmentAudioRequestRef.current.set(index, request);
+    return request;
+  }, [allSegments, tour.id]);
+
+  const preloadSegment = useCallback((index: number) => {
+    if (index < 0 || index >= totalSegments) return;
+    if (segmentAudioCacheRef.current.has(index) || segmentAudioRequestRef.current.has(index)) return;
+
+    void fetchSegmentAudioUrl(index).catch((err) => {
+      console.warn("Tour preload failed for segment:", allSegments[index]?.id, err);
+    });
+  }, [allSegments, fetchSegmentAudioUrl, totalSegments]);
+
   const playSegment = useCallback(async (index: number) => {
     cleanupAudio();
     setIsLoading(true);
     setCurrentIndex(index);
-    const requestId = Date.now();
+    const requestId = activeRequestRef.current + 1;
     activeRequestRef.current = requestId;
 
     const segment = allSegments[index];
@@ -180,20 +229,7 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke("generate-palace-tour-audio", {
-        body: {
-          segmentId: segment.id,
-          guide: segment.guide,
-          script: segment.script,
-          tourId: tour.id,
-          regenerate: true,
-        },
-      });
-
-      if (error) throw error;
-
-      const audioUrl = data?.audioUrl;
-      if (!audioUrl) throw new Error("No audio URL returned");
+      const audioUrl = await fetchSegmentAudioUrl(index);
 
       if (activeRequestRef.current !== requestId) return;
 
@@ -212,18 +248,28 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
         if (activeRequestRef.current !== requestId) return;
         setIsPlaying(true);
         setIsLoading(false);
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
         progressIntervalRef.current = setInterval(() => {
-          if (audio) setAudioProgress(audio.currentTime);
+          if (audioRef.current) setAudioProgress(audioRef.current.currentTime);
         }, 250);
+        preloadSegment(index + 1);
       };
 
       audio.onended = () => {
         if (activeRequestRef.current !== requestId) return;
         setIsPlaying(false);
-        setCompletedSegments(prev => { const next = new Set(prev); next.add(index); return next; });
-        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+        setCompletedSegments(prev => {
+          const next = new Set(prev);
+          next.add(index);
+          return next;
+        });
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
         if (index < totalSegments - 1) {
-          setTimeout(() => playSegment(index + 1), 500);
+          preloadSegment(index + 1);
+          setTimeout(() => playSegment(index + 1), 150);
         }
       };
 
@@ -232,9 +278,9 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
         console.error("Audio playback error for segment:", segment.id, e);
         setIsPlaying(false);
         setIsLoading(false);
-        // Auto-skip to next segment on error
         if (index < totalSegments - 1) {
-          setTimeout(() => playSegment(index + 1), 1000);
+          preloadSegment(index + 1);
+          setTimeout(() => playSegment(index + 1), 500);
         }
       };
 
@@ -243,12 +289,12 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
       if (activeRequestRef.current !== requestId) return;
       console.error("Tour audio error for segment:", segment?.id, err);
       setIsLoading(false);
-      // Auto-skip to next segment on error
       if (index < totalSegments - 1) {
-        setTimeout(() => playSegment(index + 1), 1500);
+        preloadSegment(index + 1);
+        setTimeout(() => playSegment(index + 1), 750);
       }
     }
-  }, [cleanupAudio, totalSegments, allSegments, tour.id]);
+  }, [allSegments, cleanupAudio, fetchSegmentAudioUrl, preloadSegment, totalSegments]);
 
   const togglePlayPause = useCallback(() => {
     if (isLoading) return;

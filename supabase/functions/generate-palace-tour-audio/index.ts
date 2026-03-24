@@ -152,7 +152,7 @@ serve(async (req) => {
     for (let i = 0; i < chunks.length; i++) {
       const previousText = i > 0 ? chunks[i - 1] : undefined;
       const nextText = i < chunks.length - 1 ? chunks[i + 1] : undefined;
-      const buffer = await generateChunkAudio(chunks[i], voiceId, previousText, nextText);
+      const buffer = await generateChunkAudio(chunks[i], voiceConfig, previousText, nextText);
       audioBuffers.push(buffer);
     }
 
