@@ -168,10 +168,16 @@ const BibleRenderedFlashcards = () => {
                   <ScrollArea className="max-h-[480px]">
                     <div className="space-y-4 pr-2">
                       {/* Header */}
-                      <div className="text-center space-y-1">
+                      <div className="text-center space-y-2">
                         <Badge className="mb-1">Frame #{current.number}</Badge>
                         <h2 className="text-xl font-bold">{current.name}</h2>
-                        <p className="text-sm text-primary font-semibold">{current.range}</p>
+                        <div className="flex items-center gap-2 justify-center flex-wrap">
+                          <Badge variant="outline">{current.range}</Badge>
+                          <Badge variant={current.testament === "new" ? "default" : "secondary"}>
+                            {current.testament === "new" ? "NT" : "OT"}
+                          </Badge>
+                          <Badge variant="outline">{current.chapters} ch</Badge>
+                        </div>
                       </div>
 
                       {/* Theme Description */}
