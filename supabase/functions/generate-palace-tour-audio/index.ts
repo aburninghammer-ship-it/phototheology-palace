@@ -112,7 +112,7 @@ serve(async (req) => {
   }
 
   try {
-    const { segmentId, guide, script, tourId } = await req.json();
+    const { segmentId, guide, script, tourId, regenerate } = await req.json();
 
     if (!segmentId || !guide || !script) {
       return new Response(
@@ -124,18 +124,20 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const storagePath = `palace-tours/${tourId || "psalm23"}/${segmentId}.mp3`;
 
-    // Check cache first
-    const { data: existing } = await supabase.storage
-      .from(BUCKET)
-      .createSignedUrl(storagePath, 3600);
+    // Check cache first (skip if regenerate flag is set)
+    if (!regenerate) {
+      const { data: existing } = await supabase.storage
+        .from(BUCKET)
+        .createSignedUrl(storagePath, 3600);
 
-    if (existing?.signedUrl) {
-      const checkResp = await fetch(existing.signedUrl, { method: "HEAD" });
-      if (checkResp.ok) {
-        return new Response(
-          JSON.stringify({ audioUrl: existing.signedUrl, cached: true }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      if (existing?.signedUrl) {
+        const checkResp = await fetch(existing.signedUrl, { method: "HEAD" });
+        if (checkResp.ok) {
+          return new Response(
+            JSON.stringify({ audioUrl: existing.signedUrl, cached: true }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
       }
     }
 
