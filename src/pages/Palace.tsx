@@ -281,12 +281,6 @@ const Palace = () => {
             </TabsContent>
 
             <TabsContent value="audio-tour" className="space-y-4">
-              <div className="text-center mb-4">
-                <h3 className="text-xl font-bold mb-1">🎧 Psalm 23 Palace Walkthrough</h3>
-                <p className="text-sm text-muted-foreground">
-                  Jeeves &amp; Reginald guide you through every room using Psalm 23 (~10 min)
-                </p>
-              </div>
               <PalaceAudioTour />
             </TabsContent>
 
