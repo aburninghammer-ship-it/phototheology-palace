@@ -671,12 +671,12 @@ export default function AdminSubscriptions() {
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
                   Active Subscribers
                 </CardTitle>
-                <CardDescription>All active subscriptions (DB)</CardDescription>
+                <CardDescription>All active Stripe subscriptions</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold text-green-600">{stats.database.by_status.active || 0}</div>
+                <div className="text-4xl font-bold text-green-600">{stats.stripe.active_subscriptions}</div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Stripe API: {stats.stripe.active_subscriptions}
+                  DB synced: {stats.database.by_status.active || 0}
                 </p>
               </CardContent>
             </Card>
