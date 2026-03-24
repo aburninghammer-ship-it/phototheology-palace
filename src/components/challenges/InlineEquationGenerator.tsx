@@ -19,6 +19,10 @@ const difficultyInfo: Record<Difficulty, { symbols: number; description: string 
   pro: { symbols: 12, description: "12 principles" },
 };
 
+interface InlineEquationGeneratorProps {
+  onSubmit: (data: any) => void;
+}
+
 export const InlineEquationGenerator = ({ onSubmit }: InlineEquationGeneratorProps) => {
   const [suggestedVerse, setSuggestedVerse] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
