@@ -522,11 +522,18 @@ const DailyChallenges = () => {
               <EquationDecodeChallenge 
                 challenge={{
                   title: "Equation Challenge",
+                  passage_reference: "John 3:16",
                   description: "Decode this biblical equation to discover its deeper meaning.",
-                  verses: ["John 3:16"],
+                  verses: ["For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."],
                   ui_config: {
                     equation: "🌍 + ❤️ + 🎁 = ∞",
-                    verse_context: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
+                    verse_text: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
+                    hints: [
+                      "🌍 = The world (all humanity)",
+                      "❤️ = God's love (agape)",
+                      "🎁 = The gift of His Son",
+                      "∞ = Everlasting life"
+                    ]
                   }
                 }}
                 onSubmit={handleChallengeSubmit}
