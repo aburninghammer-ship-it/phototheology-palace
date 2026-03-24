@@ -276,7 +276,7 @@ export function AdminUserManagement() {
             <CardDescription>Active</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+            <div className="text-2xl font-bold text-green-600">{stripeActiveCount ?? stats.active}</div>
           </CardContent>
         </Card>
         <Card className="border-blue-500/50">
