@@ -510,18 +510,32 @@ const DailyChallenges = () => {
             </TabsContent>
 
             <TabsContent value="equations" className="space-y-6">
-              <div className="bg-gradient-to-r from-primary/10 to-indigo-500/5 p-4 rounded-lg border border-primary/20">
-                <h2 className="font-semibold mb-2 flex items-center gap-2">
-                  <Calculator className="h-5 w-5 text-primary" />
-                  About Equation Challenges
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Decode biblical equations using Palace principles and symbols.
-                  Each symbol maps to a PT room or principle — discover how Scripture speaks through the Palace framework.
-                </p>
-              </div>
+              <Card className="border-border bg-card">
+                <CardContent className="space-y-3 p-5">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="h-5 w-5 text-primary" />
+                    <h2 className="font-semibold">Build an Equation Challenge</h2>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    First, either enter a verse or passage for Jeeves to encode, or leave it blank and let Jeeves generate one for you.
+                  </p>
+                </CardContent>
+              </Card>
 
-              {/* Example equation with PT principle symbols */}
+              <InlineEquationGenerator onSubmit={handleChallengeSubmit} />
+
+              <Card className="border-border bg-card">
+                <CardContent className="space-y-3 p-5">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold">PT example</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Here is a worked PT example to decode after you generate your own.
+                  </p>
+                </CardContent>
+              </Card>
+
               <EquationDecodeChallenge 
                 challenge={{
                   title: "Sample Equation — John 3:16",
@@ -545,8 +559,6 @@ const DailyChallenges = () => {
                 hasSubmitted={false}
               />
 
-              {/* Jeeves-powered equation generator */}
-              <InlineEquationGenerator onSubmit={handleChallengeSubmit} />
               <ChallengeInlineSubmissions
                 challengeType="equation"
                 challengeTitle="Equation Challenge"
