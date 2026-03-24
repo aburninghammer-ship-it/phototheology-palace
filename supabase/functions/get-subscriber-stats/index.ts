@@ -15,6 +15,15 @@ const SUITE_MONTHLY_PRICE_ID = 'price_1SZNyiFGDAd3RU8I4JHYEsEi';
 const SUITE_ANNUAL_PRICE_ID = 'price_1SZNyuFGDAd3RU8IjeGIvPEb';
 const suitePriceIds = new Set([SUITE_MONTHLY_PRICE_ID, SUITE_ANNUAL_PRICE_ID]);
 
+// Church price IDs
+const CHURCH_SMALL_PRICE_ID = 'price_1SNEzoFGDAd3RU8Iwa8PSyLw';
+const CHURCH_TIER1_PRICE_ID = 'price_1SNFDxFGDAd3RU8IrvW3c5eS';
+const CHURCH_TIER2_PRICE_ID = 'price_1SNFFMFGDAd3RU8IoasLs7ag';
+const churchPriceIds = new Set([CHURCH_SMALL_PRICE_ID, CHURCH_TIER1_PRICE_ID, CHURCH_TIER2_PRICE_ID]);
+
+// All paying subscription price IDs (Suite + Church)
+const allPayingPriceIds = new Set([...suitePriceIds, ...churchPriceIds]);
+
 // Price ID to tier mapping - used for tier classification
 // Product names will be fetched from Stripe directly for accurate display
 const priceToTierMap: Record<string, { tier: string; monthlyPrice: number }> = {
@@ -61,7 +70,7 @@ const priceToTier: Record<string, string> = Object.fromEntries(
 const appStripeTiers = new Set(['essential', 'premium', 'student', 'church']);
 
 // Helper to fetch all Stripe subscriptions with pagination
-// Filters to the two Suite price IDs only.
+// Filters to all paying price IDs (Suite + Church).
 async function fetchAllStripeSubscriptions(
   stripe: Stripe,
   status: 'active' | 'trialing' | 'canceled'
@@ -80,12 +89,12 @@ async function fetchAllStripeSubscriptions(
 
     const batch = await stripe.subscriptions.list(params);
 
-    const suiteSubscriptions = batch.data.filter((sub) => {
+    const payingSubscriptions = batch.data.filter((sub) => {
       const priceId = sub.items.data[0]?.price?.id;
-      return !!priceId && suitePriceIds.has(priceId);
+      return !!priceId && allPayingPriceIds.has(priceId);
     });
 
-    allSubscriptions.push(...suiteSubscriptions);
+    allSubscriptions.push(...payingSubscriptions);
     hasMore = batch.has_more;
     if (batch.data.length > 0) {
       startingAfter = batch.data[batch.data.length - 1].id;
