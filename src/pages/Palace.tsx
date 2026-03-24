@@ -35,7 +35,7 @@ const Palace = () => {
   const { completedRooms, completedRoomIds, totalRooms, progressPercentage, loading } = usePalaceProgress();
   const { showTour, loading: tourLoading, completeTour, skipTour } = usePalaceTour();
   const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState<"explore" | "progress">("explore");
+  const [activeTab, setActiveTab] = useState<"explore" | "progress" | "audio-tour">("explore");
   const [viewMode, setViewMode] = useState<"visual" | "list" | "3d">("list");
 
   const handleTourComplete = () => {
