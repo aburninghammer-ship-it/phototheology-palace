@@ -120,10 +120,14 @@ serve(async (req) => {
       );
     }
 
-    // Fallback: return raw audio
-    return new Response(audioBuffer, {
-      headers: { ...corsHeaders, "Content-Type": "audio/mpeg" },
-    });
+    // Fallback: encode as base64 data URI so client can still play it
+    const { encode: base64Encode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+    const base64Audio = base64Encode(audioBuffer);
+    const dataUri = `data:audio/mpeg;base64,${base64Audio}`;
+    return new Response(
+      JSON.stringify({ audioUrl: dataUri, cached: false }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (err) {
     console.error("Palace tour audio error:", err);
     return new Response(
