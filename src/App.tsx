@@ -286,6 +286,7 @@ const Polish = lazy(() => import("./pages/Polish"));
 const SparksLibrary = lazy(() => import("./pages/SparksLibrary"));
 const Libraries = lazy(() => import("./pages/Libraries"));
 const PalaceFreestyle = lazy(() => import("./pages/PalaceFreestyle"));
+const PalaceTourPage = lazy(() => import("./pages/PalaceTour"));
 const MindMapPalace = lazy(() => import("./pages/MindMapPalace"));
 const GraphicsGallery = lazy(() => import("./pages/GraphicsGallery"));
 const Devotionals = lazy(() => import("./pages/Devotionals"));
