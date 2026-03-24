@@ -11,15 +11,33 @@ const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const VOICE_IDS = {
-  jeeves: "JBFqnCBsd6RMkjVDRZzb",
-  reginald: "onwK4e9ZLuTAKqWW03F9",
-};
+const VOICE_CONFIGS = {
+  jeeves: {
+    id: "nPczCjzI2devNBz1zQrb",
+    settings: {
+      stability: 0.82,
+      similarity_boost: 0.78,
+      style: 0.08,
+      use_speaker_boost: true,
+      speed: 0.92,
+    },
+  },
+  reginald: {
+    id: "onwK4e9ZLuTAKqWW03F9",
+    settings: {
+      stability: 0.7,
+      similarity_boost: 0.75,
+      style: 0.18,
+      use_speaker_boost: true,
+      speed: 0.95,
+    },
+  },
+} as const;
 
 const BUCKET = "audio-cache";
 const MAX_CHUNK_CHARS = 4500;
+const VOICE_CACHE_VERSION = "v4-calm-american-jeeves";
 
-/** Split text into chunks at sentence boundaries, each ≤ MAX_CHUNK_CHARS */
 function chunkScript(text: string): string[] {
   if (text.length <= MAX_CHUNK_CHARS) return [text];
 
@@ -32,7 +50,6 @@ function chunkScript(text: string): string[] {
       break;
     }
 
-    // Find a sentence boundary near the limit
     let splitAt = MAX_CHUNK_CHARS;
     const searchWindow = remaining.substring(Math.floor(MAX_CHUNK_CHARS * 0.7), MAX_CHUNK_CHARS);
     const lastPeriod = searchWindow.lastIndexOf(". ");
@@ -51,7 +68,6 @@ function chunkScript(text: string): string[] {
   return chunks;
 }
 
-/** Generate TTS for a single chunk */
 async function generateChunkAudio(
   text: string,
   voiceConfig: { id: string; settings: Record<string, unknown> },
@@ -64,7 +80,6 @@ async function generateChunkAudio(
     voice_settings: voiceConfig.settings,
   };
 
-  // Use request stitching for multi-chunk continuity
   if (previousText) body.previous_text = previousText.slice(-300);
   if (nextText) body.next_text = nextText.slice(0, 300);
 
@@ -88,15 +103,16 @@ async function generateChunkAudio(
   return resp.arrayBuffer();
 }
 
-/** Concatenate multiple MP3 ArrayBuffers */
 function concatBuffers(buffers: ArrayBuffer[]): Uint8Array {
   const totalLength = buffers.reduce((sum, b) => sum + b.byteLength, 0);
   const result = new Uint8Array(totalLength);
   let offset = 0;
+
   for (const buf of buffers) {
     result.set(new Uint8Array(buf), offset);
     offset += buf.byteLength;
   }
+
   return result;
 }
 
@@ -115,10 +131,17 @@ serve(async (req) => {
       );
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const storagePath = `palace-tours/${tourId || "psalm23"}/${segmentId}.mp3`;
+    if (!ELEVENLABS_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "ElevenLabs API key not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    // Check cache first (skip if regenerate flag is set)
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const voiceConfig = VOICE_CONFIGS[guide as keyof typeof VOICE_CONFIGS] || VOICE_CONFIGS.jeeves;
+    const storagePath = `palace-tours/${tourId || "psalm23"}/${VOICE_CACHE_VERSION}/${guide}-${voiceConfig.id}/${segmentId}.mp3`;
+
     if (!regenerate) {
       const { data: existing } = await supabase.storage
         .from(BUCKET)
@@ -135,19 +158,9 @@ serve(async (req) => {
       }
     }
 
-    if (!ELEVENLABS_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: "ElevenLabs API key not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const voiceId = VOICE_IDS[guide as keyof typeof VOICE_IDS] || VOICE_IDS.jeeves;
     const chunks = chunkScript(script);
-
     console.log(`Generating ${chunks.length} chunk(s) for segment "${segmentId}" (${script.length} chars)`);
 
-    // Generate all chunks with request stitching
     const audioBuffers: ArrayBuffer[] = [];
     for (let i = 0; i < chunks.length; i++) {
       const previousText = i > 0 ? chunks[i - 1] : undefined;
@@ -156,12 +169,10 @@ serve(async (req) => {
       audioBuffers.push(buffer);
     }
 
-    // Concatenate all chunks
     const finalAudio = chunks.length === 1
       ? new Uint8Array(audioBuffers[0])
       : concatBuffers(audioBuffers);
 
-    // Cache to storage
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
       .upload(storagePath, finalAudio, {
@@ -173,7 +184,6 @@ serve(async (req) => {
       console.error("Storage upload error:", uploadError);
     }
 
-    // Return signed URL
     const { data: signedData } = await supabase.storage
       .from(BUCKET)
       .createSignedUrl(storagePath, 3600);
@@ -185,10 +195,10 @@ serve(async (req) => {
       );
     }
 
-    // Fallback: base64 data URI
     const { encode: base64Encode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
     const base64Audio = base64Encode(finalAudio);
     const dataUri = `data:audio/mpeg;base64,${base64Audio}`;
+
     return new Response(
       JSON.stringify({ audioUrl: dataUri, cached: false }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
