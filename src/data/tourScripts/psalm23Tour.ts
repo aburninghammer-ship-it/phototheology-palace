@@ -28,8 +28,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "SR",
       roomName: "Story Room",
       title: "Collecting the Story",
-      script: `Welcome to the first floor, the Furnishing Floor, where we stock the shelves of memory. In the Story Room, your job is simple: collect and remember the story beats. Psalm 23 has six vivid scenes. Scene one: green pastures, lying down in safety. Scene two: still waters, the soul being restored. Scene three: paths of righteousness, guided walking. Scene four: the valley of shadow, darkness all around but no fear. Scene five: a table set before enemies, anointing oil, an overflowing cup. Scene six: goodness and mercy following, dwelling in God's house forever. Store these as a mental film strip: pasture, water, path, valley, table, house. That sequence is now on your shelf, ready to be pulled down and used on every floor above. The power of this principle is simple but devastating: without the raw story memorized, every other room operates on fumes. The Story Room is the foundation that makes the entire palace possible.`,
-      estimatedSeconds: 45,
+      script: `Welcome to the first floor, the Furnishing Floor, where we stock the shelves of memory. In the Story Room, your job is to collect and remember the story beats in vivid sequence. Psalm 23 has six scenes that form a complete dramatic arc. Scene one: green pastures, lying down in safety — total provision. Scene two: still waters, the soul being restored — inner healing. Scene three: paths of righteousness, guided walking — moral direction. Scene four: the valley of the shadow of death, darkness pressing in from every side but no fear — crisis and presence. Scene five: a banquet table set in full view of enemies, oil poured on the head, a cup overflowing — vindication and abundance. Scene six: goodness and mercy pursuing like loyal hounds, dwelling in God's house forever — eternal security. Now here's the gem most people miss: this psalm moves from pastoral countryside to royal banquet hall. David begins as a sheep and ends as a guest of honor. That transition is the gospel in miniature — we begin as wandering sheep and end as guests at the King's table. Store this as a mental film strip: pasture, water, path, valley, table, house. Without these raw story beats memorized, every other room operates on fumes. The Story Room is the foundation that makes the entire palace possible.`,
+      estimatedSeconds: 55,
     },
     {
       id: "f1-ir",
@@ -39,8 +39,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "IR",
       roomName: "Imagination Room",
       title: "Stepping Inside the Psalm",
-      script: `Now step into the Imagination Room. Don't just read Psalm 23 — be there. Feel the cool grass under your bare feet in those green pastures. Hear the quiet babble of still waters. Smell the damp earth along the path. Now the mood shifts. You're in the valley. Shadows press in from every side. But then you feel something solid — the shepherd's rod. You hear his voice: "Keep walking. I'm here." And suddenly the valley opens into a banquet hall. Oil drips from your forehead. Your cup spills over. This is what the Imagination Room does — it turns words into lived experience, and lived experience into permanent memory. The power of sanctified imagination is this: what you can picture, you can remember. What you remember, you can teach. In the Suite, the AI Image Generator can actually create visual scenes from your text, giving you a concrete image to anchor your imagination. Try generating a scene of the valley opening into a feast hall — you'll never forget Psalm 23 again.`,
-      estimatedSeconds: 50,
+      script: `Now step into the Imagination Room, where we don't just read Psalm 23 — we live it. Feel the cool grass under your bare feet in those green pastures. The ground is soft because it's well watered. You can hear birdsong. There's no rush, no agenda — the Shepherd has made you lie down, which means there's no predator nearby, no unrest in the flock, no hunger driving you to keep moving. Now hear the quiet babble of still waters — not a rushing torrent that would frighten a sheep, but calm water deliberately chosen by a shepherd who knows his flock. Now the mood shifts. You're in the valley. The walls close in. Shadows press from every side. You can barely see. But then you feel something solid against your side — the shepherd's rod, a weapon against predators. And his staff, hooked at the end, ready to pull you back if you slip. You hear his voice ahead: "Keep walking. I'm here." And suddenly the valley opens. You step into a banquet hall, and your enemies are watching from the edges, unable to touch you. Oil drips from your forehead — the ancient sign of honored guest — and your cup doesn't just get filled, it spills over. This is what the Imagination Room does: it converts text into experience, and experience into permanent memory. In the Suite, the AI Image Generator can create visual scenes from any text, giving you concrete images to anchor your imagination.`,
+      estimatedSeconds: 60,
     },
     {
       id: "f1-24f",
@@ -50,8 +50,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "24F",
       roomName: "24FPS Room",
       title: "One Frame for the Chapter",
-      script: `The 24FPS Room creates one symbolic image per chapter. For Psalm 23, your single frame might be a shepherd's crook resting across a banquet table. That crook-on-table captures the entire arc: the pastoral shepherd of verses one through four transitions into the royal host of verses five and six. One image, one chapter, permanently stored. The power of this principle is compression: the entire Bible becomes a mental movie you can scan in minutes. In the Suite, the 24FPS section gives you pre-built symbolic frames for every chapter, complete with memory hooks and symbols. You can browse them, study them, and use them as flashcards to build your mental film library.`,
-      estimatedSeconds: 35,
+      script: `The 24FPS Room creates one symbolic image per chapter — like a single film frame that captures the essence. For Psalm 23, your frame might be a shepherd's crook resting across a banquet table. That single image captures the entire theological arc: the pastoral shepherd of verses one through four transitions into the royal host of verses five and six. Here's why that matters theologically: David himself made the same transition. He went from tending sheep in Bethlehem's fields to sitting at a royal table in Jerusalem. And Christ makes the same transition in reverse — from heaven's throne to earth's pasture, becoming the Shepherd who walks among the flock. One frame, one chapter, permanently stored. In the Suite, the 24FPS section gives you pre-built symbolic frames for every chapter, complete with memory hooks you can browse and study as flashcards.`,
+      estimatedSeconds: 40,
     },
     {
       id: "f1-br",
@@ -61,8 +61,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "BR",
       roomName: "Bible Rendered",
       title: "The Wider Lens",
-      script: `Bible Rendered zooms out even further, giving one master image to a block of 24 chapters. Psalm 23 falls within a Psalms rendered set. Picture a harp strung with lightning — the Psalms swing between lament and praise, shadow and light. Psalm 23 is the still center of that storm. The power of rendering is panoramic memory: you can scan the entire Bible in under a minute. The Suite's Bible Rendered gallery gives you all 51 rendered sets with their symbols, so you always know where you are in the sweep of Scripture.`,
-      estimatedSeconds: 30,
+      script: `Bible Rendered zooms out even further, assigning one master image to a block of 24 chapters. Psalm 23 falls within a Psalms rendered set — imagine a harp strung with lightning. The Psalms swing between lament and praise, despair and triumph, shadow and light. Psalm 23 is the still center of that storm: the one psalm where fear is mentioned only to be dismissed. It sits between Psalm 22, which is the psalm of the cross — "My God, my God, why hast thou forsaken me?" — and Psalm 24, the psalm of the King — "Lift up your heads, O ye gates." That placement is no accident. The Shepherd who suffers in Psalm 22 becomes the Shepherd who provides in Psalm 23 and the King who reigns in Psalm 24. Cross, comfort, crown — three psalms, one Christ. The Suite's Bible Rendered gallery gives you all 51 rendered sets, so you always know where you are in the sweep of Scripture.`,
+      estimatedSeconds: 45,
     },
     {
       id: "f1-tr",
@@ -72,8 +72,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "TR",
       roomName: "Translation Room",
       title: "Words Become Pictures",
-      script: `The Translation Room converts abstract text into concrete images. Take verse five: "Thou preparest a table before me in the presence of mine enemies." Translate that into a vivid picture: a king seated at a feast while defeated armies watch. Or verse three: "He restoreth my soul." Picture a shattered vase being slowly reassembled by gentle hands. The power of translation is this: abstract words become permanent architecture in your mind. In the Suite, when you study any passage, you can use the Gems feature to save these translated images as personal treasures you'll never lose.`,
-      estimatedSeconds: 30,
+      script: `The Translation Room converts abstract text into concrete images. Take verse five: "Thou preparest a table before me in the presence of mine enemies." Translate that: a king seated at a lavish feast while defeated armies stand at the perimeter, forced to watch but unable to touch. That's not just comfort — that's vindication. Now verse three: "He restoreth my soul." The Hebrew word "shuwb" means to turn back, to return. Picture a shattered mosaic being reassembled piece by piece by gentle hands, each fragment finding its place until the original design reappears. And verse four: "Thy rod and thy staff they comfort me." The rod was a short club for beating predators. The staff was a long crook for rescuing sheep from crevices. Picture both in the Shepherd's hands — one weapon, one rescue tool. Together they say: He fights for you and He pulls you back. The power of translation is this: abstract theology becomes architecture in your mind, permanent and retrievable. In the Suite, you can save these translated images as gems — personal treasures you'll never lose.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f1-gr",
@@ -83,8 +83,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "GR",
       roomName: "Gems Room",
       title: "Treasures Worth Keeping",
-      script: `The Gems Room is your treasure chest. Here's a gem most people miss: the phrase "for his name's sake" in verse three. David isn't saying God leads him because David is good enough. God leads him because God's own reputation is at stake. That shifts everything — your guidance isn't about your merit, it's about His character. That's a gem. The power of the Gems Room is preservation: insights that would otherwise vanish are collected and polished for future use. In the Suite, you can save gems from Jeeves conversations, from your personal study, or from any passage. They're stored in your personal gem box and can be recalled anytime for sermons, teaching, or devotion.`,
-      estimatedSeconds: 35,
+      script: `The Gems Room is your treasure chest — the place where striking insights are polished and preserved. Here's a gem from Psalm 23 that most people walk right past: the phrase "for his name's sake" in verse three. David isn't saying God leads him because David deserves it. He's saying God leads him because God's own reputation is at stake. If the Shepherd loses the sheep, people question the Shepherd, not the sheep. That shifts everything — your guidance isn't about your merit, it's about His character. Here's another gem: verse six says "goodness and mercy shall follow me." The Hebrew word for "follow" is "radaph" — it means to pursue, to chase, to hunt down. David uses a predator word. Goodness and mercy aren't walking politely behind you — they're tracking you like hounds on a scent. You can't outrun God's grace. That's a gem. In the Suite, you can save gems from Jeeves conversations, from your personal study, or from any passage. They're stored in your personal gem box and can be recalled anytime for sermons, teaching, or devotion.`,
+      estimatedSeconds: 50,
     },
 
     // === FLOOR 2: INVESTIGATION ===
@@ -96,8 +96,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "OR",
       roomName: "Observation Room",
       title: "The Detective's Notebook",
-      script: `Welcome to the second floor: Investigation. In the Observation Room, you log details without interpreting them. Notice: the psalm shifts from third person — "He leadeth me" — to second person — "Thou art with me" — exactly when the valley appears. In the darkest moment, the language becomes intimate. Also notice: "I shall not want" is stated once, at the start, as a thesis — everything that follows is evidence. The power of observation is this: what you don't notice, you can't interpret. A detective who misses fingerprints will never solve the case. In the Suite, Jeeves can help you generate observation lists for any passage, acting as your study partner who catches details you might miss.`,
-      estimatedSeconds: 40,
+      script: `Welcome to the second floor: Investigation. In the Observation Room, you log details without interpreting them — like a detective gathering fingerprints before building a theory. Here's what most readers miss: the psalm shifts from third person — "He leadeth me" — to second person — "Thou art with me" — at exactly the moment the valley appears. In the darkest moment, the language becomes intimate. David stops talking about God and starts talking to God. The valley doesn't create distance; it creates intimacy. Also observe the structure: "I shall not want" is stated once, at the very beginning, as a thesis. Everything that follows — pastures, waters, paths, valley, table, oil, house — is evidence supporting that thesis. David isn't hoping he won't want. He's declaring it as settled fact, then proving it point by point. One more observation: the psalm contains no requests. Not one. Every other psalm asks for something. Psalm 23 simply declares what God does. It's pure testimony. The power of observation is this: what you don't notice, you can't interpret. In the Suite, Jeeves can help you generate observation lists for any passage, catching details casual reading misses.`,
+      estimatedSeconds: 55,
     },
     {
       id: "f2-dc",
@@ -107,8 +107,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "DC",
       roomName: "Def-Com Room",
       title: "Under the Microscope",
-      script: `The Def-Com Room runs the lab tests. The Hebrew word for "restoreth" is "shuwb" — it means to turn back, to return. God doesn't just refresh David's soul; He turns it around, back to its original orientation. And "the valley of the shadow of death" — "tsalmaveth" — is literally "deep darkness." David was a literal shepherd. He knew actual valleys, actual predators, actual darkness. This isn't metaphor from a poet in a library — it's testimony from a man who lived it. The power of definitions and commentary is precision: they turn vague impressions into sharp, anchored understanding.`,
-      estimatedSeconds: 40,
+      script: `The Def-Com Room runs the lab tests — definitions and commentary under the microscope. The Hebrew word for "restoreth" is "shuwb" — it means to turn back, to return to an original state. God doesn't just refresh David's soul — He turns it around, reorienting it back to its created purpose. This is what theologians call restoration, and it echoes Eden: God is always bringing things back to their original design. Now look at "the valley of the shadow of death" — the Hebrew "tsalmaveth" is literally "deep darkness" or "death-shadow." David was a literal shepherd before he was king. He knew actual valleys where lions and bears lurked. First Samuel 17 tells us he killed both. So when David writes Psalm 23, this isn't metaphor composed in a library — it's testimony forged in real danger. And the word for "dwell" in verse six — "yashab" — means to sit down, to remain, to inhabit permanently. David isn't visiting God's house. He's moving in. The power of Def-Com is precision: vague impressions become sharp, anchored understanding that transforms how you read every word.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f2-st",
@@ -118,8 +118,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "ST",
       roomName: "Symbols/Types Room",
       title: "God's Symbolic Language",
-      script: `In the Symbols and Types Room, we build profiles. Shepherd equals Christ — John 10:11. Green pastures equal provision through the Word. Still waters equal the Spirit's peace. Rod and staff equal correction and comfort. The table equals covenant fellowship. Oil equals the Holy Spirit's anointing. The house of the Lord equals the sanctuary, and ultimately, heaven itself. Every symbol is a thread that connects to a vast tapestry across the entire Bible. The power of this room is recognition: once you learn God's symbolic vocabulary, you spot His fingerprints everywhere.`,
-      estimatedSeconds: 35,
+      script: `In the Symbols and Types Room, we build God's profile — His recurring symbolic vocabulary. Every major symbol in Psalm 23 connects to a vast web across Scripture. Shepherd equals Christ — John 10:11, "I am the good shepherd: the good shepherd giveth his life for the sheep." Green pastures equal provision through the Word — Ezekiel 34:14, "I will feed them in a good pasture." Still waters equal the Spirit's peace — Isaiah 32:17, "the work of righteousness shall be peace." Rod and staff — the rod is judgment and protection, the staff is rescue and guidance. Together they embody Christ's dual ministry: He defends and He restores. The table echoes covenant fellowship — and specifically the table of showbread in the sanctuary, where twelve loaves represented God's perpetual provision for the twelve tribes. Oil equals the Holy Spirit's anointing — the same oil poured on priests and kings, now poured on the sheep as guest of honor. And "the house of the LORD" — this is the sanctuary itself, and ultimately the New Jerusalem. Every symbol is a thread that, when pulled, unravels into an entire tapestry of biblical theology. The power of this room is recognition: once you learn God's symbolic vocabulary, you spot His fingerprints everywhere.`,
+      estimatedSeconds: 55,
     },
     {
       id: "f2-qr",
@@ -129,8 +129,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "QR",
       roomName: "Questions Room",
       title: "Interrogating the Text",
-      script: `The Questions Room interrogates until truth shines. Why does David say "I will fear no evil" instead of "there is no evil"? Because evil is present — he just refuses to fear it. Why a table "in the presence of mine enemies"? Because the point isn't the absence of danger; it's the presence of the Host. And here's a Phototheological question: which rooms does "my cup runneth over" activate? Gems Room, Fire Room, Fruit Room — one phrase, multiple rooms, cascading insight. The power of questions is depth: the right question cracks open what passive reading never touches. In the Suite, you can ask Jeeves any question about any passage and he'll answer using Phototheology principles.`,
-      estimatedSeconds: 40,
+      script: `The Questions Room interrogates until truth shines. Why does David say "I will fear no evil" instead of "there is no evil"? Because evil is present — the valley is real, the shadow is real, the enemies are real in verse five. David doesn't deny danger; he denies fear. That's a completely different theological claim. It's not the absence of threat but the presence of the Shepherd that creates courage. Now ask: why a table "in the presence of mine enemies"? Because the point of the feast isn't the absence of danger — it's the presence of the Host. God doesn't remove your enemies; He feeds you in front of them. That's not escape theology; that's vindication theology. Here's a Phototheological question: which rooms does "my cup runneth over" activate? The Gems Room — because overflow means surplus, more than enough, which is a gem about God's character. The Fire Room — because overflow creates emotional response: gratitude, wonder, worship. The Fruit Room — because overflow produces generosity, which is a fruit of the Spirit. One phrase, three rooms, cascading insight. The power of questions is this: the right question cracks open what passive reading never touches.`,
+      estimatedSeconds: 55,
     },
     {
       id: "f2-qa",
@@ -140,8 +140,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "QA",
       roomName: "Q&A Room",
       title: "Scripture Answers Scripture",
-      script: `The Q and A Room cross-examines witnesses. Why does the shepherd restore? Isaiah 40:11: "He shall feed his flock like a shepherd." Why no fear in the valley? Isaiah 41:10: "Fear thou not; for I am with thee." Why a prepared table? Exodus 25:30: the table of showbread in the sanctuary. Scripture is its own best commentary. The power of this room is corroboration: when multiple witnesses agree, the case is closed.`,
-      estimatedSeconds: 30,
+      script: `The Q and A Room cross-examines witnesses — letting Scripture answer Scripture. Why does the Shepherd restore? Isaiah 40:11 answers: "He shall feed his flock like a shepherd: he shall gather the lambs with his arm, and carry them in his bosom." Why no fear in the valley? Isaiah 41:10 corroborates: "Fear thou not; for I am with thee: be not dismayed; for I am thy God." Why a prepared table? Exodus 25:30 reveals the table of showbread in the sanctuary — perpetual provision in God's house. But here's the deeper cross-reference most miss: Psalm 23:5 says "Thou anointest my head with oil." In First Samuel 16:13, Samuel anointed David's head with oil, and the Spirit of the LORD came upon him from that day forward. David is recalling his own anointing — the moment God chose him. So when he says "thou anointest my head," he's not speaking generically. He's saying: the same God who chose me as a boy in Bethlehem still chooses me, still anoints me, still favors me — even in the presence of my enemies. The power of Q and A is corroboration: when multiple witnesses agree, the case is closed.`,
+      estimatedSeconds: 50,
     },
 
     // === FLOOR 3: FREESTYLE ===
@@ -153,8 +153,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "NF",
       roomName: "Nature Freestyle",
       title: "Scripture in the Wild",
-      script: `Third floor: Freestyle. In the Nature Freestyle Room, you see Psalm 23 in the world around you. A river flowing quietly through a meadow — still waters. A hiking trail through a narrow canyon — the valley of shadow. A bird's nest tucked safely under an overhang during a storm — "I will fear no evil, for thou art with me." The power of Nature Freestyle is that God wrote two books: Scripture and creation. They echo each other constantly. Train your eyes and nature preaches back to you every day.`,
-      estimatedSeconds: 30,
+      script: `Third floor: Freestyle — where you learn to see Scripture everywhere. In the Nature Freestyle Room, creation preaches Psalm 23 back to you constantly. A river flowing quietly through a meadow — still waters, the Shepherd's chosen route, calm by design. A hiking trail through a narrow canyon where the walls block the sun — the valley of shadow, a place you walk through, not a place you stay. A bird tucked safely in its nest during a thunderstorm — "I will fear no evil, for thou art with me." An actual shepherd leading sheep past a wolf carcass to fresh grazing — he prepared the table after defeating the enemy. Even the seasons preach this psalm: spring is green pastures, autumn is the table of harvest abundance, winter is the valley, and every sunrise is "surely goodness and mercy shall follow me." God wrote two books — Scripture and creation — and they echo each other constantly. Train your eyes, and nature preaches back to you every single day.`,
+      estimatedSeconds: 45,
     },
     {
       id: "f3-pf",
@@ -164,8 +164,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "PF",
       roomName: "Personal Freestyle",
       title: "Your Life as a Psalm",
-      script: `Personal Freestyle turns your own experience into teaching material. When have you been in green pastures — a season of peace? When have you walked through a valley — a loss, a betrayal? Looking back, can you see goodness and mercy following? Your testimony is Psalm 23 in modern dress. The power of Personal Freestyle is authenticity: when you share your own valley story, people listen differently than when you simply quote a verse.`,
-      estimatedSeconds: 30,
+      script: `Personal Freestyle turns your own life into teaching material. When have you been in green pastures — a season where everything was provided and you could finally rest? When have you walked through a valley — a diagnosis, a betrayal, a loss so deep you couldn't see the way forward? And looking back from this side, can you see goodness and mercy that were tracking you even when you couldn't feel them? Your testimony is Psalm 23 in modern dress. The power of Personal Freestyle is authenticity: when you stand before a class or a friend and say, "I've been in the valley, and the Shepherd was with me," people listen with a different ear than when you simply read a verse. Your scars become sermon illustrations. Your valleys become proofs of God's faithfulness. That's why David could write this psalm — he'd fought lions, fled kings, and buried friends, and God had been his Shepherd through all of it.`,
+      estimatedSeconds: 40,
     },
     {
       id: "f3-bf",
@@ -175,8 +175,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "BF",
       roomName: "Bible Freestyle",
       title: "Verse Genetics",
-      script: `Bible Freestyle is verse genetics — every verse has relatives. Psalm 23:1, "The LORD is my shepherd," is a sibling of John 10:14. Psalm 23:4 is a cousin of Job 10:21. Psalm 23:5, the table and anointing, is a distant relative of Revelation 19:9, the marriage supper of the Lamb. The power of verse genetics is this: no verse in Scripture is an only child. The more family members you discover, the richer every verse becomes. In the Suite, the cross-reference tools and Jeeves' Bible Freestyle mode help you trace these family trees automatically.`,
-      estimatedSeconds: 35,
+      script: `Bible Freestyle is verse genetics — tracing the family tree of a verse, because no verse in Scripture is an only child. Psalm 23:1, "The LORD is my shepherd," is a sibling of John 10:14, "I am the good shepherd, and know my sheep." They share the same DNA — divine shepherding. Psalm 23:4, the valley of shadow, is a cousin of Job 10:21, the land of darkness. Both wrestle with death's proximity, but Psalm 23 carries a confidence Job had to fight for. Psalm 23:5, the table and anointing, is a distant relative of Revelation 19:9, the marriage supper of the Lamb — the ultimate feast where Christ's people are finally vindicated before the entire universe. And Psalm 23:6, dwelling in God's house forever, is a twin of Revelation 21:3: "Behold, the tabernacle of God is with men, and he will dwell with them." David's longing becomes John's vision. The more family members you discover, the richer every verse becomes. In the Suite, the cross-reference tools and Jeeves' Bible Freestyle mode trace these family trees automatically.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f3-hf",
@@ -186,8 +186,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "HF",
       roomName: "History Freestyle",
       title: "Psalm 23 in History",
-      script: `History Freestyle sees lessons in culture and events. Christians in the Roman catacombs carved shepherd imagery on their walls — Psalm 23 was their defiance in the valley. Soldiers in World Wars carried pocket Bibles open to this psalm. Harriet Tubman, leading slaves through literal dark valleys, embodied verse four. The power of History Freestyle is weight: when you see centuries of believers living this psalm under extreme pressure, the ancient words gain modern gravity.`,
-      estimatedSeconds: 30,
+      script: `History Freestyle sees lessons in culture and events. Early Christians in the Roman catacombs carved shepherd imagery on their tunnel walls — Psalm 23 was their defiance in the valley. When Polycarp was led to the stake in 155 AD, witnesses said he went calmly, as if the Shepherd walked beside him. During the Middle Ages, when Bibles were chained and truth was suppressed, underground believers recited Psalm 23 from memory as their declaration of trust. Soldiers in World Wars carried pocket Bibles open to this psalm in their breast pockets — some literally stopped bullets. Harriet Tubman, leading enslaved people through literal dark valleys on the Underground Railroad, embodied verse four with every midnight crossing. Martin Luther King Jr., facing death threats daily, built his courage on the same assurance: "I will fear no evil, for thou art with me." The power of History Freestyle is weight: when you see centuries of believers living this psalm under extreme pressure, the ancient words gain modern gravity. This isn't poetry for comfort; it's a battle cry for the faithful.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f3-lr",
@@ -197,8 +197,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "LR",
       roomName: "Listening Room",
       title: "Hearing Psalm 23 Everywhere",
-      script: `The Listening Room trains you to hear Scripture in conversations. Someone says, "I feel empty." You hear, "I shall not want." A friend says, "I don't know which way to go." You hear, "He leadeth me in the paths of righteousness." The power of listening is ministry: you become a living concordance, speaking the Shepherd's words into real pain, in real time.`,
-      estimatedSeconds: 25,
+      script: `The Listening Room trains you to hear Scripture in everyday conversations and become a living concordance. Someone says, "I feel so empty." You hear Psalm 23: "I shall not want" — and you can share that the Shepherd specializes in filling empty souls. A friend says, "I don't know which way to go." You hear: "He leadeth me in the paths of righteousness" — direction comes from following, not from figuring it out alone. Someone confides, "I feel like my enemies are winning." You hear verse five: "Thou preparest a table before me in the presence of mine enemies" — God doesn't remove the opposition; He blesses you in front of them. A grieving parent whispers, "I feel like I'm walking through death." You hear verse four: "I will fear no evil, for thou art with me" — not the promise of escape, but the promise of presence. The power of listening is ministry: you become a walking concordance who can speak the Shepherd's words into real pain, at the exact moment they're needed. That's Psalm 23 lived, not just read.`,
+      estimatedSeconds: 45,
     },
 
     // === FLOOR 4: NEXT LEVEL ===
@@ -210,8 +210,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "CR",
       roomName: "Concentration Room",
       title: "Christ in Every Verse",
-      script: `Fourth floor: Next Level. The Concentration Room has one rule: every text must reveal Christ. In Psalm 23, Christ is the Shepherd who leads, the Host who prepares the table, the Anointer who pours oil, and the Lord of the house where we dwell forever. He maketh. He leadeth. He restoreth. He prepareth. He anointeth. The power of Concentration is focus: without Christ at the center, Bible study collapses into moral lessons or disconnected trivia. With Him, the Bible becomes one unified testimony. In the Suite, every room walkthrough begins with the Concentration Room, ensuring Christ is never sidelined.`,
-      estimatedSeconds: 40,
+      script: `Fourth floor: Next Level. The Concentration Room has one non-negotiable rule: every text must reveal Christ. In Psalm 23, Christ is not hiding — He is the subject of every verb. He is the Shepherd who makes us lie down — the same One who said in John 10:9, "by me if any man enter in, he shall be saved, and shall go in and out, and find pasture." He is the One who leads beside still waters — the same One who told the Samaritan woman, "the water that I shall give him shall be in him a well of water springing up into everlasting life." He restores souls — the same Christ who told Peter three times, "Feed my sheep," restoring the very man who denied Him. He walks with us through the valley — the same Christ who descended into the grave and emerged victorious, proving that no valley is too dark for Him. He prepares the table — the same Christ who broke bread at the Last Supper and said, "This is my body, broken for you." He anoints — the same Christ whose name, "Messiah," literally means "the Anointed One." And He is the house where we dwell forever — for in John 14:2, He said, "In my Father's house are many mansions; I go to prepare a place for you." Without Christ at the center, Psalm 23 is a nice poem. With Him, it's a portrait of the Savior.`,
+      estimatedSeconds: 60,
     },
     {
       id: "f4-dr",
@@ -221,8 +221,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "DR",
       roomName: "Dimensions Room",
       title: "Five Facets of One Diamond",
-      script: `The Dimensions Room stretches the psalm across five layers. Literal: David recalls his shepherd experience. Christ: Jesus is the Good Shepherd who lays down His life. Personal: I can rest because my Shepherd provides. Church: the congregation is the flock, led together through valleys. Heavenly: "I will dwell in the house of the LORD for ever" — the New Jerusalem. The power of dimensions is multiplied insight: one passage yields five distinct applications. The Suite's Dimensions mode in Jeeves can walk you through all five layers for any text you choose.`,
-      estimatedSeconds: 35,
+      script: `The Dimensions Room stretches the psalm across five layers, like looking at a diamond under five different lights. Literal: David recalls his real experience as a shepherd and fugitive king, writing from personal encounter with God's provision. Christ: Jesus is the Good Shepherd of John 10 who lays down His life for the sheep — the valley He walked was Calvary itself, and the table He prepares is the communion table stained with His own blood. Personal: I can rest because my Shepherd has already defeated every predator. When anxiety rises, "He maketh me to lie down" is a command I can obey today. Church: the congregation is the flock — not a collection of individuals but a community led together through valleys, fed at the same table, anointed by the same Spirit. No sheep walks alone. Heavenly: "I will dwell in the house of the LORD for ever" — this is the New Jerusalem of Revelation 21, where God Himself is the temple and the Lamb is the light. Psalm 23 ends where Revelation ends: in the eternal presence. One passage, five revelations. The Suite's Dimensions mode in Jeeves walks you through all five for any text.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f4-c6",
@@ -232,8 +232,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "C6",
       roomName: "Connect 6",
       title: "Genre Shapes Meaning",
-      script: `Connect 6 classifies texts by genre. Psalm 23 is poetry — specifically, a psalm of trust. That genre signals parallelism, metaphor, and emotional rhythm. You don't read it like a historical narrative or a prophetic timeline. The power of genre awareness is protection: it prevents you from over-literalizing or under-spiritualizing. Genre is the key that unlocks the right door.`,
-      estimatedSeconds: 25,
+      script: `Connect 6 classifies texts by genre, because genre shapes how you interpret. Psalm 23 is poetry — specifically, a psalm of trust, distinguished from psalms of lament, praise, or imprecation. In a trust psalm, the speaker doesn't ask for deliverance — he declares confidence in a God who has already proven Himself. That's why there are no requests in Psalm 23. It's all declaration. The poetic genre also means it uses parallelism, metaphor, and emotional rhythm. "He maketh me to lie down" is followed by "he leadeth me beside" — action paralleled with action, rest paralleled with movement. You don't read poetry the way you read legal code or historical narrative. The power of genre awareness is protection against misinterpretation: it prevents you from over-literalizing poetry or under-spiritualizing history. Genre is the key that unlocks the right door.`,
+      estimatedSeconds: 40,
     },
     {
       id: "f4-trm",
@@ -243,8 +243,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "TRm",
       roomName: "Theme Room",
       title: "Anchoring on the Great Walls",
-      script: `The Theme Room places Psalm 23 on the great walls of the Palace. The Sanctuary Wall: the table, oil, and cup echo the table of showbread, anointing oil, and drink offerings. The Life of Christ Wall: Jesus the shepherd of John 10 walks this psalm in real time. The Gospel Floor: "He restoreth my soul" is justification and sanctification in six words. The power of the Theme Room is architecture: random insights become load-bearing walls in a coherent theological structure.`,
-      estimatedSeconds: 30,
+      script: `The Theme Room places Psalm 23 on the great structural walls of the palace — the load-bearing theology that holds everything together. On the Sanctuary Wall: the table echoes the table of showbread — twelve loaves of perpetual provision. The oil echoes the anointing oil mixed with specific spices, poured on priests. The cup echoes the drink offerings poured out at the altar. Even the "house of the LORD" is explicitly sanctuary language — the temple was called "the house of the LORD" throughout the Old Testament. On the Life of Christ Wall: Jesus as the Good Shepherd of John 10 walks every verse of this psalm. He leads, He provides, He protects, He hosts, He anoints, He welcomes home. On the Great Controversy Wall: the enemies in verse five are not just David's political opponents — they represent the cosmic opposition that has always stood against God's people, forced to watch as God blesses the faithful. On the Gospel Floor: "He restoreth my soul" is justification and sanctification compressed into six words — God turns you back to your original design and walks you forward in righteousness. The power of the Theme Room is architecture: insights stop being random and become load-bearing walls.`,
+      estimatedSeconds: 55,
     },
     {
       id: "f4-tz",
@@ -254,8 +254,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "TZ",
       roomName: "Time Zone Room",
       title: "Past, Present, Future",
-      script: `The Time Zone Room locates the psalm across six time zones: past, present, and future — both on earth and in heaven. David experienced this in literal fields. Believers today walk through valleys. The remnant will face the final valley. Christ intercedes now as our shepherd-priest. We will dwell in God's house forever. The power of time zones is completeness: one psalm covers all of redemptive history.`,
-      estimatedSeconds: 30,
+      script: `The Time Zone Room locates the psalm across six zones — past, present, and future on both earth and in heaven. Earth past: David literally experienced green pastures, valleys, and enemies as a shepherd and fugitive king. Heaven past: before creation, the Lamb was slain in the divine plan — the Shepherd's commitment preceded the sheep's existence. Earth present: believers today walk through valleys of depression, persecution, and loss, clinging to the rod and staff. Heaven present: Christ intercedes at the Father's right hand as our High Priest-Shepherd, guiding us through the Holy Place ministry. Earth future: the remnant will face the final valley — the time of trouble described in Daniel 12:1 — but they will fear no evil because the Shepherd walks with them. Heaven future: "I will dwell in the house of the LORD for ever" — the third heaven, the New Jerusalem, where every promise in this psalm finds its eternal fulfillment. The power of time zones is completeness: one psalm, six eras, the entire sweep of redemptive history.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f4-prm",
@@ -265,8 +265,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "PRm",
       roomName: "Patterns Room",
       title: "Recurring Rhythms",
-      script: `The Patterns Room listens for motifs that repeat across Scripture. The shepherd pattern: Abel kept flocks, Moses shepherded before leading Israel, David went from sheep to throne, and Christ is the final Shepherd. The valley-to-feast pattern: Joseph goes from pit to palace, Israel from Egypt to Canaan, David from shadow to table. The power of patterns is prediction: once you hear the motif, you can anticipate its return in fuller, grander form.`,
-      estimatedSeconds: 30,
+      script: `The Patterns Room listens for motifs that repeat across Scripture like recurring themes in a symphony. The shepherd pattern is one of the most persistent in the Bible. Abel kept flocks — the first shepherd, the first martyr. Moses shepherded Jethro's flock for forty years before shepherding Israel through the wilderness. David went from sheep pastures to the throne of Israel. And Christ declared Himself the Good Shepherd who gives His life for the sheep. Each instance enlarges the motif: Abel's flock was small, Moses led a nation, David ruled a kingdom, and Christ shepherds all of humanity across all of history. The valley-to-feast pattern is equally persistent: Joseph goes from pit to palace. Israel goes from Egyptian bondage to Canaan's milk and honey. David goes from the cave of Adullam to the throne room of Jerusalem. And Christ goes from Gethsemane's agony to the marriage supper of the Lamb. Every time, the pattern holds: the valley is never the destination — the feast is. The power of patterns is this: once you hear the motif, you can trust its resolution even when you're still in the valley.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f4-par",
@@ -276,8 +276,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "P||",
       roomName: "Parallels Room",
       title: "Mirrored Actions",
-      script: `The Parallels Room shows mirrored actions across time. David anointed by Samuel, then anointed by God in Psalm 23. Israel led through the Red Sea, then David led beside still waters. Manna in the wilderness parallels the table prepared before enemies. The power of parallels is resonance: history doesn't repeat randomly, it echoes the same God doing the same kinds of things across centuries.`,
-      estimatedSeconds: 30,
+      script: `The Parallels Room shows mirrored actions — not symbols pointing forward like types, but events that echo each other across time. David anointed by Samuel with oil in First Samuel 16, then anointed by God in Psalm 23 — the same action repeated from a higher source. Israel led through the Red Sea on dry ground, then David led beside still waters — two divine guidings through water. Manna falling from heaven in the wilderness parallels the table prepared before enemies — in both cases, God feeds His people in hostile territory. Elijah fed by ravens at the Brook Cherith parallels David's table — God's provision when surrounded by those who want you dead. Even the structure of Psalm 23 parallels the sanctuary itself: the outer court of provision, pastures and waters, the Holy Place of walking in righteousness and light, and the Most Holy Place of dwelling in God's presence forever. The power of parallels is resonance: history doesn't repeat randomly. It echoes the same God doing the same kinds of things across centuries, building our confidence that He will do it again.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f4-frt",
@@ -287,8 +287,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "FRt",
       roomName: "Fruit Room",
       title: "The Taste Test",
-      script: `The Fruit Room asks: does this study produce Christlike character? Psalm 23 should produce peace, courage, gratitude, and hope. If your study produces anxiety, pride, or indifference, something has gone wrong. The power of the Fruit Room is quality control: good theology always tastes like love, joy, and peace. It's the final checkpoint before you teach or share what you've found.`,
-      estimatedSeconds: 25,
+      script: `The Fruit Room asks the essential quality-control question: does this study produce the fruit of the Spirit? Psalm 23 should produce peace — "He maketh me to lie down." It should produce courage — "I will fear no evil." It should produce gratitude — "my cup runneth over." It should produce hope — "I will dwell in the house of the LORD for ever." And it should produce love — because a Shepherd who goes through the valley with you, who prepares a table for you, who anoints you and fills your cup beyond capacity, is a Shepherd defined by self-giving love. If your study of Psalm 23 produces anxiety about the valley instead of confidence in the Shepherd, something has gone wrong. If it produces pride in your own faith rather than dependence on His faithfulness, the interpretation has failed. The power of the Fruit Room is the final checkpoint: good theology always tastes like love, joy, peace, patience, kindness, goodness, faith, meekness, and temperance. If it doesn't, go back and check your work.`,
+      estimatedSeconds: 45,
     },
 
     // === FLOOR 5: VISION ===
@@ -300,8 +300,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "BL",
       roomName: "Blue Room (Sanctuary)",
       title: "The Sanctuary Blueprint",
-      script: `Fifth floor: Vision. The Blue Room maps Psalm 23 onto the sanctuary. Green pastures and still waters are the outer court — provision and cleansing. Paths of righteousness lead through the Holy Place. The valley of shadow is the terrifying threshold at the veil. And "I will dwell in the house of the LORD for ever" is the Most Holy Place — God's throne, mercy seat, and eternal presence. The power of the Blue Room is architecture: the sanctuary is the master blueprint of salvation, and every text maps onto it. In the Suite, the Sanctuary walkthrough visualizes this mapping for any passage.`,
-      estimatedSeconds: 40,
+      script: `Fifth floor: Vision. The Blue Room maps every text onto the sanctuary — God's master blueprint of salvation. Psalm 23 maps with stunning precision. The gate of the courtyard: "The LORD is my shepherd" — entering into covenant relationship. The altar of burnt offering: this is where the Shepherd becomes the Lamb, laying down His life. The laver: "He leadeth me beside the still waters" — washing and cleansing. The Holy Place with its lampstand: "He leadeth me in the paths of righteousness" — walking in the light. The table of showbread: "Thou preparest a table before me" — perpetual provision, the twelve loaves always fresh. The altar of incense: "Thou anointest my head with oil" — prayer and the Spirit's fragrance rising. The veil: "Yea, though I walk through the valley of the shadow of death" — the terrifying threshold between the Holy and Most Holy Place, the boundary between human access and divine presence. And beyond the veil, the Most Holy Place: "I will dwell in the house of the LORD for ever" — God's throne, mercy seat, the Ark of the Covenant, and eternal presence. Psalm 23 is a walk through the sanctuary from gate to glory. The power of the Blue Room is this: the sanctuary makes abstract theology visible, walkable, and unforgettable.`,
+      estimatedSeconds: 60,
     },
     {
       id: "f5-pr",
@@ -311,8 +311,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "PR",
       roomName: "Prophecy Room",
       title: "Prophetic Telescope",
-      script: `The Prophecy Room aligns this psalm with the prophetic timeline. Ezekiel 34: God promises to search for His lost sheep. Revelation 7:17: the Lamb leads them to living fountains. Psalm 23 is the midpoint of a prophetic arc from lost flock to eternal feast. The power of the Prophecy Room is trajectory: you don't just know where you are — you see where everything is heading.`,
-      estimatedSeconds: 30,
+      script: `The Prophecy Room aligns this psalm with the prophetic timeline. Ezekiel 34 is the prophetic expansion of Psalm 23: God Himself says, "I will seek that which was lost, and bring again that which was driven away, and will bind up that which was broken. I will feed them in a good pasture." God becomes the Shepherd because the human shepherds — the kings and priests — failed. Zechariah 13:7 adds a dark note: "Smite the shepherd, and the sheep shall be scattered" — a prophecy Jesus quoted on the night of His arrest. And Revelation 7:17 completes the arc: "The Lamb which is in the midst of the throne shall feed them, and shall lead them unto living fountains of waters: and God shall wipe away all tears from their eyes." The Shepherd who was smitten becomes the Lamb on the throne who feeds and leads forever. Psalm 23 sits at the midpoint of a prophetic arc from lost flock to eternal feast. The power of the Prophecy Room is trajectory: you don't just know where you are — you see where everything is heading.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f5-3a",
@@ -322,8 +322,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "3A",
       roomName: "Three Angels' Room",
       title: "The Final Gospel Message",
-      script: `The Three Angels' Room connects Psalm 23 to the final gospel. The first angel says worship the Creator — the Creator-Shepherd who made the pastures. The second angel announces Babylon's fall — false shepherds exposed. The third angel warns against the beast — but those who trust the Shepherd "fear no evil." The power of the Three Angels' Room is convergence: all doctrine, all prophecy, all mission funnels into this final message.`,
-      estimatedSeconds: 30,
+      script: `The Three Angels' Room connects Psalm 23 to the final gospel message of Revelation 14. The first angel proclaims the everlasting gospel and calls the world to "worship him that made heaven, and earth." The Creator who made the green pastures, who engineered the still waters, who designed the paths — He is the one worthy of worship. The Shepherd is the Creator. The second angel announces: "Babylon is fallen." Babylon represents false shepherd systems — religious and political powers that claim to lead but lead astray. Ezekiel 34 condemns these false shepherds. Psalm 23 is the antidote: the LORD is my shepherd, not Babylon's substitutes. The third angel warns against receiving the mark of the beast — the mark of allegiance to a counterfeit authority. Those who trust the true Shepherd "fear no evil" because they know the voice of the real Shepherd and refuse the imposter's mark. The patience of the saints in Revelation 14:12 is the same patience of the sheep in the valley — they endure because the Shepherd is with them. The power of the Three Angels is convergence: all doctrine, all prophecy, all mission funnels into this final message.`,
+      estimatedSeconds: 55,
     },
     {
       id: "f5-fe",
@@ -333,8 +333,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "FE",
       roomName: "Feasts Room",
       title: "The Feast Calendar",
-      script: `The Feasts Room asks: which feast does this psalm echo? "He maketh me to lie down" — Sabbath rest. "Thou preparest a table" — Passover. "Thou anointest my head with oil" — Feast of Tabernacles. "I will dwell in the house of the LORD for ever" — the ultimate Tabernacles fulfillment. The power of the Feasts Room is calendar: God's feast days are prophecy written in ritual, and every text connects to them.`,
-      estimatedSeconds: 30,
+      script: `The Feasts Room asks: which feast does this psalm echo? The answer is: nearly all of them. "He maketh me to lie down" — Sabbath rest, the weekly feast of cessation and trust, the foundational feast that says God is in control and you can stop striving. "Thou preparest a table before me" — Passover, the meal of deliverance eaten while the destroyer passed over. The lamb's blood on the door, the family gathered inside, the enemies powerless outside — that's verse five. "Thou anointest my head with oil" — the Feast of Tabernacles, when oil was poured in abundance and booths were built to remember God's shelter in the wilderness. "I will dwell in the house of the LORD for ever" — the ultimate Tabernacles fulfillment, when God Himself tabernacles with humanity permanently, as described in Revelation 21. Even "He restoreth my soul" echoes the Day of Atonement — the annual reset, the day when Israel's corporate soul was restored to right standing. God embedded His theology into Israel's calendar centuries before David wrote this psalm. The power of the Feasts Room is this: God's feast days are prophecy written in ritual, and every text connects to them.`,
+      estimatedSeconds: 55,
     },
 
     // === FLOOR 6: THREE HEAVENS ===
@@ -346,8 +346,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "3H",
       roomName: "Three Heavens Framework",
       title: "Cosmic Placement",
-      script: `Sixth floor: Three Heavens and Cycles. In the first heaven, David writes under the old covenant — a shepherd-king experiencing God's provision in a physical land. In the second heaven, Christ fulfills the psalm as the shepherd who dies, rises, and leads His church through persecution into the New Covenant banquet. In the third heaven, the psalm reaches ultimate fulfillment: no more valley, no more enemies, only the house of the Lord forever. The power of the Three Heavens is context: you never misplace a text in the wrong era.`,
-      estimatedSeconds: 40,
+      script: `Sixth floor: Three Heavens and Cycles. In the first heaven — the Day of the Lord that culminated in Babylon's destruction of Jerusalem and the subsequent restoration under Cyrus — David writes under the old covenant as a shepherd-king experiencing God's tangible provision in a physical land. His green pastures were real. His enemies — Saul, the Philistines — were real. His house of the Lord was the tabernacle at Shiloh and later the temple he planned. In the second heaven — the Day of the Lord that culminated in Rome's destruction of Jerusalem in 70 AD and the inauguration of the new covenant order — Christ fulfills the psalm. He is the shepherd who dies at Calvary, rises from the grave, and leads His church through centuries of persecution into the heavenly sanctuary's ministry. The table He prepares is the communion table; the house is the heavenly temple of Hebrews 8. In the third heaven — the final Day of the Lord, the cosmic judgment of Revelation 20 and the literal new heavens and earth — the psalm reaches ultimate fulfillment. No more valley, no more enemies, no more shadow. Only the house of the Lord, forever. The power of the Three Heavens is precision: you never misplace a text in the wrong era, and each era deepens the psalm's meaning.`,
+      estimatedSeconds: 55,
     },
     {
       id: "f6-cycles",
@@ -357,8 +357,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "CY",
       roomName: "Eight Cycles",
       title: "The Shepherd Across History",
-      script: `The Eight Cycles show Psalm 23's shepherd pattern repeating. Adamic: God clothes Adam — first act of shepherding. Noahic: God guides through the flood-valley. Abrahamic: God leads to new pastures. Mosaic: God leads through the Red Sea and feeds manna. Cyrusic: God shepherds exiles home. Christ: the Good Shepherd arrives. Spirit: the church is led. Remnant: the final flock gathers. Every cycle is Psalm 23 lived again. The power of cycles is pattern recognition at scale.`,
-      estimatedSeconds: 35,
+      script: `The Eight Cycles show Psalm 23's shepherd pattern repeating across all of redemptive history, each cycle following the rhythm of fall, covenant, sanctuary, enemy, and restoration. In the Adamic cycle, God clothes Adam and Eve — the first act of shepherding, covering exposed shame. In the Noahic cycle, God guides Noah's family through the flood-valley into a cleansed world. In the Abrahamic cycle, God leads Abraham to new pastures in Canaan and prepares a ram on Moriah's mountain. In the Mosaic cycle, God leads Israel through the Red Sea valley and feeds them manna — a table in the wilderness surrounded by hostile nations. In the Cyrusic cycle, God shepherds exiles home through Cyrus, restoring temple worship. In the Christ cycle, the Good Shepherd arrives, walks through the ultimate valley of death, and rises to prepare the communion table. In the Spirit cycle, the church is led by the Spirit through centuries of persecution. And in the Remnant cycle, the final flock gathers for the last valley — the time of Jacob's trouble — before dwelling in the house of the Lord forever at Christ's return. Every cycle is Psalm 23 lived again at a larger scale. The power of cycles is this: the shepherd pattern isn't a one-time event — it's the heartbeat of all history.`,
+      estimatedSeconds: 55,
     },
     {
       id: "f6-jr",
@@ -368,8 +368,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "JR",
       roomName: "Juice Room",
       title: "Squeezing Every Drop",
-      script: `The Juice Room takes everything we've done and squeezes it all at once. In one pass through Psalm 23, we've stored story beats, imagined scenes, created symbolic frames, translated abstractions, collected gems, observed details, defined Hebrew, mapped symbols, asked questions, cross-referenced, freestyled, concentrated on Christ, stretched across dimensions, and placed it in heavens and cycles. Not a single drop wasted. The power of the Juice Room is totality: you don't just nibble at a passage — you consume it entirely. In the Suite, the Palace Guided Tour with Jeeves does exactly this for any verse you choose.`,
-      estimatedSeconds: 40,
+      script: `The Juice Room takes everything we've done and squeezes it all at once — like putting an orange under a juicer until every drop comes out. In one pass through Psalm 23, we've stored six story beats, immersed ourselves in the scene, created a symbolic frame, rendered the wider context of Psalms 22 through 24, translated abstractions into vivid pictures, collected gems about "radaph" and "for his name's sake," observed the third-to-second person shift, defined Hebrew words, mapped every major symbol, asked questions that cracked open hidden theology, cross-referenced with Isaiah, Ezekiel, and Revelation, freestyled through nature, life, verse genetics, and history, concentrated on Christ in every verse, stretched across five dimensions, identified the genre as a trust psalm, anchored on sanctuary, Christ, and gospel walls, placed it in six time zones, traced shepherd and valley-to-feast patterns, found parallels with the sanctuary walk, tested the fruit, mapped it onto sanctuary furniture from gate to Most Holy Place, aligned it with prophetic timelines from Ezekiel to Revelation, connected it to every feast, situated it in three heavens and eight cycles. Not a single drop wasted. The power of the Juice Room is totality: you don't nibble at a passage — you consume it entirely.`,
+      estimatedSeconds: 50,
     },
 
     // === FLOOR 7: SPIRITUAL ===
@@ -381,8 +381,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "FRm",
       roomName: "Fire Room",
       title: "Let It Burn",
-      script: `Seventh floor: Spiritual. The Fire Room plunges you into the emotional weight of this psalm. "Yea, though I walk through the valley of the shadow of death." You're not reading about someone else's valley. You're in your valley. Your diagnosis. Your midnight. And then the voice comes: "I will fear no evil, for thou art with me." Let that burn. The power of the Fire Room is transformation: truth stops being information and becomes encounter. The Suite's Audio Bible with Immersive Mode can help create that atmosphere — hearing the psalm read in a powerful voice while you meditate.`,
-      estimatedSeconds: 35,
+      script: `Seventh floor: Spiritual — where truth stops being information and becomes encounter. The Fire Room plunges you into the emotional weight of Scripture until it burns. "Yea, though I walk through the valley of the shadow of death." Stop. You're not reading about someone else's valley. You're in yours. Your diagnosis. Your bankruptcy. Your child's rebellion. Your midnight prayer with no answer. The walls are closing in. The shadow is not metaphorical — it feels like death is standing next to you. And then the voice: "I will fear no evil, for thou art with me." Not "there is no evil." Not "the evil will go away." But "thou art with me." That's it. The entire argument against fear in four words: thou art with me. Let that burn until it changes you. Until the next time fear rises, those four words rise faster. The power of the Fire Room is transformation: the Word becomes a flame that purifies, and what it burns away is fear itself. In the Suite, the Audio Bible's Immersive Mode creates an atmosphere where these words can reach your heart, not just your head.`,
+      estimatedSeconds: 50,
     },
     {
       id: "f7-mr",
@@ -392,8 +392,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "MR",
       roomName: "Meditation Room",
       title: "Slow Marination",
-      script: `The Meditation Room slows you down. Take just five words: "The LORD is my shepherd." "The LORD" — a Person with a name. "Is" — present tense, right now. "My" — personal, not generic. "Shepherd" — caretaker, provider, protector. Five words, and you could sit for an hour. The power of meditation is saturation: meditated Scripture carries depth that speed reading never touches.`,
-      estimatedSeconds: 30,
+      script: `The Meditation Room slows you down to the speed of the Spirit. Take just five words: "The LORD is my shepherd." Now marinate. "The LORD" — not a concept, not a force. A Person with a name. YHWH. The covenant-keeping One who told Moses, "I AM THAT I AM." "Is" — present tense. Not was. Not will be. Is. Right now. In this room. In this valley. In this silence. "My" — personal. Not the world's shepherd in a generic sense, but mine. He knows my name, my weaknesses, my fears. "Shepherd" — the one who leads, feeds, protects, searches for, carries, and if necessary, dies for the sheep. Five words. You could sit with them for an hour and not exhaust their depth. The power of meditation is saturation: when you marinate in truth long enough, it seeps past the intellect and into the soul. Speed reading produces information. Meditation produces transformation.`,
+      estimatedSeconds: 45,
     },
     {
       id: "f7-srm",
@@ -403,8 +403,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "SRm",
       roomName: "Speed Room",
       title: "Rapid Recall",
-      script: `The Speed Room is the opposite drill. Someone asks about provision: "He maketh me to lie down." Fear: "I will fear no evil." Death: "The valley of the shadow." Heaven: "I will dwell in the house of the LORD." Five questions, five instant answers. The power of the Speed Room is readiness: the psalm is always on the tip of your tongue, ready for ministry in any moment.`,
-      estimatedSeconds: 25,
+      script: `The Speed Room is the opposite drill — sprint training for spiritual reflexes. Someone asks about provision: "He maketh me to lie down in green pastures." Someone asks about fear: "I will fear no evil, for thou art with me." Someone asks about death: "The valley of the shadow of death." Someone asks about enemies: "Thou preparest a table before me in the presence of mine enemies." Someone asks about heaven: "I will dwell in the house of the LORD for ever." Someone asks about God's character: "For his name's sake." Six questions, six instant answers, all drawn from six verses. The power of the Speed Room is readiness: "Be ready always to give an answer" — First Peter 3:15. The psalm isn't locked in a study notebook; it's on the tip of your tongue, ready for ministry at a moment's notice.`,
+      estimatedSeconds: 35,
     },
 
     // === FLOOR 8: MASTER ===
@@ -416,8 +416,8 @@ export const PSALM_23_TOUR: TourDefinition = {
       roomCode: "∞",
       roomName: "Reflexive Mastery",
       title: "The Palace Disappears",
-      script: `Eighth floor: the Master Floor. There are no rooms here. When someone mentions Psalm 23, you don't think about rooms — you just respond. Story beats surface. Hebrew nuances come. Christ appears. The sanctuary map unfolds. Cycles echo. Fruit flows. It's reflexive. Like breathing. The palace is no longer outside you — it is inside you. The power of mastery is freedom: the scaffolding falls away, and what remains is a living sanctuary of the Word. The Suite is your training ground until that day — use every tool, practice in every room, and the palace will become part of who you are.`,
-      estimatedSeconds: 35,
+      script: `Eighth floor: the Master Floor. There are no rooms here. No labels. No sequence to follow. When someone mentions Psalm 23, you don't think about rooms — you respond from the depths. The six story beats surface without effort. The Hebrew nuances sharpen the words. Christ appears as Shepherd, Host, and King. The sanctuary map unfolds from gate to glory. The three heavens place the psalm in its proper era. The eight cycles echo the shepherd pattern across all of history. The fruit of peace, courage, and gratitude flows naturally. It's reflexive. Like breathing. Like a musician who no longer reads sheet music because the music lives inside them. The palace is no longer outside you — it is inside you. You don't use the method anymore — you are the method. That's the goal. Not to be an expert in Phototheology, but to be a living sanctuary of the Word, saturated with Christ, thinking Scripturally by instinct. The Suite is your training ground until that day — use every tool, practice in every room, and the palace will become part of who you are.`,
+      estimatedSeconds: 45,
     },
   ],
   outro: {
@@ -428,7 +428,7 @@ export const PSALM_23_TOUR: TourDefinition = {
     roomCode: "OUTRO",
     roomName: "Farewell",
     title: "Until Next Time",
-    script: `And there you have it. One psalm. Eight floors. Every room. Every principle. From story to mastery, from pasture to palace. Psalm 23 is no longer just a comforting poem — it is a theological cathedral, a prophetic map, a sanctuary walk, and a personal encounter with the Shepherd Himself. Now it's your turn. Pick any passage, walk it through the Palace using the Suite, and watch what the Spirit reveals. From both of us — Jeeves and Reginald — thank you for walking with us today. Until next time, may goodness and mercy follow you all the days of your life.`,
-    estimatedSeconds: 35,
+    script: `And there you have it. One psalm. Eight floors. Every room. Every principle. From story to mastery, from pasture to palace. Psalm 23 is no longer just a comforting poem — it is a theological cathedral, a prophetic map, a sanctuary walk, and a personal encounter with the Shepherd Himself. You've seen how the Story Room stores it, the Imagination Room inhabits it, the Observation Room dissects it, the Def-Com Room defines it, the Symbols Room profiles it, the Questions Room interrogates it, the Concentration Room centers it on Christ, the Dimensions Room multiplies it, the Blue Room maps it to the sanctuary, the Prophecy Room launches it into the future, the Fire Room burns it into your heart, and the Master Floor makes it reflexive. Now it's your turn. Pick any passage, walk it through the Palace using the Suite, and watch what the Spirit reveals. From both of us — Jeeves and Reginald — thank you for walking with us today. Until next time, may goodness and mercy follow you all the days of your life.`,
+    estimatedSeconds: 45,
   },
 };
