@@ -11,14 +11,18 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SUBSCRIBER-STATS] ${step}${detailsStr}`);
 };
 
+const SUITE_MONTHLY_PRICE_ID = 'price_1SZNyiFGDAd3RU8I4JHYEsEi';
+const SUITE_ANNUAL_PRICE_ID = 'price_1SZNyuFGDAd3RU8IjeGIvPEb';
+const suitePriceIds = new Set([SUITE_MONTHLY_PRICE_ID, SUITE_ANNUAL_PRICE_ID]);
+
 // Price ID to tier mapping - used for tier classification
 // Product names will be fetched from Stripe directly for accurate display
 const priceToTierMap: Record<string, { tier: string; monthlyPrice: number }> = {
   // ========== CURRENT SUBSCRIPTION PRODUCTS ==========
   'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', monthlyPrice: 9 },
   'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', monthlyPrice: 7.5 }, // $90/12
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', monthlyPrice: 15 },
-  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', monthlyPrice: 12.5 }, // $150/12
+  [SUITE_MONTHLY_PRICE_ID]: { tier: 'premium', monthlyPrice: 15 },
+  [SUITE_ANNUAL_PRICE_ID]: { tier: 'premium', monthlyPrice: 12.5 }, // $150/12
 
   // ========== STUDENT ==========
   'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', monthlyPrice: 4.99 },
@@ -37,8 +41,8 @@ const priceToTierMap: Record<string, { tier: string; monthlyPrice: number }> = {
 const priceToInfo: Record<string, { tier: string; name: string; price: number }> = {
   'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', name: 'Essential Monthly', price: 9 },
   'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', name: 'Essential Annual', price: 90 },
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', name: 'Premium Monthly', price: 15 },
-  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', name: 'Premium Annual', price: 150 },
+  [SUITE_MONTHLY_PRICE_ID]: { tier: 'premium', name: 'Suite Monthly', price: 15 },
+  [SUITE_ANNUAL_PRICE_ID]: { tier: 'premium', name: 'Suite Annual', price: 150 },
   'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', name: 'Student Discount', price: 4.99 },
   'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'premium', name: 'Phototheology App', price: 15 },
   'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'essential', name: 'Phototheology App Lite', price: 9 },
@@ -52,14 +56,12 @@ const priceToTier: Record<string, string> = Object.fromEntries(
   Object.entries(priceToInfo).map(([id, info]) => [id, info.tier])
 );
 
-const appPriceIds = Object.keys(priceToInfo);
-
 // Only these tiers count as Phototheology app subscription tiers in the database.
 // (Prevents old/incorrect records synced from unrelated Stripe products from inflating counts.)
 const appStripeTiers = new Set(['essential', 'premium', 'student', 'church']);
 
 // Helper to fetch all Stripe subscriptions with pagination
-// Now fetches ALL subscriptions (not filtered by price ID) to show full Stripe picture
+// Filters to the two Suite price IDs only.
 async function fetchAllStripeSubscriptions(
   stripe: Stripe,
   status: 'active' | 'trialing' | 'canceled'
@@ -78,8 +80,12 @@ async function fetchAllStripeSubscriptions(
 
     const batch = await stripe.subscriptions.list(params);
 
-    // Include ALL subscriptions - no filtering by price ID
-    allSubscriptions.push(...batch.data);
+    const suiteSubscriptions = batch.data.filter((sub) => {
+      const priceId = sub.items.data[0]?.price?.id;
+      return !!priceId && suitePriceIds.has(priceId);
+    });
+
+    allSubscriptions.push(...suiteSubscriptions);
     hasMore = batch.has_more;
     if (batch.data.length > 0) {
       startingAfter = batch.data[batch.data.length - 1].id;
@@ -142,8 +148,6 @@ Deno.serve(async (req) => {
 
     const userId = authUser.id;
 
-    // (supabase is already the service role client from above)
-
     // Check if user is admin (using admin_users table)
     const { data: adminCheck } = await supabase
       .from("admin_users")
@@ -173,9 +177,9 @@ Deno.serve(async (req) => {
 
     // Count active database trials (trial status + trial_ends_at in the future)
     const now = new Date();
-    const activeDbTrials = subscriptions.filter((sub: any) => 
-      sub.subscription_status === 'trial' && 
-      sub.trial_ends_at && 
+    const activeDbTrials = subscriptions.filter((sub: any) =>
+      sub.subscription_status === 'trial' &&
+      sub.trial_ends_at &&
       new Date(sub.trial_ends_at) > now
     ).length;
 
@@ -243,16 +247,20 @@ Deno.serve(async (req) => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const recentSignups = subscriptions.filter((s: any) => new Date(s.created_at) > thirtyDaysAgo).length;
 
-    // NOW GET REAL STRIPE DATA WITH PAGINATION
+    // NOW GET LIVE SUITE-ONLY STRIPE DATA WITH PAGINATION
     let stripeStats = {
       active_subscriptions: 0,
       trialing_subscriptions: 0,
       canceled_subscriptions: 0,
+      suite_monthly_active: 0,
+      suite_annual_active: 0,
+      suite_monthly_trialing: 0,
+      suite_annual_trialing: 0,
       by_tier: { essential: 0, premium: 0, student: 0, church: 0, unknown: 0 },
       by_product: {} as Record<string, { active: number; trialing: number }>,
-      active_mrr_cents: 0,      // MRR from active subscriptions only
-      trialing_mrr_cents: 0,    // MRR from trialing subscriptions (card on file)
-      total_mrr_cents: 0,       // Combined (active + trialing)
+      active_mrr_cents: 0,      // MRR from active Suite subscriptions only
+      trialing_mrr_cents: 0,    // Projected MRR from trialing Suite subscriptions only
+      total_mrr_cents: 0,       // Combined (active + trialing) for Suite only
       error: null as string | null,
       unlinked_count: 0,
     };
@@ -262,22 +270,20 @@ Deno.serve(async (req) => {
     if (stripeKey) {
       try {
         const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
-        logStep("Fetching Stripe subscriptions with pagination");
+        logStep("Fetching Suite Stripe subscriptions with pagination");
 
         // Product name cache to avoid repeated API calls
         const productCache = new Map<string, string>();
 
-        // Get ALL active subscriptions with pagination
+        // Get active Suite subscriptions with pagination
         const activeSubscriptions = await fetchAllStripeSubscriptions(stripe, 'active');
         stripeStats.active_subscriptions = activeSubscriptions.length;
 
-        // Count by tier, by product name (from Stripe), and calculate MRR
         for (const sub of activeSubscriptions) {
           const priceId = sub.items.data[0]?.price?.id;
           const priceObj = sub.items.data[0]?.price;
           const productId = priceObj?.product;
 
-          // Get product name - use cache or fetch from Stripe
           let productName = 'Unknown';
           if (productId) {
             productName = await getProductName(stripe, productId, productCache);
@@ -285,7 +291,6 @@ Deno.serve(async (req) => {
             productName = priceToInfo[priceId].name;
           }
 
-          // Get tier from our mapping
           const tierInfo = priceToTierMap[priceId];
           const tier = tierInfo?.tier || 'unknown';
 
@@ -293,13 +298,14 @@ Deno.serve(async (req) => {
             stripeStats.by_tier[tier as keyof typeof stripeStats.by_tier]++;
           }
 
-          // Track by product name (from Stripe)
           if (!stripeStats.by_product[productName]) {
             stripeStats.by_product[productName] = { active: 0, trialing: 0 };
           }
           stripeStats.by_product[productName].active++;
 
-          // Calculate MRR from Stripe's unit_amount (active subs)
+          if (priceId === SUITE_MONTHLY_PRICE_ID) stripeStats.suite_monthly_active++;
+          if (priceId === SUITE_ANNUAL_PRICE_ID) stripeStats.suite_annual_active++;
+
           const amount = priceObj?.unit_amount || 0;
           const interval = priceObj?.recurring?.interval;
           const monthlyAmount = interval === 'year' ? Math.round(amount / 12) : amount;
@@ -308,17 +314,15 @@ Deno.serve(async (req) => {
           stripeStats.total_mrr_cents += monthlyAmount;
         }
 
-        // Get ALL trialing subscriptions with pagination
+        // Get trialing Suite subscriptions with pagination
         const trialingSubscriptions = await fetchAllStripeSubscriptions(stripe, 'trialing');
         stripeStats.trialing_subscriptions = trialingSubscriptions.length;
-        
-        // Count trialing by product name AND include in MRR (card verified, will convert)
+
         for (const sub of trialingSubscriptions) {
           const priceId = sub.items.data[0]?.price?.id;
           const priceObj = sub.items.data[0]?.price;
           const productId = priceObj?.product;
 
-          // Get product name - use cache or fetch from Stripe
           let productName = 'Unknown';
           if (productId) {
             productName = await getProductName(stripe, productId, productCache);
@@ -331,7 +335,9 @@ Deno.serve(async (req) => {
           }
           stripeStats.by_product[productName].trialing++;
 
-          // Calculate trialing MRR (cards on file, will convert after 7 days)
+          if (priceId === SUITE_MONTHLY_PRICE_ID) stripeStats.suite_monthly_trialing++;
+          if (priceId === SUITE_ANNUAL_PRICE_ID) stripeStats.suite_annual_trialing++;
+
           const amount = priceObj?.unit_amount || 0;
           const interval = priceObj?.recurring?.interval;
           const monthlyAmount = interval === 'year' ? Math.round(amount / 12) : amount;
@@ -340,16 +346,14 @@ Deno.serve(async (req) => {
           stripeStats.total_mrr_cents += monthlyAmount;
         }
 
-        // Get canceled subscriptions with pagination
+        // Get canceled Suite subscriptions with pagination
         const canceledSubscriptions = await fetchAllStripeSubscriptions(stripe, 'canceled');
         stripeStats.canceled_subscriptions = canceledSubscriptions.length;
 
-        // Calculate unlinked: Stripe active/trialing - DB linked
         const totalStripeActive = stripeStats.active_subscriptions + stripeStats.trialing_subscriptions;
         stripeStats.unlinked_count = Math.max(0, totalStripeActive - dbStats.stripe_linked_count);
 
-        logStep("Stripe stats fetched with pagination", stripeStats);
-
+        logStep("Suite Stripe stats fetched with pagination", stripeStats);
       } catch (stripeError: any) {
         logStep("Stripe API error", { error: stripeError.message });
         stripeStats.error = stripeError.message;
@@ -358,23 +362,18 @@ Deno.serve(async (req) => {
       stripeStats.error = "STRIPE_SECRET_KEY not configured";
     }
 
-    // Calculate summary stats
     const summary = {
       total_paying_stripe: stripeStats.active_subscriptions,
       total_paying_patreon: patreonStats.active_patrons,
       total_trialing: stripeStats.trialing_subscriptions,
       total_lifetime: dbStats.lifetime_access,
       total_with_access: stripeStats.active_subscriptions + patreonStats.active_patrons + dbStats.lifetime_access,
-      // Current MRR - from active paying subscriptions only
       current_mrr: `$${(stripeStats.active_mrr_cents / 100).toFixed(2)}`,
       current_mrr_cents: stripeStats.active_mrr_cents,
-      // Projected MRR - includes trialing users with cards on file
       projected_mrr: `$${(stripeStats.total_mrr_cents / 100).toFixed(2)}`,
       projected_mrr_cents: stripeStats.total_mrr_cents,
-      // Trialing MRR - amount from users in trial period
       trialing_mrr: `$${(stripeStats.trialing_mrr_cents / 100).toFixed(2)}`,
       trialing_mrr_cents: stripeStats.trialing_mrr_cents,
-      // Legacy field for backward compatibility
       monthly_recurring_revenue: `$${(stripeStats.active_mrr_cents / 100).toFixed(2)}`,
       stripe_unlinked_subscriptions: stripeStats.unlinked_count,
     };
