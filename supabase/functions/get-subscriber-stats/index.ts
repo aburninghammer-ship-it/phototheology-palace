@@ -70,7 +70,7 @@ const priceToTier: Record<string, string> = Object.fromEntries(
 const appStripeTiers = new Set(['essential', 'premium', 'student', 'church']);
 
 // Helper to fetch all Stripe subscriptions with pagination
-// Filters to the two Suite price IDs only.
+// Filters to all paying price IDs (Suite + Church).
 async function fetchAllStripeSubscriptions(
   stripe: Stripe,
   status: 'active' | 'trialing' | 'canceled'
@@ -89,12 +89,12 @@ async function fetchAllStripeSubscriptions(
 
     const batch = await stripe.subscriptions.list(params);
 
-    const suiteSubscriptions = batch.data.filter((sub) => {
+    const payingSubscriptions = batch.data.filter((sub) => {
       const priceId = sub.items.data[0]?.price?.id;
-      return !!priceId && suitePriceIds.has(priceId);
+      return !!priceId && allPayingPriceIds.has(priceId);
     });
 
-    allSubscriptions.push(...suiteSubscriptions);
+    allSubscriptions.push(...payingSubscriptions);
     hasMore = batch.has_more;
     if (batch.data.length > 0) {
       startingAfter = batch.data[batch.data.length - 1].id;
