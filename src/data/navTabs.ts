@@ -9,7 +9,8 @@ import {
   User,
   PersonStanding,
   Eye,
-  Scale
+  Scale,
+  Headphones
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -99,6 +100,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
       border: "border-amber-500/20",
       text: "from-amber-600 to-orange-600",
       glow: "rgba(245,158,11,0.5)"
+    }
+  },
+  {
+    id: "palace-tour",
+    to: "/palace/tour",
+    label: "Tour the Palace",
+    shortLabel: "Tour",
+    icon: Headphones,
+    gradient: {
+      from: "from-teal-500/10",
+      to: "to-cyan-500/10",
+      border: "border-teal-500/20",
+      text: "from-teal-600 to-cyan-600",
+      glow: "rgba(20,184,166,0.5)"
     }
   },
   {
