@@ -669,12 +669,15 @@ export default function AdminSubscriptions() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  Stripe Active
+                  Active Subscribers
                 </CardTitle>
-                <CardDescription>Paying subscribers (live)</CardDescription>
+                <CardDescription>All active subscriptions (DB)</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold text-green-600">{stats.stripe.active_subscriptions}</div>
+                <div className="text-4xl font-bold text-green-600">{stats.database.by_status.active || 0}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Stripe API: {stats.stripe.active_subscriptions}
+                </p>
               </CardContent>
             </Card>
 
