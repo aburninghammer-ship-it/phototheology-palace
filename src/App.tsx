@@ -86,6 +86,7 @@ const ChallengeBoard = lazy(() => import("./pages/ChallengeBoard"));
 const DailyVerse = lazy(() => import("./pages/DailyVerse"));
 const GrowthJournal = lazy(() => import("./pages/GrowthJournal"));
 const EquationsChallenge = lazy(() => import("./pages/EquationsChallenge"));
+const EquationBattle = lazy(() => import("./pages/EquationBattle"));
 const Games = lazy(() => import("./pages/Games"));
 const GameNightGuest = lazy(() => import("./pages/GameNightGuest"));
 const PTScrabble = lazy(() => import("./pages/PTScrabble"));
@@ -536,6 +537,8 @@ function App() {
             <Route path="/challenge-board" element={<ProtectedRoute><ChallengeBoard /></ProtectedRoute>} />
             <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
+            <Route path="/equations-battle" element={<ProtectedRoute><EquationBattle /></ProtectedRoute>} />
+            <Route path="/equations-battle/:gameId" element={<ProtectedRoute><EquationBattle /></ProtectedRoute>} />
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
             <Route path="/game-night" element={<GameNightGuest />} />
             <Route path="/pt-scrabble" element={<ProtectedRoute><PTScrabble /></ProtectedRoute>} />

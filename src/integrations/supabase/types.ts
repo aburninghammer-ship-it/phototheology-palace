@@ -7005,6 +7005,125 @@ export type Database = {
         }
         Relationships: []
       }
+      equation_battle_games: {
+        Row: {
+          combined_result: string | null
+          combined_score: number | null
+          completed_at: string | null
+          created_at: string
+          difficulty: string
+          equation: string
+          explanation: string
+          game_mode: string
+          host_id: string
+          id: string
+          max_players: number
+          room_code: string
+          started_at: string | null
+          status: string
+          symbols: string[]
+          time_limit_seconds: number | null
+          updated_at: string
+          verse: string
+        }
+        Insert: {
+          combined_result?: string | null
+          combined_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: string
+          equation: string
+          explanation?: string
+          game_mode?: string
+          host_id: string
+          id?: string
+          max_players?: number
+          room_code?: string
+          started_at?: string | null
+          status?: string
+          symbols?: string[]
+          time_limit_seconds?: number | null
+          updated_at?: string
+          verse: string
+        }
+        Update: {
+          combined_result?: string | null
+          combined_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: string
+          equation?: string
+          explanation?: string
+          game_mode?: string
+          host_id?: string
+          id?: string
+          max_players?: number
+          room_code?: string
+          started_at?: string | null
+          status?: string
+          symbols?: string[]
+          time_limit_seconds?: number | null
+          updated_at?: string
+          verse?: string
+        }
+        Relationships: []
+      }
+      equation_battle_players: {
+        Row: {
+          answer: string | null
+          assigned_portion: string | null
+          assigned_symbols: string[]
+          display_name: string
+          feedback: string | null
+          game_id: string
+          id: string
+          is_done: boolean
+          joined_at: string
+          score: number | null
+          submitted_at: string | null
+          team_name: string | null
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          assigned_portion?: string | null
+          assigned_symbols?: string[]
+          display_name?: string
+          feedback?: string | null
+          game_id: string
+          id?: string
+          is_done?: boolean
+          joined_at?: string
+          score?: number | null
+          submitted_at?: string | null
+          team_name?: string | null
+          user_id: string
+        }
+        Update: {
+          answer?: string | null
+          assigned_portion?: string | null
+          assigned_symbols?: string[]
+          display_name?: string
+          feedback?: string | null
+          game_id?: string
+          id?: string
+          is_done?: boolean
+          joined_at?: string
+          score?: number | null
+          submitted_at?: string | null
+          team_name?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equation_battle_players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "equation_battle_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       equation_challenges: {
         Row: {
           created_at: string | null

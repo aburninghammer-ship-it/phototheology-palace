@@ -506,6 +506,19 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
           </p>
         </div>
 
+        {/* Battle Mode Link */}
+        <Card className="mb-6 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+          <CardContent className="flex items-center justify-between py-4">
+            <div>
+              <p className="font-semibold flex items-center gap-2">⚔️ Equation Battle</p>
+              <p className="text-sm text-muted-foreground">Split equations among friends. Each person decodes a portion. Jeeves combines and scores!</p>
+            </div>
+            <Button variant="default" size="sm" onClick={() => window.location.href = '/equations-battle'}>
+              Play
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Score Display */}
         <Card className="mb-6">
           <CardContent className="flex items-center justify-between py-4">
