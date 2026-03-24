@@ -22,6 +22,7 @@ import { FruitCheckChallenge } from "@/components/challenges/FruitCheckChallenge
 import { SubjectConnectionChallenge } from "@/components/challenges/SubjectConnectionChallenge";
 import { ChefRecipeChallenge } from "@/components/challenges/ChefRecipeChallenge";
 import { EquationDecodeChallenge } from "@/components/challenges/EquationDecodeChallenge";
+import { InlineEquationGenerator } from "@/components/challenges/InlineEquationGenerator";
 import { SeventyQuestionsChallenge } from "@/components/challenges/SeventyQuestionsChallenge";
 import { PrincipleStudyChallenge } from "@/components/challenges/PrincipleStudyChallenge";
 import { CommunityChallengeFeed } from "@/components/challenges/CommunityChallengeFeed";
