@@ -42,7 +42,7 @@ const ROOM_ICONS: Record<string, typeof BookOpen> = {
 };
 
 function getShareUrl(tourId: string) {
-  return `${window.location.origin}/palace-tour?tour=${tourId}`;
+  return `${window.location.origin}/palace/tour?tour=${tourId}`;
 }
 
 function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?: "icon" | "sm" }) {
