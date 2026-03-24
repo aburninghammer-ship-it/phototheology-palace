@@ -654,16 +654,16 @@ export default function AdminSubscriptions() {
 
             <Card className="border-primary/50 bg-primary/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Current Paying Subscribers</CardTitle>
-                <CardDescription>Suite + Church subscriptions only</CardDescription>
+                <CardTitle className="text-lg">Current Paying Users</CardTitle>
+                <CardDescription>Stripe + Patreon + Lifetime</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold text-primary">{stats.summary.total_paying_stripe}</div>
+                <div className="text-4xl font-bold text-primary">{stats.summary.total_with_access}</div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Summary Cards - LIVE SUITE STRIPE DATA */}
+          {/* Summary Cards - REAL STRIPE DATA */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
             <Card className="border-green-500/50 bg-green-500/5">
               <CardHeader className="pb-2">
@@ -671,7 +671,7 @@ export default function AdminSubscriptions() {
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
                   Stripe Active
                 </CardTitle>
-                <CardDescription>Paid subscribers only — Suite + Church (live)</CardDescription>
+                <CardDescription>Paying subscribers (live)</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-green-600">{stats.stripe.active_subscriptions}</div>
@@ -684,7 +684,7 @@ export default function AdminSubscriptions() {
                   <span className="text-blue-500">⏳</span>
                   7-Day Trials
                 </CardTitle>
-                <CardDescription>Suite Stripe trials + safety-net trials</CardDescription>
+                <CardDescription>Stripe + Safety-net trials</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-baseline gap-3">
@@ -694,7 +694,7 @@ export default function AdminSubscriptions() {
                   <span className="text-xs text-muted-foreground">total active</span>
                 </div>
                 <div className="flex gap-4 text-xs text-muted-foreground">
-                  <span>💳 {stats.stripe.trialing_subscriptions || 0} Suite Stripe</span>
+                  <span>💳 {stats.stripe.trialing_subscriptions || 0} Stripe</span>
                   <span>🛡️ {safetyNetTrials.length} Safety-net</span>
                 </div>
                 {safetyNetTrials.length > 0 && (
@@ -765,14 +765,14 @@ export default function AdminSubscriptions() {
             <Card className="border-green-500/50 bg-green-500/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Current MRR</CardTitle>
-                <CardDescription>From {stats.stripe.active_subscriptions} active paid subscribers (Suite + Church)</CardDescription>
+                <CardDescription>From {stats.stripe.active_subscriptions} active paying subscribers</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-green-600">
                   {stats.summary.current_mrr || stats.summary.monthly_recurring_revenue}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Monthly income from Suite + Church subscriptions
+                  Revenue you're collecting right now
                 </p>
               </CardContent>
             </Card>
@@ -780,14 +780,14 @@ export default function AdminSubscriptions() {
             <Card className="border-blue-500/50 bg-blue-500/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Projected MRR</CardTitle>
-                <CardDescription>Includes {stats.stripe.trialing_subscriptions} Suite trial users with cards</CardDescription>
+                <CardDescription>Includes {stats.stripe.trialing_subscriptions} trialing users with cards</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-blue-600">
                   {stats.summary.projected_mrr || stats.summary.monthly_recurring_revenue}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  +{stats.summary.trialing_mrr || '$0.00'} from Suite trials only
+                  +{stats.summary.trialing_mrr || '$0.00'} from trials (cards on file, converts in 7 days)
                 </p>
               </CardContent>
             </Card>
