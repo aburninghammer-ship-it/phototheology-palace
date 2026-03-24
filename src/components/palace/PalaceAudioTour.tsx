@@ -165,6 +165,7 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
           guide: segment.guide,
           script: segment.script,
           tourId: tour.id,
+          regenerate: true,
         },
       });
 
