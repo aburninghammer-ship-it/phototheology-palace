@@ -498,6 +498,7 @@ function App() {
             <Route path="/sparks" element={<ProtectedRoute><SparksLibrary /></ProtectedRoute>} />
             <Route path="/libraries" element={<ProtectedRoute><Libraries /></ProtectedRoute>} />
             <Route path="/palace/freestyle" element={<ProtectedRoute><PalaceFreestyle /></ProtectedRoute>} />
+            <Route path="/palace/tour" element={<ProtectedRoute><PalaceTourPage /></ProtectedRoute>} />
             <Route path="/palace/graphics" element={<ProtectedRoute><GraphicsGallery /></ProtectedRoute>} />
             <Route path="/mind-map" element={<ProtectedRoute><MindMapPalace /></ProtectedRoute>} />
             

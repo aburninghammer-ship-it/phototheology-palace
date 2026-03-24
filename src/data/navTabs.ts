@@ -103,6 +103,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     }
   },
   {
+    id: "palace-tour",
+    to: "/palace/tour",
+    label: "Tour the Palace",
+    shortLabel: "Tour",
+    icon: Headphones,
+    gradient: {
+      from: "from-teal-500/10",
+      to: "to-cyan-500/10",
+      border: "border-teal-500/20",
+      text: "from-teal-600 to-cyan-600",
+      glow: "rgba(20,184,166,0.5)"
+    }
+  },
+  {
     id: "freestyle",
     to: "/palace/freestyle",
     label: "Freestyle",
