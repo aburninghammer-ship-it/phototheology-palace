@@ -253,7 +253,7 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
     <Card className="overflow-hidden border-primary/20">
       <CardContent className="p-0">
         {/* Back button + Now Playing Header */}
-        <div className={`bg-gradient-to-r ${FLOOR_COLORS[currentSegment.floor] || FLOOR_COLORS[0]} p-4 md:p-6 text-white`}>
+        <div className={`relative bg-gradient-to-r ${FLOOR_COLORS[currentSegment.floor] || FLOOR_COLORS[0]} p-4 md:p-6 text-white`}>
           <button
             onClick={() => { cleanupAudio(); onBack(); }}
             className="flex items-center gap-1 text-xs text-white/70 hover:text-white mb-3 transition-colors"
