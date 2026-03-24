@@ -132,10 +132,23 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
   const [completedSegments, setCompletedSegments] = useState<Set<number>>(new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const activeRequestRef = useRef(0);
 
   const currentSegment = allSegments[currentIndex];
   const totalSegments = allSegments.length;
   const overallProgress = (completedSegments.size / totalSegments) * 100;
+
+  useEffect(() => {
+    const audio = new Audio();
+    audio.preload = "auto";
+    audioRef.current = audio;
+
+    return () => {
+      audio.pause();
+      audio.src = "";
+      audioRef.current = null;
+    };
+  }, []);
 
   const cleanupAudio = useCallback(() => {
     if (progressIntervalRef.current) {
@@ -144,7 +157,7 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
     }
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current = null;
+      audioRef.current.currentTime = 0;
     }
     setIsPlaying(false);
     setAudioProgress(0);
@@ -155,8 +168,16 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
     cleanupAudio();
     setIsLoading(true);
     setCurrentIndex(index);
+    const requestId = Date.now();
+    activeRequestRef.current = requestId;
 
     const segment = allSegments[index];
+    const audio = audioRef.current;
+
+    if (!audio) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-palace-tour-audio", {
@@ -174,12 +195,21 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
       const audioUrl = data?.audioUrl;
       if (!audioUrl) throw new Error("No audio URL returned");
 
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
+      if (activeRequestRef.current !== requestId) return;
+
+      audio.onloadedmetadata = null;
+      audio.onplay = null;
+      audio.onended = null;
+      audio.onerror = null;
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = audioUrl;
+      audio.load();
 
       audio.onloadedmetadata = () => setAudioDuration(audio.duration);
 
       audio.onplay = () => {
+        if (activeRequestRef.current !== requestId) return;
         setIsPlaying(true);
         setIsLoading(false);
         progressIntervalRef.current = setInterval(() => {
@@ -188,6 +218,7 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
       };
 
       audio.onended = () => {
+        if (activeRequestRef.current !== requestId) return;
         setIsPlaying(false);
         setCompletedSegments(prev => { const next = new Set(prev); next.add(index); return next; });
         if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
@@ -197,6 +228,7 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
       };
 
       audio.onerror = (e) => {
+        if (activeRequestRef.current !== requestId) return;
         console.error("Audio playback error for segment:", segment.id, e);
         setIsPlaying(false);
         setIsLoading(false);
@@ -208,6 +240,7 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
 
       await audio.play();
     } catch (err) {
+      if (activeRequestRef.current !== requestId) return;
       console.error("Tour audio error for segment:", segment?.id, err);
       setIsLoading(false);
       // Auto-skip to next segment on error
