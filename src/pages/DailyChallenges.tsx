@@ -516,34 +516,36 @@ const DailyChallenges = () => {
                   About Equation Challenges
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Decode biblical equations using palace principles and symbols.
-                  Discover how Scripture speaks in symbolic language that points to Christ.
+                  Decode biblical equations using Palace principles and symbols.
+                  Each symbol maps to a PT room or principle — discover how Scripture speaks through the Palace framework.
                 </p>
               </div>
+
+              {/* Example equation with PT principle symbols */}
               <EquationDecodeChallenge 
                 challenge={{
-                  title: "Equation Challenge",
+                  title: "Sample Equation — John 3:16",
                   passage_reference: "John 3:16",
-                  description: "Decode this biblical equation to discover its deeper meaning.",
+                  description: "Decode this PT equation to discover how Palace principles reveal Christ in this verse.",
                   verses: ["For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."],
                   ui_config: {
-                    equation: "🌍 + ❤️ + 🎁 = ∞",
+                    equation: "CR(🌍) + ST(🐑→✝️) + @CyC + DR(5D) = FRt(∞)",
                     verse_text: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
                     hints: [
-                      "🌍 = The world (all humanity)",
-                      "❤️ = God's love (agape)",
-                      "🎁 = The gift of His Son",
-                      "∞ = Everlasting life"
+                      "CR(🌍) = Concentration Room — Christ is the center of God's love for the world",
+                      "ST(🐑→✝️) = Symbols/Types Room — The Lamb (type) points to the Cross (antitype)",
+                      "@CyC = Cyrus–Christ Cycle — The ultimate Deliverer fulfills covenant promise",
+                      "DR(5D) = Dimensions Room — Literal gift, Christ as sacrifice, personal faith, church salvation, heavenly life",
+                      "FRt(∞) = Fruit Room — Everlasting life is the fruit of believing"
                     ]
                   }
                 }}
                 onSubmit={handleChallengeSubmit}
                 hasSubmitted={false}
               />
-              <div className="text-center">
-                <Button variant="outline" onClick={() => navigate("/equations-challenge")} className="gap-2">
-                  <Calculator className="h-4 w-4" />
-                  View Full Equations Challenge Mode
+
+              {/* Jeeves-powered equation generator */}
+              <InlineEquationGenerator onSubmit={handleChallengeSubmit} />
                 </Button>
               </div>
               <ChallengeInlineSubmissions
