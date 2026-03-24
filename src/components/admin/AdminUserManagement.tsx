@@ -32,11 +32,24 @@ export function AdminUserManagement() {
   const [tierFilter, setTierFilter] = useState<string>("all");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [stripeActiveCount, setStripeActiveCount] = useState<number | null>(null);
   const pageSize = 50;
 
   useEffect(() => {
     loadUsers();
+    loadStripeStats();
   }, []);
+
+  const loadStripeStats = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-subscriber-stats');
+      if (!error && data?.stripe?.active_subscriptions) {
+        setStripeActiveCount(data.stripe.active_subscriptions);
+      }
+    } catch (e) {
+      console.error("Error loading Stripe stats:", e);
+    }
+  };
 
   const loadUsers = async () => {
     setLoading(true);
