@@ -5,9 +5,10 @@ import { ProgressivePalace } from "@/components/palace/ProgressivePalace";
 import { PalaceBreadcrumbs } from "@/components/palace/PalaceBreadcrumbs";
 import { PalaceTour } from "@/components/onboarding/PalaceTour";
 import { PalaceGuidedTour } from "@/components/palace/PalaceGuidedTour";
+import { PalaceAudioTour } from "@/components/palace/PalaceAudioTour";
 import { palaceFloors } from "@/data/palaceData";
 import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
-import { Building2, Award, TrendingUp, BookOpen, Target, LayoutGrid, List, Box } from "lucide-react";
+import { Building2, Award, TrendingUp, BookOpen, Target, LayoutGrid, List, Box, Headphones } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { palaceSteps } from "@/config/howItWorksSteps";
@@ -34,7 +35,7 @@ const Palace = () => {
   const { completedRooms, completedRoomIds, totalRooms, progressPercentage, loading } = usePalaceProgress();
   const { showTour, loading: tourLoading, completeTour, skipTour } = usePalaceTour();
   const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState<"explore" | "progress">("explore");
+  const [activeTab, setActiveTab] = useState<"explore" | "progress" | "audio-tour">("explore");
   const [viewMode, setViewMode] = useState<"visual" | "list" | "3d">("list");
 
   const handleTourComplete = () => {
@@ -234,11 +235,15 @@ const Palace = () => {
             </div>
           </Card>
 
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "explore" | "progress")} className="mb-6">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "explore" | "progress" | "audio-tour")} className="mb-6">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="explore">
                 <Building2 className="h-4 w-4 mr-2" />
                 {t('palace.explorePalace')}
+              </TabsTrigger>
+              <TabsTrigger value="audio-tour">
+                <Headphones className="h-4 w-4 mr-2" />
+                Audio Tour
               </TabsTrigger>
               <TabsTrigger value="progress">
                 <Target className="h-4 w-4 mr-2" />
@@ -273,6 +278,16 @@ const Palace = () => {
                   <VisualPalace />
                 )}
               </div>
+            </TabsContent>
+
+            <TabsContent value="audio-tour" className="space-y-4">
+              <div className="text-center mb-4">
+                <h3 className="text-xl font-bold mb-1">🎧 Psalm 23 Palace Walkthrough</h3>
+                <p className="text-sm text-muted-foreground">
+                  Jeeves &amp; Reginald guide you through every room using Psalm 23 (~10 min)
+                </p>
+              </div>
+              <PalaceAudioTour />
             </TabsContent>
 
             <TabsContent value="progress" className="space-y-6">
