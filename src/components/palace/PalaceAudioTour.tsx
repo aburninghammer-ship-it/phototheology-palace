@@ -9,8 +9,10 @@ import {
   Play, Pause, SkipForward, SkipBack, Volume2, Loader2,
   Headphones, BookOpen, Flame, Eye, Gem, Brain, Crown,
   Telescope, Heart, Sparkles, Clock, Target, Layers, Scale,
-  Link2, Scroll, Search, Film, Image as ImageIcon, ChevronLeft
+  Link2, Scroll, Search, Film, Image as ImageIcon, ChevronLeft,
+  Share2, Copy, Check
 } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_TOURS, buildAllSegments, getTotalSeconds } from "@/data/tourScripts";
 import type { TourDefinition, TourSegment } from "@/data/tourScripts";
@@ -39,6 +41,47 @@ const ROOM_ICONS: Record<string, typeof BookOpen> = {
   FRm: Flame, MR: Brain, SRm: Sparkles, "∞": Crown, OUTRO: Headphones,
 };
 
+function getShareUrl(tourId: string) {
+  return `${window.location.origin}/palace/tour?tour=${tourId}`;
+}
+
+function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?: "icon" | "sm" }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = getShareUrl(tour.id);
+    const text = `🎧 Take the "${tour.title}" Palace Tour — ${tour.subtitle}\n"${tour.verseText}"`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${tour.title} — Palace Audio Tour`, text, url });
+        return;
+      } catch { /* cancelled */ }
+    }
+
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast.success("Tour link copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (size === "sm") {
+    return (
+      <Button variant="ghost" size="sm" onClick={handleShare} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/20">
+        {copied ? <Check className="h-3.5 w-3.5" /> : <Share2 className="h-3.5 w-3.5" />}
+        {copied ? "Copied!" : "Share"}
+      </Button>
+    );
+  }
+
+  return (
+    <Button variant="ghost" size="icon" onClick={handleShare} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+      {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+    </Button>
+  );
+}
+
 function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }) {
   return (
     <div className="space-y-4">
@@ -64,8 +107,11 @@ function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }
                   "{tour.verseText}"
                 </p>
               </div>
-              <div className="text-xs text-muted-foreground whitespace-nowrap">
-                ~{Math.round(getTotalSeconds(tour) / 60)} min
+              <div className="flex items-center gap-2">
+                <ShareTourButton tour={tour} />
+                <div className="text-xs text-muted-foreground whitespace-nowrap">
+                  ~{Math.round(getTotalSeconds(tour) / 60)} min
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -207,13 +253,16 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
     <Card className="overflow-hidden border-primary/20">
       <CardContent className="p-0">
         {/* Back button + Now Playing Header */}
-        <div className={`bg-gradient-to-r ${FLOOR_COLORS[currentSegment.floor] || FLOOR_COLORS[0]} p-4 md:p-6 text-white`}>
+        <div className={`relative bg-gradient-to-r ${FLOOR_COLORS[currentSegment.floor] || FLOOR_COLORS[0]} p-4 md:p-6 text-white`}>
           <button
             onClick={() => { cleanupAudio(); onBack(); }}
             className="flex items-center gap-1 text-xs text-white/70 hover:text-white mb-3 transition-colors"
           >
             <ChevronLeft className="h-3 w-3" /> All Tours
           </button>
+          <div className="absolute top-4 right-4">
+            <ShareTourButton tour={tour} size="sm" />
+          </div>
           <div className="flex items-start gap-3">
             <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm">
               <Icon className="h-6 w-6" />
@@ -341,6 +390,16 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
 
 export function PalaceAudioTour() {
   const [selectedTour, setSelectedTour] = useState<TourDefinition | null>(null);
+
+  // Auto-select tour from URL param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tourId = params.get("tour");
+    if (tourId && !selectedTour) {
+      const found = ALL_TOURS.find(t => t.id === tourId);
+      if (found) setSelectedTour(found);
+    }
+  }, []);
 
   if (selectedTour) {
     return <TourPlayer tour={selectedTour} onBack={() => setSelectedTour(null)} />;
