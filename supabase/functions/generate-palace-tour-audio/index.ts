@@ -11,13 +11,100 @@ const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// Voice assignments
 const VOICE_IDS = {
-  jeeves: "ErXwobaYiN019PkySvjV",   // Antoni — calm, analytical scholar
-  reginald: "onwK4e9ZLuTAKqWW03F9", // Daniel — authoritative, measured butler
+  jeeves: "ErXwobaYiN019PkySvjV",
+  reginald: "onwK4e9ZLuTAKqWW03F9",
 };
 
 const BUCKET = "audio-cache";
+const MAX_CHUNK_CHARS = 4500;
+
+/** Split text into chunks at sentence boundaries, each ≤ MAX_CHUNK_CHARS */
+function chunkScript(text: string): string[] {
+  if (text.length <= MAX_CHUNK_CHARS) return [text];
+
+  const chunks: string[] = [];
+  let remaining = text;
+
+  while (remaining.length > 0) {
+    if (remaining.length <= MAX_CHUNK_CHARS) {
+      chunks.push(remaining);
+      break;
+    }
+
+    // Find a sentence boundary near the limit
+    let splitAt = MAX_CHUNK_CHARS;
+    const searchWindow = remaining.substring(Math.floor(MAX_CHUNK_CHARS * 0.7), MAX_CHUNK_CHARS);
+    const lastPeriod = searchWindow.lastIndexOf(". ");
+    const lastQuestion = searchWindow.lastIndexOf("? ");
+    const lastExclaim = searchWindow.lastIndexOf("! ");
+    const bestSplit = Math.max(lastPeriod, lastQuestion, lastExclaim);
+
+    if (bestSplit > 0) {
+      splitAt = Math.floor(MAX_CHUNK_CHARS * 0.7) + bestSplit + 2;
+    }
+
+    chunks.push(remaining.substring(0, splitAt).trim());
+    remaining = remaining.substring(splitAt).trim();
+  }
+
+  return chunks;
+}
+
+/** Generate TTS for a single chunk */
+async function generateChunkAudio(
+  text: string,
+  voiceId: string,
+  previousText?: string,
+  nextText?: string
+): Promise<ArrayBuffer> {
+  const body: Record<string, unknown> = {
+    text,
+    model_id: "eleven_multilingual_v2",
+    voice_settings: {
+      stability: 0.6,
+      similarity_boost: 0.75,
+      style: 0.3,
+      use_speaker_boost: true,
+      speed: 0.95,
+    },
+  };
+
+  // Use request stitching for multi-chunk continuity
+  if (previousText) body.previous_text = previousText.slice(-300);
+  if (nextText) body.next_text = nextText.slice(0, 300);
+
+  const resp = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": ELEVENLABS_API_KEY!,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }
+  );
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`TTS error [${resp.status}]: ${errText}`);
+  }
+
+  return resp.arrayBuffer();
+}
+
+/** Concatenate multiple MP3 ArrayBuffers */
+function concatBuffers(buffers: ArrayBuffer[]): Uint8Array {
+  const totalLength = buffers.reduce((sum, b) => sum + b.byteLength, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const buf of buffers) {
+    result.set(new Uint8Array(buf), offset);
+    offset += buf.byteLength;
+  }
+  return result;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -43,7 +130,6 @@ serve(async (req) => {
       .createSignedUrl(storagePath, 3600);
 
     if (existing?.signedUrl) {
-      // Verify the file exists by checking if the URL is valid
       const checkResp = await fetch(existing.signedUrl, { method: "HEAD" });
       if (checkResp.ok) {
         return new Response(
@@ -53,7 +139,6 @@ serve(async (req) => {
       }
     }
 
-    // Generate TTS via ElevenLabs
     if (!ELEVENLABS_API_KEY) {
       return new Response(
         JSON.stringify({ error: "ElevenLabs API key not configured" }),
@@ -62,44 +147,28 @@ serve(async (req) => {
     }
 
     const voiceId = VOICE_IDS[guide as keyof typeof VOICE_IDS] || VOICE_IDS.jeeves;
+    const chunks = chunkScript(script);
 
-    const ttsResponse = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
-      {
-        method: "POST",
-        headers: {
-          "xi-api-key": ELEVENLABS_API_KEY,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: script,
-          model_id: "eleven_multilingual_v2",
-          voice_settings: {
-            stability: 0.6,
-            similarity_boost: 0.75,
-            style: 0.3,
-            use_speaker_boost: true,
-            speed: 0.95,
-          },
-        }),
-      }
-    );
+    console.log(`Generating ${chunks.length} chunk(s) for segment "${segmentId}" (${script.length} chars)`);
 
-    if (!ttsResponse.ok) {
-      const errText = await ttsResponse.text();
-      console.error(`ElevenLabs TTS error [${ttsResponse.status}]:`, errText);
-      return new Response(
-        JSON.stringify({ error: `TTS generation failed: ${ttsResponse.status}` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Generate all chunks with request stitching
+    const audioBuffers: ArrayBuffer[] = [];
+    for (let i = 0; i < chunks.length; i++) {
+      const previousText = i > 0 ? chunks[i - 1] : undefined;
+      const nextText = i < chunks.length - 1 ? chunks[i + 1] : undefined;
+      const buffer = await generateChunkAudio(chunks[i], voiceId, previousText, nextText);
+      audioBuffers.push(buffer);
     }
 
-    const audioBuffer = await ttsResponse.arrayBuffer();
+    // Concatenate all chunks
+    const finalAudio = chunks.length === 1
+      ? new Uint8Array(audioBuffers[0])
+      : concatBuffers(audioBuffers);
 
     // Cache to storage
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
-      .upload(storagePath, audioBuffer, {
+      .upload(storagePath, finalAudio, {
         contentType: "audio/mpeg",
         upsert: true,
       });
@@ -120,9 +189,9 @@ serve(async (req) => {
       );
     }
 
-    // Fallback: encode as base64 data URI so client can still play it
+    // Fallback: base64 data URI
     const { encode: base64Encode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
-    const base64Audio = base64Encode(audioBuffer);
+    const base64Audio = base64Encode(finalAudio);
     const dataUri = `data:audio/mpeg;base64,${base64Audio}`;
     return new Response(
       JSON.stringify({ audioUrl: dataUri, cached: false }),
