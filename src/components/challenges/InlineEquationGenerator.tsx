@@ -10,16 +10,13 @@ import { ChallengeShareDialog } from "./ChallengeShareDialog";
 import { PostToPublicChallengeButton } from "./PostToPublicChallengeButton";
 import { toast } from "sonner";
 
-type Difficulty = "easy" | "intermediate" | "advanced";
-
-interface InlineEquationGeneratorProps {
-  onSubmit: (data: any) => void;
-}
+type Difficulty = "easy" | "intermediate" | "advanced" | "pro";
 
 const difficultyInfo: Record<Difficulty, { symbols: number; description: string }> = {
   easy: { symbols: 3, description: "3 principles" },
   intermediate: { symbols: 6, description: "6 principles" },
   advanced: { symbols: 9, description: "9 principles" },
+  pro: { symbols: 12, description: "12 principles" },
 };
 
 export const InlineEquationGenerator = ({ onSubmit }: InlineEquationGeneratorProps) => {
