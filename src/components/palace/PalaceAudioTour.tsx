@@ -196,15 +196,24 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
         }
       };
 
-      audio.onerror = () => {
+      audio.onerror = (e) => {
+        console.error("Audio playback error for segment:", segment.id, e);
         setIsPlaying(false);
         setIsLoading(false);
+        // Auto-skip to next segment on error
+        if (index < totalSegments - 1) {
+          setTimeout(() => playSegment(index + 1), 1000);
+        }
       };
 
       await audio.play();
     } catch (err) {
-      console.error("Tour audio error:", err);
+      console.error("Tour audio error for segment:", segment?.id, err);
       setIsLoading(false);
+      // Auto-skip to next segment on error
+      if (index < totalSegments - 1) {
+        setTimeout(() => playSegment(index + 1), 1500);
+      }
     }
   }, [cleanupAudio, totalSegments, allSegments, tour.id]);
 
