@@ -1,14 +1,16 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Layers, Shuffle, RotateCcw, ChevronLeft, ChevronRight, Check, X, Trophy, Eye, EyeOff
+  Layers, Shuffle, RotateCcw, Check, X, Trophy, Eye, EyeOff, BookOpen, Lightbulb, Link2, LayoutGrid
 } from "lucide-react";
 import { bibleRenderedSets, BibleRenderedSet } from "@/data/bibleRenderedSets";
+import { getFrameDetail } from "@/data/bibleRenderedFrameDetails";
 import { getBibleRenderedImage } from "@/assets/bible-rendered";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type FlashcardSide = "image" | "info";
@@ -113,6 +115,7 @@ const BibleRenderedFlashcards = () => {
   }
 
   const img = getBibleRenderedImage(current.number);
+  const frameDetail = getFrameDetail(current.number);
 
   return (
     <div className="space-y-4">
@@ -146,12 +149,12 @@ const BibleRenderedFlashcards = () => {
               transition={{ duration: 0.25 }}
             >
               <Card
-                className="min-h-[320px] cursor-pointer hover:shadow-lg transition-shadow border-2 bg-card"
+                className="cursor-pointer hover:shadow-lg transition-shadow border-2 bg-card"
                 onClick={() => setSide(s => s === "image" ? "info" : "image")}
               >
-                <CardContent className="flex flex-col items-center justify-center min-h-[320px] p-8">
+                <CardContent className="p-6">
                 {side === "image" ? (
-                  <div className="text-center space-y-4">
+                  <div className="text-center space-y-4 min-h-[320px] flex flex-col items-center justify-center">
                     {img ? (
                       <img src={img} alt={current.name} className="w-44 h-44 mx-auto rounded-xl object-cover shadow-lg" />
                     ) : (
@@ -162,22 +165,98 @@ const BibleRenderedFlashcards = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="text-center space-y-3">
-                    <Badge className="mb-2">Set #{current.number}</Badge>
-                    <h2 className="text-2xl font-bold">{current.name}</h2>
-                    <p className="text-lg text-primary font-semibold">{current.range}</p>
-                    <p className="text-sm text-muted-foreground max-w-md leading-relaxed">{current.description}</p>
-                    {current.symbols.length > 0 && (
-                      <div className="flex flex-wrap gap-1 justify-center pt-1">
-                        {current.symbols.slice(0, 4).map((s, i) => (
-                          <Badge key={i} variant="outline" className="text-[10px]">{s}</Badge>
-                        ))}
+                  <ScrollArea className="max-h-[480px]">
+                    <div className="space-y-4 pr-2">
+                      {/* Header */}
+                      <div className="text-center space-y-1">
+                        <Badge className="mb-1">Frame #{current.number}</Badge>
+                        <h2 className="text-xl font-bold">{current.name}</h2>
+                        <p className="text-sm text-primary font-semibold">{current.range}</p>
                       </div>
-                    )}
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 justify-center mt-4">
-                      <EyeOff className="h-4 w-4" /> Tap to flip back
-                    </p>
-                  </div>
+
+                      {/* Theme Description */}
+                      {frameDetail && (
+                        <>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {frameDetail.themeDescription}
+                          </p>
+
+                          {/* Anchor Verse */}
+                          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 space-y-1">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wide">
+                              <BookOpen className="h-3.5 w-3.5" />
+                              Anchor Verse
+                            </div>
+                            <p className="text-sm font-semibold">{frameDetail.anchorVerse}</p>
+                            <p className="text-sm italic text-muted-foreground">"{frameDetail.anchorVerseText}"</p>
+                          </div>
+
+                          {/* Gem Triggers */}
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-600 uppercase tracking-wide">
+                              <Lightbulb className="h-3.5 w-3.5" />
+                              Gem Triggers
+                            </div>
+                            {frameDetail.gemTriggers.map((trigger, i) => (
+                              <p key={i} className="text-sm text-muted-foreground pl-3 border-l-2 border-amber-500/30">
+                                {trigger}
+                              </p>
+                            ))}
+                          </div>
+
+                          {/* Connections */}
+                          {frameDetail.connections.length > 0 && (
+                            <div className="space-y-1.5">
+                              <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 uppercase tracking-wide">
+                                <Link2 className="h-3.5 w-3.5" />
+                                Connections
+                              </div>
+                              <div className="flex flex-wrap gap-1">
+                                {frameDetail.connections.map((conn, i) => (
+                                  <Badge key={i} variant="outline" className="text-xs">
+                                    {conn}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* PT Room Activation */}
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-purple-600 uppercase tracking-wide">
+                              <LayoutGrid className="h-3.5 w-3.5" />
+                              PT Room Activation
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {frameDetail.primaryRooms.map((room, i) => (
+                                <Badge key={`p-${i}`} className="text-xs bg-purple-600/10 text-purple-700 border-purple-500/30">
+                                  {room}
+                                </Badge>
+                              ))}
+                              {frameDetail.secondaryRooms.map((room, i) => (
+                                <Badge key={`s-${i}`} variant="outline" className="text-xs text-muted-foreground">
+                                  {room}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Symbol badges */}
+                      {current.symbols.length > 0 && (
+                        <div className="flex flex-wrap gap-1 justify-center pt-1">
+                          {current.symbols.slice(0, 6).map((s, i) => (
+                            <Badge key={i} variant="outline" className="text-[10px]">{s}</Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 justify-center pt-2">
+                        <EyeOff className="h-4 w-4" /> Tap to flip back
+                      </p>
+                    </div>
+                  </ScrollArea>
                 )}
               </CardContent>
             </Card>
