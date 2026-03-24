@@ -765,14 +765,14 @@ export default function AdminSubscriptions() {
             <Card className="border-green-500/50 bg-green-500/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Current MRR</CardTitle>
-                <CardDescription>From {stats.stripe.active_subscriptions} active paid Suite subscribers</CardDescription>
+                <CardDescription>From {stats.stripe.active_subscriptions} active paid subscribers (Suite + Church)</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-green-600">
                   {stats.summary.current_mrr || stats.summary.monthly_recurring_revenue}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Monthly income from Suite monthly + annual only
+                  Monthly income from Suite + Church subscriptions
                 </p>
               </CardContent>
             </Card>
