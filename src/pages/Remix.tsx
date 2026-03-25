@@ -6,7 +6,7 @@ import { Disc3, Loader2, Sparkles, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import ReactMarkdown from "react-markdown";
+import { StyledMarkdownSections } from "@/components/ui/styled-markdown";
 
 export default function Remix() {
   const { user } = useAuth();
