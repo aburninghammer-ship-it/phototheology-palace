@@ -2,8 +2,8 @@ import type { TourDefinition } from "./types";
 
 export const PSALM_23_TOUR: TourDefinition = {
   id: "psalm23",
-  title: "Psalm 23 Walkthrough",
-  subtitle: "The Shepherd's Psalm through every room (~15 min)",
+  title: "Psalm 23 — Deep Immersion",
+  subtitle: "Every room, every floor, every principle (~18 min)",
   verse: "Psalm 23",
   verseText: "The LORD is my shepherd; I shall not want.",
   emoji: "🐑",
