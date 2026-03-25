@@ -12,7 +12,7 @@ import {
   Headphones, BookOpen, Flame, Eye, Gem, Brain, Crown,
   Telescope, Heart, Sparkles, Clock, Target, Layers, Scale,
   Link2, Scroll, Search, Film, Image as ImageIcon, ChevronLeft,
-  Share2, Copy, Check, Facebook, Twitter, Mail, Video
+  Share2, Copy, Check, Facebook, Twitter, Mail
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
