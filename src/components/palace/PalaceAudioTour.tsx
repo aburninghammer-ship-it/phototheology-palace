@@ -57,7 +57,6 @@ function getOgShareUrl(tourId: string) {
 function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?: "icon" | "sm" }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [generatingVideo, setGeneratingVideo] = useState(false);
 
   const shareUrl = getShareUrl(tour.id);
   const ogUrl = getOgShareUrl(tour.id);
