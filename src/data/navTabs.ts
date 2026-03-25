@@ -10,7 +10,8 @@ import {
   PersonStanding,
   Eye,
   Scale,
-  Headphones
+  Headphones,
+  Megaphone
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -677,6 +678,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
       border: "border-slate-500/20",
       text: "from-slate-600 to-zinc-600",
       glow: "rgba(100,116,139,0.5)"
+    }
+  },
+  {
+    id: "amplify",
+    to: "/amplify",
+    label: "Amplify",
+    shortLabel: "Amplify",
+    icon: Megaphone,
+    gradient: {
+      from: "from-amber-500/10",
+      to: "to-orange-500/10",
+      border: "border-amber-500/20",
+      text: "from-amber-600 to-orange-600",
+      glow: "rgba(245,158,11,0.5)"
     }
   },
   {
