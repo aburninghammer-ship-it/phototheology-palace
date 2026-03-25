@@ -146,7 +146,7 @@ export default function Remix() {
               </Button>
             </div>
             <div className="prose prose-sm dark:prose-invert max-w-none">
-              <ReactMarkdown>{report}</ReactMarkdown>
+              <StyledMarkdownSections content={report} />
             </div>
           </div>
         )}
