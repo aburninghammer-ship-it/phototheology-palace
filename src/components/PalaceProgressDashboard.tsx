@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AudioExplorerBadge } from "@/components/audio/AudioExplorerBadge";
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -309,6 +310,8 @@ export function PalaceProgressDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      <AudioExplorerBadge />
 
       <Card variant="glass">
         <CardHeader>
