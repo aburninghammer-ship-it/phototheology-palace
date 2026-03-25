@@ -10660,7 +10660,17 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     // For generate-series-outline mode, parse JSON
     if (mode === "generate-series-outline") {
       try {
-        const parsed = JSON.parse(content);
+        // Clean the content of any markdown code blocks
+        let cleanContent = content.trim();
+        if (cleanContent.startsWith('```json')) {
+          cleanContent = cleanContent.slice(7);
+        } else if (cleanContent.startsWith('```')) {
+          cleanContent = cleanContent.slice(3);
+        }
+        if (cleanContent.endsWith('```')) {
+          cleanContent = cleanContent.slice(0, -3);
+        }
+        const parsed = JSON.parse(cleanContent.trim());
         return new Response(
           JSON.stringify(parsed),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
