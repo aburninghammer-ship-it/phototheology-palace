@@ -57,6 +57,7 @@ export const TOUR_TIERS: TourTier[] = [
 export const ALL_TOURS: TourDefinition[] = [
   HOOK_TOUR,
   PSALM_23_GUIDED_TOUR,
+  PHILIPPIANS_2_GUIDED_TOUR,
   PSALM_23_TOUR,
   PHILIPPIANS_2_5_TOUR,
   SUITE_TOUR,
