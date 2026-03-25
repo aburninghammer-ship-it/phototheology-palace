@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { StyledMarkdownSections } from "@/components/ui/styled-markdown";
+import { StudyTransformActions } from "@/components/study-transform/StudyTransformActions";
 
 export default function Remix() {
   const { user } = useAuth();
   const [studyText, setStudyText] = useState("");
   const [report, setReport] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [originalInput, setOriginalInput] = useState("");
 
   const handleRemix = async () => {
     if (studyText.length < 100) {
@@ -22,6 +24,7 @@ export default function Remix() {
 
     setIsGenerating(true);
     setReport("");
+    setOriginalInput(studyText);
 
     try {
       const { data, error } = await supabase.functions.invoke("remix-study", {
@@ -54,6 +57,12 @@ export default function Remix() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleLayerBack = (combinedText: string) => {
+    setStudyText(combinedText);
+    setReport("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -98,7 +107,7 @@ export default function Remix() {
             </div>
           </div>
 
-        {/* Info */}
+          {/* Info */}
           <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
             <p className="text-xs text-muted-foreground">
               <Sparkles className="h-3.5 w-3.5 inline mr-1 text-amber-500" />
@@ -148,6 +157,14 @@ export default function Remix() {
             <div className="prose prose-sm dark:prose-invert max-w-none">
               <StyledMarkdownSections content={report} />
             </div>
+
+            <StudyTransformActions
+              report={report}
+              originalText={originalInput}
+              toolName="Remix"
+              accentColor="amber"
+              onLayerBack={handleLayerBack}
+            />
           </div>
         )}
       </div>

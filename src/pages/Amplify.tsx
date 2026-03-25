@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { StyledMarkdownSections } from "@/components/ui/styled-markdown";
+import { StudyTransformActions } from "@/components/study-transform/StudyTransformActions";
 
 export default function Amplify() {
   const { user } = useAuth();
   const [studyText, setStudyText] = useState("");
   const [report, setReport] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [originalInput, setOriginalInput] = useState("");
 
   const handleAmplify = async () => {
     if (studyText.length < 100) {
@@ -22,6 +24,7 @@ export default function Amplify() {
 
     setIsGenerating(true);
     setReport("");
+    setOriginalInput(studyText);
 
     try {
       const { data, error } = await supabase.functions.invoke("amplify-study", {
@@ -54,6 +57,12 @@ export default function Amplify() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleLayerBack = (combinedText: string) => {
+    setStudyText(combinedText);
+    setReport("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -148,6 +157,14 @@ export default function Amplify() {
             <div className="prose prose-sm dark:prose-invert max-w-none">
               <StyledMarkdownSections content={report} />
             </div>
+
+            <StudyTransformActions
+              report={report}
+              originalText={originalInput}
+              toolName="Amplify"
+              accentColor="blue"
+              onLayerBack={handleLayerBack}
+            />
           </div>
         )}
       </div>
