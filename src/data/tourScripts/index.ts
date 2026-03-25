@@ -4,12 +4,14 @@ export { HOOK_TOUR } from "./hookTour";
 export { PSALM_23_TOUR } from "./psalm23Tour";
 export { PSALM_23_GUIDED_TOUR } from "./psalm23GuidedTour";
 export { PHILIPPIANS_2_5_TOUR } from "./philippians2Tour";
+export { PHILIPPIANS_2_GUIDED_TOUR } from "./philippians2GuidedTour";
 export { SUITE_TOUR } from "./suiteTour";
 
 import { HOOK_TOUR } from "./hookTour";
 import { PSALM_23_TOUR } from "./psalm23Tour";
 import { PSALM_23_GUIDED_TOUR } from "./psalm23GuidedTour";
 import { PHILIPPIANS_2_5_TOUR } from "./philippians2Tour";
+import { PHILIPPIANS_2_GUIDED_TOUR } from "./philippians2GuidedTour";
 import { SUITE_TOUR } from "./suiteTour";
 import type { TourDefinition } from "./types";
 
@@ -34,7 +36,7 @@ export const TOUR_TIERS: TourTier[] = [
     description: "Step-by-step walkthroughs — 5 key rooms, one passage, deep insight.",
     badge: "10–12 min",
     badgeColor: "bg-blue-500/20 text-blue-400",
-    tours: [PSALM_23_GUIDED_TOUR],
+    tours: [PSALM_23_GUIDED_TOUR, PHILIPPIANS_2_GUIDED_TOUR],
   },
   {
     label: "Deep Immersion",
@@ -55,6 +57,7 @@ export const TOUR_TIERS: TourTier[] = [
 export const ALL_TOURS: TourDefinition[] = [
   HOOK_TOUR,
   PSALM_23_GUIDED_TOUR,
+  PHILIPPIANS_2_GUIDED_TOUR,
   PSALM_23_TOUR,
   PHILIPPIANS_2_5_TOUR,
   SUITE_TOUR,
