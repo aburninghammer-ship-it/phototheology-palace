@@ -123,7 +123,7 @@ const StrongsWordPopup = ({
                 {entry.transliteration} ({entry.pronunciation})
               </p>
             </div>
-            <div className="border-t border-white/10 pt-3">
+            <div className="border-t border-border pt-3">
               <p className="text-sm text-foreground/90 leading-relaxed">{entry.definition}</p>
             </div>
             {entry.usage && entry.usage.length > 0 && (
