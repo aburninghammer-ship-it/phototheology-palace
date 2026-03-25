@@ -79,7 +79,7 @@ function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?:
     window.open(url, "_blank", "noopener,noreferrer,width=600,height=500");
   };
 
-  const handleFacebook = () => openIntent(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogUrl)}&quote=${encodeURIComponent(shareText)}`);
+  const handleFacebook = () => openIntent(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`);
   const handleTwitter = () => openIntent(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`);
   const handleEmail = () => {
     window.location.href = `mailto:?subject=${encodeURIComponent(`🎧 ${tour.title} — Palace Audio Tour`)}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
