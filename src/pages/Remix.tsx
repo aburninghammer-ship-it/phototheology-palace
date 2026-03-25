@@ -6,7 +6,7 @@ import { Disc3, Loader2, Sparkles, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import ReactMarkdown from "react-markdown";
+import { StyledMarkdownSections } from "@/components/ui/styled-markdown";
 
 export default function Remix() {
   const { user } = useAuth();
@@ -98,11 +98,11 @@ export default function Remix() {
             </div>
           </div>
 
-          {/* Info */}
+        {/* Info */}
           <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
             <p className="text-xs text-muted-foreground">
               <Sparkles className="h-3.5 w-3.5 inline mr-1 text-amber-500" />
-              Jeeves will analyze your study and create <strong>3 unique Remix Tracks</strong> — each using a different combination of Palace rooms to reveal fresh angles, hidden connections, and unexplored possibilities.
+              Jeeves will take your study's elements and <strong>rebuild them into 3 entirely new studies</strong> — each with a different theological architecture (Sanctuary progression, Pattern movement, Prophetic timeline, etc.). Same bricks, new cathedral. Hit Re-Remix for fresh remix types.
             </p>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function Remix() {
               </Button>
             </div>
             <div className="prose prose-sm dark:prose-invert max-w-none">
-              <ReactMarkdown>{report}</ReactMarkdown>
+              <StyledMarkdownSections content={report} />
             </div>
           </div>
         )}
