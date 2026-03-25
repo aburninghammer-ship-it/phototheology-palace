@@ -175,22 +175,33 @@ export default function Amplify() {
         return id;
       });
 
-      const response = await supabase.functions.invoke("amplify-study", {
+      const { data, error } = await supabase.functions.invoke("amplify-study", {
         body: { studyText, rooms: roomNames }
       });
 
-      if (response.error) throw response.error;
-      setReport(response.data?.report || "No report generated.");
+      if (error) {
+        console.error("Amplify invoke error:", error);
+        const msg = typeof error === "object" && error.message ? error.message : String(error);
+        if (msg.includes("429")) {
+          toast.error("Rate limited — please wait a moment and try again");
+        } else if (msg.includes("402")) {
+          toast.error("AI credits exhausted — please add funds in Settings");
+        } else {
+          toast.error("Failed to amplify study. Please try again.");
+        }
+        return;
+      }
+
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setReport(data?.report || "No report generated.");
       toast.success("Study amplified through the Palace!");
     } catch (err: any) {
       console.error("Amplify error:", err);
-      if (err?.message?.includes("429") || err?.status === 429) {
-        toast.error("Rate limited — please wait a moment and try again");
-      } else if (err?.message?.includes("402") || err?.status === 402) {
-        toast.error("AI credits exhausted — please add funds in Settings");
-      } else {
-        toast.error("Failed to amplify study. Please try again.");
-      }
+      toast.error("Failed to amplify study. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -349,10 +360,41 @@ export default function Amplify() {
         {/* Report Output */}
         {report && (
           <div className="mt-8 border border-amber-500/20 rounded-xl bg-card p-6">
-            <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-amber-500" />
-              Amplified Report
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-amber-500" />
+                Amplified Report
+              </h2>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const suggested = suggestRooms(studyText);
+                    // Shuffle and pick a different subset
+                    const available = ALL_ROOM_IDS.filter(id => !suggested.includes(id));
+                    const extras = available.sort(() => Math.random() - 0.5).slice(0, 3);
+                    const base = suggested.sort(() => Math.random() - 0.5).slice(0, Math.max(3, suggested.length - 2));
+                    setSelectedRooms([...new Set([...base, ...extras])]);
+                    toast.info("New room combination selected — hit Amplify to re-run!");
+                  }}
+                  className="text-xs border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+                >
+                  <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                  Shuffle Rooms
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAmplify}
+                  disabled={isGenerating}
+                  className="text-xs border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+                >
+                  <Megaphone className="h-3.5 w-3.5 mr-1" />
+                  Re-Amplify
+                </Button>
+              </div>
+            </div>
             <div className="prose prose-sm dark:prose-invert max-w-none">
               <ReactMarkdown>{report}</ReactMarkdown>
             </div>
