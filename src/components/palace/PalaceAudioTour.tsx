@@ -157,16 +157,16 @@ function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?:
               )}
             </div>
 
-            {/* Facebook tip */}
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 space-y-2">
-              <p className="text-xs font-medium text-blue-400 flex items-center gap-1.5">
-                <Video className="h-3.5 w-3.5" /> Want people to listen directly on Facebook?
+            {/* Video export for native social media playback */}
+            <div className="border border-purple-500/20 bg-purple-500/5 rounded-lg p-3 space-y-2">
+              <p className="text-xs font-medium text-purple-400 flex items-center gap-1.5">
+                🎬 Share as native video on social media
               </p>
-              <p className="text-xs text-muted-foreground">
-                Facebook doesn't support inline audio from external links. To share audio natively: 
-                listen to the tour, then use your phone's screen recording to capture the audio with the tour visuals. 
-                Upload that video directly to Facebook for maximum engagement!
+              <p className="text-xs text-muted-foreground mb-2">
+                Export the tour as a video file with branded visuals & audio. 
+                Upload directly to Facebook, Instagram, or YouTube — people can listen without needing an account!
               </p>
+              <VideoExportButton tour={tour} />
             </div>
 
             {/* Link display */}
