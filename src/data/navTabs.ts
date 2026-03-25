@@ -681,6 +681,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     }
   },
   {
+    id: "amplify",
+    to: "/amplify",
+    label: "Amplify",
+    shortLabel: "Amplify",
+    icon: Zap,
+    gradient: {
+      from: "from-blue-500/10",
+      to: "to-indigo-500/10",
+      border: "border-blue-500/20",
+      text: "from-blue-600 to-indigo-600",
+      glow: "rgba(59,130,246,0.5)"
+    }
+  },
+  {
     id: "remix",
     to: "/remix",
     label: "Remix",
