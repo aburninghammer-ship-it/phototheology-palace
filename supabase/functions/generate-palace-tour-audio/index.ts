@@ -36,7 +36,7 @@ const VOICE_CONFIGS = {
 
 const BUCKET = "audio-cache";
 const MAX_CHUNK_CHARS = 4500;
-const VOICE_CACHE_VERSION = "v5-room-explanations";
+const VOICE_CACHE_VERSION = "v6-tiered-tours";
 
 function chunkScript(text: string): string[] {
   if (text.length <= MAX_CHUNK_CHARS) return [text];

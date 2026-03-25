@@ -14,8 +14,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ALL_TOURS, buildAllSegments, getTotalSeconds } from "@/data/tourScripts";
+import { ALL_TOURS, TOUR_TIERS, buildAllSegments, getTotalSeconds } from "@/data/tourScripts";
 import type { TourDefinition, TourSegment } from "@/data/tourScripts";
+import type { TourTier } from "@/data/tourScripts";
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 
 const FLOOR_COLORS: Record<number, string> = {
@@ -84,39 +85,51 @@ function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?:
 
 function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="text-center mb-6">
         <h3 className="text-xl font-bold mb-1">🎧 Palace Audio Tours</h3>
         <p className="text-sm text-muted-foreground">
-          Jeeves &amp; Reginald guide you through every room using a single passage
+          Jeeves &amp; Reginald guide you through the Palace — pick your depth
         </p>
       </div>
-      <div className="grid gap-3">
-        {ALL_TOURS.map((tour) => (
-          <Card
-            key={tour.id}
-            className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-md"
-            onClick={() => onSelect(tour)}
-          >
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="text-3xl">{tour.emoji}</div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-base">{tour.title}</h4>
-                <p className="text-sm text-muted-foreground">{tour.subtitle}</p>
-                <p className="text-xs text-primary font-medium mt-1 italic">
-                  "{tour.verseText}"
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <ShareTourButton tour={tour} />
-                <div className="text-xs text-muted-foreground whitespace-nowrap">
-                  ~{Math.round(getTotalSeconds(tour) / 60)} min
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+
+      {TOUR_TIERS.map((tier) => (
+        <div key={tier.label} className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <h4 className="text-sm font-bold text-foreground">{tier.label}</h4>
+            <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${tier.badgeColor}`}>
+              {tier.badge}
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground px-1 -mt-1">{tier.description}</p>
+          <div className="grid gap-2">
+            {tier.tours.map((tour) => (
+              <Card
+                key={tour.id}
+                className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-md"
+                onClick={() => onSelect(tour)}
+              >
+                <CardContent className="p-3 flex items-center gap-3">
+                  <div className="text-2xl">{tour.emoji}</div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-sm">{tour.title}</h4>
+                    <p className="text-xs text-muted-foreground truncate">{tour.subtitle}</p>
+                    <p className="text-[11px] text-primary font-medium mt-0.5 italic truncate">
+                      "{tour.verseText}"
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ShareTourButton tour={tour} />
+                    <div className="text-xs text-muted-foreground whitespace-nowrap">
+                      ~{Math.round(getTotalSeconds(tour) / 60)} min
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
