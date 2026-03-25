@@ -4,12 +4,14 @@ export { HOOK_TOUR } from "./hookTour";
 export { PSALM_23_TOUR } from "./psalm23Tour";
 export { PSALM_23_GUIDED_TOUR } from "./psalm23GuidedTour";
 export { PHILIPPIANS_2_5_TOUR } from "./philippians2Tour";
+export { PHILIPPIANS_2_GUIDED_TOUR } from "./philippians2GuidedTour";
 export { SUITE_TOUR } from "./suiteTour";
 
 import { HOOK_TOUR } from "./hookTour";
 import { PSALM_23_TOUR } from "./psalm23Tour";
 import { PSALM_23_GUIDED_TOUR } from "./psalm23GuidedTour";
 import { PHILIPPIANS_2_5_TOUR } from "./philippians2Tour";
+import { PHILIPPIANS_2_GUIDED_TOUR } from "./philippians2GuidedTour";
 import { SUITE_TOUR } from "./suiteTour";
 import type { TourDefinition } from "./types";
 
