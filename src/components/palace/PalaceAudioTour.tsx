@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import {
   Play, Pause, SkipForward, SkipBack, Volume2, Loader2,
   Headphones, BookOpen, Flame, Eye, Gem, Brain, Crown,
   Telescope, Heart, Sparkles, Clock, Target, Layers, Scale,
   Link2, Scroll, Search, Film, Image as ImageIcon, ChevronLeft,
-  Share2, Copy, Check
+  Share2, Copy, Check, Facebook, Twitter, Mail, Video, Download
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
