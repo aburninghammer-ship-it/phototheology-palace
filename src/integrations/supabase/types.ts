@@ -9277,6 +9277,36 @@ export type Database = {
         }
         Relationships: []
       }
+      hallucination_audit_logs: {
+        Row: {
+          id: string
+          run_at: string
+          status: string
+          summary: string | null
+          total_scanned: number
+          violations: Json
+          violations_found: number
+        }
+        Insert: {
+          id?: string
+          run_at?: string
+          status?: string
+          summary?: string | null
+          total_scanned?: number
+          violations?: Json
+          violations_found?: number
+        }
+        Update: {
+          id?: string
+          run_at?: string
+          status?: string
+          summary?: string | null
+          total_scanned?: number
+          violations?: Json
+          violations_found?: number
+        }
+        Relationships: []
+      }
       image_bible_cache: {
         Row: {
           book: string
