@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import {
   Play, Pause, SkipForward, SkipBack, Volume2, Loader2,
   Headphones, BookOpen, Flame, Eye, Gem, Brain, Crown,
   Telescope, Heart, Sparkles, Clock, Target, Layers, Scale,
   Link2, Scroll, Search, Film, Image as ImageIcon, ChevronLeft,
-  Share2, Copy, Check
+  Share2, Copy, Check, Facebook, Twitter, Mail, Video
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,44 +43,140 @@ const ROOM_ICONS: Record<string, typeof BookOpen> = {
   FRm: Flame, MR: Brain, SRm: Sparkles, "∞": Crown, OUTRO: Headphones,
 };
 
+const PRODUCTION_URL = "https://phototheologybible.com";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+
 function getShareUrl(tourId: string) {
-  return `${window.location.origin}/palace/tour?tour=${tourId}`;
+  return `${PRODUCTION_URL}/palace/tour?tour=${tourId}`;
+}
+
+function getOgShareUrl(tourId: string) {
+  return `${SUPABASE_URL}/functions/v1/og-palace-tour?tour=${tourId}`;
 }
 
 function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?: "icon" | "sm" }) {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleShare = async (e: React.MouseEvent) => {
+  const shareUrl = getShareUrl(tour.id);
+  const ogUrl = getOgShareUrl(tour.id);
+  const shareText = `🎧 Take the "${tour.title}" Palace Tour — ${tour.subtitle}\n"${tour.verseText}"\n\n— Phototheology Palace`;
+
+  const handleOpen = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const url = getShareUrl(tour.id);
-    const text = `🎧 Take the "${tour.title}" Palace Tour — ${tour.subtitle}\n"${tour.verseText}"`;
+    setDialogOpen(true);
+  };
 
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: `${tour.title} — Palace Audio Tour`, text, url });
-        return;
-      } catch { /* cancelled */ }
-    }
-
-    await navigator.clipboard.writeText(url);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`);
     setCopied(true);
-    toast.success("Tour link copied!");
+    toast.success("Copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (size === "sm") {
-    return (
-      <Button variant="ghost" size="sm" onClick={handleShare} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/20">
-        {copied ? <Check className="h-3.5 w-3.5" /> : <Share2 className="h-3.5 w-3.5" />}
-        {copied ? "Copied!" : "Share"}
-      </Button>
-    );
-  }
+  const openIntent = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer,width=600,height=500");
+  };
+
+  const handleFacebook = () => openIntent(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogUrl)}&quote=${encodeURIComponent(shareText)}`);
+  const handleTwitter = () => openIntent(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`);
+  const handleEmail = () => {
+    window.location.href = `mailto:?subject=${encodeURIComponent(`🎧 ${tour.title} — Palace Audio Tour`)}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
+  };
+  const handleWhatsApp = () => openIntent(`https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`);
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${tour.title} — Palace Audio Tour`, text: shareText, url: shareUrl });
+      } catch { /* cancelled */ }
+    }
+  };
+
+  const triggerButton = size === "sm" ? (
+    <Button variant="ghost" size="sm" onClick={handleOpen} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/20">
+      <Share2 className="h-3.5 w-3.5" /> Share
+    </Button>
+  ) : (
+    <Button variant="ghost" size="icon" onClick={handleOpen} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+      <Share2 className="h-4 w-4" />
+    </Button>
+  );
 
   return (
-    <Button variant="ghost" size="icon" onClick={handleShare} className="h-8 w-8 text-muted-foreground hover:text-foreground">
-      {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
-    </Button>
+    <>
+      {triggerButton}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" /> Share This Tour
+            </DialogTitle>
+            <DialogDescription>
+              Share "{tour.title}" with friends and Bible study groups
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Preview */}
+            <div className="border border-border/50 bg-muted/30 rounded-lg p-3 space-y-1">
+              <p className="font-medium text-sm">{tour.emoji} {tour.title}</p>
+              <p className="text-xs text-muted-foreground">{tour.subtitle}</p>
+              <p className="text-xs italic text-muted-foreground">"{tour.verseText}"</p>
+            </div>
+
+            {/* Social buttons */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium block">Share To</label>
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleFacebook}>
+                  <Facebook className="h-4 w-4 text-blue-600" /> Facebook
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleTwitter}>
+                  <Twitter className="h-4 w-4 text-sky-500" /> X / Twitter
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleWhatsApp}>
+                  <span className="w-4 text-center text-sm">💬</span> WhatsApp
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2 justify-start" onClick={handleEmail}>
+                  <Mail className="h-4 w-4" /> Email
+                </Button>
+              </div>
+            </div>
+
+            {/* Copy + Native share */}
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1 gap-2" onClick={handleCopy}>
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? "Copied!" : "Copy Link & Text"}
+              </Button>
+              {typeof navigator.share === "function" && (
+                <Button variant="default" className="flex-1 gap-2" onClick={handleNativeShare}>
+                  <Share2 className="h-4 w-4" /> More...
+                </Button>
+              )}
+            </div>
+
+            {/* Facebook tip */}
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 space-y-2">
+              <p className="text-xs font-medium text-blue-400 flex items-center gap-1.5">
+                <Video className="h-3.5 w-3.5" /> Want people to listen directly on Facebook?
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Facebook doesn't support inline audio from external links. To share audio natively: 
+                listen to the tour, then use your phone's screen recording to capture the audio with the tour visuals. 
+                Upload that video directly to Facebook for maximum engagement!
+              </p>
+            </div>
+
+            {/* Link display */}
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Share Link</label>
+              <input type="text" value={shareUrl} readOnly className="w-full px-3 py-2 text-xs border rounded-md bg-muted" />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
