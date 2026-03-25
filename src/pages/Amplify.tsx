@@ -175,22 +175,33 @@ export default function Amplify() {
         return id;
       });
 
-      const response = await supabase.functions.invoke("amplify-study", {
+      const { data, error } = await supabase.functions.invoke("amplify-study", {
         body: { studyText, rooms: roomNames }
       });
 
-      if (response.error) throw response.error;
-      setReport(response.data?.report || "No report generated.");
+      if (error) {
+        console.error("Amplify invoke error:", error);
+        const msg = typeof error === "object" && error.message ? error.message : String(error);
+        if (msg.includes("429")) {
+          toast.error("Rate limited — please wait a moment and try again");
+        } else if (msg.includes("402")) {
+          toast.error("AI credits exhausted — please add funds in Settings");
+        } else {
+          toast.error("Failed to amplify study. Please try again.");
+        }
+        return;
+      }
+
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setReport(data?.report || "No report generated.");
       toast.success("Study amplified through the Palace!");
     } catch (err: any) {
       console.error("Amplify error:", err);
-      if (err?.message?.includes("429") || err?.status === 429) {
-        toast.error("Rate limited — please wait a moment and try again");
-      } else if (err?.message?.includes("402") || err?.status === 402) {
-        toast.error("AI credits exhausted — please add funds in Settings");
-      } else {
-        toast.error("Failed to amplify study. Please try again.");
-      }
+      toast.error("Failed to amplify study. Please try again.");
     } finally {
       setIsGenerating(false);
     }
