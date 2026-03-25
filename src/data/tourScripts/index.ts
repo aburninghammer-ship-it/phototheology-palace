@@ -36,7 +36,7 @@ export const TOUR_TIERS: TourTier[] = [
     description: "Step-by-step walkthroughs — 5 key rooms, one passage, deep insight.",
     badge: "10–12 min",
     badgeColor: "bg-blue-500/20 text-blue-400",
-    tours: [PSALM_23_GUIDED_TOUR],
+    tours: [PSALM_23_GUIDED_TOUR, PHILIPPIANS_2_GUIDED_TOUR],
   },
   {
     label: "Deep Immersion",
