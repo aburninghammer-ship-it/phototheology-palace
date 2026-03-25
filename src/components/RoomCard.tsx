@@ -6,6 +6,8 @@ import { Sparkles, BookOpen, Target, Lightbulb, Lock } from "lucide-react";
 import { JeevesAssistant } from "@/components/JeevesAssistant";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { RoomDemoAudio } from "@/components/audio/RoomDemoAudio";
+import { palaceFloors } from "@/data/palaceData";
 
 interface RoomCardProps {
   room: Room;
@@ -112,7 +114,7 @@ export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
               </div>
             )}
 
-            <div className="pt-4 border-t-2 border-border/30">
+            <div className="pt-4 border-t-2 border-border/30 space-y-3">
               <div className="flex items-start gap-2">
                 <Badge variant="outline" className="text-xs font-semibold">
                   {t('roomCard.deliverable')}
@@ -121,6 +123,17 @@ export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
                   {room.deliverable}
                 </p>
               </div>
+
+              {isUnlocked && (
+                <RoomDemoAudio
+                  roomId={room.id}
+                  roomName={room.name}
+                  roomPurpose={room.purpose}
+                  roomMethod={room.method}
+                  floorNumber={floorNumber}
+                  floorName={palaceFloors.find(f => f.number === floorNumber)?.name || `Floor ${floorNumber}`}
+                />
+              )}
             </div>
           </CardContent>
         </Card>
