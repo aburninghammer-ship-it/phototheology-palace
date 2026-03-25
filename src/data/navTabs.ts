@@ -681,10 +681,10 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
     }
   },
   {
-    id: "amplify",
-    to: "/amplify",
-    label: "Amplify",
-    shortLabel: "Amplify",
+    id: "remix",
+    to: "/remix",
+    label: "Remix",
+    shortLabel: "Remix",
     icon: Megaphone,
     gradient: {
       from: "from-amber-500/10",
