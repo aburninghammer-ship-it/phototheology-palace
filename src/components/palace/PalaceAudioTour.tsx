@@ -14,8 +14,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ALL_TOURS, buildAllSegments, getTotalSeconds } from "@/data/tourScripts";
+import { ALL_TOURS, TOUR_TIERS, buildAllSegments, getTotalSeconds } from "@/data/tourScripts";
 import type { TourDefinition, TourSegment } from "@/data/tourScripts";
+import type { TourTier } from "@/data/tourScripts";
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 
 const FLOOR_COLORS: Record<number, string> = {
