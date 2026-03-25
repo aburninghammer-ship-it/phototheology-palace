@@ -136,10 +136,10 @@ export const StrongsVerseView = ({
           isAudioPlaying
             ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30 backdrop-blur-md"
             : isSelected
-            ? "bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
+            ? "bg-primary/10 dark:bg-white/10 backdrop-blur-md border border-primary/30 dark:border-white/20 shadow-lg"
             : isHighlighted
             ? "bg-accent/20 border-2 border-accent shadow-md animate-pulse-glow"
-            : "hover:bg-white/5 border-2 border-transparent"
+            : "hover:bg-muted/50 dark:hover:bg-white/5 border-2 border-transparent"
         }`}
         onClick={onSelect}
       >
