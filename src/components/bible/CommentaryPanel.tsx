@@ -692,7 +692,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
 
         {commentary && (
           <ScrollArea className="max-h-[60vh] mt-4">
-            <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border-2 border-primary/20 shadow-lg">
+            <div className="p-4 rounded-lg bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 dark:from-primary/5 dark:via-accent/5 dark:to-secondary/5 border-2 border-primary/30 dark:border-primary/20 shadow-lg">
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-primary/10 flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary animate-pulse" />

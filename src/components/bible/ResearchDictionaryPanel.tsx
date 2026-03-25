@@ -255,7 +255,7 @@ export const ResearchDictionaryPanel = ({
           <p className="text-sm text-center text-muted-foreground italic">
             {lookupResult.transliteration}
           </p>
-          <div className="pt-2 border-t border-white/10">
+          <div className="pt-2 border-t border-border">
             <p className="text-sm text-foreground/90 leading-relaxed">{lookupResult.definition}</p>
           </div>
           <Button
