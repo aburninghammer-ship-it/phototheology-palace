@@ -99,7 +99,8 @@ export const SermonTextEditor = ({
   const [lookupPopoverOpen, setLookupPopoverOpen] = useState(false);
   const [isExpandingVerse, setIsExpandingVerse] = useState(false);
   const verseExpandTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const lastExpandedRef = useRef<string>(''); // Track last expanded to avoid duplicates
+  const lastExpandedRef = useRef<string>('');
+  const editorContainerRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
     extensions: [
