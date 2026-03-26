@@ -294,6 +294,88 @@ export const gemsLibrary: Gem[] = [
     tags: ["branch", "nazarene", "nazareth", "wordplay", "hebrew"]
   },
 
+  // JESUS IN ALL THE BIBLE - Composite Sketch (Pastor Ivor Myers)
+  {
+    id: "jesus-composite-sketch",
+    title: "Jesus in All the Bible: The Composite Sketch",
+    category: "typology",
+    oldTestament: { book: "Genesis", chapter: 1, verses: "1", text: "In the beginning God created..." },
+    newTestament: { book: "Hebrews", chapter: 1, verses: "1-3", text: "God, who at various times and in various ways spoke in time past to the fathers by the prophets, has in these last days spoken to us by His Son" },
+    insight: "Like Adam, He was the Son of God. Like Samuel, only a boy discovering His mission in the temple. Like Joseph, 30 when He came into prominence. Like Joshua, He crossed the Jordan to lead 12. Like Elijah, He provided drink for the thirsty. Like Moses, He wandered 40 days in the wilderness. Like Daniel, He overcame temptation of appetite. Like Job, He refused presumption. Like the three Hebrews, He refused to bow before another lord. Like Elisha, He raised the dead, multiplied bread, and healed lepers. Like Ezekiel, He preached to a stubborn people. Like Josiah, He exposed false worship. Like Enoch, He walked with God. Like Moses, He gathered the 12 to repeat the covenant and sang a song before going to die. Like David, He crossed the brook Kidron. Like David, He was betrayed by His close friend who hung himself. Like Job, He entered a time of trouble and was tempted to think God forsook Him. Like Joseph, He was sold for silver and deserted by His brothers. Like Joseph with the butler and baker, He was placed between two men—one forgiven, the other rejected. Like Samson, He was beaten, bound, mocked, placed between two pillars, bowed His head, and saved more in death than in life. Like Isaac, He was given up for sacrifice. Like Noah, He was lifted up on wood above the earth. Like Nehemiah, He would not come down—He had a great work to do. Like Job, He prayed for His enemies. Like Elisha's dead bones, His death brought many to life from the grave. Like Jonah, He was in the belly of the earth three days. Like David, He delivered a deadly blow to the head of His enemy. Like Moses, He was willing to be blotted out but was resurrected. Like Samuel, He was called from sleep to serve as Priest. Like Nehemiah, He finished the work. Like Elijah, He was raised to the heavens. Like Joseph, He was sent ahead to prepare a place. Like Daniel, He intercedes for His people. Like Jacob, while He is away He works for His bride. Like Joseph, He will investigate His brethren before allowing entry. Like Moses, He will descend from the mount upon an unexpected people. Like Moses parting the sea, He will part the sky. Like Joshua, He will lead His people into the Promised Land. Like David, He will take His throne as rightful King. Like Solomon, He will reign in peace for a thousand years and answer all our hard questions. Like Gideon, He will put down God's enemies. Like Jephthah, He will destroy those who cannot speak the heavenly language. Like Abraham, He will be Father of a great multitude. And like Joseph, He will be reunited with His loved ones. Jesus is the center of Scripture.",
+    depth: "advanced",
+    tags: ["composite sketch", "jesus in all the bible", "typology", "christ centered", "all scripture", "ivor myers"]
+  },
+  {
+    id: "samson-christ-death",
+    title: "Samson's Death = Christ's Death",
+    category: "typology",
+    oldTestament: { book: "Judges", chapter: 16, verses: "25-30", text: "They called for Samson... he bowed himself with all his might; and the house fell... so the dead which he slew at his death were more than they which he slew in his life" },
+    newTestament: { book: "Hebrews", chapter: 2, verses: "14-15", text: "Through death He might destroy him who had the power of death" },
+    insight: "Samson: beaten, bound, mocked, eyes put out, placed between two pillars, bowed his head, pushed—and saved more in death. Christ: beaten, bound, mocked, blindfolded, placed between two crosses, bowed His head—and saved infinitely more in death than in life. Samson's death caused a great rumbling; Christ's death shook the earth (Matt 27:51).",
+    depth: "intermediate",
+    tags: ["samson", "death", "victory", "pillars", "cross", "earthquake"]
+  },
+  {
+    id: "nehemiah-cross",
+    title: "Nehemiah Would Not Come Down = Christ Would Not Come Down",
+    category: "typology",
+    oldTestament: { book: "Nehemiah", chapter: 6, verses: "3", text: "I am doing a great work, so that I cannot come down. Why should the work cease while I leave it and go down to you?" },
+    newTestament: { book: "Matthew", chapter: 27, verses: "40-42", text: "If You are the Son of God, come down from the cross... He saved others; Himself He cannot save" },
+    insight: "Nehemiah's enemies four times urged him to come down from the wall; Christ's enemies mocked 'Come down from the cross!' Nehemiah said 'I have a great work to do.' Christ had the greatest work—saving the world. Nehemiah finished the wall in 52 days; Christ cried 'It is finished!' (John 19:30).",
+    depth: "intermediate",
+    tags: ["nehemiah", "cross", "finished", "wall", "great work", "perseverance"]
+  },
+  {
+    id: "noah-lifted-on-wood",
+    title: "Noah Lifted Up on Wood = Christ Lifted on the Cross",
+    category: "typology",
+    oldTestament: { book: "Genesis", chapter: 7, verses: "17-18", text: "The waters increased and lifted up the ark, and it rose high above the earth" },
+    newTestament: { book: "John", chapter: 12, verses: "32", text: "And I, if I am lifted up from the earth, will draw all peoples to Myself" },
+    insight: "Noah was lifted above the earth on wood (the ark) and all who came to him were saved. Christ was lifted above the earth on wood (the cross) and all who come to Him are saved. The ark drew all living things; the cross draws all people. One door on the ark; one way through Christ.",
+    depth: "beginner",
+    tags: ["noah", "ark", "lifted up", "cross", "wood", "salvation", "draw"]
+  },
+  {
+    id: "david-kidron-betrayal",
+    title: "David Crossed Kidron = Christ Crossed Kidron",
+    category: "parallel",
+    oldTestament: { book: "2 Samuel", chapter: 15, verses: "23, 30-31", text: "The king crossed over the Brook Kidron... David went up by the ascent of the Mount of Olives, and wept" },
+    newTestament: { book: "John", chapter: 18, verses: "1", text: "He went out with His disciples over the Brook Kidron, where there was a garden" },
+    insight: "David crossed Kidron weeping, fleeing from Absalom's rebellion, betrayed by his counselor Ahithophel who later hanged himself (2 Sam 17:23). Christ crossed Kidron in anguish heading to Gethsemane, betrayed by Judas who later hanged himself (Matt 27:5). Both had trusted friends turn traitor.",
+    depth: "intermediate",
+    tags: ["david", "kidron", "betrayal", "ahithophel", "judas", "gethsemane", "weeping"]
+  },
+  {
+    id: "joseph-butler-baker",
+    title: "Joseph Between Two Prisoners = Christ Between Two Thieves",
+    category: "typology",
+    oldTestament: { book: "Genesis", chapter: 40, verses: "1-22", text: "The chief butler and the chief baker of the king of Egypt... were confined in prison" },
+    newTestament: { book: "Luke", chapter: 23, verses: "39-43", text: "One of the criminals... said, 'Lord, remember me'... 'Today you will be with Me in Paradise'" },
+    insight: "Joseph in prison was placed between two men—the butler (forgiven, restored) and the baker (rejected, executed). Christ on the cross was placed between two thieves—one repented and was promised paradise, the other rejected and perished. The one who remembered Joseph forgot him; the one who asked Christ to remember was never forgotten.",
+    depth: "intermediate",
+    tags: ["joseph", "butler", "baker", "thieves", "cross", "prison", "forgiveness", "judgment"]
+  },
+  {
+    id: "jacob-working-for-bride",
+    title: "Jacob Working for His Bride = Christ Working for the Church",
+    category: "typology",
+    oldTestament: { book: "Genesis", chapter: 29, verses: "18-20", text: "I will serve you seven years for Rachel your younger daughter... they seemed only a few days to him because of the love he had for her" },
+    newTestament: { book: "Ephesians", chapter: 5, verses: "25-27", text: "Christ loved the church and gave Himself for her" },
+    insight: "Jacob left his father's house and traveled to a far country to labor for his bride. The years seemed like nothing because of his love. Christ left His Father's house (heaven), came to a far country (earth), and now labors in the heavenly sanctuary for His bride, the church. His love makes every year of waiting worthwhile.",
+    depth: "intermediate",
+    tags: ["jacob", "bride", "church", "love", "labor", "waiting", "heaven"]
+  },
+  {
+    id: "elisha-dead-bones-resurrection",
+    title: "Elisha's Dead Bones = Christ's Death Brings Life",
+    category: "typology",
+    oldTestament: { book: "2 Kings", chapter: 13, verses: "21", text: "When the man touched the bones of Elisha, he revived and stood on his feet" },
+    newTestament: { book: "Matthew", chapter: 27, verses: "52-53", text: "The graves were opened; and many bodies of the saints who had fallen asleep were raised" },
+    insight: "Even after death, Elisha's bones had power to raise the dead. When Christ died, the power of His death broke open graves and raised many saints. The death of the righteous has resurrection power. Elisha's miracle was one man; Christ's death raised many.",
+    depth: "advanced",
+    tags: ["elisha", "bones", "resurrection", "death", "power", "graves"]
+  },
+
   // MORE TYPOLOGY
   {
     id: "red-sea-baptism",

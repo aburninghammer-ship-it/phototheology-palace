@@ -1104,6 +1104,90 @@ export const sevenChurchesHeavenDimension: SevenChurchHeavenDimension[] = [
 ];
 
 // ============================================
+// JESUS IN ALL THE BIBLE — COMPOSITE SKETCH
+// ============================================
+// Pastor Ivor Myers' composite sketch tracing Christ through every OT character
+// This is foundational Phototheology content for AI tools, commentary, and study
+
+export interface CompositeSketchEntry {
+  otCharacter: string;
+  connection: string;
+  otReference: string;
+  ntParallel: string;
+  phase: 'life' | 'ministry' | 'passion' | 'death' | 'resurrection' | 'ascension' | 'intercession' | 'return' | 'reign';
+}
+
+export const jesusCompositeSketch: CompositeSketchEntry[] = [
+  // LIFE
+  { otCharacter: 'Adam', connection: 'He was the Son of God', otReference: 'Genesis 1:26-27', ntParallel: 'Luke 3:38', phase: 'life' },
+  { otCharacter: 'Samuel', connection: 'Only a boy when He discovered His mission in the temple', otReference: '1 Samuel 2:18; 3:1-10', ntParallel: 'Luke 2:41-49', phase: 'life' },
+  { otCharacter: 'Joseph', connection: '30 years old when He came into prominence', otReference: 'Genesis 41:46', ntParallel: 'Luke 3:23', phase: 'life' },
+  { otCharacter: 'Enoch', connection: 'He walked with God', otReference: 'Genesis 5:22-24', ntParallel: 'John 8:29', phase: 'life' },
+
+  // MINISTRY
+  { otCharacter: 'Joshua', connection: 'Crossed the Jordan to lead 12', otReference: 'Joshua 3:14-17', ntParallel: 'Matthew 3:13-17; 10:1-4', phase: 'ministry' },
+  { otCharacter: 'Elijah', connection: 'Provided drink for the thirsty', otReference: '1 Kings 17:1-6', ntParallel: 'John 4:10-14; 7:37-38', phase: 'ministry' },
+  { otCharacter: 'Moses', connection: 'Entered the wilderness to wander for forty days', otReference: 'Exodus 34:28', ntParallel: 'Matthew 4:1-2', phase: 'ministry' },
+  { otCharacter: 'Daniel', connection: 'Overcame the temptation of appetite', otReference: 'Daniel 1:8', ntParallel: 'Matthew 4:3-4', phase: 'ministry' },
+  { otCharacter: 'Job', connection: 'Refused the sin of presumption', otReference: 'Job 1:22; 2:10', ntParallel: 'Matthew 4:5-7', phase: 'ministry' },
+  { otCharacter: 'Shadrach, Meshach, Abednego', connection: 'Refused to bow down before another lord', otReference: 'Daniel 3:16-18', ntParallel: 'Matthew 4:8-10', phase: 'ministry' },
+  { otCharacter: 'Man of God', connection: 'Healed a withered hand', otReference: '1 Kings 13:4-6', ntParallel: 'Mark 3:1-5', phase: 'ministry' },
+  { otCharacter: 'Elisha', connection: 'Raised the dead, multiplied bread, and helped lepers', otReference: '2 Kings 4:32-35; 4:42-44; 5:1-14', ntParallel: 'John 11:43-44; John 6:11-13; Luke 17:12-14', phase: 'ministry' },
+  { otCharacter: 'Ezekiel', connection: 'Preached to a stubborn and rebellious people and spoke against temple abominations', otReference: 'Ezekiel 2:3-7; 8:1-18', ntParallel: 'Matthew 23:37; John 2:13-17', phase: 'ministry' },
+  { otCharacter: 'Josiah', connection: 'Exposed false worship', otReference: '2 Kings 22:1-23:25', ntParallel: 'Matthew 15:1-9; 23:1-36', phase: 'ministry' },
+
+  // PASSION
+  { otCharacter: 'Moses', connection: 'Knew His hour had come; gathered the twelve to repeat the covenant and sang a song before going out to die alone', otReference: 'Deuteronomy 31-32', ntParallel: 'John 13:1; Matthew 26:17-30', phase: 'passion' },
+  { otCharacter: 'David', connection: 'Crossed the brook Kidron as His enemies pursued Him', otReference: '2 Samuel 15:23', ntParallel: 'John 18:1', phase: 'passion' },
+  { otCharacter: 'David', connection: 'Betrayed by His close friend who eventually hung himself', otReference: '2 Samuel 15:12; 17:23', ntParallel: 'Matthew 26:14-16; 27:3-5', phase: 'passion' },
+  { otCharacter: 'Job', connection: 'Entered into a time of trouble in the garden and was tempted to think God had forsaken Him', otReference: 'Job 3:1-26; 13:24', ntParallel: 'Matthew 26:36-46; 27:46', phase: 'passion' },
+  { otCharacter: 'Joseph', connection: 'Sold for silver and deserted by His brothers', otReference: 'Genesis 37:28', ntParallel: 'Matthew 26:15; 26:56', phase: 'passion' },
+  { otCharacter: 'Joseph', connection: 'Placed between two men—one forgiven, the other rejected', otReference: 'Genesis 40:1-22', ntParallel: 'Luke 23:39-43', phase: 'passion' },
+
+  // DEATH
+  { otCharacter: 'Samson', connection: 'Beaten, bound, and mocked; placed between two pillars, bowed His head, and saved more in death than in life', otReference: 'Judges 16:21-30', ntParallel: 'Matthew 27:26-50; John 12:24', phase: 'death' },
+  { otCharacter: 'Isaac', connection: 'Given up for sacrifice', otReference: 'Genesis 22:1-14', ntParallel: 'John 3:16; Romans 8:32', phase: 'death' },
+  { otCharacter: 'Noah', connection: 'Lifted up above the earth on wood so all would be drawn to Him', otReference: 'Genesis 7:17-18', ntParallel: 'John 3:14-15; 12:32', phase: 'death' },
+  { otCharacter: 'Nehemiah', connection: 'Would not come down for He had a great work to do', otReference: 'Nehemiah 6:3', ntParallel: 'Matthew 27:40-42; John 19:30', phase: 'death' },
+  { otCharacter: 'Job', connection: 'Prayed for His enemies', otReference: 'Job 42:10', ntParallel: 'Luke 23:34', phase: 'death' },
+  { otCharacter: 'Samson', connection: 'His death caused a great rumbling in the earth', otReference: 'Judges 16:30', ntParallel: 'Matthew 27:51', phase: 'death' },
+  { otCharacter: 'Elisha', connection: 'His death brought to life many who slept in the grave', otReference: '2 Kings 13:21', ntParallel: 'Matthew 27:52-53', phase: 'death' },
+  { otCharacter: 'Jonah', connection: 'In the belly of the earth three days and three nights', otReference: 'Jonah 1:17', ntParallel: 'Matthew 12:40', phase: 'death' },
+  { otCharacter: 'David', connection: 'Delivered a deadly blow to the head of His enemy', otReference: '1 Samuel 17:49-51', ntParallel: 'Genesis 3:15; Colossians 2:15', phase: 'death' },
+  { otCharacter: 'Moses', connection: 'Willing to be blotted out of the book but was resurrected from the dead', otReference: 'Exodus 32:32; Jude 1:9', ntParallel: 'Philippians 2:8; Romans 6:9', phase: 'death' },
+
+  // RESURRECTION
+  { otCharacter: 'Samuel', connection: 'Called out of His sleep to serve as Priest in the house of God', otReference: '1 Samuel 3:1-10', ntParallel: 'Hebrews 5:5-6; 7:24-25', phase: 'resurrection' },
+  { otCharacter: 'Jonah', connection: 'Stayed for 40 days after emerging', otReference: 'Jonah 3:4', ntParallel: 'Acts 1:3', phase: 'resurrection' },
+  { otCharacter: 'Nehemiah', connection: 'Finished the work', otReference: 'Nehemiah 6:15', ntParallel: 'John 19:30; John 17:4', phase: 'resurrection' },
+
+  // ASCENSION
+  { otCharacter: 'Elijah', connection: 'Raised into the heavens', otReference: '2 Kings 2:11', ntParallel: 'Acts 1:9-11', phase: 'ascension' },
+  { otCharacter: 'Joseph', connection: 'Sent ahead to prepare a place for His brothers', otReference: 'Genesis 45:5-7', ntParallel: 'John 14:2-3', phase: 'ascension' },
+
+  // INTERCESSION
+  { otCharacter: 'Daniel', connection: 'Interceded on behalf of His people', otReference: 'Daniel 9:1-19', ntParallel: 'Hebrews 7:25; Romans 8:34', phase: 'intercession' },
+  { otCharacter: 'Jacob', connection: 'While He is away, He is working for His bride', otReference: 'Genesis 29:18-20', ntParallel: 'Ephesians 5:25-27; John 14:2-3', phase: 'intercession' },
+  { otCharacter: 'Joseph', connection: 'Will investigate His brethren before allowing them to enter the place He has prepared', otReference: 'Genesis 42-44', ntParallel: 'Revelation 20:12; Matthew 22:11-14', phase: 'intercession' },
+
+  // RETURN
+  { otCharacter: 'Moses', connection: 'Will descend from the mount upon an unexpected people', otReference: 'Exodus 32:15-19', ntParallel: '1 Thessalonians 5:2-3; Revelation 1:7', phase: 'return' },
+  { otCharacter: 'Moses', connection: 'As Moses parted the sea, He will part the sky and lead His people out of the bondage of the grave', otReference: 'Exodus 14:21-22', ntParallel: '1 Thessalonians 4:16-17', phase: 'return' },
+  { otCharacter: 'Joshua', connection: 'Will lead His people into the Promised Land', otReference: 'Joshua 1:1-9', ntParallel: 'Revelation 21:1-4; Hebrews 4:8-9', phase: 'return' },
+  { otCharacter: 'David', connection: 'Will take His place as rightful King', otReference: '2 Samuel 5:1-4', ntParallel: 'Revelation 19:16; Matthew 25:31', phase: 'return' },
+
+  // REIGN
+  { otCharacter: 'Solomon', connection: 'Will reign in peace for a thousand years', otReference: '1 Kings 4:24-25', ntParallel: 'Revelation 20:4-6', phase: 'reign' },
+  { otCharacter: 'Solomon', connection: 'Will answer all of our hard questions', otReference: '1 Kings 10:1-3', ntParallel: '1 Corinthians 13:12; Revelation 21:3-4', phase: 'reign' },
+  { otCharacter: 'Gideon', connection: 'Will put down the enemies of God at the end of the millennium', otReference: 'Judges 7:19-22', ntParallel: 'Revelation 20:7-10', phase: 'reign' },
+  { otCharacter: 'Jephthah', connection: 'Will destroy those who cannot speak the heavenly language', otReference: 'Judges 12:5-6', ntParallel: 'Matthew 7:21-23; Revelation 20:15', phase: 'reign' },
+  { otCharacter: 'Abraham', connection: 'Will be the Father of a great multitude', otReference: 'Genesis 17:4-5', ntParallel: 'Isaiah 9:6; Revelation 7:9', phase: 'reign' },
+  { otCharacter: 'Joseph', connection: 'Will be reunited with His loved ones', otReference: 'Genesis 45:14-15; 46:29', ntParallel: '1 Thessalonians 4:17; Revelation 21:3-4', phase: 'reign' },
+];
+
+export const compositeSketchSummary = "Jesus is the center of all Scripture. Every character, every story, every event points to Him. From Adam to Joseph, from His life to His eternal reign, the composite sketch of Christ emerges from the pages of the entire Bible. He is the Son of God (Adam), the boy in the temple (Samuel), the 30-year-old coming into prominence (Joseph), the Jordan-crosser leading 12 (Joshua), the provider of living water (Elijah), the wilderness wanderer (Moses), the appetite overcomer (Daniel), the one who refuses presumption (Job), the one who will not bow (Three Hebrews), the healer and miracle worker (Elisha), the preacher to the stubborn (Ezekiel), the exposer of false worship (Josiah), the God-walker (Enoch), the betrayed one at Kidron (David), the sold-for-silver one (Joseph), the one between two who forgives one and rejects the other (Joseph/Butler/Baker), the beaten and mocked one who saves more in death (Samson), the sacrifice (Isaac), the one lifted up on wood (Noah), the one who will not come down (Nehemiah), the one who prays for enemies (Job), the one whose death shakes the earth (Samson), the one whose death brings life (Elisha), the three-day burial (Jonah), the head-crusher (David), the resurrected priest (Samuel), the ascended one (Elijah), the place-preparer (Joseph), the intercessor (Daniel), the one working for His bride (Jacob), the returning King (Moses/David), the thousand-year reigner (Solomon), the enemy-destroyer (Gideon), the Father of multitudes (Abraham), and the one who is reunited with His loved ones (Joseph). Jesus is the center of our Scriptures.";
+
+// ============================================
 // STUDY PRINCIPLES
 // ============================================
 
@@ -1238,5 +1322,9 @@ export const ptKnowledgeBank = {
   reference: {
     keyVersesByBook,
     studyPrinciples
+  },
+  compositeSketch: {
+    entries: jesusCompositeSketch,
+    summary: compositeSketchSummary
   }
 };

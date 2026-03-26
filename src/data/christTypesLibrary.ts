@@ -224,13 +224,13 @@ export const christTypesLibrary: ChristType[] = [
     book: "Judges",
     bookNumber: 7,
     testament: "old",
-    title: "The Deliverer-Judges",
-    christRevealed: "The ultimate Deliverer who saves His people",
+    title: "The Deliverer-Judges — Samson, Gideon, Jephthah",
+    christRevealed: "The ultimate Deliverer who saves His people — even through death, unconventional victory, and final judgment",
     keyVerse: "Judges 2:16",
-    explanation: "Each judge raised up to deliver Israel from oppression pictures Christ who delivers us from sin's bondage. The cycle of sin and deliverance points to the need for a permanent Savior.",
+    explanation: "Each judge pictures Christ. Samson: beaten, bound, mocked, placed between two pillars, bowed his head, saved more in death than life — like Christ between two crosses. Gideon: defeated enemies with unconventional weapons — Christ destroys evil with the word of His mouth. Jephthah: destroyed those who could not speak the language (Shibboleth) — Christ will separate those who do not know heaven's language.",
     category: "type",
-    connections: ["Matthew 1:21", "Galatians 5:1", "Romans 7:24-25"],
-    significance: "Shows human deliverers were temporary; Christ is the eternal Deliverer."
+    connections: ["Matthew 1:21", "Galatians 5:1", "Judges 16:25-30", "Judges 7:19-22", "Judges 12:5-6", "Matthew 27:26-50", "Revelation 20:7-10", "Matthew 7:21-23"],
+    significance: "Shows human deliverers were temporary; Christ is the eternal Deliverer. Samson's death, Gideon's victory, and Jephthah's judgment all point to aspects of Christ's work."
   },
 
   // Ruth
@@ -254,13 +254,13 @@ export const christTypesLibrary: ChristType[] = [
     book: "1 Samuel",
     bookNumber: 9,
     testament: "old",
-    title: "David - The Shepherd King",
-    christRevealed: "The anointed one who rises from obscurity to reign",
-    keyVerse: "1 Samuel 16:12-13",
-    explanation: "David, anointed while still a shepherd boy, pictures Christ the Good Shepherd who would become King of kings.",
+    title: "Samuel and David — The Boy Prophet and the Shepherd King",
+    christRevealed: "The boy who discovered His mission in the temple, and the anointed one who rises from obscurity to reign",
+    keyVerse: "1 Samuel 3:1-10; 16:12-13",
+    explanation: "Samuel was only a boy when he discovered his mission in the temple, called from sleep to serve as priest — Christ at twelve declared 'I must be about My Father's business' (Luke 2:49) and was called from the sleep of death to serve as eternal Priest. David, anointed while a shepherd boy, crossed Kidron fleeing his enemies, was betrayed by Ahithophel who hung himself, and delivered a deadly blow to the head of Goliath — all picturing Christ.",
     category: "type",
-    connections: ["John 10:11", "Revelation 17:14", "Ezekiel 34:23"],
-    significance: "David's life and kingdom are foundational types of Christ's reign."
+    connections: ["Luke 2:41-49", "John 10:11", "Revelation 17:14", "Hebrews 5:5-6", "John 18:1", "2 Samuel 15:23", "2 Samuel 17:23", "Matthew 27:5", "1 Samuel 17:49-51", "Genesis 3:15"],
+    significance: "Samuel's calling in the temple and David's life comprehensively typify Christ's mission, suffering, and victory."
   },
 
   // 2 Samuel
@@ -299,13 +299,13 @@ export const christTypesLibrary: ChristType[] = [
     book: "2 Kings",
     bookNumber: 12,
     testament: "old",
-    title: "Elisha - Prophet of Grace",
-    christRevealed: "The Prophet who multiplies and heals",
+    title: "Elisha - Prophet of Grace and Resurrection Power",
+    christRevealed: "The Prophet who raised the dead, multiplied bread, healed lepers, and whose very death brought life",
     keyVerse: "2 Kings 4:42-44",
-    explanation: "Elisha's miracles of multiplication and raising the dead picture Christ's ministry of grace, healing, and resurrection power.",
+    explanation: "Elisha raised the dead (2 Kings 4:32-35), multiplied bread for 100 (2 Kings 4:42-44), healed Naaman the leper (2 Kings 5), and even after death, his bones raised a dead man to life (2 Kings 13:21). Christ raised Lazarus, fed 5,000, cleansed lepers, and when He died, many saints rose from the grave (Matthew 27:52-53).",
     category: "type",
-    connections: ["John 6:11-14", "John 11:43-44", "Luke 7:11-15"],
-    significance: "Elisha's ministry foreshadows Christ's miraculous works of compassion."
+    connections: ["John 6:11-14", "John 11:43-44", "Luke 7:11-15", "Luke 17:12-14", "2 Kings 13:21", "Matthew 27:52-53"],
+    significance: "Elisha's ministry and even his death foreshadow Christ's miraculous works and the resurrection power released at Calvary."
   },
 
   // 1 Chronicles
@@ -359,13 +359,13 @@ export const christTypesLibrary: ChristType[] = [
     book: "Nehemiah",
     bookNumber: 16,
     testament: "old",
-    title: "The Wall Builder",
-    christRevealed: "The One who rebuilds and protects His people",
-    keyVerse: "Nehemiah 4:6",
-    explanation: "Nehemiah's work of rebuilding the walls in the face of opposition pictures Christ building His church against all opposition.",
+    title: "The One Who Would Not Come Down",
+    christRevealed: "The One who refused to come down because He had a great work to finish",
+    keyVerse: "Nehemiah 6:3",
+    explanation: "Nehemiah was taunted to come down from the wall but refused — 'I am doing a great work, so that I cannot come down.' Christ was mocked to come down from the cross but refused — He had the greatest work to finish. Nehemiah completed the wall; Christ cried 'It is finished!' (John 19:30).",
     category: "type",
-    connections: ["Matthew 16:18", "Ephesians 2:19-22", "1 Peter 2:5"],
-    significance: "Despite opposition, God's building work through Christ will be completed."
+    connections: ["Matthew 27:40-42", "John 19:30", "Nehemiah 6:15", "Ephesians 2:19-22"],
+    significance: "Nehemiah's refusal to come down, and his finishing the work, powerfully typify Christ's perseverance on the cross and completion of redemption."
   },
 
   // Esther
@@ -409,6 +409,19 @@ export const christTypesLibrary: ChristType[] = [
     category: "prophecy",
     connections: ["1 Timothy 2:5", "Hebrews 8:6", "Hebrews 9:15"],
     significance: "Job's longing finds fulfillment in Christ alone."
+  },
+  {
+    id: "ct-job-3",
+    book: "Job",
+    bookNumber: 18,
+    testament: "old",
+    title: "The Suffering Intercessor",
+    christRevealed: "The One who refused presumption, endured feeling forsaken by God, and prayed for His enemies",
+    keyVerse: "Job 42:10",
+    explanation: "Job refused the sin of presumption (refused to curse God). He entered a time of deep trouble and was tempted to think God had forsaken him. Yet he prayed for his enemies and was restored. Christ refused to presume upon God (Matt 4:5-7), cried 'Why hast Thou forsaken Me?' (Matt 27:46), and prayed 'Father, forgive them' (Luke 23:34).",
+    category: "type",
+    connections: ["Matthew 4:5-7", "Matthew 27:46", "Luke 23:34", "Job 1:22", "Job 13:24"],
+    significance: "Job's experience of suffering, apparent abandonment, and intercession for enemies powerfully typifies Christ's passion."
   },
 
   // Psalms
@@ -635,6 +648,19 @@ export const christTypesLibrary: ChristType[] = [
     category: "prophecy",
     connections: ["Galatians 4:4", "Mark 1:15", "Luke 19:44"],
     significance: "The most precise time prophecy pointing to Christ's first advent."
+  },
+  {
+    id: "ct-dan-4",
+    book: "Daniel",
+    bookNumber: 27,
+    testament: "old",
+    title: "The Appetite Overcomer and Intercessor",
+    christRevealed: "The One who overcame the temptation of appetite and intercedes for His captive people",
+    keyVerse: "Daniel 1:8; 9:17-19",
+    explanation: "Daniel purposed not to defile himself with the king's food (Daniel 1:8) — Christ refused Satan's temptation to turn stones to bread (Matt 4:3-4). Daniel interceded for captive Israel in prayer and fasting (Daniel 9) — Christ intercedes for captive humanity at the right hand of God (Hebrews 7:25).",
+    category: "type",
+    connections: ["Matthew 4:1-4", "Hebrews 7:25", "Romans 8:34", "Daniel 1:8", "Daniel 9:1-19"],
+    significance: "Daniel's victory over appetite and his intercessory prayer are personal types of Christ's wilderness victory and heavenly ministry."
   },
 
   // Hosea

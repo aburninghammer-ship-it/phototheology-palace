@@ -125,6 +125,182 @@ export const typesLibrary: BiblicalType[] = [
     christConnection: 'Elijah prepared the way for revival; John prepared the way for Christ, the ultimate revival.',
     application: 'Christ calls us back from spiritual compromise to wholehearted worship.'
   },
+  {
+    id: 'samuel',
+    type: 'Samuel',
+    category: 'person',
+    otReference: '1 Samuel 2-3',
+    otDescription: 'Only a boy when he discovered his mission in the temple, called from sleep to serve as priest in the house of God',
+    ntFulfillment: 'Christ as a boy discovered His mission in the temple, and was called from the sleep of death to serve as our High Priest',
+    ntReference: 'Luke 2:41-49; Hebrews 5:5-6',
+    christConnection: 'Samuel was a child when God called him in the temple; Jesus at twelve said "I must be about My Father\'s business." Samuel was called from sleep to serve; Christ was called from the sleep of death to serve as eternal Priest.',
+    application: 'God calls us early and unexpectedly—be listening in the temple of His Word.'
+  },
+  {
+    id: 'joshua',
+    type: 'Joshua',
+    category: 'person',
+    otReference: 'Joshua 1-4; 3:14-17',
+    otDescription: 'Crossed the Jordan to lead twelve tribes into the Promised Land',
+    ntFulfillment: 'Christ crossed the Jordan at baptism to lead twelve apostles, and will lead His people into the heavenly Promised Land',
+    ntReference: 'Matthew 3:13-17; Acts 7:45; Hebrews 4:8-9; Revelation 21:1-4',
+    christConnection: 'Joshua (Yeshua—same name as Jesus) crossed the Jordan to lead 12 tribes into Canaan. Christ crossed the Jordan at baptism to lead 12 apostles, and will lead His people into the eternal Promised Land.',
+    application: 'Jesus is our Joshua—He goes before us into every promise and every battle.'
+  },
+  {
+    id: 'daniel',
+    type: 'Daniel',
+    category: 'person',
+    otReference: 'Daniel 1; 9:1-19',
+    otDescription: 'Overcame the temptation of appetite; interceded on behalf of his people',
+    ntFulfillment: 'Christ overcame appetite in the wilderness; He intercedes for His people in the heavenly sanctuary',
+    ntReference: 'Matthew 4:1-4; Hebrews 7:25; Romans 8:34',
+    christConnection: 'Daniel purposed not to defile himself with the king\'s food; Christ refused Satan\'s bread in the wilderness. Daniel interceded for captive Israel; Christ intercedes for captive humanity.',
+    application: 'Victory over appetite and faithful intercession for others follow the pattern of Christ.'
+  },
+  {
+    id: 'job',
+    type: 'Job',
+    category: 'person',
+    otReference: 'Job 1-2; 42:10',
+    otDescription: 'Refused the sin of presumption, endured suffering, was tempted to think God forsook him, prayed for his enemies',
+    ntFulfillment: 'Christ refused presumption in the wilderness, endured the cross, cried "Why hast Thou forsaken Me?" and prayed for His enemies',
+    ntReference: 'Matthew 4:5-7; 27:46; Luke 23:34',
+    christConnection: 'Job refused to presume upon God; Christ refused to throw Himself from the temple. Job felt abandoned by God yet held on; Christ cried "Why hast thou forsaken me?" yet trusted. Job prayed for his enemies; Christ prayed "Father, forgive them."',
+    application: 'Like Christ, hold to God even when you cannot feel Him, and pray for those who harm you.'
+  },
+  {
+    id: 'three-hebrews',
+    type: 'Shadrach, Meshach, and Abednego',
+    category: 'person',
+    otReference: 'Daniel 3:1-30',
+    otDescription: 'Refused to bow before another lord, faced the fiery furnace, and a fourth figure appeared with them',
+    ntFulfillment: 'Christ refused to bow to Satan and was with the three Hebrews in the fire',
+    ntReference: 'Matthew 4:8-10; Philippians 2:10-11',
+    christConnection: 'The three Hebrews refused to bow before Nebuchadnezzar\'s idol; Christ refused to bow before Satan. The fourth man in the fire was Christ Himself—He walks with us through every trial.',
+    application: 'When you refuse to compromise, Christ stands with you in the fire.'
+  },
+  {
+    id: 'elisha',
+    type: 'Elisha',
+    category: 'person',
+    otReference: '2 Kings 2-13',
+    otDescription: 'Raised the dead, multiplied bread, healed lepers, and his dead bones brought a man to life',
+    ntFulfillment: 'Christ raised the dead, multiplied bread, healed lepers, and His death brought many to life from the grave',
+    ntReference: 'John 11:43-44; John 6:11-13; Luke 17:12-14; Matthew 27:52-53',
+    christConnection: 'Elisha raised the Shunammite\'s son; Christ raised Lazarus. Elisha multiplied bread for 100; Christ fed 5,000. Elisha healed Naaman; Christ cleansed lepers. Elisha\'s dead bones raised a man; Christ\'s death raised many saints from the grave.',
+    application: 'The miracles of Elisha were previews—Christ does everything Elisha did, on a grander scale and with eternal effect.'
+  },
+  {
+    id: 'ezekiel',
+    type: 'Ezekiel',
+    category: 'person',
+    otReference: 'Ezekiel 2:3-7; 8:1-18',
+    otDescription: 'Preached to a stubborn and rebellious people and spoke against the abominations done in the temple',
+    ntFulfillment: 'Christ preached to a stiff-necked generation and cleansed the temple of abominations',
+    ntReference: 'Matthew 23:37; John 2:13-17; Matthew 21:12-13',
+    christConnection: 'Ezekiel was sent to a rebellious people who would not listen; Christ wept over Jerusalem\'s stubbornness. Ezekiel exposed temple abominations; Christ drove out those who defiled His Father\'s house.',
+    application: 'God\'s truth must be spoken even to those who refuse to hear—faithfulness over popularity.'
+  },
+  {
+    id: 'josiah',
+    type: 'Josiah',
+    category: 'person',
+    otReference: '2 Kings 22-23; 2 Chronicles 34-35',
+    otDescription: 'Young king who exposed false worship, discovered the lost Book of the Law, and purified the temple',
+    ntFulfillment: 'Christ exposed false worship, restored true understanding of Scripture, and cleansed the temple',
+    ntReference: 'Matthew 15:1-9; 21:12-13; John 4:23-24',
+    christConnection: 'Josiah tore down the high places and restored worship according to God\'s Word; Christ confronted man-made traditions and called for worship in spirit and truth.',
+    application: 'Let Christ\'s Word expose every false worship pattern in your life.'
+  },
+  {
+    id: 'enoch',
+    type: 'Enoch',
+    category: 'person',
+    otReference: 'Genesis 5:22-24',
+    otDescription: 'Walked with God and was translated without seeing death',
+    ntFulfillment: 'Christ walked with the Father perfectly and ascended bodily into heaven',
+    ntReference: 'John 8:29; Acts 1:9-11; Hebrews 11:5',
+    christConnection: 'Enoch walked with God and was taken up; Christ walked with the Father and ascended to heaven. Enoch\'s translation foreshadows the rapture of the saints at Christ\'s return.',
+    application: 'Walk so closely with God that the boundary between earth and heaven disappears.'
+  },
+  {
+    id: 'nehemiah',
+    type: 'Nehemiah',
+    category: 'person',
+    otReference: 'Nehemiah 6:3, 15',
+    otDescription: 'Would not come down from the wall because he had a great work to do; finished the work',
+    ntFulfillment: 'Christ would not come down from the cross because He had a great work to do; He cried "It is finished"',
+    ntReference: 'Matthew 27:40-42; John 19:30',
+    christConnection: 'Nehemiah\'s enemies begged him to come down; the crowd mocked Jesus saying "come down from the cross." Nehemiah refused—he had a great work. Christ refused—He had a world to save. Nehemiah finished the wall; Christ cried "It is finished."',
+    application: 'Stay on your cross. Don\'t come down. Finish the work God gave you to do.'
+  },
+  {
+    id: 'samson',
+    type: 'Samson',
+    category: 'person',
+    otReference: 'Judges 16:21-30',
+    otDescription: 'Beaten, bound, and mocked; placed between two pillars, bowed his head, pushed, and saved more in death than in life',
+    ntFulfillment: 'Christ was beaten, bound, and mocked; placed between two thieves, bowed His head, and saved more in His death than in His life',
+    ntReference: 'Matthew 27:26-50; John 12:24; Hebrews 2:14-15',
+    christConnection: 'Samson was beaten, bound, mocked, placed between two pillars, bowed his head, and his death caused a great rumbling. Christ was beaten, bound, mocked, placed between two crosses, bowed His head, the earth quaked, and He saved more in death than in life.',
+    application: 'The greatest victory often comes through apparent defeat—the cross looked like failure but was ultimate triumph.'
+  },
+  {
+    id: 'noah-person',
+    type: 'Noah',
+    category: 'person',
+    otReference: 'Genesis 6-9',
+    otDescription: 'Lifted up above the earth on wood so that all who came to him would be saved',
+    ntFulfillment: 'Christ was lifted up on wood (the cross) above the earth so all who come to Him would be saved',
+    ntReference: 'John 3:14-15; 12:32',
+    christConnection: 'Noah was lifted above the earth on the ark (wood) and drew all living things to himself for salvation. Christ was lifted on the cross (wood) and said "I, if I be lifted up, will draw all men to Me."',
+    application: 'Christ lifted up on the cross is the magnetic center of salvation—look and live.'
+  },
+  {
+    id: 'gideon',
+    type: 'Gideon',
+    category: 'person',
+    otReference: 'Judges 7:1-22',
+    otDescription: 'Put down the enemies of God with a small remnant using unconventional weapons',
+    ntFulfillment: 'Christ will put down the enemies of God at the end of the millennium with the word of His mouth',
+    ntReference: 'Revelation 20:7-10; 2 Thessalonians 2:8; Revelation 19:15',
+    christConnection: 'Gideon defeated the Midianites with trumpets, empty pitchers, and light—unconventional weapons. Christ defeats His enemies not with armies but with the brightness of His coming and the sword of His mouth.',
+    application: 'God\'s methods of victory defy human strategy—trust His unconventional ways.'
+  },
+  {
+    id: 'jacob',
+    type: 'Jacob',
+    category: 'person',
+    otReference: 'Genesis 29:1-30',
+    otDescription: 'Went away to a far country to work for his bride, then returned',
+    ntFulfillment: 'Christ went away to heaven to work for His bride (the church), and will return for her',
+    ntReference: 'John 14:2-3; Ephesians 5:25-27; Revelation 19:7-9',
+    christConnection: 'Jacob left his father\'s house and labored years to win his bride Rachel. Christ left His Father\'s house (heaven) and labors in the heavenly sanctuary to prepare for His bride, the church.',
+    application: 'Christ is working for you right now—He is coming back for His bride.'
+  },
+  {
+    id: 'abraham',
+    type: 'Abraham',
+    category: 'person',
+    otReference: 'Genesis 12:1-3; 17:4-5; 22:1-18',
+    otDescription: 'Father of a great multitude, gave up his only son, received him back from the dead figuratively',
+    ntFulfillment: 'God the Father gave up His only Son and received Him back from the dead literally; Christ is father of a great multitude',
+    ntReference: 'John 3:16; Hebrews 11:17-19; Isaiah 9:6; Revelation 7:9',
+    christConnection: 'Abraham was called "father of many nations." Christ is called "Everlasting Father" (Isaiah 9:6). Abraham gave up Isaac; God gave up Christ. Abraham received Isaac back from the dead figuratively; God received Christ back literally.',
+    application: 'The faith of Abraham points to the greater Father who gave everything for us.'
+  },
+  {
+    id: 'jephthah',
+    type: 'Jephthah',
+    category: 'person',
+    otReference: 'Judges 12:5-6',
+    otDescription: 'Destroyed those who could not speak the right language (Shibboleth)',
+    ntFulfillment: 'Christ will destroy those who cannot speak the heavenly language at the end of the millennium',
+    ntReference: 'Revelation 20:9-15; Matthew 7:21-23; Zephaniah 3:9',
+    christConnection: 'The Gileadites under Jephthah tested the Ephraimites by their speech—those who could not say "Shibboleth" were destroyed. At the end, those who do not know the language of heaven ("Lord, Lord" without relationship) will be separated from God\'s people.',
+    application: 'Learn to speak heaven\'s language now—worship, prayer, surrender—so you are recognized as belonging to God.'
+  },
 
   // OBJECT TYPES
   {

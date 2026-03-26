@@ -8,7 +8,8 @@ import { PalaceGuidedTour } from "@/components/palace/PalaceGuidedTour";
 import { PalaceAudioTour } from "@/components/palace/PalaceAudioTour";
 import { palaceFloors } from "@/data/palaceData";
 import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
-import { Building2, Award, TrendingUp, BookOpen, Target, LayoutGrid, List, Box, Headphones } from "lucide-react";
+import { Building2, Award, TrendingUp, BookOpen, Target, LayoutGrid, List, Box, Headphones, Share2 } from "lucide-react";
+import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { palaceSteps } from "@/config/howItWorksSteps";
@@ -135,8 +136,16 @@ const Palace = () => {
               {t('palace.heroDescription')}
             </p>
 
-            <div className="flex justify-center mb-4 md:mb-6">
+            <div className="flex justify-center gap-2 mb-4 md:mb-6">
               <HowItWorksDialog title={t('palace.howToUse')} steps={palaceSteps} />
+              <EnhancedSocialShare
+                title="Phototheology Palace"
+                content="Explore the Bible through the 8-floor Memory Palace system. 38+ rooms of Bible study methods, AI-powered tools, and community."
+                url="https://phototheologybible.com/palace"
+                defaultMessage="I'm studying the Bible with Phototheology Palace! 🏛️\n\n8 floors, 38+ rooms, each with a unique method for seeing Christ in every chapter.\n\nCheck it out:"
+                buttonText="Share"
+                buttonVariant="outline"
+              />
             </div>
 
             {user && loading && (

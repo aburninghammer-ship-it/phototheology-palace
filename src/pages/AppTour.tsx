@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
-import { 
-  Building2, BookOpen, Gamepad2, Brain, Users, 
-  Sparkles, 
+import {
+  Building2, BookOpen, Gamepad2, Brain, Users,
+  Sparkles,
   Zap, Crown, Lightbulb,
-  ArrowRight, CheckCircle2, PlayCircle
+  ArrowRight, CheckCircle2, PlayCircle, Share2
 } from "lucide-react";
+import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 
 const SECTION_GRADIENTS = [
   "from-violet-500 via-purple-500 to-fuchsia-500",
@@ -166,9 +167,17 @@ const AppTour = () => {
           <h1 className="font-serif text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent">
             How to Use Phototheology
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-4">
             Your complete guide to mastering biblical typology through our 8-floor Memory Palace system
           </p>
+          <EnhancedSocialShare
+            title="Phototheology Palace Tour"
+            content="Discover the 8-floor Memory Palace system for studying the Bible. 38+ rooms, AI-powered tools, and a community of learners."
+            url="https://phototheologybible.com/app-tour"
+            defaultMessage="Check out this amazing Bible study system — Phototheology Palace! 🏛️\n\nIt uses a Memory Palace with 8 floors and 38+ rooms to help you see Christ in every chapter of the Bible."
+            buttonText="Share This Tour"
+            buttonVariant="outline"
+          />
         </motion.div>
 
         {/* Quick Start Guide with glass card */}

@@ -136,7 +136,7 @@ serve(async (req) => {
           .single();
 
         if (plan) {
-          dayNumber = (recipient.total_sms_sent % (plan.total_days || 30)) + 1;
+          dayNumber = (recipient.total_sms_sent % (plan.duration || 30)) + 1;
           
           const { data: dayContent } = await supabase
             .from('devotional_days')
@@ -275,8 +275,27 @@ serve(async (req) => {
       });
 
       if (sendResult.success) {
+        // Advance current_day for next send
+        const { data: planData } = profile.plan_id ? await supabase
+          .from('devotional_plans')
+          .select('duration')
+          .eq('id', profile.plan_id)
+          .single() : { data: null };
+
+        const maxDay = planData?.duration || 30;
+        const nextDay = dayNumber >= maxDay ? 1 : dayNumber + 1;
+
+        await supabase
+          .from('devotional_profiles')
+          .update({
+            current_day: nextDay,
+            last_sms_sent_at: new Date().toISOString(),
+            total_sms_sent: (profile.total_sms_sent || 0) + 1,
+          })
+          .eq('id', profile.id);
+
         results.sent++;
-        console.log(`[SMS Send] Sent to profile ${profile.name}`);
+        console.log(`[SMS Send] Sent to profile ${profile.name} (day ${dayNumber} -> next: ${nextDay})`);
       } else {
         results.errors++;
         console.error(`[SMS Send] Failed for profile ${profile.name}: ${sendResult.errorMessage}`);

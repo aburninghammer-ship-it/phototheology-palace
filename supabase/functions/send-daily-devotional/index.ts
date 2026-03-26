@@ -416,7 +416,10 @@ serve(async (req) => {
       try {
         // Calculate which day number should be available today
         const startedAt = new Date(plan.started_at);
-        const daysSinceStart = Math.floor((now.getTime() - startedAt.getTime()) / (1000 * 60 * 60 * 24));
+        // Use UTC date boundaries to avoid timezone-related off-by-one errors
+        const startDate = new Date(Date.UTC(startedAt.getUTCFullYear(), startedAt.getUTCMonth(), startedAt.getUTCDate()));
+        const todayDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+        const daysSinceStart = Math.floor((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
         const currentDayNumber = Math.min(daysSinceStart + 1, plan.duration);
 
         console.log(`Plan ${plan.id}: Day ${currentDayNumber} of ${plan.duration}`);
@@ -596,6 +599,12 @@ serve(async (req) => {
         } else {
           notificationsCreated++;
         }
+
+        // Update current_day on the plan so it tracks progress
+        await supabase
+          .from('devotional_plans')
+          .update({ current_day: currentDayNumber })
+          .eq('id', plan.id);
 
         // Send SMS to opted-in recipients
         if (!snsConfigured) {
