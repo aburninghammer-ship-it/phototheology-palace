@@ -525,8 +525,9 @@ export const SermonTextEditor = ({
       )}
 
       {/* Editor Content */}
-      <div className="overflow-y-auto max-h-[500px] sermon-editor">
+      <div className="overflow-y-auto max-h-[500px] sermon-editor relative" ref={editorContainerRef}>
         <EditorContent editor={editor} />
+        <VerseHoverOverlay containerRef={editorContainerRef} />
       </div>
 
       {/* Strong's Modal */}
