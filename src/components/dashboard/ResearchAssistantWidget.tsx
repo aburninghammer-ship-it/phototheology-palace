@@ -702,8 +702,73 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
     setFreestyleSavedId(null);
     setFreestyleSessionName("");
   };
+  const decodeGenealogy = async () => {
+    const trimmed = genealogyInput.trim();
+    if (!trimmed || genealogyIsLoading) return;
 
-  const timeLabel = (date: Date) => {
+    setGenealogyIsLoading(true);
+    const query = `Decode this biblical genealogy using Phototheology principles:\n\n${trimmed}`;
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "research",
+          query,
+          question: query,
+          conversationHistory: [],
+          systemInstructions: GENEALOGY_SYSTEM_INSTRUCTIONS,
+          maxTokens: 8192,
+        },
+      });
+      if (error) throw error;
+      const response = data?.response || data?.content || data?.answer || "No response received.";
+      setGenealogyOutput(response);
+    } catch (err) {
+      console.error("Genealogy decode error:", err);
+      toast.error("Failed to decode genealogy. Please try again.");
+    } finally {
+      setGenealogyIsLoading(false);
+    }
+  };
+
+  const saveGenealogyStudy = async () => {
+    if (!genealogyOutput) return;
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const title = genealogySessionName.trim() || `Genealogy: ${genealogyInput.slice(0, 60)}`;
+      const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const content = `# ${title}\n\n**Date:** ${date}\n**Type:** Genealogy Decoder\n\n---\n\n## 🧬 Input\n\n${genealogyInput}\n\n---\n\n${genealogyOutput}`;
+      const tags = ["genealogy", "jeeves"];
+
+      if (genealogySavedId) {
+        await supabase.from("user_studies").update({ title, content, tags, updated_at: new Date().toISOString() }).eq("id", genealogySavedId);
+      } else {
+        const { data, error } = await supabase.from("user_studies").insert({
+          user_id: user.id, title, content, tags,
+        }).select("id").single();
+        if (!error && data) setGenealogySavedId(data.id);
+      }
+      setJustSaved(true);
+      setTimeout(() => setJustSaved(false), 2000);
+      toast.success("Genealogy study saved!");
+    } catch (e) {
+      console.error("Genealogy save error:", e);
+      toast.error("Failed to save genealogy study.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const clearGenealogy = () => {
+    setGenealogyInput("");
+    setGenealogyOutput("");
+    setGenealogySavedId(null);
+    setGenealogySessionName("");
+  };
+
+
     return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   };
 
