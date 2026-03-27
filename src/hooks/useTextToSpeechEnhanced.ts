@@ -353,6 +353,28 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
       return;
     }
 
+    // MOBILE FIX: Create and resume AudioContext + prime Audio element immediately
+    // within the user gesture context, BEFORE the async network call.
+    // If we wait until after fetch, the gesture context expires and play() fails.
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    if (audioContextRef.current.state === 'suspended') {
+      await audioContextRef.current.resume();
+    }
+    // Prime the audio element with a silent source so mobile browsers "unlock" it
+    // within the gesture context. This prevents NotAllowedError on play() later.
+    const silentPrime = audioRef.current;
+    try {
+      silentPrime.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      silentPrime.load();
+      await silentPrime.play().catch(() => {});
+      silentPrime.pause();
+    } catch {}
+
     // Calculate dynamic timeout based on text length (longer texts need more time)
     const baseTimeout = Math.max(timeout, 15000); // At least 15 seconds
     const textLengthBonus = Math.min(text.length * 10, 30000); // Up to 30 extra seconds for long texts
@@ -422,22 +444,8 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
         throw new Error('No audio content received');
       }
 
-      // Create and play audio with AudioContext for better mobile support
-      if (!audioRef.current) {
-        audioRef.current = new Audio();
-      }
-
-      // Create AudioContext if needed (helps prevent suspension on mobile)
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-
-      // Resume context if suspended
-      if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
-      }
-
-      const audio = audioRef.current;
+      // Audio element and AudioContext already primed above — reuse them
+      const audio = audioRef.current!;
       const isBlobUrl = audioUrl.startsWith('blob:');
       
       // Set up event handlers BEFORE setting src for reliability
