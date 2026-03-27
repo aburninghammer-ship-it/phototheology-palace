@@ -769,6 +769,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
   };
 
 
+  const timeLabel = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   };
 
