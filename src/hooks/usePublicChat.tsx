@@ -168,7 +168,7 @@ export const usePublicChat = (): UsePublicChatReturn => {
     images?: string[],
     replyToId?: string | null
   ) => {
-    if (!activeRoomId || !user || !content.trim()) return;
+    if (!activeRoomId || !user || (!content.trim() && (!images || images.length === 0))) return;
 
     try {
       const insertData: any = {
@@ -179,6 +179,10 @@ export const usePublicChat = (): UsePublicChatReturn => {
 
       if (replyToId) {
         insertData.reply_to_id = replyToId;
+      }
+
+      if (images && images.length > 0) {
+        insertData.images = images;
       }
 
       const { error } = await (supabase as any).from('public_chat_messages').insert(insertData);
