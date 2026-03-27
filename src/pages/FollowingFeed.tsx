@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ const TYPE_COLORS: Record<string, string> = {
 
 export default function FollowingFeed() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { entries, loading, hasMore, likedEntries, repostedEntries, loadFeed, toggleLike, toggleRepost } = useFollowingFeed();
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function FollowingFeed() {
   const handleRepost = async (entry: FeedEntry) => {
     const success = await toggleRepost(entry.id, entry.type);
     if (success) {
-      toast.success(repostedEntries.has(entry.id) ? "Repost removed" : "Shared to your followers!");
+      toast.success(repostedEntries.has(entry.id) ? t('followingFeedPage.repostRemoved') : t('followingFeedPage.sharedToFollowers'));
     }
   };
 
@@ -45,8 +47,8 @@ export default function FollowingFeed() {
             <Rss className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Following Feed</h1>
-            <p className="text-sm text-muted-foreground">See what people you follow are studying and sharing</p>
+            <h1 className="text-2xl font-bold">{t('followingFeedPage.title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('followingFeedPage.subtitle')}</p>
           </div>
         </div>
 
@@ -65,12 +67,12 @@ export default function FollowingFeed() {
             <CardContent className="p-8 text-center space-y-4">
               <Users className="h-12 w-12 text-muted-foreground mx-auto" />
               <div>
-                <h3 className="font-semibold text-lg mb-1">Your feed is empty</h3>
+                <h3 className="font-semibold text-lg mb-1">{t('followingFeedPage.emptyTitle')}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Follow other believers to see their studies, reflections, and insights here.
+                  {t('followingFeedPage.emptyDescription')}
                 </p>
                 <Button asChild variant="outline">
-                  <Link to="/community">Discover People</Link>
+                  <Link to="/community">{t('followingFeedPage.discoverPeople')}</Link>
                 </Button>
               </div>
             </CardContent>
@@ -97,7 +99,7 @@ export default function FollowingFeed() {
           <div className="text-center mt-6">
             <Button variant="outline" size="sm" onClick={() => loadFeed(false)} disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              Load More
+              {t('followingFeedPage.loadMore')}
             </Button>
           </div>
         )}
@@ -121,6 +123,7 @@ function FeedCard({
   onRepost: () => void;
   currentUserId?: string;
 }) {
+  const { t } = useTranslation();
   const isOwnPost = entry.user_id === currentUserId;
 
   return (
@@ -133,7 +136,7 @@ function FeedCard({
             <Link to={`/user/${entry.reposted_by.id}`} className="hover:underline font-medium">
               {entry.reposted_by.display_name}
             </Link>
-            <span>shared this</span>
+            <span>{t('followingFeedPage.sharedThis')}</span>
           </div>
         )}
 
@@ -144,7 +147,7 @@ function FeedCard({
               <AvatarImage src={entry.profile?.avatar_url || undefined} />
               <AvatarFallback className="text-xs">{(entry.profile?.display_name || "?")[0]}</AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium">{entry.profile?.display_name || "Unknown"}</span>
+            <span className="text-sm font-medium">{entry.profile?.display_name || t('followingFeedPage.unknown')}</span>
           </Link>
           <div className="flex items-center gap-2">
             {entry.type === "study_entry" && entry.entry_type && (
@@ -154,7 +157,7 @@ function FeedCard({
             )}
             {entry.type === "community_post" && (
               <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/30">
-                community
+                {t('followingFeedPage.community')}
               </Badge>
             )}
             {entry.category && (
@@ -185,7 +188,7 @@ function FeedCard({
         {/* Thread Name */}
         {entry.thread_title && (
           <p className="text-xs text-muted-foreground">
-            in <span className="font-medium">{entry.thread_title}</span>
+            {t('followingFeedPage.in')} <span className="font-medium">{entry.thread_title}</span>
           </p>
         )}
 
@@ -198,13 +201,13 @@ function FeedCard({
           {!isOwnPost && (
             <Button variant="ghost" size="sm" className={`h-7 text-xs gap-1 ${isReposted ? "text-emerald-500" : ""}`} onClick={onRepost}>
               <Repeat2 className={`h-3.5 w-3.5 ${isReposted ? "text-emerald-500" : ""}`} />
-              {isReposted ? "Shared" : "Share"}
+              {isReposted ? t('followingFeedPage.shared') : t('followingFeedPage.share')}
             </Button>
           )}
           <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" asChild>
             <Link to={`/user/${entry.user_id}`}>
               <MessageCircle className="h-3.5 w-3.5" />
-              View Profile
+              {t('followingFeedPage.viewProfile')}
             </Link>
           </Button>
         </div>

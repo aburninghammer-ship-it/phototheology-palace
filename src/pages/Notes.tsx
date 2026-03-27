@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { SEO } from "@/components/SEO";
@@ -31,6 +32,7 @@ const Notes = () => {
   const { isOnline, notes } = useOfflineNotes();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [verseNotes, setVerseNotes] = useState<VerseNote[]>([]);
   const [verseNotesLoading, setVerseNotesLoading] = useState(true);
 
@@ -78,10 +80,10 @@ const Notes = () => {
       if (error) throw error;
 
       setVerseNotes(prev => prev.filter(n => n.id !== noteId));
-      toast.success("Note deleted");
+      toast.success(t('notesPage.noteDeleted'));
     } catch (error) {
       console.error("Error deleting note:", error);
-      toast.error("Failed to delete note");
+      toast.error(t('notesPage.failedToDelete'));
     }
   };
 
@@ -100,29 +102,29 @@ const Notes = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="My Notes | Phototheology"
-        description="Jot down thoughts, contemplations, and insights from your Bible study. Available offline."
+        title={`${t('notesPage.title')} | Phototheology`}
+        description={t('notesPage.seoDescription')}
       />
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold">My Notes</h1>
+            <h1 className="text-3xl font-bold">{t('notesPage.title')}</h1>
             <p className="text-muted-foreground">
-              Capture your thoughts and contemplations
+              {t('notesPage.captureThoughts')}
             </p>
           </div>
           <Badge variant="outline" className="flex items-center gap-2">
             {isOnline ? (
               <>
                 <Cloud className="h-4 w-4 text-green-500" />
-                Online
+                {t('notesPage.online')}
               </>
             ) : (
               <>
                 <CloudOff className="h-4 w-4" />
-                Offline Mode
+                {t('notesPage.offlineMode')}
               </>
             )}
           </Badge>
@@ -133,11 +135,11 @@ const Notes = () => {
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="quick" className="flex items-center gap-2">
               <StickyNote className="h-4 w-4" />
-              Quick Notes
+              {t('notesPage.quickNotes')}
             </TabsTrigger>
             <TabsTrigger value="bible" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
-              Bible Notes
+              {t('notesPage.bibleNotes')}
             </TabsTrigger>
           </TabsList>
 
@@ -148,10 +150,9 @@ const Notes = () => {
                 <div className="flex items-start gap-3">
                   <Info className="h-5 w-5 text-primary mt-0.5" />
                   <div>
-                    <h3 className="font-semibold text-sm">Offline Available</h3>
+                    <h3 className="font-semibold text-sm">{t('notesPage.offlineAvailable')}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Your notes are saved locally and will sync when you're back online.
-                      Write anytime, anywhere — even without internet.
+                      {t('notesPage.offlineAvailableDesc')}
                     </p>
                   </div>
                 </div>
@@ -169,10 +170,9 @@ const Notes = () => {
                 <div className="flex items-start gap-3">
                   <Info className="h-5 w-5 text-amber-500 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold text-sm">Bible Verse Notes</h3>
+                    <h3 className="font-semibold text-sm">{t('notesPage.bibleVerseNotes')}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Notes you've added directly to Bible verses while reading.
-                      Click on any note to go to that verse in the Bible reader.
+                      {t('notesPage.bibleVerseNotesDesc')}
                     </p>
                   </div>
                 </div>
@@ -183,23 +183,23 @@ const Notes = () => {
               <Card>
                 <CardContent className="py-12 text-center">
                   <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground mb-4">Sign in to view your Bible verse notes</p>
-                  <Button onClick={() => navigate("/auth")}>Sign In</Button>
+                  <p className="text-muted-foreground mb-4">{t('notesPage.signInToView')}</p>
+                  <Button onClick={() => navigate("/auth")}>{t('notesPage.signIn')}</Button>
                 </CardContent>
               </Card>
             ) : verseNotesLoading ? (
-              <div className="text-center py-12">Loading notes...</div>
+              <div className="text-center py-12">{t('notesPage.loadingNotes')}</div>
             ) : verseNotes.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <StickyNote className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground mb-2">No Bible verse notes yet</p>
+                  <p className="text-muted-foreground mb-2">{t('notesPage.noBibleNotesYet')}</p>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Add notes to verses by clicking the sticky note icon next to any verse in the Bible reader.
+                    {t('notesPage.addNotesHint')}
                   </p>
                   <Button onClick={() => navigate("/bible")}>
                     <BookOpen className="mr-2 h-4 w-4" />
-                    Go to Bible Reader
+                    {t('notesPage.goToBibleReader')}
                   </Button>
                 </CardContent>
               </Card>
@@ -212,7 +212,7 @@ const Notes = () => {
                         <BookOpen className="h-5 w-5 text-primary" />
                         {bookName}
                         <Badge variant="secondary" className="ml-auto">
-                          {bookNotes.length} {bookNotes.length === 1 ? 'note' : 'notes'}
+                          {bookNotes.length} {bookNotes.length === 1 ? t('notesPage.note') : t('notesPage.notes')}
                         </Badge>
                       </CardTitle>
                     </CardHeader>
@@ -247,7 +247,7 @@ const Notes = () => {
                                   size="sm"
                                   className="h-7 w-7 p-0"
                                   onClick={() => goToVerse(note.book, note.chapter, note.verse)}
-                                  title="Go to verse"
+                                  title={t('notesPage.goToVerse')}
                                 >
                                   <Edit3 className="h-3 w-3" />
                                 </Button>
@@ -256,7 +256,7 @@ const Notes = () => {
                                   size="sm"
                                   className="h-7 w-7 p-0 text-destructive hover:text-destructive"
                                   onClick={() => deleteVerseNote(note.id)}
-                                  title="Delete note"
+                                  title={t('notesPage.deleteNote')}
                                 >
                                   <Trash2 className="h-3 w-3" />
                                 </Button>

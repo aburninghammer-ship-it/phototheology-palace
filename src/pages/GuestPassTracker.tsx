@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -31,24 +32,24 @@ interface GuestPass {
   missions_completed?: number;
 }
 
-function getStatusBadge(pass: GuestPass) {
+function getStatusBadge(pass: GuestPass, t: (key: string, opts?: any) => string) {
   if (pass.conversion_status === "converted") {
-    return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Converted ✓</Badge>;
+    return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">{t('guestPassTracker.convertedBadge')}</Badge>;
   }
   if (!pass.activated_at) {
-    return <Badge variant="outline" className="text-muted-foreground">Not Activated</Badge>;
+    return <Badge variant="outline" className="text-muted-foreground">{t('guestPassTracker.notActivated')}</Badge>;
   }
   if (pass.expires_at && isPast(new Date(pass.expires_at))) {
-    return <Badge className="bg-destructive/20 text-destructive border-destructive/30">Expired</Badge>;
+    return <Badge className="bg-destructive/20 text-destructive border-destructive/30">{t('guestPassTracker.expired')}</Badge>;
   }
   if (pass.expires_at) {
     const daysLeft = differenceInDays(new Date(pass.expires_at), new Date());
     if (daysLeft <= 1) {
-      return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">Expiring Soon</Badge>;
+      return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">{t('guestPassTracker.expiringSoon')}</Badge>;
     }
-    return <Badge className="bg-primary/20 text-primary border-primary/30">Active ({daysLeft}d left)</Badge>;
+    return <Badge className="bg-primary/20 text-primary border-primary/30">{t('guestPassTracker.active')} ({daysLeft}d)</Badge>;
   }
-  return <Badge variant="outline">Unknown</Badge>;
+  return <Badge variant="outline">{t('followingFeedPage.unknown')}</Badge>;
 }
 
 function getDaysIntoPass(pass: GuestPass): number {
@@ -58,6 +59,7 @@ function getDaysIntoPass(pass: GuestPass): number {
 
 export default function GuestPassTracker() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [passes, setPasses] = useState<GuestPass[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("all");
@@ -124,7 +126,7 @@ export default function GuestPassTracker() {
   const copyFollowUpLink = (passToken: string) => {
     const link = `${window.location.origin}/pricing?skip_trial=true&ref=lockin_${passToken}`;
     navigator.clipboard.writeText(link);
-    toast.success("Conversion link copied!");
+    toast.success(t('guestPassTracker.conversionLinkCopied'));
   };
 
   const markConverted = async (passId: string) => {
@@ -141,7 +143,7 @@ export default function GuestPassTracker() {
             : p
         )
       );
-      toast.success("Marked as converted!");
+      toast.success(t('guestPassTracker.markedAsConverted'));
     }
   };
 
@@ -150,7 +152,7 @@ export default function GuestPassTracker() {
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 pt-24 text-center">
-          <p className="text-muted-foreground">Please sign in to view your guest passes.</p>
+          <p className="text-muted-foreground">{t('guestPassTracker.signInRequired')}</p>
         </div>
       </div>
     );
@@ -158,7 +160,7 @@ export default function GuestPassTracker() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <SEO title="Guest Pass Tracker | Phototheology" description="Track and follow up with your Lock-In Pass guests." />
+      <SEO title={`${t('guestPassTracker.title')} | Phototheology`} description={t('guestPassTracker.seoDescription')} />
       <Navigation />
 
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-5xl">
@@ -167,8 +169,8 @@ export default function GuestPassTracker() {
             <Users className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Guest Pass Tracker</h1>
-            <p className="text-sm text-muted-foreground">Monitor your Lock-In Pass guests & follow up for conversion</p>
+            <h1 className="text-2xl font-bold text-foreground">{t('guestPassTracker.title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('guestPassTracker.subtitle')}</p>
           </div>
         </div>
 
@@ -177,31 +179,31 @@ export default function GuestPassTracker() {
           <Card className="border-border/50">
             <CardContent className="p-3 text-center">
               <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-              <p className="text-xs text-muted-foreground">Total Shared</p>
+              <p className="text-xs text-muted-foreground">{t('guestPassTracker.totalShared')}</p>
             </CardContent>
           </Card>
           <Card className="border-primary/30 bg-primary/5">
             <CardContent className="p-3 text-center">
               <p className="text-2xl font-bold text-primary">{stats.active}</p>
-              <p className="text-xs text-muted-foreground">Active Now</p>
+              <p className="text-xs text-muted-foreground">{t('guestPassTracker.activeNow')}</p>
             </CardContent>
           </Card>
           <Card className="border-amber-500/30 bg-amber-500/5">
             <CardContent className="p-3 text-center">
               <p className="text-2xl font-bold text-amber-500">{stats.pending}</p>
-              <p className="text-xs text-muted-foreground">Not Activated</p>
+              <p className="text-xs text-muted-foreground">{t('guestPassTracker.notActivated')}</p>
             </CardContent>
           </Card>
           <Card className="border-destructive/30 bg-destructive/5">
             <CardContent className="p-3 text-center">
               <p className="text-2xl font-bold text-destructive">{stats.expired}</p>
-              <p className="text-xs text-muted-foreground">Expired</p>
+              <p className="text-xs text-muted-foreground">{t('guestPassTracker.expired')}</p>
             </CardContent>
           </Card>
           <Card className="border-green-500/30 bg-green-500/5">
             <CardContent className="p-3 text-center">
               <p className="text-2xl font-bold text-green-500">{stats.converted}</p>
-              <p className="text-xs text-muted-foreground">{conversionRate}% Converted</p>
+              <p className="text-xs text-muted-foreground">{t('guestPassTracker.percentConverted', { rate: conversionRate })}</p>
             </CardContent>
           </Card>
         </div>
@@ -209,23 +211,23 @@ export default function GuestPassTracker() {
         {/* Tabs */}
         <Tabs value={tab} onValueChange={setTab} className="space-y-4">
           <TabsList className="w-full grid grid-cols-5">
-            <TabsTrigger value="all">All ({stats.total})</TabsTrigger>
-            <TabsTrigger value="active">Active ({stats.active})</TabsTrigger>
-            <TabsTrigger value="pending">Pending ({stats.pending})</TabsTrigger>
-            <TabsTrigger value="expired">Expired ({stats.expired})</TabsTrigger>
-            <TabsTrigger value="converted">Converted ({stats.converted})</TabsTrigger>
+            <TabsTrigger value="all">{t('guestPassTracker.all')} ({stats.total})</TabsTrigger>
+            <TabsTrigger value="active">{t('guestPassTracker.active')} ({stats.active})</TabsTrigger>
+            <TabsTrigger value="pending">{t('guestPassTracker.pending')} ({stats.pending})</TabsTrigger>
+            <TabsTrigger value="expired">{t('guestPassTracker.expired')} ({stats.expired})</TabsTrigger>
+            <TabsTrigger value="converted">{t('guestPassTracker.converted')} ({stats.converted})</TabsTrigger>
           </TabsList>
 
           <TabsContent value={tab} className="space-y-3">
             {loading ? (
-              <p className="text-muted-foreground text-center py-8">Loading passes...</p>
+              <p className="text-muted-foreground text-center py-8">{t('guestPassTracker.loadingPasses')}</p>
             ) : filteredPasses.length === 0 ? (
               <Card className="border-dashed">
                 <CardContent className="p-8 text-center">
                   <Flame className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">No passes in this category yet.</p>
+                  <p className="text-muted-foreground">{t('guestPassTracker.noPassesInCategory')}</p>
                   <Button asChild variant="outline" className="mt-4">
-                    <a href="/gift">Share a Guest Pass</a>
+                    <a href="/gift">{t('guestPassTracker.shareGuestPass')}</a>
                   </Button>
                 </CardContent>
               </Card>
@@ -255,6 +257,7 @@ function GuestPassRow({
   onCopyLink: (token: string) => void;
   onMarkConverted: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const isExpired = pass.expires_at && isPast(new Date(pass.expires_at));
   const isActive = pass.activated_at && !isExpired && pass.conversion_status !== "converted";
   const needsFollowUp = (isExpired || (pass.expires_at && differenceInDays(new Date(pass.expires_at), new Date()) <= 1)) && pass.conversion_status !== "converted";
@@ -267,9 +270,9 @@ function GuestPassRow({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <p className="font-semibold text-foreground truncate">
-                {pass.guest_name || pass.recipient_email || "Unknown Guest"}
+                {pass.guest_name || pass.recipient_email || t('guestPassTracker.unknownGuest')}
               </p>
-              {getStatusBadge(pass)}
+              {getStatusBadge(pass, t)}
             </div>
             {pass.recipient_email && (
               <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -277,13 +280,13 @@ function GuestPassRow({
               </p>
             )}
             <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-              <span>Shared {formatDistanceToNow(new Date(pass.created_at), { addSuffix: true })}</span>
+              <span>{t('guestPassTracker.shared')} {formatDistanceToNow(new Date(pass.created_at), { addSuffix: true })}</span>
               {pass.activated_at && (
                 <>
                   <span>•</span>
-                  <span>Day {getDaysIntoPass(pass)} of 5</span>
+                  <span>{t('guestPassTracker.dayOfFive', { day: getDaysIntoPass(pass) })}</span>
                   <span>•</span>
-                  <span>{pass.missions_completed || 0}/5 missions</span>
+                  <span>{t('guestPassTracker.missionsCount', { completed: pass.missions_completed || 0 })}</span>
                 </>
               )}
             </div>
@@ -305,7 +308,7 @@ function GuestPassRow({
                 }}
               >
                 <Mail className="h-3.5 w-3.5 mr-1" />
-                Follow Up
+                {t('guestPassTracker.followUp')}
               </Button>
             )}
 
@@ -317,7 +320,7 @@ function GuestPassRow({
                 onClick={() => onCopyLink(pass.pass_token)}
               >
                 <Copy className="h-3.5 w-3.5 mr-1" />
-                Copy Link
+                {t('guestPassTracker.copyLink')}
               </Button>
             )}
 
@@ -329,7 +332,7 @@ function GuestPassRow({
                 onClick={() => onMarkConverted(pass.id)}
               >
                 <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                Mark Converted
+                {t('guestPassTracker.markConverted')}
               </Button>
             )}
           </div>

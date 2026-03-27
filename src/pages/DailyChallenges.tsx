@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,7 @@ const DailyChallenges = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { triggerOutputSpark } = useOutputSpark();
   const [dailyChallenge, setDailyChallenge] = useState<any>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -202,8 +204,8 @@ const DailyChallenges = () => {
       });
 
       toast({
-        title: "Challenge Complete! 🎉",
-        description: "Added to your Growth Journal. +25 points! Check back tomorrow for the next challenge!",
+        title: t('dailyChallengesPage.challengeComplete') + " 🎉",
+        description: t('dailyChallengesPage.challengeCompleteDesc'),
       });
 
       setHasSubmitted(true);
@@ -233,8 +235,8 @@ const DailyChallenges = () => {
     const siteUrl = 'https://phototheologybible.com';
 
     if (!dailyChallenge) return {
-      title: 'Daily Phototheology Challenge',
-      content: 'Join me in today\'s Bible study challenge!',
+      title: t('dailyChallengesPage.dailyPhototheologyChallenge'),
+      content: t('dailyChallengesPage.joinTodaysChallenge'),
       url: `${siteUrl}/daily-challenges`
     };
 
@@ -245,10 +247,10 @@ const DailyChallenges = () => {
 
     const principle = dailyChallenge.principle_used || 'biblical principles';
 
-    const explanation = "Daily Challenges test your Bible knowledge with fresh puzzles each day — from verse matching to thematic connections. Great for building a daily Scripture habit!";
+    const explanation = t('dailyChallengesPage.dailyChallengesExplanation');
 
     const details: string[] = [
-      `🔥 Try this Phototheology Daily Challenge!`,
+      `🔥 ${t('dailyChallengesPage.tryThisChallenge')}`,
       `💡 ${explanation}`,
       `📖 ${challengeTypeLabel} — training ${principle}`,
     ];
@@ -258,7 +260,7 @@ const DailyChallenges = () => {
     if (dailyChallenge.verses && Array.isArray(dailyChallenge.verses) && dailyChallenge.verses.length > 0) {
       details.push(dailyChallenge.verses.join('\n\n'));
     }
-    details.push(`✨ Try it yourself on Phototheology Palace — a free Bible learning suite!\n\n${siteUrl}/daily-challenges`);
+    details.push(`✨ ${t('dailyChallengesPage.tryItYourself')}\n\n${siteUrl}/daily-challenges`);
 
     return {
       title: `🔥 Daily ${challengeTypeLabel} Challenge`,
@@ -302,7 +304,7 @@ const DailyChallenges = () => {
           <Card>
             <CardContent className="py-8">
               <p className="text-muted-foreground text-center">
-                Challenge type not yet implemented. Check back soon!
+                {t('dailyChallengesPage.challengeNotImplemented')}
               </p>
             </CardContent>
           </Card>
@@ -314,42 +316,42 @@ const DailyChallenges = () => {
 
   const challengeSteps = [
     {
-      title: "Complete Daily Challenges",
-      description: "Each day brings a new Phototheology challenge designed to sharpen your Bible study skills and deepen your understanding of Scripture.",
+      title: t('dailyChallengesPage.stepCompleteChallenges'),
+      description: t('dailyChallengesPage.stepCompleteChallengesDesc'),
       highlights: [
-        "30-day rotating challenge system",
-        "Dimension drills, chef recipes, and equation decoding",
-        "Progress tracked in your Growth Journal"
+        t('dailyChallengesPage.stepCompleteChallengesH1'),
+        t('dailyChallengesPage.stepCompleteChallengesH2'),
+        t('dailyChallengesPage.stepCompleteChallengesH3'),
       ],
       icon: Flame
     },
     {
-      title: "Choose Your Challenge Type",
-      description: "Switch between Daily Challenges, Chef Challenges, and Equations to train different aspects of Phototheology thinking.",
+      title: t('dailyChallengesPage.stepChooseType'),
+      description: t('dailyChallengesPage.stepChooseTypeDesc'),
       highlights: [
-        "Daily challenges for reflexive training",
-        "Chef challenges to create biblical recipes",
-        "Equations to decode symbolic meanings"
+        t('dailyChallengesPage.stepChooseTypeH1'),
+        t('dailyChallengesPage.stepChooseTypeH2'),
+        t('dailyChallengesPage.stepChooseTypeH3'),
       ],
       icon: Target
     },
     {
-      title: "Learn the Principles",
-      description: "Each challenge focuses on specific Phototheology principles like the 5 Dimensions, Connect 6, or Sanctuary mapping.",
+      title: t('dailyChallengesPage.stepLearnPrinciples'),
+      description: t('dailyChallengesPage.stepLearnPrinciplesDesc'),
       highlights: [
-        "70 Questions methodology",
-        "Christ-chapter discoveries",
-        "Fruit check evaluations"
+        t('dailyChallengesPage.stepLearnPrinciplesH1'),
+        t('dailyChallengesPage.stepLearnPrinciplesH2'),
+        t('dailyChallengesPage.stepLearnPrinciplesH3'),
       ],
       icon: Lightbulb
     },
     {
-      title: "Track Your Growth",
-      description: "Completed challenges are saved to your Growth Journal where you can review your insights and track your spiritual development.",
+      title: t('dailyChallengesPage.stepTrackGrowth'),
+      description: t('dailyChallengesPage.stepTrackGrowthDesc'),
       highlights: [
-        "View past submissions and AI feedback",
-        "Share your insights with the community",
-        "Build a record of your spiritual journey"
+        t('dailyChallengesPage.stepTrackGrowthH1'),
+        t('dailyChallengesPage.stepTrackGrowthH2'),
+        t('dailyChallengesPage.stepTrackGrowthH3'),
       ],
       icon: Zap
     }
@@ -363,17 +365,17 @@ const DailyChallenges = () => {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <h1 className="text-4xl font-bold flex items-center gap-2">
               <Flame className="h-8 w-8 text-orange-500" />
-              Challenges
+              {t('dailyChallengesPage.challenges')}
             </h1>
             <div className="flex gap-2">
-              <HowItWorksDialog 
-                title="How to Use Daily Challenges" 
+              <HowItWorksDialog
+                title={t('dailyChallengesPage.howToUseTitle')}
                 steps={challengeSteps}
                 gradient="from-orange-500 via-amber-500 to-yellow-500"
               />
               <Button onClick={() => navigate("/growth-journal")} variant="outline" className="gap-2">
                 <BookOpen className="h-4 w-4" />
-                Growth Journal
+                {t('dailyChallengesPage.growthJournal')}
               </Button>
               <EnhancedSocialShare {...getShareContent()} />
             </div>
@@ -391,34 +393,31 @@ const DailyChallenges = () => {
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="daily" className="gap-2">
                 <Flame className="h-4 w-4" />
-                Daily
+                {t('dailyChallengesPage.daily')}
               </TabsTrigger>
               <TabsTrigger value="chef" className="gap-2">
                 <ChefHat className="h-4 w-4" />
-                Chef
+                {t('dailyChallengesPage.chef')}
               </TabsTrigger>
               <TabsTrigger value="equations" className="gap-2">
                 <Calculator className="h-4 w-4" />
-                Equations
+                {t('dailyChallengesPage.equations')}
               </TabsTrigger>
               <TabsTrigger value="leaderboard" className="gap-2">
                 <Trophy className="h-4 w-4" />
-                Leaderboard
+                {t('dailyChallengesPage.leaderboard')}
               </TabsTrigger>
               <TabsTrigger value="archive" className="gap-2">
                 <Archive className="h-4 w-4" />
-                Archive
+                {t('dailyChallengesPage.archive')}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="daily" className="space-y-6">
               <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 rounded-lg border border-primary/20">
-                <h2 className="font-semibold mb-2">About Daily Challenges</h2>
+                <h2 className="font-semibold mb-2">{t('dailyChallengesPage.aboutDailyChallenges')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Each day brings a new challenge designed to train you in Phototheology principles. 
-                  Complete challenges to build your Growth Journal and develop reflexive biblical thinking.
-                  We rotate through 30 different Bible study challenges: dimension drills, chef recipes, 
-                  equation decoding, 70 questions, principle studies, and more!
+                  {t('dailyChallengesPage.aboutDailyChallengesDesc')}
                 </p>
               </div>
 
@@ -434,9 +433,9 @@ const DailyChallenges = () => {
                         {dailyChallenge.challenge_tier}
                       </Badge>
                     </div>
-                    <EnhancedSocialShare 
-                      {...getShareContent()} 
-                      buttonText="Share This Challenge"
+                    <EnhancedSocialShare
+                      {...getShareContent()}
+                      buttonText={t('dailyChallengesPage.shareThisChallenge')}
                       buttonVariant="default"
                     />
                   </div>
@@ -457,7 +456,7 @@ const DailyChallenges = () => {
                 <Card>
                   <CardContent className="py-12 text-center">
                     <p className="text-muted-foreground">
-                      No challenge available right now. Challenges are generated daily. Check back soon!
+                      {t('dailyChallengesPage.noChallengeAvailable')}
                     </p>
                   </CardContent>
                 </Card>
@@ -465,7 +464,7 @@ const DailyChallenges = () => {
 
               <ChallengeInlineSubmissions
                 challengeType="daily"
-                challengeTitle={dailyChallenge?.title || "Daily Challenge"}
+                challengeTitle={dailyChallenge?.title || t('dailyChallengesPage.dailyChallenge')}
                 challengeDescription={dailyChallenge?.description || ""}
                 difficulty={dailyChallenge?.challenge_tier}
               />
@@ -475,17 +474,16 @@ const DailyChallenges = () => {
               <div className="bg-gradient-to-r from-orange-500/10 to-amber-500/5 p-4 rounded-lg border border-orange-500/20">
                 <h2 className="font-semibold mb-2 flex items-center gap-2">
                   <ChefHat className="h-5 w-5 text-orange-600" />
-                  About Chef Challenges
+                  {t('dailyChallengesPage.aboutChefChallenges')}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Create "biblical recipes" – coherent mini-sermons using only Bible verse references.
-                  Chain verses together to build theological meals that nourish the soul.
+                  {t('dailyChallengesPage.chefChallengesDesc')}
                 </p>
               </div>
-              <ChefRecipeChallenge 
+              <ChefRecipeChallenge
                 challenge={{
-                  title: "Chef Challenge",
-                  description: "Create a biblical recipe by connecting verses that build a complete theological thought.",
+                  title: t('dailyChallengesPage.chefChallenge'),
+                  description: t('dailyChallengesPage.chefChallengeDesc'),
                   verses: [],
                   ui_config: {
                     theme: "Faith Journey",
@@ -499,13 +497,13 @@ const DailyChallenges = () => {
               <div className="text-center">
                 <Button variant="outline" onClick={() => navigate("/games/chef-challenge")} className="gap-2">
                   <ChefHat className="h-4 w-4" />
-                  View Full Chef Challenge Mode
+                  {t('dailyChallengesPage.viewFullChefMode')}
                 </Button>
               </div>
               <ChallengeInlineSubmissions
                 challengeType="chef"
-                challengeTitle="Chef Challenge"
-                challengeDescription="Create a biblical recipe by connecting verses that build a complete theological thought."
+                challengeTitle={t('dailyChallengesPage.chefChallenge')}
+                challengeDescription={t('dailyChallengesPage.chefChallengeDesc')}
               />
             </TabsContent>
 
@@ -514,10 +512,10 @@ const DailyChallenges = () => {
                 <CardContent className="space-y-3 p-5">
                   <div className="flex items-center gap-2">
                     <Calculator className="h-5 w-5 text-primary" />
-                    <h2 className="font-semibold">Build an Equation Challenge</h2>
+                    <h2 className="font-semibold">{t('dailyChallengesPage.buildEquationChallenge')}</h2>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    First, either enter a verse or passage for Jeeves to encode, or leave it blank and let Jeeves generate one for you.
+                    {t('dailyChallengesPage.equationInstructions')}
                   </p>
                 </CardContent>
               </Card>
@@ -528,10 +526,10 @@ const DailyChallenges = () => {
                 <CardContent className="space-y-3 p-5">
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold">PT example</h3>
+                    <h3 className="font-semibold">{t('dailyChallengesPage.ptExample')}</h3>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Here is a worked PT example to decode after you generate your own.
+                    {t('dailyChallengesPage.ptExampleDesc')}
                   </p>
                 </CardContent>
               </Card>
@@ -561,8 +559,8 @@ const DailyChallenges = () => {
 
               <ChallengeInlineSubmissions
                 challengeType="equation"
-                challengeTitle="Equation Challenge"
-                challengeDescription="Decode this biblical equation to discover its deeper meaning."
+                challengeTitle={t('dailyChallengesPage.equationChallenge')}
+                challengeDescription={t('dailyChallengesPage.equationChallengeDesc')}
               />
             </TabsContent>
 
@@ -571,11 +569,11 @@ const DailyChallenges = () => {
               <div className="flex justify-center gap-3">
                 <Button variant="outline" onClick={() => navigate("/community-challenges")} className="gap-2">
                   <Trophy className="h-4 w-4" />
-                  View Full Leaderboard
+                  {t('dailyChallengesPage.viewFullLeaderboard')}
                 </Button>
                 <Button onClick={() => navigate("/challenge-board")} className="gap-2">
                   <Globe className="h-4 w-4" />
-                  Public Challenge Board
+                  {t('dailyChallengesPage.publicChallengeBoard')}
                 </Button>
               </div>
             </TabsContent>
@@ -584,11 +582,10 @@ const DailyChallenges = () => {
               <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/5 p-4 rounded-lg border border-purple-500/20">
                 <h2 className="font-semibold mb-2 flex items-center gap-2">
                   <Archive className="h-5 w-5 text-purple-600" />
-                  Challenge Archive
+                  {t('dailyChallengesPage.challengeArchive')}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Review your past challenge submissions and track your progress over time.
-                  See how you've grown in your Phototheology skills!
+                  {t('dailyChallengesPage.challengeArchiveDesc')}
                 </p>
               </div>
 
@@ -596,7 +593,7 @@ const DailyChallenges = () => {
               <div className="flex items-center justify-between">
                 <Button variant="outline" onClick={goToPreviousMonth}>
                   <ChevronLeft className="mr-2 h-4 w-4" />
-                  Previous
+                  {t('common.previous')}
                 </Button>
                 <h3 className="text-lg font-semibold">
                   {archiveMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -606,13 +603,13 @@ const DailyChallenges = () => {
                   onClick={goToNextMonth}
                   disabled={archiveMonth.getFullYear() === new Date().getFullYear() && archiveMonth.getMonth() === new Date().getMonth()}
                 >
-                  Next
+                  {t('common.next')}
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
 
               {archiveLoading ? (
-                <div className="text-center py-12">Loading archive...</div>
+                <div className="text-center py-12">{t('dailyChallengesPage.loadingArchive')}</div>
               ) : archiveSubmissions.length > 0 ? (
                 <div className="grid gap-4">
                   {archiveSubmissions.map((submission) => (
@@ -639,14 +636,14 @@ const DailyChallenges = () => {
                               )}
                               <Badge variant="secondary" className="text-xs">
                                 <CheckCircle2 className="mr-1 h-3 w-3" />
-                                Completed
+                                {t('dailyChallengesPage.completed')}
                               </Badge>
                             </div>
                             <h4 className="font-semibold text-lg">
                               {submission.challenge?.title || 'Challenge'}
                             </h4>
                             <p className="text-sm text-muted-foreground mt-1">
-                              {submission.challenge?.description?.slice(0, 150) || 'No description'}
+                              {submission.challenge?.description?.slice(0, 150) || t('dailyChallengesPage.noDescription')}
                               {(submission.challenge?.description?.length || 0) > 150 ? '...' : ''}
                             </p>
                             <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
@@ -669,7 +666,7 @@ const DailyChallenges = () => {
                         {/* Show submission preview */}
                         {submission.submission_data && (
                           <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">Your Response:</p>
+                            <p className="text-xs text-muted-foreground mb-1">{t('dailyChallengesPage.yourResponse')}</p>
                             <p className="text-sm line-clamp-3">
                               {typeof submission.submission_data === 'string'
                                 ? submission.submission_data
@@ -688,9 +685,9 @@ const DailyChallenges = () => {
                 <Card>
                   <CardContent className="text-center py-12">
                     <Archive className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">No challenges completed this month.</p>
+                    <p className="text-muted-foreground">{t('dailyChallengesPage.noChallengesThisMonth')}</p>
                     <p className="text-sm text-muted-foreground mt-2">
-                      Complete daily challenges to build your archive!
+                      {t('dailyChallengesPage.completeChallengesPrompt')}
                     </p>
                     <Button
                       variant="outline"
@@ -704,7 +701,7 @@ const DailyChallenges = () => {
                       className="mt-4"
                     >
                       <Flame className="mr-2 h-4 w-4" />
-                      Start Today's Challenge
+                      {t('dailyChallengesPage.startTodaysChallenge')}
                     </Button>
                   </CardContent>
                 </Card>

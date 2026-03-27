@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -160,6 +161,7 @@ export default function Libraries() {
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState("reference");
   const [searchQuery, setSearchQuery] = useState("");
@@ -284,7 +286,7 @@ export default function Libraries() {
         });
       } catch (err) {
         console.error('Error fetching libraries:', err);
-        toast.error('Failed to load libraries');
+        toast.error(t('librariesPage.failedToLoad'));
       } finally {
         setLoading(false);
       }
@@ -324,14 +326,14 @@ export default function Libraries() {
   );
 
   const libraryTabs = [
-    { id: 'reference', label: 'PT Libraries', icon: Library, count: REFERENCE_LIBRARIES.length, color: 'text-indigo-500' },
-    { id: 'powerpoints', label: 'PowerPoints', icon: Presentation, count: stats.powerpoints, color: 'text-fuchsia-500' },
-    { id: 'sermons', label: 'Sermons', icon: Mic2, count: stats.sermons, color: 'text-rose-500' },
-    { id: 'sparks', label: 'Sparks', icon: Flame, count: stats.sparks, color: 'text-orange-500' },
-    { id: 'gems', label: 'Gems', icon: Gem, count: stats.gems, color: 'text-emerald-500' },
-    { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, count: stats.bookmarks, color: 'text-blue-500' },
-    { id: 'highlights', label: 'Highlights', icon: Highlighter, count: stats.highlights, color: 'text-yellow-500' },
-    { id: 'notes', label: 'Notes', icon: StickyNote, count: stats.notes, color: 'text-purple-500' },
+    { id: 'reference', label: t('librariesPage.ptLibraries'), icon: Library, count: REFERENCE_LIBRARIES.length, color: 'text-indigo-500' },
+    { id: 'powerpoints', label: t('librariesPage.powerPoints'), icon: Presentation, count: stats.powerpoints, color: 'text-fuchsia-500' },
+    { id: 'sermons', label: t('librariesPage.sermons'), icon: Mic2, count: stats.sermons, color: 'text-rose-500' },
+    { id: 'sparks', label: t('librariesPage.sparks'), icon: Flame, count: stats.sparks, color: 'text-orange-500' },
+    { id: 'gems', label: t('librariesPage.gems'), icon: Gem, count: stats.gems, color: 'text-emerald-500' },
+    { id: 'bookmarks', label: t('librariesPage.bookmarks'), icon: Bookmark, count: stats.bookmarks, color: 'text-blue-500' },
+    { id: 'highlights', label: t('librariesPage.highlights'), icon: Highlighter, count: stats.highlights, color: 'text-yellow-500' },
+    { id: 'notes', label: t('librariesPage.notes'), icon: StickyNote, count: stats.notes, color: 'text-purple-500' },
   ];
 
   return (
@@ -352,7 +354,7 @@ export default function Libraries() {
             className="mb-4 text-white/80 hover:text-white hover:bg-white/10"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            {t('librariesPage.back')}
           </Button>
 
           <div className="flex items-center gap-4 mb-6">
@@ -360,8 +362,8 @@ export default function Libraries() {
               <Library className="h-10 w-10 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-white drop-shadow-lg">My Libraries</h1>
-              <p className="text-white/80 text-lg">All your saved discoveries in one place</p>
+              <h1 className="text-4xl font-bold text-white drop-shadow-lg">{t('librariesPage.title')}</h1>
+              <p className="text-white/80 text-lg">{t('librariesPage.subtitle')}</p>
             </div>
           </div>
 
@@ -394,7 +396,7 @@ export default function Libraries() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search your libraries..."
+              placeholder={t('librariesPage.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -432,9 +434,9 @@ export default function Libraries() {
           {/* Reference Libraries Tab - PT Room Libraries */}
           <TabsContent value="reference">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-2">Phototheology Reference Libraries</h2>
+              <h2 className="text-xl font-semibold mb-2">{t('librariesPage.referenceLibraries')}</h2>
               <p className="text-muted-foreground text-sm">
-                Access curated knowledge from each Palace Room. These libraries contain the core data for symbols, types, feasts, cycles, and more.
+                {t('librariesPage.referenceLibrariesDesc')}
               </p>
             </div>
             
@@ -444,12 +446,12 @@ export default function Libraries() {
               if (floorLibraries.length === 0) return null;
               
               const floorNames: Record<number, string> = {
-                1: "Floor 1 — Furnishing",
-                2: "Floor 2 — Investigation",
-                3: "Floor 3 — Freestyle",
-                4: "Floor 4 — Next Level",
-                5: "Floor 5 — Vision",
-                6: "Floor 6 — Three Heavens",
+                1: t('librariesPage.floor1'),
+                2: t('librariesPage.floor2'),
+                3: t('librariesPage.floor3'),
+                4: t('librariesPage.floor4'),
+                5: t('librariesPage.floor5'),
+                6: t('librariesPage.floor6'),
               };
               
               return (
@@ -503,7 +505,7 @@ export default function Libraries() {
             {REFERENCE_LIBRARIES.filter(lib => lib.floor === 0).length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                  Special Libraries
+                  {t('librariesPage.specialLibraries')}
                 </h3>
                 <div className={cn(
                   viewMode === 'grid'
@@ -554,9 +556,9 @@ export default function Libraries() {
             ) : filteredPowerpoints.length === 0 ? (
               <EmptyState
                 icon={Presentation}
-                title="No Saved PowerPoints"
-                description="Generate and save presentations to access them here"
-                action={{ label: "Create PowerPoint", path: "/sermon-powerpoint" }}
+                title={t('librariesPage.noSavedPowerPoints')}
+                description={t('librariesPage.generatePresentations')}
+                action={{ label: t('librariesPage.createPowerPoint'), path: "/sermon-powerpoint" }}
               />
             ) : (
               <div className={cn(
@@ -603,7 +605,7 @@ export default function Libraries() {
                           }}
                         >
                           <Presentation className="h-3 w-3 mr-1" />
-                          Open
+                          {t('librariesPage.open')}
                         </Button>
                       </div>
                     </CardContent>
@@ -611,7 +613,7 @@ export default function Libraries() {
                 ))}
               </div>
             )}
-            <ViewAllButton path="/sermon-powerpoint" label="Create New PowerPoint" />
+            <ViewAllButton path="/sermon-powerpoint" label={t('librariesPage.createNewPowerPoint')} />
           </TabsContent>
 
           {/* Sermons Tab */}
@@ -621,9 +623,9 @@ export default function Libraries() {
             ) : filteredSermons.length === 0 ? (
               <EmptyState
                 icon={Mic2}
-                title="No Sermons Yet"
-                description="Create sermons using the Sermon Builder"
-                action={{ label: "Build a Sermon", path: "/sermon-builder" }}
+                title={t('librariesPage.noSermonsYet')}
+                description={t('librariesPage.createSermonsHint')}
+                action={{ label: t('librariesPage.buildSermon'), path: "/sermon-builder" }}
               />
             ) : (
               <div className={cn(
@@ -658,7 +660,7 @@ export default function Libraries() {
                           {sermon.sermon_style}
                         </Badge>
                         <span>
-                          {sermon.status === 'complete' ? 'Complete' : `Step ${sermon.current_step}/5`}
+                          {sermon.status === 'complete' ? t('librariesPage.complete') : t('librariesPage.stepCount', { current: sermon.current_step })}
                         </span>
                       </div>
                       <div className="flex gap-2 mt-3">
@@ -691,7 +693,7 @@ export default function Libraries() {
                 ))}
               </div>
             )}
-            <ViewAllButton path="/sermon-archive" label="View All Sermons" />
+            <ViewAllButton path="/sermon-archive" label={t('librariesPage.viewAllSermons')} />
           </TabsContent>
 
           {/* Sparks Tab */}
@@ -701,9 +703,9 @@ export default function Libraries() {
             ) : filteredSparks.length === 0 ? (
               <EmptyState
                 icon={Flame}
-                title="No Sparks Yet"
-                description="Divine insights will appear here as you study"
-                action={{ label: "Go to Bible", path: "/bible" }}
+                title={t('librariesPage.noSparksYet')}
+                description={t('librariesPage.sparksHint')}
+                action={{ label: t('librariesPage.goToBible'), path: "/bible" }}
               />
             ) : (
               <div className={cn(
@@ -743,7 +745,7 @@ export default function Libraries() {
                 })}
               </div>
             )}
-            <ViewAllButton path="/sparks" label="View All Sparks" />
+            <ViewAllButton path="/sparks" label={t('librariesPage.viewAllSparks')} />
           </TabsContent>
 
           {/* Gems Tab */}
@@ -753,9 +755,9 @@ export default function Libraries() {
             ) : filteredGems.length === 0 ? (
               <EmptyState
                 icon={Gem}
-                title="No Gems Collected"
-                description="Collect gems from Palace rooms to build your collection"
-                action={{ label: "Visit Palace", path: "/palace" }}
+                title={t('librariesPage.noGemsCollected')}
+                description={t('librariesPage.gemsHint')}
+                action={{ label: t('librariesPage.visitPalace'), path: "/palace" }}
               />
             ) : (
               <div className={cn(
@@ -794,9 +796,9 @@ export default function Libraries() {
             ) : filteredBookmarks.length === 0 ? (
               <EmptyState
                 icon={Bookmark}
-                title="No Bookmarks"
-                description="Bookmark Bible chapters to find them quickly"
-                action={{ label: "Read Bible", path: "/bible" }}
+                title={t('librariesPage.noBookmarks')}
+                description={t('librariesPage.bookmarksHint')}
+                action={{ label: t('librariesPage.readBible'), path: "/bible" }}
               />
             ) : (
               <div className={cn(
@@ -835,9 +837,9 @@ export default function Libraries() {
             ) : highlights.length === 0 ? (
               <EmptyState
                 icon={Highlighter}
-                title="No Highlights"
-                description="Highlight verses while reading to save them here"
-                action={{ label: "Read Bible", path: "/bible" }}
+                title={t('librariesPage.noHighlights')}
+                description={t('librariesPage.highlightsHint')}
+                action={{ label: t('librariesPage.readBible'), path: "/bible" }}
               />
             ) : (
               <div className={cn(
@@ -879,9 +881,9 @@ export default function Libraries() {
             ) : filteredNotes.length === 0 ? (
               <EmptyState
                 icon={StickyNote}
-                title="No Notes"
-                description="Add notes to verses while studying"
-                action={{ label: "Read Bible", path: "/bible" }}
+                title={t('librariesPage.noNotes')}
+                description={t('librariesPage.notesHint')}
+                action={{ label: t('librariesPage.readBible'), path: "/bible" }}
               />
             ) : (
               <div className={cn(
@@ -913,7 +915,7 @@ export default function Libraries() {
                 ))}
               </div>
             )}
-            <ViewAllButton path="/notes" label="View All Notes" />
+            <ViewAllButton path="/notes" label={t('librariesPage.viewAllNotes')} />
           </TabsContent>
         </Tabs>
       </div>
