@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Plus, Trash2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ScriptureLookup } from "@/components/sermon/ScriptureLookup";
@@ -20,6 +20,7 @@ export default function SeriesLessonEditor() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [finalizing, setFinalizing] = useState(false);
   const [lesson, setLesson] = useState<any>(null);
   const [series, setSeries] = useState<any>(null);
 
@@ -59,10 +60,10 @@ export default function SeriesLessonEditor() {
     }
   };
 
-  const handleSave = async () => {
-    try {
-      setSaving(true);
+  const persistLesson = async () => {
+    if (!lesson) return false;
 
+    try {
       const { error } = await supabase
         .from('bible_study_lessons')
         .update({
@@ -82,12 +83,50 @@ export default function SeriesLessonEditor() {
 
       if (error) throw error;
 
-      toast.success(t('series.lessonSaved'));
+      return true;
     } catch (error: any) {
       console.error('Error saving lesson:', error);
       toast.error(t('series.errorSaveLesson'));
+      return false;
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+
+      const saved = await persistLesson();
+      if (!saved) return;
+
+      toast.success(t('series.lessonSaved'));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleFinalizeSeries = async () => {
+    if (!seriesId) return;
+
+    try {
+      setFinalizing(true);
+
+      const saved = await persistLesson();
+      if (!saved) return;
+
+      const { error } = await supabase
+        .from('bible_study_series')
+        .update({ status: 'published' })
+        .eq('id', seriesId);
+
+      if (error) throw error;
+
+      setSeries((prev: any) => prev ? { ...prev, status: 'published' } : prev);
+      toast.success('Series finalized successfully');
+    } catch (error: any) {
+      console.error('Error finalizing series:', error);
+      toast.error('Failed to finalize series');
+    } finally {
+      setFinalizing(false);
     }
   };
 
@@ -132,7 +171,7 @@ export default function SeriesLessonEditor() {
         <main className="container mx-auto px-4 py-8">
           <div className="text-center py-12">
             <p className="text-muted-foreground">{t('series.lessonNotFound')}</p>
-            <Button onClick={() => navigate('/series-builder')} className="mt-4">
+              <Button onClick={() => navigate(seriesId ? `/series/${seriesId}` : '/bible-study-series')} className="mt-4">
               {t('series.backToSeries')}
             </Button>
           </div>
@@ -149,7 +188,7 @@ export default function SeriesLessonEditor() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={() => navigate('/series-builder')}>
+              <Button variant="ghost" onClick={() => navigate(seriesId ? `/series/${seriesId}` : '/bible-study-series')}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {t('series.backToSeries')}
               </Button>
@@ -161,19 +200,36 @@ export default function SeriesLessonEditor() {
                 <p className="text-sm text-muted-foreground mt-1">{lesson.title}</p>
               </div>
             </div>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('common.saving')}
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  {t('common.saveChanges')}
-                </>
+            <div className="flex items-center gap-2">
+              {series.status !== 'published' && (
+                <Button variant="outline" onClick={handleFinalizeSeries} disabled={saving || finalizing}>
+                  {finalizing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Finalizing...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Finalize Draft
+                    </>
+                  )}
+                </Button>
               )}
-            </Button>
+              <Button onClick={handleSave} disabled={saving || finalizing}>
+                {saving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('common.saving')}
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    {t('common.saveChanges')}
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Scripture & PT Tools */}
@@ -357,7 +413,7 @@ export default function SeriesLessonEditor() {
 
           {/* Save Button (Bottom) */}
           <div className="flex justify-end">
-            <Button size="lg" onClick={handleSave} disabled={saving}>
+            <Button size="lg" onClick={handleSave} disabled={saving || finalizing}>
               {saving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

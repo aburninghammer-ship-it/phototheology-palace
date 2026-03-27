@@ -6,7 +6,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Plus, FileText, Loader2, Edit, Presentation, ArrowLeft, Volume2 } from "lucide-react";
+import { BookOpen, Plus, FileText, Loader2, Edit, Presentation, ArrowLeft, Volume2, CheckCircle2 } from "lucide-react";
 import { QuickAudioButton } from "@/components/audio";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,6 +121,23 @@ const BibleStudySeriesBuilder = () => {
     }
   };
 
+  const handlePublishSeries = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('bible_study_series')
+        .update({ status: 'published' })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('Series finalized successfully');
+      await Promise.all([loadSeriesDetail(id), loadUserSeries()]);
+    } catch (error) {
+      console.error('Error finalizing series:', error);
+      toast.error('Failed to finalize series');
+    }
+  };
+
   if (showWizard) {
     return (
       <SeriesWizard 
@@ -193,6 +210,12 @@ const BibleStudySeriesBuilder = () => {
               </div>
               {isOwner && (
                 <div className="flex gap-2">
+                  {selectedSeries.status !== 'published' && (
+                    <Button onClick={() => handlePublishSeries(selectedSeries.id)}>
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      Finalize Draft
+                    </Button>
+                  )}
                   <SeriesShareDialog
                     seriesId={selectedSeries.id}
                     seriesTitle={selectedSeries.title}
