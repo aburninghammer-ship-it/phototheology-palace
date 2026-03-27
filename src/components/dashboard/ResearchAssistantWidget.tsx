@@ -296,7 +296,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const [activeTab, setActiveTab] = useState<"chat" | "saved" | "freestyle">("chat");
+  const [activeTab, setActiveTab] = useState<"chat" | "saved" | "freestyle" | "genealogy">("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
