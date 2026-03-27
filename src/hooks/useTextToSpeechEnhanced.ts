@@ -444,22 +444,8 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
         throw new Error('No audio content received');
       }
 
-      // Create and play audio with AudioContext for better mobile support
-      if (!audioRef.current) {
-        audioRef.current = new Audio();
-      }
-
-      // Create AudioContext if needed (helps prevent suspension on mobile)
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-
-      // Resume context if suspended
-      if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
-      }
-
-      const audio = audioRef.current;
+      // Audio element and AudioContext already primed above — reuse them
+      const audio = audioRef.current!;
       const isBlobUrl = audioUrl.startsWith('blob:');
       
       // Set up event handlers BEFORE setting src for reliability
