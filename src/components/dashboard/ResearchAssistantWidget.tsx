@@ -869,6 +869,17 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
                 <Wand2 className="h-3.5 w-3.5" />
                 Freestyle
               </button>
+              <button
+                onClick={() => setActiveTab("genealogy")}
+                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-medium border-b-2 transition-colors -mb-px ${
+                  activeTab === "genealogy"
+                    ? "border-emerald-500 text-emerald-400"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Dna className="h-3.5 w-3.5" />
+                Genealogy
+              </button>
             </div>
 
             <CardContent className="pt-4 space-y-4">
