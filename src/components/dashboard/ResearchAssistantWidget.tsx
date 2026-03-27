@@ -311,7 +311,14 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
   const [savedResearches, setSavedResearches] = useState<SavedResearch[]>([]);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
 
-  // Freestyle tab state
+  // Genealogy Decoder tab state
+  const [genealogyInput, setGenealogyInput] = useState("");
+  const [genealogyOutput, setGenealogyOutput] = useState("");
+  const [genealogyIsLoading, setGenealogyIsLoading] = useState(false);
+  const [genealogySavedId, setGenealogySavedId] = useState<string | null>(null);
+  const [genealogySessionName, setGenealogySessionName] = useState("");
+
+
   const [freestyleInput, setFreestyleInput] = useState("");
   const [freestyleOutput, setFreestyleOutput] = useState("");
   const [freestyleIsLoading, setFreestyleIsLoading] = useState(false);
