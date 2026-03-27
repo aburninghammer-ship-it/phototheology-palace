@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  Dna,
   Search,
   Send,
   Loader2,
@@ -137,6 +138,65 @@ FORMATTING RULES:
 
 You are not summarizing. You are WEAVING. Make it rich, interconnected, and profound.`;
 
+const GENEALOGY_SYSTEM_INSTRUCTIONS = `You are Jeeves, the Phototheology Genealogy Decoder. You analyze biblical genealogies using Phototheology principles to reveal the theological architecture hidden in family lines.
+
+When given a genealogy reference (e.g., Genesis 36, Matthew 1, 1 Chronicles 1-9), produce a structured analysis following this EXACT format:
+
+## ⚔️ Seed War Analysis
+Connect this genealogy to the Genesis 3:15 conflict (seed of the woman vs seed of the serpent). Show how this lineage fits into the escalating war across Scripture. Identify:
+- Which side of the seed conflict this line represents
+- How the conflict escalates through this genealogy
+- The ultimate trajectory (toward or against covenant)
+
+## 🏛️ PT Room Breakdown
+Analyze through these specific Phototheology rooms:
+
+**Observation Room (OR):** List 5-7 key details a casual reader would miss — names, structures, counts, ordering, notable inclusions or omissions.
+
+**Patterns Room (PRm):** Identify repeating patterns — generational counts, rise/fall cycles, naming conventions, structural rhythms.
+
+**Story Room (SR):** What narrative arc is hidden in this genealogy? What story emerges when you read the names as a sequence?
+
+**Dimensions Room (DR):**
+- **Literal:** What the genealogy records historically
+- **Christ:** How does this lineage point to or away from Christ?
+- **Personal:** What lesson does this genealogy teach about spiritual identity?
+- **Church:** What does this reveal about God's covenant community?
+- **Heavenly:** What cosmic/prophetic significance does this lineage carry?
+
+**Three Heavens (1H/2H/3H):** Which Day-of-the-Lord horizon does this genealogy primarily address? (1H = Babylonian judgment/restoration, 2H = 70 AD/New Covenant, 3H = Final new creation)
+
+**Cycle Placement:** Which of the 8 cycles (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re) does this genealogy belong to?
+
+## 🔗 Claim Ladder
+- **Claim:** [One-sentence theological claim about this genealogy]
+- **Textual Basis:** [Specific verse(s) that anchor the claim]
+- **Logical Move:** [The interpretive step from text to claim]
+- **Historical Anchor:** [Historical context that supports the claim]
+- **Theological Implication:** [What this means for the larger biblical narrative]
+
+## 💎 Gems (3-5)
+Produce 3-5 striking insights that connect non-obvious ideas. Each gem should be a single memorable sentence that could anchor a sermon or Bible study. These should make the reader say "I never saw that before."
+
+## 📖 Supporting Witnesses
+For each major claim, provide 3-5 full KJV cross-references that buttress the point. Quote each verse in full.
+
+RULES:
+- Be precise, not generic. Avoid surface-level commentary.
+- Always connect to larger biblical themes and the Christ-center.
+- Treat genealogies as theological architecture, not mere lists.
+- Use KJV for all verse quotations.
+- Use the correct PT terminology: 1H = DoL1/NE1 (Babylonian/Restoration), 2H = DoL2/NE2 (70 AD/New Covenant), 3H = DoL3/NE3 (Final New Creation). NEVER use atmospheric labels.`;
+
+const GENEALOGY_EXAMPLES = [
+  { label: "Esau's Line", ref: "Genesis 36", desc: "Edom's kings & chiefs" },
+  { label: "Christ's Lineage", ref: "Matthew 1:1-17", desc: "Abraham to Jesus" },
+  { label: "Cain vs Seth", ref: "Genesis 4-5", desc: "Two seeds diverge" },
+  { label: "Ishmael's Line", ref: "Genesis 25:12-18", desc: "The other son" },
+  { label: "Jacob's Sons", ref: "Genesis 35:22-26", desc: "12 tribes origin" },
+  { label: "Post-Exile Return", ref: "Ezra 2", desc: "Remnant genealogy" },
+];
+
 // Format response content: bold headers, verse highlights, etc.
 function formatContent(text: string) {
   const parts: React.ReactNode[] = [];
@@ -236,7 +296,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const [activeTab, setActiveTab] = useState<"chat" | "saved" | "freestyle">("chat");
+  const [activeTab, setActiveTab] = useState<"chat" | "saved" | "freestyle" | "genealogy">("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -251,7 +311,14 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
   const [savedResearches, setSavedResearches] = useState<SavedResearch[]>([]);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
 
-  // Freestyle tab state
+  // Genealogy Decoder tab state
+  const [genealogyInput, setGenealogyInput] = useState("");
+  const [genealogyOutput, setGenealogyOutput] = useState("");
+  const [genealogyIsLoading, setGenealogyIsLoading] = useState(false);
+  const [genealogySavedId, setGenealogySavedId] = useState<string | null>(null);
+  const [genealogySessionName, setGenealogySessionName] = useState("");
+
+
   const [freestyleInput, setFreestyleInput] = useState("");
   const [freestyleOutput, setFreestyleOutput] = useState("");
   const [freestyleIsLoading, setFreestyleIsLoading] = useState(false);
@@ -635,6 +702,72 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
     setFreestyleSavedId(null);
     setFreestyleSessionName("");
   };
+  const decodeGenealogy = async () => {
+    const trimmed = genealogyInput.trim();
+    if (!trimmed || genealogyIsLoading) return;
+
+    setGenealogyIsLoading(true);
+    const query = `Decode this biblical genealogy using Phototheology principles:\n\n${trimmed}`;
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "research",
+          query,
+          question: query,
+          conversationHistory: [],
+          systemInstructions: GENEALOGY_SYSTEM_INSTRUCTIONS,
+          maxTokens: 8192,
+        },
+      });
+      if (error) throw error;
+      const response = data?.response || data?.content || data?.answer || "No response received.";
+      setGenealogyOutput(response);
+    } catch (err) {
+      console.error("Genealogy decode error:", err);
+      toast.error("Failed to decode genealogy. Please try again.");
+    } finally {
+      setGenealogyIsLoading(false);
+    }
+  };
+
+  const saveGenealogyStudy = async () => {
+    if (!genealogyOutput) return;
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const title = genealogySessionName.trim() || `Genealogy: ${genealogyInput.slice(0, 60)}`;
+      const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const content = `# ${title}\n\n**Date:** ${date}\n**Type:** Genealogy Decoder\n\n---\n\n## 🧬 Input\n\n${genealogyInput}\n\n---\n\n${genealogyOutput}`;
+      const tags = ["genealogy", "jeeves"];
+
+      if (genealogySavedId) {
+        await supabase.from("user_studies").update({ title, content, tags, updated_at: new Date().toISOString() }).eq("id", genealogySavedId);
+      } else {
+        const { data, error } = await supabase.from("user_studies").insert({
+          user_id: user.id, title, content, tags,
+        }).select("id").single();
+        if (!error && data) setGenealogySavedId(data.id);
+      }
+      setJustSaved(true);
+      setTimeout(() => setJustSaved(false), 2000);
+      toast.success("Genealogy study saved!");
+    } catch (e) {
+      console.error("Genealogy save error:", e);
+      toast.error("Failed to save genealogy study.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const clearGenealogy = () => {
+    setGenealogyInput("");
+    setGenealogyOutput("");
+    setGenealogySavedId(null);
+    setGenealogySessionName("");
+  };
+
 
   const timeLabel = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -736,6 +869,17 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
               >
                 <Wand2 className="h-3.5 w-3.5" />
                 Freestyle
+              </button>
+              <button
+                onClick={() => setActiveTab("genealogy")}
+                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-medium border-b-2 transition-colors -mb-px ${
+                  activeTab === "genealogy"
+                    ? "border-emerald-500 text-emerald-400"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Dna className="h-3.5 w-3.5" />
+                Genealogy
               </button>
             </div>
 
@@ -1235,6 +1379,146 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
                         Enter a mix of Bible verses, theological concepts, and questions above.
                         Jeeves will weave them into a deep, interconnected study with surprising connections.
                         Hit "Remix" for a fresh angle on the same inputs.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── GENEALOGY DECODER TAB ── */}
+              {activeTab === "genealogy" && (
+                <div className="space-y-4">
+                  {/* Quick Examples */}
+                  <div className={isMobile ? "overflow-x-auto -mx-4 px-4 pb-1" : ""}>
+                    <div className={`flex gap-2 ${isMobile ? "min-w-max" : "flex-wrap"}`}>
+                      {GENEALOGY_EXAMPLES.map((ex) => (
+                        <Badge
+                          key={ex.ref}
+                          variant="outline"
+                          className="cursor-pointer py-1.5 px-3 text-[11px] transition-all whitespace-nowrap text-amber-400 border-amber-500/40 hover:bg-amber-500/10"
+                          onClick={() => setGenealogyInput(ex.ref)}
+                        >
+                          <Dna className="h-3 w-3 mr-1.5 shrink-0" />
+                          {ex.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Input Area */}
+                  <div className="space-y-3">
+                    <Textarea
+                      placeholder={"Enter a genealogy reference or paste the text:\n\nExamples:\n• Genesis 36 (Esau's line)\n• Matthew 1:1-17 (Christ's lineage)\n• Genesis 4-5 (Cain vs Seth)\n• 1 Chronicles 1-9"}
+                      className="min-h-[100px] max-h-[160px] bg-background/60 border-border/60 text-sm resize-none rounded-xl focus:border-amber-500/50 focus:ring-amber-500/20"
+                      value={genealogyInput}
+                      onChange={(e) => setGenealogyInput(e.target.value)}
+                      disabled={genealogyIsLoading}
+                    />
+                    <Button
+                      onClick={decodeGenealogy}
+                      disabled={!genealogyInput.trim() || genealogyIsLoading}
+                      className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-md shadow-amber-600/20"
+                    >
+                      {genealogyIsLoading ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Dna className="h-4 w-4 mr-2" />
+                      )}
+                      {genealogyIsLoading ? "Decoding lineage…" : "Decode Genealogy"}
+                    </Button>
+                  </div>
+
+                  {/* Loading State */}
+                  {genealogyIsLoading && !genealogyOutput && (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <div className="flex gap-1.5 mb-3">
+                        <span className="h-2 w-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="h-2 w-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="h-2 w-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
+                      <p className="text-sm text-amber-400/70">Decoding the bloodline…</p>
+                      <p className="text-xs text-muted-foreground mt-1">Analyzing seed wars, patterns, and PT room connections</p>
+                    </div>
+                  )}
+
+                  {/* Output */}
+                  {genealogyOutput && (
+                    <div className="space-y-3">
+                      {/* Save Controls */}
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={genealogySessionName}
+                          onChange={(e) => setGenealogySessionName(e.target.value)}
+                          placeholder="Name this genealogy study…"
+                          className="h-8 text-xs bg-background/60 border-border/50 focus:border-amber-500/50 rounded-lg flex-1"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={saveGenealogyStudy}
+                          disabled={isSaving}
+                          className="h-8 px-3 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                        >
+                          {isSaving ? (
+                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                          ) : justSaved ? (
+                            <Check className="h-3 w-3 mr-1" />
+                          ) : (
+                            <Save className="h-3 w-3 mr-1" />
+                          )}
+                          {justSaved ? "Saved" : "Save"}
+                        </Button>
+                        <QuickAudioButton
+                          text={genealogyOutput}
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-2.5 border-amber-500/40 text-amber-400 hover:bg-amber-500/10"
+                        />
+                      </div>
+
+                      {/* Rendered Output */}
+                      <div
+                        className={`rounded-xl border border-amber-500/30 bg-gradient-to-b from-amber-950/10 to-black/10 dark:from-amber-950/20 dark:to-black/20 overflow-y-auto p-5 ${
+                          isMobile ? "max-h-[400px]" : "max-h-[500px]"
+                        }`}
+                      >
+                        <div className="text-[13px] leading-relaxed text-foreground/90">
+                          {formatJeevesResponse(genealogyOutput)}
+                        </div>
+                      </div>
+
+                      {/* Clear Button */}
+                      <div className="flex justify-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearGenealogy}
+                          className="text-[11px] text-muted-foreground/60 hover:text-muted-foreground h-6"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Clear genealogy
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {!genealogyOutput && !genealogyIsLoading && (
+                    <div className="flex flex-col items-center justify-center py-8 text-center px-6">
+                      <div className="relative mb-4">
+                        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                          <Dna className="h-8 w-8 text-amber-500/50" />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-red-500/15 border border-red-500/25">
+                          <Sparkles className="h-3.5 w-3.5 text-red-400/60" />
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium text-foreground/70 mb-1">
+                        Genealogy Decoder
+                      </p>
+                      <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+                        Enter a genealogy reference and Jeeves will decode it using PT principles — 
+                        Seed War analysis, Claim Ladder, PT Room Breakdown, and Gems.
+                        Genealogies aren't lists — they're theological architecture.
                       </p>
                     </div>
                   )}
