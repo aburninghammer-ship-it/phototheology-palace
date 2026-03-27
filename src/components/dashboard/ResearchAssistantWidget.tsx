@@ -1383,6 +1383,146 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
                   )}
                 </div>
               )}
+
+              {/* ── GENEALOGY DECODER TAB ── */}
+              {activeTab === "genealogy" && (
+                <div className="space-y-4">
+                  {/* Quick Examples */}
+                  <div className={isMobile ? "overflow-x-auto -mx-4 px-4 pb-1" : ""}>
+                    <div className={`flex gap-2 ${isMobile ? "min-w-max" : "flex-wrap"}`}>
+                      {GENEALOGY_EXAMPLES.map((ex) => (
+                        <Badge
+                          key={ex.ref}
+                          variant="outline"
+                          className="cursor-pointer py-1.5 px-3 text-[11px] transition-all whitespace-nowrap text-amber-400 border-amber-500/40 hover:bg-amber-500/10"
+                          onClick={() => setGenealogyInput(ex.ref)}
+                        >
+                          <Dna className="h-3 w-3 mr-1.5 shrink-0" />
+                          {ex.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Input Area */}
+                  <div className="space-y-3">
+                    <Textarea
+                      placeholder={"Enter a genealogy reference or paste the text:\n\nExamples:\n• Genesis 36 (Esau's line)\n• Matthew 1:1-17 (Christ's lineage)\n• Genesis 4-5 (Cain vs Seth)\n• 1 Chronicles 1-9"}
+                      className="min-h-[100px] max-h-[160px] bg-background/60 border-border/60 text-sm resize-none rounded-xl focus:border-amber-500/50 focus:ring-amber-500/20"
+                      value={genealogyInput}
+                      onChange={(e) => setGenealogyInput(e.target.value)}
+                      disabled={genealogyIsLoading}
+                    />
+                    <Button
+                      onClick={decodeGenealogy}
+                      disabled={!genealogyInput.trim() || genealogyIsLoading}
+                      className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-md shadow-amber-600/20"
+                    >
+                      {genealogyIsLoading ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Dna className="h-4 w-4 mr-2" />
+                      )}
+                      {genealogyIsLoading ? "Decoding lineage…" : "Decode Genealogy"}
+                    </Button>
+                  </div>
+
+                  {/* Loading State */}
+                  {genealogyIsLoading && !genealogyOutput && (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <div className="flex gap-1.5 mb-3">
+                        <span className="h-2 w-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="h-2 w-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="h-2 w-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
+                      <p className="text-sm text-amber-400/70">Decoding the bloodline…</p>
+                      <p className="text-xs text-muted-foreground mt-1">Analyzing seed wars, patterns, and PT room connections</p>
+                    </div>
+                  )}
+
+                  {/* Output */}
+                  {genealogyOutput && (
+                    <div className="space-y-3">
+                      {/* Save Controls */}
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={genealogySessionName}
+                          onChange={(e) => setGenealogySessionName(e.target.value)}
+                          placeholder="Name this genealogy study…"
+                          className="h-8 text-xs bg-background/60 border-border/50 focus:border-amber-500/50 rounded-lg flex-1"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={saveGenealogyStudy}
+                          disabled={isSaving}
+                          className="h-8 px-3 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                        >
+                          {isSaving ? (
+                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                          ) : justSaved ? (
+                            <Check className="h-3 w-3 mr-1" />
+                          ) : (
+                            <Save className="h-3 w-3 mr-1" />
+                          )}
+                          {justSaved ? "Saved" : "Save"}
+                        </Button>
+                        <QuickAudioButton
+                          text={genealogyOutput}
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-2.5 border-amber-500/40 text-amber-400 hover:bg-amber-500/10"
+                        />
+                      </div>
+
+                      {/* Rendered Output */}
+                      <div
+                        className={`rounded-xl border border-amber-500/30 bg-gradient-to-b from-amber-950/10 to-black/10 dark:from-amber-950/20 dark:to-black/20 overflow-y-auto p-5 ${
+                          isMobile ? "max-h-[400px]" : "max-h-[500px]"
+                        }`}
+                      >
+                        <div className="text-[13px] leading-relaxed text-foreground/90">
+                          {formatJeevesResponse(genealogyOutput)}
+                        </div>
+                      </div>
+
+                      {/* Clear Button */}
+                      <div className="flex justify-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearGenealogy}
+                          className="text-[11px] text-muted-foreground/60 hover:text-muted-foreground h-6"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Clear genealogy
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {!genealogyOutput && !genealogyIsLoading && (
+                    <div className="flex flex-col items-center justify-center py-8 text-center px-6">
+                      <div className="relative mb-4">
+                        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                          <Dna className="h-8 w-8 text-amber-500/50" />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-red-500/15 border border-red-500/25">
+                          <Sparkles className="h-3.5 w-3.5 text-red-400/60" />
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium text-foreground/70 mb-1">
+                        Genealogy Decoder
+                      </p>
+                      <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+                        Enter a genealogy reference and Jeeves will decode it using PT principles — 
+                        Seed War analysis, Claim Ladder, PT Room Breakdown, and Gems.
+                        Genealogies aren't lists — they're theological architecture.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </motion.div>
         )}
