@@ -49,6 +49,8 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "series", label: "Series", path: "/bible-study-series", icon: BookOpen, glow: "195 85% 50%" },
       { id: "study-buddy", label: "Study Buddy", path: "/study-buddy", icon: Brain, glow: "215 16% 53%" },
       { id: "research-assistant", label: "Research Assistant", path: "/research-assistant", icon: GraduationCap, glow: "152 68% 42%" },
+      { id: "give-me-a-gem", label: "Give Me A Gem", path: "/give-me-a-gem", icon: Gem, glow: "158 80% 42%" },
+      { id: "analyze-thoughts", label: "Analyze My Thoughts", path: "/analyze-thoughts", icon: Lightbulb, glow: "48 93% 47%" },
     ],
   },
   {
@@ -59,7 +61,6 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "courses", label: "Courses", path: "/courses", icon: GraduationCap, glow: "138 68% 42%" },
       { id: "mastery", label: "Mastery", path: "/mastery", icon: Crown, glow: "348 83% 52%" },
       { id: "spiritual-training", label: "Dojo", path: "/spiritual-training", icon: Sword, glow: "0 72% 50%" },
-      { id: "analyze-thoughts", label: "Analyze My Thoughts", path: "/analyze-thoughts", icon: Lightbulb, glow: "48 93% 47%" },
     ],
   },
   {
@@ -70,7 +71,6 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "notes", label: "Notes", path: "/notes", icon: StickyNote, glow: "45 100% 51%" },
       { id: "my-studies", label: "My Studies", path: "/my-studies", icon: BookMarked, glow: "205 95% 50%" },
       { id: "study-ideas", label: "Study Ideas", path: "/study-ideas", icon: Lightbulb, glow: "38 92% 50%" },
-      { id: "give-me-a-gem", label: "Give Me A Gem", path: "/give-me-a-gem", icon: Gem, glow: "158 80% 42%" },
     ],
   },
   {
