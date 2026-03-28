@@ -132,9 +132,9 @@ export const DOCK_ITEMS: DockItem[] = [
   },
   {
     id: "pricing", label: "Pricing", icon: CreditCard, path: "/pricing", glow: "84 75% 48%",
-    children: [
-      { id: "workspace", label: "Workspace", path: "/workspace", icon: LayoutGrid, glow: "215 14% 53%" },
-    ],
+  },
+  {
+    id: "workspace", label: "Workspace", icon: LayoutGrid, path: "/workspace", glow: "215 14% 53%",
   },
 ];
 
