@@ -370,6 +370,9 @@ const BibleReference = () => {
             <Badge variant="outline" className="backdrop-blur-sm">
               {t('bibleRef.completePTSystem', 'Complete PT System')}
             </Badge>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
           </div>
         </motion.div>
 
