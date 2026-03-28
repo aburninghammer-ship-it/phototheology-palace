@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, ChevronRight, ChevronLeft, Volume2, VolumeX, Loader2, Play } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
+
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 
 interface PalaceTabTutorialProps {
