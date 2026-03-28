@@ -51,8 +51,8 @@ export function OSTitleBar() {
       <div className="flex items-center gap-2.5 shrink-0">
         <div className="w-7 h-7 rounded-[8px] flex items-center justify-center shrink-0"
           style={{ 
-            background: "linear-gradient(135deg, hsl(32 90% 52%), hsl(25 85% 45%))",
-            boxShadow: "0 2px 12px hsl(32 90% 50% / 0.3), inset 0 1px 0 hsl(0 0% 100% / 0.15)"
+            background: "linear-gradient(135deg, hsl(200 90% 48%), hsl(190 85% 42%))",
+            boxShadow: "0 2px 12px hsl(200 90% 50% / 0.35), inset 0 1px 0 hsl(0 0% 100% / 0.2)"
           }}>
           <Sparkles className="h-3.5 w-3.5 text-white drop-shadow-sm" />
         </div>
@@ -62,7 +62,7 @@ export function OSTitleBar() {
               style={{ 
                 fontFamily: "'Sora', sans-serif", 
                 fontWeight: 800,
-                backgroundImage: "linear-gradient(100deg, hsl(32 90% 60%), hsl(28 85% 50%))",
+                backgroundImage: "linear-gradient(100deg, hsl(195 95% 60%), hsl(210 90% 65%))",
                 letterSpacing: "-0.01em"
               }}>
               Phototheology
@@ -71,7 +71,7 @@ export function OSTitleBar() {
               style={{ 
                 fontFamily: "'Sora', sans-serif", 
                 fontWeight: 600,
-                backgroundImage: "linear-gradient(100deg, hsl(32 80% 55%), hsl(25 75% 48%))",
+                backgroundImage: "linear-gradient(100deg, hsl(185 80% 52%), hsl(195 85% 58%))",
                 letterSpacing: "0.03em"
               }}>
               OS
@@ -82,18 +82,18 @@ export function OSTitleBar() {
               style={{ 
                 fontFamily: "'Inter', sans-serif", 
                 fontWeight: 500,
-                backgroundImage: "linear-gradient(90deg, hsl(32 70% 58%), hsl(28 65% 50%))",
+                backgroundImage: "linear-gradient(90deg, hsl(175 70% 50%), hsl(190 65% 55%))",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase"
               }}>
               Eden
             </span>
-            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "hsl(32 80% 55%)" }} />
+            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "hsl(195 80% 55%)" }} />
             <span className="text-[7px] whitespace-nowrap"
               style={{ 
                 fontFamily: "'Inter', sans-serif", 
                 fontWeight: 500,
-                color: "hsl(32 30% 60% / 0.55)",
+                color: "hsl(200 40% 65% / 0.55)",
                 letterSpacing: "0.06em",
                 textTransform: "uppercase"
               }}>
