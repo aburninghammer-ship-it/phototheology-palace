@@ -140,6 +140,15 @@ const Palace = () => {
 
             <div className="flex justify-center gap-2 mb-4 md:mb-6">
               <HowItWorksDialog title={t('palace.howToUse')} steps={palaceSteps} />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowTabTutorial(true)}
+                className="gap-1.5"
+              >
+                <PlayCircle className="h-4 w-4" />
+                Video Tutorial
+              </Button>
               <EnhancedSocialShare
                 title="Phototheology Palace"
                 content="Explore the Bible through the 8-floor Memory Palace system. 38+ rooms of Bible study methods, AI-powered tools, and community."
