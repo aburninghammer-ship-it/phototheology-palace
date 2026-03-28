@@ -257,7 +257,7 @@ export function OSDock() {
           )}
           style={{
             backgroundColor: active ? `hsl(${item.glow} / 0.12)` : undefined,
-            color: (active || parentActive) ? itemColor : undefined,
+            color: itemColor,
             boxShadow: active ? `0 0 16px hsl(${item.glow} / 0.15), inset 0 1px 0 rgba(255,255,255,0.05)` : undefined,
           }}
           onMouseEnter={(e) => {
@@ -270,7 +270,7 @@ export function OSDock() {
           onMouseLeave={(e) => {
             if (!active) {
               e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = parentActive ? itemColor : "";
+              e.currentTarget.style.color = itemColor;
               e.currentTarget.style.borderColor = "transparent";
             }
           }}
