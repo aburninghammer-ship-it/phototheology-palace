@@ -21,7 +21,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { Radio, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePresenceTracker } from "@/hooks/usePresenceTracker";
+import { usePresenceTracker } from "@/hooks/usePresenceTracker"; // kept for online presence
 
 export function OSTitleBar() {
   const { user, signOut } = useAuth();
@@ -67,7 +67,7 @@ export function OSTitleBar() {
 
         <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs">
           <Link to="/live-demo">
-            <Radio className="h-3.5 w-3.5 text-red-500" />
+            <Radio className="h-3.5 w-3.5 text-destructive" />
             Live
           </Link>
         </Button>
