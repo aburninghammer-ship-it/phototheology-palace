@@ -35,6 +35,7 @@ export function OSTitleBar() {
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
+  const { activeCount } = useActiveUsers();
 
   const publicPaths = ["/", "/landing", "/auth", "/pricing", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
   const isPublicPage = publicPaths.some(p => location.pathname === p) || location.pathname.startsWith("/auth");
@@ -42,7 +43,6 @@ export function OSTitleBar() {
 
   if (!user || isPublicPage || isWorkspacePane || isMobile) return null;
 
-  const { activeCount } = useActiveUsers();
   const initials = user.email?.slice(0, 2).toUpperCase() || "U";
 
   return (
