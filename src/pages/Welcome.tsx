@@ -3,6 +3,7 @@ import { SEO } from "@/components/SEO";
 import { ContinueWhereYouLeftOff } from "@/components/ContinueWhereYouLeftOff";
 import { ReginaldGreeting } from "@/components/ReginaldGreeting";
 import { DailyAudioDevotional } from "@/components/DailyAudioDevotional";
+import { AudioTourBanner } from "@/components/AudioTourBanner";
 
 const Welcome = () => {
   return (
@@ -13,6 +14,7 @@ const Welcome = () => {
       />
       <div className="px-4 pt-6 space-y-4">
         <ReginaldGreeting />
+        <AudioTourBanner />
         <DailyAudioDevotional />
         <ContinueWhereYouLeftOff />
       </div>
