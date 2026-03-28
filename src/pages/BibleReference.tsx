@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { BIBLE_REFERENCE_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -26,7 +28,8 @@ import {
   MapPin,
   Calendar,
   BarChart3,
-  Loader2
+  Loader2,
+  GraduationCap
 } from "lucide-react";
 
 const BibleReference = () => {
@@ -37,6 +40,7 @@ const BibleReference = () => {
   const [searchCategory, setSearchCategory] = useState<"events" | "maps" | "prophecy" | "charts" | "people">("events");
   const [searchResults, setSearchResults] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -335,6 +339,7 @@ const BibleReference = () => {
       </div>
 
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={BIBLE_REFERENCE_TOUR} onClose={() => setTourOpen(false)} />}
       
       <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
         <motion.div 
@@ -366,6 +371,9 @@ const BibleReference = () => {
             <Badge variant="outline" className="backdrop-blur-sm">
               {t('bibleRef.completePTSystem', 'Complete PT System')}
             </Badge>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
           </div>
         </motion.div>
 

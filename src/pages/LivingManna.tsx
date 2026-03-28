@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { LIVING_MANNA_TOUR } from "@/data/guidedTours";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -45,6 +47,7 @@ export default function LivingManna() {
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'home');
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Sync tab state when URL search params change (e.g. from internal navigate calls)
   useEffect(() => {
@@ -175,6 +178,7 @@ export default function LivingManna() {
   return (
     <DirectMessagesProvider>
       <div className="min-h-screen gradient-dreamy pb-20 md:pb-8">
+        {tourOpen && <GuidedTourOverlay steps={LIVING_MANNA_TOUR} onClose={() => setTourOpen(false)} />}
         {/* Mobile Header */}
         {isMobile && (
           <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border px-4 py-3">
@@ -285,6 +289,9 @@ export default function LivingManna() {
                     variant="outline"
                     size="sm"
                   />
+                  <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+                    <GraduationCap className="h-4 w-4" /> Tour
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"

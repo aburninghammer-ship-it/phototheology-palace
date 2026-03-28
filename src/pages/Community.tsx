@@ -1,4 +1,6 @@
 import { useEffect, useState, useMemo, useRef } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { COMMUNITY_TOUR } from "@/data/guidedTours";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
@@ -11,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Plus, Users, Reply, Send, Sparkles, Pencil, Trash2, Filter, Flame, TrendingUp } from "lucide-react";
+import { MessageSquare, Plus, Users, Reply, Send, Sparkles, Pencil, Trash2, Filter, Flame, TrendingUp, GraduationCap } from "lucide-react";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { communityPostSchema } from "@/lib/validationSchemas";
 import { sanitizeHtml } from "@/lib/sanitize";
@@ -62,6 +64,7 @@ const Community = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
+  const [tourOpen, setTourOpen] = useState(false);
   const [firstComments, setFirstComments] = useState<Record<string, any>>({});
   const newPostFormRef = useRef<HTMLDivElement>(null);
 
@@ -606,6 +609,7 @@ const Community = () => {
       </div>
 
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={COMMUNITY_TOUR} onClose={() => setTourOpen(false)} />}
       {user && <CommunityGuidelines userId={user.id} />}
       <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-5xl mx-auto space-y-6">
@@ -651,6 +655,9 @@ const Community = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+                    <GraduationCap className="h-4 w-4" /> Tour
+                  </Button>
                   {user && (
                     <CommunityNotifications
                       userId={user.id}
