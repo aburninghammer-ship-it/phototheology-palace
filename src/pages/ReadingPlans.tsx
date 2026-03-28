@@ -1,4 +1,6 @@
 import { Navigation } from "@/components/Navigation";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { READING_PLANS_TOUR } from "@/data/guidedTours";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";

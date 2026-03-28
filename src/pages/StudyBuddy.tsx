@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { STUDY_BUDDY_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import { useNavigate, useSearchParams } from "react-router-dom";
