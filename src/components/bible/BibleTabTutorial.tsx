@@ -16,18 +16,20 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const step = BIBLE_TAB_TUTORIAL[currentStep];
+  const closedRef = useRef(false);
   const totalSteps = BIBLE_TAB_TUTORIAL.length;
 
-  // Guard against out-of-bounds
-  if (!step) {
+  const safeClose = useCallback(() => {
+    if (closedRef.current) return;
+    closedRef.current = true;
     onClose();
-    return null;
-  }
+  }, [onClose]);
+
+  const step = currentStep < totalSteps ? BIBLE_TAB_TUTORIAL[currentStep] : null;
 
   // Highlight target element
   useEffect(() => {
-    if (!step.targetSelector) return;
+    if (!step?.targetSelector) return;
     const el = document.querySelector(step.targetSelector);
     if (el) {
       el.classList.add("tutorial-highlight");
@@ -36,7 +38,7 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
     return () => {
       if (el) el.classList.remove("tutorial-highlight");
     };
-  }, [currentStep, step.targetSelector]);
+  }, [currentStep, step?.targetSelector]);
 
   const stopAudio = useCallback(() => {
     if (audioRef.current) {
@@ -48,24 +50,32 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
     setIsLoading(false);
   }, []);
 
+  const advanceStep = useCallback(() => {
+    setCurrentStep((s) => {
+      if (s >= totalSteps - 1) {
+        setTimeout(() => safeClose(), 0);
+        return s;
+      }
+      return s + 1;
+    });
+  }, [totalSteps, safeClose]);
+
   const goNext = useCallback(() => {
     stopAudio();
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep((s) => s + 1);
-    } else {
-      onClose();
-    }
-  }, [currentStep, totalSteps, stopAudio, onClose]);
+    advanceStep();
+  }, [stopAudio, advanceStep]);
 
   const goPrev = useCallback(() => {
     stopAudio();
     setIsPaused(false);
-    if (currentStep > 0) setCurrentStep((s) => s - 1);
-  }, [currentStep, stopAudio]);
+    setCurrentStep((s) => (s > 0 ? s - 1 : s));
+  }, [stopAudio]);
 
   // Auto-play narration when step changes
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || !step) return;
+
+    let cancelled = false;
 
     const playNarration = async () => {
       stopAudio();
@@ -90,9 +100,12 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
           }
         );
 
+        if (cancelled) return;
         if (!response.ok) throw new Error("TTS request failed");
 
         const audioBlob = await response.blob();
+        if (cancelled) return;
+
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
         audioRef.current = audio;
@@ -103,46 +116,38 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
         };
         audio.onended = () => {
           setIsPlaying(false);
-          // Auto-advance after narration finishes
-          setTimeout(() => {
-            if (currentStep < totalSteps - 1) {
-              setCurrentStep((s) => s + 1);
-            } else {
-              onClose();
-            }
-          }, 1200);
+          if (!cancelled) {
+            setTimeout(() => advanceStep(), 1200);
+          }
         };
         audio.onerror = () => {
           setIsPlaying(false);
           setIsLoading(false);
-          // Auto-advance even on error after delay
-          setTimeout(() => {
-            if (currentStep < totalSteps - 1) {
-              setCurrentStep((s) => s + 1);
-            }
-          }, 4000);
+          if (!cancelled) {
+            setTimeout(() => advanceStep(), 4000);
+          }
         };
 
         await audio.play();
       } catch {
+        if (cancelled) return;
         setIsLoading(false);
-        // Fallback: auto-advance after reading time
         setTimeout(() => {
-          if (currentStep < totalSteps - 1) {
-            setCurrentStep((s) => s + 1);
-          }
+          if (!cancelled) advanceStep();
         }, 5000);
       }
     };
 
     const timer = setTimeout(playNarration, 500);
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [currentStep, isPaused]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const togglePause = useCallback(() => {
     if (isPaused) {
       setIsPaused(false);
-      // Will trigger auto-play via effect
     } else {
       setIsPaused(true);
       if (audioRef.current) {
@@ -168,11 +173,13 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
       if (e.key === "ArrowRight") goNext();
       else if (e.key === "ArrowLeft") goPrev();
       else if (e.key === " ") { e.preventDefault(); togglePause(); }
-      else if (e.key === "Escape") { stopAudio(); onClose(); }
+      else if (e.key === "Escape") { stopAudio(); safeClose(); }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [goNext, goPrev, togglePause, stopAudio, onClose]);
+  }, [goNext, goPrev, togglePause, stopAudio, safeClose]);
+
+  if (!step) return null;
 
   const tooltipPositionClass = step.tooltipPosition === "center"
     ? "fixed inset-0 flex items-center justify-center z-[102]"
@@ -180,16 +187,14 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
 
   return (
     <>
-      {/* Overlay */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black/60 z-[100]"
-        onClick={() => { stopAudio(); onClose(); }}
+        onClick={() => { stopAudio(); safeClose(); }}
       />
 
-      {/* Tutorial Card */}
       <div className={tooltipPositionClass} onClick={(e) => e.stopPropagation()}>
         <AnimatePresence mode="wait">
           <motion.div
@@ -200,16 +205,14 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
             transition={{ duration: 0.3 }}
           >
             <Card className="relative overflow-hidden border-primary/30 bg-gradient-to-br from-background via-background to-primary/10 shadow-2xl shadow-primary/10 max-w-lg w-full">
-              {/* Close */}
               <button
-                onClick={() => { stopAudio(); onClose(); }}
+                onClick={() => { stopAudio(); safeClose(); }}
                 className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-accent/80 text-muted-foreground hover:text-foreground transition-colors z-10"
               >
                 <X className="h-4 w-4" />
               </button>
 
               <div className="p-5">
-                {/* Header with avatar */}
                 <div className="flex items-start gap-3 mb-4">
                   <div className="h-11 w-11 rounded-full overflow-hidden flex-shrink-0 border-2 border-primary/40 shadow-lg">
                     <img src={reginaldAvatar} alt="Reginald" className="h-full w-full object-cover object-top" />
@@ -222,7 +225,7 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
                       {isLoading && <Loader2 className="h-3 w-3 animate-spin text-primary" />}
                       {isPlaying && (
                         <span className="flex gap-0.5 items-end h-3">
-                          {[1,2,3].map(i => (
+                          {[1, 2, 3].map(i => (
                             <span key={i} className="w-0.5 bg-primary rounded-full animate-pulse" style={{ height: `${6 + i * 3}px`, animationDelay: `${i * 0.15}s` }} />
                           ))}
                         </span>
@@ -232,12 +235,10 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
                   </div>
                 </div>
 
-                {/* Description */}
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4 pl-14">
                   {step.description}
                 </p>
 
-                {/* Progress bar */}
                 <div className="w-full h-1 bg-muted rounded-full mb-4 overflow-hidden">
                   <motion.div
                     className="h-full bg-primary rounded-full"
@@ -247,39 +248,17 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
                   />
                 </div>
 
-                {/* Controls */}
                 <div className="flex items-center justify-between">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={goPrev}
-                    disabled={currentStep === 0}
-                    className="gap-1"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Back
+                  <Button variant="ghost" size="sm" onClick={goPrev} disabled={currentStep === 0} className="gap-1">
+                    <ChevronLeft className="h-4 w-4" /> Back
                   </Button>
 
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={togglePause}
-                    className="h-9 w-9 rounded-full border border-primary/30 hover:bg-primary/10"
-                  >
-                    {isPaused ? (
-                      <Play className="h-4 w-4 text-primary" />
-                    ) : (
-                      <Pause className="h-4 w-4 text-primary" />
-                    )}
+                  <Button variant="ghost" size="icon" onClick={togglePause} className="h-9 w-9 rounded-full border border-primary/30 hover:bg-primary/10">
+                    {isPaused ? <Play className="h-4 w-4 text-primary" /> : <Pause className="h-4 w-4 text-primary" />}
                   </Button>
 
-                  <Button
-                    size="sm"
-                    onClick={goNext}
-                    className="gap-1"
-                  >
-                    {currentStep === totalSteps - 1 ? "Finish" : "Skip"}
-                    <ChevronRight className="h-4 w-4" />
+                  <Button size="sm" onClick={goNext} className="gap-1">
+                    {currentStep === totalSteps - 1 ? "Finish" : "Skip"} <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
