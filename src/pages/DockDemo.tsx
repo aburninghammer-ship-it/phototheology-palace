@@ -245,6 +245,10 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
     const isOpen = expandedItems.has(item.id);
     const Icon = item.icon;
 
+    const itemColor = `hsl(${item.glow})`;
+    const itemColorFaint = `hsl(${item.glow} / 0.15)`;
+    const itemColorMed = `hsl(${item.glow} / 0.25)`;
+
     const mainButton = (
       <button
         key={item.id}
@@ -258,26 +262,37 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
         className={cn(
           "relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full",
           expanded ? "px-3 py-2.5" : "p-2.5 justify-center",
-          active
-            ? "bg-primary/15 text-primary"
-            : parentActive
-              ? "text-primary/70"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
         )}
+        style={{
+          backgroundColor: active ? itemColorFaint : undefined,
+          color: active ? itemColor : parentActive ? itemColor : undefined,
+        }}
+        onMouseEnter={(e) => {
+          if (!active) {
+            e.currentTarget.style.backgroundColor = itemColorFaint;
+            e.currentTarget.style.color = itemColor;
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!active) {
+            e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.color = "";
+          }
+        }}
       >
         {/* Active glow bar */}
         {(active || parentActive) && (
           <div
             className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
             style={{
-              backgroundColor: `hsl(${item.glow})`,
+              backgroundColor: itemColor,
               height: active ? "24px" : "16px",
               opacity: active ? 1 : 0.5,
             }}
           />
         )}
 
-        <Icon className="h-5 w-5 shrink-0" />
+        <Icon className="h-5 w-5 shrink-0" style={{ color: itemColor }} />
 
         {expanded && (
           <>
@@ -285,9 +300,10 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
             {hasChildren && (
               <ChevronDown
                 className={cn(
-                  "h-3.5 w-3.5 shrink-0 transition-transform text-muted-foreground",
+                  "h-3.5 w-3.5 shrink-0 transition-transform",
                   isOpen && "rotate-180"
                 )}
+                style={{ color: `hsl(${item.glow} / 0.5)` }}
               />
             )}
           </>
@@ -296,7 +312,7 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
         {/* Active glow bg */}
         {active && (
           <div
-            className="absolute inset-0 rounded-xl opacity-10 pointer-events-none"
+            className="absolute inset-0 rounded-xl opacity-20 pointer-events-none"
             style={{ background: `radial-gradient(circle at center, hsl(${item.glow} / 0.4), transparent)` }}
           />
         )}
