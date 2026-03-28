@@ -51,6 +51,7 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "research-assistant", label: "Research Assistant", path: "/research-assistant", icon: GraduationCap, glow: "152 68% 42%" },
       { id: "give-me-a-gem", label: "Give Me A Gem", path: "/give-me-a-gem", icon: Gem, glow: "158 80% 42%" },
       { id: "analyze-thoughts", label: "Analyze My Thoughts", path: "/analyze-thoughts", icon: Lightbulb, glow: "48 93% 47%" },
+      { id: "drill-drill", label: "Gather Fragments", path: "/drill-drill", icon: Target, glow: "25 95% 53%" },
     ],
   },
   {
@@ -94,7 +95,7 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "challenge-board", label: "Public Challenge Board", path: "/challenge-board", icon: Trophy, glow: "28 92% 48%" },
       { id: "leaderboard", label: "Leaderboard", path: "/leaderboard", icon: Trophy, glow: "42 93% 50%" },
       { id: "achievements", label: "Achievements", path: "/achievements", icon: Trophy, glow: "35 88% 55%" },
-      { id: "drill-drill", label: "Gather Fragments", path: "/drill-drill", icon: Target, glow: "25 95% 53%" },
+      
     ],
   },
   {
