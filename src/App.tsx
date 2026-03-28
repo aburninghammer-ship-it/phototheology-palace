@@ -47,6 +47,8 @@ import { PickaxeAccountLinker } from "@/components/PickaxeAccountLinker";
 import { ChangeManagerProvider, GuidedPathChecklist, ChangeSpineUpgradePrompt, IdentityMessage } from "@/components/change-manager";
 import { GuidedPathTracker } from "@/hooks/useGuidedPathTracker";
 import { useUTMCapture } from "@/hooks/useUTMCapture";
+import { OSDock } from "@/components/os/OSDock";
+import { CommandPalette } from "@/components/os/CommandPalette";
 
 // Critical pages - load immediately (landing + auth only)
 import Gatehouse from "./pages/Gatehouse";
@@ -416,9 +418,11 @@ function App() {
                           <GuidedPathChecklist />
                         </div>
                         </>}
+                        <CommandPalette />
                         <div className="flex flex-1 w-full">
+                          {!isWorkspacePane && <OSDock />}
                           <MessagingSidebar />
-                          <main className="flex-1 w-full overflow-x-hidden pb-mobile-nav">
+                          <main className="flex-1 w-full overflow-x-hidden pb-mobile-nav min-w-0">
                           <Suspense fallback={<LoadingScreen />}>
                             <KeepAliveRoutes maxCached={20} excludePaths={["/auth", "/auth/callback", "/guesthouse"]}>
                             <Routes>
