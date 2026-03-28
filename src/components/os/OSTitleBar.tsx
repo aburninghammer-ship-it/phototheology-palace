@@ -48,7 +48,7 @@ export function OSTitleBar() {
   return (
     <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
       {/* Left: Brand */}
-      <div className="flex items-center gap-2.5 min-w-0">
+      <div className="flex items-center gap-2.5 shrink-0">
         <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
           style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
           <Sparkles className="h-3 w-3 text-white" />
