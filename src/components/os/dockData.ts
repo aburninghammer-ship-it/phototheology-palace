@@ -47,6 +47,8 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "character-profiles", label: "Character Profiles", path: "/character-profiles", icon: PersonStanding, glow: "240 72% 55%" },
       { id: "libraries", label: "Libraries", path: "/libraries", icon: Library, glow: "250 65% 55%" },
       { id: "series", label: "Series", path: "/bible-study-series", icon: BookOpen, glow: "195 85% 50%" },
+      { id: "study-buddy", label: "Study Buddy", path: "/study-buddy", icon: Brain, glow: "215 16% 53%" },
+      { id: "research-assistant", label: "Research Assistant", path: "/research-assistant", icon: GraduationCap, glow: "152 68% 42%" },
     ],
   },
   {
@@ -57,6 +59,7 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "courses", label: "Courses", path: "/courses", icon: GraduationCap, glow: "138 68% 42%" },
       { id: "mastery", label: "Mastery", path: "/mastery", icon: Crown, glow: "348 83% 52%" },
       { id: "spiritual-training", label: "Dojo", path: "/spiritual-training", icon: Sword, glow: "0 72% 50%" },
+      { id: "analyze-thoughts", label: "Analyze My Thoughts", path: "/analyze-thoughts", icon: Lightbulb, glow: "48 93% 47%" },
     ],
   },
   {
@@ -117,9 +120,10 @@ export const DOCK_ITEMS: DockItem[] = [
     id: "gpts", label: "GPTs", icon: Sparkles, path: "/phototheologygpt", glow: "263 70% 58%",
     children: [
       { id: "pt-gpt", label: "Phototheology GPT", path: "/phototheologygpt", icon: Sparkles, glow: "268 72% 55%" },
-      { id: "study-buddy", label: "Study Buddy", path: "/study-buddy", icon: Brain, glow: "215 16% 53%" },
-      { id: "research-assistant", label: "Research Assistant", path: "/research-assistant", icon: GraduationCap, glow: "152 68% 42%" },
-      { id: "analyze-thoughts", label: "Analyze My Thoughts", path: "/analyze-thoughts", icon: Lightbulb, glow: "48 93% 47%" },
+      { id: "branch-study", label: "BranchStudy", path: "/branch-study", icon: Network, glow: "280 65% 55%" },
+      { id: "kid-gpt", label: "Kid GPT", path: "/kidgpt", icon: Users, glow: "290 60% 62%" },
+      { id: "dr-gpt", label: "Daniel & Revelation GPT", path: "/daniel-revelation-gpt", icon: Eye, glow: "255 75% 50%" },
+      { id: "apol-gpt", label: "Apologetics GPT", path: "/apologetics-gpt", icon: Shield, glow: "248 60% 45%" },
     ],
   },
   {
