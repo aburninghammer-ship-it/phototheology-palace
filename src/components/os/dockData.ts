@@ -134,7 +134,7 @@ export const DOCK_ITEMS: DockItem[] = [
     ],
   },
   {
-    id: "church", label: "Church", icon: Church, path: "/living-manna", glow: "142 71% 45%",
+    id: "church", label: "My Church Space", icon: Church, path: "/living-manna", glow: "142 71% 45%",
   },
   {
     id: "pricing", label: "Pricing", icon: CreditCard, path: "/pricing", glow: "84 75% 48%",
