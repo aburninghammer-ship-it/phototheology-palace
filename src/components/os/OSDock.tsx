@@ -171,7 +171,7 @@ export function OSDock() {
               style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               PhototheologyOS
             </span>
-            <span className="text-[10px] text-muted-foreground">Biblical Intelligence</span>
+            <span className="text-[10px] text-muted-foreground">Powered by AI. Built for BI.</span>
           </div>
         )}
       </div>
