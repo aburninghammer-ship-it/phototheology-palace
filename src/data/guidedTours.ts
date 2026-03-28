@@ -189,3 +189,193 @@ export const COURSES_TOUR: GuidedTourStep[] = [
     tooltipPosition: "bottom",
   },
 ];
+
+export const STUDY_BUDDY_TOUR: GuidedTourStep[] = [
+  {
+    id: "study-buddy-welcome",
+    title: "Welcome to Study Buddy",
+    description: "Your AI-powered study companion that walks alongside you through any passage of Scripture.",
+    narration: "Hello! Welcome to Study Buddy — your personal AI-powered study companion. Think of me as a fellow student sitting beside you, ready to explore any passage of Scripture together. Let me show you how it works.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "study-buddy-passage",
+    title: "Choose Your Passage",
+    description: "Select any book, chapter, and verse to begin studying — or paste a passage directly.",
+    narration: "Start by selecting a book, chapter, and verse. You can study a single verse, a chapter, or even paste a passage directly. Study Buddy will pull up the text and prepare contextual insights for you.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "study-buddy-prompts",
+    title: "AI Study Prompts",
+    description: "Use pre-built Phototheology prompts or ask your own questions — each one activates a different Palace room.",
+    narration: "The real power is in the prompts. You'll find pre-built Phototheology prompts — each one designed to activate a specific Palace room. Tap Observation to run the Observation Room, or Concentration to find Christ in the passage. You can also type your own questions.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "study-buddy-sessions",
+    title: "Saved Study Sessions",
+    description: "Every conversation is saved so you can pick up where you left off — your study journal lives here.",
+    narration: "Every study session is automatically saved. You can return to any previous session, review your insights, and continue where you left off. Think of it as your digital study journal — always organized, always accessible.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "study-buddy-modes",
+    title: "Study Modes & Focus",
+    description: "Switch between guided study, deep dive, and freestyle modes to match your study style.",
+    narration: "You can switch between different study modes — guided study walks you step by step, deep dive goes intensive on one passage, and freestyle lets you explore freely. Match the mode to your study goal. That's Study Buddy — your companion through the Word!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const READING_PLANS_TOUR: GuidedTourStep[] = [
+  {
+    id: "reading-plans-welcome",
+    title: "Welcome to Reading Plans",
+    description: "Structured Bible reading plans that guide you through Scripture with daily assignments and progress tracking.",
+    narration: "Hello! Welcome to Reading Plans. These are structured paths through Scripture — each one gives you daily reading assignments, tracks your progress, and keeps you accountable. Let me walk you through the features.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "reading-plans-active",
+    title: "Your Active Plan",
+    description: "See your current reading plan, today's assignment, and how far you've progressed.",
+    narration: "At the top you'll see your active reading plan. It shows today's reading assignment, your overall progress percentage, and how many days you've completed. Just tap to open today's reading and start studying.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "reading-plans-browse",
+    title: "Browse Plans",
+    description: "Choose from pre-built plans — chronological, thematic, book-by-book, or Phototheology-focused.",
+    narration: "Browse through our library of reading plans. You'll find chronological plans that read Scripture in historical order, thematic plans focused on topics like prophecy or the sanctuary, book-by-book deep dives, and plans aligned with specific Palace floors.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "reading-plans-custom",
+    title: "Custom Plan Builder",
+    description: "Build your own reading plan — choose the books, pace, and duration that work for you.",
+    narration: "Want something unique? The Custom Plan Builder lets you create your own reading plan. Choose which books to include, set your pace — whether it's a chapter a day or three — and pick a start date. The system does the rest.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "reading-plans-tracking",
+    title: "Progress & Streaks",
+    description: "Track your reading streak and see completion stats — consistency builds mastery.",
+    narration: "Your progress is tracked automatically. You'll see your reading streak, completion percentage, and daily consistency. The more consistently you read, the more you'll retain. That's Reading Plans — pick one and start your journey through the Word!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const SERMON_BUILDER_TOUR: GuidedTourStep[] = [
+  {
+    id: "sermon-welcome",
+    title: "Welcome to Sermon Builder",
+    description: "A complete sermon preparation studio — from idea to delivery, all powered by Phototheology principles.",
+    narration: "Hello! Welcome to the Sermon Builder — your complete sermon preparation studio. Whether you're a pastor, Bible worker, or lay preacher, this tool takes you from initial idea to polished sermon, all powered by Phototheology principles.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "sermon-forge",
+    title: "The Sermon Forge",
+    description: "Start with a theme, text, or topic — the AI helps you shape your sermon structure step by step.",
+    narration: "The Sermon Forge is where it all begins. Enter a theme, a key text, or a topic, and the AI helps you build a sermon outline. It walks you through the Simmer Method — letting ideas develop naturally, just like a good meal simmered slowly.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "sermon-armory",
+    title: "Scripture Armory",
+    description: "Build a collection of supporting verses — search, organize, and attach them to your sermon.",
+    narration: "The Scripture Armory is your verse collection tool. Search for supporting passages, organize them by theme, and attach them to specific sermon points. It's like building a quiver of arrows before the battle.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "sermon-writing",
+    title: "Writing & Polishing",
+    description: "Write your sermon with rich text editing, AI suggestions, and Phototheology integration.",
+    narration: "Once your outline is ready, move to the writing stage. The rich text editor gives you AI suggestions, Phototheology integration, and automatic formatting. When you're done, use the Polish tab to refine your language and flow.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "sermon-export",
+    title: "Export & Present",
+    description: "Export your sermon as PDF, PowerPoint, or share it with your congregation directly.",
+    narration: "When your sermon is ready, export it as a PDF for your notes, generate a PowerPoint for presentation, or share it directly with your congregation. From idea to pulpit — that's the Sermon Builder!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const LEADERBOARD_TOUR: GuidedTourStep[] = [
+  {
+    id: "leaderboard-welcome",
+    title: "Welcome to the Leaderboard",
+    description: "See how you rank among fellow students — track points, streaks, and achievements across the community.",
+    narration: "Hello! Welcome to the Leaderboard. This is where you see how you rank among fellow Phototheology students. It's not about competition — it's about motivation. Seeing others grow pushes you to keep studying. Let me show you around.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "leaderboard-rankings",
+    title: "Overall Rankings",
+    description: "The main leaderboard shows total points earned from studies, challenges, games, and room completions.",
+    narration: "The main leaderboard ranks students by total points. You earn points from completing studies, winning challenges, playing games, and mastering Palace rooms. The more you engage, the higher you climb.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "leaderboard-categories",
+    title: "Category Rankings",
+    description: "Switch to category view to see leaders in specific areas — challenges, rooms, streaks, and more.",
+    narration: "Switch to the category view to see rankings in specific areas. Who has the longest study streak? Who has mastered the most Palace rooms? Who has completed the most challenges? Each category highlights different strengths.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "leaderboard-time",
+    title: "Time Periods",
+    description: "Filter by all-time, monthly, or weekly to see who's performing right now.",
+    narration: "You can filter the leaderboard by time period — all-time shows lifetime achievement, monthly shows this month's top performers, and weekly highlights who's on fire right now. It keeps things fresh and competitive.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "leaderboard-your-rank",
+    title: "Your Rank & Stats",
+    description: "See your personal ranking, points breakdown, and how close you are to the next level.",
+    narration: "Your personal stats appear at the top — your current rank, total points, study streak, and achievement count. Use it as a mirror to see your growth. That's the Leaderboard — now go earn your place!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const MEMORY_PALACE_TOUR: GuidedTourStep[] = [
+  {
+    id: "memory-welcome",
+    title: "Welcome to Memory Palace",
+    description: "Build, practice, and master memory lists using proven techniques — from Bible verses to Palace room codes.",
+    narration: "Hello! Welcome to the Memory Palace. This is where you build, practice, and master memory lists using proven techniques. Whether you're memorizing Bible verses, Palace room codes, or prophetic timelines — this tool makes it stick.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "memory-lists",
+    title: "Your Memory Lists",
+    description: "Create custom memory lists with text, images, and audio — then practice with spaced repetition.",
+    narration: "Start by creating memory lists. Each list can contain text, images, and audio cues. The system uses spaced repetition — showing you items right before you'd forget them — to lock knowledge into long-term memory.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "memory-games",
+    title: "Memory Games",
+    description: "Practice your lists through interactive games — matching, speed recall, and sequence challenges.",
+    narration: "Once you have a list, practice it through interactive games. Matching games test recognition, speed recall tests your reflexes, and sequence challenges test your ordering. Each game mode reinforces memory differently.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "memory-templates",
+    title: "Templates & Community",
+    description: "Use pre-built templates or share your lists with the community — learn from each other.",
+    narration: "Don't want to build from scratch? Browse pre-built templates covering common topics — the 28 Fundamentals, Bible book order, prophetic timelines, and more. You can also explore community-created lists and share your own.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "memory-mastery",
+    title: "PT Mastery Tracker",
+    description: "Track your mastery of Phototheology concepts — see which rooms and principles you've memorized.",
+    narration: "The PT Mastery Tracker shows how well you've memorized the Phototheology system itself — rooms, codes, principles, and techniques. As you master each element, your tracker fills up. That's the Memory Palace — build your mind into a fortress of truth!",
+    tooltipPosition: "bottom",
+  },
+];
