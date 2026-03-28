@@ -3,15 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, ChevronLeft, ChevronDown } from "lucide-react";
+import { ChevronRight, ChevronLeft, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { DOCK_SECTIONS, type DockItem, type DockSubItem } from "./dockData";
+import { DOCK_ITEMS, type DockItem } from "./dockData";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export function OSDock() {
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [visible, setVisible] = useState(true);
   const [expanded, setExpanded] = useState(true);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const currentPath = location.pathname;
@@ -32,6 +33,21 @@ export function OSDock() {
       return next;
     });
   };
+
+  // Fully hidden — just show a small toggle button
+  if (!visible) {
+    return (
+      <div className="shrink-0 relative z-40">
+        <button
+          onClick={() => setVisible(true)}
+          className="absolute top-3 left-2 p-1.5 rounded-lg bg-sidebar/80 backdrop-blur-md border border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+          title="Show Dock"
+        >
+          <PanelLeftOpen className="h-4 w-4" />
+        </button>
+      </div>
+    );
+  }
 
   const renderItem = (item: DockItem) => {
     const active = isActive(item.path);
@@ -97,7 +113,7 @@ export function OSDock() {
         <button
           onClick={() => hasChildren ? toggleExpand(item.id) : navigate(item.path)}
           className={cn(
-            "relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full px-3 py-2.5",
+            "relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full px-3 py-2",
             "backdrop-blur-md border border-transparent",
             (active) && "border-white/10"
           )}
@@ -125,7 +141,7 @@ export function OSDock() {
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
               style={{ backgroundColor: itemColor, height: active ? "24px" : "16px", opacity: active ? 1 : 0.5 }} />
           )}
-          <Icon className="h-5 w-5 shrink-0" style={{ color: itemColor }} />
+          <Icon className="h-4.5 w-4.5 shrink-0" style={{ color: itemColor }} />
           <span className="text-sm font-medium truncate flex-1 text-left">{item.label}</span>
           {hasChildren && (
             <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 transition-transform", isOpen && "rotate-180")}
@@ -142,18 +158,6 @@ export function OSDock() {
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
               <div className="ml-4 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.2)` }}>
-                <button onClick={() => navigate(item.path)}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full",
-                    "backdrop-blur-sm border border-transparent hover:border-white/5"
-                  )}
-                  style={{
-                    color: active ? itemColor : undefined,
-                    backgroundColor: active ? `hsl(${item.glow} / 0.1)` : undefined,
-                  }}>
-                  <Icon className="h-3.5 w-3.5 shrink-0" style={{ color: itemColor }} />
-                  <span className="truncate">{item.label} Home</span>
-                </button>
                 {item.children!.map((sub) => {
                   const subActive = isActive(sub.path);
                   const SubIcon = sub.icon || ChevronRight;
@@ -207,27 +211,26 @@ export function OSDock() {
       transition={{ duration: 0.2, ease: "easeInOut" }}
       className="h-full flex flex-col bg-sidebar/80 backdrop-blur-xl border-r border-white/5 shrink-0 relative z-40"
     >
-      {/* Spacer */}
-      <div className={cn("shrink-0 border-b border-white/5", expanded ? "h-3" : "h-3")} />
+      {/* Header with hide button */}
+      <div className={cn("shrink-0 border-b border-white/5 flex items-center", expanded ? "px-3 py-2 justify-between" : "p-2 justify-center")}>
+        {expanded && <span className="text-[10px] uppercase font-semibold text-muted-foreground/50 tracking-wider">Navigation</span>}
+        <button
+          onClick={() => setVisible(false)}
+          className="p-1 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-muted/30 transition-colors"
+          title="Hide Dock"
+        >
+          <PanelLeftClose className="h-3.5 w-3.5" />
+        </button>
+      </div>
 
       {/* Navigation */}
       <ScrollArea className="flex-1">
-        <div className={cn("flex flex-col gap-0.5 py-2", expanded ? "px-3" : "px-2")}>
-          {DOCK_SECTIONS.map((section, sIdx) => (
-            <div key={section.id}>
-              {sIdx > 0 && <div className="border-t border-white/5 my-2 mx-1" />}
-              {expanded && (
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground/60 tracking-wider px-3 pt-2 pb-1 block">
-                  {section.label}
-                </span>
-              )}
-              {section.items.map(renderItem)}
-            </div>
-          ))}
+        <div className={cn("flex flex-col gap-0.5 py-2", expanded ? "px-2" : "px-2")}>
+          {DOCK_ITEMS.map(renderItem)}
         </div>
       </ScrollArea>
 
-      {/* Toggle */}
+      {/* Collapse toggle */}
       <div className={cn("shrink-0 border-t border-white/5 p-2", !expanded && "flex justify-center")}>
         <button onClick={() => setExpanded(!expanded)}
           className="flex items-center gap-2 px-3 py-2 rounded-xl text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors w-full backdrop-blur-sm">
