@@ -44,7 +44,8 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
-      audioRef.current = null;
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
     }
     setIsPlaying(false);
     setIsLoading(false);
@@ -103,12 +104,15 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
         if (cancelled) return;
         if (!response.ok) throw new Error("TTS request failed");
 
-        const audioBlob = await response.blob();
+        const data = await response.json();
         if (cancelled) return;
+        if (!data?.audioUrl) throw new Error("No audio URL returned");
 
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
+        const audio = audioRef.current ?? new Audio();
         audioRef.current = audio;
+        audio.preload = "auto";
+        audio.src = data.audioUrl;
+        audio.load();
 
         audio.onplay = () => {
           setIsPlaying(true);
@@ -129,7 +133,8 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
         };
 
         await audio.play();
-      } catch {
+      } catch (error) {
+        console.error("[BibleTabTutorial] Audio playback failed:", error);
         if (cancelled) return;
         setIsLoading(false);
         setTimeout(() => {
@@ -143,7 +148,7 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [currentStep, isPaused]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentStep, isPaused, step, stopAudio, advanceStep]);
 
   const togglePause = useCallback(() => {
     if (isPaused) {
