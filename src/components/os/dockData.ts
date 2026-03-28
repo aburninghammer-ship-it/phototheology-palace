@@ -56,6 +56,22 @@ export const DOCK_ITEMS: DockItem[] = [
     ],
   },
   {
+    id: "study-tools", label: "Study Tools", icon: Layers3, path: "/bible-lexicon", glow: "180 70% 45%",
+    children: [
+      { id: "interlinear", label: "Interlinear Bible", path: "/bible/John/1?strongs=true", icon: BookText, glow: "210 80% 50%" },
+      { id: "lexicon", label: "Greek/Hebrew Lexicon", path: "/bible-lexicon", icon: Languages, glow: "220 75% 55%" },
+      { id: "bible-timeline", label: "Bible Timeline", path: "/bible-timeline", icon: Clock, glow: "40 90% 50%" },
+      { id: "bible-atlas", label: "Bible Atlas", path: "/bible-atlas", icon: Map, glow: "160 70% 45%" },
+      { id: "flashcards", label: "Flashcards", path: "/card-deck", icon: Sparkles, glow: "271 76% 53%" },
+      { id: "daily-reading", label: "Daily Reading", path: "/daily-reading", icon: Calendar, glow: "160 84% 39%" },
+      { id: "training-drills", label: "Training Drills", path: "/test-me", icon: Target, glow: "0 84% 60%" },
+      { id: "study-partners", label: "Study Partners", path: "/community", icon: Users, glow: "174 72% 40%" },
+      { id: "source-library", label: "Source Library", path: "/libraries", icon: Library, glow: "250 65% 55%" },
+      { id: "infographic-gen", label: "Infographic Generator", path: "/image-bible", icon: ImageIcon, glow: "36 88% 50%" },
+      { id: "study-series", label: "Study Series", path: "/bible-study-series", icon: BookOpen, glow: "195 85% 50%" },
+    ],
+  },
+
     id: "training", label: "Training", icon: GraduationCap, path: "/test-me", glow: "0 84% 60%",
     children: [
       { id: "test-me", label: "Test Me", path: "/test-me", icon: GraduationCap, glow: "0 84% 60%" },
