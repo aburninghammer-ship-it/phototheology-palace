@@ -14,6 +14,7 @@ export interface DockSubItem {
   label: string;
   path: string;
   icon?: LucideIcon;
+  glow?: string; // Individual sub-item color override
 }
 
 export interface DockItem {
