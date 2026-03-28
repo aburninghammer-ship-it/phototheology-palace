@@ -85,24 +85,24 @@ export function OSTitleBar() {
         <PWAInstallButton />
         <ThemeToggle />
 
-        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs">
+        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs" style={{ color: "hsl(0 85% 60%)" }}>
           <Link to="/live-demo">
-            <Radio className="h-3.5 w-3.5 text-destructive" />
+            <Radio className="h-3.5 w-3.5" style={{ color: "hsl(0 85% 60%)" }} />
             Live
           </Link>
         </Button>
 
-        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs">
+        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs" style={{ color: "hsl(210 85% 60%)" }}>
           <Link to="/workspace">
-            <Globe className="h-3.5 w-3.5" />
+            <Globe className="h-3.5 w-3.5" style={{ color: "hsl(210 85% 60%)" }} />
             Workspace
           </Link>
         </Button>
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs border border-border/50 bg-muted/20 hover:bg-muted/40">
-              <Languages className="h-3.5 w-3.5" />
+            <Button variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs border border-border/50 bg-muted/20 hover:bg-muted/40" style={{ color: "hsl(270 75% 65%)" }}>
+              <Languages className="h-3.5 w-3.5" style={{ color: "hsl(270 75% 65%)" }} />
               Language
             </Button>
           </PopoverTrigger>
