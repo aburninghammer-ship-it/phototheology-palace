@@ -527,10 +527,22 @@ The literal history of Daniel 1–4 (Babylon vs Egypt vs Jerusalem) is a prophet
 DANIEL 2 — THE STONE AND THE LAW:
 The stone "cut out without hands" (Daniel 2:34) parallels the Ten Commandment tablets, also "cut" by God alone without human hands (Exodus 31:18, 32:16). Daniel 2 is not merely "Christ destroys the kingdoms" — it reveals that God's law is the rule of judgment. The iron and clay in the feet represent the forbidden mingling of churchcraft and statecraft — the same sin pattern from Genesis 6 (sons of God + daughters of men) through to the final church-state union. The toes are NOT merely European nations — they represent a global system of enforced religious-political authority.
 
-DANIEL 11:40–45 — THE PRE-CLOSE-OF-PROBATION CRISIS:
-Daniel 11:40–45 maps the mechanics of the final crisis BEFORE probation closes:
-• King of the South = atheism / anti-Bible systems (spiritual Egypt — "Who is the LORD?" Exodus 5:2)
-• King of the North = ultimately Satan himself working through religious-political power
+DANIEL 11:23-45 — PAPAL BIOGRAPHY AND END-TIME CRISIS:
+Daniel 11:23-29 maps the Papacy's MILITARY phase:
+• v.23 "the league" = church-state alliance (Clovis/Justinian) — the Papacy enters Daniel 11 here
+• v.25-26 King of the South (KOS) = ISLAM (Ottoman/Saracen power) — the Crusades are Papacy (KON) vs Islam (KOS)
+• v.27 "both these kings' hearts shall be to do mischief" = mutual deception between Papacy and Islamic powers
+
+Daniel 11:30-39 maps the Papacy's RELIGIOUS/SPIRITUAL phase:
+• v.30-31 = papal corruption of Christ's heavenly ministry, abomination of desolation set up
+• v.32-35 = Waldenses, Reformers persecuted; v.36-39 = papal self-exaltation above every god
+
+Daniel 11:40-45 maps the END-TIME CRISIS:
+• v.40 King of the South (KOS) = ATHEISM / French Revolution (spiritual Egypt — "Who is the LORD?" Exodus 5:2) — pushed at Papacy, delivering deadly wound of 1798
+• v.40 King of the North (KON) = SATAN HIMSELF impersonating Christ as head of a TRIPLE UNION:
+  1. The Papacy (revived religious authority)
+  2. Apostate Protestantism (false prophet / image of the beast)
+  3. Spiritualism / Satan personally
 • The "whirlwind" (v.40) = counterfeit Second Coming — Satan appearing as Christ (cf. Isaiah 66:15, Ezekiel 1 whirlwind+glory, Job 38:1, 2 Kings 2:1)
 • "Chariots and horsemen" = demonic angels impersonating holy angels (cf. Psalm 68:17)
 • "Ships" = spiritualism / demons impersonating the dead (the "deep" = death realm)
