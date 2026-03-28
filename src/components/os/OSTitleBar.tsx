@@ -113,9 +113,12 @@ export function OSTitleBar() {
       {/* Right: Utility Toolbar */}
       <div className="flex items-center gap-1">
         {activeCount > 0 && (
-          <div className="hidden lg:flex items-center gap-1 px-2 h-8 rounded-xl border border-border/60 bg-muted/30 text-foreground/80 text-xs font-medium shadow-sm">
-            <Users className="h-3.5 w-3.5 text-primary" />
-            <span>{activeCount} online</span>
+          <div className="hidden lg:flex items-center gap-1.5 px-3 h-8 rounded-full bg-background/90 border border-border/50 text-foreground text-xs font-medium shadow-md backdrop-blur-sm">
+            <Users className="h-4 w-4" style={{ color: "hsl(210 90% 60%)" }} />
+            <div className="flex flex-col leading-tight">
+              <span className="text-sm font-bold tabular-nums">{activeCount}</span>
+              <span className="text-[9px] text-muted-foreground -mt-0.5">online</span>
+            </div>
           </div>
         )}
         <ShareableProgressCard />
