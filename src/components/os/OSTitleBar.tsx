@@ -65,7 +65,7 @@ export function OSTitleBar() {
             </span>
             <span className="w-1 h-1 rounded-full" style={{ background: "hsl(145 70% 50%)" }} />
             <span className="text-[8px] text-muted-foreground/60 font-medium tracking-wider uppercase whitespace-nowrap">
-              Biblical Intelligence
+              Powered by AI · Biblical Intelligence
             </span>
           </div>
         </div>
