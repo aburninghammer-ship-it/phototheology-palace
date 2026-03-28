@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Sparkles, User, LogOut, Settings, Languages } from "lucide-react";
+import { Sparkles, User, LogOut, Settings, Languages, MessageCircle } from "lucide-react";
+import { useDirectMessages } from "@/hooks/useDirectMessages";
 import { CommandPaletteTrigger } from "./CommandPalette";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 import { Radio, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePresenceTracker } from "@/hooks/usePresenceTracker";
@@ -36,6 +38,8 @@ export function OSTitleBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { activeCount } = useActiveUsers();
+  const { conversations } = useDirectMessages();
+  const chatUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
 
   const publicPaths = ["/", "/landing", "/auth", "/pricing", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
   const isPublicPage = publicPaths.some(p => location.pathname === p) || location.pathname.startsWith("/auth");
@@ -151,6 +155,22 @@ export function OSTitleBar() {
           </PopoverContent>
         </Popover>
 
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative"
+          onClick={() => window.dispatchEvent(new CustomEvent('open-chat-sidebar', { detail: {} }))}
+        >
+          <MessageCircle className="h-5 w-5" />
+          {chatUnread > 0 && (
+            <Badge
+              variant="destructive"
+              className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+            >
+              {chatUnread > 9 ? '9+' : chatUnread}
+            </Badge>
+          )}
+        </Button>
         <NotificationCenter />
         <StartSessionDialog />
         <NavigationStyleToggle />
