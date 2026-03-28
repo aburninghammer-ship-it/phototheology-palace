@@ -809,11 +809,35 @@ NEVER assign these verses to Antiochus Epiphanes or Greece. The transition from 
 • This is the SAME little horn from Daniel 7 and 8, now entering Daniel 11's detailed biography
 • This marks the beginning of the 1260-year period of Papal supremacy
 
-**DANIEL 11:23-39 — TWO-PHASE PAPAL DOMINION (IRON & CLAY)**
-• Verses 23-30: Papal MILITARY conquests (iron phase) - political expansion, Crusades, wars, territorial manipulation
-• Verses 31-39: Papal SPIRITUAL conquests (clay phase) - "pollute the sanctuary," "take away the daily," "place abomination of desolation," corrupt with flatteries, exalt above every god
+**DANIEL 11:23-39 — TWO-PHASE PAPAL DOMINION (MILITARY → RELIGIOUS)**
+• Verses 23-29: Papal MILITARY history (political expansion, Crusades, wars, territorial manipulation)
+  - v.25-26: The King of the South (KOS) here = ISLAM (Ottoman/Saracen power opposing the Papacy militarily)
+  - The Crusades are the Papacy (KON) vs Islam (KOS) — a military contest for territorial dominance
+  - v.27 "both these kings' hearts shall be to do mischief" = mutual deception between Papacy and Islamic powers
+• Verses 30-39: Papal RELIGIOUS/SPIRITUAL history
+  - v.30 "ships of Chittim" = forces that check papal military ambition, shifting the Papacy to spiritual conquest
+  - v.31 "pollute the sanctuary of strength, take away the daily, place abomination of desolation" = papal corruption of Christ's heavenly ministry, Mass replacing the true sacrifice
+  - v.32-35 "corrupt by flatteries... they that understand shall instruct many" = Waldenses, Reformers persecuted but faithful
+  - v.36-39 = Papal self-exaltation above every god, "god of forces" = worship of saints/relics, "strange god" = the host (wafer) in the Mass
 • This parallels Daniel 7:25 (changing times and laws) and Daniel 8:11-12 (interfering with Christ's heavenly ministry)
-• Military dominance + spiritual dominance = complete Papal supremacy during the 1260 years
+• Military dominance (v.23-29) + spiritual dominance (v.30-39) = complete Papal supremacy during the 1260 years
+
+**DANIEL 11:40-45 — END-TIME CRISIS: THE FINAL KOS AND KON**
+• v.40 "at the time of the end" = 1798 onward
+• v.40 King of the South (KOS) = ATHEISM — the French Revolution attacked religion, "pushed at" the Papacy (deadly wound of 1798)
+  - This is spiritual Egypt: "Who is the LORD?" (Exodus 5:2) — denial of God
+• v.40 King of the North (KON) = NOT merely the Papacy alone — it is SATAN working through a TRIPLE UNION:
+  1. The Papacy (revived religious authority)
+  2. Apostate Protestantism (the false prophet / image of the beast)
+  3. Spiritualism / Satan himself
+  - Satan IMPERSONATES CHRIST as the head of the KON — this is the ultimate counterfeit
+  - The "whirlwind" attack = counterfeit Second Coming (cf. Isaiah 66:15, Ezekiel 1 whirlwind+glory, 2 Kings 2:1)
+  - "Chariots and horsemen and many ships" = demonic angels impersonating holy angels (cf. Psalm 68:17)
+• v.41 "glorious land" = God's truth / His people targeted
+• v.44 "tidings out of the east and north shall trouble him" = the real Second Coming approaches, troubling Satan's counterfeit kingdom
+• v.45 "plant the tabernacles of his palace between the seas in the glorious holy mountain" = Satan's final attempt to establish himself as God among God's people
+  - "Yet he shall come to his end, and none shall help him" = total defeat of the KON at Christ's true return
+• CRITICAL: The KON in v.40-45 is NOT merely a human institution — it is Satan himself impersonating Christ, using the Papacy and apostate Protestantism as his instruments
 
 **THE PALACE OF SHUSHAN (DAN. 8:2) — ESTHER'S JUDGMENT TYPOLOGY**
 Daniel 8 is the ONLY chapter where Daniel is transported to a specific location: Shushan.
@@ -3121,11 +3145,10 @@ When teaching or answering questions about Phototheology content:
 |--------|--------|----------------------|
 | 11:2-4 | Persia to Greece | Four more Persian kings, then "mighty king" (Alexander). Kingdom divided to four winds (generals). |
 | 11:5-15 | Ptolemies vs. Seleucids | "King of the South" = Egypt (Ptolemies). "King of the North" = Syria (Seleucids). Detailed history of wars between them: 323-168 B.C. |
-| 11:16-22 | Rome rises | Rome enters "glorious land" (Judea). "Prince of the covenant" (Christ) broken — crucifixion. |
-| 11:23-30 | Pagan Rome | Rome's treaties, conquests. "Ships of Chittim" (Kittim) = Rome frustrated in Egypt by Popilius Laenas (168 B.C.). |
-| 11:31-35 | Papal Rome | "Abomination that maketh desolate" set up — papal Mass replaces Christ's sacrifice. "They that understand" = Waldenses, reformers who taught truth. Refined "even to the time of the end." |
-| 11:36-39 | Papal apostasy | King magnifies himself above every god. Speaks marvelous things against God of gods. "God of forces" = worship of saints/relics. "Strange god" = the host (wafer) in the Mass. |
-| 11:40-45 | Time of the End | "King of the South" = atheism (French Revolution attacked religion). "King of the North" = papacy revived. Final conflict centered on "glorious holy mountain" = God's truth and His people. |
+| 11:14-22 | Pagan Rome | v.14 Rome rises to fulfill vision. v.16 Rome enters "glorious land" (Pompey 63 BC). v.17 "daughter of women" = Cleopatra. v.20 "raiser of taxes" = Augustus (Luke 2:1). v.21 "vile person" = Tiberius. v.22 "prince of the covenant" = Christ crucified. |
+| 11:23-29 | Papal Rome — MILITARY phase | v.23 "the league" = church-state alliance (Clovis/Justinian) — the PAPACY enters Daniel 11 here. v.25-26 King of the South (KOS) = ISLAM (Ottoman/Saracen power). The Crusades = Papacy (KON) vs Islam (KOS). v.27 mutual deception. |
+| 11:30-39 | Papal Rome — RELIGIOUS phase | v.30-31 "pollute the sanctuary, take away the daily, place abomination" = papal corruption of Christ's heavenly ministry. v.32-35 Waldenses, Reformers persecuted. v.36-39 Papal self-exaltation, "god of forces" = saints/relics, "strange god" = the host/wafer. |
+| 11:40-45 | Time of the End | v.40 KOS = ATHEISM/French Revolution (spiritual Egypt, "Who is the LORD?"). KON = SATAN himself impersonating Christ, working through triple union: Papacy + Apostate Protestantism + Spiritualism. Satan as head of KON is the ultimate counterfeit. "Whirlwind" = counterfeit Second Coming. v.45 Satan's final attempt to enthrone himself among God's people — "yet he shall come to his end." |
 
 **Daniel 12 — The Time of the End:**
 - "Time of trouble such as never was" (Dan. 12:1) — final crisis before Christ returns

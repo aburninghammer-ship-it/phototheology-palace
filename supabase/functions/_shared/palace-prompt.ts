@@ -219,11 +219,18 @@ export const THEOLOGICAL_GUARDRAILS = `
      * v.20 "raiser of taxes" = Caesar Augustus (Luke 2:1)
      * v.21 "vile person" = Tiberius Caesar (not Antiochus!)
      * v.22 "prince of the covenant" = Christ crucified under Rome
-   - Daniel 11:23-30 = PAPAL ROME (the league, deceitful rise, small people)
-     * v.23 "the league" = church-state alliance (Clovis/Justinian)
-     * v.23-30 = Papal military/political expansion phase
-   - Daniel 11:31-39 = Papal spiritual conquests (abomination, flatteries)
+   - Daniel 11:23-29 = PAPAL ROME — MILITARY phase (the league, Crusades)
+      * v.23 "the league" = church-state alliance (Clovis/Justinian) — PAPACY ENTERS HERE
+      * v.25-26 KOS = ISLAM (Ottoman/Saracen power opposing Papacy militarily)
+      * Crusades = Papacy (KON) vs Islam (KOS)
+   - Daniel 11:30-39 = PAPAL ROME — RELIGIOUS/SPIRITUAL phase
+      * v.30-31 = papal corruption of Christ's heavenly ministry, abomination set up
+      * v.32-35 = Waldenses, Reformers persecuted; v.36-39 = papal self-exaltation
    - Daniel 11:40-45 = End-time crisis
+      * v.40 KOS = ATHEISM / French Revolution (spiritual Egypt — "Who is the LORD?")
+      * v.40 KON = SATAN impersonating Christ as head of triple union: Papacy + Apostate Protestantism + Spiritualism
+      * Satan himself is the ultimate KON, not merely a human institution
+      * "Whirlwind" = counterfeit Second Coming; v.45 = Satan's final enthronement attempt
    - NEVER assign Daniel 11:14-22 to Antiochus or the Grecian Empire
    - NEVER say Papal Rome begins only at verse 36 — it begins at verse 23
 

@@ -44,9 +44,9 @@ D. DANIEL 11 PROPHETIC SEQUENCE:
      * v.20 "raiser of taxes" = Caesar Augustus (Luke 2:1)
      * v.21 "vile person" = Tiberius Caesar
      * v.22 "prince of the covenant" = Christ crucified under Rome
-   - Daniel 11:23-30 = PAPAL ROME (the league = church-state alliance; papal military expansion)
-   - Daniel 11:31-39 = Papal spiritual conquests (abomination, flatteries, exalting above every god)
-   - Daniel 11:40-45 = End-time crisis. The "king of the north" = papacy in end-time role. The "whirlwind" attack (v.40) involves Satan working through spiritualism and apostate forces. The "glorious holy mountain" (v.45) = God's true people and His law.
+   - Daniel 11:23-29 = PAPAL ROME — MILITARY phase (the league = church-state alliance; Crusades; v.25-26 KOS = ISLAM opposing Papacy)
+   - Daniel 11:30-39 = Papal RELIGIOUS/SPIRITUAL conquests (abomination, flatteries, exalting above every god)
+   - Daniel 11:40-45 = End-time crisis. v.40 KOS = ATHEISM/French Revolution. KON = SATAN impersonating Christ as head of triple union (Papacy + Apostate Protestantism + Spiritualism). "Whirlwind" = counterfeit Second Coming. v.45 = God's truth and His people targeted; Satan's final defeat.
    - NEVER assign Daniel 11:14-22 to Antiochus or Greece. NEVER say Papal Rome begins only at verse 36.
 
 E. REVELATION 13 & APOSTATE PROTESTANTISM: The second beast (earth beast) of Revelation 13 represents the United States. The "image to the beast" is formed when apostate Protestantism unites with civil power to enforce religious legislation. The mark of the beast involves enforced false worship in contrast to God's Sabbath seal. Never soften this identification.
