@@ -39,6 +39,7 @@ const Palace = () => {
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<"explore" | "progress" | "audio-tour">("explore");
   const [viewMode, setViewMode] = useState<"visual" | "list" | "3d">("list");
+  const [showTabTutorial, setShowTabTutorial] = useState(false);
 
   const handleTourComplete = () => {
     completeTour();
