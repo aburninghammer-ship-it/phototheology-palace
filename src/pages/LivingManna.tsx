@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { LIVING_MANNA_TOUR } from "@/data/guidedTours";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";

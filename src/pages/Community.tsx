@@ -655,6 +655,9 @@ const Community = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+                    <GraduationCap className="h-4 w-4" /> Tour
+                  </Button>
                   {user && (
                     <CommunityNotifications
                       userId={user.id}
