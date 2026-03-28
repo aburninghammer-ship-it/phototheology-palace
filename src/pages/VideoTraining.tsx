@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { VIDEO_TRAINING_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Upload, Play, Video, Trash2 } from "lucide-react";
+import { Upload, Play, Video, Trash2, GraduationCap } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { videoTrainingSteps } from "@/config/howItWorksSteps";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -249,6 +251,9 @@ const VideoTraining = () => {
         </div>
         
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+            <GraduationCap className="h-4 w-4" /> Tour
+          </Button>
           <HowItWorksDialog title={t('videoTraining.howToUseTitle')} steps={videoTrainingSteps} />
           {isVideoAdmin && (
           <Dialog>
