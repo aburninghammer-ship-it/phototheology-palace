@@ -9660,12 +9660,112 @@ Return ONLY valid JSON: ${mode === "family_feud_forge" ? '{"question": "..."}' :
 
       const recentCategories = previousDrops.slice(-categories.length).map((d: any) => d.category);
 
-      // Generate entropy to push the LLM away from its defaults
+      // Generate strong entropy to push the LLM away from its defaults
       const entropySeeds = [
         Math.random().toString(36).substring(2, 8),
         Date.now() % 10000,
         Math.floor(Math.random() * 1000),
       ];
+
+      // Thematic steering: pick a random sub-theme to anchor the drop around
+      const scriptureSteering = [
+        "Minor Prophets (Obadiah, Nahum, Habakkuk, Zephaniah, Haggai, Malachi)",
+        "Levitical laws and ceremonies", "Song of Solomon imagery", "Genealogies and their hidden meanings",
+        "Judges-era stories", "Numbers wilderness events", "Proverbs wisdom sayings",
+        "Ecclesiastes paradoxes", "Job's friends and their arguments", "1 & 2 Chronicles unique material",
+        "Ezra-Nehemiah rebuilding details", "Ruth's threshing floor", "Lamentations poetry",
+        "Ezekiel's visions and symbolic acts", "Hosea's marriage metaphor", "Joel's locust army",
+        "Amos social justice oracles", "Micah's prophecies", "Zechariah's night visions",
+        "Acts missionary journeys", "Philemon's story", "Jude's warnings",
+        "2 & 3 John's brief letters", "Hebrews' faith heroes beyond ch.11",
+        "Revelation's letters to seven churches", "Daniel's court narratives (ch.1-6)",
+        "Psalm titles and musical directions", "Old Testament place names and their meanings",
+        "Biblical foods, meals, and feasts", "Dreams and visions across Scripture",
+        "Women of the Bible (lesser-known)", "Animals mentioned in Scripture",
+        "Biblical numbers and their significance", "Tools, weapons, and instruments in the Bible",
+        "Trees and plants in Scripture", "Water events (crossings, storms, wells, floods)",
+        "Mountains and high places", "Gates, doors, and thresholds in the Bible",
+        "Clothing and garments in Scripture", "Stones and rocks in the Bible",
+      ];
+      const natureSteering = [
+        "Deep ocean creatures", "Desert survival adaptations", "Fungal networks",
+        "Insect life cycles", "Bird migration patterns", "Volcanic geology",
+        "Arctic/Antarctic phenomena", "Rainforest canopy life", "River delta ecosystems",
+        "Cave formations", "Weather extremes", "Symbiotic relationships in nature",
+        "Bioluminescent organisms", "Seed dispersal mechanisms", "Nocturnal animals",
+        "Tidal patterns", "Cloud types and formations", "Mineral crystal structures",
+        "Pollination strategies", "Camouflage and mimicry", "Fossilization process",
+        "Coral reef ecosystems", "Lightning and electrical storms", "Plant root systems",
+      ];
+      const everydaySteering = [
+        "Kitchen moments", "Childhood memories", "Travel experiences", "Work/career situations",
+        "Family dynamics", "Technology frustrations", "Shopping moments", "Health/body experiences",
+        "Morning routines", "Night-time moments", "Seasonal transitions", "Moving/relocation",
+        "Learning a new skill", "Financial moments", "Waiting rooms and delays",
+        "Celebrations and holidays", "Repair and maintenance", "Lost and found moments",
+        "First-time experiences", "Last-time experiences", "Sounds of daily life",
+        "Textures and tactile experiences", "Forgotten objects", "Shared meals",
+      ];
+      const historySteering = [
+        "Ancient civilizations (Mesopotamia, Egypt, Persia)", "Medieval period events",
+        "Renaissance discoveries", "Age of Exploration", "Industrial Revolution impacts",
+        "African empires and kingdoms", "Asian dynasties", "Indigenous peoples' histories",
+        "Scientific breakthroughs", "Medical history", "Architectural wonders",
+        "Maritime history", "Agricultural revolutions", "Communication technology evolution",
+        "Civil rights movements worldwide", "Ancient trade routes", "Archaeological discoveries",
+        "Space exploration milestones", "Music and art history", "Philosophy movements",
+        "Colonial and post-colonial history", "Natural disasters that shaped history",
+        "Inventions that changed daily life", "Diplomatic and peace treaties",
+      ];
+      const humanExpSteering = [
+        "Parent-child dynamics", "Sibling relationships", "Grief stages",
+        "Moments of courage", "Shame and recovery", "Mentorship experiences",
+        "Cultural identity", "Language and communication gaps", "Trust and betrayal",
+        "Loneliness vs solitude", "Dreams and aspirations", "Aging and time",
+        "Forgiveness journeys", "Joy in unexpected places", "Fear and its forms",
+        "Belonging and exclusion", "Generosity received", "Moral dilemmas",
+        "Creative breakthroughs", "Physical limitations", "Nostalgia",
+        "Responsibility and burden", "Hope deferred", "Reconciliation",
+      ];
+      const symbolicSteering = [
+        "Light and shadow imagery", "Containers and vessels", "Bridges and crossings",
+        "Keys and locks", "Mirrors and reflections", "Seeds and growth",
+        "Fire and transformation", "Water states (ice, steam, liquid)", "Circles and cycles",
+        "Thresholds and doorways", "Masks and faces", "Knots and bonds",
+        "Scales and balance", "Roots and foundations", "Wings and flight",
+        "Walls and barriers", "Clocks and time symbols", "Colors as symbols",
+        "Maps and navigation", "Chains and freedom", "Crowns and authority",
+        "Dust and ashes", "Horizons and boundaries", "Echoes and reverberations",
+      ];
+
+      const steeringPools: Record<string, string[]> = {
+        scripture: scriptureSteering,
+        nature: natureSteering,
+        everyday: everydaySteering,
+        history: historySteering,
+        human_experience: humanExpSteering,
+        symbolic: symbolicSteering,
+      };
+
+      const steeringPool = steeringPools[preferredCategory] || scriptureSteering;
+      const steeringTheme = steeringPool[Math.floor(Math.random() * steeringPool.length)];
+
+      // Drop format variety — force different structures
+      const dropFormats = [
+        "a SINGLE evocative word",
+        "a vivid sensory image (sight, sound, smell, texture, taste)",
+        "a 'what if' scenario or hypothetical",
+        "a specific Bible story moment frozen in time",
+        "a juxtaposition of two contrasting things",
+        "a question that provokes thought",
+        "a micro-narrative (one sentence story)",
+        "a paradox or contradiction",
+        "a specific object described in unusual detail",
+        "a moment of transition or change",
+        "a forgotten or overlooked detail from a familiar story",
+        "an emotion captured in a physical sensation",
+      ];
+      const requiredFormat = dropFormats[Math.floor(Math.random() * dropFormats.length)];
 
       // Build the exclusion list from both current session AND cross-session history
       const allRecentDrops = [...new Set([...previousDrops, ...recentDropHistory])];
@@ -9680,12 +9780,12 @@ UNIQUENESS IS PARAMOUNT. The Bible has 66 books, 1,189 chapters, and thousands o
 A "drop" is a short, evocative prompt. Drops can range from a SINGLE WORD to a short phrase (1-2 sentences max). Mix it up — sometimes drop just one word, sometimes a vivid image, sometimes a brief scenario, sometimes a specific Bible story or parable.
 
 CATEGORIES AND VAST EXAMPLE POOLS (do NOT reuse these examples — generate your OWN original drops):
-- scripture: ANY Bible verse, passage, parable, character, object, event, law, prophecy, miracle, or concept from ANY of the 66 books. Think beyond the famous ones. Examples of the RANGE (not to be reused): "The parable of the sheep and the goats", "Adam's deep sleep", "Ehud's left-handed assassination", "The ax head that floated", "Balaam's donkey", "The scarlet cord in Rahab's window", "Lot's wife", "The urim and thummim", "Melchizedek's bread and wine", "The 153 fish", "Jael and the tent peg", "Nathan's parable to David", "The potter's wheel in Jeremiah", "Ezekiel lying on his side 390 days", "The widow's two mites", "Achan's hidden gold", "The cities of refuge", "Mephibosheth at David's table"
-- nature: ANY natural phenomenon, animal, plant, weather event, geological feature, ecosystem, season, celestial body. Examples of the RANGE: "Bioluminescence", "A venus flytrap", "The migration of monarch butterflies", "Permafrost thawing", "A spider rebuilding its web after rain", "The rings inside a tree trunk", "Coral bleaching", "A volcano under the ocean", "The sound of crickets at night", "Mycelium networks underground", "A hawk circling", "Quicksand", "Northern lights", "The dark side of the moon"
-- everyday: ANY ordinary life experience, memory, sensation, routine, object, moment. Examples of the RANGE: "The smell of a hospital", "Forgetting why you walked into a room", "A sticky note reminder", "Parallel parking", "The last page of a book", "A power outage", "Finding money in an old jacket", "The taste of medicine as a child", "A voicemail from someone who passed away", "Ironing a shirt", "The first paycheck", "A cancelled flight", "Trying to stay awake in class", "The junk drawer"
-- history: ANY historical event, person, invention, battle, movement, discovery, civilization, era. Examples of the RANGE: "The Library of Alexandria burning", "Harriet Tubman", "The invention of the printing press", "The Titanic's last orchestra", "The Rosetta Stone", "Pompeii", "The Wright brothers' first flight", "The Trail of Tears", "Galileo's telescope", "The fall of the Soviet Union", "Cleopatra", "The Silk Road", "The Irish potato famine", "Magellan's circumnavigation"
-- human_experience: ANY emotion, relationship dynamic, life stage, internal experience, social interaction. Examples of the RANGE: "The guilt of an unanswered phone call", "Learning your parents are imperfect", "Being the new kid", "The silence after an argument", "Outgrowing a friendship", "Stage fright", "Homesickness", "The pride of teaching someone something", "Jealousy you're ashamed of", "A promise you couldn't keep", "Déjà vu", "The grief no one sees", "Second chances"
-- symbolic: ANY symbol, archetype, paradox, visual image, metaphorical concept. Examples of the RANGE: "A mirror with no reflection", "The last domino", "A clock with no hands", "Scaffolding around a building", "A ship in a bottle", "The eye of a needle", "A white flag", "Quicksilver", "A maze with no exit", "The tip of an iceberg", "A revolving door", "Ashes", "An anchor", "A cocoon"
+- scripture: ANY Bible verse, passage, parable, character, object, event, law, prophecy, miracle, or concept from ANY of the 66 books. Think beyond the famous ones — dig into Minor Prophets, Levitical details, genealogies, lesser-known judges, wilderness events, Ezekiel's visions, Song of Solomon, Chronicles' unique material, Acts' journeys, short epistles.
+- nature: ANY natural phenomenon, animal, plant, weather event, geological feature, ecosystem, season, celestial body. Go specific: name actual species, describe particular behaviors, reference real ecological processes.
+- everyday: ANY ordinary life experience, memory, sensation, routine, object, moment. Be hyper-specific: not "cooking" but "the sizzle when onions hit hot oil." Not "driving" but "checking your blind spot on a highway merge."
+- history: ANY historical event, person, invention, battle, movement, discovery, civilization, era from ANY continent and ANY century. Include African kingdoms, Asian dynasties, indigenous histories, scientific breakthroughs, not just Western European events.
+- human_experience: ANY emotion, relationship dynamic, life stage, internal experience, social interaction. Go deep: not "sadness" but "the specific ache of watching someone you love make a choice you can't stop."
+- symbolic: ANY symbol, archetype, paradox, visual image, metaphorical concept. Be inventive — create unusual symbolic images, not just stock metaphors.
 
 DIFFICULTY RULES:
 - beginner: Simple, familiar drops with obvious Christ connections. Categories: scripture, nature, everyday.
@@ -9703,7 +9803,14 @@ Return ONLY valid JSON:
   "hint": "A subtle hint for beginners (1 sentence, only for beginner/intermediate difficulty)"
 }`;
 
-      userPrompt = `Generate a ${difficulty}-level drop. Use the category "${preferredCategory}" for this drop. This is drop #${dropCount + 1} of the session. Entropy seed: ${entropySeeds.join("-")}. Be wildly original — surprise the player.`;
+      userPrompt = `Generate a ${difficulty}-level drop. Category: "${preferredCategory}". Drop #${dropCount + 1}.
+
+MANDATORY CONSTRAINTS FOR THIS DROP:
+1. SUB-THEME ANCHOR: Draw from this specific area: "${steeringTheme}"
+2. FORMAT: Use this structure: ${requiredFormat}
+3. ENTROPY SEED: ${entropySeeds.join("-")}
+
+Be wildly original. Do NOT default to well-known examples. Dig deep into the ${preferredCategory} category. Surprise the player with something they've never been prompted with before.`;
 
     } else if (mode === "freestyle_evaluate") {
       const drop = requestBody.drop || {};
