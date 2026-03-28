@@ -48,16 +48,21 @@ export function OSTitleBar() {
   return (
     <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
       {/* Left: Brand */}
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2.5 min-w-0">
         <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
           style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
           <Sparkles className="h-3 w-3 text-white" />
         </div>
-        <span className="text-xs font-bold tracking-wide"
-          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-          PhototheologyOS
-        </span>
-        <span className="text-[9px] text-muted-foreground hidden sm:inline">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-xs font-bold tracking-wide whitespace-nowrap"
+            style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            PhototheologyOS
+          </span>
+          <span className="hidden sm:inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.24em] text-foreground/80">
+            Eden
+          </span>
+        </div>
+        <span className="text-[9px] text-muted-foreground hidden xl:inline whitespace-nowrap">
           Powered by AI. Built for Biblical Intelligence.
         </span>
       </div>
@@ -70,8 +75,8 @@ export function OSTitleBar() {
       {/* Right: Utility Toolbar */}
       <div className="flex items-center gap-1">
         {activeCount > 0 && (
-          <div className="hidden lg:flex items-center gap-1 px-2 h-8 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
-            <Users className="h-3.5 w-3.5" />
+          <div className="hidden lg:flex items-center gap-1 px-2 h-8 rounded-xl border border-border/60 bg-muted/30 text-foreground/80 text-xs font-medium shadow-sm">
+            <Users className="h-3.5 w-3.5 text-primary" />
             <span>{activeCount} online</span>
           </div>
         )}
@@ -93,22 +98,21 @@ export function OSTitleBar() {
           </Link>
         </Button>
 
-        <NotificationCenter />
-        <StartSessionDialog />
-        <NavigationStyleToggle />
-
-        {/* Language Selector */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="h-8 w-8 shrink-0">
-              <Languages className="h-4 w-4" />
-              <span className="sr-only">Language</span>
+            <Button variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs border border-border/50 bg-muted/20 hover:bg-muted/40">
+              <Languages className="h-3.5 w-3.5" />
+              Language
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-48 p-2" align="end">
             <LanguageSelector showLabel={false} />
           </PopoverContent>
         </Popover>
+
+        <NotificationCenter />
+        <StartSessionDialog />
+        <NavigationStyleToggle />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
