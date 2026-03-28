@@ -46,6 +46,7 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "encyclopedia", label: "Encyclopedia", path: "/encyclopedia", icon: Search, glow: "230 78% 62%" },
       { id: "character-profiles", label: "Character Profiles", path: "/character-profiles", icon: PersonStanding, glow: "240 72% 55%" },
       { id: "libraries", label: "Libraries", path: "/libraries", icon: Library, glow: "250 65% 55%" },
+      { id: "series", label: "Series", path: "/bible-study-series", icon: BookOpen, glow: "195 85% 50%" },
     ],
   },
   {
@@ -96,7 +97,7 @@ export const DOCK_ITEMS: DockItem[] = [
     children: [
       { id: "sermon-builder", label: "Sermon Builder", path: "/sermon-builder", icon: MessageSquare, glow: "270 56% 65%" },
       { id: "sermon-ideas", label: "My Sermon Ideas", path: "/sermon-ideas", icon: Lightbulb, glow: "20 85% 50%" },
-      { id: "series", label: "Series", path: "/bible-study-series", icon: BookOpen, glow: "195 85% 50%" },
+      
       { id: "amplify", label: "Amplify", path: "/amplify", icon: Megaphone, glow: "218 88% 54%" },
       { id: "remix", label: "Remix", path: "/remix", icon: Megaphone, glow: "27 90% 50%" },
       { id: "polish", label: "Polish", path: "/polish", icon: Film, glow: "285 78% 58%" },
