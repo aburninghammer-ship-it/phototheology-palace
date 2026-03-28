@@ -24,6 +24,7 @@ import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
 
 import { SessionModeIndicator } from "@/components/session/SessionModeIndicator";
 import { BackButton } from "@/components/BackButton";
+import { PhototheologyOSLogo } from "@/components/PhototheologyOSLogo";
 import { SessionStartButton } from "@/components/session/SessionStartButton";
 import { SuiteModeToggle, SuiteModeBadge } from "@/components/SuiteModeToggle";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
@@ -112,15 +113,7 @@ export const Navigation = () => {
         >
           <div className="w-full px-4">
             <div className="flex items-center justify-between h-16 max-w-7xl mx-auto">
-              <Link to="/" className="flex items-center gap-2 group">
-                <div className="relative">
-                  <Building2 className="h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110" />
-                  <Sparkles className="h-3 w-3 text-accent absolute -top-1 -right-1 animate-pulse-glow" />
-                </div>
-                <span className="font-serif text-xl font-semibold bg-gradient-palace bg-clip-text text-transparent">
-                  Phototheology
-                </span>
-              </Link>
+              <PhototheologyOSLogo />
               <div className="flex items-center gap-2">
                 <PWAInstallButton />
               </div>
@@ -145,15 +138,7 @@ export const Navigation = () => {
           <div className="flex items-center justify-between h-16 max-w-7xl mx-auto">
             <div className="flex items-center gap-2">
               <BackButton />
-              <Link to="/" className="flex items-center gap-2 group" aria-label="Phototheology home">
-                <div className="relative">
-                  <Building2 className="h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110" aria-hidden="true" />
-                  <Sparkles className="h-3 w-3 text-accent absolute -top-1 -right-1 animate-pulse-glow" aria-hidden="true" />
-                </div>
-                <span className="font-serif text-xl font-semibold bg-gradient-palace bg-clip-text text-transparent">
-                  Phototheology
-                </span>
-              </Link>
+              <PhototheologyOSLogo />
               {/* Guest House Mode Badge */}
               <SuiteModeBadge className="hidden md:flex" />
             </div>
