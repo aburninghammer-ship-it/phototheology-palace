@@ -53,6 +53,7 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "give-me-a-gem", label: "Give Me A Gem", path: "/give-me-a-gem", icon: Gem, glow: "158 80% 42%" },
       { id: "analyze-thoughts", label: "Analyze My Thoughts", path: "/analyze-thoughts", icon: Lightbulb, glow: "48 93% 47%" },
       { id: "drill-drill", label: "Gather Fragments", path: "/drill-drill", icon: Target, glow: "25 95% 53%" },
+      { id: "genealogy-decoder", label: "Genealogy Decoder", path: "/research-assistant?tab=genealogy", icon: Network, glow: "320 70% 55%" },
     ],
   },
   {
