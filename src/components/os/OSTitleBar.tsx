@@ -48,35 +48,57 @@ export function OSTitleBar() {
   return (
     <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
       {/* Left: Brand */}
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-lg"
-          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(270 75% 60%), hsl(210 85% 55%))", boxShadow: "0 0 16px hsl(32 95% 53% / 0.3)" }}>
-          <Sparkles className="h-3.5 w-3.5 text-white drop-shadow-sm" />
+      <div className="flex items-center gap-2.5 shrink-0">
+        <div className="w-7 h-7 rounded-[8px] flex items-center justify-center shrink-0"
+          style={{ 
+            background: "linear-gradient(135deg, hsl(220 60% 50% / 0.25), hsl(270 50% 55% / 0.2))",
+            backdropFilter: "blur(12px)",
+            border: "1px solid hsl(220 60% 80% / 0.15)",
+            boxShadow: "0 2px 12px hsl(220 60% 50% / 0.15), inset 0 1px 0 hsl(0 0% 100% / 0.1)"
+          }}>
+          <Sparkles className="h-3.5 w-3.5 drop-shadow-sm" style={{ color: "hsl(220 80% 75%)" }} />
         </div>
         <div className="flex flex-col leading-none">
-          <span className="text-[14px] tracking-[-0.02em] whitespace-nowrap bg-clip-text text-transparent"
-            style={{ 
-              fontFamily: "'Playfair Display', serif", 
-              fontWeight: 900,
-              backgroundImage: "linear-gradient(105deg, hsl(32 95% 62%), hsl(350 80% 62%), hsl(280 70% 68%), hsl(210 85% 62%))",
-              letterSpacing: "-0.02em"
-            }}>
-            Phototheology<span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: "11px", opacity: 0.85 }}>OS</span>
-          </span>
-          <div className="flex items-center gap-1.5 mt-[2px]">
+          <div className="flex items-baseline gap-0">
+            <span className="text-[14px] whitespace-nowrap bg-clip-text text-transparent"
+              style={{ 
+                fontFamily: "'Outfit', sans-serif", 
+                fontWeight: 800,
+                backgroundImage: "linear-gradient(120deg, hsl(0 0% 95% / 0.95), hsl(220 30% 85% / 0.8), hsl(0 0% 90% / 0.7))",
+                letterSpacing: "-0.01em"
+              }}>
+              Phototheology
+            </span>
+            <span className="text-[11px] whitespace-nowrap bg-clip-text text-transparent"
+              style={{ 
+                fontFamily: "'Space Grotesk', sans-serif", 
+                fontWeight: 700,
+                backgroundImage: "linear-gradient(120deg, hsl(220 80% 72%), hsl(270 60% 72%))",
+                letterSpacing: "0.02em"
+              }}>
+              OS
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 mt-[1px]">
             <span className="text-[8px] whitespace-nowrap bg-clip-text text-transparent"
               style={{ 
-                fontFamily: "'JetBrains Mono', monospace", 
+                fontFamily: "'Space Grotesk', sans-serif", 
                 fontWeight: 500,
-                backgroundImage: "linear-gradient(90deg, hsl(145 70% 50%), hsl(170 65% 55%))",
-                letterSpacing: "0.15em",
+                backgroundImage: "linear-gradient(90deg, hsl(160 60% 60%), hsl(190 55% 58%))",
+                letterSpacing: "0.12em",
                 textTransform: "uppercase"
               }}>
               Eden
             </span>
-            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "hsl(145 70% 50%)" }} />
-            <span className="text-[7.5px] text-muted-foreground/50 tracking-[0.08em] uppercase whitespace-nowrap"
-              style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 500 }}>
+            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "hsl(160 60% 60% / 0.6)" }} />
+            <span className="text-[7px] whitespace-nowrap"
+              style={{ 
+                fontFamily: "'Space Grotesk', sans-serif", 
+                fontWeight: 500,
+                color: "hsl(220 20% 70% / 0.5)",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase"
+              }}>
               Powered by AI. Built for Biblical Intelligence.
             </span>
           </div>
