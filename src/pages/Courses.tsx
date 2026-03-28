@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 const Courses = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [tourOpen, setTourOpen] = useState(false);
 
   const courses = [
     {
@@ -117,7 +118,11 @@ const Courses = () => {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               {t('courses.pageDescription')}
             </p>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="mt-4 gap-1">
+              <GraduationCap className="h-4 w-4" /> Guided Tour
+            </Button>
           </div>
+          {tourOpen && <GuidedTourOverlay steps={COURSES_TOUR} onClose={() => setTourOpen(false)} />}
 
           {/* Courses Grid */}
           <div className="grid md:grid-cols-2 gap-8 mb-16">
