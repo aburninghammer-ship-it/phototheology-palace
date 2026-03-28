@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
-import { Radio, Users, MessageCircle, Globe } from "lucide-react";
+import { Radio, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePresenceTracker } from "@/hooks/usePresenceTracker";
 
