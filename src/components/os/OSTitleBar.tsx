@@ -1,0 +1,83 @@
+import { useAuth } from "@/hooks/useAuth";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Sparkles, User, LogOut, Settings, Bell } from "lucide-react";
+import { CommandPaletteTrigger } from "./CommandPalette";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { NotificationCenter } from "@/components/NotificationCenter";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+export function OSTitleBar() {
+  const { user, signOut } = useAuth();
+  const isMobile = useIsMobile();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const publicPaths = ["/", "/landing", "/auth", "/pricing", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
+  const isPublicPage = publicPaths.some(p => location.pathname === p) || location.pathname.startsWith("/auth");
+  const isWorkspacePane = new URLSearchParams(window.location.search).has('workspace');
+
+  if (!user || isPublicPage || isWorkspacePane || isMobile) return null;
+
+  const initials = user.email?.slice(0, 2).toUpperCase() || "U";
+
+  return (
+    <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
+      {/* Left: Brand */}
+      <div className="flex items-center gap-2.5">
+        <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
+          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
+          <Sparkles className="h-3 w-3 text-white" />
+        </div>
+        <span className="text-xs font-bold tracking-wide"
+          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          PhototheologyOS
+        </span>
+        <span className="text-[9px] text-muted-foreground hidden sm:inline">
+          Powered by AI. Built for Biblical Intelligence.
+        </span>
+      </div>
+
+      {/* Center: Search */}
+      <div className="hidden md:flex flex-1 max-w-sm mx-4">
+        <CommandPaletteTrigger className="w-full justify-center text-[11px]" />
+      </div>
+
+      {/* Right: Actions */}
+      <div className="flex items-center gap-1.5">
+        <ThemeToggle />
+        <NotificationCenter />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="p-1 rounded-lg hover:bg-muted transition-colors">
+              <Avatar className="h-7 w-7">
+                <AvatarFallback className="text-[10px] font-semibold bg-primary/15 text-primary">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => navigate("/my-profile")}>
+              <User className="h-4 w-4 mr-2" /> Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/settings")}>
+              <Settings className="h-4 w-4 mr-2" /> Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => signOut()} className="text-destructive">
+              <LogOut className="h-4 w-4 mr-2" /> Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
+}
