@@ -3,7 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
 import { COURSES_TOUR } from "@/data/guidedTours";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Footer } from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { GlassBubbles } from "@/components/ui/glass-bubbles";
 import { BookOpen, Users, Calendar, GraduationCap, ChevronRight } from "lucide-react";
