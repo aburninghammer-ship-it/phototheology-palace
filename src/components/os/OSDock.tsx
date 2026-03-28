@@ -158,19 +158,8 @@ export function OSDock() {
       transition={{ duration: 0.2, ease: "easeInOut" }}
       className="h-full flex flex-col bg-sidebar border-r border-sidebar-border shrink-0 relative z-40"
     >
-      {/* Brand */}
-      <div className={cn("flex items-center shrink-0 border-b border-sidebar-border", expanded ? "h-12 px-4 gap-3" : "h-12 justify-center")}>
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
-          <Sparkles className="h-3.5 w-3.5 text-white" />
-        </div>
-        {expanded && (
-          <span className="text-xs font-bold truncate"
-            style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            PhototheologyOS
-          </span>
-        )}
-      </div>
+      {/* Spacer for top alignment */}
+      <div className={cn("shrink-0 border-b border-sidebar-border", expanded ? "h-3" : "h-3")} />
 
       {/* Navigation */}
       <ScrollArea className="flex-1">
