@@ -295,46 +295,52 @@ export function OSDock() {
           {hasChildren && isOpen && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-              <div className="ml-7 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.2)` }}>
-                {item.children!.map((sub) => {
-                  const subActive = isActive(sub.path);
-                  const SubIcon = sub.icon || ChevronRight;
-                  const subGlow = sub.glow || item.glow;
-                  const subColor = `hsl(${subGlow})`;
-                  return (
-                    <button key={sub.id} onClick={() => navigate(sub.path)}
-                      className={cn(
-                        "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full",
-                        "backdrop-blur-sm border border-transparent",
-                        subActive && "border-white/8"
-                      )}
-                      style={{
-                        color: subActive ? subColor : `hsl(${subGlow} / 0.7)`,
-                        backgroundColor: subActive ? `hsl(${subGlow} / 0.12)` : undefined,
-                        fontWeight: subActive ? 600 : 400,
-                        boxShadow: subActive ? `0 0 10px hsl(${subGlow} / 0.1)` : undefined,
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!subActive) {
-                          e.currentTarget.style.backgroundColor = `hsl(${subGlow} / 0.06)`;
-                          e.currentTarget.style.color = subColor;
-                          e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!subActive) {
-                          e.currentTarget.style.backgroundColor = "transparent";
-                          e.currentTarget.style.color = `hsl(${subGlow} / 0.7)`;
-                          e.currentTarget.style.borderColor = "transparent";
-                        }
-                      }}
-                    >
-                      <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: subColor }} />
-                      <span className="truncate">{sub.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSubDragEnd(item.id, getOrderedChildren(item))}>
+                <SortableContext items={getOrderedChildren(item).map(c => c.id)} strategy={verticalListSortingStrategy}>
+                  <div className="ml-7 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.2)` }}>
+                    {getOrderedChildren(item).map((sub) => {
+                      const subActive = isActive(sub.path);
+                      const SubIcon = sub.icon || ChevronRight;
+                      const subGlow = sub.glow || item.glow;
+                      const subColor = `hsl(${subGlow})`;
+                      return (
+                        <SortableSubItem key={sub.id} id={sub.id}>
+                          <button onClick={() => navigate(sub.path)}
+                            className={cn(
+                              "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full",
+                              "backdrop-blur-sm border border-transparent",
+                              subActive && "border-white/8"
+                            )}
+                            style={{
+                              color: subActive ? subColor : `hsl(${subGlow} / 0.7)`,
+                              backgroundColor: subActive ? `hsl(${subGlow} / 0.12)` : undefined,
+                              fontWeight: subActive ? 600 : 400,
+                              boxShadow: subActive ? `0 0 10px hsl(${subGlow} / 0.1)` : undefined,
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!subActive) {
+                                e.currentTarget.style.backgroundColor = `hsl(${subGlow} / 0.06)`;
+                                e.currentTarget.style.color = subColor;
+                                e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!subActive) {
+                                e.currentTarget.style.backgroundColor = "transparent";
+                                e.currentTarget.style.color = `hsl(${subGlow} / 0.7)`;
+                                e.currentTarget.style.borderColor = "transparent";
+                              }
+                            }}
+                          >
+                            <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: subColor }} />
+                            <span className="truncate">{sub.label}</span>
+                          </button>
+                        </SortableSubItem>
+                      );
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </motion.div>
           )}
         </AnimatePresence>
