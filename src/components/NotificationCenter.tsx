@@ -120,10 +120,10 @@ export function NotificationCenter() {
                   handleNotificationClick(notification);
                 }}
               >
-                <div className="flex items-start justify-between w-full">
-                  <div className="flex-1">
+                <div className="flex items-start justify-between w-full gap-2">
+                  <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm">{notification.title}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1 truncate">
                       {notification.message}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -131,7 +131,18 @@ export function NotificationCenter() {
                     </p>
                   </div>
                   {!notification.is_read && (
-                    <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-1" />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 shrink-0 rounded-full hover:bg-primary/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markAsRead(notification.id);
+                      }}
+                      title="Mark as read"
+                    >
+                      <Check className="h-3 w-3 text-primary" />
+                    </Button>
                   )}
                 </div>
               </DropdownMenuItem>
