@@ -46,8 +46,7 @@ export function OSTitleBar() {
   const initials = user.email?.slice(0, 2).toUpperCase() || "U";
 
   return (
-    <div className="h-12 flex items-center justify-between px-4 bg-background/60 backdrop-blur-2xl border-b border-border/20 shrink-0 z-50"
-      style={{ background: "linear-gradient(180deg, hsl(var(--background) / 0.85), hsl(var(--background) / 0.6))" }}>
+    <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
       {/* Left: Brand */}
       <div className="flex items-center gap-3 shrink-0">
         <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-lg"
@@ -65,7 +64,7 @@ export function OSTitleBar() {
               Eden
             </span>
             <span className="w-1 h-1 rounded-full" style={{ background: "hsl(145 70% 50%)" }} />
-            <span className="text-[8px] text-muted-foreground/60 font-medium tracking-wider uppercase hidden xl:inline whitespace-nowrap">
+            <span className="text-[8px] text-muted-foreground/60 font-medium tracking-wider uppercase whitespace-nowrap">
               Biblical Intelligence
             </span>
           </div>
