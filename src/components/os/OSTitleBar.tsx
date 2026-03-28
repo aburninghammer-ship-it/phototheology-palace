@@ -44,7 +44,6 @@ export function OSTitleBar() {
   if (!user || isPublicPage || isWorkspacePane || isMobile) return null;
 
   const initials = user.email?.slice(0, 2).toUpperCase() || "U";
-  const initials = user.email?.slice(0, 2).toUpperCase() || "U";
 
   return (
     <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
