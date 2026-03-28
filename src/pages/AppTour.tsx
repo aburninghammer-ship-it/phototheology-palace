@@ -150,7 +150,7 @@ const AppTour = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="App Tour" <SEO title="App Tour" description="Take a guided tour of PhototheologyOS. Explore the 8-floor Palace, AI tools, games, and community features." /> />
+      <SEO title="App Tour" description="Take a guided tour of PhototheologyOS. Explore the 8-floor Palace, AI tools, games, and community features." /> description="Take a guided tour of PhototheologyOS. Explore the 8-floor Palace, AI tools, games, and community features." /> />
       <Navigation />
 
       <div className="container mx-auto px-4 py-12 max-w-6xl">

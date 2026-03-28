@@ -77,7 +77,7 @@ export default function DayPassRedeem() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-blue-500/5">
-      <SEO title="Day Pass | Phototheology" <SEO title="Day Pass | Phototheology" description="Activate your free 24-hour Day Pass to PhototheologyOS." /> />
+      <SEO title="Day Pass | Phototheology" description="Activate your free 24-hour Day Pass to PhototheologyOS." /> description="Activate your free 24-hour Day Pass to PhototheologyOS." /> />
       <Navigation />
 
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-lg text-center">
