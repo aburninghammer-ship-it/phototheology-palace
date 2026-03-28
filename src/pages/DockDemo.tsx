@@ -383,21 +383,35 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="ml-4 pl-3 border-l border-border/50 py-1 flex flex-col gap-0.5">
+              <div className="ml-4 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.25)` }}>
                 {/* Direct link to parent page */}
                 <button
                   onClick={() => navigate(item.path)}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full",
-                    active
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  )}
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full hover:bg-muted"
+                  style={{ color: active ? itemColor : undefined }}
                 >
-                  <Icon className="h-3.5 w-3.5 shrink-0" />
+                  <Icon className="h-3.5 w-3.5 shrink-0" style={{ color: itemColor }} />
                   <span className="truncate">{item.label} Home</span>
                 </button>
-                {item.children!.map(renderSubItem)}
+                {item.children!.map((sub) => {
+                  const subActive = isActive(sub.path);
+                  const SubIcon = sub.icon || ChevronRight;
+                  return (
+                    <button
+                      key={sub.id}
+                      onClick={() => navigate(sub.path)}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full hover:bg-muted"
+                      style={{
+                        color: subActive ? itemColor : undefined,
+                        backgroundColor: subActive ? `hsl(${item.glow} / 0.1)` : undefined,
+                        fontWeight: subActive ? 500 : undefined,
+                      }}
+                    >
+                      <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: `hsl(${item.glow} / 0.6)` }} />
+                      <span className="truncate">{sub.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
           )}
