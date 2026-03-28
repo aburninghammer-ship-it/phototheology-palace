@@ -392,6 +392,13 @@ const Palace = () => {
         </div>
       </div>
       <Footer />
+
+      {showTabTutorial && (
+        <PalaceTabTutorial
+          onClose={() => setShowTabTutorial(false)}
+          onTabChange={(tab) => setActiveTab(tab)}
+        />
+      )}
     </div>
   );
 };
