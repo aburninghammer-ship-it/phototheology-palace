@@ -245,6 +245,10 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
     const isOpen = expandedItems.has(item.id);
     const Icon = item.icon;
 
+    const itemColor = `hsl(${item.glow})`;
+    const itemColorFaint = `hsl(${item.glow} / 0.15)`;
+    const itemColorMed = `hsl(${item.glow} / 0.25)`;
+
     const mainButton = (
       <button
         key={item.id}
@@ -258,26 +262,37 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
         className={cn(
           "relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full",
           expanded ? "px-3 py-2.5" : "p-2.5 justify-center",
-          active
-            ? "bg-primary/15 text-primary"
-            : parentActive
-              ? "text-primary/70"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
         )}
+        style={{
+          backgroundColor: active ? itemColorFaint : undefined,
+          color: active ? itemColor : parentActive ? itemColor : undefined,
+        }}
+        onMouseEnter={(e) => {
+          if (!active) {
+            e.currentTarget.style.backgroundColor = itemColorFaint;
+            e.currentTarget.style.color = itemColor;
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!active) {
+            e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.color = "";
+          }
+        }}
       >
         {/* Active glow bar */}
         {(active || parentActive) && (
           <div
             className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
             style={{
-              backgroundColor: `hsl(${item.glow})`,
+              backgroundColor: itemColor,
               height: active ? "24px" : "16px",
               opacity: active ? 1 : 0.5,
             }}
           />
         )}
 
-        <Icon className="h-5 w-5 shrink-0" />
+        <Icon className="h-5 w-5 shrink-0" style={{ color: itemColor }} />
 
         {expanded && (
           <>
@@ -285,9 +300,10 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
             {hasChildren && (
               <ChevronDown
                 className={cn(
-                  "h-3.5 w-3.5 shrink-0 transition-transform text-muted-foreground",
+                  "h-3.5 w-3.5 shrink-0 transition-transform",
                   isOpen && "rotate-180"
                 )}
+                style={{ color: `hsl(${item.glow} / 0.5)` }}
               />
             )}
           </>
@@ -296,7 +312,7 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
         {/* Active glow bg */}
         {active && (
           <div
-            className="absolute inset-0 rounded-xl opacity-10 pointer-events-none"
+            className="absolute inset-0 rounded-xl opacity-20 pointer-events-none"
             style={{ background: `radial-gradient(circle at center, hsl(${item.glow} / 0.4), transparent)` }}
           />
         )}
@@ -311,22 +327,22 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
             <TooltipTrigger asChild>
               <button
                 onClick={() => navigate(item.path)}
-                className={cn(
-                  "relative flex items-center p-2.5 justify-center rounded-xl transition-all duration-200 w-full",
-                  active ? "bg-primary/15 text-primary" :
-                  parentActive ? "text-primary/70" :
-                  "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
+                className="relative flex items-center p-2.5 justify-center rounded-xl transition-all duration-200 w-full"
+                style={{
+                  backgroundColor: active ? itemColorFaint : undefined,
+                }}
+                onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = itemColorFaint; }}
+                onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = "transparent"; }}
               >
                 {(active || parentActive) && (
                   <div
                     className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
-                    style={{ backgroundColor: `hsl(${item.glow})`, height: active ? "24px" : "16px", opacity: active ? 1 : 0.5 }}
+                    style={{ backgroundColor: itemColor, height: active ? "24px" : "16px", opacity: active ? 1 : 0.5 }}
                   />
                 )}
-                <Icon className="h-5 w-5 shrink-0" />
+                <Icon className="h-5 w-5 shrink-0" style={{ color: itemColor }} />
                 {hasChildren && (
-                  <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+                  <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `hsl(${item.glow} / 0.5)` }} />
                 )}
               </button>
             </TooltipTrigger>
@@ -367,21 +383,35 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="ml-4 pl-3 border-l border-border/50 py-1 flex flex-col gap-0.5">
+              <div className="ml-4 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.25)` }}>
                 {/* Direct link to parent page */}
                 <button
                   onClick={() => navigate(item.path)}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full",
-                    active
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  )}
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full hover:bg-muted"
+                  style={{ color: active ? itemColor : undefined }}
                 >
-                  <Icon className="h-3.5 w-3.5 shrink-0" />
+                  <Icon className="h-3.5 w-3.5 shrink-0" style={{ color: itemColor }} />
                   <span className="truncate">{item.label} Home</span>
                 </button>
-                {item.children!.map(renderSubItem)}
+                {item.children!.map((sub) => {
+                  const subActive = isActive(sub.path);
+                  const SubIcon = sub.icon || ChevronRight;
+                  return (
+                    <button
+                      key={sub.id}
+                      onClick={() => navigate(sub.path)}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full hover:bg-muted"
+                      style={{
+                        color: subActive ? itemColor : undefined,
+                        backgroundColor: subActive ? `hsl(${item.glow} / 0.1)` : undefined,
+                        fontWeight: subActive ? 500 : undefined,
+                      }}
+                    >
+                      <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: `hsl(${item.glow} / 0.6)` }} />
+                      <span className="truncate">{sub.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
           )}
@@ -402,12 +432,13 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
         "flex items-center shrink-0 border-b border-sidebar-border",
         expanded ? "h-14 px-4 gap-3" : "h-14 justify-center"
       )}>
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0">
-          <Sparkles className="h-4 w-4 text-primary-foreground" />
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
+          <Sparkles className="h-4 w-4 text-white" />
         </div>
         {expanded && (
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-bold text-foreground truncate">PhototheologyOS</span>
+            <span className="text-sm font-bold truncate" style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>PhototheologyOS</span>
             <span className="text-[10px] text-muted-foreground">Biblical Intelligence</span>
           </div>
         )}
