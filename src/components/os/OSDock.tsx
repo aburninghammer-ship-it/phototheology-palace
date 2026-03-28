@@ -26,6 +26,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 const DOCK_ORDER_KEY = "phototheology-dock-order";
+const SUB_ORDER_KEY_PREFIX = "phototheology-sub-order-";
 
 function getStoredOrder(): string[] | null {
   try {
@@ -36,6 +37,17 @@ function getStoredOrder(): string[] | null {
 
 function storeOrder(ids: string[]) {
   localStorage.setItem(DOCK_ORDER_KEY, JSON.stringify(ids));
+}
+
+function getStoredSubOrder(parentId: string): string[] | null {
+  try {
+    const stored = localStorage.getItem(SUB_ORDER_KEY_PREFIX + parentId);
+    return stored ? JSON.parse(stored) : null;
+  } catch { return null; }
+}
+
+function storeSubOrder(parentId: string, ids: string[]) {
+  localStorage.setItem(SUB_ORDER_KEY_PREFIX + parentId, JSON.stringify(ids));
 }
 
 function SortableDockItem({ item, children }: { item: DockItem; children: React.ReactNode }) {
@@ -57,6 +69,25 @@ function SortableDockItem({ item, children }: { item: DockItem; children: React.
   );
 }
 
+function SortableSubItem({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} className="relative group/sub-sortable flex items-center">
+      <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover/sub-sortable:opacity-60 transition-opacity cursor-grab active:cursor-grabbing z-10" {...listeners}>
+        <GripVertical className="h-3 w-3 text-muted-foreground" />
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export function OSDock() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -64,6 +95,7 @@ export function OSDock() {
   const [visible, setVisible] = useState(true);
   const [expanded, setExpanded] = useState(true);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [subOrders, setSubOrders] = useState<Record<string, string[]>>({});
   const [orderedItems, setOrderedItems] = useState<DockItem[]>(() => {
     const storedOrder = getStoredOrder();
     if (storedOrder) {
@@ -72,7 +104,6 @@ export function OSDock() {
         const found = DOCK_ITEMS.find(i => i.id === id);
         if (found) ordered.push(found);
       }
-      // Add any new items not in stored order
       for (const item of DOCK_ITEMS) {
         if (!storedOrder.includes(item.id)) ordered.push(item);
       }
@@ -80,6 +111,32 @@ export function OSDock() {
     }
     return DOCK_ITEMS;
   });
+
+  const getOrderedChildren = useCallback((item: DockItem) => {
+    if (!item.children) return [];
+    const stored = subOrders[item.id] || getStoredSubOrder(item.id);
+    if (stored) {
+      const ordered = stored.map(id => item.children!.find(c => c.id === id)).filter(Boolean) as typeof item.children;
+      // Add any new children not in stored order
+      for (const child of item.children) {
+        if (!stored.includes(child.id)) ordered!.push(child);
+      }
+      return ordered!;
+    }
+    return item.children;
+  }, [subOrders]);
+
+  const handleSubDragEnd = useCallback((parentId: string, children: typeof DOCK_ITEMS[0]['children']) => (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !children) return;
+    const oldIndex = children.findIndex(c => c.id === active.id);
+    const newIndex = children.findIndex(c => c.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(children, oldIndex, newIndex);
+    const newIds = reordered.map(c => c.id);
+    storeSubOrder(parentId, newIds);
+    setSubOrders(prev => ({ ...prev, [parentId]: newIds }));
+  }, []);
   const currentPath = location.pathname;
 
   const sensors = useSensors(
@@ -238,46 +295,52 @@ export function OSDock() {
           {hasChildren && isOpen && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-              <div className="ml-7 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.2)` }}>
-                {item.children!.map((sub) => {
-                  const subActive = isActive(sub.path);
-                  const SubIcon = sub.icon || ChevronRight;
-                  const subGlow = sub.glow || item.glow;
-                  const subColor = `hsl(${subGlow})`;
-                  return (
-                    <button key={sub.id} onClick={() => navigate(sub.path)}
-                      className={cn(
-                        "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full",
-                        "backdrop-blur-sm border border-transparent",
-                        subActive && "border-white/8"
-                      )}
-                      style={{
-                        color: subActive ? subColor : `hsl(${subGlow} / 0.7)`,
-                        backgroundColor: subActive ? `hsl(${subGlow} / 0.12)` : undefined,
-                        fontWeight: subActive ? 600 : 400,
-                        boxShadow: subActive ? `0 0 10px hsl(${subGlow} / 0.1)` : undefined,
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!subActive) {
-                          e.currentTarget.style.backgroundColor = `hsl(${subGlow} / 0.06)`;
-                          e.currentTarget.style.color = subColor;
-                          e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!subActive) {
-                          e.currentTarget.style.backgroundColor = "transparent";
-                          e.currentTarget.style.color = `hsl(${subGlow} / 0.7)`;
-                          e.currentTarget.style.borderColor = "transparent";
-                        }
-                      }}
-                    >
-                      <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: subColor }} />
-                      <span className="truncate">{sub.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSubDragEnd(item.id, getOrderedChildren(item))}>
+                <SortableContext items={getOrderedChildren(item).map(c => c.id)} strategy={verticalListSortingStrategy}>
+                  <div className="ml-7 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.2)` }}>
+                    {getOrderedChildren(item).map((sub) => {
+                      const subActive = isActive(sub.path);
+                      const SubIcon = sub.icon || ChevronRight;
+                      const subGlow = sub.glow || item.glow;
+                      const subColor = `hsl(${subGlow})`;
+                      return (
+                        <SortableSubItem key={sub.id} id={sub.id}>
+                          <button onClick={() => navigate(sub.path)}
+                            className={cn(
+                              "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full",
+                              "backdrop-blur-sm border border-transparent",
+                              subActive && "border-white/8"
+                            )}
+                            style={{
+                              color: subActive ? subColor : `hsl(${subGlow} / 0.7)`,
+                              backgroundColor: subActive ? `hsl(${subGlow} / 0.12)` : undefined,
+                              fontWeight: subActive ? 600 : 400,
+                              boxShadow: subActive ? `0 0 10px hsl(${subGlow} / 0.1)` : undefined,
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!subActive) {
+                                e.currentTarget.style.backgroundColor = `hsl(${subGlow} / 0.06)`;
+                                e.currentTarget.style.color = subColor;
+                                e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!subActive) {
+                                e.currentTarget.style.backgroundColor = "transparent";
+                                e.currentTarget.style.color = `hsl(${subGlow} / 0.7)`;
+                                e.currentTarget.style.borderColor = "transparent";
+                              }
+                            }}
+                          >
+                            <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: subColor }} />
+                            <span className="truncate">{sub.label}</span>
+                          </button>
+                        </SortableSubItem>
+                      );
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </motion.div>
           )}
         </AnimatePresence>
