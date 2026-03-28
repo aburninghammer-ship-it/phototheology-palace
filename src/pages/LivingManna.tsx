@@ -178,6 +178,7 @@ export default function LivingManna() {
   return (
     <DirectMessagesProvider>
       <div className="min-h-screen gradient-dreamy pb-20 md:pb-8">
+        {tourOpen && <GuidedTourOverlay steps={LIVING_MANNA_TOUR} onClose={() => setTourOpen(false)} />}
         {/* Mobile Header */}
         {isMobile && (
           <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border px-4 py-3">

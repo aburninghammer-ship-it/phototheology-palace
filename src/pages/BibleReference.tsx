@@ -338,6 +338,7 @@ const BibleReference = () => {
       </div>
 
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={BIBLE_REFERENCE_TOUR} onClose={() => setTourOpen(false)} />}
       
       <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
         <motion.div 
