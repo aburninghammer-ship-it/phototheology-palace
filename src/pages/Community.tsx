@@ -609,6 +609,7 @@ const Community = () => {
       </div>
 
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={COMMUNITY_TOUR} onClose={() => setTourOpen(false)} />}
       {user && <CommunityGuidelines userId={user.id} />}
       <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-5xl mx-auto space-y-6">
