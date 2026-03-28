@@ -7,7 +7,8 @@ import { SpiritOfProphecyTab } from "@/components/living-manna/SpiritOfProphecyT
 import { DefenseMode } from "@/components/living-manna/DefenseMode";
 import { AATSTraining } from "@/components/living-manna/AATSTraining";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookMarked, Shield, Swords } from "lucide-react";
+import { BookMarked, Shield, Swords, GraduationCap } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const validTabs = ["library", "defense", "aats"] as const;
 type TabValue = typeof validTabs[number];
