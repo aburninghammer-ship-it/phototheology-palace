@@ -3,10 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, ChevronLeft, ChevronDown, Sparkles, Search } from "lucide-react";
+import { ChevronRight, ChevronLeft, ChevronDown, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DOCK_SECTIONS, type DockItem, type DockSubItem } from "./dockData";
-import { CommandPaletteTrigger } from "./CommandPalette";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export function OSDock() {
