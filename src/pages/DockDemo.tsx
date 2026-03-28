@@ -327,22 +327,23 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
             <TooltipTrigger asChild>
               <button
                 onClick={() => navigate(item.path)}
-                className={cn(
-                  "relative flex items-center p-2.5 justify-center rounded-xl transition-all duration-200 w-full",
-                  active ? "bg-primary/15 text-primary" :
-                  parentActive ? "text-primary/70" :
-                  "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
+                className="relative flex items-center p-2.5 justify-center rounded-xl transition-all duration-200 w-full"
+                style={{
+                  backgroundColor: active ? itemColorFaint : undefined,
+                }}
+                onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = itemColorFaint; }}
+                onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = "transparent"; }}
               >
                 {(active || parentActive) && (
                   <div
                     className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
-                    style={{ backgroundColor: `hsl(${item.glow})`, height: active ? "24px" : "16px", opacity: active ? 1 : 0.5 }}
+                    style={{ backgroundColor: itemColor, height: active ? "24px" : "16px", opacity: active ? 1 : 0.5 }}
                   />
                 )}
-                <Icon className="h-5 w-5 shrink-0" />
+                <Icon className="h-5 w-5 shrink-0" style={{ color: itemColor }} />
                 {hasChildren && (
-                  <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+                  <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `hsl(${item.glow} / 0.5)` }} />
+                )}
                 )}
               </button>
             </TooltipTrigger>
