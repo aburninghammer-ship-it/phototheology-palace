@@ -87,6 +87,8 @@ export const DOCK_ITEMS: DockItem[] = [
   {
     id: "challenges", label: "Challenges", icon: Zap, path: "/daily-challenges", glow: "16 88% 50%",
     children: [
+      { id: "daily-challenges", label: "Daily Challenges", path: "/daily-challenges", icon: Zap, glow: "12 85% 55%" },
+      { id: "challenge-board", label: "Public Challenge Board", path: "/challenge-board", icon: Trophy, glow: "28 92% 48%" },
       { id: "leaderboard", label: "Leaderboard", path: "/leaderboard", icon: Trophy, glow: "42 93% 50%" },
       { id: "achievements", label: "Achievements", path: "/achievements", icon: Trophy, glow: "35 88% 55%" },
       { id: "drill-drill", label: "Gather Fragments", path: "/drill-drill", icon: Target, glow: "25 95% 53%" },
