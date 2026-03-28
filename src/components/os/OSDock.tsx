@@ -251,45 +251,47 @@ export function OSDock() {
         <button
           onClick={() => { navigate(item.path); if (hasChildren) toggleExpand(item.id); }}
           className={cn(
-            "relative flex items-center gap-3 rounded-full transition-all duration-200 group w-[calc(100%-16px)] px-3 py-2 mx-2",
-            "backdrop-blur-md border"
+            "relative flex items-center gap-3 transition-all duration-200 group w-[calc(100%-12px)] px-3 py-2 mx-1.5",
+            "border overflow-hidden"
           )}
           style={{
-            backgroundColor: active ? `hsl(${item.glow} / 0.22)` : `hsl(${item.glow} / 0.12)`,
-            borderColor: active ? `hsl(${item.glow} / 0.45)` : `hsl(${item.glow} / 0.28)`,
+            borderRadius: "14px",
+            backgroundColor: active ? `hsl(${item.glow} / 0.2)` : `hsl(${item.glow} / 0.08)`,
+            borderColor: active ? `hsl(${item.glow} / 0.4)` : `hsl(${item.glow} / 0.2)`,
             color: itemColor,
             boxShadow: active
-              ? `0 0 22px hsl(${item.glow} / 0.25), inset 0 1px 0 hsl(${item.glow} / 0.15)`
-              : `0 0 14px hsl(${item.glow} / 0.12)`,
+              ? `0 0 20px hsl(${item.glow} / 0.2), inset 0 1px 0 hsl(${item.glow} / 0.1)`
+              : `0 2px 8px hsl(${item.glow} / 0.06)`,
           }}
           onMouseEnter={(e) => {
             if (!active) {
-              e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.18)`;
-              e.currentTarget.style.borderColor = `hsl(${item.glow} / 0.36)`;
-              e.currentTarget.style.boxShadow = `0 0 18px hsl(${item.glow} / 0.18)`;
+              e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.15)`;
+              e.currentTarget.style.borderColor = `hsl(${item.glow} / 0.35)`;
+              e.currentTarget.style.boxShadow = `0 0 16px hsl(${item.glow} / 0.15)`;
+              e.currentTarget.style.transform = "translateX(2px)";
             }
           }}
           onMouseLeave={(e) => {
             if (!active) {
-              e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.12)`;
-              e.currentTarget.style.borderColor = `hsl(${item.glow} / 0.28)`;
-              e.currentTarget.style.boxShadow = `0 0 14px hsl(${item.glow} / 0.12)`;
+              e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.08)`;
+              e.currentTarget.style.borderColor = `hsl(${item.glow} / 0.2)`;
+              e.currentTarget.style.boxShadow = `0 2px 8px hsl(${item.glow} / 0.06)`;
+              e.currentTarget.style.transform = "translateX(0)";
             }
           }}
         >
           {(active || parentActive) && (
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
-              style={{ backgroundColor: itemColor, height: active ? "24px" : "16px", opacity: active ? 1 : 0.5 }} />
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px]"
+              style={{ backgroundColor: itemColor, height: active ? "20px" : "12px", opacity: active ? 1 : 0.6, borderRadius: "0 4px 4px 0" }} />
           )}
-          <Icon className="h-4.5 w-4.5 shrink-0" style={{ color: itemColor }} />
-          <span className="text-sm font-medium truncate flex-1 text-left">{item.label}</span>
+          <Icon className="h-4 w-4 shrink-0" style={{ color: itemColor }} />
+          <span className="text-[13px] font-semibold truncate flex-1 text-left">{item.label}</span>
           {hasChildren && (
-            <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 transition-transform", isOpen && "rotate-180")}
+            <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 transition-transform duration-200", isOpen && "rotate-180")}
               style={{ color: `hsl(${item.glow} / 0.5)` }} />
           )}
           {active && (
-            <div className="absolute inset-0 rounded-xl opacity-10 pointer-events-none"
-              style={{ background: `radial-gradient(circle at center, hsl(${item.glow} / 0.4), transparent)` }} />
+            <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{ borderRadius: "14px", background: `radial-gradient(ellipse at 30% 50%, hsl(${item.glow} / 0.6), transparent 70%)` }} />
           )}
         </button>
 
