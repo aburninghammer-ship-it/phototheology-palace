@@ -69,6 +69,25 @@ function SortableDockItem({ item, children }: { item: DockItem; children: React.
   );
 }
 
+function SortableSubItem({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} className="relative group/sub-sortable flex items-center">
+      <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover/sub-sortable:opacity-60 transition-opacity cursor-grab active:cursor-grabbing z-10" {...listeners}>
+        <GripVertical className="h-3 w-3 text-muted-foreground" />
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export function OSDock() {
   const location = useLocation();
   const navigate = useNavigate();
