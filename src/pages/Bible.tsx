@@ -77,7 +77,18 @@ const Bible = () => {
                 <Button
                   variant="outline"
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
+                  onClick={() => setTutorialOpen(true)}
+                  data-tutorial="bible-tutorial-btn"
+                >
+                  <GraduationCap className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Guided Tour</span>
+                  <span className="sm:hidden">Tour</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
                   onClick={() => setSidebarOpen(!sidebarOpen)}
+                  data-tutorial="at-a-glance-btn"
                 >
                   <PanelLeft className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">{t('bible.atAGlance', 'At a Glance')}</span>
@@ -87,6 +98,7 @@ const Bible = () => {
                   variant="outline"
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
                   onClick={() => setResearchMode(true)}
+                  data-tutorial="research-mode-btn"
                 >
                   <FlaskConical className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">{t('bible.researchMode', 'Research Mode')}</span>
@@ -102,14 +114,14 @@ const Bible = () => {
                   <span className="sm:hidden">{t('bible.help', 'Help')}</span>
                 </Button>
                 <Button asChild variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap">
-                  <Link to="/memorization-verses">
+                  <Link to="/memorization-verses" data-tutorial="memorization-btn">
                     <BookMarked className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">{t('bible.myMemorizationVerses', 'My Memorization Verses')}</span>
                     <span className="sm:hidden">{t('bible.memorization', 'Memorization')}</span>
                   </Link>
                 </Button>
                 <Button asChild className="bg-primary/90 hover:bg-primary text-primary-foreground whitespace-nowrap">
-                  <Link to="/audio-bible">
+                  <Link to="/audio-bible" data-tutorial="audio-bible-btn">
                     <Headphones className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">{t('bible.audioBibleCommentary', 'Audio Bible & Commentary')}</span>
                     <span className="sm:hidden">{t('bible.listen', 'Listen')}</span>
