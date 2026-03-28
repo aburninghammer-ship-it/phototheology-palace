@@ -3,7 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Users, BookOpen, Filter, Flame, X } from "lucide-react";
+import { Search, Users, BookOpen, Filter, Flame, X, GraduationCap } from "lucide-react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { CHARACTER_PROFILES_TOUR } from "@/data/guidedTours";
 import { biblicalCharacterProfiles } from "@/data/biblicalCharacterProfiles";
 import type { Archetype, SituationCategory } from "@/data/biblicalCharacterProfiles";
 import { CharacterProfileCard } from "@/components/character-profiles/CharacterProfileCard";
@@ -31,6 +33,7 @@ export default function CharacterProfiles() {
   const [archetypeFilter, setArchetypeFilter] = useState<Archetype | null>(null);
   const [situationFilter, setSituationFilter] = useState<SituationCategory | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const { data: characterImages } = useCharacterImages();
 
   const selectedCharacter = useMemo(
@@ -109,10 +112,16 @@ export default function CharacterProfiles() {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 mb-8 text-white">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-3">
-            <Users className="h-8 w-8" />
-            <h1 className="text-3xl md:text-4xl font-bold">Biblical Character Profiles</h1>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <Users className="h-8 w-8" />
+              <h1 className="text-3xl md:text-4xl font-bold">Biblical Character Profiles</h1>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="text-white/80 hover:text-white hover:bg-white/10 gap-1">
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
           </div>
+          {tourOpen && <GuidedTourOverlay steps={CHARACTER_PROFILES_TOUR} onClose={() => setTourOpen(false)} />}
           <p className="text-white/80 text-lg max-w-2xl mb-2">
             Psychological-spiritual analysis of Scripture's most important figures.
             Understand who they were, how they responded under pressure, and what their lives teach us.
