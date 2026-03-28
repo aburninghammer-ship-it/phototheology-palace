@@ -82,33 +82,38 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
     transition,
   };
 
+  const glowColor = tab.gradient.glow.replace("rgba(", "rgb(").replace(",0.5)", ")");
+  const glowSoft = tab.gradient.glow.replace(",0.5)", ",0.12)");
+  const glowMid = tab.gradient.glow.replace(",0.5)", ",0.2)");
+  const glowBorder = tab.gradient.glow.replace(",0.5)", ",0.32)");
+  const glowStrong = tab.gradient.glow.replace(",0.5)", ",0.48)");
+
   const tabContent = (
     <div
       className={cn(
-        "px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1",
-        `bg-gradient-to-r ${tab.gradient.from.replace('/10', '/20')} ${tab.gradient.to.replace('/10', '/20')} border ${tab.gradient.border.replace('/20', '/40')}`,
-        isActive && "border-opacity-80 ring-1",
+        "relative overflow-hidden px-4 py-2 text-sm font-medium rounded-2xl transition-all duration-300 whitespace-nowrap flex items-center gap-2.5 border backdrop-blur-xl hover:-translate-y-0.5",
         isDragging && "opacity-50 scale-105 shadow-lg z-50"
       )}
       style={{
+        background: `linear-gradient(135deg, ${glowMid}, ${glowSoft})`,
+        borderColor: isActive ? glowStrong : glowBorder,
         boxShadow: isActive
-          ? `0 0 16px 3px ${tab.gradient.glow}, inset 0 0 8px ${tab.gradient.glow.replace('0.5', '0.15')}`
-          : `0 0 8px 1px ${tab.gradient.glow.replace('0.5', '0.25')}`,
-        ...(isActive ? { ringColor: tab.gradient.glow } : {}),
+          ? `0 0 0 1px ${glowBorder}, 0 0 30px ${glowStrong}, inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 18px ${glowSoft}`
+          : `0 0 0 1px ${glowBorder}, 0 0 18px ${glowSoft}, inset 0 1px 0 rgba(255,255,255,0.04)`,
       }}
     >
       {!isPinned && (
-        <span {...listeners} className="cursor-grab active:cursor-grabbing mr-1 opacity-50 hover:opacity-100">
-          <GripVertical className="h-3 w-3" />
+        <span {...listeners} className="cursor-grab active:cursor-grabbing opacity-55 hover:opacity-100 transition-opacity">
+          <GripVertical className="h-3 w-3" style={{ color: glowColor }} />
         </span>
       )}
-      {isPinned && <Pin className="h-3 w-3 text-yellow-500 mr-1" />}
+      {isPinned && <Pin className="h-3 w-3" style={{ color: glowColor }} />}
       {tab.logoUrl ? (
         <img src={tab.logoUrl} alt="" className="h-4 w-4 rounded-sm object-contain" />
       ) : (
-        <tab.icon className={`h-3.5 w-3.5`} style={{ color: tab.gradient.glow.replace('rgba(', 'rgb(').replace(',0.5)', ')') }} />
+        <tab.icon className="h-3.5 w-3.5 shrink-0" style={{ color: glowColor, filter: `drop-shadow(0 0 8px ${glowSoft})` }} />
       )}
-      <span className={`bg-gradient-to-r ${tab.gradient.text} bg-clip-text text-transparent font-semibold`}>
+      <span className="font-semibold tracking-tight" style={{ color: glowColor, textShadow: `0 0 14px ${glowSoft}` }}>
         {t('navTabs.' + tab.id, { defaultValue: tab.shortLabel || tab.label })}
       </span>
     </div>
