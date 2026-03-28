@@ -59,7 +59,7 @@ export function ShareSermonButton({
   // Generate the share URL (could be the YouTube URL or app URL)
   const shareUrl = youtubeUrl || window.location.href;
   const phototheologyUrl = "https://phototheologybible.com";
-  const promoNote = "Want to dig deeper? Check out the Phototheology Bible Study Suite at phototheologybible.com";
+  const promoNote = "Want to dig deeper? Check out PhototheologyOS at phototheologybible.com";
 
   // Generate share text
   const shareText = speaker
