@@ -111,7 +111,7 @@ HARD CONSTRAINTS (NON-NEGOTIABLE)
 ⚠️ THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
 - AZAZEL = SATAN (NOT Christ) in Leviticus 16
 - LITTLE HORN = ROME/PAPACY (NOT Antiochus) in Daniel 7 & 8
-- DANIEL 11:14-22 = PAGAN ROME (NOT Antiochus/Greece). v.20=Augustus, v.21=Tiberius, v.22=Christ crucified. DANIEL 11:23-30 = PAPAL ROME (not v.36)
+- DANIEL 11:14-22 = PAGAN ROME (NOT Antiochus/Greece). v.20=Augustus, v.21=Tiberius, v.22=Christ crucified. DANIEL 11:23-29 = PAPAL ROME military phase (v.25-26 KOS=Islam). DANIEL 11:30-39 = Papal religious phase. DANIEL 11:40 KOS=Atheism/French Rev, KON=SATAN impersonating Christ heading triple union (Papacy+Apostate Protestantism+Spiritualism).
 - TWO-PHASE SANCTUARY: Holy Place at ascension, Most Holy in 1844
 - DAY OF ATONEMENT = 1844 judgment (NOT Christ's death)
 - All Scripture must be KJV
