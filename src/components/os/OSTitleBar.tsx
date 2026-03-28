@@ -48,24 +48,27 @@ export function OSTitleBar() {
   return (
     <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
       {/* Left: Brand */}
-      <div className="flex items-center gap-2.5 shrink-0">
-        <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
-          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
-          <Sparkles className="h-3 w-3 text-white" />
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-lg"
+          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(270 75% 60%), hsl(210 85% 55%))", boxShadow: "0 0 16px hsl(32 95% 53% / 0.3)" }}>
+          <Sparkles className="h-3.5 w-3.5 text-white drop-shadow-sm" />
         </div>
-        <div className="flex items-center gap-1 min-w-0">
-          <span className="text-sm font-extrabold tracking-wide whitespace-nowrap"
-            style={{ background: "linear-gradient(90deg, hsl(32 95% 53%), hsl(340 80% 55%), hsl(270 75% 60%), hsl(210 85% 55%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+        <div className="flex flex-col leading-none">
+          <span className="text-[13px] font-black tracking-tight whitespace-nowrap"
+            style={{ background: "linear-gradient(90deg, hsl(32 95% 58%), hsl(350 80% 60%), hsl(280 70% 65%), hsl(210 85% 60%), hsl(160 70% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 8px hsl(32 95% 53% / 0.2))" }}>
             PhototheologyOS
           </span>
-          <span className="text-sm font-extrabold tracking-wide whitespace-nowrap"
-            style={{ background: "linear-gradient(90deg, hsl(145 70% 45%), hsl(32 95% 53%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            : Eden
-          </span>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] whitespace-nowrap"
+              style={{ background: "linear-gradient(90deg, hsl(145 70% 50%), hsl(170 65% 55%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              Eden
+            </span>
+            <span className="w-1 h-1 rounded-full" style={{ background: "hsl(145 70% 50%)" }} />
+            <span className="text-[8px] text-muted-foreground/60 font-medium tracking-wider uppercase hidden xl:inline whitespace-nowrap">
+              Biblical Intelligence
+            </span>
+          </div>
         </div>
-        <span className="text-[9px] text-muted-foreground hidden xl:inline whitespace-nowrap">
-          Powered by AI. Built for Biblical Intelligence.
-        </span>
       </div>
 
       {/* Center: Search */}
