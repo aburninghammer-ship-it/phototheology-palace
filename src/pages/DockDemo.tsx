@@ -42,7 +42,7 @@ const TRAIN_ITEMS: DockItem[] = [
   { id: "games", label: "Games", icon: Gamepad2, path: "/games", glow: "280 70% 60%" },
 ];
 
-const CREATE_ITEMS: DockItem[] = [
+const DEVOTION_ITEMS: DockItem[] = [
   { id: "gems", label: "Gems", icon: Gem, path: "/give-me-a-gem", glow: "160 70% 45%" },
   { id: "music", label: "Music", icon: Headphones, path: "/music", glow: "190 70% 50%" },
   { id: "sermon", label: "Sermons", icon: MessageSquare, path: "/sermon-builder", glow: "270 60% 55%" },
@@ -232,13 +232,13 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
           {/* Separator */}
           <div className={cn("border-t border-sidebar-border my-2", expanded ? "mx-2" : "mx-1")} />
 
-          {/* Create */}
+          {/* Devotion */}
           {expanded && (
             <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider px-3 pt-1 pb-1">
-              Create
+              Devotion
             </span>
           )}
-          {CREATE_ITEMS.map(renderItem)}
+          {DEVOTION_ITEMS.map(renderItem)}
 
           {/* Separator */}
           <div className={cn("border-t border-sidebar-border my-2", expanded ? "mx-2" : "mx-1")} />
