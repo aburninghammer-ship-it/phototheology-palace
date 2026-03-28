@@ -360,6 +360,14 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  .tutorial-highlight {
+    position: relative;
+    z-index: 101;
+    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.5), 0 0 20px 4px hsl(var(--primary) / 0.2);
+    border-radius: 0.75rem;
+    transition: box-shadow 0.3s ease;
+  }
+
   .gradient-palace {
     background: var(--gradient-palace);
   }
