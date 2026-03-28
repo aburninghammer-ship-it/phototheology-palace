@@ -180,7 +180,7 @@ const PublicChallenge = () => {
         <meta property="og:url" content={ogUrl} />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://phototheologybible.com/phototheology-hero-og.png" />
-        <meta property="og:site_name" content="PhototheologyOS" /> content="PhototheologyOS" /> />
+        <meta property="og:site_name" content="PhototheologyOS" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={ogTitle} />
         <meta name="twitter:description" content={ogDescription} />
