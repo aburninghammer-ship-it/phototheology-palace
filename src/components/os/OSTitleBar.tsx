@@ -51,8 +51,8 @@ export function OSTitleBar() {
       <div className="flex items-center gap-2.5 shrink-0">
         <div className="w-7 h-7 rounded-[8px] flex items-center justify-center shrink-0"
           style={{ 
-            background: "linear-gradient(135deg, hsl(32 95% 55%), hsl(320 80% 55%), hsl(260 75% 58%))",
-            boxShadow: "0 2px 14px hsl(320 80% 55% / 0.35), inset 0 1px 0 hsl(0 0% 100% / 0.2)"
+            background: "linear-gradient(135deg, hsl(32 90% 52%), hsl(25 85% 45%))",
+            boxShadow: "0 2px 12px hsl(32 90% 50% / 0.3), inset 0 1px 0 hsl(0 0% 100% / 0.15)"
           }}>
           <Sparkles className="h-3.5 w-3.5 text-white drop-shadow-sm" />
         </div>
@@ -62,7 +62,7 @@ export function OSTitleBar() {
               style={{ 
                 fontFamily: "'Sora', sans-serif", 
                 fontWeight: 800,
-                backgroundImage: "linear-gradient(100deg, hsl(32 95% 62%), hsl(350 85% 62%), hsl(310 75% 65%), hsl(260 80% 68%), hsl(210 90% 62%))",
+                backgroundImage: "linear-gradient(100deg, hsl(32 90% 60%), hsl(28 85% 50%))",
                 letterSpacing: "-0.01em"
               }}>
               Phototheology
@@ -71,7 +71,7 @@ export function OSTitleBar() {
               style={{ 
                 fontFamily: "'Sora', sans-serif", 
                 fontWeight: 600,
-                backgroundImage: "linear-gradient(100deg, hsl(180 70% 55%), hsl(150 75% 50%))",
+                backgroundImage: "linear-gradient(100deg, hsl(32 80% 55%), hsl(25 75% 48%))",
                 letterSpacing: "0.03em"
               }}>
               OS
@@ -82,18 +82,18 @@ export function OSTitleBar() {
               style={{ 
                 fontFamily: "'Inter', sans-serif", 
                 fontWeight: 500,
-                backgroundImage: "linear-gradient(90deg, hsl(145 70% 55%), hsl(180 65% 55%))",
+                backgroundImage: "linear-gradient(90deg, hsl(32 70% 58%), hsl(28 65% 50%))",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase"
               }}>
               Eden
             </span>
-            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "linear-gradient(135deg, hsl(32 90% 60%), hsl(350 80% 60%))" }} />
-            <span className="text-[7px] whitespace-nowrap bg-clip-text text-transparent"
+            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "hsl(32 80% 55%)" }} />
+            <span className="text-[7px] whitespace-nowrap"
               style={{ 
                 fontFamily: "'Inter', sans-serif", 
                 fontWeight: 500,
-                backgroundImage: "linear-gradient(90deg, hsl(220 60% 70% / 0.7), hsl(280 50% 70% / 0.6))",
+                color: "hsl(32 30% 60% / 0.55)",
                 letterSpacing: "0.06em",
                 textTransform: "uppercase"
               }}>
