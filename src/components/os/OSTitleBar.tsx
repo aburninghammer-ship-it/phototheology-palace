@@ -1,10 +1,15 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Sparkles, User, LogOut, Settings, Bell } from "lucide-react";
+import { Sparkles, User, LogOut, Settings } from "lucide-react";
 import { CommandPaletteTrigger } from "./CommandPalette";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ShareableProgressCard } from "@/components/ShareableProgressCard";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
+import { StartSessionDialog } from "@/components/session/StartSessionDialog";
+import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
+import { LiveChatToggle } from "@/components/LiveChatToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +18,10 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Link } from "react-router-dom";
+import { Radio, Users, MessageCircle, Globe } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { usePresenceTracker } from "@/hooks/usePresenceTracker";
 
 export function OSTitleBar() {
   const { user, signOut } = useAuth();
@@ -50,10 +59,31 @@ export function OSTitleBar() {
         <CommandPaletteTrigger className="w-full justify-center text-[11px]" />
       </div>
 
-      {/* Right: Actions */}
-      <div className="flex items-center gap-1.5">
+      {/* Right: Utility Toolbar */}
+      <div className="flex items-center gap-1">
+        <ShareableProgressCard />
+        <PWAInstallButton />
         <ThemeToggle />
+
+        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs">
+          <Link to="/live-demo">
+            <Radio className="h-3.5 w-3.5 text-red-500" />
+            Live
+          </Link>
+        </Button>
+
+        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs">
+          <Link to="/workspace">
+            <Globe className="h-3.5 w-3.5" />
+            Workspace
+          </Link>
+        </Button>
+
+        <LiveChatToggle />
         <NotificationCenter />
+        <StartSessionDialog />
+        <NavigationStyleToggle />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="p-1 rounded-lg hover:bg-muted transition-colors">

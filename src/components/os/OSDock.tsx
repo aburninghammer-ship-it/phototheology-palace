@@ -16,7 +16,6 @@ export function OSDock() {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const currentPath = location.pathname;
 
-  // Hide dock on mobile (MobileBottomNav handles mobile), and on public/auth pages
   const publicPaths = ["/", "/landing", "/auth", "/pricing", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
   const isPublicPage = publicPaths.some(p => currentPath === p) || currentPath.startsWith("/auth");
   if (isMobile || isPublicPage) return null;
@@ -41,7 +40,6 @@ export function OSDock() {
     const isOpen = expandedItems.has(item.id);
     const Icon = item.icon;
     const itemColor = `hsl(${item.glow})`;
-    const itemColorFaint = `hsl(${item.glow} / 0.15)`;
 
     // Collapsed mode
     if (!expanded) {
@@ -51,10 +49,17 @@ export function OSDock() {
             <TooltipTrigger asChild>
               <button
                 onClick={() => navigate(item.path)}
-                className="relative flex items-center p-2.5 justify-center rounded-xl transition-all duration-200 w-full"
-                style={{ backgroundColor: (active || parentActive) ? itemColorFaint : undefined }}
-                onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = itemColorFaint; }}
-                onMouseLeave={(e) => { if (!active && !parentActive) e.currentTarget.style.backgroundColor = "transparent"; }}
+                className={cn(
+                  "relative flex items-center p-2.5 justify-center rounded-xl transition-all duration-200 w-full",
+                  "backdrop-blur-md border border-transparent",
+                  (active || parentActive) && "border-white/10"
+                )}
+                style={{
+                  backgroundColor: (active || parentActive) ? `hsl(${item.glow} / 0.15)` : undefined,
+                  boxShadow: active ? `0 0 12px hsl(${item.glow} / 0.2)` : undefined,
+                }}
+                onMouseEnter={(e) => { if (!active) { e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.12)`; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; } }}
+                onMouseLeave={(e) => { if (!active && !parentActive) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.borderColor = "transparent"; } }}
               >
                 {(active || parentActive) && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
@@ -66,15 +71,17 @@ export function OSDock() {
                 )}
               </button>
             </TooltipTrigger>
-            <TooltipContent side="right" className="font-medium">
+            <TooltipContent side="right" className="font-medium backdrop-blur-xl bg-popover/90 border-white/10">
               <p className="font-semibold">{item.label}</p>
               {hasChildren && (
                 <div className="mt-1.5 space-y-0.5 border-t border-border pt-1.5">
                   {item.children!.map((sub) => (
                     <button key={sub.id} onClick={() => navigate(sub.path)}
                       className={cn("block text-xs w-full text-left px-1 py-0.5 rounded hover:bg-muted",
-                        isActive(sub.path) && "text-primary font-medium"
-                      )}>{sub.label}</button>
+                        isActive(sub.path) && "font-medium"
+                      )}
+                      style={{ color: isActive(sub.path) ? `hsl(${sub.glow || item.glow})` : undefined }}
+                    >{sub.label}</button>
                   ))}
                 </div>
               )}
@@ -89,13 +96,30 @@ export function OSDock() {
       <div key={item.id}>
         <button
           onClick={() => hasChildren ? toggleExpand(item.id) : navigate(item.path)}
-          className="relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full px-3 py-2.5"
+          className={cn(
+            "relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full px-3 py-2.5",
+            "backdrop-blur-md border border-transparent",
+            (active) && "border-white/10"
+          )}
           style={{
-            backgroundColor: active ? itemColorFaint : undefined,
+            backgroundColor: active ? `hsl(${item.glow} / 0.12)` : undefined,
             color: (active || parentActive) ? itemColor : undefined,
+            boxShadow: active ? `0 0 16px hsl(${item.glow} / 0.15), inset 0 1px 0 rgba(255,255,255,0.05)` : undefined,
           }}
-          onMouseEnter={(e) => { if (!active) { e.currentTarget.style.backgroundColor = itemColorFaint; e.currentTarget.style.color = itemColor; } }}
-          onMouseLeave={(e) => { if (!active) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = parentActive ? itemColor : ""; } }}
+          onMouseEnter={(e) => {
+            if (!active) {
+              e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.08)`;
+              e.currentTarget.style.color = itemColor;
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!active) {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = parentActive ? itemColor : "";
+              e.currentTarget.style.borderColor = "transparent";
+            }
+          }}
         >
           {(active || parentActive) && (
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
@@ -108,7 +132,7 @@ export function OSDock() {
               style={{ color: `hsl(${item.glow} / 0.5)` }} />
           )}
           {active && (
-            <div className="absolute inset-0 rounded-xl opacity-20 pointer-events-none"
+            <div className="absolute inset-0 rounded-xl opacity-10 pointer-events-none"
               style={{ background: `radial-gradient(circle at center, hsl(${item.glow} / 0.4), transparent)` }} />
           )}
         </button>
@@ -117,10 +141,16 @@ export function OSDock() {
           {hasChildren && isOpen && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-              <div className="ml-4 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.25)` }}>
+              <div className="ml-4 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.2)` }}>
                 <button onClick={() => navigate(item.path)}
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full hover:bg-muted"
-                  style={{ color: active ? itemColor : undefined }}>
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full",
+                    "backdrop-blur-sm border border-transparent hover:border-white/5"
+                  )}
+                  style={{
+                    color: active ? itemColor : undefined,
+                    backgroundColor: active ? `hsl(${item.glow} / 0.1)` : undefined,
+                  }}>
                   <Icon className="h-3.5 w-3.5 shrink-0" style={{ color: itemColor }} />
                   <span className="truncate">{item.label} Home</span>
                 </button>
@@ -131,14 +161,31 @@ export function OSDock() {
                   const subColor = `hsl(${subGlow})`;
                   return (
                     <button key={sub.id} onClick={() => navigate(sub.path)}
-                      className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full"
+                      className={cn(
+                        "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full",
+                        "backdrop-blur-sm border border-transparent",
+                        subActive && "border-white/8"
+                      )}
                       style={{
-                        color: subActive ? subColor : `hsl(${subGlow} / 0.75)`,
-                        backgroundColor: subActive ? `hsl(${subGlow} / 0.15)` : undefined,
+                        color: subActive ? subColor : `hsl(${subGlow} / 0.7)`,
+                        backgroundColor: subActive ? `hsl(${subGlow} / 0.12)` : undefined,
                         fontWeight: subActive ? 600 : 400,
+                        boxShadow: subActive ? `0 0 10px hsl(${subGlow} / 0.1)` : undefined,
                       }}
-                      onMouseEnter={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = `hsl(${subGlow} / 0.08)`; e.currentTarget.style.color = subColor; }}}
-                      onMouseLeave={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = `hsl(${subGlow} / 0.75)`; }}}
+                      onMouseEnter={(e) => {
+                        if (!subActive) {
+                          e.currentTarget.style.backgroundColor = `hsl(${subGlow} / 0.06)`;
+                          e.currentTarget.style.color = subColor;
+                          e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!subActive) {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = `hsl(${subGlow} / 0.7)`;
+                          e.currentTarget.style.borderColor = "transparent";
+                        }
+                      }}
                     >
                       <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: subColor }} />
                       <span className="truncate">{sub.label}</span>
@@ -158,19 +205,19 @@ export function OSDock() {
       initial={false}
       animate={{ width: expanded ? 240 : 64 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="h-full flex flex-col bg-sidebar border-r border-sidebar-border shrink-0 relative z-40"
+      className="h-full flex flex-col bg-sidebar/80 backdrop-blur-xl border-r border-white/5 shrink-0 relative z-40"
     >
-      {/* Spacer for top alignment */}
-      <div className={cn("shrink-0 border-b border-sidebar-border", expanded ? "h-3" : "h-3")} />
+      {/* Spacer */}
+      <div className={cn("shrink-0 border-b border-white/5", expanded ? "h-3" : "h-3")} />
 
       {/* Navigation */}
       <ScrollArea className="flex-1">
         <div className={cn("flex flex-col gap-0.5 py-2", expanded ? "px-3" : "px-2")}>
           {DOCK_SECTIONS.map((section, sIdx) => (
             <div key={section.id}>
-              {sIdx > 0 && <div className="border-t border-sidebar-border my-2 mx-1" />}
+              {sIdx > 0 && <div className="border-t border-white/5 my-2 mx-1" />}
               {expanded && (
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider px-3 pt-2 pb-1 block">
+                <span className="text-[10px] uppercase font-semibold text-muted-foreground/60 tracking-wider px-3 pt-2 pb-1 block">
                   {section.label}
                 </span>
               )}
@@ -181,9 +228,9 @@ export function OSDock() {
       </ScrollArea>
 
       {/* Toggle */}
-      <div className={cn("shrink-0 border-t border-sidebar-border p-2", !expanded && "flex justify-center")}>
+      <div className={cn("shrink-0 border-t border-white/5 p-2", !expanded && "flex justify-center")}>
         <button onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors w-full">
+          className="flex items-center gap-2 px-3 py-2 rounded-xl text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors w-full backdrop-blur-sm">
           {expanded ? (
             <><ChevronLeft className="h-4 w-4" /><span className="text-xs font-medium">Collapse</span></>
           ) : (
