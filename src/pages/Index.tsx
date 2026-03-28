@@ -35,7 +35,10 @@ const ExplainerVideo = lazy(() =>
 const InteractiveWalkthrough = lazy(() => 
   import("@/components/InteractiveWalkthrough").then(m => ({ default: m.InteractiveWalkthrough }))
 );
-const TransparencySection = lazy(() => 
+const StudyBibleWalkthrough = lazy(() =>
+  import("@/components/StudyBibleWalkthrough").then(m => ({ default: m.StudyBibleWalkthrough }))
+);
+const TransparencySection = lazy(() =>
   import("@/components/TransparencySection").then(m => ({ default: m.TransparencySection }))
 );
 const FourPathsShowcase = lazy(() => 
@@ -161,6 +164,11 @@ const Index = () => {
       <Suspense fallback={<SectionSkeleton />}>
         {/* 3. Interactive Demo - Try it yourself */}
         <InteractiveWalkthrough />
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton />}>
+        {/* 3.5. Study Bible Interactive Demo */}
+        <StudyBibleWalkthrough />
       </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
