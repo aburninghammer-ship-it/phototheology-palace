@@ -20,7 +20,7 @@ import {
   Brain, Loader2, Save, Trash2,
   ChevronLeft, ChevronRight, StickyNote,
   Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye, Send, Search, Sun, Moon,
-  FolderOpen, Clock, MoreVertical, Play
+  FolderOpen, Clock, MoreVertical, Play, GraduationCap
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
