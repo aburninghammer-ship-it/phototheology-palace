@@ -101,6 +101,7 @@ export function OSTitleBar() {
             </span>
           </div>
         </div>
+      </div>
 
       {/* Center: Search */}
       <div className="hidden md:flex flex-1 max-w-sm mx-4">
