@@ -379,3 +379,193 @@ export const MEMORY_PALACE_TOUR: GuidedTourStep[] = [
     tooltipPosition: "bottom",
   },
 ];
+
+export const CHARACTER_PROFILES_TOUR: GuidedTourStep[] = [
+  {
+    id: "characters-welcome",
+    title: "Welcome to Character Profiles",
+    description: "Explore psychological-spiritual analyses of the Bible's most important figures.",
+    narration: "Hello! Welcome to the Character Profiles gallery. Here you'll find in-depth psychological and spiritual analyses of Scripture's most important figures — from patriarchs and prophets to kings and apostles. Let me show you around.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "characters-search",
+    title: "Search & Filter",
+    description: "Find characters by name, archetype, testament, or life situation.",
+    narration: "Use the search bar to find any character by name. You can also filter by testament — Old or New — and by archetype, such as Warrior, Prophet, or Servant. There's even a situational filter so you can find characters who faced temptation, betrayal, or leadership pressure.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "characters-cards",
+    title: "Character Cards",
+    description: "Each card shows the character's archetype, strengths, weaknesses, and a key lesson.",
+    narration: "Each character card gives you a quick snapshot — their archetype badges, core strength and weakness, their mindset, and a key life lesson. Think of it as a flash card for spiritual leadership development.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "characters-detail",
+    title: "Deep Dive Profiles",
+    description: "Click any character for a full profile with situations, responses, and AI-powered analysis.",
+    narration: "Click any character to open their full profile. Inside you'll find detailed situation analyses — how they responded under pressure, what they got right, what they got wrong, and what we can learn. You can even request an AI-powered deep analysis from Jeeves.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "characters-apply",
+    title: "Apply to Your Life",
+    description: "Use character lessons for personal growth, sermon prep, and Bible study groups.",
+    narration: "The real power of Character Profiles is application. Use these lessons for personal devotion, sermon preparation, or small group discussion. Every character is a mirror — reflecting our own struggles and pointing us to Christ. That's the Character Profiles tab — explore and grow!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const ENCYCLOPEDIA_TOUR: GuidedTourStep[] = [
+  {
+    id: "encyclopedia-welcome",
+    title: "Welcome to the Bible Encyclopedia",
+    description: "An AI-powered biblical reference integrating Phototheology principles.",
+    narration: "Hello! Welcome to the Bible Encyclopedia. This is your AI-powered reference tool — powered by Jeeves and rooted in Phototheology principles. Whether you need to look up a person, place, theme, or symbol, Jeeves will deliver a thorough, Christ-centered answer.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "encyclopedia-categories",
+    title: "Browse by Category",
+    description: "Choose from themes, people, places, objects, symbols, numbers, feasts, and more.",
+    narration: "Start by choosing a category. You can explore themes like Covenant and Exile, look up people like Moses or Paul, study places like Jerusalem, or dive into symbols, numbers, animals, and even the biblical feasts. Each category focuses the search so Jeeves gives you the most relevant answer.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "encyclopedia-search",
+    title: "Search Any Topic",
+    description: "Type your question or topic and Jeeves will deliver a Phototheology-rich answer.",
+    narration: "Type any question or topic into the search bar and hit search. Jeeves will generate a comprehensive, Phototheology-enriched article — complete with scripture references, palace room connections, and Christ-centered interpretation.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "encyclopedia-random",
+    title: "Surprise Me",
+    description: "Hit the random button for a serendipitous discovery — let Jeeves pick the topic.",
+    narration: "Feeling adventurous? Use the random entry button and let Jeeves surprise you with a topic you might never have searched for. It's a wonderful way to discover hidden gems in Scripture.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "encyclopedia-results",
+    title: "Rich Results",
+    description: "Results include formatted text, scripture references, and maps when relevant.",
+    narration: "When Jeeves delivers your result, you'll see beautifully formatted text with scripture references, contextual maps for places, and cross-references to other topics. It's like having a biblical scholar in your pocket. That's the Encyclopedia — search, discover, and grow!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const LIBRARIES_TOUR: GuidedTourStep[] = [
+  {
+    id: "libraries-welcome",
+    title: "Welcome to Your Libraries",
+    description: "All your saved content in one place — sparks, gems, bookmarks, highlights, notes, and more.",
+    narration: "Hello! Welcome to your Libraries. This is your personal vault — every spark, gem, bookmark, highlight, note, sermon, and image you've saved across the platform lives here. Let me show you how it's organized.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "libraries-stats",
+    title: "Library Stats",
+    description: "See at a glance how much content you've collected across all categories.",
+    narration: "At the top you'll see your library statistics — how many sparks, gems, bookmarks, highlights, notes, sermons, and images you've saved. It's a quick pulse check on your study investment.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "libraries-reference",
+    title: "Reference Libraries",
+    description: "Browse the PT Room Libraries — organized by Palace floor, each room has its own collection.",
+    narration: "The Reference Libraries tab shows all the Phototheology Room Libraries, organized by Palace floor. Each room — from the Story Room to the Patterns Room — has its own curated collection. Click any room to explore its library.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "libraries-personal",
+    title: "Personal Collections",
+    description: "Access your saved sparks, gems, bookmarks, highlights, verse notes, and sermons.",
+    narration: "Switch to your personal collections to see everything you've saved — sparks of insight, gems from study, bookmarks, verse highlights, handwritten notes, and sermons you've built. Each collection is searchable and organized by date.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "libraries-powerpoints",
+    title: "PowerPoints & Media",
+    description: "Your generated presentations and Bible images are stored here too.",
+    narration: "Don't forget your media library! Any PowerPoint presentations or Bible images you've generated are stored here as well. You can preview, download, or share them anytime. That's your Libraries — your personal treasury of biblical study!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const NOTES_TOUR: GuidedTourStep[] = [
+  {
+    id: "notes-welcome",
+    title: "Welcome to Notes",
+    description: "Capture your thoughts, insights, and reflections as you study Scripture.",
+    narration: "Hello! Welcome to your Notes hub. This is where all your study notes, quick thoughts, and verse annotations live. Whether you're journaling through a chapter or capturing a flash of insight, your notes are always here.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "notes-quick",
+    title: "Quick Notes",
+    description: "Jot down fast thoughts that sync across devices — online or offline.",
+    narration: "Quick Notes let you jot down fast thoughts anytime. They sync automatically when you're online, and they even work offline so you never lose an idea. Think of them as your digital sticky notes for Bible study.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "notes-verse",
+    title: "Verse Notes",
+    description: "Your annotations tied to specific Bible verses — organized by book.",
+    narration: "Verse Notes are your annotations tied to specific Bible passages. When you write a note on a verse in the Study Bible tab, it appears here organized by book. Click any note to jump straight back to that verse in context.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "notes-sync",
+    title: "Cloud Sync",
+    description: "Your notes sync to the cloud automatically — available on any device.",
+    narration: "Notice the sync indicator at the top — it tells you whether your notes are syncing to the cloud or saved locally. When you're online, everything is backed up automatically so you can access your notes from any device.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "notes-organize",
+    title: "Organize & Navigate",
+    description: "Browse notes by type, delete old ones, or jump to the verse they reference.",
+    narration: "Use the tabs to switch between Quick Notes and Verse Notes. You can delete notes you no longer need, or click the link icon to jump straight to the verse in the Study Bible. That's your Notes — capture every insight before it fades!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const ACHIEVEMENTS_TOUR: GuidedTourStep[] = [
+  {
+    id: "achievements-welcome",
+    title: "Welcome to Achievements",
+    description: "Unlock badges and track your mastery of Phototheology.",
+    narration: "Hello! Welcome to the Achievements gallery. Here you can see every badge available in the platform, track which ones you've unlocked, and discover what it takes to earn the rest. Let me walk you through it.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "achievements-progress",
+    title: "Your Progress",
+    description: "See how many achievements you've unlocked, your total points, and completion percentage.",
+    narration: "At the top you'll see your achievement stats — how many you've unlocked out of the total, your accumulated points, and your overall completion percentage. These stats reflect your journey through the entire Phototheology system.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "achievements-categories",
+    title: "Browse by Category",
+    description: "Filter achievements by category — rooms, drills, streaks, challenges, and more.",
+    narration: "Use the category filter to browse achievements by type — Palace rooms, study drills, reading streaks, challenges, and special milestones. Each category has its own set of badges to earn.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "achievements-roadmap",
+    title: "Achievement Roadmap",
+    description: "Switch to roadmap view to see the path ahead — what to unlock next.",
+    narration: "Switch to the Roadmap tab for a visual journey of your progress. It shows which achievements are next in line and what requirements you need to meet. Think of it as your trail map through the Palace.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "achievements-share",
+    title: "Share & Certificates",
+    description: "Share your achievements and generate certificates for major milestones.",
+    narration: "When you unlock a major achievement, you can share it with your community or generate a certificate to commemorate the milestone. It's a wonderful way to celebrate your growth. That's the Achievements tab — keep climbing!",
+    tooltipPosition: "bottom",
+  },
+];

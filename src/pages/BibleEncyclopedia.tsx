@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { ENCYCLOPEDIA_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -60,6 +62,7 @@ const BibleEncyclopedia = () => {
   const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [initialSearchDone, setInitialSearchDone] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const handleRandomEntry = () => {
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
@@ -176,8 +179,12 @@ const BibleEncyclopedia = () => {
               <CardDescription className="text-lg">
                 {t('bibleEncyclopedia.subtitle', 'AI-powered biblical reference integrating Phototheology principles through Jeeves')}
               </CardDescription>
+              <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="mt-2 w-fit gap-1">
+                <Book className="h-4 w-4" /> Guided Tour
+              </Button>
             </CardHeader>
           </Card>
+          {tourOpen && <GuidedTourOverlay steps={ENCYCLOPEDIA_TOUR} onClose={() => setTourOpen(false)} />}
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2">

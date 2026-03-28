@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { NOTES_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
@@ -35,6 +37,7 @@ const Notes = () => {
   const { t } = useTranslation();
   const [verseNotes, setVerseNotes] = useState<VerseNote[]>([]);
   const [verseNotesLoading, setVerseNotesLoading] = useState(true);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Enable scroll position preservation for this page
   usePreservePage();
@@ -115,20 +118,26 @@ const Notes = () => {
               {t('notesPage.captureThoughts')}
             </p>
           </div>
-          <Badge variant="outline" className="flex items-center gap-2">
-            {isOnline ? (
-              <>
-                <Cloud className="h-4 w-4 text-green-500" />
-                {t('notesPage.online')}
-              </>
-            ) : (
-              <>
-                <CloudOff className="h-4 w-4" />
-                {t('notesPage.offlineMode')}
-              </>
-            )}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <StickyNote className="h-4 w-4" /> Tour
+            </Button>
+            <Badge variant="outline" className="flex items-center gap-2">
+              {isOnline ? (
+                <>
+                  <Cloud className="h-4 w-4 text-green-500" />
+                  {t('notesPage.online')}
+                </>
+              ) : (
+                <>
+                  <CloudOff className="h-4 w-4" />
+                  {t('notesPage.offlineMode')}
+                </>
+              )}
+            </Badge>
+          </div>
         </div>
+        {tourOpen && <GuidedTourOverlay steps={NOTES_TOUR} onClose={() => setTourOpen(false)} />}
 
         {/* Tabs for Quick Notes and Bible Notes */}
         <Tabs defaultValue="quick" className="space-y-6">

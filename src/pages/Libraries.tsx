@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { LIBRARIES_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
@@ -166,6 +168,7 @@ export default function Libraries() {
   const [activeTab, setActiveTab] = useState("reference");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [tourOpen, setTourOpen] = useState(false);
   const [stats, setStats] = useState<LibraryStats>({ sparks: 0, gems: 0, bookmarks: 0, highlights: 0, notes: 0, images: 0, sermons: 0, powerpoints: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -357,15 +360,21 @@ export default function Libraries() {
             {t('librariesPage.back')}
           </Button>
 
-          <div className="flex items-center gap-4 mb-6">
-            <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm shadow-xl">
-              <Library className="h-10 w-10 text-white" />
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm shadow-xl">
+                <Library className="h-10 w-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-white drop-shadow-lg">{t('librariesPage.title')}</h1>
+                <p className="text-white/80 text-lg">{t('librariesPage.subtitle')}</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold text-white drop-shadow-lg">{t('librariesPage.title')}</h1>
-              <p className="text-white/80 text-lg">{t('librariesPage.subtitle')}</p>
-            </div>
+            <Button variant="ghost" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="text-white/80 hover:text-white hover:bg-white/10 gap-1">
+              <FolderOpen className="h-4 w-4" /> Tour
+            </Button>
           </div>
+          {tourOpen && <GuidedTourOverlay steps={LIBRARIES_TOUR} onClose={() => setTourOpen(false)} />}
 
           {/* Quick Stats */}
           <div className="grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-3 mt-6">

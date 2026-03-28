@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { ACHIEVEMENTS_TOUR } from "@/data/guidedTours";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +36,7 @@ const Achievements = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 const [certificateAchievement, setCertificateAchievement] = useState<any>(null);
   const [mainTab, setMainTab] = useState<"gallery" | "roadmap">("gallery");
+  const [tourOpen, setTourOpen] = useState(false);
   const [userStats, setUserStats] = useState<Record<string, number>>({
     rooms_completed: 0,
     drills_completed: 0,
@@ -197,13 +200,19 @@ const [certificateAchievement, setCertificateAchievement] = useState<any>(null);
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 text-white py-12 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex items-center gap-4 mb-4">
-            <Award className="h-16 w-16" />
-            <div>
-              <h1 className="text-5xl font-bold">Achievements</h1>
-              <p className="text-purple-200 text-lg">Unlock badges as you master Phototheology</p>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-4">
+              <Award className="h-16 w-16" />
+              <div>
+                <h1 className="text-5xl font-bold">Achievements</h1>
+                <p className="text-purple-200 text-lg">Unlock badges as you master Phototheology</p>
+              </div>
             </div>
+            <Button variant="ghost" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="text-white/80 hover:text-white hover:bg-white/10 gap-1">
+              <Award className="h-4 w-4" /> Tour
+            </Button>
           </div>
+          {tourOpen && <GuidedTourOverlay steps={ACHIEVEMENTS_TOUR} onClose={() => setTourOpen(false)} />}
 
           {/* Progress Stats */}
           <div className="grid md:grid-cols-3 gap-4 mt-8">
