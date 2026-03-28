@@ -79,7 +79,7 @@ export function OSTitleBar() {
           </Link>
         </Button>
 
-        <LiveChatToggle />
+        
         <NotificationCenter />
         <StartSessionDialog />
         <NavigationStyleToggle />
