@@ -41,9 +41,8 @@ import {
 } from "@/components/ui/popover";
 
 export const Navigation = () => {
-  // Hide navigation when rendered inside a workspace iframe pane
-  const isWorkspacePane = new URLSearchParams(window.location.search).has('workspace');
-  if (isWorkspacePane) return null;
+  // OS Dock + OSTitleBar now handle all navigation — this legacy component is disabled
+  return null;
 
   const { t } = useTranslation();
   const { user, signOut, loading } = useAuth();
