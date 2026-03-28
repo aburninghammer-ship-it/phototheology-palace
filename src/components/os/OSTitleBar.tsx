@@ -115,37 +115,67 @@ export function OSTitleBar() {
       </div>
 
       {/* Right: Utility Toolbar */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         {activeCount > 0 && (
-          <div className="hidden lg:flex items-center gap-1.5 px-3 h-8 rounded-full bg-background/90 border border-border/50 text-foreground text-xs font-medium shadow-md backdrop-blur-sm">
-            <Users className="h-4 w-4" style={{ color: "hsl(210 90% 60%)" }} />
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm font-bold tabular-nums">{activeCount}</span>
-              <span className="text-[9px] text-muted-foreground -mt-0.5">online</span>
-            </div>
+          <div className="hidden lg:flex items-center gap-2 px-3 h-8 rounded-full border text-xs font-semibold"
+            style={{
+              background: "hsl(140 50% 20% / 0.5)",
+              borderColor: "hsl(140 60% 40% / 0.4)",
+              color: "hsl(140 70% 65%)",
+            }}>
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "hsl(140 70% 50%)" }} />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: "hsl(140 70% 50%)" }} />
+            </span>
+            <span className="text-sm font-bold tabular-nums">{activeCount}</span>
+            <span style={{ color: "hsl(140 40% 60%)" }}>online</span>
           </div>
         )}
-        <ShareableProgressCard />
+
+        <div className="hidden lg:flex items-center gap-1.5 px-3 h-8 rounded-full border text-xs font-semibold"
+          style={{
+            background: "hsl(210 50% 20% / 0.5)",
+            borderColor: "hsl(210 60% 45% / 0.4)",
+            color: "hsl(210 80% 70%)",
+          }}>
+          <ShareableProgressCard />
+        </div>
+
         <PWAInstallButton />
         <ThemeToggle />
 
-        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs" style={{ color: "hsl(0 85% 60%)" }}>
+        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border"
+          style={{
+            background: "hsl(0 50% 20% / 0.5)",
+            borderColor: "hsl(0 60% 45% / 0.4)",
+            color: "hsl(0 80% 70%)",
+          }}>
           <Link to="/live-demo">
-            <Radio className="h-3.5 w-3.5" style={{ color: "hsl(0 85% 60%)" }} />
+            <Radio className="h-3.5 w-3.5" style={{ color: "hsl(0 80% 65%)" }} />
             Live
           </Link>
         </Button>
 
-        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs" style={{ color: "hsl(210 85% 60%)" }}>
+        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border"
+          style={{
+            background: "hsl(210 50% 20% / 0.5)",
+            borderColor: "hsl(210 60% 45% / 0.4)",
+            color: "hsl(210 80% 70%)",
+          }}>
           <Link to="/workspace">
-            <Globe className="h-3.5 w-3.5" style={{ color: "hsl(210 85% 60%)" }} />
+            <Globe className="h-3.5 w-3.5" style={{ color: "hsl(210 80% 65%)" }} />
             Workspace
           </Link>
         </Button>
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-2 text-xs border border-border/50 bg-muted/20 hover:bg-muted/40" style={{ color: "hsl(270 75% 65%)" }}>
+            <Button variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border"
+              style={{
+                background: "hsl(270 50% 20% / 0.5)",
+                borderColor: "hsl(270 60% 45% / 0.4)",
+                color: "hsl(270 75% 70%)",
+              }}>
               <Languages className="h-3.5 w-3.5" style={{ color: "hsl(270 75% 65%)" }} />
               Language
             </Button>
