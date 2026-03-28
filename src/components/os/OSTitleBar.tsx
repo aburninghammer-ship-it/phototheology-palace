@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Sparkles, User, LogOut, Settings, Languages } from "lucide-react";
+import { User, LogOut, Settings, Languages } from "lucide-react";
+import { PhototheologyOSLogo } from "@/components/PhototheologyOSLogo";
 import { CommandPaletteTrigger } from "./CommandPalette";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -49,34 +50,7 @@ export function OSTitleBar() {
     <div className="h-12 flex items-center justify-between px-4 bg-background/60 backdrop-blur-2xl border-b border-border/20 shrink-0 z-50"
       style={{ background: "linear-gradient(180deg, hsl(var(--background) / 0.85), hsl(var(--background) / 0.6))" }}>
       {/* Left: Brand */}
-      <div className="flex items-center gap-2.5 shrink-0 group cursor-pointer" onClick={() => navigate("/palace")}>
-        {/* Animated gradient orb */}
-        <div className="relative w-8 h-8 shrink-0">
-          <div className="absolute inset-0 rounded-xl blur-sm opacity-60"
-            style={{ background: "linear-gradient(135deg, hsl(32 95% 55%), hsl(280 75% 55%), hsl(210 85% 55%))" }} />
-          <div className="relative w-full h-full rounded-xl flex items-center justify-center overflow-hidden"
-            style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(280 70% 58%), hsl(210 85% 55%))" }}>
-            <Sparkles className="h-4 w-4 text-white/90" />
-          </div>
-        </div>
-        {/* Text */}
-        <div className="flex flex-col leading-none">
-          <span className="text-[14px] font-black tracking-[-0.02em] whitespace-nowrap bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(105deg, hsl(32 95% 62%), hsl(350 85% 62%), hsl(280 70% 68%), hsl(210 90% 64%), hsl(160 75% 52%))" }}>
-            PhototheologyOS
-          </span>
-          <div className="flex items-center gap-1.5 mt-[2px]">
-            <span className="text-[9px] font-extrabold uppercase tracking-[0.25em] whitespace-nowrap bg-clip-text text-transparent"
-              style={{ backgroundImage: "linear-gradient(90deg, hsl(145 80% 55%), hsl(180 70% 50%))" }}>
-              Eden
-            </span>
-            <span className="w-[5px] h-[5px] rounded-full animate-pulse" style={{ background: "hsl(145 80% 55%)", boxShadow: "0 0 6px hsl(145 80% 55% / 0.6)" }} />
-            <span className="text-[8px] text-muted-foreground/50 font-semibold tracking-[0.15em] uppercase hidden xl:inline whitespace-nowrap">
-              Biblical Intelligence
-            </span>
-          </div>
-        </div>
-      </div>
+      <PhototheologyOSLogo to="/palace" />
 
       {/* Center: Search */}
       <div className="hidden md:flex flex-1 max-w-sm mx-4">
