@@ -43,7 +43,7 @@ const routeTitles: Record<string, string> = {
   "/notifications": "Notifications",
   "/settings": "Settings",
   "/quick-start": "Quick Start Guide",
-  "/study-suite": "Study Suite",
+  "/study-suite": "PhototheologyOS",
   "/bible-prophecy-guide": "Bible Prophecy Guide",
   "/series": "Bible Study Series",
   "/devotional-plans": "Devotional Plans",

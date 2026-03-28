@@ -295,7 +295,7 @@ export default function InteractiveDemo() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Interactive Demo" description="Try the Phototheology Bible Learning Suite for free. Experience the Palace method in this hands-on interactive demonstration." />
+      <SEO title="Interactive Demo" description="Try the PhototheologyOS for free. Experience the Palace method in this hands-on interactive demonstration." />
       <Navigation />
 
       {/* Progress Bar */}

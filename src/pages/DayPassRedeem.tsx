@@ -77,7 +77,7 @@ export default function DayPassRedeem() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-blue-500/5">
-      <SEO title="Day Pass | Phototheology" description="Activate your free 24-hour Day Pass to the Phototheology Bible Suite." />
+      <SEO title="Day Pass | Phototheology" description="Activate your free 24-hour Day Pass to PhototheologyOS." />
       <Navigation />
 
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-lg text-center">
@@ -97,7 +97,7 @@ export default function DayPassRedeem() {
             </Badge>
             <h1 className="text-3xl font-bold mb-2">You're Invited! ✨</h1>
             <p className="text-muted-foreground mb-6">
-              Someone shared a free 24-hour pass to the Phototheology Bible Suite with you.
+              Someone shared a free 24-hour pass to PhototheologyOS with you.
             </p>
 
             <Card className="mb-6 border-blue-500/30 bg-blue-500/5">

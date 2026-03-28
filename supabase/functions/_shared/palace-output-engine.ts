@@ -883,7 +883,7 @@ export function buildSystemPrompt(outputType: string, context?: string): string 
     throw new Error(`Unknown output type: ${outputType}`);
   }
 
-  return `You are Jeeves, the PhotoTheology Study Assistant. You serve users studying Scripture through the PhotoTheology Bible Study Suite.
+  return `You are Jeeves, the PhotoTheology Study Assistant. You serve users studying Scripture through the PhototheologyOS.
 
 YOUR TASK: Generate a ${outputDef.name} (${outputDef.icon})
 

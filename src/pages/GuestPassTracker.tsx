@@ -301,9 +301,8 @@ function GuestPassRow({
                 className="border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
                 onClick={() => {
                   const subject = encodeURIComponent("Your Phototheology experience");
-                  const body = encodeURIComponent(
-                    `Hey${pass.guest_name ? ` ${pass.guest_name}` : ""}!\n\nI hope you enjoyed your 5-Day Lock-In Pass to the Phototheology Bible Suite! Your pass has ${isExpired ? "expired" : "almost expired"}.\n\nIf you'd like to continue, you can get started right away here:\n${window.location.origin}/pricing?skip_trial=true&ref=lockin_${pass.pass_token}\n\nThis link takes you straight to checkout — no extra trial period needed since you've already experienced the suite.\n\nLet me know if you have any questions!`
-                  );
+                  const body = encodeURIComponent(`Hey${pass.guest_name ? ` ${pass.guest_name}` : ""}!\n\nI hope you enjoyed your 5-Day Lock-In Pass to PhototheologyOS! Your pass has ${isExpired ? "expired" : "almost expired"}.\n\nIf you'd like to continue, you can get started right away here:\n${window.location.origin}/pricing?skip_trial=true&ref=lockin_${pass.pass_token}\n\nThis link takes you straight to checkout — no extra trial period needed since you've already experienced PhototheologyOS.\n\nLet me know if you have any questions!`);
+
                   window.open(`mailto:${pass.recipient_email}?subject=${subject}&body=${body}`, "_blank");
                 }}
               >

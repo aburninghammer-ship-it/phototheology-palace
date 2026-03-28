@@ -30,7 +30,7 @@ const buildEmailHTML = (name: string) => `
                 The Palace Has Been Upgraded
               </h1>
               <p style="color:#c0c0c0;font-size:14px;margin:0;">
-                Phototheology Palace • Bible Study Suite
+                Phototheology Palace • PhototheologyOS
               </p>
             </td>
           </tr>

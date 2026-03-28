@@ -43,8 +43,8 @@ const FAQ_ITEMS = [
     answer: "Sign up and get full access to all Premium features for 7 days — no restrictions. After your trial, choose a plan that fits your needs. We believe you should experience the full value before deciding."
   },
   {
-    question: "What's the difference between the suite and the card deck/courses?",
-    answer: "The Phototheology Bible Learning Suite is a standalone digital platform. The physical card deck and video courses are separate products that complement the suite but are not required. The suite contains the complete Palace method — you don't need anything else to master it."
+    question: "What's the difference between PhototheologyOS and the card deck/courses?",
+    answer: "PhototheologyOS is a standalone digital platform — the Operating System for Biblical Thinking. The physical card deck and video courses are separate products that complement it but are not required. PhototheologyOS contains the complete Palace method — you don't need anything else to master it."
   },
   {
     question: "How is this different from YouVersion or Logos?",

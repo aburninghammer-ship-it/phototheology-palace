@@ -48,7 +48,7 @@ const TOUR_META: Record<string, { title: string; subtitle: string; verse: string
     duration: "18 min",
   },
   "suite-tour": {
-    title: "The Complete Suite Tour",
+    title: "The Complete PhototheologyOS Tour",
     subtitle: "Every tool in the Phototheology platform.",
     verse: "Psalm 119:18",
     verseText: "Open thou mine eyes, that I may behold wondrous things out of thy law.",
@@ -114,7 +114,7 @@ serve(async (req) => {
   <meta property="og:image" content="${ogImage}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:site_name" content="Phototheology Bible Learning Suite" />
+  <meta property="og:site_name" content="PhototheologyOS" />
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />

@@ -1,4 +1,4 @@
-// Analyzes user activity across the Phototheology Suite to determine strengths for Forge & Defend drafting
+// Analyzes user activity across PhototheologyOS to determine strengths for Forge & Defend drafting
 
 import { supabase } from "@/integrations/supabase/client";
 

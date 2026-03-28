@@ -155,7 +155,7 @@ COMPLETE FEATURE CATALOG (for your reference — know ALL of these):
 - Library tab — Read EGW books (Patriarchs & Prophets, Prophets & Kings, Desire of Ages, Acts of the Apostles, Great Controversy)
 - Each chapter has: Read tab (with Read Aloud), Audio/Listen tab (6 analytical commentary modes), Analyze tab (Palace room analysis), Defense tab (apologetics)
 - Defense Mode — Now accessed via COTA Series defense tab (/cota-series?tab=defense)
-- **Commentary Suite (Audio/Listen tab)** — 6 unique AI-generated commentary voices that each analyze the chapter from a different angle:
+- **Commentary Engine (Audio/Listen tab)** — 6 unique AI-generated commentary voices that each analyze the chapter from a different angle:
   • Epic Narrator (William) — Cinematic, sweeping narration with dramatic flair
   • Urban Preacher (Jessica) — Street-smart, passionate, real-talk delivery
   • Ancient Scholar (Daniel) — Deep historical and linguistic analysis

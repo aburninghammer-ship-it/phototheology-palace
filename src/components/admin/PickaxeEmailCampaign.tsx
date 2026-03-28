@@ -260,10 +260,10 @@ export function PickaxeEmailCampaign() {
             className="w-full justify-start border-green-500/30 hover:bg-green-500/10"
             onClick={() => {
               setFilter("paid");
-              setSubject("🎉 You Have Full Access to the PhotoTheology Suite!");
+              setSubject("🎉 You Have Full Access to the PhototheologyOS!");
               setContent(`<h1>Great News — Your Full Access is Confirmed!</h1>
 <p>Hi there,</p>
-<p>As a <strong>paying Pickaxe member</strong>, you already have <strong>full access</strong> to the entire PhotoTheology Suite!</p>
+<p>As a <strong>paying Pickaxe member</strong>, you already have <strong>full access</strong> to the entire PhototheologyOS!</p>
 <h2>What's Included:</h2>
 <ul>
   <li>✅ All 8 Floors of the Palace unlocked</li>
@@ -292,10 +292,10 @@ export function PickaxeEmailCampaign() {
             className="w-full justify-start border-amber-500/30 hover:bg-amber-500/10"
             onClick={() => {
               setFilter("unpaid");
-              setSubject("⛏️ Unlock the Full PhotoTheology Suite!");
+              setSubject("⛏️ Unlock the Full PhototheologyOS!");
               setContent(`<h1>Unlock Premium Access to PhotoTheology!</h1>
 <p>Hi there,</p>
-<p>Thank you for being part of our Pickaxe community! We wanted to let you know about the full PhotoTheology Suite that's available to our subscribers.</p>
+<p>Thank you for being part of our Pickaxe community! We wanted to let you know about the full PhototheologyOS that's available to our subscribers.</p>
 <h2>What You're Missing:</h2>
 <ul>
   <li>🔒 Access to all 8 Floors of the Palace (currently limited)</li>

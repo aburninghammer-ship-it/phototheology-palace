@@ -137,7 +137,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           verified: false, 
-          message: "No active Master Class enrollment found. Only paying Master Class students ($20/month) have access to the Bible Study Suite. Free signups do not include app access.",
+          message: "No active Master Class enrollment found. Only paying Master Class students ($20/month) have access to the PhototheologyOS. Free signups do not include app access.",
           upgradeUrl: "https://your-teachable-school-url/master-class"
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }

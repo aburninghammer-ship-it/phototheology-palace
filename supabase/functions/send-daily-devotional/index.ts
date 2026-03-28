@@ -538,14 +538,14 @@ serve(async (req) => {
               </div>
 
               <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
-                <p style="color: #a78bfa; font-size: 14px; margin: 0 0 12px 0; font-weight: bold;">✨ Explore the Bible Study Suite</p>
+                <p style="color: #a78bfa; font-size: 14px; margin: 0 0 12px 0; font-weight: bold;">✨ Explore the PhototheologyOS</p>
                 <p style="color: #a1a1aa; font-size: 13px; margin: 0 0 15px 0; line-height: 1.6;">
                   Deepen your understanding with visual memory tools, Hebrew/Greek word studies,
                   commentary insights, and more. Share these devotionals with friends!
                 </p>
                 <a href="https://phototheology.app/bible-study"
                    style="display: inline-block; background: rgba(139, 92, 246, 0.2); color: #a78bfa; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 13px; border: 1px solid rgba(139, 92, 246, 0.3);">
-                  🔍 Explore Bible Study Suite →
+                  🔍 Explore PhototheologyOS →
                 </a>
               </div>
             </div>
