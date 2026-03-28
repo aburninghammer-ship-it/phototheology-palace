@@ -1,12 +1,61 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, ChevronLeft, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronRight, ChevronLeft, ChevronDown, PanelLeftClose, PanelLeftOpen, GripVertical } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DOCK_ITEMS, type DockItem } from "./dockData";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+const DOCK_ORDER_KEY = "phototheology-dock-order";
+
+function getStoredOrder(): string[] | null {
+  try {
+    const stored = localStorage.getItem(DOCK_ORDER_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch { return null; }
+}
+
+function storeOrder(ids: string[]) {
+  localStorage.setItem(DOCK_ORDER_KEY, JSON.stringify(ids));
+}
+
+function SortableDockItem({ item, children }: { item: DockItem; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} className="relative group/sortable">
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover/sortable:opacity-60 transition-opacity cursor-grab active:cursor-grabbing z-10" {...listeners}>
+        <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
+      </div>
+      {children}
+    </div>
+  );
+}
 
 export function OSDock() {
   const location = useLocation();
@@ -15,7 +64,28 @@ export function OSDock() {
   const [visible, setVisible] = useState(true);
   const [expanded, setExpanded] = useState(true);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [orderedItems, setOrderedItems] = useState<DockItem[]>(() => {
+    const storedOrder = getStoredOrder();
+    if (storedOrder) {
+      const ordered: DockItem[] = [];
+      for (const id of storedOrder) {
+        const found = DOCK_ITEMS.find(i => i.id === id);
+        if (found) ordered.push(found);
+      }
+      // Add any new items not in stored order
+      for (const item of DOCK_ITEMS) {
+        if (!storedOrder.includes(item.id)) ordered.push(item);
+      }
+      return ordered;
+    }
+    return DOCK_ITEMS;
+  });
   const currentPath = location.pathname;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
   const isPublicPage = publicPaths.some(p => currentPath === p) || currentPath.startsWith("/auth");
@@ -34,7 +104,20 @@ export function OSDock() {
     });
   };
 
-  // Fully hidden — just show a small toggle button
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setOrderedItems((items) => {
+        const oldIndex = items.findIndex(i => i.id === active.id);
+        const newIndex = items.findIndex(i => i.id === over.id);
+        const newItems = arrayMove(items, oldIndex, newIndex);
+        storeOrder(newItems.map(i => i.id));
+        return newItems;
+      });
+    }
+  };
+
+  // Fully hidden
   if (!visible) {
     return (
       <div className="shrink-0 relative z-40">
@@ -60,60 +143,58 @@ export function OSDock() {
     // Collapsed mode
     if (!expanded) {
       return (
-        <div key={item.id}>
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => navigate(item.path)}
-                className={cn(
-                  "relative flex items-center p-2.5 justify-center rounded-xl transition-all duration-200 w-full",
-                  "backdrop-blur-md border border-transparent",
-                  (active || parentActive) && "border-white/10"
-                )}
-                style={{
-                  backgroundColor: (active || parentActive) ? `hsl(${item.glow} / 0.15)` : undefined,
-                  boxShadow: active ? `0 0 12px hsl(${item.glow} / 0.2)` : undefined,
-                }}
-                onMouseEnter={(e) => { if (!active) { e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.12)`; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; } }}
-                onMouseLeave={(e) => { if (!active && !parentActive) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.borderColor = "transparent"; } }}
-              >
-                {(active || parentActive) && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
-                    style={{ backgroundColor: itemColor, height: active ? "24px" : "16px", opacity: active ? 1 : 0.5 }} />
-                )}
-                <Icon className="h-5 w-5 shrink-0" style={{ color: itemColor }} />
-                {hasChildren && (
-                  <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `hsl(${item.glow} / 0.5)` }} />
-                )}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="font-medium backdrop-blur-xl bg-popover/90 border-white/10">
-              <p className="font-semibold">{item.label}</p>
-              {hasChildren && (
-                <div className="mt-1.5 space-y-0.5 border-t border-border pt-1.5">
-                  {item.children!.map((sub) => (
-                    <button key={sub.id} onClick={() => navigate(sub.path)}
-                      className={cn("block text-xs w-full text-left px-1 py-0.5 rounded hover:bg-muted",
-                        isActive(sub.path) && "font-medium"
-                      )}
-                      style={{ color: isActive(sub.path) ? `hsl(${sub.glow || item.glow})` : undefined }}
-                    >{sub.label}</button>
-                  ))}
-                </div>
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => navigate(item.path)}
+              className={cn(
+                "relative flex items-center p-2.5 justify-center rounded-xl transition-all duration-200 w-full",
+                "backdrop-blur-md border border-transparent",
+                (active || parentActive) && "border-white/10"
               )}
-            </TooltipContent>
-          </Tooltip>
-        </div>
+              style={{
+                backgroundColor: (active || parentActive) ? `hsl(${item.glow} / 0.15)` : undefined,
+                boxShadow: active ? `0 0 12px hsl(${item.glow} / 0.2)` : undefined,
+              }}
+              onMouseEnter={(e) => { if (!active) { e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.12)`; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; } }}
+              onMouseLeave={(e) => { if (!active && !parentActive) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.borderColor = "transparent"; } }}
+            >
+              {(active || parentActive) && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full"
+                  style={{ backgroundColor: itemColor, height: active ? "24px" : "16px", opacity: active ? 1 : 0.5 }} />
+              )}
+              <Icon className="h-5 w-5 shrink-0" style={{ color: itemColor }} />
+              {hasChildren && (
+                <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `hsl(${item.glow} / 0.5)` }} />
+              )}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="font-medium backdrop-blur-xl bg-popover/90 border-white/10">
+            <p className="font-semibold">{item.label}</p>
+            {hasChildren && (
+              <div className="mt-1.5 space-y-0.5 border-t border-border pt-1.5">
+                {item.children!.map((sub) => (
+                  <button key={sub.id} onClick={() => navigate(sub.path)}
+                    className={cn("block text-xs w-full text-left px-1 py-0.5 rounded hover:bg-muted",
+                      isActive(sub.path) && "font-medium"
+                    )}
+                    style={{ color: isActive(sub.path) ? `hsl(${sub.glow || item.glow})` : undefined }}
+                  >{sub.label}</button>
+                ))}
+              </div>
+            )}
+          </TooltipContent>
+        </Tooltip>
       );
     }
 
     // Expanded mode
     return (
-      <div key={item.id}>
+      <>
         <button
           onClick={() => hasChildren ? toggleExpand(item.id) : navigate(item.path)}
           className={cn(
-            "relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full px-3 py-2",
+            "relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full px-3 py-2 ml-3",
             "backdrop-blur-md border border-transparent",
             (active) && "border-white/10"
           )}
@@ -157,7 +238,7 @@ export function OSDock() {
           {hasChildren && isOpen && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-              <div className="ml-4 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.2)` }}>
+              <div className="ml-7 pl-3 py-1 flex flex-col gap-0.5" style={{ borderLeft: `2px solid hsl(${item.glow} / 0.2)` }}>
                 {item.children!.map((sub) => {
                   const subActive = isActive(sub.path);
                   const SubIcon = sub.icon || ChevronRight;
@@ -200,7 +281,7 @@ export function OSDock() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </>
     );
   };
 
@@ -226,7 +307,15 @@ export function OSDock() {
       {/* Navigation */}
       <ScrollArea className="flex-1">
         <div className={cn("flex flex-col gap-0.5 py-2", expanded ? "px-2" : "px-2")}>
-          {DOCK_ITEMS.map(renderItem)}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={orderedItems.map(i => i.id)} strategy={verticalListSortingStrategy}>
+              {orderedItems.map((item) => (
+                <SortableDockItem key={item.id} item={item}>
+                  {renderItem(item)}
+                </SortableDockItem>
+              ))}
+            </SortableContext>
+          </DndContext>
         </div>
       </ScrollArea>
 
