@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { SERMON_BUILDER_TOUR } from "@/data/guidedTours";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { usePreservePage } from "@/hooks/usePreservePage";
@@ -10,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive, Gem, Info, Swords, PenLine, FileText, Presentation, Lightbulb, Plus, Sparkles, Calendar, Edit, Trash2, Copy, Clock, Brain } from "lucide-react";
+import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive, Gem, Info, Swords, PenLine, FileText, Presentation, Lightbulb, Plus, Sparkles, Calendar, Edit, Trash2, Copy, Clock, Brain, GraduationCap } from "lucide-react";
 import { MyIdeaTab } from "@/components/simmer/MyIdeaTab";
 import { sermonTitleSchema, sermonThemeSchema, sermonStoneSchema, sermonBridgeSchema } from "@/lib/validationSchemas";
 import { sanitizeText, sanitizeHtml } from "@/lib/sanitize";
@@ -102,6 +104,7 @@ export default function SermonBuilder() {
   const [currentStep, setCurrentStep] = useState(1);
   const [activeTab, setActiveTab] = useState<"builder" | "library" | "simmer" | "starters" | "myidea">("builder");
   const [loading, setLoading] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const [asking, setAsking] = useState(false);
   const [librarySermons, setLibrarySermons] = useState<any[]>([]);
   const [loadingLibrary, setLoadingLibrary] = useState(false);
@@ -687,6 +690,7 @@ export default function SermonBuilder() {
         />
       </div>
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={SERMON_BUILDER_TOUR} onClose={() => setTourOpen(false)} />}
       {/* Header */}
       <div className="relative z-10 bg-white/5 backdrop-blur-xl border-b border-white/10 py-8 px-6">
         <div className="max-w-7xl mx-auto">
@@ -718,6 +722,14 @@ export default function SermonBuilder() {
               </div>
             </div>
             <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { primeAudioForTour(); setTourOpen(true); }}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 gap-1"
+              >
+                <GraduationCap className="w-4 h-4" /> Tour
+              </Button>
               <Button
                 onClick={startNewSermon}
                 className="bg-white text-purple-900 hover:bg-white/90"

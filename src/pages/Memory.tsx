@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { MEMORY_PALACE_TOUR } from "@/data/guidedTours";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Plus, Users, Trophy, Book, Sparkles, Gamepad2, Play, ArrowRight, Target, ArrowLeft, Loader2 } from "lucide-react";
+import { Brain, Plus, Users, Trophy, Book, Sparkles, Gamepad2, Play, ArrowRight, Target, ArrowLeft, Loader2, GraduationCap } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { memoryPalaceSteps } from "@/config/howItWorksSteps";
@@ -28,6 +30,7 @@ export default function Memory() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("learn");
+  const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -66,6 +69,7 @@ export default function Memory() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-palace-purple/5 relative overflow-x-hidden">
+      {tourOpen && <GuidedTourOverlay steps={MEMORY_PALACE_TOUR} onClose={() => setTourOpen(false)} />}
       {/* Animated background glow effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-1/4 w-1/2 h-1/2 bg-palace-purple/20 rounded-full blur-[100px] animate-pulse" />
@@ -99,8 +103,11 @@ export default function Memory() {
             {t('memory.subtitle')}
           </p>
           
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center gap-2 mb-4">
             <HowItWorksDialog title={t('memory.howToUse')} steps={memoryPalaceSteps} />
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <GraduationCap className="h-4 w-4" /> Guided Tour
+            </Button>
           </div>
           
           {/* START MEMORIZING CTA */}

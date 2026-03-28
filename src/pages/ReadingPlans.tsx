@@ -1,4 +1,6 @@
 import { Navigation } from "@/components/Navigation";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { READING_PLANS_TOUR } from "@/data/guidedTours";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +13,7 @@ import { readingPlansSteps } from "@/config/howItWorksSteps";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import { GraduationCap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -32,6 +35,7 @@ export default function ReadingPlans() {
   const [selectedTranslation, setSelectedTranslation] = useState("kjv");
   const [showTranslationDialog, setShowTranslationDialog] = useState(false);
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const handleOpenTranslationDialog = (planId: string) => {
     setSelectedPlanId(planId);
@@ -87,6 +91,7 @@ export default function ReadingPlans() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={READING_PLANS_TOUR} onClose={() => setTourOpen(false)} />}
       
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
@@ -98,8 +103,11 @@ export default function ReadingPlans() {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-4">
             {t('readingPlans.subtitle')}
           </p>
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center gap-2 mb-4">
             <HowItWorksDialog title={t('readingPlans.howToUse')} steps={readingPlansSteps} />
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <GraduationCap className="h-4 w-4" /> Guided Tour
+            </Button>
           </div>
           <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">

@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { STUDY_BUDDY_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -18,7 +20,7 @@ import {
   Brain, Loader2, Save, Trash2,
   ChevronLeft, ChevronRight, StickyNote,
   Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye, Send, Search, Sun, Moon,
-  FolderOpen, Clock, MoreVertical, Play
+  FolderOpen, Clock, MoreVertical, Play, GraduationCap
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
@@ -244,6 +246,7 @@ export default function StudyBuddy() {
   const { user, loading: authLoading } = useAuth();
   const { preferences, updatePreference } = useUserPreferences();
   const analysisEndRef = useRef<HTMLDivElement>(null);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Theme state
   const isLightTheme = preferences.study_buddy_theme === "light";
@@ -951,6 +954,7 @@ export default function StudyBuddy() {
       </div>
 
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={STUDY_BUDDY_TOUR} onClose={() => setTourOpen(false)} />}
 
       {/* Header */}
       <div className={`relative z-10 backdrop-blur-xl border-b py-4 px-6 flex-shrink-0 ${
@@ -999,6 +1003,14 @@ export default function StudyBuddy() {
             >
               <Sparkles className="w-4 h-4 mr-1" />
               {t('studyBuddy.newSession')}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => { primeAudioForTour(); setTourOpen(true); }}
+              className={`${isLightTheme ? "bg-white/80 border-orange-300 text-orange-700 hover:bg-orange-100" : "bg-black/20 border-orange-500/30 text-orange-200 hover:bg-orange-500/20"}`}
+            >
+              <GraduationCap className="w-4 h-4 mr-1" /> Tour
             </Button>
             <Button 
               size="sm" 

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { LEADERBOARD_TOUR } from "@/data/guidedTours";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Trophy, Medal, Award, Target, Building2, Flame, Calendar, Crown, Star } from "lucide-react";
+import { Trophy, Medal, Award, Target, Building2, Flame, Calendar, Crown, Star, GraduationCap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Leaderboard = () => {
@@ -23,6 +25,7 @@ const Leaderboard = () => {
   const [viewMode, setViewMode] = useState<'general' | 'categories'>('general');
   const [categoryLeaders, setCategoryLeaders] = useState<Record<string, any[]>>({});
   const [isInTop100, setIsInTop100] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -361,6 +364,7 @@ const Leaderboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={LEADERBOARD_TOUR} onClose={() => setTourOpen(false)} />}
       
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 text-white py-12 px-4">
@@ -371,6 +375,9 @@ const Leaderboard = () => {
               <h1 className="text-5xl font-bold">{t('leaderboard.title')}</h1>
               <p className="text-purple-200 text-lg">{t('leaderboard.subtitle')}</p>
             </div>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="bg-white/10 border-white/20 text-white hover:bg-white/20 gap-1">
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
           </div>
 
           {/* Stats Cards */}
