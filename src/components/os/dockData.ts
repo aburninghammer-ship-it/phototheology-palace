@@ -46,6 +46,7 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "encyclopedia", label: "Encyclopedia", path: "/encyclopedia", icon: Search, glow: "230 78% 62%" },
       { id: "character-profiles", label: "Character Profiles", path: "/character-profiles", icon: PersonStanding, glow: "240 72% 55%" },
       { id: "libraries", label: "Libraries", path: "/libraries", icon: Library, glow: "250 65% 55%" },
+      { id: "series", label: "Series", path: "/bible-study-series", icon: BookOpen, glow: "195 85% 50%" },
     ],
   },
   {
