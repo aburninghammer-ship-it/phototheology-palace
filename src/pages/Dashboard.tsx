@@ -149,6 +149,7 @@ export default function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [recentReading, setRecentReading] = useState<any[]>([]);
+  const [tourOpen, setTourOpen] = useState(false);
   const featured = getFeaturedToday();
   const FeaturedIcon = featured.icon;
 
@@ -199,7 +200,13 @@ export default function Dashboard() {
     <div className="min-h-screen gradient-dreamy">
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
       <JeevesWelcomeModal />
+      {tourOpen && <GuidedTourOverlay steps={DASHBOARD_TOUR} onClose={() => setTourOpen(false)} />}
       <div className="container mx-auto px-3 md:px-4 py-4 md:py-8 pb-32 md:pb-8 max-w-7xl">
+        <div className="flex justify-end mb-2">
+          <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+            <GraduationCap className="h-4 w-4" /> Guided Tour
+          </Button>
+        </div>
         <div className="mb-6 md:mb-8 flex items-center gap-3 md:gap-4">
           <img
             src="/pwa-192x192.png"
