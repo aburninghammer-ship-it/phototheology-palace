@@ -310,7 +310,7 @@ export default function DockDemo() {
   const navigate = useNavigate();
 
   return (
-    <div className="fixed inset-0 z-[200] flex bg-background">
+    <div className="flex min-h-screen bg-background -mt-16 pt-0 relative z-50">
       {/* The Dock */}
       <OSDock expanded={expanded} onToggle={() => setExpanded(!expanded)} />
 
