@@ -19,6 +19,12 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
   const step = BIBLE_TAB_TUTORIAL[currentStep];
   const totalSteps = BIBLE_TAB_TUTORIAL.length;
 
+  // Guard against out-of-bounds
+  if (!step) {
+    onClose();
+    return null;
+  }
+
   // Highlight target element
   useEffect(() => {
     if (!step.targetSelector) return;
