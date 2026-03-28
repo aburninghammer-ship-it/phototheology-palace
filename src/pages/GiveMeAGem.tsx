@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { GIVE_ME_A_GEM_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
@@ -106,6 +108,7 @@ export default function GiveMeAGem() {
   const [passageInput, setPassageInput] = useState("");
   const [gemMode, setGemMode] = useState<"personal" | "daily">("personal");
   const [showOptions, setShowOptions] = useState(true);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Gem state
   const [gem, setGem] = useState<GemData | null>(null);
@@ -375,6 +378,7 @@ export default function GiveMeAGem() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-950/30 via-background to-emerald-950/20">
       <NavComponent />
+      {tourOpen && <GuidedTourOverlay steps={GIVE_ME_A_GEM_TOUR} onClose={() => setTourOpen(false)} />}
 
       <main className="container mx-auto px-4 py-8 pt-20 pb-24 max-w-4xl">
         {/* Warrior-Style Rank Card */}

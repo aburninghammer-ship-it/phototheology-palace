@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { MUSIC_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { Navigation } from "@/components/Navigation";
@@ -103,6 +105,7 @@ export default function MusicCategories() {
   const [volume, setVolume] = useState(0.08);
   const [isMuted, setIsMuted] = useState(false);
   const [duckMultiplier, setDuckMultiplier] = useState(1);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Listen for audio ducking events (when TTS is playing)
   useAudioDucking(useCallback((ducked: boolean, duckRatio: number) => {
@@ -151,6 +154,7 @@ export default function MusicCategories() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={MUSIC_TOUR} onClose={() => setTourOpen(false)} />}
       <div className="container max-w-6xl mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">

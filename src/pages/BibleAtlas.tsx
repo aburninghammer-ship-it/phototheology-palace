@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { BIBLE_ATLAS_TOUR } from "@/data/guidedTours";
 import { ResearchToolsNav } from "@/components/bible/research/ResearchToolsNav";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { MapPin, BookOpen, Search, Globe, Compass, Mountain, Waves } from "lucide-react";
+import { MapPin, BookOpen, Search, Globe, Compass, Mountain, Waves, GraduationCap } from "lucide-react";
 
 interface BibleLocation {
   id: string;
@@ -54,6 +56,7 @@ const BibleAtlas = () => {
   const isDark = theme === "dark";
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [tourOpen, setTourOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<BibleLocation | null>(null);
 
   const filteredLocations = BIBLE_LOCATIONS.filter((loc) => {
@@ -69,6 +72,7 @@ const BibleAtlas = () => {
         <meta name="description" content="Explore key locations from the Bible — cities, mountains, rivers, and regions — with scriptural references and historical context." />
       </Helmet>
 
+      {tourOpen && <GuidedTourOverlay steps={BIBLE_ATLAS_TOUR} onClose={() => setTourOpen(false)} />}
       <div className={cn("min-h-screen flex flex-col", isDark ? "bg-[hsl(225,40%,8%)]" : "bg-gradient-to-br from-slate-50 via-amber-50/20 to-white")}>
         {/* Header */}
         <div className={cn("border-b px-4 py-3 shrink-0 backdrop-blur-xl", isDark ? "border-[hsl(32,70%,45%)/0.3] bg-[hsl(230,35%,12%)/0.95]" : "border-amber-200/50 bg-white/90")}>
@@ -81,9 +85,14 @@ const BibleAtlas = () => {
                 Bible Atlas
               </h1>
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-              <BookOpen className="h-4 w-4 mr-1" /> Back
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
+                <BookOpen className="h-4 w-4 mr-1" /> Back
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+                <GraduationCap className="h-4 w-4" /> Tour
+              </Button>
+            </div>
           </div>
           <div className="mt-2 max-w-7xl mx-auto">
             <ResearchToolsNav />

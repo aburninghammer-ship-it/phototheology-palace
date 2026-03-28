@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { QUARTERLY_STUDY_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,7 @@ const QuarterlyStudy = () => {
   const [userQuestion, setUserQuestion] = useState<string>("");
   const [showPdfViewer, setShowPdfViewer] = useState(false);
   const { toast } = useToast();
+  const [tourOpen, setTourOpen] = useState(false);
 
   const rooms = [
     "Room 1: Story Room (SR)", "Room 2: Imagination Room (IR)", "Room 3: 24FPS Room (24)", 
@@ -239,6 +242,7 @@ const QuarterlyStudy = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={QUARTERLY_STUDY_TOUR} onClose={() => setTourOpen(false)} />}
       
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
