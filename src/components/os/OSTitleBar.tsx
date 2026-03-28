@@ -77,7 +77,7 @@ export function OSTitleBar() {
             <span className="w-[3px] h-[3px] rounded-full" style={{ background: "hsl(145 70% 50%)" }} />
             <span className="text-[7.5px] text-muted-foreground/50 tracking-[0.08em] uppercase whitespace-nowrap"
               style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 500 }}>
-              Powered by AI · Biblical Intelligence
+              Powered by AI. Built for Biblical Intelligence.
             </span>
           </div>
         </div>
