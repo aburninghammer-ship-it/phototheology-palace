@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Sparkles, User, LogOut, Settings } from "lucide-react";
+import { Sparkles, User, LogOut, Settings, Languages } from "lucide-react";
 import { CommandPaletteTrigger } from "./CommandPalette";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -9,7 +9,7 @@ import { ShareableProgressCard } from "@/components/ShareableProgressCard";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { StartSessionDialog } from "@/components/session/StartSessionDialog";
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
-
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,11 +17,16 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { Radio, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePresenceTracker } from "@/hooks/usePresenceTracker"; // kept for online presence
+import { usePresenceTracker } from "@/hooks/usePresenceTracker";
 
 export function OSTitleBar() {
   const { user, signOut } = useAuth();
@@ -79,10 +84,21 @@ export function OSTitleBar() {
           </Link>
         </Button>
 
-        
         <NotificationCenter />
         <StartSessionDialog />
         <NavigationStyleToggle />
+
+        {/* Language Selector */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Languages className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 p-2" align="end">
+            <LanguageSelector showLabel={false} />
+          </PopoverContent>
+        </Popover>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
