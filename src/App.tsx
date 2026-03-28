@@ -471,6 +471,7 @@ function App() {
             <Route path="/bible-prophecy-guide" element={<BibleProphecyGuide />} />
             <Route path="/bible-prophecy-guide/success" element={<BibleProphecyGuideSuccess />} />
             <Route path="/app-tour" element={<AppTour />} />
+            <Route path="/dock-demo" element={<DockDemo />} />
             
 {/* Gatehouse Flow - Public (/ is the main gatehouse, /gatehouse kept for legacy links) */}
             <Route path="/welcome" element={<Welcome />} />
