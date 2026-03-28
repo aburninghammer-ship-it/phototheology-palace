@@ -133,6 +133,10 @@ const Bible = () => {
 
           <StudyBibleDemoDialog open={demoOpen} onOpenChange={setDemoOpen} />
 
+          {tutorialOpen && (
+            <BibleTabTutorial onClose={() => setTutorialOpen(false)} />
+          )}
+
           {user && (
             <VoiceChatWidget
               roomType="bible"
@@ -160,12 +164,14 @@ const Bible = () => {
 
             <div className={`flex-1 min-w-0 ${sidebarOpen && !isMobile ? 'pl-4' : ''}`}>
               {/* Navigation */}
-              <div className="mb-6 sm:mb-8">
+              <div className="mb-6 sm:mb-8 bible-navigation-area">
                 <BibleNavigation />
               </div>
 
               {/* Bible Reader */}
-              <BibleReader />
+              <div className="bible-reader-area">
+                <BibleReader />
+              </div>
             </div>
           </div>
         </div>
