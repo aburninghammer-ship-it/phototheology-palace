@@ -113,7 +113,13 @@ export const MessagingSidebar = () => {
       }
       
       if (!e.detail?.conversationId && !e.detail?.userId) {
-        console.error('📬 MessagingSidebar: No conversationId or userId in event detail!');
+        // Just open the sidebar to conversations list
+        setActiveTab('conversations');
+        if (isMobile) {
+          setOpenMobile(true);
+        } else if (setOpen) {
+          setOpen(true);
+        }
       }
     };
     
