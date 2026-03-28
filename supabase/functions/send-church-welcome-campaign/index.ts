@@ -47,7 +47,7 @@ const generateEmailHtml = (name: string) => `
     <div class="accent-bar"></div>
     
     <div class="header">
-      <h1>📖 The Bible Study Suite</h1>
+      <h1>📖 The PhototheologyOS</h1>
       <p class="subtitle">A Gift from Living Manna to You</p>
       <span class="badge">Full Premium Access</span>
     </div>
@@ -55,7 +55,7 @@ const generateEmailHtml = (name: string) => `
     <div class="card">
       <div class="greeting">
         Dear ${name},<br><br>
-        As a valued member of <span class="highlight">Living Manna Online Church</span>, Pastor Myers has opened the doors of the <span class="highlight-teal">Bible Study Suite</span> for you — a powerful digital platform designed to take your Bible study to an entirely new level.
+        As a valued member of <span class="highlight">Living Manna Online Church</span>, Pastor Myers has opened the doors of the <span class="highlight-teal">PhototheologyOS</span> for you — a powerful digital platform designed to take your Bible study to an entirely new level.
       </div>
 
       <div class="divider"></div>
@@ -132,7 +132,7 @@ const generateEmailHtml = (name: string) => `
     </div>
 
     <div class="footer">
-      <p>Living Manna Online Church × Bible Study Suite</p>
+      <p>Living Manna Online Church × PhototheologyOS</p>
       <p>If you have questions, reply to this email or reach out to your church leaders.</p>
     </div>
   </div>
@@ -312,7 +312,7 @@ serve(async (req) => {
           body: JSON.stringify(batch.map(r => ({
             from: "Living Manna Church <support@thephototheologyapp.com>",
             to: [r.email],
-            subject: "🏰 Welcome to the Phototheology Suite — Your Access is Ready!",
+            subject: "🏰 Welcome to the PhototheologyOS — Your Access is Ready!",
             html: generateEmailHtml(r.name),
           }))),
         });

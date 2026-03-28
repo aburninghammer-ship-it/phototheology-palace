@@ -58,7 +58,7 @@ serve(async (req) => {
     <meta property="og:image:alt" content="${escapeHtml(title)}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:site_name" content="Phototheology Bible Learning Suite" />
+    <meta property="og:site_name" content="PhototheologyOS" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="${escapeHtml(previewUrl)}" />
@@ -77,7 +77,7 @@ serve(async (req) => {
       ${content ? `<pre style="margin:0 0 18px;padding:20px;border-radius:20px;white-space:pre-wrap;word-break:break-word;background:hsl(215 28% 17%);color:hsl(210 40% 96%);font:15px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;">${escapeHtml(content)}</pre>` : ""}
       ${instructions ? `<div style="margin:0 0 18px;padding:18px 20px;border-radius:20px;background:hsl(43 96% 56% / 0.12);border:1px solid hsl(43 96% 56% / 0.28);color:hsl(48 96% 89%);font-size:15px;line-height:1.6;"><strong style="display:block;margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase;font-size:12px;color:hsl(43 96% 56%);">What to do</strong>${escapeHtml(instructions)}</div>` : ""}
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 14px;">
-        <a href="${escapeHtml(targetUrl)}" style="display:inline-block;padding:12px 18px;border-radius:999px;background:hsl(43 96% 56%);color:hsl(222 47% 11%);font-weight:700;text-decoration:none;">Open this in the Suite</a>
+        <a href="${escapeHtml(targetUrl)}" style="display:inline-block;padding:12px 18px;border-radius:999px;background:hsl(43 96% 56%);color:hsl(222 47% 11%);font-weight:700;text-decoration:none;">Open in PhototheologyOS</a>
         <a href="${escapeHtml(APP_URL)}" style="display:inline-block;padding:12px 18px;border-radius:999px;border:1px solid hsl(215 20% 35%);color:hsl(210 40% 98%);font-weight:700;text-decoration:none;">Visit Phototheology Palace</a>
       </div>
       <p style="margin:0;font-size:14px;color:hsl(215 20% 65%);">

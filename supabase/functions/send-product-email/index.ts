@@ -26,9 +26,9 @@ const PRODUCT_CONFIG: Record<string, {
     description: "Master Genesis using the Phototheology method in just 6 days"
   },
   "study-suite": {
-    name: "Phototheology Study Suite",
+    name: "PhototheologyOS",
     files: ["FLOOR-2.pdf", "FLOOR-4-The-Next-Level-Floor.pdf", "FLOOR-6.pdf"],
-    description: "The complete Phototheology Study Suite collection"
+    description: "The complete PhototheologyOS collection"
   },
 };
 

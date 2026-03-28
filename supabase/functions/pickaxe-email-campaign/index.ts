@@ -71,7 +71,7 @@ const getPromoEmail = (name: string | null, appUrl: string) => `
   <p style="font-size: 16px;">Since you've tried our Phototheology tools, we wanted to let you know about our <strong>all-new Phototheology App</strong> — the complete Bible study platform!</p>
   
   <div style="background: #f8f5ff; border-radius: 12px; padding: 24px; margin: 24px 0; border: 2px solid #e9d5ff;">
-    <h2 style="color: #7c3aed; margin: 0 0 12px 0;">The Complete Phototheology Suite:</h2>
+    <h2 style="color: #7c3aed; margin: 0 0 12px 0;">The Complete PhototheologyOS:</h2>
     <ul style="margin: 0; padding-left: 20px; color: #4a4a4a;">
       <li>📖 <strong>Interactive Bible Reader</strong> with Palace lens</li>
       <li>🤖 <strong>Jeeves AI</strong> - Your personal study companion</li>

@@ -123,7 +123,7 @@ serve(async (req) => {
       );
     }
 
-    // Special filter: Teachable users NOT subscribed to the Suite
+    // Special filter: Teachable users NOT subscribed to PhototheologyOS
     // These are users in teachable_students whose linked app account has no active/trial subscription
     // OR who have no linked account at all (unlinked).
     let emails: string[] = [];

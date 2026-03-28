@@ -26,12 +26,12 @@ const PRODUCT_CONFIG = {
     description: "Master Genesis using the Phototheology method in just 6 days"
   },
   "study-suite": {
-    name: "Phototheology Study Suite",
+    name: "PhototheologyOS",
     priceId: "price_1SnNoGFGDAd3RU8I4ALn4b0N",
     productId: "prod_TktboSZYb6oAQt",
     amount: 9700, // $97.00
     files: ["FLOOR-2.pdf", "FLOOR-4-The-Next-Level-Floor.pdf", "FLOOR-6.pdf"],
-    description: "The complete Phototheology Study Suite collection"
+    description: "The complete PhototheologyOS collection"
   },
   "quick-start-guide": {
     name: "Phototheology Quick-Start Guide",
@@ -39,7 +39,7 @@ const PRODUCT_CONFIG = {
     productId: "prod_TktbhIk7zIQ28w",
     amount: 1200, // $12.00
     files: ["THE-PHOTOTHEOLOGY-QUICK-START-GUIDE.pdf"],
-    description: "Your fast-track introduction to the Phototheology Bible Learning Suite"
+    description: "Your fast-track introduction to the PhototheologyOS"
   }
 };
 

@@ -114,7 +114,7 @@ serve(async (req) => {
   <meta property="og:image" content="${ogImage}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:site_name" content="Phototheology Bible Learning Suite" />
+  <meta property="og:site_name" content="PhototheologyOS" />
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />

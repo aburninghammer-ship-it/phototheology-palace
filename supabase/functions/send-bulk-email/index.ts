@@ -68,7 +68,7 @@ serve(async (req) => {
       emails = [testEmail];
       logStep("Test mode - sending to", { testEmail });
     } else if (filter === 'teachable_not_signed_up') {
-      // Special filter: Teachable members who haven't signed up for the Suite
+      // Special filter: Teachable members who haven't signed up for PhototheologyOS
       // Pull all teachable emails
       const { data: teachableStudents, error: teachableError } = await supabaseClient
         .from("teachable_students")
@@ -83,14 +83,14 @@ serve(async (req) => {
         (authUsers?.users || []).map(u => u.email?.toLowerCase()).filter(Boolean)
       );
 
-      // Return only Teachable members NOT already in the Suite
+      // Return only Teachable members NOT already in PhototheologyOS
       const teachableEmails = (teachableStudents || [])
         .map(s => s.teachable_email?.toLowerCase())
         .filter((email): email is string => !!email && !suiteEmails.has(email));
 
       // Deduplicate
       emails = [...new Set(teachableEmails)];
-      logStep("Teachable-only emails filtered", { total: teachableStudents?.length, notInSuite: emails.length });
+      logStep("Teachable-only emails filtered", { total: teachableStudents?.length, notInOS: emails.length });
     } else {
       // Get all users with emails from auth.users using admin API
       const { data: authUsers, error: authError } = await supabaseClient.auth.admin.listUsers({ perPage: 1000 });

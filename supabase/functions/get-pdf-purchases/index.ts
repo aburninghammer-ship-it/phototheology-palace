@@ -20,7 +20,7 @@ const PRODUCT_CONFIG = {
     amount: 900, // $9.00
   },
   "study-suite": {
-    name: "Phototheology Study Suite",
+    name: "PhototheologyOS",
     priceId: "price_1SnNoGFGDAd3RU8I4ALn4b0N",
     productId: "prod_TktboSZYb6oAQt",
     amount: 9700, // $97.00
