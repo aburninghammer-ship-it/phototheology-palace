@@ -1,11 +1,11 @@
 import {
   Building2, BookOpen, Brain, StickyNote, Sword, Zap, Gem, Gamepad2,
-  Search, Clock, MapPin, Languages, BookMarked, Crown, Layers,
+  Search, Crown, Layers,
   Sparkles, GraduationCap, Eye, Calendar, CalendarDays,
   MessageSquare, Users, Trophy, Target, Church, LayoutGrid,
   Headphones, Image, Network, Film, PersonStanding, Shield,
   Lightbulb, Video, Library, Scale, Megaphone, CreditCard,
-  Heart, Flame, Dumbbell, HeartHandshake, User,
+  Heart, Dumbbell, HeartHandshake, User, Flame, BookMarked,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -26,7 +26,8 @@ export interface DockItem {
   children?: DockSubItem[];
 }
 
-// Organized into 13 major tabs using ONLY items from navTabs.ts
+// ONLY top-level tabs from navTabs.ts (no dropdown sub-items)
+// Organized under 13 major categories
 export const DOCK_ITEMS: DockItem[] = [
   {
     id: "palace", label: "Palace", icon: Building2, path: "/palace", glow: "32 95% 53%",
@@ -42,11 +43,8 @@ export const DOCK_ITEMS: DockItem[] = [
   {
     id: "bible", label: "Study Bible", icon: BookOpen, path: "/bible", glow: "210 100% 56%",
     children: [
-      { id: "interlinear", label: "Interlinear Bible", path: "/interlinear", icon: Languages, glow: "168 78% 38%" },
-      { id: "lexicon", label: "Greek/Hebrew Lexicon", path: "/bible-lexicon", icon: BookOpen, glow: "155 70% 45%" },
       { id: "encyclopedia", label: "Encyclopedia", path: "/encyclopedia", icon: Search, glow: "230 78% 62%" },
       { id: "character-profiles", label: "Character Profiles", path: "/character-profiles", icon: PersonStanding, glow: "240 72% 55%" },
-      { id: "sources", label: "Source Library", path: "/sources", icon: Library, glow: "235 70% 58%" },
       { id: "libraries", label: "Libraries", path: "/libraries", icon: Library, glow: "250 65% 55%" },
     ],
   },
@@ -55,7 +53,6 @@ export const DOCK_ITEMS: DockItem[] = [
     children: [
       { id: "test-me", label: "Test Me", path: "/test-me", icon: GraduationCap, glow: "0 84% 60%" },
       { id: "video-training", label: "Video Training", path: "/video-training", icon: Video, glow: "4 78% 55%" },
-      { id: "training-drills", label: "Training Drills", path: "/training-drills", icon: Target, glow: "355 72% 50%" },
       { id: "courses", label: "Courses", path: "/courses", icon: GraduationCap, glow: "138 68% 42%" },
       { id: "mastery", label: "Mastery", path: "/mastery", icon: Crown, glow: "348 83% 52%" },
       { id: "spiritual-training", label: "Dojo", path: "/spiritual-training", icon: Sword, glow: "0 72% 50%" },
@@ -66,7 +63,6 @@ export const DOCK_ITEMS: DockItem[] = [
     children: [
       { id: "devotionals", label: "Devotionals", path: "/devotionals", icon: Flame, glow: "328 85% 58%" },
       { id: "reading-plans", label: "Reading Plans", path: "/reading-plans", icon: Calendar, glow: "160 84% 39%" },
-      { id: "daily-reading", label: "Daily Reading", path: "/daily-reading", icon: Calendar, glow: "199 89% 48%" },
       { id: "notes", label: "Notes", path: "/notes", icon: StickyNote, glow: "45 100% 51%" },
       { id: "my-studies", label: "My Studies", path: "/my-studies", icon: BookMarked, glow: "205 95% 50%" },
       { id: "study-ideas", label: "Study Ideas", path: "/study-ideas", icon: Lightbulb, glow: "38 92% 50%" },
@@ -85,15 +81,11 @@ export const DOCK_ITEMS: DockItem[] = [
     id: "games", label: "Games", icon: Gamepad2, path: "/games", glow: "292 84% 61%",
     children: [
       { id: "schedule", label: "Scheduled Games", path: "/schedule", icon: CalendarDays, glow: "200 80% 52%" },
-      { id: "flashcards", label: "Flashcards", path: "/flashcards", icon: Layers, glow: "165 75% 42%" },
     ],
   },
   {
     id: "challenges", label: "Challenges", icon: Zap, path: "/daily-challenges", glow: "16 88% 50%",
     children: [
-      { id: "daily-challenges", label: "Daily Challenges", path: "/daily-challenges", icon: Zap, glow: "12 85% 55%" },
-      { id: "challenge-board", label: "Public Challenge Board", path: "/challenge-board", icon: Trophy, glow: "28 92% 48%" },
-      { id: "genesis-challenge", label: "Genesis High Rise", path: "/genesis-challenge", icon: Building2, glow: "18 80% 58%" },
       { id: "leaderboard", label: "Leaderboard", path: "/leaderboard", icon: Trophy, glow: "42 93% 50%" },
       { id: "achievements", label: "Achievements", path: "/achievements", icon: Trophy, glow: "35 88% 55%" },
       { id: "drill-drill", label: "Gather Fragments", path: "/drill-drill", icon: Target, glow: "25 95% 53%" },
@@ -108,8 +100,6 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "amplify", label: "Amplify", path: "/amplify", icon: Megaphone, glow: "218 88% 54%" },
       { id: "remix", label: "Remix", path: "/remix", icon: Megaphone, glow: "27 90% 50%" },
       { id: "polish", label: "Polish", path: "/polish", icon: Film, glow: "285 78% 58%" },
-      { id: "infographics", label: "Infographic Generator", path: "/infographics", icon: Image, glow: "175 72% 38%" },
-      { id: "study-series", label: "Study Series", path: "/study-series", icon: BookMarked, glow: "195 85% 50%" },
     ],
   },
   {
@@ -128,21 +118,12 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "pt-gpt", label: "Phototheology GPT", path: "/phototheologygpt", icon: Sparkles, glow: "268 72% 55%" },
       { id: "study-buddy", label: "Study Buddy", path: "/study-buddy", icon: Brain, glow: "215 16% 53%" },
       { id: "research-assistant", label: "Research Assistant", path: "/research-assistant", icon: GraduationCap, glow: "152 68% 42%" },
-      { id: "branch-study", label: "BranchStudy", path: "/branch-study", icon: Network, glow: "280 65% 55%" },
-      { id: "kid-gpt", label: "Kid GPT", path: "/kidgpt", icon: Users, glow: "290 60% 62%" },
-      { id: "dr-gpt", label: "Daniel & Revelation GPT", path: "/daniel-revelation-gpt", icon: Eye, glow: "255 75% 50%" },
-      { id: "apol-gpt", label: "Apologetics GPT", path: "/apologetics-gpt", icon: Shield, glow: "248 60% 45%" },
       { id: "analyze-thoughts", label: "Analyze My Thoughts", path: "/analyze-thoughts", icon: Lightbulb, glow: "48 93% 47%" },
     ],
   },
   {
     id: "community", label: "Community", icon: Users, path: "/community", glow: "174 72% 40%",
     children: [
-      { id: "community-feed", label: "Community Feed", path: "/community", icon: Users, glow: "180 68% 45%" },
-      { id: "discover", label: "Discover People", path: "/discover", icon: Search, glow: "188 75% 38%" },
-      { id: "multiplayer", label: "PT Multiplayer", path: "/pt-multiplayer", icon: Gamepad2, glow: "300 70% 55%" },
-      { id: "guilds", label: "Guilds", path: "/guilds", icon: Shield, glow: "192 70% 42%" },
-      { id: "study-partners", label: "Study Partners", path: "/study-partners", icon: Users, glow: "192 70% 42%" },
       { id: "my-profile", label: "My Profile", path: "/my-profile", icon: User, glow: "263 70% 58%" },
     ],
   },
