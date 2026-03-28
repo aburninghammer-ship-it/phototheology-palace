@@ -49,6 +49,7 @@ import { GuidedPathTracker } from "@/hooks/useGuidedPathTracker";
 import { useUTMCapture } from "@/hooks/useUTMCapture";
 import { OSDock } from "@/components/os/OSDock";
 import { CommandPalette } from "@/components/os/CommandPalette";
+import { OSTitleBar } from "@/components/os/OSTitleBar";
 
 // Critical pages - load immediately (landing + auth only)
 import Gatehouse from "./pages/Gatehouse";
@@ -419,6 +420,7 @@ function App() {
                         </div>
                         </>}
                         <CommandPalette />
+                        {!isWorkspacePane && <OSTitleBar />}
                         <div className="flex flex-1 w-full">
                           {!isWorkspacePane && <OSDock />}
                           <MessagingSidebar />
