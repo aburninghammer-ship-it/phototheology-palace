@@ -401,26 +401,25 @@ function App() {
                       <div className="min-h-screen flex flex-col w-full pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
                         {!isWorkspacePane && <>
                         <FontSizeControl />
-                        <div className="zen-hideable">
-                          <AnnouncementBanner />
-                          <TrialUpgradePrompt variant="banner" />
-                          <ChangeSpineUpgradePrompt />
-                          <TrialUrgencyMessage />
-                          <VoiceChatInviteNotification />
-                          <LiveDemoNotification />
-                          <InstallPrompt />
-                          <ExitIntentPopup />
-                          <IncompleteSignupPrompt />
-                        </div>
                         {/* Session Mode Prompt Dialog */}
                         <SessionPromptDialog />
-                        {/* Change Manager Guided Path Checklist */}
-                        <div className="zen-hideable">
-                          <GuidedPathChecklist />
-                        </div>
                         </>}
                         <CommandPalette />
                         {!isWorkspacePane && <OSTitleBar />}
+                        {!isWorkspacePane && (
+                          <div className="zen-hideable">
+                            <AnnouncementBanner />
+                            <TrialUpgradePrompt variant="banner" />
+                            <ChangeSpineUpgradePrompt />
+                            <TrialUrgencyMessage />
+                            <VoiceChatInviteNotification />
+                            <LiveDemoNotification />
+                            <InstallPrompt />
+                            <ExitIntentPopup />
+                            <IncompleteSignupPrompt />
+                            <GuidedPathChecklist />
+                          </div>
+                        )}
                         <div className="flex flex-1 w-full">
                           {!isWorkspacePane && <OSDock />}
                           <MessagingSidebar />
