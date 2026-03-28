@@ -9,7 +9,9 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Image, Search, Heart, Trash2, RefreshCw, Loader2, ArrowLeft, MessageCircle, Send, X, Edit, Package, Download, Share2, Globe, FolderOpen, ChevronRight, ChevronDown } from "lucide-react";
+import { Image, Search, Heart, Trash2, RefreshCw, Loader2, ArrowLeft, MessageCircle, Send, X, Edit, Package, Download, Share2, Globe, FolderOpen, ChevronRight, ChevronDown, GraduationCap } from "lucide-react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { BIBLE_IMAGE_LIBRARY_TOUR } from "@/data/guidedTours";
 import { genesisImages } from "@/assets/24fps/genesis";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -38,6 +40,7 @@ export default function BibleImageLibrary() {
   const [activeTab, setActiveTab] = useState<"all" | "favorites" | "by-book" | "genesis-pack">("all");
   const [expandedBooks, setExpandedBooks] = useState<Set<string>>(new Set());
   const [jeevesOpen, setJeevesOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const [jeevesPrompt, setJeevesPrompt] = useState("");
   const [jeevesGenerating, setJeevesGenerating] = useState(false);
   const [jeevesMessages, setJeevesMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
@@ -543,6 +546,14 @@ export default function BibleImageLibrary() {
               </div>
             </div>
             <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => { primeAudioForTour(); setTourOpen(true); }}
+              className="text-white/80 hover:text-white hover:bg-white/10 gap-1"
+            >
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
+            <Button
               onClick={() => navigate("/palace")}
               variant="outline"
               className="bg-white/10 text-white border-white/20 hover:bg-white/20"
@@ -553,6 +564,7 @@ export default function BibleImageLibrary() {
           </div>
         </div>
       </div>
+      {tourOpen && <GuidedTourOverlay steps={BIBLE_IMAGE_LIBRARY_TOUR} onClose={() => setTourOpen(false)} />}
 
       {/* Stats Cards */}
       <div className="max-w-7xl mx-auto px-6 py-8">

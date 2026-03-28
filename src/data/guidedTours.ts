@@ -569,3 +569,193 @@ export const ACHIEVEMENTS_TOUR: GuidedTourStep[] = [
     tooltipPosition: "bottom",
   },
 ];
+
+export const FEEDBACK_TOUR: GuidedTourStep[] = [
+  {
+    id: "feedback-welcome",
+    title: "Welcome to Feedback",
+    description: "Share your ideas, report bugs, and help shape the future of Phototheology.",
+    narration: "Hello! Welcome to the Feedback page. This is where your voice matters most. Whether you've found a bug, have an idea for a new feature, or want to suggest an improvement — this is the place to share it. Let me walk you through it.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "feedback-category",
+    title: "Choose a Category",
+    description: "Select whether you're reporting a bug, requesting a feature, or suggesting an improvement.",
+    narration: "Start by selecting a category. Choose Bug Report if something isn't working right, Feature Request if you have an idea for something new, or Improvement if you'd like an existing feature to work better.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "feedback-form",
+    title: "Describe Your Idea",
+    description: "Give your feedback a clear title and detailed description so we can act on it.",
+    narration: "Give your feedback a clear, descriptive title and then write out the details. The more specific you are, the faster we can act on it. Screenshots and step-by-step descriptions are especially helpful for bug reports.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "feedback-submit",
+    title: "Submit & Track",
+    description: "Once submitted, your feedback goes directly to the development team.",
+    narration: "When you're ready, hit submit. Your feedback goes directly to the development team and helps prioritize what gets built next. Every submission matters — you're helping shape the future of Phototheology!",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "feedback-community",
+    title: "Community Driven",
+    description: "The best features in Phototheology started as user feedback — keep sharing!",
+    narration: "Many of the best features in Phototheology started as user feedback just like yours. So don't hold back — your insights, frustrations, and dreams for the platform are invaluable. That's the Feedback page — speak up and help us grow!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const CULTURE_CONTROVERSY_TOUR: GuidedTourStep[] = [
+  {
+    id: "cc-welcome",
+    title: "Welcome to Culture & Controversy",
+    description: "Explore hot-button cultural topics through the lens of Scripture and Phototheology.",
+    narration: "Hello! Welcome to Culture and Controversy. This is where faith meets the real world. You can explore any hot-button cultural topic — from politics to technology to social issues — and receive a thoughtful, Scripture-grounded analysis powered by Jeeves.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "cc-quick-topics",
+    title: "Quick Topics",
+    description: "Choose from pre-loaded controversial topics or type your own.",
+    narration: "Start with one of the pre-loaded topics — these cover some of the most debated issues of our time. Each one is designed to provoke thoughtful reflection, not knee-jerk reactions. Or type your own topic in the search bar.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "cc-analysis",
+    title: "AI-Powered Analysis",
+    description: "Jeeves delivers a balanced, Scripture-rooted analysis with multiple perspectives.",
+    narration: "When you submit a topic, Jeeves generates a comprehensive analysis. It presents multiple perspectives — biblical, historical, and cultural — while always grounding the discussion in Scripture and Phototheology principles.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "cc-audio",
+    title: "Listen to the Analysis",
+    description: "Convert any analysis to audio and listen on the go.",
+    narration: "Every analysis can be converted to audio so you can listen on the go. It's perfect for commutes, walks, or anytime you want to engage with difficult topics hands-free.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "cc-apply",
+    title: "Think Biblically",
+    description: "Use these analyses for personal reflection, sermon prep, or small group discussions.",
+    narration: "The goal isn't to give you pre-packaged answers — it's to train you to think biblically about complex issues. Use these analyses for personal reflection, sermon preparation, or to spark meaningful small group conversations. That's Culture and Controversy — engage with courage!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const BIBLE_LEXICON_TOUR: GuidedTourStep[] = [
+  {
+    id: "lexicon-welcome",
+    title: "Welcome to the Bible Lexicon",
+    description: "Study Hebrew and Greek words with definitions, semantic ranges, and usage data.",
+    narration: "Hello! Welcome to the Bible Lexicon. This is your word-study laboratory — where you can dig into the original Hebrew and Greek behind every English translation. Whether you're a language student or just curious, this tool makes the original languages accessible.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "lexicon-search",
+    title: "Search Any Word",
+    description: "Look up by Strong's number, English word, or original Hebrew/Greek.",
+    narration: "Type any word into the search bar — you can use a Strong's number like H2713, an English word like 'love' or 'covenant', or even original Hebrew and Greek terms like 'agape' or 'shalom'. The lexicon will find the right entry.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "lexicon-definition",
+    title: "Full Definitions",
+    description: "See transliterations, part of speech, and extended definitions for every word.",
+    narration: "Each entry shows the original word, its transliteration, part of speech, and both a concise and extended definition. This gives you the full picture of what the word meant in its original context.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "lexicon-semantic",
+    title: "Semantic Range",
+    description: "Discover all the ways a word is translated and used across Scripture.",
+    narration: "The semantic range tab reveals all the different ways a single word is translated across the Bible. You'll see usage percentages and example verses for each meaning — essential for understanding the full breadth of a word.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "lexicon-related",
+    title: "Related Words & Verses",
+    description: "Explore word families and key verses where each word appears.",
+    narration: "Finally, explore related words — the word family tree — and key verses where the word appears most significantly. This connects your word study to the broader landscape of Scripture. That's the Bible Lexicon — dig deep into the language of God!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const RESEARCH_ASSISTANT_TOUR: GuidedTourStep[] = [
+  {
+    id: "research-welcome",
+    title: "Welcome to the Research Assistant",
+    description: "Your AI-powered biblical research companion for deep study sessions.",
+    narration: "Hello! Welcome to the Research Assistant. This is your AI-powered study companion for deep biblical research. Whether you're preparing a sermon, writing a paper, or just diving deep into a topic, the Research Assistant helps you explore Scripture systematically.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "research-query",
+    title: "Ask Any Question",
+    description: "Type a research question or topic and Jeeves will conduct thorough biblical research.",
+    narration: "Start by typing any research question or topic. Jeeves will conduct a thorough investigation — pulling from Scripture, cross-references, historical context, and Phototheology principles to build a comprehensive answer.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "research-results",
+    title: "Structured Results",
+    description: "Results are organized with scripture references, context, and practical applications.",
+    narration: "Your research results come back beautifully structured — with scripture references, historical and cultural context, theological analysis, and practical applications. It's like having a seminary library at your fingertips.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "research-save",
+    title: "Save & Resume",
+    description: "Save your research sessions and resume them later — your work is never lost.",
+    narration: "Every research session is saved automatically. You can come back later and resume exactly where you left off. Your research history builds over time into a personal theological library.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "research-connect",
+    title: "Connect to Your Study",
+    description: "Use research findings in sermons, Bible studies, and personal devotions.",
+    narration: "The real power is in connection. Take your research findings and feed them into sermons, Bible study series, or personal devotions. The Research Assistant doesn't replace your thinking — it amplifies it. That's your Research Assistant — study smarter!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const BIBLE_IMAGE_LIBRARY_TOUR: GuidedTourStep[] = [
+  {
+    id: "imagelib-welcome",
+    title: "Welcome to the Bible Image Library",
+    description: "Generate, collect, and organize AI-created biblical artwork.",
+    narration: "Hello! Welcome to the Bible Image Library. This is your gallery of AI-generated biblical artwork — images created from Scripture passages, palace rooms, and your own descriptions. Let me show you how to use it.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "imagelib-generate",
+    title: "Generate New Images",
+    description: "Describe a scene or enter a verse reference and Jeeves will create original artwork.",
+    narration: "To create a new image, enter a description or a verse reference. Jeeves will generate original artwork that captures the scene. You can choose between Translation Room style — turning verses into visual representations — or 24FPS style for chapter-by-chapter frames.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "imagelib-browse",
+    title: "Browse Your Collection",
+    description: "View all your images, filter by type, search by description, or browse by book.",
+    narration: "Browse your collection using the tabs — view all images, filter by favorites, browse by Bible book, or explore the Genesis Pack with pre-generated frames for every chapter. Use the search bar to find specific images by description or verse.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "imagelib-favorites",
+    title: "Favorites & Organization",
+    description: "Mark images as favorites, make them public, or delete ones you don't need.",
+    narration: "Click the heart icon to favorite an image for quick access. You can also toggle images to public so other users can see them, or delete images you no longer need. Your library grows with your study journey.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "imagelib-share",
+    title: "Download & Share",
+    description: "Download images for presentations, social media, or personal devotional use.",
+    narration: "Every image can be downloaded for use in presentations, social media posts, or personal devotional material. You can also ask Jeeves to refine or regenerate images until they're exactly right. That's the Bible Image Library — see the Word come alive!",
+    tooltipPosition: "bottom",
+  },
+];

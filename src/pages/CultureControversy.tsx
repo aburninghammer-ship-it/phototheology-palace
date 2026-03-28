@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Scale, Link2, Sparkles } from "lucide-react";
+import { Scale, Link2, Sparkles, GraduationCap } from "lucide-react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { CULTURE_CONTROVERSY_TOUR } from "@/data/guidedTours";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StyledMarkdownSections } from "@/components/ui/styled-markdown";
 import { motion } from "framer-motion";
@@ -19,6 +21,7 @@ const CultureControversy = () => {
   const [topic, setTopic] = useState("");
   const [analysis, setAnalysis] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const quickTopics = [
     "Black Lives Matter",
@@ -157,10 +160,14 @@ const CultureControversy = () => {
                 >
                   {t('challenges.cultureControversySubtitle')}
                 </motion.p>
+                <Button variant="ghost" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="mt-2 text-white/80 hover:text-white hover:bg-white/10 gap-1">
+                  <GraduationCap className="h-4 w-4" /> Guided Tour
+                </Button>
               </div>
             </div>
           </div>
         </motion.div>
+        {tourOpen && <GuidedTourOverlay steps={CULTURE_CONTROVERSY_TOUR} onClose={() => setTourOpen(false)} />}
 
         {/* Analysis Section */}
         <div className="container mx-auto px-4 py-8 max-w-6xl">

@@ -9,7 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, GraduationCap } from "lucide-react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { FEEDBACK_TOUR } from "@/data/guidedTours";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 
@@ -28,6 +30,7 @@ const Feedback = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("feature");
   const [submitting, setSubmitting] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,8 +108,12 @@ const Feedback = () => {
           <p className="text-xl text-blue-100">
             {t('feedback.hero.subtitle')}
           </p>
+          <Button variant="ghost" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="mt-4 text-white/80 hover:text-white hover:bg-white/10 gap-1">
+            <GraduationCap className="h-4 w-4" /> Guided Tour
+          </Button>
         </div>
       </div>
+      {tourOpen && <GuidedTourOverlay steps={FEEDBACK_TOUR} onClose={() => setTourOpen(false)} />}
 
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
