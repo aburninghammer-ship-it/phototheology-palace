@@ -5,7 +5,7 @@ import {
   MessageSquare, Users, Trophy, Target, Church, LayoutGrid,
   Headphones, Image, Network, Film, PersonStanding, Shield,
   Lightbulb, Video, Library, Scale, Megaphone, CreditCard,
-  Heart, Flame, Dumbbell, PenTool, HeartHandshake, User,
+  Heart, Flame, Dumbbell, HeartHandshake, User,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -26,6 +26,7 @@ export interface DockItem {
   children?: DockSubItem[];
 }
 
+// Organized into 13 major tabs using ONLY items from navTabs.ts
 export const DOCK_ITEMS: DockItem[] = [
   {
     id: "palace", label: "Palace", icon: Building2, path: "/palace", glow: "32 95% 53%",
@@ -43,13 +44,10 @@ export const DOCK_ITEMS: DockItem[] = [
     children: [
       { id: "interlinear", label: "Interlinear Bible", path: "/interlinear", icon: Languages, glow: "168 78% 38%" },
       { id: "lexicon", label: "Greek/Hebrew Lexicon", path: "/bible-lexicon", icon: BookOpen, glow: "155 70% 45%" },
-      { id: "timeline", label: "Bible Timeline", path: "/bible-timeline", icon: Clock, glow: "145 65% 40%" },
-      { id: "atlas", label: "Bible Atlas", path: "/bible-atlas", icon: MapPin, glow: "170 80% 35%" },
       { id: "encyclopedia", label: "Encyclopedia", path: "/encyclopedia", icon: Search, glow: "230 78% 62%" },
       { id: "character-profiles", label: "Character Profiles", path: "/character-profiles", icon: PersonStanding, glow: "240 72% 55%" },
       { id: "sources", label: "Source Library", path: "/sources", icon: Library, glow: "235 70% 58%" },
       { id: "libraries", label: "Libraries", path: "/libraries", icon: Library, glow: "250 65% 55%" },
-      { id: "study-series", label: "Study Series", path: "/study-series", icon: BookMarked, glow: "195 85% 50%" },
     ],
   },
   {
@@ -111,6 +109,7 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "remix", label: "Remix", path: "/remix", icon: Megaphone, glow: "27 90% 50%" },
       { id: "polish", label: "Polish", path: "/polish", icon: Film, glow: "285 78% 58%" },
       { id: "infographics", label: "Infographic Generator", path: "/infographics", icon: Image, glow: "175 72% 38%" },
+      { id: "study-series", label: "Study Series", path: "/study-series", icon: BookMarked, glow: "195 85% 50%" },
     ],
   },
   {
