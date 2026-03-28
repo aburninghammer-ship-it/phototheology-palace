@@ -232,13 +232,13 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
           {/* Separator */}
           <div className={cn("border-t border-sidebar-border my-2", expanded ? "mx-2" : "mx-1")} />
 
-          {/* Create */}
+          {/* Devotion */}
           {expanded && (
             <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider px-3 pt-1 pb-1">
-              Create
+              Devotion
             </span>
           )}
-          {CREATE_ITEMS.map(renderItem)}
+          {DEVOTION_ITEMS.map(renderItem)}
 
           {/* Separator */}
           <div className={cn("border-t border-sidebar-border my-2", expanded ? "mx-2" : "mx-1")} />
