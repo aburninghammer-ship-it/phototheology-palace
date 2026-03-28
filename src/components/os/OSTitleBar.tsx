@@ -100,8 +100,9 @@ export function OSTitleBar() {
         {/* Language Selector */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="outline" size="icon" className="h-8 w-8 shrink-0">
               <Languages className="h-4 w-4" />
+              <span className="sr-only">Language</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-48 p-2" align="end">
