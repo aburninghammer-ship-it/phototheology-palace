@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { SPIRITUAL_TRAINING_TOUR } from "@/data/guidedTours";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GlassBubbles } from "@/components/ui/glass-bubbles";
@@ -446,6 +448,8 @@ export default function SpiritualTraining() {
     }
   };
 
+  const [tourOpen, setTourOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -461,10 +465,16 @@ export default function SpiritualTraining() {
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             {t('training.spiritual.heroQuote')}
           </p>
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            {t('training.spiritual.heroBadge')}
-          </Badge>
+          <div className="flex items-center justify-center gap-2">
+            <Badge variant="outline" className="text-lg px-4 py-2">
+              {t('training.spiritual.heroBadge')}
+            </Badge>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
+          </div>
         </section>
+        {tourOpen && <GuidedTourOverlay steps={SPIRITUAL_TRAINING_TOUR} onClose={() => setTourOpen(false)} />}
 
         {/* Daily Encouragement */}
         <Card variant="glass" className="border-primary/20">

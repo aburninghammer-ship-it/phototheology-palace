@@ -759,3 +759,193 @@ export const BIBLE_IMAGE_LIBRARY_TOUR: GuidedTourStep[] = [
     tooltipPosition: "bottom",
   },
 ];
+
+export const SPIRITUAL_TRAINING_TOUR: GuidedTourStep[] = [
+  {
+    id: "spiritual-welcome",
+    title: "Welcome to Spiritual Training",
+    description: "Train your spirit like a warrior trains for battle — daily disciplines, combat arenas, and character growth.",
+    narration: "Hello! Welcome to the Spiritual Training Dojo. This is where you build spiritual muscle through daily disciplines, combat scenarios, and character tracking. Let me show you what's here.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "spiritual-encouragement",
+    title: "Daily Victory Thought",
+    description: "Start each session with an AI-generated encouragement drawn from Scripture.",
+    narration: "At the top you'll find the Daily Victory Thought — an AI-generated encouragement pulled from Scripture to fuel your spirit before training begins. Tap the button to generate a fresh word for today.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "spiritual-weapons",
+    title: "Spiritual Weapons & Combat",
+    description: "Learn to apply spiritual weapons to real-life situations using the Armor of God.",
+    narration: "The Spiritual Weapons section lets you select a piece of the Armor of God and apply it to a real-life situation. The AI will coach you on how to wield that weapon effectively — turning doctrine into daily practice.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "spiritual-lessons",
+    title: "Dojo Lessons & Challenges",
+    description: "Work through structured lessons on spiritual warfare, character building, and the Art of War.",
+    narration: "Explore the Dojo Lessons — structured training modules covering spiritual warfare, the Art of War applied to Scripture, and character-building challenges. Complete them to track your warrior progress.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "spiritual-mastery",
+    title: "Character & Combat Arena",
+    description: "Track your Fruit of the Spirit growth and test yourself in the Combat Arena.",
+    narration: "Finally, track your Fruit of the Spirit growth with the Character Tracker, and test yourself in the Combat Arena with real-life scenario challenges. This is where knowledge becomes transformation. That's Spiritual Training — now go train!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const VIDEO_TRAINING_TOUR: GuidedTourStep[] = [
+  {
+    id: "video-welcome",
+    title: "Welcome to Video Training",
+    description: "Watch step-by-step video tutorials on how to use every feature of Phototheology.",
+    narration: "Hello! Welcome to Video Training. This is your library of step-by-step video tutorials showing you how to use every feature of the Phototheology platform. Let me walk you through it.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "video-categories",
+    title: "Browse by Category",
+    description: "Filter videos by category — general tutorials, Palace methods, advanced techniques, and more.",
+    narration: "Use the category tabs to filter videos by topic — whether you're looking for general tutorials, Palace methodology, advanced techniques, or specific feature walkthroughs. Everything is organized for quick access.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "video-player",
+    title: "Watch & Learn",
+    description: "Click any video to play it. Each tutorial walks you through the feature with clear, visual instructions.",
+    narration: "Click any video card to open the player. Each tutorial walks you through the feature with clear, visual instructions. You can watch at your own pace and replay sections as needed.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "video-share",
+    title: "Share Tutorials",
+    description: "Share helpful tutorials with friends or your church community.",
+    narration: "Found a tutorial that helped you? Use the share button to send it to friends, post it in your church community, or bookmark it for later. Sharing knowledge multiplies impact.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "video-admin",
+    title: "Admin Uploads",
+    description: "Video admins can upload new tutorials directly from this page.",
+    narration: "If you're a video admin, you can upload new tutorials directly from this page — add a title, description, category, and video file. That's Video Training — learn visually, grow practically!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const COMMUNITY_TOUR: GuidedTourStep[] = [
+  {
+    id: "community-welcome",
+    title: "Welcome to the Palace Lounge",
+    description: "A community space where iron sharpens iron — share insights, ask questions, and encourage one another.",
+    narration: "Hello! Welcome to the Palace Lounge — the community hub where believers sharpen one another. Here you can share insights, ask questions, post prayer requests, and encourage each other on the journey. Let me show you around.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "community-post",
+    title: "Create a Post",
+    description: "Share a study insight, question, or prayer request with the community.",
+    narration: "Use the Quick Post bar or the Create Post button to share something — whether it's a study insight, a theological question, a prayer request, or a testimony. Choose a category and add tags to help others find your post.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "community-interact",
+    title: "Like, Comment & Reply",
+    description: "Engage with posts through likes, comments, and threaded replies.",
+    narration: "Engage with the community by liking posts, leaving comments, and replying to specific threads. The more you interact, the richer the conversation becomes. You can also edit or delete your own posts and comments.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "community-filter",
+    title: "Sort & Filter",
+    description: "Sort by latest, trending, or needs feedback. Filter by category to find what matters most.",
+    narration: "Use the sort options to view posts by latest, most commented, trending, or those that need feedback. Filter by category — general discussion, prayer, study questions — to find exactly what you're looking for.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "community-spotlight",
+    title: "Weekly Spotlight & Challenges",
+    description: "Check the weekly spotlight and daily challenges to stay engaged.",
+    narration: "Keep an eye on the Weekly Spotlight for featured posts and the Daily Challenge banner for community-wide activities. The Palace Lounge is more than a forum — it's your family of scholars. Welcome home!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const LIVING_MANNA_TOUR: GuidedTourStep[] = [
+  {
+    id: "manna-welcome",
+    title: "Welcome to Living Manna",
+    description: "Your church's discipleship hub — connecting members through study, worship, and community.",
+    narration: "Hello! Welcome to Living Manna — your church's discipleship home base. This is where your congregation connects for study, worship, small groups, and spiritual growth. Let me show you what's available.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "manna-home",
+    title: "Member Home",
+    description: "See announcements, upcoming events, and your church's activity at a glance.",
+    narration: "The Home tab gives you a snapshot of your church community — announcements, upcoming events, and recent activity. It's your church bulletin board, always up to date.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "manna-learn",
+    title: "Learn & Grow Tabs",
+    description: "Access Bible studies, devotionals, small groups, and spiritual growth resources.",
+    narration: "The Learn and Grow tabs provide access to church Bible studies, weekly devotionals, small group discussions, and spiritual growth resources. Everything your church needs for discipleship is organized right here.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "manna-connect",
+    title: "Connect & Serve",
+    description: "Chat with members, join small groups, find serving opportunities, and support your church.",
+    narration: "Use the Connect tab for church chat rooms and direct messaging. The Serve tab shows ministry opportunities, and the Giving tab makes it easy to support your church financially. Community is at the heart of Living Manna.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "manna-baptism",
+    title: "Baptism Track & More",
+    description: "Track baptism candidates, access youth spaces, and explore the full church platform.",
+    narration: "Living Manna also includes a Baptism Track for preparing candidates, a Youth Space for younger members, and specialized ministry tools. It's a complete church platform — all in one place. Welcome to your church family!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const BIBLE_REFERENCE_TOUR: GuidedTourStep[] = [
+  {
+    id: "bibleref-welcome",
+    title: "Welcome to the PT Codebook",
+    description: "The complete Phototheology reference manual — all principles, cycles, symbols, and memory tools in one place.",
+    narration: "Hello! Welcome to the Phototheology Codebook — your complete reference manual for the entire system. All eight floors, all cycles, all symbols, and all memory tools are documented right here. Let me walk you through it.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "bibleref-principles",
+    title: "PT Principles",
+    description: "Browse all eight floors of the Palace with every room, its code, and its purpose.",
+    narration: "The PT Principles tab lays out all eight floors of the Palace. Each floor lists its rooms with their codes and purposes. You can also see the Five Ascensions and Four Expansions — the framework that ties everything together.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "bibleref-cycles",
+    title: "Cycles & Heavens",
+    description: "Explore the eight redemptive cycles and three heavens that map salvation history.",
+    narration: "The Cycles and Heavens tab maps the eight great cycles of redemption — from Adam to the Remnant — and the Three Heavens framework showing the Day of the Lord patterns. This is the cosmic stage of Phototheology.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "bibleref-symbols",
+    title: "Symbol Library",
+    description: "A searchable library of biblical symbols, types, and their meanings.",
+    narration: "The Symbol Library is a searchable catalog of biblical symbols and types — from lambs to mountains, from water to fire. Each entry shows its meaning and key Scripture references. It's your quick-reference decoder ring.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "bibleref-memory",
+    title: "Memory Tools",
+    description: "Access mnemonic tools, room codes, and study aids to internalize the system.",
+    narration: "Finally, the Memory Tools tab provides mnemonics, room codes, and study aids to help you internalize the entire Phototheology system. Use these tools until the Palace becomes reflexive — that's the goal of Floor Eight. That's the Codebook — your complete reference!",
+    tooltipPosition: "bottom",
+  },
+];
