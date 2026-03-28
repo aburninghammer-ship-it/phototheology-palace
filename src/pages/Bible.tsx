@@ -87,7 +87,10 @@ const Bible = () => {
                 <Button
                   variant="outline"
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
-                  onClick={() => setTutorialOpen(true)}
+                  onClick={() => {
+                    primeAudio();
+                    setTutorialOpen(true);
+                  }}
                   data-tutorial="bible-tutorial-btn"
                 >
                   <GraduationCap className="h-4 w-4 mr-2" />
