@@ -26,6 +26,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 const DOCK_ORDER_KEY = "phototheology-dock-order";
+const SUB_ORDER_KEY_PREFIX = "phototheology-sub-order-";
 
 function getStoredOrder(): string[] | null {
   try {
@@ -36,6 +37,17 @@ function getStoredOrder(): string[] | null {
 
 function storeOrder(ids: string[]) {
   localStorage.setItem(DOCK_ORDER_KEY, JSON.stringify(ids));
+}
+
+function getStoredSubOrder(parentId: string): string[] | null {
+  try {
+    const stored = localStorage.getItem(SUB_ORDER_KEY_PREFIX + parentId);
+    return stored ? JSON.parse(stored) : null;
+  } catch { return null; }
+}
+
+function storeSubOrder(parentId: string, ids: string[]) {
+  localStorage.setItem(SUB_ORDER_KEY_PREFIX + parentId, JSON.stringify(ids));
 }
 
 function SortableDockItem({ item, children }: { item: DockItem; children: React.ReactNode }) {
