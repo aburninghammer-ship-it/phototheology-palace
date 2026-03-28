@@ -53,14 +53,14 @@ export function OSTitleBar() {
           style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
           <Sparkles className="h-3 w-3 text-white" />
         </div>
-        <div className="flex items-center gap-1.5 min-w-0">
-          <span className="text-xs font-bold tracking-wide whitespace-nowrap"
-            style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+        <div className="flex items-center gap-1 min-w-0">
+          <span className="text-sm font-extrabold tracking-wide whitespace-nowrap"
+            style={{ background: "linear-gradient(90deg, hsl(32 95% 53%), hsl(340 80% 55%), hsl(270 75% 60%), hsl(210 85% 55%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             PhototheologyOS
           </span>
-          <span className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest shrink-0"
-            style={{ background: "linear-gradient(135deg, hsl(32 95% 53% / 0.15), hsl(210 85% 50% / 0.15))", color: "hsl(32 95% 53%)", border: "1px solid hsl(32 95% 53% / 0.3)" }}>
-            Eden
+          <span className="text-sm font-extrabold tracking-wide whitespace-nowrap"
+            style={{ background: "linear-gradient(90deg, hsl(145 70% 45%), hsl(32 95% 53%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            : Eden
           </span>
         </div>
         <span className="text-[9px] text-muted-foreground hidden xl:inline whitespace-nowrap">
