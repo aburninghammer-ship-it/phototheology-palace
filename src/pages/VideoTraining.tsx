@@ -221,6 +221,7 @@ const VideoTraining = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {tourOpen && <GuidedTourOverlay steps={VIDEO_TRAINING_TOUR} onClose={() => setTourOpen(false)} />}
       <Helmet>
         <title>{shareTitle}</title>
         <meta name="description" content={shareDescription} />

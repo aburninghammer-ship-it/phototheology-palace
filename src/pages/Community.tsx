@@ -1,4 +1,6 @@
 import { useEffect, useState, useMemo, useRef } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { COMMUNITY_TOUR } from "@/data/guidedTours";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
@@ -11,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Plus, Users, Reply, Send, Sparkles, Pencil, Trash2, Filter, Flame, TrendingUp } from "lucide-react";
+import { MessageSquare, Plus, Users, Reply, Send, Sparkles, Pencil, Trash2, Filter, Flame, TrendingUp, GraduationCap } from "lucide-react";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { communityPostSchema } from "@/lib/validationSchemas";
 import { sanitizeHtml } from "@/lib/sanitize";
@@ -62,6 +64,7 @@ const Community = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
+  const [tourOpen, setTourOpen] = useState(false);
   const [firstComments, setFirstComments] = useState<Record<string, any>>({});
   const newPostFormRef = useRef<HTMLDivElement>(null);
 
