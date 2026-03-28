@@ -30,7 +30,7 @@ export function PatreonOutreach() {
   const [subject, setSubject] = useState("Unlock Phototheology – Your Patron Access Awaits!");
   const [htmlContent, setHtmlContent] = useState(`
 <h2>Hey there, Patron!</h2>
-<p>Thank you for supporting Phototheology! As a patron pledging <strong>$15/month or more</strong>, you qualify for <strong>premium access</strong> to the full Phototheology Suite.</p>
+<p>Thank you for supporting Phototheology! As a patron pledging <strong>$15/month or more</strong>, you qualify for <strong>premium access</strong> to the full PhototheologyOS.</p>
 
 <h3>Here's how to claim your access:</h3>
 <ol>
@@ -426,10 +426,10 @@ export function PatreonOutreach() {
             variant="outline"
             className="w-full justify-start border-red-500/30 hover:bg-red-500/10"
             onClick={() => {
-              setSubject("🎉 You Have Full Access to the PhotoTheology Suite!");
+              setSubject("🎉 You Have Full Access to the PhototheologyOS!");
               setHtmlContent(`<h1>Thank You, Patron!</h1>
 <p>Hi there,</p>
-<p>Thank you so much for your generous support on Patreon! As a patron pledging <strong>$15/month or more</strong>, you have <strong>full access</strong> to the complete PhotoTheology Suite.</p>
+<p>Thank you so much for your generous support on Patreon! As a patron pledging <strong>$15/month or more</strong>, you have <strong>full access</strong> to the complete PhototheologyOS.</p>
 
 <h2>What's Included:</h2>
 <ul>
@@ -468,7 +468,7 @@ export function PatreonOutreach() {
             onClick={() => {
               setSubject("Unlock Phototheology – Your Patron Access Awaits!");
               setHtmlContent(`<h2>Hey there, Patron!</h2>
-<p>Thank you for supporting Phototheology! As a patron pledging <strong>$15/month or more</strong>, you qualify for <strong>premium access</strong> to the full Phototheology Suite.</p>
+<p>Thank you for supporting Phototheology! As a patron pledging <strong>$15/month or more</strong>, you qualify for <strong>premium access</strong> to the full PhototheologyOS.</p>
 
 <h3>Here's how to claim your access:</h3>
 <ol>

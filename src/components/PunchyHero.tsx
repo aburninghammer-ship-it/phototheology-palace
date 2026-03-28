@@ -48,7 +48,7 @@ export const PunchyHero = () => {
               <div className="absolute top-2 right-3 w-1.5 h-1.5 rounded-full bg-cyan-400/60 animate-pulse" />
               <div className="absolute bottom-2 left-4 w-1 h-1 rounded-full bg-yellow-400/50 animate-pulse delay-500" />
                 <h2 className="relative font-display text-lg sm:text-xl md:text-2xl font-bold tracking-widest text-primary uppercase drop-shadow-[0_0_15px_hsl(var(--primary)/0.6)]">
-                  Phototheology Bible Learning Suite
+                  PhototheologyOS
                 </h2>
             </div>
           </div>
