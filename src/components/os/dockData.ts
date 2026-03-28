@@ -170,6 +170,16 @@ export const DOCK_SECTIONS: DockSection[] = [
           { id: "sermon-ideas", label: "Sermon Ideas", path: "/sermon-ideas", icon: Lightbulb },
         ],
       },
+      {
+        id: "blueprints", label: "Blueprints", icon: HeartHandshake, path: "/blueprint-marriage", glow: "320 60% 55%",
+        children: [
+          { id: "bp-marriage", label: "Dating & Marriage", path: "/blueprint-marriage", icon: Heart },
+          { id: "bp-grief", label: "Grieving", path: "/blueprint-grief", icon: HeartHandshake },
+          { id: "bp-stronghold", label: "Breaking Strongholds", path: "/blueprint-stronghold", icon: Shield },
+          { id: "bp-weight", label: "Weight Loss", path: "/blueprint-weight-loss", icon: Dumbbell },
+          { id: "bp-mental", label: "Mental Health", path: "/blueprint-mental-health", icon: Brain },
+        ],
+      },
     ],
   },
   {
