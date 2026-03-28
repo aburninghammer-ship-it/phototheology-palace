@@ -57,43 +57,45 @@ export function OSTitleBar() {
           <Sparkles className="h-3.5 w-3.5 text-white drop-shadow-sm" />
         </div>
         <div className="flex flex-col leading-none">
-          <div className="flex items-baseline gap-0">
-            <span className="text-[14px] whitespace-nowrap bg-clip-text text-transparent"
+          <div className="flex items-baseline gap-0.5">
+            <span className="text-[14px] whitespace-nowrap"
               style={{ 
-                fontFamily: "'Sora', sans-serif", 
-                fontWeight: 800,
-                backgroundImage: "linear-gradient(100deg, hsl(195 95% 60%), hsl(210 90% 65%))",
-                letterSpacing: "-0.01em"
+                fontFamily: "'Cinzel', serif", 
+                fontWeight: 700,
+                color: "hsl(200 85% 58%)",
+                letterSpacing: "0.04em"
               }}>
-              Phototheology
+              PHOTOTHEOLOGY
             </span>
-            <span className="text-[11px] whitespace-nowrap bg-clip-text text-transparent"
+            <span className="text-[10px] whitespace-nowrap rounded-[3px] px-1 py-[1px]"
               style={{ 
-                fontFamily: "'Sora', sans-serif", 
-                fontWeight: 600,
-                backgroundImage: "linear-gradient(100deg, hsl(185 80% 52%), hsl(195 85% 58%))",
-                letterSpacing: "0.03em"
+                fontFamily: "'Inter', sans-serif", 
+                fontWeight: 700,
+                color: "hsl(190 90% 45%)",
+                background: "hsl(195 80% 55% / 0.12)",
+                border: "1px solid hsl(195 80% 55% / 0.2)",
+                letterSpacing: "0.08em"
               }}>
               OS
             </span>
           </div>
           <div className="flex items-center gap-1.5 mt-[2px]">
-            <span className="text-[8px] whitespace-nowrap bg-clip-text text-transparent"
+            <span className="text-[8px] whitespace-nowrap"
               style={{ 
-                fontFamily: "'Inter', sans-serif", 
-                fontWeight: 500,
-                backgroundImage: "linear-gradient(90deg, hsl(175 70% 50%), hsl(190 65% 55%))",
-                letterSpacing: "0.14em",
+                fontFamily: "'Cinzel', serif", 
+                fontWeight: 600,
+                color: "hsl(185 70% 50%)",
+                letterSpacing: "0.18em",
                 textTransform: "uppercase"
               }}>
               Eden
             </span>
-            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "hsl(195 80% 55%)" }} />
+            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "hsl(190 75% 50%)" }} />
             <span className="text-[7px] whitespace-nowrap"
               style={{ 
                 fontFamily: "'Inter', sans-serif", 
                 fontWeight: 500,
-                color: "hsl(200 40% 65% / 0.55)",
+                color: "hsl(200 30% 60% / 0.6)",
                 letterSpacing: "0.06em",
                 textTransform: "uppercase"
               }}>
