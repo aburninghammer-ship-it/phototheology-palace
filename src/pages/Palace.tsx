@@ -160,7 +160,7 @@ const Palace = () => {
             </div>
 
             {user && loading && (
-              <Card variant="glass" className="max-w-md mx-auto mb-4 md:mb-6">
+              <Card variant="glass" className="palace-progress-card max-w-md mx-auto mb-4 md:mb-6">
                 <CardContent className="p-4 md:pt-6 relative z-10">
                   <div className="flex items-center justify-between mb-2">
                     <Skeleton className="h-5 w-32" />
@@ -200,7 +200,7 @@ const Palace = () => {
               />
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center px-4 sm:px-0 flex-wrap">
+            <div className="palace-action-buttons flex flex-col sm:flex-row gap-3 justify-center px-4 sm:px-0 flex-wrap">
               <Button asChild size="lg" className="gradient-palace text-white h-12 md:h-11 text-base">
                 <Link to={user ? "/games/palace_quiz" : "/auth"}>
                   <Building2 className="mr-2 h-5 w-5 md:h-4 md:w-4" />
@@ -219,7 +219,7 @@ const Palace = () => {
             </div>
           </div>
 
-          <Card variant="glassSubtle" className="mb-6 md:mb-8 p-4 md:p-6">
+          <Card variant="glassSubtle" className="palace-floor-overview mb-6 md:mb-8 p-4 md:p-6">
             <h2 className="font-serif text-xl md:text-2xl font-semibold mb-3 md:mb-4 text-center">
               {t('palace.palaceMetaphor')}
             </h2>
@@ -255,7 +255,7 @@ const Palace = () => {
             </div>
           </Card>
 
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "explore" | "progress" | "audio-tour")} className="mb-6">
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "explore" | "progress" | "audio-tour")} className="palace-tabs mb-6">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="explore">
                 <Building2 className="h-4 w-4 mr-2" />
@@ -272,7 +272,7 @@ const Palace = () => {
             </TabsList>
 
             <TabsContent value="explore" className="space-y-6">
-              <div className="flex justify-end gap-2">
+              <div className="palace-view-toggle flex justify-end gap-2">
                 <Button
                   variant={viewMode === "list" ? "default" : "outline"}
                   size="sm"
