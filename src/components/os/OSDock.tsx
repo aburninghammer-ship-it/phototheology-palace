@@ -127,18 +127,20 @@ export function OSDock() {
                 {item.children!.map((sub) => {
                   const subActive = isActive(sub.path);
                   const SubIcon = sub.icon || ChevronRight;
+                  const subGlow = sub.glow || item.glow;
+                  const subColor = `hsl(${subGlow})`;
                   return (
                     <button key={sub.id} onClick={() => navigate(sub.path)}
                       className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full"
                       style={{
-                        color: subActive ? itemColor : `hsl(${item.glow} / 0.75)`,
-                        backgroundColor: subActive ? `hsl(${item.glow} / 0.15)` : undefined,
+                        color: subActive ? subColor : `hsl(${subGlow} / 0.75)`,
+                        backgroundColor: subActive ? `hsl(${subGlow} / 0.15)` : undefined,
                         fontWeight: subActive ? 600 : 400,
                       }}
-                      onMouseEnter={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.08)`; e.currentTarget.style.color = itemColor; }}}
-                      onMouseLeave={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = `hsl(${item.glow} / 0.75)`; }}}
+                      onMouseEnter={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = `hsl(${subGlow} / 0.08)`; e.currentTarget.style.color = subColor; }}}
+                      onMouseLeave={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = `hsl(${subGlow} / 0.75)`; }}}
                     >
-                      <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: itemColor }} />
+                      <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: subColor }} />
                       <span className="truncate">{sub.label}</span>
                     </button>
                   );
