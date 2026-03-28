@@ -28,7 +28,8 @@ import {
   MapPin,
   Calendar,
   BarChart3,
-  Loader2
+  Loader2,
+  GraduationCap
 } from "lucide-react";
 
 const BibleReference = () => {
