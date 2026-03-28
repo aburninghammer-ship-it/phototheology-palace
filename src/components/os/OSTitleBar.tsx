@@ -27,6 +27,8 @@ import { Link } from "react-router-dom";
 import { Radio, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePresenceTracker } from "@/hooks/usePresenceTracker";
+import { useActiveUsers } from "@/hooks/useActiveUsers";
+import { Users } from "lucide-react";
 
 export function OSTitleBar() {
   const { user, signOut } = useAuth();
@@ -40,6 +42,7 @@ export function OSTitleBar() {
 
   if (!user || isPublicPage || isWorkspacePane || isMobile) return null;
 
+  const { activeCount } = useActiveUsers();
   const initials = user.email?.slice(0, 2).toUpperCase() || "U";
 
   return (
@@ -66,6 +69,12 @@ export function OSTitleBar() {
 
       {/* Right: Utility Toolbar */}
       <div className="flex items-center gap-1">
+        {activeCount > 0 && (
+          <div className="hidden lg:flex items-center gap-1 px-2 h-8 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+            <Users className="h-3.5 w-3.5" />
+            <span>{activeCount} online</span>
+          </div>
+        )}
         <ShareableProgressCard />
         <PWAInstallButton />
         <ThemeToggle />
