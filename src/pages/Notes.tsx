@@ -37,6 +37,7 @@ const Notes = () => {
   const { t } = useTranslation();
   const [verseNotes, setVerseNotes] = useState<VerseNote[]>([]);
   const [verseNotesLoading, setVerseNotesLoading] = useState(true);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Enable scroll position preservation for this page
   usePreservePage();
@@ -110,15 +111,19 @@ const Notes = () => {
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">{t('notesPage.title')}</h1>
-            <p className="text-muted-foreground">
-              {t('notesPage.captureThoughts')}
-            </p>
-          </div>
-          <Badge variant="outline" className="flex items-center gap-2">
-            {isOnline ? (
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">{t('notesPage.title')}</h1>
+              <p className="text-muted-foreground">
+                {t('notesPage.captureThoughts')}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+                <StickyNote className="h-4 w-4" /> Tour
+              </Button>
+              <Badge variant="outline" className="flex items-center gap-2">
+                {isOnline ? (
               <>
                 <Cloud className="h-4 w-4 text-green-500" />
                 {t('notesPage.online')}
