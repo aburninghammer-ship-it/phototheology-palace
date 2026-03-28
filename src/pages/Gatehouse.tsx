@@ -12,7 +12,7 @@ import { useEventTracking } from '@/hooks/useEventTracking';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { UserCountBadge } from '@/components/UserCountBadge';
-import { GiveGemButton } from '@/components/GiveGemButton';
+import { Headphones } from 'lucide-react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { useTranslation } from 'react-i18next';
@@ -322,7 +322,14 @@ const Gatehouse = () => {
             </h1>
 
             <div className="mt-8 flex justify-center">
-              <GiveGemButton />
+              <Button
+                onClick={() => navigate("/palace-tour")}
+                size="lg"
+                className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:via-yellow-600 hover:to-amber-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group"
+              >
+                <Headphones className="h-5 w-5 mr-2 group-hover:animate-pulse" />
+                🎧 Take the Audio Tour
+              </Button>
             </div>
           </motion.div>
 
@@ -491,7 +498,14 @@ const Gatehouse = () => {
           </motion.div>
 
           <div className="mt-8 flex justify-center">
-            <GiveGemButton />
+            <Button
+              onClick={() => navigate("/palace-tour")}
+              size="lg"
+              className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:via-yellow-600 hover:to-amber-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group"
+            >
+              <Headphones className="h-5 w-5 mr-2 group-hover:animate-pulse" />
+              🎧 Take the Audio Tour
+            </Button>
           </div>
         </motion.div>
 
