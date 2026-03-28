@@ -5,7 +5,7 @@ import { BibleReader } from "@/components/bible/BibleReader";
 import { BibleNavigation } from "@/components/bible/BibleNavigation";
 import { AtAGlanceSidebar } from "@/components/bible/AtAGlanceSidebar";
 import { Button } from "@/components/ui/button";
-import { BookMarked, HelpCircle, Headphones, FlaskConical, PanelLeft } from "lucide-react";
+import { BookMarked, HelpCircle, Headphones, FlaskConical, PanelLeft, GraduationCap } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { StudyBibleDemoDialog } from "@/components/bible/StudyBibleDemoDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
@@ -14,6 +14,7 @@ import { OfflineIndicator } from "@/components/bible/OfflineIndicator";
 import { usePreservePage } from "@/hooks/usePreservePage";
 import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { BibleTabTutorial } from "@/components/bible/BibleTabTutorial";
 
 
 const Bible = () => {
@@ -22,6 +23,7 @@ const Bible = () => {
   const isMobile = useIsMobile();
   const [demoOpen, setDemoOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   // Auto-close sidebar on mobile, auto-open on desktop
   useEffect(() => {
