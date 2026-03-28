@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { COTA_TOUR } from "@/data/guidedTours";
 import { Navigation } from "@/components/Navigation";
 import { SpiritOfProphecyTab } from "@/components/living-manna/SpiritOfProphecyTab";
 import { DefenseMode } from "@/components/living-manna/DefenseMode";

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { LockInMissionTracker } from "@/components/LockInMissionTracker";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { DASHBOARD_TOUR } from "@/data/guidedTours";
 import { LockInConversionBanner } from "@/components/LockInConversionBanner";
 import { LockInPassAllowanceWidget } from "@/components/LockInPassAllowanceWidget";
 import { useTranslation } from "react-i18next";

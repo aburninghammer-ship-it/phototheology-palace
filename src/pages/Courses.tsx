@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { COURSES_TOUR } from "@/data/guidedTours";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

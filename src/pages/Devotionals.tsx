@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { DEVOTIONALS_TOUR } from "@/data/guidedTours";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus, GraduationCap, Home, HeartHandshake, Sun, Church, GraduationCap as StudyIcon, MessageSquare, Pencil } from "lucide-react";
