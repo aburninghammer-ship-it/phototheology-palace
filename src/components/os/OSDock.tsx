@@ -357,11 +357,11 @@ export function OSDock() {
       initial={false}
       animate={{ width: expanded ? 240 : 64 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="h-full flex flex-col bg-sidebar/80 backdrop-blur-xl border-r border-white/5 shrink-0 relative z-40"
+      className="h-full flex flex-col bg-sidebar/70 backdrop-blur-2xl border-r border-white/[0.04] shrink-0 relative z-40"
     >
       {/* Header with hide button */}
-      <div className={cn("shrink-0 border-b border-white/5 flex items-center", expanded ? "px-3 py-2 justify-between" : "p-2 justify-center")}>
-        {expanded && <span className="text-[10px] uppercase font-semibold text-muted-foreground/50 tracking-wider">Navigation</span>}
+      <div className={cn("shrink-0 border-b border-white/[0.04] flex items-center", expanded ? "px-3 py-2.5 justify-between" : "p-2.5 justify-center")}>
+        {expanded && <span className="text-[9px] uppercase font-bold text-muted-foreground/40 tracking-[0.2em]">Navigation</span>}
         <div className="flex items-center gap-0.5">
           <button
             onClick={() => setExpanded(!expanded)}
