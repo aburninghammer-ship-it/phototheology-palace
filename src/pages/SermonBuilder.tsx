@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive, Gem, Info, Swords, PenLine, FileText, Presentation, Lightbulb, Plus, Sparkles, Calendar, Edit, Trash2, Copy, Clock, Brain } from "lucide-react";
+import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive, Gem, Info, Swords, PenLine, FileText, Presentation, Lightbulb, Plus, Sparkles, Calendar, Edit, Trash2, Copy, Clock, Brain, GraduationCap } from "lucide-react";
 import { MyIdeaTab } from "@/components/simmer/MyIdeaTab";
 import { sermonTitleSchema, sermonThemeSchema, sermonStoneSchema, sermonBridgeSchema } from "@/lib/validationSchemas";
 import { sanitizeText, sanitizeHtml } from "@/lib/sanitize";

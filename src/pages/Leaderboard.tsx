@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Trophy, Medal, Award, Target, Building2, Flame, Calendar, Crown, Star } from "lucide-react";
+import { Trophy, Medal, Award, Target, Building2, Flame, Calendar, Crown, Star, GraduationCap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Leaderboard = () => {

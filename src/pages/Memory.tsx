@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Plus, Users, Trophy, Book, Sparkles, Gamepad2, Play, ArrowRight, Target, ArrowLeft, Loader2 } from "lucide-react";
+import { Brain, Plus, Users, Trophy, Book, Sparkles, Gamepad2, Play, ArrowRight, Target, ArrowLeft, Loader2, GraduationCap } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { memoryPalaceSteps } from "@/config/howItWorksSteps";
