@@ -1,7 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
-import { User, LogOut, Settings, Languages } from "lucide-react";
-import { PhototheologyOSLogo } from "@/components/PhototheologyOSLogo";
+import { Sparkles, User, LogOut, Settings, Languages } from "lucide-react";
 import { CommandPaletteTrigger } from "./CommandPalette";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -50,7 +49,28 @@ export function OSTitleBar() {
     <div className="h-12 flex items-center justify-between px-4 bg-background/60 backdrop-blur-2xl border-b border-border/20 shrink-0 z-50"
       style={{ background: "linear-gradient(180deg, hsl(var(--background) / 0.85), hsl(var(--background) / 0.6))" }}>
       {/* Left: Brand */}
-      <PhototheologyOSLogo to="/palace" />
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-lg"
+          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(270 75% 60%), hsl(210 85% 55%))", boxShadow: "0 0 16px hsl(32 95% 53% / 0.3)" }}>
+          <Sparkles className="h-3.5 w-3.5 text-white drop-shadow-sm" />
+        </div>
+        <div className="flex flex-col leading-none">
+          <span className="text-[13px] font-black tracking-tight whitespace-nowrap bg-clip-text text-transparent"
+            style={{ backgroundImage: "linear-gradient(90deg, hsl(32 95% 58%), hsl(350 80% 60%), hsl(280 70% 65%), hsl(210 85% 60%), hsl(160 70% 50%))" }}>
+            PhototheologyOS
+          </span>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-clip-text text-transparent"
+              style={{ backgroundImage: "linear-gradient(90deg, hsl(145 70% 50%), hsl(170 65% 55%))" }}>
+              Eden
+            </span>
+            <span className="w-1 h-1 rounded-full" style={{ background: "hsl(145 70% 50%)" }} />
+            <span className="text-[8px] text-muted-foreground/60 font-medium tracking-wider uppercase hidden xl:inline whitespace-nowrap">
+              Biblical Intelligence
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Center: Search */}
       <div className="hidden md:flex flex-1 max-w-sm mx-4">
