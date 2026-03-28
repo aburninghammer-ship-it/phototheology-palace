@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, ChevronLeft, ChevronDown, Sparkles } from "lucide-react";
+import { ChevronRight, ChevronLeft, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DOCK_SECTIONS, type DockItem, type DockSubItem } from "./dockData";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -127,18 +127,20 @@ export function OSDock() {
                 {item.children!.map((sub) => {
                   const subActive = isActive(sub.path);
                   const SubIcon = sub.icon || ChevronRight;
+                  const subGlow = sub.glow || item.glow;
+                  const subColor = `hsl(${subGlow})`;
                   return (
                     <button key={sub.id} onClick={() => navigate(sub.path)}
                       className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-all w-full"
                       style={{
-                        color: subActive ? itemColor : `hsl(${item.glow} / 0.75)`,
-                        backgroundColor: subActive ? `hsl(${item.glow} / 0.15)` : undefined,
+                        color: subActive ? subColor : `hsl(${subGlow} / 0.75)`,
+                        backgroundColor: subActive ? `hsl(${subGlow} / 0.15)` : undefined,
                         fontWeight: subActive ? 600 : 400,
                       }}
-                      onMouseEnter={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.08)`; e.currentTarget.style.color = itemColor; }}}
-                      onMouseLeave={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = `hsl(${item.glow} / 0.75)`; }}}
+                      onMouseEnter={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = `hsl(${subGlow} / 0.08)`; e.currentTarget.style.color = subColor; }}}
+                      onMouseLeave={(e) => { if (!subActive) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = `hsl(${subGlow} / 0.75)`; }}}
                     >
-                      <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: itemColor }} />
+                      <SubIcon className="h-3.5 w-3.5 shrink-0" style={{ color: subColor }} />
                       <span className="truncate">{sub.label}</span>
                     </button>
                   );
@@ -158,19 +160,8 @@ export function OSDock() {
       transition={{ duration: 0.2, ease: "easeInOut" }}
       className="h-full flex flex-col bg-sidebar border-r border-sidebar-border shrink-0 relative z-40"
     >
-      {/* Brand */}
-      <div className={cn("flex items-center shrink-0 border-b border-sidebar-border", expanded ? "h-12 px-4 gap-3" : "h-12 justify-center")}>
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
-          <Sparkles className="h-3.5 w-3.5 text-white" />
-        </div>
-        {expanded && (
-          <span className="text-xs font-bold truncate"
-            style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            PhototheologyOS
-          </span>
-        )}
-      </div>
+      {/* Spacer for top alignment */}
+      <div className={cn("shrink-0 border-b border-sidebar-border", expanded ? "h-3" : "h-3")} />
 
       {/* Navigation */}
       <ScrollArea className="flex-1">

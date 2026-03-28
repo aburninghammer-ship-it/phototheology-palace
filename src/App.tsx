@@ -23,6 +23,7 @@ import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import { UserPreferencesProvider } from "@/hooks/useUserPreferences";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { GlobalStudyBanner } from "@/components/GlobalStudyBanner";
 import { TrialUpgradePrompt } from "@/components/TrialUpgradePrompt";
 import { IncompleteSignupPrompt } from "@/components/IncompleteSignupPrompt";
 import { TrialUrgencyMessage } from "@/components/TrialUrgencyMessage";
@@ -406,6 +407,7 @@ function App() {
                         </>}
                         <CommandPalette />
                         {!isWorkspacePane && <OSTitleBar />}
+                        {!isWorkspacePane && <GlobalStudyBanner />}
                         {!isWorkspacePane && (
                           <div className="zen-hideable">
                             <AnnouncementBanner />
