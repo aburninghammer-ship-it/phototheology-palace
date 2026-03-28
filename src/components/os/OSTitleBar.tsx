@@ -55,7 +55,7 @@ export function OSTitleBar() {
         </div>
         <div className="flex flex-col leading-none">
           <span className="text-[13px] font-black tracking-tight whitespace-nowrap"
-            style={{ background: "linear-gradient(90deg, hsl(32 95% 58%), hsl(350 80% 60%), hsl(280 70% 65%), hsl(210 85% 60%), hsl(160 70% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 8px hsl(32 95% 53% / 0.2))" }}>
+            style={{ background: "linear-gradient(90deg, hsl(32 95% 58%), hsl(350 80% 60%), hsl(280 70% 65%), hsl(210 85% 60%), hsl(160 70% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             PhototheologyOS
           </span>
           <div className="flex items-center gap-1.5 mt-0.5">

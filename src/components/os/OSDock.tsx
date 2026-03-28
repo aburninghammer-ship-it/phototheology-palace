@@ -360,13 +360,22 @@ export function OSDock() {
       {/* Header with hide button */}
       <div className={cn("shrink-0 border-b border-white/5 flex items-center", expanded ? "px-3 py-2 justify-between" : "p-2 justify-center")}>
         {expanded && <span className="text-[10px] uppercase font-semibold text-muted-foreground/50 tracking-wider">Navigation</span>}
-        <button
-          onClick={() => setVisible(false)}
-          className="p-1 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-muted/30 transition-colors"
-          title="Hide Dock"
-        >
-          <PanelLeftClose className="h-3.5 w-3.5" />
-        </button>
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="p-1 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-muted/30 transition-colors"
+            title={expanded ? "Collapse Dock" : "Expand Dock"}
+          >
+            {expanded ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+          </button>
+          <button
+            onClick={() => setVisible(false)}
+            className="p-1 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-muted/30 transition-colors"
+            title="Hide Dock"
+          >
+            <PanelLeftClose className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Navigation */}
