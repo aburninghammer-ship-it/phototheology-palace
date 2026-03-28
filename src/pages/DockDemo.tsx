@@ -432,12 +432,13 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
         "flex items-center shrink-0 border-b border-sidebar-border",
         expanded ? "h-14 px-4 gap-3" : "h-14 justify-center"
       )}>
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0">
-          <Sparkles className="h-4 w-4 text-primary-foreground" />
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+          style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
+          <Sparkles className="h-4 w-4 text-white" />
         </div>
         {expanded && (
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-bold text-foreground truncate">PhototheologyOS</span>
+            <span className="text-sm font-bold truncate" style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>PhototheologyOS</span>
             <span className="text-[10px] text-muted-foreground">Biblical Intelligence</span>
           </div>
         )}
