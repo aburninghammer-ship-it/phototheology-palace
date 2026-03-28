@@ -344,7 +344,6 @@ function OSDock({ expanded, onToggle }: { expanded: boolean; onToggle: () => voi
                 {hasChildren && (
                   <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `hsl(${item.glow} / 0.5)` }} />
                 )}
-                )}
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" className="font-medium">
