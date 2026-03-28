@@ -86,25 +86,19 @@ export default function ChristLock() {
   }, [gameWon, user, score]);
 
   const fetchVerseText = async (ref: string) => {
-    const parsed = parseVerseReference(ref);
-    if (!parsed) return;
     setLoadingVerse(true);
     try {
-      let query = supabase
-        .from("bible_verses_tokenized")
-        .select("verse_num, text_kjv")
-        .eq("book", parsed.book)
-        .eq("chapter", parsed.chapter);
-
-      if (parsed.endVerse) {
-        query = query.gte("verse_num", parsed.verse).lte("verse_num", parsed.endVerse);
-      } else {
-        query = query.eq("verse_num", parsed.verse);
-      }
-
-      const { data, error } = await query.order("verse_num");
-      if (!error && data && data.length > 0) {
-        setVerseText(data.map(v => v.text_kjv).join(" "));
+      const formattedRef = ref.replace(/\s+/g, '+');
+      const response = await fetch(
+        `https://bible-api.com/${encodeURIComponent(formattedRef)}?translation=kjv`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data.text) {
+          setVerseText(data.text.trim());
+        } else {
+          setVerseText("");
+        }
       } else {
         setVerseText("");
       }
