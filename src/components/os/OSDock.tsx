@@ -251,31 +251,29 @@ export function OSDock() {
         <button
           onClick={() => { navigate(item.path); if (hasChildren) toggleExpand(item.id); }}
           className={cn(
-            "relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full px-3 py-2 ml-3",
+            "relative flex items-center gap-3 rounded-2xl transition-all duration-200 group w-full px-3 py-2 ml-3",
             "backdrop-blur-md border"
           )}
           style={{
-            backgroundColor: active ? `hsl(${item.glow} / 0.14)` : `hsl(${item.glow} / 0.06)`,
-            borderColor: active ? `hsl(${item.glow} / 0.32)` : `hsl(${item.glow} / 0.16)`,
+            backgroundColor: active ? `hsl(${item.glow} / 0.22)` : `hsl(${item.glow} / 0.12)`,
+            borderColor: active ? `hsl(${item.glow} / 0.45)` : `hsl(${item.glow} / 0.28)`,
             color: itemColor,
             boxShadow: active
-              ? `0 0 18px hsl(${item.glow} / 0.18), inset 0 1px 0 hsl(${item.glow} / 0.12)`
-              : `0 0 0 1px hsl(${item.glow} / 0.08), 0 0 12px hsl(${item.glow} / 0.08)`,
+              ? `0 0 22px hsl(${item.glow} / 0.25), inset 0 1px 0 hsl(${item.glow} / 0.15)`
+              : `0 0 14px hsl(${item.glow} / 0.12)`,
           }}
           onMouseEnter={(e) => {
             if (!active) {
-              e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.1)`;
-              e.currentTarget.style.color = itemColor;
-              e.currentTarget.style.borderColor = `hsl(${item.glow} / 0.24)`;
-              e.currentTarget.style.boxShadow = `0 0 0 1px hsl(${item.glow} / 0.12), 0 0 16px hsl(${item.glow} / 0.12)`;
+              e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.18)`;
+              e.currentTarget.style.borderColor = `hsl(${item.glow} / 0.36)`;
+              e.currentTarget.style.boxShadow = `0 0 18px hsl(${item.glow} / 0.18)`;
             }
           }}
           onMouseLeave={(e) => {
             if (!active) {
-              e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.06)`;
-              e.currentTarget.style.color = itemColor;
-              e.currentTarget.style.borderColor = `hsl(${item.glow} / 0.16)`;
-              e.currentTarget.style.boxShadow = `0 0 0 1px hsl(${item.glow} / 0.08), 0 0 12px hsl(${item.glow} / 0.08)`;
+              e.currentTarget.style.backgroundColor = `hsl(${item.glow} / 0.12)`;
+              e.currentTarget.style.borderColor = `hsl(${item.glow} / 0.28)`;
+              e.currentTarget.style.boxShadow = `0 0 14px hsl(${item.glow} / 0.12)`;
             }
           }}
         >
