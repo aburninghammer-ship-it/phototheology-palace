@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { GAMES_TOUR } from "@/data/guidedTours";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
@@ -39,6 +41,7 @@ const Games = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Preserve page state across navigation
   usePreservePageState();
@@ -506,10 +509,14 @@ const Games = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+              <Gamepad2 className="h-4 w-4" /> Guided Tour
+            </Button>
             <GameNightInviteDialog />
             <HowItWorksDialog title="How to Use Games" steps={gamesSteps} />
           </div>
         </motion.div>
+        {tourOpen && <GuidedTourOverlay steps={GAMES_TOUR} onClose={() => setTourOpen(false)} />}
         
         {/* Search and Filter Header */}
         <motion.div 

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { DEVOTIONALS_TOUR } from "@/data/guidedTours";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus, GraduationCap, Home, HeartHandshake, Sun, Church, GraduationCap as StudyIcon, MessageSquare, Pencil } from "lucide-react";
@@ -82,6 +84,7 @@ export default function Devotionals() {
   const [showFriendWizard, setShowFriendWizard] = useState(false);
   const [showProfileWizard, setShowProfileWizard] = useState(false);
   const [showQuickDevotion, setShowQuickDevotion] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const [showChurchWizard, setShowChurchWizard] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -153,8 +156,15 @@ export default function Devotionals() {
               <h1 className="text-4xl font-bold text-white drop-shadow-lg">{t('devotionals.pageTitle')}</h1>
               <p className="text-white/80 text-lg">{t('devotionals.pageSubtitle')}</p>
             </div>
-            <HowItWorksDialog title={t('devotionals.howToUse')} steps={devotionalsSteps} />
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }}
+                className="gap-1 bg-white/10 border-white/20 text-white hover:bg-white/20">
+                <GraduationCap className="h-4 w-4" /> Guided Tour
+              </Button>
+              <HowItWorksDialog title={t('devotionals.howToUse')} steps={devotionalsSteps} />
+            </div>
           </div>
+          {tourOpen && <GuidedTourOverlay steps={DEVOTIONALS_TOUR} onClose={() => setTourOpen(false)} />}
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mt-8">
             {/* Quick Daily Devotion */}
