@@ -55,6 +55,7 @@ export default function Flashcards() {
   const [publicSets, setPublicSets] = useState<FlashcardSet[]>([]);
   const [activeTab, setActiveTab] = useState<"my" | "public">("my");
   const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Initial state for study mode
   const initialStudyState: FlashcardStudyState = {
@@ -492,6 +493,7 @@ export default function Flashcards() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
+      {tourOpen && <GuidedTourOverlay steps={FLASHCARDS_TOUR} onClose={() => setTourOpen(false)} />}
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-900/90 to-indigo-900/90 backdrop-blur-sm border-b border-white/10 py-8 px-6">
         <div className="max-w-7xl mx-auto">

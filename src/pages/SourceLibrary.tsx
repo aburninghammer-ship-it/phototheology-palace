@@ -58,6 +58,7 @@ export default function SourceLibrary() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [filterType, setFilterType] = useState<FilterType>("all");
   const [showUploader, setShowUploader] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Filter and search sources
   const filteredSources = useMemo(() => {
@@ -115,6 +116,7 @@ export default function SourceLibrary() {
       </Helmet>
 
       <div className="min-h-screen bg-background">
+        {tourOpen && <GuidedTourOverlay steps={SOURCE_LIBRARY_TOUR} onClose={() => setTourOpen(false)} />}
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <motion.div
