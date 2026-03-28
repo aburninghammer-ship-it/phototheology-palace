@@ -59,7 +59,7 @@ export const DOCK_SECTIONS: DockSection[] = [
         ],
       },
       {
-        id: "study-buddy", label: "Study Buddy", icon: Brain, path: "/study-buddy", glow: "270 70% 60%",
+        id: "study-buddy", label: "Study Buddy", icon: Brain, path: "/study-buddy", glow: "215 16% 47%",
         children: [
           { id: "pt-gpt", label: "Phototheology GPT", path: "/phototheologygpt", icon: Sparkles },
           { id: "branch-study", label: "BranchStudy", path: "/branch-study", icon: Network },
@@ -117,7 +117,7 @@ export const DOCK_SECTIONS: DockSection[] = [
     label: "Study",
     items: [
       {
-        id: "research", label: "Research Tools", icon: Search, path: "/interlinear", glow: "180 70% 50%",
+        id: "research", label: "Research Tools", icon: Search, path: "/interlinear", glow: "160 84% 39%",
         children: [
           { id: "interlinear", label: "Interlinear Bible", path: "/interlinear", icon: Languages },
           { id: "lexicon", label: "Greek/Hebrew Lexicon", path: "/bible-lexicon", icon: BookOpen },
@@ -171,7 +171,7 @@ export const DOCK_SECTIONS: DockSection[] = [
         ],
       },
       {
-        id: "blueprints", label: "Blueprints", icon: HeartHandshake, path: "/blueprint-marriage", glow: "320 60% 55%",
+        id: "blueprints", label: "Blueprints", icon: HeartHandshake, path: "/blueprint-marriage", glow: "220 70% 55%",
         children: [
           { id: "bp-marriage", label: "Dating & Marriage", path: "/blueprint-marriage", icon: Heart },
           { id: "bp-grief", label: "Grieving", path: "/blueprint-grief", icon: HeartHandshake },
@@ -201,7 +201,7 @@ export const DOCK_SECTIONS: DockSection[] = [
         ],
       },
       {
-        id: "workspace", label: "Workspace", icon: LayoutGrid, path: "/workspace", glow: "210 60% 50%",
+        id: "workspace", label: "Workspace", icon: LayoutGrid, path: "/workspace", glow: "215 14% 47%",
       },
     ],
   },
