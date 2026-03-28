@@ -25,6 +25,7 @@ const Leaderboard = () => {
   const [viewMode, setViewMode] = useState<'general' | 'categories'>('general');
   const [categoryLeaders, setCategoryLeaders] = useState<Record<string, any[]>>({});
   const [isInTop100, setIsInTop100] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -363,6 +364,7 @@ const Leaderboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={LEADERBOARD_TOUR} onClose={() => setTourOpen(false)} />}
       
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 text-white py-12 px-4">
@@ -373,6 +375,9 @@ const Leaderboard = () => {
               <h1 className="text-5xl font-bold">{t('leaderboard.title')}</h1>
               <p className="text-purple-200 text-lg">{t('leaderboard.subtitle')}</p>
             </div>
+            <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="bg-white/10 border-white/20 text-white hover:bg-white/20 gap-1">
+              <GraduationCap className="h-4 w-4" /> Tour
+            </Button>
           </div>
 
           {/* Stats Cards */}

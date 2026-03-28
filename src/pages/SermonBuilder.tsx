@@ -104,6 +104,7 @@ export default function SermonBuilder() {
   const [currentStep, setCurrentStep] = useState(1);
   const [activeTab, setActiveTab] = useState<"builder" | "library" | "simmer" | "starters" | "myidea">("builder");
   const [loading, setLoading] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const [asking, setAsking] = useState(false);
   const [librarySermons, setLibrarySermons] = useState<any[]>([]);
   const [loadingLibrary, setLoadingLibrary] = useState(false);
@@ -689,6 +690,7 @@ export default function SermonBuilder() {
         />
       </div>
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={SERMON_BUILDER_TOUR} onClose={() => setTourOpen(false)} />}
       {/* Header */}
       <div className="relative z-10 bg-white/5 backdrop-blur-xl border-b border-white/10 py-8 px-6">
         <div className="max-w-7xl mx-auto">
@@ -720,6 +722,14 @@ export default function SermonBuilder() {
               </div>
             </div>
             <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { primeAudioForTour(); setTourOpen(true); }}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 gap-1"
+              >
+                <GraduationCap className="w-4 h-4" /> Tour
+              </Button>
               <Button
                 onClick={startNewSermon}
                 className="bg-white text-purple-900 hover:bg-white/90"
