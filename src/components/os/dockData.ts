@@ -4,8 +4,8 @@ import {
   Sparkles, GraduationCap, Eye,
   MessageSquare, Users, Trophy, Target, Church, LayoutGrid,
   Headphones, Image, Network, Calendar, Film, PersonStanding, Shield,
-  Lightbulb, Video, Library, Scale,
-  Heart, Flame, Dumbbell, PenTool,
+  Lightbulb, Video, Library, Scale, Megaphone,
+  Heart, Flame, Dumbbell, PenTool, HeartHandshake,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -137,6 +137,7 @@ export const DOCK_SECTIONS: DockSection[] = [
           { id: "image-bible", label: "Image Bible", path: "/image-bible", icon: Image },
           { id: "video-training", label: "Video Training", path: "/video-training", icon: Video },
           { id: "sources", label: "Source Library", path: "/sources", icon: Library },
+          { id: "libraries", label: "Libraries", path: "/libraries", icon: Library },
         ],
       },
     ],
@@ -150,6 +151,8 @@ export const DOCK_SECTIONS: DockSection[] = [
         children: [
           { id: "polish", label: "Polish", path: "/polish", icon: Film },
           { id: "amplify", label: "Amplify", path: "/amplify", icon: Zap },
+          { id: "remix", label: "Remix", path: "/remix", icon: Megaphone },
+          { id: "infographics", label: "Infographics", path: "/infographics", icon: Image },
         ],
       },
       {
@@ -165,6 +168,16 @@ export const DOCK_SECTIONS: DockSection[] = [
         id: "sermons", label: "Sermons", icon: MessageSquare, path: "/sermon-builder", glow: "270 60% 55%",
         children: [
           { id: "sermon-ideas", label: "Sermon Ideas", path: "/sermon-ideas", icon: Lightbulb },
+        ],
+      },
+      {
+        id: "blueprints", label: "Blueprints", icon: HeartHandshake, path: "/blueprint-marriage", glow: "320 60% 55%",
+        children: [
+          { id: "bp-marriage", label: "Dating & Marriage", path: "/blueprint-marriage", icon: Heart },
+          { id: "bp-grief", label: "Grieving", path: "/blueprint-grief", icon: HeartHandshake },
+          { id: "bp-stronghold", label: "Breaking Strongholds", path: "/blueprint-stronghold", icon: Shield },
+          { id: "bp-weight", label: "Weight Loss", path: "/blueprint-weight-loss", icon: Dumbbell },
+          { id: "bp-mental", label: "Mental Health", path: "/blueprint-mental-health", icon: Brain },
         ],
       },
     ],
