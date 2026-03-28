@@ -949,3 +949,289 @@ export const BIBLE_REFERENCE_TOUR: GuidedTourStep[] = [
     tooltipPosition: "bottom",
   },
 ];
+
+export const DAILY_CHALLENGES_TOUR: GuidedTourStep[] = [
+  {
+    id: "challenges-welcome",
+    title: "Welcome to Daily Challenges",
+    description: "Sharpen your Phototheology skills with daily exercises that train every principle.",
+    narration: "Hello! Welcome to Daily Challenges — your training ground for sharpening every Phototheology principle. Each day brings a fresh challenge designed to strengthen your biblical thinking. Let me show you how it works.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "challenges-daily",
+    title: "Today's Challenge",
+    description: "Each day features a rotating challenge type — dimension drills, sanctuary maps, fruit checks, and more.",
+    narration: "The Daily tab presents today's challenge. Challenges rotate through different types — dimension drills, sanctuary maps, Christ-chapter exercises, fruit checks, and more. Each one targets a specific Palace principle.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "challenges-types",
+    title: "Challenge Types",
+    description: "Explore specialized challenges like Chef Recipe, Equation Decode, and 70 Questions.",
+    narration: "Use the tabs to access specialized challenge types — Chef Recipe challenges for creative connections, Equation Decode for symbolic thinking, and the intense 70 Questions drill. Each type builds different biblical muscles.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "challenges-archive",
+    title: "Archive & Progress",
+    description: "Review past submissions and track your challenge completion history.",
+    narration: "The Archive tab stores all your past submissions so you can review your growth over time. Track which principles you've practiced and see how your biblical thinking has sharpened month by month.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "challenges-community",
+    title: "Community & Sharing",
+    description: "Share your challenge completions and see what others are discovering.",
+    narration: "Share your challenge completions with the community and see what others are discovering. The Community feed lets you learn from fellow scholars and get inspired by different approaches. That's Daily Challenges — train daily, grow exponentially!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const PROPHECY_WATCH_TOUR: GuidedTourStep[] = [
+  {
+    id: "prophecy-welcome",
+    title: "Welcome to Prophecy Watch",
+    description: "An evidence-driven watchtower tracking prophetic developments in real-time.",
+    narration: "Hello! Welcome to Prophecy Watch — your evidence-driven watchtower for tracking prophetic developments through a disciplined biblical lens. This tool connects current events to prophetic timelines. Let me walk you through it.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "prophecy-query",
+    title: "Run a Watch Query",
+    description: "Enter a topic or current event and let Jeeves analyze it through prophetic frameworks.",
+    narration: "Enter a topic, headline, or current event into the query box. Select a focus area — church-state relations, religious liberty, economic coercion, or any of the prophetic signal categories. Then let Jeeves analyze it through the lens of biblical prophecy.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "prophecy-signals",
+    title: "Signal Categories",
+    description: "Track developments across categories like Christian Nationalism, Sunday laws, and religious liberty.",
+    narration: "Prophecy Watch tracks developments across specific signal categories — from church-state dynamics to Sunday legislation trajectories. Each signal is rated by intensity and mapped to prophetic anchors in Daniel and Revelation.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "prophecy-link",
+    title: "Analyze Articles",
+    description: "Paste a news article URL for instant prophetic analysis and biblical context.",
+    narration: "You can also paste a news article URL for instant analysis. Jeeves will extract the key claims, map them to prophetic signals, provide counter-reads for balanced thinking, and suggest mission implications.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "prophecy-results",
+    title: "Analysis Results",
+    description: "Get structured analysis with evidence, prophetic anchors, and mission implications.",
+    narration: "Results include structured analysis with evidence citations, prophetic anchor verses, confidence ratings, and actionable mission implications. Think of it as your prophetic intelligence briefing. That's Prophecy Watch — eyes open, Bible ready!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const BIBLE_TIMELINE_TOUR: GuidedTourStep[] = [
+  {
+    id: "timeline-welcome",
+    title: "Welcome to Bible Timeline",
+    description: "Explore the chronological sweep of Scripture from Creation to the New Earth.",
+    narration: "Hello! Welcome to the Bible Timeline — a chronological journey through Scripture from Creation to the New Earth. Every major event is mapped to its era, cycle, and heaven. Let me show you how to navigate it.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "timeline-eras",
+    title: "Filter by Era",
+    description: "Filter events by era — Patriarchs, Exodus, Kingdom, Exile, and more.",
+    narration: "Use the era badges to filter events by period — Creation and Patriarchs, Exodus and Conquest, Kingdom Era, Exile and Return, and the New Testament age. Each era is color-coded for quick visual reference.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "timeline-events",
+    title: "Explore Events",
+    description: "Each event includes dates, descriptions, Scripture references, and PT cycle placement.",
+    narration: "Click any event to see its full details — approximate dates, descriptions, Scripture references, and its placement within the Phototheology cycles and heavens. This connects history to theology in a single view.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "timeline-search",
+    title: "Search Events",
+    description: "Use the search bar to find specific events, people, or locations in the timeline.",
+    narration: "The search bar lets you quickly find specific events, people, or locations. Type a name like Moses or a place like Babylon and the timeline filters instantly. That's the Bible Timeline — history made visible!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const BIBLE_ATLAS_TOUR: GuidedTourStep[] = [
+  {
+    id: "atlas-welcome",
+    title: "Welcome to Bible Atlas",
+    description: "Explore key locations from Scripture — cities, mountains, rivers, and regions.",
+    narration: "Hello! Welcome to the Bible Atlas — your geographic guide to Scripture. Explore the cities, mountains, rivers, and regions where biblical history unfolded. Let me show you around.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "atlas-categories",
+    title: "Filter by Category",
+    description: "Browse locations by type — cities, mountains, bodies of water, or regions.",
+    narration: "Filter locations by category — cities like Jerusalem and Babylon, mountains like Sinai and Moriah, bodies of water like the Jordan and Red Sea, or regions like Galilee and Judea. Each category has its own icon.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "atlas-details",
+    title: "Location Details",
+    description: "Each location includes modern names, descriptions, Scripture references, and key events.",
+    narration: "Click any location to see its modern name, a rich description, Scripture references, and the key events that happened there. This connects geography to theology — knowing where helps you understand why.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "atlas-search",
+    title: "Search Locations",
+    description: "Quickly find any biblical location using the search bar.",
+    narration: "Use the search bar to find any location instantly. Whether you're preparing a sermon or studying a passage, the Atlas puts biblical geography at your fingertips. That's the Bible Atlas — walk where they walked!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const MUSIC_TOUR: GuidedTourStep[] = [
+  {
+    id: "music-welcome",
+    title: "Welcome to the Music Room",
+    description: "Set the atmosphere for your study with curated ambient music and worship tracks.",
+    narration: "Hello! Welcome to the Music Room — your soundtrack for study and devotion. Choose from curated ambient categories to set the perfect atmosphere while you explore the Palace. Let me show you what's here.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "music-categories",
+    title: "Music Categories",
+    description: "Browse categories like Worship, Ambient, Focus, and more to find your study soundtrack.",
+    narration: "Browse through music categories — worship, ambient, focus, prayer, and more. Each category is curated to complement different study moods and activities within the Phototheology system.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "music-controls",
+    title: "Volume & Playback",
+    description: "Control volume, mute, and select tracks. Music auto-ducks when narration plays.",
+    narration: "Use the volume slider to set your preferred level. The music automatically ducks when narration or commentary plays, so your study audio is never competing. Toggle mute for quick silence. That's the Music Room — study in atmosphere!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const SOURCE_LIBRARY_TOUR: GuidedTourStep[] = [
+  {
+    id: "source-welcome",
+    title: "Welcome to Source Library",
+    description: "Upload and manage study documents — PDFs, Word docs, and more.",
+    narration: "Hello! Welcome to the Source Library — your personal document vault for study materials. Upload PDFs, Word documents, PowerPoint files, and text files to build your research collection. Let me walk you through it.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "source-upload",
+    title: "Upload Documents",
+    description: "Drag and drop or browse to upload study materials in multiple formats.",
+    narration: "Upload documents by dragging and dropping or browsing your files. The library supports PDF, DOCX, PPTX, and TXT formats. Each upload is automatically categorized and searchable.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "source-browse",
+    title: "Browse & Filter",
+    description: "Search, filter by type, and organize your documents with favorites.",
+    narration: "Browse your collection with search and type filters. Mark important documents as favorites for quick access. Switch between grid and list views to find what you need.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "source-actions",
+    title: "Generate From Sources",
+    description: "Turn uploaded documents into infographics, study series, and more.",
+    narration: "The real power is in generation — turn any uploaded document into an infographic or a full Bible study series. Your sources become the raw material for teaching and sharing. That's the Source Library — your research foundation!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const FLASHCARDS_TOUR: GuidedTourStep[] = [
+  {
+    id: "flashcards-welcome",
+    title: "Welcome to Flashcards",
+    description: "Create, study, and share flashcard sets for Scripture memorization and doctrine review.",
+    narration: "Hello! Welcome to Flashcards — your tool for Scripture memorization and doctrine review. Create custom sets, generate them with AI, or study community-shared decks. Let me show you how it works.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "flashcards-create",
+    title: "Create & Generate",
+    description: "Build flashcard sets manually or use AI to generate them from any topic or passage.",
+    narration: "Create flashcard sets manually by adding your own cards, or let AI generate a complete set from any topic, passage, or doctrine. AI-generated cards include verse references and contextual explanations.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "flashcards-study",
+    title: "Study Mode",
+    description: "Flip through cards, track progress, and choose your preferred Bible translation.",
+    narration: "Enter Study Mode to flip through your cards one by one. Track your progress, choose your preferred Bible translation, and pick up right where you left off with session persistence.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "flashcards-community",
+    title: "Public Sets",
+    description: "Browse and study flashcard sets shared by the community.",
+    narration: "The Public tab lets you browse flashcard sets shared by other users. Find sets on topics you're studying and add them to your collection. That's Flashcards — memorize Scripture, master doctrine!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const GIVE_ME_A_GEM_TOUR: GuidedTourStep[] = [
+  {
+    id: "gem-welcome",
+    title: "Welcome to Give Me a Gem",
+    description: "Discover powerful biblical insights — each one a treasure from the Gems Room of the Palace.",
+    narration: "Hello! Welcome to Give Me a Gem — your portal to the Gems Room of the Phototheology Palace. Each gem is a powerful biblical insight crafted by Jeeves, ready to enrich your study and teaching. Let me show you how it works.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "gem-styles",
+    title: "Choose Your Style",
+    description: "Select from multiple gem styles — theological, devotional, prophetic, apologetic, and more.",
+    narration: "Choose a gem style that matches your mood or study focus — theological depth, devotional warmth, prophetic insight, apologetic sharpness, or let it be random for a surprise. You can also specify a passage to focus on.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "gem-interact",
+    title: "Interact & Expand",
+    description: "Highlight text to ask follow-up questions. Jeeves will expound on any part of the gem.",
+    narration: "Once your gem appears, highlight any text to ask Jeeves follow-up questions. Use the quick question buttons or type your own. Each expansion digs deeper, turning one gem into an entire study session.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "gem-save",
+    title: "Save & Collect",
+    description: "Save gems to your collection and track your Gem Warrior rank.",
+    narration: "Save gems to your personal collection and watch your Gem Warrior rank grow. The more gems you collect and interact with, the higher you climb. That's Give Me a Gem — mine the Word for treasure!",
+    tooltipPosition: "bottom",
+  },
+];
+
+export const QUARTERLY_STUDY_TOUR: GuidedTourStep[] = [
+  {
+    id: "quarterly-welcome",
+    title: "Welcome to Quarterly Study",
+    description: "Study the Sabbath School quarterly lesson with Jeeves as your Phototheology guide.",
+    narration: "Hello! Welcome to Quarterly Study — where the weekly Sabbath School lesson meets the power of Phototheology. Jeeves analyzes each lesson through Palace principles, cycles, and heavens. Let me show you how to use it.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "quarterly-lessons",
+    title: "Select a Lesson",
+    description: "Browse the current quarter's lessons and select any day to study.",
+    narration: "Browse the current quarter's lessons in the sidebar. Each lesson is broken into daily sections. Select a day to load its content, and the study textarea will automatically populate with the lesson material.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "quarterly-analyze",
+    title: "Jeeves Analysis",
+    description: "Choose a Palace room or principle, then let Jeeves analyze the lesson through that lens.",
+    narration: "Select a Palace room or principle from the dropdown, optionally add your own question, then hit Analyze. Jeeves will process the lesson through your chosen Phototheology lens — giving you insights no commentary can match.",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "quarterly-results",
+    title: "Study Results",
+    description: "Get rich, structured analysis with Christ-centered connections and practical applications.",
+    narration: "The analysis results include Christ-centered connections, practical applications, and Palace principle mappings. You can run multiple analyses on the same lesson using different rooms for a comprehensive study. That's Quarterly Study — transform your Sabbath School experience!",
+    tooltipPosition: "bottom",
+  },
+];
