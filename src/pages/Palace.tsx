@@ -196,7 +196,7 @@ const Palace = () => {
               <VoiceChatWidget
                 roomType="palace"
                 roomId="main"
-                className="max-w-md mx-auto mb-4 md:mb-6"
+                className="palace-voice-widget max-w-md mx-auto mb-4 md:mb-6"
               />
             )}
 
