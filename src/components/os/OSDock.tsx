@@ -17,7 +17,7 @@ export function OSDock() {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const currentPath = location.pathname;
 
-  const publicPaths = ["/", "/landing", "/auth", "/pricing", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
+  const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
   const isPublicPage = publicPaths.some(p => currentPath === p) || currentPath.startsWith("/auth");
   if (isMobile || isPublicPage) return null;
 
