@@ -4,6 +4,7 @@ import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/G
 import { COURSES_TOUR } from "@/data/guidedTours";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GlassBubbles } from "@/components/ui/glass-bubbles";
 import { BookOpen, Users, Calendar, GraduationCap, ChevronRight } from "lucide-react";
