@@ -288,6 +288,9 @@ export default function LivingManna() {
                     variant="outline"
                     size="sm"
                   />
+                  <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+                    <GraduationCap className="h-4 w-4" /> Tour
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
