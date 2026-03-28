@@ -42,7 +42,7 @@ const TRAIN_ITEMS: DockItem[] = [
   { id: "games", label: "Games", icon: Gamepad2, path: "/games", glow: "280 70% 60%" },
 ];
 
-const CREATE_ITEMS: DockItem[] = [
+const DEVOTION_ITEMS: DockItem[] = [
   { id: "gems", label: "Gems", icon: Gem, path: "/give-me-a-gem", glow: "160 70% 45%" },
   { id: "music", label: "Music", icon: Headphones, path: "/music", glow: "190 70% 50%" },
   { id: "sermon", label: "Sermons", icon: MessageSquare, path: "/sermon-builder", glow: "270 60% 55%" },
