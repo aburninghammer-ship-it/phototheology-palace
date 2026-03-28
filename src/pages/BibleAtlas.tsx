@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { BIBLE_ATLAS_TOUR } from "@/data/guidedTours";
 import { ResearchToolsNav } from "@/components/bible/research/ResearchToolsNav";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { MapPin, BookOpen, Search, Globe, Compass, Mountain, Waves } from "lucide-react";
+import { MapPin, BookOpen, Search, Globe, Compass, Mountain, Waves, GraduationCap } from "lucide-react";
 
 interface BibleLocation {
   id: string;

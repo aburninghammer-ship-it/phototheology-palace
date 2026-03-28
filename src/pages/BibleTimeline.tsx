@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { BIBLE_TIMELINE_TOUR } from "@/data/guidedTours";
 import { ResearchToolsNav } from "@/components/bible/research/ResearchToolsNav";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { Clock, BookOpen, Search, ChevronRight, MapPin, Crown, Sword, Flame, Star, Scroll } from "lucide-react";
+import { Clock, BookOpen, Search, ChevronRight, MapPin, Crown, Sword, Flame, Star, Scroll, GraduationCap } from "lucide-react";
 
 interface TimelineEvent {
   id: string;

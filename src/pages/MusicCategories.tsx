@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { MUSIC_TOUR } from "@/data/guidedTours";
 import { useTranslation } from "react-i18next";
 import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { Navigation } from "@/components/Navigation";
