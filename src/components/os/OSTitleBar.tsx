@@ -53,12 +53,13 @@ export function OSTitleBar() {
           style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
           <Sparkles className="h-3 w-3 text-white" />
         </div>
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0">
           <span className="text-xs font-bold tracking-wide whitespace-nowrap"
             style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             PhototheologyOS
           </span>
-          <span className="hidden sm:inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.24em] text-foreground/80">
+          <span className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest shrink-0"
+            style={{ background: "linear-gradient(135deg, hsl(32 95% 53% / 0.15), hsl(210 85% 50% / 0.15))", color: "hsl(32 95% 53%)", border: "1px solid hsl(32 95% 53% / 0.3)" }}>
             Eden
           </span>
         </div>
