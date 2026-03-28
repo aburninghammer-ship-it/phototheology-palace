@@ -65,7 +65,7 @@ export function LockInPassCard() {
     if (shareLink && navigator.share) {
       navigator.share({
         title: "Phototheology Lock-In Pass",
-        text: personalMessage || "Check out the Phototheology Bible Suite — 5 days free!",
+        text: personalMessage || "Check out PhototheologyOS — 5 days free!",
         url: shareLink,
       });
     }

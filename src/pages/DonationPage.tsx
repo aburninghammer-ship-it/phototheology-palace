@@ -67,7 +67,7 @@ export default function DonationPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Donate" description="Support the Phototheology mission. As more users join, costs grow. Your one-time donation helps keep this Bible learning suite running and accessible for everyone." />
+      <SEO title="Donate" <SEO title="Donate" description="Support the Phototheology mission. As more users join, costs grow. Your one-time donation helps keep PhototheologyOS running and accessible for everyone." /> />
       {/* Header */}
       <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-background py-16 px-4">
         <div className="max-w-4xl mx-auto">
@@ -86,7 +86,7 @@ export default function DonationPage() {
               Help Keep Phototheology Running
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mt-4 max-w-2xl mx-auto">
-              As our community grows, so do the costs to keep this Bible learning suite alive and improving. Your one-time donation makes a real difference.
+              As our community grows, so do the costs to keep PhototheologyOS alive and improving. Your one-time donation makes a real difference.
             </p>
           </div>
         </div>

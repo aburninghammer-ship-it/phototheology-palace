@@ -90,7 +90,7 @@ export default function GiftRedeem() {
             </Badge>
             <h1 className="text-3xl font-bold mb-2">Welcome to the Palace! 🎉</h1>
             <p className="text-muted-foreground mb-6">
-              You now have {planLabel} of premium access to the Phototheology Bible Suite.
+              You now have {planLabel} of premium access to PhototheologyOS.
             </p>
             {giftInfo?.personal_message && (
               <Card className="mb-6 border-amber-500/30 bg-amber-500/5">

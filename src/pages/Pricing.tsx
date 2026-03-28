@@ -469,7 +469,7 @@ export default function Pricing() {
             >
               <Link to="/gift">
                 <Gift className="h-4 w-4" />
-                Gift the Suite or Share a Day Pass
+                Gift PhototheologyOS or Share a Day Pass
               </Link>
             </Button>
           </div>

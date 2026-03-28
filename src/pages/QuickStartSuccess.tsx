@@ -187,12 +187,12 @@ export default function QuickStartSuccess() {
           >
             <h2 className="text-2xl font-bold">Ready for the Next Level?</h2>
             <p className="text-muted-foreground">
-              Once you've oriented yourself with the Quick-Start Guide, the Study Suite
+              Once you've oriented yourself with the Quick-Start Guide, PhototheologyOS
               provides complete method training for all 8 Floors of the Palace.
             </p>
             <Button asChild variant="outline" size="lg">
               <Link to="/study-suite">
-                Explore the Study Suite
+                Explore PhototheologyOS
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>

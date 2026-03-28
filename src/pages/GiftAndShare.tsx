@@ -21,7 +21,7 @@ export default function GiftAndShare() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <SEO title="Gift & Share | Phototheology" description="Gift the Phototheology Bible Suite or share a free 5-Day Lock-In Pass with someone." />
+      <SEO title="Gift & Share | Phototheology" <SEO title="Gift & Share | Phototheology" description="Gift PhototheologyOS or share a free 5-Day Lock-In Pass with someone." /> />
       <Navigation />
 
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
@@ -34,7 +34,7 @@ export default function GiftAndShare() {
             Share the Word
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Gift someone the full Phototheology Bible Suite, or share a free 5-Day Lock-In Pass so they can experience it firsthand.
+            Gift someone full access to PhototheologyOS, or share a free 5-Day Lock-In Pass so they can experience it firsthand.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ function GiftSuiteCard({ user }: { user: any }) {
 
   const handleGift = async () => {
     if (!user) {
-      toast.error("Please sign in to gift the Suite");
+      toast.error("Please sign in to gift PhototheologyOS");
       return;
     }
     if (!recipientEmail) {
@@ -107,9 +107,9 @@ function GiftSuiteCard({ user }: { user: any }) {
         <div className="mx-auto mb-3 p-4 rounded-2xl bg-gradient-to-br from-amber-500/20 to-rose-500/20 w-fit">
           <Gift className="h-8 w-8 text-amber-500" />
         </div>
-        <CardTitle className="text-2xl">Gift the Suite</CardTitle>
+        <CardTitle className="text-2xl">Gift PhototheologyOS</CardTitle>
         <CardDescription>
-          Purchase the full Phototheology Bible Suite for someone you care about. They'll receive full premium access.
+          Purchase full PhototheologyOS access for someone you care about. They'll receive full premium access.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
