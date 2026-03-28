@@ -86,11 +86,16 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
     <div
       className={cn(
         "px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1",
-        `bg-gradient-to-r ${tab.gradient.from} ${tab.gradient.to} border ${tab.gradient.border}`,
-        isActive && "border-opacity-60",
+        `bg-gradient-to-r ${tab.gradient.from.replace('/10', '/20')} ${tab.gradient.to.replace('/10', '/20')} border ${tab.gradient.border.replace('/20', '/40')}`,
+        isActive && "border-opacity-80 ring-1",
         isDragging && "opacity-50 scale-105 shadow-lg z-50"
       )}
-      style={isActive ? { boxShadow: `0 0 12px 2px ${tab.gradient.glow}` } : undefined}
+      style={{
+        boxShadow: isActive
+          ? `0 0 16px 3px ${tab.gradient.glow}, inset 0 0 8px ${tab.gradient.glow.replace('0.5', '0.15')}`
+          : `0 0 8px 1px ${tab.gradient.glow.replace('0.5', '0.25')}`,
+        ...(isActive ? { ringColor: tab.gradient.glow } : {}),
+      }}
     >
       {!isPinned && (
         <span {...listeners} className="cursor-grab active:cursor-grabbing mr-1 opacity-50 hover:opacity-100">
