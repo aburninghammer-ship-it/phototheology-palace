@@ -287,7 +287,7 @@ export default function AudioBible() {
 
   // Add chapter to custom list (with current mode) — duplicates allowed for different modes
   const addCustomChapter = () => {
-    const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
+    const mode: EpicModeType | undefined = (commentarySource === "epic" || commentarySource === "counselor") ? epicMode : undefined;
     setCustomChapters([...customChapters, { book: customBook, chapter: customChapter, mode }]);
     // Auto-increment to next chapter for quick sequential adding
     const maxCh = getChapterCount(customBook);
@@ -300,7 +300,7 @@ export default function AudioBible() {
   const addStoryToPlaylist = (storyId: string) => {
     const story = CURATED_STORIES.find(s => s.id === storyId);
     if (!story) return;
-    const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
+    const mode: EpicModeType | undefined = (commentarySource === "epic" || commentarySource === "counselor") ? epicMode : undefined;
     // Allow up to 4 stories in a playlist
     const storyCount = customChapters.filter(c => c.storyId).length;
     if (storyCount >= 4) {
@@ -327,7 +327,7 @@ export default function AudioBible() {
   // Add chapter range to custom list (with current mode)
   const addChapterRange = () => {
     const newChapters: ChapterSelection[] = [];
-    const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
+    const mode: EpicModeType | undefined = (commentarySource === "epic" || commentarySource === "counselor") ? epicMode : undefined;
     for (let ch = rangeStartChapter; ch <= rangeEndChapter; ch++) {
       const exists = customChapters.some(
         (c) => c.book === customBook && c.chapter === ch && c.mode === mode
@@ -344,8 +344,8 @@ export default function AudioBible() {
     const startIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeStartBook);
     const endIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeEndBook);
     const newChapters: ChapterSelection[] = [];
-    const mode: EpicModeType | undefined = commentarySource === "epic" ? epicMode : undefined;
-    
+    const mode: EpicModeType | undefined = (commentarySource === "epic" || commentarySource === "counselor") ? epicMode : undefined;
+
     for (let bookIdx = startIdx; bookIdx <= endIdx; bookIdx++) {
       const book = BIBLE_BOOK_METADATA[bookIdx];
       for (let ch = 1; ch <= book.chapters; ch++) {
@@ -1529,7 +1529,7 @@ export default function AudioBible() {
                       <p className="text-sm text-muted-foreground">
                         {t('audioBible.listenToAllChapters', { count: getChapterCount(), book: selectedBook })}
                       </p>
-                      {commentarySource === "epic" ? (
+                      {(commentarySource === "epic" || commentarySource === "counselor") ? (
                         <div className="space-y-2 w-full">
                           <Button size="lg" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700" onClick={() => handlePlayEpicBookChapters(selectedBook)} disabled={isEpicLoading}>
                             {isEpicLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : (() => { const Icon = activeModeMeta.icon; return <Icon className="h-5 w-5 mr-2" />; })()}
@@ -1810,7 +1810,7 @@ export default function AudioBible() {
                                     <span className="font-medium min-w-[100px] truncate">
                                       {ch.storyId ? `📖 ${ch.storyTitle || ch.book}` : `${ch.book} ${ch.chapter}`}
                                     </span>
-                                    {commentarySource === "epic" && (
+                                    {(commentarySource === "epic" || commentarySource === "counselor") && (
                                       <Select
                                         value={ch.mode || epicMode}
                                         onValueChange={(v) => {
@@ -1847,7 +1847,7 @@ export default function AudioBible() {
                         </div>
                       )}
 
-                      {commentarySource === "epic" ? (
+                      {(commentarySource === "epic" || commentarySource === "counselor") ? (
                         <Button
                           size="lg"
                           className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
