@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { DAILY_CHALLENGES_TOUR } from "@/data/guidedTours";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
@@ -10,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useOutputSpark } from "@/hooks/useOutputSpark";
-import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock, Trophy, Globe } from "lucide-react";
+import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap, Archive, CheckCircle2, ChevronLeft, ChevronRight, Clock, Trophy, Globe, GraduationCap } from "lucide-react";
 import { PostToPublicChallengeButton } from "@/components/challenges/PostToPublicChallengeButton";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
@@ -61,6 +63,7 @@ const DailyChallenges = () => {
   const [archiveSubmissions, setArchiveSubmissions] = useState<ChallengeSubmission[]>([]);
   const [archiveLoading, setArchiveLoading] = useState(false);
   const [archiveMonth, setArchiveMonth] = useState(new Date());
+  const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -360,6 +363,7 @@ const DailyChallenges = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={DAILY_CHALLENGES_TOUR} onClose={() => setTourOpen(false)} />}
       <main className="container mx-auto px-4 pt-36 pb-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
@@ -368,6 +372,9 @@ const DailyChallenges = () => {
               {t('dailyChallengesPage.challenges')}
             </h1>
             <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+                <GraduationCap className="h-4 w-4" /> Tour
+              </Button>
               <HowItWorksDialog
                 title={t('dailyChallengesPage.howToUseTitle')}
                 steps={challengeSteps}

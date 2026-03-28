@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { PROPHECY_WATCH_TOUR } from "@/data/guidedTours";
 import DOMPurify from "dompurify";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Telescope, Sparkles, Filter, Search, AlertTriangle, Shield, BookOpen, Scale, ChevronRight, Clock, MapPin, Lightbulb, Quote, FileText, HelpCircle, Link, ExternalLink, Loader2 } from "lucide-react";
+import { Telescope, Sparkles, Filter, Search, AlertTriangle, Shield, BookOpen, Scale, ChevronRight, Clock, MapPin, Lightbulb, Quote, FileText, HelpCircle, Link, ExternalLink, Loader2, GraduationCap } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
@@ -66,6 +68,7 @@ const ProphecyWatch = () => {
   // Link analysis state
   const [articleUrl, setArticleUrl] = useState("");
   const [analyzingLink, setAnalyzingLink] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const runProphecyWatch = async () => {
     if (!watchQuery.trim() && focusArea === "all") {
@@ -355,6 +358,7 @@ const ProphecyWatch = () => {
       </div>
 
       <Navigation />
+      {tourOpen && <GuidedTourOverlay steps={PROPHECY_WATCH_TOUR} onClose={() => setTourOpen(false)} />}
       <main className="pt-16 relative z-10">
         {/* Hero Section */}
         <motion.div
