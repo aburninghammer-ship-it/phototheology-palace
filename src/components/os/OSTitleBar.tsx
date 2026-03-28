@@ -51,56 +51,57 @@ export function OSTitleBar() {
       <div className="flex items-center gap-2.5 shrink-0">
         <div className="w-7 h-7 rounded-[8px] flex items-center justify-center shrink-0"
           style={{ 
-            background: "linear-gradient(135deg, hsl(220 60% 50% / 0.25), hsl(270 50% 55% / 0.2))",
-            backdropFilter: "blur(12px)",
-            border: "1px solid hsl(220 60% 80% / 0.15)",
-            boxShadow: "0 2px 12px hsl(220 60% 50% / 0.15), inset 0 1px 0 hsl(0 0% 100% / 0.1)"
+            background: "linear-gradient(135deg, hsl(32 95% 55%), hsl(320 80% 55%), hsl(260 75% 58%))",
+            boxShadow: "0 2px 14px hsl(320 80% 55% / 0.35), inset 0 1px 0 hsl(0 0% 100% / 0.2)"
           }}>
-          <Sparkles className="h-3.5 w-3.5 drop-shadow-sm" style={{ color: "hsl(220 80% 75%)" }} />
+          <Sparkles className="h-3.5 w-3.5 text-white drop-shadow-sm" />
         </div>
         <div className="flex flex-col leading-none">
           <div className="flex items-baseline gap-0">
             <span className="text-[14px] whitespace-nowrap bg-clip-text text-transparent"
               style={{ 
-                fontFamily: "'Outfit', sans-serif", 
+                fontFamily: "'Sora', sans-serif", 
                 fontWeight: 800,
-                backgroundImage: "linear-gradient(120deg, hsl(0 0% 95% / 0.95), hsl(220 30% 85% / 0.8), hsl(0 0% 90% / 0.7))",
+                backgroundImage: "linear-gradient(100deg, hsl(32 95% 62%), hsl(350 85% 62%), hsl(310 75% 65%), hsl(260 80% 68%), hsl(210 90% 62%))",
                 letterSpacing: "-0.01em"
               }}>
               Phototheology
             </span>
             <span className="text-[11px] whitespace-nowrap bg-clip-text text-transparent"
               style={{ 
-                fontFamily: "'Space Grotesk', sans-serif", 
-                fontWeight: 700,
-                backgroundImage: "linear-gradient(120deg, hsl(220 80% 72%), hsl(270 60% 72%))",
-                letterSpacing: "0.02em"
+                fontFamily: "'Sora', sans-serif", 
+                fontWeight: 600,
+                backgroundImage: "linear-gradient(100deg, hsl(180 70% 55%), hsl(150 75% 50%))",
+                letterSpacing: "0.03em"
               }}>
               OS
             </span>
           </div>
-          <div className="flex items-center gap-1.5 mt-[1px]">
+          <div className="flex items-center gap-1.5 mt-[2px]">
             <span className="text-[8px] whitespace-nowrap bg-clip-text text-transparent"
               style={{ 
-                fontFamily: "'Space Grotesk', sans-serif", 
+                fontFamily: "'Inter', sans-serif", 
                 fontWeight: 500,
-                backgroundImage: "linear-gradient(90deg, hsl(160 60% 60%), hsl(190 55% 58%))",
-                letterSpacing: "0.12em",
+                backgroundImage: "linear-gradient(90deg, hsl(145 70% 55%), hsl(180 65% 55%))",
+                letterSpacing: "0.14em",
                 textTransform: "uppercase"
               }}>
               Eden
             </span>
-            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "hsl(160 60% 60% / 0.6)" }} />
-            <span className="text-[7px] whitespace-nowrap"
+            <span className="w-[3px] h-[3px] rounded-full" style={{ background: "linear-gradient(135deg, hsl(32 90% 60%), hsl(350 80% 60%))" }} />
+            <span className="text-[7px] whitespace-nowrap bg-clip-text text-transparent"
               style={{ 
-                fontFamily: "'Space Grotesk', sans-serif", 
+                fontFamily: "'Inter', sans-serif", 
                 fontWeight: 500,
-                color: "hsl(220 20% 70% / 0.5)",
+                backgroundImage: "linear-gradient(90deg, hsl(220 60% 70% / 0.7), hsl(280 50% 70% / 0.6))",
                 letterSpacing: "0.06em",
                 textTransform: "uppercase"
               }}>
               Powered by AI. Built for Biblical Intelligence.
             </span>
+          </div>
+        </div>
+      </div>
           </div>
         </div>
       </div>
