@@ -2276,7 +2276,7 @@ export function ForgeDefendHub({ churchId }: ForgeDefendHubProps) {
             <CardContent className="p-4 space-y-3">
               <h4 className="font-semibold text-purple-300 flex items-center gap-2">
                 <Zap className="h-4 w-4" />
-                Recommended Training in Phototheology Suite
+                Recommended Training in PhototheologyOS
               </h4>
               <div className="space-y-2">
                 <div className="p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
