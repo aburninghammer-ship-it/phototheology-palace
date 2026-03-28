@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { BookOpen, Search, Loader2, Languages, BarChart3 } from "lucide-react";
+import { BookOpen, Search, Loader2, Languages, BarChart3, GraduationCap } from "lucide-react";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { BIBLE_LEXICON_TOUR } from "@/data/guidedTours";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -36,6 +38,7 @@ const BibleLexicon = () => {
   const [loading, setLoading] = useState(false);
   const [entry, setEntry] = useState<LexiconEntry | null>(null);
   const [activeTab, setActiveTab] = useState("definition");
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Auto-search if ?q= param present
   useEffect(() => {
@@ -86,10 +89,16 @@ const BibleLexicon = () => {
                 Bible Lexicon
               </h1>
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-              <BookOpen className="h-4 w-4 mr-1" /> Back
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => { primeAudioForTour(); setTourOpen(true); }} className="gap-1">
+                <GraduationCap className="h-4 w-4" /> Tour
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
+                <BookOpen className="h-4 w-4 mr-1" /> Back
+              </Button>
+            </div>
           </div>
+          {tourOpen && <GuidedTourOverlay steps={BIBLE_LEXICON_TOUR} onClose={() => setTourOpen(false)} />}
           <div className="mt-2 max-w-4xl mx-auto">
             <ResearchToolsNav />
           </div>
