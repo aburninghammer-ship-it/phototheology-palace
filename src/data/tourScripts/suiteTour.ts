@@ -2,8 +2,8 @@ import type { TourDefinition } from "./types";
 
 export const SUITE_TOUR: TourDefinition = {
   id: "suite-overview",
-  title: "The Phototheology Suite Tour",
-  subtitle: "Reginald walks you through every tool (~18 min)",
+  title: "PhototheologyOS Eden — Full Tour",
+  subtitle: "Reginald walks you through every tool in the OS (~18 min)",
   verse: "Colossians 3:16",
   verseText: "Let the word of Christ dwell in you richly in all wisdom.",
   emoji: "🏰",
@@ -14,8 +14,8 @@ export const SUITE_TOUR: TourDefinition = {
     floorName: "Welcome",
     roomCode: "INTRO",
     roomName: "Introduction",
-    title: "Welcome to the Suite Tour",
-    script: `Hello. I'm Reginald — your concierge and navigator for the Phototheology Suite. And right now, it's just me. No Jeeves on this tour. Don't worry, he's not offended — he's probably in the Juice Room squeezing Habakkuk right now. But before I show you anything, let me be honest with you. Most people who use this platform never actually use it. They talk to Jeeves — maybe play a game or two — and miss eighty percent of what could change how they read the Bible forever. That ends now. Because here's what I've learned: the people who transform their Bible study aren't the ones who use every feature. They're the ones who use the right three features consistently. So I'm going to show you everything — but more importantly, I'm going to show you where to start. If you only use three things after this tour, start here: open the Bible tab and read a chapter. Ask Jeeves one question about it. Play one game. That's day one. That's enough to change everything. But first, let me show you why this platform has over forty features — and why you'll eventually want all of them. Colossians 3:16 says, "Let the word of Christ dwell in you richly in all wisdom." The Suite exists to make that dwelling rich. Let's begin.`,
+    title: "Welcome to PhototheologyOS Eden",
+    script: `Hello. I'm Reginald — your concierge and navigator for PhototheologyOS. And right now, it's just me. No Jeeves on this tour. Don't worry, he's not offended — he's probably in the Juice Room squeezing Habakkuk right now. But before I show you anything, let me be honest with you. Most people who use this operating system never actually use it. They talk to Jeeves — maybe play a game or two — and miss eighty percent of what could change how they read the Bible forever. That ends now. Because here's what I've learned: the people who transform their Bible study aren't the ones who use every feature. They're the ones who use the right three features consistently. So I'm going to show you everything — but more importantly, I'm going to show you where to start. If you only use three things after this tour, start here: open the Bible tab and read a chapter. Ask Jeeves one question about it. Play one game. That's day one. That's enough to change everything. But first, let me show you why PhototheologyOS Eden has over forty features — and why you'll eventually want all of them. Colossians 3:16 says, "Let the word of Christ dwell in you richly in all wisdom." This operating system exists to make that dwelling rich. Let's begin.`,
     estimatedSeconds: 60,
   },
   segments: [
