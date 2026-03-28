@@ -160,36 +160,18 @@ export function OSDock() {
       className="h-full flex flex-col bg-sidebar border-r border-sidebar-border shrink-0 relative z-40"
     >
       {/* Brand */}
-      <div className={cn("flex items-center shrink-0 border-b border-sidebar-border", expanded ? "h-14 px-4 gap-3" : "h-14 justify-center")}>
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+      <div className={cn("flex items-center shrink-0 border-b border-sidebar-border", expanded ? "h-12 px-4 gap-3" : "h-12 justify-center")}>
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
           style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))" }}>
-          <Sparkles className="h-4 w-4 text-white" />
+          <Sparkles className="h-3.5 w-3.5 text-white" />
         </div>
         {expanded && (
-          <div className="flex flex-col min-w-0">
-            <span className="text-sm font-bold truncate"
-              style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              PhototheologyOS
-            </span>
-            <span className="text-[10px] text-muted-foreground">Powered by AI. Built for BI.</span>
-          </div>
+          <span className="text-xs font-bold truncate"
+            style={{ background: "linear-gradient(135deg, hsl(32 95% 53%), hsl(210 85% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            PhototheologyOS
+          </span>
         )}
       </div>
-
-      {/* Search trigger */}
-      {expanded && (
-        <div className="px-3 pt-2 pb-1">
-          <CommandPaletteTrigger className="w-full justify-start" />
-        </div>
-      )}
-      {!expanded && (
-        <div className="flex justify-center pt-2 pb-1">
-          <button onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-            className="p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-            <Search className="h-4 w-4" />
-          </button>
-        </div>
-      )}
 
       {/* Navigation */}
       <ScrollArea className="flex-1">
