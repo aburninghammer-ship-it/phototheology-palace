@@ -166,10 +166,8 @@ const CultureControversy = () => {
               </div>
             </div>
           </div>
-          {tourOpen && <GuidedTourOverlay steps={CULTURE_CONTROVERSY_TOUR} onClose={() => setTourOpen(false)} />}
-            </div>
-          </div>
         </motion.div>
+        {tourOpen && <GuidedTourOverlay steps={CULTURE_CONTROVERSY_TOUR} onClose={() => setTourOpen(false)} />}
 
         {/* Analysis Section */}
         <div className="container mx-auto px-4 py-8 max-w-6xl">
