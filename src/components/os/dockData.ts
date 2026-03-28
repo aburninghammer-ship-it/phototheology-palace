@@ -153,7 +153,13 @@ export const DOCK_SECTIONS: DockSection[] = [
         ],
       },
       {
-        id: "music", label: "Music", icon: Headphones, path: "/music", glow: "190 70% 50%",
+        id: "daily-walk", label: "Daily Walk", icon: Heart, path: "/daily-reading", glow: "340 70% 55%",
+        children: [
+          { id: "dw-daily-verse", label: "Daily Verse", path: "/daily-verse", icon: Sparkles },
+          { id: "dw-daily-reading", label: "Daily Reading", path: "/daily-reading", icon: BookOpen },
+          { id: "dw-devotionals", label: "Devotionals", path: "/devotionals", icon: Flame },
+          { id: "dw-growth-journal", label: "Growth Journal", path: "/growth-journal", icon: PenTool },
+        ],
       },
       {
         id: "sermons", label: "Sermons", icon: MessageSquare, path: "/sermon-builder", glow: "270 60% 55%",
