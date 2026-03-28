@@ -81,7 +81,7 @@ serve(async (req) => {
         <a href="${escapeHtml(APP_URL)}" style="display:inline-block;padding:12px 18px;border-radius:999px;border:1px solid hsl(215 20% 35%);color:hsl(210 40% 98%);font-weight:700;text-decoration:none;">Visit Phototheology Palace</a>
       </div>
       <p style="margin:0;font-size:14px;color:hsl(215 20% 65%);">
-        This public preview explains the challenge for newcomers; use the button above to jump back into the suite and respond.
+        This public preview explains the challenge for newcomers; use the button above to jump back into PhototheologyOS and respond.
       </p>
     </main>
   </body>

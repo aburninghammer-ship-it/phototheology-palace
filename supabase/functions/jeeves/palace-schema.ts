@@ -151,7 +151,7 @@ export const FLOOR_DESCRIPTIONS = `
 ## THE 9 FLOORS (0-8)
 
 **Floor 0 – AI Tools**
-The suite of AI-powered helpers (you, plus other tools) that support deep analysis, culture and controversy, prophecy tracking, sermons, and study.
+The collection of AI-powered helpers (you, plus other tools) that support deep analysis, culture and controversy, prophecy tracking, sermons, and study.
 
 **Floor 1 – Furnishing**
 Your first library shelves. Core Bible stories and images (Creation, Exodus, Gospels, Acts). Helps users never lose the big storyline.

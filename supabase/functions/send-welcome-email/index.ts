@@ -37,11 +37,11 @@ serve(async (req) => {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to the Bible Study Suite!</title>
+  <title>Welcome to PhototheologyOS!</title>
 </head>
 <body style="font-family: 'Georgia', serif; line-height: 1.6; color: #2c1810; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #faf8f5;">
   <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
-    <h1 style="color: #f5e6d3; margin: 0; font-size: 28px;">Welcome to the Bible Study Suite!</h1>
+    <h1 style="color: #f5e6d3; margin: 0; font-size: 28px;">Welcome to PhototheologyOS!</h1>
     <p style="color: #d4c4b0; margin: 10px 0 0 0; font-size: 16px;">Your Phototheology Journey Begins</p>
   </div>
   
@@ -50,12 +50,12 @@ serve(async (req) => {
     
     <p style="margin-bottom: 20px;">Thank you for joining us through <strong>${sourceDisplay}</strong>${pledgeAmount ? ` at $${(pledgeAmount / 100).toFixed(2)}/month` : ""}! 🎉</p>
     
-    <p style="margin-bottom: 20px;">You now have access to the <strong>Bible Study Suite</strong> — a powerful platform designed to help you study Scripture through the Phototheology method.</p>
+    <p style="margin-bottom: 20px;">You now have access to <strong>PhototheologyOS</strong> — a powerful platform designed to help you study Scripture through the Phototheology method.</p>
     
     <div style="background: #f9f5f0; border-left: 4px solid #8B4513; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
       <h3 style="color: #654321; margin: 0 0 15px 0; font-size: 18px;">📋 How to Get Started:</h3>
       <ol style="margin: 0; padding-left: 20px; color: #4a3728;">
-        <li style="margin-bottom: 10px;"><strong>Create an account</strong> at the Bible Study Suite using the same email address (<strong>${email}</strong>)</li>
+        <li style="margin-bottom: 10px;"><strong>Create an account</strong> at PhototheologyOS using the same email address (<strong>${email}</strong>)</li>
         <li style="margin-bottom: 10px;"><strong>Connect your ${source === "patreon" ? "Patreon" : "Teachable"} account</strong> by clicking the "${source === "patreon" ? "Connect with Patreon" : "Verify Teachable"}" button on the Pricing page</li>
         <li style="margin-bottom: 10px;"><strong>Start exploring</strong> the Palace floors, Bible reader, and all premium features!</li>
       </ol>
@@ -88,7 +88,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: "Phototheology <onboarding@resend.dev>",
         to: [email],
-        subject: `Welcome to the Bible Study Suite, ${firstName}! 📖`,
+        subject: `Welcome to PhototheologyOS, ${firstName}! 📖`,
         html: emailHtml,
         reply_to: "aburninghammer@gmail.com",
       }),

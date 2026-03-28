@@ -48,7 +48,7 @@ const TOUR_META: Record<string, { title: string; subtitle: string; verse: string
     duration: "18 min",
   },
   "suite-tour": {
-    title: "The Complete Suite Tour",
+    title: "The Complete PhototheologyOS Tour",
     subtitle: "Every tool in the Phototheology platform.",
     verse: "Psalm 119:18",
     verseText: "Open thou mine eyes, that I may behold wondrous things out of thy law.",
