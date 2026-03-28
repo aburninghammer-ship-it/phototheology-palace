@@ -323,7 +323,7 @@ const Gatehouse = () => {
 
             <div className="mt-8 flex justify-center">
               <Button
-                onClick={() => navigate("/palace-tour")}
+                onClick={() => navigate("/palace/tour")}
                 size="lg"
                 className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:via-yellow-600 hover:to-amber-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group"
               >
@@ -499,7 +499,7 @@ const Gatehouse = () => {
 
           <div className="mt-8 flex justify-center">
             <Button
-              onClick={() => navigate("/palace-tour")}
+              onClick={() => navigate("/palace/tour")}
               size="lg"
               className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:via-yellow-600 hover:to-amber-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group"
             >

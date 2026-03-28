@@ -12,7 +12,7 @@ export const AudioTourBanner = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, duration: 0.4 }}
       className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 p-5 cursor-pointer group"
-      onClick={() => navigate("/palace-tour")}
+      onClick={() => navigate("/palace/tour")}
     >
       {/* Decorative background icon */}
       <Castle className="absolute -right-4 -bottom-4 h-28 w-28 text-primary/5 rotate-12 transition-transform group-hover:rotate-6 group-hover:scale-110" />
