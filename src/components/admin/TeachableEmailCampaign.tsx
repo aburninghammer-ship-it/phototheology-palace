@@ -416,10 +416,10 @@ export function TeachableEmailCampaign() {
               variant="outline"
               className="w-full justify-start border-orange-500/30 hover:bg-orange-500/10"
               onClick={() => {
-                setSubject("🎓 Welcome to the PhotoTheology Suite!");
+                setSubject("🎓 Welcome to the PhototheologyOS!");
                 setContent(`<h1>Welcome Teachable Student!</h1>
 <p>Hi there,</p>
-<p>Thank you for enrolling in our Teachable course! We're excited to let you know that you now have access to the full PhotoTheology Suite.</p>
+<p>Thank you for enrolling in our Teachable course! We're excited to let you know that you now have access to the full PhototheologyOS.</p>
 <h2>Here's what you can do:</h2>
 <ul>
   <li>Access all 8 Floors of the Palace</li>
@@ -441,7 +441,7 @@ export function TeachableEmailCampaign() {
                 setSubject("🎓 Connect Your Teachable Account to the App!");
                 setContent(`<h1>Link Your Account for Full Access!</h1>
 <p>Hi there,</p>
-<p>We noticed you haven't connected your Teachable account to the PhotoTheology app yet.</p>
+<p>We noticed you haven't connected your Teachable account to PhototheologyOS yet.</p>
 <p>Connecting your account gives you:</p>
 <ul>
   <li>Automatic premium access</li>
@@ -489,7 +489,7 @@ export function TeachableEmailCampaign() {
                 setSubject("🎓 Continue Your PhotoTheology Journey!");
                 setContent(`<h1>We Miss You!</h1>
 <p>Hi there,</p>
-<p>We noticed you haven't been active in the PhotoTheology app recently.</p>
+<p>We noticed you haven't been active in PhototheologyOS recently.</p>
 <p>Don't miss out on your learning journey! Here's what's waiting for you:</p>
 <ul>
   <li>Continue where you left off in the Palace</li>
@@ -510,10 +510,10 @@ export function TeachableEmailCampaign() {
           {/* Conversion Campaign: Teachable non-Suite-subscribers */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-blue-500 flex items-center gap-2">
-              🎯 Conversion Campaign — Teachable Non-Suite-Subscribers
+              🎯 Conversion Campaign — Teachable Non-Subscribers
             </h4>
             <p className="text-xs text-muted-foreground">
-              Targets all Teachable (and Patreon) members who are NOT currently paying subscribers on the Suite. Excludes active/lifetime users.
+              Targets all Teachable (and Patreon) members who are NOT currently paying subscribers on PhototheologyOS. Excludes active/lifetime users.
             </p>
 
             <Button
@@ -533,10 +533,10 @@ export function TeachableEmailCampaign() {
 
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">You've already shown you care about going deeper into Scripture. Whether through the Teachable courses or the Phototheology community, you're part of this family.</p>
 
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">Now I want to introduce you to something I've poured everything into: <strong style="color: #d4af37;">The Phototheology Bible Study Suite</strong> — the full Palace method, living inside an app.</p>
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">Now I want to introduce you to something I've poured everything into: <strong style="color: #d4af37;">The Phototheology PhototheologyOS</strong> — the full Palace method, living inside an app.</p>
 
     <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 25px 0;">
-      <h3 style="color: #d4af37; margin: 0 0 15px 0;">🏰 What's Inside the Suite</h3>
+      <h3 style="color: #d4af37; margin: 0 0 15px 0;">🏰 What's Inside PhototheologyOS</h3>
       <ul style="font-size: 15px; line-height: 2; color: #c0c0c0; padding-left: 20px; margin: 0;">
         <li>🤖 <strong>Jeeves</strong> — Your AI study companion trained entirely in the Palace method</li>
         <li>🏛️ <strong>8 Floors of the Palace</strong> — Interactive study rooms for every level</li>
@@ -583,7 +583,7 @@ export function TeachableEmailCampaign() {
               className="w-full justify-start border-green-500/30 hover:bg-green-500/10"
               onClick={() => {
                 setFilter("free_signup");
-                setSubject("📖 Unlock the Bible Study Suite — Master Class Now Includes Full App Access!");
+                setSubject("📖 Unlock the PhototheologyOS — Master Class Now Includes Full App Access!");
                 setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
   <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
     <h1 style="color: #d4af37; font-size: 28px; margin: 0;">The Full Palace Awaits</h1>
@@ -598,7 +598,7 @@ export function TeachableEmailCampaign() {
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">But did you know there's a <strong style="color: #d4af37;">whole world</strong> you haven't seen yet?</p>
     
     <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 25px 0;">
-      <h3 style="color: #d4af37; margin: 0 0 15px 0;">🏰 The Bible Study Suite</h3>
+      <h3 style="color: #d4af37; margin: 0 0 15px 0;">🏰 The PhototheologyOS</h3>
       <p style="color: #c0c0c0; margin: 0 0 15px 0;">Our premium app brings Phototheology to life with:</p>
       <ul style="font-size: 15px; line-height: 2; color: #c0c0c0; padding-left: 20px; margin: 0;">
         <li>🤖 <strong>Jeeves</strong> — Your AI study companion trained in the Palace method</li>
@@ -615,7 +615,7 @@ export function TeachableEmailCampaign() {
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">For just <strong style="color: #d4af37;">$20/month</strong>, you get:</p>
     <ul style="font-size: 15px; line-height: 2; color: #c0c0c0; padding-left: 20px;">
       <li>✅ Weekly live Master Class sessions with Pastor Ivor</li>
-      <li>✅ Full access to the Bible Study Suite app</li>
+      <li>✅ Full access to the PhototheologyOS app</li>
       <li>✅ All course materials and replays</li>
       <li>✅ Direct Q&A opportunities</li>
     </ul>
@@ -643,7 +643,7 @@ export function TeachableEmailCampaign() {
               className="w-full justify-start border-green-500/30 hover:bg-green-500/10"
               onClick={() => {
                 setFilter("not_paying");
-                setSubject("🆕 Big Update: Bible Study Suite Now Included with Master Class!");
+                setSubject("🆕 Big Update: PhototheologyOS Now Included with Master Class!");
                 setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
   <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
     <h1 style="color: #d4af37; font-size: 26px; margin: 0;">🆕 New Benefit Announcement</h1>
@@ -655,12 +655,12 @@ export function TeachableEmailCampaign() {
     
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">I'm excited to share some news...</p>
     
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">We've built something special: <strong style="color: #d4af37;">The Bible Study Suite</strong> — a full app dedicated to studying Scripture through the Phototheology method.</p>
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">We've built something special: <strong style="color: #d4af37;">The PhototheologyOS</strong> — a full app dedicated to studying Scripture through the Phototheology method.</p>
     
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">And starting now, <strong style="color: #d4af37;">all Phototheology Master Class members get full access — included with their subscription!</strong></p>
     
     <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 25px 0;">
-      <h3 style="color: #d4af37; margin: 0 0 15px 0;">What's in the Bible Study Suite?</h3>
+      <h3 style="color: #d4af37; margin: 0 0 15px 0;">What's in the PhototheologyOS?</h3>
       <ul style="font-size: 15px; line-height: 2; color: #c0c0c0; padding-left: 20px; margin: 0;">
         <li>🤖 Jeeves — AI trained in the Palace method</li>
         <li>🏛️ All 8 Palace Floors — interactive study</li>
