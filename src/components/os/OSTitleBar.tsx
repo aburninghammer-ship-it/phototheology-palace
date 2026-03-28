@@ -61,13 +61,13 @@ export function OSTitleBar() {
         </div>
         {/* Text */}
         <div className="flex flex-col leading-none">
-          <span className="text-[14px] font-black tracking-[-0.02em] whitespace-nowrap"
-            style={{ background: "linear-gradient(105deg, hsl(32 95% 62%), hsl(350 85% 62%), hsl(280 70% 68%), hsl(210 90% 64%), hsl(160 75% 52%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          <span className="text-[14px] font-black tracking-[-0.02em] whitespace-nowrap bg-clip-text text-transparent"
+            style={{ backgroundImage: "linear-gradient(105deg, hsl(32 95% 62%), hsl(350 85% 62%), hsl(280 70% 68%), hsl(210 90% 64%), hsl(160 75% 52%))" }}>
             PhototheologyOS
           </span>
           <div className="flex items-center gap-1.5 mt-[2px]">
-            <span className="text-[9px] font-extrabold uppercase tracking-[0.25em] whitespace-nowrap"
-              style={{ background: "linear-gradient(90deg, hsl(145 80% 55%), hsl(180 70% 50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span className="text-[9px] font-extrabold uppercase tracking-[0.25em] whitespace-nowrap bg-clip-text text-transparent"
+              style={{ backgroundImage: "linear-gradient(90deg, hsl(145 80% 55%), hsl(180 70% 50%))" }}>
               Eden
             </span>
             <span className="w-[5px] h-[5px] rounded-full animate-pulse" style={{ background: "hsl(145 80% 55%)", boxShadow: "0 0 6px hsl(145 80% 55% / 0.6)" }} />
