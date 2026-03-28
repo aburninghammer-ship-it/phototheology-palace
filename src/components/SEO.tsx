@@ -22,24 +22,24 @@ const DEFAULT_IMAGE = `${BASE_URL}/phototheology-hero-og.png`;
 const organizationJsonLd: JsonLdData = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Phototheology",
+  name: "PhototheologyOS",
   url: BASE_URL,
   logo: `${BASE_URL}/pwa-512x512.png`,
-  description: "Bible learning suite using the Palace method for Scripture memorization and study.",
+  description: "PhototheologyOS — Powered by AI. Built for Biblical Intelligence.",
   sameAs: []
 };
 
 const websiteJsonLd: JsonLdData = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "Phototheology Bible Learning Suite",
+  name: "PhototheologyOS",
   url: BASE_URL,
-  description: "Master Scripture through the 8-floor Palace method."
+  description: "Powered by AI. Built for Biblical Intelligence. Master Scripture through the 8-floor Palace method."
 };
 
 export const SEO = ({
-  title = "Phototheology Bible Learning Suite",
-  description = "🏛️ Explore the Bible through the 8-floor Palace method. AI-powered study tools, multiplayer games, mind maps, daily challenges, and a Christ-centered approach that turns every verse into a living image. Try it free!",
+  title = "PhototheologyOS",
+  description = "PhototheologyOS — Powered by AI. Built for Biblical Intelligence. Master Scripture through the 8-floor Palace method with AI-powered study tools, games, and Christ-centered interpretation.",
   canonical,
   noindex = false,
   image = DEFAULT_IMAGE,
@@ -47,7 +47,7 @@ export const SEO = ({
 }: SEOProps) => {
   const location = useLocation();
   const canonicalUrl = canonical || `${BASE_URL}${location.pathname}`;
-  const fullTitle = title === "Phototheology Bible Learning Suite" ? title : `${title} | Phototheology`;
+  const fullTitle = title === "PhototheologyOS" ? title : `${title} | PhototheologyOS`;
 
   const isHome = location.pathname === "/" || location.pathname === "/landing" || location.pathname === "/gatehouse";
   const allJsonLd = jsonLd
@@ -81,7 +81,7 @@ export const SEO = ({
       <meta property="og:image" content={image} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content="Phototheology Bible Learning Suite" />
+      <meta property="og:site_name" content="PhototheologyOS" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
