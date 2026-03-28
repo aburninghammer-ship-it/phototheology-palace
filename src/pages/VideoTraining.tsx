@@ -49,6 +49,7 @@ const VideoTraining = () => {
   const [selectedVideo, setSelectedVideo] = useState<TrainingVideo | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [tourOpen, setTourOpen] = useState(false);
   
   // Form state for new video
   const [title, setTitle] = useState("");
