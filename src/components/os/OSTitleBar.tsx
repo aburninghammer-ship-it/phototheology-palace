@@ -9,7 +9,7 @@ import { ShareableProgressCard } from "@/components/ShareableProgressCard";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { StartSessionDialog } from "@/components/session/StartSessionDialog";
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
-import { LiveChatToggle } from "@/components/LiveChatToggle";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
