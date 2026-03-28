@@ -95,6 +95,7 @@ export function OSDock() {
   const [visible, setVisible] = useState(true);
   const [expanded, setExpanded] = useState(true);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [subOrders, setSubOrders] = useState<Record<string, string[]>>({});
   const [orderedItems, setOrderedItems] = useState<DockItem[]>(() => {
     const storedOrder = getStoredOrder();
     if (storedOrder) {
@@ -103,7 +104,6 @@ export function OSDock() {
         const found = DOCK_ITEMS.find(i => i.id === id);
         if (found) ordered.push(found);
       }
-      // Add any new items not in stored order
       for (const item of DOCK_ITEMS) {
         if (!storedOrder.includes(item.id)) ordered.push(item);
       }
@@ -111,6 +111,32 @@ export function OSDock() {
     }
     return DOCK_ITEMS;
   });
+
+  const getOrderedChildren = useCallback((item: DockItem) => {
+    if (!item.children) return [];
+    const stored = subOrders[item.id] || getStoredSubOrder(item.id);
+    if (stored) {
+      const ordered = stored.map(id => item.children!.find(c => c.id === id)).filter(Boolean) as typeof item.children;
+      // Add any new children not in stored order
+      for (const child of item.children) {
+        if (!stored.includes(child.id)) ordered!.push(child);
+      }
+      return ordered!;
+    }
+    return item.children;
+  }, [subOrders]);
+
+  const handleSubDragEnd = useCallback((parentId: string, children: typeof DOCK_ITEMS[0]['children']) => (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !children) return;
+    const oldIndex = children.findIndex(c => c.id === active.id);
+    const newIndex = children.findIndex(c => c.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(children, oldIndex, newIndex);
+    const newIds = reordered.map(c => c.id);
+    storeSubOrder(parentId, newIds);
+    setSubOrders(prev => ({ ...prev, [parentId]: newIds }));
+  }, []);
   const currentPath = location.pathname;
 
   const sensors = useSensors(
