@@ -57,6 +57,10 @@ export const PhototheologyOSLogo = ({
           {showEden && (
             <span className="flex items-center gap-1.5 mt-0.5">
               <span className="text-[11px] font-semibold tracking-[0.2em] text-muted-foreground/70 uppercase">
+                Operating System
+              </span>
+              <span className="text-[9px] text-muted-foreground/50 mx-1">•</span>
+              <span className="text-[11px] font-semibold tracking-[0.15em] text-muted-foreground/50 uppercase">
                 Eden
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
