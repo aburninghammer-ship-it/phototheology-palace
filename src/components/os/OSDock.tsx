@@ -192,7 +192,7 @@ export function OSDock() {
     return (
       <>
         <button
-          onClick={() => hasChildren ? toggleExpand(item.id) : navigate(item.path)}
+          onClick={() => { navigate(item.path); if (hasChildren) toggleExpand(item.id); }}
           className={cn(
             "relative flex items-center gap-3 rounded-xl transition-all duration-200 group w-full px-3 py-2 ml-3",
             "backdrop-blur-md border border-transparent",
