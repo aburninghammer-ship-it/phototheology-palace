@@ -39,6 +39,7 @@ const BibleReference = () => {
   const [searchCategory, setSearchCategory] = useState<"events" | "maps" | "prophecy" | "charts" | "people">("events");
   const [searchResults, setSearchResults] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;

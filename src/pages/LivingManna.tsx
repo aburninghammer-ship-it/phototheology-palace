@@ -47,6 +47,7 @@ export default function LivingManna() {
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'home');
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Sync tab state when URL search params change (e.g. from internal navigate calls)
   useEffect(() => {
