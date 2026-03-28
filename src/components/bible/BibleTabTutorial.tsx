@@ -78,6 +78,7 @@ export const BibleTabTutorial = ({ onClose }: BibleTabTutorialProps) => {
             body: JSON.stringify({
               script: step.narration,
               voice: "reginald",
+              guide: "reginald",
               segmentId: `bible-tutorial-${step.id}`,
             }),
           }
