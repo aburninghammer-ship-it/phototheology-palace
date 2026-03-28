@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, ChevronRight, ChevronLeft, Volume2, VolumeX, Loader2, Play } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
+
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 
 interface PalaceTabTutorialProps {
@@ -56,20 +56,33 @@ export const PalaceTabTutorial = ({ onClose, onTabChange }: PalaceTabTutorialPro
     setIsLoading(true);
 
     try {
-      const { data } = await supabase.functions.invoke("text-to-speech", {
-        body: { text: step.narration, voice: "reginald" },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-palace-tour-audio`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            script: step.narration,
+            voice: "reginald",
+            segmentId: `tutorial-${step.id}`,
+          }),
+        }
+      );
 
-      if (data?.audioUrl) {
-        const audio = new Audio(data.audioUrl);
-        audioRef.current = audio;
-        audio.onplay = () => { setIsPlaying(true); setIsLoading(false); };
-        audio.onended = () => setIsPlaying(false);
-        audio.onerror = () => { setIsPlaying(false); setIsLoading(false); };
-        await audio.play();
-      } else {
-        setIsLoading(false);
-      }
+      if (!response.ok) throw new Error("TTS request failed");
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      audio.onplay = () => { setIsPlaying(true); setIsLoading(false); };
+      audio.onended = () => setIsPlaying(false);
+      audio.onerror = () => { setIsPlaying(false); setIsLoading(false); };
+      await audio.play();
     } catch {
       setIsLoading(false);
     }
