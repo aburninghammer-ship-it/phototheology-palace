@@ -88,14 +88,14 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "devotionals", label: "Devotionals", path: "/devotionals", icon: Flame, glow: "328 85% 58%" },
       { id: "reading-plans", label: "Reading Plans", path: "/reading-plans", icon: Calendar, glow: "160 84% 39%" },
       { id: "notes", label: "Notes", path: "/notes", icon: StickyNote, glow: "45 100% 51%" },
+      { id: "prophecy-watch", label: "Prophecy Watch", path: "/prophecy-watch", icon: Eye, glow: "239 84% 67%" },
+      { id: "culture-controversy", label: "Christ & Culture", path: "/culture-controversy", icon: Scale, glow: "342 82% 54%" },
     ],
   },
   {
     id: "cota", label: "COTA", icon: Crown, path: "/cota-series", glow: "30 90% 52%",
     children: [
       { id: "cota-series", label: "COTA Series", path: "/cota-series", icon: Crown, glow: "30 90% 52%" },
-      { id: "prophecy-watch", label: "Prophecy Watch", path: "/prophecy-watch", icon: Eye, glow: "239 84% 67%" },
-      { id: "culture-controversy", label: "Christ & Culture", path: "/culture-controversy", icon: Scale, glow: "342 82% 54%" },
     ],
   },
   {
