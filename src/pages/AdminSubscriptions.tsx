@@ -180,7 +180,7 @@ export default function AdminSubscriptions() {
             setNewSignupName(null);
           }, 6000);
           // Also refresh stats
-          loadStats({ reason: "new-signup" });
+          loadStats({ reason: "manual" });
         }
       )
       .subscribe();
