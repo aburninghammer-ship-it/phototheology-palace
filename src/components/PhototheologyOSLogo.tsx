@@ -14,19 +14,20 @@ export const PhototheologyOSLogo = ({
   className = "",
 }: PhototheologyOSLogoProps) => {
   const content = (
-    <div className={`flex items-center gap-2.5 group ${className}`}>
-      {/* Icon - gradient rounded square with sparkle */}
+    <div className={`flex items-center gap-3.5 group ${className}`}>
+      {/* Icon - warm gold rounded square with sparkle */}
       <div className="relative flex-shrink-0">
         <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
+          className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
           style={{
-            background: "linear-gradient(135deg, #a855f7, #ec4899, #f97316, #06b6d4)",
+            background: "linear-gradient(135deg, #b8860b, #d4a017, #e6be44, #c8922a)",
+            boxShadow: "0 0 16px rgba(212, 160, 23, 0.4), inset 0 1px 1px rgba(255,255,255,0.2)",
           }}
         >
           <svg
             viewBox="0 0 24 24"
             fill="none"
-            className="w-5 h-5"
+            className="w-6 h-6"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
@@ -45,25 +46,45 @@ export const PhototheologyOSLogo = ({
 
       {/* Text */}
       {!compact && (
-        <div className="flex flex-col leading-none">
-          <span
-            className="font-bold text-[15px] tracking-tight bg-clip-text text-transparent"
-            style={{
-              backgroundImage: "linear-gradient(90deg, #a855f7, #ec4899, #f97316, #22d3ee, #4ade80)",
-            }}
-          >
-            PhototheologyOS
-          </span>
+        <div className="flex flex-col leading-none gap-1">
+          <div className="flex items-center gap-2">
+            <span
+              className="font-bold text-[19px] tracking-[0.04em] uppercase"
+              style={{
+                fontFamily: "'Cinzel', serif",
+                color: "#d4a017",
+                textShadow: "0 0 12px rgba(212, 160, 23, 0.3)",
+              }}
+            >
+              PHOTOTHEOLOGY
+            </span>
+            <span
+              className="text-[11px] font-semibold tracking-wide px-1.5 py-0.5 rounded"
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                color: "#d4a017",
+                background: "rgba(212, 160, 23, 0.15)",
+                border: "1px solid rgba(212, 160, 23, 0.3)",
+              }}
+            >
+              OS
+            </span>
+          </div>
           {showEden && (
-            <span className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-[11px] font-semibold tracking-[0.2em] text-muted-foreground/70 uppercase">
-                Operating System
-              </span>
-              <span className="text-[9px] text-muted-foreground/50 mx-1">•</span>
-              <span className="text-[11px] font-semibold tracking-[0.15em] text-muted-foreground/50 uppercase">
+            <span className="flex items-center gap-2">
+              <span
+                className="text-[11px] font-semibold tracking-[0.2em] uppercase"
+                style={{ color: "rgba(212, 160, 23, 0.7)" }}
+              >
                 Eden
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[9px] mx-0.5" style={{ color: "rgba(212, 160, 23, 0.4)" }}>•</span>
+              <span
+                className="text-[10px] tracking-wide"
+                style={{ color: "rgba(255, 255, 255, 0.5)" }}
+              >
+                Powered by AI. Built for Biblical Intelligence.
+              </span>
             </span>
           )}
         </div>
