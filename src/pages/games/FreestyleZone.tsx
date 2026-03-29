@@ -13,6 +13,7 @@ import {
   BookOpen, Sparkles, FileText, ChevronRight, ChevronDown, ChevronUp, Loader2,
   Play, Flame, Target, Crown, Eye, Swords, HelpCircle, Lightbulb, History, X,
   Users, Plus, Minus, Link2, Unlink, ShieldCheck, AlertTriangle,
+  Shapes, Lock, ArrowLeftRight, Building2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,6 +26,12 @@ import {
   type DropFocus,
   type FreestyleMode,
   type FactCheckResult,
+  type VerseStormDrop,
+  type TrinityDrop,
+  type ConstraintDrop,
+  type OppositesDrop,
+  type TargetDrop,
+  type PalaceRoomDrop,
 } from "@/hooks/useFreestyleZone";
 
 // ── Saved Session Types ────────────────────────────────────────────────
@@ -357,39 +364,33 @@ function SetupScreen({ onStart, hasExisting, onResume, onAbandon, pastSessions, 
           <Link2 className="h-5 w-5 text-purple-500" />
           Freestyle Mode
         </h2>
-        <div className="grid grid-cols-2 gap-3">
-          <Card
-            className={`cursor-pointer transition-all ${
-              selectedMode === "partial"
-                ? "border-primary bg-primary/10 shadow-md ring-2 ring-primary/30"
-                : "hover:border-primary/40 hover:bg-primary/5"
-            }`}
-            onClick={() => setSelectedMode("partial")}
-          >
-            <CardContent className="p-4 space-y-2 text-center">
-              <Unlink className="h-6 w-6 mx-auto text-amber-500" />
-              <p className="font-semibold text-sm">Partial Freestyle</p>
-              <p className="text-xs text-muted-foreground">
-                Each drop stands alone. Connect it to Christ without needing to link to previous drops.
-              </p>
-            </CardContent>
-          </Card>
-          <Card
-            className={`cursor-pointer transition-all ${
-              selectedMode === "whole"
-                ? "border-primary bg-primary/10 shadow-md ring-2 ring-primary/30"
-                : "hover:border-primary/40 hover:bg-primary/5"
-            }`}
-            onClick={() => setSelectedMode("whole")}
-          >
-            <CardContent className="p-4 space-y-2 text-center">
-              <Link2 className="h-6 w-6 mx-auto text-purple-500" />
-              <p className="font-semibold text-sm">Whole Freestyle</p>
-              <p className="text-xs text-muted-foreground">
-                Build a chain. Each response must connect to Christ AND link to the previous drops.
-              </p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {([
+            { mode: "partial" as FreestyleMode, icon: Unlink, color: "text-amber-500", label: "Partial", desc: "Each drop stands alone" },
+            { mode: "whole" as FreestyleMode, icon: Link2, color: "text-purple-500", label: "Whole", desc: "Chain-link your responses" },
+            { mode: "verse_storm" as FreestyleMode, icon: Zap, color: "text-orange-500", label: "Verse Storm", desc: "Verse + 10-15 objects, beat the clock" },
+            { mode: "trinity_drop" as FreestyleMode, icon: Shapes, color: "text-teal-500", label: "Trinity Drop", desc: "Object + Concept + Action" },
+            { mode: "constraint" as FreestyleMode, icon: Lock, color: "text-rose-500", label: "Constraint", desc: "Freestyle with a restriction" },
+            { mode: "opposites" as FreestyleMode, icon: ArrowLeftRight, color: "text-red-500", label: "Opposites", desc: "Tension pairs, connect both sides" },
+            { mode: "target" as FreestyleMode, icon: Target, color: "text-blue-500", label: "Target", desc: "Apply a verse to a specific person" },
+            { mode: "palace_room" as FreestyleMode, icon: Building2, color: "text-violet-500", label: "Palace Room", desc: "Interpret through a PT room lens" },
+          ] as const).map(({ mode: m, icon: Icon, color, label, desc }) => (
+            <Card
+              key={m}
+              className={`cursor-pointer transition-all ${
+                selectedMode === m
+                  ? "border-primary bg-primary/10 shadow-md ring-2 ring-primary/30"
+                  : "hover:border-primary/40 hover:bg-primary/5"
+              }`}
+              onClick={() => setSelectedMode(m)}
+            >
+              <CardContent className="p-3 space-y-1.5 text-center">
+                <Icon className={`h-6 w-6 mx-auto ${color}`} />
+                <p className="font-semibold text-xs">{label}</p>
+                <p className="text-[10px] text-muted-foreground leading-tight">{desc}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
 
@@ -544,8 +545,8 @@ function SetupScreen({ onStart, hasExisting, onResume, onAbandon, pastSessions, 
 function ActiveSession({
   gameState, currentDrop, currentDropIndex, currentFeedback, timeRemaining,
   momentum, isGeneratingDrop, isEvaluating, isAskingJeeves, jeevesAssist,
-  onSubmit, onPass, onNext, onEnd, onAskJeeves,
-  players, currentPlayerIndex,
+  onSubmit, onPass, onNext, onEnd, onAskJeeves, onSubmitStorm,
+  players, currentPlayerIndex, pendingStormAutoSubmitRef,
 }: {
   gameState: ReturnType<typeof useFreestyleZone>["gameState"];
   currentDrop: ReturnType<typeof useFreestyleZone>["currentDrop"];
@@ -558,17 +559,21 @@ function ActiveSession({
   isAskingJeeves: boolean;
   jeevesAssist: string | null;
   onSubmit: (response: string) => void;
+  onSubmitStorm: (response: string) => void;
   onPass: () => void;
   onNext: () => void;
   onEnd: () => void;
   onAskJeeves: () => void;
   players: string[];
   currentPlayerIndex: number;
+  pendingStormAutoSubmitRef: React.MutableRefObject<boolean>;
 }) {
   const [input, setInput] = useState("");
   const [showChainHistory, setShowChainHistory] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hasSubmitted = currentFeedback !== null;
+  const isStorm = gameState.freestyleMode === "verse_storm";
+  const stormDrop = gameState.verseStormDrop;
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -576,9 +581,23 @@ function ActiveSession({
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
+  // Storm auto-submit when timer hits 0
+  useEffect(() => {
+    if (pendingStormAutoSubmitRef.current && isStorm && !hasSubmitted && !isEvaluating) {
+      pendingStormAutoSubmitRef.current = false;
+      const text = input.trim() || "(Time expired — no response)";
+      onSubmitStorm(text);
+      setInput("");
+    }
+  }, [gameState.stormTimeRemaining, isStorm, hasSubmitted, isEvaluating]);
+
   const handleSubmit = () => {
     if (!input.trim() || isEvaluating) return;
-    onSubmit(input.trim());
+    if (isStorm) {
+      onSubmitStorm(input.trim());
+    } else {
+      onSubmit(input.trim());
+    }
     setInput("");
   };
 
@@ -619,8 +638,17 @@ function ActiveSession({
               {DROP_FOCUS_OPTIONS.find(o => o.value === gameState.dropFocus)?.icon} {DROP_FOCUS_OPTIONS.find(o => o.value === gameState.dropFocus)?.label}
             </Badge>
           )}
-          <Badge variant="outline" className={`text-[10px] ${gameState.freestyleMode === "partial" ? "border-amber-500/30 text-amber-600 dark:text-amber-400" : "border-purple-500/30 text-purple-600 dark:text-purple-400"}`}>
-            {gameState.freestyleMode === "partial" ? "Partial" : "Whole"}
+          <Badge variant="outline" className={`text-[10px] ${
+            gameState.freestyleMode === "partial" ? "border-amber-500/30 text-amber-600 dark:text-amber-400"
+            : gameState.freestyleMode === "verse_storm" ? "border-orange-500/30 text-orange-600 dark:text-orange-400"
+            : gameState.freestyleMode === "trinity_drop" ? "border-teal-500/30 text-teal-600 dark:text-teal-400"
+            : gameState.freestyleMode === "constraint" ? "border-rose-500/30 text-rose-600 dark:text-rose-400"
+            : gameState.freestyleMode === "opposites" ? "border-red-500/30 text-red-600 dark:text-red-400"
+            : gameState.freestyleMode === "target" ? "border-blue-500/30 text-blue-600 dark:text-blue-400"
+            : gameState.freestyleMode === "palace_room" ? "border-violet-500/30 text-violet-600 dark:text-violet-400"
+            : "border-purple-500/30 text-purple-600 dark:text-purple-400"
+          }`}>
+            {{ partial: "Partial", whole: "Whole", verse_storm: "Storm", trinity_drop: "Trinity", constraint: "Constraint", opposites: "Opposites", target: "Target", palace_room: "Palace" }[gameState.freestyleMode]}
           </Badge>
           <Badge variant="secondary" className="font-mono text-xs">
             Drop #{currentDropIndex + 1}
@@ -788,7 +816,7 @@ function ActiveSession({
         </div>
       )}
 
-      {/* Drop Card */}
+      {/* Drop Card — mode-specific rendering */}
       <AnimatePresence mode="wait">
         {isGeneratingDrop ? (
           <motion.div
@@ -803,11 +831,237 @@ function ActiveSession({
                   <Flame className="h-10 w-10 text-orange-500/50 animate-pulse" />
                   <Loader2 className="h-5 w-5 animate-spin text-orange-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                 </div>
-                <p className="text-muted-foreground text-sm">Jeeves is preparing your next drop...</p>
+                <p className="text-muted-foreground text-sm">
+                  {isStorm ? "Jeeves is building your storm..." : "Jeeves is preparing your next drop..."}
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : isStorm && stormDrop ? (
+          /* ── Verse Storm Card ── */
+          <motion.div
+            key={`storm-${currentDropIndex}`}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="space-y-3">
+              {/* Storm Countdown Bar */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className={`font-mono font-bold ${
+                    gameState.stormTimeRemaining <= 30 ? "text-red-500 animate-pulse" :
+                    gameState.stormTimeRemaining <= 60 ? "text-amber-500" : "text-green-500"
+                  }`}>
+                    {gameState.stormTimeRemaining <= 0 ? "TIME'S UP" : formatTime(gameState.stormTimeRemaining)}
+                  </span>
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <Zap className="h-3 w-3 text-orange-500" /> Verse Storm
+                  </span>
+                </div>
+                <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                  <motion.div
+                    className={`absolute inset-y-0 left-0 rounded-full ${
+                      gameState.stormTimeRemaining <= 30 ? "animate-pulse" : ""
+                    }`}
+                    style={{
+                      background: gameState.stormTimeRemaining <= 30
+                        ? "linear-gradient(90deg, #ef4444, #dc2626)"
+                        : gameState.stormTimeRemaining <= 60
+                        ? "linear-gradient(90deg, #f59e0b, #d97706)"
+                        : "linear-gradient(90deg, #22c55e, #16a34a)",
+                    }}
+                    animate={{
+                      width: `${(gameState.stormTimeRemaining / (
+                        gameState.difficulty === "beginner" ? 300 :
+                        gameState.difficulty === "intermediate" ? 240 :
+                        gameState.difficulty === "advanced" ? 180 : 120
+                      )) * 100}%`,
+                    }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+              </div>
+
+              <Card className={`shadow-lg ${getGlowColor()} transition-shadow duration-500`}>
+                <CardContent className="p-6 space-y-4">
+                  {/* Verse Block */}
+                  <div className="border-l-4 border-orange-500 pl-4 py-2 bg-orange-500/5 rounded-r-lg">
+                    <p className="text-sm font-bold text-orange-600 dark:text-orange-400">{stormDrop.verse}</p>
+                    <p className="text-sm leading-relaxed mt-1 italic">{stormDrop.verseText}</p>
+                  </div>
+
+                  {/* Object Grid */}
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2">Connect as many as you can:</p>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                      {stormDrop.objects.map((obj, i) => {
+                        const colors = ["bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20",
+                          "bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/20",
+                          "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20",
+                          "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20",
+                          "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20"];
+                        return (
+                          <Badge key={i} variant="outline" className={`text-xs px-2 py-1 justify-center ${colors[i % colors.length]}`}>
+                            {obj}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </motion.div>
+        ) : gameState.freestyleMode === "trinity_drop" && gameState.trinityDrop ? (
+          /* ── Trinity Drop Card ── */
+          <motion.div
+            key={`trinity-${currentDropIndex}`}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className={`shadow-lg ${getGlowColor()} transition-shadow duration-500`}>
+              <CardContent className="p-6 space-y-4">
+                <Badge className="bg-teal-500 text-white"><Shapes className="h-3 w-3 mr-1" /> Trinity Drop</Badge>
+                <div className="flex items-center gap-3 text-center">
+                  <div className="flex-1 p-3 rounded-lg bg-teal-500/10 border border-teal-500/20">
+                    <p className="text-[10px] text-muted-foreground">Object</p>
+                    <p className="font-semibold text-sm">{gameState.trinityDrop.object}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <div className="flex-1 p-3 rounded-lg bg-teal-500/10 border border-teal-500/20">
+                    <p className="text-[10px] text-muted-foreground">Concept</p>
+                    <p className="font-semibold text-sm">{gameState.trinityDrop.concept}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <div className="flex-1 p-3 rounded-lg bg-teal-500/10 border border-teal-500/20">
+                    <p className="text-[10px] text-muted-foreground">Action</p>
+                    <p className="font-semibold text-sm">{gameState.trinityDrop.action}</p>
+                  </div>
+                </div>
+                {gameState.trinityDrop.verse && (
+                  <div className="border-l-4 border-teal-500/40 pl-3 py-1">
+                    <p className="text-xs font-medium text-teal-600 dark:text-teal-400">{gameState.trinityDrop.verse}</p>
+                    {gameState.trinityDrop.verseText && <p className="text-xs italic text-muted-foreground">{gameState.trinityDrop.verseText}</p>}
+                  </div>
+                )}
+                {gameState.trinityDrop.hint && gameState.difficulty === "beginner" && (
+                  <p className="text-sm text-muted-foreground italic">Hint: {gameState.trinityDrop.hint}</p>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : gameState.freestyleMode === "constraint" && gameState.constraintDrop ? (
+          /* ── Constraint Card ── */
+          <motion.div
+            key={`constraint-${currentDropIndex}`}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className={`shadow-lg ${getGlowColor()} transition-shadow duration-500`}>
+              <CardContent className="p-6 space-y-4">
+                <Badge className="bg-rose-500 text-white"><Lock className="h-3 w-3 mr-1" /> Constraint</Badge>
+                <div className="border-l-4 border-rose-500/40 pl-3 py-2 bg-rose-500/5 rounded-r-lg">
+                  <p className="text-sm font-bold text-rose-600 dark:text-rose-400">{gameState.constraintDrop.verse}</p>
+                  <p className="text-sm italic mt-1">{gameState.constraintDrop.verseText}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-center">
+                  <p className="text-[10px] text-muted-foreground">Constraint</p>
+                  <p className="font-bold text-sm text-rose-600 dark:text-rose-400">{gameState.constraintDrop.constraint}</p>
+                </div>
+                <p className="text-xl font-medium">{gameState.constraintDrop.drop}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : gameState.freestyleMode === "opposites" && gameState.oppositesDrop ? (
+          /* ── Opposites Card ── */
+          <motion.div
+            key={`opposites-${currentDropIndex}`}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className={`shadow-lg ${getGlowColor()} transition-shadow duration-500`}>
+              <CardContent className="p-6 space-y-4">
+                <Badge className="bg-red-500 text-white"><ArrowLeftRight className="h-3 w-3 mr-1" /> Opposites</Badge>
+                <div className="border-l-4 border-red-500/40 pl-3 py-2">
+                  <p className="text-sm font-bold text-red-600 dark:text-red-400">{gameState.oppositesDrop.verse}</p>
+                  <p className="text-sm italic mt-1">{gameState.oppositesDrop.verseText}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-center">
+                    <p className="font-bold text-lg">{gameState.oppositesDrop.pair[0]}</p>
+                  </div>
+                  <span className="text-muted-foreground font-bold text-sm shrink-0">vs</span>
+                  <div className="flex-1 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-center">
+                    <p className="font-bold text-lg">{gameState.oppositesDrop.pair[1]}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : gameState.freestyleMode === "target" && gameState.targetDrop ? (
+          /* ── Target Card ── */
+          <motion.div
+            key={`target-${currentDropIndex}`}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className={`shadow-lg ${getGlowColor()} transition-shadow duration-500`}>
+              <CardContent className="p-6 space-y-4">
+                <Badge className="bg-blue-500 text-white"><Target className="h-3 w-3 mr-1" /> Target</Badge>
+                <div className="border-l-4 border-blue-500/40 pl-3 py-2">
+                  <p className="text-sm font-bold text-blue-600 dark:text-blue-400">{gameState.targetDrop.verse}</p>
+                  <p className="text-sm italic mt-1">{gameState.targetDrop.verseText}</p>
+                </div>
+                <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-2xl">🎯</span>
+                    <p className="font-bold">{gameState.targetDrop.targetPerson}</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{gameState.targetDrop.targetDescription}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : gameState.freestyleMode === "palace_room" && gameState.palaceRoomDrop ? (
+          /* ── Palace Room Card ── */
+          <motion.div
+            key={`palace-${currentDropIndex}`}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className={`shadow-lg ${getGlowColor()} transition-shadow duration-500`}>
+              <CardContent className="p-6 space-y-4">
+                <Badge className="bg-violet-500 text-white"><Building2 className="h-3 w-3 mr-1" /> Palace Room</Badge>
+                <div className="border-l-4 border-violet-500/40 pl-3 py-2">
+                  <p className="text-sm font-bold text-violet-600 dark:text-violet-400">{gameState.palaceRoomDrop.verse}</p>
+                  <p className="text-sm italic mt-1">{gameState.palaceRoomDrop.verseText}</p>
+                </div>
+                <div className="p-4 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center gap-3">
+                  <Building2 className="h-8 w-8 text-violet-500 shrink-0" />
+                  <div>
+                    <p className="font-bold">{gameState.palaceRoomDrop.roomName}</p>
+                    <Badge variant="outline" className="text-[10px] mt-1 border-violet-500/30 text-violet-600 dark:text-violet-400">
+                      {gameState.palaceRoomDrop.roomCode}
+                    </Badge>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
         ) : currentDrop ? (
+          /* ── Standard Drop Card (Partial / Whole) ── */
           <motion.div
             key={`drop-${currentDropIndex}`}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -865,8 +1119,14 @@ function ActiveSession({
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={gameState.freestyleMode === "partial"
-              ? "Connect this drop to Christ... How does it point to Him?"
+            placeholder={
+              isStorm ? "Connect as many objects as you can to this verse..."
+              : gameState.freestyleMode === "trinity_drop" ? "Weave the object, concept, and action together through Christ..."
+              : gameState.freestyleMode === "constraint" ? "Freestyle within the constraint — connect the drop to Christ..."
+              : gameState.freestyleMode === "opposites" ? "How do both sides of this tension point to Christ?"
+              : gameState.freestyleMode === "target" ? "How would you explain this verse to this person?"
+              : gameState.freestyleMode === "palace_room" ? "Interpret this verse through the lens of this palace room..."
+              : gameState.freestyleMode === "partial" ? "Connect this drop to Christ... How does it point to Him?"
               : "Connect this drop to Christ... How does it point to Him? Can you link it to previous drops?"
             }
             className="min-h-[120px] resize-none"
@@ -937,6 +1197,16 @@ function ActiveSession({
                 )}
               </div>
 
+              {/* Storm: Objects Connected Count */}
+              {isStorm && (currentFeedback as any).objectsConnected !== undefined && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Zap className="h-4 w-4 text-orange-500" />
+                  <span className="font-mono font-bold">
+                    Connected {(currentFeedback as any).objectsConnected}/{(currentFeedback as any).totalObjects || "?"} objects
+                  </span>
+                </div>
+              )}
+
               {/* Score Bars */}
               <div className="grid grid-cols-2 gap-2 text-sm">
                 {[
@@ -944,6 +1214,7 @@ function ActiveSession({
                   { label: "Depth", value: currentFeedback.depth, emoji: "🔍" },
                   { label: "Creativity", value: currentFeedback.creativity, emoji: "💡" },
                   ...(gameState.freestyleMode === "whole" ? [{ label: "Chain Link", value: currentFeedback.chainLink, emoji: "🔗" }] : []),
+                  ...(isStorm && (currentFeedback as any).objectsConnected !== undefined ? [{ label: "Objects Connected", value: (currentFeedback as any).objectsConnected, emoji: "🎯" }] : []),
                 ].map(({ label, value, emoji }, idx) => (
                   <div key={label} className="space-y-1">
                     <div className="flex justify-between">
@@ -1466,12 +1737,14 @@ export default function FreestyleZone() {
             isAskingJeeves={game.isAskingJeeves}
             jeevesAssist={game.jeevesAssist}
             onSubmit={game.submitResponse}
+            onSubmitStorm={game.submitStormResponse}
             onPass={game.passDrop}
             onNext={game.advanceToNextDrop}
             onEnd={game.endSession}
             onAskJeeves={game.askJeevesForHelp}
             players={game.gameState.players}
             currentPlayerIndex={game.gameState.currentPlayerIndex}
+            pendingStormAutoSubmitRef={game.pendingStormAutoSubmitRef}
           />
         ) : (
           <CompletionScreen

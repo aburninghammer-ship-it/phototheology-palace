@@ -8,15 +8,57 @@ import { useAuth } from "@/hooks/useAuth";
 
 export type Difficulty = "beginner" | "intermediate" | "advanced" | "master";
 export type GamePhase = "setup" | "active" | "complete";
-export type FreestyleMode = "partial" | "whole";
+export type FreestyleMode = "partial" | "whole" | "verse_storm" | "trinity_drop" | "constraint" | "opposites" | "target" | "palace_room";
 
-export type DropCategory = "scripture" | "nature" | "everyday" | "history" | "human_experience" | "symbolic";
+export type DropCategory = "scripture" | "nature" | "everyday" | "history" | "human_experience" | "symbolic" | "action" | "tension_pair" | "abstract";
 export type DropFocus = DropCategory | "random";
 
 export interface Drop {
   category: DropCategory;
   drop: string;
   hint?: string;
+}
+
+export interface VerseStormDrop {
+  verse: string;        // e.g. "John 3:16"
+  verseText: string;
+  objects: string[];    // 10-15 items
+}
+
+export interface TrinityDrop {
+  object: string;
+  concept: string;
+  action: string;
+  hint?: string;
+  verse?: string;
+  verseText?: string;
+}
+
+export interface ConstraintDrop {
+  verse: string;
+  verseText: string;
+  constraint: string;
+  drop: string;
+}
+
+export interface OppositesDrop {
+  verse: string;
+  verseText: string;
+  pair: [string, string];
+}
+
+export interface TargetDrop {
+  verse: string;
+  verseText: string;
+  targetPerson: string;
+  targetDescription: string;
+}
+
+export interface PalaceRoomDrop {
+  verse: string;
+  verseText: string;
+  roomName: string;
+  roomCode: string;
 }
 
 export interface FactCheckIssue {
@@ -95,6 +137,15 @@ export interface FreestyleGameState {
   players: string[];           // player names, empty = solo mode
   currentPlayerIndex: number;  // whose turn it is (index into players[])
   playerResponses: number[];   // maps each drop index → player index who responded
+  // Verse Storm
+  verseStormDrop: VerseStormDrop | null;
+  stormTimeRemaining: number;
+  // Mode-specific drops
+  trinityDrop: TrinityDrop | null;
+  constraintDrop: ConstraintDrop | null;
+  oppositesDrop: OppositesDrop | null;
+  targetDrop: TargetDrop | null;
+  palaceRoomDrop: PalaceRoomDrop | null;
 }
 
 const INITIAL_STATE: FreestyleGameState = {
@@ -113,16 +164,30 @@ const INITIAL_STATE: FreestyleGameState = {
   players: [],
   currentPlayerIndex: 0,
   playerResponses: [],
+  verseStormDrop: null,
+  stormTimeRemaining: 0,
+  trinityDrop: null,
+  constraintDrop: null,
+  oppositesDrop: null,
+  targetDrop: null,
+  palaceRoomDrop: null,
 };
 
 const SESSION_DURATION = 60 * 60; // 60 minutes in seconds
 const MOMENTUM_DECAY_ON_PASS = 15;
 const MOMENTUM_CONSECUTIVE_PASS_PENALTY = 5;
 
+const STORM_DURATION: Record<Difficulty, number> = {
+  beginner: 300,
+  intermediate: 240,
+  advanced: 180,
+  master: 120,
+};
+
 // ── Cross-session drop history (localStorage) ──────────────────────────
 const DROP_HISTORY_KEY = "freestyle_drop_history";
-const DROP_HISTORY_MAX = 200; // remember last 200 drops across all sessions
-const DROP_HISTORY_EXPIRY_DAYS = 7;
+const DROP_HISTORY_MAX = 500; // remember last 500 drops across all sessions
+const DROP_HISTORY_EXPIRY_DAYS = 30;
 
 function getDropHistory(): string[] {
   try {
@@ -170,6 +235,9 @@ export const CATEGORY_CONFIG: Record<DropCategory, { label: string; color: strin
   history: { label: "History", color: "bg-amber-700", emoji: "🏛️" },
   human_experience: { label: "Human Experience", color: "bg-purple-500", emoji: "💭" },
   symbolic: { label: "Symbolic", color: "bg-red-500", emoji: "🔮" },
+  action: { label: "Action", color: "bg-cyan-500", emoji: "⚡" },
+  tension_pair: { label: "Tension", color: "bg-red-600", emoji: "⚔️" },
+  abstract: { label: "Abstract", color: "bg-violet-500", emoji: "🧠" },
 };
 
 export const DIFFICULTY_CONFIG: Record<Difficulty, { label: string; description: string; color: string }> = {
@@ -234,8 +302,10 @@ export function useFreestyleZone() {
 
   // Refs
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stormTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const savedSessionIdRef = useRef<string | null>(null);
   const gameStateRef = useRef<FreestyleGameState>(gameState);
+  const pendingStormAutoSubmitRef = useRef(false);
 
   // Keep ref in sync with state to avoid stale closures
   useEffect(() => {
@@ -272,6 +342,29 @@ export function useFreestyleZone() {
       endSession();
     }
   }, [gameState.elapsedSeconds]);
+
+  // Storm countdown timer
+  useEffect(() => {
+    if (gameState.phase !== "active" || gameState.freestyleMode !== "verse_storm" || !gameState.verseStormDrop) {
+      if (stormTimerRef.current) clearInterval(stormTimerRef.current);
+      return;
+    }
+
+    stormTimerRef.current = setInterval(() => {
+      setGameState(prev => {
+        if (prev.stormTimeRemaining <= 1) {
+          if (stormTimerRef.current) clearInterval(stormTimerRef.current);
+          pendingStormAutoSubmitRef.current = true;
+          return { ...prev, stormTimeRemaining: 0 };
+        }
+        return { ...prev, stormTimeRemaining: prev.stormTimeRemaining - 1 };
+      });
+    }, 1000);
+
+    return () => {
+      if (stormTimerRef.current) clearInterval(stormTimerRef.current);
+    };
+  }, [gameState.phase, gameState.freestyleMode, gameState.verseStormDrop, setGameState]);
 
   // ── Helpers ────────────────────────────────────────────────────────
 
@@ -323,18 +416,36 @@ export function useFreestyleZone() {
     setPolishedContent(null);
     setPrefetchedDrop(null);
 
-    // Generate first drop
-    await generateNextDrop(difficulty, [], 0);
+    // Generate first drop — verse storm uses its own generator
+    if (freestyleMode === "verse_storm") {
+      await generateVerseStorm(difficulty);
+    } else {
+      await generateNextDrop(difficulty, [], 0, freestyleMode);
+    }
   }, [startNewGame, setGameState]);
 
   const generateNextDrop = useCallback(async (
     difficulty?: Difficulty,
     previousDrops?: Drop[],
-    dropCount?: number
+    dropCount?: number,
+    mode?: FreestyleMode,
   ) => {
     const diff = difficulty || gameState.difficulty;
     const prevDrops = previousDrops || gameState.drops;
     const count = dropCount ?? gameState.drops.length;
+    const currentMode = mode || gameState.freestyleMode;
+
+    // Verse storm uses its own generator
+    if (currentMode === "verse_storm") {
+      await generateVerseStorm(diff);
+      return;
+    }
+
+    // Mode-specific drop generators
+    if (["trinity_drop", "constraint", "opposites", "target", "palace_room"].includes(currentMode)) {
+      await generateModeDrop(currentMode, diff, prevDrops, count);
+      return;
+    }
 
     const lastDropText = prevDrops[prevDrops.length - 1]?.drop;
 
@@ -361,7 +472,7 @@ export function useFreestyleZone() {
         mode: "freestyle_generate_drop",
         difficulty: diff,
         previousDrops: prevDrops.slice(-5).map(d => d.drop),
-        recentDropHistory: crossSessionHistory.slice(-50),
+        recentDropHistory: crossSessionHistory.slice(-100),
         dropCount: count,
         dropFocus: focus !== "random" ? focus : undefined,
       }, "freestyle-zone");
@@ -398,7 +509,7 @@ export function useFreestyleZone() {
     } finally {
       setIsGeneratingDrop(false);
     }
-  }, [gameState.difficulty, gameState.drops, gameState.dropFocus, prefetchedDrop, setGameState]);
+  }, [gameState.difficulty, gameState.drops, gameState.dropFocus, gameState.freestyleMode, prefetchedDrop, setGameState]);
 
   const prefetchNextDrop = useCallback(async (
     difficulty: Difficulty,
@@ -412,7 +523,7 @@ export function useFreestyleZone() {
         mode: "freestyle_generate_drop",
         difficulty,
         previousDrops: previousDrops.slice(-5).map(d => d.drop),
-        recentDropHistory: crossSessionHistory.slice(-50),
+        recentDropHistory: crossSessionHistory.slice(-100),
         dropCount,
         dropFocus: focus !== "random" ? focus : undefined,
       }, "freestyle-zone");
@@ -429,6 +540,233 @@ export function useFreestyleZone() {
       // Silently fail on prefetch — generateNextDrop will use fallback pool
     }
   }, [gameState.dropFocus]);
+
+  // ── Verse Storm Generator ────────────────────────────────────────────
+
+  const generateVerseStorm = useCallback(async (difficulty?: Difficulty) => {
+    const diff = difficulty || gameState.difficulty;
+    setIsGeneratingDrop(true);
+    try {
+      const { data } = await callJeeves({
+        mode: "freestyle_generate_verse_storm",
+        difficulty: diff,
+        previousDrops: gameState.drops.slice(-5).map(d => d.drop),
+      }, "freestyle-zone");
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      if (!parsed.verse || !parsed.objects?.length) throw new Error("Invalid storm data");
+
+      const stormDrop: VerseStormDrop = {
+        verse: parsed.verse,
+        verseText: parsed.verseText || "",
+        objects: parsed.objects.slice(0, 15),
+      };
+
+      // Also create a regular Drop entry for chain tracking
+      const drop: Drop = {
+        category: "scripture",
+        drop: `[Storm] ${stormDrop.verse}: ${stormDrop.objects.length} objects`,
+      };
+
+      setGameState(prev => ({
+        ...prev,
+        drops: [...prev.drops, drop],
+        verseStormDrop: stormDrop,
+        stormTimeRemaining: STORM_DURATION[diff],
+      }));
+    } catch (error) {
+      console.error("Failed to generate verse storm:", error);
+      // Fallback storm
+      const fallbackStorm: VerseStormDrop = {
+        verse: "Romans 8:28",
+        verseText: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.",
+        objects: ["a broken clock", "a seed in dry ground", "a detour sign", "a surgeon's scalpel", "a refiner's fire", "a winding river", "a closed door", "a farmer's plow", "a diamond under pressure", "a shepherd's staff"],
+      };
+      const drop: Drop = {
+        category: "scripture",
+        drop: `[Storm] ${fallbackStorm.verse}: ${fallbackStorm.objects.length} objects`,
+      };
+      setGameState(prev => ({
+        ...prev,
+        drops: [...prev.drops, drop],
+        verseStormDrop: fallbackStorm,
+        stormTimeRemaining: STORM_DURATION[gameState.difficulty],
+      }));
+    } finally {
+      setIsGeneratingDrop(false);
+    }
+  }, [gameState.difficulty, gameState.drops, setGameState]);
+
+  const submitStormResponse = useCallback(async (response: string) => {
+    if (gameState.phase !== "active") return;
+    if (stormTimerRef.current) clearInterval(stormTimerRef.current);
+
+    setIsEvaluating(true);
+    setCurrentFeedback(null);
+
+    try {
+      const { data, error } = await callJeeves({
+        mode: "freestyle_evaluate_verse_storm",
+        verseStormDrop: gameState.verseStormDrop,
+        userResponse: response,
+        difficulty: gameState.difficulty,
+        timeUsed: STORM_DURATION[gameState.difficulty] - gameState.stormTimeRemaining,
+      }, "freestyle-zone");
+
+      if (error || !data) throw new Error(error?.message || "No response");
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+
+      const scores: EvaluationScores = {
+        christConnection: parsed.christConnection ?? 5,
+        depth: parsed.depth ?? 5,
+        creativity: parsed.creativity ?? 5,
+        chainLink: parsed.objectsConnected ?? 0,
+        totalScore: parsed.totalScore ?? 20,
+        feedback: parsed.feedback || "Storm complete!",
+        suggestion: parsed.suggestion,
+      };
+
+      // Store objectsConnected in the scores for display
+      (scores as any).objectsConnected = parsed.objectsConnected ?? 0;
+      (scores as any).totalObjects = gameState.verseStormDrop?.objects.length ?? 0;
+
+      setCurrentFeedback(scores);
+      updateMomentum(scores.totalScore, false);
+
+      setGameState(prev => ({
+        ...prev,
+        userResponses: [...prev.userResponses, response],
+        scores: [...prev.scores, scores],
+        consecutivePasses: 0,
+        playerResponses: [...prev.playerResponses, prev.currentPlayerIndex],
+      }));
+
+      await saveSession({
+        userResponses: [...gameState.userResponses, response],
+        scores: [...gameState.scores, scores],
+      });
+    } catch (error) {
+      console.error("Failed to evaluate storm:", error);
+      const fallbackScores: EvaluationScores = {
+        christConnection: 5, depth: 5, creativity: 5, chainLink: 5,
+        totalScore: 20,
+        feedback: "Storm evaluated — keep going!",
+      };
+      setCurrentFeedback(fallbackScores);
+      setGameState(prev => ({
+        ...prev,
+        userResponses: [...prev.userResponses, response],
+        scores: [...prev.scores, fallbackScores],
+        consecutivePasses: 0,
+        playerResponses: [...prev.playerResponses, prev.currentPlayerIndex],
+      }));
+    } finally {
+      setIsEvaluating(false);
+    }
+  }, [gameState, updateMomentum, setGameState, saveSession]);
+
+  // ── Mode-Specific Drop Generator ──────────────────────────────────
+
+  const generateModeDrop = useCallback(async (
+    mode: FreestyleMode,
+    difficulty: Difficulty,
+    previousDrops: Drop[],
+    dropCount: number,
+  ) => {
+    setIsGeneratingDrop(true);
+    const focusMap: Record<string, string> = {
+      trinity_drop: "trinity",
+      constraint: "constraint",
+      opposites: "opposites",
+      target: "target",
+      palace_room: "palace_room",
+    };
+
+    try {
+      const { data } = await callJeeves({
+        mode: "freestyle_generate_drop",
+        difficulty,
+        previousDrops: previousDrops.slice(-5).map(d => d.drop),
+        recentDropHistory: getDropHistory().slice(-100),
+        dropCount,
+        dropFocus: focusMap[mode],
+      }, "freestyle-zone");
+
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+
+      // Create a regular drop for chain tracking
+      const dropText = parsed.drop || parsed.object || parsed.verse || "Unknown drop";
+      const drop: Drop = {
+        category: parsed.category || "scripture",
+        drop: dropText,
+        hint: parsed.hint,
+      };
+
+      addToDropHistory(drop.drop);
+
+      // Build mode-specific data
+      const stateUpdate: Partial<FreestyleGameState> = {
+        drops: [...previousDrops, drop],
+        trinityDrop: null,
+        constraintDrop: null,
+        oppositesDrop: null,
+        targetDrop: null,
+        palaceRoomDrop: null,
+      };
+
+      if (mode === "trinity_drop") {
+        stateUpdate.trinityDrop = {
+          object: parsed.object || parsed.drop || dropText,
+          concept: parsed.concept || "Redemption",
+          action: parsed.action || "Surrender",
+          hint: parsed.hint,
+          verse: parsed.verse,
+          verseText: parsed.verseText,
+        };
+      } else if (mode === "constraint") {
+        stateUpdate.constraintDrop = {
+          verse: parsed.verse || "John 1:1",
+          verseText: parsed.verseText || "",
+          constraint: parsed.constraint || "Use only one-syllable words",
+          drop: parsed.drop || dropText,
+        };
+      } else if (mode === "opposites") {
+        stateUpdate.oppositesDrop = {
+          verse: parsed.verse || "John 1:1",
+          verseText: parsed.verseText || "",
+          pair: parsed.pair || [parsed.drop || "Light", "Darkness"],
+        };
+      } else if (mode === "target") {
+        stateUpdate.targetDrop = {
+          verse: parsed.verse || "John 1:1",
+          verseText: parsed.verseText || "",
+          targetPerson: parsed.targetPerson || "A skeptical friend",
+          targetDescription: parsed.targetDescription || "Someone questioning God's goodness",
+        };
+      } else if (mode === "palace_room") {
+        stateUpdate.palaceRoomDrop = {
+          verse: parsed.verse || "John 1:1",
+          verseText: parsed.verseText || "",
+          roomName: parsed.roomName || "The Throne Room",
+          roomCode: parsed.roomCode || "THRONE",
+        };
+      }
+
+      setGameState(prev => ({ ...prev, ...stateUpdate }));
+    } catch (error) {
+      console.error("Failed to generate mode drop:", error);
+      const usedTexts = new Set(previousDrops.slice(-5).map(d => d.drop));
+      const fallback = FALLBACK_DROPS.find(f => !usedTexts.has(f.drop)) || FALLBACK_DROPS[0];
+      setGameState(prev => ({
+        ...prev,
+        drops: [...prev.drops, fallback],
+        trinityDrop: null, constraintDrop: null, oppositesDrop: null, targetDrop: null, palaceRoomDrop: null,
+      }));
+    } finally {
+      setIsGeneratingDrop(false);
+    }
+  }, [setGameState]);
 
   const submitResponse = useCallback(async (response: string) => {
     if (!response.trim() || gameState.phase !== "active") return;
@@ -578,8 +916,12 @@ export function useFreestyleZone() {
     setCurrentFeedback(null);
     setJeevesAssist(null);
     rotatePlayer();
-    await generateNextDrop();
-  }, [generateNextDrop, rotatePlayer]);
+    if (gameState.freestyleMode === "verse_storm") {
+      await generateVerseStorm();
+    } else {
+      await generateNextDrop();
+    }
+  }, [generateNextDrop, generateVerseStorm, gameState.freestyleMode, rotatePlayer]);
 
   const askJeevesForHelp = useCallback(async () => {
     if (gameState.phase !== "active") return;
@@ -793,6 +1135,7 @@ export function useFreestyleZone() {
     polishedContent,
     timeRemaining,
     answeredCount,
+    pendingStormAutoSubmitRef,
 
     // Loading states
     isGeneratingDrop,
@@ -813,6 +1156,7 @@ export function useFreestyleZone() {
     // Actions
     startSession,
     submitResponse,
+    submitStormResponse,
     passDrop,
     advanceToNextDrop,
     askJeevesForHelp,
