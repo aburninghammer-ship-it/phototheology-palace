@@ -50,6 +50,7 @@ import { SermonForgeWidget } from "@/components/dashboard/SermonForgeWidget";
 import { ResearchAssistantWidget } from "@/components/dashboard/ResearchAssistantWidget";
 import { WeeklyChallengeWidget, WinnerBanner } from "@/components/weekly-challenge";
 import { GoalsSurveyBanner } from "@/components/goals-survey/GoalsSurveyBanner";
+import { TodaysChallengeCard } from "@/components/dashboard/TodaysChallengeCard";
 
 interface DashboardStats {
   dailyStreak: number;
@@ -418,6 +419,8 @@ export default function Dashboard() {
                 </Button>
               </CardContent>
             </Card>
+
+            <TodaysChallengeCard />
 
             <QuickAIPrompt />
 
