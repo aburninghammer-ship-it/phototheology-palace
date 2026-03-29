@@ -19056,6 +19056,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_playlist_items: {
+        Row: {
+          audio_meta: Json | null
+          audio_type: string
+          audio_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          position: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          audio_meta?: Json | null
+          audio_type?: string
+          audio_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          position?: number
+          title: string
+          user_id: string
+        }
+        Update: {
+          audio_meta?: Json | null
+          audio_type?: string
+          audio_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          position?: number
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           app_font_size: string | null
