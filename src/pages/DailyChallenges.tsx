@@ -110,19 +110,22 @@ const DailyChallenges = () => {
         }
       }
 
-    const todayChallenge = challenges?.[0] || null;
-    setDailyChallenge(todayChallenge);
-    
-    if (todayChallenge && user) {
-      const { data: submission } = await supabase
-        .from("challenge_submissions")
-        .select("*")
-        .eq("challenge_id", todayChallenge.id)
-        .eq("user_id", user.id)
-        .gte("created_at", new Date(now.setHours(0, 0, 0, 0)).toISOString())
-        .maybeSingle();
+      const todayChallenge = challenges?.[0] || null;
+      setDailyChallenge(todayChallenge);
+      
+      if (todayChallenge && user) {
+        const { data: submission } = await supabase
+          .from("challenge_submissions")
+          .select("*")
+          .eq("challenge_id", todayChallenge.id)
+          .eq("user_id", user.id)
+          .gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
+          .maybeSingle();
 
-      setHasSubmitted(!!submission);
+        setHasSubmitted(!!submission);
+      }
+    } catch (err) {
+      console.error("[DailyChallenge] Unexpected error:", err);
     }
   };
 
