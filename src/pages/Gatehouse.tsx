@@ -314,12 +314,22 @@ const Gatehouse = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <p className="text-sm text-primary/80 mb-4 tracking-wide uppercase">
-              {t('gatehouse.welcomeBack')}
-            </p>
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
-              {t('gatehouse.theChoiceIsYours')}
+            <h1
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 tracking-[0.04em] uppercase"
+              style={{
+                fontFamily: "'Cinzel', serif",
+                color: "#d4a017",
+                textShadow: "0 0 20px rgba(212, 160, 23, 0.3), 0 2px 4px rgba(0,0,0,0.3)",
+              }}
+            >
+              PhototheologyOS
             </h1>
+            <p
+              className="text-lg md:text-xl font-semibold tracking-[0.25em] uppercase"
+              style={{ color: "rgba(212, 160, 23, 0.6)" }}
+            >
+              Eden
+            </p>
 
             <div className="mt-8 flex justify-center">
               <Button
