@@ -15,7 +15,7 @@ export const OS_TOUR: TourDefinition = {
     roomCode: "INTRO",
     roomName: "Introduction",
     title: "Powered by AI. Built for Biblical Intelligence.",
-    script: `Welcome. I'm Reginald, and right now I'm going to explain something that will reframe everything you thought you knew about this platform. You're not using an app. You're not using a tool. You're running an operating system. PhototheologyOS — the operating system for biblical thinking. Powered by AI. Built for biblical intelligence. Now, I know that sounds bold. So let me explain exactly what I mean — and why the distinction matters more than you think.`,
+    script: `Welcome. I'm Reginald, and right now I'm going to show you something that will change how you think about Bible study forever. You're not just looking at an app. You're not looking at a tool. You're looking at an operating system. PhototheologyOS — the operating system for biblical thinking. Powered by AI. Built for biblical intelligence. Now, I know that sounds bold. So let me explain exactly what I mean — and why the distinction matters more than you think.`,
     estimatedSeconds: 30,
   },
   segments: [
