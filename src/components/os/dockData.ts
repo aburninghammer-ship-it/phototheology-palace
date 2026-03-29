@@ -46,8 +46,6 @@ export const DOCK_ITEMS: DockItem[] = [
     children: [
       { id: "encyclopedia", label: "Encyclopedia", path: "/encyclopedia", icon: Search, glow: "230 78% 62%" },
       { id: "character-profiles", label: "Character Profiles", path: "/character-profiles", icon: PersonStanding, glow: "240 72% 55%" },
-      { id: "libraries", label: "Libraries", path: "/libraries", icon: Library, glow: "250 65% 55%" },
-      { id: "series", label: "Series", path: "/bible-study-series", icon: BookOpen, glow: "195 85% 50%" },
       { id: "study-buddy", label: "Study Buddy", path: "/study-buddy", icon: Brain, glow: "215 16% 53%" },
       { id: "research-assistant", label: "Research Assistant", path: "/research-assistant", icon: GraduationCap, glow: "152 68% 42%" },
       { id: "give-me-a-gem", label: "Give Me A Gem", path: "/give-me-a-gem", icon: Gem, glow: "158 80% 42%" },
