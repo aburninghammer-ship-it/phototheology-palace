@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, Send, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RevenueDashboard } from "@/components/admin/RevenueDashboard";
 import { EmailCampaignManager } from "@/components/admin/EmailCampaignManager";
@@ -132,6 +134,7 @@ export default function AdminSubscriptions() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { width, height } = useWindowSize();
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -149,11 +152,43 @@ export default function AdminSubscriptions() {
   const [pickaxePaidCount, setPickaxePaidCount] = useState<number>(0);
   const [pickaxeMembers, setPickaxeMembers] = useState<any[]>([]);
   const [safetyNetTrials, setSafetyNetTrials] = useState<{ email: string; expires_at: string }[]>([]);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [newSignupName, setNewSignupName] = useState<string | null>(null);
 
   // Make refresh activity visible and avoid overlapping refresh requests.
   const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
   const [secondsSinceRefresh, setSecondsSinceRefresh] = useState<number | null>(null);
   const refreshInFlightRef = useRef(false);
+
+  // 🎉 Realtime confetti on new signups
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-new-signups')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'profiles' },
+        (payload) => {
+          const name = (payload.new as any)?.display_name || (payload.new as any)?.email || 'Someone';
+          setNewSignupName(name);
+          setShowConfetti(true);
+          toast({
+            title: "🎉 New Signup!",
+            description: `${name} just joined Phototheology!`,
+          });
+          setTimeout(() => {
+            setShowConfetti(false);
+            setNewSignupName(null);
+          }, 6000);
+          // Also refresh stats
+          loadStats({ reason: "new-signup" });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const handleSyncStripeSubscriptions = async () => {
     setSyncing(true);
@@ -559,7 +594,22 @@ export default function AdminSubscriptions() {
   const dbVsStripeMatch = unlinked === 0;
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="container mx-auto p-6 max-w-6xl relative">
+      {showConfetti && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={false}
+          numberOfPieces={300}
+          gravity={0.25}
+          colors={["#d4a017", "#f59e0b", "#22c55e", "#8b5cf6", "#06b6d4", "#ef4444"]}
+        />
+      )}
+      {newSignupName && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 bg-gradient-to-r from-primary/90 to-accent/90 text-white px-6 py-3 rounded-full shadow-2xl text-lg font-bold">
+          🎉 {newSignupName} just signed up!
+        </div>
+      )}
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Subscription Analytics</h1>
