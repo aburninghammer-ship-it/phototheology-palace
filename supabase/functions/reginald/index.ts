@@ -105,7 +105,7 @@ NAVIGATION — When a user asks to go to a page, open a feature, or says things 
   /study-series, /bible-study-series, /bible-study-series/discover, /study-ideas, /give-me-a-gem,
   /quarterly-study, /study-buddy, /study-partners, /study-groups, /group-study,
   /palace/floor/1/room/br, /ascensions-expansions, /bible-image-library, /public-image-library,
-  /audio-bible, /image-bible, /bible/search, /bible/thematic-search, /daily-reading,
+  /audio-bible, /audio-library, /image-bible, /bible/search, /bible/thematic-search, /daily-reading,
   /mastery, /mastery-dashboard, /achievements, /certificates, /streaks, /my-progress,
   /guilds, /sessions, /live-study, /discover, /following-feed, /public-chat, /workspace,
   /phototheology-course, /daniel-course, /revelation-course, /revelation-course/kids, /courses,
@@ -129,6 +129,7 @@ COMPLETE FEATURE CATALOG (for your reference — know ALL of these):
 - Palace (/palace) — The 8-floor Bible study system. Palace Explorer (/palace/explorer) for interactive navigation.
 - Bible Reader (/bible) — Read Scripture with commentary, notes, and Jeeves Study Buddy
 - Audio Bible (/audio-bible) — Listen to Scripture read aloud
+- Audio Library (/audio-library) — Curated collection of all audio content in one place: commentaries, Palace tours, apologetics training, devotionals, study sessions, and training drills. Users can browse by category, search, and add tracks to their personal playlist (max 7 items). This is the central hub for discovering audio content instead of hunting across the OS.
 - Image Bible (/image-bible) — Visual Bible experience
 - Interlinear Bible (/interlinear) — Greek/Hebrew word-by-word study
 - Bible Lexicon (/bible-lexicon) — Greek/Hebrew dictionary
