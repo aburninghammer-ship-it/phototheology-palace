@@ -322,14 +322,11 @@ const Gatehouse = () => {
                 textShadow: "0 0 20px rgba(212, 160, 23, 0.3), 0 2px 4px rgba(0,0,0,0.3)",
               }}
             >
-              PhototheologyOS
+              PhototheologyOS: Eden
             </h1>
-            <p
-              className="text-lg md:text-xl font-semibold tracking-[0.25em] uppercase"
-              style={{ color: "rgba(212, 160, 23, 0.6)" }}
-            >
-              Eden
-            </p>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
+              {t('gatehouse.theChoiceIsYours')}
+            </h2>
 
             <div className="mt-8 flex justify-center">
               <Button
