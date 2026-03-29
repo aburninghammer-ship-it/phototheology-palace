@@ -56,6 +56,7 @@ const categoryConfig = {
       { to: "/study-ideas", label: "Study Ideas", icon: "💡" },
       { to: "/mind-map", label: "Mind Map Palace", icon: "🗺️" },
       { to: "/audio-bible", label: "Audio Bible", icon: "🎧" },
+      { to: "/audio-library", label: "Audio Library", icon: "🎵" },
       { to: "/bible-image-library", label: "PT Image Bible", icon: "🎨" },
       { to: "/card-deck", label: "PT Study Deck", icon: "🃏" },
       { to: "/reading-plans", label: "Reading Plans", icon: "📅" },

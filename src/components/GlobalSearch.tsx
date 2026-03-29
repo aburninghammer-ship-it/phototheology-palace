@@ -47,6 +47,9 @@ const searchItems = [
   { title: "Daniel & Revelation GPT", path: "/daniel-revelation-gpt", icon: Sparkles, category: "AI Assistants" },
   { title: "Apologetics GPT", path: "/apologetics-gpt", icon: Sparkles, category: "AI Assistants" },
   
+  // Audio
+  { title: "Audio Library", path: "/audio-library", icon: BookOpen, category: "Study Tools", badge: "New" },
+
   // Practice & Drills
   { title: "Training Drills", path: "/training-drills", icon: Trophy, category: "Practice & Drills" },
   { title: "Flashcards", path: "/flashcards", icon: BookOpen, category: "Practice & Drills" },

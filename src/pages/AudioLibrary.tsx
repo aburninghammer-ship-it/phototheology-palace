@@ -1,0 +1,516 @@
+import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+import { Navigation } from "@/components/Navigation";
+import { Footer } from "@/components/Footer";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  BookOpen,
+  Compass,
+  Swords,
+  Headphones,
+  Search,
+  ListPlus,
+  Check,
+  Play,
+  Sparkles,
+  Heart,
+  Flame,
+  Shield,
+  Crown,
+  ChevronRight,
+  Library,
+  Music,
+  GraduationCap,
+  Star,
+  Clock,
+} from "lucide-react";
+import { AddToPlaylistButton } from "@/components/audio/AddToPlaylistButton";
+import { PlaylistPanel } from "@/components/audio/PlaylistPanel";
+
+// ── Audio Content Catalog ───────────────────────────────────────────────────
+
+interface AudioEntry {
+  id: string;
+  title: string;
+  description: string;
+  category: "commentary" | "tour" | "apologetics" | "devotional" | "study" | "training";
+  duration: string;
+  icon: React.ReactNode;
+  gradient: string;
+  audioMeta: Record<string, any>;
+  audioUrl?: string;
+  badge?: string;
+}
+
+const AUDIO_CATALOG: AudioEntry[] = [
+  // ── Commentary ────────────────────────────────────────
+  {
+    id: "comm-genesis-1",
+    title: "Genesis 1 — Creation Commentary",
+    description: "Verse-by-verse audio commentary on the creation account. Explore how God's creative acts set the stage for all of redemption history.",
+    category: "commentary",
+    duration: "8 min",
+    icon: <BookOpen className="h-5 w-5" />,
+    gradient: "from-blue-500 to-cyan-500",
+    audioMeta: { text: "Genesis chapter 1 presents the creation account. In the beginning, God created the heavens and the earth. This foundational chapter establishes God as sovereign Creator, the origin of light, life, and order. Each day builds upon the last — a palace of creation, floor by floor. Day one gives light, separating it from darkness, establishing the cosmic rhythm of evening and morning. The waters are divided on day two, creating an expanse — the firmament. Day three raises dry land and seeds vegetation. Day four places luminaries as signs and seasons. Day five fills seas and skies. Day six crowns creation with humanity, made in God's image. And day seven — the Sabbath — God rests, blesses, and sanctifies. This is not just history; it is the blueprint of redemption.", voice: "nPczCjzI2devNBz1zQrb" },
+    badge: "Popular",
+  },
+  {
+    id: "comm-john-3",
+    title: "John 3 — Born Again",
+    description: "Nicodemus meets Jesus at night. Unpack the meaning of being born of water and Spirit.",
+    category: "commentary",
+    duration: "7 min",
+    icon: <BookOpen className="h-5 w-5" />,
+    gradient: "from-blue-500 to-cyan-500",
+    audioMeta: { text: "John chapter 3 introduces us to Nicodemus, a Pharisee and ruler of the Jews, who comes to Jesus by night. Jesus tells him: You must be born again. Nicodemus is confused — how can a man enter his mother's womb a second time? But Jesus speaks of spiritual rebirth, born of water and the Spirit. The wind blows where it wishes — you hear its sound but cannot tell where it comes from or where it goes. So is everyone born of the Spirit. Then comes the golden verse: For God so loved the world that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life. This chapter is the heartbeat of the gospel — invitation, transformation, and eternal hope.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "comm-psalm-23",
+    title: "Psalm 23 — The Lord Is My Shepherd",
+    description: "A meditative walk through David's most beloved psalm. Rest, restoration, and the table prepared.",
+    category: "commentary",
+    duration: "6 min",
+    icon: <BookOpen className="h-5 w-5" />,
+    gradient: "from-blue-500 to-cyan-500",
+    audioMeta: { text: "The Lord is my shepherd; I shall not want. Psalm 23 is perhaps the most memorized passage in all of Scripture. David, himself a shepherd, writes from deep personal experience. He makes me to lie down in green pastures — provision and rest. He leads me beside still waters — peace and refreshment. He restores my soul — healing and renewal. Yea, though I walk through the valley of the shadow of death, I will fear no evil — courage in darkness. Your rod and your staff, they comfort me — guidance and protection. You prepare a table before me in the presence of my enemies — honor amid opposition. My cup runs over — abundance. Surely goodness and mercy shall follow me all the days of my life, and I will dwell in the house of the Lord forever.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "comm-rev-14",
+    title: "Revelation 14 — The Three Angels",
+    description: "The final gospel appeal. Understand the everlasting gospel, Babylon's fall, and the mark warning.",
+    category: "commentary",
+    duration: "10 min",
+    icon: <BookOpen className="h-5 w-5" />,
+    gradient: "from-blue-500 to-cyan-500",
+    audioMeta: { text: "Revelation 14 presents the Three Angels' Messages — the final gospel appeal before Christ's return. The first angel flies in the midst of heaven with the everlasting gospel: Fear God, give glory to Him, for the hour of His judgment has come. Worship Him who made heaven and earth, the sea and springs of water. This is a call back to the Creator, echoing the fourth commandment. The second angel declares: Babylon is fallen, is fallen, that great city — false religious systems exposed and crumbling. The third angel warns with a loud voice against worshipping the beast or his image, or receiving his mark. Here is the patience of the saints: here are they that keep the commandments of God and the faith of Jesus. These three messages form the capstone of Phototheology — prophecy, gospel, sanctuary, and mission all converging.", voice: "nPczCjzI2devNBz1zQrb" },
+    badge: "Essential",
+  },
+  {
+    id: "comm-daniel-2",
+    title: "Daniel 2 — The Image of Empires",
+    description: "Nebuchadnezzar's dream of the great statue. Gold, silver, bronze, iron, and clay — a prophetic roadmap.",
+    category: "commentary",
+    duration: "9 min",
+    icon: <BookOpen className="h-5 w-5" />,
+    gradient: "from-blue-500 to-cyan-500",
+    audioMeta: { text: "Daniel chapter 2 records Nebuchadnezzar's dream of a great image — a statue of world empires. The head of gold represents Babylon, the chest of silver Medo-Persia, the belly of bronze Greece, and the legs of iron Rome. The feet of iron and clay represent the divided nations of Europe — they shall not cleave one to another, even as iron does not mix with clay. Then a stone cut without hands strikes the image and becomes a great mountain filling the whole earth. That stone is Christ's kingdom — the kingdom that shall never be destroyed. This prophecy gives the believer confidence: human kingdoms rise and fall, but God's kingdom is eternal. The Prophecy Room lights up, the Patterns Room echoes, and the Great Controversy Wall displays the sweep of history under divine sovereignty.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "comm-exodus-12",
+    title: "Exodus 12 — The Passover Lamb",
+    description: "Blood on the doorposts, the destroyer passes over, and Israel is delivered. A type of Calvary.",
+    category: "commentary",
+    duration: "8 min",
+    icon: <BookOpen className="h-5 w-5" />,
+    gradient: "from-blue-500 to-cyan-500",
+    audioMeta: { text: "Exodus 12 records the institution of Passover — God's dramatic act of deliverance. Each family selects a lamb without blemish on the tenth day and keeps it until the fourteenth day. The lamb is slain at twilight, its blood applied to the doorposts and lintel. When the destroyer passes through Egypt, every house under the blood is spared. This is one of the most powerful types in all Scripture. Christ is our Passover Lamb, sacrificed for us. Paul declares it plainly in First Corinthians 5:7. The lamb without blemish points to Christ's sinless life. The blood on the doorposts points to faith applied personally. The haste of eating with sandals on points to readiness. The unleavened bread points to sincerity and truth. Every detail of Exodus 12 is a gem, a type, and a testimony of the cross.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "comm-isaiah-53",
+    title: "Isaiah 53 — The Suffering Servant",
+    description: "He was wounded for our transgressions. The most Christ-saturated chapter in the Old Testament.",
+    category: "commentary",
+    duration: "9 min",
+    icon: <BookOpen className="h-5 w-5" />,
+    gradient: "from-blue-500 to-cyan-500",
+    audioMeta: { text: "Isaiah 53 is the crown jewel of Old Testament Christology. Written seven hundred years before Calvary, it describes Christ's suffering with surgical precision. He is despised and rejected of men, a man of sorrows and acquainted with grief. He was wounded for our transgressions, bruised for our iniquities. The chastisement of our peace was upon Him, and with His stripes we are healed. All we like sheep have gone astray, and the Lord has laid on Him the iniquity of us all. He was oppressed and afflicted, yet He opened not His mouth — like a lamb to the slaughter. He was cut off out of the land of the living. Yet it pleased the Lord to bruise Him. He shall see the travail of His soul and be satisfied. This chapter activates every room: the Fire Room burns, the Concentration Room fixes on Christ, and the Fruit Room overflows with gratitude.", voice: "nPczCjzI2devNBz1zQrb" },
+    badge: "Must Listen",
+  },
+
+  // ── Palace Tours ──────────────────────────────────────
+  {
+    id: "tour-floor-1",
+    title: "Palace Tour — Floor 1: The Furnishing Floor",
+    description: "Your guide Reginald walks you through the Story Room, Imagination Room, 24FPS, and Gems Room.",
+    category: "tour",
+    duration: "12 min",
+    icon: <Compass className="h-5 w-5" />,
+    gradient: "from-amber-500 to-orange-500",
+    audioMeta: { text: "Welcome to Floor 1 of the Phototheology Palace — the Furnishing Floor. This is where you begin building your palace of the mind. Think of it like a craftsman preparing a workshop. You are gathering raw material — stories, images, translations, and gems. The Story Room is your foundation. The Bible is primarily narrative — creation, fall, flood, exodus, kingdom, exile, incarnation, crucifixion, resurrection, and restoration. In the Imagination Room, you step inside the story as if you were there. Feel the sand beneath your feet at the Red Sea. Hear the roar of the water. See the fish swimming in walls of water. The 24FPS Room turns Scripture into a mental film strip — one symbolic image per chapter. Genesis becomes 50 frames. And the Gems Room is your treasure chest. Every striking insight you discover gets stored here like a jewel for future use.", voice: "onwK4e9ZLuTAKqWW03F9" },
+    badge: "Start Here",
+  },
+  {
+    id: "tour-floor-2",
+    title: "Palace Tour — Floor 2: The Investigation Floor",
+    description: "Become a detective of Scripture. Observation, definitions, symbols, and relentless questions.",
+    category: "tour",
+    duration: "10 min",
+    icon: <Compass className="h-5 w-5" />,
+    gradient: "from-amber-500 to-orange-500",
+    audioMeta: { text: "Welcome to Floor 2 — the Investigation Floor. This is where you become a detective of the Word. The Observation Room is your notebook. You log details without rushing to meaning. A detective doesn't start with theories — he starts with fingerprints and footprints. Take Luke 15:20 — when the prodigal was yet a great way off, his father saw him, had compassion, and ran. Each detail is a clue. The Def-Com Room is the forensic lab — Greek and Hebrew definitions, historical context, commentary. The Symbols and Types Room builds behavioral profiles — lamb equals Christ, rock equals Christ, water equals Spirit. And the Questions Room is where interrogation happens. You ask 75 questions per passage: intratextual, intertextual, and phototheological. Nothing is filler in Scripture. Everything is a clue.", voice: "onwK4e9ZLuTAKqWW03F9" },
+  },
+  {
+    id: "tour-floor-3",
+    title: "Palace Tour — Floor 3: The Freestyle Floor",
+    description: "Learn to riff on Scripture spontaneously. Nature, personal life, history, and verse genetics.",
+    category: "tour",
+    duration: "9 min",
+    icon: <Compass className="h-5 w-5" />,
+    gradient: "from-amber-500 to-orange-500",
+    audioMeta: { text: "Welcome to Floor 3 — the Freestyle Floor. If Floor 2 made you a detective, Floor 3 makes you an artist. Here you learn to riff on Scripture spontaneously, like a hip hop artist freestyling over a beat. The Nature Freestyle Room teaches you to see God's second book — every flower, bird, and storm becomes a sermon illustration. A tree by water is Psalm 1. A sunrise is Malachi 4:2. The Personal Freestyle Room turns your life into object lessons — stuck in traffic becomes Israel at the Red Sea. The Bible Freestyle Room develops verse genetics — every verse in the Bible is related to every other verse. John 3:16 and Romans 5:8 are brothers. Genesis 22 and John 19 are cousins. You train yourself to trace genealogies of thought. This floor teaches that Bible study is not confined to a desk. It happens everywhere.", voice: "onwK4e9ZLuTAKqWW03F9" },
+  },
+  {
+    id: "tour-floor-4",
+    title: "Palace Tour — Floor 4: The Next Level Floor",
+    description: "Christ-centered depth. Dimensions, themes, patterns, parallels, and the fruit test.",
+    category: "tour",
+    duration: "11 min",
+    icon: <Compass className="h-5 w-5" />,
+    gradient: "from-amber-500 to-orange-500",
+    audioMeta: { text: "Welcome to Floor 4 — the Next Level Floor. This is where the Bible student becomes a builder. Every verse is now seen in relation to Christ, organized into dimensions, genres, themes, and parallels. The Concentration Room insists on one rule: every text must reveal Christ. The Dimensions Room stretches every passage across five layers — literal, Christ, me, church, and heaven. The Theme Room anchors verses on the great walls: Sanctuary Wall, Life of Christ Wall, Great Controversy Wall, Time Prophecy Wall, Gospel Floor, and Heaven Ceiling. The Patterns Room trains your ear for recurring motifs — 40 days, 3 days, deliverer stories. And the Fruit Room tests every interpretation: does it produce love, joy, peace, patience? If not, something is wrong. By the end of this floor, you don't just improvise — you build theology with walls, beams, and balance.", voice: "onwK4e9ZLuTAKqWW03F9" },
+  },
+  {
+    id: "tour-floor-5",
+    title: "Palace Tour — Floor 5: The Vision Floor",
+    description: "Prophecy and sanctuary united. The Blue Room, Prophecy Room, and Three Angels' Messages.",
+    category: "tour",
+    duration: "10 min",
+    icon: <Compass className="h-5 w-5" />,
+    gradient: "from-amber-500 to-orange-500",
+    audioMeta: { text: "Welcome to Floor 5 — the Vision Floor. This is the telescope of Phototheology. The Blue Room is the architectural blueprint. The sanctuary is not just furniture — it is the map of salvation history. Altar of Burnt Offering equals the cross. Laver equals baptism. Lampstand equals the Spirit. Table of Showbread equals the Word. Altar of Incense equals intercession. Ark of the Covenant equals God's throne. The Prophecy Room lines up the stars of Daniel and Revelation. Daniel 2 is the statue of empires. Daniel 7 is the beasts of kingdoms. Revelation 13 is the beast and image. Each prophecy is a star; together they form constellations. And the Three Angels' Room unites all doctrine and mission into a final gospel appeal — everlasting gospel, Babylon is fallen, warning against the mark. This floor expands your sight to see God's master plan.", voice: "onwK4e9ZLuTAKqWW03F9" },
+  },
+
+  // ── Apologetics Training ──────────────────────────────
+  {
+    id: "apol-existence-god",
+    title: "Does God Exist? — The Case for a Creator",
+    description: "Cosmological, teleological, and moral arguments for God's existence, made simple and powerful.",
+    category: "apologetics",
+    duration: "12 min",
+    icon: <Shield className="h-5 w-5" />,
+    gradient: "from-red-500 to-rose-600",
+    audioMeta: { text: "Does God exist? This is the most fundamental question in apologetics. Let's examine three powerful arguments. First, the cosmological argument: everything that begins to exist has a cause. The universe began to exist — therefore, the universe has a cause. That cause must be outside time, space, and matter — immaterial, timeless, and incredibly powerful. Second, the teleological argument — the argument from design. The fine-tuning of the universe is staggering. The gravitational constant, the electromagnetic force, the strong nuclear force — if any were altered by a fraction, life would be impossible. Third, the moral argument: if objective moral values exist, then God exists. We all recognize that torturing children for fun is objectively wrong — not just culturally unpopular, but genuinely evil. Where does that moral law come from? Not from matter. Not from evolution. It points to a moral Lawgiver. Together, these three arguments build a powerful cumulative case for the existence of God.", voice: "nPczCjzI2devNBz1zQrb" },
+    badge: "Foundation",
+  },
+  {
+    id: "apol-bible-reliable",
+    title: "Can We Trust the Bible?",
+    description: "Manuscript evidence, archaeological confirmation, and internal consistency — why the Bible stands.",
+    category: "apologetics",
+    duration: "11 min",
+    icon: <Shield className="h-5 w-5" />,
+    gradient: "from-red-500 to-rose-600",
+    audioMeta: { text: "Can we trust the Bible? Let's examine the evidence. First, manuscript evidence. The New Testament has over 5,800 Greek manuscripts — more than any other ancient document by a massive margin. Homer's Iliad has about 1,800. The earliest New Testament fragment dates to within 25 years of the original. By contrast, most classical texts have gaps of 500 to 1,000 years. Second, archaeological confirmation. The Bible mentions over 50 people confirmed by archaeology — Pontius Pilate, King David, Nebuchadnezzar, Cyrus. The Dead Sea Scrolls, discovered in 1947, confirmed that Isaiah had been transmitted with remarkable accuracy for over a thousand years. Third, internal consistency. Forty authors, three languages, 1,500 years, three continents — and one unified story of redemption. No human committee could orchestrate this. The Bible does not merely survive scrutiny — it thrives under it.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "apol-sabbath",
+    title: "The Sabbath Question — Saturday or Sunday?",
+    description: "Biblical, historical, and prophetic evidence for the seventh-day Sabbath.",
+    category: "apologetics",
+    duration: "13 min",
+    icon: <Shield className="h-5 w-5" />,
+    gradient: "from-red-500 to-rose-600",
+    audioMeta: { text: "Which day is the Sabbath? This question matters deeply. Let's trace the evidence. Genesis 2:1-3 — God rested on the seventh day, blessed it, and sanctified it. This was before sin, before Israel, before any human institution. The Sabbath is creation's crown. Exodus 20:8-11 — Remember the Sabbath day to keep it holy. The fourth commandment points back to creation, not forward to any temporary covenant. Jesus kept the Sabbath — Luke 4:16 says it was His custom. The disciples kept it after the cross — Luke 23:56 says they rested according to the commandment. So when did Sunday worship begin? History reveals it was a gradual shift, influenced by Roman sun worship and formalized by Constantine in 321 AD. The Council of Laodicea in 364 AD further enforced Sunday observance. But prophecy warned this would happen — Daniel 7:25 speaks of a power that would think to change times and laws. The Sabbath is not a Jewish relic — it is God's eternal sign of creation and redemption.", voice: "nPczCjzI2devNBz1zQrb" },
+    badge: "Key Topic",
+  },
+  {
+    id: "apol-suffering",
+    title: "Why Does God Allow Suffering?",
+    description: "The Great Controversy answer to the problem of evil. Not a cliché — a cosmic framework.",
+    category: "apologetics",
+    duration: "10 min",
+    icon: <Shield className="h-5 w-5" />,
+    gradient: "from-red-500 to-rose-600",
+    audioMeta: { text: "Why does God allow suffering? This is perhaps the most emotionally charged question in all of theology. The standard answers — free will, character building, mystery — are true but incomplete. Phototheology offers the Great Controversy framework. Suffering exists because a cosmic war is being fought. Lucifer challenged God's character in heaven — is God truly just? Is God truly loving? Or is He a cosmic dictator? God could have destroyed Satan immediately, but that would have proved Satan's point — that God rules by force. Instead, God chose to let the controversy play out, allowing sin to reveal its true nature. The cross is the answer. At Calvary, God demonstrated that He would rather die than force obedience. Every tear, every tragedy, every injustice is being recorded — and one day God will wipe away every tear. Suffering is temporary. God's love is eternal. The Great Controversy will end, and the universe will be secure forever.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "apol-state-of-dead",
+    title: "What Happens When You Die?",
+    description: "The biblical teaching on death, sleep, and the resurrection hope — versus popular mythology.",
+    category: "apologetics",
+    duration: "10 min",
+    icon: <Shield className="h-5 w-5" />,
+    gradient: "from-red-500 to-rose-600",
+    audioMeta: { text: "What happens when you die? The Bible's answer may surprise you. Ecclesiastes 9:5 says the dead know nothing. Psalm 146:4 says when a person dies, his thoughts perish. Psalm 115:17 says the dead do not praise the Lord. Jesus Himself called death a sleep — in John 11:11, He said Lazarus sleeps, and I go to wake him. If Lazarus had been in heaven for four days, calling him back would not be a blessing — it would be a punishment. The biblical hope is not floating in heaven at death — it is resurrection at Christ's return. First Thessalonians 4:16-17 describes the dead in Christ rising first, then the living being caught up together with them. This is the blessed hope. The idea of an immortal soul comes not from Scripture but from Greek philosophy — Plato, not Paul. Understanding the state of the dead protects you from deception, because if the dead are truly sleeping, then any spirit claiming to be a dead loved one is a counterfeit.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+
+  // ── Devotional Audio ──────────────────────────────────
+  {
+    id: "dev-morning-1",
+    title: "Morning Meditation — Walking with God",
+    description: "Start your day grounded in Scripture. A 5-minute devotional on Enoch's walk with God.",
+    category: "devotional",
+    duration: "5 min",
+    icon: <Heart className="h-5 w-5" />,
+    gradient: "from-pink-500 to-rose-400",
+    audioMeta: { text: "Good morning. Let's begin today by walking with God. Genesis 5:24 says Enoch walked with God, and he was not, for God took him. What does it mean to walk with God? Walking implies movement — it is not sitting still. Walking implies direction — you are going somewhere. Walking implies companionship — you are not alone. Enoch's walk was not a sprint or a leap — it was a daily, steady rhythm of communion. Three hundred years of walking, one step at a time. Today, let your steps be ordered by the Lord. In every decision, every conversation, every moment — walk. Don't run ahead of God. Don't lag behind. Walk with Him. Let Psalm 16:11 be your compass: You will show me the path of life; in Your presence is fullness of joy; at Your right hand are pleasures forevermore. Take one step today. Walk.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "dev-morning-2",
+    title: "Morning Meditation — Be Still and Know",
+    description: "Psalm 46:10 meditation. Slow down, breathe, and enter God's presence before the day begins.",
+    category: "devotional",
+    duration: "5 min",
+    icon: <Heart className="h-5 w-5" />,
+    gradient: "from-pink-500 to-rose-400",
+    audioMeta: { text: "Be still, and know that I am God. Psalm 46:10. The world is noisy. Your mind is busy. Notifications, obligations, worries — they crowd in before you even open your eyes. But God says: Be still. This is not a suggestion. It is a command — and it is a gift. Stillness is where you remember who God is. He is the Creator of the heavens and the earth. He is the One who makes wars cease. He breaks the bow and shatters the spear. He burns the chariots with fire. The Lord of hosts is with us; the God of Jacob is our refuge. Before you rush into today, pause. Breathe. Let the silence speak. God is not in the earthquake, not in the fire, not in the wind — He is in the still, small voice. Be still. Know. He is God. And that is enough.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "dev-evening-1",
+    title: "Evening Reflection — The Day's Manna",
+    description: "End your day reflecting on what God provided, taught, and revealed today.",
+    category: "devotional",
+    duration: "5 min",
+    icon: <Heart className="h-5 w-5" />,
+    gradient: "from-pink-500 to-rose-400",
+    audioMeta: { text: "The day is ending. Before you sleep, let's gather the manna — what did God provide today? In Exodus 16, God sent manna every morning. It could not be hoarded; it had to be gathered fresh each day. Your experiences today were God's manna — lessons, encounters, provisions, corrections. What verse came to mind today? What conversation opened a door? What difficulty taught patience? What beauty reminded you of the Creator? Take a moment to write it down — even one sentence. The Gems Room of Phototheology is built this way: one insight at a time, stored like treasures. Lamentations 3:22-23 says His mercies are new every morning. That means today had mercies you may have missed. Look back. Find them. Thank God for them. Then rest, knowing that tomorrow's manna is already prepared. Good night.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+
+  // ── Study Sessions ────────────────────────────────────
+  {
+    id: "study-sanctuary-101",
+    title: "Sanctuary 101 — The Blueprint of Salvation",
+    description: "A guided walkthrough of the earthly sanctuary and how every piece of furniture points to Christ.",
+    category: "study",
+    duration: "15 min",
+    icon: <GraduationCap className="h-5 w-5" />,
+    gradient: "from-emerald-500 to-teal-500",
+    audioMeta: { text: "The sanctuary is the master key of Bible study. God told Moses: Make all things according to the pattern shown to you on the mountain. Hebrews 8:5. The earthly sanctuary was a copy — a teaching model of heavenly realities. Let's walk through it. You enter through the gate — one entrance, one way. Christ said, I am the door. The altar of burnt offering is first — the cross, where the lamb is slain. Without shedding of blood there is no remission. Next, the laver — a bronze basin of water for washing. This represents baptism and daily cleansing by the Word. Now you enter the Holy Place. On the left, the lampstand — seven branches burning with oil. This is the Holy Spirit illuminating truth. On the right, the table of showbread — twelve loaves, representing the Word of God, the bread of life. Straight ahead, the altar of incense — prayers rising like sweet fragrance before God. Behind the veil is the Most Holy Place. The Ark of the Covenant rests here — inside it, the Ten Commandments (God's law), Aaron's rod that budded (God's authority), and a pot of manna (God's provision). Above the ark, the mercy seat — where the Shekinah glory dwelt. The blood was sprinkled here on the Day of Atonement. Every piece points to Christ. The sanctuary is not ancient history — it is the gospel in 3D.", voice: "nPczCjzI2devNBz1zQrb" },
+    badge: "Essential",
+  },
+  {
+    id: "study-types-shadows",
+    title: "Types & Shadows — Christ in the Old Testament",
+    description: "How the Passover lamb, bronze serpent, manna, and more prefigure Jesus.",
+    category: "study",
+    duration: "12 min",
+    icon: <GraduationCap className="h-5 w-5" />,
+    gradient: "from-emerald-500 to-teal-500",
+    audioMeta: { text: "The Old Testament is not just history — it is prophecy in action. Types are people, events, or objects that foreshadow Christ. The Passover lamb in Exodus 12 — a lamb without blemish, slain at twilight, blood applied to the doorposts — Christ is our Passover, sacrificed for us. The bronze serpent in Numbers 21 — lifted up on a pole so that whoever looked at it would live — as Moses lifted up the serpent, so must the Son of Man be lifted up. Manna in the wilderness — bread from heaven given daily — I am the bread of life, Jesus said. Jonah in the belly of the fish for three days — as Jonah was three days in the belly of the great fish, so shall the Son of Man be three days in the heart of the earth. Isaac on Mount Moriah — the father willing to sacrifice his only son, and God providing a substitute — God will provide Himself a lamb. Joseph — betrayed by brothers, sold for silver, raised to the right hand of power, and saving the very ones who rejected him. Every type is a gem. Every shadow proves that Christ is the center of all Scripture.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "study-great-controversy",
+    title: "The Great Controversy — The Cosmic War",
+    description: "How the conflict between Christ and Satan explains history, prophecy, and personal experience.",
+    category: "study",
+    duration: "14 min",
+    icon: <GraduationCap className="h-5 w-5" />,
+    gradient: "from-emerald-500 to-teal-500",
+    audioMeta: { text: "The Great Controversy is the master narrative of the Bible. It begins before Genesis 1 — in heaven, where Lucifer, the covering cherub, the most beautiful of all created beings, chose to rebel against God. Isaiah 14 and Ezekiel 28 give us glimpses: I will ascend above the heights of the clouds. I will be like the Most High. Lucifer's challenge was not merely political — it was theological. He questioned God's character, God's law, and God's government. Is God truly fair? Is His law necessary? Can creatures be trusted with freedom? War broke out in heaven. Michael and His angels fought against the dragon. The dragon was cast out — and he came to earth. Eden was the next battlefield. The serpent's approach to Eve was the same challenge in new clothes: Has God said? Is God holding something back? The fall of humanity was not random — it was a strategic move in a cosmic war. From that point forward, every story in Scripture is a chapter in this war. Cain versus Abel. Pharaoh versus Moses. Babylon versus Jerusalem. The cross was the decisive battle — Satan's defeat was sealed. But the war continues until the second coming. Understanding this changes everything.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+
+  // ── Deep Training ─────────────────────────────────────
+  {
+    id: "train-observation",
+    title: "Detective Training — The Observation Drill",
+    description: "Practice writing 30 observations on a single passage. Train your eye like a Scripture detective.",
+    category: "training",
+    duration: "8 min",
+    icon: <Flame className="h-5 w-5" />,
+    gradient: "from-violet-500 to-purple-600",
+    audioMeta: { text: "Welcome to detective training. Today we practice the Observation Drill from the Investigation Floor. Pick a passage — let's use Mark 5:1-20, the demoniac of the Gadarenes. Your job is to notice, not interpret. Write observations only. Here are examples to get you started. Observation one: Jesus had just crossed the sea — He came from Jewish territory into Gentile territory. Two: A man with an unclean spirit met Him immediately. Three: The man lived among the tombs. Four: No one could bind him, not even with chains. Five: He had been bound often but broke the chains. Six: Night and day he was in the mountains and tombs, crying and cutting himself. Seven: He ran to Jesus from afar. Eight: He fell down before Jesus. Nine: He cried with a loud voice. Ten: He called Jesus Son of the Most High God. Keep going. Every word is a clue. Where did the demons go? How many pigs? What did the townspeople do? What did Jesus tell the healed man? Train yourself to see what casual readers miss.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "train-freestyle",
+    title: "Freestyle Training — Nature Connections",
+    description: "Practice seeing Scripture in everyday nature. Trees, storms, rivers, seeds — God's second book.",
+    category: "training",
+    duration: "7 min",
+    icon: <Flame className="h-5 w-5" />,
+    gradient: "from-violet-500 to-purple-600",
+    audioMeta: { text: "Let's practice freestyle. Look outside. What do you see? A tree? Psalm 1 says the righteous man is like a tree planted by rivers of water that brings forth fruit in its season. Its leaf does not wither. A tree teaches stability, rootedness, and seasonal fruitfulness. What about the wind? John 3 says the wind blows where it wishes — you hear its sound but cannot tell where it comes from or where it goes. So is everyone born of the Spirit. The wind is invisible but powerful, unpredictable but real. What about rain? Isaiah 55 says as the rain comes down from heaven and does not return without watering the earth and making it bring forth, so shall My Word be. Rain is the Word — it comes down, saturates, and produces fruit. What about seeds? Mark 4 — the parable of the sower. A seed is the smallest of things, but it holds an entire forest inside it. Every element of nature is a sermon waiting to be preached. Practice this today — pick three things in nature and connect them to Scripture.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+  {
+    id: "train-speed-drill",
+    title: "Speed Drill — Rapid Bible Connections",
+    description: "3-minute sprint. Flip through chapters and make instant Christ-connections. Build your reflexes.",
+    category: "training",
+    duration: "5 min",
+    icon: <Flame className="h-5 w-5" />,
+    gradient: "from-violet-500 to-purple-600",
+    audioMeta: { text: "Speed drill. You have three minutes. I'll name a chapter — you name the Christ connection. Ready? Genesis 1 — Christ is the Creator, the Word through whom all things were made. Genesis 3 — Christ is the promised Seed who will crush the serpent's head. Genesis 22 — Christ is the ram caught in the thicket, the substitute on Moriah. Exodus 12 — Christ is the Passover Lamb. Exodus 16 — Christ is the manna, the bread from heaven. Numbers 21 — Christ is the bronze serpent lifted up for healing. Joshua 5 — Christ is the Captain of the Lord's host. Ruth 4 — Christ is the kinsman Redeemer. First Samuel 17 — Christ is the greater David who defeats our Goliath. Second Samuel 7 — Christ is the Son whose kingdom will never end. Psalm 22 — Christ is the forsaken One whose hands and feet are pierced. Isaiah 53 — Christ is the suffering Servant wounded for our transgressions. Daniel 7 — Christ is the Son of Man who receives the eternal kingdom. Jonah 2 — Christ is the One who spent three days in the heart of the earth. That's your starter. Now keep going on your own — every chapter, every book. Christ is everywhere.", voice: "nPczCjzI2devNBz1zQrb" },
+  },
+];
+
+// ── Category Config ─────────────────────────────────────────────────────────
+
+const CATEGORIES = [
+  { id: "all", label: "All", icon: <Library className="h-4 w-4" /> },
+  { id: "commentary", label: "Commentary", icon: <BookOpen className="h-4 w-4" /> },
+  { id: "tour", label: "Palace Tours", icon: <Compass className="h-4 w-4" /> },
+  { id: "apologetics", label: "Apologetics", icon: <Shield className="h-4 w-4" /> },
+  { id: "devotional", label: "Devotional", icon: <Heart className="h-4 w-4" /> },
+  { id: "study", label: "Study Sessions", icon: <GraduationCap className="h-4 w-4" /> },
+  { id: "training", label: "Training Drills", icon: <Flame className="h-4 w-4" /> },
+];
+
+// ── Page Component ──────────────────────────────────────────────────────────
+
+export default function AudioLibrary() {
+  const { t } = useTranslation();
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
+
+  const filtered = useMemo(() => {
+    return AUDIO_CATALOG.filter((item) => {
+      const matchesCategory = activeCategory === "all" || item.category === activeCategory;
+      const matchesSearch =
+        !search ||
+        item.title.toLowerCase().includes(search.toLowerCase()) ||
+        item.description.toLowerCase().includes(search.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [search, activeCategory]);
+
+  const categoryCount = useMemo(() => {
+    const counts: Record<string, number> = { all: AUDIO_CATALOG.length };
+    AUDIO_CATALOG.forEach((item) => {
+      counts[item.category] = (counts[item.category] || 0) + 1;
+    });
+    return counts;
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-3 mb-3">
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20">
+              <Headphones className="h-8 w-8 text-primary" />
+            </div>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Audio Library</h1>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Curated audio experiences — commentaries, Palace tours, apologetics training,
+            devotionals, and study sessions. Add up to 7 to your personal playlist.
+          </p>
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <Badge variant="outline" className="gap-1">
+              <Music className="h-3 w-3" />
+              {AUDIO_CATALOG.length} tracks
+            </Badge>
+            <PlaylistPanel />
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-6 max-w-md mx-auto">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by title or topic..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        {/* Category Tabs */}
+        <div className="mb-6">
+          <ScrollArea className="w-full">
+            <div className="flex gap-2 pb-2 justify-center flex-wrap">
+              {CATEGORIES.map((cat) => (
+                <Button
+                  key={cat.id}
+                  variant={activeCategory === cat.id ? "default" : "outline"}
+                  size="sm"
+                  className="gap-1.5 whitespace-nowrap"
+                  onClick={() => setActiveCategory(cat.id)}
+                >
+                  {cat.icon}
+                  {cat.label}
+                  <Badge
+                    variant="secondary"
+                    className="ml-1 h-5 min-w-[20px] p-0 flex items-center justify-center text-[10px]"
+                  >
+                    {categoryCount[cat.id] || 0}
+                  </Badge>
+                </Button>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+
+        {/* Results */}
+        <AnimatePresence mode="popLayout">
+          {filtered.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-16"
+            >
+              <Search className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+              <p className="text-muted-foreground">No audio found matching your search.</p>
+            </motion.div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {filtered.map((item, i) => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ delay: i * 0.03 }}
+                >
+                  <Card className="h-full hover:shadow-md transition-shadow border-2 hover:border-primary/30">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        {/* Icon */}
+                        <div className={`flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br ${item.gradient} text-white`}>
+                          {item.icon}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="font-semibold text-sm leading-tight">{item.title}</h3>
+                            {item.badge && (
+                              <Badge variant="secondary" className="text-[10px] flex-shrink-0">
+                                {item.badge}
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                            {item.description}
+                          </p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant="outline" className="text-[10px] gap-1 px-1.5">
+                              <Clock className="h-2.5 w-2.5" />
+                              {item.duration}
+                            </Badge>
+                            <AddToPlaylistButton
+                              title={item.title}
+                              description={item.description}
+                              audioType={item.category}
+                              audioMeta={item.audioMeta}
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Bottom CTA */}
+        <div className="text-center mt-10 mb-6">
+          <p className="text-sm text-muted-foreground mb-2">
+            New content is added regularly. Check back for fresh commentaries, studies, and training.
+          </p>
+          <Badge variant="outline" className="gap-1">
+            <Star className="h-3 w-3 text-amber-500" />
+            Premium users get access to extended audio content
+          </Badge>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}
