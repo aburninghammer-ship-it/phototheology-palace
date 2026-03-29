@@ -33,6 +33,7 @@ import { LiveDemoNotification } from "@/components/live/LiveDemoNotification";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
+import { PlaylistPanel } from "@/components/audio/PlaylistPanel";
 import { JeevesWidget } from "@/components/JeevesWidget";
 import { ReginaldButler } from "@/components/ReginaldButler";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
@@ -802,6 +803,7 @@ function App() {
                   {!isWorkspacePane && (
                     <div className="zen-hideable">
                       <DraggableWidgetStack>
+                        <PlaylistPanel />
                         <AmbientMusicPlayer minimal />
                         <JeevesWidget />
                         <ReginaldButler />
