@@ -72,37 +72,60 @@ const DailyChallenges = () => {
   }, [user]);
 
   const fetchDailyChallenge = async () => {
-    const now = new Date();
-    
-    // Get today's challenge based on 30-day rotation
-    const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-    const rotationDay = (dayOfYear % 30) + 1; // 30-day rotation
+    try {
+      const now = new Date();
+      
+      // Get today's challenge based on 30-day rotation
+      const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+      const rotationDay = (dayOfYear % 30) + 1; // 30-day rotation
+      console.log("[DailyChallenge] Fetching rotation day:", rotationDay, "dayOfYear:", dayOfYear);
 
-    const { data: challenges, error } = await supabase
-      .from("challenges")
-      .select("*")
-      .eq("day_in_rotation", rotationDay)
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    if (error) {
-      console.error("Error fetching challenges:", error);
-      return;
-    }
-
-    const todayChallenge = challenges?.[0] || null;
-    setDailyChallenge(todayChallenge);
-    
-    if (todayChallenge && user) {
-      const { data: submission } = await supabase
-        .from("challenge_submissions")
+      const { data: challenges, error } = await supabase
+        .from("challenges")
         .select("*")
-        .eq("challenge_id", todayChallenge.id)
-        .eq("user_id", user.id)
-        .gte("created_at", new Date(now.setHours(0, 0, 0, 0)).toISOString())
-        .maybeSingle();
+        .eq("day_in_rotation", rotationDay)
+        .order("created_at", { ascending: false })
+        .limit(1);
 
-      setHasSubmitted(!!submission);
+      if (error) {
+        console.error("[DailyChallenge] Error fetching:", error);
+        return;
+      }
+
+      console.log("[DailyChallenge] Found challenges:", challenges?.length, challenges?.[0]?.title);
+
+      if (!challenges || challenges.length === 0) {
+        // Fallback: try fetching any available challenge
+        console.warn("[DailyChallenge] No challenge for rotation day", rotationDay, "— fetching fallback");
+        const { data: fallback } = await supabase
+          .from("challenges")
+          .select("*")
+          .eq("challenge_type", "daily")
+          .order("created_at", { ascending: false })
+          .limit(1);
+        
+        if (fallback && fallback.length > 0) {
+          setDailyChallenge(fallback[0]);
+          return;
+        }
+      }
+
+      const todayChallenge = challenges?.[0] || null;
+      setDailyChallenge(todayChallenge);
+      
+      if (todayChallenge && user) {
+        const { data: submission } = await supabase
+          .from("challenge_submissions")
+          .select("*")
+          .eq("challenge_id", todayChallenge.id)
+          .eq("user_id", user.id)
+          .gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
+          .maybeSingle();
+
+        setHasSubmitted(!!submission);
+      }
+    } catch (err) {
+      console.error("[DailyChallenge] Unexpected error:", err);
     }
   };
 
