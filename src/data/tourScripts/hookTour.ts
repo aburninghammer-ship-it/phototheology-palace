@@ -15,7 +15,7 @@ export const HOOK_TOUR: TourDefinition = {
     roomCode: "INTRO",
     roomName: "Introduction",
     title: "Something You've Never Seen",
-    script: `Good evening. I'm Reginald, your concierge at the Phototheology Palace — the heart of PhototheologyOS, the operating system for biblical thinking. Powered by AI. Built for biblical intelligence. I'm going to take exactly three minutes to show you something that will change how you read the Bible — permanently. Here's the problem. You've read Psalm 23 a hundred times. "The LORD is my shepherd, I shall not want." You know the words. But be honest — when's the last time those words actually moved you? When's the last time a familiar passage made your heart race with a discovery you'd never seen before? If the Bible has started feeling flat, it's not the Bible's fault. And it's definitely not yours. You were just never given a method for seeing what's really there.`,
+    script: `Welcome. I'm Reginald, your concierge at the Phototheology Palace — the heart of PhototheologyOS, the operating system for biblical thinking. Powered by AI. Built for biblical intelligence. I'm going to take exactly three minutes to show you something that will change how you read the Bible — permanently. Here's the problem. You've read Psalm 23 a hundred times. "The LORD is my shepherd, I shall not want." You know the words. But be honest — when's the last time those words actually moved you? When's the last time a familiar passage made your heart race with a discovery you'd never seen before? If the Bible has started feeling flat, it's not the Bible's fault. And it's definitely not yours. You were just never given a method for seeing what's really there.`,
     estimatedSeconds: 35,
   },
   segments: [
