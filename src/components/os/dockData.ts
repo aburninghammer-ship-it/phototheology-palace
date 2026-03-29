@@ -52,6 +52,8 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "analyze-thoughts", label: "Analyze My Thoughts", path: "/analyze-thoughts", icon: Lightbulb, glow: "48 93% 47%" },
       { id: "drill-drill", label: "Gather Fragments", path: "/drill-drill", icon: Target, glow: "25 95% 53%" },
       { id: "genealogy-decoder", label: "Genealogy Decoder", path: "/research-assistant?tab=genealogy", icon: Network, glow: "320 70% 55%" },
+      { id: "my-studies", label: "My Studies", path: "/my-studies", icon: BookMarked, glow: "205 95% 50%" },
+      { id: "study-ideas", label: "Study Ideas", path: "/study-ideas", icon: Lightbulb, glow: "38 92% 50%" },
     ],
   },
   {
@@ -86,8 +88,6 @@ export const DOCK_ITEMS: DockItem[] = [
       { id: "devotionals", label: "Devotionals", path: "/devotionals", icon: Flame, glow: "328 85% 58%" },
       { id: "reading-plans", label: "Reading Plans", path: "/reading-plans", icon: Calendar, glow: "160 84% 39%" },
       { id: "notes", label: "Notes", path: "/notes", icon: StickyNote, glow: "45 100% 51%" },
-      { id: "my-studies", label: "My Studies", path: "/my-studies", icon: BookMarked, glow: "205 95% 50%" },
-      { id: "study-ideas", label: "Study Ideas", path: "/study-ideas", icon: Lightbulb, glow: "38 92% 50%" },
     ],
   },
   {
