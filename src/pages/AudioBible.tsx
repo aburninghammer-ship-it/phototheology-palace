@@ -189,7 +189,7 @@ export default function AudioBible() {
   const [endVerse, setEndVerse] = useState<number | null>(null);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [storyCategory, setStoryCategory] = useState("all");
-  const [showImmersiveView, setShowImmersiveView] = useState(false);
+  const immersive = useImmersiveMode();
 
   // Custom playlist add mode state
   const [customAddMode, setCustomAddMode] = useState<"single" | "chapter-range" | "book-range">("single");
