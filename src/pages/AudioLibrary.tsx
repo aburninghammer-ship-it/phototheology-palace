@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
+import { useImmersiveMode, type ImmersiveTrack } from "@/hooks/useImmersiveMode";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
