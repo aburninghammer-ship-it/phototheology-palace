@@ -262,7 +262,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             transition={{ duration: 3, repeat: Infinity }}
             className="text-6xl font-bold text-amber-50 mb-2"
           >
-            PhototheologyOS
+            Phototheology<span className="text-[0.65em] font-semibold tracking-wide px-2 py-0.5 rounded ml-1 align-middle inline-block" style={{ background: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.25)", color: "#e8e8e8", fontFamily: "'Inter', sans-serif", verticalAlign: "middle", position: "relative", top: "-0.1em" }}>OS</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}

@@ -48,7 +48,7 @@ export const PunchyHero = () => {
               <div className="absolute top-2 right-3 w-1.5 h-1.5 rounded-full bg-cyan-400/60 animate-pulse" />
               <div className="absolute bottom-2 left-4 w-1 h-1 rounded-full bg-yellow-400/50 animate-pulse delay-500" />
                 <h2 className="relative font-display text-lg sm:text-xl md:text-2xl font-bold tracking-widest text-primary uppercase drop-shadow-[0_0_15px_hsl(var(--primary)/0.6)]">
-                  PhototheologyOS
+                  Phototheology<span className="text-[0.65em] font-semibold tracking-wide px-1.5 py-0.5 rounded ml-1 align-middle inline-block" style={{ background: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.25)", color: "#e8e8e8", fontFamily: "'Inter', sans-serif", verticalAlign: "middle", position: "relative", top: "-0.1em" }}>OS</span>
                 </h2>
             </div>
           </div>

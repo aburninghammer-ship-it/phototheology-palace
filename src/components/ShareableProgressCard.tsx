@@ -182,7 +182,7 @@ export const ShareableProgressCard = () => {
 
                 {/* Footer */}
                 <div className="mt-4 pt-3 border-t border-white/20 flex items-center justify-between">
-                  <span className="text-xs opacity-60 font-medium tracking-wider uppercase">PhototheologyOS Eden</span>
+                  <span className="text-xs opacity-60 font-medium tracking-wider uppercase">Phototheology<span style={{ color: "#e8e8e8" }}>OS</span> <span style={{ color: "rgba(180, 220, 255, 0.85)" }}>Eden</span></span>
                   <span className="text-xs opacity-60">phototheologybible.com</span>
                 </div>
               </div>
