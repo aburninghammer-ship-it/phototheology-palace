@@ -13,28 +13,18 @@ import { useCourseProgress } from "@/hooks/useCourseProgress";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-type AgeGroup = 'adult' | 'ages-6-8' | 'ages-9-12' | 'ages-13-15';
-
 export default function PhototheologyCourse() {
   const { completedDays, reflections, loading, toggleDay, saveReflection } = useCourseProgress("phototheology");
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('adult');
   const [expandedWeeks, setExpandedWeeks] = useState<number[]>([1]);
   const [reflectionDraft, setReflectionDraft] = useState("");
 
-  const currentCourse = useMemo(() =>
-    ageGroup === 'adult'
-      ? phototheologyCourse
-      : kidsPhototheologyCourse.filter(day => day.ageGroup === ageGroup),
-    [ageGroup]
-  );
+  const currentCourse = phototheologyCourse;
 
   const selectedDayData = useMemo(() => {
     if (!selectedDay) return null;
-    return ageGroup === 'adult'
-      ? phototheologyCourse.find(d => d.day === selectedDay)
-      : kidsPhototheologyCourse.find(d => d.day === selectedDay && d.ageGroup === ageGroup);
-  }, [selectedDay, ageGroup]);
+    return phototheologyCourse.find(d => d.day === selectedDay);
+  }, [selectedDay]);
 
   const weeks = useMemo(() => Array.from(new Set(currentCourse.map(d => d.week))), [currentCourse]);
   const completionPct = currentCourse.length > 0 ? Math.round((completedDays.filter(d => currentCourse.some(c => c.day === d)).length / currentCourse.length) * 100) : 0;
