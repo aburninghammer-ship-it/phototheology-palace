@@ -153,46 +153,98 @@ export function PlaylistPanel() {
         const genType = meta.generationType;
 
         if (genType === "chapter-commentary" || genType === "verse-commentary") {
-          // Call generate-epic-commentary which returns audioUrl or generates it
-          const resp = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-epic-commentary`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-              },
-              body: JSON.stringify({
-                book: meta.book,
-                chapter: meta.chapter,
-                mode: meta.voiceStyle || "epic",
-              }),
-            }
-          );
-          const data = await resp.json();
-          if (!resp.ok) throw new Error(data.error || "Commentary generation failed");
+          const voiceMode = meta.voiceStyle || "epic";
+          
+          // First check database cache for existing audio
+          const { data: cached } = await supabase
+            .from("chapter_commentary_cache")
+            .select("audio_storage_path")
+            .eq("book", meta.book)
+            .eq("chapter", meta.chapter)
+            .eq("voice_id", voiceMode)
+            .maybeSingle();
 
-          if (data.audioUrl) {
-            url = data.audioUrl;
-          } else if (data.status === "ready" && data.id) {
-            // Fetch signed URL from storage via the same endpoint (already cached now)
-            const retry = await fetch(
-              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-epic-commentary`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-                },
-                body: JSON.stringify({
-                  book: meta.book,
-                  chapter: meta.chapter,
-                  mode: meta.voiceStyle || "epic",
-                }),
+          if (cached?.audio_storage_path) {
+            const { data: signed } = await supabase.storage
+              .from("audio-cache")
+              .createSignedUrl(cached.audio_storage_path, 3600);
+            if (signed?.signedUrl) {
+              url = signed.signedUrl;
+            }
+          }
+
+          if (!url) {
+            toast.info("Generating commentary audio — this may take a moment...");
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 120000);
+
+            try {
+              const resp = await fetch(
+                `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-epic-commentary`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+                  },
+                  body: JSON.stringify({
+                    book: meta.book,
+                    chapter: meta.chapter,
+                    mode: voiceMode,
+                  }),
+                  signal: controller.signal,
+                }
+              );
+              clearTimeout(timeout);
+              const data = await resp.json();
+              if (!resp.ok) throw new Error(data.error || "Commentary generation failed");
+              url = data.audioUrl || null;
+
+              // If queued/processing, poll the cache table
+              if (!url && (data.status === "queued" || data.status === "ready")) {
+                toast.info("Audio is being prepared...");
+                for (let i = 0; i < 30; i++) {
+                  await new Promise(r => setTimeout(r, 4000));
+                  const { data: poll } = await supabase
+                    .from("chapter_commentary_cache")
+                    .select("audio_storage_path")
+                    .eq("book", meta.book)
+                    .eq("chapter", meta.chapter)
+                    .eq("voice_id", voiceMode)
+                    .maybeSingle();
+                  if (poll?.audio_storage_path) {
+                    const { data: s } = await supabase.storage
+                      .from("audio-cache")
+                      .createSignedUrl(poll.audio_storage_path, 3600);
+                    if (s?.signedUrl) { url = s.signedUrl; break; }
+                  }
+                }
               }
-            );
-            const retryData = await retry.json();
-            url = retryData.audioUrl || null;
+            } catch (e: any) {
+              clearTimeout(timeout);
+              if (e.name === "AbortError") {
+                toast.info("Still generating... checking for result");
+                for (let i = 0; i < 15; i++) {
+                  await new Promise(r => setTimeout(r, 5000));
+                  const { data: poll } = await supabase
+                    .from("chapter_commentary_cache")
+                    .select("audio_storage_path")
+                    .eq("book", meta.book)
+                    .eq("chapter", meta.chapter)
+                    .eq("voice_id", voiceMode)
+                    .maybeSingle();
+                  if (poll?.audio_storage_path) {
+                    const { data: s } = await supabase.storage
+                      .from("audio-cache")
+                      .createSignedUrl(poll.audio_storage_path, 3600);
+                    if (s?.signedUrl) { url = s.signedUrl; break; }
+                  }
+                }
+                if (!url) throw new Error("Commentary generation timed out. Try again later.");
+              } else {
+                throw e;
+              }
+            }
           }
         } else if (genType === "aats-training") {
           // Generate apologetics training audio via TTS with a contextual prompt
