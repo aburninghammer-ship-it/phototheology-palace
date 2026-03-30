@@ -26,7 +26,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Globe } from "lucide-react";
+import { Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePresenceTracker } from "@/hooks/usePresenceTracker";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -156,17 +156,6 @@ export function OSTitleBar() {
           </Link>
         </Button>
 
-        <Button asChild variant="ghost" size="sm" className="hidden lg:flex gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border"
-          style={{
-            background: "hsl(210 50% 20% / 0.5)",
-            borderColor: "hsl(210 60% 45% / 0.4)",
-            color: "hsl(210 80% 70%)",
-          }}>
-          <Link to="/workspace">
-            <Globe className="h-3.5 w-3.5" style={{ color: "hsl(210 80% 65%)" }} />
-            Workspace
-          </Link>
-        </Button>
 
         <Popover>
           <PopoverTrigger asChild>
