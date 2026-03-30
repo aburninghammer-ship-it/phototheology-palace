@@ -363,12 +363,11 @@ export function ImmersiveAudioPlayer({
             }}
             transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
           />
-          {/* Subtle particle dots */}
-          <div className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: "radial-gradient(circle, hsl(var(--primary)) 1px, transparent 1px)",
-              backgroundSize: "30px 30px",
-            }}
+          {/* Canvas particle field */}
+          <ImmersiveParticles
+            isPlaying={isPlaying}
+            mood={track?.type || "commentary"}
+            intensity={sleepFadeMultiplier * 0.6}
           />
         </div>
 
