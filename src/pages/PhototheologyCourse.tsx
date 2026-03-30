@@ -330,14 +330,31 @@ export default function PhototheologyCourse() {
                             )}
                           </div>
 
-                          {/* Practice Link */}
-                          {selectedDayData.practiceLink && (
-                            <Link to={selectedDayData.practiceLink}>
-                              <Button variant="outline" size="sm" className="gap-2 w-full">
-                                <ExternalLink className="h-3.5 w-3.5" />
-                                {selectedDayData.practiceLinkLabel || "Open Practice Tool"}
-                              </Button>
-                            </Link>
+                          {/* Practice Tools */}
+                          {(selectedDayData.practiceLink || (selectedDayData.practiceTools && selectedDayData.practiceTools.length > 0)) && (
+                            <div className="space-y-2">
+                              <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5">
+                                🛠️ Practice Tools
+                              </h3>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {selectedDayData.practiceLink && (
+                                  <Link to={selectedDayData.practiceLink}>
+                                    <Button variant="outline" size="sm" className="gap-2 w-full">
+                                      <ExternalLink className="h-3.5 w-3.5" />
+                                      {selectedDayData.practiceLinkLabel || "Open Practice Tool"}
+                                    </Button>
+                                  </Link>
+                                )}
+                                {selectedDayData.practiceTools?.map((tool, idx) => (
+                                  <Link key={idx} to={tool.link}>
+                                    <Button variant="outline" size="sm" className="gap-2 w-full">
+                                      <ExternalLink className="h-3.5 w-3.5" />
+                                      {tool.label}
+                                    </Button>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
                           )}
 
                           {/* Reflection */}
