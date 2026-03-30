@@ -27,8 +27,19 @@ export function OpenAIAudioButton({
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        globalAudioManager.unregister(audioRef.current);
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
   const stop = useCallback(() => {
     if (audioRef.current) {
+      globalAudioManager.unregister(audioRef.current);
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
       audioRef.current = null;
