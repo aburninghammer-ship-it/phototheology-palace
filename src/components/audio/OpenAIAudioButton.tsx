@@ -1,9 +1,10 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, Loader2, Square } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
+import { globalAudioManager } from "@/lib/globalAudioManager";
 
 interface OpenAIAudioButtonProps {
   text: string;
