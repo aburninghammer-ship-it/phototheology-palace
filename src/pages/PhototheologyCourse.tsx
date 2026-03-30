@@ -224,6 +224,10 @@ export default function PhototheologyCourse() {
             {/* Day Detail */}
             <div className="lg:col-span-2">
               {selectedDayData ? (
+                (() => {
+                  const dayUnlocked = isDayUnlocked(selectedDayData.day);
+                  const dayCompletable = isDayCompletable(selectedDayData.day);
+                  return (
                 <motion.div
                   key={selectedDay}
                   initial={{ opacity: 0, y: 10 }}
@@ -242,22 +246,37 @@ export default function PhototheologyCourse() {
                             {selectedDayData.roomCode && (
                               <Badge variant="secondary" className="text-xs">{selectedDayData.roomCode}</Badge>
                             )}
+                            {!dayUnlocked && (
+                              <Badge variant="destructive" className="text-xs gap-1">
+                                <Lock className="h-3 w-3" /> Locked
+                              </Badge>
+                            )}
                           </div>
                           <CardTitle className="text-2xl leading-tight">{selectedDayData.title}</CardTitle>
                           <CardDescription className="mt-1">{selectedDayData.floor}</CardDescription>
                         </div>
-                        <Button
-                          variant={completedDays.includes(selectedDayData.day) ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => toggleDay(selectedDayData.day)}
-                          className={cn("shrink-0", completedDays.includes(selectedDayData.day) && "bg-green-600 hover:bg-green-700")}
-                        >
-                          {completedDays.includes(selectedDayData.day) ? (
-                            <><CheckCircle2 className="h-4 w-4 mr-1.5" /> Done</>
-                          ) : (
-                            <><Circle className="h-4 w-4 mr-1.5" /> Complete</>
-                          )}
-                        </Button>
+                        {dayUnlocked ? (
+                          <Button
+                            variant={completedDays.includes(selectedDayData.day) ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => toggleDay(selectedDayData.day)}
+                            disabled={!dayCompletable && !completedDays.includes(selectedDayData.day)}
+                            className={cn("shrink-0", completedDays.includes(selectedDayData.day) && "bg-green-600 hover:bg-green-700")}
+                          >
+                            {completedDays.includes(selectedDayData.day) ? (
+                              <><CheckCircle2 className="h-4 w-4 mr-1.5" /> Done</>
+                            ) : !dayCompletable ? (
+                              <><Lock className="h-4 w-4 mr-1.5" /> Complete Previous</>
+                            ) : (
+                              <><Circle className="h-4 w-4 mr-1.5" /> Complete</>
+                            )}
+                          </Button>
+                        ) : (
+                          <Badge variant="outline" className="text-xs py-2 px-3 gap-1.5">
+                            <Calendar className="h-3.5 w-3.5" />
+                            Unlocks in {selectedDayData.day - getUnlockedDay()} day{selectedDayData.day - getUnlockedDay() !== 1 ? 's' : ''}
+                          </Badge>
+                        )}
                       </div>
                     </CardHeader>
                     <CardContent>
