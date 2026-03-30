@@ -693,7 +693,7 @@ export function PlaylistPanel() {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[380px] sm:w-[420px] flex flex-col p-0">
+      <SheetContent side="right" className="z-[120] w-[calc(100vw-0.75rem)] max-w-[420px] sm:w-[420px] flex flex-col p-0">
         <SheetHeader className="p-4 pb-2 border-b">
           <SheetTitle className="flex items-center gap-2">
             <ListMusic className="h-5 w-5 text-primary" />
