@@ -140,7 +140,7 @@ const AUDIO_CATALOG: AudioEntry[] = [
   },
   {
     id: "suite-urban-romans8",
-    title: "Urban Preacher — Romans 8: More Than Conquerors",
+    title: "Modern Preacher — Romans 8: More Than Conquerors",
     description: "Jessica brings raw, real-talk energy to Paul's most triumphant chapter. Feel it in your bones.",
     category: "commentary",
     duration: "8 min",
