@@ -100,26 +100,6 @@ export default function PhototheologyCourse() {
             </div>
           </div>
 
-          {/* Age Group Selector */}
-          <div className="flex justify-center gap-2 mb-6 flex-wrap">
-            {([
-              { key: 'adult' as AgeGroup, label: 'Adult', icon: BookOpen },
-              { key: 'ages-6-8' as AgeGroup, label: 'Ages 6–8', icon: Users },
-              { key: 'ages-9-12' as AgeGroup, label: 'Ages 9–12', icon: Users },
-              { key: 'ages-13-15' as AgeGroup, label: 'Ages 13–15', icon: Users },
-            ]).map(({ key, label, icon: Icon }) => (
-              <Button
-                key={key}
-                variant={ageGroup === key ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => { setAgeGroup(key); setSelectedDay(null); }}
-                className="gap-1.5"
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {label}
-              </Button>
-            ))}
-          </div>
 
           {/* Floor Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
