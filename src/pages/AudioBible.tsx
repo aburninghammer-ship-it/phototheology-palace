@@ -32,6 +32,7 @@ import {
   MessageSquare,
   Loader2,
   Headphones,
+  Sparkles,
   ListMusic,
   Plus,
   X,
@@ -65,7 +66,7 @@ interface Theme {
   verse_count: number;
 }
 
-type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar" | "counselor";
+type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar" | "counselor" | "kids";
 
 interface ChapterSelection {
   book: string;
@@ -111,12 +112,13 @@ export default function AudioBible() {
   const [epicMode, setEpicMode] = useState<EpicModeType>("epic");
 
   const COMMENTARY_MODES = [
-    { id: "urban" as const, label: "Urban", subtitle: "Human condition", icon: Zap, color: "blue" },
+    { id: "urban" as const, label: "Modern", subtitle: "Human condition", icon: Zap, color: "blue" },
     { id: "ancient" as const, label: "Ancient", subtitle: "Covenant-historical", icon: BookText, color: "amber" },
     { id: "preacher" as const, label: "Preacher", subtitle: "Redemptive-proclamation", icon: Crown, color: "purple" },
     { id: "epic" as const, label: "Epic", subtitle: "Cosmic conflict", icon: Film, color: "orange" },
     { id: "scholar" as const, label: "Scholar", subtitle: "Canonical-theological", icon: Layers, color: "emerald" },
     { id: "counselor" as const, label: "Counselor", subtitle: "Soul care", icon: Heart, color: "rose" },
+    { id: "kids" as const, label: "Kids", subtitle: "Ages 8-12", icon: Sparkles, color: "cyan" },
   ] as const;
 
   const activeModeMeta = COMMENTARY_MODES.find(m => m.id === epicMode) || COMMENTARY_MODES[3];

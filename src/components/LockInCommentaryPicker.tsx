@@ -10,10 +10,11 @@ import { Headphones, Play, RotateCcw, Volume2, Sparkles } from "lucide-react";
 const COMMENTARY_MODES = [
   { value: "epic", label: "Epic Narrator", description: "Cinematic, dramatic storytelling", icon: "🎬" },
   { value: "counselor", label: "Counselor", description: "Warm, empathetic, personal growth", icon: "💛" },
-  { value: "urban", label: "Urban Preacher", description: "Bold, expressive, street-level truth", icon: "🔥" },
+  { value: "urban", label: "Modern Preacher", description: "Bold, expressive, street-level truth", icon: "🔥" },
   { value: "ancient", label: "Ancient Scholar", description: "Measured, authoritative, timeless", icon: "📜" },
   { value: "preacher", label: "Preacher", description: "Clear, natural, pulpit energy", icon: "🎤" },
   { value: "scholar", label: "Scholar", description: "Calm, analytical, academic depth", icon: "🔬" },
+  { value: "kids", label: "Kids", description: "Wonder-filled, ages 8-12", icon: "✨" },
 ];
 
 // A small set of compelling starter chapters for new users

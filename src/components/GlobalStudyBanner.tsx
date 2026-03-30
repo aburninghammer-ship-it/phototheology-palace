@@ -82,7 +82,7 @@ const ALL_PROMPTS: DailyPrompt[] = [
   { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Five Ascensions",
     text: "Run any verse through Text → Chapter → Book → Cycle → Heaven. Watch it expand at every level.", actionLabel: "Five Ascensions", actionLink: "/palace?room=FE" },
   { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Commentary Suite",
-    text: "Listen to a COTA chapter analyzed by 6 unique voices — Epic Narrator, Urban Preacher, Ancient Scholar, Fiery Preacher, Academic, or Counselor.", actionLabel: "COTA Series", actionLink: "/cota-series" },
+    text: "Listen to a COTA chapter analyzed by 7 unique voices — Epic Narrator, Modern Preacher, Ancient Scholar, Fiery Preacher, Academic, Counselor, or Kids.", actionLabel: "COTA Series", actionLink: "/cota-series" },
   { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Counselor Mode",
     text: "The Counselor commentary connects Scripture to your personal growth with a warm, therapeutic voice. Try it on your favorite chapter.", actionLabel: "Listen Now", actionLink: "/cota-series" },
 
