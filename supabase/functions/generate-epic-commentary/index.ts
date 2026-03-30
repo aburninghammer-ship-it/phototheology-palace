@@ -2018,6 +2018,30 @@ serve(async (req) => {
     const expectedModeVoiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
     const expectedVoiceLabel = ELEVENLABS_API_KEY ? `elevenlabs:${expectedModeVoiceId}` : "onyx";
 
+    // Clean up stuck "generating" records older than 5 minutes
+    {
+      const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      let staleQuery = supabaseAdmin
+        .from("epic_commentaries")
+        .delete()
+        .eq("commentary_mode", mode)
+        .eq("status", "generating")
+        .lt("updated_at", fiveMinAgo);
+
+      if (isStoryScope) {
+        staleQuery = staleQuery.eq("book", storyTitle).eq("chapter", -1);
+      } else {
+        staleQuery = staleQuery.eq("book", effectiveBook).eq("chapter", effectiveChapter);
+      }
+
+      const { error: staleErr } = await staleQuery;
+      if (staleErr) {
+        console.warn("[EpicCommentary] Failed to clean stale records:", staleErr.message);
+      } else {
+        console.log(`[EpicCommentary] Cleaned stale generating records for ${mode} ${effectiveBook} ${effectiveChapter}`);
+      }
+    }
+
     // Check if already exists and ready (unless regenerate requested)
     if (!regenerate) {
       let existingQuery = supabaseAdmin
