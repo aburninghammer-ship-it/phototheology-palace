@@ -35,6 +35,7 @@ import {
   Compass,
   Swords,
   GripVertical,
+  Maximize2,
   Plus,
   ChevronDown,
   Pencil,
