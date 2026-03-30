@@ -802,5 +802,23 @@ export function PlaylistPanel() {
         )}
       </SheetContent>
     </Sheet>
+
+    <ImmersiveAudioPlayer
+      isOpen={immersive.isOpen}
+      onClose={immersive.closeImmersive}
+      tracks={immersive.queue.tracks}
+      currentIndex={immersive.queue.currentIndex}
+      onNextTrack={immersive.nextTrack}
+      onPrevTrack={immersive.prevTrack}
+      hasNext={immersive.hasNext}
+      hasPrev={immersive.hasPrev}
+      ambientMusicEnabled={immersive.ambientMusicEnabled}
+      ambientVolume={immersive.ambientVolume}
+      continuousPlay={immersive.continuousPlay}
+      onSetAmbientMusic={immersive.setAmbientMusic}
+      onSetAmbientVolume={immersive.setAmbientVolume}
+      onSetContinuousPlay={immersive.setContinuousPlay}
+    />
+    </>
   );
 }
