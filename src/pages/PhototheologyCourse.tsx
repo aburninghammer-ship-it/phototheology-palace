@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export default function PhototheologyCourse() {
-  const { completedDays, reflections, loading, toggleDay, saveReflection } = useCourseProgress("phototheology");
+  const { completedDays, reflections, loading, toggleDay, saveReflection, courseStartDate, isDayUnlocked, isDayCompletable, getUnlockedDay } = useCourseProgress("phototheology");
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [expandedWeeks, setExpandedWeeks] = useState<number[]>([1]);
   const [reflectionDraft, setReflectionDraft] = useState("");
