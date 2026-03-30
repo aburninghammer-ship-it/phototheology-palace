@@ -24,7 +24,7 @@ import antiProphetAvatar from "@/assets/defense/anti-prophet.jpg";
 import internetSkepticAvatar from "@/assets/defense/internet-skeptic.jpg";
 import agnosticAvatar from "@/assets/defense/agnostic.jpg";
 import pentecostalAvatar from "@/assets/defense/pentecostal.jpg";
-
+import antiTrinitarianAvatar from "@/assets/defense/anti-trinitarian.jpg";
 export interface DefenseOpponent {
   id: string;
   name: string;
