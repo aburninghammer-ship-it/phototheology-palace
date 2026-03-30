@@ -18688,6 +18688,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_course_progress: {
+        Row: {
+          completed_at: string
+          course_id: string
+          created_at: string
+          day_number: number
+          id: string
+          reflection_note: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          course_id?: string
+          created_at?: string
+          day_number: number
+          id?: string
+          reflection_note?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          course_id?: string
+          created_at?: string
+          day_number?: number
+          id?: string
+          reflection_note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_drill_completions: {
         Row: {
           completed_at: string | null
