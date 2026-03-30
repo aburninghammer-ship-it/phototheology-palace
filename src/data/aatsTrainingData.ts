@@ -194,6 +194,7 @@ import { internetSkepticTraining } from "./aats/internetSkepticTraining";
 import { agnosticTraining } from "./aats/agnosticTraining";
 import { scientistTraining } from "./aats/scientistTraining";
 import { pentecostalTraining } from "./aats/pentecostalTraining";
+import { antiTrinitarianTraining } from "./aats/antiTrinitarianTraining";
 
 const TRAINING_MAP: Record<AATSAvatarId, AATSAvatarTraining> = {
   atheist: atheistTraining,
@@ -218,6 +219,7 @@ const TRAINING_MAP: Record<AATSAvatarId, AATSAvatarTraining> = {
   "internet-skeptic": internetSkepticTraining,
   agnostic: agnosticTraining,
   pentecostal: pentecostalTraining,
+  "anti-trinitarian": antiTrinitarianTraining,
 };
 
 export function getAvatarTraining(avatarId: AATSAvatarId): AATSAvatarTraining {
