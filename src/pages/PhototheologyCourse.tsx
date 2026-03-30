@@ -380,6 +380,7 @@ export default function PhototheologyCourse() {
                           </div>
                         </div>
                       </ScrollArea>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
