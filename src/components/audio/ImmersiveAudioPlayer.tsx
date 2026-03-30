@@ -390,6 +390,15 @@ export function ImmersiveAudioPlayer({
                 <Music className="h-3 w-3" /> Ambient
               </Badge>
             )}
+            <ImmersiveSleepTimer
+              isOpen={isOpen}
+              onSleepTrigger={() => {
+                if (audioRef.current) audioRef.current.pause();
+                if (ambientRef.current) ambientRef.current.pause();
+                setIsPlaying(false);
+              }}
+              onVolumeFade={setSleepFadeMultiplier}
+            />
             <Button variant="ghost" size="icon" onClick={() => setShowSettings(!showSettings)}>
               <Settings className="h-4 w-4" />
             </Button>
