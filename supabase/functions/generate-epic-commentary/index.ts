@@ -34,6 +34,7 @@ const ALLOWED_COMMENTARY_MODES = new Set([
   "scholar",
   "counselor",
   "kids",
+  "mirror",
 ]);
 
 // Keep backward-compat constant for existing code paths
