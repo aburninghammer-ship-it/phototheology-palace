@@ -26,7 +26,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Globe } from "lucide-react";
+import { Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePresenceTracker } from "@/hooks/usePresenceTracker";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
