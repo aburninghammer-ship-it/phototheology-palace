@@ -147,7 +147,7 @@ export const ARENA_RINGS: ArenaRing[] = [
     description: "Intra-Christian challengers including evangelicals, Catholics, ex-SDAs, and prophecy schools",
     icon: "Sparkles",
     color: "text-blue-400",
-    avatarIds: ["evangelical", "catholic", "jw", "progressive-christian", "former-sda", "offshoot-sda", "skeptical-exsda", "anti-prophet", "preterist", "futurist", "pentecostal"],
+    avatarIds: ["evangelical", "catholic", "jw", "progressive-christian", "former-sda", "offshoot-sda", "skeptical-exsda", "anti-prophet", "preterist", "futurist", "pentecostal", "anti-trinitarian"],
   },
 ];
 
