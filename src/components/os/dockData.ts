@@ -150,6 +150,9 @@ export const DOCK_ITEMS: DockItem[] = [
     ],
   },
   {
+    id: "audio-library", label: "Audio Library", icon: Headphones, path: "/audio-library", glow: "280 75% 60%",
+  },
+  {
     id: "church", label: "My Church Space", icon: Church, path: "/living-manna", glow: "142 71% 45%",
   },
   {
