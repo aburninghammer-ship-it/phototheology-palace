@@ -1,9 +1,10 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, Loader2, Square } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
+import { globalAudioManager } from "@/lib/globalAudioManager";
 
 interface OpenAIAudioButtonProps {
   text: string;
@@ -26,8 +27,19 @@ export function OpenAIAudioButton({
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        globalAudioManager.unregister(audioRef.current);
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
   const stop = useCallback(() => {
     if (audioRef.current) {
+      globalAudioManager.unregister(audioRef.current);
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
       audioRef.current = null;
@@ -47,6 +59,8 @@ export function OpenAIAudioButton({
       return;
     }
 
+    // Stop all other audio before starting
+    globalAudioManager.stopAll();
     setIsLoading(true);
 
     try {
@@ -72,12 +86,14 @@ export function OpenAIAudioButton({
       const audio = new Audio(audioUrl);
 
       audio.onplay = () => {
+        globalAudioManager.register(audio);
         setIsPlaying(true);
         setIsLoading(false);
         notifyTTSStarted();
       };
 
       audio.onended = () => {
+        globalAudioManager.unregister(audio);
         setIsPlaying(false);
         notifyTTSStopped();
         if (shouldRevoke) URL.revokeObjectURL(audioUrl);
@@ -85,6 +101,7 @@ export function OpenAIAudioButton({
       };
 
       audio.onerror = () => {
+        globalAudioManager.unregister(audio);
         setIsPlaying(false);
         setIsLoading(false);
         notifyTTSStopped();
