@@ -53,7 +53,7 @@ import { toast } from "sonner";
 import { ExportEpicAudioDialog } from "@/components/audio/ExportEpicAudioDialog";
 import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
 import { useImmersiveMode, type ImmersiveTrack } from "@/hooks/useImmersiveMode";
-import { Maximize2, Music } from "lucide-react";
+import { Maximize2, Music, Eye } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { requestMusicForCommentary, getAutoMusicEnabled, setAutoMusicEnabled, subscribeToAutoMusicToggle } from "@/hooks/useCommentaryMusicSync";
 
