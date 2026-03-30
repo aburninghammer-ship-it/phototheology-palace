@@ -147,14 +147,71 @@ export function PlaylistPanel() {
     try {
       let url = item.audio_url;
 
-      // If no direct URL, generate TTS from meta
-      if (!url && item.audio_meta?.text) {
-        const { data, error } = await supabase.functions.invoke("text-to-speech", {
-          body: { text: item.audio_meta.text.substring(0, 12000), voice: item.audio_meta.voice || "nPczCjzI2devNBz1zQrb" },
-        });
-        if (error || !data) throw new Error("TTS generation failed");
-        const blob = new Blob([data], { type: "audio/mpeg" });
-        url = URL.createObjectURL(blob);
+      // Handle structured audio_meta types
+      if (!url && item.audio_meta) {
+        const meta = item.audio_meta as Record<string, any>;
+        const genType = meta.generationType;
+
+        if (genType === "chapter-commentary" || genType === "verse-commentary") {
+          // Call generate-epic-commentary which returns audioUrl or generates it
+          const resp = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-epic-commentary`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+              },
+              body: JSON.stringify({
+                book: meta.book,
+                chapter: meta.chapter,
+                mode: meta.voiceStyle || "epic",
+              }),
+            }
+          );
+          const data = await resp.json();
+          if (!resp.ok) throw new Error(data.error || "Commentary generation failed");
+
+          if (data.audioUrl) {
+            url = data.audioUrl;
+          } else if (data.status === "ready" && data.id) {
+            // Fetch signed URL from storage via the same endpoint (already cached now)
+            const retry = await fetch(
+              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-epic-commentary`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+                },
+                body: JSON.stringify({
+                  book: meta.book,
+                  chapter: meta.chapter,
+                  mode: meta.voiceStyle || "epic",
+                }),
+              }
+            );
+            const retryData = await retry.json();
+            url = retryData.audioUrl || null;
+          }
+        } else if (genType === "aats-training") {
+          // Generate apologetics training audio via TTS with a contextual prompt
+          const trainingText = `Apologetics training session: Day ${meta.day} with ${meta.avatarName}. This is an interactive training exercise designed to sharpen your ability to defend biblical truth against common objections.`;
+          const { data, error } = await supabase.functions.invoke("text-to-speech", {
+            body: { text: trainingText, voice: "nPczCjzI2devNBz1zQrb" },
+          });
+          if (error || !data) throw new Error("TTS generation failed");
+          const blob = new Blob([data], { type: "audio/mpeg" });
+          url = URL.createObjectURL(blob);
+        } else if (meta.text) {
+          // Fallback: raw text TTS
+          const { data, error } = await supabase.functions.invoke("text-to-speech", {
+            body: { text: meta.text.substring(0, 12000), voice: meta.voice || "nPczCjzI2devNBz1zQrb" },
+          });
+          if (error || !data) throw new Error("TTS generation failed");
+          const blob = new Blob([data], { type: "audio/mpeg" });
+          url = URL.createObjectURL(blob);
+        }
       }
 
       if (!url) {
@@ -171,7 +228,7 @@ export function PlaylistPanel() {
     } catch (err) {
       console.error("Playlist playback error:", err);
       setAudioLoading(false);
-      toast.error("Playback failed");
+      toast.error("Playback failed — try again in a moment");
     }
   }, [items, setCurrentIndex, setIsPlaying]);
 
