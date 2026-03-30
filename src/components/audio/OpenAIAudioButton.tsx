@@ -59,6 +59,8 @@ export function OpenAIAudioButton({
       return;
     }
 
+    // Stop all other audio before starting
+    globalAudioManager.stopAll();
     setIsLoading(true);
 
     try {
