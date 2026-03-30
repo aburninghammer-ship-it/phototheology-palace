@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -10,6 +11,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   ListMusic,
   Play,
@@ -25,6 +33,10 @@ import {
   Compass,
   Swords,
   GripVertical,
+  Plus,
+  ChevronDown,
+  Pencil,
+  Check,
 } from "lucide-react";
 import { usePlaylist, PlaylistItem } from "@/hooks/usePlaylist";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,7 +53,6 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core";
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
@@ -157,6 +168,163 @@ function SortablePlaylistItem({
   );
 }
 
+// Playlist selector/creator component
+function PlaylistSelector({
+  playlists,
+  activePlaylistId,
+  onSelect,
+  onCreate,
+  onRename,
+  onDelete,
+}: {
+  playlists: { id: string; name: string }[];
+  activePlaylistId: string | null;
+  onSelect: (id: string | null) => void;
+  onCreate: (name: string) => Promise<any>;
+  onRename: (id: string, name: string) => Promise<boolean>;
+  onDelete: (id: string) => Promise<boolean>;
+}) {
+  const [isCreating, setIsCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+
+  const activePlaylist = playlists.find(p => p.id === activePlaylistId);
+
+  const handleCreate = async () => {
+    if (!newName.trim()) return;
+    await onCreate(newName);
+    setNewName("");
+    setIsCreating(false);
+  };
+
+  const handleRename = async (id: string) => {
+    if (!editName.trim()) return;
+    await onRename(id, editName);
+    setEditingId(null);
+  };
+
+  if (isCreating) {
+    return (
+      <div className="flex items-center gap-1.5 px-4 py-2 border-b">
+        <Input
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          placeholder="Playlist name..."
+          className="h-8 text-sm"
+          autoFocus
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleCreate();
+            if (e.key === "Escape") setIsCreating(false);
+          }}
+        />
+        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleCreate}>
+          <Check className="h-4 w-4" />
+        </Button>
+        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setIsCreating(false)}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 px-4 py-2 border-b">
+      {editingId ? (
+        <div className="flex items-center gap-1.5 flex-1">
+          <Input
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            className="h-8 text-sm"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleRename(editingId);
+              if (e.key === "Escape") setEditingId(null);
+            }}
+          />
+          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleRename(editingId)}>
+            <Check className="h-4 w-4" />
+          </Button>
+          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setEditingId(null)}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="flex-1 justify-between h-8 text-sm">
+                <span className="truncate">{activePlaylist?.name || "No Playlist"}</span>
+                <ChevronDown className="h-3.5 w-3.5 ml-1 flex-shrink-0 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              {playlists.map(pl => (
+                <DropdownMenuItem
+                  key={pl.id}
+                  className="flex items-center justify-between"
+                  onClick={() => onSelect(pl.id)}
+                >
+                  <span className="truncate">{pl.name}</span>
+                  {pl.id === activePlaylistId && (
+                    <Check className="h-3.5 w-3.5 text-primary ml-2 flex-shrink-0" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+              {playlists.length === 0 && (
+                <DropdownMenuItem disabled>No playlists yet</DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setIsCreating(true)}>
+                <Plus className="h-3.5 w-3.5 mr-2" />
+                New Playlist
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {activePlaylist && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 flex-shrink-0"
+                onClick={() => {
+                  setEditingId(activePlaylist.id);
+                  setEditName(activePlaylist.name);
+                }}
+                title="Rename playlist"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 flex-shrink-0 text-destructive hover:text-destructive"
+                onClick={() => onDelete(activePlaylist.id)}
+                title="Delete playlist"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </>
+          )}
+
+          {!activePlaylist && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 flex-shrink-0"
+              onClick={() => setIsCreating(true)}
+            >
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              New
+            </Button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 export function PlaylistPanel() {
   const {
     items,
@@ -170,6 +338,12 @@ export function PlaylistPanel() {
     isPlaying,
     setIsPlaying,
     reorderItems,
+    playlists,
+    activePlaylistId,
+    selectPlaylist,
+    createPlaylist,
+    renamePlaylist,
+    deletePlaylist,
   } = usePlaylist();
 
   const [audioLoading, setAudioLoading] = useState(false);
@@ -202,7 +376,6 @@ export function PlaylistPanel() {
 
     const onEnded = () => {
       notifyTTSStopped();
-      // Auto-advance
       if (currentIndex !== null && currentIndex < items.length - 1) {
         playItem(currentIndex + 1);
       } else {
@@ -273,7 +446,6 @@ export function PlaylistPanel() {
         if (genType === "chapter-commentary" || genType === "verse-commentary") {
           const voiceMode = meta.voiceStyle || "epic";
           
-          // First check database cache for existing audio
           const { data: cached } = await supabase
             .from("chapter_commentary_cache")
             .select("audio_storage_path")
@@ -318,7 +490,6 @@ export function PlaylistPanel() {
               if (!resp.ok) throw new Error(data.error || "Commentary generation failed");
               url = data.audioUrl || null;
 
-              // If queued/processing, poll the cache table
               if (!url && (data.status === "queued" || data.status === "ready")) {
                 toast.info("Audio is being prepared...");
                 for (let i = 0; i < 30; i++) {
@@ -365,7 +536,6 @@ export function PlaylistPanel() {
             }
           }
         } else if (genType === "aats-training") {
-          // Generate apologetics training audio via TTS with a contextual prompt
           const trainingText = `Apologetics training session: Day ${meta.day} with ${meta.avatarName}. This is an interactive training exercise designed to sharpen your ability to defend biblical truth against common objections.`;
           const { data, error } = await supabase.functions.invoke("text-to-speech", {
             body: { text: trainingText, voice: "nPczCjzI2devNBz1zQrb" },
@@ -374,7 +544,6 @@ export function PlaylistPanel() {
           const blob = new Blob([data], { type: "audio/mpeg" });
           url = URL.createObjectURL(blob);
         } else if (meta.text) {
-          // Fallback: raw text TTS
           const { data, error } = await supabase.functions.invoke("text-to-speech", {
             body: { text: meta.text.substring(0, 12000), voice: meta.voice || "nPczCjzI2devNBz1zQrb" },
           });
@@ -451,6 +620,7 @@ export function PlaylistPanel() {
   };
 
   const currentItem = currentIndex !== null ? items[currentIndex] : null;
+  const activePlaylist = playlists.find(p => p.id === activePlaylistId);
 
   return (
     <Sheet>
@@ -459,7 +629,7 @@ export function PlaylistPanel() {
           variant="ghost"
           size="icon"
           className="relative"
-          title="My Playlist"
+          title="My Playlists"
         >
           <ListMusic className="h-5 w-5" />
           {count > 0 && (
@@ -476,12 +646,22 @@ export function PlaylistPanel() {
         <SheetHeader className="p-4 pb-2 border-b">
           <SheetTitle className="flex items-center gap-2">
             <ListMusic className="h-5 w-5 text-primary" />
-            My Playlist
+            My Playlists
             <Badge variant="outline" className="ml-auto text-xs">
               {count}/{maxItems}
             </Badge>
           </SheetTitle>
         </SheetHeader>
+
+        {/* Playlist Selector */}
+        <PlaylistSelector
+          playlists={playlists}
+          activePlaylistId={activePlaylistId}
+          onSelect={selectPlaylist}
+          onCreate={createPlaylist}
+          onRename={renamePlaylist}
+          onDelete={deletePlaylist}
+        />
 
         {/* Now-Playing Bar */}
         {currentItem && (
@@ -520,7 +700,21 @@ export function PlaylistPanel() {
 
         {/* Playlist Items */}
         <ScrollArea className="flex-1">
-          {loading ? (
+          {!activePlaylistId && playlists.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center gap-3">
+              <ListMusic className="h-12 w-12 text-muted-foreground/30" />
+              <div>
+                <p className="font-medium text-muted-foreground">No playlists yet</p>
+                <p className="text-sm text-muted-foreground/60 mt-1">
+                  Create your first playlist to start organizing your audio content.
+                </p>
+              </div>
+              <Button size="sm" onClick={() => createPlaylist("My Playlist")} className="gap-1 mt-2">
+                <Plus className="h-3.5 w-3.5" />
+                Create Playlist
+              </Button>
+            </div>
+          ) : loading ? (
             <div className="flex items-center justify-center p-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
@@ -528,7 +722,9 @@ export function PlaylistPanel() {
             <div className="flex flex-col items-center justify-center p-8 text-center gap-3">
               <ListMusic className="h-12 w-12 text-muted-foreground/30" />
               <div>
-                <p className="font-medium text-muted-foreground">Your playlist is empty</p>
+                <p className="font-medium text-muted-foreground">
+                  {activePlaylist ? `"${activePlaylist.name}" is empty` : "Your playlist is empty"}
+                </p>
                 <p className="text-sm text-muted-foreground/60 mt-1">
                   Add commentaries, audio tours, or training sessions using the
                   <ListMusic className="h-3.5 w-3.5 inline mx-1" />
