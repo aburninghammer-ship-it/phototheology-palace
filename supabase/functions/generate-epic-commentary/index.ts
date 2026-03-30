@@ -25,6 +25,16 @@ const VOICE_IDS: Record<string, string> = {
   kids: "pFZP5JQG7iQjIQuC4Bku",      // Lily - Young bright expressive voice
 };
 
+const ALLOWED_COMMENTARY_MODES = new Set([
+  "epic",
+  "urban",
+  "ancient",
+  "preacher",
+  "scholar",
+  "counselor",
+  "kids",
+]);
+
 // Keep backward-compat constant for existing code paths
 const EPIC_ELEVENLABS_VOICE_ID = VOICE_IDS.epic;
 
@@ -1848,7 +1858,8 @@ serve(async (req) => {
   try {
     const { book, chapter, regenerate, scope, customInstructions, mode: requestMode, storyTitle } = await req.json();
     const effectiveScope = scope || "chapter";
-    const mode = requestMode || "epic";
+    const normalizedMode = typeof requestMode === "string" ? requestMode.trim().toLowerCase() : "epic";
+    const mode = ALLOWED_COMMENTARY_MODES.has(normalizedMode) ? normalizedMode : "epic";
     const isStoryScope = effectiveScope === "story";
 
     if (!isStoryScope && (!book || (effectiveScope === "chapter" && !chapter))) {
@@ -1867,6 +1878,9 @@ serve(async (req) => {
     const storySlug = isStoryScope ? storyTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").substring(0, 60) : null;
 
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    const expectedModeVoiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
+    const expectedVoiceLabel = ELEVENLABS_API_KEY ? `elevenlabs:${expectedModeVoiceId}` : "onyx";
 
     // Check if already exists and ready (unless regenerate requested)
     if (!regenerate) {
@@ -1887,6 +1901,20 @@ serve(async (req) => {
       const { data: existing } = await existingQuery.maybeSingle();
 
       if (existing) {
+        const hasWrongKidsVoice =
+          mode === "kids" &&
+          existing.voice_id !== `elevenlabs:${VOICE_IDS.kids}`;
+
+        const hasWrongKidsPath =
+          mode === "kids" &&
+          typeof existing.audio_storage_path === "string" &&
+          !existing.audio_storage_path.startsWith("kids/");
+
+        if (hasWrongKidsVoice || hasWrongKidsPath) {
+          console.warn(
+            `[EpicCommentary] Kids cache mismatch for ${effectiveBook} ${effectiveChapter}. Regenerating. Existing voice=${existing.voice_id}, path=${existing.audio_storage_path}`,
+          );
+        } else {
         // Build audio URL if audio exists
         let audioUrl = null;
         if (existing.audio_storage_path) {
@@ -1899,12 +1927,13 @@ serve(async (req) => {
           JSON.stringify({ status: "already_exists", id: existing.id, audioUrl, text: existing.commentary_text }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
+        }
       }
     }
 
     // Voice label for record
-    const modeVoiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
-    const voiceIdLabel = ELEVENLABS_API_KEY ? `elevenlabs:${modeVoiceId}` : "onyx";
+    const modeVoiceId = expectedModeVoiceId;
+    const voiceIdLabel = expectedVoiceLabel;
 
     // Upsert — for stories, use storyTitle as the "book" field and -1 as chapter
     const upsertBook = isStoryScope ? storyTitle : effectiveBook;
@@ -1975,6 +2004,7 @@ serve(async (req) => {
         audio_storage_path: storagePath,
         audio_duration_ms: durationMs,
         audio_file_size_bytes: fileSizeBytes,
+        voice_id: voiceIdLabel,
       })
       .eq("id", record.id);
 
