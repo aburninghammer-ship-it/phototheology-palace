@@ -714,12 +714,10 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
               </p>
 
               <div className="flex items-center gap-1 flex-shrink-0">
-                {prompt.actionLink && (
-                  <Button asChild size="sm" variant="ghost" className="text-[11px] h-6 px-2 hover:bg-background/50">
-                    <Link to={prompt.actionLink} onClick={(e) => e.stopPropagation()}>
-                      {prompt.actionLabel}
-                      <ChevronRight className="h-3 w-3 ml-0.5" />
-                    </Link>
+                {prompt.actionLabel && (
+                  <Button size="sm" variant="ghost" className="text-[11px] h-6 px-2 hover:bg-background/50">
+                    {prompt.actionLabel}
+                    <ChevronRight className="h-3 w-3 ml-0.5" />
                   </Button>
                 )}
                 <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); shuffle(); }} title="Shuffle">
