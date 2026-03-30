@@ -16,6 +16,7 @@ import {
   Compass,
   Swords,
   Headphones,
+  Maximize2,
   Search,
   ListPlus,
   Check,
