@@ -442,6 +442,153 @@ export function PlaylistPanel() {
     };
   }, [isPlaying]);
 
+  const resolveAudioUrl = useCallback(async (item: PlaylistItem): Promise<string | null> => {
+    let url = item.audio_url ?? null;
+
+    // Handle structured audio_meta types
+    if (!url && item.audio_meta) {
+      const meta = item.audio_meta as Record<string, any>;
+      const genType = meta.generationType;
+
+      if (genType === "chapter-commentary" || genType === "verse-commentary") {
+        const voiceMode = meta.voiceStyle || "epic";
+
+        const { data: cached } = await supabase
+          .from("chapter_commentary_cache")
+          .select("audio_storage_path")
+          .eq("book", meta.book)
+          .eq("chapter", meta.chapter)
+          .eq("voice_id", voiceMode)
+          .maybeSingle();
+
+        if (cached?.audio_storage_path) {
+          const { data: signed } = await supabase.storage
+            .from("audio-cache")
+            .createSignedUrl(cached.audio_storage_path, 3600);
+          if (signed?.signedUrl) {
+            url = signed.signedUrl;
+          }
+        }
+
+        if (!url) {
+          toast.info("Generating commentary audio — this may take a moment...");
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 120000);
+
+          try {
+            const resp = await fetch(
+              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-epic-commentary`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+                },
+                body: JSON.stringify({
+                  book: meta.book,
+                  chapter: meta.chapter,
+                  mode: voiceMode,
+                }),
+                signal: controller.signal,
+              }
+            );
+            clearTimeout(timeout);
+            const data = await resp.json();
+            if (!resp.ok) throw new Error(data.error || "Commentary generation failed");
+            url = data.audioUrl || null;
+
+            if (!url && (data.status === "queued" || data.status === "ready")) {
+              toast.info("Audio is being prepared...");
+              for (let i = 0; i < 30; i++) {
+                await new Promise(r => setTimeout(r, 4000));
+                const { data: poll } = await supabase
+                  .from("chapter_commentary_cache")
+                  .select("audio_storage_path")
+                  .eq("book", meta.book)
+                  .eq("chapter", meta.chapter)
+                  .eq("voice_id", voiceMode)
+                  .maybeSingle();
+                if (poll?.audio_storage_path) {
+                  const { data: s } = await supabase.storage
+                    .from("audio-cache")
+                    .createSignedUrl(poll.audio_storage_path, 3600);
+                  if (s?.signedUrl) {
+                    url = s.signedUrl;
+                    break;
+                  }
+                }
+              }
+            }
+          } catch (e: any) {
+            clearTimeout(timeout);
+            if (e.name === "AbortError") {
+              toast.info("Still generating... checking for result");
+              for (let i = 0; i < 15; i++) {
+                await new Promise(r => setTimeout(r, 5000));
+                const { data: poll } = await supabase
+                  .from("chapter_commentary_cache")
+                  .select("audio_storage_path")
+                  .eq("book", meta.book)
+                  .eq("chapter", meta.chapter)
+                  .eq("voice_id", voiceMode)
+                  .maybeSingle();
+                if (poll?.audio_storage_path) {
+                  const { data: s } = await supabase.storage
+                    .from("audio-cache")
+                    .createSignedUrl(poll.audio_storage_path, 3600);
+                  if (s?.signedUrl) {
+                    url = s.signedUrl;
+                    break;
+                  }
+                }
+              }
+              if (!url) throw new Error("Commentary generation timed out. Try again later.");
+            } else {
+              throw e;
+            }
+          }
+        }
+      } else if (genType === "aats-training") {
+        const trainingText = `Apologetics training session: Day ${meta.day} with ${meta.avatarName}. This is an interactive training exercise designed to sharpen your ability to defend biblical truth against common objections.`;
+        const { data, error } = await supabase.functions.invoke("text-to-speech", {
+          body: { text: trainingText, voice: "nPczCjzI2devNBz1zQrb" },
+        });
+        if (error || !data) throw new Error("TTS generation failed");
+        const blob = new Blob([data], { type: "audio/mpeg" });
+        url = URL.createObjectURL(blob);
+      } else if (meta.text) {
+        const { data, error } = await supabase.functions.invoke("text-to-speech", {
+          body: { text: meta.text.substring(0, 12000), voice: meta.voice || "nPczCjzI2devNBz1zQrb" },
+        });
+        if (error || !data) throw new Error("TTS generation failed");
+        const blob = new Blob([data], { type: "audio/mpeg" });
+        url = URL.createObjectURL(blob);
+      }
+    }
+
+    return url;
+  }, []);
+
+  const buildImmersiveQueue = useCallback((): ImmersiveTrack[] => {
+    return items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: item.description || undefined,
+      type: (item.audio_type as ImmersiveTrack["type"]) || "commentary",
+      displayText: (item.audio_meta as Record<string, any> | null)?.text,
+      audioUrl: item.audio_url || undefined,
+      generateAudio: item.audio_url ? undefined : () => resolveAudioUrl(item),
+    }));
+  }, [items, resolveAudioUrl]);
+
+  const openPlaylistImmersive = useCallback((startIndex: number) => {
+    if (items.length === 0) {
+      toast.error("Playlist is empty");
+      return;
+    }
+    immersive.openImmersive(buildImmersiveQueue(), Math.max(0, Math.min(startIndex, items.length - 1)));
+  }, [buildImmersiveQueue, immersive, items.length]);
+
   const playItem = useCallback(async (index: number) => {
     const item = items[index];
     if (!item) return;
@@ -454,122 +601,7 @@ export function PlaylistPanel() {
     if (!audio) return;
 
     try {
-      let url = item.audio_url;
-
-      // Handle structured audio_meta types
-      if (!url && item.audio_meta) {
-        const meta = item.audio_meta as Record<string, any>;
-        const genType = meta.generationType;
-
-        if (genType === "chapter-commentary" || genType === "verse-commentary") {
-          const voiceMode = meta.voiceStyle || "epic";
-          
-          const { data: cached } = await supabase
-            .from("chapter_commentary_cache")
-            .select("audio_storage_path")
-            .eq("book", meta.book)
-            .eq("chapter", meta.chapter)
-            .eq("voice_id", voiceMode)
-            .maybeSingle();
-
-          if (cached?.audio_storage_path) {
-            const { data: signed } = await supabase.storage
-              .from("audio-cache")
-              .createSignedUrl(cached.audio_storage_path, 3600);
-            if (signed?.signedUrl) {
-              url = signed.signedUrl;
-            }
-          }
-
-          if (!url) {
-            toast.info("Generating commentary audio — this may take a moment...");
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 120000);
-
-            try {
-              const resp = await fetch(
-                `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-epic-commentary`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-                  },
-                  body: JSON.stringify({
-                    book: meta.book,
-                    chapter: meta.chapter,
-                    mode: voiceMode,
-                  }),
-                  signal: controller.signal,
-                }
-              );
-              clearTimeout(timeout);
-              const data = await resp.json();
-              if (!resp.ok) throw new Error(data.error || "Commentary generation failed");
-              url = data.audioUrl || null;
-
-              if (!url && (data.status === "queued" || data.status === "ready")) {
-                toast.info("Audio is being prepared...");
-                for (let i = 0; i < 30; i++) {
-                  await new Promise(r => setTimeout(r, 4000));
-                  const { data: poll } = await supabase
-                    .from("chapter_commentary_cache")
-                    .select("audio_storage_path")
-                    .eq("book", meta.book)
-                    .eq("chapter", meta.chapter)
-                    .eq("voice_id", voiceMode)
-                    .maybeSingle();
-                  if (poll?.audio_storage_path) {
-                    const { data: s } = await supabase.storage
-                      .from("audio-cache")
-                      .createSignedUrl(poll.audio_storage_path, 3600);
-                    if (s?.signedUrl) { url = s.signedUrl; break; }
-                  }
-                }
-              }
-            } catch (e: any) {
-              clearTimeout(timeout);
-              if (e.name === "AbortError") {
-                toast.info("Still generating... checking for result");
-                for (let i = 0; i < 15; i++) {
-                  await new Promise(r => setTimeout(r, 5000));
-                  const { data: poll } = await supabase
-                    .from("chapter_commentary_cache")
-                    .select("audio_storage_path")
-                    .eq("book", meta.book)
-                    .eq("chapter", meta.chapter)
-                    .eq("voice_id", voiceMode)
-                    .maybeSingle();
-                  if (poll?.audio_storage_path) {
-                    const { data: s } = await supabase.storage
-                      .from("audio-cache")
-                      .createSignedUrl(poll.audio_storage_path, 3600);
-                    if (s?.signedUrl) { url = s.signedUrl; break; }
-                  }
-                }
-                if (!url) throw new Error("Commentary generation timed out. Try again later.");
-              } else {
-                throw e;
-              }
-            }
-          }
-        } else if (genType === "aats-training") {
-          const trainingText = `Apologetics training session: Day ${meta.day} with ${meta.avatarName}. This is an interactive training exercise designed to sharpen your ability to defend biblical truth against common objections.`;
-          const { data, error } = await supabase.functions.invoke("text-to-speech", {
-            body: { text: trainingText, voice: "nPczCjzI2devNBz1zQrb" },
-          });
-          if (error || !data) throw new Error("TTS generation failed");
-          const blob = new Blob([data], { type: "audio/mpeg" });
-          url = URL.createObjectURL(blob);
-        } else if (meta.text) {
-          const { data, error } = await supabase.functions.invoke("text-to-speech", {
-            body: { text: meta.text.substring(0, 12000), voice: meta.voice || "nPczCjzI2devNBz1zQrb" },
-          });
-          if (error || !data) throw new Error("TTS generation failed");
-          const blob = new Blob([data], { type: "audio/mpeg" });
-          url = URL.createObjectURL(blob);
-        }
-      }
+      const url = await resolveAudioUrl(item);
 
       if (!url) {
         toast.error("No audio available for this item");
@@ -587,7 +619,7 @@ export function PlaylistPanel() {
       setAudioLoading(false);
       toast.error("Playback failed — try again in a moment");
     }
-  }, [items, setCurrentIndex, setIsPlaying]);
+  }, [items, resolveAudioUrl, setCurrentIndex, setIsPlaying]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
