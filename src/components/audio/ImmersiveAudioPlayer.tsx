@@ -219,11 +219,16 @@ export function ImmersiveAudioPlayer({
     // Pulse effect based on time
     setPulseIntensity(Math.sin(Date.now() / 2000) * 0.3 + 0.7);
     
-    // Map time to verse
+    // Map time to verse + compute word-level progress within verse
     if (verses.length > 0 && audio.duration > 0) {
       const verseLen = audio.duration / verses.length;
       const idx = Math.min(Math.floor(audio.currentTime / verseLen), verses.length - 1);
       setActiveVerseIndex(idx);
+      
+      // Progress within current verse (0-1) for karaoke word sync
+      const verseStart = idx * verseLen;
+      const progressInVerse = (audio.currentTime - verseStart) / verseLen;
+      setVerseProgress(Math.max(0, Math.min(1, progressInVerse)));
     }
     
     rafRef.current = requestAnimationFrame(updateTime);
