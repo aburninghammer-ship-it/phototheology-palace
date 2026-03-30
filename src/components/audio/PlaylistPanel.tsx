@@ -800,16 +800,7 @@ export function PlaylistPanel() {
                       isPlaying={isPlaying}
                       onPlay={() => playItem(idx)}
                       onRemove={() => handleRemove(item.id)}
-                      onImmerse={() => {
-                        const track: ImmersiveTrack = {
-                          id: item.id,
-                          title: item.title,
-                          subtitle: item.description || undefined,
-                          type: (item.audio_type as ImmersiveTrack["type"]) || "commentary",
-                          displayText: (item.audio_meta as any)?.text,
-                        };
-                        immersive.openImmersive([track]);
-                      }}
+                      onImmerse={() => openPlaylistImmersive(idx)}
                     />
                   ))}
                 </div>
