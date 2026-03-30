@@ -280,6 +280,19 @@ export default function PhototheologyCourse() {
                       </div>
                     </CardHeader>
                     <CardContent>
+                      {!dayUnlocked ? (
+                        <div className="text-center py-16 space-y-4">
+                          <div className="p-4 rounded-full bg-muted w-fit mx-auto">
+                            <Lock className="h-10 w-10 text-muted-foreground" />
+                          </div>
+                          <h3 className="text-lg font-semibold">This Day is Locked</h3>
+                          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                            Day {selectedDayData.day} unlocks in {selectedDayData.day - getUnlockedDay()} day{selectedDayData.day - getUnlockedDay() !== 1 ? 's' : ''}.
+                            The Phototheology Course is designed to be completed over 90 real days — one day at a time, building depth through patience.
+                          </p>
+                          <p className="text-xs text-muted-foreground italic">"Line upon line, precept upon precept" — Isaiah 28:10</p>
+                        </div>
+                      ) : (
                       <ScrollArea className="h-[550px] pr-4">
                         <div className="space-y-5">
                           {/* Focus */}
