@@ -110,6 +110,7 @@ export const AATS_AVATAR_IDS = [
   "internet-skeptic",
   "agnostic",
   "pentecostal",
+  "anti-trinitarian",
 ] as const;
 
 export type AATSAvatarId = (typeof AATS_AVATAR_IDS)[number];

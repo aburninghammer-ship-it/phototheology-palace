@@ -1400,6 +1400,28 @@ export const DEFENSE_TOPICS: DefenseTopic[] = [
       "The Agnostic argues FOR: Faith is belief without sufficient evidence — a truly rational person proportions belief to evidence, and the evidence for Christianity is insufficient for certainty",
     isSignature: true,
   },
+  // ── Anti-Trinitarian Signature Topics ────────────────────────
+  {
+    id: "anti-trinity-pioneer",
+    name: "Pioneer Anti-Trinitarianism",
+    description:
+      "Elder Arius argues FOR: Early Adventist pioneers (James White, Joseph Bates, Uriah Smith) rejected the Trinity — the modern SDA adoption is apostasy from the founders' biblical position",
+    isSignature: true,
+  },
+  {
+    id: "anti-trinity-rome",
+    name: "Trinity as Roman Import",
+    description:
+      "Elder Arius argues FOR: The Trinity doctrine was formalized at the Council of Nicaea under Constantine — it is a Catholic/pagan invention imposed on Christianity through political power",
+    isSignature: true,
+  },
+  {
+    id: "anti-trinity-begotten",
+    name: "Christ as Literally Begotten",
+    description:
+      "Elder Arius argues FOR: 'Only begotten Son' means Jesus had a literal beginning — He was brought forth by the Father before creation and is therefore subordinate, not co-eternal",
+    isSignature: true,
+  },
 ];
 
 export const DIFFICULTY_LEVELS: DifficultyLevel[] = [
