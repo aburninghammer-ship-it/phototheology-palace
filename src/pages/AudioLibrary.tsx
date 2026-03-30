@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
+import { useImmersiveMode, type ImmersiveTrack } from "@/hooks/useImmersiveMode";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -14,6 +16,7 @@ import {
   Compass,
   Swords,
   Headphones,
+  Maximize2,
   Search,
   ListPlus,
   Check,
@@ -469,6 +472,18 @@ export default function AudioLibrary() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const immersive = useImmersiveMode();
+
+  const handleImmerse = (item: AudioEntry) => {
+    const track: ImmersiveTrack = {
+      id: item.id,
+      title: item.title,
+      subtitle: item.description,
+      type: item.category as ImmersiveTrack["type"],
+      displayText: item.audioMeta?.text,
+    };
+    immersive.openImmersive([track]);
+  };
 
   const filtered = useMemo(() => {
     return AUDIO_CATALOG.filter((item) => {
@@ -612,6 +627,15 @@ export default function AudioLibrary() {
                               size="sm"
                               className="h-7 text-xs"
                             />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs gap-1 text-amber-400 hover:bg-amber-500/10"
+                              onClick={() => handleImmerse(item)}
+                            >
+                              <Maximize2 className="h-3 w-3" />
+                              Immerse
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -636,6 +660,23 @@ export default function AudioLibrary() {
       </div>
 
       <Footer />
+
+      <ImmersiveAudioPlayer
+        isOpen={immersive.isOpen}
+        onClose={immersive.closeImmersive}
+        tracks={immersive.queue.tracks}
+        currentIndex={immersive.queue.currentIndex}
+        onNextTrack={immersive.nextTrack}
+        onPrevTrack={immersive.prevTrack}
+        hasNext={immersive.hasNext}
+        hasPrev={immersive.hasPrev}
+        ambientMusicEnabled={immersive.ambientMusicEnabled}
+        ambientVolume={immersive.ambientVolume}
+        continuousPlay={immersive.continuousPlay}
+        onSetAmbientMusic={immersive.setAmbientMusic}
+        onSetAmbientVolume={immersive.setAmbientVolume}
+        onSetContinuousPlay={immersive.setContinuousPlay}
+      />
     </div>
   );
 }

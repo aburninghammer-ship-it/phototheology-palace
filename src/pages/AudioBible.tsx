@@ -51,7 +51,8 @@ import { useFreeTier } from "@/hooks/useFreeTier";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { ExportEpicAudioDialog } from "@/components/audio/ExportEpicAudioDialog";
-import { ImmersiveCommentaryView } from "@/components/audio/ImmersiveCommentaryView";
+import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
+import { useImmersiveMode, type ImmersiveTrack } from "@/hooks/useImmersiveMode";
 import { Maximize2, Music } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { requestMusicForCommentary, getAutoMusicEnabled, setAutoMusicEnabled, subscribeToAutoMusicToggle } from "@/hooks/useCommentaryMusicSync";
@@ -188,7 +189,7 @@ export default function AudioBible() {
   const [endVerse, setEndVerse] = useState<number | null>(null);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [storyCategory, setStoryCategory] = useState("all");
-  const [showImmersiveView, setShowImmersiveView] = useState(false);
+  const immersive = useImmersiveMode();
 
   // Custom playlist add mode state
   const [customAddMode, setCustomAddMode] = useState<"single" | "chapter-range" | "book-range">("single");
@@ -1141,11 +1142,24 @@ export default function AudioBible() {
                           variant="outline"
                           size="lg"
                           className="border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
-                          onClick={() => setShowImmersiveView(true)}
+                          onClick={() => {
+                            const track: ImmersiveTrack = {
+                              id: `${epicNowPlayingBook}-${epicNowPlayingChapter}-${epicMode}`,
+                              title: `${epicNowPlayingBook || selectedBook} ${epicNowPlayingChapter || selectedChapter}`,
+                              subtitle: `${activeModeMeta.label} Commentary`,
+                              type: "commentary",
+                              audioUrl: epicAudioUrl,
+                              book: epicNowPlayingBook || selectedBook,
+                              chapter: epicNowPlayingChapter || selectedChapter,
+                              modeName: activeModeMeta.label,
+                              icon: "📖",
+                            };
+                            immersive.openImmersive([track]);
+                          }}
                           disabled={!epicAudioUrl}
                         >
                           <Maximize2 className="h-5 w-5 mr-2" />
-                          Immersive
+                          Immerse
                         </Button>
                       )}
                     </div>
@@ -2370,28 +2384,21 @@ export default function AudioBible() {
         queue={epicQueueRef.current.map((q) => ({ book: q.book, chapter: q.chapter }))}
         modeName={activeModeMeta.label}
       />
-      <ImmersiveCommentaryView
-        isOpen={showImmersiveView}
-        onClose={() => setShowImmersiveView(false)}
-        book={epicNowPlayingBook || selectedBook}
-        chapter={epicNowPlayingChapter || selectedChapter}
-        audioRef={epicAudioRef}
-        isPlaying={isEpicPlaying}
-        isPaused={isEpicPaused}
-        modeName={activeModeMeta.label}
-        onTogglePlayPause={() => {
-          if (epicAudioRef.current) {
-            if (isEpicPaused) {
-              epicAudioRef.current.play();
-              setIsEpicPaused(false);
-              setIsEpicPlaying(true);
-            } else {
-              epicAudioRef.current.pause();
-              setIsEpicPaused(true);
-              setIsEpicPlaying(false);
-            }
-          }
-        }}
+      <ImmersiveAudioPlayer
+        isOpen={immersive.isOpen}
+        onClose={immersive.closeImmersive}
+        tracks={immersive.queue.tracks}
+        currentIndex={immersive.queue.currentIndex}
+        onNextTrack={immersive.nextTrack}
+        onPrevTrack={immersive.prevTrack}
+        hasNext={immersive.hasNext}
+        hasPrev={immersive.hasPrev}
+        ambientMusicEnabled={immersive.ambientMusicEnabled}
+        ambientVolume={immersive.ambientVolume}
+        continuousPlay={immersive.continuousPlay}
+        onSetAmbientMusic={immersive.setAmbientMusic}
+        onSetAmbientVolume={immersive.setAmbientVolume}
+        onSetContinuousPlay={immersive.setContinuousPlay}
       />
     </div>
   );
