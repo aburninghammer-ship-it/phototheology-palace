@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { AddToPlaylistButton } from "@/components/audio/AddToPlaylistButton";
 import { PlaylistPanel } from "@/components/audio/PlaylistPanel";
+import { AudioContentBuilder } from "@/components/audio/AudioContentBuilder";
 
 // ── Audio Content Catalog ───────────────────────────────────────────────────
 
@@ -513,6 +514,9 @@ export default function AudioLibrary() {
             <PlaylistPanel />
           </div>
         </div>
+
+        {/* Dynamic Builders */}
+        <AudioContentBuilder />
 
         {/* Search */}
         <div className="relative mb-6 max-w-md mx-auto">
