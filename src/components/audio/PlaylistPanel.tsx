@@ -522,52 +522,27 @@ export function PlaylistPanel() {
               </div>
             </div>
           ) : (
-            <div className="p-2 space-y-1">
-              {items.map((item, idx) => {
-                const isCurrent = currentIndex === idx;
-                return (
-                  <div
-                    key={item.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                      isCurrent
-                        ? "bg-primary/10 border border-primary/30"
-                        : "hover:bg-muted/50"
-                    }`}
-                    onClick={() => playItem(idx)}
-                  >
-                    <div className={`flex-shrink-0 ${isCurrent ? "text-primary" : "text-muted-foreground"}`}>
-                      {isCurrent && isPlaying ? (
-                        <Volume2 className="h-4 w-4 animate-pulse" />
-                      ) : (
-                        getTypeIcon(item.audio_type)
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium truncate ${isCurrent ? "text-primary" : ""}`}>
-                        {item.title}
-                      </p>
-                      {item.description && (
-                        <p className="text-xs text-muted-foreground truncate">{item.description}</p>
-                      )}
-                      <Badge variant="outline" className="mt-1 text-[10px] px-1.5 py-0">
-                        {getTypeLabel(item.audio_type)}
-                      </Badge>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 flex-shrink-0 text-muted-foreground hover:text-destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemove(item.id);
-                      }}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+                <div className="p-2 space-y-1">
+                  {items.map((item, idx) => (
+                    <SortablePlaylistItem
+                      key={item.id}
+                      item={item}
+                      idx={idx}
+                      isCurrent={currentIndex === idx}
+                      isPlaying={isPlaying}
+                      onPlay={() => playItem(idx)}
+                      onRemove={() => handleRemove(item.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </ScrollArea>
 
