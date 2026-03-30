@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useImmersiveMode, type ImmersiveTrack } from "@/hooks/useImmersiveMode";
+import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
