@@ -127,7 +127,7 @@ export default function PhototheologyCourse() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg">Course Days</CardTitle>
                   <CardDescription className="text-xs">
-                    {ageGroup === 'adult' ? '90-day journey through the Palace' : `Kids version (${ageGroup.replace('ages-', 'Ages ')})`}
+                    90-day journey through the Palace
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
