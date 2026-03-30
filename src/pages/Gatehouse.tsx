@@ -322,7 +322,7 @@ const Gatehouse = () => {
                 textShadow: "0 0 20px rgba(212, 160, 23, 0.3), 0 2px 4px rgba(0,0,0,0.3)",
               }}
             >
-              Phototheology<span className="text-[0.65em] font-semibold tracking-wide px-2 py-0.5 rounded ml-1 align-middle inline-block" style={{ background: "rgba(212, 160, 23, 0.15)", border: "1px solid rgba(212, 160, 23, 0.4)", color: "#d4a017", fontFamily: "'Inter', sans-serif", verticalAlign: "middle", position: "relative", top: "-0.1em" }}>OS</span>: Eden
+              Phototheology<span className="text-[0.65em] font-semibold tracking-wide px-2 py-0.5 rounded ml-1 align-middle inline-block" style={{ background: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.25)", color: "#e8e8e8", fontFamily: "'Inter', sans-serif", verticalAlign: "middle", position: "relative", top: "-0.1em" }}>OS</span>: <span style={{ color: "rgba(180, 220, 255, 0.85)" }}>Eden</span>
             </h1>
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
               {t('gatehouse.theChoiceIsYours')}
