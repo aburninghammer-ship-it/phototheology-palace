@@ -35,6 +35,7 @@ const VOICE_STYLES = [
   { id: "preacher", label: "Preacher", voice: "shimmer", description: "Pulpit-ready conviction" },
   { id: "scholar", label: "Scholar", voice: "echo", description: "Analytical, scholarly depth" },
   { id: "kids", label: "🧒 Kids Adventure", voice: "pFZP5JQG7iQjIQuC4Bku", description: "Wonder-filled for ages 8–12" },
+  { id: "mirror", label: "🪞 Mirror", voice: "SAz9YHcvj6GT2YYXdXww", description: "Personal application — the 'Me' dimension" },
   { id: "verse-by-verse", label: "Verse-by-Verse", voice: "nPczCjzI2devNBz1zQrb", description: "Detailed verse commentary" },
 ];
 

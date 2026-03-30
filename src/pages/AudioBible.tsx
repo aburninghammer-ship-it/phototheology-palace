@@ -53,7 +53,7 @@ import { toast } from "sonner";
 import { ExportEpicAudioDialog } from "@/components/audio/ExportEpicAudioDialog";
 import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
 import { useImmersiveMode, type ImmersiveTrack } from "@/hooks/useImmersiveMode";
-import { Maximize2, Music } from "lucide-react";
+import { Maximize2, Music, Eye } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { requestMusicForCommentary, getAutoMusicEnabled, setAutoMusicEnabled, subscribeToAutoMusicToggle } from "@/hooks/useCommentaryMusicSync";
 
@@ -67,7 +67,7 @@ interface Theme {
   verse_count: number;
 }
 
-type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar" | "counselor" | "kids";
+type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar" | "counselor" | "kids" | "mirror";
 
 const KIDS_VOICE_ID = "elevenlabs:pFZP5JQG7iQjIQuC4Bku";
 
@@ -122,6 +122,7 @@ export default function AudioBible() {
     { id: "scholar" as const, label: "Scholar", subtitle: "Canonical-theological", icon: Layers, color: "emerald" },
     { id: "counselor" as const, label: "Counselor", subtitle: "Soul care", icon: Heart, color: "rose" },
     { id: "kids" as const, label: "Kids", subtitle: "Ages 8-12", icon: Sparkles, color: "cyan" },
+    { id: "mirror" as const, label: "Mirror", subtitle: "Personal application", icon: Eye, color: "indigo" },
   ] as const;
 
   const activeModeMeta = COMMENTARY_MODES.find(m => m.id === epicMode) || COMMENTARY_MODES[3];
