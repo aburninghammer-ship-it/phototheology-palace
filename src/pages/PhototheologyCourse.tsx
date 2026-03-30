@@ -6,35 +6,25 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Book, CheckCircle2, Circle, BookOpen, Sparkles, Users, ExternalLink, ChevronDown, ChevronRight, Flame, Trophy, GraduationCap } from "lucide-react";
+import { Book, CheckCircle2, Circle, BookOpen, Sparkles, ExternalLink, ChevronDown, ChevronRight, Flame, Trophy, GraduationCap } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
-import { phototheologyCourse, kidsPhototheologyCourse, FLOOR_META } from "@/data/phototheologyCourseData";
+import { phototheologyCourse, FLOOR_META } from "@/data/phototheologyCourseData";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-type AgeGroup = 'adult' | 'ages-6-8' | 'ages-9-12' | 'ages-13-15';
-
 export default function PhototheologyCourse() {
   const { completedDays, reflections, loading, toggleDay, saveReflection } = useCourseProgress("phototheology");
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('adult');
   const [expandedWeeks, setExpandedWeeks] = useState<number[]>([1]);
   const [reflectionDraft, setReflectionDraft] = useState("");
 
-  const currentCourse = useMemo(() =>
-    ageGroup === 'adult'
-      ? phototheologyCourse
-      : kidsPhototheologyCourse.filter(day => day.ageGroup === ageGroup),
-    [ageGroup]
-  );
+  const currentCourse = phototheologyCourse;
 
   const selectedDayData = useMemo(() => {
     if (!selectedDay) return null;
-    return ageGroup === 'adult'
-      ? phototheologyCourse.find(d => d.day === selectedDay)
-      : kidsPhototheologyCourse.find(d => d.day === selectedDay && d.ageGroup === ageGroup);
-  }, [selectedDay, ageGroup]);
+    return phototheologyCourse.find(d => d.day === selectedDay);
+  }, [selectedDay]);
 
   const weeks = useMemo(() => Array.from(new Set(currentCourse.map(d => d.week))), [currentCourse]);
   const completionPct = currentCourse.length > 0 ? Math.round((completedDays.filter(d => currentCourse.some(c => c.day === d)).length / currentCourse.length) * 100) : 0;
@@ -54,9 +44,7 @@ export default function PhototheologyCourse() {
 
   const handleSelectDay = (day: number) => {
     setSelectedDay(day);
-    const data = ageGroup === 'adult'
-      ? phototheologyCourse.find(d => d.day === day)
-      : kidsPhototheologyCourse.find(d => d.day === day && d.ageGroup === ageGroup);
+    const data = phototheologyCourse.find(d => d.day === day);
     if (data) setReflectionDraft(reflections[day] || "");
   };
 
@@ -112,26 +100,6 @@ export default function PhototheologyCourse() {
             </div>
           </div>
 
-          {/* Age Group Selector */}
-          <div className="flex justify-center gap-2 mb-6 flex-wrap">
-            {([
-              { key: 'adult' as AgeGroup, label: 'Adult', icon: BookOpen },
-              { key: 'ages-6-8' as AgeGroup, label: 'Ages 6–8', icon: Users },
-              { key: 'ages-9-12' as AgeGroup, label: 'Ages 9–12', icon: Users },
-              { key: 'ages-13-15' as AgeGroup, label: 'Ages 13–15', icon: Users },
-            ]).map(({ key, label, icon: Icon }) => (
-              <Button
-                key={key}
-                variant={ageGroup === key ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => { setAgeGroup(key); setSelectedDay(null); }}
-                className="gap-1.5"
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {label}
-              </Button>
-            ))}
-          </div>
 
           {/* Floor Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
@@ -159,7 +127,7 @@ export default function PhototheologyCourse() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg">Course Days</CardTitle>
                   <CardDescription className="text-xs">
-                    {ageGroup === 'adult' ? '90-day journey through the Palace' : `Kids version (${ageGroup.replace('ages-', 'Ages ')})`}
+                    90-day journey through the Palace
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
