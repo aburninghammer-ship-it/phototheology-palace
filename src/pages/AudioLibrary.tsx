@@ -140,14 +140,14 @@ const AUDIO_CATALOG: AudioEntry[] = [
   },
   {
     id: "suite-urban-romans8",
-    title: "Urban Preacher — Romans 8: More Than Conquerors",
+    title: "Modern Preacher — Romans 8: More Than Conquerors",
     description: "Jessica brings raw, real-talk energy to Paul's most triumphant chapter. Feel it in your bones.",
     category: "commentary",
     duration: "8 min",
     icon: <Crown className="h-5 w-5" />,
     gradient: "from-fuchsia-600 to-pink-500",
     audioMeta: { text: "Alright, let's talk about Romans 8 — and I need you to hear this like your life depends on it. Because it does. Paul starts with this bomb: There is therefore now NO condemnation to them which are in Christ Jesus. You hear that? No condemnation. Not reduced condemnation. Not sometimes condemnation. NONE. Zero. If you're in Christ, the verdict is in and it's NOT GUILTY. Now watch this — Paul keeps building. If God be for us, who can be against us? He didn't say nobody would come against you. People will. Systems will. Your own mind will. But who can stand against the God who is FOR you? Then he drops the mic: Who shall separate us from the love of Christ? Shall tribulation? Nah. Distress? Nope. Persecution? Try again. Famine? Nakedness? Peril? Sword? NAH. In ALL these things we are MORE than conquerors through Him that loved us. Not barely surviving. Not scraping by. MORE than conquerors. That's your identity. Walk in it.", voice: "cgSgspJ2msm6clMCkdW9" },
-    badge: "Urban Voice",
+    badge: "Modern Voice",
   },
   {
     id: "suite-counselor-psalm42",
