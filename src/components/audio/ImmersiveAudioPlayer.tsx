@@ -101,6 +101,12 @@ export function ImmersiveAudioPlayer({
   // Visual effects
   const [pulseIntensity, setPulseIntensity] = useState(0);
   
+  // Sleep timer
+  const [sleepFadeMultiplier, setSleepFadeMultiplier] = useState(1);
+  
+  // Verse progress (for karaoke word-level sync)
+  const [verseProgress, setVerseProgress] = useState(0);
+  
   // Initialize main audio
   useEffect(() => {
     if (!audioRef.current) {
