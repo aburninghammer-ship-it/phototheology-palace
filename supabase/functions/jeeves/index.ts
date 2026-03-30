@@ -5168,19 +5168,58 @@ Return JSON:
 }`;
     } else if (mode === "culture-controversy") {
       systemPrompt = `You are Jeeves, a biblical scholar analyzing cultural issues through Jesus' teachings.
-Be balanced, compassionate, and grounded in Scripture. Address both sides with grace while maintaining biblical truth.`;
+Be balanced, compassionate, and grounded in Scripture. Address both sides with grace while maintaining biblical truth.
+CRITICAL: You will be provided with real web search results about the topic. You MUST base your "Understanding the Issue" section on these search results — use real facts, real events, and real details from the articles. Do NOT invent or hallucinate any facts about the topic. If the search results don't cover the topic well, say so honestly rather than making things up.`;
+
+      // Search the web for real information about this cultural topic
+      let cultureSearchResults = "";
+      let hasCultureSearch = false;
+      try {
+        const cultureSearchQuery = `${topic} news current events 2025 2026`;
+        console.log(`Culture search: ${cultureSearchQuery}`);
+        const cultureSearchResponse = await fetch('https://api.tavily.com/search', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('TAVILY_API_KEY') || 'tvly-demo-key'}`
+          },
+          body: JSON.stringify({
+            query: cultureSearchQuery,
+            search_depth: 'advanced',
+            include_answer: false,
+            max_results: 8
+          })
+        });
+        
+        if (cultureSearchResponse.ok) {
+          const cultureSearchData = await cultureSearchResponse.json();
+          if (cultureSearchData.results && cultureSearchData.results.length > 0) {
+            cultureSearchResults = cultureSearchData.results
+              .map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nContent: ${r.content}`)
+              .join('\n\n---\n\n');
+            hasCultureSearch = true;
+          }
+        }
+      } catch (e) {
+        console.log('Culture web search unavailable, will use general knowledge');
+      }
+
+      const searchContext = hasCultureSearch 
+        ? `\n\nREAL WEB SEARCH RESULTS (base your factual claims on these):\n${cultureSearchResults}\n\nIMPORTANT: Use the actual facts, names, dates, and events from these search results. Do not make up details.`
+        : `\n\nNote: Web search was unavailable. Be honest about what you know and don't know. Do not invent specific events or details you're unsure about.`;
 
       userPrompt = `Analyze this cultural topic through the lens of Jesus' teachings: "${topic}"
+${searchContext}
 
 Structure your analysis:
-1. Understanding the Issue (2-3 paragraphs explaining the topic objectively)
+1. Understanding the Issue (2-3 paragraphs explaining the topic objectively — USE THE SEARCH RESULTS for real facts)
 2. Jesus' Perspective (4-5 paragraphs examining what Scripture teaches)
 3. Key Biblical Principles (list 3-4 principles with verses)
 4. Balanced Application (2-3 paragraphs on how Christians can engage compassionately)
 5. Common Misconceptions (address 2-3 misunderstandings from both sides)
 6. Moving Forward (practical steps for Christ-centered engagement)
 
-Be scholarly, compassionate, and clear. Cite specific verses.`;
+Be scholarly, compassionate, and clear. Cite specific verses. Ground all factual claims in the search results provided.`;
 
     } else if (mode === "prophecy-signal") {
       const scopeContext = scope === "america"
