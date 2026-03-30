@@ -69,6 +69,8 @@ interface Theme {
 
 type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar" | "counselor" | "kids";
 
+const KIDS_VOICE_ID = "elevenlabs:pFZP5JQG7iQjIQuC4Bku";
+
 interface ChapterSelection {
   book: string;
   chapter: number;
@@ -444,12 +446,22 @@ export default function AudioBible() {
 
       if (error) throw error;
 
-      // If not cached, generate on demand
-      if (!data || !data.audio_storage_path) {
+      const hasWrongKidsVoice = currentMode === "kids" && data?.voice_id !== KIDS_VOICE_ID;
+      const hasWrongKidsPath = currentMode === "kids" && !!data?.audio_storage_path && !data.audio_storage_path.startsWith("kids/");
+
+      // If not cached (or kids cache is mismatched), generate on demand
+      if (!data || !data.audio_storage_path || hasWrongKidsVoice || hasWrongKidsPath) {
+        if (hasWrongKidsVoice || hasWrongKidsPath) {
+          console.warn("[AudioBible] Rejecting stale kids cache; forcing regeneration", {
+            voice_id: data?.voice_id,
+            audio_storage_path: data?.audio_storage_path,
+          });
+        }
+
         toast.info(`Generating ${modeName} commentary for ${book} ${chapter}... This may take a moment.`);
 
         const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
-          body: { book, chapter, mode: currentMode },
+          body: { book, chapter, mode: currentMode, regenerate: hasWrongKidsVoice || hasWrongKidsPath },
         });
 
         if (genResponse.error || genResponse.data?.error) {
