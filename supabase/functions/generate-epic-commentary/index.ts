@@ -1413,6 +1413,7 @@ function getSystemPrompts(mode: string, scope: string): string {
       case "scholar": return SCHOLAR_STORY_SYSTEM_PROMPT;
       case "counselor": return COUNSELOR_STORY_SYSTEM_PROMPT;
       case "kids": return KIDS_STORY_SYSTEM_PROMPT;
+      case "mirror": return MIRROR_STORY_SYSTEM_PROMPT;
       case "epic":
       default: return EPIC_STORY_SYSTEM_PROMPT;
     }
@@ -1424,6 +1425,7 @@ function getSystemPrompts(mode: string, scope: string): string {
       case "scholar": return SCHOLAR_BOOK_SYSTEM_PROMPT;
       case "counselor": return COUNSELOR_BOOK_SYSTEM_PROMPT;
       case "kids": return KIDS_BOOK_SYSTEM_PROMPT;
+      case "mirror": return MIRROR_BOOK_SYSTEM_PROMPT;
       case "epic":
       default: return EPIC_BOOK_SYSTEM_PROMPT;
     }
@@ -1435,6 +1437,7 @@ function getSystemPrompts(mode: string, scope: string): string {
       case "scholar": return SCHOLAR_CHAPTER_SYSTEM_PROMPT;
       case "counselor": return COUNSELOR_CHAPTER_SYSTEM_PROMPT;
       case "kids": return KIDS_CHAPTER_SYSTEM_PROMPT;
+      case "mirror": return MIRROR_CHAPTER_SYSTEM_PROMPT;
       case "epic":
       default: return EPIC_CHAPTER_SYSTEM_PROMPT;
     }
