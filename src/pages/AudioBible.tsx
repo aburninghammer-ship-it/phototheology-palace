@@ -122,6 +122,7 @@ export default function AudioBible() {
     { id: "scholar" as const, label: "Scholar", subtitle: "Canonical-theological", icon: Layers, color: "emerald" },
     { id: "counselor" as const, label: "Counselor", subtitle: "Soul care", icon: Heart, color: "rose" },
     { id: "kids" as const, label: "Kids", subtitle: "Ages 8-12", icon: Sparkles, color: "cyan" },
+    { id: "mirror" as const, label: "Mirror", subtitle: "Personal application", icon: Eye, color: "indigo" },
   ] as const;
 
   const activeModeMeta = COMMENTARY_MODES.find(m => m.id === epicMode) || COMMENTARY_MODES[3];

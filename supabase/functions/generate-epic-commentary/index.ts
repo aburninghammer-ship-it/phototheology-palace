@@ -1565,6 +1565,12 @@ These anchors are non-negotiable. They have been drawn from careful typological 
       chapterDesc: "an exciting chapter of this book for kids ages 8-12 — with vivid imagery, relatable emotions, and stunning Jesus connections. Use 'Picture this...' and 'Imagine you are standing right there...' to pull the listener into the scene. Explain big ideas simply but never shallowly. Every moment should spark wonder.",
       storyDesc: "an amazing story from the Bible for kids ages 8-12 — told with vivid detail, exciting pacing, and deep connections to Jesus and to the listener's own life. Set the stage so the listener can SEE the story in their mind. Make them feel like they are right there. Close with something that sticks in their heart.",
     },
+    mirror: {
+      adj: "Mirror Personal-Application",
+      bookDesc: "a personal application overview of this entire book — asking 'What does this book demand of ME?' Trace the patterns of hiding, compromise, faith, and obedience across the book and hold them up as a mirror to the listener's life. Christ is always the answer. Use invitational language ('you might be,' 'perhaps') — never accusatory. Close with concrete action steps and a haunting final challenge.",
+      chapterDesc: "a personal application commentary on this chapter — asking 'What does this text demand of ME today?' Ground in what the text shows, then pivot to the listener's real life. Identify patterns (hiding, running, compromising, doubting) and show how the listener might be living in them. Christ is the surgical solution. Give 2-3 concrete actions for today. Close with one sentence that follows the listener home.",
+      storyDesc: "a personal application narration of this story — asking 'Where am I in this story? Which character's pattern am I living right now?' At each key moment, hold up the mirror. Bridge every character's struggle to the listener's real life. Christ is always the answer. Close with a personal challenge that makes the story inescapable.",
+    },
   };
 
   const framing = modeFraming[mode] || modeFraming.epic;
