@@ -153,7 +153,7 @@ export const ARENA_RINGS: ArenaRing[] = [
 
 /** Cross-avatar subjects that appear across multiple worldviews */
 export const CROSS_AVATAR_SUBJECTS: { id: string; title: string; avatarIds: AATSAvatarId[] }[] = [
-  { id: "trinity", title: "The Trinity", avatarIds: ["muslim", "jw", "mormon", "bhi", "jewish", "philosopher"] },
+  { id: "trinity", title: "The Trinity", avatarIds: ["muslim", "jw", "mormon", "bhi", "jewish", "philosopher", "anti-trinitarian"] },
   { id: "sabbath", title: "The Sabbath", avatarIds: ["evangelical", "catholic", "atheist", "progressive-christian", "former-sda"] },
   { id: "deity-of-christ", title: "Deity of Christ", avatarIds: ["muslim", "jw", "atheist", "jewish", "new-age"] },
   { id: "bible-authority", title: "Bible Authority", avatarIds: ["muslim", "catholic", "mormon", "secular-scholar", "atheist"] },
