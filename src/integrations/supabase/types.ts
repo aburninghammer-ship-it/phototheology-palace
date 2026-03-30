@@ -21132,27 +21132,63 @@ export type Database = {
       profiles_public_info: {
         Row: {
           avatar_url: string | null
+          bio: string | null
+          cover_photo_url: string | null
+          created_at: string | null
+          current_floor: number | null
+          daily_study_streak: number | null
           display_name: string | null
           id: string | null
+          interests: string[] | null
+          is_profile_public: boolean | null
           level: number | null
+          location: string | null
+          master_title: string | null
+          ministry_tags: string[] | null
           points: number | null
+          social_links: Json | null
           username: string | null
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
+          cover_photo_url?: string | null
+          created_at?: string | null
+          current_floor?: number | null
+          daily_study_streak?: number | null
           display_name?: string | null
           id?: string | null
+          interests?: string[] | null
+          is_profile_public?: boolean | null
           level?: number | null
+          location?: string | null
+          master_title?: string | null
+          ministry_tags?: string[] | null
           points?: number | null
+          social_links?: Json | null
           username?: string | null
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
+          cover_photo_url?: string | null
+          created_at?: string | null
+          current_floor?: number | null
+          daily_study_streak?: number | null
           display_name?: string | null
           id?: string | null
+          interests?: string[] | null
+          is_profile_public?: boolean | null
           level?: number | null
+          location?: string | null
+          master_title?: string | null
+          ministry_tags?: string[] | null
           points?: number | null
+          social_links?: Json | null
           username?: string | null
+          website?: string | null
         }
         Relationships: []
       }
@@ -21271,6 +21307,17 @@ export type Database = {
           access_token: string
           refresh_token: string
           token_expires_at: string
+        }[]
+      }
+      get_gift_by_token: {
+        Args: { _token: string }
+        Returns: {
+          expires_at: string
+          gift_token: string
+          id: string
+          personal_message: string
+          plan_type: string
+          status: string
         }[]
       }
       get_or_create_conversation: {
