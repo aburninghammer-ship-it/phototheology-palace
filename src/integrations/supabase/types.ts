@@ -19064,6 +19064,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          playlist_id: string | null
           position: number
           title: string
           user_id: string
@@ -19075,6 +19076,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          playlist_id?: string | null
           position?: number
           title: string
           user_id: string
@@ -19086,8 +19088,38 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          playlist_id?: string | null
           position?: number
           title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_playlist_items_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "user_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_playlists: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
           user_id?: string
         }
         Relationships: []

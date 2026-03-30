@@ -12,36 +12,163 @@ export interface PlaylistItem {
   audio_meta: Record<string, any>;
   position: number;
   created_at: string;
+  playlist_id: string | null;
+}
+
+export interface Playlist {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
 }
 
 const MAX_ITEMS = 7;
 
 export function usePlaylist() {
   const { user } = useAuth();
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [activePlaylistId, setActivePlaylistId] = useState<string | null>(null);
   const [items, setItems] = useState<PlaylistItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Fetch all playlists for user
+  const fetchPlaylists = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await (supabase as any)
+      .from("user_playlists")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true });
+
+    if (!error && data) {
+      setPlaylists(data as Playlist[]);
+      // Auto-select first playlist if none selected
+      if (!activePlaylistId && data.length > 0) {
+        setActivePlaylistId(data[0].id);
+      }
+    }
+  }, [user, activePlaylistId]);
+
+  // Fetch items for active playlist
   const fetchItems = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
+
+    let query = (supabase as any)
       .from("user_playlist_items")
       .select("*")
       .eq("user_id", user.id)
       .order("position", { ascending: true });
 
+    if (activePlaylistId) {
+      query = query.eq("playlist_id", activePlaylistId);
+    } else {
+      query = query.is("playlist_id", null);
+    }
+
+    const { data, error } = await query;
     if (!error && data) {
       setItems(data as PlaylistItem[]);
     }
     setLoading(false);
-  }, [user]);
+  }, [user, activePlaylistId]);
+
+  useEffect(() => {
+    fetchPlaylists();
+  }, [fetchPlaylists]);
 
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  // Create a new playlist
+  const createPlaylist = useCallback(async (name: string) => {
+    if (!user) {
+      toast.error("Sign in to create a playlist");
+      return null;
+    }
+    const trimmed = name.trim();
+    if (!trimmed) {
+      toast.error("Playlist name cannot be empty");
+      return null;
+    }
+
+    const { data, error } = await (supabase as any)
+      .from("user_playlists")
+      .insert({ user_id: user.id, name: trimmed })
+      .select()
+      .single();
+
+    if (error) {
+      toast.error("Failed to create playlist");
+      console.error(error);
+      return null;
+    }
+
+    toast.success(`Created playlist "${trimmed}"`);
+    await fetchPlaylists();
+    setActivePlaylistId(data.id);
+    return data as Playlist;
+  }, [user, fetchPlaylists]);
+
+  // Rename a playlist
+  const renamePlaylist = useCallback(async (playlistId: string, newName: string) => {
+    if (!user) return false;
+    const trimmed = newName.trim();
+    if (!trimmed) return false;
+
+    const { error } = await (supabase as any)
+      .from("user_playlists")
+      .update({ name: trimmed })
+      .eq("id", playlistId);
+
+    if (error) {
+      toast.error("Failed to rename playlist");
+      return false;
+    }
+
+    toast.success(`Renamed to "${trimmed}"`);
+    await fetchPlaylists();
+    return true;
+  }, [user, fetchPlaylists]);
+
+  // Delete a playlist (and its items via CASCADE)
+  const deletePlaylist = useCallback(async (playlistId: string) => {
+    if (!user) return false;
+    const pl = playlists.find(p => p.id === playlistId);
+
+    const { error } = await (supabase as any)
+      .from("user_playlists")
+      .delete()
+      .eq("id", playlistId);
+
+    if (error) {
+      toast.error("Failed to delete playlist");
+      return false;
+    }
+
+    toast.success(`Deleted "${pl?.name || "playlist"}"`);
+    if (activePlaylistId === playlistId) {
+      const remaining = playlists.filter(p => p.id !== playlistId);
+      setActivePlaylistId(remaining.length > 0 ? remaining[0].id : null);
+      setCurrentIndex(null);
+      setIsPlaying(false);
+    }
+    await fetchPlaylists();
+    return true;
+  }, [user, playlists, activePlaylistId, fetchPlaylists]);
+
+  // Select a playlist
+  const selectPlaylist = useCallback((playlistId: string | null) => {
+    if (activePlaylistId !== playlistId) {
+      setActivePlaylistId(playlistId);
+      setCurrentIndex(null);
+      setIsPlaying(false);
+    }
+  }, [activePlaylistId]);
 
   const addItem = useCallback(async (item: {
     title: string;
@@ -61,7 +188,7 @@ export function usePlaylist() {
 
     const nextPosition = items.length > 0 ? Math.max(...items.map(i => i.position)) + 1 : 0;
 
-    const { error } = await supabase.from("user_playlist_items").insert({
+    const { error } = await (supabase as any).from("user_playlist_items").insert({
       user_id: user.id,
       title: item.title,
       description: item.description || null,
@@ -69,6 +196,7 @@ export function usePlaylist() {
       audio_url: item.audio_url || null,
       audio_meta: item.audio_meta || {},
       position: nextPosition,
+      playlist_id: activePlaylistId,
     });
 
     if (error) {
@@ -84,15 +212,14 @@ export function usePlaylist() {
     toast.success(`Added "${item.title}" to playlist`);
     await fetchItems();
     return true;
-  }, [user, items, fetchItems]);
+  }, [user, items, fetchItems, activePlaylistId]);
 
   const removeItem = useCallback(async (id: string) => {
     if (!user) return;
     const removing = items.find(i => i.id === id);
-    const { error } = await supabase.from("user_playlist_items").delete().eq("id", id);
+    const { error } = await (supabase as any).from("user_playlist_items").delete().eq("id", id);
     if (!error) {
       toast.success(`Removed "${removing?.title || "item"}" from playlist`);
-      // Adjust current index if needed
       if (currentIndex !== null) {
         const idx = items.findIndex(i => i.id === id);
         if (idx < currentIndex) setCurrentIndex(prev => (prev !== null ? prev - 1 : null));
@@ -107,12 +234,18 @@ export function usePlaylist() {
 
   const clearPlaylist = useCallback(async () => {
     if (!user) return;
-    await supabase.from("user_playlist_items").delete().eq("user_id", user.id);
+    let query = (supabase as any).from("user_playlist_items").delete().eq("user_id", user.id);
+    if (activePlaylistId) {
+      query = query.eq("playlist_id", activePlaylistId);
+    } else {
+      query = query.is("playlist_id", null);
+    }
+    await query;
     setItems([]);
     setCurrentIndex(null);
     setIsPlaying(false);
     toast.success("Playlist cleared");
-  }, [user]);
+  }, [user, activePlaylistId]);
 
   const reorderItems = useCallback(async (oldIndex: number, newIndex: number) => {
     if (oldIndex === newIndex || !user) return;
@@ -120,10 +253,8 @@ export function usePlaylist() {
     const [moved] = reordered.splice(oldIndex, 1);
     reordered.splice(newIndex, 0, moved);
 
-    // Optimistic update
     setItems(reordered);
 
-    // Adjust currentIndex to follow the playing track
     if (currentIndex !== null) {
       if (currentIndex === oldIndex) {
         setCurrentIndex(newIndex);
@@ -134,9 +265,8 @@ export function usePlaylist() {
       }
     }
 
-    // Persist new positions
     const updates = reordered.map((item, i) =>
-      supabase.from("user_playlist_items").update({ position: i }).eq("id", item.id)
+      (supabase as any).from("user_playlist_items").update({ position: i }).eq("id", item.id)
     );
     await Promise.all(updates);
   }, [user, items, currentIndex]);
@@ -159,5 +289,12 @@ export function usePlaylist() {
     setCurrentIndex,
     isPlaying,
     setIsPlaying,
+    // Multi-playlist features
+    playlists,
+    activePlaylistId,
+    selectPlaylist,
+    createPlaylist,
+    renamePlaylist,
+    deletePlaylist,
   };
 }
