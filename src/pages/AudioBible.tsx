@@ -2384,28 +2384,21 @@ export default function AudioBible() {
         queue={epicQueueRef.current.map((q) => ({ book: q.book, chapter: q.chapter }))}
         modeName={activeModeMeta.label}
       />
-      <ImmersiveCommentaryView
-        isOpen={showImmersiveView}
-        onClose={() => setShowImmersiveView(false)}
-        book={epicNowPlayingBook || selectedBook}
-        chapter={epicNowPlayingChapter || selectedChapter}
-        audioRef={epicAudioRef}
-        isPlaying={isEpicPlaying}
-        isPaused={isEpicPaused}
-        modeName={activeModeMeta.label}
-        onTogglePlayPause={() => {
-          if (epicAudioRef.current) {
-            if (isEpicPaused) {
-              epicAudioRef.current.play();
-              setIsEpicPaused(false);
-              setIsEpicPlaying(true);
-            } else {
-              epicAudioRef.current.pause();
-              setIsEpicPaused(true);
-              setIsEpicPlaying(false);
-            }
-          }
-        }}
+      <ImmersiveAudioPlayer
+        isOpen={immersive.isOpen}
+        onClose={immersive.closeImmersive}
+        tracks={immersive.queue.tracks}
+        currentIndex={immersive.queue.currentIndex}
+        onNextTrack={immersive.nextTrack}
+        onPrevTrack={immersive.prevTrack}
+        hasNext={immersive.hasNext}
+        hasPrev={immersive.hasPrev}
+        ambientMusicEnabled={immersive.ambientMusicEnabled}
+        ambientVolume={immersive.ambientVolume}
+        continuousPlay={immersive.continuousPlay}
+        onSetAmbientMusic={immersive.setAmbientMusic}
+        onSetAmbientVolume={immersive.setAmbientVolume}
+        onSetContinuousPlay={immersive.setContinuousPlay}
       />
     </div>
   );
