@@ -811,17 +811,23 @@ export function PlaylistPanel() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="p-3 border-t flex items-center justify-between">
+          <div className="p-3 border-t flex items-center justify-between gap-2">
             <Button variant="ghost" size="sm" className="text-destructive" onClick={clearPlaylist}>
               <Trash2 className="h-3.5 w-3.5 mr-1" />
               Clear All
             </Button>
-            {!isPlaying && items.length > 0 && (
-              <Button size="sm" onClick={() => playItem(0)} className="gap-1">
-                <Play className="h-3.5 w-3.5" />
-                Play All
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => openPlaylistImmersive(currentIndex ?? 0)} className="gap-1">
+                <Maximize2 className="h-3.5 w-3.5" />
+                Immerse
               </Button>
-            )}
+              {!isPlaying && items.length > 0 && (
+                <Button size="sm" onClick={() => playItem(0)} className="gap-1">
+                  <Play className="h-3.5 w-3.5" />
+                  Play All
+                </Button>
+              )}
+            </div>
           </div>
         )}
       </SheetContent>
