@@ -83,6 +83,9 @@ export const DOCK_ITEMS: DockItem[] = [
     ],
   },
   {
+    id: "audio-library", label: "Audio Library", icon: Headphones, path: "/audio-library", glow: "280 75% 60%",
+  },
+  {
     id: "devotional", label: "Devotional", icon: Flame, path: "/devotionals", glow: "328 85% 58%",
     children: [
       { id: "devotionals", label: "Devotionals", path: "/devotionals", icon: Flame, glow: "328 85% 58%" },
@@ -148,9 +151,6 @@ export const DOCK_ITEMS: DockItem[] = [
     children: [
       { id: "my-profile", label: "My Profile", path: "/my-profile", icon: User, glow: "263 70% 58%" },
     ],
-  },
-  {
-    id: "audio-library", label: "Audio Library", icon: Headphones, path: "/audio-library", glow: "280 75% 60%",
   },
   {
     id: "church", label: "My Church Space", icon: Church, path: "/living-manna", glow: "142 71% 45%",
