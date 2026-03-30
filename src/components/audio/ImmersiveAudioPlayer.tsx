@@ -275,19 +275,19 @@ export function ImmersiveAudioPlayer({
     }
   }, [isOpen, ambientMusicEnabled, isPlaying, ambientTrackIdx, ambientVolume]);
 
-  // Update ambient volume live
+  // Update ambient volume live (with sleep fade)
   useEffect(() => {
     if (ambientRef.current) {
-      ambientRef.current.volume = ambientMusicEnabled ? ambientVolume : 0;
+      ambientRef.current.volume = ambientMusicEnabled ? ambientVolume * sleepFadeMultiplier : 0;
     }
-  }, [ambientVolume, ambientMusicEnabled]);
+  }, [ambientVolume, ambientMusicEnabled, sleepFadeMultiplier]);
 
-  // Update main volume
+  // Update main volume (with sleep fade)
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = mainMuted ? 0 : mainVolume;
+      audioRef.current.volume = mainMuted ? 0 : mainVolume * sleepFadeMultiplier;
     }
-  }, [mainVolume, mainMuted]);
+  }, [mainVolume, mainMuted, sleepFadeMultiplier]);
 
   // Keyboard shortcuts
   useEffect(() => {
