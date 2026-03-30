@@ -176,17 +176,37 @@ export function usePlaylist() {
     audio_type: string;
     audio_url?: string;
     audio_meta?: Record<string, any>;
+    targetPlaylistId?: string | null;
   }) => {
     if (!user) {
       toast.error("Sign in to create a playlist");
       return false;
     }
-    if (items.length >= MAX_ITEMS) {
+
+    const targetId = item.targetPlaylistId !== undefined ? item.targetPlaylistId : activePlaylistId;
+
+    // Get current count for target playlist to check limit
+    let countQuery = (supabase as any)
+      .from("user_playlist_items")
+      .select("id, position", { count: "exact" })
+      .eq("user_id", user.id);
+
+    if (targetId) {
+      countQuery = countQuery.eq("playlist_id", targetId);
+    } else {
+      countQuery = countQuery.is("playlist_id", null);
+    }
+
+    const { data: existingItems, count: itemCount } = await countQuery;
+
+    if ((itemCount ?? 0) >= MAX_ITEMS) {
       toast.error(`Playlist is full (max ${MAX_ITEMS} items). Remove one first.`);
       return false;
     }
 
-    const nextPosition = items.length > 0 ? Math.max(...items.map(i => i.position)) + 1 : 0;
+    const nextPosition = existingItems && existingItems.length > 0
+      ? Math.max(...existingItems.map((i: any) => i.position)) + 1
+      : 0;
 
     const { error } = await (supabase as any).from("user_playlist_items").insert({
       user_id: user.id,
@@ -196,7 +216,7 @@ export function usePlaylist() {
       audio_url: item.audio_url || null,
       audio_meta: item.audio_meta || {},
       position: nextPosition,
-      playlist_id: activePlaylistId,
+      playlist_id: targetId,
     });
 
     if (error) {
@@ -209,10 +229,13 @@ export function usePlaylist() {
       return false;
     }
 
-    toast.success(`Added "${item.title}" to playlist`);
-    await fetchItems();
+    const playlistName = playlists.find(p => p.id === targetId)?.name || "playlist";
+    toast.success(`Added "${item.title}" to ${playlistName}`);
+    if (targetId === activePlaylistId) {
+      await fetchItems();
+    }
     return true;
-  }, [user, items, fetchItems, activePlaylistId]);
+  }, [user, playlists, fetchItems, activePlaylistId]);
 
   const removeItem = useCallback(async (id: string) => {
     if (!user) return;
