@@ -22,6 +22,9 @@ import { fetchChapterVerses } from "@/services/audioBibleService";
 import { globalAudioManager } from "@/lib/globalAudioManager";
 import { cn } from "@/lib/utils";
 import type { ImmersiveTrack } from "@/hooks/useImmersiveMode";
+import { ImmersiveParticles } from "./immersive/ImmersiveParticles";
+import { ImmersiveKaraokeVerse } from "./immersive/ImmersiveKaraokeVerse";
+import { ImmersiveSleepTimer } from "./immersive/ImmersiveSleepTimer";
 
 // Ambient tracks for background layering
 const AMBIENT_BG_TRACKS = [
