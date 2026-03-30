@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useImmersiveMode, type ImmersiveTrack } from "@/hooks/useImmersiveMode";
+import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +35,7 @@ import {
   Compass,
   Swords,
   GripVertical,
+  Maximize2,
   Plus,
   ChevronDown,
   Pencil,
@@ -92,6 +95,7 @@ function SortablePlaylistItem({
   isPlaying,
   onPlay,
   onRemove,
+  onImmerse,
 }: {
   item: PlaylistItem;
   idx: number;
@@ -99,6 +103,7 @@ function SortablePlaylistItem({
   isPlaying: boolean;
   onPlay: () => void;
   onRemove: () => void;
+  onImmerse: () => void;
 }) {
   const {
     attributes,
@@ -153,6 +158,18 @@ function SortablePlaylistItem({
           {getTypeLabel(item.audio_type)}
         </Badge>
       </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7 flex-shrink-0 text-amber-400 hover:bg-amber-500/10"
+        onClick={(e) => {
+          e.stopPropagation();
+          onImmerse();
+        }}
+        title="Immerse Mode"
+      >
+        <Maximize2 className="h-3.5 w-3.5" />
+      </Button>
       <Button
         variant="ghost"
         size="icon"
@@ -346,6 +363,7 @@ export function PlaylistPanel() {
     deletePlaylist,
   } = usePlaylist();
 
+  const immersive = useImmersiveMode();
   const [audioLoading, setAudioLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -623,6 +641,7 @@ export function PlaylistPanel() {
   const activePlaylist = playlists.find(p => p.id === activePlaylistId);
 
   return (
+    <>
     <Sheet>
       <SheetTrigger asChild>
         <Button
@@ -749,6 +768,16 @@ export function PlaylistPanel() {
                       isPlaying={isPlaying}
                       onPlay={() => playItem(idx)}
                       onRemove={() => handleRemove(item.id)}
+                      onImmerse={() => {
+                        const track: ImmersiveTrack = {
+                          id: item.id,
+                          title: item.title,
+                          subtitle: item.description || undefined,
+                          type: (item.audio_type as ImmersiveTrack["type"]) || "commentary",
+                          displayText: (item.audio_meta as any)?.text,
+                        };
+                        immersive.openImmersive([track]);
+                      }}
                     />
                   ))}
                 </div>
@@ -774,5 +803,23 @@ export function PlaylistPanel() {
         )}
       </SheetContent>
     </Sheet>
+
+    <ImmersiveAudioPlayer
+      isOpen={immersive.isOpen}
+      onClose={immersive.closeImmersive}
+      tracks={immersive.queue.tracks}
+      currentIndex={immersive.queue.currentIndex}
+      onNextTrack={immersive.nextTrack}
+      onPrevTrack={immersive.prevTrack}
+      hasNext={immersive.hasNext}
+      hasPrev={immersive.hasPrev}
+      ambientMusicEnabled={immersive.ambientMusicEnabled}
+      ambientVolume={immersive.ambientVolume}
+      continuousPlay={immersive.continuousPlay}
+      onSetAmbientMusic={immersive.setAmbientMusic}
+      onSetAmbientVolume={immersive.setAmbientVolume}
+      onSetContinuousPlay={immersive.setContinuousPlay}
+    />
+    </>
   );
 }
