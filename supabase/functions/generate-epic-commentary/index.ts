@@ -23,6 +23,7 @@ const VOICE_IDS: Record<string, string> = {
   scholar: "ErXwobaYiN019PkySvjV",     // Antoni - Calm analytical
   counselor: "SAz9YHcvj6GT2YYXdXww",  // River - Warm reflective
   kids: "pFZP5JQG7iQjIQuC4Bku",      // Lily - Young bright expressive voice
+  mirror: "SAz9YHcvj6GT2YYXdXww",    // River - Warm reflective (shared with Counselor for pastoral warmth)
 };
 
 const ALLOWED_COMMENTARY_MODES = new Set([
