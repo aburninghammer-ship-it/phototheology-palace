@@ -113,13 +113,26 @@ export const fetchChapter = async (book: string, chapter: number, translation: T
 // Translations that bible-api.com doesn't support - skip direct call and go straight to edge function
 const EDGE_FUNCTION_ONLY = ['niv', 'esv', 'nkjv', 'nasb', 'nlt', 'rves', 'rvr', 'rvr1960', 'nvi', 'lsg', 'luther', 'lut', 'arc', 'nvi-pt'];
 
+// Single-chapter books need a verse range or bible-api.com interprets "Book 1" as "Book 1:1"
+const SINGLE_CHAPTER_BOOKS: Record<string, number> = {
+  obadiah: 21, philemon: 25, "2 john": 13, "3 john": 14, jude: 25,
+};
+
+function buildBibleApiRef(book: string, chapter: number): string {
+  const verseCount = SINGLE_CHAPTER_BOOKS[book.toLowerCase().trim()];
+  if (verseCount && chapter === 1) {
+    return `${encodeURIComponent(book)}%201:1-${verseCount}`;
+  }
+  return `${encodeURIComponent(book)}%20${chapter}`;
+}
+
 const fetchChapterFromAPI = async (book: string, chapter: number, translation: Translation = "kjv"): Promise<Chapter> => {
   // Skip direct bible-api.com for translations it doesn't support (avoids 5s timeout)
   if (!EDGE_FUNCTION_ONLY.includes(translation)) {
   // Try direct public API first for speed - it's more reliable
   try {
     const directResponse = await fetch(
-      `${BIBLE_API_BASE}/${encodeURIComponent(book)}%20${chapter}?translation=${translation}`,
+      `${BIBLE_API_BASE}/${buildBibleApiRef(book, chapter)}?translation=${translation}`,
       { signal: AbortSignal.timeout(5000) }
     );
 

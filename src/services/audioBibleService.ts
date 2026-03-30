@@ -66,10 +66,19 @@ export async function fetchChapterVerses(
     return cached;
   }
 
+  // Single-chapter books: bible-api.com interprets "Obadiah 1" as verse 1 only
+  const singleChapterCounts: Record<string, number> = {
+    obadiah: 21, philemon: 25, "2 john": 13, "3 john": 14, jude: 25,
+  };
+  const scVerseCount = singleChapterCounts[book.toLowerCase().trim()];
+  const ref = (scVerseCount && chapter === 1)
+    ? `${encodeURIComponent(book)}+1:1-${scVerseCount}`
+    : `${encodeURIComponent(book)}+${chapter}`;
+
   // Fetch from API
   try {
     const response = await fetch(
-      `https://bible-api.com/${encodeURIComponent(book)}+${chapter}?translation=kjv`
+      `https://bible-api.com/${ref}?translation=kjv`
     );
     const data = await response.json();
 
