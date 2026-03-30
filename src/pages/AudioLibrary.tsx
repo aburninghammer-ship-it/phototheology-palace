@@ -626,6 +626,15 @@ export default function AudioLibrary() {
                               size="sm"
                               className="h-7 text-xs"
                             />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs gap-1 text-amber-400 hover:bg-amber-500/10"
+                              onClick={() => handleImmerse(item)}
+                            >
+                              <Maximize2 className="h-3 w-3" />
+                              Immerse
+                            </Button>
                           </div>
                         </div>
                       </div>
