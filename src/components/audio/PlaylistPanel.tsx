@@ -641,7 +641,7 @@ export function PlaylistPanel() {
   const activePlaylist = playlists.find(p => p.id === activePlaylistId);
 
   return (
-    <Sheet>
+    <>
       <SheetTrigger asChild>
         <Button
           variant="ghost"
