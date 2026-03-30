@@ -601,7 +601,7 @@ export function PlaylistPanel() {
     if (!audio) return;
 
     try {
-      const url = await resolveAudioUrl(item);
+      let url = await resolveAudioUrl(item);
 
       if (!url) {
         toast.error("No audio available for this item");
@@ -609,7 +609,40 @@ export function PlaylistPanel() {
         return;
       }
 
+      // If stored audio_url is a signed URL that may have expired, re-sign it
+      if (url === item.audio_url && url.includes('/storage/v1/object/sign/')) {
+        try {
+          const pathMatch = url.match(/\/storage\/v1\/object\/sign\/([^?]+)/);
+          if (pathMatch) {
+            const bucketAndPath = pathMatch[1];
+            const slashIdx = bucketAndPath.indexOf('/');
+            const bucket = bucketAndPath.substring(0, slashIdx);
+            const filePath = bucketAndPath.substring(slashIdx + 1);
+            const { data: resigned } = await supabase.storage
+              .from(bucket)
+              .createSignedUrl(filePath, 3600);
+            if (resigned?.signedUrl) url = resigned.signedUrl;
+          }
+        } catch {
+          // Use original URL as fallback
+        }
+      }
+
       audio.src = url;
+
+      // Wait for audio to be loadable before playing
+      await new Promise<void>((resolve, reject) => {
+        const onCanPlay = () => { cleanup(); resolve(); };
+        const onError = () => { cleanup(); reject(new Error("Audio failed to load")); };
+        const cleanup = () => {
+          audio.removeEventListener("canplay", onCanPlay);
+          audio.removeEventListener("error", onError);
+        };
+        audio.addEventListener("canplay", onCanPlay, { once: true });
+        audio.addEventListener("error", onError, { once: true });
+        audio.load();
+      });
+
       notifyTTSStarted();
       await audio.play();
       setIsPlaying(true);
