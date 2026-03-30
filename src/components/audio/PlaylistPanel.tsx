@@ -642,6 +642,7 @@ export function PlaylistPanel() {
 
   return (
     <>
+    <Sheet>
       <SheetTrigger asChild>
         <Button
           variant="ghost"
