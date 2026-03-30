@@ -18,7 +18,7 @@ export const PhototheologyOSLogo = ({
       {/* Icon - warm gold rounded square with sparkle */}
       <div className="relative flex-shrink-0">
         <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+          className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
           style={{
             background: "linear-gradient(135deg, #b8860b, #d4a017, #e6be44, #c8922a)",
             boxShadow: "0 0 16px rgba(212, 160, 23, 0.4), inset 0 1px 1px rgba(255,255,255,0.2)",
@@ -27,7 +27,7 @@ export const PhototheologyOSLogo = ({
           <svg
             viewBox="0 0 24 24"
             fill="none"
-            className="w-6 h-6"
+            className="w-8 h-8"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
@@ -49,7 +49,7 @@ export const PhototheologyOSLogo = ({
         <div className="flex flex-col leading-none gap-1">
           <div className="flex items-center gap-2">
             <span
-              className="font-bold text-[19px] tracking-[0.04em] uppercase"
+              className="font-bold text-[22px] tracking-[0.04em] uppercase"
               style={{
                 fontFamily: "'Cinzel', serif",
                 color: "#d4a017",
@@ -59,7 +59,7 @@ export const PhototheologyOSLogo = ({
               PHOTOTHEOLOGY
             </span>
             <span
-              className="text-[11px] font-semibold tracking-wide px-1.5 py-0.5 rounded"
+              className="text-[12px] font-semibold tracking-wide px-2 py-0.5 rounded"
               style={{
                 fontFamily: "'Inter', sans-serif",
                 color: "#e8e8e8",
@@ -73,7 +73,7 @@ export const PhototheologyOSLogo = ({
           {showEden && (
             <span className="flex items-center gap-2">
               <span
-                className="text-[11px] font-semibold tracking-[0.2em] uppercase"
+                className="text-[12px] font-semibold tracking-[0.2em] uppercase"
                 style={{ color: "rgba(180, 220, 255, 0.85)" }}
               >
                 Eden
