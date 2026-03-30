@@ -94,8 +94,18 @@ export default function PhototheologyCourse() {
               </div>
             </div>
 
+            {/* Time-Lock Info */}
+            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <Lock className="h-3 w-3" />
+              <span>
+                {courseStartDate
+                  ? `Day ${getUnlockedDay()} of 90 unlocked · Started ${courseStartDate.toLocaleDateString()}`
+                  : "Complete Day 1 to begin your 90-day journey"}
+              </span>
+            </div>
+
             {/* Progress Bar */}
-            <div className="mt-4 max-w-md mx-auto">
+            <div className="mt-3 max-w-md mx-auto">
               <Progress value={completionPct} className="h-3" />
             </div>
           </div>
