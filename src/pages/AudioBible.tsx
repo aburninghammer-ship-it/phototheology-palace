@@ -67,7 +67,7 @@ interface Theme {
   verse_count: number;
 }
 
-type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar" | "counselor" | "kids";
+type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar" | "counselor" | "kids" | "mirror";
 
 const KIDS_VOICE_ID = "elevenlabs:pFZP5JQG7iQjIQuC4Bku";
 
