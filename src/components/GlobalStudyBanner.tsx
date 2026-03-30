@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { InsightDeepDiveModal } from "@/components/banner/InsightDeepDiveModal";
 import {
   XpPopover, GemsPopover, RoomsPopover,
   ChaptersPopover, FloorsPopover, StreakPopover
@@ -508,6 +509,8 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
   });
   const [promptIdx, setPromptIdx] = useState(() => getUnseenIndex());
   const [xpFlash, setXpFlash] = useState(false);
+  const [deepDiveOpen, setDeepDiveOpen] = useState(false);
+  const [deepDivePrompt, setDeepDivePrompt] = useState<{ label: string; text: string } | null>(null);
   const stats = useUserBannerStats(resolvedUserId, fallbackDisplayName);
 
   useEffect(() => {
