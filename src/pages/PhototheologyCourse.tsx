@@ -173,31 +173,40 @@ export default function PhototheologyCourse() {
                                   className="overflow-hidden"
                                 >
                                   <div className="ml-5 space-y-0.5 pb-2">
-                                    {weekDays.map(day => (
+                                    {weekDays.map(day => {
+                                      const unlocked = isDayUnlocked(day.day);
+                                      const completable = isDayCompletable(day.day);
+                                      return (
                                       <button
                                         key={day.day}
                                         onClick={() => handleSelectDay(day.day)}
                                         className={cn(
                                           "w-full flex items-center gap-2 py-1.5 px-2 rounded-md text-left transition-colors text-sm",
-                                          selectedDay === day.day ? "bg-primary/10 text-primary" : "hover:bg-muted/50"
+                                          selectedDay === day.day ? "bg-primary/10 text-primary" : "hover:bg-muted/50",
+                                          !unlocked && "opacity-50"
                                         )}
                                       >
                                         <button
                                           onClick={(e) => { e.stopPropagation(); toggleDay(day.day); }}
                                           className="shrink-0"
+                                          disabled={!unlocked}
                                         >
                                           {completedDays.includes(day.day) ? (
                                             <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                          ) : !unlocked ? (
+                                            <Lock className="h-4 w-4 text-muted-foreground/30" />
                                           ) : (
                                             <Circle className="h-4 w-4 text-muted-foreground/40" />
                                           )}
                                         </button>
                                         <div className="flex-1 min-w-0">
                                           <div className="text-xs font-medium truncate">
-                                            Day {day.day}: {day.title}
+                                            Day {day.day}: {unlocked ? day.title : "🔒 Locked"}
                                           </div>
                                         </div>
                                       </button>
+                                      );
+                                    })}
                                     ))}
                                   </div>
                                 </motion.div>
