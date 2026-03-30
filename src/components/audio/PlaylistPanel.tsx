@@ -24,12 +24,30 @@ import {
   BookOpen,
   Compass,
   Swords,
+  GripVertical,
 } from "lucide-react";
 import { usePlaylist, PlaylistItem } from "@/hooks/usePlaylist";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const AUDIO_TYPE_ICONS: Record<string, React.ReactNode> = {
   commentary: <BookOpen className="h-4 w-4" />,
@@ -55,6 +73,90 @@ function getTypeLabel(type: string) {
   return AUDIO_TYPE_LABELS[type] || type.charAt(0).toUpperCase() + type.slice(1);
 }
 
+// Sortable playlist item component
+function SortablePlaylistItem({
+  item,
+  idx,
+  isCurrent,
+  isPlaying,
+  onPlay,
+  onRemove,
+}: {
+  item: PlaylistItem;
+  idx: number;
+  isCurrent: boolean;
+  isPlaying: boolean;
+  onPlay: () => void;
+  onRemove: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors ${
+        isCurrent
+          ? "bg-primary/10 border border-primary/30"
+          : "hover:bg-muted/50"
+      }`}
+      onClick={onPlay}
+    >
+      <button
+        className="flex-shrink-0 touch-none text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <div className={`flex-shrink-0 ${isCurrent ? "text-primary" : "text-muted-foreground"}`}>
+        {isCurrent && isPlaying ? (
+          <Volume2 className="h-4 w-4 animate-pulse" />
+        ) : (
+          getTypeIcon(item.audio_type)
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm font-medium truncate ${isCurrent ? "text-primary" : ""}`}>
+          {item.title}
+        </p>
+        {item.description && (
+          <p className="text-xs text-muted-foreground truncate">{item.description}</p>
+        )}
+        <Badge variant="outline" className="mt-1 text-[10px] px-1.5 py-0">
+          {getTypeLabel(item.audio_type)}
+        </Badge>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7 flex-shrink-0 text-muted-foreground hover:text-destructive"
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove();
+        }}
+      >
+        <X className="h-3.5 w-3.5" />
+      </Button>
+    </div>
+  );
+}
+
 export function PlaylistPanel() {
   const {
     items,
@@ -67,6 +169,7 @@ export function PlaylistPanel() {
     setCurrentIndex,
     isPlaying,
     setIsPlaying,
+    reorderItems,
   } = usePlaylist();
 
   const [audioLoading, setAudioLoading] = useState(false);
