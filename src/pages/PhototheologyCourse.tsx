@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Book, CheckCircle2, Circle, BookOpen, Sparkles, ExternalLink, ChevronDown, ChevronRight, Flame, Trophy, GraduationCap } from "lucide-react";
+import { Book, CheckCircle2, Circle, BookOpen, Sparkles, ExternalLink, ChevronDown, ChevronRight, Flame, Trophy, GraduationCap, Lock, Calendar } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { phototheologyCourse, FLOOR_META } from "@/data/phototheologyCourseData";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export default function PhototheologyCourse() {
-  const { completedDays, reflections, loading, toggleDay, saveReflection } = useCourseProgress("phototheology");
+  const { completedDays, reflections, loading, toggleDay, saveReflection, courseStartDate, isDayUnlocked, isDayCompletable, getUnlockedDay } = useCourseProgress("phototheology");
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [expandedWeeks, setExpandedWeeks] = useState<number[]>([1]);
   const [reflectionDraft, setReflectionDraft] = useState("");
@@ -94,8 +94,18 @@ export default function PhototheologyCourse() {
               </div>
             </div>
 
+            {/* Time-Lock Info */}
+            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <Lock className="h-3 w-3" />
+              <span>
+                {courseStartDate
+                  ? `Day ${getUnlockedDay()} of 90 unlocked · Started ${courseStartDate.toLocaleDateString()}`
+                  : "Complete Day 1 to begin your 90-day journey"}
+              </span>
+            </div>
+
             {/* Progress Bar */}
-            <div className="mt-4 max-w-md mx-auto">
+            <div className="mt-3 max-w-md mx-auto">
               <Progress value={completionPct} className="h-3" />
             </div>
           </div>
@@ -163,32 +173,41 @@ export default function PhototheologyCourse() {
                                   className="overflow-hidden"
                                 >
                                   <div className="ml-5 space-y-0.5 pb-2">
-                                    {weekDays.map(day => (
+                                    {weekDays.map(day => {
+                                      const unlocked = isDayUnlocked(day.day);
+                                      const completable = isDayCompletable(day.day);
+                                      return (
                                       <button
                                         key={day.day}
                                         onClick={() => handleSelectDay(day.day)}
                                         className={cn(
                                           "w-full flex items-center gap-2 py-1.5 px-2 rounded-md text-left transition-colors text-sm",
-                                          selectedDay === day.day ? "bg-primary/10 text-primary" : "hover:bg-muted/50"
+                                          selectedDay === day.day ? "bg-primary/10 text-primary" : "hover:bg-muted/50",
+                                          !unlocked && "opacity-50"
                                         )}
                                       >
                                         <button
                                           onClick={(e) => { e.stopPropagation(); toggleDay(day.day); }}
                                           className="shrink-0"
+                                          disabled={!unlocked}
                                         >
                                           {completedDays.includes(day.day) ? (
                                             <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                          ) : !unlocked ? (
+                                            <Lock className="h-4 w-4 text-muted-foreground/30" />
                                           ) : (
                                             <Circle className="h-4 w-4 text-muted-foreground/40" />
                                           )}
                                         </button>
                                         <div className="flex-1 min-w-0">
                                           <div className="text-xs font-medium truncate">
-                                            Day {day.day}: {day.title}
+                                            Day {day.day}: {unlocked ? day.title : "🔒 Locked"}
                                           </div>
                                         </div>
                                       </button>
-                                    ))}
+                                      );
+                                    })}
+                                    
                                   </div>
                                 </motion.div>
                               )}
@@ -205,6 +224,10 @@ export default function PhototheologyCourse() {
             {/* Day Detail */}
             <div className="lg:col-span-2">
               {selectedDayData ? (
+                (() => {
+                  const dayUnlocked = isDayUnlocked(selectedDayData.day);
+                  const dayCompletable = isDayCompletable(selectedDayData.day);
+                  return (
                 <motion.div
                   key={selectedDay}
                   initial={{ opacity: 0, y: 10 }}
@@ -223,25 +246,53 @@ export default function PhototheologyCourse() {
                             {selectedDayData.roomCode && (
                               <Badge variant="secondary" className="text-xs">{selectedDayData.roomCode}</Badge>
                             )}
+                            {!dayUnlocked && (
+                              <Badge variant="destructive" className="text-xs gap-1">
+                                <Lock className="h-3 w-3" /> Locked
+                              </Badge>
+                            )}
                           </div>
                           <CardTitle className="text-2xl leading-tight">{selectedDayData.title}</CardTitle>
                           <CardDescription className="mt-1">{selectedDayData.floor}</CardDescription>
                         </div>
-                        <Button
-                          variant={completedDays.includes(selectedDayData.day) ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => toggleDay(selectedDayData.day)}
-                          className={cn("shrink-0", completedDays.includes(selectedDayData.day) && "bg-green-600 hover:bg-green-700")}
-                        >
-                          {completedDays.includes(selectedDayData.day) ? (
-                            <><CheckCircle2 className="h-4 w-4 mr-1.5" /> Done</>
-                          ) : (
-                            <><Circle className="h-4 w-4 mr-1.5" /> Complete</>
-                          )}
-                        </Button>
+                        {dayUnlocked ? (
+                          <Button
+                            variant={completedDays.includes(selectedDayData.day) ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => toggleDay(selectedDayData.day)}
+                            disabled={!dayCompletable && !completedDays.includes(selectedDayData.day)}
+                            className={cn("shrink-0", completedDays.includes(selectedDayData.day) && "bg-green-600 hover:bg-green-700")}
+                          >
+                            {completedDays.includes(selectedDayData.day) ? (
+                              <><CheckCircle2 className="h-4 w-4 mr-1.5" /> Done</>
+                            ) : !dayCompletable ? (
+                              <><Lock className="h-4 w-4 mr-1.5" /> Complete Previous</>
+                            ) : (
+                              <><Circle className="h-4 w-4 mr-1.5" /> Complete</>
+                            )}
+                          </Button>
+                        ) : (
+                          <Badge variant="outline" className="text-xs py-2 px-3 gap-1.5">
+                            <Calendar className="h-3.5 w-3.5" />
+                            Unlocks in {selectedDayData.day - getUnlockedDay()} day{selectedDayData.day - getUnlockedDay() !== 1 ? 's' : ''}
+                          </Badge>
+                        )}
                       </div>
                     </CardHeader>
                     <CardContent>
+                      {!dayUnlocked ? (
+                        <div className="text-center py-16 space-y-4">
+                          <div className="p-4 rounded-full bg-muted w-fit mx-auto">
+                            <Lock className="h-10 w-10 text-muted-foreground" />
+                          </div>
+                          <h3 className="text-lg font-semibold">This Day is Locked</h3>
+                          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                            Day {selectedDayData.day} unlocks in {selectedDayData.day - getUnlockedDay()} day{selectedDayData.day - getUnlockedDay() !== 1 ? 's' : ''}.
+                            The Phototheology Course is designed to be completed over 90 real days — one day at a time, building depth through patience.
+                          </p>
+                          <p className="text-xs text-muted-foreground italic">"Line upon line, precept upon precept" — Isaiah 28:10</p>
+                        </div>
+                      ) : (
                       <ScrollArea className="h-[550px] pr-4">
                         <div className="space-y-5">
                           {/* Focus */}
@@ -329,9 +380,12 @@ export default function PhototheologyCourse() {
                           </div>
                         </div>
                       </ScrollArea>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
+                  );
+                })()
               ) : (
                 <Card className="h-full flex items-center justify-center border-border/50">
                   <CardContent className="text-center py-16">
