@@ -22,11 +22,9 @@ export default function GiftRedeem() {
 
   useEffect(() => {
     if (!token) return;
-    // Fetch gift info (public select policy)
+    // Use secure function to fetch gift info by token (no blanket SELECT policy)
     supabase
-      .from("gift_purchases")
-      .select("plan_type, personal_message, status, gifter_email, expires_at")
-      .eq("gift_token", token)
+      .rpc("get_gift_by_token", { _token: token })
       .single()
       .then(({ data, error }) => {
         if (error || !data) {
