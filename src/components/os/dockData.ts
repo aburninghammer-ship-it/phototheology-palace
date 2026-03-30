@@ -73,6 +73,9 @@ export const DOCK_ITEMS: DockItem[] = [
     ],
   },
   {
+    id: "pt-course", label: "PT Course", icon: BookText, path: "/phototheology-course", glow: "32 90% 50%",
+  },
+  {
     id: "training", label: "Training", icon: GraduationCap, path: "/test-me", glow: "0 84% 60%",
     children: [
       { id: "test-me", label: "Test Me", path: "/test-me", icon: GraduationCap, glow: "0 84% 60%" },
