@@ -62,9 +62,9 @@ export const PhototheologyOSLogo = ({
               className="text-[11px] font-semibold tracking-wide px-1.5 py-0.5 rounded"
               style={{
                 fontFamily: "'Inter', sans-serif",
-                color: "#d4a017",
-                background: "rgba(212, 160, 23, 0.15)",
-                border: "1px solid rgba(212, 160, 23, 0.3)",
+                color: "#e8e8e8",
+                background: "rgba(255, 255, 255, 0.12)",
+                border: "1px solid rgba(255, 255, 255, 0.25)",
               }}
             >
               OS
@@ -74,7 +74,7 @@ export const PhototheologyOSLogo = ({
             <span className="flex items-center gap-2">
               <span
                 className="text-[11px] font-semibold tracking-[0.2em] uppercase"
-                style={{ color: "rgba(212, 160, 23, 0.7)" }}
+                style={{ color: "rgba(180, 220, 255, 0.85)" }}
               >
                 Eden
               </span>
