@@ -370,6 +370,8 @@ export default function PhototheologyCourse() {
                     </CardContent>
                   </Card>
                 </motion.div>
+                  );
+                })()
               ) : (
                 <Card className="h-full flex items-center justify-center border-border/50">
                   <CardContent className="text-center py-16">
