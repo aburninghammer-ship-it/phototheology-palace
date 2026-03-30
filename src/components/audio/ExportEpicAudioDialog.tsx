@@ -47,7 +47,7 @@ interface ExportEpicAudioDialogProps {
   chapter: number;
   /** Full queue of chapters currently loaded (optional) */
   queue?: EpicChapter[];
-  /** The active commentary mode name (e.g. "Epic", "Urban", "Counselor") */
+  /** The active commentary mode name (e.g. "Epic", "Modern", "Counselor") */
   modeName?: string;
 }
 

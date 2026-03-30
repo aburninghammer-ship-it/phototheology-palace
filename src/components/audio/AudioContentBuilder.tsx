@@ -29,7 +29,7 @@ const CHAPTER_COUNTS: Record<string, number> = {
 // ── Voice styles ─────────────────────────────────────────────────────────────
 const VOICE_STYLES = [
   { id: "epic", label: "Epic Narrator", voice: "6v8IsT0UP1aaVwjGhVPn", description: "Cinematic, sweeping narration" },
-  { id: "urban", label: "Urban Preacher", voice: "cgSgspJ2msm6clMCkdW9", description: "Raw, real-talk energy" },
+  { id: "urban", label: "Modern Preacher", voice: "cgSgspJ2msm6clMCkdW9", description: "Raw, real-talk energy" },
   { id: "counselor", label: "Counselor", voice: "SAz9YHcvj6GT2YYXdXww", description: "Warm, empathetic guidance" },
   { id: "ancient", label: "Ancient Voice", voice: "onyx", description: "Authoritative, solemn tone" },
   { id: "preacher", label: "Preacher", voice: "shimmer", description: "Pulpit-ready conviction" },
