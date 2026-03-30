@@ -114,6 +114,33 @@ export function usePlaylist() {
     toast.success("Playlist cleared");
   }, [user]);
 
+  const reorderItems = useCallback(async (oldIndex: number, newIndex: number) => {
+    if (oldIndex === newIndex || !user) return;
+    const reordered = [...items];
+    const [moved] = reordered.splice(oldIndex, 1);
+    reordered.splice(newIndex, 0, moved);
+
+    // Optimistic update
+    setItems(reordered);
+
+    // Adjust currentIndex to follow the playing track
+    if (currentIndex !== null) {
+      if (currentIndex === oldIndex) {
+        setCurrentIndex(newIndex);
+      } else if (oldIndex < currentIndex && newIndex >= currentIndex) {
+        setCurrentIndex(currentIndex - 1);
+      } else if (oldIndex > currentIndex && newIndex <= currentIndex) {
+        setCurrentIndex(currentIndex + 1);
+      }
+    }
+
+    // Persist new positions
+    const updates = reordered.map((item, i) =>
+      supabase.from("user_playlist_items").update({ position: i }).eq("id", item.id)
+    );
+    await Promise.all(updates);
+  }, [user, items, currentIndex]);
+
   const isFull = items.length >= MAX_ITEMS;
   const count = items.length;
 
@@ -124,6 +151,7 @@ export function usePlaylist() {
     removeItem,
     clearPlaylist,
     fetchItems,
+    reorderItems,
     isFull,
     count,
     maxItems: MAX_ITEMS,
