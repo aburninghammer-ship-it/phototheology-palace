@@ -515,6 +515,23 @@ function TourPlayer({ tour, onBack }: { tour: TourDefinition; onBack: () => void
             <span>{currentIndex + 1} of {totalSegments} segments</span>
             <span>•</span>
             <span>~{Math.round(totalEstimated / 60)} min total</span>
+            <span>•</span>
+            <button
+              className="underline hover:text-white transition-colors"
+              onClick={() => {
+                // Dispatch custom event for immersive mode
+                const event = new CustomEvent("immerse-tour", {
+                  detail: {
+                    title: tour.title,
+                    segments: allSegments,
+                    currentIndex,
+                  },
+                });
+                window.dispatchEvent(event);
+              }}
+            >
+              🌙 Immerse
+            </button>
           </div>
         </div>
 
