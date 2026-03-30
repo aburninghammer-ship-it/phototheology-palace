@@ -178,6 +178,21 @@ export function PlaylistPanel() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval>>();
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = items.findIndex(i => i.id === active.id);
+    const newIndex = items.findIndex(i => i.id === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      reorderItems(oldIndex, newIndex);
+    }
+  }, [items, reorderItems]);
+
   // Create persistent audio element
   useEffect(() => {
     if (!audioRef.current) {
