@@ -363,6 +363,7 @@ export function PlaylistPanel() {
     deletePlaylist,
   } = usePlaylist();
 
+  const immersive = useImmersiveMode();
   const [audioLoading, setAudioLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
