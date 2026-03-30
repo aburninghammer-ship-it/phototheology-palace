@@ -471,6 +471,18 @@ export default function AudioLibrary() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const immersive = useImmersiveMode();
+
+  const handleImmerse = (item: AudioEntry) => {
+    const track: ImmersiveTrack = {
+      id: item.id,
+      title: item.title,
+      subtitle: item.description,
+      type: item.category as ImmersiveTrack["type"],
+      displayText: item.audioMeta?.text,
+    };
+    immersive.openImmersive([track]);
+  };
 
   const filtered = useMemo(() => {
     return AUDIO_CATALOG.filter((item) => {
