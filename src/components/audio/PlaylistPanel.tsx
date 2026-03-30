@@ -161,7 +161,7 @@ function SortablePlaylistItem({
       <Button
         variant="ghost"
         size="icon"
-        className="h-7 w-7 flex-shrink-0 text-amber-400 hover:bg-amber-500/10"
+        className="h-7 w-7 flex-shrink-0 text-primary hover:bg-primary/10"
         onClick={(e) => {
           e.stopPropagation();
           onImmerse();
