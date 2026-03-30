@@ -697,9 +697,9 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
             <div className={cn(
               "rounded-xl border bg-gradient-to-r backdrop-blur-sm px-3 py-2 flex items-center gap-2.5 transition-all",
               style.accent,
-              prompt.actionLink && "cursor-pointer active:opacity-80"
+              "cursor-pointer active:opacity-80"
             )}
-              onClick={() => { if (prompt.actionLink) navigate(prompt.actionLink); }}
+              onClick={() => { setDeepDivePrompt({ label: prompt.label, text: prompt.text }); setDeepDiveOpen(true); }}
             >
               <div className={cn("flex-shrink-0", style.iconColor)}>
                 {prompt.icon}
@@ -732,6 +732,15 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
             </div>
           </motion.div>
         </AnimatePresence>
+      )}
+
+      {deepDivePrompt && (
+        <InsightDeepDiveModal
+          open={deepDiveOpen}
+          onOpenChange={setDeepDiveOpen}
+          label={deepDivePrompt.label}
+          text={deepDivePrompt.text}
+        />
       )}
     </div>
   );
