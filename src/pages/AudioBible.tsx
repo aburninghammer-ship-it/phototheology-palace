@@ -1142,11 +1142,24 @@ export default function AudioBible() {
                           variant="outline"
                           size="lg"
                           className="border-amber-500/30 hover:bg-amber-500/10 text-amber-400"
-                          onClick={() => setShowImmersiveView(true)}
+                          onClick={() => {
+                            const track: ImmersiveTrack = {
+                              id: `${epicNowPlayingBook}-${epicNowPlayingChapter}-${epicMode}`,
+                              title: `${epicNowPlayingBook || selectedBook} ${epicNowPlayingChapter || selectedChapter}`,
+                              subtitle: `${activeModeMeta.label} Commentary`,
+                              type: "commentary",
+                              audioUrl: epicAudioUrl,
+                              book: epicNowPlayingBook || selectedBook,
+                              chapter: epicNowPlayingChapter || selectedChapter,
+                              modeName: activeModeMeta.label,
+                              icon: "📖",
+                            };
+                            immersive.openImmersive([track]);
+                          }}
                           disabled={!epicAudioUrl}
                         >
                           <Maximize2 className="h-5 w-5 mr-2" />
-                          Immersive
+                          Immerse
                         </Button>
                       )}
                     </div>
