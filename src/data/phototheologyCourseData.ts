@@ -1,3 +1,8 @@
+export interface PracticeToolLink {
+  link: string;
+  label: string;
+}
+
 export interface CourseDay {
   day: number;
   week: number;
@@ -14,6 +19,7 @@ export interface CourseDay {
   roomCode?: string;
   practiceLink?: string;
   practiceLinkLabel?: string;
+  practiceTools?: PracticeToolLink[];
 }
 
 export interface KidsCourseDay extends CourseDay {
