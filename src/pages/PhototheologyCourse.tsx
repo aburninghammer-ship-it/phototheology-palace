@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Book, CheckCircle2, Circle, BookOpen, Sparkles, Users, ExternalLink, ChevronDown, ChevronRight, Flame, Trophy, GraduationCap } from "lucide-react";
+import { Book, CheckCircle2, Circle, BookOpen, Sparkles, ExternalLink, ChevronDown, ChevronRight, Flame, Trophy, GraduationCap } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { phototheologyCourse, kidsPhototheologyCourse, FLOOR_META } from "@/data/phototheologyCourseData";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
