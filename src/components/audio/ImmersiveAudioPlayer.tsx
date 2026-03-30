@@ -22,6 +22,9 @@ import { fetchChapterVerses } from "@/services/audioBibleService";
 import { globalAudioManager } from "@/lib/globalAudioManager";
 import { cn } from "@/lib/utils";
 import type { ImmersiveTrack } from "@/hooks/useImmersiveMode";
+import { ImmersiveParticles } from "./immersive/ImmersiveParticles";
+import { ImmersiveKaraokeVerse } from "./immersive/ImmersiveKaraokeVerse";
+import { ImmersiveSleepTimer } from "./immersive/ImmersiveSleepTimer";
 
 // Ambient tracks for background layering
 const AMBIENT_BG_TRACKS = [
@@ -97,6 +100,12 @@ export function ImmersiveAudioPlayer({
   
   // Visual effects
   const [pulseIntensity, setPulseIntensity] = useState(0);
+  
+  // Sleep timer
+  const [sleepFadeMultiplier, setSleepFadeMultiplier] = useState(1);
+  
+  // Verse progress (for karaoke word-level sync)
+  const [verseProgress, setVerseProgress] = useState(0);
   
   // Initialize main audio
   useEffect(() => {
@@ -210,11 +219,16 @@ export function ImmersiveAudioPlayer({
     // Pulse effect based on time
     setPulseIntensity(Math.sin(Date.now() / 2000) * 0.3 + 0.7);
     
-    // Map time to verse
+    // Map time to verse + compute word-level progress within verse
     if (verses.length > 0 && audio.duration > 0) {
       const verseLen = audio.duration / verses.length;
       const idx = Math.min(Math.floor(audio.currentTime / verseLen), verses.length - 1);
       setActiveVerseIndex(idx);
+      
+      // Progress within current verse (0-1) for karaoke word sync
+      const verseStart = idx * verseLen;
+      const progressInVerse = (audio.currentTime - verseStart) / verseLen;
+      setVerseProgress(Math.max(0, Math.min(1, progressInVerse)));
     }
     
     rafRef.current = requestAnimationFrame(updateTime);
@@ -261,19 +275,19 @@ export function ImmersiveAudioPlayer({
     }
   }, [isOpen, ambientMusicEnabled, isPlaying, ambientTrackIdx, ambientVolume]);
 
-  // Update ambient volume live
+  // Update ambient volume live (with sleep fade)
   useEffect(() => {
     if (ambientRef.current) {
-      ambientRef.current.volume = ambientMusicEnabled ? ambientVolume : 0;
+      ambientRef.current.volume = ambientMusicEnabled ? ambientVolume * sleepFadeMultiplier : 0;
     }
-  }, [ambientVolume, ambientMusicEnabled]);
+  }, [ambientVolume, ambientMusicEnabled, sleepFadeMultiplier]);
 
-  // Update main volume
+  // Update main volume (with sleep fade)
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = mainMuted ? 0 : mainVolume;
+      audioRef.current.volume = mainMuted ? 0 : mainVolume * sleepFadeMultiplier;
     }
-  }, [mainVolume, mainMuted]);
+  }, [mainVolume, mainMuted, sleepFadeMultiplier]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -349,12 +363,11 @@ export function ImmersiveAudioPlayer({
             }}
             transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
           />
-          {/* Subtle particle dots */}
-          <div className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: "radial-gradient(circle, hsl(var(--primary)) 1px, transparent 1px)",
-              backgroundSize: "30px 30px",
-            }}
+          {/* Canvas particle field */}
+          <ImmersiveParticles
+            isPlaying={isPlaying}
+            mood={track?.type || "commentary"}
+            intensity={sleepFadeMultiplier * 0.6}
           />
         </div>
 
@@ -377,6 +390,15 @@ export function ImmersiveAudioPlayer({
                 <Music className="h-3 w-3" /> Ambient
               </Badge>
             )}
+            <ImmersiveSleepTimer
+              isOpen={isOpen}
+              onSleepTrigger={() => {
+                if (audioRef.current) audioRef.current.pause();
+                if (ambientRef.current) ambientRef.current.pause();
+                setIsPlaying(false);
+              }}
+              onVolumeFade={setSleepFadeMultiplier}
+            />
             <Button variant="ghost" size="icon" onClick={() => setShowSettings(!showSettings)}>
               <Settings className="h-4 w-4" />
             </Button>
@@ -450,45 +472,26 @@ export function ImmersiveAudioPlayer({
               <p className="text-muted-foreground text-sm">Preparing your immersive experience...</p>
             </div>
           ) : verses.length > 0 ? (
-            /* Verse-synced display for commentary */
+            /* Karaoke verse-synced display for commentary */
             <ScrollArea className="h-full">
               <div className="max-w-2xl mx-auto px-6 py-12 space-y-1">
                 {verses.map((v, idx) => {
                   const isActive = idx === activeVerseIndex;
                   const isPast = idx < activeVerseIndex;
                   return (
-                    <motion.div
+                    <ImmersiveKaraokeVerse
                       key={v.verse}
-                      ref={isActive ? activeVerseRef : undefined}
-                      animate={isActive ? { scale: 1.01 } : { scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className={cn(
-                        "py-4 px-5 rounded-xl transition-all duration-700 cursor-pointer",
-                        isActive
-                          ? "bg-primary/10 border border-primary/25 shadow-xl shadow-primary/5"
-                          : isPast
-                            ? "opacity-40"
-                            : "opacity-30"
-                      )}
+                      verse={v}
+                      isActive={isActive}
+                      isPast={isPast}
+                      verseProgress={isActive ? verseProgress : 0}
+                      innerRef={isActive ? activeVerseRef : undefined}
                       onClick={() => {
                         if (audioRef.current && duration > 0) {
                           audioRef.current.currentTime = (idx / verses.length) * duration;
                         }
                       }}
-                    >
-                      <span className={cn(
-                        "inline-block w-8 text-right mr-4 text-xs font-mono",
-                        isActive ? "text-primary font-bold" : "text-muted-foreground"
-                      )}>
-                        {v.verse}
-                      </span>
-                      <span className={cn(
-                        "text-lg leading-relaxed",
-                        isActive ? "text-foreground font-medium" : "text-foreground/50"
-                      )}>
-                        {v.text}
-                      </span>
-                    </motion.div>
+                    />
                   );
                 })}
                 <div className="h-40" />
