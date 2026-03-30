@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Book, CheckCircle2, Circle, BookOpen, Sparkles, ExternalLink, ChevronDown, ChevronRight, Flame, Trophy, GraduationCap, Lock, Calendar } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { phototheologyCourse, FLOOR_META } from "@/data/phototheologyCourseData";
+import { courseAssignments } from "@/data/courseAssignments";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -351,6 +352,31 @@ export default function PhototheologyCourse() {
                                       <ExternalLink className="h-3.5 w-3.5" />
                                       {tool.label}
                                     </Button>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Assignments */}
+                          {courseAssignments[selectedDayData.day] && (
+                            <div className="space-y-3">
+                              <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5">
+                                📋 Today's Assignments
+                              </h3>
+                              <div className="space-y-2">
+                                {courseAssignments[selectedDayData.day].map((assignment, idx) => (
+                                  <Link key={idx} to={assignment.route} className="block">
+                                    <div className="flex items-start gap-3 p-3 rounded-lg border border-border/60 bg-card hover:bg-accent/50 transition-colors group">
+                                      <span className="text-lg mt-0.5">{assignment.icon}</span>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs font-semibold text-primary">{assignment.tool}</span>
+                                          <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{assignment.task}</p>
+                                      </div>
+                                    </div>
                                   </Link>
                                 ))}
                               </div>
