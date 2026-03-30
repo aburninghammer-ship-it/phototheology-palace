@@ -21273,6 +21273,17 @@ export type Database = {
           token_expires_at: string
         }[]
       }
+      get_gift_by_token: {
+        Args: { _token: string }
+        Returns: {
+          expires_at: string
+          gift_token: string
+          id: string
+          personal_message: string
+          plan_type: string
+          status: string
+        }[]
+      }
       get_or_create_conversation: {
         Args: { other_user_id: string }
         Returns: string
