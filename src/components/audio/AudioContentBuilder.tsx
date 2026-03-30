@@ -160,7 +160,7 @@ export function AudioContentBuilder() {
             <SelectTrigger className="h-9 text-sm">
               <SelectValue placeholder="Select Book..." />
             </SelectTrigger>
-            <SelectContent className="max-h-60">
+            <SelectContent className="max-h-[300px] overflow-y-auto z-[200]">
               {BIBLE_BOOKS.map(book => (
                 <SelectItem key={book} value={book}>{book}</SelectItem>
               ))}
@@ -172,7 +172,7 @@ export function AudioContentBuilder() {
             <SelectTrigger className="h-9 text-sm">
               <SelectValue placeholder={selectedBook ? "Select Chapter..." : "Pick a book first"} />
             </SelectTrigger>
-            <SelectContent className="max-h-60">
+            <SelectContent className="max-h-[300px] overflow-y-auto z-[200]" position="popper" sideOffset={4}>
               {chapterOptions.map(ch => (
                 <SelectItem key={ch} value={String(ch)}>Chapter {ch}</SelectItem>
               ))}
@@ -184,7 +184,7 @@ export function AudioContentBuilder() {
             <SelectTrigger className="h-9 text-sm">
               <SelectValue placeholder="Select Voice Style..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[200]" position="popper" sideOffset={4}>
               {VOICE_STYLES.map(v => (
                 <SelectItem key={v.id} value={v.id}>
                   {v.label} — {v.description}
@@ -239,7 +239,7 @@ export function AudioContentBuilder() {
             <SelectTrigger className="h-9 text-sm">
               <SelectValue placeholder="Select Avatar..." />
             </SelectTrigger>
-            <SelectContent className="max-h-60">
+            <SelectContent className="max-h-[300px] overflow-y-auto z-[200]" position="popper" sideOffset={4}>
               {AATS_AVATARS.map(a => (
                 <SelectItem key={a.id} value={a.id}>
                   {a.emoji} {a.name}
@@ -253,7 +253,7 @@ export function AudioContentBuilder() {
             <SelectTrigger className="h-9 text-sm">
               <SelectValue placeholder={selectedAvatar ? "Select Day..." : "Pick an avatar first"} />
             </SelectTrigger>
-            <SelectContent className="max-h-60">
+            <SelectContent className="max-h-[300px] overflow-y-auto z-[200]" position="popper" sideOffset={4}>
               {selectedAvatarInfo && Array.from({ length: selectedAvatarInfo.totalDays }, (_, i) => i + 1).map(day => (
                 <SelectItem key={day} value={String(day)}>
                   Day {day}{day <= 8 ? " — Week 1" : day <= 16 ? " — Week 2" : day <= 24 ? " — Week 3" : day <= 32 ? " — Week 4" : day <= 40 ? " — Week 5" : day <= 48 ? " — Week 6" : day <= 56 ? " — Week 7-8" : ""}
