@@ -472,45 +472,26 @@ export function ImmersiveAudioPlayer({
               <p className="text-muted-foreground text-sm">Preparing your immersive experience...</p>
             </div>
           ) : verses.length > 0 ? (
-            /* Verse-synced display for commentary */
+            /* Karaoke verse-synced display for commentary */
             <ScrollArea className="h-full">
               <div className="max-w-2xl mx-auto px-6 py-12 space-y-1">
                 {verses.map((v, idx) => {
                   const isActive = idx === activeVerseIndex;
                   const isPast = idx < activeVerseIndex;
                   return (
-                    <motion.div
+                    <ImmersiveKaraokeVerse
                       key={v.verse}
-                      ref={isActive ? activeVerseRef : undefined}
-                      animate={isActive ? { scale: 1.01 } : { scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className={cn(
-                        "py-4 px-5 rounded-xl transition-all duration-700 cursor-pointer",
-                        isActive
-                          ? "bg-primary/10 border border-primary/25 shadow-xl shadow-primary/5"
-                          : isPast
-                            ? "opacity-40"
-                            : "opacity-30"
-                      )}
+                      verse={v}
+                      isActive={isActive}
+                      isPast={isPast}
+                      verseProgress={isActive ? verseProgress : 0}
+                      innerRef={isActive ? activeVerseRef : undefined}
                       onClick={() => {
                         if (audioRef.current && duration > 0) {
                           audioRef.current.currentTime = (idx / verses.length) * duration;
                         }
                       }}
-                    >
-                      <span className={cn(
-                        "inline-block w-8 text-right mr-4 text-xs font-mono",
-                        isActive ? "text-primary font-bold" : "text-muted-foreground"
-                      )}>
-                        {v.verse}
-                      </span>
-                      <span className={cn(
-                        "text-lg leading-relaxed",
-                        isActive ? "text-foreground font-medium" : "text-foreground/50"
-                      )}>
-                        {v.text}
-                      </span>
-                    </motion.div>
+                    />
                   );
                 })}
                 <div className="h-40" />
