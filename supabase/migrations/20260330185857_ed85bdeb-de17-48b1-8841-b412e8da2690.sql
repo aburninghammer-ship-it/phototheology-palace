@@ -1,0 +1,1 @@
+DELETE FROM public.epic_commentaries WHERE commentary_mode = 'kids';
