@@ -86,12 +86,14 @@ export function OpenAIAudioButton({
       const audio = new Audio(audioUrl);
 
       audio.onplay = () => {
+        globalAudioManager.register(audio);
         setIsPlaying(true);
         setIsLoading(false);
         notifyTTSStarted();
       };
 
       audio.onended = () => {
+        globalAudioManager.unregister(audio);
         setIsPlaying(false);
         notifyTTSStopped();
         if (shouldRevoke) URL.revokeObjectURL(audioUrl);
@@ -99,6 +101,7 @@ export function OpenAIAudioButton({
       };
 
       audio.onerror = () => {
+        globalAudioManager.unregister(audio);
         setIsPlaying(false);
         setIsLoading(false);
         notifyTTSStopped();
