@@ -95,6 +95,7 @@ function SortablePlaylistItem({
   isPlaying,
   onPlay,
   onRemove,
+  onImmerse,
 }: {
   item: PlaylistItem;
   idx: number;
@@ -102,6 +103,7 @@ function SortablePlaylistItem({
   isPlaying: boolean;
   onPlay: () => void;
   onRemove: () => void;
+  onImmerse: () => void;
 }) {
   const {
     attributes,
