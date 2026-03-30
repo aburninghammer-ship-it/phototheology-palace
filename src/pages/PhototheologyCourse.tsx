@@ -207,7 +207,7 @@ export default function PhototheologyCourse() {
                                       </button>
                                       );
                                     })}
-                                    ))}
+                                    
                                   </div>
                                 </motion.div>
                               )}
