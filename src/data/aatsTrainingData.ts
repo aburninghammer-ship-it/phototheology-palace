@@ -110,6 +110,7 @@ export const AATS_AVATAR_IDS = [
   "internet-skeptic",
   "agnostic",
   "pentecostal",
+  "anti-trinitarian",
 ] as const;
 
 export type AATSAvatarId = (typeof AATS_AVATAR_IDS)[number];
@@ -146,13 +147,13 @@ export const ARENA_RINGS: ArenaRing[] = [
     description: "Intra-Christian challengers including evangelicals, Catholics, ex-SDAs, and prophecy schools",
     icon: "Sparkles",
     color: "text-blue-400",
-    avatarIds: ["evangelical", "catholic", "jw", "progressive-christian", "former-sda", "offshoot-sda", "skeptical-exsda", "anti-prophet", "preterist", "futurist", "pentecostal"],
+    avatarIds: ["evangelical", "catholic", "jw", "progressive-christian", "former-sda", "offshoot-sda", "skeptical-exsda", "anti-prophet", "preterist", "futurist", "pentecostal", "anti-trinitarian"],
   },
 ];
 
 /** Cross-avatar subjects that appear across multiple worldviews */
 export const CROSS_AVATAR_SUBJECTS: { id: string; title: string; avatarIds: AATSAvatarId[] }[] = [
-  { id: "trinity", title: "The Trinity", avatarIds: ["muslim", "jw", "mormon", "bhi", "jewish", "philosopher"] },
+  { id: "trinity", title: "The Trinity", avatarIds: ["muslim", "jw", "mormon", "bhi", "jewish", "philosopher", "anti-trinitarian"] },
   { id: "sabbath", title: "The Sabbath", avatarIds: ["evangelical", "catholic", "atheist", "progressive-christian", "former-sda"] },
   { id: "deity-of-christ", title: "Deity of Christ", avatarIds: ["muslim", "jw", "atheist", "jewish", "new-age"] },
   { id: "bible-authority", title: "Bible Authority", avatarIds: ["muslim", "catholic", "mormon", "secular-scholar", "atheist"] },
@@ -193,6 +194,7 @@ import { internetSkepticTraining } from "./aats/internetSkepticTraining";
 import { agnosticTraining } from "./aats/agnosticTraining";
 import { scientistTraining } from "./aats/scientistTraining";
 import { pentecostalTraining } from "./aats/pentecostalTraining";
+import { antiTrinitarianTraining } from "./aats/antiTrinitarianTraining";
 
 const TRAINING_MAP: Record<AATSAvatarId, AATSAvatarTraining> = {
   atheist: atheistTraining,
@@ -217,6 +219,7 @@ const TRAINING_MAP: Record<AATSAvatarId, AATSAvatarTraining> = {
   "internet-skeptic": internetSkepticTraining,
   agnostic: agnosticTraining,
   pentecostal: pentecostalTraining,
+  "anti-trinitarian": antiTrinitarianTraining,
 };
 
 export function getAvatarTraining(avatarId: AATSAvatarId): AATSAvatarTraining {
