@@ -44,9 +44,7 @@ export default function PhototheologyCourse() {
 
   const handleSelectDay = (day: number) => {
     setSelectedDay(day);
-    const data = ageGroup === 'adult'
-      ? phototheologyCourse.find(d => d.day === day)
-      : kidsPhototheologyCourse.find(d => d.day === day && d.ageGroup === ageGroup);
+    const data = phototheologyCourse.find(d => d.day === day);
     if (data) setReflectionDraft(reflections[day] || "");
   };
 
