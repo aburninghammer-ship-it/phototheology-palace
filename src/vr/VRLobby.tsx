@@ -22,9 +22,11 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         <meshStandardMaterial color="#0a0a15" side={1} />
       </mesh>
 
-      {/* Ambient lighting */}
-      <ambientLight intensity={0.3} />
-      <pointLight position={[0, 4, 0]} intensity={1} color="#e8d5b7" />
+      {/* Ambient lighting — boosted for XR visibility */}
+      <ambientLight intensity={0.8} />
+      <pointLight position={[0, 4, 0]} intensity={2} color="#e8d5b7" />
+      <pointLight position={[-3, 3, -3]} intensity={1} color="#6366f1" />
+      <pointLight position={[3, 3, -3]} intensity={1} color="#8b5cf6" />
 
       {/* Title */}
       <Text
