@@ -12,6 +12,7 @@ import { useEventTracking } from '@/hooks/useEventTracking';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { UserCountBadge } from '@/components/UserCountBadge';
+import { OsSpacesWelcome } from '@/components/OsSpacesWelcome';
 import { Headphones } from 'lucide-react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
