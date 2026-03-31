@@ -13,7 +13,7 @@ import {
   Heart,
   Flame,
   ArrowRight
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 
 interface MemoryTemplate {
   id: string;

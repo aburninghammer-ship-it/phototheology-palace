@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Award, BookOpen, Flame, Target, Users, Brain, Heart, Star, Lock, Crown, Zap, Gift } from "lucide-react";
+import { Award, BookOpen, Flame, Target, Users, Brain, Heart, Star, Lock, Crown, Zap, Gift , type LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";

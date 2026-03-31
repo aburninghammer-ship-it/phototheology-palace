@@ -23,7 +23,7 @@ import {
   Book, Film, Layers, MessageCircleQuestion, TreeDeciduous, History,
   Compass, Target, GitCompare, Crown, CalendarDays, Scroll, Mountain,
 Scale, Zap, Calculator, Mic2, Edit, Copy, Presentation, CheckCircle2, Grid3X3
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { StyledMarkdown } from "@/components/ui/styled-markdown";
 

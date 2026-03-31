@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { 
   BookOpen, Users, Heart, Target, Rocket, GraduationCap,
   Calendar, CheckCircle2, ArrowRight, Download
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 
 interface MinistryLaunchTemplatesProps {
   churchId: string;

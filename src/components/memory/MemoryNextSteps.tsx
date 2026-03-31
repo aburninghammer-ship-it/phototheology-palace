@@ -11,7 +11,7 @@ import {
   Sparkles,
   CheckCircle2,
   Circle
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 
 interface NextStep {
   id: string;

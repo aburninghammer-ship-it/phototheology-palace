@@ -13,7 +13,7 @@ import {
   Play,
   ChevronRight,
   Info,
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 
 interface ActionOption {
   id: string;

@@ -18,7 +18,7 @@ import {
   Sparkles,
   GraduationCap,
   Flame
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 
 interface DrillType {
   id: string;
