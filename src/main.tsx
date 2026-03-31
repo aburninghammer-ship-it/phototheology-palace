@@ -75,29 +75,8 @@ if ("serviceWorker" in navigator) {
       }
     })();
   } else {
-    // Production: if a new SW is waiting, tell it to activate NOW
-    navigator.serviceWorker.getRegistration().then((reg) => {
-      if (reg?.waiting) {
-        reg.waiting.postMessage({ type: "SKIP_WAITING" });
-      }
-      // Listen for future waiting workers
-      reg?.addEventListener("updatefound", () => {
-        const newWorker = reg.installing;
-        newWorker?.addEventListener("statechange", () => {
-          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-            newWorker.postMessage({ type: "SKIP_WAITING" });
-          }
-        });
-      });
-    });
-    // Reload once the new SW takes control
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (!refreshing) {
-        refreshing = true;
-        window.location.reload();
-      }
-    });
+    // Production: let PWAUpdatePrompt (useRegisterSW) handle updates & prompt.
+    // No auto-SKIP_WAITING or force-reload here — that bypasses the user prompt.
   }
 }
 
