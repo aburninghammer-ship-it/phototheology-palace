@@ -12,7 +12,7 @@ import {
   Flame, Calendar, StickyNote, Scale, Heart, HeartHandshake,
   MessageSquare, Megaphone, Video, Crown, Users, User,
   Library, Clock, Map, Languages, BookText, Glasses,
-  CreditCard, LayoutGrid, ImageIcon,
+  CreditCard, LayoutGrid, ImageIcon, Scroll,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -163,8 +163,10 @@ const OS_SPACES: OsSpace[] = [
     color: "45 90% 50%",
     items: [
       { label: "PT Course", path: "/phototheology-course", icon: BookText, description: "90-day flagship course" },
-      { label: "Courses", path: "/courses", icon: GraduationCap, description: "Learning paths" },
-      { label: "Floor Mastery", path: "/mastery", icon: Crown, description: "Track progression" },
+      { label: "Blueprint Course", path: "/blueprint-course", icon: BookOpen, description: "Prophecy foundations" },
+      { label: "Daniel Course", path: "/daniel-course", icon: Scroll, description: "Book of Daniel deep dive" },
+      { label: "Revelation Course", path: "/revelation-course", icon: Crown, description: "Unveiling Revelation" },
+      { label: "Floor Mastery", path: "/mastery", icon: GraduationCap, description: "Track progression" },
       { label: "Certificates", path: "/achievements", icon: Trophy, description: "Earned certificates" },
     ],
   },
