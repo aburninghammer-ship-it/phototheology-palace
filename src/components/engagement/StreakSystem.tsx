@@ -11,7 +11,7 @@ interface StreakMilestone {
   days: number;
   title: string;
   reward: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
 }
 

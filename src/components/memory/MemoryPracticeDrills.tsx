@@ -24,7 +24,7 @@ interface DrillType {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   difficulty: "beginner" | "intermediate" | "advanced";
   timeEstimate: string;
   skills: string[];

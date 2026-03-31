@@ -33,7 +33,7 @@ interface EGWBook {
   id: string;
   title: string;
   shortTitle: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   series: "conflict" | "devotional";
   chapters: EGWChapter[];
   description: string;

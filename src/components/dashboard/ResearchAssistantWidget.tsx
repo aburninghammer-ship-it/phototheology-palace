@@ -57,7 +57,7 @@ interface ChatMessage {
 
 interface QuickAction {
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   prefix: string;
   color: string;
 }

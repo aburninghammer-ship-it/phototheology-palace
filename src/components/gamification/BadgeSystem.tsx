@@ -13,7 +13,7 @@ interface BadgeDefinition {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
   requirement: { type: string; count: number };
   tier: "bronze" | "silver" | "gold" | "platinum";

@@ -34,7 +34,7 @@ interface StatCard {
   label: string;
   value: string | number;
   change?: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
 }
 

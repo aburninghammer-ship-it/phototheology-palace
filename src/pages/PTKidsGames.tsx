@@ -26,7 +26,7 @@ interface KidsGame {
   id: string;
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
   ageRange: string;
   difficulty: "easy" | "medium" | "hard";

@@ -17,7 +17,7 @@ import {
 
 interface ActionOption {
   id: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   title: string;
   description: string;
   path: string;

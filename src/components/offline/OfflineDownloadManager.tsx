@@ -24,7 +24,7 @@ interface DownloadableContent {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   sizeEstimate: string;
   isDownloaded: boolean;
   downloadProgress: number;

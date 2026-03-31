@@ -18,7 +18,7 @@ interface Template {
   description: string;
   category: string;
   duration: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   steps: string[];
   resources: string[];
 }

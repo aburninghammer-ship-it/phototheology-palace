@@ -7,7 +7,7 @@ type SabbathPhase = 'preparation' | 'sabbath' | 'reflection' | 'carrying';
 interface PhaseConfig {
   label: string;
   subtitle: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   gradient: string;
   textColor: string;
 }
