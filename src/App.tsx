@@ -60,6 +60,9 @@ import Auth from "./pages/Auth";
 // Legacy landing page (lazy loaded)
 const Index = lazy(() => import("./pages/Index"));
 
+// VR Hub (lazy loaded - no VR code in main bundle)
+const VRHub = lazy(() => import("./vr/VRHub"));
+
 // Lazy load pricing, demo, and donation
 const Pricing = lazy(() => import("./pages/Pricing"));
 const FixBilling = lazy(() => import("./pages/FixBilling"));
@@ -793,6 +796,8 @@ function App() {
               </ProtectedRoute>
             } />
 
+
+            <Route path="/vr" element={<VRHub />} />
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
