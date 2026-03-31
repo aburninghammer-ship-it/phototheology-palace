@@ -25,7 +25,8 @@ import {
   CalendarDays,
   Wand2,
   RefreshCcw,
-, type LucideIcon } from "lucide-react";
+  type LucideIcon,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

@@ -7,7 +7,8 @@ import {
   BookOpen, Shield, Brain, Zap, Swords, Flame, ArrowLeft, ArrowRight,
   CheckCircle2, Circle, ChevronDown, ChevronUp, ChevronRight, GraduationCap,
   Target, Eye, Sparkles, Trophy, Users, Lightbulb, HelpCircle, Loader2, Headphones,
-, type LucideIcon } from "lucide-react";
+  type LucideIcon,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

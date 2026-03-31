@@ -27,7 +27,8 @@ import {
   StarOff,
   ChevronDown,
   ChevronUp,
-, type LucideIcon } from "lucide-react";
+  type LucideIcon,
+} from "lucide-react";
 import { useFreestyleMentor, type ExitCommand } from "@/hooks/useFreestyleMentor";
 import { cn } from "@/lib/utils";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
