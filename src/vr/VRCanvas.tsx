@@ -38,7 +38,8 @@ function VRScene() {
 
 export default function VRCanvas() {
   return (
-    <>
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      {/* XR session buttons — positioned above the canvas */}
       <div
         style={{
           position: 'absolute',
@@ -76,7 +77,9 @@ export default function VRCanvas() {
         />
       </div>
 
+      {/* R3F Canvas — fills the parent div */}
       <Canvas
+        style={{ width: '100%', height: '100%' }}
         gl={{ antialias: true, alpha: false }}
         camera={{ position: [0, 1.6, 0], fov: 75, near: 0.1, far: 200 }}
       >
@@ -85,6 +88,7 @@ export default function VRCanvas() {
         </XR>
       </Canvas>
 
+      {/* Non-XR notice */}
       <div
         style={{
           position: 'absolute',
@@ -99,6 +103,6 @@ export default function VRCanvas() {
       >
         For the full experience, open this page on Meta Quest 3 browser and click "Enter VR"
       </div>
-    </>
+    </div>
   );
 }

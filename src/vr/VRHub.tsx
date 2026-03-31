@@ -33,7 +33,18 @@ class VRErrorBoundary extends React.Component<
 
 export default function VRHub() {
   return (
-    <div className="w-full h-screen bg-black relative">
+    // Fixed full-screen overlay — covers app shell (nav, sidebars, dock)
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 9999,
+        background: '#000',
+      }}
+    >
       <VRErrorBoundary>
         <VRCanvas />
       </VRErrorBoundary>
