@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         // ⚠️  Precache only the index page and main JS/CSS.
         // Large images will be cached at runtime instead.
-        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MiB
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 8 MiB
         globPatterns: ['**/*.{js,css,html,woff,woff2}'],
         navigateFallback: '/index.html',
         // Runtime caching for everything else
