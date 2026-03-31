@@ -12,7 +12,7 @@ import {
   Heart, Cross, Star, ArrowRight, MessageSquareMore, Send, X, BookText, Telescope,
   Link2, ExternalLink, Headphones, Play, Pause, Square, SkipForward, SkipBack,
   Volume2, RefreshCw, Clock, Scale, Scroll, Mic, AlertTriangle, History
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -33,7 +33,7 @@ interface EGWBook {
   id: string;
   title: string;
   shortTitle: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   series: "conflict" | "devotional";
   chapters: EGWChapter[];
   description: string;

@@ -13,13 +13,13 @@ import {
   Heart,
   Flame,
   ArrowRight
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 
 interface MemoryTemplate {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
   verseCount: number;
   difficulty: "easy" | "medium" | "hard";

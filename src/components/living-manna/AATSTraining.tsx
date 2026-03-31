@@ -7,6 +7,7 @@ import {
   BookOpen, Shield, Brain, Zap, Swords, Flame, ArrowLeft, ArrowRight,
   CheckCircle2, Circle, ChevronDown, ChevronUp, ChevronRight, GraduationCap,
   Target, Eye, Sparkles, Trophy, Users, Lightbulb, HelpCircle, Loader2, Headphones,
+  type LucideIcon,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ import {
 import { DEFENSE_OPPONENTS } from "@/data/defenseModeOpponents";
 
 // ── Icon map for phases ─────────────────────────────────────────────────────
-const PHASE_ICONS: Record<string, React.ElementType> = {
+const PHASE_ICONS: Record<string, LucideIcon> = {
   BookOpen, Shield, Brain, Zap, Swords, Flame,
 };
 

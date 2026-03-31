@@ -18,7 +18,7 @@ import {
   Map,
   ArrowRight,
   Lock
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -26,7 +26,7 @@ interface KidsGame {
   id: string;
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
   ageRange: string;
   difficulty: "easy" | "medium" | "hard";

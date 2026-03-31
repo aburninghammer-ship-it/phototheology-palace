@@ -11,13 +11,13 @@ import {
   Sparkles,
   CheckCircle2,
   Circle
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 
 interface NextStep {
   id: string;
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   action: string;
   path: string;
   completed?: boolean;

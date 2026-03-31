@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Sun, Moon, Sunrise, Sparkles } from "lucide-react";
+import { Sun, Moon, Sunrise, Sparkles , type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type SabbathPhase = 'preparation' | 'sabbath' | 'reflection' | 'carrying';
@@ -7,7 +7,7 @@ type SabbathPhase = 'preparation' | 'sabbath' | 'reflection' | 'carrying';
 interface PhaseConfig {
   label: string;
   subtitle: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   gradient: string;
   textColor: string;
 }

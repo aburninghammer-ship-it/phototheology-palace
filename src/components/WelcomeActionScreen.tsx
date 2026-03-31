@@ -13,11 +13,12 @@ import {
   Play,
   ChevronRight,
   Info,
+  type LucideIcon,
 } from "lucide-react";
 
 interface ActionOption {
   id: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   title: string;
   description: string;
   path: string;

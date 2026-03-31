@@ -7,6 +7,7 @@ import {
   Lightbulb, Video, Library, Scale, Megaphone, CreditCard,
   Heart, Dumbbell, HeartHandshake, User, Flame, BookMarked,
   Languages, Microscope, Map, Clock, BookText, ImageIcon, Layers3,
+  Glasses,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -157,6 +158,9 @@ export const DOCK_ITEMS: DockItem[] = [
   },
   {
     id: "church", label: "My Church Space", icon: Church, path: "/living-manna", glow: "142 71% 45%",
+  },
+  {
+    id: "vr", label: "VR Experience", icon: Glasses, path: "/vr", glow: "200 90% 55%",
   },
   {
     id: "pricing", label: "Pricing", icon: CreditCard, path: "/pricing", glow: "84 75% 48%",

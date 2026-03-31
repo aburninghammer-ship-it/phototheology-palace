@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   GraduationCap, Clock, Award, CheckCircle, Play,
   ChevronRight, Star, Users, BookOpen, Flame, Lightbulb
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { ALL_PACKAGES } from "@/data/discipleshipPackages";
 import type { DiscipleshipPackage } from "@/data/discipleshipPackages";
@@ -20,7 +20,7 @@ interface DiscipleshipPackagesProps {
   churchId: string;
 }
 
-const PACKAGE_ICONS: Record<string, React.ElementType> = {
+const PACKAGE_ICONS: Record<string, LucideIcon> = {
   Flame,
   BookOpen,
   Lightbulb,

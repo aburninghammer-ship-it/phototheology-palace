@@ -25,6 +25,7 @@ import {
   CalendarDays,
   Wand2,
   RefreshCcw,
+  type LucideIcon,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,7 +58,7 @@ interface ChatMessage {
 
 interface QuickAction {
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   prefix: string;
   color: string;
 }

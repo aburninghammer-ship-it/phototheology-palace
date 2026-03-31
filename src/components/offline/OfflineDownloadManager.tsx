@@ -17,14 +17,14 @@ import {
   Library,
   Image,
   Loader2
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 
 interface DownloadableContent {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   sizeEstimate: string;
   isDownloaded: boolean;
   downloadProgress: number;
