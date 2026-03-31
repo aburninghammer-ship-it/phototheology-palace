@@ -12,6 +12,7 @@ import { useEventTracking } from '@/hooks/useEventTracking';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { UserCountBadge } from '@/components/UserCountBadge';
+import { OsSpacesWelcome } from '@/components/OsSpacesWelcome';
 import { Headphones } from 'lucide-react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
@@ -340,6 +341,9 @@ const Gatehouse = () => {
             </div>
           </motion.div>
 
+          {/* OS Spaces Dashboard */}
+          <OsSpacesWelcome />
+
           {/* Full Card Layout */}
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full">
             {/* Surface Study Path - Blue Glass */}
@@ -515,6 +519,9 @@ const Gatehouse = () => {
             </Button>
           </div>
         </motion.div>
+
+        {/* OS Spaces Dashboard */}
+        <OsSpacesWelcome />
 
         {/* The Two Paths - Glass Cards */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
