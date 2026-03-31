@@ -103,7 +103,7 @@ export function OSTitleBar() {
                 letterSpacing: "0.06em",
                 textTransform: "uppercase"
               }}>
-              Powered by AI. Built for Biblical Intelligence.
+              The Art of Seeing Christ in All Things.
             </span>
           </div>
         </div>

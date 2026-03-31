@@ -25,7 +25,7 @@ const organizationJsonLd: JsonLdData = {
   name: "PhototheologyOS",
   url: BASE_URL,
   logo: `${BASE_URL}/pwa-512x512.png`,
-  description: "PhototheologyOS — Powered by AI. Built for Biblical Intelligence.",
+  description: "PhototheologyOS — The Art of Seeing Christ in All Things. Biblical Intelligence.",
   sameAs: []
 };
 
@@ -34,12 +34,12 @@ const websiteJsonLd: JsonLdData = {
   "@type": "WebSite",
   name: "PhototheologyOS",
   url: BASE_URL,
-  description: "Powered by AI. Built for Biblical Intelligence. Master Scripture through the 8-floor Palace method."
+  description: "The Art of Seeing Christ in All Things. Biblical Intelligence. Master Scripture through the 8-floor Palace method."
 };
 
 export const SEO = ({
   title = "PhototheologyOS",
-  description = "PhototheologyOS — Powered by AI. Built for Biblical Intelligence. Master Scripture through the 8-floor Palace method with AI-powered study tools, games, and Christ-centered interpretation.",
+  description = "PhototheologyOS — The Art of Seeing Christ in All Things. Biblical Intelligence. Master Scripture through the 8-floor Palace method with AI-powered study tools, games, and Christ-centered interpretation.",
   canonical,
   noindex = false,
   image = DEFAULT_IMAGE,
