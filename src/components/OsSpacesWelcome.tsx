@@ -21,6 +21,7 @@ interface SpaceItem {
   path: string;
   icon: LucideIcon;
   description?: string;
+  hue?: number;
 }
 
 interface OsSpace {
