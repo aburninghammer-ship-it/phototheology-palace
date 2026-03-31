@@ -430,7 +430,7 @@ function App() {
                           <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden pb-mobile-nav min-w-0">
                           <Suspense fallback={<LoadingScreen />}>
-                            <KeepAliveRoutes maxCached={20} excludePaths={["/auth", "/auth/callback", "/guesthouse"]}>
+                            <KeepAliveRoutes maxCached={20} excludePaths={["/auth", "/auth/callback", "/guesthouse", "/vr"]}>
                             <Routes>
             <Route path="/" element={<Gatehouse />} />
             <Route path="/landing" element={<Index />} />
