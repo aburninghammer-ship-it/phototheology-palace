@@ -145,6 +145,7 @@ const CharacterProfiles = lazy(() => import("./pages/CharacterProfiles"));
 const SpiritualTraining = lazy(() => import("./pages/SpiritualTraining"));
 const AppTour = lazy(() => import("./pages/AppTour"));
 const DockDemo = lazy(() => import("./pages/DockDemo"));
+const OsSpacesDraft = lazy(() => import("./pages/OsSpacesDraft"));
 const Courses = lazy(() => import("./pages/Courses"));
 const BlueprintCourse = lazy(() => import("./pages/BlueprintCourse"));
 const BlueprintWeightLoss = lazy(() => import("./pages/BlueprintWeightLoss"));
@@ -483,6 +484,7 @@ function App() {
             <Route path="/bible-prophecy-guide/success" element={<BibleProphecyGuideSuccess />} />
             <Route path="/app-tour" element={<AppTour />} />
             <Route path="/dock-demo" element={<DockDemo />} />
+            <Route path="/os-spaces-draft" element={<OsSpacesDraft />} />
             
 {/* Gatehouse Flow - Public (/ is the main gatehouse, /gatehouse kept for legacy links) */}
             <Route path="/welcome" element={<Welcome />} />
