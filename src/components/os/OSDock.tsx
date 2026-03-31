@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, ChevronLeft, ChevronDown, PanelLeftClose, PanelLeftOpen, GripVertical } from "lucide-react";
+import { ChevronRight, ChevronLeft, ChevronDown, PanelLeftClose, PanelLeftOpen, GripVertical, LayoutGrid } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DOCK_ITEMS, type DockItem } from "./dockData";
 import { useIsMobile } from "@/hooks/use-mobile";
