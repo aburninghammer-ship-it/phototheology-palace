@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, ChevronLeft, ChevronDown, PanelLeftClose, PanelLeftOpen, GripVertical } from "lucide-react";
+import { ChevronRight, ChevronLeft, ChevronDown, PanelLeftClose, PanelLeftOpen, GripVertical, LayoutGrid } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DOCK_ITEMS, type DockItem } from "./dockData";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -379,6 +379,24 @@ export function OSDock() {
           </button>
         </div>
       </div>
+
+      {/* Back to Spaces button */}
+      {currentPath !== "/" && (
+        <div className={cn("shrink-0 px-2 pt-2", !expanded && "flex justify-center")}>
+          <button
+            onClick={() => navigate("/")}
+            className={cn(
+              "flex items-center gap-2 rounded-xl transition-all w-full backdrop-blur-md border border-white/10",
+              "bg-primary/10 hover:bg-primary/20 text-primary hover:border-primary/30",
+              expanded ? "px-3 py-2" : "p-2.5 justify-center"
+            )}
+            title="Back to Spaces"
+          >
+            <LayoutGrid className="h-4 w-4 shrink-0" />
+            {expanded && <span className="text-xs font-semibold">Back to Spaces</span>}
+          </button>
+        </div>
+      )}
 
       {/* Navigation */}
       <ScrollArea className="flex-1">
