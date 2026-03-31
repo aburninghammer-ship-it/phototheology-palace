@@ -34,7 +34,7 @@ const websiteJsonLd: JsonLdData = {
   "@type": "WebSite",
   name: "PhototheologyOS",
   url: BASE_URL,
-  description: "Powered by AI. Built for Biblical Intelligence. Master Scripture through the 8-floor Palace method."
+  description: "The Art of Seeing Christ in All Things. Biblical Intelligence. Master Scripture through the 8-floor Palace method."
 };
 
 export const SEO = ({
