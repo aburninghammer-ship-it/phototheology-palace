@@ -79,8 +79,7 @@ const OS_SPACES: OsSpace[] = [
       { label: "Study Deck", path: "/card-deck", icon: Sparkles, description: "Flashcards" },
       { label: "Infographics", path: "/image-bible", icon: ImageIcon, description: "Visual summaries" },
       { label: "VR Experience", path: "/vr", icon: Glasses, description: "Immersive 3D palace" },
-      { label: "PT Course", path: "/phototheology-course", icon: BookText, description: "Learn the method" },
-      { label: "Floor Mastery", path: "/mastery", icon: Crown, description: "Track progression" },
+      { label: "VR Experience", path: "/vr", icon: Glasses, description: "Immersive 3D palace" },
     ],
   },
   {
