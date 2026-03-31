@@ -49,8 +49,6 @@ const OS_SPACES: OsSpace[] = [
       { label: "Give Me A Gem", path: "/give-me-a-gem", icon: Gem, description: "Quick insights" },
       { label: "Analyze Thoughts", path: "/analyze-thoughts", icon: Lightbulb, description: "AI thought analysis" },
       { label: "Gather Fragments", path: "/drill-drill", icon: Target, description: "Collect fragments" },
-      { label: "Amplify", path: "/amplify", icon: Megaphone, description: "Enhance with cross-refs" },
-      { label: "Remix", path: "/remix", icon: Zap, description: "New frameworks" },
       { label: "Study Series", path: "/bible-study-series", icon: BookOpen, description: "Multi-lesson series" },
       { label: "Notes", path: "/notes", icon: StickyNote, description: "Personal notes" },
       { label: "Interlinear Bible", path: "/bible/John/1?strongs=true", icon: BookText, description: "Greek/Hebrew" },
@@ -79,7 +77,6 @@ const OS_SPACES: OsSpace[] = [
       { label: "Study Deck", path: "/card-deck", icon: Sparkles, description: "Flashcards" },
       { label: "Infographics", path: "/image-bible", icon: ImageIcon, description: "Visual summaries" },
       { label: "VR Experience", path: "/vr", icon: Glasses, description: "Immersive 3D palace" },
-      { label: "VR Experience", path: "/vr", icon: Glasses, description: "Immersive 3D palace" },
     ],
   },
   {
@@ -91,10 +88,10 @@ const OS_SPACES: OsSpace[] = [
     items: [
       { label: "Sermon Builder", path: "/sermon-builder", icon: MessageSquare, description: "Craft sermons" },
       { label: "Sermon Ideas", path: "/sermon-ideas", icon: Lightbulb, description: "Saved concepts" },
+      { label: "Amplify", path: "/amplify", icon: Megaphone, description: "Enhance with cross-refs" },
+      { label: "Remix", path: "/remix", icon: Zap, description: "Remix frameworks" },
       { label: "Polish", path: "/polish", icon: Film, description: "Sermon manuscripts" },
       { label: "Video Training", path: "/video-training", icon: Video, description: "Teaching videos" },
-      { label: "Leaderboard", path: "/leaderboard", icon: Trophy, description: "Top Phototheologists" },
-      { label: "Achievements", path: "/achievements", icon: Trophy, description: "Earned badges" },
     ],
   },
   {
@@ -111,6 +108,8 @@ const OS_SPACES: OsSpace[] = [
       { label: "Scheduled Games", path: "/schedule", icon: CalendarDays, description: "Game nights" },
       { label: "Daily Challenges", path: "/daily-challenges", icon: Zap, description: "Today's challenge" },
       { label: "Challenge Board", path: "/challenge-board", icon: Trophy, description: "Public board" },
+      { label: "Leaderboard", path: "/leaderboard", icon: Trophy, description: "Top Phototheologists" },
+      { label: "Achievements", path: "/achievements", icon: Trophy, description: "Earned badges" },
       { label: "Test Me", path: "/test-me", icon: GraduationCap, description: "Assessments" },
       { label: "Training Drills", path: "/test-me", icon: Target, description: "Speed drills" },
       { label: "Dojo", path: "/spiritual-training", icon: Swords, description: "Combat training" },
