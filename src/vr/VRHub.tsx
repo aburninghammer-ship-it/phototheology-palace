@@ -1,126 +1,52 @@
 import React, { useState, Suspense, useCallback } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { XR } from '@react-three/xr';
-import { Text } from '@react-three/drei';
-import { useXRSessionStore } from './hooks/useXRSession';
-import { VRLobby, type VRExperience } from './VRLobby';
+import { Glasses, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-// Lazy-load experiences so they're tree-shaken when not used
-const SanctuaryWalk = React.lazy(() => import('./experiences/SanctuaryWalk'));
-const GalleryCorridor = React.lazy(() => import('./experiences/GalleryCorridor'));
-const SpatialAudioPlayer = React.lazy(() => import('./experiences/SpatialAudioPlayer'));
-const HeavensDiary = React.lazy(() => import('./experiences/HeavensDiary'));
-
-function LoadingFallback() {
-  return (
-    <Text position={[0, 1.5, -2]} fontSize={0.2} color="white" anchorX="center">
-      Loading experience...
-    </Text>
-  );
+// Error boundary for WebGL/Three.js crashes
+class VRErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  state = { hasError: false, error: undefined as Error | undefined };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-8">
+          <AlertTriangle className="h-12 w-12 text-amber-500" />
+          <h2 className="text-xl font-bold text-foreground">WebGL Not Available</h2>
+          <p className="text-muted-foreground max-w-md">
+            The VR experience requires WebGL which isn't available in this preview.
+            Open this page on a Meta Quest 3 browser or a WebGL-capable desktop browser.
+          </p>
+          <p className="text-xs text-muted-foreground/60 font-mono">{this.state.error?.message}</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
-function VRScene() {
-  const [currentExperience, setCurrentExperience] = useState<VRExperience>('lobby');
-
-  const goToLobby = useCallback(() => setCurrentExperience('lobby'), []);
-
-  return (
-    <>
-      {currentExperience === 'lobby' && (
-        <VRLobby onEnterExperience={setCurrentExperience} />
-      )}
-
-      <Suspense fallback={<LoadingFallback />}>
-        {currentExperience === 'sanctuary' && (
-          <SanctuaryWalk onBack={goToLobby} />
-        )}
-        {currentExperience === 'gallery' && (
-          <GalleryCorridor onBack={goToLobby} />
-        )}
-        {currentExperience === 'audio' && (
-          <SpatialAudioPlayer onBack={goToLobby} />
-        )}
-        {currentExperience === 'heavensDiary' && (
-          <HeavensDiary onBack={goToLobby} />
-        )}
-      </Suspense>
-    </>
-  );
-}
+// Lazy-load heavy 3D deps so they don't block initial render
+const VRCanvas = React.lazy(() => import('./VRCanvas'));
 
 export default function VRHub() {
-  const store = useXRSessionStore();
-
   return (
-    <div style={{ width: '100vw', height: '100vh', background: '#000' }}>
-      {/* Non-XR fallback UI */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 16,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 10,
-          display: 'flex',
-          gap: 12,
-        }}
-      >
-        <button
-          onClick={() => store.enterVR()}
-          style={{
-            padding: '12px 24px',
-            background: '#4488FF',
-            color: 'white',
-            border: 'none',
-            borderRadius: 8,
-            fontSize: 16,
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
+    <div className="w-full h-screen bg-black relative">
+      <VRErrorBoundary>
+        <Suspense
+          fallback={
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <Glasses className="h-10 w-10 text-primary animate-pulse" />
+              <p className="text-muted-foreground">Loading VR Experience...</p>
+            </div>
+          }
         >
-          Enter VR
-        </button>
-        <button
-          onClick={() => store.enterAR()}
-          style={{
-            padding: '12px 24px',
-            background: '#44FFEE',
-            color: '#000',
-            border: 'none',
-            borderRadius: 8,
-            fontSize: 16,
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
-          Enter AR
-        </button>
-      </div>
-
-      <Canvas
-        gl={{ antialias: true, alpha: false }}
-        camera={{ position: [0, 1.6, 0], fov: 75, near: 0.1, far: 200 }}
-      >
-        <XR store={store}>
-          <VRScene />
-        </XR>
-      </Canvas>
-
-      {/* Non-XR notice for desktop browsers */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 24,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          color: '#666',
-          fontSize: 14,
-          textAlign: 'center',
-          zIndex: 10,
-        }}
-      >
-        For the full experience, open this page on Meta Quest 3 browser and click "Enter VR"
-      </div>
+          <VRCanvas />
+        </Suspense>
+      </VRErrorBoundary>
     </div>
   );
 }
