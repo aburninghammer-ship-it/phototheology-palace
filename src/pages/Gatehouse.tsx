@@ -520,6 +520,9 @@ const Gatehouse = () => {
           </div>
         </motion.div>
 
+        {/* OS Spaces Dashboard */}
+        <OsSpacesWelcome />
+
         {/* The Two Paths - Glass Cards */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           {/* Surface Study Path - Blue Glass */}
