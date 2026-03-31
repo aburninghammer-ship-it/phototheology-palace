@@ -1,6 +1,6 @@
 import React, { useState, Suspense, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { XR } from '@react-three/xr';
+import { XR, VRButton, ARButton } from '@react-three/xr';
 import { OrbitControls } from '@react-three/drei';
 import { VRLobby, type VRExperience } from './VRLobby';
 
@@ -39,6 +39,43 @@ function VRScene() {
 export default function VRCanvas() {
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      {/* XR session buttons */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          zIndex: 200,
+          display: 'flex',
+          gap: 12,
+        }}
+      >
+        <VRButton
+          style={{
+            padding: '12px 24px',
+            background: '#4488FF',
+            color: 'white',
+            border: 'none',
+            borderRadius: 8,
+            fontSize: 16,
+            cursor: 'pointer',
+            fontWeight: 600,
+          }}
+        />
+        <ARButton
+          style={{
+            padding: '12px 24px',
+            background: '#44FFEE',
+            color: '#000',
+            border: 'none',
+            borderRadius: 8,
+            fontSize: 16,
+            cursor: 'pointer',
+            fontWeight: 600,
+          }}
+        />
+      </div>
+
       {/* R3F Canvas — fills the parent div */}
       <Canvas
         style={{ width: '100%', height: '100%' }}
