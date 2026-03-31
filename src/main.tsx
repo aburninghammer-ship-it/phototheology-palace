@@ -17,13 +17,63 @@ const isInIframe = (() => {
 const isPreviewHost =
   window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
+const previewFreshnessKey = "__preview_sw_freshened_v2__";
+const chunkReloadKey = "__chunk_reload_once__";
+
+function reloadOnce(key: string) {
+  if (sessionStorage.getItem(key) === "1") return;
+  sessionStorage.setItem(key, "1");
+  window.location.reload();
+}
+
+function bindChunkLoadRecovery() {
+  const shouldReloadForReason = (reason: unknown) => {
+    const message =
+      typeof reason === "string"
+        ? reason
+        : reason instanceof Error
+          ? reason.message
+          : "";
+
+    return (
+      message.includes("ChunkLoadError") ||
+      message.includes("Failed to fetch dynamically imported module")
+    );
+  };
+
+  window.addEventListener("unhandledrejection", (event) => {
+    if (shouldReloadForReason(event.reason)) {
+      reloadOnce(chunkReloadKey);
+    }
+  });
+
+  window.addEventListener("error", (event) => {
+    if (shouldReloadForReason(event.error ?? event.message)) {
+      reloadOnce(chunkReloadKey);
+    }
+  });
+}
+
+bindChunkLoadRecovery();
 
 if ("serviceWorker" in navigator) {
   if (isPreviewHost || isInIframe) {
-    // Preview: unregister all SWs so stale cache never blocks updates
-    navigator.serviceWorker.getRegistrations().then((regs) =>
-      regs.forEach((r) => r.unregister())
-    );
+    // Preview: wipe stale service workers + caches, then refresh once.
+    void (async () => {
+      const alreadyFreshened = sessionStorage.getItem(previewFreshnessKey) === "1";
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+
+      if ("caches" in window) {
+        const cacheKeys = await caches.keys();
+        await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+      }
+
+      if (!alreadyFreshened) {
+        sessionStorage.setItem(previewFreshnessKey, "1");
+        window.location.reload();
+      }
+    })();
   } else {
     // Production: if a new SW is waiting, tell it to activate NOW
     navigator.serviceWorker.getRegistration().then((reg) => {
