@@ -51,37 +51,37 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         Select a portal to begin your experience
       </Text>
 
-      {/* Five portals arranged in a semicircle in front of the user */}
+      {/* Five portals arranged in a semicircle — closer for XR visibility */}
       <Portal
-        position={[-4, 0, -3]}
+        position={[-3, 0.5, -2]}
         rotation={[0, 0.5, 0]}
         label="The Sanctuary"
         color="#FFD700"
         onClick={() => onEnterExperience('sanctuary')}
       />
       <Portal
-        position={[-2, 0, -4.5]}
+        position={[-1.5, 0.5, -3]}
         rotation={[0, 0.25, 0]}
         label="24FPS Gallery"
         color="#4488FF"
         onClick={() => onEnterExperience('gallery')}
       />
       <Portal
-        position={[0, 0, -5]}
+        position={[0, 0.5, -3.5]}
         rotation={[0, 0, 0]}
         label="Audio Theater"
         color="#9944FF"
         onClick={() => onEnterExperience('audio')}
       />
       <Portal
-        position={[2, 0, -4.5]}
+        position={[1.5, 0.5, -3]}
         rotation={[0, -0.25, 0]}
         label="Heaven's Diary"
         color="#44FFEE"
         onClick={() => onEnterExperience('heavensDiary')}
       />
       <Portal
-        position={[4, 0, -3]}
+        position={[3, 0.5, -2]}
         rotation={[0, -0.5, 0]}
         label="Game Arcade"
         color="#39FF14"
