@@ -1,6 +1,6 @@
 import React, { useState, Suspense, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { XR } from '@react-three/xr';
+import { XR, VRButton, ARButton } from '@react-three/xr';
 import { OrbitControls } from '@react-three/drei';
 import { VRLobby, type VRExperience } from './VRLobby';
 
