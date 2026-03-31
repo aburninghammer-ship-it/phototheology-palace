@@ -1,6 +1,6 @@
 import React, { useState, Suspense, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { XR, ARButton, useXR } from '@react-three/xr';
+import { XR, VRButton, ARButton, useXR } from '@react-three/xr';
 import { OrbitControls, Environment } from '@react-three/drei';
 import { BackSide } from 'three';
 import { VRLobby, type VRExperience } from './VRLobby';
@@ -60,39 +60,74 @@ function VRScene() {
 export default function VRCanvas() {
   const [xrError, setXrError] = useState<string | null>(null);
 
+  const xrButtonStyle: React.CSSProperties = {
+    position: 'absolute',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 200,
+    padding: '16px 40px',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    border: '2px solid rgba(255,255,255,0.3)',
+    borderRadius: 16,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  };
+
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      {/* Primary XR button — uses AR mode to bypass Quest 3 boundary requirement */}
+      {/* Primary: VR mode — Quest 3's native immersive-vr */}
+      <VRButton
+        sessionInit={{
+          optionalFeatures: ['hand-tracking', 'local-floor', 'bounded-floor'],
+          requiredFeatures: ['local'],
+        }}
+        onError={(err) => {
+          console.error('[VR] VR session error:', err.message);
+          setXrError(err.message);
+        }}
+        style={{
+          ...xrButtonStyle,
+          bottom: 120,
+          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          boxShadow: '0 4px 24px rgba(99,102,241,0.5)',
+        }}
+      >
+        {(status: string) =>
+          status === 'unsupported'
+            ? 'VR Not Supported'
+            : status === 'entered'
+            ? 'Exit Immersive'
+            : '🥽 Enter VR Mode'
+        }
+      </VRButton>
+
+      {/* Fallback: AR mode — for passthrough / boundary-free entry */}
       <ARButton
         sessionInit={{
           optionalFeatures: ['hand-tracking', 'local-floor'],
           requiredFeatures: ['local'],
         }}
-        onError={(err) => setXrError(err.message)}
+        onError={(err) => {
+          console.error('[VR] AR session error:', err.message);
+          setXrError(err.message);
+        }}
         style={{
-          position: 'absolute',
-          bottom: 120,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 200,
-          padding: '16px 40px',
-          fontSize: 20,
-          fontWeight: 'bold',
-          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-          color: '#fff',
-          border: '2px solid rgba(255,255,255,0.3)',
-          borderRadius: 16,
-          cursor: 'pointer',
-          boxShadow: '0 4px 24px rgba(99,102,241,0.5)',
-          whiteSpace: 'nowrap',
+          ...xrButtonStyle,
+          bottom: 60,
+          background: 'linear-gradient(135deg, #059669, #10b981)',
+          boxShadow: '0 4px 24px rgba(16,185,129,0.4)',
+          fontSize: 16,
+          padding: '12px 28px',
         }}
       >
         {(status: string) =>
           status === 'unsupported'
-            ? 'XR Not Supported'
+            ? 'AR Not Supported'
             : status === 'entered'
-            ? 'Exit Immersive'
-            : '🥽 Enter Immersive Mode'
+            ? 'Exit AR'
+            : '📱 Enter AR Passthrough'
         }
       </ARButton>
 
