@@ -589,15 +589,21 @@ export function PlaylistPanel() {
   }, []);
 
   const buildImmersiveQueue = useCallback((): ImmersiveTrack[] => {
-    return items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: item.description || undefined,
-      type: (item.audio_type as ImmersiveTrack["type"]) || "commentary",
-      displayText: (item.audio_meta as Record<string, any> | null)?.text,
-      audioUrl: item.audio_url || undefined,
-      generateAudio: item.audio_url ? undefined : () => resolveAudioUrl(item),
-    }));
+    return items.map((item) => {
+      const meta = item.audio_meta as Record<string, any> | null;
+      return {
+        id: item.id,
+        title: item.title,
+        subtitle: item.description || undefined,
+        type: (item.audio_type as ImmersiveTrack["type"]) || "commentary",
+        displayText: meta?.text,
+        book: meta?.book,
+        chapter: meta?.chapter,
+        modeName: meta?.voiceStyle || meta?.generationType,
+        audioUrl: item.audio_url || undefined,
+        generateAudio: item.audio_url ? undefined : () => resolveAudioUrl(item),
+      };
+    });
   }, [items, resolveAudioUrl]);
 
   const openPlaylistImmersive = useCallback((startIndex: number) => {
