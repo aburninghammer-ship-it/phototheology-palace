@@ -22,6 +22,7 @@ interface SpaceItem {
   path: string;
   icon: LucideIcon;
   description?: string;
+  tooltip?: string;
   hue?: number;
 }
 
