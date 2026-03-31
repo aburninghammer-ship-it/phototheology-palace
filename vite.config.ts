@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
-// PWA Cache Version: 2026-02-07-v1 (force rebuild)
+// PWA Cache Version: 2026-03-31-v2 (force rebuild)
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
