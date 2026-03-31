@@ -27,7 +27,7 @@ import {
   StarOff,
   ChevronDown,
   ChevronUp,
-} from "lucide-react";
+, type LucideIcon } from "lucide-react";
 import { useFreestyleMentor, type ExitCommand } from "@/hooks/useFreestyleMentor";
 import { cn } from "@/lib/utils";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
@@ -37,7 +37,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 
-const EXIT_COMMANDS: { id: ExitCommand; label: string; icon: React.ElementType }[] = [
+const EXIT_COMMANDS: { id: ExitCommand; label: string; icon: LucideIcon }[] = [
   { id: "stabilize", label: "Stabilize This", icon: Target },
   { id: "gem", label: "Make a Gem", icon: Gem },
   { id: "which_room", label: "Which Room?", icon: Home },
