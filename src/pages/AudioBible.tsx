@@ -2183,6 +2183,8 @@ export default function AudioBible() {
                           orange: isActive ? "bg-gradient-to-b from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 border-amber-500/50 text-white" : "border-orange-500/30 hover:border-orange-500/50 text-orange-400",
                           emerald: isActive ? "bg-emerald-600 hover:bg-emerald-700 border-emerald-500/50 text-white" : "border-emerald-500/30 hover:border-emerald-500/50 text-emerald-400",
                           rose: isActive ? "bg-rose-600 hover:bg-rose-700 border-rose-500/50 text-white" : "border-rose-500/30 hover:border-rose-500/50 text-rose-400",
+                          cyan: isActive ? "bg-cyan-600 hover:bg-cyan-700 border-cyan-500/50 text-white" : "border-cyan-500/30 hover:border-cyan-500/50 text-cyan-400",
+                          indigo: isActive ? "bg-indigo-600 hover:bg-indigo-700 border-indigo-500/50 text-white" : "border-indigo-500/30 hover:border-indigo-500/50 text-indigo-400",
                         };
                         return (
                           <Button
