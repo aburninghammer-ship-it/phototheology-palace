@@ -122,43 +122,47 @@ export function PWAUpdatePrompt() {
   if (!offlineReady && !showReload) return null;
 
   return (
-    <div className="fixed bottom-24 md:bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-[100] sm:max-w-md animate-in slide-in-from-bottom-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
       {offlineReady && !showReload && (
-        <Alert className="bg-gradient-to-br from-emerald-500/15 via-green-500/10 to-teal-500/15 backdrop-blur-xl border-2 border-emerald-500/40 shadow-[0_8px_32px_-4px_rgba(16,185,129,0.4),0_0_0_1px_rgba(255,255,255,0.1)_inset] rounded-2xl">
-          <Download className="h-4 w-4 text-emerald-500" />
-          <AlertTitle className="text-foreground font-bold">✅ App ready for offline use</AlertTitle>
-          <AlertDescription className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-2">
-            <span className="flex-1 text-sm text-muted-foreground">The app is now available offline</span>
-            <Button onClick={close} variant="outline" size="sm" className="w-full sm:w-auto border-emerald-500/40 hover:bg-emerald-500/10">
-              Dismiss
-            </Button>
-          </AlertDescription>
-        </Alert>
+        <div className="w-[320px] max-w-[calc(100vw-2rem)] rounded-2xl border-2 border-emerald-500/40 bg-background/95 p-5 shadow-[0_8px_32px_rgba(16,185,129,0.3)] backdrop-blur-xl pointer-events-auto animate-in slide-in-from-bottom-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Download className="h-5 w-5 text-emerald-500" />
+            <h3 className="text-base font-bold">✅ Ready Offline</h3>
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-4 break-words">
+            The app is now available offline. You can use it without an internet connection.
+          </p>
+          <Button onClick={close} variant="outline" size="sm" className="w-full border-emerald-500/40 hover:bg-emerald-500/10">
+            Dismiss
+          </Button>
+        </div>
       )}
 
       {showReload && (
-        <Alert className="bg-gradient-to-br from-blue-500/15 via-indigo-500/10 to-violet-500/15 backdrop-blur-xl border-2 border-blue-500/40 shadow-[0_8px_32px_-4px_rgba(59,130,246,0.4),0_0_0_1px_rgba(255,255,255,0.1)_inset] rounded-2xl">
-          <RefreshCw className="h-4 w-4 text-blue-500" />
-          <AlertTitle className="text-foreground font-bold">🚀 New version available</AlertTitle>
-          <AlertDescription className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-2">
-            <span className="flex-1 text-sm text-muted-foreground">Click reload to update to the latest version</span>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button 
-                onClick={handleUpdate} 
-                variant="default" 
-                size="sm"
-                className="flex-1 sm:flex-initial"
-                disabled={isUpdating}
-              >
-                <RefreshCw className={`h-3 w-3 mr-1 ${isUpdating ? 'animate-spin' : ''}`} />
-                {isUpdating ? 'Updating...' : 'Reload'}
-              </Button>
-              <Button onClick={close} variant="outline" size="sm" className="flex-1 sm:flex-initial" disabled={isUpdating}>
-                Later
-              </Button>
-            </div>
-          </AlertDescription>
-        </Alert>
+        <div className="w-[320px] max-w-[calc(100vw-2rem)] rounded-2xl border-2 border-blue-500/40 bg-background/95 p-5 shadow-[0_8px_32px_rgba(59,130,246,0.3)] backdrop-blur-xl pointer-events-auto animate-in slide-in-from-bottom-4">
+          <div className="flex items-center gap-2 mb-2">
+            <RefreshCw className="h-5 w-5 text-blue-500" />
+            <h3 className="text-base font-bold">🚀 New Version Available</h3>
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-4 break-words">
+            A new version is ready. Refresh now to load the latest features and fixes.
+          </p>
+          <div className="flex gap-2">
+            <Button 
+              onClick={handleUpdate} 
+              variant="default" 
+              size="sm"
+              className="flex-1"
+              disabled={isUpdating}
+            >
+              <RefreshCw className={`h-3 w-3 mr-1 ${isUpdating ? 'animate-spin' : ''}`} />
+              {isUpdating ? 'Updating...' : 'Reload'}
+            </Button>
+            <Button onClick={close} variant="outline" size="sm" className="flex-1" disabled={isUpdating}>
+              Later
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );
