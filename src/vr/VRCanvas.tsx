@@ -1,7 +1,7 @@
 import React, { useState, Suspense, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { XR, ARButton, useXR } from '@react-three/xr';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Environment } from '@react-three/drei';
 import { BackSide } from 'three';
 import { VRLobby, type VRExperience } from './VRLobby';
 
@@ -26,22 +26,6 @@ function DesktopControls() {
   );
 }
 
-/**
- * Black sky sphere that blocks AR passthrough cameras.
- * Only rendered during XR sessions so the scene looks like VR
- * even though we use AR mode (to bypass Quest 3 boundary requirement).
- */
-function BlackSkySphere() {
-  const { isPresenting } = useXR();
-  if (!isPresenting) return null;
-  return (
-    <mesh>
-      <sphereGeometry args={[100, 32, 32]} />
-      <meshBasicMaterial color="#000000" side={BackSide} />
-    </mesh>
-  );
-}
-
 function VRScene() {
   const [currentExperience, setCurrentExperience] = useState<VRExperience>('lobby');
   const goToLobby = useCallback(() => setCurrentExperience('lobby'), []);
@@ -49,7 +33,16 @@ function VRScene() {
   return (
     <Suspense fallback={null}>
       <DesktopControls />
-      <BlackSkySphere />
+
+      {/*
+        Opaque black sky sphere — blocks AR passthrough in immersive mode.
+        Always rendered so it serves as the scene background both on desktop and in XR.
+        Uses meshBasicMaterial (no lighting needed) with BackSide rendering.
+      */}
+      <mesh renderOrder={-1}>
+        <sphereGeometry args={[150, 32, 32]} />
+        <meshBasicMaterial color="#0a0a15" side={BackSide} depthWrite={false} />
+      </mesh>
 
       {currentExperience === 'lobby' && (
         <VRLobby onEnterExperience={setCurrentExperience} />
@@ -127,10 +120,10 @@ export default function VRCanvas() {
         </div>
       )}
 
-      {/* R3F Canvas */}
+      {/* R3F Canvas — alpha:true required for AR compositor to show our rendered content */}
       <Canvas
         style={{ width: '100%', height: '100%' }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{ antialias: true, alpha: true }}
         camera={{ position: [0, 2.5, 4], fov: 75, near: 0.1, far: 200 }}
       >
         <XR referenceSpace="local" foveation={1} frameRate={72}>
