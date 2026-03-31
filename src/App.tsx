@@ -56,7 +56,7 @@ import { OSTitleBar } from "@/components/os/OSTitleBar";
 // Critical pages - load immediately (landing + auth only)
 import Gatehouse from "./pages/Gatehouse";
 import Auth from "./pages/Auth";
-import VRHub from "./vr/VRHub";
+const VRHub = lazy(() => import("./vr/VRHub"));
 
 // Legacy landing page (lazy loaded)
 const Index = lazy(() => import("./pages/Index"));
