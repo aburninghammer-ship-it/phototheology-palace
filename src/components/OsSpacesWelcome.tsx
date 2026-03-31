@@ -101,10 +101,13 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "arena",
     label: "The Arena",
-    subtitle: "Games, Challenges & Drills",
+    subtitle: "Games, Challenges & Combat",
     icon: Swords,
     color: "0 84% 60%",
     items: [
+      { label: "COTA Series", path: "/cota-series", icon: Crown, description: "Christ in OT" },
+      { label: "Defense Mode", path: "/cota-series?tab=defense", icon: Shield, description: "Doctrinal defense" },
+      { label: "AATS War College", path: "/cota-series?tab=aats", icon: Swords, description: "Advanced training" },
       { label: "Games", path: "/games", icon: Gamepad2, description: "Multiplayer games" },
       { label: "Scheduled Games", path: "/schedule", icon: CalendarDays, description: "Game nights" },
       { label: "Daily Challenges", path: "/daily-challenges", icon: Zap, description: "Today's challenge" },
