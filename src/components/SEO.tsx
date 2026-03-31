@@ -25,7 +25,7 @@ const organizationJsonLd: JsonLdData = {
   name: "PhototheologyOS",
   url: BASE_URL,
   logo: `${BASE_URL}/pwa-512x512.png`,
-  description: "PhototheologyOS — Powered by AI. Built for Biblical Intelligence.",
+  description: "PhototheologyOS — The Art of Seeing Christ in All Things. Biblical Intelligence.",
   sameAs: []
 };
 
