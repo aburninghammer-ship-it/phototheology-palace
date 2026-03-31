@@ -280,26 +280,36 @@ export const OsSpacesWelcome = () => {
                   const light = 50 + (idx % 4) * 5; // 50-65%
                   const itemColor = `${itemHue} ${sat}% ${light}%`;
                   return (
-                    <button
-                      key={item.path + item.label}
-                      onClick={() => navigate(item.path)}
-                      className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/30 transition-all group hover:scale-[1.04]"
-                      style={{
-                        background: `linear-gradient(135deg, hsl(${itemColor} / 0.14), hsl(${itemColor} / 0.05))`,
-                        boxShadow: `0 0 12px hsl(${itemColor} / 0.1)`,
-                      }}
-                    >
-                      <div
-                        className="w-9 h-9 rounded-lg flex items-center justify-center transition-all group-hover:scale-110"
-                        style={{
-                          background: `linear-gradient(135deg, hsl(${itemColor} / 0.5), hsl(${itemColor} / 0.2))`,
-                          boxShadow: `0 0 16px hsl(${itemColor} / 0.35), 0 2px 8px hsl(${itemColor} / 0.2)`,
-                        }}
-                      >
-                        <ItemIcon className="w-4 h-4 text-white/90 group-hover:text-white transition-colors drop-shadow-sm" />
-                      </div>
-                      <span className="text-[10px] font-medium leading-tight text-center line-clamp-2">{item.label}</span>
-                    </button>
+                    <TooltipProvider key={item.path + item.label} delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => navigate(item.path)}
+                            className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/30 transition-all group hover:scale-[1.04]"
+                            style={{
+                              background: `linear-gradient(135deg, hsl(${itemColor} / 0.14), hsl(${itemColor} / 0.05))`,
+                              boxShadow: `0 0 12px hsl(${itemColor} / 0.1)`,
+                            }}
+                          >
+                            <div
+                              className="w-9 h-9 rounded-lg flex items-center justify-center transition-all group-hover:scale-110"
+                              style={{
+                                background: `linear-gradient(135deg, hsl(${itemColor} / 0.5), hsl(${itemColor} / 0.2))`,
+                                boxShadow: `0 0 16px hsl(${itemColor} / 0.35), 0 2px 8px hsl(${itemColor} / 0.2)`,
+                              }}
+                            >
+                              <ItemIcon className="w-4 h-4 text-white/90 group-hover:text-white transition-colors drop-shadow-sm" />
+                            </div>
+                            <span className="text-[10px] font-medium leading-tight text-center line-clamp-2">{item.label}</span>
+                          </button>
+                        </TooltipTrigger>
+                        {item.tooltip && (
+                          <TooltipContent side="bottom" className="max-w-[260px] text-xs leading-relaxed">
+                            <p>{item.tooltip}</p>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
                   );
                 })}
               </div>
