@@ -432,6 +432,18 @@ export function PlaylistPanel() {
     };
   }, [currentIndex, items.length]);
 
+  // Apply volume to audio element
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
+
+  // Persist volume
+  useEffect(() => {
+    localStorage.setItem("pt-playlist-volume", volume.toString());
+  }, [volume]);
+
   // Progress tracker
   useEffect(() => {
     if (isPlaying && audioRef.current) {
