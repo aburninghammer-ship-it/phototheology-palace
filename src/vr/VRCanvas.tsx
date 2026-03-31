@@ -1,7 +1,6 @@
 import React, { useState, Suspense, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { XR, VRButton, ARButton } from '@react-three/xr';
-import { Text } from '@react-three/drei';
 import { VRLobby, type VRExperience } from './VRLobby';
 
 const SanctuaryWalk = React.lazy(() => import('./experiences/SanctuaryWalk'));
@@ -9,30 +8,20 @@ const GalleryCorridor = React.lazy(() => import('./experiences/GalleryCorridor')
 const SpatialAudioPlayer = React.lazy(() => import('./experiences/SpatialAudioPlayer'));
 const HeavensDiary = React.lazy(() => import('./experiences/HeavensDiary'));
 
-function LoadingFallback() {
-  return (
-    <Text position={[0, 1.5, -2]} fontSize={0.2} color="white" anchorX="center">
-      Loading experience...
-    </Text>
-  );
-}
-
 function VRScene() {
   const [currentExperience, setCurrentExperience] = useState<VRExperience>('lobby');
   const goToLobby = useCallback(() => setCurrentExperience('lobby'), []);
 
   return (
-    <>
+    <Suspense fallback={null}>
       {currentExperience === 'lobby' && (
         <VRLobby onEnterExperience={setCurrentExperience} />
       )}
-      <Suspense fallback={<LoadingFallback />}>
-        {currentExperience === 'sanctuary' && <SanctuaryWalk onBack={goToLobby} />}
-        {currentExperience === 'gallery' && <GalleryCorridor onBack={goToLobby} />}
-        {currentExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
-        {currentExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
-      </Suspense>
-    </>
+      {currentExperience === 'sanctuary' && <SanctuaryWalk onBack={goToLobby} />}
+      {currentExperience === 'gallery' && <GalleryCorridor onBack={goToLobby} />}
+      {currentExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
+      {currentExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
+    </Suspense>
   );
 }
 
