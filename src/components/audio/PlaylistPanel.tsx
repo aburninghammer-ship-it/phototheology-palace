@@ -662,6 +662,7 @@ export function PlaylistPanel() {
         audio.load();
       });
 
+      audio.volume = isMuted ? 0 : volume;
       notifyTTSStarted();
       await audio.play();
       setIsPlaying(true);
