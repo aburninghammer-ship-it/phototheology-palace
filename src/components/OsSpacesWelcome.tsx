@@ -108,6 +108,8 @@ const OS_SPACES: OsSpace[] = [
       { label: "Scheduled Games", path: "/schedule", icon: CalendarDays, description: "Game nights" },
       { label: "Daily Challenges", path: "/daily-challenges", icon: Zap, description: "Today's challenge" },
       { label: "Challenge Board", path: "/challenge-board", icon: Trophy, description: "Public board" },
+      { label: "Leaderboard", path: "/leaderboard", icon: Trophy, description: "Top Phototheologists" },
+      { label: "Achievements", path: "/achievements", icon: Trophy, description: "Earned badges" },
       { label: "Test Me", path: "/test-me", icon: GraduationCap, description: "Assessments" },
       { label: "Training Drills", path: "/test-me", icon: Target, description: "Speed drills" },
       { label: "Dojo", path: "/spiritual-training", icon: Swords, description: "Combat training" },
