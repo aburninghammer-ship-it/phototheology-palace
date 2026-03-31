@@ -56,12 +56,10 @@ import { OSTitleBar } from "@/components/os/OSTitleBar";
 // Critical pages - load immediately (landing + auth only)
 import Gatehouse from "./pages/Gatehouse";
 import Auth from "./pages/Auth";
+import VRHub from "./vr/VRHub";
 
 // Legacy landing page (lazy loaded)
 const Index = lazy(() => import("./pages/Index"));
-
-// VR Hub (lazy loaded - no VR code in main bundle)
-const VRHub = lazy(() => import("./vr/VRHub"));
 
 // Lazy load pricing, demo, and donation
 const Pricing = lazy(() => import("./pages/Pricing"));
@@ -432,7 +430,7 @@ function App() {
                           <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden pb-mobile-nav min-w-0">
                           <Suspense fallback={<LoadingScreen />}>
-                            <KeepAliveRoutes maxCached={20} excludePaths={["/auth", "/auth/callback", "/guesthouse"]}>
+                            <KeepAliveRoutes maxCached={20} excludePaths={["/auth", "/auth/callback", "/guesthouse", "/vr"]}>
                             <Routes>
             <Route path="/" element={<Gatehouse />} />
             <Route path="/landing" element={<Index />} />
