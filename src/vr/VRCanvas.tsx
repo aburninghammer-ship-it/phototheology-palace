@@ -1,7 +1,8 @@
 import React, { useState, Suspense, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { XR, VRButton, ARButton, useXR } from '@react-three/xr';
+import { XR, ARButton, useXR } from '@react-three/xr';
 import { OrbitControls } from '@react-three/drei';
+import { BackSide } from 'three';
 import { VRLobby, type VRExperience } from './VRLobby';
 
 const SanctuaryWalk = React.lazy(() => import('./experiences/SanctuaryWalk'));
@@ -25,6 +26,22 @@ function DesktopControls() {
   );
 }
 
+/**
+ * Black sky sphere that blocks AR passthrough cameras.
+ * Only rendered during XR sessions so the scene looks like VR
+ * even though we use AR mode (to bypass Quest 3 boundary requirement).
+ */
+function BlackSkySphere() {
+  const { isPresenting } = useXR();
+  if (!isPresenting) return null;
+  return (
+    <mesh>
+      <sphereGeometry args={[100, 32, 32]} />
+      <meshBasicMaterial color="#000000" side={BackSide} />
+    </mesh>
+  );
+}
+
 function VRScene() {
   const [currentExperience, setCurrentExperience] = useState<VRExperience>('lobby');
   const goToLobby = useCallback(() => setCurrentExperience('lobby'), []);
@@ -32,6 +49,7 @@ function VRScene() {
   return (
     <Suspense fallback={null}>
       <DesktopControls />
+      <BlackSkySphere />
 
       {currentExperience === 'lobby' && (
         <VRLobby onEnterExperience={setCurrentExperience} />
@@ -49,52 +67,39 @@ export default function VRCanvas() {
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      {/* XR session buttons */}
-      <div
+      {/* Primary XR button — uses AR mode to bypass Quest 3 boundary requirement */}
+      <ARButton
+        sessionInit={{
+          optionalFeatures: ['hand-tracking', 'local-floor'],
+          requiredFeatures: ['local'],
+        }}
+        onError={(err) => setXrError(err.message)}
         style={{
           position: 'absolute',
-          top: 16,
-          right: 16,
+          bottom: 120,
+          left: '50%',
+          transform: 'translateX(-50%)',
           zIndex: 200,
-          display: 'flex',
-          gap: 12,
+          padding: '16px 40px',
+          fontSize: 20,
+          fontWeight: 'bold',
+          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          color: '#fff',
+          border: '2px solid rgba(255,255,255,0.3)',
+          borderRadius: 16,
+          cursor: 'pointer',
+          boxShadow: '0 4px 24px rgba(99,102,241,0.5)',
+          whiteSpace: 'nowrap',
         }}
       >
-        <VRButton
-          sessionInit={{
-            optionalFeatures: ['hand-tracking', 'local-floor'],
-            requiredFeatures: ['local'],
-          }}
-          onError={(err) => setXrError(`VR: ${err.message}`)}
-          style={{
-            padding: '12px 24px',
-            background: '#4488FF',
-            color: 'white',
-            border: 'none',
-            borderRadius: 8,
-            fontSize: 16,
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        />
-        <ARButton
-          sessionInit={{
-            optionalFeatures: ['hand-tracking', 'local-floor'],
-            requiredFeatures: ['local'],
-          }}
-          onError={(err) => setXrError(`AR: ${err.message}`)}
-          style={{
-            padding: '12px 24px',
-            background: '#44FFEE',
-            color: '#000',
-            border: 'none',
-            borderRadius: 8,
-            fontSize: 16,
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        />
-      </div>
+        {(status: string) =>
+          status === 'unsupported'
+            ? 'XR Not Supported'
+            : status === 'entered'
+            ? 'Exit Immersive'
+            : '🥽 Enter Immersive Mode'
+        }
+      </ARButton>
 
       {/* XR error message */}
       {xrError && (
@@ -122,10 +127,10 @@ export default function VRCanvas() {
         </div>
       )}
 
-      {/* R3F Canvas — fills the parent div */}
+      {/* R3F Canvas */}
       <Canvas
         style={{ width: '100%', height: '100%' }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{ antialias: true, alpha: true }}
         camera={{ position: [0, 2.5, 4], fov: 75, near: 0.1, far: 200 }}
       >
         <XR referenceSpace="local" foveation={1} frameRate={72}>
@@ -150,28 +155,7 @@ export default function VRCanvas() {
           pointerEvents: 'none',
         }}
       >
-        For the full experience, open this page on Meta Quest 3 browser and click "Enter VR"
-      </div>
-
-      {/* Quest 3 boundary tip */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 80,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          color: '#f0c040',
-          fontSize: 13,
-          textAlign: 'center',
-          zIndex: 100,
-          background: 'rgba(0,0,0,0.7)',
-          padding: '8px 16px',
-          borderRadius: 8,
-          pointerEvents: 'none',
-          maxWidth: 400,
-        }}
-      >
-        Quest 3: If prompted for a boundary, choose "Stationary" (small circle). You must set up a guardian boundary before entering VR.
+        Open on Meta Quest 3 and tap "Enter Immersive Mode"
       </div>
 
       {/* Desktop controls hint */}
