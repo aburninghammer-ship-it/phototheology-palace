@@ -94,8 +94,6 @@ const OS_SPACES: OsSpace[] = [
       { label: "Sermon Ideas", path: "/sermon-ideas", icon: Lightbulb, description: "Saved concepts" },
       { label: "Polish", path: "/polish", icon: Film, description: "Sermon manuscripts" },
       { label: "Video Training", path: "/video-training", icon: Video, description: "Teaching videos" },
-      { label: "Courses", path: "/courses", icon: GraduationCap, description: "Learning paths" },
-      { label: "COTA Series", path: "/cota-series", icon: Crown, description: "Christ in OT" },
       { label: "Leaderboard", path: "/leaderboard", icon: Trophy, description: "Top Phototheologists" },
       { label: "Achievements", path: "/achievements", icon: Trophy, description: "Earned badges" },
     ],
