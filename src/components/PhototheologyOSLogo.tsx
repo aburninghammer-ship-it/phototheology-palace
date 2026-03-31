@@ -83,7 +83,7 @@ export const PhototheologyOSLogo = ({
                 className="text-[10px] tracking-wide"
                 style={{ color: "rgba(255, 255, 255, 0.5)" }}
               >
-                Powered by AI. Built for Biblical Intelligence.
+                The Art of Seeing Christ in All Things
               </span>
             </span>
           )}
