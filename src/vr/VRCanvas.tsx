@@ -130,7 +130,7 @@ export default function VRCanvas() {
       {/* R3F Canvas */}
       <Canvas
         style={{ width: '100%', height: '100%' }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: false }}
         camera={{ position: [0, 2.5, 4], fov: 75, near: 0.1, far: 200 }}
       >
         <XR referenceSpace="local" foveation={1} frameRate={72}>
