@@ -255,22 +255,27 @@ export const OsSpacesWelcome = () => {
 
               {/* App icon grid */}
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                {active.items.map((item) => {
+                {active.items.map((item, idx) => {
                   const ItemIcon = item.icon;
+                  // Parse base hue from space color and spread items across a 60° range
+                  const baseHue = parseInt(active.color.split(" ")[0]);
+                  const spread = 60;
+                  const itemHue = (baseHue - spread / 2 + (idx * spread) / Math.max(active.items.length - 1, 1)) % 360;
+                  const itemColor = `${itemHue} 70% 55%`;
                   return (
                     <button
                       key={item.path + item.label}
                       onClick={() => navigate(item.path)}
                       className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/25 transition-all group"
                       style={{
-                        background: `linear-gradient(135deg, hsl(${active.color} / 0.12), hsl(${active.color} / 0.04))`,
+                        background: `linear-gradient(135deg, hsl(${itemColor} / 0.12), hsl(${itemColor} / 0.04))`,
                       }}
                     >
                       <div
                         className="w-9 h-9 rounded-lg flex items-center justify-center transition-all group-hover:scale-110"
                         style={{
-                          background: `linear-gradient(135deg, hsl(${active.color} / 0.3), hsl(${active.color} / 0.12))`,
-                          boxShadow: `0 2px 8px hsl(${active.color} / 0.15)`,
+                          background: `linear-gradient(135deg, hsl(${itemColor} / 0.35), hsl(${itemColor} / 0.15))`,
+                          boxShadow: `0 2px 8px hsl(${itemColor} / 0.2)`,
                         }}
                       >
                         <ItemIcon className="w-4 h-4 text-white/80 group-hover:text-white transition-colors" />
