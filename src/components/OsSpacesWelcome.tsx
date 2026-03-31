@@ -156,6 +156,19 @@ const OS_SPACES: OsSpace[] = [
       { label: "Pricing", path: "/pricing", icon: CreditCard, description: "Plans" },
     ],
   },
+  {
+    id: "academy",
+    label: "The Academy",
+    subtitle: "Courses & Progression",
+    icon: GraduationCap,
+    color: "45 90% 50%",
+    items: [
+      { label: "PT Course", path: "/phototheology-course", icon: BookText, description: "90-day flagship course" },
+      { label: "Courses", path: "/courses", icon: GraduationCap, description: "Learning paths" },
+      { label: "Floor Mastery", path: "/mastery", icon: Crown, description: "Track progression" },
+      { label: "Certificates", path: "/achievements", icon: Trophy, description: "Earned certificates" },
+    ],
+  },
 ];
 
 export const OsSpacesWelcome = () => {
