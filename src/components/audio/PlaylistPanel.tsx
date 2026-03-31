@@ -369,6 +369,11 @@ export function PlaylistPanel() {
   const [audioLoading, setAudioLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(() => {
+    const saved = localStorage.getItem("pt-playlist-volume");
+    return saved ? parseFloat(saved) : 0.8;
+  });
+  const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval>>();
 
