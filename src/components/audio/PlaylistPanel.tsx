@@ -28,6 +28,7 @@ import {
   SkipBack,
   Trash2,
   Volume2,
+  VolumeX,
   X,
   Loader2,
   Headphones,
@@ -41,6 +42,7 @@ import {
   Pencil,
   Check,
 } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 import { usePlaylist, PlaylistItem } from "@/hooks/usePlaylist";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -367,6 +369,11 @@ export function PlaylistPanel() {
   const [audioLoading, setAudioLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(() => {
+    const saved = localStorage.getItem("pt-playlist-volume");
+    return saved ? parseFloat(saved) : 0.8;
+  });
+  const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval>>();
 
@@ -424,6 +431,18 @@ export function PlaylistPanel() {
       audio.removeEventListener("error", onError);
     };
   }, [currentIndex, items.length]);
+
+  // Apply volume to audio element
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
+
+  // Persist volume
+  useEffect(() => {
+    localStorage.setItem("pt-playlist-volume", volume.toString());
+  }, [volume]);
 
   // Progress tracker
   useEffect(() => {
@@ -643,6 +662,7 @@ export function PlaylistPanel() {
         audio.load();
       });
 
+      audio.volume = isMuted ? 0 : volume;
       notifyTTSStarted();
       await audio.play();
       setIsPlaying(true);
@@ -777,6 +797,30 @@ export function PlaylistPanel() {
               </div>
               <span className="text-[10px] text-muted-foreground">
                 {formatTime(duration)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 shrink-0"
+                onClick={() => setIsMuted(!isMuted)}
+              >
+                {isMuted || volume === 0 ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+              </Button>
+              <Slider
+                value={[isMuted ? 0 : volume]}
+                min={0}
+                max={1}
+                step={0.01}
+                onValueChange={(v) => {
+                  setVolume(v[0]);
+                  if (v[0] > 0 && isMuted) setIsMuted(false);
+                }}
+                className="flex-1 touch-pan-x"
+              />
+              <span className="text-[10px] text-muted-foreground w-8 text-right">
+                {Math.round((isMuted ? 0 : volume) * 100)}%
               </span>
             </div>
           </div>
