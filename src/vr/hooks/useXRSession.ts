@@ -1,14 +1,5 @@
-import { useMemo } from 'react';
-import { createXRStore } from '@react-three/xr';
+// XR session hook — v5 API uses <VRButton> / <ARButton> components
+// and <XR> wrapper inside Canvas rather than a store.
+// This file is kept for future extension (e.g. session event tracking).
 
-export function useXRSessionStore() {
-  const store = useMemo(
-    () =>
-      createXRStore({
-        // Request immersive VR with local-floor reference space
-        // Quest 3 supports hand tracking natively
-      }),
-    []
-  );
-  return store;
-}
+export {};

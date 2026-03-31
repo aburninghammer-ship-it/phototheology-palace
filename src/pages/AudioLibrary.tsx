@@ -36,6 +36,7 @@ import {
 import { AddToPlaylistButton } from "@/components/audio/AddToPlaylistButton";
 import { PlaylistPanel } from "@/components/audio/PlaylistPanel";
 import { AudioContentBuilder } from "@/components/audio/AudioContentBuilder";
+import { usePlaylist } from "@/hooks/usePlaylist";
 
 // ── Audio Content Catalog ───────────────────────────────────────────────────
 
@@ -473,6 +474,9 @@ export default function AudioLibrary() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const immersive = useImmersiveMode();
+  const { createPlaylist, playlists } = usePlaylist();
+  const [showNewPlaylist, setShowNewPlaylist] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState("");
 
   const handleImmerse = (item: AudioEntry) => {
     const track: ImmersiveTrack = {
@@ -527,6 +531,55 @@ export default function AudioLibrary() {
               {AUDIO_CATALOG.length} tracks
             </Badge>
             <PlaylistPanel />
+          </div>
+
+          {/* Create Playlist */}
+          <div className="flex items-center justify-center gap-2 mt-4">
+            {showNewPlaylist ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={newPlaylistName}
+                  onChange={(e) => setNewPlaylistName(e.target.value)}
+                  placeholder="Playlist name..."
+                  className="h-9 w-48"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newPlaylistName.trim()) {
+                      createPlaylist(newPlaylistName.trim());
+                      setNewPlaylistName("");
+                      setShowNewPlaylist(false);
+                    }
+                    if (e.key === "Escape") setShowNewPlaylist(false);
+                  }}
+                />
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    if (newPlaylistName.trim()) {
+                      createPlaylist(newPlaylistName.trim());
+                      setNewPlaylistName("");
+                      setShowNewPlaylist(false);
+                    }
+                  }}
+                >
+                  <Check className="h-4 w-4 mr-1" />
+                  Create
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setShowNewPlaylist(false)}>
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => setShowNewPlaylist(true)}
+              >
+                <ListPlus className="h-4 w-4" />
+                Create New Playlist
+              </Button>
+            )}
           </div>
         </div>
 

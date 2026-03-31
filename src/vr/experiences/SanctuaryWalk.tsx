@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Text } from '@react-three/drei';
-import { TeleportTarget } from '@react-three/xr';
+import { TeleportationPlane } from '@react-three/xr';
 import {
   getSanctuaryElementsByZone,
   type SanctuaryZone,
@@ -122,21 +122,18 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
       <ambientLight intensity={0.4} color="#fff5e6" />
       <directionalLight position={[5, 10, 5]} intensity={0.8} color="#ffe8c4" castShadow />
 
-      {/* Ground */}
-      <TeleportTarget onTeleport={(point) => {
-        // Determine which zone the user teleported to based on z position
-        const z = point.z;
-        const idx = ZONES.findIndex((zone, i) => {
-          const next = ZONES[i + 1];
-          return next ? z > next.zOffset + 3 : true;
-        });
-        if (idx >= 0) setActiveZone(idx);
-      }}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -18]} receiveShadow>
-          <planeGeometry args={[12, 50]} />
-          <meshStandardMaterial color="#3a2a1a" roughness={0.9} />
-        </mesh>
-      </TeleportTarget>
+      {/* Teleportation ground plane */}
+      <TeleportationPlane
+        leftHand
+        rightHand
+        maxDistance={20}
+      />
+
+      {/* Visible ground */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -18]} receiveShadow>
+        <planeGeometry args={[12, 50]} />
+        <meshStandardMaterial color="#3a2a1a" roughness={0.9} />
+      </mesh>
 
       {/* Zone labels and elements */}
       {zoneData.map((zone, zoneIdx) => (

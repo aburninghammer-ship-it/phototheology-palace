@@ -1,8 +1,7 @@
 import React, { useState, Suspense, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { XR } from '@react-three/xr';
+import { XR, VRButton, ARButton } from '@react-three/xr';
 import { Text } from '@react-three/drei';
-import { useXRSessionStore } from './hooks/useXRSession';
 import { VRLobby, type VRExperience } from './VRLobby';
 
 const SanctuaryWalk = React.lazy(() => import('./experiences/SanctuaryWalk'));
@@ -38,8 +37,6 @@ function VRScene() {
 }
 
 export default function VRCanvas() {
-  const store = useXRSessionStore();
-
   return (
     <>
       <div
@@ -53,8 +50,7 @@ export default function VRCanvas() {
           gap: 12,
         }}
       >
-        <button
-          onClick={() => store.enterVR()}
+        <VRButton
           style={{
             padding: '12px 24px',
             background: '#4488FF',
@@ -65,11 +61,8 @@ export default function VRCanvas() {
             cursor: 'pointer',
             fontWeight: 600,
           }}
-        >
-          Enter VR
-        </button>
-        <button
-          onClick={() => store.enterAR()}
+        />
+        <ARButton
           style={{
             padding: '12px 24px',
             background: '#44FFEE',
@@ -80,16 +73,14 @@ export default function VRCanvas() {
             cursor: 'pointer',
             fontWeight: 600,
           }}
-        >
-          Enter AR
-        </button>
+        />
       </div>
 
       <Canvas
         gl={{ antialias: true, alpha: false }}
         camera={{ position: [0, 1.6, 0], fov: 75, near: 0.1, far: 200 }}
       >
-        <XR store={store}>
+        <XR>
           <VRScene />
         </XR>
       </Canvas>

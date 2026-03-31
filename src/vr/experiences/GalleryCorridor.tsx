@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, Instances, Instance } from '@react-three/drei';
-import { TeleportTarget } from '@react-three/xr';
+import { TeleportationPlane } from '@react-three/xr';
 import * as THREE from 'three';
 
 // Import all bible sets from allBooks
@@ -156,13 +156,14 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
         />
       ))}
 
+      {/* Teleportation plane */}
+      <TeleportationPlane leftHand rightHand maxDistance={20} />
+
       {/* Floor */}
-      <TeleportTarget onTeleport={() => {}}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -CORRIDOR_LENGTH / 2]} receiveShadow>
-          <planeGeometry args={[8, CORRIDOR_LENGTH + 10]} />
-          <meshStandardMaterial color="#1a1520" roughness={0.9} />
-        </mesh>
-      </TeleportTarget>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -CORRIDOR_LENGTH / 2]} receiveShadow>
+        <planeGeometry args={[8, CORRIDOR_LENGTH + 10]} />
+        <meshStandardMaterial color="#1a1520" roughness={0.9} />
+      </mesh>
 
       {/* Left wall */}
       <mesh position={[-WALL_OFFSET - 0.5, 1, -CORRIDOR_LENGTH / 2]}>
