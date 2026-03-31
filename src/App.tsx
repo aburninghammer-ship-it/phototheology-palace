@@ -145,6 +145,7 @@ const CharacterProfiles = lazy(() => import("./pages/CharacterProfiles"));
 const SpiritualTraining = lazy(() => import("./pages/SpiritualTraining"));
 const AppTour = lazy(() => import("./pages/AppTour"));
 const DockDemo = lazy(() => import("./pages/DockDemo"));
+const OsSpacesDraft = lazy(() => import("./pages/OsSpacesDraft"));
 const Courses = lazy(() => import("./pages/Courses"));
 const BlueprintCourse = lazy(() => import("./pages/BlueprintCourse"));
 const BlueprintWeightLoss = lazy(() => import("./pages/BlueprintWeightLoss"));
