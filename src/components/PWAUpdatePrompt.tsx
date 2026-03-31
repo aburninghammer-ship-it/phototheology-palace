@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Download, RefreshCw } from 'lucide-react';
 
 // Key for tracking recent updates to prevent prompt spam
@@ -121,50 +121,51 @@ export function PWAUpdatePrompt() {
 
   if (!offlineReady && !showReload) return null;
 
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
-      {offlineReady && !showReload && (
-        <div className="w-[320px] max-w-[calc(100vw-2rem)] rounded-2xl border-2 border-emerald-500/40 bg-background/95 p-5 shadow-[0_8px_32px_rgba(16,185,129,0.3)] backdrop-blur-xl pointer-events-auto animate-in slide-in-from-bottom-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Download className="h-5 w-5 text-emerald-500" />
-            <h3 className="text-base font-bold">✅ Ready Offline</h3>
-          </div>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-4 break-words">
-            The app is now available offline. You can use it without an internet connection.
-          </p>
-          <Button onClick={close} variant="outline" size="sm" className="w-full border-emerald-500/40 hover:bg-emerald-500/10">
-            Dismiss
-          </Button>
-        </div>
-      )}
-
-      {showReload && (
-        <div className="w-[320px] max-w-[calc(100vw-2rem)] rounded-2xl border-2 border-blue-500/40 bg-background/95 p-5 shadow-[0_8px_32px_rgba(59,130,246,0.3)] backdrop-blur-xl pointer-events-auto animate-in slide-in-from-bottom-4">
-          <div className="flex items-center gap-2 mb-2">
-            <RefreshCw className="h-5 w-5 text-blue-500" />
-            <h3 className="text-base font-bold">🚀 New Version Available</h3>
-          </div>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-4 break-words">
-            A new version is ready. Refresh now to load the latest features and fixes.
-          </p>
-          <div className="flex gap-2">
-            <Button 
-              onClick={handleUpdate} 
-              variant="default" 
-              size="sm"
-              className="flex-1"
-              disabled={isUpdating}
-            >
-              <RefreshCw className={`h-3 w-3 mr-1 ${isUpdating ? 'animate-spin' : ''}`} />
-              {isUpdating ? 'Updating...' : 'Reload'}
+  return createPortal(
+    <div className="fixed inset-0 z-[2147483647] flex items-center justify-center p-4 overflow-visible pointer-events-none">
+      <div className="pointer-events-auto w-[min(92vw,22rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 fade-in-0">
+        {offlineReady && !showReload ? (
+          <>
+            <div className="flex items-center gap-2 mb-2">
+              <Download className="h-5 w-5 text-accent" />
+              <h3 className="text-base font-bold text-foreground">Ready Offline</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4 break-words">
+              The app is now available offline. You can use it without an internet connection.
+            </p>
+            <Button onClick={close} variant="outline" size="sm" className="w-full">
+              Dismiss
             </Button>
-            <Button onClick={close} variant="outline" size="sm" className="flex-1" disabled={isUpdating}>
-              Later
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-2 mb-2">
+              <RefreshCw className="h-5 w-5 text-primary" />
+              <h3 className="text-base font-bold text-foreground">New Version Available</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4 break-words">
+              A new version is ready. Refresh now to load the latest features and fixes.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleUpdate}
+                variant="default"
+                size="sm"
+                className="flex-1"
+                disabled={isUpdating}
+              >
+                <RefreshCw className={`h-3 w-3 mr-1 ${isUpdating ? 'animate-spin' : ''}`} />
+                {isUpdating ? 'Updating...' : 'Reload'}
+              </Button>
+              <Button onClick={close} variant="outline" size="sm" className="flex-1" disabled={isUpdating}>
+                Later
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>,
+    document.body
   );
 }
 
