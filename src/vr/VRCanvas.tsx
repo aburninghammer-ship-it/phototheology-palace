@@ -45,6 +45,8 @@ function VRScene() {
 }
 
 export default function VRCanvas() {
+  const [xrError, setXrError] = useState<string | null>(null);
+
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       {/* XR session buttons */}
@@ -60,9 +62,10 @@ export default function VRCanvas() {
       >
         <VRButton
           sessionInit={{
-            optionalFeatures: ['hand-tracking'],
+            optionalFeatures: ['hand-tracking', 'local-floor'],
             requiredFeatures: ['local'],
           }}
+          onError={(err) => setXrError(`VR: ${err.message}`)}
           style={{
             padding: '12px 24px',
             background: '#4488FF',
@@ -76,9 +79,10 @@ export default function VRCanvas() {
         />
         <ARButton
           sessionInit={{
-            optionalFeatures: ['hand-tracking'],
+            optionalFeatures: ['hand-tracking', 'local-floor'],
             requiredFeatures: ['local'],
           }}
+          onError={(err) => setXrError(`AR: ${err.message}`)}
           style={{
             padding: '12px 24px',
             background: '#44FFEE',
@@ -92,13 +96,38 @@ export default function VRCanvas() {
         />
       </div>
 
+      {/* XR error message */}
+      {xrError && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 70,
+            right: 16,
+            zIndex: 200,
+            background: 'rgba(220,40,40,0.9)',
+            color: '#fff',
+            padding: '10px 16px',
+            borderRadius: 8,
+            fontSize: 13,
+            maxWidth: 320,
+          }}
+        >
+          {xrError}
+          <button
+            onClick={() => setXrError(null)}
+            style={{ marginLeft: 12, background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* R3F Canvas — fills the parent div */}
       <Canvas
         style={{ width: '100%', height: '100%' }}
         gl={{ antialias: true, alpha: false }}
         camera={{ position: [0, 2.5, 4], fov: 75, near: 0.1, far: 200 }}
       >
-        {/* referenceSpace="local" avoids Quest 3 guardian boundary requirement */}
         <XR referenceSpace="local" foveation={1} frameRate={72}>
           <VRScene />
         </XR>
@@ -122,6 +151,27 @@ export default function VRCanvas() {
         }}
       >
         For the full experience, open this page on Meta Quest 3 browser and click "Enter VR"
+      </div>
+
+      {/* Quest 3 boundary tip */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 80,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          color: '#f0c040',
+          fontSize: 13,
+          textAlign: 'center',
+          zIndex: 100,
+          background: 'rgba(0,0,0,0.7)',
+          padding: '8px 16px',
+          borderRadius: 8,
+          pointerEvents: 'none',
+          maxWidth: 400,
+        }}
+      >
+        Quest 3: If prompted for a boundary, choose "Stationary" (small circle). You must set up a guardian boundary before entering VR.
       </div>
 
       {/* Desktop controls hint */}
