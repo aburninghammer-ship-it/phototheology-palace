@@ -1,16 +1,17 @@
-import React, { useState, Suspense, useCallback } from 'react';
-import { Glasses, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { AlertTriangle } from 'lucide-react';
+import VRCanvas from './VRCanvas';
 
-// Error boundary for WebGL/Three.js crashes
 class VRErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { hasError: boolean; error?: Error }
 > {
   state = { hasError: false, error: undefined as Error | undefined };
+
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
   }
+
   render() {
     if (this.state.hasError) {
       return (
@@ -25,27 +26,16 @@ class VRErrorBoundary extends React.Component<
         </div>
       );
     }
+
     return this.props.children;
   }
 }
-
-// Lazy-load heavy 3D deps so they don't block initial render
-const VRCanvas = React.lazy(() => import('./VRCanvas'));
 
 export default function VRHub() {
   return (
     <div className="w-full h-screen bg-black relative">
       <VRErrorBoundary>
-        <Suspense
-          fallback={
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <Glasses className="h-10 w-10 text-primary animate-pulse" />
-              <p className="text-muted-foreground">Loading VR Experience...</p>
-            </div>
-          }
-        >
-          <VRCanvas />
-        </Suspense>
+        <VRCanvas />
       </VRErrorBoundary>
     </div>
   );
