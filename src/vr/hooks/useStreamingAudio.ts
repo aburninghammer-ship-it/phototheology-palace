@@ -101,8 +101,8 @@ export function useStreamingAudio(src: string): [StreamingAudioState, StreamingA
 
     let raf: number;
     const update = () => {
-      analyserRef.current!.getByteFrequencyData(dataArrayRef.current!);
-      setState((s) => ({ ...s, analyserData: new Uint8Array(dataArrayRef.current!.buffer.slice(0)) }));
+      analyserRef.current!.getByteFrequencyData(dataArrayRef.current! as Uint8Array<ArrayBuffer>);
+      setState((s) => ({ ...s, analyserData: new Uint8Array(Array.from(dataArrayRef.current!)) }));
       raf = requestAnimationFrame(update);
     };
     raf = requestAnimationFrame(update);
