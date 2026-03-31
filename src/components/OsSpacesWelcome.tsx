@@ -257,28 +257,30 @@ export const OsSpacesWelcome = () => {
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                 {active.items.map((item, idx) => {
                   const ItemIcon = item.icon;
-                  // Parse base hue from space color and spread items across a 60° range
-                  const baseHue = parseInt(active.color.split(" ")[0]);
-                  const spread = 60;
-                  const itemHue = (baseHue - spread / 2 + (idx * spread) / Math.max(active.items.length - 1, 1)) % 360;
-                  const itemColor = `${itemHue} 70% 55%`;
+                  // Deterministic "random" hue per item using golden angle for max spread
+                  const goldenAngle = 137.508;
+                  const itemHue = Math.round((idx * goldenAngle + active.id.charCodeAt(0) * 47) % 360);
+                  const sat = 65 + (idx % 3) * 10; // 65-85%
+                  const light = 50 + (idx % 4) * 5; // 50-65%
+                  const itemColor = `${itemHue} ${sat}% ${light}%`;
                   return (
                     <button
                       key={item.path + item.label}
                       onClick={() => navigate(item.path)}
-                      className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/25 transition-all group"
+                      className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/30 transition-all group hover:scale-[1.04]"
                       style={{
-                        background: `linear-gradient(135deg, hsl(${itemColor} / 0.12), hsl(${itemColor} / 0.04))`,
+                        background: `linear-gradient(135deg, hsl(${itemColor} / 0.14), hsl(${itemColor} / 0.05))`,
+                        boxShadow: `0 0 12px hsl(${itemColor} / 0.1)`,
                       }}
                     >
                       <div
                         className="w-9 h-9 rounded-lg flex items-center justify-center transition-all group-hover:scale-110"
                         style={{
-                          background: `linear-gradient(135deg, hsl(${itemColor} / 0.35), hsl(${itemColor} / 0.15))`,
-                          boxShadow: `0 2px 8px hsl(${itemColor} / 0.2)`,
+                          background: `linear-gradient(135deg, hsl(${itemColor} / 0.5), hsl(${itemColor} / 0.2))`,
+                          boxShadow: `0 0 16px hsl(${itemColor} / 0.35), 0 2px 8px hsl(${itemColor} / 0.2)`,
                         }}
                       >
-                        <ItemIcon className="w-4 h-4 text-white/80 group-hover:text-white transition-colors" />
+                        <ItemIcon className="w-4 h-4 text-white/90 group-hover:text-white transition-colors drop-shadow-sm" />
                       </div>
                       <span className="text-[10px] font-medium leading-tight text-center line-clamp-2">{item.label}</span>
                     </button>
