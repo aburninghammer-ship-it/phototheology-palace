@@ -231,11 +231,14 @@ export const OsSpacesWelcome = () => {
             className="overflow-hidden"
           >
             <div
-              className="rounded-2xl border p-5 space-y-4"
+            <div
+              className="rounded-2xl border p-5 space-y-4 backdrop-blur-xl"
               style={{
-                background: `linear-gradient(135deg, hsl(${active.color} / 0.08), hsl(${active.color} / 0.03))`,
-                borderColor: `hsl(${active.color} / 0.2)`,
+                background: `linear-gradient(135deg, hsl(${active.color} / 0.12), hsl(${active.color} / 0.04), hsl(${active.color} / 0.08))`,
+                borderColor: `hsl(${active.color} / 0.25)`,
+                boxShadow: `0 8px 32px hsl(${active.color} / 0.15), inset 0 1px 0 hsl(${active.color} / 0.1)`,
               }}
+            >
             >
               {/* Space header */}
               <div className="flex items-center gap-3">
