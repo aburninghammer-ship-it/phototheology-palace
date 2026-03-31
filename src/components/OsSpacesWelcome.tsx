@@ -88,10 +88,10 @@ const OS_SPACES: OsSpace[] = [
     items: [
       { label: "Sermon Builder", path: "/sermon-builder", icon: MessageSquare, description: "Craft sermons" },
       { label: "Sermon Ideas", path: "/sermon-ideas", icon: Lightbulb, description: "Saved concepts" },
+      { label: "Amplify", path: "/amplify", icon: Megaphone, description: "Enhance with cross-refs" },
+      { label: "Remix", path: "/remix", icon: Zap, description: "Remix frameworks" },
       { label: "Polish", path: "/polish", icon: Film, description: "Sermon manuscripts" },
       { label: "Video Training", path: "/video-training", icon: Video, description: "Teaching videos" },
-      { label: "Leaderboard", path: "/leaderboard", icon: Trophy, description: "Top Phototheologists" },
-      { label: "Achievements", path: "/achievements", icon: Trophy, description: "Earned badges" },
     ],
   },
   {
