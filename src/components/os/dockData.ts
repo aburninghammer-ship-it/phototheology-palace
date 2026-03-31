@@ -7,6 +7,7 @@ import {
   Lightbulb, Video, Library, Scale, Megaphone, CreditCard,
   Heart, Dumbbell, HeartHandshake, User, Flame, BookMarked,
   Languages, Microscope, Map, Clock, BookText, ImageIcon, Layers3,
+  Glasses,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
