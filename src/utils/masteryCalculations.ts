@@ -35,11 +35,11 @@ export const XP_REQUIREMENTS = {
  * Mastery level titles
  */
 export const MASTERY_TITLES = {
-  1: "Novice",
-  2: "Apprentice",
-  3: "Practitioner",
-  4: "Expert",
-  5: "Master",
+  1: "Apprentice",
+  2: "Journeyman",
+  3: "Artisan",
+  4: "Master",
+  5: "Grand Phototheologist",
 } as const;
 
 /**
