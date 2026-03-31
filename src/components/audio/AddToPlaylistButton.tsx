@@ -87,41 +87,50 @@ export function AddToPlaylistButton({
           {showLabel && <span className="ml-1">+ Playlist</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-2" align="start">
+      <PopoverContent className="w-64 p-2 z-[200]" align="start">
         <p className="text-xs font-medium text-muted-foreground px-2 py-1">Add to playlist</p>
-        <div className="max-h-48 overflow-y-auto space-y-0.5">
-          {playlists.length === 0 && (
-            <p className="text-xs text-muted-foreground px-2 py-2">No playlists yet</p>
-          )}
-          {playlists.map((pl) => (
-            <button
-              key={pl.id}
-              onClick={() => handleAddTo(pl.id)}
-              className="w-full text-left px-2 py-1.5 text-sm rounded hover:bg-accent hover:text-accent-foreground transition-colors truncate"
-            >
-              {pl.name}
-            </button>
-          ))}
-        </div>
-        <div className="border-t border-border mt-1 pt-1">
-          <div className="flex gap-1 px-1">
+        
+        {/* Create new playlist section - prominent at top */}
+        <div className="border border-dashed border-border rounded-md p-2 mb-2">
+          <div className="flex gap-1">
             <Input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="New playlist name..."
-              className="h-7 text-xs"
+              className="h-8 text-xs"
               onKeyDown={(e) => e.key === "Enter" && handleCreateAndAdd()}
             />
             <Button
               size="sm"
-              variant="ghost"
-              className="h-7 px-2 shrink-0"
+              variant="secondary"
+              className="h-8 px-2 shrink-0 gap-1"
               onClick={handleCreateAndAdd}
               disabled={creating || !newName.trim()}
             >
               <Plus className="h-3 w-3" />
+              <span className="text-xs">Create</span>
             </Button>
           </div>
+        </div>
+
+        {/* Existing playlists */}
+        <div className="max-h-48 overflow-y-auto space-y-0.5">
+          {playlists.length === 0 && (
+            <p className="text-xs text-muted-foreground px-2 py-2 text-center">Create a playlist above to get started</p>
+          )}
+          {playlists.map((pl) => (
+            <button
+              key={pl.id}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddTo(pl.id);
+              }}
+              className="w-full text-left px-2 py-2 text-sm rounded hover:bg-accent hover:text-accent-foreground transition-colors truncate cursor-pointer"
+            >
+              {pl.name}
+            </button>
+          ))}
         </div>
       </PopoverContent>
     </Popover>
