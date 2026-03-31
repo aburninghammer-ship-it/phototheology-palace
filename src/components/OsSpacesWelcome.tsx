@@ -79,8 +79,7 @@ const OS_SPACES: OsSpace[] = [
       { label: "Study Deck", path: "/card-deck", icon: Sparkles, description: "Flashcards" },
       { label: "Infographics", path: "/image-bible", icon: ImageIcon, description: "Visual summaries" },
       { label: "VR Experience", path: "/vr", icon: Glasses, description: "Immersive 3D palace" },
-      { label: "PT Course", path: "/phototheology-course", icon: BookText, description: "Learn the method" },
-      { label: "Floor Mastery", path: "/mastery", icon: Crown, description: "Track progression" },
+      { label: "VR Experience", path: "/vr", icon: Glasses, description: "Immersive 3D palace" },
     ],
   },
   {
@@ -94,8 +93,6 @@ const OS_SPACES: OsSpace[] = [
       { label: "Sermon Ideas", path: "/sermon-ideas", icon: Lightbulb, description: "Saved concepts" },
       { label: "Polish", path: "/polish", icon: Film, description: "Sermon manuscripts" },
       { label: "Video Training", path: "/video-training", icon: Video, description: "Teaching videos" },
-      { label: "Courses", path: "/courses", icon: GraduationCap, description: "Learning paths" },
-      { label: "COTA Series", path: "/cota-series", icon: Crown, description: "Christ in OT" },
       { label: "Leaderboard", path: "/leaderboard", icon: Trophy, description: "Top Phototheologists" },
       { label: "Achievements", path: "/achievements", icon: Trophy, description: "Earned badges" },
     ],
@@ -103,10 +100,13 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "arena",
     label: "The Arena",
-    subtitle: "Games, Challenges & Drills",
+    subtitle: "Games, Challenges & Combat",
     icon: Swords,
     color: "0 84% 60%",
     items: [
+      { label: "COTA Series", path: "/cota-series", icon: Crown, description: "Christ in OT" },
+      { label: "Defense Mode", path: "/cota-series?tab=defense", icon: Shield, description: "Doctrinal defense" },
+      { label: "AATS War College", path: "/cota-series?tab=aats", icon: Swords, description: "Advanced training" },
       { label: "Games", path: "/games", icon: Gamepad2, description: "Multiplayer games" },
       { label: "Scheduled Games", path: "/schedule", icon: CalendarDays, description: "Game nights" },
       { label: "Daily Challenges", path: "/daily-challenges", icon: Zap, description: "Today's challenge" },
@@ -156,6 +156,19 @@ const OS_SPACES: OsSpace[] = [
       { label: "Pricing", path: "/pricing", icon: CreditCard, description: "Plans" },
     ],
   },
+  {
+    id: "academy",
+    label: "The Academy",
+    subtitle: "Courses & Progression",
+    icon: GraduationCap,
+    color: "45 90% 50%",
+    items: [
+      { label: "PT Course", path: "/phototheology-course", icon: BookText, description: "90-day flagship course" },
+      { label: "Courses", path: "/courses", icon: GraduationCap, description: "Learning paths" },
+      { label: "Floor Mastery", path: "/mastery", icon: Crown, description: "Track progression" },
+      { label: "Certificates", path: "/achievements", icon: Trophy, description: "Earned certificates" },
+    ],
+  },
 ];
 
 export const OsSpacesWelcome = () => {
@@ -185,7 +198,7 @@ export const OsSpacesWelcome = () => {
       </motion.div>
 
       {/* 6 OS Space Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 max-w-3xl mx-auto">
+      <div className="grid grid-cols-4 sm:grid-cols-7 gap-3 max-w-4xl mx-auto">
         {OS_SPACES.map((space, i) => {
           const Icon = space.icon;
           const isActive = activeSpace === space.id;
@@ -303,7 +316,7 @@ export const OsSpacesWelcome = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border/40">
             <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#d4a017" }} />
             <span className="text-xs text-muted-foreground">
-              <span className="font-semibold" style={{ color: "#d4a017" }}>BI</span> · Biblical Intelligence Engine · 65 tools across 6 spaces
+              <span className="font-semibold" style={{ color: "#d4a017" }}>BI</span> · Biblical Intelligence Engine · 70+ tools across 7 spaces
             </span>
           </div>
         </motion.div>
