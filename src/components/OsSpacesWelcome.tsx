@@ -304,8 +304,13 @@ export const OsSpacesWelcome = () => {
                           </button>
                         </TooltipTrigger>
                         {item.tooltip && (
-                          <TooltipContent side="bottom" className="max-w-[260px] text-xs leading-relaxed">
-                            <p>{item.tooltip}</p>
+                          <TooltipContent 
+                            side="top" 
+                            sideOffset={8}
+                            className="max-w-[280px] text-xs leading-relaxed px-4 py-3 rounded-xl border-primary/20 bg-popover/95 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
+                          >
+                            <p className="font-semibold text-primary mb-1 text-[11px]">{item.label}</p>
+                            <p className="text-muted-foreground">{item.tooltip}</p>
                           </TooltipContent>
                         )}
                       </Tooltip>
