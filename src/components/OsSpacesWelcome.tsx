@@ -198,7 +198,7 @@ export const OsSpacesWelcome = () => {
       </motion.div>
 
       {/* 6 OS Space Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 max-w-3xl mx-auto">
+      <div className="grid grid-cols-4 sm:grid-cols-7 gap-3 max-w-4xl mx-auto">
         {OS_SPACES.map((space, i) => {
           const Icon = space.icon;
           const isActive = activeSpace === space.id;
