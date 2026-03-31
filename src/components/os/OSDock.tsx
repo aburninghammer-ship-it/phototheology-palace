@@ -380,6 +380,24 @@ export function OSDock() {
         </div>
       </div>
 
+      {/* Back to Spaces button */}
+      {currentPath !== "/" && (
+        <div className={cn("shrink-0 px-2 pt-2", !expanded && "flex justify-center")}>
+          <button
+            onClick={() => navigate("/")}
+            className={cn(
+              "flex items-center gap-2 rounded-xl transition-all w-full backdrop-blur-md border border-white/10",
+              "bg-primary/10 hover:bg-primary/20 text-primary hover:border-primary/30",
+              expanded ? "px-3 py-2" : "p-2.5 justify-center"
+            )}
+            title="Back to Spaces"
+          >
+            <LayoutGrid className="h-4 w-4 shrink-0" />
+            {expanded && <span className="text-xs font-semibold">Back to Spaces</span>}
+          </button>
+        </div>
+      )}
+
       {/* Navigation */}
       <ScrollArea className="flex-1">
         <div className={cn("flex flex-col gap-0.5 py-2", expanded ? "px-2" : "px-2")}>
