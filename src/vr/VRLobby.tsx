@@ -1,7 +1,7 @@
 import { Portal } from './components/Portal';
 import { Text } from '@react-three/drei';
 
-export type VRExperience = 'lobby' | 'sanctuary' | 'gallery' | 'audio' | 'heavensDiary';
+export type VRExperience = 'lobby' | 'sanctuary' | 'gallery' | 'audio' | 'heavensDiary' | 'arcade';
 
 interface VRLobbyProps {
   onEnterExperience: (experience: VRExperience) => void;
@@ -49,34 +49,41 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         Select a portal to begin your experience
       </Text>
 
-      {/* Four portals arranged in a semicircle in front of the user */}
+      {/* Five portals arranged in a semicircle in front of the user */}
       <Portal
-        position={[-3, 0, -4]}
-        rotation={[0, 0.35, 0]}
+        position={[-4, 0, -3]}
+        rotation={[0, 0.5, 0]}
         label="The Sanctuary"
         color="#FFD700"
         onClick={() => onEnterExperience('sanctuary')}
       />
       <Portal
-        position={[-1, 0, -5]}
-        rotation={[0, 0.12, 0]}
+        position={[-2, 0, -4.5]}
+        rotation={[0, 0.25, 0]}
         label="24FPS Gallery"
         color="#4488FF"
         onClick={() => onEnterExperience('gallery')}
       />
       <Portal
-        position={[1, 0, -5]}
-        rotation={[0, -0.12, 0]}
+        position={[0, 0, -5]}
+        rotation={[0, 0, 0]}
         label="Audio Theater"
         color="#9944FF"
         onClick={() => onEnterExperience('audio')}
       />
       <Portal
-        position={[3, 0, -4]}
-        rotation={[0, -0.35, 0]}
+        position={[2, 0, -4.5]}
+        rotation={[0, -0.25, 0]}
         label="Heaven's Diary"
         color="#44FFEE"
         onClick={() => onEnterExperience('heavensDiary')}
+      />
+      <Portal
+        position={[4, 0, -3]}
+        rotation={[0, -0.5, 0]}
+        label="Game Arcade"
+        color="#39FF14"
+        onClick={() => onEnterExperience('arcade')}
       />
 
       {/* Decorative center element — glowing orb */}

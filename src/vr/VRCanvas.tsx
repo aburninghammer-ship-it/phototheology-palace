@@ -9,6 +9,7 @@ const SanctuaryWalk = React.lazy(() => import('./experiences/SanctuaryWalk'));
 const GalleryCorridor = React.lazy(() => import('./experiences/GalleryCorridor'));
 const SpatialAudioPlayer = React.lazy(() => import('./experiences/SpatialAudioPlayer'));
 const HeavensDiary = React.lazy(() => import('./experiences/HeavensDiary'));
+const GameArcade = React.lazy(() => import('./experiences/GameArcade'));
 
 /** Disable OrbitControls when inside an XR session (head tracking takes over) */
 function DesktopControls() {
@@ -51,6 +52,7 @@ function VRScene() {
       {currentExperience === 'gallery' && <GalleryCorridor onBack={goToLobby} />}
       {currentExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
       {currentExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
+      {currentExperience === 'arcade' && <GameArcade onBack={goToLobby} />}
     </Suspense>
   );
 }
