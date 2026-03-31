@@ -39,7 +39,7 @@ const websiteJsonLd: JsonLdData = {
 
 export const SEO = ({
   title = "PhototheologyOS",
-  description = "PhototheologyOS — Powered by AI. Built for Biblical Intelligence. Master Scripture through the 8-floor Palace method with AI-powered study tools, games, and Christ-centered interpretation.",
+  description = "PhototheologyOS — The Art of Seeing Christ in All Things. Biblical Intelligence. Master Scripture through the 8-floor Palace method with AI-powered study tools, games, and Christ-centered interpretation.",
   canonical,
   noindex = false,
   image = DEFAULT_IMAGE,

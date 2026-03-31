@@ -270,7 +270,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             transition={{ delay: 0.6 }}
             className="text-sm text-amber-100/80 font-light tracking-widest uppercase"
           >
-            Powered by AI. Built for Biblical Intelligence.
+            The Art of Seeing Christ in All Things.
           </motion.p>
         </motion.div>
 

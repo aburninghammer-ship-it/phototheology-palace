@@ -476,7 +476,7 @@ const Gatehouse = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="PhototheologyOS" description="PhototheologyOS — Powered by AI. Built for Biblical Intelligence. Master Scripture through the 8-floor Palace method." />
+      <SEO title="PhototheologyOS" description="PhototheologyOS — The Art of Seeing Christ in All Things. Biblical Intelligence. Master Scripture through the 8-floor Palace method." />
       <Navigation />
 
       <main className="container mx-auto px-4 py-12 pt-24 md:pt-28 max-w-4xl">
