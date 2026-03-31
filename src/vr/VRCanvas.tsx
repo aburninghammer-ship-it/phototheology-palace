@@ -92,13 +92,17 @@ export default function VRCanvas() {
       <div
         style={{
           position: 'absolute',
-          bottom: 24,
+          bottom: 32,
           left: '50%',
           transform: 'translateX(-50%)',
-          color: '#666',
-          fontSize: 14,
+          color: '#ccc',
+          fontSize: 15,
           textAlign: 'center',
-          zIndex: 10,
+          zIndex: 100,
+          background: 'rgba(0,0,0,0.7)',
+          padding: '10px 20px',
+          borderRadius: 8,
+          pointerEvents: 'none',
         }}
       >
         For the full experience, open this page on Meta Quest 3 browser and click "Enter VR"
