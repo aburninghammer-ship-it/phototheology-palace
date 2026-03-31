@@ -341,6 +341,9 @@ const Gatehouse = () => {
             </div>
           </motion.div>
 
+          {/* OS Spaces Dashboard */}
+          <OsSpacesWelcome />
+
           {/* Full Card Layout */}
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full">
             {/* Surface Study Path - Blue Glass */}
