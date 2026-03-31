@@ -307,6 +307,7 @@ export function StudyGuideGenerator({
                   const Tag = `h${section.level + 1}` as keyof JSX.IntrinsicElements;
                   return (
                     <div key={idx} className="mb-6">
+                      {/* @ts-ignore - dynamic heading tag */}
                       <Tag>{section.heading}</Tag>
                       <p className="whitespace-pre-wrap">{section.content}</p>
                       {section.scriptures && section.scriptures.length > 0 && (
