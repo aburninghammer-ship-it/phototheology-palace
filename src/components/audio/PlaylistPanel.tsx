@@ -28,6 +28,7 @@ import {
   SkipBack,
   Trash2,
   Volume2,
+  VolumeX,
   X,
   Loader2,
   Headphones,
@@ -41,6 +42,7 @@ import {
   Pencil,
   Check,
 } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 import { usePlaylist, PlaylistItem } from "@/hooks/usePlaylist";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
