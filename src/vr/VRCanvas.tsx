@@ -161,9 +161,9 @@ export default function VRCanvas() {
       <Canvas
         style={{ width: '100%', height: '100%' }}
         gl={{ antialias: true, alpha: true }}
-        camera={{ position: [0, 2.5, 4], fov: 75, near: 0.1, far: 200 }}
+        camera={{ position: [0, 1.6, 3], fov: 75, near: 0.1, far: 200 }}
       >
-        <XR referenceSpace="local" foveation={1} frameRate={72}>
+        <XR referenceSpace="local-floor" foveation={1} frameRate={72}>
           <VRScene />
         </XR>
       </Canvas>

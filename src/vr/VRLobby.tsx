@@ -22,9 +22,11 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         <meshStandardMaterial color="#0a0a15" side={1} />
       </mesh>
 
-      {/* Ambient lighting */}
-      <ambientLight intensity={0.3} />
-      <pointLight position={[0, 4, 0]} intensity={1} color="#e8d5b7" />
+      {/* Ambient lighting — boosted for XR visibility */}
+      <ambientLight intensity={0.8} />
+      <pointLight position={[0, 4, 0]} intensity={2} color="#e8d5b7" />
+      <pointLight position={[-3, 3, -3]} intensity={1} color="#6366f1" />
+      <pointLight position={[3, 3, -3]} intensity={1} color="#8b5cf6" />
 
       {/* Title */}
       <Text
@@ -49,37 +51,37 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         Select a portal to begin your experience
       </Text>
 
-      {/* Five portals arranged in a semicircle in front of the user */}
+      {/* Five portals arranged in a semicircle — closer for XR visibility */}
       <Portal
-        position={[-4, 0, -3]}
+        position={[-3, 0.5, -2]}
         rotation={[0, 0.5, 0]}
         label="The Sanctuary"
         color="#FFD700"
         onClick={() => onEnterExperience('sanctuary')}
       />
       <Portal
-        position={[-2, 0, -4.5]}
+        position={[-1.5, 0.5, -3]}
         rotation={[0, 0.25, 0]}
         label="24FPS Gallery"
         color="#4488FF"
         onClick={() => onEnterExperience('gallery')}
       />
       <Portal
-        position={[0, 0, -5]}
+        position={[0, 0.5, -3.5]}
         rotation={[0, 0, 0]}
         label="Audio Theater"
         color="#9944FF"
         onClick={() => onEnterExperience('audio')}
       />
       <Portal
-        position={[2, 0, -4.5]}
+        position={[1.5, 0.5, -3]}
         rotation={[0, -0.25, 0]}
         label="Heaven's Diary"
         color="#44FFEE"
         onClick={() => onEnterExperience('heavensDiary')}
       />
       <Portal
-        position={[4, 0, -3]}
+        position={[3, 0.5, -2]}
         rotation={[0, -0.5, 0]}
         label="Game Arcade"
         color="#39FF14"
