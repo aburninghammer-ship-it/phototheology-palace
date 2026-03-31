@@ -39,7 +39,7 @@ function VRScene() {
 export default function VRCanvas() {
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      {/* XR session buttons */}
+      {/* XR session buttons — 'local' reference space avoids Quest 3 boundary setup */}
       <div
         style={{
           position: 'absolute',
@@ -51,6 +51,10 @@ export default function VRCanvas() {
         }}
       >
         <VRButton
+          sessionInit={{
+            optionalFeatures: ['local-floor', 'hand-tracking'],
+            requiredFeatures: ['local'],
+          }}
           style={{
             padding: '12px 24px',
             background: '#4488FF',
@@ -63,6 +67,10 @@ export default function VRCanvas() {
           }}
         />
         <ARButton
+          sessionInit={{
+            optionalFeatures: ['local-floor', 'hand-tracking'],
+            requiredFeatures: ['local'],
+          }}
           style={{
             padding: '12px 24px',
             background: '#44FFEE',
