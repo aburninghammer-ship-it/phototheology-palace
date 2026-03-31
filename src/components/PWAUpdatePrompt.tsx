@@ -18,9 +18,37 @@ function setCooldown(): void {
   localStorage.setItem(UPDATE_COOLDOWN_KEY, String(Date.now() + UPDATE_COOLDOWN_MS));
 }
 
+const isMetaWebView = /FBAN|FBAV|Instagram/i.test(navigator.userAgent);
+
 export function PWAUpdatePrompt() {
   const [showReload, setShowReload] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Meta in-app browser fallback: SW updates don't fire, so poll build tag
+  useEffect(() => {
+    if (!isMetaWebView) return;
+    const currentBuild = document.querySelector('meta[name="app-build"]')?.getAttribute('content');
+    if (!currentBuild) return;
+
+    const check = async () => {
+      try {
+        const html = await fetch(`${location.pathname}?_v=${Date.now()}`, { cache: 'no-store' }).then(r => r.text());
+        const match = html.match(/<meta name="app-build" content="([^"]+)"/);
+        const nextBuild = match?.[1];
+        if (nextBuild && nextBuild !== currentBuild) {
+          console.log('[PWA] Meta webview: new build detected', { currentBuild, nextBuild });
+          setShowReload(true);
+        }
+      } catch (e) {
+        console.error('[PWA] Meta webview build check failed:', e);
+      }
+    };
+
+    // Check immediately, then every 30s
+    check();
+    const id = setInterval(check, 30_000);
+    return () => clearInterval(id);
+  }, []);
   
   const {
     offlineReady: [offlineReady, setOfflineReady],
