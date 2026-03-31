@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Download, RefreshCw } from 'lucide-react';
 
 // Key for tracking recent updates to prevent prompt spam
