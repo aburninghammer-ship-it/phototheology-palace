@@ -523,7 +523,7 @@ export default function AudioLibrary() {
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Audio Library</h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Curated audio experiences — commentaries, Palace tours, apologetics training,
-            devotionals, and study sessions. Add up to 7 to your personal playlist.
+            devotionals, and study sessions. Add up to 25 to your personal playlist.
           </p>
           <div className="flex items-center justify-center gap-2 mt-3">
             <Badge variant="outline" className="gap-1">

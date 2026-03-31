@@ -215,6 +215,10 @@ export function AudioContentBuilder() {
               <>
                 <Check className="h-4 w-4" /> In Playlist
               </>
+            ) : isFull ? (
+              <>
+                <ListPlus className="h-4 w-4" /> Playlist Full
+              </>
             ) : (
               <>
                 <ListPlus className="h-4 w-4" /> Add to Playlist
@@ -284,6 +288,10 @@ export function AudioContentBuilder() {
             {aatsInPlaylist ? (
               <>
                 <Check className="h-4 w-4" /> In Playlist
+              </>
+            ) : isFull ? (
+              <>
+                <ListPlus className="h-4 w-4" /> Playlist Full
               </>
             ) : (
               <>
