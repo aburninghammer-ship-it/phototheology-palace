@@ -8,7 +8,7 @@ import { NebulaClouds } from '../components/NebulaClouds';
 import { useStreamingAudio } from '../hooks/useStreamingAudio';
 
 // The audio file URL — in production this should be a hosted/streamed URL
-const AUDIO_SRC = '/audio/eternal-echoes.mp3';
+const AUDIO_SRC = '/audio/heavens-diary.m4a';
 
 interface HeavensDiaryProps {
   onBack: () => void;

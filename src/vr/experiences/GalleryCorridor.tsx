@@ -1,4 +1,4 @@
-import { useMemo, useRef, Suspense } from 'react';
+import { useMemo, useRef, useState, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, Instances, Instance } from '@react-three/drei';
 import { TeleportationPlane, Interactive } from '@react-three/xr';
