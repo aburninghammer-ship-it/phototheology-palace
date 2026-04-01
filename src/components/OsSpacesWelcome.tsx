@@ -253,11 +253,10 @@ export const OsSpacesWelcome = () => {
         {active && (
           <motion.div
             key={active.id}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={{ opacity: 0, height: 0, overflow: "hidden" }}
+            animate={{ opacity: 1, height: "auto", overflow: "visible", transitionEnd: { overflow: "visible" } }}
+            exit={{ opacity: 0, height: 0, overflow: "hidden" }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden"
           >
             <div
               className="rounded-2xl border p-5 space-y-4 backdrop-blur-xl"
