@@ -4,7 +4,7 @@ import { Portal } from './components/Portal';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-export type VRExperience = 'lobby' | 'sanctuary' | 'gallery' | 'audio' | 'heavensDiary' | 'arcade';
+export type VRExperience = 'lobby' | 'sanctuary' | 'gallery' | 'audio' | 'heavensDiary' | 'arcade' | 'palace';
 
 interface VRLobbyProps {
   onEnterExperience: (experience: VRExperience) => void;
@@ -169,41 +169,48 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       {/* Pulsing center orb */}
       <CenterOrb />
 
-      {/* Five portals arranged in a semicircle */}
+      {/* Six portals arranged in a semicircle + elevated center portal */}
       <Portal
-        position={[-3, 0.5, -2]}
-        rotation={[0, 0.5, 0]}
+        position={[-3.2, 0.5, -1.8]}
+        rotation={[0, 0.55, 0]}
         label="The Sanctuary"
         color="#FFD700"
         onClick={() => onEnterExperience('sanctuary')}
       />
       <Portal
-        position={[-1.5, 0.5, -3]}
-        rotation={[0, 0.25, 0]}
+        position={[-1.8, 0.5, -3]}
+        rotation={[0, 0.3, 0]}
         label="24FPS Gallery"
         color="#4488FF"
         onClick={() => onEnterExperience('gallery')}
       />
       <Portal
-        position={[0, 0.5, -3.5]}
-        rotation={[0, 0, 0]}
+        position={[-0.5, 0.5, -3.5]}
+        rotation={[0, 0.1, 0]}
         label="Audio Theater"
         color="#9944FF"
         onClick={() => onEnterExperience('audio')}
       />
       <Portal
-        position={[1.5, 0.5, -3]}
-        rotation={[0, -0.25, 0]}
+        position={[0.5, 0.5, -3.5]}
+        rotation={[0, -0.1, 0]}
         label="Heaven's Diary"
         color="#44FFEE"
         onClick={() => onEnterExperience('heavensDiary')}
       />
       <Portal
-        position={[3, 0.5, -2]}
-        rotation={[0, -0.5, 0]}
+        position={[1.8, 0.5, -3]}
+        rotation={[0, -0.3, 0]}
         label="Game Arcade"
         color="#39FF14"
         onClick={() => onEnterExperience('arcade')}
+      />
+      <Portal
+        position={[3.2, 0.5, -1.8]}
+        rotation={[0, -0.55, 0]}
+        label="Tour the Palace"
+        color="#E8B84B"
+        onClick={() => onEnterExperience('palace')}
       />
     </group>
   );

@@ -10,6 +10,7 @@ const GalleryCorridor = React.lazy(() => import('./experiences/GalleryCorridor')
 const SpatialAudioPlayer = React.lazy(() => import('./experiences/SpatialAudioPlayer'));
 const HeavensDiary = React.lazy(() => import('./experiences/HeavensDiary'));
 const GameArcade = React.lazy(() => import('./experiences/GameArcade'));
+const PalaceTour = React.lazy(() => import('./experiences/PalaceTour'));
 
 /** Disable OrbitControls when inside an XR session (head tracking takes over) */
 function DesktopControls() {
@@ -82,6 +83,7 @@ function VRScene() {
           {currentExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
           {currentExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
           {currentExperience === 'arcade' && <GameArcade onBack={goToLobby} />}
+          {currentExperience === 'palace' && <PalaceTour onBack={goToLobby} />}
         </Suspense>
       </XRSceneAnchor>
     </>
