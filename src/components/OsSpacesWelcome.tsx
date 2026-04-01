@@ -349,7 +349,6 @@ export const OsSpacesWelcome = () => {
             <span className="text-xs text-muted-foreground">
               <span className="font-semibold" style={{ color: "#d4a017" }}>BI</span> · Biblical Intelligence Engine · 70+ tools across 8 spaces
             </span>
-            </span>
           </div>
         </motion.div>
       )}
