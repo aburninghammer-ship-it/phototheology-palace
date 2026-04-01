@@ -18,16 +18,34 @@ function setCooldown(): void {
   localStorage.setItem(UPDATE_COOLDOWN_KEY, String(Date.now() + UPDATE_COOLDOWN_MS));
 }
 
-const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent) && !/OculusBrowser|Meta Quest/i.test(navigator.userAgent);
-const metaPromptRefreshAttemptsKey = '__meta_sw_refresh_attempts_v1__';
-const metaPromptMaxRefreshAttempts = 3;
+const isMetaWebView =
+  /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent) &&
+  !/OculusBrowser|Meta Quest/i.test(navigator.userAgent);
+const metaBuildRefreshKeyPrefix = '__meta_build_refresh__:';
+
+async function forceMetaRefresh(refreshToken: string) {
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+    }
+  } finally {
+    const target = new URL(window.location.href);
+    target.searchParams.set('__meta_refresh', refreshToken);
+    window.location.replace(target.toString());
+  }
+}
 
 export function PWAUpdatePrompt() {
   const [showReload, setShowReload] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Meta in-app browser fallback: SW updates don't fire, so poll build tag
-  // Use full origin URL and multiple cache-busting strategies
+  // Meta in-app browser fallback: SW updates don't fire reliably, so poll the build tag.
   useEffect(() => {
     if (!isMetaWebView) return;
     const currentBuild = document.querySelector('meta[name="app-build"]')?.getAttribute('content');
@@ -35,51 +53,39 @@ export function PWAUpdatePrompt() {
 
     const check = async () => {
       try {
-        // Fetch with aggressive cache busting and explicit build-check marker.
         const url = `${location.origin}/?__buildcheck=${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const html = await fetch(url, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
-            'Pragma': 'no-cache',
+            Pragma: 'no-cache',
           },
-        }).then(r => r.text());
+        }).then((r) => r.text());
         const match = html.match(/<meta\s+name=["']app-build["']\s+content=["']([^"']+)["']/i);
         const nextBuild = match?.[1];
+
         if (nextBuild && nextBuild !== currentBuild) {
-          const refreshAttempts = Number.parseInt(sessionStorage.getItem(metaPromptRefreshAttemptsKey) ?? '0', 10);
-          if (refreshAttempts >= metaPromptMaxRefreshAttempts) {
+          const refreshKey = `${metaBuildRefreshKeyPrefix}${nextBuild}`;
+          if (sessionStorage.getItem(refreshKey) === '1') {
             return;
           }
-          sessionStorage.setItem(metaPromptRefreshAttemptsKey, String(refreshAttempts + 1));
 
-          // Clear all caches before reloading so Meta browser serves fresh assets
-          if ('caches' in window) {
-            const keys = await caches.keys();
-            await Promise.all(keys.map(k => caches.delete(k)));
-          }
-          // Unregister service worker so it doesn't serve stale cache
-          if ('serviceWorker' in navigator) {
-            const regs = await navigator.serviceWorker.getRegistrations();
-            await Promise.all(regs.map(r => r.unregister()));
-          }
-          // Force full reload with cache bust, preserving route
-          const target = new URL(location.href);
-          target.searchParams.set('__meta_refresh', `${Date.now()}-${Math.random().toString(36).slice(2)}`);
-          window.location.replace(target.toString());
-          return;
+          sessionStorage.setItem(refreshKey, '1');
+          await forceMetaRefresh(`${nextBuild}-${Date.now()}`);
         }
       } catch {
         // silently ignore — will retry on next interval
       }
     };
 
-    // Check after 3s (let page settle), then every 15s
     const timeout = setTimeout(check, 3000);
     const id = setInterval(check, 15_000);
-    return () => { clearTimeout(timeout); clearInterval(id); };
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(id);
+    };
   }, []);
-  
+
   const {
     offlineReady: [offlineReady, setOfflineReady],
     needRefresh: [needRefresh, setNeedRefresh],
@@ -96,7 +102,7 @@ export function PWAUpdatePrompt() {
             r.update();
           }
         }, 5 * 60 * 1000);
-        
+
         // Only check immediately if not in cooldown
         if (!isInCooldown()) {
           r.update();
@@ -131,21 +137,21 @@ export function PWAUpdatePrompt() {
   const handleUpdate = useCallback(async () => {
     if (isUpdating) return;
     setIsUpdating(true);
-    
+
     try {
       // Set cooldown before updating to prevent immediate re-prompt
       setCooldown();
-      
+
       // Update the service worker
       await updateServiceWorker(true);
-      
+
       // Wait for SW to activate, then reload
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration?.waiting) {
           // Send skip waiting message
           registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-          
+
           // Wait for the new SW to activate
           await new Promise<void>((resolve) => {
             const onControllerChange = () => {
@@ -158,13 +164,22 @@ export function PWAUpdatePrompt() {
           });
         }
       }
-      
-      // Reload the page
+
+      if (isMetaWebView) {
+        await forceMetaRefresh(`manual-${Date.now()}`);
+        return;
+      }
+
       window.location.reload();
     } catch (error) {
       console.error('Error during update:', error);
+
+      if (isMetaWebView) {
+        await forceMetaRefresh(`retry-${Date.now()}`);
+        return;
+      }
+
       setIsUpdating(false);
-      // Still try to reload
       window.location.reload();
     }
   }, [updateServiceWorker, isUpdating]);
@@ -237,7 +252,7 @@ export function useCheckForUpdates() {
     if (isInCooldown()) {
       return false;
     }
-    
+
     setIsChecking(true);
     try {
       if ('serviceWorker' in navigator) {
@@ -265,6 +280,12 @@ export function useCheckForUpdates() {
       const registration = await navigator.serviceWorker.getRegistration();
       if (registration?.waiting) {
         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+        if (isMetaWebView) {
+          await forceMetaRefresh(`hook-${Date.now()}`);
+          return;
+        }
+
         window.location.reload();
       }
     }
