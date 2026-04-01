@@ -18,7 +18,7 @@ function setCooldown(): void {
   localStorage.setItem(UPDATE_COOLDOWN_KEY, String(Date.now() + UPDATE_COOLDOWN_MS));
 }
 
-const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent);
+const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|OculusBrowser|Meta Quest/i.test(navigator.userAgent);
 
 export function PWAUpdatePrompt() {
   const [showReload, setShowReload] = useState(false);
@@ -161,8 +161,8 @@ export function PWAUpdatePrompt() {
   if (!offlineReady && !showReload) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[2147483647] flex items-center justify-center p-4 overflow-visible pointer-events-none">
-      <div className="pointer-events-auto w-[min(92vw,22rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 fade-in-0">
+    <div className="fixed inset-0 z-[2147483647] flex items-center justify-center p-4 overflow-visible" style={{ pointerEvents: 'none' }}>
+      <div style={{ pointerEvents: 'auto' }} className="w-[min(92vw,22rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 fade-in-0">
         {offlineReady && !showReload ? (
           <>
             <div className="flex items-center gap-2 mb-2">
