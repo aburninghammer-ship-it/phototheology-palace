@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -81,18 +81,20 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
         <meshStandardMaterial transparent opacity={0} />
       </mesh>
 
-      {/* Label */}
-      <Text
-        position={[0, 1.5, 0]}
-        fontSize={0.2}
-        color="white"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.01}
-        outlineColor="black"
-      >
-        {label}
-      </Text>
+      {/* Label — wrapped in Suspense so font loading doesn't block the portal */}
+      <Suspense fallback={null}>
+        <Text
+          position={[0, 1.5, 0]}
+          fontSize={0.2}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.01}
+          outlineColor="black"
+        >
+          {label}
+        </Text>
+      </Suspense>
 
       {/* Point light for glow effect */}
       <pointLight position={[0, 0, 0.5]} color={color} intensity={2} distance={4} />

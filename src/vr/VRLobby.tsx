@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Portal } from './components/Portal';
 import { Text } from '@react-three/drei';
 
@@ -28,28 +29,30 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       <pointLight position={[-3, 3, -3]} intensity={1} color="#6366f1" />
       <pointLight position={[3, 3, -3]} intensity={1} color="#8b5cf6" />
 
-      {/* Title */}
-      <Text
-        position={[0, 2.5, 0]}
-        fontSize={0.35}
-        color="#e8d5b7"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.01}
-        outlineColor="#000"
-      >
-        PhototheologyOS VR Hub
-      </Text>
+      {/* Title — Suspense-wrapped so font loading doesn't block portal rendering */}
+      <Suspense fallback={null}>
+        <Text
+          position={[0, 2.5, 0]}
+          fontSize={0.35}
+          color="#e8d5b7"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.01}
+          outlineColor="#000"
+        >
+          PhototheologyOS VR Hub
+        </Text>
 
-      <Text
-        position={[0, 2.1, 0]}
-        fontSize={0.15}
-        color="#888"
-        anchorX="center"
-        anchorY="middle"
-      >
-        Select a portal to begin your experience
-      </Text>
+        <Text
+          position={[0, 2.1, 0]}
+          fontSize={0.15}
+          color="#888"
+          anchorX="center"
+          anchorY="middle"
+        >
+          Select a portal to begin your experience
+        </Text>
+      </Suspense>
 
       {/* Five portals arranged in a semicircle — closer for XR visibility */}
       <Portal

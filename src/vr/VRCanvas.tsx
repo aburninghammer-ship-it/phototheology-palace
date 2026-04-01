@@ -27,6 +27,16 @@ function DesktopControls() {
   );
 }
 
+/** Loading indicator visible inside XR while lazy experiences load */
+function XRLoadingFallback() {
+  return (
+    <mesh position={[0, 1.5, -3]}>
+      <sphereGeometry args={[0.2, 16, 16]} />
+      <meshBasicMaterial color="#6366f1" wireframe />
+    </mesh>
+  );
+}
+
 /**
  * In XR, the headset becomes the active camera at the scene origin.
  * Shift the entire hub forward so Quest users spawn with the PT OS lobby in front of them
@@ -44,7 +54,7 @@ function VRScene() {
   const goToLobby = useCallback(() => setCurrentExperience('lobby'), []);
 
   return (
-    <Suspense fallback={null}>
+    <>
       <DesktopControls />
 
       <XRSceneAnchor>
@@ -58,16 +68,21 @@ function VRScene() {
           <meshBasicMaterial color="#0a0a15" side={BackSide} depthWrite={false} />
         </mesh>
 
-        {currentExperience === 'lobby' && (
-          <VRLobby onEnterExperience={setCurrentExperience} />
-        )}
-        {currentExperience === 'sanctuary' && <SanctuaryWalk onBack={goToLobby} />}
-        {currentExperience === 'gallery' && <GalleryCorridor onBack={goToLobby} />}
-        {currentExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
-        {currentExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
-        {currentExperience === 'arcade' && <GameArcade onBack={goToLobby} />}
+        {/* Basic ambient light always on so geometry is visible even if Suspense is pending */}
+        <ambientLight intensity={0.5} />
+
+        <Suspense fallback={<XRLoadingFallback />}>
+          {currentExperience === 'lobby' && (
+            <VRLobby onEnterExperience={setCurrentExperience} />
+          )}
+          {currentExperience === 'sanctuary' && <SanctuaryWalk onBack={goToLobby} />}
+          {currentExperience === 'gallery' && <GalleryCorridor onBack={goToLobby} />}
+          {currentExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
+          {currentExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
+          {currentExperience === 'arcade' && <GameArcade onBack={goToLobby} />}
+        </Suspense>
       </XRSceneAnchor>
-    </Suspense>
+    </>
   );
 }
 
