@@ -56,7 +56,7 @@ function VRScene() {
   return (
     <>
       <DesktopControls />
-      <Controllers />
+      <Controllers rayMaterial={{ color: '#6366f1' }} />
       <Hands />
 
       <XRSceneAnchor>
