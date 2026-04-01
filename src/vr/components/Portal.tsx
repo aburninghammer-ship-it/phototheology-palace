@@ -69,9 +69,9 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
         Interactive wraps it for XR controller/hand select; onClick for desktop.
       */}
       <Interactive onSelect={onClick}>
-        <mesh position={[0, 0, 0.03]} onClick={onClick}>
+        <mesh position={[0, 0, 0.05]} onClick={onClick}>
           <planeGeometry args={[2.6, 2.8]} />
-          <meshBasicMaterial color={color} transparent opacity={0.03} side={THREE.DoubleSide} />
+          <meshBasicMaterial color={color} transparent opacity={0.08} side={THREE.DoubleSide} />
         </mesh>
       </Interactive>
 

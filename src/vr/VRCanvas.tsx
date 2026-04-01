@@ -44,7 +44,7 @@ function XRLoadingFallback() {
  */
 function XRSceneAnchor({ children }: { children: React.ReactNode }) {
   const { isPresenting } = useXR();
-  const sceneOffset: [number, number, number] = isPresenting ? [0, 0, -3] : [0, 0, 0];
+  const sceneOffset: [number, number, number] = isPresenting ? [0, 0, -1.5] : [0, 0, 0];
 
   return <group position={sceneOffset}>{children}</group>;
 }
