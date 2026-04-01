@@ -1,13 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
+import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { StarField } from '../components/StarField';
 import { NebulaClouds } from '../components/NebulaClouds';
 import { useStreamingAudio } from '../hooks/useStreamingAudio';
 
 // The audio file URL — in production this should be a hosted/streamed URL
-const AUDIO_SRC = '/audio/heavens-diary.m4a';
+const AUDIO_SRC = '/audio/eternal-echoes.mp3';
 
 interface HeavensDiaryProps {
   onBack: () => void;
@@ -208,18 +209,20 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
         {phaseLabel}
       </Text>
 
-      {/* Play/Pause button */}
-      <mesh
-        position={[0, 1.5, -3]}
-        onClick={audioControls.togglePlayPause}
-      >
-        <circleGeometry args={[0.15, 32]} />
-        <meshStandardMaterial
-          color={audioState.isPlaying ? '#FF4444' : '#44FF44'}
-          emissive={audioState.isPlaying ? '#FF4444' : '#44FF44'}
-          emissiveIntensity={0.5}
-        />
-      </mesh>
+      {/* Play/Pause button — XR compatible */}
+      <Interactive onSelect={audioControls.togglePlayPause}>
+        <mesh
+          position={[0, 1.5, -3]}
+          onClick={audioControls.togglePlayPause}
+        >
+          <circleGeometry args={[0.15, 32]} />
+          <meshStandardMaterial
+            color={audioState.isPlaying ? '#FF4444' : '#44FF44'}
+            emissive={audioState.isPlaying ? '#FF4444' : '#44FF44'}
+            emissiveIntensity={0.5}
+          />
+        </mesh>
+      </Interactive>
       <Text
         position={[0, 1.5, -2.98]}
         fontSize={0.08}
@@ -252,16 +255,18 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
         </Text>
       )}
 
-      {/* Back button */}
-      <Text
-        position={[0, 0.2, 2]}
-        fontSize={0.1}
-        color="#FF6666"
-        anchorX="center"
-        onClick={onBack}
-      >
-        ← Back to Lobby
-      </Text>
+      {/* Back button — XR compatible */}
+      <Interactive onSelect={onBack}>
+        <mesh position={[0, 0.2, 2]} onClick={onBack}>
+          <planeGeometry args={[1.5, 0.3]} />
+          <meshBasicMaterial color="#331111" />
+        </mesh>
+      </Interactive>
+      <Suspense fallback={null}>
+        <Text position={[0, 0.2, 2.01]} fontSize={0.1} color="#FF6666" anchorX="center">
+          ← Back to Lobby
+        </Text>
+      </Suspense>
     </group>
   );
 }

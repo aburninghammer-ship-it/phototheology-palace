@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import { Text } from '@react-three/drei';
-import { TeleportationPlane } from '@react-three/xr';
+import { TeleportationPlane, Interactive } from '@react-three/xr';
 import {
   getSanctuaryElementsByZone,
   type SanctuaryZone,
@@ -29,7 +29,6 @@ function FurnitureMesh({ element, position, color }: FurnitureMeshProps) {
     if (!element.dimensions) return { width: 0.5, height: 0.5, depth: 0.5 };
     const parsed = parseDimensions(element.dimensions);
     if (!parsed) return { width: 0.5, height: 0.5, depth: 0.5 };
-    // Clamp for VR visibility — very small items get a minimum size
     return {
       width: Math.max(parsed.width, 0.2),
       height: Math.max(parsed.height, 0.2),
@@ -37,57 +36,58 @@ function FurnitureMesh({ element, position, color }: FurnitureMeshProps) {
     };
   }, [element.dimensions]);
 
-  // Use cylinder for laver/altar-like items, box for others
   const isRound = element.name.toLowerCase().includes('laver') ||
     element.name.toLowerCase().includes('lampstand');
 
+  const toggle = () => setShowInfo(!showInfo);
+
   return (
     <group position={position}>
-      {/* Furniture mesh */}
-      <mesh
-        position={[0, dims.height / 2, 0]}
-        onClick={() => setShowInfo(!showInfo)}
-        castShadow
-      >
-        {isRound ? (
-          <cylinderGeometry args={[dims.width / 2, dims.width / 2, dims.height, 16]} />
-        ) : (
-          <boxGeometry args={[dims.width, dims.height, dims.depth]} />
-        )}
-        <meshStandardMaterial
-          color={color}
-          metalness={color === '#FFD700' ? 0.8 : 0.3}
-          roughness={color === '#FFD700' ? 0.2 : 0.6}
-        />
-      </mesh>
+      <Interactive onSelect={toggle}>
+        <mesh
+          position={[0, dims.height / 2, 0]}
+          onClick={toggle}
+          castShadow
+        >
+          {isRound ? (
+            <cylinderGeometry args={[dims.width / 2, dims.width / 2, dims.height, 16]} />
+          ) : (
+            <boxGeometry args={[dims.width, dims.height, dims.depth]} />
+          )}
+          <meshStandardMaterial
+            color={color}
+            metalness={color === '#FFD700' ? 0.8 : 0.3}
+            roughness={color === '#FFD700' ? 0.2 : 0.6}
+          />
+        </mesh>
+      </Interactive>
 
-      {/* Name label below */}
-      <Text
-        position={[0, -0.1, 0.3]}
-        fontSize={0.08}
-        color="white"
-        anchorX="center"
-        anchorY="top"
-        outlineWidth={0.005}
-        outlineColor="black"
-      >
-        {element.name}
-      </Text>
-
-      {/* Hebrew name */}
-      {element.hebrewName && (
+      <Suspense fallback={null}>
         <Text
-          position={[0, -0.25, 0.3]}
-          fontSize={0.06}
-          color="#aaa"
+          position={[0, -0.1, 0.3]}
+          fontSize={0.08}
+          color="white"
           anchorX="center"
           anchorY="top"
+          outlineWidth={0.005}
+          outlineColor="black"
         >
-          {element.hebrewName}
+          {element.name}
         </Text>
-      )}
 
-      {/* Detailed info panel on click */}
+        {element.hebrewName && (
+          <Text
+            position={[0, -0.25, 0.3]}
+            fontSize={0.06}
+            color="#aaa"
+            anchorX="center"
+            anchorY="top"
+          >
+            {element.hebrewName}
+          </Text>
+        )}
+      </Suspense>
+
       {showInfo && (
         <InfoPanel
           position={[0, dims.height + 0.8, 0]}
@@ -116,41 +116,36 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
     }));
   }, []);
 
+  const goPrev = () => activeZone > 0 && setActiveZone(activeZone - 1);
+  const goNext = () => activeZone < ZONES.length - 1 && setActiveZone(activeZone + 1);
+
   return (
     <group>
-      {/* Warm ambient light */}
       <ambientLight intensity={0.4} color="#fff5e6" />
       <directionalLight position={[5, 10, 5]} intensity={0.8} color="#ffe8c4" castShadow />
 
-      {/* Teleportation ground plane */}
-      <TeleportationPlane
-        leftHand
-        rightHand
-        maxDistance={20}
-      />
+      <TeleportationPlane leftHand rightHand maxDistance={20} />
 
-      {/* Visible ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -18]} receiveShadow>
         <planeGeometry args={[12, 50]} />
         <meshStandardMaterial color="#3a2a1a" roughness={0.9} />
       </mesh>
 
-      {/* Zone labels and elements */}
-      {zoneData.map((zone, zoneIdx) => (
+      {zoneData.map((zone) => (
         <group key={zone.id} position={[0, 0, zone.zOffset]}>
-          {/* Zone title */}
-          <Text
-            position={[0, 2.5, 0]}
-            fontSize={0.3}
-            color={zone.color}
-            anchorX="center"
-            outlineWidth={0.01}
-            outlineColor="#000"
-          >
-            {zone.label}
-          </Text>
+          <Suspense fallback={null}>
+            <Text
+              position={[0, 2.5, 0]}
+              fontSize={0.3}
+              color={zone.color}
+              anchorX="center"
+              outlineWidth={0.01}
+              outlineColor="#000"
+            >
+              {zone.label}
+            </Text>
+          </Suspense>
 
-          {/* Zone boundary markers */}
           <mesh position={[-5, 0, 0]}>
             <boxGeometry args={[0.1, 3, 0.1]} />
             <meshStandardMaterial color={zone.color} emissive={zone.color} emissiveIntensity={0.3} />
@@ -160,7 +155,6 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
             <meshStandardMaterial color={zone.color} emissive={zone.color} emissiveIntensity={0.3} />
           </mesh>
 
-          {/* Furniture elements laid out in a row */}
           {zone.elements.map((el, i) => {
             const spacing = 2.5;
             const totalWidth = (zone.elements.length - 1) * spacing;
@@ -183,46 +177,45 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
         </group>
       ))}
 
-      {/* Zone navigation buttons */}
+      {/* Zone navigation — XR compatible */}
       <group position={[0, 0.5, 1]}>
-        <Text
-          position={[-1, 0, 0]}
-          fontSize={0.12}
-          color={activeZone > 0 ? '#fff' : '#555'}
-          anchorX="center"
-          onClick={() => activeZone > 0 && setActiveZone(activeZone - 1)}
-        >
-          ← Previous Zone
-        </Text>
-        <Text
-          position={[0, 0, 0]}
-          fontSize={0.1}
-          color="#aaa"
-          anchorX="center"
-        >
-          {ZONES[activeZone].label}
-        </Text>
-        <Text
-          position={[1, 0, 0]}
-          fontSize={0.12}
-          color={activeZone < ZONES.length - 1 ? '#fff' : '#555'}
-          anchorX="center"
-          onClick={() => activeZone < ZONES.length - 1 && setActiveZone(activeZone + 1)}
-        >
-          Next Zone →
-        </Text>
+        <Interactive onSelect={goPrev}>
+          <mesh position={[-1.2, 0, 0]} onClick={goPrev}>
+            <planeGeometry args={[1.2, 0.3]} />
+            <meshBasicMaterial color={activeZone > 0 ? '#222' : '#111'} />
+          </mesh>
+        </Interactive>
+        <Suspense fallback={null}>
+          <Text position={[-1.2, 0, 0.01]} fontSize={0.1} color={activeZone > 0 ? '#fff' : '#555'} anchorX="center">
+            ← Previous Zone
+          </Text>
+          <Text position={[0, 0, 0.01]} fontSize={0.1} color="#aaa" anchorX="center">
+            {ZONES[activeZone].label}
+          </Text>
+          <Text position={[1.2, 0, 0.01]} fontSize={0.1} color={activeZone < ZONES.length - 1 ? '#fff' : '#555'} anchorX="center">
+            Next Zone →
+          </Text>
+        </Suspense>
+        <Interactive onSelect={goNext}>
+          <mesh position={[1.2, 0, 0]} onClick={goNext}>
+            <planeGeometry args={[1.0, 0.3]} />
+            <meshBasicMaterial color={activeZone < ZONES.length - 1 ? '#222' : '#111'} />
+          </mesh>
+        </Interactive>
       </group>
 
-      {/* Back button */}
-      <Text
-        position={[0, 0.2, 1.5]}
-        fontSize={0.1}
-        color="#FF6666"
-        anchorX="center"
-        onClick={onBack}
-      >
-        ← Back to Lobby
-      </Text>
+      {/* Back button — XR compatible */}
+      <Interactive onSelect={onBack}>
+        <mesh position={[0, 0.2, 1.5]} onClick={onBack}>
+          <planeGeometry args={[1.5, 0.3]} />
+          <meshBasicMaterial color="#331111" />
+        </mesh>
+      </Interactive>
+      <Suspense fallback={null}>
+        <Text position={[0, 0.2, 1.51]} fontSize={0.1} color="#FF6666" anchorX="center">
+          ← Back to Lobby
+        </Text>
+      </Suspense>
     </group>
   );
 }

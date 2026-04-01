@@ -1,7 +1,7 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, Instances, Instance } from '@react-three/drei';
-import { TeleportationPlane } from '@react-three/xr';
+import { TeleportationPlane, Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 
 // Import all bible sets from allBooks
@@ -222,16 +222,18 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
         Genesis 1 → Revelation 22 — {allChapters.length} chapter frames
       </Text>
 
-      {/* Back button */}
-      <Text
-        position={[0, 0.2, 2.5]}
-        fontSize={0.1}
-        color="#FF6666"
-        anchorX="center"
-        onClick={onBack}
-      >
-        ← Back to Lobby
-      </Text>
+      {/* Back button — XR compatible */}
+      <Interactive onSelect={onBack}>
+        <mesh position={[0, 0.2, 2.5]} onClick={onBack}>
+          <planeGeometry args={[1.5, 0.3]} />
+          <meshBasicMaterial color="#331111" />
+        </mesh>
+      </Interactive>
+      <Suspense fallback={null}>
+        <Text position={[0, 0.2, 2.51]} fontSize={0.1} color="#FF6666" anchorX="center">
+          ← Back to Lobby
+        </Text>
+      </Suspense>
     </group>
   );
 }
