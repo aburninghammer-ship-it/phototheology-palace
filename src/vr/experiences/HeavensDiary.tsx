@@ -5,6 +5,7 @@ import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { NebulaClouds } from '../components/NebulaClouds';
 import { useStreamingAudio } from '../hooks/useStreamingAudio';
+import { getSoftCircleTexture, getNebulaBlobTexture } from '../utils/softTextures';
 
 const AUDIO_SRC = '/audio/heavens-diary.m4a';
 
@@ -121,6 +122,7 @@ function WarpStars({ progress, brightness }: { progress: number; brightness: num
   const starData = useMemo(() => initStarData(), []);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const colorObj = useMemo(() => new THREE.Color(), []);
+  const starMap = useMemo(() => getSoftCircleTexture(), []);
 
   useFrame((_, delta) => {
     const mesh = meshRef.current;
@@ -180,11 +182,13 @@ function WarpStars({ progress, brightness }: { progress: number; brightness: num
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, STAR_COUNT]}>
-      <sphereGeometry args={[1, 4, 3]} />
+      <planeGeometry args={[2, 2]} />
       <meshBasicMaterial
+        map={starMap}
         color="#ffffff"
         transparent
         opacity={0.9}
+        alphaTest={0.02}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
@@ -349,19 +353,27 @@ function CelestialBodies({ progress }: { progress: number }) {
           )}
           {body.type === 'plane' && (
             <>
-              {/* Multi-layered nebula wall */}
-              <mesh>
-                <planeGeometry args={[body.scale * 2, body.scale]} />
-                <meshBasicMaterial color="#CC44FF" transparent opacity={0.25} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} depthWrite={false} />
-              </mesh>
-              <mesh position={[3, 2, 2]} rotation={[0, 0.2, 0.1]}>
-                <planeGeometry args={[body.scale * 1.5, body.scale * 0.8]} />
-                <meshBasicMaterial color="#FF44AA" transparent opacity={0.15} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} depthWrite={false} />
-              </mesh>
-              <mesh position={[-4, -1, -1]} rotation={[0, -0.15, 0]}>
-                <planeGeometry args={[body.scale * 1.2, body.scale * 0.6]} />
-                <meshBasicMaterial color="#44CCFF" transparent opacity={0.12} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} depthWrite={false} />
-              </mesh>
+              {/* Soft nebula cloud layers instead of flat squares */}
+              {[
+                { pos: [0, 0, 0] as [number, number, number], color: '#CC44FF', s: body.scale * 1.8, o: 0.2 },
+                { pos: [3, 2, 2] as [number, number, number], color: '#FF44AA', s: body.scale * 1.4, o: 0.15 },
+                { pos: [-4, -1, -1] as [number, number, number], color: '#44CCFF', s: body.scale * 1.0, o: 0.12 },
+                { pos: [2, -2, 3] as [number, number, number], color: '#8844FF', s: body.scale * 1.2, o: 0.1 },
+                { pos: [-2, 3, -2] as [number, number, number], color: '#FF88CC', s: body.scale * 0.9, o: 0.1 },
+              ].map((layer, li) => (
+                <mesh key={li} position={layer.pos}>
+                  <planeGeometry args={[layer.s, layer.s]} />
+                  <meshBasicMaterial
+                    map={getNebulaBlobTexture()}
+                    color={layer.color}
+                    transparent
+                    opacity={layer.o}
+                    blending={THREE.AdditiveBlending}
+                    side={THREE.DoubleSide}
+                    depthWrite={false}
+                  />
+                </mesh>
+              ))}
               <pointLight color="#CC44FF" intensity={2} distance={30} />
             </>
           )}
@@ -553,12 +565,16 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
 
   return (
     <group ref={sceneGroupRef}>
-      {/* Dynamic ambient light — brighter for visibility */}
-      <ambientLight intensity={0.15} color={phase.ambient} />
+      {/* Dynamic ambient light — boosted for XR visibility */}
+      <ambientLight intensity={0.4} color={phase.ambient} />
 
-      {/* Phase-reactive accent lights */}
-      <pointLight position={[-5, 3, -5]} color={phase.accentColor} intensity={0.5 + avgVolume * 0.5} distance={15} />
-      <pointLight position={[5, 3, -5]} color={phase.nebula[1] || phase.accentColor} intensity={0.4 + avgVolume * 0.4} distance={12} />
+      {/* Directional fill so emissive materials aren't the only light source */}
+      <directionalLight position={[0, 5, -10]} intensity={0.3} color="#8888cc" />
+
+      {/* Phase-reactive accent lights — stronger */}
+      <pointLight position={[-5, 3, -5]} color={phase.accentColor} intensity={1.2 + avgVolume * 0.8} distance={25} />
+      <pointLight position={[5, 3, -5]} color={phase.nebula[1] || phase.accentColor} intensity={0.8 + avgVolume * 0.6} distance={20} />
+      <pointLight position={[0, -2, -10]} color={phase.nebula[0]} intensity={0.5} distance={20} />
 
       {/* Warp star field — more stars, more color */}
       <WarpStars

@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { getNebulaBlobTexture } from '../utils/softTextures';
 
 interface NebulaCloudProps {
   position: [number, number, number];
@@ -14,6 +15,7 @@ function NebulaCloud({ position, color, scale = 5, opacity = 0.15, zSpeed = 0 }:
   const meshRef = useRef<THREE.Mesh>(null);
   const offset = useMemo(() => Math.random() * Math.PI * 2, []);
   const baseZ = useRef(position[2]);
+  const map = useMemo(() => getNebulaBlobTexture(), []);
 
   useFrame(({ clock, camera }, delta) => {
     if (!meshRef.current) return;
@@ -37,6 +39,7 @@ function NebulaCloud({ position, color, scale = 5, opacity = 0.15, zSpeed = 0 }:
     <mesh ref={meshRef} position={position} scale={scale}>
       <planeGeometry args={[1, 1]} />
       <meshBasicMaterial
+        map={map}
         color={color}
         transparent
         opacity={opacity}
