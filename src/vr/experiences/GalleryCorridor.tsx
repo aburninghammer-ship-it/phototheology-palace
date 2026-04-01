@@ -11,17 +11,15 @@ import {
   type BibleSet,
 } from '@/data/bible24fps/allBooks';
 
-// We need to import all sets. Since allBooks.ts exports named sets,
-// we'll import them all and collect them.
 import * as allBooksData from '@/data/bible24fps/allBooks';
 
-// Book color mapping — simple hash-based coloring per book
+// Rich color palette for book differentiation
 const BOOK_COLORS: Record<string, string> = {};
 const COLOR_PALETTE = [
-  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-  '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-  '#F0B27A', '#82E0AA', '#F1948A', '#AED6F1', '#D7BDE2',
-  '#A3E4D7', '#FAD7A0', '#D5F5E3', '#FADBD8', '#D4E6F1',
+  '#FF4466', '#44DDFF', '#FFD700', '#44FF88', '#FF8844',
+  '#BB66FF', '#FF44AA', '#44FFCC', '#FFAA22', '#66AAFF',
+  '#FF6688', '#88FF44', '#FF44DD', '#44AAFF', '#FFCC44',
+  '#AA44FF', '#FF8866', '#22FFAA', '#FF6644', '#88DDFF',
 ];
 
 function getBookColor(book: string): string {
@@ -68,87 +66,77 @@ function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
 
   return (
     <group position={position} rotation={rotation}>
-      {/* Frame border glow */}
-      <mesh position={[0, 0, -0.005]}>
-        <planeGeometry args={[0.85, 1.05]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={hovered ? 1 : 0.3} transparent opacity={0.8} />
+      {/* Ornate frame border with gold trim */}
+      <mesh position={[0, 0, -0.008]}>
+        <planeGeometry args={[0.9, 1.1]} />
+        <meshStandardMaterial
+          color="#FFD700"
+          emissive="#FFD700"
+          emissiveIntensity={hovered ? 0.4 : 0.15}
+          metalness={0.85}
+          roughness={0.2}
+          transparent
+          opacity={0.9}
+        />
       </mesh>
 
-      {/* Frame background with gradient feel */}
+      {/* Frame inner border */}
+      <mesh position={[0, 0, -0.006]}>
+        <planeGeometry args={[0.86, 1.06]} />
+        <meshStandardMaterial color="#1a1520" metalness={0.3} roughness={0.5} />
+      </mesh>
+
+      {/* Frame background */}
       <Interactive
         onSelect={() => {}}
         onHover={() => setHovered(true)}
         onBlur={() => setHovered(false)}
       >
-        <mesh onClick={() => {}}>
-          <planeGeometry args={[0.8, 1.0]} />
-          <meshStandardMaterial color="#1a1a2e" />
+        <mesh onClick={() => {}} onPointerDown={() => {}}>
+          <planeGeometry args={[0.82, 1.02]} />
+          <meshStandardMaterial
+            color="#0a0a18"
+            emissive={color}
+            emissiveIntensity={hovered ? 0.08 : 0.03}
+          />
         </mesh>
       </Interactive>
 
-      {/* Colored image area (top half) */}
+      {/* Colored image area (top half) — more vibrant */}
       <mesh position={[0, 0.2, 0.001]}>
-        <planeGeometry args={[0.72, 0.5]} />
+        <planeGeometry args={[0.74, 0.52]} />
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={0.15}
+          emissiveIntensity={hovered ? 0.3 : 0.12}
           transparent
-          opacity={0.25}
+          opacity={0.35}
         />
       </mesh>
 
       {/* Large symbol as visual centerpiece */}
-      <Text
-        position={[0, 0.22, 0.01]}
-        fontSize={0.22}
-        anchorX="center"
-        anchorY="middle"
-        color={color}
-      >
+      <Text position={[0, 0.22, 0.01]} fontSize={0.24} anchorX="center" anchorY="middle" color={color}>
         {frame.symbol}
       </Text>
 
-      {/* Color accent bar */}
+      {/* Color accent bar — brighter */}
       <mesh position={[0, -0.08, 0.001]}>
-        <planeGeometry args={[0.72, 0.02]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} />
+        <planeGeometry args={[0.74, 0.025]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.2} />
       </mesh>
 
       {/* Book + Chapter */}
-      <Text
-        position={[0, -0.15, 0.01]}
-        fontSize={0.06}
-        color={color}
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={0.7}
-      >
+      <Text position={[0, -0.15, 0.01]} fontSize={0.065} color={color} anchorX="center" anchorY="middle" maxWidth={0.72}>
         {frame.book} {frame.chapter}
       </Text>
 
       {/* Title */}
-      <Text
-        position={[0, -0.25, 0.01]}
-        fontSize={0.05}
-        color="white"
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={0.7}
-      >
+      <Text position={[0, -0.25, 0.01]} fontSize={0.05} color="#eeeeff" anchorX="center" anchorY="middle" maxWidth={0.72}>
         {frame.title}
       </Text>
 
       {/* Memory Hook */}
-      <Text
-        position={[0, -0.37, 0.01]}
-        fontSize={0.035}
-        color="#aaa"
-        anchorX="center"
-        anchorY="top"
-        maxWidth={0.7}
-        lineHeight={1.3}
-      >
+      <Text position={[0, -0.37, 0.01]} fontSize={0.038} color="#aaaacc" anchorX="center" anchorY="top" maxWidth={0.72} lineHeight={1.3}>
         {frame.memoryHook}
       </Text>
     </group>
@@ -162,57 +150,83 @@ interface GalleryCorridorProps {
 export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
   const allChapters = useMemo(() => getAllChapters(), []);
 
-  // Arrange frames on both walls of a long corridor
-  // Frame spacing: 1.2m apart along z-axis
   const FRAME_SPACING = 1.2;
-  const WALL_OFFSET = 3; // x distance from center to wall
+  const WALL_OFFSET = 3;
   const CORRIDOR_LENGTH = allChapters.length * FRAME_SPACING / 2;
 
   return (
     <group>
-      {/* Corridor lighting */}
-      <ambientLight intensity={0.2} />
-      {/* Spot lights every 20 frames */}
+      {/* Rich ambient lighting */}
+      <ambientLight intensity={0.15} color="#e8d0ff" />
+
+      {/* Spot lights every 20 frames — warm golden */}
       {Array.from({ length: Math.ceil(allChapters.length / 40) }, (_, i) => (
-        <pointLight
-          key={i}
-          position={[0, 3, -i * FRAME_SPACING * 20]}
-          intensity={1.5}
-          distance={30}
-          color="#e8d5b7"
-        />
+        <group key={i}>
+          <pointLight
+            position={[0, 3, -i * FRAME_SPACING * 20]}
+            intensity={1.8}
+            distance={35}
+            color="#FFD088"
+          />
+          {/* Accent colored lights alternating sides */}
+          <pointLight
+            position={[i % 2 === 0 ? -2.5 : 2.5, 2, -i * FRAME_SPACING * 20]}
+            intensity={0.4}
+            distance={15}
+            color={i % 3 === 0 ? '#6666FF' : i % 3 === 1 ? '#FF6666' : '#66FF66'}
+          />
+        </group>
       ))}
+
+      {/* Fog for atmospheric depth */}
+      <fog attach="fog" args={['#0a0a18', 8, 40]} />
 
       {/* Teleportation plane */}
       <TeleportationPlane leftHand rightHand maxDistance={20} />
 
-      {/* Floor */}
+      {/* Rich marble floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -CORRIDOR_LENGTH / 2]} receiveShadow>
         <planeGeometry args={[8, CORRIDOR_LENGTH + 10]} />
-        <meshStandardMaterial color="#1a1520" roughness={0.9} />
+        <meshStandardMaterial color="#1a1520" metalness={0.4} roughness={0.5} />
       </mesh>
 
-      {/* Left wall */}
+      {/* Floor runner (decorative center strip) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.19, -CORRIDOR_LENGTH / 2]}>
+        <planeGeometry args={[2, CORRIDOR_LENGTH + 10]} />
+        <meshStandardMaterial color="#2a1830" emissive="#4400AA" emissiveIntensity={0.03} metalness={0.3} roughness={0.6} />
+      </mesh>
+
+      {/* Left wall — deeper color */}
       <mesh position={[-WALL_OFFSET - 0.5, 1, -CORRIDOR_LENGTH / 2]}>
-        <boxGeometry args={[0.1, 5, CORRIDOR_LENGTH + 10]} />
-        <meshStandardMaterial color="#2a2040" />
+        <boxGeometry args={[0.15, 5, CORRIDOR_LENGTH + 10]} />
+        <meshStandardMaterial color="#2a1840" roughness={0.7} />
       </mesh>
 
       {/* Right wall */}
       <mesh position={[WALL_OFFSET + 0.5, 1, -CORRIDOR_LENGTH / 2]}>
-        <boxGeometry args={[0.1, 5, CORRIDOR_LENGTH + 10]} />
-        <meshStandardMaterial color="#2a2040" />
+        <boxGeometry args={[0.15, 5, CORRIDOR_LENGTH + 10]} />
+        <meshStandardMaterial color="#2a1840" roughness={0.7} />
       </mesh>
 
-      {/* Ceiling */}
-      <mesh position={[0, 3.5, -CORRIDOR_LENGTH / 2]}>
-        <boxGeometry args={[8, 0.1, CORRIDOR_LENGTH + 10]} />
-        <meshStandardMaterial color="#0a0a15" />
+      {/* Gold trim along walls */}
+      <mesh position={[-WALL_OFFSET - 0.44, 2.8, -CORRIDOR_LENGTH / 2]}>
+        <boxGeometry args={[0.03, 0.06, CORRIDOR_LENGTH + 10]} />
+        <meshStandardMaterial color="#FFD700" emissive="#FFD700" emissiveIntensity={0.2} metalness={0.9} roughness={0.15} />
+      </mesh>
+      <mesh position={[WALL_OFFSET + 0.44, 2.8, -CORRIDOR_LENGTH / 2]}>
+        <boxGeometry args={[0.03, 0.06, CORRIDOR_LENGTH + 10]} />
+        <meshStandardMaterial color="#FFD700" emissive="#FFD700" emissiveIntensity={0.2} metalness={0.9} roughness={0.15} />
+      </mesh>
+
+      {/* Vaulted ceiling — arched */}
+      <mesh position={[0, 3.8, -CORRIDOR_LENGTH / 2]}>
+        <boxGeometry args={[8.2, 0.15, CORRIDOR_LENGTH + 10]} />
+        <meshStandardMaterial color="#0a0a15" roughness={0.9} />
       </mesh>
 
       {/* Chapter frames on alternating walls */}
       {allChapters.map((frame, i) => {
-        const side = i % 2 === 0 ? -1 : 1; // Alternate left/right
+        const side = i % 2 === 0 ? -1 : 1;
         const z = -Math.floor(i / 2) * FRAME_SPACING;
         const x = side * WALL_OFFSET;
         const rotY = side > 0 ? Math.PI / 2 : -Math.PI / 2;
@@ -229,36 +243,24 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
         );
       })}
 
-      {/* Entrance label */}
-      <Text
-        position={[0, 2, 2]}
-        fontSize={0.25}
-        color="#4488FF"
-        anchorX="center"
-        outlineWidth={0.01}
-        outlineColor="#000"
-      >
+      {/* Entrance label — more prominent */}
+      <Text position={[0, 2, 2]} fontSize={0.28} color="#44AAFF" anchorX="center" outlineWidth={0.012} outlineColor="#000">
         24FPS Bible Gallery
       </Text>
-      <Text
-        position={[0, 1.6, 2]}
-        fontSize={0.1}
-        color="#888"
-        anchorX="center"
-      >
+      <Text position={[0, 1.6, 2]} fontSize={0.1} color="#AAAACC" anchorX="center">
         Genesis 1 → Revelation 22 — {allChapters.length} chapter frames
       </Text>
 
-      {/* Back button — XR compatible */}
+      {/* Back button */}
       <Interactive onSelect={onBack}>
         <mesh position={[0, 0.2, 2.5]} onClick={onBack} onPointerDown={onBack}>
           <planeGeometry args={[1.5, 0.3]} />
-          <meshBasicMaterial color="#331111" />
+          <meshStandardMaterial color="#220808" emissive="#FF4444" emissiveIntensity={0.15} />
         </mesh>
       </Interactive>
       <Suspense fallback={null}>
         <Text position={[0, 0.2, 2.51]} fontSize={0.1} color="#FF6666" anchorX="center">
-          ← Back to Lobby
+          Back to Lobby
         </Text>
       </Suspense>
     </group>
