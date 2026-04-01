@@ -83,7 +83,7 @@ const OS_SPACES: OsSpace[] = [
   },
   {
     id: "stage",
-    label: "The Stage",
+    label: "Phototheology Stage",
     subtitle: "Sermons, Teaching & Output",
     icon: Mic,
     color: "270 56% 65%",
