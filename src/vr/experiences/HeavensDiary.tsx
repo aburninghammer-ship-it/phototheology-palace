@@ -5,6 +5,7 @@ import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { NebulaClouds } from '../components/NebulaClouds';
 import { useStreamingAudio } from '../hooks/useStreamingAudio';
+import { getSoftCircleTexture } from '../utils/softTextures';
 
 const AUDIO_SRC = '/audio/heavens-diary.m4a';
 
