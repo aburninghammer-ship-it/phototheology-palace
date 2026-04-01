@@ -17,7 +17,8 @@ const isInIframe = (() => {
 const isPreviewHost =
   window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
-const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|OculusBrowser|Meta Quest/i.test(navigator.userAgent);
+// Meta in-app browsers (FB/IG) — exclude Quest/Oculus which is a real browser, not an in-app webview
+const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent) && !/OculusBrowser|Meta Quest/i.test(navigator.userAgent);
 const previewFreshnessKey = "__preview_sw_freshened_v2__";
 const chunkReloadKey = "__chunk_reload_once__";
 const metaRefreshAttemptsKey = "__meta_sw_refresh_attempts_v1__";

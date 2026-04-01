@@ -18,7 +18,7 @@ function setCooldown(): void {
   localStorage.setItem(UPDATE_COOLDOWN_KEY, String(Date.now() + UPDATE_COOLDOWN_MS));
 }
 
-const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|OculusBrowser|Meta Quest/i.test(navigator.userAgent);
+const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent) && !/OculusBrowser|Meta Quest/i.test(navigator.userAgent);
 const metaPromptRefreshAttemptsKey = '__meta_sw_refresh_attempts_v1__';
 const metaPromptMaxRefreshAttempts = 3;
 
