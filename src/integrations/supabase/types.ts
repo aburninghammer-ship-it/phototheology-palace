@@ -18201,6 +18201,48 @@ export type Database = {
         }
         Relationships: []
       }
+      training_courses: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          lesson_count: number
+          pdf_storage_path: string | null
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+          voice: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          lesson_count?: number
+          pdf_storage_path?: string | null
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          voice?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          lesson_count?: number
+          pdf_storage_path?: string | null
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          voice?: string
+        }
+        Relationships: []
+      }
       training_drills: {
         Row: {
           created_at: string | null
@@ -18230,6 +18272,53 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      training_lessons: {
+        Row: {
+          audio_storage_path: string | null
+          course_id: string
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          lesson_number: number
+          status: string
+          title: string
+          transcript: string
+          updated_at: string
+        }
+        Insert: {
+          audio_storage_path?: string | null
+          course_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          lesson_number: number
+          status?: string
+          title: string
+          transcript?: string
+          updated_at?: string
+        }
+        Update: {
+          audio_storage_path?: string | null
+          course_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          lesson_number?: number
+          status?: string
+          title?: string
+          transcript?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "training_courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       training_videos: {
         Row: {
