@@ -220,15 +220,17 @@ export const OsSpacesWelcome = () => {
               )}
             >
               <div
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all"
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-all relative overflow-hidden"
                 style={{
-                  background: `linear-gradient(135deg, hsl(${space.color}), hsl(${space.color} / 0.7))`,
+                  background: `linear-gradient(160deg, hsl(${space.color} / 0.95), hsl(${space.color}) 50%, hsl(${space.color} / 0.75))`,
                   boxShadow: isActive
-                    ? `0 0 20px hsl(${space.color} / 0.5)`
-                    : `0 3px 8px hsl(${space.color} / 0.25)`,
+                    ? `0 0 24px hsl(${space.color} / 0.55), 0 4px 12px hsl(${space.color} / 0.3), inset 0 1px 1px rgba(255,255,255,0.25)`
+                    : `0 4px 12px hsl(${space.color} / 0.3), 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.2)`,
                 }}
               >
-                <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                {/* Inner highlight for gloss effect */}
+                <div className="absolute inset-0 rounded-2xl" style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 45%, transparent 50%)' }} />
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
               </div>
               <span className="text-[10px] sm:text-xs font-semibold leading-tight text-center">{space.label}</span>
             </motion.button>
@@ -292,13 +294,14 @@ export const OsSpacesWelcome = () => {
                             }}
                           >
                             <div
-                              className="w-9 h-9 rounded-lg flex items-center justify-center transition-all group-hover:scale-110"
+                              className="w-10 h-10 rounded-xl flex items-center justify-center transition-all group-hover:scale-110 relative overflow-hidden"
                               style={{
-                                background: `linear-gradient(135deg, hsl(${itemColor} / 0.5), hsl(${itemColor} / 0.2))`,
-                                boxShadow: `0 0 16px hsl(${itemColor} / 0.35), 0 2px 8px hsl(${itemColor} / 0.2)`,
+                                background: `linear-gradient(160deg, hsl(${itemColor} / 0.85), hsl(${itemColor} / 0.55) 50%, hsl(${itemColor} / 0.35))`,
+                                boxShadow: `0 4px 14px hsl(${itemColor} / 0.35), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.18)`,
                               }}
                             >
-                              <ItemIcon className="w-4 h-4 text-white/90 group-hover:text-white transition-colors drop-shadow-sm" />
+                              <div className="absolute inset-0 rounded-xl" style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 45%)' }} />
+                              <ItemIcon className="w-4 h-4 text-white/95 group-hover:text-white transition-colors relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
                             </div>
                             <span className="text-[10px] font-medium leading-tight text-center line-clamp-2">{item.label}</span>
                           </button>
