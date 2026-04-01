@@ -1,6 +1,6 @@
 import React, { useState, Suspense, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { XR, VRButton, ARButton, useXR } from '@react-three/xr';
+import { XR, VRButton, ARButton, useXR, Controllers, Hands } from '@react-three/xr';
 import { OrbitControls, Environment } from '@react-three/drei';
 import { BackSide } from 'three';
 import { VRLobby, type VRExperience } from './VRLobby';
@@ -56,6 +56,8 @@ function VRScene() {
   return (
     <>
       <DesktopControls />
+      <Controllers />
+      <Hands />
 
       <XRSceneAnchor>
         {/*

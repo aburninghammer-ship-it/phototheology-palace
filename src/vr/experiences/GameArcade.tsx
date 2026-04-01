@@ -1,5 +1,6 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, Suspense } from 'react';
 import { Text } from '@react-three/drei';
+import { Interactive } from '@react-three/xr';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -52,48 +53,49 @@ function GameScreen({ name, route, emoji, color, desc, position, rotation }: Gam
         />
       </mesh>
 
-      {/* Screen face */}
-      <mesh
-        onClick={handleClick}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
+      {/* Screen face — Interactive for XR controller/hand select */}
+      <Interactive
+        onSelect={handleClick}
+        onHover={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
       >
-        <planeGeometry args={[1.2, 0.9]} />
-        <meshBasicMaterial color="#111122" />
-      </mesh>
+        <mesh onClick={handleClick}>
+          <planeGeometry args={[1.2, 0.9]} />
+          <meshBasicMaterial color="#111122" />
+        </mesh>
+      </Interactive>
 
-      {/* Emoji */}
-      <Text
-        position={[0, 0.15, 0.01]}
-        fontSize={0.25}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {emoji}
-      </Text>
+      {/* Text labels — wrapped in Suspense so font loading doesn't block */}
+      <Suspense fallback={null}>
+        <Text
+          position={[0, 0.15, 0.01]}
+          fontSize={0.25}
+          anchorX="center"
+          anchorY="middle"
+        >
+          {emoji}
+        </Text>
 
-      {/* Game name */}
-      <Text
-        position={[0, -0.1, 0.01]}
-        fontSize={0.1}
-        color="#ffffff"
-        anchorX="center"
-        anchorY="middle"
+        <Text
+          position={[0, -0.1, 0.01]}
+          fontSize={0.1}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {name}
+        </Text>
 
-      >
-        {name}
-      </Text>
-
-      {/* Description */}
-      <Text
-        position={[0, -0.25, 0.01]}
-        fontSize={0.06}
-        color="#aaaaaa"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {desc}
-      </Text>
+        <Text
+          position={[0, -0.25, 0.01]}
+          fontSize={0.06}
+          color="#aaaaaa"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {desc}
+        </Text>
+      </Suspense>
 
       {/* Point light for glow effect */}
       <pointLight position={[0, 0, 0.5]} color={color} intensity={0.4} distance={2} />
@@ -152,27 +154,29 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
       <pointLight position={[4, 3, -2]} intensity={0.3} color="#9944FF" />
 
       {/* Title */}
-      <Text
-        position={[0, 3.2, -2]}
-        fontSize={0.4}
-        color="#39FF14"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.01}
-        outlineColor="#000"
-      >
-        🕹️ Game Arcade
-      </Text>
+      <Suspense fallback={null}>
+        <Text
+          position={[0, 3.2, -2]}
+          fontSize={0.4}
+          color="#39FF14"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.01}
+          outlineColor="#000"
+        >
+          Game Arcade
+        </Text>
 
-      <Text
-        position={[0, 2.8, -2]}
-        fontSize={0.12}
-        color="#888"
-        anchorX="center"
-        anchorY="middle"
-      >
-        Tap a screen to play
-      </Text>
+        <Text
+          position={[0, 2.8, -2]}
+          fontSize={0.12}
+          color="#888"
+          anchorX="center"
+          anchorY="middle"
+        >
+          Tap a screen to play
+        </Text>
+      </Suspense>
 
       {/* Game screens */}
       {screens.map((screen) => (
@@ -180,15 +184,22 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
       ))}
 
       {/* Back button */}
-      <Text
-        position={[0, 0.3, 2]}
-        fontSize={0.1}
-        color="#FF6666"
-        anchorX="center"
-        onClick={onBack}
-      >
-        ← Back to Lobby
-      </Text>
+      <Interactive onSelect={onBack}>
+        <mesh position={[0, 0.3, 2]} onClick={onBack}>
+          <planeGeometry args={[1.5, 0.3]} />
+          <meshBasicMaterial color="#331111" />
+        </mesh>
+      </Interactive>
+      <Suspense fallback={null}>
+        <Text
+          position={[0, 0.3, 2.01]}
+          fontSize={0.1}
+          color="#FF6666"
+          anchorX="center"
+        >
+          Back to Lobby
+        </Text>
+      </Suspense>
     </group>
   );
 }

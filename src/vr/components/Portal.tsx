@@ -1,6 +1,7 @@
 import { useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
+import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 
 interface PortalProps {
@@ -46,22 +47,31 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
         <meshStandardMaterial color="#444" metalness={0.8} roughness={0.2} />
       </mesh>
 
-      {/* Glowing portal surface */}
-      <mesh
-        ref={glowRef}
-        position={[0, 0, 0.01]}
-        onClick={onClick}
-      >
-        <circleGeometry args={[1.1, 32, 0, Math.PI]} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.6}
-          transparent
-          opacity={0.4}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
+      {/* Interactive wrapper for XR controller/hand select + desktop click */}
+      <Interactive onSelect={onClick}>
+        {/* Glowing portal surface */}
+        <mesh
+          ref={glowRef}
+          position={[0, 0, 0.01]}
+          onClick={onClick}
+        >
+          <circleGeometry args={[1.1, 32, 0, Math.PI]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.6}
+            transparent
+            opacity={0.4}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+
+        {/* Ground plane (clickable area for the full portal) */}
+        <mesh position={[0, -0.6, 0.01]} onClick={onClick}>
+          <planeGeometry args={[2.2, 1.2]} />
+          <meshStandardMaterial transparent opacity={0} />
+        </mesh>
+      </Interactive>
 
       {/* Animated ring */}
       <mesh ref={ringRef} position={[0, 0, 0.02]}>
@@ -73,12 +83,6 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
           transparent
           opacity={0.6}
         />
-      </mesh>
-
-      {/* Ground plane (clickable area for the full portal) */}
-      <mesh position={[0, -0.6, 0.01]} onClick={onClick}>
-        <planeGeometry args={[2.2, 1.2]} />
-        <meshStandardMaterial transparent opacity={0} />
       </mesh>
 
       {/* Label — wrapped in Suspense so font loading doesn't block the portal */}
