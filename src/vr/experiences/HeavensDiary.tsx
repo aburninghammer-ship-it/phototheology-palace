@@ -122,6 +122,7 @@ function WarpStars({ progress, brightness }: { progress: number; brightness: num
   const starData = useMemo(() => initStarData(), []);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const colorObj = useMemo(() => new THREE.Color(), []);
+  const starMap = useMemo(() => getSoftCircleTexture(), []);
 
   useFrame((_, delta) => {
     const mesh = meshRef.current;
@@ -181,11 +182,13 @@ function WarpStars({ progress, brightness }: { progress: number; brightness: num
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, STAR_COUNT]}>
-      <sphereGeometry args={[1, 4, 3]} />
+      <planeGeometry args={[2, 2]} />
       <meshBasicMaterial
+        map={starMap}
         color="#ffffff"
         transparent
         opacity={0.9}
+        alphaTest={0.02}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
