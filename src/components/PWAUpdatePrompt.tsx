@@ -18,7 +18,7 @@ function setCooldown(): void {
   localStorage.setItem(UPDATE_COOLDOWN_KEY, String(Date.now() + UPDATE_COOLDOWN_MS));
 }
 
-const isMetaWebView = /FBAN|FBAV|Instagram/i.test(navigator.userAgent);
+const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent);
 
 export function PWAUpdatePrompt() {
   const [showReload, setShowReload] = useState(false);
@@ -33,16 +33,16 @@ export function PWAUpdatePrompt() {
 
     const check = async () => {
       try {
-        // Fetch with aggressive cache busting: full origin, random path param, no-store + no-cache headers
-        const url = `${location.origin}/?_nocache=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        // Fetch with aggressive cache busting and explicit build-check marker.
+        const url = `${location.origin}/?__buildcheck=${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const html = await fetch(url, {
           cache: 'no-store',
           headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
             'Pragma': 'no-cache',
           },
         }).then(r => r.text());
-        const match = html.match(/<meta name="app-build" content="([^"]+)"/);
+        const match = html.match(/<meta\s+name=["']app-build["']\s+content=["']([^"']+)["']/i);
         const nextBuild = match?.[1];
         if (nextBuild && nextBuild !== currentBuild) {
           console.log('[PWA] Meta webview: new build detected, auto-reloading', { currentBuild, nextBuild });
