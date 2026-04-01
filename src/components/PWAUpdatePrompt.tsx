@@ -45,19 +45,28 @@ export function PWAUpdatePrompt() {
         const match = html.match(/<meta\s+name=["']app-build["']\s+content=["']([^"']+)["']/i);
         const nextBuild = match?.[1];
         if (nextBuild && nextBuild !== currentBuild) {
-          console.log('[PWA] Meta webview: new build detected, auto-reloading', { currentBuild, nextBuild });
-          // In Meta webviews, auto-reload is more reliable than showing a prompt
+          // Clear all caches before reloading so Meta browser serves fresh assets
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          }
+          // Unregister service worker so it doesn't serve stale cache
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(r => r.unregister()));
+          }
+          // Force full reload with cache bust
           window.location.href = `${location.origin}/?_v=${Date.now()}`;
           return;
         }
-      } catch (e) {
-        console.error('[PWA] Meta webview build check failed:', e);
+      } catch {
+        // silently ignore — will retry on next interval
       }
     };
 
-    // Check after 5s (let page settle), then every 20s
-    const timeout = setTimeout(check, 5000);
-    const id = setInterval(check, 20_000);
+    // Check after 3s (let page settle), then every 15s
+    const timeout = setTimeout(check, 3000);
+    const id = setInterval(check, 15_000);
     return () => { clearTimeout(timeout); clearInterval(id); };
   }, []);
   

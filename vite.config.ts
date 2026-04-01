@@ -1,8 +1,23 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
+
+// Inject a unique build hash into the app-build meta tag so Meta Quest
+// browser can detect when a new version has been deployed.
+function buildHashPlugin(): Plugin {
+  const buildHash = `build-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return {
+    name: 'inject-build-hash',
+    transformIndexHtml(html) {
+      return html.replace(
+        /<meta\s+name=["']app-build["']\s+content=["'][^"']*["']/i,
+        `<meta name="app-build" content="${buildHash}"`,
+      );
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 // PWA Cache Version: 2026-04-01-meta-fix
@@ -19,6 +34,7 @@ export default defineConfig(({ mode }) => ({
   logLevel: "warn",
   plugins: [
     react(),
+    buildHashPlugin(),
     mode === "development" && componentTagger(),
     VitePWA({
       strategies: 'injectManifest',
