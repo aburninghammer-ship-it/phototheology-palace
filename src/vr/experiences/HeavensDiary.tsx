@@ -557,12 +557,16 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
 
   return (
     <group ref={sceneGroupRef}>
-      {/* Dynamic ambient light — brighter for visibility */}
-      <ambientLight intensity={0.15} color={phase.ambient} />
+      {/* Dynamic ambient light — boosted for XR visibility */}
+      <ambientLight intensity={0.4} color={phase.ambient} />
 
-      {/* Phase-reactive accent lights */}
-      <pointLight position={[-5, 3, -5]} color={phase.accentColor} intensity={0.5 + avgVolume * 0.5} distance={15} />
-      <pointLight position={[5, 3, -5]} color={phase.nebula[1] || phase.accentColor} intensity={0.4 + avgVolume * 0.4} distance={12} />
+      {/* Directional fill so emissive materials aren't the only light source */}
+      <directionalLight position={[0, 5, -10]} intensity={0.3} color="#8888cc" />
+
+      {/* Phase-reactive accent lights — stronger */}
+      <pointLight position={[-5, 3, -5]} color={phase.accentColor} intensity={1.2 + avgVolume * 0.8} distance={25} />
+      <pointLight position={[5, 3, -5]} color={phase.nebula[1] || phase.accentColor} intensity={0.8 + avgVolume * 0.6} distance={20} />
+      <pointLight position={[0, -2, -10]} color={phase.nebula[0]} intensity={0.5} distance={20} />
 
       {/* Warp star field — more stars, more color */}
       <WarpStars
