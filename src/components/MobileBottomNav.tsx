@@ -11,6 +11,7 @@ const primaryNavItems = [
   { icon: BookOpen, labelKey: "nav.bible", path: "/bible" },
   { icon: Church, labelKey: "nav.church", path: "/living-manna" },
   { icon: Building2, labelKey: "nav.palace", path: "/palace" },
+  { icon: Crown, labelKey: "nav.subscribe", path: "/pricing" },
 ];
 
 const moreNavItems = [
