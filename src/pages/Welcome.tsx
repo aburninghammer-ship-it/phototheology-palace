@@ -5,6 +5,7 @@ import { DailyAudioDevotional } from "@/components/DailyAudioDevotional";
 import { AudioTourBanner } from "@/components/AudioTourBanner";
 import { OsSpacesWelcome } from "@/components/OsSpacesWelcome";
 import { PtGlossaryTable } from "@/components/PtGlossaryTable";
+import { UpgradeFloatingCard } from "@/components/UpgradeFloatingCard";
 
 const Welcome = () => {
   return (
@@ -15,6 +16,7 @@ const Welcome = () => {
       />
       <div className="px-4 pt-6 space-y-4">
         <ReginaldGreeting />
+        <UpgradeFloatingCard />
         <AudioTourBanner />
         <DailyAudioDevotional />
         <ContinueWhereYouLeftOff />
