@@ -38,7 +38,7 @@ interface OsSpace {
 const OS_SPACES: OsSpace[] = [
   {
     id: "studio",
-    label: "The Studio",
+    label: "Phototheology Studio",
     subtitle: "Study, Write & Research",
     icon: Palette,
     color: "210 100% 56%",
