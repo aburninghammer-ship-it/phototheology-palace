@@ -119,8 +119,11 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
   const goPrev = () => activeZone > 0 && setActiveZone(activeZone - 1);
   const goNext = () => activeZone < ZONES.length - 1 && setActiveZone(activeZone + 1);
 
+  // Camera offset to move user to the active zone
+  const targetZ = ZONES[activeZone].zOffset;
+
   return (
-    <group>
+    <group position={[0, 0, -targetZ]}>
       <ambientLight intensity={0.4} color="#fff5e6" />
       <directionalLight position={[5, 10, 5]} intensity={0.8} color="#ffe8c4" castShadow />
 

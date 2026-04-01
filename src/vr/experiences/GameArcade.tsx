@@ -36,7 +36,8 @@ function GameScreen({ name, route, emoji, color, desc, position, rotation }: Gam
   });
 
   const handleClick = () => {
-    window.location.href = route;
+    // Open in a new tab so VR session isn't destroyed
+    window.open(route, '_blank');
   };
 
   return (

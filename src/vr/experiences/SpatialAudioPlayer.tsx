@@ -120,6 +120,10 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
   });
 
   const selectTrack = (idx: number) => {
+    if (idx === trackIndex) {
+      audioControls.togglePlayPause();
+      return;
+    }
     audioControls.pause();
     setTrackIndex(idx);
   };
