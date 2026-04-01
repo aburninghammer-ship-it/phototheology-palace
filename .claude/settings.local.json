@@ -137,7 +137,9 @@
       "WebFetch(domain:tdjtumtdkjicnhlpqqzd.supabase.co)",
       "Bash(echo === game_sessions ===:*)",
       "Bash(echo === game_scores with user_id counts ===:*)",
-      "Bash(echo === profiles count ===:*)"
+      "Bash(echo === profiles count ===:*)",
+      "Bash(bun run:*)",
+      "Bash(ffprobe:*)"
     ],
     "deny": [],
     "ask": []

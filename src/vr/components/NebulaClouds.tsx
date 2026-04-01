@@ -7,13 +7,15 @@ interface NebulaCloudProps {
   color: string;
   scale?: number;
   opacity?: number;
+  zSpeed?: number;
 }
 
-function NebulaCloud({ position, color, scale = 5, opacity = 0.15 }: NebulaCloudProps) {
+function NebulaCloud({ position, color, scale = 5, opacity = 0.15, zSpeed = 0 }: NebulaCloudProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const offset = useMemo(() => Math.random() * Math.PI * 2, []);
+  const baseZ = useRef(position[2]);
 
-  useFrame(({ clock, camera }) => {
+  useFrame(({ clock, camera }, delta) => {
     if (!meshRef.current) return;
     // Billboard: always face camera
     meshRef.current.quaternion.copy(camera.quaternion);
@@ -21,7 +23,14 @@ function NebulaCloud({ position, color, scale = 5, opacity = 0.15 }: NebulaCloud
     const t = clock.getElapsedTime();
     meshRef.current.position.x = position[0] + Math.sin(t * 0.05 + offset) * 2;
     meshRef.current.position.y = position[1] + Math.cos(t * 0.03 + offset) * 1;
-    meshRef.current.position.z = position[2] + Math.sin(t * 0.04 + offset) * 1.5;
+
+    // Z-travel: rush toward user when speed > 0
+    baseZ.current += zSpeed * delta;
+    // Reset if passed behind user
+    if (baseZ.current > 20) {
+      baseZ.current = -40 - Math.random() * 20;
+    }
+    meshRef.current.position.z = baseZ.current + Math.sin(t * 0.04 + offset) * 1.5;
   });
 
   return (
@@ -43,7 +52,8 @@ interface NebulaCloudsProps {
   count?: number;
   radius?: number;
   colors?: string[];
-  opacity?: number; // can be driven by audio analyser
+  opacity?: number;
+  zSpeed?: number;
 }
 
 export function NebulaClouds({
@@ -51,6 +61,7 @@ export function NebulaClouds({
   radius = 30,
   colors = ['#4a0080', '#0044aa', '#006644', '#880044'],
   opacity = 0.15,
+  zSpeed = 0,
 }: NebulaCloudsProps) {
   const clouds = useMemo(() => {
     return Array.from({ length: count }, (_, i) => {
@@ -78,6 +89,7 @@ export function NebulaClouds({
           color={cloud.color}
           scale={cloud.scale}
           opacity={opacity}
+          zSpeed={zSpeed}
         />
       ))}
     </group>
