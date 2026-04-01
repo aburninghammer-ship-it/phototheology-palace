@@ -27,6 +27,18 @@ function DesktopControls() {
   );
 }
 
+/**
+ * In XR, the headset becomes the active camera at the scene origin.
+ * Shift the entire hub forward so Quest users spawn with the PT OS lobby in front of them
+ * instead of inside the desktop-authored layout.
+ */
+function XRSceneAnchor({ children }: { children: React.ReactNode }) {
+  const { isPresenting } = useXR();
+  const sceneOffset: [number, number, number] = isPresenting ? [0, 0, -3] : [0, 0, 0];
+
+  return <group position={sceneOffset}>{children}</group>;
+}
+
 function VRScene() {
   const [currentExperience, setCurrentExperience] = useState<VRExperience>('lobby');
   const goToLobby = useCallback(() => setCurrentExperience('lobby'), []);
@@ -35,24 +47,26 @@ function VRScene() {
     <Suspense fallback={null}>
       <DesktopControls />
 
-      {/*
-        Opaque black sky sphere — blocks AR passthrough in immersive mode.
-        Always rendered so it serves as the scene background both on desktop and in XR.
-        Uses meshBasicMaterial (no lighting needed) with BackSide rendering.
-      */}
-      <mesh renderOrder={-1}>
-        <sphereGeometry args={[150, 32, 32]} />
-        <meshBasicMaterial color="#0a0a15" side={BackSide} depthWrite={false} />
-      </mesh>
+      <XRSceneAnchor>
+        {/*
+          Opaque black sky sphere — blocks AR passthrough in immersive mode.
+          Always rendered so it serves as the scene background both on desktop and in XR.
+          Uses meshBasicMaterial (no lighting needed) with BackSide rendering.
+        */}
+        <mesh renderOrder={-1}>
+          <sphereGeometry args={[150, 32, 32]} />
+          <meshBasicMaterial color="#0a0a15" side={BackSide} depthWrite={false} />
+        </mesh>
 
-      {currentExperience === 'lobby' && (
-        <VRLobby onEnterExperience={setCurrentExperience} />
-      )}
-      {currentExperience === 'sanctuary' && <SanctuaryWalk onBack={goToLobby} />}
-      {currentExperience === 'gallery' && <GalleryCorridor onBack={goToLobby} />}
-      {currentExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
-      {currentExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
-      {currentExperience === 'arcade' && <GameArcade onBack={goToLobby} />}
+        {currentExperience === 'lobby' && (
+          <VRLobby onEnterExperience={setCurrentExperience} />
+        )}
+        {currentExperience === 'sanctuary' && <SanctuaryWalk onBack={goToLobby} />}
+        {currentExperience === 'gallery' && <GalleryCorridor onBack={goToLobby} />}
+        {currentExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
+        {currentExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
+        {currentExperience === 'arcade' && <GameArcade onBack={goToLobby} />}
+      </XRSceneAnchor>
     </Suspense>
   );
 }
