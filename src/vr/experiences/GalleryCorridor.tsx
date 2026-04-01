@@ -64,33 +64,60 @@ interface FrameLabelProps {
 }
 
 function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <group position={position} rotation={rotation}>
-      {/* Frame background */}
-      <mesh>
-        <planeGeometry args={[0.8, 1.0]} />
-        <meshStandardMaterial color="#1a1a2e" />
+      {/* Frame border glow */}
+      <mesh position={[0, 0, -0.005]}>
+        <planeGeometry args={[0.85, 1.05]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={hovered ? 1 : 0.3} transparent opacity={0.8} />
       </mesh>
 
-      {/* Color accent bar */}
-      <mesh position={[0, 0.45, 0.001]}>
-        <planeGeometry args={[0.8, 0.06]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+      {/* Frame background with gradient feel */}
+      <Interactive
+        onSelect={() => {}}
+        onHover={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
+      >
+        <mesh onClick={() => {}}>
+          <planeGeometry args={[0.8, 1.0]} />
+          <meshStandardMaterial color="#1a1a2e" />
+        </mesh>
+      </Interactive>
+
+      {/* Colored image area (top half) */}
+      <mesh position={[0, 0.2, 0.001]}>
+        <planeGeometry args={[0.72, 0.5]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.15}
+          transparent
+          opacity={0.25}
+        />
       </mesh>
 
-      {/* Symbol */}
+      {/* Large symbol as visual centerpiece */}
       <Text
-        position={[0, 0.2, 0.01]}
-        fontSize={0.18}
+        position={[0, 0.22, 0.01]}
+        fontSize={0.22}
         anchorX="center"
         anchorY="middle"
+        color={color}
       >
         {frame.symbol}
       </Text>
 
+      {/* Color accent bar */}
+      <mesh position={[0, -0.08, 0.001]}>
+        <planeGeometry args={[0.72, 0.02]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} />
+      </mesh>
+
       {/* Book + Chapter */}
       <Text
-        position={[0, -0.02, 0.01]}
+        position={[0, -0.15, 0.01]}
         fontSize={0.06}
         color={color}
         anchorX="center"
@@ -102,7 +129,7 @@ function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
 
       {/* Title */}
       <Text
-        position={[0, -0.14, 0.01]}
+        position={[0, -0.25, 0.01]}
         fontSize={0.05}
         color="white"
         anchorX="center"
@@ -114,7 +141,7 @@ function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
 
       {/* Memory Hook */}
       <Text
-        position={[0, -0.3, 0.01]}
+        position={[0, -0.37, 0.01]}
         fontSize={0.035}
         color="#aaa"
         anchorX="center"
