@@ -8,9 +8,9 @@ import { CacheFirst } from 'workbox-strategies';
 
 declare let self: ServiceWorkerGlobalScope;
 
-const IMAGE_CACHE = 'pt-images-2026-04-01-5';
-const GOOGLE_FONTS_CACHE = 'pt-google-fonts-2026-04-01-5';
-const GSTATIC_FONTS_CACHE = 'pt-gstatic-fonts-2026-04-01-5';
+const IMAGE_CACHE = 'pt-images-2026-04-01-6';
+const GOOGLE_FONTS_CACHE = 'pt-google-fonts-2026-04-01-6';
+const GSTATIC_FONTS_CACHE = 'pt-gstatic-fonts-2026-04-01-6';
 const ALLOWED_CACHES = new Set([cacheNames.precache, IMAGE_CACHE, GOOGLE_FONTS_CACHE, GSTATIC_FONTS_CACHE]);
 
 self.skipWaiting();
