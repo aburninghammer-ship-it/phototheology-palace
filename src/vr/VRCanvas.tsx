@@ -68,7 +68,7 @@ function VRScene() {
         */}
         <mesh renderOrder={-1}>
           <sphereGeometry args={[150, 32, 32]} />
-          <meshBasicMaterial color="#0a0a15" side={BackSide} depthWrite={false} />
+          <meshBasicMaterial color="#060818" side={BackSide} depthWrite={false} />
         </mesh>
 
         {/* Basic ambient light always on so geometry is visible even if Suspense is pending */}
