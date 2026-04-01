@@ -5,11 +5,15 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
-// PWA Cache Version: 2026-04-01-vr-refresh
+// PWA Cache Version: 2026-04-01-meta-fix
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    headers: { 'Cache-Control': 'no-store' },
+  },
+  preview: {
+    headers: { 'Cache-Control': 'no-store' },
   },
   // Reduce build output noise (helps surface the actual error in CI logs)
   logLevel: "warn",
