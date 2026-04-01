@@ -79,7 +79,7 @@ function GameScreen({ name, route, emoji, color, desc, position, rotation }: Gam
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        fontWeight="bold"
+
       >
         {name}
       </Text>
@@ -135,7 +135,7 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
 
       {/* Grid lines on floor */}
       <gridHelper
-        args={[20, 40, '#39FF1433', '#39FF1418']}
+        args={[20, 40, '#194a0a', '#0f2e06']}
         position={[0, -1.19, 0]}
       />
 
