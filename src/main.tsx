@@ -17,8 +17,10 @@ const isInIframe = (() => {
 const isPreviewHost =
   window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
+const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent);
 const previewFreshnessKey = "__preview_sw_freshened_v2__";
 const chunkReloadKey = "__chunk_reload_once__";
+const metaFreshnessKey = "__meta_sw_freshened_v1__";
 
 function reloadOnce(key: string) {
   if (sessionStorage.getItem(key) === "1") return;
@@ -73,6 +75,33 @@ if ("serviceWorker" in navigator) {
         sessionStorage.setItem(previewFreshnessKey, "1");
         window.location.reload();
       }
+    })();
+  } else if (isMetaWebView) {
+    // Meta in-app browser can hold stale SW/index caches aggressively.
+    // Force a one-time session refresh after clearing SW + cache storage.
+    void (async () => {
+      const alreadyFreshened = sessionStorage.getItem(metaFreshnessKey) === "1";
+
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+
+      if ("caches" in window) {
+        const cacheKeys = await caches.keys();
+        await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+      }
+
+      if (!alreadyFreshened) {
+        sessionStorage.setItem(metaFreshnessKey, "1");
+        const bust = `__meta_refresh=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const target = `${window.location.origin}${window.location.pathname}?${bust}${window.location.hash}`;
+        window.location.replace(target);
+        return;
+      }
+
+      await navigator.serviceWorker
+        .getRegistration()
+        .then((registration) => registration?.update())
+        .catch(() => undefined);
     })();
   } else {
     // Production: let PWAUpdatePrompt (useRegisterSW) handle updates & prompt.
