@@ -1,33 +1,59 @@
 
+# Audio Training Courses — Option D Implementation
 
-## Fix: Screenshot Upload in Public Chat
+## Overview
+Convert Genesis in 6 Days ($9), Quick-Start Guide ($17), and Study Suite ($97) from paid PDFs into **free audio training courses** available to all subscribers inside Phototheology University. Each course has lessons with audio narration (OpenAI TTS), read-along transcript, and downloadable PDF companion.
 
-### Problem
-1. **No upload button** — `ChatInput` only supports pasting images from clipboard; no file picker for selecting screenshots from device.
-2. **Images never saved** — `usePublicChat.sendMessage()` receives the `images` array but never includes it in the database insert.
+## Three Courses
 
-### Plan
+### 1. Quick-Start Guide (from Training Manual — Parts I & IV)
+- **5 lessons**: The Big Idea → The Palace Picture → Imagination & Memory → PT Codes → Guardrails
+- Orientation to the framework before diving in
+- Voice: `nova` (warm, welcoming)
 
-**1. Add upload button to ChatInput** (`src/components/ChatInput.tsx`)
-- Add a hidden `<input type="file" accept="image/*" multiple>` element
-- Add an image/camera icon button next to the emoji picker that triggers the file input
-- On file select, read files as base64 data URLs and append to the `images` array (same as paste flow)
-- Keep existing paste support intact
+### 2. Genesis in 6 Days (from Genesis PDF)
+- **6 lessons** (one per day): Day 1 (Ch 1-8) → Day 2 (Ch 9-16) → Day 3 (Ch 17-24) → Day 4 (Ch 25-34) → Day 5 (Ch 35-42) → Day 6 (Ch 43-50)
+- Each lesson covers ~8 chapter frames with memory keys
+- Voice: `onyx` (deep, authoritative)
 
-**2. Persist images in sendMessage** (`src/hooks/usePublicChat.tsx`)
-- In the `sendMessage` function (line ~174), add `images` to `insertData` when the array is non-empty:
-  ```typescript
-  if (images && images.length > 0) {
-    insertData.images = images;
-  }
-  ```
-- Also fix the early return guard to allow image-only messages (currently requires `content.trim()`)
+### 3. The Complete Study Suite (from Training Manual — Parts II, III, V)
+- **12 lessons**: Floor 1 → Floor 2 → Floor 3 → Floor 4 → Floor 5 → Floor 6 → Floor 7 → Floor 8 → Cycles & Heavens → Ascensions & Expansions → Training Exercises → Walkthroughs (Daniel 7, Genesis 22, Psalm 23)
+- Deep method training
+- Voice: `echo` (scholarly, precise)
 
-**3. No storage bucket needed** — Images are already stored as base64 strings in the `TEXT[]` column, and the display code in `PublicChat.tsx` (line 248-258) already renders them. This keeps it simple for screenshots. If images get too large, a storage migration can be done later.
+## Database
 
-### Technical Details
-- The `public_chat_messages.images` column is `TEXT[]` — already supports base64 strings
-- The rendering in `PublicChat.tsx` lines 248-258 already handles displaying images from messages
-- Base64 screenshots are typically 100-500KB; PostgreSQL TEXT fields handle this fine
-- Max 4 images per message to prevent abuse
+### `training_courses` table
+- id, title, description, slug, voice (OpenAI voice ID), lesson_count, icon, sort_order
 
+### `training_lessons` table  
+- id, course_id, lesson_number, title, transcript (full text for read-along), audio_storage_path, duration_seconds, status (pending/ready)
+
+## Edge Function: `generate-training-audio`
+- Takes lesson_id, generates OpenAI TTS audio from transcript
+- Chunks long transcripts, stitches MP3s
+- Stores in Supabase storage bucket `training-audio`
+- Uses existing OpenAI TTS pattern (parallel batching, "nova" fallback)
+
+## UI Components
+1. **Training Courses page** (`/university/training`) — card grid of 3 courses
+2. **Course Detail page** (`/university/training/:slug`) — lesson list with play buttons
+3. **Lesson Player** — audio player + scrollable read-along transcript + PDF download button
+
+## PDF Companions
+- Store the uploaded PDFs in Supabase storage (`training-pdfs` bucket)
+- Quick-Start Guide PDF = Training Manual PDF (it IS the companion)
+- Genesis PDF = Genesis in 6 Days PDF
+- Study Suite PDF = Training Manual PDF
+
+## Access
+- All 3 courses: **free for all authenticated subscribers** (any tier)
+- Non-subscribers see a locked state prompting subscription
+
+## Steps
+1. Create database tables + storage buckets
+2. Seed course & lesson data (titles, transcripts extracted from PDFs)
+3. Build edge function for OpenAI TTS generation
+4. Upload PDFs to storage
+5. Build UI: courses page, course detail, lesson player
+6. Add navigation entry in University space
