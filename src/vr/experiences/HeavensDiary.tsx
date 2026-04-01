@@ -353,19 +353,27 @@ function CelestialBodies({ progress }: { progress: number }) {
           )}
           {body.type === 'plane' && (
             <>
-              {/* Multi-layered nebula wall */}
-              <mesh>
-                <planeGeometry args={[body.scale * 2, body.scale]} />
-                <meshBasicMaterial color="#CC44FF" transparent opacity={0.25} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} depthWrite={false} />
-              </mesh>
-              <mesh position={[3, 2, 2]} rotation={[0, 0.2, 0.1]}>
-                <planeGeometry args={[body.scale * 1.5, body.scale * 0.8]} />
-                <meshBasicMaterial color="#FF44AA" transparent opacity={0.15} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} depthWrite={false} />
-              </mesh>
-              <mesh position={[-4, -1, -1]} rotation={[0, -0.15, 0]}>
-                <planeGeometry args={[body.scale * 1.2, body.scale * 0.6]} />
-                <meshBasicMaterial color="#44CCFF" transparent opacity={0.12} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} depthWrite={false} />
-              </mesh>
+              {/* Soft nebula cloud layers instead of flat squares */}
+              {[
+                { pos: [0, 0, 0] as [number, number, number], color: '#CC44FF', s: body.scale * 1.8, o: 0.2 },
+                { pos: [3, 2, 2] as [number, number, number], color: '#FF44AA', s: body.scale * 1.4, o: 0.15 },
+                { pos: [-4, -1, -1] as [number, number, number], color: '#44CCFF', s: body.scale * 1.0, o: 0.12 },
+                { pos: [2, -2, 3] as [number, number, number], color: '#8844FF', s: body.scale * 1.2, o: 0.1 },
+                { pos: [-2, 3, -2] as [number, number, number], color: '#FF88CC', s: body.scale * 0.9, o: 0.1 },
+              ].map((layer, li) => (
+                <mesh key={li} position={layer.pos}>
+                  <planeGeometry args={[layer.s, layer.s]} />
+                  <meshBasicMaterial
+                    map={getNebulaBlobTexture()}
+                    color={layer.color}
+                    transparent
+                    opacity={layer.o}
+                    blending={THREE.AdditiveBlending}
+                    side={THREE.DoubleSide}
+                    depthWrite={false}
+                  />
+                </mesh>
+              ))}
               <pointLight color="#CC44FF" intensity={2} distance={30} />
             </>
           )}
