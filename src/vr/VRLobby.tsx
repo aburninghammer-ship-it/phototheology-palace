@@ -169,45 +169,45 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       {/* Pulsing center orb */}
       <CenterOrb />
 
-      {/* Six portals arranged in a semicircle + elevated center portal */}
+      {/* Six portals in a wide semicircle (radius 5, ~27° apart) */}
       <Portal
-        position={[-3.2, 0.5, -1.8]}
-        rotation={[0, 0.55, 0]}
+        position={[-4.6, 0.5, -1.95]}
+        rotation={[0, 1.17, 0]}
         label="The Sanctuary"
         color="#FFD700"
         onClick={() => onEnterExperience('sanctuary')}
       />
       <Portal
-        position={[-1.8, 0.5, -3]}
-        rotation={[0, 0.3, 0]}
+        position={[-3.2, 0.5, -3.8]}
+        rotation={[0, 0.7, 0]}
         label="24FPS Gallery"
         color="#4488FF"
         onClick={() => onEnterExperience('gallery')}
       />
       <Portal
-        position={[-0.5, 0.5, -3.5]}
-        rotation={[0, 0.1, 0]}
+        position={[-1.1, 0.5, -4.9]}
+        rotation={[0, 0.23, 0]}
         label="Audio Theater"
         color="#9944FF"
         onClick={() => onEnterExperience('audio')}
       />
       <Portal
-        position={[0.5, 0.5, -3.5]}
-        rotation={[0, -0.1, 0]}
+        position={[1.1, 0.5, -4.9]}
+        rotation={[0, -0.23, 0]}
         label="Heaven's Diary"
         color="#44FFEE"
         onClick={() => onEnterExperience('heavensDiary')}
       />
       <Portal
-        position={[1.8, 0.5, -3]}
-        rotation={[0, -0.3, 0]}
+        position={[3.2, 0.5, -3.8]}
+        rotation={[0, -0.7, 0]}
         label="Game Arcade"
         color="#39FF14"
         onClick={() => onEnterExperience('arcade')}
       />
       <Portal
-        position={[3.2, 0.5, -1.8]}
-        rotation={[0, -0.55, 0]}
+        position={[4.6, 0.5, -1.95]}
+        rotation={[0, -1.17, 0]}
         label="Tour the Palace"
         color="#E8B84B"
         onClick={() => onEnterExperience('palace')}
