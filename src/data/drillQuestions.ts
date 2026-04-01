@@ -148,7 +148,7 @@ export const observationRoomDrills: DrillQuestion[] = [
   },
   {
     id: "or-3",
-    question: "What should you observe FIRST in the Observation Room?",
+    question: "What should you observe FIRST in any passage?",
     options: [
       "Theological meanings",
       "What is happening: numbers, people, objects, actions",
@@ -156,19 +156,19 @@ export const observationRoomDrills: DrillQuestion[] = [
       "What commentaries say",
     ],
     correctAnswer: 1,
-    explanation: "Start with 'WHAT IS HAPPENING' - count people, objects, actions. '10 virgins, 5 foolish, 5 wise' IS an observation."
+    explanation: "Start with 'WHAT IS HAPPENING' — count the people, objects, and actions. Raw factual details come before interpretation."
   },
   {
     id: "or-4",
-    question: "In Matthew 25:1-4 (Ten Virgins), which is a proper observation?",
+    question: "Which of these is a proper observation (not an interpretation)?",
     options: [
-      "The foolish virgins represent unprepared Christians",
-      "10 virgins total: 5 foolish + 5 wise = exact 50/50 split",
-      "This teaches us to always be ready",
-      "Oil symbolizes the Holy Spirit",
+      "This story teaches us to trust God",
+      "The passage mentions 3 specific people and 2 locations",
+      "The oil in this verse symbolizes the Holy Spirit",
+      "God is showing us to always be prepared",
     ],
     correctAnswer: 1,
-    explanation: "Counting details (10 virgins, 5+5 split) is pure observation. The others are interpretations."
+    explanation: "Counting specific details (3 people, 2 locations) is pure observation. The others are interpretations or applications."
   },
   {
     id: "or-5",
@@ -180,7 +180,7 @@ export const observationRoomDrills: DrillQuestion[] = [
       "Application observations",
     ],
     correctAnswer: 1,
-    explanation: "'What is happening' captures factual details: numbers, who/what/where/when, and actions - the foundation of observation."
+    explanation: "'What is happening' captures factual details: numbers, who/what/where/when, and actions — the foundation of observation."
   },
 ];
 
