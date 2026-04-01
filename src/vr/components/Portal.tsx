@@ -47,29 +47,31 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
         <meshStandardMaterial color="#444" metalness={0.8} roughness={0.2} />
       </mesh>
 
-      {/* Interactive wrapper for XR controller/hand select + desktop click */}
-      <Interactive onSelect={onClick}>
-        {/* Glowing portal surface */}
-        <mesh
-          ref={glowRef}
-          position={[0, 0, 0.01]}
-          onClick={onClick}
-        >
-          <circleGeometry args={[1.1, 32, 0, Math.PI]} />
-          <meshStandardMaterial
-            color={color}
-            emissive={color}
-            emissiveIntensity={0.6}
-            transparent
-            opacity={0.4}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
+      {/* Glowing portal surface (visual only) */}
+      <mesh
+        ref={glowRef}
+        position={[0, 0, 0.01]}
+      >
+        <circleGeometry args={[1.1, 32, 0, Math.PI]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.6}
+          transparent
+          opacity={0.4}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
 
-        {/* Ground plane (clickable area for the full portal) */}
-        <mesh position={[0, -0.6, 0.01]} onClick={onClick}>
-          <planeGeometry args={[2.2, 1.2]} />
-          <meshStandardMaterial transparent opacity={0} />
+      {/*
+        Full-portal hit area — a large plane covering the entire portal.
+        Uses a very subtle tint so Three.js raycaster registers it.
+        Interactive wraps it for XR controller/hand select; onClick for desktop.
+      */}
+      <Interactive onSelect={onClick}>
+        <mesh position={[0, 0, 0.03]} onClick={onClick}>
+          <planeGeometry args={[2.6, 2.8]} />
+          <meshBasicMaterial color={color} transparent opacity={0.03} side={THREE.DoubleSide} />
         </mesh>
       </Interactive>
 
