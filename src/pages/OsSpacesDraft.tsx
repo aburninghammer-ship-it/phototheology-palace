@@ -66,7 +66,7 @@ const OS_SPACES: OsSpace[] = [
   },
   {
     id: "gallery",
-    label: "The Gallery",
+    label: "Phototheology Gallery",
     subtitle: "Palace, Visuals & Memory",
     icon: Landmark,
     color: "32 95% 53%",
