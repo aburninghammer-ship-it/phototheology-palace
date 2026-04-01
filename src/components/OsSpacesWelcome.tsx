@@ -5,11 +5,12 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
-  Palette, Landmark, Mic, Swords, Church, Wrench,
+  BookOpenCheck, Dumbbell, Mic2, Gamepad2, Church, Wrench,
+  GraduationCap, Shield,
   BookOpen, Brain, Zap, Gem, BookMarked, Lightbulb, Target,
-  Search, PersonStanding, GraduationCap, Network, Headphones,
+  Search, PersonStanding, Network, Headphones,
   Building2, Image, Sparkles, Film, Eye,
-  Gamepad2, CalendarDays, Trophy, Dumbbell, Shield,
+  CalendarDays, Trophy,
   Flame, Calendar, StickyNote, Scale, Heart, HeartHandshake,
   MessageSquare, Megaphone, Video, Crown, Users, User,
   Library, Clock, Map, Languages, BookText, Glasses,
