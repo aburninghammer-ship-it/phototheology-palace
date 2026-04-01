@@ -88,7 +88,6 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
         color="white"
         anchorX="center"
         anchorY="middle"
-        font="/fonts/inter-bold.woff"
         outlineWidth={0.01}
         outlineColor="black"
       >
