@@ -98,7 +98,7 @@ const OS_SPACES: OsSpace[] = [
   },
   {
     id: "arena",
-    label: "The Arena",
+    label: "Phototheology Arena",
     subtitle: "Games, Challenges & Combat",
     icon: Swords,
     color: "0 84% 60%",
