@@ -19,6 +19,8 @@ function setCooldown(): void {
 }
 
 const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|OculusBrowser|Meta Quest/i.test(navigator.userAgent);
+const metaPromptRefreshAttemptsKey = '__meta_sw_refresh_attempts_v1__';
+const metaPromptMaxRefreshAttempts = 3;
 
 export function PWAUpdatePrompt() {
   const [showReload, setShowReload] = useState(false);
@@ -45,6 +47,12 @@ export function PWAUpdatePrompt() {
         const match = html.match(/<meta\s+name=["']app-build["']\s+content=["']([^"']+)["']/i);
         const nextBuild = match?.[1];
         if (nextBuild && nextBuild !== currentBuild) {
+          const refreshAttempts = Number.parseInt(sessionStorage.getItem(metaPromptRefreshAttemptsKey) ?? '0', 10);
+          if (refreshAttempts >= metaPromptMaxRefreshAttempts) {
+            return;
+          }
+          sessionStorage.setItem(metaPromptRefreshAttemptsKey, String(refreshAttempts + 1));
+
           // Clear all caches before reloading so Meta browser serves fresh assets
           if ('caches' in window) {
             const keys = await caches.keys();
@@ -55,8 +63,10 @@ export function PWAUpdatePrompt() {
             const regs = await navigator.serviceWorker.getRegistrations();
             await Promise.all(regs.map(r => r.unregister()));
           }
-          // Force full reload with cache bust
-          window.location.href = `${location.origin}/?_v=${Date.now()}`;
+          // Force full reload with cache bust, preserving route
+          const target = new URL(location.href);
+          target.searchParams.set('__meta_refresh', `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+          window.location.replace(target.toString());
           return;
         }
       } catch {

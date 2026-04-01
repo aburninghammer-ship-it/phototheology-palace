@@ -17,10 +17,11 @@ const isInIframe = (() => {
 const isPreviewHost =
   window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
-const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent);
+const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|OculusBrowser|Meta Quest/i.test(navigator.userAgent);
 const previewFreshnessKey = "__preview_sw_freshened_v2__";
 const chunkReloadKey = "__chunk_reload_once__";
-const metaFreshnessKey = "__meta_sw_freshened_v1__";
+const metaRefreshAttemptsKey = "__meta_sw_refresh_attempts_v1__";
+const metaMaxRefreshAttempts = 3;
 
 function reloadOnce(key: string) {
   if (sessionStorage.getItem(key) === "1") return;
@@ -77,10 +78,10 @@ if ("serviceWorker" in navigator) {
       }
     })();
   } else if (isMetaWebView) {
-    // Meta in-app browser can hold stale SW/index caches aggressively.
-    // Force a one-time session refresh after clearing SW + cache storage.
+    // Meta webviews (FB/IG/Quest) can keep stale SW/index caches aggressively.
+    // Force up to 3 hard refresh passes per session after clearing SW + caches.
     void (async () => {
-      const alreadyFreshened = sessionStorage.getItem(metaFreshnessKey) === "1";
+      const refreshAttempts = Number.parseInt(sessionStorage.getItem(metaRefreshAttemptsKey) ?? "0", 10);
 
       const regs = await navigator.serviceWorker.getRegistrations();
       await Promise.all(regs.map((r) => r.unregister()));
@@ -90,11 +91,12 @@ if ("serviceWorker" in navigator) {
         await Promise.all(cacheKeys.map((key) => caches.delete(key)));
       }
 
-      if (!alreadyFreshened) {
-        sessionStorage.setItem(metaFreshnessKey, "1");
-        const bust = `__meta_refresh=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-        const target = `${window.location.origin}${window.location.pathname}?${bust}${window.location.hash}`;
-        window.location.replace(target);
+      if (refreshAttempts < metaMaxRefreshAttempts) {
+        sessionStorage.setItem(metaRefreshAttemptsKey, String(refreshAttempts + 1));
+        const refreshValue = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const target = new URL(window.location.href);
+        target.searchParams.set("__meta_refresh", refreshValue);
+        window.location.replace(target.toString());
         return;
       }
 
