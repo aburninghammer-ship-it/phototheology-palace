@@ -25,6 +25,7 @@ export function PWAUpdatePrompt() {
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Meta in-app browser fallback: SW updates don't fire, so poll build tag
+  // Use full origin URL and multiple cache-busting strategies
   useEffect(() => {
     if (!isMetaWebView) return;
     const currentBuild = document.querySelector('meta[name="app-build"]')?.getAttribute('content');
@@ -32,22 +33,32 @@ export function PWAUpdatePrompt() {
 
     const check = async () => {
       try {
-        const html = await fetch(`${location.pathname}?_v=${Date.now()}`, { cache: 'no-store' }).then(r => r.text());
+        // Fetch with aggressive cache busting: full origin, random path param, no-store + no-cache headers
+        const url = `${location.origin}/?_nocache=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const html = await fetch(url, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }).then(r => r.text());
         const match = html.match(/<meta name="app-build" content="([^"]+)"/);
         const nextBuild = match?.[1];
         if (nextBuild && nextBuild !== currentBuild) {
-          console.log('[PWA] Meta webview: new build detected', { currentBuild, nextBuild });
-          setShowReload(true);
+          console.log('[PWA] Meta webview: new build detected, auto-reloading', { currentBuild, nextBuild });
+          // In Meta webviews, auto-reload is more reliable than showing a prompt
+          window.location.href = `${location.origin}/?_v=${Date.now()}`;
+          return;
         }
       } catch (e) {
         console.error('[PWA] Meta webview build check failed:', e);
       }
     };
 
-    // Check immediately, then every 30s
-    check();
-    const id = setInterval(check, 30_000);
-    return () => clearInterval(id);
+    // Check after 5s (let page settle), then every 20s
+    const timeout = setTimeout(check, 5000);
+    const id = setInterval(check, 20_000);
+    return () => { clearTimeout(timeout); clearInterval(id); };
   }, []);
   
   const {
