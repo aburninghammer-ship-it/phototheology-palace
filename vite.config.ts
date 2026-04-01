@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
-// PWA Cache Version: 2026-03-31-v2 (force rebuild)
+// PWA Cache Version: 2026-04-01-vr-refresh
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
@@ -17,6 +17,10 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectRegister: 'auto',
       registerType: 'prompt',
       includeAssets: ['favicon.ico', 'robots.txt'],
       manifest: {
@@ -39,56 +43,9 @@ export default defineConfig(({ mode }) => ({
           }
         ]
       },
-      workbox: {
-        // ⚠️  Precache only the index page and main JS/CSS.
-        // Large images will be cached at runtime instead.
-        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 8 MiB
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,woff,woff2}'],
-        navigateFallback: '/index.html',
-        // Runtime caching for everything else
-        runtimeCaching: [
-          {
-            // Images: cache at runtime, not precache
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30
-              }
-            }
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365
-              }
-            }
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'gstatic-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365
-              }
-            }
-          },
-          {
-            urlPattern: /\.(?:js|css)$/,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'static-resources'
-            }
-          }
-        ]
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
       }
     })
   ].filter(Boolean),

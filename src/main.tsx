@@ -76,7 +76,11 @@ if ("serviceWorker" in navigator) {
     })();
   } else {
     // Production: let PWAUpdatePrompt (useRegisterSW) handle updates & prompt.
-    // No auto-SKIP_WAITING or force-reload here — that bypasses the user prompt.
+    // Still force an update check so Quest picks up the newest SW as soon as possible.
+    void navigator.serviceWorker
+      .getRegistration()
+      .then((registration) => registration?.update())
+      .catch(() => undefined);
   }
 }
 
