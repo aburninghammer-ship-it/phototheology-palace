@@ -17,12 +17,12 @@ const isInIframe = (() => {
 const isPreviewHost =
   window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
-// Meta in-app browsers (FB/IG) — exclude Quest/Oculus which is a real browser, not an in-app webview
-const isMetaWebView = /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent) && !/OculusBrowser|Meta Quest/i.test(navigator.userAgent);
+const isMetaWebView =
+  /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent) &&
+  !/OculusBrowser|Meta Quest/i.test(navigator.userAgent);
 const previewFreshnessKey = "__preview_sw_freshened_v2__";
 const chunkReloadKey = "__chunk_reload_once__";
-const metaRefreshAttemptsKey = "__meta_sw_refresh_attempts_v1__";
-const metaMaxRefreshAttempts = 3;
+const metaForceReloadKey = "__meta_force_reload_v2__";
 
 function reloadOnce(key: string) {
   if (sessionStorage.getItem(key) === "1") return;
@@ -79,32 +79,32 @@ if ("serviceWorker" in navigator) {
       }
     })();
   } else if (isMetaWebView) {
-    // Meta webviews (FB/IG/Quest) can keep stale SW/index caches aggressively.
-    // Force up to 3 hard refresh passes per session after clearing SW + caches.
+    // FB/IG webviews often ignore normal reloads and keep serving stale index.html.
+    // Clear SW + caches once per session, then force a brand-new URL.
     void (async () => {
-      const refreshAttempts = Number.parseInt(sessionStorage.getItem(metaRefreshAttemptsKey) ?? "0", 10);
-
-      const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map((r) => r.unregister()));
-
-      if ("caches" in window) {
-        const cacheKeys = await caches.keys();
-        await Promise.all(cacheKeys.map((key) => caches.delete(key)));
-      }
-
-      if (refreshAttempts < metaMaxRefreshAttempts) {
-        sessionStorage.setItem(metaRefreshAttemptsKey, String(refreshAttempts + 1));
-        const refreshValue = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-        const target = new URL(window.location.href);
-        target.searchParams.set("__meta_refresh", refreshValue);
-        window.location.replace(target.toString());
+      if (sessionStorage.getItem(metaForceReloadKey) === "1") {
+        await navigator.serviceWorker
+          .getRegistration()
+          .then((registration) => registration?.update())
+          .catch(() => undefined);
         return;
       }
 
-      await navigator.serviceWorker
-        .getRegistration()
-        .then((registration) => registration?.update())
-        .catch(() => undefined);
+      sessionStorage.setItem(metaForceReloadKey, "1");
+
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+
+        if ("caches" in window) {
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+        }
+      } finally {
+        const target = new URL(window.location.href);
+        target.searchParams.set("__meta_refresh", Date.now().toString());
+        window.location.replace(target.toString());
+      }
     })();
   } else {
     // Production: let PWAUpdatePrompt (useRegisterSW) handle updates & prompt.
