@@ -131,7 +131,7 @@ function VRButton({ position, size = [2, 0.35], label, color, onSelect, fontSize
   return (
     <group position={position}>
       <Interactive onSelect={disabled ? () => {} : onSelect}>
-        <mesh onClick={disabled ? undefined : onSelect}>
+        <mesh onClick={disabled ? undefined : onSelect} onPointerDown={disabled ? undefined : onSelect}>
           <planeGeometry args={size} />
           <meshStandardMaterial
             color={disabled ? '#333' : '#1a1a2e'}
@@ -171,7 +171,7 @@ function MenuScreen({ onSelect }: { onSelect: (screen: 'library' | 'suite') => v
       {/* Audio Library Button */}
       <group position={[-1.2, 1.2, -2.5]}>
         <Interactive onSelect={() => onSelect('library')}>
-          <mesh onClick={() => onSelect('library')}>
+          <mesh onClick={() => onSelect('library')} onPointerDown={() => onSelect('library')}>
             <planeGeometry args={[1.8, 0.8]} />
             <meshStandardMaterial color="#1a1a3e" emissive="#4488FF" emissiveIntensity={0.25} />
           </mesh>
@@ -189,7 +189,7 @@ function MenuScreen({ onSelect }: { onSelect: (screen: 'library' | 'suite') => v
       {/* Audio Suite Button */}
       <group position={[1.2, 1.2, -2.5]}>
         <Interactive onSelect={() => onSelect('suite')}>
-          <mesh onClick={() => onSelect('suite')}>
+          <mesh onClick={() => onSelect('suite')} onPointerDown={() => onSelect('suite')}>
             <planeGeometry args={[1.8, 0.8]} />
             <meshStandardMaterial color="#2a1a2e" emissive="#9944FF" emissiveIntensity={0.25} />
           </mesh>
@@ -352,7 +352,7 @@ function SuiteScreen({
         return (
           <group key={voice.id} position={[x, 1, z]} rotation={[0, rotY, 0]}>
             <Interactive onSelect={() => onSelectVoice(voice)}>
-              <mesh onClick={() => onSelectVoice(voice)}>
+              <mesh onClick={() => onSelectVoice(voice)} onPointerDown={() => onSelectVoice(voice)}>
                 <planeGeometry args={[1.2, 0.7]} />
                 <meshStandardMaterial color="#1a1a2e" emissive={color} emissiveIntensity={0.2} />
               </mesh>
@@ -428,7 +428,7 @@ function PlayerScreen({
 
       {/* Play/Pause button */}
       <Interactive onSelect={audioControls.togglePlayPause}>
-        <mesh position={[0, 1.35, -2]} onClick={audioControls.togglePlayPause}>
+        <mesh position={[0, 1.35, -2]} onClick={audioControls.togglePlayPause} onPointerDown={audioControls.togglePlayPause}>
           <circleGeometry args={[0.15, 32]} />
           <meshStandardMaterial
             color={audioState.isPlaying ? '#FF4444' : '#44FF44'}
@@ -517,7 +517,7 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
 
       {/* Back to Lobby — always visible */}
       <Interactive onSelect={onBack}>
-        <mesh position={[0, -0.8, 2.5]} onClick={onBack}>
+        <mesh position={[0, -0.8, 2.5]} onClick={onBack} onPointerDown={onBack}>
           <planeGeometry args={[1.5, 0.3]} />
           <meshBasicMaterial color="#331111" />
         </mesh>

@@ -47,6 +47,7 @@ function FurnitureMesh({ element, position, color }: FurnitureMeshProps) {
         <mesh
           position={[0, dims.height / 2, 0]}
           onClick={toggle}
+          onPointerDown={toggle}
           castShadow
         >
           {isRound ? (
@@ -183,7 +184,7 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
       {/* Zone navigation — XR compatible */}
       <group position={[0, 0.5, 1]}>
         <Interactive onSelect={goPrev}>
-          <mesh position={[-1.2, 0, 0]} onClick={goPrev}>
+          <mesh position={[-1.2, 0, 0]} onClick={goPrev} onPointerDown={goPrev}>
             <planeGeometry args={[1.2, 0.3]} />
             <meshBasicMaterial color={activeZone > 0 ? '#222' : '#111'} />
           </mesh>
@@ -200,7 +201,7 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
           </Text>
         </Suspense>
         <Interactive onSelect={goNext}>
-          <mesh position={[1.2, 0, 0]} onClick={goNext}>
+          <mesh position={[1.2, 0, 0]} onClick={goNext} onPointerDown={goNext}>
             <planeGeometry args={[1.0, 0.3]} />
             <meshBasicMaterial color={activeZone < ZONES.length - 1 ? '#222' : '#111'} />
           </mesh>
@@ -209,7 +210,7 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
 
       {/* Back button — XR compatible */}
       <Interactive onSelect={onBack}>
-        <mesh position={[0, 0.2, 1.5]} onClick={onBack}>
+        <mesh position={[0, 0.2, 1.5]} onClick={onBack} onPointerDown={onBack}>
           <planeGeometry args={[1.5, 0.3]} />
           <meshBasicMaterial color="#331111" />
         </mesh>

@@ -60,7 +60,7 @@ function GameScreen({ name, route, emoji, color, desc, position, rotation }: Gam
         onHover={() => setHovered(true)}
         onBlur={() => setHovered(false)}
       >
-        <mesh onClick={handleClick}>
+        <mesh onClick={handleClick} onPointerDown={handleClick}>
           <planeGeometry args={[1.2, 0.9]} />
           <meshBasicMaterial color="#111122" />
         </mesh>
@@ -186,7 +186,7 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
 
       {/* Back button */}
       <Interactive onSelect={onBack}>
-        <mesh position={[0, 0.3, 2]} onClick={onBack}>
+        <mesh position={[0, 0.3, 2]} onClick={onBack} onPointerDown={onBack}>
           <planeGeometry args={[1.5, 0.3]} />
           <meshBasicMaterial color="#331111" />
         </mesh>

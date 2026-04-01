@@ -545,7 +545,7 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
 
       {/* Play/Pause button */}
       <Interactive onSelect={audioControls.togglePlayPause}>
-        <mesh position={[0, 1.5, -3]} onClick={audioControls.togglePlayPause}>
+        <mesh position={[0, 1.5, -3]} onClick={audioControls.togglePlayPause} onPointerDown={audioControls.togglePlayPause}>
           <circleGeometry args={[0.15, 32]} />
           <meshStandardMaterial
             color={audioState.isPlaying ? '#FF4444' : '#44FF44'}
@@ -578,7 +578,7 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
 
       {/* Back button */}
       <Interactive onSelect={onBack}>
-        <mesh position={[0, 0.2, 2]} onClick={onBack}>
+        <mesh position={[0, 0.2, 2]} onClick={onBack} onPointerDown={onBack}>
           <planeGeometry args={[1.5, 0.3]} />
           <meshBasicMaterial color="#331111" />
         </mesh>

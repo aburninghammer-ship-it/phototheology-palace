@@ -251,7 +251,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
 
       {/* Back button — XR compatible */}
       <Interactive onSelect={onBack}>
-        <mesh position={[0, 0.2, 2.5]} onClick={onBack}>
+        <mesh position={[0, 0.2, 2.5]} onClick={onBack} onPointerDown={onBack}>
           <planeGeometry args={[1.5, 0.3]} />
           <meshBasicMaterial color="#331111" />
         </mesh>
