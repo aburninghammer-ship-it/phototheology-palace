@@ -36,7 +36,7 @@ interface OsSpace {
 const OS_SPACES: OsSpace[] = [
   {
     id: "studio",
-    label: "The Studio",
+    label: "Phototheology Studio",
     subtitle: "Study, Write & Research",
     icon: Palette,
     color: "210 100% 56%",
@@ -66,7 +66,7 @@ const OS_SPACES: OsSpace[] = [
   },
   {
     id: "gallery",
-    label: "The Gallery",
+    label: "Phototheology Gallery",
     subtitle: "Palace, Visuals & Memory",
     icon: Landmark,
     color: "32 95% 53%",
@@ -87,7 +87,7 @@ const OS_SPACES: OsSpace[] = [
   },
   {
     id: "stage",
-    label: "The Stage",
+    label: "Phototheology Stage",
     subtitle: "Sermons, Teaching & Output",
     icon: Mic,
     color: "270 56% 65%",
@@ -105,7 +105,7 @@ const OS_SPACES: OsSpace[] = [
   },
   {
     id: "arena",
-    label: "The Arena",
+    label: "Phototheology Arena",
     subtitle: "Games, Challenges & Drills",
     icon: Swords,
     color: "0 84% 60%",
@@ -124,7 +124,7 @@ const OS_SPACES: OsSpace[] = [
   },
   {
     id: "chapel",
-    label: "The Chapel",
+    label: "Phototheology Chapel",
     subtitle: "Devotional, Church & Community",
     icon: Church,
     color: "142 71% 45%",
@@ -147,7 +147,7 @@ const OS_SPACES: OsSpace[] = [
   },
   {
     id: "workshop",
-    label: "The Workshop",
+    label: "Phototheology Workshop",
     subtitle: "AI Tools, GPTs & Settings",
     icon: Wrench,
     color: "215 14% 53%",
