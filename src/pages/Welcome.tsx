@@ -18,7 +18,7 @@ const Welcome = () => {
         <ReginaldGreeting />
         <UpgradeFloatingCard />
         <AudioTourBanner />
-        
+        <DailyAudioDevotional />
         <ContinueWhereYouLeftOff />
       </div>
       <OsSpacesWelcome />
