@@ -104,6 +104,8 @@ const PalaceCardGame = lazy(() => import("./pages/PalaceCardGame"));
 const MemoryBattle = lazy(() => import("./pages/games/MemoryBattle"));
 const BibleTrivia = lazy(() => import("./pages/games/BibleTrivia"));
 const KidsGames = lazy(() => import("./pages/KidsGames"));
+const PersonalStudyPlan = lazy(() => import("./pages/PersonalStudyPlan"));
+const SituationalVerseFinder = lazy(() => import("./pages/SituationalVerseFinder"));
 const LiveStudy = lazy(() => import("./pages/LiveStudy"));
 const LiveStudyRoom = lazy(() => import("./pages/LiveStudyRoom"));
 const StudyGroups = lazy(() => import("./pages/StudyGroups"));
