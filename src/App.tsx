@@ -609,6 +609,8 @@ function App() {
             <Route path="/games/palace-cards" element={<ProtectedRoute><PalaceCardGame /></ProtectedRoute>} />
             <Route path="/games/memory-battle" element={<ProtectedRoute><MemoryBattle /></ProtectedRoute>} />
             <Route path="/games/bible-trivia" element={<ProtectedRoute><BibleTrivia /></ProtectedRoute>} />
+            <Route path="/study-plan" element={<ProtectedRoute><PersonalStudyPlan /></ProtectedRoute>} />
+            <Route path="/verse-finder" element={<SituationalVerseFinder />} />
             <Route path="/games/palace_quiz/:mode?" element={<ProtectedRoute><PalaceQuiz /></ProtectedRoute>} />
             <Route path="/games/principle_puzzle/:mode?" element={<ProtectedRoute><PrinciplePuzzle /></ProtectedRoute>} />
             <Route path="/games/master-exam" element={<ProtectedRoute><MasterExam /></ProtectedRoute>} />
