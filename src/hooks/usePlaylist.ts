@@ -22,7 +22,7 @@ export interface Playlist {
   created_at: string;
 }
 
-const MAX_ITEMS = 25;
+const MAX_ITEMS = 10;
 
 export function usePlaylist() {
   const { user } = useAuth();
