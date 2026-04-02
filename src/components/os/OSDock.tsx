@@ -226,7 +226,7 @@ export function OSDock() {
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent side="right" className="font-medium backdrop-blur-xl bg-popover/90 border-white/10">
+          <TooltipContent side="right" align="start" sideOffset={8} avoidCollisions collisionPadding={{ left: 12, right: 12, top: 8, bottom: 8 }} className="font-medium backdrop-blur-xl bg-popover/90 border-white/10 max-w-[min(280px,calc(100vw-24px))] break-words z-50">
             <p className="font-semibold">{item.label}</p>
             {hasChildren && (
               <div className="mt-1.5 space-y-0.5 border-t border-border pt-1.5">
