@@ -210,7 +210,7 @@ export const OsSpacesWelcome = () => {
         </p>
       </motion.div>
 
-      {/* 6 OS Space Grid */}
+      {/* 8 OS Space Grid */}
       <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 max-w-5xl mx-auto">
         {OS_SPACES.map((space, i) => {
           const Icon = space.icon;
@@ -223,14 +223,44 @@ export const OsSpacesWelcome = () => {
               transition={{ delay: i * 0.05 }}
               onClick={() => setActiveSpace(isActive ? null : space.id)}
               className={cn(
-                "flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all duration-200",
-                isActive
-                  ? "border-primary/60 bg-primary/10 scale-105 shadow-lg"
-                  : "border-border/40 bg-card/80 hover:border-primary/40 hover:bg-primary/5"
+                "relative flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all duration-200 group/space overflow-hidden",
+                isActive ? "scale-105" : "hover:scale-[1.03]"
               )}
+              style={{
+                background: `linear-gradient(135deg, hsl(${space.color} / 0.12), hsl(${space.color} / 0.04), rgba(0,0,0,0.6))`,
+                border: `1px solid hsl(${space.color} / ${isActive ? '0.6' : '0.25'})`,
+                boxShadow: isActive
+                  ? `0 0 28px hsl(${space.color} / 0.4), 0 0 8px hsl(${space.color} / 0.2), inset 0 1px 0 hsl(${space.color} / 0.15)`
+                  : `0 0 12px hsl(${space.color} / 0.15), inset 0 1px 0 hsl(${space.color} / 0.08)`,
+              }}
             >
+              {/* Animated border glow — rotating conic gradient */}
               <div
-                className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-all relative overflow-hidden"
+                className="absolute inset-0 rounded-xl pointer-events-none"
+                style={{
+                  background: `conic-gradient(from ${i * 45}deg, transparent 0%, hsl(${space.color} / 0.7) 10%, transparent 20%, transparent 50%, hsl(${space.color} / 0.5) 60%, transparent 70%)`,
+                  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  maskComposite: 'xor' as any,
+                  WebkitMaskComposite: 'xor' as any,
+                  padding: '1.5px',
+                  animation: `spin ${3 + i * 0.5}s linear infinite`,
+                  opacity: isActive ? 1 : 0.6,
+                }}
+              />
+
+              {/* Pulsing ambient glow */}
+              <div
+                className="absolute inset-0 rounded-xl pointer-events-none"
+                style={{
+                  boxShadow: `inset 0 0 20px hsl(${space.color} / 0.1), 0 0 20px hsl(${space.color} / 0.08)`,
+                  animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                  opacity: isActive ? 0.8 : 0.4,
+                }}
+              />
+
+              <div
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-all relative overflow-hidden z-10"
                 style={{
                   background: `linear-gradient(160deg, hsl(${space.color} / 0.95), hsl(${space.color}) 50%, hsl(${space.color} / 0.75))`,
                   boxShadow: isActive
@@ -242,7 +272,7 @@ export const OsSpacesWelcome = () => {
                 <div className="absolute inset-0 rounded-2xl" style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 45%, transparent 50%)' }} />
                 <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
               </div>
-              <span className="text-[10px] sm:text-xs font-semibold leading-tight text-center">{space.label}</span>
+              <span className="text-[10px] sm:text-xs font-semibold leading-tight text-center relative z-10" style={{ color: `hsl(${space.color})` }}>{space.label}</span>
             </motion.button>
           );
         })}
