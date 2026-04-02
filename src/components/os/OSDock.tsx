@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { PanelLeftClose, PanelLeftOpen, LayoutGrid } from "lucide-react";
-import { motion } from "framer-motion";
+import { PanelLeftClose, PanelLeftOpen, LayoutGrid, PinOff } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePinnedDock } from "@/hooks/usePinnedDock";
 
@@ -12,8 +12,26 @@ export function OSDock() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [visible, setVisible] = useState(true);
-  const { pinnedItems } = usePinnedDock();
+  const { pinnedItems, togglePin } = usePinnedDock();
+  const [contextMenu, setContextMenu] = useState<{ path: string; x: number; y: number } | null>(null);
+  const contextRef = useRef<HTMLDivElement>(null);
   const currentPath = location.pathname;
+
+  // Close context menu on outside click or scroll
+  useEffect(() => {
+    if (!contextMenu) return;
+    const close = (e: MouseEvent | TouchEvent) => {
+      if (contextRef.current && !contextRef.current.contains(e.target as Node)) {
+        setContextMenu(null);
+      }
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("touchstart", close);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("touchstart", close);
+    };
+  }, [contextMenu]);
 
   const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
   const isPublicPage = publicPaths.some(p => currentPath === p) || currentPath.startsWith("/auth");
@@ -90,6 +108,10 @@ export function OSDock() {
               <TooltipTrigger asChild>
                 <button
                   onClick={() => navigate(item.path)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setContextMenu({ path: item.path, x: e.clientX, y: e.clientY });
+                  }}
                   className={cn(
                     "relative flex items-center p-2.5 justify-center rounded-xl transition-all duration-200 w-full",
                     "backdrop-blur-md border border-transparent",
@@ -134,6 +156,32 @@ export function OSDock() {
           );
         })}
       </div>
+
+      {/* Unpin context menu */}
+      <AnimatePresence>
+        {contextMenu && (
+          <motion.div
+            ref={contextRef}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.1 }}
+            className="fixed z-[100] rounded-lg border border-white/10 bg-popover/95 backdrop-blur-xl shadow-2xl py-1 px-1"
+            style={{ left: contextMenu.x, top: contextMenu.y }}
+          >
+            <button
+              onClick={() => {
+                togglePin(contextMenu.path);
+                setContextMenu(null);
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-red-400 hover:bg-red-500/10 transition-colors w-full"
+            >
+              <PinOff className="h-3.5 w-3.5" />
+              Unpin
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
