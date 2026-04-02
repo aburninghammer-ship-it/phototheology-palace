@@ -122,7 +122,7 @@ export default function AudioLibrary() {
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Audio Library</h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Curated audio experiences — commentaries, Palace tours, apologetics training,
-            devotionals, and study sessions. Add up to 25 to your personal playlist.
+            devotionals, and study sessions. Add up to 10 tracks per playlist.
           </p>
           <div className="flex items-center justify-center gap-2 mt-3">
             <Badge variant="outline" className="gap-1">
@@ -131,56 +131,95 @@ export default function AudioLibrary() {
             </Badge>
             <PlaylistPanel />
           </div>
-
-          {/* Create Playlist */}
-          <div className="flex items-center justify-center gap-2 mt-4">
-            {showNewPlaylist ? (
-              <div className="flex items-center gap-2">
-                <Input
-                  value={newPlaylistName}
-                  onChange={(e) => setNewPlaylistName(e.target.value)}
-                  placeholder="Playlist name..."
-                  className="h-9 w-48"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && newPlaylistName.trim()) {
-                      createPlaylist(newPlaylistName.trim());
-                      setNewPlaylistName("");
-                      setShowNewPlaylist(false);
-                    }
-                    if (e.key === "Escape") setShowNewPlaylist(false);
-                  }}
-                />
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    if (newPlaylistName.trim()) {
-                      createPlaylist(newPlaylistName.trim());
-                      setNewPlaylistName("");
-                      setShowNewPlaylist(false);
-                    }
-                  }}
-                >
-                  <Check className="h-4 w-4 mr-1" />
-                  Create
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => setShowNewPlaylist(false)}>
-                  Cancel
-                </Button>
-              </div>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5"
-                onClick={() => setShowNewPlaylist(true)}
-              >
-                <ListPlus className="h-4 w-4" />
-                Create New Playlist
-              </Button>
-            )}
-          </div>
         </div>
+
+        {/* My Playlists Quick View */}
+        <Card className="mb-6 border-2 border-primary/20 bg-primary/5">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <ListPlus className="h-5 w-5 text-primary" />
+                <h2 className="font-semibold text-base">My Playlists</h2>
+                <Badge variant="secondary" className="text-xs">{playlists.length}</Badge>
+              </div>
+              {showNewPlaylist ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={newPlaylistName}
+                    onChange={(e) => setNewPlaylistName(e.target.value)}
+                    placeholder="Playlist name..."
+                    className="h-8 w-40 text-sm"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && newPlaylistName.trim()) {
+                        createPlaylist(newPlaylistName.trim());
+                        setNewPlaylistName("");
+                        setShowNewPlaylist(false);
+                      }
+                      if (e.key === "Escape") setShowNewPlaylist(false);
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    className="h-8"
+                    onClick={() => {
+                      if (newPlaylistName.trim()) {
+                        createPlaylist(newPlaylistName.trim());
+                        setNewPlaylistName("");
+                        setShowNewPlaylist(false);
+                      }
+                    }}
+                  >
+                    <Check className="h-3.5 w-3.5 mr-1" />
+                    Create
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8" onClick={() => setShowNewPlaylist(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 h-8"
+                  onClick={() => setShowNewPlaylist(true)}
+                >
+                  <ListPlus className="h-3.5 w-3.5" />
+                  New Playlist
+                </Button>
+              )}
+            </div>
+            {playlists.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Create your first playlist to start organizing audio content. You can add up to 10 tracks per playlist.
+              </p>
+            ) : (
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {playlists.map((pl) => (
+                  <div
+                    key={pl.id}
+                    className="flex items-center gap-2 p-2.5 rounded-lg bg-background border hover:border-primary/40 transition-colors cursor-pointer"
+                    onClick={() => {
+                      // Open the playlist panel sheet
+                      const trigger = document.querySelector('[title="My Playlists"]') as HTMLButtonElement;
+                      if (trigger) trigger.click();
+                    }}
+                  >
+                    <div className="p-1.5 rounded-md bg-primary/10">
+                      <Headphones className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{pl.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(pl.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Dynamic Builders */}
         <AudioContentBuilder />
