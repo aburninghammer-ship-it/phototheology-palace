@@ -327,12 +327,16 @@ export const OsSpacesWelcome = () => {
                         <TooltipTrigger asChild>
                           <button
                             onClick={() => navigate(item.path)}
-                            className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/30 transition-all group hover:scale-[1.04]"
+                            className="relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/30 transition-all group hover:scale-[1.04]"
                             style={{
                               background: `linear-gradient(135deg, hsl(${itemColor} / 0.14), hsl(${itemColor} / 0.05))`,
                               boxShadow: `0 0 12px hsl(${itemColor} / 0.1)`,
                             }}
                           >
+                            {/* Pin button — top-right corner */}
+                            <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                              <PinToDockButton path={item.path} label={item.label} />
+                            </div>
                             <div
                               className="w-10 h-10 rounded-xl flex items-center justify-center transition-all group-hover:scale-110 relative overflow-hidden"
                               style={{
