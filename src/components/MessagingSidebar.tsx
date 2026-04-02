@@ -176,7 +176,7 @@ export const MessagingSidebar = () => {
           {/* Split Layout */}
           <div className="flex-1 flex overflow-hidden min-w-0">
             {/* Left Panel - User/Conv List */}
-            <div className={`w-full md:w-80 lg:w-[22rem] md:border-r border-border/30 flex flex-col ${isMobile && mobileShowChat ? 'hidden' : 'flex'}`}>
+            <div className={`w-full md:w-64 lg:w-72 md:border-r border-border/30 flex flex-col shrink-0 ${isMobile && mobileShowChat ? 'hidden' : 'flex'}`}>
               {/* Tab Switcher */}
               <div className="flex gap-2 px-4 pt-4 pb-2">
                 <button
