@@ -71,7 +71,14 @@ export default function FloorMastery() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
+        {/* Floor Completion Badges */}
+        <FloorBadges 
+          completedFloors={(floorProgress || [])
+            .filter((f: any) => f.floor_completed_at)
+            .map((f: any) => f.floor_number)} 
+        />
+
+        <div className="grid lg:grid-cols-2 gap-6 mt-6">
           <div>
             <FloorProgressTower floors={floorProgress || []} globalTitle={globalTitle} />
           </div>
