@@ -11,6 +11,7 @@ import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { StartSessionDialog } from "@/components/session/StartSessionDialog";
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
+import { PinToDockButton } from "@/components/os/PinToDockButton";
 import {
   DropdownMenu,
   DropdownMenuContent,
