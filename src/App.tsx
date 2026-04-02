@@ -627,6 +627,7 @@ function App() {
             <Route path="/escape-room" element={<ProtectedRoute><EscapeRoom /></ProtectedRoute>} />
             <Route path="/escape-room/play/:roomId" element={<ProtectedRoute><EscapeRoomPlay /></ProtectedRoute>} />
             
+            <Route path="/photo31" element={<ProtectedRoute><Photo31 /></ProtectedRoute>} />
             <Route path="/training-drills" element={<ProtectedRoute><TrainingDrills /></ProtectedRoute>} />
             <Route path="/drill-drill" element={<ProtectedRoute><DrillDrill /></ProtectedRoute>} />
             <Route path="/live-study" element={<ProtectedRoute><LiveStudy /></ProtectedRoute>} />
