@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useFloorProgress } from "@/hooks/useFloorProgress";
 import { FloorProgressTower } from "@/components/mastery/FloorProgressTower";
 import { FloorRequirementsCard } from "@/components/mastery/FloorRequirementsCard";
+import { FloorBadges } from "@/components/mastery/FloorBadges";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Navigation } from "@/components/Navigation";
 import { Badge } from "@/components/ui/badge";
