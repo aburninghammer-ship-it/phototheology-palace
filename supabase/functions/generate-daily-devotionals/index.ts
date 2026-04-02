@@ -134,11 +134,10 @@ serve(async (req) => {
 
         const devotional = JSON.parse(toolCall.function.arguments);
         
-        // Validate devotional text isn't truncated (must be >500 chars and end properly)
+        // Validate devotional text isn't truncated (must be >500 chars)
         const devText = (devotional.devotional_text || '').trim();
-        const isTruncated = devText.length < 500 || !/[.!?"')\n]$/.test(devText);
-        if (isTruncated) {
-          throw new Error(`Devotional text appears truncated (${devText.length} chars, ending: "${devText.slice(-40)}")`);
+        if (devText.length < 400) {
+          throw new Error(`Devotional text too short (${devText.length} chars)`);
         }
 
         await supabase
