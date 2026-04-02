@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Sparkles, CheckCircle2, LogIn } from "lucide-react";
+import { ChevronRight, Sparkles, CheckCircle2, LogIn, Castle, Compass } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import heroCardsDisplay from "@/assets/branding/hero-cards-display.png";
 import { UserCountBadge } from "@/components/UserCountBadge";
 import { useAuth } from "@/hooks/useAuth";
+import { useMemo } from "react";
+import { getVariant, trackABEvent, HERO_CTA_EXPERIMENT } from "@/utils/abTesting";
 const socialProof = [
   "Thousands taught over 20 years",
   "Discover Christ in every chapter", 
