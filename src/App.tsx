@@ -307,6 +307,7 @@ const PalaceTourPage = lazy(() => import("./pages/PalaceTour"));
 const MindMapPalace = lazy(() => import("./pages/MindMapPalace"));
 const GraphicsGallery = lazy(() => import("./pages/GraphicsGallery"));
 const Devotionals = lazy(() => import("./pages/Devotionals"));
+const DailyAudioDevotionalPage = lazy(() => import("./pages/DailyAudioDevotionalPage"));
 const DevotionalView = lazy(() => import("./pages/DevotionalView"));
 const DevotionalProfileDetail = lazy(() => import("./pages/DevotionalProfileDetail"));
 const PublicDevotionalView = lazy(() => import("./pages/PublicDevotionalView"));
