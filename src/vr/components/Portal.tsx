@@ -1,4 +1,4 @@
-import { useRef, Suspense } from 'react';
+import { useRef, useState, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
@@ -15,24 +15,37 @@ interface PortalProps {
 export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }: PortalProps) {
   const glowRef = useRef<THREE.Mesh>(null);
   const ringRef = useRef<THREE.Mesh>(null);
+  const archRef = useRef<THREE.Mesh>(null);
+  const shimmerRef = useRef<THREE.Mesh>(null);
+  const [hovered, setHovered] = useState(false);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     if (glowRef.current) {
       const mat = glowRef.current.material as THREE.MeshStandardMaterial;
-      mat.emissiveIntensity = 0.5 + Math.sin(t * 2) * 0.3;
+      mat.emissiveIntensity = hovered ? 1.5 : (0.5 + Math.sin(t * 2) * 0.3);
     }
     if (ringRef.current) {
       ringRef.current.rotation.z = t * 0.3;
+    }
+    // Hover scale on arch
+    if (archRef.current) {
+      const targetScale = hovered ? 1.05 : 1.0;
+      archRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+    }
+    // Shimmer on inner surface
+    if (shimmerRef.current) {
+      const mat = shimmerRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.08 + Math.sin(t * 3) * 0.04 + (hovered ? 0.06 : 0);
     }
   });
 
   return (
     <group position={position} rotation={rotation}>
       {/* Arch frame */}
-      <mesh castShadow>
-        <torusGeometry args={[1.2, 0.08, 8, 32, Math.PI]} />
-        <meshStandardMaterial color="#444" metalness={0.8} roughness={0.2} />
+      <mesh ref={archRef} castShadow>
+        <torusGeometry args={[1.2, 0.12, 8, 32, Math.PI]} />
+        <meshStandardMaterial color="#444" metalness={0.8} roughness={0.2} emissive={color} emissiveIntensity={hovered ? 0.3 : 0} />
       </mesh>
 
       {/* Left pillar */}
@@ -68,12 +81,19 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
         Uses a very subtle tint so Three.js raycaster registers it.
         Interactive wraps it for XR controller/hand select; onClick for desktop.
       */}
-      <Interactive onSelect={onClick}>
-        <mesh position={[0, 0, 0.05]} onClick={onClick} onPointerDown={onClick}>
+      <Interactive onSelect={onClick} onHover={() => setHovered(true)} onBlur={() => setHovered(false)}>
+        <mesh position={[0, 0, 0.05]} onClick={onClick} onPointerDown={onClick}
+          onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)}>
           <planeGeometry args={[2.6, 2.8]} />
           <meshBasicMaterial color={color} transparent opacity={0.08} side={THREE.DoubleSide} />
         </mesh>
       </Interactive>
+
+      {/* Shimmer surface */}
+      <mesh ref={shimmerRef} position={[0, 0, 0.03]}>
+        <circleGeometry args={[1.05, 32, 0, Math.PI]} />
+        <meshBasicMaterial color={color} transparent opacity={0.08} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
 
       {/* Animated ring */}
       <mesh ref={ringRef} position={[0, 0, 0.02]}>

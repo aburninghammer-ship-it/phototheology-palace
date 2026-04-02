@@ -3,6 +3,7 @@ import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
 const GAMES = [
   { name: 'Escape Room', route: '/escape-room', emoji: '🔐', color: '#FF4444', glowColor: '#FF2222', desc: '28 themed escape rooms' },
@@ -256,17 +257,7 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
       ))}
 
       {/* Back button */}
-      <Interactive onSelect={onBack}>
-        <mesh position={[0, 0.3, 2]} onClick={onBack} onPointerDown={onBack}>
-          <planeGeometry args={[1.5, 0.3]} />
-          <meshStandardMaterial color="#220808" emissive="#FF4444" emissiveIntensity={0.15} />
-        </mesh>
-      </Interactive>
-      <Suspense fallback={null}>
-        <Text position={[0, 0.3, 2.01]} fontSize={0.1} color="#FF6666" anchorX="center">
-          Back to Lobby
-        </Text>
-      </Suspense>
+      <BackToLobbyButton onBack={onBack} position={[0, 0.3, 2]} />
     </group>
   );
 }

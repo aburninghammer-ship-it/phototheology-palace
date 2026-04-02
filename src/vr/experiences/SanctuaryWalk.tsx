@@ -10,6 +10,7 @@ import {
 } from '@/data/sanctuaryLibrary';
 import { parseDimensions, cubitsToMeters } from '../utils/cubitsToMeters';
 import { InfoPanel } from '../components/InfoPanel';
+import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
 const ZONES: { id: SanctuaryZone; label: string; color: string; groundColor: string; ambientColor: string; zOffset: number }[] = [
   { id: 'camp', label: 'The Camp', color: '#CC8844', groundColor: '#3a2a1a', ambientColor: '#8B7355', zOffset: 0 },
@@ -147,7 +148,7 @@ function FurnitureMesh({ element, position, color }: FurnitureMeshProps) {
         </Text>
 
         {element.hebrewName && (
-          <Text position={[0, -0.28, 0.3]} fontSize={0.065} color={color} anchorX="center" anchorY="top">
+          <Text position={[0, -0.28, 0.3]} fontSize={0.075} color={color} anchorX="center" anchorY="top">
             {element.hebrewName}
           </Text>
         )}
@@ -319,17 +320,7 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
       </group>
 
       {/* Back button */}
-      <Interactive onSelect={onBack}>
-        <mesh position={[0, 0.2, 1.5]} onClick={onBack} onPointerDown={onBack}>
-          <planeGeometry args={[1.5, 0.3]} />
-          <meshStandardMaterial color="#220808" emissive="#FF4444" emissiveIntensity={0.15} />
-        </mesh>
-      </Interactive>
-      <Suspense fallback={null}>
-        <Text position={[0, 0.2, 1.51]} fontSize={0.1} color="#FF6666" anchorX="center">
-          Back to Lobby
-        </Text>
-      </Suspense>
+      <BackToLobbyButton onBack={onBack} />
     </group>
   );
 }

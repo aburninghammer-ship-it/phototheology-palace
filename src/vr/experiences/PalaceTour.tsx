@@ -5,6 +5,7 @@ import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { palaceFloors, type Floor, type Room } from '@/data/palaceData';
 import { CANONICAL_ROOMS } from '@/data/canonicalRooms';
+import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
 // ── Floor theming ───────────────────────────────────────────────────────────
 
@@ -282,14 +283,7 @@ function ElevatorView({
       </group>
 
       {/* Back to Lobby */}
-      <VRButton
-        position={[0, -0.8, 2]}
-        size={[1.5, 0.3]}
-        label="< Back to Lobby"
-        color="#AA6644"
-        fontSize={0.08}
-        onSelect={onBack}
-      />
+      <BackToLobbyButton onBack={onBack} position={[0, -0.8, 2]} />
     </group>
   );
 }
@@ -477,7 +471,7 @@ function RoomView({
         <Text position={[-1.9, 2.35, -6.35]} fontSize={0.06} color="#E8B84B" anchorX="left">
           Purpose
         </Text>
-        <Text position={[-1.9, 2.1, -6.35]} fontSize={0.05} color="#ddc" anchorX="left" maxWidth={3.6} lineHeight={1.3}>
+        <Text position={[-1.9, 2.1, -6.35]} fontSize={0.06} color="#ddc" anchorX="left" maxWidth={3.6} lineHeight={1.3}>
           {room.purpose.slice(0, 200)}{room.purpose.length > 200 ? '...' : ''}
         </Text>
 
@@ -493,7 +487,7 @@ function RoomView({
         <Text position={[-1.9, 1.1, -6.35]} fontSize={0.06} color="#88BBFF" anchorX="left">
           Method
         </Text>
-        <Text position={[-1.9, 0.7, -6.35]} fontSize={0.04} color="#ccb" anchorX="left" maxWidth={3.6} lineHeight={1.3}>
+        <Text position={[-1.9, 0.7, -6.35]} fontSize={0.055} color="#ccb" anchorX="left" maxWidth={3.6} lineHeight={1.3}>
           {methodPreview}
         </Text>
 
@@ -504,7 +498,7 @@ function RoomView({
               Examples
             </Text>
             {examplesPreview.map((ex, i) => (
-              <Text key={i} position={[-1.9, 0.15 - i * 0.18, -6.35]} fontSize={0.038} color="#bba" anchorX="left" maxWidth={3.6} lineHeight={1.2}>
+              <Text key={i} position={[-1.9, 0.15 - i * 0.18, -6.35]} fontSize={0.055} color="#bba" anchorX="left" maxWidth={3.6} lineHeight={1.2}>
                 {ex}
               </Text>
             ))}

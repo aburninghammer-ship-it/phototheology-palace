@@ -1,8 +1,9 @@
-import React, { useState, Suspense, useCallback } from 'react';
-import { Canvas } from '@react-three/fiber';
+import React, { useState, Suspense, useCallback, useRef, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { XR, VRButton, ARButton, useXR, Controllers, Hands } from '@react-three/xr';
-import { OrbitControls, Environment } from '@react-three/drei';
+import { OrbitControls, Environment, Text } from '@react-three/drei';
 import { BackSide } from 'three';
+import * as THREE from 'three';
 import { VRLobby, type VRExperience } from './VRLobby';
 
 const SanctuaryWalk = React.lazy(() => import('./experiences/SanctuaryWalk'));
@@ -28,12 +29,97 @@ function DesktopControls() {
   );
 }
 
-/** Loading indicator visible inside XR while lazy experiences load */
+/** Pulsing golden orb loading indicator */
 function XRLoadingFallback() {
+  const orbRef = useRef<THREE.Mesh>(null);
+  const ringRef = useRef<THREE.Points>(null);
+
+  const particlePositions = React.useMemo(() => {
+    const count = 30;
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      pos[i * 3] = Math.cos(angle) * 0.5;
+      pos[i * 3 + 1] = 0;
+      pos[i * 3 + 2] = Math.sin(angle) * 0.5;
+    }
+    return pos;
+  }, []);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (orbRef.current) {
+      const s = 0.8 + Math.sin(t * 2) * 0.4;
+      orbRef.current.scale.set(s, s, s);
+    }
+    if (ringRef.current) {
+      ringRef.current.rotation.y = t * 0.5;
+    }
+  });
+
   return (
-    <mesh position={[0, 1.5, -3]}>
-      <sphereGeometry args={[0.2, 16, 16]} />
-      <meshBasicMaterial color="#6366f1" wireframe />
+    <group position={[0, 1.5, -3]}>
+      <mesh ref={orbRef}>
+        <sphereGeometry args={[0.15, 16, 16]} />
+        <meshStandardMaterial
+          color="#FFD700"
+          emissive="#FFD700"
+          emissiveIntensity={0.8}
+          transparent
+          opacity={0.9}
+        />
+      </mesh>
+      {/* Glow */}
+      <mesh>
+        <sphereGeometry args={[0.25, 12, 12]} />
+        <meshBasicMaterial color="#FFD700" transparent opacity={0.15} depthWrite={false} />
+      </mesh>
+      {/* Particle ring */}
+      <points ref={ringRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={30} array={particlePositions} itemSize={3} />
+        </bufferGeometry>
+        <pointsMaterial size={0.04} color="#FFD700" transparent opacity={0.6} depthWrite={false} sizeAttenuation />
+      </points>
+      <Suspense fallback={null}>
+        <Text position={[0, -0.4, 0]} fontSize={0.08} color="#FFD700" anchorX="center">
+          Loading...
+        </Text>
+      </Suspense>
+    </group>
+  );
+}
+
+/** Fade-to-black overlay that follows the camera */
+function FadeOverlay({ fadeState }: { fadeState: 'idle' | 'out' | 'in' }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const opacityRef = useRef(0);
+  const { camera } = useThree();
+
+  useFrame((_, delta) => {
+    if (!meshRef.current) return;
+
+    // Animate opacity
+    if (fadeState === 'out') {
+      opacityRef.current = Math.min(1, opacityRef.current + delta / 0.3);
+    } else if (fadeState === 'in') {
+      opacityRef.current = Math.max(0, opacityRef.current - delta / 0.3);
+    }
+
+    const mat = meshRef.current.material as THREE.MeshBasicMaterial;
+    mat.opacity = opacityRef.current;
+    meshRef.current.visible = opacityRef.current > 0.001;
+
+    // Follow camera
+    meshRef.current.position.copy(camera.position);
+    meshRef.current.quaternion.copy(camera.quaternion);
+    meshRef.current.translateZ(-0.3);
+  });
+
+  return (
+    <mesh ref={meshRef} renderOrder={9999}>
+      <planeGeometry args={[4, 4]} />
+      <meshBasicMaterial color="#000000" transparent opacity={0} depthTest={false} />
     </mesh>
   );
 }
@@ -52,7 +138,27 @@ function XRSceneAnchor({ children }: { children: React.ReactNode }) {
 
 function VRScene() {
   const [currentExperience, setCurrentExperience] = useState<VRExperience>('lobby');
-  const goToLobby = useCallback(() => setCurrentExperience('lobby'), []);
+  const [displayedExperience, setDisplayedExperience] = useState<VRExperience>('lobby');
+  const [fadeState, setFadeState] = useState<'idle' | 'out' | 'in'>('idle');
+  const pendingExperience = useRef<VRExperience | null>(null);
+
+  const handleExperienceChange = useCallback((next: VRExperience) => {
+    if (fadeState !== 'idle') return;
+    pendingExperience.current = next;
+    setFadeState('out');
+
+    // After fade-out, swap scene, then fade-in
+    setTimeout(() => {
+      setDisplayedExperience(next);
+      setCurrentExperience(next);
+      setFadeState('in');
+      setTimeout(() => {
+        setFadeState('idle');
+      }, 350);
+    }, 300);
+  }, [fadeState]);
+
+  const goToLobby = useCallback(() => handleExperienceChange('lobby'), [handleExperienceChange]);
 
   return (
     <>
@@ -61,30 +167,26 @@ function VRScene() {
       <Hands />
 
       <XRSceneAnchor>
-        {/*
-          Opaque black sky sphere — blocks AR passthrough in immersive mode.
-          Always rendered so it serves as the scene background both on desktop and in XR.
-          Uses meshBasicMaterial (no lighting needed) with BackSide rendering.
-        */}
         <mesh renderOrder={-1}>
           <sphereGeometry args={[150, 32, 32]} />
           <meshBasicMaterial color="#060818" side={BackSide} depthWrite={false} />
         </mesh>
 
-        {/* Basic ambient light always on so geometry is visible even if Suspense is pending */}
         <ambientLight intensity={0.5} />
 
         <Suspense fallback={<XRLoadingFallback />}>
-          {currentExperience === 'lobby' && (
-            <VRLobby onEnterExperience={setCurrentExperience} />
+          {displayedExperience === 'lobby' && (
+            <VRLobby onEnterExperience={handleExperienceChange} />
           )}
-          {currentExperience === 'sanctuary' && <SanctuaryWalk onBack={goToLobby} />}
-          {currentExperience === 'gallery' && <GalleryCorridor onBack={goToLobby} />}
-          {currentExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
-          {currentExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
-          {currentExperience === 'arcade' && <GameArcade onBack={goToLobby} />}
-          {currentExperience === 'palace' && <PalaceTour onBack={goToLobby} />}
+          {displayedExperience === 'sanctuary' && <SanctuaryWalk onBack={goToLobby} />}
+          {displayedExperience === 'gallery' && <GalleryCorridor onBack={goToLobby} />}
+          {displayedExperience === 'audio' && <SpatialAudioPlayer onBack={goToLobby} />}
+          {displayedExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
+          {displayedExperience === 'arcade' && <GameArcade onBack={goToLobby} />}
+          {displayedExperience === 'palace' && <PalaceTour onBack={goToLobby} />}
         </Suspense>
+
+        <FadeOverlay fadeState={fadeState} />
       </XRSceneAnchor>
     </>
   );

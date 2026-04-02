@@ -5,6 +5,7 @@ import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { StarField } from '../components/StarField';
 import { useStreamingAudio } from '../hooks/useStreamingAudio';
+import { BackToLobbyButton } from '../components/BackToLobbyButton';
 import {
   AUDIO_LIBRARY,
   AUDIO_CATEGORIES,
@@ -145,7 +146,7 @@ function VRButton({ position, size = [2, 0.35], label, color, onSelect, fontSize
           {label}
         </Text>
         {sublabel && (
-          <Text position={[0, -0.06, 0.01]} fontSize={0.055} color="#888" anchorX="center" anchorY="middle" maxWidth={size[0] - 0.1}>
+          <Text position={[0, -0.06, 0.01]} fontSize={0.065} color="#888" anchorX="center" anchorY="middle" maxWidth={size[0] - 0.1}>
             {sublabel}
           </Text>
         )}
@@ -386,6 +387,48 @@ function SuiteScreen({
   );
 }
 
+// ── Transcript Panel ────────────────────────────────────────────────────────
+
+function TranscriptPanel({ text, progress, color }: { text: string; progress: number; color: string }) {
+  const sentences = useMemo(() => text.split(/(?<=[.!?])\s+/).filter((s) => s.trim()), [text]);
+
+  const currentIdx = Math.min(Math.floor(progress * sentences.length), sentences.length - 1);
+  const windowStart = Math.max(0, currentIdx - 3);
+  const windowEnd = Math.min(sentences.length, currentIdx + 4);
+  const visible = sentences.slice(windowStart, windowEnd);
+
+  return (
+    <group position={[0, 0.7, -2]}>
+      {/* Background panel */}
+      <mesh position={[0, 0, -0.01]}>
+        <planeGeometry args={[3.2, 0.8]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.5} />
+      </mesh>
+
+      <Suspense fallback={null}>
+        {visible.map((sentence, i) => {
+          const actualIdx = windowStart + i;
+          const isCurrent = actualIdx === currentIdx;
+          const yOffset = (visible.length / 2 - i - 0.5) * 0.1;
+          return (
+            <Text
+              key={actualIdx}
+              position={[0, yOffset, 0.01]}
+              fontSize={isCurrent ? 0.065 : 0.055}
+              color={isCurrent ? color : '#888'}
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={2.9}
+            >
+              {sentence}
+            </Text>
+          );
+        })}
+      </Suspense>
+    </group>
+  );
+}
+
 // ── Player Screen ───────────────────────────────────────────────────────────
 
 function PlayerScreen({
@@ -417,10 +460,10 @@ function PlayerScreen({
         <Text position={[0, 2.1, -2]} fontSize={0.1} color={trackColor} anchorX="center" maxWidth={3}>
           {entry.title}
         </Text>
-        <Text position={[0, 1.85, -2]} fontSize={0.06} color="#aaa" anchorX="center" maxWidth={3}>
+        <Text position={[0, 1.85, -2]} fontSize={0.07} color="#aaa" anchorX="center" maxWidth={3}>
           {entry.description.slice(0, 100)}{entry.description.length > 100 ? '...' : ''}
         </Text>
-        <Text position={[0, 1.6, -2]} fontSize={0.06} color="#888" anchorX="center">
+        <Text position={[0, 1.6, -2]} fontSize={0.07} color="#888" anchorX="center">
           {formatTime(audioState.currentTime)} / {formatTime(audioState.duration)}
           {audioState.isLoading ? '  Loading...' : ''}
         </Text>
@@ -443,9 +486,18 @@ function PlayerScreen({
         </Text>
       </Suspense>
 
+      {/* Transcript panel */}
+      {entry.audioMeta?.text && (
+        <TranscriptPanel
+          text={entry.audioMeta.text}
+          progress={audioState.progress}
+          color={trackColor}
+        />
+      )}
+
       {/* Back button */}
       <VRButton
-        position={[0, 0.2, 2]}
+        position={[0, -0.2, 2]}
         size={[1.5, 0.3]}
         label="< Back"
         color="#FF6666"
@@ -516,17 +568,7 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
       )}
 
       {/* Back to Lobby — always visible */}
-      <Interactive onSelect={onBack}>
-        <mesh position={[0, -0.8, 2.5]} onClick={onBack} onPointerDown={onBack}>
-          <planeGeometry args={[1.5, 0.3]} />
-          <meshBasicMaterial color="#331111" />
-        </mesh>
-      </Interactive>
-      <Suspense fallback={null}>
-        <Text position={[0, -0.8, 2.51]} fontSize={0.1} color="#FF6666" anchorX="center">
-          {'<'} Back to Lobby
-        </Text>
-      </Suspense>
+      <BackToLobbyButton onBack={onBack} position={[0, -0.8, 2.5]} />
     </group>
   );
 }

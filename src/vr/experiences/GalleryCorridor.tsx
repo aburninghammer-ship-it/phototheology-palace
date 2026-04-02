@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState, Suspense } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Text, Instances, Instance } from '@react-three/drei';
 import { TeleportationPlane, Interactive } from '@react-three/xr';
 import * as THREE from 'three';
+import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
 // Import all bible sets from allBooks
 import {
@@ -136,7 +137,7 @@ function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
       </Text>
 
       {/* Memory Hook */}
-      <Text position={[0, -0.37, 0.01]} fontSize={0.038} color="#aaaacc" anchorX="center" anchorY="top" maxWidth={0.72} lineHeight={1.3}>
+      <Text position={[0, -0.37, 0.01]} fontSize={0.055} color="#aaaacc" anchorX="center" anchorY="top" maxWidth={0.72} lineHeight={1.3}>
         {frame.memoryHook}
       </Text>
     </group>
@@ -149,18 +150,71 @@ interface GalleryCorridorProps {
 
 export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
   const allChapters = useMemo(() => getAllChapters(), []);
+  const { camera } = useThree();
+  const frameCounterRef = useRef(0);
+  const [visibleRange, setVisibleRange] = useState({ startIdx: 0, endIdx: 100 });
 
   const FRAME_SPACING = 1.2;
   const WALL_OFFSET = 3;
   const CORRIDOR_LENGTH = allChapters.length * FRAME_SPACING / 2;
+  const CULL_DISTANCE = 30;
+
+  // Frustum culling: update visible range every 10 frames
+  useFrame(() => {
+    frameCounterRef.current++;
+    if (frameCounterRef.current % 10 !== 0) return;
+
+    const camZ = camera.position.z;
+    let startIdx = Infinity;
+    let endIdx = -1;
+
+    for (let i = 0; i < allChapters.length; i++) {
+      const z = -Math.floor(i / 2) * FRAME_SPACING;
+      if (Math.abs(z - camZ) < CULL_DISTANCE) {
+        if (i < startIdx) startIdx = i;
+        if (i > endIdx) endIdx = i;
+      }
+    }
+
+    if (startIdx === Infinity) { startIdx = 0; endIdx = 50; }
+    // Add buffer
+    startIdx = Math.max(0, startIdx - 4);
+    endIdx = Math.min(allChapters.length - 1, endIdx + 4);
+
+    setVisibleRange((prev) => {
+      if (prev.startIdx === startIdx && prev.endIdx === endIdx) return prev;
+      return { startIdx, endIdx };
+    });
+  });
+
+  const visibleChapters = useMemo(() => {
+    return allChapters.slice(visibleRange.startIdx, visibleRange.endIdx + 1).map((frame, sliceIdx) => ({
+      frame,
+      originalIdx: visibleRange.startIdx + sliceIdx,
+    }));
+  }, [allChapters, visibleRange]);
+
+  // Only render lights near the camera
+  const visibleLightIndices = useMemo(() => {
+    const indices: number[] = [];
+    const totalLights = Math.ceil(allChapters.length / 40);
+    for (let i = 0; i < totalLights; i++) {
+      const lightZ = -i * FRAME_SPACING * 20;
+      // Use a broader range for lights since they illuminate a large area
+      if (Math.abs(lightZ - (visibleRange.startIdx > 0 ? -Math.floor(visibleRange.startIdx / 2) * FRAME_SPACING : 0)) < CULL_DISTANCE + 20) {
+        indices.push(i);
+      }
+    }
+    return indices;
+  }, [allChapters.length, visibleRange.startIdx]);
 
   return (
     <group>
       {/* Rich ambient lighting */}
       <ambientLight intensity={0.15} color="#e8d0ff" />
 
-      {/* Spot lights every 20 frames — warm golden */}
-      {Array.from({ length: Math.ceil(allChapters.length / 40) }, (_, i) => (
+      {/* Spot lights — only render visible ones */}
+      {visibleLightIndices.map((i) => (
         <group key={i}>
           <pointLight
             position={[0, 3, -i * FRAME_SPACING * 20]}
@@ -168,7 +222,6 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
             distance={35}
             color="#FFD088"
           />
-          {/* Accent colored lights alternating sides */}
           <pointLight
             position={[i % 2 === 0 ? -2.5 : 2.5, 2, -i * FRAME_SPACING * 20]}
             intensity={0.4}
@@ -224,10 +277,10 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
         <meshStandardMaterial color="#0a0a15" roughness={0.9} />
       </mesh>
 
-      {/* Chapter frames on alternating walls */}
-      {allChapters.map((frame, i) => {
-        const side = i % 2 === 0 ? -1 : 1;
-        const z = -Math.floor(i / 2) * FRAME_SPACING;
+      {/* Chapter frames — only visible range rendered */}
+      {visibleChapters.map(({ frame, originalIdx }) => {
+        const side = originalIdx % 2 === 0 ? -1 : 1;
+        const z = -Math.floor(originalIdx / 2) * FRAME_SPACING;
         const x = side * WALL_OFFSET;
         const rotY = side > 0 ? Math.PI / 2 : -Math.PI / 2;
         const color = getBookColor(frame.book);
@@ -252,17 +305,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
       </Text>
 
       {/* Back button */}
-      <Interactive onSelect={onBack}>
-        <mesh position={[0, 0.2, 2.5]} onClick={onBack} onPointerDown={onBack}>
-          <planeGeometry args={[1.5, 0.3]} />
-          <meshStandardMaterial color="#220808" emissive="#FF4444" emissiveIntensity={0.15} />
-        </mesh>
-      </Interactive>
-      <Suspense fallback={null}>
-        <Text position={[0, 0.2, 2.51]} fontSize={0.1} color="#FF6666" anchorX="center">
-          Back to Lobby
-        </Text>
-      </Suspense>
+      <BackToLobbyButton onBack={onBack} />
     </group>
   );
 }
