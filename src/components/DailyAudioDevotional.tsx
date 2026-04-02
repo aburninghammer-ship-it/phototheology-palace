@@ -4,13 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Play, Pause, BookOpen, Phone, PhoneOff, Loader2, Volume2 } from "lucide-react";
+import { Play, Pause, BookOpen, Phone, PhoneOff, Loader2, Volume2, Share2, MessageCircle, Copy, Check, Facebook, Twitter } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useTodayDevotional, useDevotionalSmsSubscription } from "@/hooks/useDailyAudioDevotional";
 import { useAuth } from "@/hooks/useAuth";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { globalAudioManager } from "@/lib/globalAudioManager";
 import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from "@/lib/mediaSessionHelper";
 import { useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+
+const SUITE_URL = "https://phototheologybible.com";
+
+const openIntent = (url: string) => {
+  window.open(url, "_blank", "noopener,noreferrer,width=600,height=500");
+};
 
 export function DailyAudioDevotional() {
   const { user } = useAuth();
@@ -24,6 +32,7 @@ export function DailyAudioDevotional() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showText, setShowText] = useState(false);
   const [playingIntro, setPlayingIntro] = useState(false);
+  const [copied, setCopied] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const introAudioRef = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<number>(0);
@@ -43,6 +52,57 @@ export function DailyAudioDevotional() {
       clearMediaSession();
     };
   }, []);
+
+  const getShareText = useCallback(() => {
+    if (!devotional) return "";
+    const excerpt = devotional.devotional_text?.slice(0, 200)?.replace(/\n/g, " ") || "";
+    return `📖 "${devotional.title}"\n\n${devotional.scripture_reference}\n\n${excerpt}…\n\n#Phototheology #BibleStudy\n✨ Listen & explore: ${SUITE_URL}`;
+  }, [devotional]);
+
+  const handleCopy = useCallback(async () => {
+    if (!devotional) return;
+    try {
+      await navigator.clipboard.writeText(getShareText());
+      setCopied(true);
+      toast.success("Devotional copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Failed to copy");
+    }
+  }, [devotional, getShareText]);
+
+  const handleTwitterShare = useCallback(() => {
+    const text = getShareText();
+    openIntent(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`);
+  }, [getShareText]);
+
+  const handleFacebookShare = useCallback(() => {
+    openIntent(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SUITE_URL)}&quote=${encodeURIComponent(getShareText())}`);
+  }, [getShareText]);
+
+  const handleSmsShare = useCallback(() => {
+    if (!devotional) return;
+    const text = getShareText();
+    // sms: works on both iOS and Android
+    window.location.href = `sms:?body=${encodeURIComponent(text)}`;
+  }, [devotional, getShareText]);
+
+  const handleNativeShare = useCallback(async () => {
+    if (!devotional) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: devotional.title,
+          text: getShareText(),
+          url: SUITE_URL,
+        });
+        return;
+      } catch (e) {
+        if ((e as Error).name === "AbortError") return;
+      }
+    }
+    handleCopy();
+  }, [devotional, getShareText, handleCopy]);
 
   const playMainAudio = useCallback(() => {
     if (!devotional?.audio_url) return;
@@ -112,7 +172,6 @@ export function DailyAudioDevotional() {
     setIsPlaying(true);
     notifyTTSStarted();
 
-    // If there's a personalized intro URL, play it first
     if (introUrl) {
       setPlayingIntro(true);
       introAudioRef.current = new Audio(introUrl);
@@ -121,7 +180,6 @@ export function DailyAudioDevotional() {
         playMainAudio();
       };
       introAudioRef.current.onerror = () => {
-        // If intro fails, just play the main audio
         setPlayingIntro(false);
         playMainAudio();
       };
@@ -178,15 +236,47 @@ export function DailyAudioDevotional() {
               Daily Audio Devotional
             </span>
           </div>
-          {hasDevotional ? (
-            <Badge variant="outline" className="text-amber-300 border-amber-300/40 text-xs sm:text-sm bg-amber-400/10">
-              Day {devotional.day_number}
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="text-amber-300 border-amber-300/40 text-xs sm:text-sm bg-amber-400/10">
-              Coming Soon
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {hasDevotional && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-400/70 hover:text-amber-300">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground">Share this devotional</div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleNativeShare} className="gap-2">
+                    <Share2 className="h-4 w-4" /> Share via…
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSmsShare} className="gap-2">
+                    <MessageCircle className="h-4 w-4 text-green-500" /> Text Message
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleTwitterShare} className="gap-2">
+                    <Twitter className="h-4 w-4 text-sky-500" /> X / Twitter
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleFacebookShare} className="gap-2">
+                    <Facebook className="h-4 w-4 text-blue-600" /> Facebook
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleCopy} className="gap-2">
+                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    {copied ? "Copied!" : "Copy Text"}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {hasDevotional ? (
+              <Badge variant="outline" className="text-amber-300 border-amber-300/40 text-xs sm:text-sm bg-amber-400/10">
+                Day {devotional.day_number}
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-amber-300 border-amber-300/40 text-xs sm:text-sm bg-amber-400/10">
+                Coming Soon
+              </Badge>
+            )}
+          </div>
         </div>
         <CardTitle className="text-lg sm:text-xl text-foreground leading-snug pt-1">
           {devotional?.title ?? "Get daily audio devotionals on your phone"}
@@ -197,7 +287,7 @@ export function DailyAudioDevotional() {
           </p>
         ) : (
           <p className="text-sm sm:text-base text-amber-200/80 leading-relaxed">
-            Today’s audio is still being prepared, but you can already subscribe for daily devotional SMS delivery.
+            Today's audio is still being prepared, but you can already subscribe for daily devotional SMS delivery.
           </p>
         )}
       </CardHeader>
