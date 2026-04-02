@@ -17,6 +17,17 @@ const socialProof = [
 export const PunchyHero = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const ctaVariant = useMemo(() => getVariant(HERO_CTA_EXPERIMENT), []);
+
+  const ctaIcon = ctaVariant.props?.icon === "sparkles" ? <Sparkles className="mr-2 h-5 w-5 sm:h-6 sm:w-6" /> 
+    : ctaVariant.props?.icon === "castle" ? <Castle className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+    : ctaVariant.props?.icon === "compass" ? <Compass className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+    : <LogIn className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />;
+
+  const handleCtaClick = () => {
+    trackABEvent(HERO_CTA_EXPERIMENT.name, ctaVariant.id, "click");
+    navigate("/auth");
+  };
 
   const scrollToDemo = () => {
     const demoSection = document.getElementById("interactive-demo");
