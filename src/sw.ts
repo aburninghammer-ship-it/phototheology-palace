@@ -13,7 +13,8 @@ const GOOGLE_FONTS_CACHE = 'pt-google-fonts-2026-04-02-7';
 const GSTATIC_FONTS_CACHE = 'pt-gstatic-fonts-2026-04-02-7';
 const ALLOWED_CACHES = new Set([cacheNames.precache, IMAGE_CACHE, GOOGLE_FONTS_CACHE, GSTATIC_FONTS_CACHE]);
 
-self.skipWaiting();
+// Don't call skipWaiting() at top level — let the PWAUpdatePrompt control
+// when the new SW activates so the user sees the reload prompt.
 clientsClaim();
 
 precacheAndRoute(self.__WB_MANIFEST);
@@ -33,9 +34,6 @@ self.addEventListener('activate', (event) => {
     );
 
     await self.clients.claim();
-
-    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    await Promise.all(clients.map((client) => client.navigate(client.url)));
   })());
 });
 

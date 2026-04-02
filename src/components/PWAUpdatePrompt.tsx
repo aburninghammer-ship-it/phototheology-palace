@@ -142,47 +142,37 @@ export function PWAUpdatePrompt() {
       // Set cooldown before updating to prevent immediate re-prompt
       setCooldown();
 
-      // Update the service worker
-      await updateServiceWorker(true);
+      if (isMetaWebView) {
+        // Meta webviews: skip SW dance, just nuke caches and hard-navigate
+        await forceMetaRefresh(`manual-${Date.now()}`);
+        return;
+      }
 
-      // Wait for SW to activate, then reload
+      // Send SKIP_WAITING to the waiting SW, then wait for it to take control
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration?.waiting) {
-          // Send skip waiting message
           registration.waiting.postMessage({ type: 'SKIP_WAITING' });
 
-          // Wait for the new SW to activate
+          // Wait for the new SW to activate before reloading
           await new Promise<void>((resolve) => {
             const onControllerChange = () => {
               navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
               resolve();
             };
             navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
-            // Timeout after 3 seconds
             setTimeout(resolve, 3000);
           });
         }
       }
 
-      if (isMetaWebView) {
-        await forceMetaRefresh(`manual-${Date.now()}`);
-        return;
-      }
-
       window.location.reload();
     } catch (error) {
       console.error('Error during update:', error);
-
-      if (isMetaWebView) {
-        await forceMetaRefresh(`retry-${Date.now()}`);
-        return;
-      }
-
       setIsUpdating(false);
       window.location.reload();
     }
-  }, [updateServiceWorker, isUpdating]);
+  }, [isUpdating]);
 
   const close = () => {
     setOfflineReady(false);
