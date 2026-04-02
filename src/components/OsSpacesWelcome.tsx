@@ -72,6 +72,7 @@ const OS_SPACES: OsSpace[] = [
     icon: Dumbbell,
     color: "32 95% 53%",
     items: [
+      { label: "Photo31", path: "/photo31", icon: Flame, description: "31-day book study", tooltip: "Deep 31-day book study with Jeeves as your personal teacher, trainer, and theological sparring partner. Scales from beginner to master." },
       { label: "Memory Palace", path: "/palace", icon: Building2, description: "8 Floors of PT", tooltip: "Enter the Phototheology Palace — all 8 floors with their rooms, principles, and exercises. The heart of the entire PT system." },
       { label: "Tour the Palace", path: "/palace/tour", icon: Headphones, description: "Audio walkthrough", tooltip: "Take a guided audio tour through the Palace floors. Listen as each room is explained with examples." },
       { label: "Freestyle Arena", path: "/palace/freestyle", icon: Zap, description: "Spontaneous connections", tooltip: "Practice spontaneous Scripture connections like a freestyle artist. Get random prompts and weave verses, nature, and life into real-time Bible application." },

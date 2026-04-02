@@ -105,6 +105,7 @@ const MemoryBattle = lazy(() => import("./pages/games/MemoryBattle"));
 const BibleTrivia = lazy(() => import("./pages/games/BibleTrivia"));
 const KidsGames = lazy(() => import("./pages/KidsGames"));
 const PersonalStudyPlan = lazy(() => import("./pages/PersonalStudyPlan"));
+const Photo31 = lazy(() => import("./pages/Photo31"));
 const SituationalVerseFinder = lazy(() => import("./pages/SituationalVerseFinder"));
 const LiveStudy = lazy(() => import("./pages/LiveStudy"));
 const LiveStudyRoom = lazy(() => import("./pages/LiveStudyRoom"));
@@ -626,6 +627,7 @@ function App() {
             <Route path="/escape-room" element={<ProtectedRoute><EscapeRoom /></ProtectedRoute>} />
             <Route path="/escape-room/play/:roomId" element={<ProtectedRoute><EscapeRoomPlay /></ProtectedRoute>} />
             
+            <Route path="/photo31" element={<ProtectedRoute><Photo31 /></ProtectedRoute>} />
             <Route path="/training-drills" element={<ProtectedRoute><TrainingDrills /></ProtectedRoute>} />
             <Route path="/drill-drill" element={<ProtectedRoute><DrillDrill /></ProtectedRoute>} />
             <Route path="/live-study" element={<ProtectedRoute><LiveStudy /></ProtectedRoute>} />
