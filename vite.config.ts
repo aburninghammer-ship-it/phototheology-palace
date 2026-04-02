@@ -20,7 +20,7 @@ function buildHashPlugin(): Plugin {
 }
 
 // https://vitejs.dev/config/
-// PWA Cache Version: 2026-04-01-meta-fix
+// PWA Cache Version: 2026-04-02-force-update-7
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
