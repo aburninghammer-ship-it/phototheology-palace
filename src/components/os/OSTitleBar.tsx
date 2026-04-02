@@ -120,7 +120,7 @@ export function OSTitleBar() {
         {/* Pin current page to dock */}
         <PinToDockButton path={location.pathname} variant="icon" className="hidden sm:flex" />
 
-
+        {activeCount > 0 && (
           <div className="hidden lg:flex items-center gap-2 px-3 h-8 rounded-full border text-xs font-semibold"
             style={{
               background: "hsl(140 50% 20% / 0.5)",
