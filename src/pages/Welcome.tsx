@@ -1,7 +1,7 @@
 import { SEO } from "@/components/SEO";
 import { ContinueWhereYouLeftOff } from "@/components/ContinueWhereYouLeftOff";
 import { ReginaldGreeting } from "@/components/ReginaldGreeting";
-import { DailyAudioDevotional } from "@/components/DailyAudioDevotional";
+
 import { AudioTourBanner } from "@/components/AudioTourBanner";
 import { OsSpacesWelcome } from "@/components/OsSpacesWelcome";
 import { PtGlossaryTable } from "@/components/PtGlossaryTable";
@@ -18,7 +18,7 @@ const Welcome = () => {
         <ReginaldGreeting />
         <UpgradeFloatingCard />
         <AudioTourBanner />
-        <DailyAudioDevotional />
+        
         <ContinueWhereYouLeftOff />
       </div>
       <OsSpacesWelcome />

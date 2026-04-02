@@ -126,6 +126,7 @@ const OS_SPACES: OsSpace[] = [
     color: "142 71% 45%",
     items: [
       { label: "Devotionals", path: "/devotionals", icon: Flame, description: "Daily devotions", tooltip: "Start your day with a devotional built on PT principles. Includes Scripture, meditation prompts, and a Christ-connection." },
+      { label: "Daily Audio", path: "/daily-audio-devotional", icon: Headphones, description: "Audio devotions", tooltip: "Listen to today's Phototheology-based audio devotional — deep, Christ-centered, sanctuary-mapped reflections delivered daily." },
       { label: "Daily Reading", path: "/daily-reading", icon: Calendar, description: "Reading plan", tooltip: "Follow a structured daily Bible reading plan that covers the entire Bible." },
       { label: "Reading Plans", path: "/reading-plans", icon: Calendar, description: "Structured paths", tooltip: "Choose from multiple reading plans — chronological, thematic, prophetic, or book-by-book." },
       { label: "Audio Library", path: "/audio-library", icon: Headphones, description: "Audio studies", tooltip: "Listen to narrated Bible studies, devotionals, and PT teachings." },

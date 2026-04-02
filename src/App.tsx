@@ -307,6 +307,7 @@ const PalaceTourPage = lazy(() => import("./pages/PalaceTour"));
 const MindMapPalace = lazy(() => import("./pages/MindMapPalace"));
 const GraphicsGallery = lazy(() => import("./pages/GraphicsGallery"));
 const Devotionals = lazy(() => import("./pages/Devotionals"));
+const DailyAudioDevotionalPage = lazy(() => import("./pages/DailyAudioDevotionalPage"));
 const DevotionalView = lazy(() => import("./pages/DevotionalView"));
 const DevotionalProfileDetail = lazy(() => import("./pages/DevotionalProfileDetail"));
 const PublicDevotionalView = lazy(() => import("./pages/PublicDevotionalView"));
@@ -699,6 +700,7 @@ function App() {
            <Route path="/bible-study-series" element={<ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute>} />
            <Route path="/character-profiles" element={<ProtectedRoute><CharacterProfiles /></ProtectedRoute>} />
            <Route path="/devotionals" element={<ProtectedRoute><Devotionals /></ProtectedRoute>} />
+           <Route path="/daily-audio-devotional" element={<ProtectedRoute><DailyAudioDevotionalPage /></ProtectedRoute>} />
            <Route path="/devotionals/:planId" element={<ProtectedRoute><DevotionalView /></ProtectedRoute>} />
            <Route path="/devotionals/profile/:profileId" element={<ProtectedRoute><DevotionalProfileDetail /></ProtectedRoute>} />
            <Route path="/shared-devotional/:shareToken" element={<PublicDevotionalView />} />
