@@ -2,35 +2,17 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import {
-  PanelLeftClose,
-  PanelLeftOpen,
-  LayoutGrid,
-  BookOpen,
-  Building2,
-  Flame,
-  Zap,
-  Headphones,
-  BookText,
-} from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, LayoutGrid } from "lucide-react";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-/** Top-6 pinned favorites — Spaces dashboard is the full directory */
-const FAVORITES = [
-  { id: "bible", label: "Study Bible", icon: BookOpen, path: "/bible", glow: "210 100% 56%" },
-  { id: "palace", label: "Palace", icon: Building2, path: "/palace", glow: "32 95% 53%" },
-  { id: "pt-course", label: "PT Course", icon: BookText, path: "/phototheology-course", glow: "32 90% 50%" },
-  { id: "devotional", label: "Devotional", icon: Flame, path: "/devotionals", glow: "328 85% 58%" },
-  { id: "challenges", label: "Challenges", icon: Zap, path: "/daily-challenges", glow: "16 88% 50%" },
-  { id: "audio", label: "Audio Library", icon: Headphones, path: "/audio-library", glow: "280 75% 60%" },
-];
+import { usePinnedDock } from "@/hooks/usePinnedDock";
 
 export function OSDock() {
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [visible, setVisible] = useState(true);
+  const { pinnedItems } = usePinnedDock();
   const currentPath = location.pathname;
 
   const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
@@ -91,15 +73,20 @@ export function OSDock() {
         </div>
       )}
 
-      {/* Favorites */}
+      {/* Pinned Favorites */}
       <div className="flex-1 flex flex-col items-center gap-1 py-3 px-2">
-        {FAVORITES.map((item) => {
+        {pinnedItems.length === 0 && (
+          <div className="text-[9px] text-muted-foreground/40 text-center px-1 mt-4">
+            Pin tools from Spaces
+          </div>
+        )}
+        {pinnedItems.map((item) => {
           const active = isActive(item.path);
           const Icon = item.icon;
           const itemColor = `hsl(${item.glow})`;
 
           return (
-            <Tooltip key={item.id} delayDuration={0}>
+            <Tooltip key={item.path} delayDuration={0}>
               <TooltipTrigger asChild>
                 <button
                   onClick={() => navigate(item.path)}
