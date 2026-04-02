@@ -564,9 +564,9 @@ export const BibleReader = () => {
         verseText={selectedVerse ? chapterData.verses.find(v => v.verse === selectedVerse)?.text || "" : ""}
       />
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-5 gap-6">
         {/* Main Reading Pane */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-3 space-y-6">
           <Card variant="glass" className={`shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
             {/* Sticky Book Title Header */}
             <div className="sticky top-0 z-20 bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 backdrop-blur-xl border-b border-primary/30 px-6 py-4 rounded-t-xl shadow-sm mx-0">
@@ -828,7 +828,7 @@ export const BibleReader = () => {
 
           // On desktop: render inline as sticky sidebar
           return (
-            <div className="lg:col-span-1 space-y-4 lg:space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto" ref={jeevesRef}>
+            <div className="lg:col-span-2 space-y-4 lg:space-y-6 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto scrollbar-thin" ref={jeevesRef}>
               {hasPanelContent ? panelContent : (
                 <Card className="p-6 text-center text-muted-foreground sticky top-24">
                   <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary/50" />
