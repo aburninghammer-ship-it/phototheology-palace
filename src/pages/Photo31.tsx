@@ -4,52 +4,13 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Send, Trash2, BookOpen, Flame, Dumbbell, GraduationCap, Crown, Clock, Play } from "lucide-react";
+import { ArrowLeft, Send, Trash2, BookOpen, Flame, Dumbbell, GraduationCap, Crown, Clock, Play, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { SEO } from "@/components/SEO";
 import ReactMarkdown from "react-markdown";
-
-// Book data with 31-day passage clusters
-const BOOKS: Record<string, { name: string; passages: string[] }> = {
-  daniel: {
-    name: "Daniel",
-    passages: [
-      "Daniel 1:1-8", "Daniel 1:9-21", "Daniel 2:1-16", "Daniel 2:17-30", "Daniel 2:31-49",
-      "Daniel 3:1-18", "Daniel 3:19-30", "Daniel 4:1-18", "Daniel 4:19-37", "Daniel 5:1-16",
-      "Daniel 5:17-31", "Daniel 6:1-15", "Daniel 6:16-28", "Daniel 7:1-8", "Daniel 7:9-14",
-      "Daniel 7:15-28", "Daniel 8:1-14", "Daniel 8:15-27", "Daniel 9:1-14", "Daniel 9:15-19",
-      "Daniel 9:20-27", "Daniel 10:1-14", "Daniel 10:15-21", "Daniel 11:1-13", "Daniel 11:14-22",
-      "Daniel 11:23-35", "Daniel 11:36-45", "Daniel 12:1-7", "Daniel 12:8-13", "Daniel Review & Synthesis Day 1",
-      "Daniel Review & Synthesis Day 2"
-    ],
-  },
-  genesis: {
-    name: "Genesis",
-    passages: [
-      "Genesis 1:1-13", "Genesis 1:14-31", "Genesis 2:1-14", "Genesis 2:15-25", "Genesis 3:1-13",
-      "Genesis 3:14-24", "Genesis 4:1-16", "Genesis 4:17-5:32", "Genesis 6:1-22", "Genesis 7:1-24",
-      "Genesis 8:1-22", "Genesis 9:1-17", "Genesis 9:18-10:32", "Genesis 11:1-32", "Genesis 12:1-20",
-      "Genesis 13-14", "Genesis 15:1-21", "Genesis 16-17", "Genesis 18:1-19:29", "Genesis 19:30-20:18",
-      "Genesis 21:1-22:24", "Genesis 23-24", "Genesis 25:1-34", "Genesis 26-27", "Genesis 28-29",
-      "Genesis 30-31", "Genesis 32-33", "Genesis 34-36", "Genesis 37-39", "Genesis 40-45",
-      "Genesis 46-50"
-    ],
-  },
-  revelation: {
-    name: "Revelation",
-    passages: [
-      "Revelation 1:1-8", "Revelation 1:9-20", "Revelation 2:1-17", "Revelation 2:18-29", "Revelation 3:1-13",
-      "Revelation 3:14-22", "Revelation 4:1-11", "Revelation 5:1-14", "Revelation 6:1-11", "Revelation 6:12-7:8",
-      "Revelation 7:9-8:6", "Revelation 8:7-9:12", "Revelation 9:13-21", "Revelation 10:1-11:2", "Revelation 11:3-19",
-      "Revelation 12:1-9", "Revelation 12:10-17", "Revelation 13:1-10", "Revelation 13:11-18", "Revelation 14:1-5",
-      "Revelation 14:6-13", "Revelation 14:14-15:4", "Revelation 15:5-16:11", "Revelation 16:12-21", "Revelation 17:1-18",
-      "Revelation 18:1-24", "Revelation 19:1-21", "Revelation 20:1-15", "Revelation 21:1-14", "Revelation 21:15-22:5",
-      "Revelation 22:6-21"
-    ],
-  },
-};
+import { BIBLE_BOOKS, type Photo31Book } from "@/data/photo31Books";
 
 const LEVELS = [
   { id: "beginner", label: "Beginner", icon: BookOpen, color: "text-green-500", description: "Foundation — learn rooms & observe" },
@@ -66,7 +27,7 @@ interface Message {
 const Photo31 = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [book, setBook] = useState("daniel");
+  const [book, setBook] = useState("genesis");
   const [day, setDay] = useState(1);
   const [level, setLevel] = useState("beginner");
   const [sessionMinutes, setSessionMinutes] = useState(30);
@@ -74,6 +35,7 @@ const Photo31 = () => {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [bookSearch, setBookSearch] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,6 +43,12 @@ const Photo31 = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const selectedBook = BIBLE_BOOKS.find(b => b.key === book)!;
+
+  const filteredBooks = BIBLE_BOOKS.filter(b =>
+    b.name.toLowerCase().includes(bookSearch.toLowerCase())
+  );
 
   const sendMessage = useCallback(async (userMessage?: string, init = false) => {
     const newMessages = [...messages];
@@ -91,15 +59,13 @@ const Photo31 = () => {
     setIsStreaming(true);
 
     try {
-      const selectedBook = BOOKS[book];
-      const passages = selectedBook.passages[day - 1] || "";
-
       const { data, error } = await supabase.functions.invoke("photo31-session", {
         body: {
           messages: newMessages,
           book: selectedBook.name,
           day,
-          passages,
+          chapters: selectedBook.chapters,
+          bookSummary: selectedBook.summary,
           level,
           sessionMinutes,
           isInit: init,
@@ -120,7 +86,7 @@ const Photo31 = () => {
     } finally {
       setIsStreaming(false);
     }
-  }, [messages, book, day, level, sessionMinutes]);
+  }, [messages, selectedBook, day, level, sessionMinutes]);
 
   const handleStartSession = () => {
     setSessionStarted(true);
@@ -167,7 +133,7 @@ const Photo31 = () => {
                 </h1>
                 {sessionStarted && (
                   <p className="text-xs text-muted-foreground">
-                    {BOOKS[book].name} • Day {day}/31 • <span className={selectedLevel.color}>{selectedLevel.label}</span>
+                    {selectedBook.name} • Day {day}/31 • <span className={selectedLevel.color}>{selectedLevel.label}</span>
                   </p>
                 )}
               </div>
@@ -198,36 +164,71 @@ const Photo31 = () => {
               </div>
               <h2 className="text-2xl font-bold">Photo31</h2>
               <p className="text-muted-foreground text-sm">
-                31-day deep book study with Jeeves as your personal teacher, trainer, and theological sparring partner.
+                31-day picture study through any book of the Bible. Big picture concepts zooming into fine details — with Jeeves as your teacher, trainer, and sparring partner.
               </p>
             </div>
 
             {/* Book Selection */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Choose Your Book</label>
-              <Select value={book} onValueChange={setBook}>
+              <Select value={book} onValueChange={(v) => { setBook(v); setDay(1); }}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue>{selectedBook.name}</SelectValue>
                 </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(BOOKS).map(([key, b]) => (
-                    <SelectItem key={key} value={key}>{b.name}</SelectItem>
-                  ))}
+                <SelectContent className="max-h-[300px]">
+                  <div className="px-2 pb-2 sticky top-0 bg-popover z-10">
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                      <Input
+                        placeholder="Search books..."
+                        value={bookSearch}
+                        onChange={(e) => setBookSearch(e.target.value)}
+                        className="pl-8 h-8 text-sm"
+                      />
+                    </div>
+                  </div>
+                  {filteredBooks.length > 0 && (
+                    <>
+                      {/* OT section */}
+                      {filteredBooks.some(b => b.testament === "OT") && (
+                        <div className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Old Testament</div>
+                      )}
+                      {filteredBooks.filter(b => b.testament === "OT").map(b => (
+                        <SelectItem key={b.key} value={b.key}>
+                          <div className="flex flex-col">
+                            <span>{b.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                      {/* NT section */}
+                      {filteredBooks.some(b => b.testament === "NT") && (
+                        <div className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-1">New Testament</div>
+                      )}
+                      {filteredBooks.filter(b => b.testament === "NT").map(b => (
+                        <SelectItem key={b.key} value={b.key}>
+                          <div className="flex flex-col">
+                            <span>{b.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground italic">{selectedBook.summary}</p>
             </div>
 
             {/* Day Selection */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Day ({BOOKS[book].passages[day - 1]})</label>
+              <label className="text-sm font-medium">Day ({day} of 31)</label>
               <Select value={day.toString()} onValueChange={(v) => setDay(parseInt(v))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {BOOKS[book].passages.map((p, i) => (
-                    <SelectItem key={i} value={(i + 1).toString()}>
-                      Day {i + 1}: {p}
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                    <SelectItem key={d} value={d.toString()}>
+                      Day {d}{d >= 30 ? " — Synthesis & Review" : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
