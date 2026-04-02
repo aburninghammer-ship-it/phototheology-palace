@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { getAllDockItems } from "@/components/os/dockData";
 
 const PINNED_KEY = "phototheology-pinned-dock";
-const MAX_PINS = 8;
+const MAX_PINS = 9;
 
 // Default pins if nothing stored
 const DEFAULT_PINS = [
