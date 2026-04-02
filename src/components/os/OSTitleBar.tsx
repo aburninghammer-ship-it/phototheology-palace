@@ -11,6 +11,7 @@ import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { StartSessionDialog } from "@/components/session/StartSessionDialog";
 import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
+import { PinToDockButton } from "@/components/os/PinToDockButton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -116,6 +117,9 @@ export function OSTitleBar() {
 
       {/* Right: Utility Toolbar */}
       <div className="flex items-center gap-1.5">
+        {/* Pin current page to dock */}
+        <PinToDockButton path={location.pathname} variant="icon" className="hidden sm:flex" />
+
         {activeCount > 0 && (
           <div className="hidden lg:flex items-center gap-2 px-3 h-8 rounded-full border text-xs font-semibold"
             style={{
