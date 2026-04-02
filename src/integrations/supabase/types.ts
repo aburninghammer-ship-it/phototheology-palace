@@ -11170,6 +11170,60 @@ export type Database = {
         }
         Relationships: []
       }
+      multiplayer_matches: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_round: number | null
+          id: string
+          match_type: string
+          player1_id: string
+          player1_score: number | null
+          player2_id: string | null
+          player2_score: number | null
+          started_at: string | null
+          status: string
+          total_rounds: number | null
+          updated_at: string
+          verse_references: string[] | null
+          winner_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_round?: number | null
+          id?: string
+          match_type?: string
+          player1_id: string
+          player1_score?: number | null
+          player2_id?: string | null
+          player2_score?: number | null
+          started_at?: string | null
+          status?: string
+          total_rounds?: number | null
+          updated_at?: string
+          verse_references?: string[] | null
+          winner_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_round?: number | null
+          id?: string
+          match_type?: string
+          player1_id?: string
+          player1_score?: number | null
+          player2_id?: string | null
+          player2_score?: number | null
+          started_at?: string | null
+          status?: string
+          total_rounds?: number | null
+          updated_at?: string
+          verse_references?: string[] | null
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           christ_chapter_challenges: boolean
@@ -18591,6 +18645,83 @@ export type Database = {
           is_active?: boolean
           time_limit_hours?: number
           title?: string
+        }
+        Relationships: []
+      }
+      trivia_room_players: {
+        Row: {
+          id: string
+          is_ready: boolean | null
+          joined_at: string
+          room_id: string
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_ready?: boolean | null
+          joined_at?: string
+          room_id: string
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_ready?: boolean | null
+          joined_at?: string
+          room_id?: string
+          score?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trivia_room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "trivia_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trivia_rooms: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_question_index: number | null
+          difficulty: string | null
+          host_id: string
+          id: string
+          max_players: number | null
+          question_count: number | null
+          room_code: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_question_index?: number | null
+          difficulty?: string | null
+          host_id: string
+          id?: string
+          max_players?: number | null
+          question_count?: number | null
+          room_code: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_question_index?: number | null
+          difficulty?: string | null
+          host_id?: string
+          id?: string
+          max_players?: number | null
+          question_count?: number | null
+          room_code?: string
+          started_at?: string | null
+          status?: string
         }
         Relationships: []
       }

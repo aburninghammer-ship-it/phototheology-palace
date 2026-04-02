@@ -101,7 +101,11 @@ const GroupStudySession = lazy(() => import("./pages/GroupStudySession"));
 const ChainChess = lazy(() => import("./pages/ChainChess"));
 const ConcentrationGame = lazy(() => import("./pages/ConcentrationGame"));
 const PalaceCardGame = lazy(() => import("./pages/PalaceCardGame"));
+const MemoryBattle = lazy(() => import("./pages/games/MemoryBattle"));
+const BibleTrivia = lazy(() => import("./pages/games/BibleTrivia"));
 const KidsGames = lazy(() => import("./pages/KidsGames"));
+const PersonalStudyPlan = lazy(() => import("./pages/PersonalStudyPlan"));
+const SituationalVerseFinder = lazy(() => import("./pages/SituationalVerseFinder"));
 const LiveStudy = lazy(() => import("./pages/LiveStudy"));
 const LiveStudyRoom = lazy(() => import("./pages/LiveStudyRoom"));
 const StudyGroups = lazy(() => import("./pages/StudyGroups"));
@@ -603,6 +607,10 @@ function App() {
             <Route path="/games/chain-chess/:gameId/:mode?" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
             <Route path="/games/concentration" element={<ProtectedRoute><ConcentrationGame /></ProtectedRoute>} />
             <Route path="/games/palace-cards" element={<ProtectedRoute><PalaceCardGame /></ProtectedRoute>} />
+            <Route path="/games/memory-battle" element={<ProtectedRoute><MemoryBattle /></ProtectedRoute>} />
+            <Route path="/games/bible-trivia" element={<ProtectedRoute><BibleTrivia /></ProtectedRoute>} />
+            <Route path="/study-plan" element={<ProtectedRoute><PersonalStudyPlan /></ProtectedRoute>} />
+            <Route path="/verse-finder" element={<SituationalVerseFinder />} />
             <Route path="/games/palace_quiz/:mode?" element={<ProtectedRoute><PalaceQuiz /></ProtectedRoute>} />
             <Route path="/games/principle_puzzle/:mode?" element={<ProtectedRoute><PrinciplePuzzle /></ProtectedRoute>} />
             <Route path="/games/master-exam" element={<ProtectedRoute><MasterExam /></ProtectedRoute>} />

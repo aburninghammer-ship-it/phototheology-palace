@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Sparkles, CheckCircle2, LogIn } from "lucide-react";
+import { ChevronRight, Sparkles, CheckCircle2, LogIn, Castle, Compass } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import heroCardsDisplay from "@/assets/branding/hero-cards-display.png";
 import { UserCountBadge } from "@/components/UserCountBadge";
 import { useAuth } from "@/hooks/useAuth";
+import { useMemo } from "react";
+import { getVariant, trackABEvent, HERO_CTA_EXPERIMENT } from "@/utils/abTesting";
 const socialProof = [
   "Thousands taught over 20 years",
   "Discover Christ in every chapter", 
@@ -15,6 +17,17 @@ const socialProof = [
 export const PunchyHero = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const ctaVariant = useMemo(() => getVariant(HERO_CTA_EXPERIMENT), []);
+
+  const ctaIcon = ctaVariant.props?.icon === "sparkles" ? <Sparkles className="mr-2 h-5 w-5 sm:h-6 sm:w-6" /> 
+    : ctaVariant.props?.icon === "castle" ? <Castle className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+    : ctaVariant.props?.icon === "compass" ? <Compass className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+    : <LogIn className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />;
+
+  const handleCtaClick = () => {
+    trackABEvent(HERO_CTA_EXPERIMENT.name, ctaVariant.id, "click");
+    navigate("/auth");
+  };
 
   const scrollToDemo = () => {
     const demoSection = document.getElementById("interactive-demo");
@@ -188,11 +201,11 @@ export const PunchyHero = () => {
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                 <Button
                   size="lg"
-                  onClick={() => navigate("/auth")}
+                  onClick={handleCtaClick}
                   className="text-lg sm:text-xl px-8 sm:px-12 py-6 sm:py-7 gradient-palace shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-300 w-full sm:w-auto max-w-sm"
                 >
-                  <LogIn className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
-                  Sign In
+                  {ctaIcon}
+                  {ctaVariant.label}
                 </Button>
                 <Button
                   size="lg"

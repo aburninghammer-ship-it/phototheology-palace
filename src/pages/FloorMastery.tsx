@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useFloorProgress } from "@/hooks/useFloorProgress";
 import { FloorProgressTower } from "@/components/mastery/FloorProgressTower";
 import { FloorRequirementsCard } from "@/components/mastery/FloorRequirementsCard";
+import { FloorBadges } from "@/components/mastery/FloorBadges";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Navigation } from "@/components/Navigation";
 import { Badge } from "@/components/ui/badge";
@@ -70,7 +71,14 @@ export default function FloorMastery() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
+        {/* Floor Completion Badges */}
+        <FloorBadges 
+          completedFloors={(floorProgress || [])
+            .filter((f: any) => f.floor_completed_at)
+            .map((f: any) => f.floor_number)} 
+        />
+
+        <div className="grid lg:grid-cols-2 gap-6 mt-6">
           <div>
             <FloorProgressTower floors={floorProgress || []} globalTitle={globalTitle} />
           </div>
