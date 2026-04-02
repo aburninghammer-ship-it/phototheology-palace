@@ -221,7 +221,7 @@ export function usePlaylist() {
 
     if (error) {
       if (error.message?.includes("limit")) {
-        toast.error("Playlist is full (max 7 items)");
+        toast.error(`Playlist is full (max ${MAX_ITEMS} items)`);
       } else {
         toast.error("Failed to add to playlist");
         console.error(error);
