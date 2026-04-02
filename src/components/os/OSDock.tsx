@@ -74,7 +74,7 @@ export function OSDock() {
       )}
 
       {/* Pinned Favorites */}
-      <div className="flex-1 flex flex-col items-center gap-1 py-3 px-2">
+      <div className="flex-1 flex flex-col items-center gap-1 py-3 px-1 overflow-visible">
         {pinnedItems.length === 0 && (
           <div className="text-[9px] text-muted-foreground/40 text-center px-1 mt-4">
             Pin tools from Spaces
@@ -86,7 +86,7 @@ export function OSDock() {
           const itemColor = `hsl(${item.glow})`;
 
           return (
-            <div key={item.path} className="relative w-full group">
+            <div key={item.path} className="relative w-full group overflow-visible">
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                   <button
@@ -129,21 +129,21 @@ export function OSDock() {
                   collisionPadding={{ left: 12, right: 12, top: 8, bottom: 8 }}
                   className="font-medium backdrop-blur-xl bg-popover/90 border-white/10 max-w-[min(280px,calc(100vw-24px))] z-50"
                 >
-                  {item.label}
+                  <div className="flex items-center gap-2">
+                    <span>{item.label}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        togglePin(item.path);
+                      }}
+                      className="ml-1 p-1 rounded-md text-muted-foreground hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                      title="Unpin from dock"
+                    >
+                      <Pin className="h-3 w-3" />
+                    </button>
+                  </div>
                 </TooltipContent>
               </Tooltip>
-
-              {/* Unpin button — visible on hover */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  togglePin(item.path);
-                }}
-                className="absolute -top-1 -right-1 p-0.5 rounded-full bg-background/90 border border-white/10 text-muted-foreground hover:text-red-400 hover:border-red-400/30 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                title="Unpin"
-              >
-                <Pin className="h-2.5 w-2.5" />
-              </button>
             </div>
           );
         })}
