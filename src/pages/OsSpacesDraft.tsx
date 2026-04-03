@@ -11,7 +11,7 @@ import {
   Flame, Calendar, StickyNote, Scale, Heart, HeartHandshake,
   MessageSquare, Megaphone, Video, Crown, Users, User,
   Library, Clock, Map, Languages, BookText, Glasses,
-  CreditCard, LayoutGrid, ImageIcon,
+  CreditCard, LayoutGrid, ImageIcon, Moon,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
