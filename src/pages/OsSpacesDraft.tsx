@@ -11,7 +11,7 @@ import {
   Flame, Calendar, StickyNote, Scale, Heart, HeartHandshake,
   MessageSquare, Megaphone, Video, Crown, Users, User,
   Library, Clock, Map, Languages, BookText, Glasses,
-  CreditCard, LayoutGrid, ImageIcon,
+  CreditCard, LayoutGrid, ImageIcon, Moon,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -130,6 +130,8 @@ const OS_SPACES: OsSpace[] = [
     color: "142 71% 45%",
     gradient: "from-green-600/20 to-emerald-600/20",
     items: [
+      { label: "Night Watches", path: "/night-watches", icon: Moon, description: "Evening Master Mind meditation" },
+      { label: "Morning Watches", path: "/morning-watches", icon: Flame, description: "Morning activation sessions" },
       { label: "Devotionals", path: "/devotionals", icon: Flame, description: "Daily spiritual food" },
       { label: "Daily Reading", path: "/daily-reading", icon: Calendar, description: "Bible reading plan" },
       { label: "Reading Plans", path: "/reading-plans", icon: Calendar, description: "Structured reading paths" },
