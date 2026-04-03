@@ -63,7 +63,7 @@ const TOUR_SCENES: TourScene[] = [
     label: 'He Is Risen',
     subtitle: 'Matthew 28:6 — He is not here: for He is risen',
     start: 0.45, end: 0.60,
-    colors: { nebula: ['#FFD700', '#FFFFFF', '#FFEE88', '#FFB700'], ambient: '#2a2200', fog: '#1a1100', accent: '#FFD700' },
+    colors: { nebula: ['#FFD700', '#FFFFFF', '#C4B5FD', '#FFB700'], ambient: '#0c0818', fog: '#060818', accent: '#FFD700' },
     cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 3) * 4, y: 2 + t * 5, z: -5 - t * 25 }),
     particleColor: '#FFD700',
     lightIntensity: 2.0,
