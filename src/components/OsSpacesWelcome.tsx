@@ -299,7 +299,7 @@ export const OsSpacesWelcome = () => {
                 <div className="absolute inset-0 rounded-2xl" style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 45%, transparent 50%)' }} />
                 <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
               </div>
-              <span className="text-[10px] sm:text-xs font-semibold leading-tight text-center relative z-10" style={{ color: `hsl(${space.color})` }}>{space.label}</span>
+              <span className="text-[10px] sm:text-xs font-semibold leading-tight text-center relative z-10" style={{ color: `hsl(${space.color})` }}>{isSimple ? space.simpleLabel : space.label}</span>
             </motion.button>
           );
         })}
