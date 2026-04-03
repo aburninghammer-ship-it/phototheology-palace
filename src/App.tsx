@@ -644,6 +644,8 @@ function App() {
             <Route path="/testimonials" element={<ProtectedRoute><TestimonialWall /></ProtectedRoute>} />
           <Route path="/culture-controversy" element={<ProtectedRoute><CultureControversy /></ProtectedRoute>} />
           <Route path="/prophecy-watch" element={<ProtectedRoute><ProphecyWatch /></ProtectedRoute>} />
+          <Route path="/night-watches" element={<ProtectedRoute><NightWatches /></ProtectedRoute>} />
+          <Route path="/morning-watches" element={<ProtectedRoute><MorningWatches /></ProtectedRoute>} />
           <Route path="/research-mode" element={<ProtectedRoute><ResearchMode /></ProtectedRoute>} />
           <Route path="/interlinear" element={<ProtectedRoute><InterlinearBible /></ProtectedRoute>} />
           <Route path="/interlinear/:book/:chapter" element={<ProtectedRoute><InterlinearBible /></ProtectedRoute>} />
