@@ -457,23 +457,23 @@ export function SanctuaryDome() {
   }, []);
 
   const nebulaTex1 = useMemo(() => createNebulaTexture(512, [
-    { stop: 0, color: 'rgba(255,200,60,0.15)' },
-    { stop: 0.3, color: 'rgba(180,120,30,0.08)' },
-    { stop: 0.6, color: 'rgba(100,50,120,0.04)' },
+    { stop: 0, color: 'rgba(107,33,168,0.2)' },
+    { stop: 0.3, color: 'rgba(192,38,211,0.1)' },
+    { stop: 0.6, color: 'rgba(67,56,202,0.05)' },
     { stop: 1, color: 'rgba(0,0,0,0)' },
   ]), []);
 
   const nebulaTex2 = useMemo(() => createNebulaTexture(512, [
-    { stop: 0, color: 'rgba(120,80,200,0.1)' },
-    { stop: 0.4, color: 'rgba(80,40,150,0.05)' },
-    { stop: 0.7, color: 'rgba(40,20,80,0.02)' },
+    { stop: 0, color: 'rgba(124,58,237,0.15)' },
+    { stop: 0.4, color: 'rgba(37,99,235,0.08)' },
+    { stop: 0.7, color: 'rgba(30,27,75,0.03)' },
     { stop: 1, color: 'rgba(0,0,0,0)' },
   ]), []);
 
   const nebulaTex3 = useMemo(() => createNebulaTexture(512, [
-    { stop: 0, color: 'rgba(255,140,40,0.08)' },
-    { stop: 0.3, color: 'rgba(200,80,20,0.04)' },
-    { stop: 0.7, color: 'rgba(60,20,10,0.02)' },
+    { stop: 0, color: 'rgba(219,39,119,0.12)' },
+    { stop: 0.3, color: 'rgba(192,38,211,0.06)' },
+    { stop: 0.7, color: 'rgba(67,56,202,0.03)' },
     { stop: 1, color: 'rgba(0,0,0,0)' },
   ]), []);
 
