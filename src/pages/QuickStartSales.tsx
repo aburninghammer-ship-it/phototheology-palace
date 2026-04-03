@@ -558,25 +558,25 @@ export default function QuickStartSales() {
             </Badge>
 
             <h2 className="text-3xl md:text-4xl font-bold">
-              After the Quick-Start: The Study Suite
+              After the Quick-Start: PhototheologyOS
             </h2>
 
             <p className="text-lg text-muted-foreground">
-              Once you understand the Palace architecture, the{" "}
-              <strong className="text-foreground">PhotoTheology Study Suite</strong> provides
-              method training for each Room. You will move from conceptual understanding to
-              skill development.
+              Once you understand the Palace architecture,{" "}
+              <strong className="text-foreground">PhototheologyOS</strong> provides
+              interactive method training for each Room. Move from conceptual understanding to
+              skill development with AI-powered guidance.
             </p>
 
             <p className="text-muted-foreground">
-              The Study Suite teaches you how to actually work within each Room—how to observe,
+              PhototheologyOS teaches you how to actually work within each Room—how to observe,
               how to interpret, how to connect, and how to see Christ emerge through
               disciplined study.
             </p>
 
             <Card className="border-accent/20 bg-accent/5 p-6 mt-8">
               <p className="text-sm text-muted-foreground italic">
-                Progression matters. The Quick-Start prepares you. The Study Suite trains you.
+                Progression matters. The Quick-Start prepares you. PhototheologyOS trains you.
               </p>
             </Card>
           </motion.div>
