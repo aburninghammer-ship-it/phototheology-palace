@@ -62,6 +62,7 @@ const OS_SPACES: OsSpace[] = [
       { label: "Bible Timeline", path: "/bible-timeline", icon: Clock, description: "Chronological Bible map" },
       { label: "Bible Atlas", path: "/bible-atlas", icon: Map, description: "Geographic Bible explorer" },
       { label: "Source Library", path: "/libraries", icon: Library, description: "Reference materials" },
+      { label: "Audio Library", path: "/audio-library", icon: Headphones, description: "Audio Bible & studies" },
     ],
   },
   {
