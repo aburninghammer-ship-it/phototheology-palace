@@ -82,7 +82,7 @@ export function SanctuaryParticles({ count = 350 }: { count?: number }) {
   const colorObj = useMemo(() => new THREE.Color(), []);
 
   const particles = useMemo(() => {
-    const colors = ['#FFD700', '#FFE4A0', '#FFFBE0', '#F5C542', '#E8A317', '#FFF8DC', '#FFAA00'];
+    const colors = ['#C4B5FD', '#93C5FD', '#F9A8D4', '#67E8F9', '#FFFFFF', '#E9D5FF', '#A78BFA'];
     return Array.from({ length: count }, () => ({
       x: (Math.random() - 0.5) * 28,
       y: Math.random() * 12 - 1,
