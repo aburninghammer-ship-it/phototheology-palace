@@ -1,6 +1,6 @@
-import { useState, useMemo, useRef, Suspense } from 'react';
+import { useState, useMemo, useRef, Suspense, useCallback } from 'react';
 import { Text } from '@react-three/drei';
-import { TeleportationPlane, Interactive } from '@react-three/xr';
+import { TeleportationPlane, Interactive, useController } from '@react-three/xr';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
@@ -171,12 +171,66 @@ function FurnitureMesh({ element, position, color }: FurnitureMeshProps) {
   );
 }
 
+/** Reads VR thumbstick and drives smooth locomotion along the sanctuary path */
+function useThumbstickLocomotion(
+  posRef: React.MutableRefObject<number>,
+  setActiveZone: (z: number) => void,
+  speed: number = 4,
+) {
+  const rightController = useController('right');
+  const leftController = useController('left');
+
+  useFrame((_, delta) => {
+    // Read thumbstick Y axis from either controller (axes[3] = forward/back)
+    let axisY = 0;
+    const rGP = rightController?.inputSource?.gamepad;
+    const lGP = leftController?.inputSource?.gamepad;
+    if (rGP && rGP.axes.length >= 4) axisY = rGP.axes[3];
+    if (Math.abs(axisY) < 0.15 && lGP && lGP.axes.length >= 4) axisY = lGP.axes[3];
+
+    // Dead zone
+    if (Math.abs(axisY) < 0.15) return;
+
+    // Move (pushing stick forward = negative axis = walk deeper into sanctuary)
+    const minZ = ZONES[ZONES.length - 1].zOffset;
+    const maxZ = ZONES[0].zOffset;
+    posRef.current = Math.max(minZ, Math.min(maxZ, posRef.current + axisY * speed * delta));
+
+    // Update active zone based on current position
+    let closest = 0;
+    let closestDist = Infinity;
+    for (let i = 0; i < ZONES.length; i++) {
+      const dist = Math.abs(posRef.current - ZONES[i].zOffset);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = i;
+      }
+    }
+    setActiveZone(closest);
+  });
+}
+
+/** Smoothly interpolates the scene group position each frame */
+function useSmoothPosition(groupRef: React.RefObject<THREE.Group | null>, posRef: React.MutableRefObject<number>) {
+  const currentZ = useRef(0);
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) return;
+    // Lerp toward target
+    currentZ.current += ((-posRef.current) - currentZ.current) * Math.min(1, delta * 6);
+    groupRef.current.position.z = currentZ.current;
+  });
+}
+
 interface SanctuaryWalkProps {
   onBack: () => void;
 }
 
 export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
   const [activeZone, setActiveZone] = useState(0);
+  const sceneRef = useRef<THREE.Group>(null);
+  // Continuous Z position for smooth joystick movement
+  const posRef = useRef(ZONES[0].zOffset);
 
   const zoneData = useMemo(() => {
     return ZONES.map((zone) => ({
@@ -185,14 +239,32 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
     }));
   }, []);
 
-  const goPrev = () => activeZone > 0 && setActiveZone(activeZone - 1);
-  const goNext = () => activeZone < ZONES.length - 1 && setActiveZone(activeZone + 1);
+  const goPrev = useCallback(() => {
+    if (activeZone > 0) {
+      const newZone = activeZone - 1;
+      setActiveZone(newZone);
+      posRef.current = ZONES[newZone].zOffset;
+    }
+  }, [activeZone]);
 
-  const targetZ = ZONES[activeZone].zOffset;
+  const goNext = useCallback(() => {
+    if (activeZone < ZONES.length - 1) {
+      const newZone = activeZone + 1;
+      setActiveZone(newZone);
+      posRef.current = ZONES[newZone].zOffset;
+    }
+  }, [activeZone]);
+
+  // Thumbstick locomotion in VR
+  useThumbstickLocomotion(posRef, setActiveZone);
+  // Smooth scene position interpolation
+  useSmoothPosition(sceneRef, posRef);
+
   const currentZone = ZONES[activeZone];
 
   return (
-    <group position={[0, 0, -targetZ]}>
+    <>
+    <group ref={sceneRef}>
       {/* Rich warm lighting */}
       <ambientLight intensity={0.3} color="#fff5e6" />
       <directionalLight position={[5, 10, 5]} intensity={1} color="#ffe8c4" castShadow />
@@ -284,70 +356,72 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
         </group>
       ))}
 
-      {/* ── Zone Navigation HUD ── fixed at bottom-center, always visible */}
-      <group position={[0, 0.1, 0.5]}>
-        {/* Dark nav panel background */}
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[4.8, 0.9]} />
-          <meshBasicMaterial color="#000000" transparent opacity={0.6} />
-        </mesh>
-
-        {/* Zone indicator dots */}
-        {ZONES.map((zone, i) => (
-          <group key={zone.id} position={[(i - 1.5) * 0.5, 0.2, 0]}>
-            <mesh>
-              <circleGeometry args={[i === activeZone ? 0.08 : 0.05, 16]} />
-              <meshBasicMaterial
-                color={zone.color}
-                transparent
-                opacity={i === activeZone ? 1 : 0.3}
-              />
-            </mesh>
-            <Suspense fallback={null}>
-              <Text position={[0, -0.12, 0.01]} fontSize={0.04} color={i === activeZone ? '#fff' : '#666'} anchorX="center">
-                {zone.label}
-              </Text>
-            </Suspense>
-          </group>
-        ))}
-
-        {/* Previous button — large and clear */}
-        <Interactive onSelect={goPrev}>
-          <mesh position={[-1.8, -0.05, 0]} onClick={goPrev} onPointerDown={goPrev}>
-            <planeGeometry args={[1.2, 0.5]} />
-            <meshStandardMaterial
-              color={activeZone > 0 ? '#1a1a30' : '#111118'}
-              emissive={activeZone > 0 ? currentZone.color : '#333'}
-              emissiveIntensity={activeZone > 0 ? 0.2 : 0.02}
-            />
-          </mesh>
-        </Interactive>
-        <Suspense fallback={null}>
-          <Text position={[-1.8, -0.05, 0.01]} fontSize={0.12} color={activeZone > 0 ? '#fff' : '#555'} anchorX="center" anchorY="middle">
-            ← Previous
-          </Text>
-        </Suspense>
-
-        {/* Next button — large and clear */}
-        <Interactive onSelect={goNext}>
-          <mesh position={[1.8, -0.05, 0]} onClick={goNext} onPointerDown={goNext}>
-            <planeGeometry args={[1.2, 0.5]} />
-            <meshStandardMaterial
-              color={activeZone < ZONES.length - 1 ? '#1a1a30' : '#111118'}
-              emissive={activeZone < ZONES.length - 1 ? currentZone.color : '#333'}
-              emissiveIntensity={activeZone < ZONES.length - 1 ? 0.2 : 0.02}
-            />
-          </mesh>
-        </Interactive>
-        <Suspense fallback={null}>
-          <Text position={[1.8, -0.05, 0.01]} fontSize={0.12} color={activeZone < ZONES.length - 1 ? '#fff' : '#555'} anchorX="center" anchorY="middle">
-            Next →
-          </Text>
-        </Suspense>
-      </group>
-
-      {/* Back button — positioned clearly below nav */}
-      <BackToLobbyButton onBack={onBack} position={[0, -0.5, 0.5]} />
     </group>
+
+    {/* ── Zone Navigation HUD ── outside moving group, stays at camera position */}
+    <group position={[0, 0.1, 0.5]}>
+      {/* Dark nav panel background */}
+      <mesh position={[0, 0, -0.01]}>
+        <planeGeometry args={[4.8, 0.9]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.6} />
+      </mesh>
+
+      {/* Zone indicator dots */}
+      {ZONES.map((zone, i) => (
+        <group key={zone.id} position={[(i - 1.5) * 0.5, 0.2, 0]}>
+          <mesh>
+            <circleGeometry args={[i === activeZone ? 0.08 : 0.05, 16]} />
+            <meshBasicMaterial
+              color={zone.color}
+              transparent
+              opacity={i === activeZone ? 1 : 0.3}
+            />
+          </mesh>
+          <Suspense fallback={null}>
+            <Text position={[0, -0.12, 0.01]} fontSize={0.04} color={i === activeZone ? '#fff' : '#666'} anchorX="center">
+              {zone.label}
+            </Text>
+          </Suspense>
+        </group>
+      ))}
+
+      {/* Previous button — large and clear */}
+      <Interactive onSelect={goPrev}>
+        <mesh position={[-1.8, -0.05, 0]} onClick={goPrev} onPointerDown={goPrev}>
+          <planeGeometry args={[1.2, 0.5]} />
+          <meshStandardMaterial
+            color={activeZone > 0 ? '#1a1a30' : '#111118'}
+            emissive={activeZone > 0 ? currentZone.color : '#333'}
+            emissiveIntensity={activeZone > 0 ? 0.2 : 0.02}
+          />
+        </mesh>
+      </Interactive>
+      <Suspense fallback={null}>
+        <Text position={[-1.8, -0.05, 0.01]} fontSize={0.12} color={activeZone > 0 ? '#fff' : '#555'} anchorX="center" anchorY="middle">
+          ← Previous
+        </Text>
+      </Suspense>
+
+      {/* Next button — large and clear */}
+      <Interactive onSelect={goNext}>
+        <mesh position={[1.8, -0.05, 0]} onClick={goNext} onPointerDown={goNext}>
+          <planeGeometry args={[1.2, 0.5]} />
+          <meshStandardMaterial
+            color={activeZone < ZONES.length - 1 ? '#1a1a30' : '#111118'}
+            emissive={activeZone < ZONES.length - 1 ? currentZone.color : '#333'}
+            emissiveIntensity={activeZone < ZONES.length - 1 ? 0.2 : 0.02}
+          />
+        </mesh>
+      </Interactive>
+      <Suspense fallback={null}>
+        <Text position={[1.8, -0.05, 0.01]} fontSize={0.12} color={activeZone < ZONES.length - 1 ? '#fff' : '#555'} anchorX="center" anchorY="middle">
+          Next →
+        </Text>
+      </Suspense>
+    </group>
+
+    {/* Back button — positioned clearly below nav */}
+    <BackToLobbyButton onBack={onBack} position={[0, -0.5, 0.5]} />
+    </>
   );
 }
