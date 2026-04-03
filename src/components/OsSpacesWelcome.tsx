@@ -111,6 +111,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "game",
     label: "Phototheology Game",
+    simpleLabel: "Games",
     subtitle: "Games, Challenges & Competition",
     icon: Gamepad2,
     color: "0 84% 60%",
