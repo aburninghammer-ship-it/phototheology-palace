@@ -165,7 +165,7 @@ export function LightShafts() {
         <mesh key={i} position={[s.x, 5, s.z]} rotation={[0, 0, s.angle]}>
           <planeGeometry args={[s.width, 14]} />
           <meshBasicMaterial
-            color="#FFD700"
+            color="#7C3AED"
             transparent
             opacity={s.opacity}
             blending={THREE.AdditiveBlending}
