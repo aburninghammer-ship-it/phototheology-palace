@@ -232,20 +232,21 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
         </mesh>
       </Interactive>
 
-      {/* === LABEL === */}
+      {/* === LABEL — counter-rotate so text always faces forward === */}
       <Suspense fallback={null}>
-        <Text
-          position={[0, 1.8, 0]}
-          fontSize={0.15}
-          color={color}
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.008}
-          outlineColor="#000"
-          font={undefined}
-        >
-          {label}
-        </Text>
+        <group position={[0, 1.8, 0]} rotation={[0, -rotation[1], 0]}>
+          <Text
+            fontSize={0.15}
+            color={color}
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.008}
+            outlineColor="#000"
+            font={undefined}
+          >
+            {label}
+          </Text>
+        </group>
       </Suspense>
 
       {/* === GLOW LIGHTS === */}
