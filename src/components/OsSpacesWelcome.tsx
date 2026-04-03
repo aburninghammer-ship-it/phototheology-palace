@@ -183,6 +183,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "equip",
     label: "Phototheology Equip",
+    simpleLabel: "Defend",
     subtitle: "Apologetics & Doctrinal Defense",
     icon: Shield,
     color: "20 80% 50%",
