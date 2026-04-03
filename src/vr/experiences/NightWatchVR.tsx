@@ -230,8 +230,8 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
 
       {/* Lighting */}
       <ambientLight intensity={0.15} color="#ccccee" />
-      <pointLight position={[0, 3, -2]} intensity={0.4 + avgVolume * 0.3} color="#6366f1" distance={12} />
-      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#8b5cf6" distance={8} />
+      <pointLight position={[0, 3, -2]} intensity={0.4 + avgVolume * 0.3} color="#7C3AED" distance={12} />
+      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#C026D3" distance={8} />
 
       <MeditationParticles brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
 

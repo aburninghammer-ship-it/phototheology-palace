@@ -239,9 +239,9 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
       </mesh>
 
       {/* Lighting — warm sunrise */}
-      <ambientLight intensity={0.2} color="#fef3c7" />
-      <pointLight position={[0, 3, -6]} intensity={0.6 + avgVolume * 0.4} color="#f59e0b" distance={15} />
-      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#d97706" distance={8} />
+      <ambientLight intensity={0.2} color="#ddd8f0" />
+      <pointLight position={[0, 3, -6]} intensity={0.6 + avgVolume * 0.4} color="#C026D3" distance={15} />
+      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#7C3AED" distance={8} />
 
       <SunriseParticles brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
 
