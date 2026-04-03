@@ -712,9 +712,9 @@ export default function StudySuiteSales() {
                 </p>
 
                 <div className="py-6">
-                  <p className="text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">$97</p>
+                  <p className="text-2xl font-bold text-primary">Now included with PhototheologyOS subscription</p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    {t('studySuite.oneTimePurchase')}
+                    Access all training materials with your membership
                   </p>
                 </div>
 
