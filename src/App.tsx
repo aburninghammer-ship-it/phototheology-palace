@@ -851,6 +851,7 @@ function App() {
           )}
         </TooltipProvider>
         </ThemeProvider>
+        </ExperienceModeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

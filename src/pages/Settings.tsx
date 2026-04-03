@@ -407,6 +407,13 @@ export default function Settings() {
             </CardContent>
           </Card>
 
+          {/* Experience Mode */}
+          <Card>
+            <CardContent className="pt-6">
+              <ExperienceModeSelector variant="full" />
+            </CardContent>
+          </Card>
+
           {/* Font Size / Accessibility */}
           <FontSizeSettings />
 
