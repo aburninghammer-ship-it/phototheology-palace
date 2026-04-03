@@ -72,6 +72,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "train",
     label: "Phototheology Train",
+    simpleLabel: "Practice",
     subtitle: "Palace, Memory & PT Principles",
     icon: Dumbbell,
     color: "32 95% 53%",
