@@ -151,6 +151,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "workshop",
     label: "Phototheology Workshop",
+    simpleLabel: "AI Tools",
     subtitle: "AI Tools, GPTs & Settings",
     icon: Wrench,
     color: "215 14% 53%",
