@@ -33,7 +33,7 @@ const TOUR_SCENES: TourScene[] = [
     label: 'In the Beginning',
     subtitle: 'Genesis 1:1 — God created the heavens and the earth',
     start: 0, end: 0.15,
-    colors: { nebula: ['#0022AA', '#1144CC', '#003388', '#FFD700'], ambient: '#080818', fog: '#020210', accent: '#4488FF' },
+    colors: { nebula: ['#2563EB', '#4338CA', '#6B21A8', '#FFD700'], ambient: '#060818', fog: '#060818', accent: '#93C5FD' },
     cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 2) * 3, y: t * 4 - 2, z: -5 - t * 20 }),
     particleColor: '#4488FF',
     lightIntensity: 0.8,
