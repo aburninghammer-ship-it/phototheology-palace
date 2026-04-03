@@ -202,7 +202,7 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
       <XRSceneAnchor>
         <mesh renderOrder={-1}>
           <sphereGeometry args={[150, 32, 32]} />
-          <meshBasicMaterial color="#040410" side={BackSide} depthWrite={false} />
+          <meshBasicMaterial color="#060818" side={BackSide} depthWrite={false} />
         </mesh>
 
         <ambientLight intensity={0.2} color="#D4C5A0" />

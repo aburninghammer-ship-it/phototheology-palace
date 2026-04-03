@@ -438,7 +438,7 @@ export function SanctuaryDome() {
     const pos = new Float32Array(count * 3);
     const col = new Float32Array(count * 3);
     const colorObj = new THREE.Color();
-    const palette = ['#FFD700', '#FFE8B0', '#FFFFFF', '#FFA500', '#FFFBE0', '#E8C550'];
+    const palette = COSMIC.starPalette;
 
     for (let i = 0; i < count; i++) {
       const theta = Math.random() * Math.PI * 2;
