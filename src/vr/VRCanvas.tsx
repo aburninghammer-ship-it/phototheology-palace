@@ -2,6 +2,7 @@ import React, { useState, Suspense, useCallback, useRef, useEffect } from 'react
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { XR, VRButton, ARButton, useXR, Controllers, Hands } from '@react-three/xr';
 import { OrbitControls, Environment, Text } from '@react-three/drei';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { BackSide } from 'three';
 import * as THREE from 'three';
 import { VRLobby, type VRExperience } from './VRLobby';
@@ -205,6 +206,17 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
 
         <FadeOverlay fadeState={fadeState} />
       </XRSceneAnchor>
+
+      {/* Global post-processing — cinematic look across all VR experiences */}
+      <EffectComposer multisampling={0}>
+        <Bloom
+          intensity={0.4}
+          luminanceThreshold={0.6}
+          luminanceSmoothing={0.9}
+          mipmapBlur
+        />
+        <Vignette eskil={false} offset={0.3} darkness={0.6} />
+      </EffectComposer>
     </>
   );
 }
