@@ -1,6 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { useCheckForUpdates } from '@/components/PWAUpdatePrompt';
 
 const VRCanvas = React.lazy(() => import('./VRCanvas'));
 
@@ -34,12 +33,55 @@ class VRErrorBoundary extends React.Component<
 }
 
 export default function VRHub() {
-  const { checkForUpdates, applyUpdate, updateAvailable } = useCheckForUpdates();
+  const [updateAvailable, setUpdateAvailable] = useState(false);
 
-  // Check for updates on mount
-  React.useEffect(() => {
-    checkForUpdates();
-  }, [checkForUpdates]);
+  // Poll for SW updates every 15s and listen for statechange
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+
+    let cancelled = false;
+
+    const checkSW = async () => {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (!reg) return;
+        await reg.update();
+        if (reg.waiting) {
+          setUpdateAvailable(true);
+        }
+        // Listen for installing worker to become waiting
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              setUpdateAvailable(true);
+            }
+          });
+        });
+      } catch (e) {
+        console.warn('VR SW check error:', e);
+      }
+    };
+
+    checkSW();
+    const interval = setInterval(() => {
+      if (!cancelled) checkSW();
+    }, 15_000);
+
+    return () => { cancelled = true; clearInterval(interval); };
+  }, []);
+
+  const applyUpdate = useCallback(async () => {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg?.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    } finally {
+      window.location.reload();
+    }
+  }, []);
 
   return (
     <div
@@ -65,33 +107,31 @@ export default function VRHub() {
         </React.Suspense>
       </VRErrorBoundary>
 
-      {/* VR-specific update button — always on top */}
-      {updateAvailable && (
-        <button
-          onClick={applyUpdate}
-          style={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 10001,
-            background: 'rgba(99,102,241,0.9)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            padding: '10px 18px',
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-          }}
-        >
-          <RefreshCw size={16} />
-          Update Available — Reload
-        </button>
-      )}
+      {/* Always-visible reload button for VR — top-right */}
+      <button
+        onClick={applyUpdate}
+        style={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          zIndex: 10001,
+          background: updateAvailable ? 'rgba(99,102,241,0.95)' : 'rgba(255,255,255,0.15)',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 8,
+          padding: '10px 18px',
+          fontSize: 14,
+          fontWeight: 600,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          boxShadow: updateAvailable ? '0 4px 20px rgba(99,102,241,0.5)' : '0 2px 8px rgba(0,0,0,0.3)',
+        }}
+      >
+        <RefreshCw size={16} />
+        {updateAvailable ? 'Update Available — Reload' : 'Reload'}
+      </button>
     </div>
   );
 }
