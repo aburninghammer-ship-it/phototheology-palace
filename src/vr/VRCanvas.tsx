@@ -229,11 +229,11 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
       {/* Global post-processing — cinematic look; guarded so VR still works if it crashes */}
       <PostFXGuard>
         <EffectComposer multisampling={0}>
-          <Bloom intensity={0.8} luminanceThreshold={0.4} luminanceSmoothing={0.85} mipmapBlur radius={0.8} />
-          <BrightnessContrast brightness={0.02} contrast={grading.contrast + 0.05} />
-          <HueSaturation hue={grading.hue} saturation={grading.saturation + 0.05} />
+          <Bloom intensity={1.0} luminanceThreshold={0.35} luminanceSmoothing={0.9} mipmapBlur radius={0.85} />
+          <BrightnessContrast brightness={0.03} contrast={grading.contrast + 0.06} />
+          <HueSaturation hue={grading.hue} saturation={grading.saturation + 0.08} />
           <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
-          <Vignette eskil={false} offset={0.25} darkness={0.75} />
+          <Vignette eskil={false} offset={0.2} darkness={0.8} />
         </EffectComposer>
       </PostFXGuard>
     </>
