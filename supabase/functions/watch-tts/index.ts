@@ -71,7 +71,7 @@ async function generateElevenLabs(
       similarity_boost: 0.75,
       style: 0.3,
       use_speaker_boost: true,
-      speed: 0.85, // slightly slower for meditation
+      speed: 1.0, // natural pacing — pauses come from script markers, not speed
     },
   };
   if (previousText) body.previous_text = previousText;
