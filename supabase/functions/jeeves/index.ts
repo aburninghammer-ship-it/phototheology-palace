@@ -556,6 +556,35 @@ Return as JSON array with objects containing: verse, text, connection, principle
     let systemPrompt = "";
     let userPrompt = "";
 
+    // Experience mode instructions — injected into every system prompt
+    const experienceModeInstruction = (() => {
+      const mode = experienceMode || 'master';
+      if (mode === 'simple') {
+        return `\n\n**LANGUAGE MODE: SIMPLE**
+CRITICAL: Do NOT use any Phototheology jargon, room names, floor numbers, codes, or technical terminology.
+- Say "layers of meaning" not "Dimensions Room"
+- Say "hidden connections" not "Connect 6"
+- Say "Christ-centered focus" not "Concentration Room"
+- Say "pattern" not "Parallels Room" or "P‖"
+- Say "prophetic insight" not "Prophecy Room" or "PR"
+- Say "sanctuary connection" not "Blue Room" or "BL"
+- Say "deeper study" not "Juice Room"
+- Never mention floors, rooms, cycles (@Ad, @Mo, etc.), or heaven codes (1H, 2H, 3H).
+- Present insights naturally, as if you're a knowledgeable Bible scholar having a conversation.
+- Focus on: what the text means, how it points to Christ, and how it applies to life.`;
+      }
+      if (mode === 'guided') {
+        return `\n\n**LANGUAGE MODE: GUIDED**
+You may occasionally mention Phototheology room names or principles, but ALWAYS pair them with a plain-language explanation.
+- Example: "This is what we call the Dimensions Room approach — looking at a text through 5 different lenses: literal, Christ-centered, personal, church, and heavenly."
+- Example: "Using the Parallels principle, we can see how this event mirrors..."
+- Keep PT terminology secondary. Lead with insight, follow with the PT concept name as a learning moment.
+- Do NOT assume the user knows what rooms or floors are. Introduce them gently.`;
+      }
+      // Master mode — full PT architecture (default behavior)
+      return '';
+    })();
+
     // Build greeting based on user's name - NEVER use "friend" or "dear friend"
     // Priority: userName from request body, then fetched userFirstName
     // If no name is available, use "there" as in "Hey there"
