@@ -1424,7 +1424,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
                   {/* Input Area */}
                   <div className="space-y-3">
                     <Textarea
-                      placeholder={"Enter a genealogy reference or paste the text:\n\nExamples:\n• Genesis 36 (Esau's line)\n• Matthew 1:1-17 (Christ's lineage)\n• Genesis 4-5 (Cain vs Seth)\n• 1 Chronicles 1-9"}
+                      placeholder={"Enter a name or genealogy reference:\n\nExamples:\n• Jabez — who is he and what's in his lineage?\n• Rahab — from Jericho to Christ's line\n• Matthew 1:1-17 (Christ's lineage)\n• Genesis 4-5 (Cain vs Seth)"}
                       className="min-h-[100px] max-h-[160px] bg-background/60 border-border/60 text-sm resize-none rounded-xl focus:border-amber-500/50 focus:ring-amber-500/20"
                       value={genealogyInput}
                       onChange={(e) => setGenealogyInput(e.target.value)}
