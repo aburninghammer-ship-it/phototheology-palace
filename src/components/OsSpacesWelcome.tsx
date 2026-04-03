@@ -32,6 +32,7 @@ interface SpaceItem {
 interface OsSpace {
   id: string;
   label: string;
+  simpleLabel: string;
   subtitle: string;
   icon: LucideIcon;
   color: string;
