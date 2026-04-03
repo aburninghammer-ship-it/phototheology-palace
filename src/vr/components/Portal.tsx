@@ -113,6 +113,8 @@ function useRuneTexture() {
 }
 
 export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }: PortalProps) {
+  // Counter-rotate label so text always faces the viewer correctly
+  const labelYRotation = -rotation[1];
   const outerRingRef = useRef<THREE.Mesh>(null);
   const innerRingRef = useRef<THREE.Mesh>(null);
   const energyRef = useRef<THREE.Mesh>(null);
