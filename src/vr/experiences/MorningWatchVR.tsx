@@ -135,7 +135,7 @@ function SunriseParticles({ count = 40, brightness = 1 }: { count?: number; brig
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <sphereGeometry args={[1, 6, 6]} />
-      <meshBasicMaterial color="#f59e0b" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <meshBasicMaterial color="#C026D3" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
     </instancedMesh>
   );
 }
@@ -152,7 +152,7 @@ function HorizonGlow({ brightness = 0 }: { brightness?: number }) {
   return (
     <mesh ref={ref} position={[0, -0.5, -15]} rotation={[-0.2, 0, 0]}>
       <planeGeometry args={[40, 8]} />
-      <meshBasicMaterial color="#f59e0b" transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial color="#C026D3" transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
@@ -228,20 +228,20 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
     <group>
       {/* Stars fading into dawn */}
       <StarField count={1500} radius={60} brightness={screen === 'playing' ? 0.3 + avgVolume * 0.2 : 0.4} />
-      <NebulaClouds count={6} radius={30} colors={['#92400e', '#78350f', '#7c2d12', '#451a03']} opacity={0.08 + avgVolume * 0.06} />
+      <NebulaClouds count={6} radius={30} colors={['#7C3AED', '#C026D3', '#DB2777', '#6B21A8']} opacity={0.08 + avgVolume * 0.06} />
 
       <HorizonGlow brightness={avgVolume} />
 
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#1a0f05" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#0a0818" metalness={0.3} roughness={0.6} />
       </mesh>
 
       {/* Lighting — warm sunrise */}
-      <ambientLight intensity={0.2} color="#fef3c7" />
-      <pointLight position={[0, 3, -6]} intensity={0.6 + avgVolume * 0.4} color="#f59e0b" distance={15} />
-      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#d97706" distance={8} />
+      <ambientLight intensity={0.2} color="#ddd8f0" />
+      <pointLight position={[0, 3, -6]} intensity={0.6 + avgVolume * 0.4} color="#C026D3" distance={15} />
+      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#7C3AED" distance={8} />
 
       <SunriseParticles brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
 

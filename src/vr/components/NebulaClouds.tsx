@@ -62,7 +62,7 @@ interface NebulaCloudsProps {
 export function NebulaClouds({
   count = 12,
   radius = 30,
-  colors = ['#4a0080', '#0044aa', '#006644', '#880044'],
+  colors = ['#6B21A8', '#C026D3', '#2563EB', '#4338CA'],
   opacity = 0.15,
   zSpeed = 0,
 }: NebulaCloudsProps) {

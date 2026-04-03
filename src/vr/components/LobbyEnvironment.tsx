@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { COSMIC } from '../utils/cosmicTheme';
 
 // ─── Procedural texture helpers ───────────────────────────────────────
 
@@ -81,7 +82,7 @@ export function SanctuaryParticles({ count = 350 }: { count?: number }) {
   const colorObj = useMemo(() => new THREE.Color(), []);
 
   const particles = useMemo(() => {
-    const colors = ['#FFD700', '#FFE4A0', '#FFFBE0', '#F5C542', '#E8A317', '#FFF8DC', '#FFAA00'];
+    const colors = ['#C4B5FD', '#93C5FD', '#F9A8D4', '#67E8F9', '#FFFFFF', '#E9D5FF', '#A78BFA'];
     return Array.from({ length: count }, () => ({
       x: (Math.random() - 0.5) * 28,
       y: Math.random() * 12 - 1,
@@ -164,7 +165,7 @@ export function LightShafts() {
         <mesh key={i} position={[s.x, 5, s.z]} rotation={[0, 0, s.angle]}>
           <planeGeometry args={[s.width, 14]} />
           <meshBasicMaterial
-            color="#FFD700"
+            color="#7C3AED"
             transparent
             opacity={s.opacity}
             blending={THREE.AdditiveBlending}
@@ -437,7 +438,7 @@ export function SanctuaryDome() {
     const pos = new Float32Array(count * 3);
     const col = new Float32Array(count * 3);
     const colorObj = new THREE.Color();
-    const palette = ['#FFD700', '#FFE8B0', '#FFFFFF', '#FFA500', '#FFFBE0', '#E8C550'];
+    const palette = COSMIC.starPalette;
 
     for (let i = 0; i < count; i++) {
       const theta = Math.random() * Math.PI * 2;
@@ -456,23 +457,23 @@ export function SanctuaryDome() {
   }, []);
 
   const nebulaTex1 = useMemo(() => createNebulaTexture(512, [
-    { stop: 0, color: 'rgba(255,200,60,0.15)' },
-    { stop: 0.3, color: 'rgba(180,120,30,0.08)' },
-    { stop: 0.6, color: 'rgba(100,50,120,0.04)' },
+    { stop: 0, color: 'rgba(107,33,168,0.2)' },
+    { stop: 0.3, color: 'rgba(192,38,211,0.1)' },
+    { stop: 0.6, color: 'rgba(67,56,202,0.05)' },
     { stop: 1, color: 'rgba(0,0,0,0)' },
   ]), []);
 
   const nebulaTex2 = useMemo(() => createNebulaTexture(512, [
-    { stop: 0, color: 'rgba(120,80,200,0.1)' },
-    { stop: 0.4, color: 'rgba(80,40,150,0.05)' },
-    { stop: 0.7, color: 'rgba(40,20,80,0.02)' },
+    { stop: 0, color: 'rgba(124,58,237,0.15)' },
+    { stop: 0.4, color: 'rgba(37,99,235,0.08)' },
+    { stop: 0.7, color: 'rgba(30,27,75,0.03)' },
     { stop: 1, color: 'rgba(0,0,0,0)' },
   ]), []);
 
   const nebulaTex3 = useMemo(() => createNebulaTexture(512, [
-    { stop: 0, color: 'rgba(255,140,40,0.08)' },
-    { stop: 0.3, color: 'rgba(200,80,20,0.04)' },
-    { stop: 0.7, color: 'rgba(60,20,10,0.02)' },
+    { stop: 0, color: 'rgba(219,39,119,0.12)' },
+    { stop: 0.3, color: 'rgba(192,38,211,0.06)' },
+    { stop: 0.7, color: 'rgba(67,56,202,0.03)' },
     { stop: 1, color: 'rgba(0,0,0,0)' },
   ]), []);
 
@@ -488,9 +489,9 @@ export function SanctuaryDome() {
       <mesh position={[0, 2, -2]}>
         <sphereGeometry args={[20, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
         <meshStandardMaterial
-          color="#030308"
+          color="#060818"
           side={THREE.BackSide}
-          emissive="#050510"
+          emissive="#0c1030"
           emissiveIntensity={0.5}
         />
       </mesh>

@@ -136,7 +136,7 @@ function MeditationParticles({ count = 40, brightness = 1 }: { count?: number; b
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <sphereGeometry args={[1, 6, 6]} />
-      <meshBasicMaterial color="#8b5cf6" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <meshBasicMaterial color="#7C3AED" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
     </instancedMesh>
   );
 }
@@ -220,18 +220,18 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
     <group>
       {/* Deep space backdrop */}
       <StarField count={2500} radius={60} brightness={screen === 'playing' ? 0.6 + avgVolume * 0.4 : 0.8} />
-      <NebulaClouds count={8} radius={35} colors={['#2e1065', '#312e81', '#1e1b4b', '#4c1d95']} opacity={0.1 + avgVolume * 0.1} />
+      <NebulaClouds count={8} radius={35} colors={['#2e1065', '#6B21A8', '#4338CA', '#C026D3']} opacity={0.1 + avgVolume * 0.1} />
 
       {/* Subtle floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#0a0a20" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#080818" metalness={0.3} roughness={0.6} />
       </mesh>
 
       {/* Lighting */}
       <ambientLight intensity={0.15} color="#ccccee" />
-      <pointLight position={[0, 3, -2]} intensity={0.4 + avgVolume * 0.3} color="#6366f1" distance={12} />
-      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#8b5cf6" distance={8} />
+      <pointLight position={[0, 3, -2]} intensity={0.4 + avgVolume * 0.3} color="#7C3AED" distance={12} />
+      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#C026D3" distance={8} />
 
       <MeditationParticles brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
 

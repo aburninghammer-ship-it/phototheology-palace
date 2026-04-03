@@ -37,13 +37,13 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       <Candlestick position={[6.8, -1.2, -1.5]} />
 
       {/* === LIGHTING RIG — rich warm golden sanctuary === */}
-      <ambientLight intensity={0.25} color="#D4C5A0" />
+      <ambientLight intensity={0.25} color="#C4B5FD" />
 
       {/* Key light — warm golden from above */}
       <directionalLight
         position={[5, 12, 3]}
         intensity={1.4}
-        color="#FFE4B0"
+        color="#C4B5FD"
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
@@ -56,32 +56,32 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       />
 
       {/* Fill light — warm from left */}
-      <directionalLight position={[-8, 6, 2]} intensity={0.5} color="#FFD080" />
+      <directionalLight position={[-8, 6, 2]} intensity={0.5} color="#7C3AED" />
 
-      {/* Rim light — golden from behind */}
-      <directionalLight position={[0, 6, -12]} intensity={0.7} color="#FFD700" />
+      {/* Rim light — purple from behind */}
+      <directionalLight position={[0, 6, -12]} intensity={0.7} color="#C026D3" />
 
       {/* Overhead zenith light */}
-      <directionalLight position={[0, 15, -3]} intensity={0.3} color="#FFFBE0" />
+      <directionalLight position={[0, 15, -3]} intensity={0.3} color="#E9D5FF" />
 
       {/* Portal atmosphere lights */}
-      <pointLight position={[-6, 5, -3]} intensity={0.8} color="#FFD700" distance={16} decay={2} />
-      <pointLight position={[6, 5, -3]} intensity={0.8} color="#FFD700" distance={16} decay={2} />
-      <pointLight position={[0, 4, -8]} intensity={0.6} color="#FFE4A0" distance={14} decay={2} />
-      <pointLight position={[0, 1, 2]} intensity={0.4} color="#FFD700" distance={8} decay={2} />
+      <pointLight position={[-6, 5, -3]} intensity={0.8} color="#7C3AED" distance={16} decay={2} />
+      <pointLight position={[6, 5, -3]} intensity={0.8} color="#7C3AED" distance={16} decay={2} />
+      <pointLight position={[0, 4, -8]} intensity={0.6} color="#C4B5FD" distance={14} decay={2} />
+      <pointLight position={[0, 1, 2]} intensity={0.4} color="#C026D3" distance={8} decay={2} />
 
       {/* Floor warmth & reflections */}
-      <pointLight position={[0, -0.8, -2]} intensity={0.6} color="#FFD700" distance={10} decay={2} />
+      <pointLight position={[0, -0.8, -2]} intensity={0.6} color="#7C3AED" distance={10} decay={2} />
 
       {/* Fog for depth — warm tint, deeper range */}
-      <fog attach="fog" args={['#060810', 12, 32]} />
+      <fog attach="fog" args={['#060818', 12, 32]} />
 
       {/* === TITLE === */}
       <Suspense fallback={null}>
         <Text
           position={[0, 3.5, -4]}
           fontSize={0.32}
-          color="#FFD700"
+          color="#C4B5FD"
           anchorX="center"
           anchorY="middle"
           outlineWidth={0.01}
@@ -95,7 +95,7 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         <Text
           position={[0, 3.0, -4]}
           fontSize={0.12}
-          color="#CCBB88"
+          color="#93C5FD"
           anchorX="center"
           anchorY="middle"
         >
