@@ -163,7 +163,7 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         onClick={() => onEnterExperience('morningWatch')}
       />
       <Portal
-        position={[0, 0.5, 1.0]}
+        position={[0, 0.5, 3.5]}
         rotation={[0, Math.PI, 0]}
         label="Sword of the Spirit"
         color="#FF4466"

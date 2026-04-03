@@ -145,21 +145,25 @@ export default function MorningWatches() {
     <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto px-4 py-6 max-w-3xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <Sun className="w-8 h-8 text-amber-400" />
-            <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "'Cinzel', serif" }}>
-              Morning Watches
-            </h1>
+        {/* Hero Image */}
+        <div className="relative rounded-2xl overflow-hidden mb-8">
+          <img src={morningWatchImage} alt="Beautiful sunrise over calm waters" className="w-full h-48 md:h-64 object-cover" loading="lazy" width={1024} height={576} />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <Sun className="w-8 h-8 text-amber-400" />
+              <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "'Cinzel', serif" }}>
+                Morning Watches
+              </h1>
+            </div>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-sm">
+              Walk in the Master Mind — 5-8 minute audio activation sessions that translate last night's
+              formation into today's action. Think like Christ before the first challenge arrives.
+            </p>
+            <p className="text-xs text-muted-foreground/70 mt-2">
+              Night Watch: Receive. Morning Watch: Walk.
+            </p>
           </div>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-sm">
-            Walk in the Master Mind — 5-8 minute audio activation sessions that translate last night's
-            formation into today's action. Think like Christ before the first challenge arrives.
-          </p>
-          <p className="text-xs text-muted-foreground/70 mt-2">
-            Night Watch: Receive. Morning Watch: Walk.
-          </p>
         </div>
 
         {/* 4-Touch Daily Cycle */}
