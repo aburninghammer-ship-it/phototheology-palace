@@ -489,9 +489,9 @@ export function SanctuaryDome() {
       <mesh position={[0, 2, -2]}>
         <sphereGeometry args={[20, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
         <meshStandardMaterial
-          color="#030308"
+          color="#060818"
           side={THREE.BackSide}
-          emissive="#050510"
+          emissive="#0c1030"
           emissiveIntensity={0.5}
         />
       </mesh>
