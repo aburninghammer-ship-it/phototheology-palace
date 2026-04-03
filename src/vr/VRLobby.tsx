@@ -43,7 +43,7 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       <directionalLight
         position={[5, 12, 3]}
         intensity={1.4}
-        color="#FFE4B0"
+        color="#C4B5FD"
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
