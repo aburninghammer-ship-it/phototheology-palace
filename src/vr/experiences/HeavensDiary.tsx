@@ -598,8 +598,6 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
       {/* Peripheral speed lines — with color variety */}
       <SpeedLines speed={speed} />
 
-      {/* Cockpit porthole frame */}
-      <CockpitPorthole phaseColor={phase.nebula[0]} />
 
       {/* Golden light tunnel for arrival phase */}
       <GoldenLightTunnel intensity={arrivalIntensity} />
@@ -617,22 +615,9 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
               blending={THREE.AdditiveBlending}
             />
           </mesh>
-          {/* Atmosphere rim */}
-          <mesh position={[0, -22, 0]}>
-            <torusGeometry args={[14, 0.5, 8, 48]} />
-            <meshBasicMaterial
-              color="#44CCFF"
-              transparent
-              opacity={0.2 * (1 - audioState.progress / 0.25)}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-            />
-          </mesh>
         </>
       )}
 
-      {/* Progress ring — colored by phase */}
-      <ProgressRing progress={audioState.progress} color={phase.accentColor} />
 
       {/* Fog for depth */}
       <fog attach="fog" args={[phase.fogColor, 15, 60]} />
