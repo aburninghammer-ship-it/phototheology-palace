@@ -259,6 +259,8 @@ serve(async (req) => {
       commentaryDepth,
       // User identification
       userName,
+      // Experience mode (simple/guided/master)
+      experienceMode,
       // Card deck properties
       roomId,
       userAnswer,
