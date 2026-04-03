@@ -8395,6 +8395,51 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_spark_cards: {
+        Row: {
+          category: string
+          created_at: string
+          generation_date: string
+          id: string
+          is_active: boolean
+          palace_rooms: Json
+          prompts: Json
+          tags: string[]
+          title: string
+          updated_at: string
+          verse_anchors: string[]
+          view_count: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          generation_date?: string
+          id?: string
+          is_active?: boolean
+          palace_rooms?: Json
+          prompts?: Json
+          tags?: string[]
+          title: string
+          updated_at?: string
+          verse_anchors?: string[]
+          view_count?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          generation_date?: string
+          id?: string
+          is_active?: boolean
+          palace_rooms?: Json
+          prompts?: Json
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          verse_anchors?: string[]
+          view_count?: number
+        }
+        Relationships: []
+      }
       generated_study_paths: {
         Row: {
           category: string
@@ -21661,6 +21706,10 @@ export type Database = {
         Returns: boolean
       }
       has_teachable_access: { Args: { _user_id: string }; Returns: boolean }
+      increment_spark_card_view: {
+        Args: { card_id: string }
+        Returns: undefined
+      }
       increment_user_points: {
         Args: { points_to_add: number; user_id: string }
         Returns: undefined

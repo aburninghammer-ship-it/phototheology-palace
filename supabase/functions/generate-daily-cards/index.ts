@@ -224,16 +224,20 @@ Respond with ONLY a JSON array:
     }
 
     // Log the generation
-    await supabase
-      .from("spark_card_generation_log")
-      .insert({
-        generation_date: today,
-        cards_generated: generatedCards.length,
-        success: generatedCards.length > 0,
-        error_message: generatedCards.length === 0
-          ? `AI returned ${debugInfo.ai_cards_count} cards, ${debugInfo.duplicates_skipped} duplicates skipped, ${debugInfo.insert_errors.length} insert errors`
-          : null,
-      });
+    try {
+      await supabase
+        .from("spark_card_generation_log")
+        .insert({
+          generation_date: today,
+          cards_generated: generatedCards.length,
+          success: generatedCards.length > 0,
+          error_message: generatedCards.length === 0
+            ? `AI returned ${debugInfo.ai_cards_count} cards, ${debugInfo.duplicates_skipped} duplicates skipped, ${debugInfo.insert_errors.length} insert errors`
+            : null,
+        });
+    } catch {
+      // Log table may not exist yet — skip logging
+    }
 
     console.log(`Generated ${generatedCards.length} spark cards for ${today}. Debug:`, JSON.stringify(debugInfo));
 
@@ -261,7 +265,7 @@ Respond with ONLY a JSON array:
         cards_generated: 0,
         success: false,
         error_message: errorMessage,
-      });
+      }).catch(() => {});
     } catch { /* ignore logging failure */ }
 
     return new Response(
