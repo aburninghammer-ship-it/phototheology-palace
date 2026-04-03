@@ -226,14 +226,16 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
         <FadeOverlay fadeState={fadeState} />
       </XRSceneAnchor>
 
-      {/* Global post-processing — cinematic look across all VR experiences */}
-      <EffectComposer multisampling={0}>
-        <Bloom intensity={0.4} luminanceThreshold={0.6} luminanceSmoothing={0.9} mipmapBlur />
-        <BrightnessContrast brightness={0} contrast={grading.contrast} />
-        <HueSaturation hue={grading.hue} saturation={grading.saturation} />
-        <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
-        <Vignette eskil={false} offset={0.3} darkness={0.6} />
-      </EffectComposer>
+      {/* Global post-processing — cinematic look; guarded so VR still works if it crashes */}
+      <PostFXGuard>
+        <EffectComposer multisampling={0}>
+          <Bloom intensity={0.4} luminanceThreshold={0.6} luminanceSmoothing={0.9} mipmapBlur />
+          <BrightnessContrast brightness={0} contrast={grading.contrast} />
+          <HueSaturation hue={grading.hue} saturation={grading.saturation} />
+          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+          <Vignette eskil={false} offset={0.3} darkness={0.6} />
+        </EffectComposer>
+      </PostFXGuard>
     </>
   );
 }
