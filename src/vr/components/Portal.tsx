@@ -234,7 +234,7 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
 
       {/* === LABEL — counter-rotate so text always faces forward === */}
       <Suspense fallback={null}>
-        <group position={[0, 1.8, 0]} rotation={[0, -rotation[1], 0]}>
+        <group position={[0, 1.8, 0]}>
           <Text
             fontSize={0.15}
             color={color}
