@@ -138,8 +138,6 @@ const OS_SPACES: OsSpace[] = [
       { label: "Reading Plans", path: "/reading-plans", icon: Calendar, description: "Structured reading paths" },
       { label: "Prophecy Watch", path: "/prophecy-watch", icon: Eye, description: "Current events & prophecy" },
       { label: "My Church Space", path: "/living-manna", icon: Church, description: "Your church community" },
-      { label: "Community", path: "/community", icon: Users, description: "Study partners & chat" },
-      { label: "My Profile", path: "/my-profile", icon: User, description: "Your Phototheologist profile" },
       { label: "Blueprint: Marriage", path: "/blueprint-marriage", icon: Heart, description: "Dating & marriage guide" },
       { label: "Blueprint: Grief", path: "/blueprint-grief", icon: HeartHandshake, description: "Grief support" },
       { label: "Blueprint: Strongholds", path: "/blueprint-stronghold", icon: Shield, description: "Breaking strongholds" },
