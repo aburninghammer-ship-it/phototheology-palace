@@ -375,7 +375,7 @@ function FloorView({
       <HoloPalaceInterior wallColor={wallColor} floorColor={groundColor} accentColor={floorColor} />
 
       {/* Holographic ambient + floor-themed accent */}
-      <ambientLight intensity={0.2} color="#aabbee" />
+      <ambientLight intensity={0.4} color="#aabbee" />
       <pointLight position={[0, 3.5, -3]} color={floorColor} intensity={1} distance={10} />
       <pointLight position={[0, 3.5, -3]} color="#00CCFF" intensity={0.8} distance={10} />
 
