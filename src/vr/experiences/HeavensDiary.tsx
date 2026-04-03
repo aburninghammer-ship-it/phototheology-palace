@@ -53,7 +53,7 @@ const TOUR_SCENES: TourScene[] = [
     label: 'The Cross',
     subtitle: 'John 19:30 — It is finished',
     start: 0.30, end: 0.45,
-    colors: { nebula: ['#880022', '#CC0044', '#FF4400', '#FFD700'], ambient: '#1a0808', fog: '#0a0404', accent: '#FF4444' },
+    colors: { nebula: ['#DB2777', '#C026D3', '#7C3AED', '#FFD700'], ambient: '#0c0818', fog: '#060818', accent: '#F9A8D4' },
     cameraPath: (t) => ({ x: Math.cos(t * Math.PI) * 2, y: -1 + t * 6, z: -8 - t * 10 }),
     particleColor: '#FF4444',
     lightIntensity: 0.6,
