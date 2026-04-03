@@ -11,7 +11,9 @@ import {
   Eye,
   Scale,
   Headphones,
-  Megaphone
+  Megaphone,
+  Moon,
+  Sun
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -279,6 +281,34 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
       border: "border-pink-500/20",
       text: "from-pink-600 to-rose-600",
       glow: "rgba(236,72,153,0.5)"
+    }
+  },
+  {
+    id: "night-watches",
+    to: "/night-watches",
+    label: "Night Watches",
+    shortLabel: "Night",
+    icon: Moon,
+    gradient: {
+      from: "from-indigo-500/10",
+      to: "to-violet-500/10",
+      border: "border-indigo-500/20",
+      text: "from-indigo-600 to-violet-600",
+      glow: "rgba(99,102,241,0.5)"
+    }
+  },
+  {
+    id: "morning-watches",
+    to: "/morning-watches",
+    label: "Morning Watches",
+    shortLabel: "Morning",
+    icon: Sun,
+    gradient: {
+      from: "from-amber-500/10",
+      to: "to-orange-500/10",
+      border: "border-amber-500/20",
+      text: "from-amber-600 to-orange-600",
+      glow: "rgba(245,158,11,0.5)"
     }
   },
   {

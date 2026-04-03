@@ -1,208 +1,49 @@
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Moon, Play, Pause, Clock, BookOpen, Heart, Brain, Flame, Wind, Volume2, ChevronRight, Lock, Star } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { callJeeves } from "@/lib/jeevesClient";
-import { useToast } from "@/hooks/use-toast";
+import { Moon, Play, Clock, BookOpen, ChevronRight, Lock, Star, ChevronDown } from "lucide-react";
+import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
+import { useWatchPlayer } from "@/hooks/useWatchPlayer";
+import {
+  WATCH_TRACTS,
+  MOOD_COLORS,
+  STRUGGLE_ICONS,
+  getTractsByType,
+  type WatchTract,
+  type WatchSession,
+} from "@/data/watchSeries";
+import { Heart } from "lucide-react";
 
-// ── Night Watch Session Types ──
-interface NightWatchSession {
-  title: string;
-  seriesName: string;
-  dayNumber: number;
-  scripture: string;
-  scene: string;
-  masterMindInsight: string;
-  mood: string;
-  struggle: string;
-  entryType: string;
-  metaphor: string;
-  locked?: boolean;
-}
-
-// ── 7-Day Creation Series ──
-const CREATION_SERIES: NightWatchSession[] = [
-  {
-    title: "The Mind That Speaks Light",
-    seriesName: "Creation",
-    dayNumber: 1,
-    scripture: "Genesis 1:1-3",
-    scene: "Darkness, void, then voice. Light breaks in.",
-    masterMindInsight: "Christ speaks light into darkness without waiting for conditions to improve.",
-    mood: "awe",
-    struggle: "anxiety",
-    entryType: "A",
-    metaphor: "light",
-  },
-  {
-    title: "The Mind That Makes Space",
-    seriesName: "Creation",
-    dayNumber: 2,
-    scripture: "Genesis 1:6-8",
-    scene: "Waters above, waters below. An expanse is made.",
-    masterMindInsight: "The Master Mind creates space — separation is not rejection, it's architecture.",
-    mood: "rest",
-    struggle: "burnout",
-    entryType: "D",
-    metaphor: "water",
-  },
-  {
-    title: "The Mind That Calls Forth",
-    seriesName: "Creation",
-    dayNumber: 3,
-    scripture: "Genesis 1:9-13",
-    scene: "Land rises from water. Seeds open. Green appears.",
-    masterMindInsight: "Christ doesn't build from nothing — He calls out what's already hidden inside.",
-    mood: "wonder",
-    struggle: "doubt",
-    entryType: "G",
-    metaphor: "walk",
-  },
-  {
-    title: "The Mind That Marks Time",
-    seriesName: "Creation",
-    dayNumber: 4,
-    scripture: "Genesis 1:14-19",
-    scene: "Sun, moon, stars placed as signs and seasons.",
-    masterMindInsight: "The Master Mind doesn't rush — it establishes rhythm before expecting fruit.",
-    mood: "awe",
-    struggle: "burnout",
-    entryType: "F",
-    metaphor: "light",
-  },
-  {
-    title: "The Mind That Fills",
-    seriesName: "Creation",
-    dayNumber: 5,
-    scripture: "Genesis 1:20-23",
-    scene: "Waters teem, skies fill, abundance everywhere.",
-    masterMindInsight: "Christ's thinking is abundance, not scarcity — He fills until it overflows.",
-    mood: "wonder",
-    struggle: "fear",
-    entryType: "K",
-    metaphor: "sound",
-  },
-  {
-    title: "The Mind That Images",
-    seriesName: "Creation",
-    dayNumber: 6,
-    scripture: "Genesis 1:26-28",
-    scene: "Dust. Breath. Image. Dominion given.",
-    masterMindInsight: "The Master Mind shares itself — it does not hoard its nature but imprints it.",
-    mood: "intimate",
-    struggle: "shame",
-    entryType: "E",
-    metaphor: "room",
-  },
-  {
-    title: "The Mind That Rests",
-    seriesName: "Creation",
-    dayNumber: 7,
-    scripture: "Genesis 2:1-3",
-    scene: "Everything complete. Nothing missing. Sabbath.",
-    masterMindInsight: "The Master Mind knows when to stop — rest is not absence of work, it's the crown of it.",
-    mood: "rest",
-    struggle: "anxiety",
-    entryType: "L",
-    metaphor: "screen",
-  },
-];
-
-const MOOD_COLORS: Record<string, string> = {
-  awe: "bg-indigo-500/20 text-indigo-300",
-  intimate: "bg-rose-500/20 text-rose-300",
-  tension: "bg-amber-500/20 text-amber-300",
-  grief: "bg-slate-500/20 text-slate-300",
-  triumph: "bg-yellow-500/20 text-yellow-300",
-  rest: "bg-emerald-500/20 text-emerald-300",
-  wonder: "bg-purple-500/20 text-purple-300",
-};
-
-const STRUGGLE_ICONS: Record<string, typeof Heart> = {
-  anxiety: Wind,
-  burnout: Flame,
-  doubt: Brain,
-  fear: Heart,
-  shame: Heart,
-};
+type TractTab = "free" | "40-day" | "365-day";
 
 export default function NightWatches() {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [activeSession, setActiveSession] = useState<NightWatchSession | null>(null);
-  const [generatedScript, setGeneratedScript] = useState<string>("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { startNightWatch, isGenerating, immersive } = useWatchPlayer();
+  const [activeTab, setActiveTab] = useState<TractTab>("free");
+  const [selectedTract, setSelectedTract] = useState<WatchTract | null>(null);
+  const [expandedTract, setExpandedTract] = useState<string | null>(null);
 
-  const generateSession = async (session: NightWatchSession) => {
-    setActiveSession(session);
-    setIsGenerating(true);
-    setGeneratedScript("");
+  const freeTracts = WATCH_TRACTS.filter((t) => t.isFree);
+  const fortyDayTracts = getTractsByType("40-day").filter((t) => !t.isFree);
+  const yearTracts = getTractsByType("365-day");
 
-    try {
-      const { data, error } = await callJeeves({
-        mode: "night-watch",
-        message: `Generate a Night Watch meditation session.
-Title: ${session.title}
-Series: ${session.seriesName}, Day ${session.dayNumber}
-Scripture: ${session.scripture}
-Scene: ${session.scene}
-Master Mind Insight: ${session.masterMindInsight}
-Mood: ${session.mood}
-Primary Struggle: ${session.struggle}
-Entry Type: ${session.entryType}
-Metaphor Family: ${session.metaphor}
-
-Structure this as a 15-minute immersive meditation with 5 phases:
-1. ENTRY (2-3 min) - Set the emotional tone, breathing guidance
-2. SCENE IMMERSION (6-7 min) - Present tense, sensory-rich narration of the biblical scene
-3. MASTER MIND MOMENT (5-6 min) - Observe what Christ does, Recognize the pattern, Receive the transformation
-4. HEALING (3-4 min) - Address the primary struggle (${session.struggle}) directly and specifically
-5. REST (1-2 min) - Identity reinforcement, fading to peace
-
-This is BIBLICAL meditation - filling the mind with truth through Scripture, not emptying it.
-The Master Mind = the mind of Christ (Philippians 2:5).
-Use short sentences (3-10 words). Include [pause] markers. Be cinematic and immersive.`,
-      }, "night-watches");
-
-      const d = data as Record<string, unknown> | string | null;
-      const script = typeof d === "object" && d ? ((d as any).response || (d as any).result || d) : d;
-      if (typeof script === "string") {
-        setGeneratedScript(script);
-      } else {
-        setGeneratedScript(JSON.stringify(script, null, 2));
-      }
-    } catch (err) {
-      console.error("Night Watch generation error:", err);
-      toast({
-        title: "Generation failed",
-        description: "Could not generate the Night Watch session. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGenerating(false);
-    }
+  const handleBeginWatch = (session: WatchSession, tractName: string) => {
+    startNightWatch(session, tractName);
   };
 
-  const renderSessionCard = (session: NightWatchSession) => {
+  const renderSessionCard = (session: WatchSession, tractName: string) => {
     const StruggleIcon = STRUGGLE_ICONS[session.struggle] || Heart;
-    const isActive = activeSession?.dayNumber === session.dayNumber;
-
     return (
       <Card
         key={session.dayNumber}
-        className={`cursor-pointer transition-all duration-300 border-border/50 hover:border-primary/40 ${
-          isActive ? "ring-2 ring-primary/50 bg-primary/5" : "bg-card/80"
-        }`}
-        onClick={() => !session.locked && generateSession(session)}
+        className="cursor-pointer transition-all duration-300 border-border/50 hover:border-indigo-500/40 bg-card/80 hover:bg-indigo-500/5"
+        onClick={() => handleBeginWatch(session, tractName)}
       >
         <CardContent className="p-4">
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
+              <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-sm font-bold text-indigo-300">
                 {session.dayNumber}
               </div>
               <div>
@@ -210,15 +51,13 @@ Use short sentences (3-10 words). Include [pause] markers. Be cinematic and imme
                 <p className="text-xs text-muted-foreground">{session.scripture}</p>
               </div>
             </div>
-            {session.locked ? (
-              <Lock className="w-4 h-4 text-muted-foreground" />
+            {isGenerating ? (
+              <div className="w-4 h-4 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              <Play className="w-4 h-4 text-indigo-400" />
             )}
           </div>
-
-          <p className="text-xs text-muted-foreground mb-3 italic">"{session.scene}"</p>
-
+          <p className="text-xs text-muted-foreground mb-3 italic line-clamp-2">"{session.scene}"</p>
           <div className="flex flex-wrap gap-1.5">
             <Badge variant="outline" className={`text-[10px] ${MOOD_COLORS[session.mood] || ""}`}>
               {session.mood}
@@ -233,10 +72,115 @@ Use short sentences (3-10 words). Include [pause] markers. Be cinematic and imme
     );
   };
 
+  const renderTractCard = (tract: WatchTract) => {
+    const isExpanded = expandedTract === tract.id;
+    const hasSessions = tract.sessions.length > 0;
+
+    return (
+      <Card key={tract.id} className="border-border/50 bg-card/80 overflow-hidden">
+        <CardContent className="p-0">
+          <button
+            className="w-full p-4 flex items-start gap-3 text-left hover:bg-indigo-500/5 transition-colors"
+            onClick={() => {
+              if (hasSessions) {
+                setSelectedTract(isExpanded ? null : tract);
+                setExpandedTract(isExpanded ? null : tract.id);
+              } else {
+                setExpandedTract(isExpanded ? null : tract.id);
+              }
+            }}
+          >
+            <span className="text-2xl">{tract.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-sm text-foreground">{tract.name}</h3>
+                {tract.isFree && (
+                  <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px]">
+                    FREE
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-indigo-400">{tract.subtitle}</p>
+              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{tract.description}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Badge variant="outline" className="text-[10px]">
+                {tract.totalSessions} days
+              </Badge>
+              <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+            </div>
+          </button>
+
+          {isExpanded && hasSessions && (
+            <div className="border-t border-border/30 p-4 space-y-2 max-h-96 overflow-y-auto">
+              {tract.sessions.map((s) => renderSessionCard(s, tract.name))}
+            </div>
+          )}
+
+          {isExpanded && !hasSessions && tract.weekOverviews && (
+            <div className="border-t border-border/30 p-4 space-y-2">
+              <p className="text-xs text-muted-foreground mb-3">
+                Sessions generated on demand by the Master Mind AI.
+              </p>
+              {tract.weekOverviews.map((w) => (
+                <div key={w.week} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20">
+                  <div className="w-7 h-7 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-300">
+                    {w.week}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">{w.title}</p>
+                    <p className="text-xs text-muted-foreground">{w.theme}</p>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">{w.scriptureRange}</p>
+                  <Lock className="w-3 h-3 text-muted-foreground" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {isExpanded && !hasSessions && tract.seriesBlocks && (
+            <div className="border-t border-border/30 p-4 space-y-2 max-h-96 overflow-y-auto">
+              <p className="text-xs text-muted-foreground mb-3">
+                {tract.seriesBlocks.length} series blocks · Sessions generated on demand
+              </p>
+              {tract.seriesBlocks.map((b) => (
+                <div key={b.name} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20">
+                  <div className="text-right shrink-0">
+                    <p className="text-[10px] text-indigo-400 font-mono">
+                      Day {b.dayRange[0]}-{b.dayRange[1]}
+                    </p>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">{b.name}</p>
+                    <p className="text-xs text-muted-foreground">{b.scriptureScope}</p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">{b.sessions}</Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const tabs: { id: TractTab; label: string; count: number }[] = [
+    { id: "free", label: "Free", count: freeTracts.length },
+    { id: "40-day", label: "40-Day Tracts", count: fortyDayTracts.length },
+    { id: "365-day", label: "365-Day Journeys", count: yearTracts.length },
+  ];
+
+  const currentTracts =
+    activeTab === "free"
+      ? freeTracts
+      : activeTab === "40-day"
+        ? fortyDayTracts
+        : yearTracts;
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container mx-auto px-4 py-6 max-w-5xl">
+      <div className="container mx-auto px-4 py-6 max-w-3xl">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-3">
@@ -246,153 +190,79 @@ Use short sentences (3-10 words). Include [pause] markers. Be cinematic and imme
             </h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto text-sm">
-            The Master Mind — 15-minute immersive meditation sessions. Biblical meditation that fills
-            the mind with truth through Scripture. Behold how Christ thinks, and receive His mind.
+            The Master Mind — immersive audio meditation sessions. Biblical meditation that fills
+            the mind with truth through Scripture. Close your eyes and behold how Christ thinks.
           </p>
           <p className="text-xs text-muted-foreground/70 mt-2">
             "Let this mind be in you, which was also in Christ Jesus." — Philippians 2:5
           </p>
         </div>
 
-        {/* Series Header */}
-        <Card className="mb-6 bg-gradient-to-r from-indigo-950/40 to-purple-950/40 border-indigo-500/20">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg text-indigo-300 flex items-center gap-2">
-                  <Star className="w-5 h-5" />
-                  Creation Series — Genesis 1-2
-                </CardTitle>
-                <p className="text-xs text-indigo-400/70 mt-1">
-                  Throughline: "The Master Mind brings order from chaos — each day reveals another dimension of how."
-                </p>
-              </div>
-              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
-                7 Sessions
-              </Badge>
-            </div>
-          </CardHeader>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Session List */}
-          <div className="lg:col-span-1 space-y-3">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-              Sessions
-            </h2>
-            {CREATION_SERIES.map(renderSessionCard)}
-          </div>
-
-          {/* Session Content */}
-          <div className="lg:col-span-2">
-            {!activeSession && !generatedScript && (
-              <Card className="bg-card/50 border-dashed border-border/50">
-                <CardContent className="p-12 text-center">
-                  <Moon className="w-16 h-16 text-indigo-400/30 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Select a Night Watch</h3>
-                  <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                    Choose a session from the Creation Series to begin your evening meditation.
-                    Each session is 15 minutes of immersive, Christ-centered biblical meditation.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
-            {activeSession && (
-              <div className="space-y-4">
-                {/* Active Session Header */}
-                <Card className="bg-gradient-to-br from-indigo-950/50 to-slate-950/50 border-indigo-500/20">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <p className="text-xs text-indigo-400 mb-1">
-                          {activeSession.seriesName} — Day {activeSession.dayNumber}
-                        </p>
-                        <h2 className="text-xl font-bold text-foreground">{activeSession.title}</h2>
-                        <p className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
-                          <BookOpen className="w-4 h-4" />
-                          {activeSession.scripture}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-indigo-400" />
-                        <span className="text-xs text-indigo-400">~15 min</span>
-                      </div>
-                    </div>
-
-                    <div className="bg-black/20 rounded-lg p-4 mb-4">
-                      <p className="text-sm text-indigo-200 italic">
-                        "{activeSession.masterMindInsight}"
-                      </p>
-                    </div>
-
-                    {/* 5-Phase Structure */}
-                    <div className="grid grid-cols-5 gap-1 mb-4">
-                      {[
-                        { label: "Entry", time: "2-3 min", color: "bg-indigo-500/30" },
-                        { label: "Scene", time: "6-7 min", color: "bg-purple-500/30" },
-                        { label: "Master Mind", time: "5-6 min", color: "bg-amber-500/30" },
-                        { label: "Healing", time: "3-4 min", color: "bg-rose-500/30" },
-                        { label: "Rest", time: "1-2 min", color: "bg-emerald-500/30" },
-                      ].map((phase) => (
-                        <div key={phase.label} className={`${phase.color} rounded p-2 text-center`}>
-                          <p className="text-[10px] font-semibold text-foreground">{phase.label}</p>
-                          <p className="text-[9px] text-muted-foreground">{phase.time}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {!generatedScript && (
-                      <Button
-                        onClick={() => generateSession(activeSession)}
-                        disabled={isGenerating}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700"
-                      >
-                        {isGenerating ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                            Preparing your Night Watch...
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4 mr-2" />
-                            Begin Night Watch
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Generated Script */}
-                {generatedScript && (
-                  <Card className="bg-slate-950/80 border-indigo-500/10">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-semibold text-indigo-300 flex items-center gap-2">
-                          <Volume2 className="w-4 h-4" />
-                          Night Watch Meditation
-                        </h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setIsPlaying(!isPlaying)}
-                          className="text-indigo-400 hover:text-indigo-300"
-                        >
-                          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                        </Button>
-                      </div>
-                      <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-foreground/90 leading-relaxed">
-                        {generatedScript}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            )}
-          </div>
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setExpandedTract(null);
+                setSelectedTract(null);
+              }}
+              className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+                activeTab === tab.id
+                  ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
+                  : "bg-muted/30 text-muted-foreground hover:bg-muted/50 border border-transparent"
+              }`}
+            >
+              {tab.label}
+              <span className="ml-1.5 text-[10px] opacity-60">({tab.count})</span>
+            </button>
+          ))}
         </div>
+
+        {/* Generating overlay */}
+        {isGenerating && (
+          <Card className="mb-4 bg-indigo-950/50 border-indigo-500/30">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="w-5 h-5 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
+              <div>
+                <p className="text-sm font-medium text-indigo-300">Preparing your Night Watch...</p>
+                <p className="text-xs text-muted-foreground">Generating meditation and audio</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Tract List */}
+        <div className="space-y-3">
+          {currentTracts.map(renderTractCard)}
+        </div>
+
+        {currentTracts.length === 0 && (
+          <div className="text-center py-12">
+            <Moon className="w-12 h-12 text-indigo-400/20 mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">No tracts in this category yet.</p>
+          </div>
+        )}
       </div>
+
+      {/* Immersive Audio Player */}
+      <ImmersiveAudioPlayer
+        isOpen={immersive.isOpen}
+        onClose={immersive.closeImmersive}
+        tracks={immersive.queue.tracks}
+        currentIndex={immersive.queue.currentIndex}
+        onNextTrack={immersive.nextTrack}
+        onPrevTrack={immersive.prevTrack}
+        hasNext={immersive.hasNext}
+        hasPrev={immersive.hasPrev}
+        ambientMusicEnabled={immersive.ambientMusicEnabled}
+        ambientVolume={immersive.ambientVolume}
+        continuousPlay={immersive.continuousPlay}
+        onSetAmbientMusic={immersive.setAmbientMusic}
+        onSetAmbientVolume={immersive.setAmbientVolume}
+        onSetContinuousPlay={immersive.setContinuousPlay}
+      />
     </div>
   );
 }
