@@ -56,13 +56,13 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       />
 
       {/* Fill light — warm from left */}
-      <directionalLight position={[-8, 6, 2]} intensity={0.5} color="#FFD080" />
+      <directionalLight position={[-8, 6, 2]} intensity={0.5} color="#7C3AED" />
 
-      {/* Rim light — golden from behind */}
-      <directionalLight position={[0, 6, -12]} intensity={0.7} color="#FFD700" />
+      {/* Rim light — purple from behind */}
+      <directionalLight position={[0, 6, -12]} intensity={0.7} color="#C026D3" />
 
       {/* Overhead zenith light */}
-      <directionalLight position={[0, 15, -3]} intensity={0.3} color="#FFFBE0" />
+      <directionalLight position={[0, 15, -3]} intensity={0.3} color="#E9D5FF" />
 
       {/* Portal atmosphere lights */}
       <pointLight position={[-6, 5, -3]} intensity={0.8} color="#7C3AED" distance={16} decay={2} />
