@@ -1,5 +1,6 @@
-import React from 'react';
-import { AlertTriangle } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { useCheckForUpdates } from '@/components/PWAUpdatePrompt';
 
 const VRCanvas = React.lazy(() => import('./VRCanvas'));
 
