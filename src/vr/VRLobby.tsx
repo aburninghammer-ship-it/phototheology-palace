@@ -81,7 +81,7 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         <Text
           position={[0, 3.5, -4]}
           fontSize={0.32}
-          color="#FFD700"
+          color="#C4B5FD"
           anchorX="center"
           anchorY="middle"
           outlineWidth={0.01}
