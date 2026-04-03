@@ -34,6 +34,13 @@ class VRErrorBoundary extends React.Component<
 }
 
 export default function VRHub() {
+  const { checkForUpdates, applyUpdate, updateAvailable } = useCheckForUpdates();
+
+  // Check for updates on mount
+  React.useEffect(() => {
+    checkForUpdates();
+  }, [checkForUpdates]);
+
   return (
     <div
       style={{
@@ -57,6 +64,34 @@ export default function VRHub() {
           <VRCanvas />
         </React.Suspense>
       </VRErrorBoundary>
+
+      {/* VR-specific update button — always on top */}
+      {updateAvailable && (
+        <button
+          onClick={applyUpdate}
+          style={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            zIndex: 10001,
+            background: 'rgba(99,102,241,0.9)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '10px 18px',
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          }}
+        >
+          <RefreshCw size={16} />
+          Update Available — Reload
+        </button>
+      )}
     </div>
   );
 }
