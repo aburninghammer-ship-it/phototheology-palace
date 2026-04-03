@@ -128,6 +128,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "chapel",
     label: "Phototheology Chapel",
+    simpleLabel: "Devotional",
     subtitle: "Devotional, Church & Community",
     icon: Church,
     color: "142 71% 45%",
