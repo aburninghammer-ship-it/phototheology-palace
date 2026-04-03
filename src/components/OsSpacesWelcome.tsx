@@ -95,6 +95,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "teach",
     label: "Phototheology Teach",
+    simpleLabel: "Teach",
     subtitle: "Sermon Prep & Teaching Output",
     icon: Mic2,
     color: "270 56% 65%",
