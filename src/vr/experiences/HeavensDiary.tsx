@@ -43,7 +43,7 @@ const TOUR_SCENES: TourScene[] = [
     label: 'The Garden',
     subtitle: 'Genesis 2:8 — God planted a garden eastward in Eden',
     start: 0.15, end: 0.30,
-    colors: { nebula: ['#11AA44', '#88FF44', '#FFD700', '#22CC66'], ambient: '#0a1a08', fog: '#040a04', accent: '#44FF88' },
+    colors: { nebula: ['#6B21A8', '#C026D3', '#7C3AED', '#22CC66'], ambient: '#0a0818', fog: '#060818', accent: '#C4B5FD' },
     cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 4) * 5, y: 1 + Math.sin(t * Math.PI * 2) * 2, z: -10 - t * 15 }),
     particleColor: '#88FF44',
     lightIntensity: 1.2,
