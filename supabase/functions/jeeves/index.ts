@@ -10283,6 +10283,11 @@ End with resolve, not a question. Write the full script ready for text-to-speech
       }
     }
 
+    // Inject experience mode instructions into system prompt
+    if (experienceModeInstruction) {
+      systemPrompt += experienceModeInstruction;
+    }
+
     // Build messages array — for research quick mode, pass conversation history as real message turns
     // so the AI maintains full conversational context instead of receiving history as embedded text.
     let finalMessages: Array<{ role: string; content: string }> = [
