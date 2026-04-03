@@ -30,7 +30,7 @@ export default function QuickStartSales() {
     "Identify the purpose of each of the 8 Floors",
     "Know which Room to enter for any study goal",
     "See why discipline precedes devotion in serious Bible study",
-    "Prepare yourself for method training in the Study Suite",
+    "Prepare yourself for deeper method training in PhototheologyOS",
   ];
 
   const included = [
