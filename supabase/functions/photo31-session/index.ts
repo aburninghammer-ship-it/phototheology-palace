@@ -527,6 +527,8 @@ function buildSystemPrompt(
 
   return `${MASTER_PROMPT}
 
+${PICTURE_PATTERNS_REFERENCE}
+
 ${greeting}
 
 ## CURRENT SESSION CONTEXT
