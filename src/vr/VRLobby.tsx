@@ -37,7 +37,7 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       <Candlestick position={[6.8, -1.2, -1.5]} />
 
       {/* === LIGHTING RIG — rich warm golden sanctuary === */}
-      <ambientLight intensity={0.25} color="#D4C5A0" />
+      <ambientLight intensity={0.25} color="#C4B5FD" />
 
       {/* Key light — warm golden from above */}
       <directionalLight
