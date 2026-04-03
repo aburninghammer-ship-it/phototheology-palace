@@ -51,8 +51,8 @@ const AMBIENT_SOUND_TRACKS = [
 
 // Crossfade duration in ms
 const CROSSFADE_DURATION = 4000;
-// Voice ducking: music volume multiplier when voice is playing (lower = more ducking)
-const VOICE_DUCK_RATIO = 0.25;
+// Voice ducking: music volume multiplier when voice is playing (higher = less ducking)
+const VOICE_DUCK_RATIO = 0.55;
 
 interface ImmersiveAudioPlayerProps {
   isOpen: boolean;
