@@ -138,8 +138,6 @@ const OS_SPACES: OsSpace[] = [
       { label: "Reading Plans", path: "/reading-plans", icon: Calendar, description: "Structured reading paths" },
       { label: "Prophecy Watch", path: "/prophecy-watch", icon: Eye, description: "Current events & prophecy" },
       { label: "My Church Space", path: "/living-manna", icon: Church, description: "Your church community" },
-      { label: "Community", path: "/community", icon: Users, description: "Study partners & chat" },
-      { label: "My Profile", path: "/my-profile", icon: User, description: "Your Phototheologist profile" },
       { label: "Blueprint: Marriage", path: "/blueprint-marriage", icon: Heart, description: "Dating & marriage guide" },
       { label: "Blueprint: Grief", path: "/blueprint-grief", icon: HeartHandshake, description: "Grief support" },
       { label: "Blueprint: Strongholds", path: "/blueprint-stronghold", icon: Shield, description: "Breaking strongholds" },
@@ -220,6 +218,34 @@ export default function OsSpacesDraft() {
                 </div>
                 <span className="text-sm font-semibold">{space.label}</span>
                 <span className="text-[10px] text-muted-foreground leading-tight text-center">{space.subtitle}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Global Buttons — outside spaces */}
+        <div className="flex justify-center gap-3 mb-10">
+          {[
+            { label: "Community", path: "/community", icon: Users, color: "210 100% 56%" },
+            { label: "My Profile", path: "/my-profile", icon: User, color: "280 60% 55%" },
+          ].map((btn) => {
+            const BtnIcon = btn.icon;
+            return (
+              <button
+                key={btn.path}
+                onClick={() => navigate(btn.path)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border/50 bg-card hover:border-primary/50 hover:bg-primary/5 transition-all"
+              >
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{
+                    background: `linear-gradient(135deg, hsl(${btn.color}), hsl(${btn.color} / 0.7))`,
+                    boxShadow: `0 2px 8px hsl(${btn.color} / 0.3)`,
+                  }}
+                >
+                  <BtnIcon className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-sm font-semibold">{btn.label}</span>
               </button>
             );
           })}
