@@ -103,8 +103,10 @@ export function ImmersiveAudioPlayer({
   const [mainVolume, setMainVolume] = useState(1);
   const [mainMuted, setMainMuted] = useState(false);
   
-  // Ambient music
+  // Ambient music — two audio elements for crossfade
   const ambientRef = useRef<HTMLAudioElement | null>(null);
+  const ambientNextRef = useRef<HTMLAudioElement | null>(null);
+  const crossfadeTimerRef = useRef<number>();
   const [ambientTrackIdx, setAmbientTrackIdx] = useState(0);
   const [ambientPlaying, setAmbientPlaying] = useState(false);
   
@@ -125,6 +127,13 @@ export function ImmersiveAudioPlayer({
   
   // Verse progress (for karaoke word-level sync)
   const [verseProgress, setVerseProgress] = useState(0);
+
+  // Compute ducked ambient volume — lower when voice is playing
+  const getAmbientTargetVolume = useCallback((modeMultiplier: number) => {
+    const base = ambientVolume * modeMultiplier * sleepFadeMultiplier;
+    // When voice is playing, duck the music significantly
+    return isPlaying ? base * VOICE_DUCK_RATIO : base;
+  }, [ambientVolume, sleepFadeMultiplier, isPlaying]);
   
   // Initialize main audio
   useEffect(() => {
@@ -136,6 +145,11 @@ export function ImmersiveAudioPlayer({
       ambientRef.current = new Audio();
       ambientRef.current.preload = "auto";
       ambientRef.current.loop = false;
+    }
+    if (!ambientNextRef.current) {
+      ambientNextRef.current = new Audio();
+      ambientNextRef.current.preload = "auto";
+      ambientNextRef.current.loop = false;
     }
     return () => {
       if (audioRef.current) {
