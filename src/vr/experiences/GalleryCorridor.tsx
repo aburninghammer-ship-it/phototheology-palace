@@ -211,7 +211,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
   return (
     <group>
       {/* Rich ambient lighting */}
-      <ambientLight intensity={0.15} color="#e8d0ff" />
+      <ambientLight intensity={0.4} color="#e8d0ff" />
 
       {/* Spot lights — only render visible ones */}
       {visibleLightIndices.map((i) => (

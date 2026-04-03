@@ -291,7 +291,7 @@ function ElevatorView({
       <HoloPalaceInterior wallColor="#0a0e20" floorColor="#0a0e1e" accentColor="#00AAFF" />
 
       {/* Holographic lighting */}
-      <ambientLight intensity={0.25} color="#aabbee" />
+      <ambientLight intensity={0.45} color="#aabbee" />
       <pointLight position={[0, 3.5, -3]} color="#00CCFF" intensity={1.5} distance={12} />
       <pointLight position={[-4, 2, -2]} color="#4488FF" intensity={0.6} distance={8} />
       <pointLight position={[4, 2, -2]} color="#8844FF" intensity={0.6} distance={8} />
@@ -375,7 +375,7 @@ function FloorView({
       <HoloPalaceInterior wallColor={wallColor} floorColor={groundColor} accentColor={floorColor} />
 
       {/* Holographic ambient + floor-themed accent */}
-      <ambientLight intensity={0.2} color="#aabbee" />
+      <ambientLight intensity={0.4} color="#aabbee" />
       <pointLight position={[0, 3.5, -3]} color={floorColor} intensity={1} distance={10} />
       <pointLight position={[0, 3.5, -3]} color="#00CCFF" intensity={0.8} distance={10} />
 
@@ -507,7 +507,7 @@ function RoomView({
       <HoloPalaceInterior wallColor={wallColor} floorColor={groundColor} accentColor={floorColor} />
 
       {/* Study chamber lighting — holographic */}
-      <ambientLight intensity={0.15} color="#aabbee" />
+      <ambientLight intensity={0.35} color="#aabbee" />
       <pointLight position={[0, 3, -3]} color="#00CCFF" intensity={1} distance={8} />
       <pointLight position={[0, 2, -3.2]} color={floorColor} intensity={0.8} distance={6} />
 

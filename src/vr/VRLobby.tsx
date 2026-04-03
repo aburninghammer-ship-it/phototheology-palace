@@ -87,69 +87,68 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         </Text>
       </Suspense>
 
-      {/* === PORTALS — semicircle arrangement === */}
+      {/* === PORTALS — two rows, well-spaced === */}
+      {/* TOP ROW: 6 portals in a wide arc */}
       <Portal
-        position={[-4.6, 0.5, -1.95]}
-        rotation={[0, 1.17, 0]}
+        position={[-5.5, 0.5, -2]}
+        rotation={[0, 1.0, 0]}
         label="The Sanctuary"
         color="#FFD700"
         onClick={() => onEnterExperience('sanctuary')}
       />
       <Portal
-        position={[-3.2, 0.5, -3.8]}
-        rotation={[0, 0.7, 0]}
+        position={[-3.3, 0.5, -4.2]}
+        rotation={[0, 0.6, 0]}
         label="24FPS Gallery"
         color="#44AAFF"
         onClick={() => onEnterExperience('gallery')}
       />
       <Portal
-        position={[-1.1, 0.5, -4.9]}
-        rotation={[0, 0.23, 0]}
+        position={[-1.0, 0.5, -5.2]}
+        rotation={[0, 0.2, 0]}
         label="Audio Theater"
         color="#BB66FF"
         onClick={() => onEnterExperience('audio')}
       />
       <Portal
-        position={[1.1, 0.5, -4.9]}
-        rotation={[0, -0.23, 0]}
+        position={[1.0, 0.5, -5.2]}
+        rotation={[0, -0.2, 0]}
         label="Heaven's Diary"
         color="#44FFEE"
         onClick={() => onEnterExperience('heavensDiary')}
       />
       <Portal
-        position={[3.2, 0.5, -3.8]}
-        rotation={[0, -0.7, 0]}
+        position={[3.3, 0.5, -4.2]}
+        rotation={[0, -0.6, 0]}
         label="Game Arcade"
         color="#39FF14"
         onClick={() => onEnterExperience('arcade')}
       />
       <Portal
-        position={[4.6, 0.5, -1.95]}
-        rotation={[0, -1.17, 0]}
+        position={[5.5, 0.5, -2]}
+        rotation={[0, -1.0, 0]}
         label="Tour the Palace"
         color="#FFB844"
         onClick={() => onEnterExperience('palace')}
       />
 
-      {/* Watch portals — centered below main semicircle */}
+      {/* BOTTOM ROW: 3 portals on the flanks — clearly separated from top row */}
       <Portal
-        position={[-1.5, 0.5, -6.5]}
-        rotation={[0, 0.15, 0]}
+        position={[-3.5, 0.5, -0.5]}
+        rotation={[0, 1.3, 0]}
         label="Night Watch"
         color="#8b5cf6"
         onClick={() => onEnterExperience('nightWatch')}
       />
       <Portal
-        position={[1.5, 0.5, -6.5]}
-        rotation={[0, -0.15, 0]}
+        position={[3.5, 0.5, -0.5]}
+        rotation={[0, -1.3, 0]}
         label="Morning Watch"
         color="#f59e0b"
         onClick={() => onEnterExperience('morningWatch')}
       />
-
-      {/* Sword of the Spirit */}
       <Portal
-        position={[0, 0.5, -7.5]}
+        position={[0, 0.5, -0.8]}
         rotation={[0, 0, 0]}
         label="Sword of the Spirit"
         color="#FF4466"
