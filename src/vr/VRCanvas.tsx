@@ -1,4 +1,4 @@
-import React, { useState, Suspense, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useState, Suspense, useCallback, useRef, useEffect, useMemo, Component, type ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { XR, VRButton, ARButton, useXR, Controllers, Hands } from '@react-three/xr';
 import { OrbitControls, Environment, Text } from '@react-three/drei';
@@ -7,6 +7,14 @@ import { ToneMappingMode } from 'postprocessing';
 import { BackSide } from 'three';
 import * as THREE from 'three';
 import { VRLobby, type VRExperience } from './VRLobby';
+
+/** Silently swallow postprocessing crashes so the VR scene still renders */
+class PostFXGuard extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(e: Error) { console.warn('[PostFX] disabled due to error:', e.message); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
 
 interface VRCanvasProps {
   initialExperience?: VRExperience;
