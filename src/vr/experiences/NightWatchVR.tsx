@@ -136,7 +136,7 @@ function MeditationParticles({ count = 40, brightness = 1 }: { count?: number; b
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <sphereGeometry args={[1, 6, 6]} />
-      <meshBasicMaterial color="#8b5cf6" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <meshBasicMaterial color="#7C3AED" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
     </instancedMesh>
   );
 }
