@@ -25,27 +25,27 @@ function getPhaseColors(progress: number): {
   if (progress < 0.2) {
     const t = progress / 0.2;
     return {
-      nebula: ['#0066FF', '#0088FF', '#00AAFF', '#44CCFF'],
-      ambient: '#112244',
-      fogColor: '#000822',
+      nebula: ['#1144AA', '#2266CC', '#3388DD', '#FFD700'],
+      ambient: '#1a1408',
+      fogColor: '#050408',
       starBrightness: 0.4 + t * 0.6,
-      accentColor: '#44CCFF',
+      accentColor: '#FFD700',
     };
   } else if (progress < 0.5) {
     return {
-      nebula: ['#6600FF', '#0088FF', '#00CC88', '#FF4488'],
-      ambient: '#111133',
-      fogColor: '#060616',
+      nebula: ['#6600FF', '#FFD700', '#00CC88', '#FF4488'],
+      ambient: '#161020',
+      fogColor: '#080612',
       starBrightness: 1,
-      accentColor: '#88AAFF',
+      accentColor: '#FFE088',
     };
   } else if (progress < 0.8) {
     return {
-      nebula: ['#AA00FF', '#FF0088', '#FF6600', '#00FF88', '#0088FF'],
+      nebula: ['#AA00FF', '#FF0088', '#FFD700', '#00FF88', '#0088FF'],
       ambient: '#221144',
-      fogColor: '#0a0820',
+      fogColor: '#0a0818',
       starBrightness: 0.8 + ((progress - 0.5) / 0.3) * 0.2,
-      accentColor: '#FF88CC',
+      accentColor: '#FFCC66',
     };
   } else {
     const t = (progress - 0.8) / 0.2;
