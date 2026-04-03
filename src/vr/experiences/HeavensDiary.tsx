@@ -25,27 +25,27 @@ function getPhaseColors(progress: number): {
   if (progress < 0.2) {
     const t = progress / 0.2;
     return {
-      nebula: ['#0066FF', '#0088FF', '#00AAFF', '#44CCFF'],
-      ambient: '#112244',
-      fogColor: '#000822',
+      nebula: ['#1144AA', '#2266CC', '#3388DD', '#FFD700'],
+      ambient: '#1a1408',
+      fogColor: '#050408',
       starBrightness: 0.4 + t * 0.6,
-      accentColor: '#44CCFF',
+      accentColor: '#FFD700',
     };
   } else if (progress < 0.5) {
     return {
-      nebula: ['#6600FF', '#0088FF', '#00CC88', '#FF4488'],
-      ambient: '#111133',
-      fogColor: '#060616',
+      nebula: ['#6600FF', '#FFD700', '#00CC88', '#FF4488'],
+      ambient: '#161020',
+      fogColor: '#080612',
       starBrightness: 1,
-      accentColor: '#88AAFF',
+      accentColor: '#FFE088',
     };
   } else if (progress < 0.8) {
     return {
-      nebula: ['#AA00FF', '#FF0088', '#FF6600', '#00FF88', '#0088FF'],
+      nebula: ['#AA00FF', '#FF0088', '#FFD700', '#00FF88', '#0088FF'],
       ambient: '#221144',
-      fogColor: '#0a0820',
+      fogColor: '#0a0818',
       starBrightness: 0.8 + ((progress - 0.5) / 0.3) * 0.2,
-      accentColor: '#FF88CC',
+      accentColor: '#FFCC66',
     };
   } else {
     const t = (progress - 0.8) / 0.2;
@@ -90,29 +90,29 @@ function initStarData(): StarData {
     offsets[i * 3 + 1] = Math.sin(angle) * r;
     offsets[i * 3 + 2] = -Math.random() * CYLINDER_DEPTH;
     baseSizes[i] = 0.02 + Math.random() * 0.08;
-    // Varied star colors — not just white
+    // Varied star colors — warm golden palette dominant
     const type = Math.random();
-    if (type < 0.3) {
+    if (type < 0.35) {
+      // Warm gold
+      colors[i * 3] = 1.0;
+      colors[i * 3 + 1] = 0.82 + Math.random() * 0.18;
+      colors[i * 3 + 2] = 0.3 + Math.random() * 0.4;
+    } else if (type < 0.55) {
       // Blue-white
       colors[i * 3] = 0.7 + Math.random() * 0.2;
       colors[i * 3 + 1] = 0.8 + Math.random() * 0.2;
       colors[i * 3 + 2] = 1.0;
-    } else if (type < 0.5) {
-      // Warm gold
+    } else if (type < 0.7) {
+      // Amber/orange
       colors[i * 3] = 1.0;
-      colors[i * 3 + 1] = 0.85 + Math.random() * 0.15;
-      colors[i * 3 + 2] = 0.5 + Math.random() * 0.3;
-    } else if (type < 0.65) {
-      // Pink/magenta
-      colors[i * 3] = 0.9 + Math.random() * 0.1;
-      colors[i * 3 + 1] = 0.4 + Math.random() * 0.3;
-      colors[i * 3 + 2] = 0.8 + Math.random() * 0.2;
+      colors[i * 3 + 1] = 0.65 + Math.random() * 0.2;
+      colors[i * 3 + 2] = 0.2 + Math.random() * 0.2;
     } else {
-      // White with slight variation
+      // White-gold with slight variation
       const warmth = Math.random();
-      colors[i * 3] = 0.9 + warmth * 0.1;
-      colors[i * 3 + 1] = 0.9 + warmth * 0.05;
-      colors[i * 3 + 2] = 0.95 + Math.random() * 0.05;
+      colors[i * 3] = 0.95 + warmth * 0.05;
+      colors[i * 3 + 1] = 0.88 + warmth * 0.08;
+      colors[i * 3 + 2] = 0.7 + Math.random() * 0.2;
     }
   }
   return { offsets, baseSizes, colors };
@@ -460,19 +460,34 @@ function CockpitPorthole({ phaseColor }: { phaseColor: string }) {
   return (
     <>
       <mesh ref={meshRef} position={[0, 0, -1.5]}>
-        <torusGeometry args={[1.8, 0.08, 12, 64]} />
-        <meshStandardMaterial
-          color="#334455"
+        <torusGeometry args={[1.8, 0.1, 16, 64]} />
+        <meshPhysicalMaterial
+          color="#8B7535"
           emissive={phaseColor}
           emissiveIntensity={0.2}
-          metalness={0.85}
-          roughness={0.2}
+          metalness={0.92}
+          roughness={0.08}
+          clearcoat={0.8}
+          clearcoatRoughness={0.05}
         />
       </mesh>
-      {/* Inner glow ring */}
+      {/* Inner glow ring — golden */}
       <mesh position={[0, 0, -1.48]}>
-        <torusGeometry args={[1.72, 0.02, 8, 48]} />
-        <meshBasicMaterial color={phaseColor} transparent opacity={0.3} blending={THREE.AdditiveBlending} />
+        <torusGeometry args={[1.72, 0.025, 8, 48]} />
+        <meshBasicMaterial color="#FFD700" transparent opacity={0.3} blending={THREE.AdditiveBlending} />
+      </mesh>
+      {/* Outer decorative ring */}
+      <mesh position={[0, 0, -1.52]}>
+        <torusGeometry args={[1.88, 0.02, 8, 48]} />
+        <meshStandardMaterial
+          color="#A08830"
+          emissive="#FFD700"
+          emissiveIntensity={0.4}
+          metalness={0.9}
+          roughness={0.1}
+          transparent
+          opacity={0.6}
+        />
       </mesh>
     </>
   );
@@ -566,16 +581,16 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
 
   return (
     <group ref={sceneGroupRef}>
-      {/* Dynamic ambient light — boosted for XR visibility */}
-      <ambientLight intensity={0.4} color={phase.ambient} />
+      {/* Dynamic ambient light — warm golden base */}
+      <ambientLight intensity={0.35} color={phase.ambient} />
 
-      {/* Directional fill so emissive materials aren't the only light source */}
-      <directionalLight position={[0, 5, -10]} intensity={0.3} color="#8888cc" />
+      {/* Directional fill — warm golden */}
+      <directionalLight position={[0, 5, -10]} intensity={0.4} color="#FFE4B0" />
 
-      {/* Phase-reactive accent lights — stronger */}
-      <pointLight position={[-5, 3, -5]} color={phase.accentColor} intensity={1.2 + avgVolume * 0.8} distance={25} />
-      <pointLight position={[5, 3, -5]} color={phase.nebula[1] || phase.accentColor} intensity={0.8 + avgVolume * 0.6} distance={20} />
-      <pointLight position={[0, -2, -10]} color={phase.nebula[0]} intensity={0.5} distance={20} />
+      {/* Phase-reactive accent lights — golden warmth */}
+      <pointLight position={[-5, 3, -5]} color={phase.accentColor} intensity={1.5 + avgVolume * 0.8} distance={25} />
+      <pointLight position={[5, 3, -5]} color={phase.nebula[1] || phase.accentColor} intensity={1.0 + avgVolume * 0.6} distance={20} />
+      <pointLight position={[0, -2, -10]} color="#FFD700" intensity={0.6} distance={20} />
 
       {/* Warp star field — more stars, more color */}
       <WarpStars
