@@ -220,7 +220,7 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
     <group>
       {/* Deep space backdrop */}
       <StarField count={2500} radius={60} brightness={screen === 'playing' ? 0.6 + avgVolume * 0.4 : 0.8} />
-      <NebulaClouds count={8} radius={35} colors={['#2e1065', '#312e81', '#1e1b4b', '#4c1d95']} opacity={0.1 + avgVolume * 0.1} />
+      <NebulaClouds count={8} radius={35} colors={['#2e1065', '#6B21A8', '#4338CA', '#C026D3']} opacity={0.1 + avgVolume * 0.1} />
 
       {/* Subtle floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
