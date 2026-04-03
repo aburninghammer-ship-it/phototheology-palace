@@ -405,6 +405,7 @@ export default function StudyIdeaLibrary() {
                     <GeneratedPathCard
                       key={path.id}
                       path={path}
+                      onStart={(p) => navigate(`/study-buddy?source=generated-path&pathId=${p.id}`)}
                     />
                   ))}
                 </div>
