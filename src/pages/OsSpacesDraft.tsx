@@ -136,7 +136,6 @@ const OS_SPACES: OsSpace[] = [
       { label: "Devotionals", path: "/devotionals", icon: Flame, description: "Daily spiritual food" },
       { label: "Daily Reading", path: "/daily-reading", icon: Calendar, description: "Bible reading plan" },
       { label: "Reading Plans", path: "/reading-plans", icon: Calendar, description: "Structured reading paths" },
-      { label: "Audio Library", path: "/audio-library", icon: Headphones, description: "Audio Bible & studies" },
       { label: "Prophecy Watch", path: "/prophecy-watch", icon: Eye, description: "Current events & prophecy" },
       { label: "My Church Space", path: "/living-manna", icon: Church, description: "Your church community" },
       { label: "Community", path: "/community", icon: Users, description: "Study partners & chat" },
