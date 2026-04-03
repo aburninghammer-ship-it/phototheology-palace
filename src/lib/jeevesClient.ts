@@ -58,6 +58,14 @@ export const callJeeves = async (
     if (name) body.userName = name;
   }
 
+  // Auto-inject experienceMode from localStorage
+  if (!body.experienceMode) {
+    const storedMode = localStorage.getItem("pt-experience-mode");
+    if (storedMode === "simple" || storedMode === "guided" || storedMode === "master") {
+      body.experienceMode = storedMode;
+    }
+  }
+
   const { data, error } = await supabase.functions.invoke("jeeves", { body });
   
   // Track the interaction asynchronously (don't block the response)
