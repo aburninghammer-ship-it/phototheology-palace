@@ -41,6 +41,170 @@ You MUST ONLY quote Scripture from the King James Version (KJV). This is NON-NEG
 `;
 
 // ============================================================
+// PICTURE PATTERNS REFERENCE (FROM PHOTOTHEOLOGY SOURCE)
+// ============================================================
+const PICTURE_PATTERNS_REFERENCE = `
+## PICTURE PATTERNS REFERENCE — CANONICAL FRAMEWORKS
+
+These are the master patterns Jeeves must use when designing pictures for any book of the Bible. Every book should be studied through these lenses, identifying which patterns are active.
+
+### THE SIX WALLS/PATTERNS
+Every book, story, and passage can be analyzed through six interlocking pattern walls:
+
+1. **The Christ Pattern**: Find Jesus in every story. Key Christ-figure examples:
+   - **Joseph**: Hated by his brothers → They come to him in time of famine
+   - **Moses**: Decree to kill male children → Wilderness 40 years → Returns to deliver his people
+   - **Jonah**: My will vs God's will → Into the belly/out of the belly → Sent to preach and warn → God saves the repentant
+   - **David**: Watches father's flock → Anointed → Rejected → Becomes king
+   - **Elijah/Elisha**: Elijah removed, Elisha receives double the power → Disciples follow → First miracle provides drink for the thirsty
+   
+2. **The Sanctuary/Feast Day Pattern**: Map every book onto sanctuary furniture and feast days:
+   - **Altar of Sacrifice** = Witnessing Christ's Death (Gospels)
+   - **Laver** = Baptism (Acts)
+   - **Table of Showbread, Incense, Candlestick** = Word, Prayer, Light (Romans to Jude)
+   - **Day of Atonement** = Judgment (Revelation)
+   - **Tabernacles** = Harvest/Celebration (Rev 21-22)
+   - Feast Day mapping: Gospels = Passover/Unleavened Bread/Firstfruits; Acts = Pentecost; Romans-Jude = Trumpets; Revelation = Day of Atonement/Tabernacles
+
+3. **The Time Prophecy Pattern**: 70 Weeks, 1260, 2300
+   - OT: Genesis to Joshua = Setting up Sanctuary Service (70 Weeks, 1260, Temple Cast Down)
+   - OT: Judges to Chronicles = Apostasy
+   - OT: Ezra to Malachi = Restoration, Coming of Christ (2300)
+   - NT: Gospels to Acts = 70 Weeks, Setting up Sanctuary Service
+   - NT: Romans to Jude = True Gospel/Apostasy (1260)
+   - NT: Revelation = Judgment, Coming of Christ (2300)
+   - **Third Dimension of Prophecy**: 70 Weeks = when anyone genuinely accepts Christ; 1260 = all under false religion; 2300 = whenever anyone is being cleansed per the three angels' messages
+
+4. **The Ancient Israel/Historic Pattern** (OT/NT Parallel):
+   - Adam to Joseph = Ephesus (Start of the Movement)
+   - Moses to Ruth = Smyrna (Persecution, Faithfulness)
+   - Samuel/Saul = Pergamos (Compromise/Constantine)
+   - Kings to Chronicles = Thyatira (Jezebel/History of Apostasy)
+   - Ezra = Sardis (Escaping Babylon/Persecution/Rebuilding)
+   - Nehemiah = Philadelphia (Completes Reformation)
+   - Prophets to Christ first coming = Laodicea (1844, Prophecies to Christ second coming)
+
+5. **The Gospel Floor**: The base of all truth — justification, sanctification, glorification
+
+6. **The Heaven Ceiling**: The final hope — new creation, eternal life, God's presence
+
+### THE FIVE DIMENSIONS (Apply to every picture)
+1. **Literal/Sanctuary**: The sanctuary pattern in the story
+2. **Christ**: How Christ is revealed (as Prophet, Priest, Judge, King)
+3. **Me ("I am the temple")**: Personal application
+4. **Church ("The church is the temple")**: Corporate/ecclesiological application
+5. **Heaven ("There is a temple in heaven")**: Heavenly/eschatological application
+
+### OLD TESTAMENT OFFICES → CHRIST PATTERN
+- Prophet = Christ's Life
+- Priest = Christ's Ascension/Intercession
+- Judge = 1844/Investigative Judgment
+- King = Second Coming
+
+### PENTATEUCH AS CHRIST PATTERN
+- **Genesis**: Adam, Son of God — Creation, Intro to Sin
+- **Exodus**: Moses drawn from water, wilderness 40 days, returns to deliver
+- **Leviticus**: Christ in the sanctuary, work of cleansing from sin
+- **Numbers**: Moses leading twelve, ordaining
+- **Deuteronomy**: Moses' final sermon, repeats covenant, sings a song, goes out alone to die, buried, resurrected
+
+### GENESIS PICTURE BREAKDOWN (MODEL FOR ALL BOOKS)
+- 1-2: Adam — Creation/Intro to Sin → Creation of the World
+- 3-11: Noah — Results of Sin → Consequences unfold
+- 12-20: Abraham — Birth of a Nation → Birth of Nation of Israel
+- 21-25: Isaac and the Sacrifice → Christ and His Sacrifice
+- 27-34: Transitions/Older to Younger/Prospers/Time of Trouble
+- 36-50: Joseph sent ahead to prepare a place → Christ sent ahead to prepare a place/Judgment
+
+### NT ENTIRE PATTERN (Church History in Christ's Life)
+- Birth = Birth of Church
+- Baptism = Pentecost
+- Wilderness = 1260, conflict over worship, word, and light
+- Emerge to Preach = 1798
+- Gospel Work = Three Angels' Messages
+- Gethsemane/Death = Self must die in prep for Latter Rain
+- Acts = Outpouring of Holy Spirit, Latter Rain
+- Romans to Jude = Preaching under Latter Rain under persecution
+- Revelation of Jesus Christ = Final unveiling
+
+### MATTHEW AS CHURCH HISTORY PARALLEL
+- Matthew 1-2: Birth of Christ = Birth of NT Church at the Cross
+- Matthew 3: Baptism of Christ = Baptism of NT Church at Pentecost
+- Matthew 4: Christ in Wilderness, sorely tried = Church goes into wilderness for 1260 years
+- John 2:11-15: Christ cleanses temple (46 years) = Church comes out of wilderness with message of cleansing the sanctuary (1844; 1798-1844 = 46 years)
+- Matthew 4-16: Christ preaching, teaching, healing = Church preaching three angels' messages
+- Matthew 12:14: Persecution because of the Sabbath = Persecution will come because of the Sabbath
+- Matthew 17: Transfigured by Holy Spirit = Final outpouring of the Spirit, Latter Rain
+- Matthew 18-25: Temple purified, temple desolate = God's church purified, Babylon declared desolate
+- Matthew 26-28: Death sentence, death, burial, resurrection = Death decree, death, burial, resurrection of the saints
+
+### RIVERS PATTERN (Divine Design)
+Trace the theological meaning of rivers through Scripture:
+- **Rivers of Eden** (Gen 1-2): Paradise, Paradise Lost
+- **Nile** (Exo 1-2): Captivity to Sin/Bondage
+- **Red Sea** (Exo 16): Deliverance from Sin through Sacrifice
+- **Jordan** (Josh 1-3): Israel Baptized, Ready to Conquer
+- **Cherith** (1 Ki 17:1-3): Protection in Wilderness 3.5 years (1260)
+- **Chebar** (Ezek 1,10): Called to speak concerning temple abominations (Reformation)
+- **Mediterranean** (Dan 7): Little Horn identified
+- **Ulai** (Dan 8): Cleansing of the Sanctuary: 1844
+- **Hiddikel** (Dan 10-12): Perfecting of God's people / End-time vision
+- **Sea of Galilee** (Gospels): Multitudes healed and saved by gospel preaching
+- **Brook Cedron** (John 18:1): Gethsemane
+- **Euphrates** (Rev 16): Drying up of enemy forces
+- **River of Life** (Rev 21-22): Paradise Restored
+
+### COMPLEX PICTURES (Multiple passages forming one theological scene)
+When designing pictures, draw from multiple scattered passages:
+- 2 Kings 2:1-21 + 2 Sam 15:12-14, 21, 15:23, 25, 31, 17:1-2, 7, 23
+- Exodus 24-32 + David watches his father's flock
+- Psalm 22-23-24 as a sanctuary triptych (Altar → Holy Place → Most Holy Place)
+
+### SANCTUARY EXAMPLE: PRIESTHOOD THROUGH FIVE DIMENSIONS
+1. Levites/Priesthood (Kohen: Priest, Prince, Chief)
+2. Christ as our High Priest
+3. I am a priest in Christ
+4. The priesthood of believers
+5. Priesthood in heaven
+
+### MANNA THROUGH FIVE DIMENSIONS
+1. Manna (literal)
+2. Christ (the Bread of Life)
+3. Word of God (personal nourishment)
+4. Three Angels' Messages (Ex 16:13-14, Deut 32:2)
+5. Hidden Manna (heavenly reward)
+
+### JACOB/ESAU PATTERN THROUGH FIVE DIMENSIONS
+1. Jacob gains the blessing over his older twin brother
+2. Christ gains the blessing over His older twin brother (Satan/fallen nature)
+3. I gain the blessing over my older twin sibling (flesh vs spirit)
+4. Spiritual Israel gets the blessing over Literal Israel
+5. Those born twice gain the blessing over the wicked at the end
+
+### REVELATION 12 STRUCTURE
+Maps onto the three time prophecy periods:
+- 70 Weeks period
+- 1260 period
+- 2300 to End of Time
+
+### DANIEL 11 STRUCTURE
+- Verses 1-22: 70 Weeks period
+- Verses 23-40: 1260 period
+- Verses 40-45: 2300 to End of Time
+
+### PICTURE DESIGN RULE
+When studying ANY book, always ask:
+1. Where is the Christ Pattern in this book? (Find Jesus)
+2. Where is the Sanctuary Pattern? (Map to furniture/services)
+3. Where are the Prophetic Time Patterns? (70 Weeks, 1260, 2300)
+4. Where is the Historic Pattern? (OT/NT parallel, Seven Churches)
+5. What is the Gospel Floor? (Justification, sanctification, glorification)
+6. What is the Heaven Ceiling? (Eschatological hope)
+7. Apply the Five Dimensions to key passages
+8. Look for Complex Pictures — multiple passages forming one theological scene
+`;
+
+// ============================================================
 // MASTER PROMPT V3 — PICTURE-BASED STUDY
 // ============================================================
 const MASTER_PROMPT = `
@@ -362,6 +526,8 @@ function buildSystemPrompt(
     : "SYNTHESIS DAYS (29-31): Review, synthesize, and identify the book's irreplaceable 'gem' — its unique contribution to Scripture.";
 
   return `${MASTER_PROMPT}
+
+${PICTURE_PATTERNS_REFERENCE}
 
 ${greeting}
 
