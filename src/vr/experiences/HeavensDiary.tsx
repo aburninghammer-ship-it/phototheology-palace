@@ -1,4 +1,4 @@
-import { useRef, useMemo, Suspense } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
@@ -14,72 +14,99 @@ interface HeavensDiaryProps {
   onBack: () => void;
 }
 
-// Phase-based color palettes — much more vibrant
-function getPhaseColors(progress: number): {
-  nebula: string[];
-  ambient: string;
-  fogColor: string;
-  starBrightness: number;
-  accentColor: string;
-} {
-  if (progress < 0.2) {
-    const t = progress / 0.2;
-    return {
-      nebula: ['#1144AA', '#2266CC', '#3388DD', '#FFD700'],
-      ambient: '#1a1408',
-      fogColor: '#050408',
-      starBrightness: 0.4 + t * 0.6,
-      accentColor: '#FFD700',
-    };
-  } else if (progress < 0.5) {
-    return {
-      nebula: ['#6600FF', '#FFD700', '#00CC88', '#FF4488'],
-      ambient: '#161020',
-      fogColor: '#080612',
-      starBrightness: 1,
-      accentColor: '#FFE088',
-    };
-  } else if (progress < 0.8) {
-    return {
-      nebula: ['#AA00FF', '#FF0088', '#FFD700', '#00FF88', '#0088FF'],
-      ambient: '#221144',
-      fogColor: '#0a0818',
-      starBrightness: 0.8 + ((progress - 0.5) / 0.3) * 0.2,
-      accentColor: '#FFCC66',
-    };
-  } else {
-    const t = (progress - 0.8) / 0.2;
-    return {
-      nebula: ['#FFD700', '#FFA500', '#FFEE88', '#FFFFFF'],
-      ambient: `#${Math.floor(0x44 + t * 0x44).toString(16).padStart(2, '0')}${Math.floor(0x33 + t * 0x44).toString(16).padStart(2, '0')}00`,
-      fogColor: '#1a1100',
-      starBrightness: 1 - t * 0.5,
-      accentColor: '#FFD700',
-    };
-  }
+// ─── Tour Scenes ──────────────────────────────────────────
+interface TourScene {
+  id: string;
+  label: string;
+  subtitle: string;
+  start: number;  // progress 0-1
+  end: number;
+  colors: { nebula: string[]; ambient: string; fog: string; accent: string };
+  cameraPath: (t: number) => { x: number; y: number; z: number };
+  particleColor: string;
+  lightIntensity: number;
 }
 
-// Compute travel speed from audio progress
-function getSpeed(progress: number): number {
-  if (progress < 0.05) return progress / 0.05 * 0.3;
-  if (progress < 0.2) return 0.3 + ((progress - 0.05) / 0.15) * 0.7;
-  if (progress < 0.5) return 1.0;
-  if (progress < 0.8) return 0.8;
-  return 0.8 * (1 - (progress - 0.8) / 0.2);
+const TOUR_SCENES: TourScene[] = [
+  {
+    id: 'creation',
+    label: 'In the Beginning',
+    subtitle: 'Genesis 1:1 — God created the heavens and the earth',
+    start: 0, end: 0.15,
+    colors: { nebula: ['#0022AA', '#1144CC', '#003388', '#FFD700'], ambient: '#080818', fog: '#020210', accent: '#4488FF' },
+    cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 2) * 3, y: t * 4 - 2, z: -5 - t * 20 }),
+    particleColor: '#4488FF',
+    lightIntensity: 0.8,
+  },
+  {
+    id: 'garden',
+    label: 'The Garden',
+    subtitle: 'Genesis 2:8 — God planted a garden eastward in Eden',
+    start: 0.15, end: 0.30,
+    colors: { nebula: ['#11AA44', '#88FF44', '#FFD700', '#22CC66'], ambient: '#0a1a08', fog: '#040a04', accent: '#44FF88' },
+    cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 4) * 5, y: 1 + Math.sin(t * Math.PI * 2) * 2, z: -10 - t * 15 }),
+    particleColor: '#88FF44',
+    lightIntensity: 1.2,
+  },
+  {
+    id: 'cross',
+    label: 'The Cross',
+    subtitle: 'John 19:30 — It is finished',
+    start: 0.30, end: 0.45,
+    colors: { nebula: ['#880022', '#CC0044', '#FF4400', '#FFD700'], ambient: '#1a0808', fog: '#0a0404', accent: '#FF4444' },
+    cameraPath: (t) => ({ x: Math.cos(t * Math.PI) * 2, y: -1 + t * 6, z: -8 - t * 10 }),
+    particleColor: '#FF4444',
+    lightIntensity: 0.6,
+  },
+  {
+    id: 'resurrection',
+    label: 'He Is Risen',
+    subtitle: 'Matthew 28:6 — He is not here: for He is risen',
+    start: 0.45, end: 0.60,
+    colors: { nebula: ['#FFD700', '#FFFFFF', '#FFEE88', '#FFB700'], ambient: '#2a2200', fog: '#1a1100', accent: '#FFD700' },
+    cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 3) * 4, y: 2 + t * 5, z: -5 - t * 25 }),
+    particleColor: '#FFD700',
+    lightIntensity: 2.0,
+  },
+  {
+    id: 'throne',
+    label: 'The Throne Room',
+    subtitle: 'Revelation 4:2 — A throne was set in heaven',
+    start: 0.60, end: 0.80,
+    colors: { nebula: ['#AA00FF', '#FFD700', '#FF44AA', '#0088FF'], ambient: '#180830', fog: '#0a0418', accent: '#CC88FF' },
+    cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 6) * 6, y: Math.sin(t * Math.PI * 3) * 3, z: -15 - t * 20 }),
+    particleColor: '#CC88FF',
+    lightIntensity: 1.5,
+  },
+  {
+    id: 'newJerusalem',
+    label: 'The Holy City',
+    subtitle: 'Revelation 21:2 — New Jerusalem, coming down from God',
+    start: 0.80, end: 1.0,
+    colors: { nebula: ['#FFD700', '#FFEE88', '#FFFFFF', '#FFB700'], ambient: '#332800', fog: '#1a1400', accent: '#FFD700' },
+    cameraPath: (t) => ({ x: 0, y: t * 8, z: -5 - t * 15 }),
+    particleColor: '#FFD700',
+    lightIntensity: 3.0,
+  },
+];
+
+function getCurrentScene(progress: number): TourScene {
+  for (const scene of TOUR_SCENES) {
+    if (progress >= scene.start && progress < scene.end) return scene;
+  }
+  return TOUR_SCENES[TOUR_SCENES.length - 1];
+}
+
+function getSceneLocalProgress(progress: number, scene: TourScene): number {
+  return Math.max(0, Math.min(1, (progress - scene.start) / (scene.end - scene.start)));
 }
 
 // ─── WarpStars ────────────────────────────────────────────
-const STAR_COUNT = 4000;
-const CYLINDER_RADIUS = 35;
-const CYLINDER_DEPTH = 120;
+const STAR_COUNT = 5000;
+const CYLINDER_RADIUS = 40;
+const CYLINDER_DEPTH = 140;
 
-interface StarData {
-  offsets: Float32Array;
-  baseSizes: Float32Array;
-  colors: Float32Array;
-}
-
-function initStarData(): StarData {
+function initStarData() {
   const offsets = new Float32Array(STAR_COUNT * 3);
   const baseSizes = new Float32Array(STAR_COUNT);
   const colors = new Float32Array(STAR_COUNT * 3);
@@ -89,36 +116,22 @@ function initStarData(): StarData {
     offsets[i * 3] = Math.cos(angle) * r;
     offsets[i * 3 + 1] = Math.sin(angle) * r;
     offsets[i * 3 + 2] = -Math.random() * CYLINDER_DEPTH;
-    baseSizes[i] = 0.02 + Math.random() * 0.08;
-    // Varied star colors — warm golden palette dominant
+    baseSizes[i] = 0.02 + Math.random() * 0.1;
     const type = Math.random();
-    if (type < 0.35) {
-      // Warm gold
-      colors[i * 3] = 1.0;
-      colors[i * 3 + 1] = 0.82 + Math.random() * 0.18;
-      colors[i * 3 + 2] = 0.3 + Math.random() * 0.4;
-    } else if (type < 0.55) {
-      // Blue-white
-      colors[i * 3] = 0.7 + Math.random() * 0.2;
-      colors[i * 3 + 1] = 0.8 + Math.random() * 0.2;
-      colors[i * 3 + 2] = 1.0;
-    } else if (type < 0.7) {
-      // Amber/orange
-      colors[i * 3] = 1.0;
-      colors[i * 3 + 1] = 0.65 + Math.random() * 0.2;
-      colors[i * 3 + 2] = 0.2 + Math.random() * 0.2;
+    if (type < 0.4) {
+      colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.85 + Math.random() * 0.15; colors[i * 3 + 2] = 0.3 + Math.random() * 0.4;
+    } else if (type < 0.6) {
+      colors[i * 3] = 0.7 + Math.random() * 0.2; colors[i * 3 + 1] = 0.8 + Math.random() * 0.2; colors[i * 3 + 2] = 1.0;
+    } else if (type < 0.75) {
+      colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.6 + Math.random() * 0.2; colors[i * 3 + 2] = 0.2 + Math.random() * 0.2;
     } else {
-      // White-gold with slight variation
-      const warmth = Math.random();
-      colors[i * 3] = 0.95 + warmth * 0.05;
-      colors[i * 3 + 1] = 0.88 + warmth * 0.08;
-      colors[i * 3 + 2] = 0.7 + Math.random() * 0.2;
+      colors[i * 3] = 0.95; colors[i * 3 + 1] = 0.9; colors[i * 3 + 2] = 0.8;
     }
   }
   return { offsets, baseSizes, colors };
 }
 
-function WarpStars({ progress, brightness }: { progress: number; brightness: number }) {
+function WarpStars({ progress, scene, avgVolume }: { progress: number; scene: TourScene; avgVolume: number }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const starData = useMemo(() => initStarData(), []);
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -129,14 +142,15 @@ function WarpStars({ progress, brightness }: { progress: number; brightness: num
     const mesh = meshRef.current;
     if (!mesh) return;
 
-    const speed = getSpeed(progress);
-    const zMove = speed * delta * 45;
+    const localT = getSceneLocalProgress(progress, scene);
+    const speed = 0.3 + localT * 0.7 + avgVolume * 0.3;
+    const zMove = speed * delta * 50;
     const { offsets, baseSizes, colors } = starData;
+    const tintColor = new THREE.Color(scene.particleColor);
 
     for (let i = 0; i < STAR_COUNT; i++) {
       const i3 = i * 3;
       offsets[i3 + 2] += zMove;
-
       if (offsets[i3 + 2] > 10) {
         offsets[i3 + 2] = -CYLINDER_DEPTH + Math.random() * 5;
         const angle = Math.random() * Math.PI * 2;
@@ -144,313 +158,350 @@ function WarpStars({ progress, brightness }: { progress: number; brightness: num
         offsets[i3] = Math.cos(angle) * r;
         offsets[i3 + 1] = Math.sin(angle) * r;
       }
-
       dummy.position.set(offsets[i3], offsets[i3 + 1], offsets[i3 + 2]);
-      const streakZ = 1 + speed * 4;
-      const s = baseSizes[i];
+      const streakZ = 1 + speed * 3;
+      const s = baseSizes[i] * (1 + avgVolume * 0.5);
       dummy.scale.set(s, s, s * streakZ);
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
 
-      // Phase-based color tinting
-      const cr = colors[i3], cg = colors[i3 + 1], cb = colors[i3 + 2];
-      if (progress > 0.5 && progress < 0.8) {
-        const t = (progress - 0.5) / 0.3;
-        colorObj.setRGB(
-          cr * (1 - t * 0.2) + t * 0.4,
-          cg * (1 - t * 0.3),
-          cb * (1 - t * 0.1) + t * 0.5,
-        );
-      } else if (progress >= 0.8) {
-        const t = (progress - 0.8) / 0.2;
-        colorObj.setRGB(
-          cr * (1 - t * 0.2) + t * 0.8,
-          cg * (1 - t * 0.1) + t * 0.5,
-          cb * (1 - t * 0.5),
-        );
-      } else {
-        colorObj.setRGB(cr, cg, cb);
-      }
+      // Tint stars with scene color
+      colorObj.setRGB(
+        colors[i3] * 0.6 + tintColor.r * 0.4,
+        colors[i3 + 1] * 0.6 + tintColor.g * 0.4,
+        colors[i3 + 2] * 0.6 + tintColor.b * 0.4,
+      );
       mesh.setColorAt(i, colorObj);
     }
-
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-
-    const mat = mesh.material as THREE.MeshBasicMaterial;
-    mat.opacity = brightness * (progress >= 0.8 ? 1 - (progress - 0.8) / 0.2 : 1);
   });
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, STAR_COUNT]}>
       <planeGeometry args={[2, 2]} />
-      <meshBasicMaterial
-        map={starMap}
-        color="#ffffff"
-        transparent
-        opacity={0.9}
-        alphaTest={0.02}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
+      <meshBasicMaterial map={starMap} color="#ffffff" transparent opacity={0.9} alphaTest={0.02} depthWrite={false} blending={THREE.AdditiveBlending} />
     </instancedMesh>
   );
 }
 
-// ─── CelestialBodies ──────────────────────────────────────
-interface CelestialBody {
-  name: string;
-  triggerStart: number;
-  triggerEnd: number;
-  offsetX: number;
-  offsetY: number;
-  startZ: number;
-  color: string;
-  emissive: string;
-  scale: number;
-  type: 'sphere' | 'cluster' | 'plane' | 'binary' | 'ringedPlanet';
-}
+// ─── Scene-Specific Geometry ─────────────────────────────
 
-const BODIES: CelestialBody[] = [
-  // Earth — vibrant blue-green with atmosphere glow
-  { name: 'earth', triggerStart: 0.08, triggerEnd: 0.22, offsetX: -5, offsetY: -3, startZ: -60, color: '#2288EE', emissive: '#1166CC', scale: 3, type: 'sphere' },
-  // Moon — silvery with craters implied
-  { name: 'moon', triggerStart: 0.2, triggerEnd: 0.32, offsetX: 6, offsetY: 2, startZ: -60, color: '#CCCCCC', emissive: '#888888', scale: 1, type: 'sphere' },
-  // Asteroids — colorful rocky debris
-  { name: 'asteroids', triggerStart: 0.3, triggerEnd: 0.42, offsetX: -3, offsetY: 1, startZ: -60, color: '#AA8866', emissive: '#665544', scale: 0.5, type: 'cluster' },
-  // Gas Giant — vibrant orange/red banded planet with ring
-  { name: 'gasGiant', triggerStart: 0.45, triggerEnd: 0.58, offsetX: 10, offsetY: -2, startZ: -70, color: '#FF8844', emissive: '#CC6622', scale: 6, type: 'ringedPlanet' },
-  // Nebula Wall — vivid purple/magenta/cyan
-  { name: 'nebulaWall', triggerStart: 0.6, triggerEnd: 0.72, offsetX: 0, offsetY: 0, startZ: -60, color: '#CC44FF', emissive: '#8822CC', scale: 25, type: 'plane' },
-  // Binary Stars — bright blue and gold
-  { name: 'binaryStars', triggerStart: 0.7, triggerEnd: 0.82, offsetX: -8, offsetY: 4, startZ: -65, color: '#FFD700', emissive: '#FFAA00', scale: 1.5, type: 'binary' },
-];
-
-function CelestialBodies({ progress }: { progress: number }) {
+function CreationScene({ localT, avgVolume }: { localT: number; avgVolume: number }) {
   const groupRef = useRef<THREE.Group>(null);
-  const bodyRefs = useRef<(THREE.Group | null)[]>(new Array(BODIES.length).fill(null));
-
-  useFrame(() => {
-    for (let i = 0; i < BODIES.length; i++) {
-      const body = BODIES[i];
-      const grp = bodyRefs.current[i];
-      if (!grp) continue;
-
-      const { triggerStart, triggerEnd } = body;
-      if (progress < triggerStart || progress > triggerEnd) {
-        grp.visible = false;
-        continue;
-      }
-
-      grp.visible = true;
-      const t = (progress - triggerStart) / (triggerEnd - triggerStart);
-      const z = body.startZ + t * 80;
-      grp.position.set(body.offsetX, body.offsetY, z);
-
-      const fade = t < 0.2 ? t / 0.2 : t > 0.8 ? (1 - t) / 0.2 : 1;
-      grp.traverse((child) => {
-        if ((child as THREE.Mesh).isMesh) {
-          const mat = (child as THREE.Mesh).material as THREE.MeshStandardMaterial;
-          if (mat.opacity !== undefined) {
-            mat.opacity = fade;
-            mat.transparent = true;
-          }
-        }
-      });
-    }
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    groupRef.current.rotation.y = clock.getElapsedTime() * 0.1;
+    groupRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.05) * 0.1;
   });
 
   return (
-    <group ref={groupRef}>
-      {BODIES.map((body, i) => (
-        <group key={body.name} ref={(el) => { bodyRefs.current[i] = el; }} visible={false}>
-          {body.type === 'sphere' && (
-            <>
-              <mesh>
-                <sphereGeometry args={[body.scale, 24, 16]} />
-                <meshStandardMaterial
-                  color={body.color}
-                  emissive={body.emissive}
-                  emissiveIntensity={0.6}
-                  transparent
-                  metalness={0.1}
-                  roughness={0.7}
-                />
-              </mesh>
-              {/* Atmosphere glow */}
-              <mesh>
-                <sphereGeometry args={[body.scale * 1.15, 16, 12]} />
-                <meshBasicMaterial
-                  color={body.color}
-                  transparent
-                  opacity={0.12}
-                  side={THREE.BackSide}
-                  blending={THREE.AdditiveBlending}
-                  depthWrite={false}
-                />
-              </mesh>
-              <pointLight color={body.emissive} intensity={0.5} distance={body.scale * 4} />
-            </>
-          )}
-          {body.type === 'ringedPlanet' && (
-            <>
-              <mesh>
-                <sphereGeometry args={[body.scale, 24, 16]} />
-                <meshStandardMaterial
-                  color={body.color}
-                  emissive={body.emissive}
-                  emissiveIntensity={0.4}
-                  transparent
-                  metalness={0.1}
-                  roughness={0.6}
-                />
-              </mesh>
-              {/* Planet ring */}
-              <mesh rotation={[Math.PI * 0.35, 0, 0]}>
-                <ringGeometry args={[body.scale * 1.3, body.scale * 2, 64]} />
-                <meshBasicMaterial
-                  color="#FFCC88"
-                  transparent
-                  opacity={0.4}
-                  side={THREE.DoubleSide}
-                  blending={THREE.AdditiveBlending}
-                  depthWrite={false}
-                />
-              </mesh>
-              {/* Inner ring */}
-              <mesh rotation={[Math.PI * 0.35, 0, 0]}>
-                <ringGeometry args={[body.scale * 1.1, body.scale * 1.3, 64]} />
-                <meshBasicMaterial
-                  color="#CC8844"
-                  transparent
-                  opacity={0.25}
-                  side={THREE.DoubleSide}
-                  depthWrite={false}
-                />
-              </mesh>
-              <pointLight color={body.emissive} intensity={1} distance={20} />
-            </>
-          )}
-          {body.type === 'cluster' && (
-            <>
-              {Array.from({ length: 18 }, (_, j) => {
-                const a = (j / 18) * Math.PI * 2;
-                const r = 1 + Math.random() * 4;
-                const rockColor = ['#AA7744', '#887766', '#BB9955', '#776655'][j % 4];
-                return (
-                  <mesh key={j} position={[Math.cos(a) * r, Math.sin(a) * r * 0.5, Math.sin(a + j) * 2]}>
-                    <dodecahedronGeometry args={[body.scale * (0.3 + Math.random() * 0.8), 0]} />
-                    <meshStandardMaterial
-                      color={rockColor}
-                      emissive={body.emissive}
-                      emissiveIntensity={0.2}
-                      transparent
-                      roughness={0.9}
-                    />
-                  </mesh>
-                );
-              })}
-            </>
-          )}
-          {body.type === 'plane' && (
-            <>
-              {/* Soft nebula cloud layers instead of flat squares */}
-              {[
-                { pos: [0, 0, 0] as [number, number, number], color: '#CC44FF', s: body.scale * 1.8, o: 0.2 },
-                { pos: [3, 2, 2] as [number, number, number], color: '#FF44AA', s: body.scale * 1.4, o: 0.15 },
-                { pos: [-4, -1, -1] as [number, number, number], color: '#44CCFF', s: body.scale * 1.0, o: 0.12 },
-                { pos: [2, -2, 3] as [number, number, number], color: '#8844FF', s: body.scale * 1.2, o: 0.1 },
-                { pos: [-2, 3, -2] as [number, number, number], color: '#FF88CC', s: body.scale * 0.9, o: 0.1 },
-              ].map((layer, li) => (
-                <mesh key={li} position={layer.pos}>
-                  <planeGeometry args={[layer.s, layer.s]} />
-                  <meshBasicMaterial
-                    map={getNebulaBlobTexture()}
-                    color={layer.color}
-                    transparent
-                    opacity={layer.o}
-                    blending={THREE.AdditiveBlending}
-                    side={THREE.DoubleSide}
-                    depthWrite={false}
-                  />
-                </mesh>
-              ))}
-              <pointLight color="#CC44FF" intensity={2} distance={30} />
-            </>
-          )}
-          {body.type === 'binary' && (
-            <>
-              <mesh position={[-2, 0, 0]}>
-                <sphereGeometry args={[body.scale, 16, 12]} />
-                <meshStandardMaterial color="#FFD700" emissive="#FFAA00" emissiveIntensity={1.5} transparent />
-              </mesh>
-              {/* Sun corona */}
-              <mesh position={[-2, 0, 0]}>
-                <sphereGeometry args={[body.scale * 1.8, 12, 8]} />
-                <meshBasicMaterial color="#FFD700" transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} />
-              </mesh>
-              <mesh position={[2, 0, 0]}>
-                <sphereGeometry args={[body.scale * 0.7, 16, 12]} />
-                <meshStandardMaterial color="#88CCFF" emissive="#44AAFF" emissiveIntensity={1.5} transparent />
-              </mesh>
-              <mesh position={[2, 0, 0]}>
-                <sphereGeometry args={[body.scale * 1.2, 12, 8]} />
-                <meshBasicMaterial color="#88CCFF" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
-              </mesh>
-              <pointLight position={[-2, 0, 0]} color="#FFD700" intensity={4} distance={25} />
-              <pointLight position={[2, 0, 0]} color="#88CCFF" intensity={3} distance={20} />
-            </>
-          )}
-        </group>
-      ))}
+    <group ref={groupRef} position={[0, 0, -30]}>
+      {/* Swirling proto-matter */}
+      {Array.from({ length: 12 }, (_, i) => {
+        const angle = (i / 12) * Math.PI * 2;
+        const r = 8 + i * 0.5;
+        return (
+          <mesh key={i} position={[Math.cos(angle) * r, Math.sin(angle) * r * 0.3, Math.sin(angle) * 3]}>
+            <sphereGeometry args={[0.5 + Math.random() * 1.5, 12, 8]} />
+            <meshStandardMaterial
+              color={['#4488FF', '#2266CC', '#FFD700', '#6644AA'][i % 4]}
+              emissive={['#2244AA', '#1133AA', '#AA8800', '#4422AA'][i % 4]}
+              emissiveIntensity={0.8 + avgVolume * 0.5}
+              transparent opacity={localT * 0.8}
+            />
+          </mesh>
+        );
+      })}
+      {/* Central light burst */}
+      <pointLight color="#FFFFFF" intensity={localT * 5 + avgVolume * 3} distance={40} />
+      <mesh>
+        <sphereGeometry args={[2 + localT * 3, 24, 24]} />
+        <meshBasicMaterial color="#FFFFFF" transparent opacity={localT * 0.3} blending={THREE.AdditiveBlending} />
+      </mesh>
     </group>
   );
 }
 
-// ─── SpeedLines ───────────────────────────────────────────
-const SPEED_LINE_COUNT = 50;
-
-function SpeedLines({ speed }: { speed: number }) {
+function GardenScene({ localT, avgVolume }: { localT: number; avgVolume: number }) {
   const groupRef = useRef<THREE.Group>(null);
 
-  const lines = useMemo(() => {
-    return Array.from({ length: SPEED_LINE_COUNT }, (_, i) => {
+  return (
+    <group ref={groupRef} position={[0, -2, -25]}>
+      {/* Trees of life — glowing pillars */}
+      {Array.from({ length: 8 }, (_, i) => {
+        const angle = (i / 8) * Math.PI * 2;
+        const r = 10;
+        return (
+          <group key={i} position={[Math.cos(angle) * r, 0, Math.sin(angle) * r]}>
+            <mesh>
+              <cylinderGeometry args={[0.3, 0.5, 8, 8]} />
+              <meshStandardMaterial color="#44AA22" emissive="#22CC44" emissiveIntensity={0.4 + avgVolume * 0.3} transparent opacity={localT} />
+            </mesh>
+            {/* Canopy */}
+            <mesh position={[0, 5, 0]}>
+              <sphereGeometry args={[2.5, 12, 8]} />
+              <meshStandardMaterial color="#22CC44" emissive="#88FF44" emissiveIntensity={0.3 + avgVolume * 0.2} transparent opacity={localT * 0.7} />
+            </mesh>
+            {/* Fruit glow */}
+            <pointLight position={[0, 4, 0]} color="#FFD700" intensity={0.5 * localT} distance={8} />
+          </group>
+        );
+      })}
+      {/* River of life */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.1, 0]}>
+        <planeGeometry args={[3, 25]} />
+        <meshBasicMaterial color="#44CCFF" transparent opacity={0.3 * localT} blending={THREE.AdditiveBlending} />
+      </mesh>
+      {/* Warm golden sunlight */}
+      <pointLight position={[0, 12, 0]} color="#FFD700" intensity={2 * localT} distance={30} />
+    </group>
+  );
+}
+
+function CrossScene({ localT, avgVolume }: { localT: number; avgVolume: number }) {
+  const groupRef = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    // Slow dramatic rotation
+    groupRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.2) * 0.05;
+  });
+
+  return (
+    <group ref={groupRef} position={[0, 0, -20]}>
+      {/* The Cross — glowing beams */}
+      <mesh position={[0, 2, 0]}>
+        <boxGeometry args={[0.6, 10, 0.6]} />
+        <meshStandardMaterial color="#8B4513" emissive="#FF2200" emissiveIntensity={0.3 + avgVolume * 0.5} transparent opacity={localT} />
+      </mesh>
+      <mesh position={[0, 5, 0]}>
+        <boxGeometry args={[6, 0.6, 0.6]} />
+        <meshStandardMaterial color="#8B4513" emissive="#FF2200" emissiveIntensity={0.3 + avgVolume * 0.5} transparent opacity={localT} />
+      </mesh>
+      {/* Blood-red glow at base */}
+      <pointLight position={[0, 0, 2]} color="#FF0000" intensity={localT * 3} distance={15} />
+      {/* Crown of thorns ring */}
+      <mesh position={[0, 7, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.8, 0.1, 8, 24]} />
+        <meshStandardMaterial color="#8B6914" emissive="#FFD700" emissiveIntensity={0.5 * localT} transparent opacity={localT} />
+      </mesh>
+      {/* Darkness effect — dark atmosphere */}
+      <mesh position={[0, 5, 0]}>
+        <sphereGeometry args={[20, 16, 16]} />
+        <meshBasicMaterial color="#110000" transparent opacity={0.2 * localT} side={THREE.BackSide} />
+      </mesh>
+      {/* Dramatic rays breaking through */}
+      {localT > 0.5 && Array.from({ length: 6 }, (_, i) => {
+        const angle = (i / 6) * Math.PI * 2;
+        return (
+          <mesh key={i} position={[Math.cos(angle) * 3, 5, Math.sin(angle) * 3]} rotation={[0, 0, angle]}>
+            <coneGeometry args={[0.3, 8 * (localT - 0.5) * 2, 4]} />
+            <meshBasicMaterial color="#FFD700" transparent opacity={0.15 * localT} blending={THREE.AdditiveBlending} depthWrite={false} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+function ResurrectionScene({ localT, avgVolume }: { localT: number; avgVolume: number }) {
+  const groupRef = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    groupRef.current.rotation.y = clock.getElapsedTime() * 0.3;
+  });
+
+  return (
+    <group ref={groupRef} position={[0, 0, -15]}>
+      {/* Burst of golden light */}
+      <mesh>
+        <sphereGeometry args={[3 + localT * 8, 32, 32]} />
+        <meshBasicMaterial color="#FFD700" transparent opacity={localT * 0.4} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[1 + localT * 4, 24, 24]} />
+        <meshBasicMaterial color="#FFFFFF" transparent opacity={localT * 0.6} blending={THREE.AdditiveBlending} />
+      </mesh>
+      {/* Radiating light shafts */}
+      {Array.from({ length: 12 }, (_, i) => {
+        const angle = (i / 12) * Math.PI * 2;
+        return (
+          <mesh key={i} position={[0, 0, 0]} rotation={[Math.cos(angle) * 0.5, angle, 0]}>
+            <coneGeometry args={[0.2, 15 * localT, 4]} />
+            <meshBasicMaterial color="#FFEE88" transparent opacity={0.2 * localT + avgVolume * 0.1} blending={THREE.AdditiveBlending} depthWrite={false} />
+          </mesh>
+        );
+      })}
+      {/* Empty tomb stone rolled away */}
+      <mesh position={[5, -3, 0]} rotation={[0, 0, localT * Math.PI * 0.3]}>
+        <cylinderGeometry args={[1.5, 1.5, 0.5, 16]} />
+        <meshStandardMaterial color="#888888" emissive="#444444" emissiveIntensity={0.2} transparent opacity={localT * 0.8} />
+      </mesh>
+      <pointLight color="#FFD700" intensity={localT * 8 + avgVolume * 3} distance={40} />
+    </group>
+  );
+}
+
+function ThroneScene({ localT, avgVolume }: { localT: number; avgVolume: number }) {
+  const groupRef = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    groupRef.current.rotation.y = clock.getElapsedTime() * 0.05;
+  });
+
+  return (
+    <group ref={groupRef} position={[0, 0, -25]}>
+      {/* Throne — golden stepped platform */}
+      {[0, 1, 2].map(step => (
+        <mesh key={step} position={[0, step * 1.5, 0]}>
+          <boxGeometry args={[6 - step * 1.5, 1, 4 - step]} />
+          <meshStandardMaterial
+            color="#FFD700" emissive="#AA8800" emissiveIntensity={0.5 + avgVolume * 0.3}
+            metalness={0.8} roughness={0.2} transparent opacity={localT}
+          />
+        </mesh>
+      ))}
+      {/* Throne seat */}
+      <mesh position={[0, 5, -0.5]}>
+        <boxGeometry args={[2.5, 3, 1]} />
+        <meshStandardMaterial color="#FFD700" emissive="#FFAA00" emissiveIntensity={0.6} metalness={0.9} roughness={0.1} transparent opacity={localT} />
+      </mesh>
+      {/* Rainbow around throne — Revelation 4:3 */}
+      <mesh position={[0, 6, 0]} rotation={[0, 0, 0]}>
+        <torusGeometry args={[5, 0.3, 16, 64, Math.PI]} />
+        <meshBasicMaterial color="#44FFAA" transparent opacity={0.4 * localT} blending={THREE.AdditiveBlending} />
+      </mesh>
+      {/* 24 Elder seats in circle */}
+      {Array.from({ length: 24 }, (_, i) => {
+        const angle = (i / 24) * Math.PI * 2;
+        const r = 12;
+        return (
+          <mesh key={i} position={[Math.cos(angle) * r, 0, Math.sin(angle) * r]}>
+            <boxGeometry args={[0.8, 2, 0.8]} />
+            <meshStandardMaterial color="#FFD700" emissive="#886600" emissiveIntensity={0.3} metalness={0.7} roughness={0.3} transparent opacity={localT * 0.7} />
+          </mesh>
+        );
+      })}
+      {/* Sea of glass */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
+        <circleGeometry args={[15, 64]} />
+        <meshPhysicalMaterial color="#88CCFF" transparent opacity={0.3 * localT} metalness={0.1} roughness={0.0} clearcoat={1} />
+      </mesh>
+      {/* Four living creatures — 4 glowing orbs */}
+      {[[-3, 3, 3], [3, 3, 3], [-3, 3, -3], [3, 3, -3]].map((pos, i) => (
+        <group key={i} position={pos as [number, number, number]}>
+          <mesh>
+            <sphereGeometry args={[1, 16, 12]} />
+            <meshBasicMaterial color={['#FF4444', '#4488FF', '#44FF44', '#FFD700'][i]} transparent opacity={0.5 * localT} blending={THREE.AdditiveBlending} />
+          </mesh>
+          <pointLight color={['#FF4444', '#4488FF', '#44FF44', '#FFD700'][i]} intensity={1 * localT} distance={8} />
+        </group>
+      ))}
+      <pointLight position={[0, 10, 0]} color="#FFD700" intensity={localT * 5 + avgVolume * 2} distance={30} />
+    </group>
+  );
+}
+
+function NewJerusalemScene({ localT, avgVolume }: { localT: number; avgVolume: number }) {
+  const groupRef = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    groupRef.current.position.y = 10 - localT * 12; // Descending city
+    groupRef.current.rotation.y = clock.getElapsedTime() * 0.08;
+  });
+
+  return (
+    <group ref={groupRef} position={[0, 10, -30]}>
+      {/* City walls — 4 sides of golden cubic */}
+      {[0, 1, 2, 3].map(side => {
+        const angle = (side / 4) * Math.PI * 2;
+        return (
+          <mesh key={side} position={[Math.cos(angle) * 8, 4, Math.sin(angle) * 8]} rotation={[0, -angle, 0]}>
+            <boxGeometry args={[12, 8, 0.5]} />
+            <meshPhysicalMaterial
+              color="#FFD700" emissive="#FFAA00" emissiveIntensity={0.5 + avgVolume * 0.3}
+              metalness={0.9} roughness={0.05} clearcoat={1} transparent opacity={localT * 0.8}
+            />
+          </mesh>
+        );
+      })}
+      {/* 12 Gates — pearls */}
+      {Array.from({ length: 12 }, (_, i) => {
+        const angle = (i / 12) * Math.PI * 2;
+        return (
+          <mesh key={i} position={[Math.cos(angle) * 8.5, 2, Math.sin(angle) * 8.5]}>
+            <sphereGeometry args={[0.8, 16, 12]} />
+            <meshPhysicalMaterial color="#FFFFFF" emissive="#FFEEDD" emissiveIntensity={0.6} metalness={0.1} roughness={0.0} clearcoat={1} transparent opacity={localT} />
+          </mesh>
+        );
+      })}
+      {/* Street of gold */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.1, 0]}>
+        <planeGeometry args={[4, 20]} />
+        <meshPhysicalMaterial color="#FFD700" emissive="#AA8800" emissiveIntensity={0.4} metalness={0.95} roughness={0.05} clearcoat={1} transparent opacity={localT * 0.7} />
+      </mesh>
+      {/* River of life from throne */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.2, 0]}>
+        <planeGeometry args={[1.5, 20]} />
+        <meshBasicMaterial color="#44EEFF" transparent opacity={0.4 * localT} blending={THREE.AdditiveBlending} />
+      </mesh>
+      {/* Tree of life */}
+      <group position={[0, 0, 0]}>
+        <mesh>
+          <cylinderGeometry args={[0.4, 0.6, 6, 8]} />
+          <meshStandardMaterial color="#88AA44" emissive="#44CC22" emissiveIntensity={0.5} transparent opacity={localT} />
+        </mesh>
+        <mesh position={[0, 4, 0]}>
+          <sphereGeometry args={[3, 16, 12]} />
+          <meshStandardMaterial color="#22FF44" emissive="#88FF44" emissiveIntensity={0.4 + avgVolume * 0.3} transparent opacity={localT * 0.6} />
+        </mesh>
+      </group>
+      {/* Glory light — no need for sun */}
+      <pointLight position={[0, 15, 0]} color="#FFFFFF" intensity={localT * 10} distance={50} />
+      <pointLight position={[0, 5, 0]} color="#FFD700" intensity={localT * 5 + avgVolume * 3} distance={30} />
+    </group>
+  );
+}
+
+// ─── Speed Lines ──────────────────────────────────────────
+const SPEED_LINE_COUNT = 60;
+
+function SpeedLines({ speed, color }: { speed: number; color: string }) {
+  const groupRef = useRef<THREE.Group>(null);
+  const lines = useMemo(() =>
+    Array.from({ length: SPEED_LINE_COUNT }, (_, i) => {
       const angle = (i / SPEED_LINE_COUNT) * Math.PI * 2;
-      const radius = 1.8;
-      const colorIdx = i % 3;
-      const color = colorIdx === 0 ? '#aaccff' : colorIdx === 1 ? '#ffaacc' : '#aaffcc';
-      return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, angle, color };
-    });
-  }, []);
+      const radius = 2;
+      return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, angle };
+    }), []);
 
   useFrame(() => {
     if (!groupRef.current) return;
     groupRef.current.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial;
-        mat.opacity = speed * 0.7;
+        mat.opacity = speed * 0.6;
       }
     });
   });
 
-  if (speed < 0.05) return null;
+  if (speed < 0.1) return null;
 
   return (
     <group ref={groupRef} position={[0, 0, -1]}>
       {lines.map((line, i) => (
         <mesh key={i} position={[line.x, line.y, -1]} rotation={[0, 0, line.angle]}>
-          <cylinderGeometry args={[0.004, 0.004, 0.5 + speed * 2, 3]} />
-          <meshBasicMaterial color={line.color} transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+          <cylinderGeometry args={[0.004, 0.004, 0.5 + speed * 2.5, 3]} />
+          <meshBasicMaterial color={color} transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
         </mesh>
       ))}
     </group>
   );
 }
 
-// ─── CockpitPorthole ─────────────────────────────────────
+// ─── Cockpit Porthole ────────────────────────────────────
 function CockpitPorthole({ phaseColor }: { phaseColor: string }) {
   const meshRef = useRef<THREE.Mesh>(null);
-
   useFrame(({ clock }) => {
     if (!meshRef.current) return;
     const mat = meshRef.current.material as THREE.MeshStandardMaterial;
@@ -461,44 +512,68 @@ function CockpitPorthole({ phaseColor }: { phaseColor: string }) {
     <>
       <mesh ref={meshRef} position={[0, 0, -1.5]}>
         <torusGeometry args={[1.8, 0.1, 16, 64]} />
-        <meshPhysicalMaterial
-          color="#8B7535"
-          emissive={phaseColor}
-          emissiveIntensity={0.2}
-          metalness={0.92}
-          roughness={0.08}
-          clearcoat={0.8}
-          clearcoatRoughness={0.05}
-        />
+        <meshPhysicalMaterial color="#8B7535" emissive={phaseColor} emissiveIntensity={0.2} metalness={0.92} roughness={0.08} clearcoat={0.8} clearcoatRoughness={0.05} />
       </mesh>
-      {/* Inner glow ring — golden */}
       <mesh position={[0, 0, -1.48]}>
         <torusGeometry args={[1.72, 0.025, 8, 48]} />
         <meshBasicMaterial color="#FFD700" transparent opacity={0.3} blending={THREE.AdditiveBlending} />
-      </mesh>
-      {/* Outer decorative ring */}
-      <mesh position={[0, 0, -1.52]}>
-        <torusGeometry args={[1.88, 0.02, 8, 48]} />
-        <meshStandardMaterial
-          color="#A08830"
-          emissive="#FFD700"
-          emissiveIntensity={0.4}
-          metalness={0.9}
-          roughness={0.1}
-          transparent
-          opacity={0.6}
-        />
       </mesh>
     </>
   );
 }
 
-// ─── ProgressRing ─────────────────────────────────────────
-function ProgressRing({ progress, color }: { progress: number; color: string }) {
-  const geometry = useMemo(() => {
-    return new THREE.RingGeometry(1.8, 1.88, 64, 1, 0, progress * Math.PI * 2);
-  }, [progress]);
+// ─── Floating Particles ──────────────────────────────────
+function FloatingEmbers({ count, color, avgVolume }: { count: number; color: string; avgVolume: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const particleData = useMemo(() => {
+    const data = [];
+    for (let i = 0; i < count; i++) {
+      data.push({
+        x: (Math.random() - 0.5) * 30,
+        y: (Math.random() - 0.5) * 20,
+        z: -Math.random() * 40 - 5,
+        speedX: (Math.random() - 0.5) * 0.02,
+        speedY: Math.random() * 0.01 + 0.005,
+        phase: Math.random() * Math.PI * 2,
+        size: 0.03 + Math.random() * 0.08,
+      });
+    }
+    return data;
+  }, [count]);
 
+  useFrame(({ clock }) => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    const t = clock.getElapsedTime();
+    for (let i = 0; i < particleData.length; i++) {
+      const p = particleData[i];
+      const pulse = 1 + Math.sin(t * 2 + p.phase) * 0.3 + avgVolume * 0.5;
+      dummy.position.set(
+        p.x + Math.sin(t * 0.5 + p.phase) * 2,
+        p.y + Math.sin(t * p.speedY * 10 + p.phase) * 3,
+        p.z,
+      );
+      dummy.scale.setScalar(p.size * pulse);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  });
+
+  const map = useMemo(() => getSoftCircleTexture(), []);
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial map={map} color={color} transparent opacity={0.6} depthWrite={false} blending={THREE.AdditiveBlending} />
+    </instancedMesh>
+  );
+}
+
+// ─── Progress Ring ────────────────────────────────────────
+function ProgressRing({ progress, color }: { progress: number; color: string }) {
+  const geometry = useMemo(() => new THREE.RingGeometry(1.8, 1.88, 64, 1, 0, progress * Math.PI * 2), [progress]);
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
       <primitive object={geometry} attach="geometry" />
@@ -507,35 +582,24 @@ function ProgressRing({ progress, color }: { progress: number; color: string }) 
   );
 }
 
-// ─── GoldenLightTunnel ────────────────────────────────────
-function GoldenLightTunnel({ intensity }: { intensity: number }) {
-  if (intensity <= 0) return null;
+// ─── Scene Transition Overlay ─────────────────────────────
+function SceneTransition({ progress, scenes }: { progress: number; scenes: TourScene[] }) {
+  // Show brief flash at scene boundaries
+  const isTransitioning = useMemo(() => {
+    for (const scene of scenes) {
+      const dist = Math.abs(progress - scene.start);
+      if (dist < 0.015 && scene.start > 0) return dist / 0.015;
+    }
+    return 0;
+  }, [progress, scenes]);
+
+  if (isTransitioning <= 0) return null;
 
   return (
-    <group>
-      {/* Central golden sun */}
-      <mesh position={[0, 0, -20]}>
-        <sphereGeometry args={[3 + intensity * 6, 24, 24]} />
-        <meshBasicMaterial color="#FFD700" transparent opacity={intensity * 0.4} side={THREE.BackSide} />
-      </mesh>
-      {/* Bright corona */}
-      <mesh position={[0, 0, -18]}>
-        <sphereGeometry args={[5 + intensity * 10, 16, 16]} />
-        <meshBasicMaterial color="#FFEE88" transparent opacity={intensity * 0.12} side={THREE.BackSide} blending={THREE.AdditiveBlending} depthWrite={false} />
-      </mesh>
-      <pointLight position={[0, 0, -15]} color="#FFD700" intensity={intensity * 8} distance={50} />
-      <pointLight position={[0, 0, -10]} color="#FFEE88" intensity={intensity * 3} distance={30} />
-      {/* Light rays */}
-      {Array.from({ length: 8 }, (_, i) => {
-        const angle = (i / 8) * Math.PI * 2;
-        return (
-          <mesh key={i} position={[Math.cos(angle) * 5, Math.sin(angle) * 5, -25]} rotation={[0, 0, angle]}>
-            <coneGeometry args={[0.8 + intensity * 3, 20, 4]} />
-            <meshBasicMaterial color="#FFD700" transparent opacity={intensity * 0.12} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} />
-          </mesh>
-        );
-      })}
-    </group>
+    <mesh position={[0, 0, -2]}>
+      <planeGeometry args={[20, 20]} />
+      <meshBasicMaterial color="#FFFFFF" transparent opacity={(1 - isTransitioning) * 0.6} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </mesh>
   );
 }
 
@@ -543,10 +607,11 @@ function GoldenLightTunnel({ intensity }: { intensity: number }) {
 export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
   const [audioState, audioControls] = useStreamingAudio(AUDIO_SRC);
   const sceneGroupRef = useRef<THREE.Group>(null);
+  const cameraGroupRef = useRef<THREE.Group>(null);
 
   const avgVolume = useMemo(() => {
     if (!audioState.analyserData) return 0;
-    const sum = audioState.analyserData.reduce((a, b) => a + b, 0);
+    const sum = audioState.analyserData.reduce((a: number, b: number) => a + b, 0);
     return sum / audioState.analyserData.length / 255;
   }, [audioState.analyserData]);
 
@@ -557,126 +622,125 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
     return sum / 8 / 255;
   }, [audioState.analyserData]);
 
-  const phase = getPhaseColors(audioState.progress);
-  const speed = getSpeed(audioState.progress);
-  const arrivalIntensity = audioState.progress > 0.8 ? (audioState.progress - 0.8) / 0.2 : 0;
+  const currentScene = getCurrentScene(audioState.progress);
+  const localT = getSceneLocalProgress(audioState.progress, currentScene);
+  const speed = 0.3 + localT * 0.7 + avgVolume * 0.3;
 
-  const phaseLabel = audioState.progress < 0.2
-    ? 'Earth Departure'
-    : audioState.progress < 0.5
-      ? 'Deep Space'
-      : audioState.progress < 0.8
-        ? 'Cosmic Wonder'
-        : 'Arrival';
-
-  // Audio-reactive camera shake
+  // Camera flythrough path
   useFrame(({ clock }) => {
-    if (!sceneGroupRef.current) return;
+    if (!cameraGroupRef.current) return;
+    const camPos = currentScene.cameraPath(localT);
+    const target = cameraGroupRef.current.position;
+    target.x += (camPos.x * 0.3 - target.x) * 0.02;
+    target.y += (camPos.y * 0.3 - target.y) * 0.02;
+
+    // Audio-reactive shake
     const t = clock.getElapsedTime();
-    const shakeX = Math.sin(t * 17) * bassVolume * 0.025 + Math.sin(t * 7) * avgVolume * 0.006;
-    const shakeY = Math.cos(t * 13) * bassVolume * 0.018 + Math.cos(t * 11) * avgVolume * 0.005;
-    sceneGroupRef.current.position.x = shakeX;
-    sceneGroupRef.current.position.y = shakeY;
+    const shakeX = Math.sin(t * 17) * bassVolume * 0.03;
+    const shakeY = Math.cos(t * 13) * bassVolume * 0.02;
+    target.x += shakeX;
+    target.y += shakeY;
   });
 
   return (
     <group ref={sceneGroupRef}>
-      {/* Dynamic ambient light — warm golden base */}
-      <ambientLight intensity={0.35} color={phase.ambient} />
+      <group ref={cameraGroupRef}>
+        {/* Dynamic ambient */}
+        <ambientLight intensity={0.3} color={currentScene.colors.ambient} />
+        <directionalLight position={[0, 5, -10]} intensity={0.4} color="#FFE4B0" />
 
-      {/* Directional fill — warm golden */}
-      <directionalLight position={[0, 5, -10]} intensity={0.4} color="#FFE4B0" />
+        {/* Scene accent lights */}
+        <pointLight position={[-5, 3, -5]} color={currentScene.colors.accent} intensity={currentScene.lightIntensity + avgVolume * 0.8} distance={25} />
+        <pointLight position={[5, 3, -5]} color={currentScene.colors.nebula[1] || currentScene.colors.accent} intensity={1 + avgVolume * 0.6} distance={20} />
 
-      {/* Phase-reactive accent lights — golden warmth */}
-      <pointLight position={[-5, 3, -5]} color={phase.accentColor} intensity={1.5 + avgVolume * 0.8} distance={25} />
-      <pointLight position={[5, 3, -5]} color={phase.nebula[1] || phase.accentColor} intensity={1.0 + avgVolume * 0.6} distance={20} />
-      <pointLight position={[0, -2, -10]} color="#FFD700" intensity={0.6} distance={20} />
+        {/* Warp stars */}
+        <WarpStars progress={audioState.progress} scene={currentScene} avgVolume={avgVolume} />
 
-      {/* Warp star field — more stars, more color */}
-      <WarpStars
-        progress={audioState.progress}
-        brightness={phase.starBrightness * (1 + avgVolume * 0.4)}
-      />
+        {/* Nebula clouds */}
+        <NebulaClouds count={18} radius={40} colors={currentScene.colors.nebula} opacity={0.12 + avgVolume * 0.15} zSpeed={speed * 15} />
 
-      {/* Nebula clouds — more, brighter */}
-      <NebulaClouds
-        count={20}
-        radius={40}
-        colors={phase.nebula}
-        opacity={0.15 + avgVolume * 0.2}
-        zSpeed={speed * 18}
-      />
+        {/* Scene-specific geometry */}
+        {currentScene.id === 'creation' && <CreationScene localT={localT} avgVolume={avgVolume} />}
+        {currentScene.id === 'garden' && <GardenScene localT={localT} avgVolume={avgVolume} />}
+        {currentScene.id === 'cross' && <CrossScene localT={localT} avgVolume={avgVolume} />}
+        {currentScene.id === 'resurrection' && <ResurrectionScene localT={localT} avgVolume={avgVolume} />}
+        {currentScene.id === 'throne' && <ThroneScene localT={localT} avgVolume={avgVolume} />}
+        {currentScene.id === 'newJerusalem' && <NewJerusalemScene localT={localT} avgVolume={avgVolume} />}
 
-      {/* Celestial bodies flying past */}
-      <CelestialBodies progress={audioState.progress} />
+        {/* Speed lines */}
+        <SpeedLines speed={speed} color={currentScene.particleColor} />
 
-      {/* Peripheral speed lines — with color variety */}
-      <SpeedLines speed={speed} />
+        {/* Floating embers */}
+        <FloatingEmbers count={200} color={currentScene.particleColor} avgVolume={avgVolume} />
 
+        {/* Scene transition flash */}
+        <SceneTransition progress={audioState.progress} scenes={TOUR_SCENES} />
 
-      {/* Golden light tunnel for arrival phase */}
-      <GoldenLightTunnel intensity={arrivalIntensity} />
+        {/* Cockpit porthole */}
+        <CockpitPorthole phaseColor={currentScene.colors.accent} />
 
-      {/* Earth departure atmosphere — vivid blue */}
-      {audioState.progress < 0.25 && (
-        <>
-          <mesh position={[0, -20, 0]}>
-            <sphereGeometry args={[15, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-            <meshBasicMaterial
-              color="#3366FF"
-              transparent
-              opacity={0.35 * (1 - audioState.progress / 0.25)}
-              side={THREE.BackSide}
-              blending={THREE.AdditiveBlending}
+        {/* Progress ring */}
+        <ProgressRing progress={audioState.progress} color={currentScene.colors.accent} />
+
+        {/* Fog */}
+        <fog attach="fog" args={[currentScene.colors.fog, 12, 55]} />
+
+        {/* Title */}
+        <Text position={[0, 2.5, -3]} fontSize={0.25} color={currentScene.colors.accent} anchorX="center" outlineWidth={0.012} outlineColor="#000">
+          Heaven's Diary
+        </Text>
+
+        {/* Scene label */}
+        <Text position={[0, 2.15, -3]} fontSize={0.14} color="#FFFFFF" anchorX="center" outlineWidth={0.008} outlineColor="#000">
+          {currentScene.label}
+        </Text>
+
+        {/* Scripture subtitle */}
+        <Text position={[0, 1.9, -3]} fontSize={0.07} color="#CCCCAA" anchorX="center" maxWidth={3}>
+          {currentScene.subtitle}
+        </Text>
+
+        {/* Play/Pause button */}
+        <Interactive onSelect={audioControls.togglePlayPause}>
+          <mesh position={[0, 1.45, -3]} onClick={audioControls.togglePlayPause} onPointerDown={audioControls.togglePlayPause}>
+            <circleGeometry args={[0.18, 32]} />
+            <meshStandardMaterial
+              color={audioState.isPlaying ? '#FF4444' : '#44FF44'}
+              emissive={audioState.isPlaying ? '#FF4444' : '#44FF44'}
+              emissiveIntensity={0.8}
             />
           </mesh>
-        </>
-      )}
+        </Interactive>
+        <Text position={[0, 1.45, -2.98]} fontSize={0.1} color="white" anchorX="center" anchorY="middle">
+          {audioState.isPlaying ? '⏸' : '▶'}
+        </Text>
 
+        {/* Time display */}
+        <Text position={[0, 1.15, -3]} fontSize={0.07} color="#CCCCEE" anchorX="center">
+          {formatTime(audioState.currentTime)} / {formatTime(audioState.duration)}
+          {audioState.isLoading ? '  Loading...' : ''}
+        </Text>
 
-      {/* Fog for depth */}
-      <fog attach="fog" args={[phase.fogColor, 15, 60]} />
+        {/* Scene progress dots */}
+        <group position={[0, 1.0, -3]}>
+          {TOUR_SCENES.map((scene, i) => {
+            const isCurrent = scene.id === currentScene.id;
+            const isPast = audioState.progress >= scene.end;
+            return (
+              <mesh key={scene.id} position={[(i - (TOUR_SCENES.length - 1) / 2) * 0.2, 0, 0]}>
+                <circleGeometry args={[isCurrent ? 0.04 : 0.025, 16]} />
+                <meshBasicMaterial
+                  color={isCurrent ? scene.colors.accent : isPast ? '#888888' : '#444444'}
+                  transparent opacity={isCurrent ? 1 : 0.6}
+                />
+              </mesh>
+            );
+          })}
+        </group>
 
-      {/* Title */}
-      <Text
-        position={[0, 2.5, -3]}
-        fontSize={0.25}
-        color={phase.accentColor}
-        anchorX="center"
-        outlineWidth={0.012}
-        outlineColor="#000"
-      >
-        Heaven's Diary
-      </Text>
-
-      {/* Phase indicator */}
-      <Text position={[0, 2.1, -3]} fontSize={0.1} color="#AAAACC" anchorX="center">
-        {phaseLabel}
-      </Text>
-
-      {/* Play/Pause button */}
-      <Interactive onSelect={audioControls.togglePlayPause}>
-        <mesh position={[0, 1.5, -3]} onClick={audioControls.togglePlayPause} onPointerDown={audioControls.togglePlayPause}>
-          <circleGeometry args={[0.18, 32]} />
-          <meshStandardMaterial
-            color={audioState.isPlaying ? '#FF4444' : '#44FF44'}
-            emissive={audioState.isPlaying ? '#FF4444' : '#44FF44'}
-            emissiveIntensity={0.8}
-          />
-        </mesh>
-      </Interactive>
-      <Text position={[0, 1.5, -2.98]} fontSize={0.1} color="white" anchorX="center" anchorY="middle">
-        {audioState.isPlaying ? '⏸' : '▶'}
-      </Text>
-
-      {/* Time display */}
-      <Text position={[0, 1.2, -3]} fontSize={0.07} color="#CCCCEE" anchorX="center">
-        {formatTime(audioState.currentTime)} / {formatTime(audioState.duration)}
-        {audioState.isLoading ? '  Loading...' : ''}
-      </Text>
-
-      {/* Back button */}
-      <BackToLobbyButton onBack={onBack} position={[0, 0.2, -1.5]} />
+        {/* Back button */}
+        <BackToLobbyButton onBack={onBack} position={[0, 0.2, -1.5]} />
+      </group>
     </group>
   );
 }
