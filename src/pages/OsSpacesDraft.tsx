@@ -249,6 +249,7 @@ export default function OsSpacesDraft() {
               </button>
             );
           })}
+        </div>
 
         {/* Expanded Space Contents */}
         {active && (
