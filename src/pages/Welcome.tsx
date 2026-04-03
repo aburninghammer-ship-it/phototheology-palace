@@ -20,13 +20,16 @@ const Welcome = () => {
       <div className="px-4 pt-6 space-y-4">
         <WhatsNewTicker />
         <ReginaldGreeting />
+        <ExperienceModeSelector variant="compact" className="justify-center" />
         <UpgradeFloatingCard />
         <AudioTourBanner />
         <DailyAudioDevotional />
         <ContinueWhereYouLeftOff />
       </div>
       <OsSpacesWelcome />
-      <PtGlossaryTable />
+      <PTSection showIn={["guided", "master"]}>
+        <PtGlossaryTable />
+      </PTSection>
     </>
   );
 };
