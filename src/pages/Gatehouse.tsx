@@ -761,21 +761,6 @@ const Gatehouse = () => {
                 <p className="text-lg font-bold text-primary">$17</p>
               </Card>
             </Link>
-
-            <Link to="/study-suite" className="group">
-              <Card className="p-6 h-full border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg hover:shadow-primary/10">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Layers className="h-5 w-5 text-primary" />
-                  </div>
-                  <h4 className="font-semibold group-hover:text-primary transition-colors">{t('gatehouse.studySuite')}</h4>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  {t('gatehouse.studySuiteDesc')}
-                </p>
-                <p className="text-lg font-bold text-primary">$97</p>
-              </Card>
-            </Link>
           </div>
         </motion.div>
       </main>

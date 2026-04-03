@@ -26,11 +26,9 @@ import {
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
-import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
 
 export default function StudySuiteSales() {
   const { t } = useTranslation();
-  const paymentLinks = useTrackedPaymentLinks();
   const floors = [
     {
       number: 1,
@@ -247,7 +245,7 @@ export default function StudySuiteSales() {
                 asChild
                 className="text-lg px-8 py-6 h-auto shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
               >
-                <a href={paymentLinks.studySuite} target="_blank" rel="noopener noreferrer">
+                <a href="/pricing" rel="noopener noreferrer">
                   {t('studySuite.getCompleteStudySuitePrice')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </a>
@@ -712,9 +710,9 @@ export default function StudySuiteSales() {
                 </p>
 
                 <div className="py-6">
-                  <p className="text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">$97</p>
+                  <p className="text-2xl font-bold text-primary">Now included with PhototheologyOS subscription</p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    {t('studySuite.oneTimePurchase')}
+                    Access all training materials with your membership
                   </p>
                 </div>
 
@@ -723,7 +721,7 @@ export default function StudySuiteSales() {
                   asChild
                   className="w-full text-lg py-6 h-auto shadow-lg shadow-primary/25 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
                 >
-                  <a href={paymentLinks.studySuite} target="_blank" rel="noopener noreferrer">
+                  <a href="/pricing" rel="noopener noreferrer">
                     <Building2 className="w-5 h-5 mr-2" />
                     {t('studySuite.getCompleteStudySuite')}
                   </a>
