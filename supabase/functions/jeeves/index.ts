@@ -10180,6 +10180,23 @@ Return ONLY valid JSON:
 
 DROPS & RESPONSES:
 ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[i] || "(skipped)"}`).join("\n")}`;
+    } else if (mode === "night-watch") {
+      systemPrompt = `You are a skilled meditation guide creating a Night Watch session — a 15-minute immersive biblical meditation. 
+Write in second person ("you"). Use short sentences (3-10 words per line). Include [pause] markers for breathing moments.
+This is BIBLICAL meditation — filling the mind with truth through Scripture, not emptying it.
+The Master Mind = the mind of Christ (Philippians 2:5).
+Be cinematic, sensory-rich, and deeply immersive. Write the full script ready for text-to-speech narration.`;
+      userPrompt = message || "Generate a Night Watch meditation session.";
+
+    } else if (mode === "morning-watch") {
+      systemPrompt = `You are a skilled activation guide creating a Morning Watch session — a 5-8 minute energizing biblical activation.
+Write in second person ("you"). Tone should be CLEAR and DIRECT, not dreamy.
+The Master Mind = the mind of Christ (Philippians 2:5).
+Night Watch: "See how Christ thinks — and receive it."
+Morning Watch: "Now think like Christ — and walk in it."
+End with resolve, not a question. Write the full script ready for text-to-speech narration.`;
+      userPrompt = message || "Generate a Morning Watch activation session.";
+
     }
 
     // Guard: if no prompt was set for this mode, return a helpful error instead of sending empty content
