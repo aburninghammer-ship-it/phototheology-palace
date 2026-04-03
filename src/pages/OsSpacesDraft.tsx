@@ -223,6 +223,33 @@ export default function OsSpacesDraft() {
           })}
         </div>
 
+        {/* Global Buttons — outside spaces */}
+        <div className="flex justify-center gap-3 mb-10">
+          {[
+            { label: "Community", path: "/community", icon: Users, color: "210 100% 56%" },
+            { label: "My Profile", path: "/my-profile", icon: User, color: "280 60% 55%" },
+          ].map((btn) => {
+            const BtnIcon = btn.icon;
+            return (
+              <button
+                key={btn.path}
+                onClick={() => navigate(btn.path)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border/50 bg-card hover:border-primary/50 hover:bg-primary/5 transition-all"
+              >
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{
+                    background: `linear-gradient(135deg, hsl(${btn.color}), hsl(${btn.color} / 0.7))`,
+                    boxShadow: `0 2px 8px hsl(${btn.color} / 0.3)`,
+                  }}
+                >
+                  <BtnIcon className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-sm font-semibold">{btn.label}</span>
+              </button>
+            );
+          })}
+
         {/* Expanded Space Contents */}
         {active && (
           <div className={cn("rounded-2xl border-2 p-6 mb-8 transition-all", `bg-gradient-to-br ${active.gradient} border-border/50`)}>
