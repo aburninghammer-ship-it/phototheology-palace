@@ -90,29 +90,29 @@ function initStarData(): StarData {
     offsets[i * 3 + 1] = Math.sin(angle) * r;
     offsets[i * 3 + 2] = -Math.random() * CYLINDER_DEPTH;
     baseSizes[i] = 0.02 + Math.random() * 0.08;
-    // Varied star colors — not just white
+    // Varied star colors — warm golden palette dominant
     const type = Math.random();
-    if (type < 0.3) {
+    if (type < 0.35) {
+      // Warm gold
+      colors[i * 3] = 1.0;
+      colors[i * 3 + 1] = 0.82 + Math.random() * 0.18;
+      colors[i * 3 + 2] = 0.3 + Math.random() * 0.4;
+    } else if (type < 0.55) {
       // Blue-white
       colors[i * 3] = 0.7 + Math.random() * 0.2;
       colors[i * 3 + 1] = 0.8 + Math.random() * 0.2;
       colors[i * 3 + 2] = 1.0;
-    } else if (type < 0.5) {
-      // Warm gold
+    } else if (type < 0.7) {
+      // Amber/orange
       colors[i * 3] = 1.0;
-      colors[i * 3 + 1] = 0.85 + Math.random() * 0.15;
-      colors[i * 3 + 2] = 0.5 + Math.random() * 0.3;
-    } else if (type < 0.65) {
-      // Pink/magenta
-      colors[i * 3] = 0.9 + Math.random() * 0.1;
-      colors[i * 3 + 1] = 0.4 + Math.random() * 0.3;
-      colors[i * 3 + 2] = 0.8 + Math.random() * 0.2;
+      colors[i * 3 + 1] = 0.65 + Math.random() * 0.2;
+      colors[i * 3 + 2] = 0.2 + Math.random() * 0.2;
     } else {
-      // White with slight variation
+      // White-gold with slight variation
       const warmth = Math.random();
-      colors[i * 3] = 0.9 + warmth * 0.1;
-      colors[i * 3 + 1] = 0.9 + warmth * 0.05;
-      colors[i * 3 + 2] = 0.95 + Math.random() * 0.05;
+      colors[i * 3] = 0.95 + warmth * 0.05;
+      colors[i * 3 + 1] = 0.88 + warmth * 0.08;
+      colors[i * 3 + 2] = 0.7 + Math.random() * 0.2;
     }
   }
   return { offsets, baseSizes, colors };
