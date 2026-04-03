@@ -10,6 +10,10 @@ import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
 const AUDIO_SRC = '/audio/heavens-diary.m4a';
 
+interface HeavensDiaryProps {
+  onBack: () => void;
+}
+
 // ─── Tour Scenes ──────────────────────────────────────────
 interface TourScene {
   id: string;
