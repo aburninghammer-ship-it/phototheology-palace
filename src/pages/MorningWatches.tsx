@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sun, Play, ChevronDown, Lock } from "lucide-react";
+import morningWatchImage from "@/assets/morning-watch-sunrise.jpg";
 import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
 import { useWatchPlayer } from "@/hooks/useWatchPlayer";
 import { useWatchProgress } from "@/hooks/useWatchProgress";
