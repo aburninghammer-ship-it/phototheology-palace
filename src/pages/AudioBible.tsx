@@ -432,6 +432,18 @@ export default function AudioBible() {
     setIsEpicLoading(true);
     setEpicNowPlayingBook(book);
     setEpicNowPlayingChapter(chapter);
+
+    // MOBILE FIX: Prime an Audio element within the user gesture context BEFORE
+    // any async work (DB queries, generation). This prevents the browser from
+    // blocking play() later because the gesture context has expired.
+    const primedAudio = new Audio();
+    try {
+      primedAudio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      primedAudio.load();
+      await primedAudio.play().catch(() => {});
+      primedAudio.pause();
+    } catch {}
+
     try {
       // Fetch cached commentary for this mode
       let { data, error } = await supabase
@@ -518,8 +530,9 @@ export default function AudioBible() {
         epicAudioRef.current = null;
       }
 
-      // Play the audio
-      const audio = new Audio(epicUrl);
+      // Play the audio — reuse the primed element so the gesture context carries over
+      primedAudio.src = epicUrl;
+      const audio = primedAudio;
       epicAudioRef.current = audio;
       audio.volume = volume;
 
