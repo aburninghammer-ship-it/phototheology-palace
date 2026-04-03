@@ -125,6 +125,8 @@ const Achievements = lazy(() => import("./pages/Achievements"));
 const Feedback = lazy(() => import("./pages/Feedback"));
 const CultureControversy = lazy(() => import("./pages/CultureControversy"));
 const ProphecyWatch = lazy(() => import("./pages/ProphecyWatch"));
+const NightWatches = lazy(() => import("./pages/NightWatches"));
+const MorningWatches = lazy(() => import("./pages/MorningWatches"));
 const ResearchMode = lazy(() => import("./pages/ResearchMode"));
 const InterlinearBible = lazy(() => import("./pages/InterlinearBible"));
 const BibleTimeline = lazy(() => import("./pages/BibleTimeline"));
