@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Moon, Play, Clock, BookOpen, ChevronRight, Lock, Star, ChevronDown } from "lucide-react";
+import { Moon, Play, ChevronDown, Lock } from "lucide-react";
 import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
 import { useWatchPlayer } from "@/hooks/useWatchPlayer";
+import { useWatchProgress } from "@/hooks/useWatchProgress";
 import {
   WATCH_TRACTS,
   MOOD_COLORS,
@@ -19,40 +19,66 @@ import { Heart } from "lucide-react";
 type TractTab = "free" | "40-day" | "365-day";
 
 export default function NightWatches() {
-  const { startNightWatch, isGenerating, immersive } = useWatchPlayer();
+  const { startTract, markDayComplete, isDayUnlocked, getProgress } = useWatchProgress();
+  const { startNightWatch, isGenerating, immersive, handleClose } = useWatchPlayer({
+    onComplete: (tractId, day) => markDayComplete(tractId, day),
+  });
   const [activeTab, setActiveTab] = useState<TractTab>("free");
-  const [selectedTract, setSelectedTract] = useState<WatchTract | null>(null);
   const [expandedTract, setExpandedTract] = useState<string | null>(null);
 
   const freeTracts = WATCH_TRACTS.filter((t) => t.isFree);
   const fortyDayTracts = getTractsByType("40-day").filter((t) => !t.isFree);
   const yearTracts = getTractsByType("365-day");
 
-  const handleBeginWatch = (session: WatchSession, tractName: string) => {
-    startNightWatch(session, tractName);
+  const handleBeginWatch = (session: WatchSession, tract: WatchTract) => {
+    startTract(tract.id);
+    startNightWatch(session, tract.name, tract.id);
   };
 
-  const renderSessionCard = (session: WatchSession, tractName: string) => {
+  const renderSessionCard = (session: WatchSession, tract: WatchTract) => {
     const StruggleIcon = STRUGGLE_ICONS[session.struggle] || Heart;
+    const unlocked = isDayUnlocked(tract.id, session.dayNumber);
+    const progress = getProgress(tract.id);
+    const isCompleted = progress.completedDays.includes(session.dayNumber);
+    const isCurrent = progress.currentDay === session.dayNumber && !isCompleted;
+
     return (
       <Card
         key={session.dayNumber}
-        className="cursor-pointer transition-all duration-300 border-border/50 hover:border-indigo-500/40 bg-card/80 hover:bg-indigo-500/5"
-        onClick={() => handleBeginWatch(session, tractName)}
+        className={`transition-all duration-300 border-border/50 bg-card/80 ${
+          unlocked
+            ? isCurrent
+              ? "cursor-pointer border-indigo-500/60 bg-indigo-500/10 ring-1 ring-indigo-500/30"
+              : "cursor-pointer hover:border-indigo-500/40 hover:bg-indigo-500/5"
+            : "opacity-50 cursor-not-allowed"
+        }`}
+        onClick={() => unlocked && handleBeginWatch(session, tract)}
       >
         <CardContent className="p-4">
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-sm font-bold text-indigo-300">
-                {session.dayNumber}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                isCompleted
+                  ? "bg-emerald-500/20 text-emerald-300"
+                  : isCurrent
+                    ? "bg-indigo-500/30 text-indigo-200"
+                    : "bg-indigo-500/20 text-indigo-300"
+              }`}>
+                {isCompleted ? "✓" : session.dayNumber}
               </div>
               <div>
                 <h3 className="font-semibold text-sm text-foreground">{session.title}</h3>
                 <p className="text-xs text-muted-foreground">{session.scripture}</p>
               </div>
             </div>
-            {isGenerating ? (
+            {!unlocked ? (
+              <Lock className="w-4 h-4 text-muted-foreground/50" />
+            ) : isGenerating ? (
               <div className="w-4 h-4 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
+            ) : isCurrent ? (
+              <span className="text-xs font-semibold text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full">
+                Begin Watch
+              </span>
             ) : (
               <Play className="w-4 h-4 text-indigo-400" />
             )}
@@ -75,20 +101,14 @@ export default function NightWatches() {
   const renderTractCard = (tract: WatchTract) => {
     const isExpanded = expandedTract === tract.id;
     const hasSessions = tract.sessions.length > 0;
+    const progress = getProgress(tract.id);
 
     return (
       <Card key={tract.id} className="border-border/50 bg-card/80 overflow-hidden">
         <CardContent className="p-0">
           <button
             className="w-full p-4 flex items-start gap-3 text-left hover:bg-indigo-500/5 transition-colors"
-            onClick={() => {
-              if (hasSessions) {
-                setSelectedTract(isExpanded ? null : tract);
-                setExpandedTract(isExpanded ? null : tract.id);
-              } else {
-                setExpandedTract(isExpanded ? null : tract.id);
-              }
-            }}
+            onClick={() => setExpandedTract(isExpanded ? null : tract.id)}
           >
             <span className="text-2xl">{tract.icon}</span>
             <div className="flex-1 min-w-0">
@@ -102,6 +122,11 @@ export default function NightWatches() {
               </div>
               <p className="text-xs text-indigo-400">{tract.subtitle}</p>
               <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{tract.description}</p>
+              {hasSessions && progress.completedDays.length > 0 && (
+                <p className="text-[10px] text-indigo-400/70 mt-1">
+                  Day {progress.currentDay} of {tract.totalSessions} · {progress.completedDays.length} completed
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Badge variant="outline" className="text-[10px]">
@@ -113,7 +138,7 @@ export default function NightWatches() {
 
           {isExpanded && hasSessions && (
             <div className="border-t border-border/30 p-4 space-y-2 max-h-96 overflow-y-auto">
-              {tract.sessions.map((s) => renderSessionCard(s, tract.name))}
+              {tract.sessions.map((s) => renderSessionCard(s, tract))}
             </div>
           )}
 
@@ -206,7 +231,6 @@ export default function NightWatches() {
               onClick={() => {
                 setActiveTab(tab.id);
                 setExpandedTract(null);
-                setSelectedTract(null);
               }}
               className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab.id
@@ -249,7 +273,7 @@ export default function NightWatches() {
       {/* Immersive Audio Player */}
       <ImmersiveAudioPlayer
         isOpen={immersive.isOpen}
-        onClose={immersive.closeImmersive}
+        onClose={handleClose}
         tracks={immersive.queue.tracks}
         currentIndex={immersive.queue.currentIndex}
         onNextTrack={immersive.nextTrack}

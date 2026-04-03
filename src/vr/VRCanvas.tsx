@@ -6,12 +6,19 @@ import { BackSide } from 'three';
 import * as THREE from 'three';
 import { VRLobby, type VRExperience } from './VRLobby';
 
+interface VRCanvasProps {
+  initialExperience?: VRExperience;
+  onBackToHub?: () => void;
+}
+
 const SanctuaryWalk = React.lazy(() => import('./experiences/SanctuaryWalk'));
 const GalleryCorridor = React.lazy(() => import('./experiences/GalleryCorridor'));
 const SpatialAudioPlayer = React.lazy(() => import('./experiences/SpatialAudioPlayer'));
 const HeavensDiary = React.lazy(() => import('./experiences/HeavensDiary'));
 const GameArcade = React.lazy(() => import('./experiences/GameArcade'));
 const PalaceTour = React.lazy(() => import('./experiences/PalaceTour'));
+const NightWatchVR = React.lazy(() => import('./experiences/NightWatchVR'));
+const MorningWatchVR = React.lazy(() => import('./experiences/MorningWatchVR'));
 
 /** Disable OrbitControls when inside an XR session (head tracking takes over) */
 function DesktopControls() {
@@ -136,9 +143,9 @@ function XRSceneAnchor({ children }: { children: React.ReactNode }) {
   return <group position={sceneOffset}>{children}</group>;
 }
 
-function VRScene() {
-  const [currentExperience, setCurrentExperience] = useState<VRExperience>('lobby');
-  const [displayedExperience, setDisplayedExperience] = useState<VRExperience>('lobby');
+function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperience?: VRExperience; onBackToHub?: () => void }) {
+  const [currentExperience, setCurrentExperience] = useState<VRExperience>(initialExperience);
+  const [displayedExperience, setDisplayedExperience] = useState<VRExperience>(initialExperience);
   const [fadeState, setFadeState] = useState<'idle' | 'out' | 'in'>('idle');
   const pendingExperience = useRef<VRExperience | null>(null);
 
@@ -158,7 +165,13 @@ function VRScene() {
     }, 300);
   }, [fadeState]);
 
-  const goToLobby = useCallback(() => handleExperienceChange('lobby'), [handleExperienceChange]);
+  const goToLobby = useCallback(() => {
+    if (onBackToHub) {
+      onBackToHub();
+    } else {
+      handleExperienceChange('lobby');
+    }
+  }, [handleExperienceChange, onBackToHub]);
 
   return (
     <>
@@ -184,6 +197,8 @@ function VRScene() {
           {displayedExperience === 'heavensDiary' && <HeavensDiary onBack={goToLobby} />}
           {displayedExperience === 'arcade' && <GameArcade onBack={goToLobby} />}
           {displayedExperience === 'palace' && <PalaceTour onBack={goToLobby} />}
+          {displayedExperience === 'nightWatch' && <NightWatchVR onBack={goToLobby} />}
+          {displayedExperience === 'morningWatch' && <MorningWatchVR onBack={goToLobby} />}
         </Suspense>
 
         <FadeOverlay fadeState={fadeState} />
@@ -192,7 +207,7 @@ function VRScene() {
   );
 }
 
-export default function VRCanvas() {
+export default function VRCanvas({ initialExperience, onBackToHub }: VRCanvasProps) {
   const [xrError, setXrError] = useState<string | null>(null);
 
   const xrButtonStyle: React.CSSProperties = {
@@ -299,7 +314,7 @@ export default function VRCanvas() {
         camera={{ position: [0, 1.6, 3], fov: 75, near: 0.1, far: 200 }}
       >
         <XR referenceSpace="local-floor" foveation={1} frameRate={72}>
-          <VRScene />
+          <VRScene initialExperience={initialExperience} onBackToHub={onBackToHub} />
         </XR>
       </Canvas>
 

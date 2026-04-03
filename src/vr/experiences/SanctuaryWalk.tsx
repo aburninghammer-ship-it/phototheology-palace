@@ -284,43 +284,70 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
         </group>
       ))}
 
-      {/* Zone navigation — styled buttons */}
-      <group position={[0, 0.5, 1]}>
+      {/* ── Zone Navigation HUD ── fixed at bottom-center, always visible */}
+      <group position={[0, 0.1, 0.5]}>
+        {/* Dark nav panel background */}
+        <mesh position={[0, 0, -0.01]}>
+          <planeGeometry args={[4.8, 0.9]} />
+          <meshBasicMaterial color="#000000" transparent opacity={0.6} />
+        </mesh>
+
+        {/* Zone indicator dots */}
+        {ZONES.map((zone, i) => (
+          <group key={zone.id} position={[(i - 1.5) * 0.5, 0.2, 0]}>
+            <mesh>
+              <circleGeometry args={[i === activeZone ? 0.08 : 0.05, 16]} />
+              <meshBasicMaterial
+                color={zone.color}
+                transparent
+                opacity={i === activeZone ? 1 : 0.3}
+              />
+            </mesh>
+            <Suspense fallback={null}>
+              <Text position={[0, -0.12, 0.01]} fontSize={0.04} color={i === activeZone ? '#fff' : '#666'} anchorX="center">
+                {zone.label}
+              </Text>
+            </Suspense>
+          </group>
+        ))}
+
+        {/* Previous button — large and clear */}
         <Interactive onSelect={goPrev}>
-          <mesh position={[-1.2, 0, 0]} onClick={goPrev} onPointerDown={goPrev}>
-            <planeGeometry args={[1.2, 0.3]} />
+          <mesh position={[-1.8, -0.05, 0]} onClick={goPrev} onPointerDown={goPrev}>
+            <planeGeometry args={[1.2, 0.5]} />
             <meshStandardMaterial
               color={activeZone > 0 ? '#1a1a30' : '#111118'}
               emissive={activeZone > 0 ? currentZone.color : '#333'}
-              emissiveIntensity={activeZone > 0 ? 0.15 : 0.02}
+              emissiveIntensity={activeZone > 0 ? 0.2 : 0.02}
             />
           </mesh>
         </Interactive>
         <Suspense fallback={null}>
-          <Text position={[-1.2, 0, 0.01]} fontSize={0.1} color={activeZone > 0 ? '#fff' : '#555'} anchorX="center">
-            Previous Zone
-          </Text>
-          <Text position={[0, 0, 0.01]} fontSize={0.11} color={currentZone.color} anchorX="center" outlineWidth={0.005} outlineColor="#000">
-            {ZONES[activeZone].label}
-          </Text>
-          <Text position={[1.2, 0, 0.01]} fontSize={0.1} color={activeZone < ZONES.length - 1 ? '#fff' : '#555'} anchorX="center">
-            Next Zone
+          <Text position={[-1.8, -0.05, 0.01]} fontSize={0.12} color={activeZone > 0 ? '#fff' : '#555'} anchorX="center" anchorY="middle">
+            ← Previous
           </Text>
         </Suspense>
+
+        {/* Next button — large and clear */}
         <Interactive onSelect={goNext}>
-          <mesh position={[1.2, 0, 0]} onClick={goNext} onPointerDown={goNext}>
-            <planeGeometry args={[1.0, 0.3]} />
+          <mesh position={[1.8, -0.05, 0]} onClick={goNext} onPointerDown={goNext}>
+            <planeGeometry args={[1.2, 0.5]} />
             <meshStandardMaterial
               color={activeZone < ZONES.length - 1 ? '#1a1a30' : '#111118'}
               emissive={activeZone < ZONES.length - 1 ? currentZone.color : '#333'}
-              emissiveIntensity={activeZone < ZONES.length - 1 ? 0.15 : 0.02}
+              emissiveIntensity={activeZone < ZONES.length - 1 ? 0.2 : 0.02}
             />
           </mesh>
         </Interactive>
+        <Suspense fallback={null}>
+          <Text position={[1.8, -0.05, 0.01]} fontSize={0.12} color={activeZone < ZONES.length - 1 ? '#fff' : '#555'} anchorX="center" anchorY="middle">
+            Next →
+          </Text>
+        </Suspense>
       </group>
 
-      {/* Back button */}
-      <BackToLobbyButton onBack={onBack} />
+      {/* Back button — positioned clearly below nav */}
+      <BackToLobbyButton onBack={onBack} position={[0, -0.5, 0.5]} />
     </group>
   );
 }

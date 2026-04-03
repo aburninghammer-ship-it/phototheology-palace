@@ -7,9 +7,10 @@ import * as THREE from 'three';
 interface BackToLobbyButtonProps {
   onBack: () => void;
   position?: [number, number, number];
+  label?: string;
 }
 
-export function BackToLobbyButton({ onBack, position = [0, 0.2, -1.5] }: BackToLobbyButtonProps) {
+export function BackToLobbyButton({ onBack, position = [0, 0.2, -1.5], label = '← Back' }: BackToLobbyButtonProps) {
   const glowRef = useRef<THREE.Mesh>(null);
   const lightRef = useRef<THREE.PointLight>(null);
 
@@ -20,15 +21,15 @@ export function BackToLobbyButton({ onBack, position = [0, 0.2, -1.5] }: BackToL
       (glowRef.current.material as THREE.MeshBasicMaterial).opacity = pulse;
     }
     if (lightRef.current) {
-      lightRef.current.intensity = 0.3 + Math.sin(t * 2.5) * 0.15;
+      lightRef.current.intensity = 0.4 + Math.sin(t * 2.5) * 0.2;
     }
   });
 
   return (
     <group position={position}>
-      {/* Pulsing cyan glow border behind button */}
+      {/* Pulsing glow border */}
       <mesh ref={glowRef} position={[0, 0, -0.01]}>
-        <planeGeometry args={[1.6, 0.36]} />
+        <planeGeometry args={[2.0, 0.48]} />
         <meshBasicMaterial
           color="#00AAFF"
           transparent
@@ -40,11 +41,11 @@ export function BackToLobbyButton({ onBack, position = [0, 0.2, -1.5] }: BackToL
 
       <Interactive onSelect={onBack}>
         <mesh onClick={onBack} onPointerDown={onBack}>
-          <planeGeometry args={[1.5, 0.3]} />
+          <planeGeometry args={[1.8, 0.4]} />
           <meshStandardMaterial
             color="#0a1428"
             emissive="#00AAFF"
-            emissiveIntensity={0.2}
+            emissiveIntensity={0.25}
           />
         </mesh>
       </Interactive>
@@ -52,18 +53,18 @@ export function BackToLobbyButton({ onBack, position = [0, 0.2, -1.5] }: BackToL
       <Suspense fallback={null}>
         <Text
           position={[0, 0, 0.01]}
-          fontSize={0.11}
+          fontSize={0.14}
           color="#66DDFF"
           anchorX="center"
           anchorY="middle"
-          outlineWidth={0.005}
+          outlineWidth={0.006}
           outlineColor="#003366"
         >
-          Back to Lobby
+          {label}
         </Text>
       </Suspense>
 
-      <pointLight ref={lightRef} position={[0, 0, 0.3]} color="#00AAFF" intensity={0.3} distance={2} />
+      <pointLight ref={lightRef} position={[0, 0, 0.3]} color="#00AAFF" intensity={0.4} distance={3} />
     </group>
   );
 }

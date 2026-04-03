@@ -1,50 +1,75 @@
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sun, Play, Zap, ChevronDown, Lock } from "lucide-react";
+import { Sun, Play, ChevronDown, Lock } from "lucide-react";
 import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
 import { useWatchPlayer } from "@/hooks/useWatchPlayer";
+import { useWatchProgress } from "@/hooks/useWatchProgress";
 import {
   WATCH_TRACTS,
   ENERGY_COLORS,
-  getTractsByType,
   type WatchTract,
   type MorningWatchSession,
 } from "@/data/watchSeries";
 
 export default function MorningWatches() {
-  const { startMorningWatch, isGenerating, immersive } = useWatchPlayer();
+  const { startTract, markDayComplete, isDayUnlocked, getProgress } = useWatchProgress();
+  const { startMorningWatch, isGenerating, immersive, handleClose } = useWatchPlayer({
+    onComplete: (tractId, day) => markDayComplete(tractId, day),
+  });
   const [expandedTract, setExpandedTract] = useState<string | null>(null);
 
-  // Only show tracts that have morning sessions
   const tractsWithMornings = WATCH_TRACTS.filter((t) => t.mornings && t.mornings.length > 0);
 
-  const handleBeginWatch = (session: MorningWatchSession, tractName: string) => {
-    startMorningWatch(session, tractName);
+  const handleBeginWatch = (session: MorningWatchSession, tract: WatchTract) => {
+    startTract(tract.id);
+    startMorningWatch(session, tract.name, tract.id);
   };
 
-  const renderSessionCard = (session: MorningWatchSession, tractName: string) => {
+  const renderSessionCard = (session: MorningWatchSession, tract: WatchTract) => {
+    const unlocked = isDayUnlocked(tract.id, session.dayNumber);
+    const progress = getProgress(tract.id);
+    const isCompleted = progress.completedDays.includes(session.dayNumber);
+    const isCurrent = progress.currentDay === session.dayNumber && !isCompleted;
+
     return (
       <Card
         key={session.dayNumber}
-        className="cursor-pointer transition-all duration-300 border-border/50 hover:border-amber-500/40 bg-card/80 hover:bg-amber-500/5"
-        onClick={() => handleBeginWatch(session, tractName)}
+        className={`transition-all duration-300 border-border/50 bg-card/80 ${
+          unlocked
+            ? isCurrent
+              ? "cursor-pointer border-amber-500/60 bg-amber-500/10 ring-1 ring-amber-500/30"
+              : "cursor-pointer hover:border-amber-500/40 hover:bg-amber-500/5"
+            : "opacity-50 cursor-not-allowed"
+        }`}
+        onClick={() => unlocked && handleBeginWatch(session, tract)}
       >
         <CardContent className="p-4">
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-sm font-bold text-amber-400">
-                {session.dayNumber}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                isCompleted
+                  ? "bg-emerald-500/20 text-emerald-300"
+                  : isCurrent
+                    ? "bg-amber-500/30 text-amber-200"
+                    : "bg-amber-500/20 text-amber-400"
+              }`}>
+                {isCompleted ? "✓" : session.dayNumber}
               </div>
               <div>
                 <h3 className="font-semibold text-sm text-foreground">{session.title}</h3>
                 <p className="text-xs text-muted-foreground">{session.morningScripture}</p>
               </div>
             </div>
-            {isGenerating ? (
+            {!unlocked ? (
+              <Lock className="w-4 h-4 text-muted-foreground/50" />
+            ) : isGenerating ? (
               <div className="w-4 h-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+            ) : isCurrent ? (
+              <span className="text-xs font-semibold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full">
+                Begin Watch
+              </span>
             ) : (
               <Play className="w-4 h-4 text-amber-400" />
             )}
@@ -68,6 +93,7 @@ export default function MorningWatches() {
   const renderTractCard = (tract: WatchTract) => {
     const isExpanded = expandedTract === tract.id;
     const mornings = tract.mornings || [];
+    const progress = getProgress(tract.id);
 
     return (
       <Card key={tract.id} className="border-border/50 bg-card/80 overflow-hidden">
@@ -90,6 +116,11 @@ export default function MorningWatches() {
               <p className="text-xs text-muted-foreground mt-1">
                 Walk in the Master Mind pattern received during the Night Watch.
               </p>
+              {mornings.length > 0 && progress.completedDays.length > 0 && (
+                <p className="text-[10px] text-amber-400/70 mt-1">
+                  Day {progress.currentDay} of {mornings.length} · {progress.completedDays.length} completed
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Badge variant="outline" className="text-[10px]">
@@ -101,7 +132,7 @@ export default function MorningWatches() {
 
           {isExpanded && (
             <div className="border-t border-border/30 p-4 space-y-2 max-h-96 overflow-y-auto">
-              {mornings.map((s) => renderSessionCard(s, tract.name))}
+              {mornings.map((s) => renderSessionCard(s, tract))}
             </div>
           )}
         </CardContent>
@@ -187,7 +218,7 @@ export default function MorningWatches() {
       {/* Immersive Audio Player */}
       <ImmersiveAudioPlayer
         isOpen={immersive.isOpen}
-        onClose={immersive.closeImmersive}
+        onClose={handleClose}
         tracks={immersive.queue.tracks}
         currentIndex={immersive.queue.currentIndex}
         onNextTrack={immersive.nextTrack}

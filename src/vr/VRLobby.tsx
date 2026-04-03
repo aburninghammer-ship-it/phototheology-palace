@@ -4,7 +4,7 @@ import { Portal } from './components/Portal';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-export type VRExperience = 'lobby' | 'sanctuary' | 'gallery' | 'audio' | 'heavensDiary' | 'arcade' | 'palace';
+export type VRExperience = 'lobby' | 'sanctuary' | 'gallery' | 'audio' | 'heavensDiary' | 'arcade' | 'palace' | 'nightWatch' | 'morningWatch';
 
 interface VRLobbyProps {
   onEnterExperience: (experience: VRExperience) => void;
@@ -233,6 +233,22 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         label="Tour the Palace"
         color="#FFB844"
         onClick={() => onEnterExperience('palace')}
+      />
+
+      {/* Watch portals — centered below main semicircle */}
+      <Portal
+        position={[-1.5, 0.5, -6.5]}
+        rotation={[0, 0.15, 0]}
+        label="Night Watch"
+        color="#8b5cf6"
+        onClick={() => onEnterExperience('nightWatch')}
+      />
+      <Portal
+        position={[1.5, 0.5, -6.5]}
+        rotation={[0, -0.15, 0]}
+        label="Morning Watch"
+        color="#f59e0b"
+        onClick={() => onEnterExperience('morningWatch')}
       />
     </group>
   );
