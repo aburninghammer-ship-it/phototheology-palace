@@ -723,7 +723,7 @@ export default function StudySuiteSales() {
                   asChild
                   className="w-full text-lg py-6 h-auto shadow-lg shadow-primary/25 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
                 >
-                  <a href={paymentLinks.studySuite} target="_blank" rel="noopener noreferrer">
+                  <a href="/pricing" rel="noopener noreferrer">
                     <Building2 className="w-5 h-5 mr-2" />
                     {t('studySuite.getCompleteStudySuite')}
                   </a>
