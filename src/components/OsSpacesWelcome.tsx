@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { PinToDockButton } from "@/components/os/PinToDockButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   BookOpenCheck, Dumbbell, Mic2, Gamepad2, Church, Wrench,
@@ -31,6 +32,7 @@ interface SpaceItem {
 interface OsSpace {
   id: string;
   label: string;
+  simpleLabel: string;
   subtitle: string;
   icon: LucideIcon;
   color: string;
@@ -41,6 +43,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "study",
     label: "Phototheology Study",
+    simpleLabel: "Study",
     subtitle: "Read, Research & Explore Scripture",
     icon: BookOpenCheck,
     color: "210 100% 56%",
@@ -69,6 +72,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "train",
     label: "Phototheology Train",
+    simpleLabel: "Practice",
     subtitle: "Palace, Memory & PT Principles",
     icon: Dumbbell,
     color: "32 95% 53%",
@@ -91,6 +95,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "teach",
     label: "Phototheology Teach",
+    simpleLabel: "Teach",
     subtitle: "Sermon Prep & Teaching Output",
     icon: Mic2,
     color: "270 56% 65%",
@@ -106,6 +111,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "game",
     label: "Phototheology Game",
+    simpleLabel: "Games",
     subtitle: "Games, Challenges & Competition",
     icon: Gamepad2,
     color: "0 84% 60%",
@@ -122,6 +128,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "chapel",
     label: "Phototheology Chapel",
+    simpleLabel: "Devotional",
     subtitle: "Devotional, Church & Community",
     icon: Church,
     color: "142 71% 45%",
@@ -144,6 +151,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "workshop",
     label: "Phototheology Workshop",
+    simpleLabel: "AI Tools",
     subtitle: "AI Tools, GPTs & Settings",
     icon: Wrench,
     color: "215 14% 53%",
@@ -160,6 +168,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "university",
     label: "Phototheology University",
+    simpleLabel: "Courses",
     subtitle: "Courses & Certificates",
     icon: GraduationCap,
     color: "45 90% 50%",
@@ -174,6 +183,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "equip",
     label: "Phototheology Equip",
+    simpleLabel: "Defend",
     subtitle: "Apologetics & Doctrinal Defense",
     icon: Shield,
     color: "20 80% 50%",
@@ -191,8 +201,22 @@ export const OsSpacesWelcome = () => {
   const [activeSpace, setActiveSpace] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isSimple, isMaster } = useExperienceMode();
 
   const active = OS_SPACES.find(s => s.id === activeSpace);
+
+  // Mode-aware hero text
+  const heroTitle = user
+    ? isSimple
+      ? "Welcome back"
+      : "Welcome back, Phototheologist"
+    : isSimple
+      ? "Explore the Bible"
+      : "The Art of Phototheology";
+
+  const heroSubtitle = isSimple
+    ? "70+ Bible study tools across 8 categories"
+    : <>The Art of Seeing Christ in All Things — powered by <span className="font-semibold" style={{ color: "#d4a017" }}>Biblical Intelligence (BI)</span></>;
 
   return (
     <div className="px-4 py-6 space-y-6">
@@ -206,10 +230,10 @@ export const OsSpacesWelcome = () => {
           className="text-2xl sm:text-3xl font-bold tracking-wide"
           style={{ fontFamily: "'Cinzel', serif", color: "#d4a017" }}
         >
-          {user ? "Welcome back, Phototheologist" : "The Art of Phototheology"}
+          {heroTitle}
         </h2>
         <p className="text-sm text-muted-foreground max-w-lg mx-auto">
-          The Art of Seeing Christ in All Things — powered by <span className="font-semibold" style={{ color: "#d4a017" }}>Biblical Intelligence (BI)</span>
+          {heroSubtitle}
         </p>
       </motion.div>
 
@@ -275,7 +299,7 @@ export const OsSpacesWelcome = () => {
                 <div className="absolute inset-0 rounded-2xl" style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 45%, transparent 50%)' }} />
                 <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
               </div>
-              <span className="text-[10px] sm:text-xs font-semibold leading-tight text-center relative z-10" style={{ color: `hsl(${space.color})` }}>{space.label}</span>
+              <span className="text-[10px] sm:text-xs font-semibold leading-tight text-center relative z-10" style={{ color: `hsl(${space.color})` }}>{isSimple ? space.simpleLabel : space.label}</span>
             </motion.button>
           );
         })}
