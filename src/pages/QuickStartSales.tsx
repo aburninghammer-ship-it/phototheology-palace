@@ -733,9 +733,6 @@ export default function QuickStartSales() {
         </div>
       </section>
 
-          </motion.div>
-        </div>
-      </section>
 
       {/* 10. FINAL AUTHORITY STATEMENT */}
       <section className="py-20 bg-muted/30">
