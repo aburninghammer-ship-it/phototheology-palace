@@ -37,8 +37,10 @@ const AMBIENT_BG_TRACKS = [
 
 // For "ambient-sounds" mode, use the softest existing tracks at lower volume
 const AMBIENT_SOUND_TRACKS = [
-  { id: "wings-of-stillness", name: "Wings of Stillness", url: "/audio/wings-of-stillness.mp3" },
-  { id: "eternal-echoes", name: "Eternal Echoes", url: "/audio/eternal-echoes.mp3" },
+  { id: "deep-drone", name: "Deep Drone", url: "/audio/ambient-deep-drone.mp3" },
+  { id: "celestial-pad", name: "Celestial Pad", url: "/audio/ambient-celestial-pad.mp3" },
+  { id: "soft-wind", name: "Soft Wind", url: "/audio/ambient-soft-wind.mp3" },
+  { id: "gentle-rain", name: "Gentle Rain", url: "/audio/ambient-gentle-rain.mp3" },
 ];
 
 interface ImmersiveAudioPlayerProps {
@@ -305,9 +307,10 @@ export function ImmersiveAudioPlayer({
   // Update ambient volume live (with sleep fade)
   useEffect(() => {
     if (ambientRef.current) {
-      ambientRef.current.volume = ambientMusicEnabled ? ambientVolume * sleepFadeMultiplier : 0;
+      const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+      ambientRef.current.volume = ambientMusicEnabled ? ambientVolume * modeMultiplier * sleepFadeMultiplier : 0;
     }
-  }, [ambientVolume, ambientMusicEnabled, sleepFadeMultiplier]);
+  }, [ambientVolume, ambientMusicEnabled, sleepFadeMultiplier, ambientMode]);
 
   // Update main volume (with sleep fade)
   useEffect(() => {
