@@ -228,7 +228,7 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
     <group>
       {/* Stars fading into dawn */}
       <StarField count={1500} radius={60} brightness={screen === 'playing' ? 0.3 + avgVolume * 0.2 : 0.4} />
-      <NebulaClouds count={6} radius={30} colors={['#92400e', '#78350f', '#7c2d12', '#451a03']} opacity={0.08 + avgVolume * 0.06} />
+      <NebulaClouds count={6} radius={30} colors={['#7C3AED', '#C026D3', '#DB2777', '#6B21A8']} opacity={0.08 + avgVolume * 0.06} />
 
       <HorizonGlow brightness={avgVolume} />
 
