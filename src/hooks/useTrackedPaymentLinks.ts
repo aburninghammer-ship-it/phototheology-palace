@@ -17,7 +17,7 @@ export function useTrackedPaymentLinks() {
   return useMemo(() => ({
     genesis6Days: buildTrackedPaymentLink(STRIPE_LINKS.genesis6Days),
     quickStartGuide: buildTrackedPaymentLink(STRIPE_LINKS.quickStartGuide),
-    studySuite: buildTrackedPaymentLink(STRIPE_LINKS.studySuite),
+    
     essentialMonthly: buildTrackedPaymentLink(STRIPE_LINKS.essentialMonthly),
     essentialAnnual: buildTrackedPaymentLink(STRIPE_LINKS.essentialAnnual),
   }), []);
