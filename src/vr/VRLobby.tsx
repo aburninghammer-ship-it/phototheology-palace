@@ -65,13 +65,13 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       <directionalLight position={[0, 15, -3]} intensity={0.3} color="#FFFBE0" />
 
       {/* Portal atmosphere lights */}
-      <pointLight position={[-6, 5, -3]} intensity={0.8} color="#FFD700" distance={16} decay={2} />
-      <pointLight position={[6, 5, -3]} intensity={0.8} color="#FFD700" distance={16} decay={2} />
-      <pointLight position={[0, 4, -8]} intensity={0.6} color="#FFE4A0" distance={14} decay={2} />
-      <pointLight position={[0, 1, 2]} intensity={0.4} color="#FFD700" distance={8} decay={2} />
+      <pointLight position={[-6, 5, -3]} intensity={0.8} color="#7C3AED" distance={16} decay={2} />
+      <pointLight position={[6, 5, -3]} intensity={0.8} color="#7C3AED" distance={16} decay={2} />
+      <pointLight position={[0, 4, -8]} intensity={0.6} color="#C4B5FD" distance={14} decay={2} />
+      <pointLight position={[0, 1, 2]} intensity={0.4} color="#C026D3" distance={8} decay={2} />
 
       {/* Floor warmth & reflections */}
-      <pointLight position={[0, -0.8, -2]} intensity={0.6} color="#FFD700" distance={10} decay={2} />
+      <pointLight position={[0, -0.8, -2]} intensity={0.6} color="#7C3AED" distance={10} decay={2} />
 
       {/* Fog for depth — warm tint, deeper range */}
       <fog attach="fog" args={['#060818', 12, 32]} />
