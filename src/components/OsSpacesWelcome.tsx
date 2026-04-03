@@ -43,6 +43,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "study",
     label: "Phototheology Study",
+    simpleLabel: "Study",
     subtitle: "Read, Research & Explore Scripture",
     icon: BookOpenCheck,
     color: "210 100% 56%",
