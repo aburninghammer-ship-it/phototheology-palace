@@ -202,11 +202,11 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
       <XRSceneAnchor>
         <mesh renderOrder={-1}>
           <sphereGeometry args={[150, 32, 32]} />
-          <meshBasicMaterial color="#060818" side={BackSide} depthWrite={false} />
+          <meshBasicMaterial color="#040410" side={BackSide} depthWrite={false} />
         </mesh>
 
-        <ambientLight intensity={0.5} />
-        <Environment preset="night" background={false} />
+        <ambientLight intensity={0.2} color="#D4C5A0" />
+        <Environment preset="night" background={false} environmentIntensity={0.6} />
 
         <Suspense fallback={<XRLoadingFallback />}>
           {displayedExperience === 'lobby' && (
@@ -229,11 +229,11 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
       {/* Global post-processing — cinematic look; guarded so VR still works if it crashes */}
       <PostFXGuard>
         <EffectComposer multisampling={0}>
-          <Bloom intensity={0.4} luminanceThreshold={0.6} luminanceSmoothing={0.9} mipmapBlur />
-          <BrightnessContrast brightness={0} contrast={grading.contrast} />
-          <HueSaturation hue={grading.hue} saturation={grading.saturation} />
+          <Bloom intensity={0.8} luminanceThreshold={0.4} luminanceSmoothing={0.85} mipmapBlur radius={0.8} />
+          <BrightnessContrast brightness={0.02} contrast={grading.contrast + 0.05} />
+          <HueSaturation hue={grading.hue} saturation={grading.saturation + 0.05} />
           <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
-          <Vignette eskil={false} offset={0.3} darkness={0.6} />
+          <Vignette eskil={false} offset={0.25} darkness={0.75} />
         </EffectComposer>
       </PostFXGuard>
     </>
