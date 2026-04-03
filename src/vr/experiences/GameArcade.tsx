@@ -213,7 +213,7 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
       </mesh>
 
       {/* Vibrant multi-colored lighting */}
-      <ambientLight intensity={0.12} color="#222244" />
+      <ambientLight intensity={0.35} color="#444466" />
       <pointLight position={[0, 4, 0]} intensity={1.2} color="#39FF14" distance={15} />
       <pointLight position={[-5, 3, -3]} intensity={0.8} color="#BB44FF" distance={10} />
       <pointLight position={[5, 3, -3]} intensity={0.8} color="#FF4444" distance={10} />
