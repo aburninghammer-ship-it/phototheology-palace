@@ -8,6 +8,7 @@ import {
   SanctuaryPillars,
   SanctuaryDome,
   CenterOrb,
+  Candlestick,
 } from './components/LobbyEnvironment';
 
 export type VRExperience = 'lobby' | 'sanctuary' | 'gallery' | 'audio' | 'heavensDiary' | 'arcade' | 'palace' | 'nightWatch' | 'morningWatch' | 'swordOfTheSpirit';
@@ -27,133 +28,149 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       <SanctuaryParticles />
       <CenterOrb />
 
-      {/* === LIGHTING RIG === */}
-      {/* Ambient — low but warm */}
-      <ambientLight intensity={0.15} color="#D4C5A0" />
+      {/* === CANDLESTICKS flanking portals === */}
+      <Candlestick position={[-6.8, -1.2, -1.5]} />
+      <Candlestick position={[-4.5, -1.2, -3.8]} />
+      <Candlestick position={[-2.2, -1.2, -5]} />
+      <Candlestick position={[2.2, -1.2, -5]} />
+      <Candlestick position={[4.5, -1.2, -3.8]} />
+      <Candlestick position={[6.8, -1.2, -1.5]} />
 
-      {/* Key light — warm from above-right (like a heavenly source) */}
+      {/* === LIGHTING RIG — warm golden sanctuary === */}
+      <ambientLight intensity={0.2} color="#D4C5A0" />
+
+      {/* Key light — warm golden from above */}
       <directionalLight
-        position={[5, 8, 3]}
-        intensity={1.0}
+        position={[5, 10, 3]}
+        intensity={1.2}
         color="#FFE4B0"
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
         shadow-camera-near={0.1}
         shadow-camera-far={30}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
+        shadow-camera-top={12}
+        shadow-camera-bottom={-12}
       />
 
-      {/* Fill light — cool from left */}
-      <directionalLight position={[-6, 4, 2]} intensity={0.3} color="#8888cc" />
+      {/* Fill light — warm from left */}
+      <directionalLight position={[-6, 5, 2]} intensity={0.4} color="#FFD080" />
 
-      {/* Rim light — indigo from behind */}
-      <directionalLight position={[0, 4, -10]} intensity={0.5} color="#6366f1" />
+      {/* Rim light — golden from behind */}
+      <directionalLight position={[0, 5, -10]} intensity={0.6} color="#FFD700" />
 
-      {/* Portal atmosphere lights */}
-      <pointLight position={[-5, 4, -3]} intensity={0.5} color="#FFD700" distance={12} decay={2} />
-      <pointLight position={[5, 4, -3]} intensity={0.5} color="#8b5cf6" distance={12} decay={2} />
-      <pointLight position={[0, 3, -7]} intensity={0.4} color="#44FFEE" distance={10} decay={2} />
+      {/* Portal atmosphere lights — warm tones */}
+      <pointLight position={[-5, 4, -3]} intensity={0.6} color="#FFD700" distance={14} decay={2} />
+      <pointLight position={[5, 4, -3]} intensity={0.6} color="#FFD700" distance={14} decay={2} />
+      <pointLight position={[0, 3, -7]} intensity={0.5} color="#FFE4A0" distance={12} decay={2} />
 
-      {/* Fog for depth */}
-      <fog attach="fog" args={['#080818', 8, 25]} />
+      {/* Floor warmth */}
+      <pointLight position={[0, -0.5, -2]} intensity={0.5} color="#FFD700" distance={8} decay={2} />
+
+      {/* Fog for depth — warm tint */}
+      <fog attach="fog" args={['#080810', 10, 28]} />
 
       {/* === TITLE === */}
       <Suspense fallback={null}>
         <Text
-          position={[0, 3.2, -3]}
-          fontSize={0.28}
+          position={[0, 3.5, -4]}
+          fontSize={0.32}
           color="#FFD700"
           anchorX="center"
           anchorY="middle"
-          outlineWidth={0.008}
+          outlineWidth={0.01}
           outlineColor="#000"
-          maxWidth={8}
+          maxWidth={10}
+          font={undefined}
         >
           PhototheologyOS VR Hub
         </Text>
 
         <Text
-          position={[0, 2.8, -3]}
-          fontSize={0.11}
-          color="#AAAACC"
+          position={[0, 3.0, -4]}
+          fontSize={0.12}
+          color="#CCBB88"
           anchorX="center"
           anchorY="middle"
         >
-          Step through a portal to begin your experience
+          Select a portal to begin your experience
         </Text>
       </Suspense>
 
-      {/* === PORTALS — two rows, well-spaced === */}
-      {/* TOP ROW: 6 portals in a wide arc */}
+      {/* === MAIN PORTALS — wide semicircle of 6 === */}
       <Portal
-        position={[-5.5, 0.5, -2]}
+        position={[-5.8, 0.5, -2]}
         rotation={[0, 1.0, 0]}
         label="The Sanctuary"
         color="#FFD700"
         onClick={() => onEnterExperience('sanctuary')}
       />
       <Portal
-        position={[-3.3, 0.5, -4.2]}
+        position={[-3.5, 0.5, -4.2]}
         rotation={[0, 0.6, 0]}
         label="24FPS Gallery"
         color="#44AAFF"
         onClick={() => onEnterExperience('gallery')}
       />
       <Portal
-        position={[-1.0, 0.5, -5.2]}
+        position={[-1.0, 0.5, -5.5]}
         rotation={[0, 0.2, 0]}
         label="Audio Theater"
         color="#BB66FF"
         onClick={() => onEnterExperience('audio')}
       />
       <Portal
-        position={[1.0, 0.5, -5.2]}
+        position={[1.0, 0.5, -5.5]}
         rotation={[0, -0.2, 0]}
         label="Heaven's Diary"
         color="#44FFEE"
         onClick={() => onEnterExperience('heavensDiary')}
       />
       <Portal
-        position={[3.3, 0.5, -4.2]}
+        position={[3.5, 0.5, -4.2]}
         rotation={[0, -0.6, 0]}
         label="Game Arcade"
         color="#39FF14"
         onClick={() => onEnterExperience('arcade')}
       />
       <Portal
-        position={[5.5, 0.5, -2]}
+        position={[5.8, 0.5, -2]}
         rotation={[0, -1.0, 0]}
         label="Tour the Palace"
         color="#FFB844"
         onClick={() => onEnterExperience('palace')}
       />
 
-      {/* BOTTOM ROW: 3 portals on the flanks — clearly separated from top row */}
+      {/* === SECONDARY PORTALS — forward row, clearly visible === */}
       <Portal
-        position={[-3.5, 0.5, -0.5]}
-        rotation={[0, 1.3, 0]}
+        position={[-4.0, 0.5, 1.5]}
+        rotation={[0, 1.4, 0]}
         label="Night Watch"
         color="#8b5cf6"
         onClick={() => onEnterExperience('nightWatch')}
       />
       <Portal
-        position={[3.5, 0.5, -0.5]}
-        rotation={[0, -1.3, 0]}
+        position={[4.0, 0.5, 1.5]}
+        rotation={[0, -1.4, 0]}
         label="Morning Watch"
         color="#f59e0b"
         onClick={() => onEnterExperience('morningWatch')}
       />
       <Portal
-        position={[0, 0.5, -0.8]}
-        rotation={[0, 0, 0]}
+        position={[0, 0.5, 1.0]}
+        rotation={[0, Math.PI, 0]}
         label="Sword of the Spirit"
         color="#FF4466"
         onClick={() => onEnterExperience('swordOfTheSpirit')}
       />
+
+      {/* Candlesticks for secondary portals */}
+      <Candlestick position={[-5.3, -1.2, 1.8]} />
+      <Candlestick position={[5.3, -1.2, 1.8]} />
+      <Candlestick position={[-1.3, -1.2, 1.3]} />
+      <Candlestick position={[1.3, -1.2, 1.3]} />
     </group>
   );
 }

@@ -99,8 +99,8 @@ function GameScreen({ name, route, emoji, color, glowColor, desc, position, rota
   });
 
   const handleClick = () => {
-    // Navigate directly — window.open doesn't work reliably in Meta Quest browser
-    window.location.href = route;
+    // Open in new tab to preserve VR session stability
+    window.open(route, '_blank');
   };
 
   return (
