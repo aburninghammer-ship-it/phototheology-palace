@@ -530,8 +530,9 @@ export default function AudioBible() {
         epicAudioRef.current = null;
       }
 
-      // Play the audio
-      const audio = new Audio(epicUrl);
+      // Play the audio — reuse the primed element so the gesture context carries over
+      primedAudio.src = epicUrl;
+      const audio = primedAudio;
       epicAudioRef.current = audio;
       audio.volume = volume;
 
