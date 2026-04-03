@@ -207,21 +207,25 @@ export default function NightWatches() {
     <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto px-4 py-6 max-w-3xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <Moon className="w-8 h-8 text-indigo-400" />
-            <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "'Cinzel', serif" }}>
-              Night Watches
-            </h1>
+        {/* Hero Image */}
+        <div className="relative rounded-2xl overflow-hidden mb-8">
+          <img src={nightWatchImage} alt="Starry night sky with moon and shooting stars" className="w-full h-48 md:h-64 object-cover" loading="lazy" width={1024} height={576} />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <Moon className="w-8 h-8 text-indigo-400" />
+              <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "'Cinzel', serif" }}>
+                Night Watches
+              </h1>
+            </div>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-sm">
+              The Master Mind — immersive audio meditation sessions. Biblical meditation that fills
+              the mind with truth through Scripture. Close your eyes and behold how Christ thinks.
+            </p>
+            <p className="text-xs text-muted-foreground/70 mt-2">
+              "Let this mind be in you, which was also in Christ Jesus." — Philippians 2:5
+            </p>
           </div>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-sm">
-            The Master Mind — immersive audio meditation sessions. Biblical meditation that fills
-            the mind with truth through Scripture. Close your eyes and behold how Christ thinks.
-          </p>
-          <p className="text-xs text-muted-foreground/70 mt-2">
-            "Let this mind be in you, which was also in Christ Jesus." — Philippians 2:5
-          </p>
         </div>
 
         {/* Tabs */}
