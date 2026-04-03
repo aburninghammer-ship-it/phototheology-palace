@@ -36,7 +36,7 @@ Follow this 7-phase structure inspired by the Calm app. Each phase flows natural
 PHASE 1 — SETTLING AND FRAMING (~2 minutes of audio):
 Begin with a warm welcome. Invite the listener to get comfortable and be still. You may mention one calming breath, but do NOT dwell on breathing technique as if it has mystical power. Move quickly into framing the purpose:
 
-Explain that this is a Night Watch — a practice of beholding the thoughts and feelings of Christ. Biblical meditation is not about emptying the mind or breathing exercises. It is about filling the mind with the thoughts of Jesus. The goal tonight is to step into a scene from Scripture, observe how Christ thinks and feels, and begin to take those thoughts and feelings as your own. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Tonight, you are accessing the Master Mind. [pause]
+Explain that this is a Night Watch — a practice of beholding the mind of Christ. Our deepest goal as believers is to become like Christ in character. And character is made up of thoughts and feelings — how a person thinks, what moves them, what they feel in the face of pressure, loss, joy, or injustice. To become like Christ, we must behold Him — not just His actions, but the thoughts behind those actions and the feelings that drove them. That is what biblical meditation is: fixing your gaze on Jesus, watching how He thinks and feels, and letting those thoughts and feelings reshape your own from the inside out. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Tonight, you are stepping into a scene from Scripture to observe the inner life of Christ — His Master Mind — and begin to take His thoughts and feelings as your own. [pause]
 
 Then briefly introduce tonight's specific theme and Scripture (${session.scripture}), connecting it to ${session.struggle}.
 
@@ -70,8 +70,8 @@ CRITICAL RULES:
   [extended silence] = 30-60 seconds where ONLY the background music plays. Use at least 3-4 of these throughout the meditation, especially after emotionally rich moments. The guide does not always need to be speaking.
 - The pacing must DECELERATE through the session. Phases 1-2: conversational. Phases 3-4: noticeably slower. Phases 5-6: very slow, spacious. Phase 7: gentle return.
 - Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
-- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ and making them your own. NOT emptying the mind, NOT breathing exercises. The power is in what you behold, not how you breathe.
-- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to ACCESS His thoughts and feelings and take them as your own.
+- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ to become like Him in character. Character is thoughts + feelings. To be transformed into His likeness, we must behold His inner life, not just His actions. NOT emptying the mind, NOT breathing exercises. The power is in what you behold, not how you breathe.
+- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to observe how Christ thinks and feels, and take those thoughts and feelings as your own — this is how character is formed.
 - Do NOT spend more than one sentence on breathing. Get to the Scripture and Christ quickly.
 - Second person ("you") throughout. Intimate. Cinematic.`;
 }
@@ -179,6 +179,9 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
   }, [audioState.analyserData]);
 
   const handleSelectSession = useCallback(async (session: WatchSession, tractName: string) => {
+    // Start background music immediately — must be inside user gesture
+    bgMusic.play();
+
     setGenerating(true);
     setStatusText('Generating meditation script...');
     setActiveSession({ session, tractName });
@@ -202,10 +205,11 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
       setAudioUrl(url);
       setScreen('playing');
       setStatusText('');
-      // Auto-play after a brief delay for the audio element to load
-      setTimeout(() => { audioControls.play(); bgMusic.play(); }, 500);
+      // Auto-play voice after a brief delay for the audio element to load
+      setTimeout(() => audioControls.play(), 500);
     } catch (err) {
       console.error('[NightWatchVR]', err);
+      bgMusic.pause();
       setStatusText('Generation failed. Tap a session to retry.');
     } finally {
       setGenerating(false);

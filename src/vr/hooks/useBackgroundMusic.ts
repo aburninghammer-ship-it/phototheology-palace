@@ -7,48 +7,53 @@ const SHARED_TRACKS = [
   '/audio/weightless-river.mp3',
 ];
 
-export function useBackgroundMusic(variant: 'night' | 'morning') {
+export function useBackgroundMusic(_variant: 'night' | 'morning') {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const trackIndexRef = useRef(0);
-
-  const tracks = SHARED_TRACKS;
+  const trackIndexRef = useRef(Math.floor(Math.random() * SHARED_TRACKS.length));
+  const wantPlayRef = useRef(false);
 
   useEffect(() => {
     const audio = new Audio();
     audio.loop = false;
     audio.volume = 0.18;
+    audio.preload = 'auto';
+    audio.src = SHARED_TRACKS[trackIndexRef.current];
     audioRef.current = audio;
 
-    // Pick a random starting track
-    trackIndexRef.current = Math.floor(Math.random() * tracks.length);
-
     const onEnded = () => {
-      // Cycle to next track
-      trackIndexRef.current = (trackIndexRef.current + 1) % tracks.length;
-      audio.src = tracks[trackIndexRef.current];
-      audio.play().catch(() => {});
+      trackIndexRef.current = (trackIndexRef.current + 1) % SHARED_TRACKS.length;
+      audio.src = SHARED_TRACKS[trackIndexRef.current];
+      if (wantPlayRef.current) {
+        audio.play().catch((e) => console.warn('[bgMusic] cycle play failed:', e));
+      }
+    };
+
+    const onError = (e: Event) => {
+      console.warn('[bgMusic] audio error:', (e.target as HTMLAudioElement)?.error?.message);
     };
 
     audio.addEventListener('ended', onEnded);
+    audio.addEventListener('error', onError);
 
     return () => {
       audio.removeEventListener('ended', onEnded);
+      audio.removeEventListener('error', onError);
       audio.pause();
       audio.removeAttribute('src');
       audio.load();
+      wantPlayRef.current = false;
     };
-  }, [tracks]);
+  }, []);
 
   const play = useCallback(() => {
+    wantPlayRef.current = true;
     const audio = audioRef.current;
     if (!audio) return;
-    if (!audio.src || audio.src === window.location.href) {
-      audio.src = tracks[trackIndexRef.current];
-    }
-    audio.play().catch(() => {});
-  }, [tracks]);
+    audio.play().catch((e) => console.warn('[bgMusic] play failed:', e));
+  }, []);
 
   const pause = useCallback(() => {
+    wantPlayRef.current = false;
     audioRef.current?.pause();
   }, []);
 

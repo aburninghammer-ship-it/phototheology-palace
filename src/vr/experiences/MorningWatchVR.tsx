@@ -36,7 +36,7 @@ Follow this 7-phase structure inspired by the Calm app's morning meditations. Ea
 PHASE 1 — AWAKENING AND FRAMING (~2 minutes of audio):
 Begin with a warm good morning. Invite the listener to sit up, plant their feet, and gather themselves. You may mention one centering breath, but do NOT dwell on breathing technique — move quickly into the purpose.
 
-Explain that this is a Morning Watch — the activation half of the Master Mind practice. Last night you beheld the thoughts and feelings of Christ. You watched how He thinks, how He responds, what He feels. This morning, the goal is to TAKE those thoughts and feelings as your own and carry them into your day. This is biblical meditation — not emptying the mind, but filling it with the mind of Christ. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Today you are not just remembering what Christ thought — you are thinking WITH Him. [pause]
+Explain that this is a Morning Watch — the activation half of the Master Mind practice. Last night you beheld the inner life of Christ — not just what He did, but how He thought and what He felt. Character is made up of thoughts and feelings, and to become like Christ in character, you must first behold those thoughts and feelings and then take them as your own. That is what you did last night. This morning, the goal is to CARRY those thoughts and feelings into your day — to think with Christ, to feel with Christ, to respond as He would. This is biblical meditation — not emptying the mind, but filling it with the mind of Christ until His character becomes yours. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Today you are not just remembering what Christ thought — you are thinking WITH Him. [pause]
 
 PHASE 2 — REMEMBER LAST NIGHT (~1.5 minutes):
 Recall last night's Master Mind insight from "${session.pairedNightTitle}". Briefly revisit the scene, the core truth. Weave in the night scripture naturally. The listener should feel continuity between night and morning.
@@ -68,8 +68,8 @@ CRITICAL RULES:
   [extended silence] = 30-60 seconds where ONLY the background music plays. Use at least 3-4 of these throughout the meditation, especially after emotionally rich moments. The guide does not always need to be speaking.
 - Morning Watch tone is CLEAR, WARM, and DIRECTED — not dreamy. Energy level: ${session.energy}. Think of a trusted coach at sunrise, not a sleep guide.
 - Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
-- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ and making them your own. NOT emptying the mind, NOT breathing exercises, NOT Eastern mysticism. The power is in what you behold, not how you breathe.
-- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to ACCESS His thoughts and feelings and make them your own.
+- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ to become like Him in character. Character = thoughts + feelings. To be transformed, we behold His inner life, not just His actions. NOT emptying the mind, NOT breathing exercises, NOT Eastern mysticism. The power is in what you behold, not how you breathe.
+- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to observe how Christ thinks and feels, take those thoughts and feelings as your own, and walk in them — this is how Christlike character is formed.
 - Night Watch: "Behold the thoughts and feelings of Christ — and receive them." Morning Watch: "Now take those thoughts as your own — and walk in them."
 - Do NOT spend more than one sentence on breathing. The power is in beholding Christ, not in breath work.
 - Second person ("you") throughout. End with resolve and momentum, not a question.`;
@@ -187,6 +187,9 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
   }, [audioState.analyserData]);
 
   const handleSelectSession = useCallback(async (session: MorningWatchSession, tractName: string) => {
+    // Start background music immediately — must be inside user gesture
+    bgMusic.play();
+
     setGenerating(true);
     setStatusText('Generating activation script...');
     setActiveSession({ session, tractName });
@@ -210,9 +213,11 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
       setAudioUrl(url);
       setScreen('playing');
       setStatusText('');
-      setTimeout(() => { audioControls.play(); bgMusic.play(); }, 500);
+      // Auto-play voice after a brief delay for the audio element to load
+      setTimeout(() => audioControls.play(), 500);
     } catch (err) {
       console.error('[MorningWatchVR]', err);
+      bgMusic.pause();
       setStatusText('Generation failed. Tap a session to retry.');
     } finally {
       setGenerating(false);
