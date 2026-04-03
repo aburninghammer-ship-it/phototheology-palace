@@ -73,7 +73,7 @@ const TOUR_SCENES: TourScene[] = [
     label: 'The Throne Room',
     subtitle: 'Revelation 4:2 — A throne was set in heaven',
     start: 0.60, end: 0.80,
-    colors: { nebula: ['#AA00FF', '#FFD700', '#FF44AA', '#0088FF'], ambient: '#180830', fog: '#0a0418', accent: '#CC88FF' },
+    colors: { nebula: ['#7C3AED', '#FFD700', '#C026D3', '#2563EB'], ambient: '#0c0818', fog: '#060818', accent: '#C4B5FD' },
     cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 6) * 6, y: Math.sin(t * Math.PI * 3) * 3, z: -15 - t * 20 }),
     particleColor: '#CC88FF',
     lightIntensity: 1.5,
