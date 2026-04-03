@@ -7,6 +7,7 @@ import { StarField } from '../components/StarField';
 import { NebulaClouds } from '../components/NebulaClouds';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 import { useStreamingAudio } from '../hooks/useStreamingAudio';
+import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
 import { callJeeves } from '@/lib/jeevesClient';
 import { supabase } from '@/integrations/supabase/client';
 import { WATCH_TRACTS, type WatchSession, type WatchTract } from '@/data/watchSeries';
@@ -18,7 +19,9 @@ interface NightWatchVRProps {
 // ── Audio generation (same pipeline as useWatchPlayer) ──
 
 function buildPrompt(session: WatchSession, tractName: string): string {
-  return `Generate a 15-minute Night Watch meditation script to be read aloud as audio. This must be LONG — approximately 2,500 to 3,000 words. Do NOT cut it short.
+  return `Generate a 12-minute Night Watch meditation script to be read aloud as audio. This must be LONG — approximately 2,000 to 2,500 words of spoken content, PLUS generous silence. Do NOT cut it short.
+
+IMPORTANT: Ambient music plays underneath the entire meditation. You do NOT need to fill every moment with words. Include EXTENDED SILENCES of 30-60 seconds where the music plays alone and the listener simply rests in what has been said. These musical interludes are not awkward gaps — they are sacred space. The music carries the meditation during these silences.
 
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
@@ -28,7 +31,7 @@ Master Mind Insight: ${session.masterMindInsight}
 Mood: ${session.mood}
 Primary Struggle: ${session.struggle}
 
-Follow this 7-phase structure inspired by the Calm app. Each phase flows naturally into the next — no labels, no headers, no time references. Just seamless spoken narration.
+Follow this 7-phase structure inspired by the Calm app. Each phase flows naturally into the next — no labels, no headers, no time references. Just seamless spoken narration with generous silence.
 
 PHASE 1 — SETTLING AND FRAMING (~2 minutes of audio):
 Begin with a warm welcome. Invite the listener to get comfortable and be still. You may mention one calming breath, but do NOT dwell on breathing technique as if it has mystical power. Move quickly into framing the purpose:
@@ -39,28 +42,32 @@ Then briefly introduce tonight's specific theme and Scripture (${session.scriptu
 
 PHASE 2 — TEACHING (~2 minutes):
 Go deeper into the Scripture and tonight's theme. Weave in the Scripture naturally. Connect it to the human experience of ${session.struggle}. This should feel like a wise friend sharing insight by firelight.
+End this phase with [extended silence] — let the music carry the listener for 30-45 seconds.
 
 PHASE 3 — TRANSITION TO SCENE (~1 minute):
 Gently shift from teaching into immersive experience. Bridge the listener from intellectual understanding into embodied imagination. Pacing begins to slow here.
 
-PHASE 4 — SCENE IMMERSION (~4 minutes):
+PHASE 4 — SCENE IMMERSION (~3 minutes):
 Present-tense, sensory-rich narration of the biblical scene (${session.scene}). Paint the setting with vivid detail. Place the listener inside the scene as a witness. Let them observe Christ. Pacing should be notably slower, with [long pause] after every 2-3 sentences. Let images breathe.
+After the scene is painted, include [extended silence] — 45-60 seconds of pure music while the listener remains in the scene.
 
-PHASE 5 — MASTER MIND MOMENT (~3 minutes):
+PHASE 5 — MASTER MIND MOMENT (~2 minutes):
 This is the heart. Observe what Christ does. The Master Mind insight: ${session.masterMindInsight}. Speak this truth over the listener. Address ${session.struggle} with direct compassion. Use very long pauses here. Minimal words, maximum weight.
+End with [extended silence] — 30-45 seconds of music.
 
-PHASE 6 — OPEN AWARENESS / SILENCE (~2.5 minutes):
-Reduce verbal guidance dramatically. Offer a single gentle prompt, then [long pause] [long pause] [long pause] for extended silence. Another brief prompt. Another long silence. Only 3-4 sentences total in this phase.
+PHASE 6 — OPEN AWARENESS / SILENCE (~1.5 minutes):
+Reduce verbal guidance dramatically. Offer a single gentle prompt, then [extended silence] for 45-60 seconds. Only 1-2 sentences total in this phase. Let the music hold the space.
 
-PHASE 7 — GENTLE RETURN AND CLOSE (~1.5 minutes):
+PHASE 7 — GENTLE RETURN AND CLOSE (~1 minute):
 Slowly bring awareness back. Brief closing reflection tying back to the opening theme. End with an identity statement rooted in Scripture. Final breath together. Soft close.
 
 CRITICAL RULES:
-- THIS MUST BE 2,500-3,000 WORDS. A 15-minute meditation requires substantial content. Do NOT write a short script.
+- Total meditation is 12 minutes. Spoken content should be ~2,000-2,500 words. The remaining time is filled by SILENCE where ambient music plays alone.
 - Write in complete, flowing sentences. Every thought should read naturally when spoken aloud.
-- Use TWO types of pause markers:
+- Use THREE types of pause markers:
   [pause] = 3-5 seconds of silence (use frequently, after every 1-2 sentences)
-  [long pause] = 10-20 seconds of silence (use in phases 5-6, and between breaths in phase 1)
+  [long pause] = 10-20 seconds of silence (use in phases 4-5, and between breaths in phase 1)
+  [extended silence] = 30-60 seconds where ONLY the background music plays. Use at least 3-4 of these throughout the meditation, especially after emotionally rich moments. The guide does not always need to be speaking.
 - The pacing must DECELERATE through the session. Phases 1-2: conversational. Phases 3-4: noticeably slower. Phases 5-6: very slow, spacious. Phase 7: gentle return.
 - Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
 - This is BIBLICAL meditation — beholding the thoughts and feelings of Christ and making them your own. NOT emptying the mind, NOT breathing exercises. The power is in what you behold, not how you breathe.
@@ -151,6 +158,7 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
   const [activeSession, setActiveSession] = useState<{ session: WatchSession; tractName: string } | null>(null);
 
   const [audioState, audioControls] = useStreamingAudio(audioUrl || '');
+  const bgMusic = useBackgroundMusic('night');
 
   // Get tracts that have night sessions
   const availableTracts = useMemo(() =>
@@ -195,14 +203,14 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
       setScreen('playing');
       setStatusText('');
       // Auto-play after a brief delay for the audio element to load
-      setTimeout(() => audioControls.play(), 500);
+      setTimeout(() => { audioControls.play(); bgMusic.play(); }, 500);
     } catch (err) {
       console.error('[NightWatchVR]', err);
       setStatusText('Generation failed. Tap a session to retry.');
     } finally {
       setGenerating(false);
     }
-  }, [audioControls]);
+  }, [audioControls, bgMusic]);
 
   return (
     <group>
@@ -300,8 +308,8 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
           </Text>
 
           {/* Play/Pause button */}
-          <Interactive onSelect={audioControls.togglePlayPause}>
-            <mesh position={[0, 1.2, -3.5]} onClick={audioControls.togglePlayPause} onPointerDown={audioControls.togglePlayPause}>
+          <Interactive onSelect={() => { audioControls.togglePlayPause(); audioState.isPlaying ? bgMusic.pause() : bgMusic.play(); }}>
+            <mesh position={[0, 1.2, -3.5]} onClick={() => { audioControls.togglePlayPause(); audioState.isPlaying ? bgMusic.pause() : bgMusic.play(); }} onPointerDown={() => { audioControls.togglePlayPause(); audioState.isPlaying ? bgMusic.pause() : bgMusic.play(); }}>
               <circleGeometry args={[0.2, 32]} />
               <meshStandardMaterial
                 color={audioState.isPlaying ? '#7c3aed' : '#8b5cf6'}
@@ -321,11 +329,11 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
           </Text>
 
           {/* Back to session select */}
-          <Interactive onSelect={() => { audioControls.pause(); setScreen('menu'); setAudioUrl(null); }}>
+          <Interactive onSelect={() => { audioControls.pause(); bgMusic.pause(); setScreen('menu'); setAudioUrl(null); }}>
             <mesh
               position={[0, 0.55, -3.5]}
-              onClick={() => { audioControls.pause(); setScreen('menu'); setAudioUrl(null); }}
-              onPointerDown={() => { audioControls.pause(); setScreen('menu'); setAudioUrl(null); }}
+              onClick={() => { audioControls.pause(); bgMusic.pause(); setScreen('menu'); setAudioUrl(null); }}
+              onPointerDown={() => { audioControls.pause(); bgMusic.pause(); setScreen('menu'); setAudioUrl(null); }}
             >
               <planeGeometry args={[1.2, 0.25]} />
               <meshStandardMaterial color="#0f0a2a" emissive="#4338ca" emissiveIntensity={0.1} />

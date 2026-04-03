@@ -147,12 +147,18 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       {/* Fog for depth */}
       <fog attach="fog" args={['#0a0a18', 12, 30]} />
 
-      {/* Balanced lighting */}
-      <ambientLight intensity={0.5} color="#ccccee" />
-      <pointLight position={[0, 4, -1]} intensity={1.5} color="#FFD088" distance={15} />
-      <pointLight position={[-4, 3, -3]} intensity={0.8} color="#6366f1" distance={10} />
-      <pointLight position={[4, 3, -3]} intensity={0.8} color="#8b5cf6" distance={10} />
-      <pointLight position={[0, 2, -5]} intensity={0.5} color="#44FFEE" distance={8} />
+      {/* 3-point directional lighting */}
+      <ambientLight intensity={0.25} color="#ccccee" />
+      {/* Key: warm from above-right */}
+      <directionalLight position={[4, 6, 2]} intensity={1.2} color="#FFD088" />
+      {/* Fill: cool from left */}
+      <directionalLight position={[-5, 3, 1]} intensity={0.4} color="#8888cc" />
+      {/* Rim: indigo from behind */}
+      <directionalLight position={[0, 3, -8]} intensity={0.6} color="#6366f1" />
+      {/* Accent point lights for portal glow atmosphere */}
+      <pointLight position={[-4, 3, -3]} intensity={0.6} color="#6366f1" distance={10} />
+      <pointLight position={[4, 3, -3]} intensity={0.6} color="#8b5cf6" distance={10} />
+      <pointLight position={[0, 2, -5]} intensity={0.4} color="#44FFEE" distance={8} />
 
       {/* Title */}
       <Suspense fallback={null}>

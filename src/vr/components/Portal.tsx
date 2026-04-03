@@ -45,7 +45,17 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
       {/* Arch frame */}
       <mesh ref={archRef} castShadow>
         <torusGeometry args={[1.2, 0.12, 8, 32, Math.PI]} />
-        <meshStandardMaterial color="#444" metalness={0.8} roughness={0.2} emissive={color} emissiveIntensity={hovered ? 0.3 : 0} />
+        <meshPhysicalMaterial
+          color="#444"
+          metalness={0.85}
+          roughness={0.15}
+          emissive={color}
+          emissiveIntensity={hovered ? 0.3 : 0}
+          clearcoat={0.8}
+          clearcoatRoughness={0.1}
+          iridescence={0.3}
+          iridescenceIOR={1.3}
+        />
       </mesh>
 
       {/* Left pillar */}

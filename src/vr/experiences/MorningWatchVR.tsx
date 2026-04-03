@@ -7,6 +7,7 @@ import { StarField } from '../components/StarField';
 import { NebulaClouds } from '../components/NebulaClouds';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 import { useStreamingAudio } from '../hooks/useStreamingAudio';
+import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
 import { callJeeves } from '@/lib/jeevesClient';
 import { supabase } from '@/integrations/supabase/client';
 import { WATCH_TRACTS, type MorningWatchSession } from '@/data/watchSeries';
@@ -16,7 +17,9 @@ interface MorningWatchVRProps {
 }
 
 function buildPrompt(session: MorningWatchSession, tractName: string): string {
-  return `Generate a 15-minute Morning Watch activation script to be read aloud as audio. This must be LONG — approximately 2,500 to 3,000 words. Do NOT cut it short.
+  return `Generate a 12-minute Morning Watch activation script to be read aloud as audio. This must be LONG — approximately 2,000 to 2,500 words of spoken content, PLUS generous silence. Do NOT cut it short.
+
+IMPORTANT: Ambient music plays underneath the entire meditation. You do NOT need to fill every moment with words. Include EXTENDED SILENCES of 30-60 seconds where the music plays alone and the listener simply sits in what has been declared. These musical interludes are not awkward gaps — they are sacred space. The music carries the activation during these silences.
 
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
@@ -28,37 +31,41 @@ Energy: ${session.energy}
 Commitment Style: ${session.commitmentStyle}
 Scenario Types: ${session.scenarioTypes.join(', ')}
 
-Follow this 7-phase structure inspired by the Calm app's morning meditations. Each phase flows naturally into the next — no labels, no headers, no time references. The Morning Watch is more alert and directed than the Night Watch, but still begins with grounding.
+Follow this 7-phase structure inspired by the Calm app's morning meditations. Each phase flows naturally into the next — no labels, no headers, no time references. The Morning Watch is more alert and directed than the Night Watch, but still includes generous moments of musical silence.
 
 PHASE 1 — AWAKENING AND FRAMING (~2 minutes of audio):
 Begin with a warm good morning. Invite the listener to sit up, plant their feet, and gather themselves. You may mention one centering breath, but do NOT dwell on breathing technique — move quickly into the purpose.
 
 Explain that this is a Morning Watch — the activation half of the Master Mind practice. Last night you beheld the thoughts and feelings of Christ. You watched how He thinks, how He responds, what He feels. This morning, the goal is to TAKE those thoughts and feelings as your own and carry them into your day. This is biblical meditation — not emptying the mind, but filling it with the mind of Christ. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Today you are not just remembering what Christ thought — you are thinking WITH Him. [pause]
 
-PHASE 2 — REMEMBER LAST NIGHT (~2 minutes):
+PHASE 2 — REMEMBER LAST NIGHT (~1.5 minutes):
 Recall last night's Master Mind insight from "${session.pairedNightTitle}". Briefly revisit the scene, the core truth. Weave in the night scripture naturally. The listener should feel continuity between night and morning.
+End with [extended silence] — 30-45 seconds of music alone while the memory settles.
 
-PHASE 3 — TRUTH DECLARATION (~2.5 minutes):
+PHASE 3 — TRUTH DECLARATION (~2 minutes):
 Shift to this morning's Scripture: ${session.morningScripture}. Speak it with weight and conviction. Then unpack it into an identity statement. The activation principle: ${session.activationPrinciple}. Repeat the key Scripture phrase 2-3 times with [pause] after each, letting it sink deeper.
+Follow with [extended silence] — 30-40 seconds of music while the declaration reverberates.
 
-PHASE 4 — MENTAL ALIGNMENT (~3 minutes):
+PHASE 4 — MENTAL ALIGNMENT (~2 minutes):
 Translate the pattern into today's thinking. Walk through the mental shift — from the old default reaction to the Christ-pattern response. Be specific and practical. Use [pause] generously. Steady and clear, like a coach walking you through a play.
 
-PHASE 5 — REAL-LIFE SCENARIOS (~4 minutes):
+PHASE 5 — REAL-LIFE SCENARIOS (~2.5 minutes):
 Present 3 distinct, vivid scenarios based on: ${session.scenarioTypes.join(', ')}. For each: paint the situation concretely, name the old reaction honestly, then speak the Master Mind response. [pause] after each scenario. Make these feel REAL with sensory details.
+After the final scenario, include [extended silence] — 45-60 seconds of music. Let the scenarios settle into the body.
 
-PHASE 6 — OPEN STILLNESS (~1.5 minutes):
-Reduced guidance. "Take a moment to let these truths settle into your body." [long pause] One more gentle prompt. [long pause] Only 2-3 sentences total.
+PHASE 6 — OPEN STILLNESS (~1 minute):
+Reduced guidance. "Take a moment to let these truths settle into your body." [extended silence] for 30-40 seconds. Only 1-2 sentences total. Let the music hold the space.
 
-PHASE 7 — COMMITMENT AND SEND-OFF (~1.5 minutes):
+PHASE 7 — COMMITMENT AND SEND-OFF (~1 minute):
 End with resolve, not a question. ${session.commitmentStyle} style commitment. Bring energy up slightly — resolute and warm. One final breath. A brief blessing or send-off.
 
 CRITICAL RULES:
-- THIS MUST BE 2,500-3,000 WORDS. A 15-minute session requires substantial content. Do NOT write a short script.
+- Total meditation is 12 minutes. Spoken content should be ~2,000-2,500 words. The remaining time is filled by SILENCE where ambient music plays alone.
 - Write in complete, flowing sentences. Every thought should read naturally when spoken aloud.
-- Use TWO types of pause markers:
+- Use THREE types of pause markers:
   [pause] = 3-5 seconds of silence (use frequently, after every 1-2 sentences)
-  [long pause] = 10-20 seconds of silence (use in phases 1 and 6, and after key truth declarations)
+  [long pause] = 10-20 seconds of silence (use after key truth declarations and between scenarios)
+  [extended silence] = 30-60 seconds where ONLY the background music plays. Use at least 3-4 of these throughout the meditation, especially after emotionally rich moments. The guide does not always need to be speaking.
 - Morning Watch tone is CLEAR, WARM, and DIRECTED — not dreamy. Energy level: ${session.energy}. Think of a trusted coach at sunrise, not a sleep guide.
 - Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
 - This is BIBLICAL meditation — beholding the thoughts and feelings of Christ and making them your own. NOT emptying the mind, NOT breathing exercises, NOT Eastern mysticism. The power is in what you behold, not how you breathe.
@@ -165,6 +172,7 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
   const [activeSession, setActiveSession] = useState<{ session: MorningWatchSession; tractName: string } | null>(null);
 
   const [audioState, audioControls] = useStreamingAudio(audioUrl || '');
+  const bgMusic = useBackgroundMusic('morning');
 
   const quickSessions = useMemo(() => {
     const tract = WATCH_TRACTS.find((t) => t.mornings && t.mornings.length > 0);
@@ -202,14 +210,14 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
       setAudioUrl(url);
       setScreen('playing');
       setStatusText('');
-      setTimeout(() => audioControls.play(), 500);
+      setTimeout(() => { audioControls.play(); bgMusic.play(); }, 500);
     } catch (err) {
       console.error('[MorningWatchVR]', err);
       setStatusText('Generation failed. Tap a session to retry.');
     } finally {
       setGenerating(false);
     }
-  }, [audioControls]);
+  }, [audioControls, bgMusic]);
 
   return (
     <group>
@@ -290,8 +298,8 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
           </Text>
 
           {/* Play/Pause */}
-          <Interactive onSelect={audioControls.togglePlayPause}>
-            <mesh position={[0, 1.2, -3.5]} onClick={audioControls.togglePlayPause} onPointerDown={audioControls.togglePlayPause}>
+          <Interactive onSelect={() => { audioControls.togglePlayPause(); audioState.isPlaying ? bgMusic.pause() : bgMusic.play(); }}>
+            <mesh position={[0, 1.2, -3.5]} onClick={() => { audioControls.togglePlayPause(); audioState.isPlaying ? bgMusic.pause() : bgMusic.play(); }} onPointerDown={() => { audioControls.togglePlayPause(); audioState.isPlaying ? bgMusic.pause() : bgMusic.play(); }}>
               <circleGeometry args={[0.2, 32]} />
               <meshStandardMaterial
                 color={audioState.isPlaying ? '#d97706' : '#f59e0b'}
@@ -310,11 +318,11 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
           </Text>
 
           {/* Back to session select */}
-          <Interactive onSelect={() => { audioControls.pause(); setScreen('menu'); setAudioUrl(null); }}>
+          <Interactive onSelect={() => { audioControls.pause(); bgMusic.pause(); setScreen('menu'); setAudioUrl(null); }}>
             <mesh
               position={[0, 0.55, -3.5]}
-              onClick={() => { audioControls.pause(); setScreen('menu'); setAudioUrl(null); }}
-              onPointerDown={() => { audioControls.pause(); setScreen('menu'); setAudioUrl(null); }}
+              onClick={() => { audioControls.pause(); bgMusic.pause(); setScreen('menu'); setAudioUrl(null); }}
+              onPointerDown={() => { audioControls.pause(); bgMusic.pause(); setScreen('menu'); setAudioUrl(null); }}
             >
               <planeGeometry args={[1.2, 0.25]} />
               <meshStandardMaterial color="#1a0f05" emissive="#92400e" emissiveIntensity={0.1} />

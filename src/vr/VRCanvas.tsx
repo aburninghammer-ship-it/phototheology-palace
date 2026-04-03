@@ -1,8 +1,9 @@
-import React, { useState, Suspense, useCallback, useRef, useEffect } from 'react';
+import React, { useState, Suspense, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { XR, VRButton, ARButton, useXR, Controllers, Hands } from '@react-three/xr';
 import { OrbitControls, Environment, Text } from '@react-three/drei';
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, Vignette, ToneMapping, HueSaturation, BrightnessContrast } from '@react-three/postprocessing';
+import { ToneMappingMode } from 'postprocessing';
 import { BackSide } from 'three';
 import * as THREE from 'three';
 import { VRLobby, type VRExperience } from './VRLobby';
@@ -175,6 +176,15 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
     }
   }, [handleExperienceChange, onBackToHub]);
 
+  const grading = useMemo(() => {
+    switch (displayedExperience) {
+      case 'sanctuary': return { hue: 0.05, saturation: 0.15, contrast: 0.1 };
+      case 'nightWatch': return { hue: -0.05, saturation: 0.08, contrast: 0.06 };
+      case 'morningWatch': return { hue: 0.08, saturation: 0.15, contrast: 0.08 };
+      default: return { hue: 0, saturation: 0.12, contrast: 0.08 };
+    }
+  }, [displayedExperience]);
+
   return (
     <>
       <DesktopControls />
@@ -188,6 +198,7 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
         </mesh>
 
         <ambientLight intensity={0.5} />
+        <Environment preset="night" background={false} />
 
         <Suspense fallback={<XRLoadingFallback />}>
           {displayedExperience === 'lobby' && (
@@ -209,12 +220,10 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
 
       {/* Global post-processing — cinematic look across all VR experiences */}
       <EffectComposer multisampling={0}>
-        <Bloom
-          intensity={0.4}
-          luminanceThreshold={0.6}
-          luminanceSmoothing={0.9}
-          mipmapBlur
-        />
+        <Bloom intensity={0.4} luminanceThreshold={0.6} luminanceSmoothing={0.9} mipmapBlur />
+        <BrightnessContrast brightness={0} contrast={grading.contrast} />
+        <HueSaturation hue={grading.hue} saturation={grading.saturation} />
+        <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
         <Vignette eskil={false} offset={0.3} darkness={0.6} />
       </EffectComposer>
     </>
@@ -324,7 +333,7 @@ export default function VRCanvas({ initialExperience, onBackToHub }: VRCanvasPro
       {/* R3F Canvas — alpha:true required for AR compositor to show our rendered content */}
       <Canvas
         style={{ width: '100%', height: '100%' }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, toneMapping: THREE.NoToneMapping }}
         camera={{ position: [0, 1.6, 3], fov: 75, near: 0.1, far: 200 }}
       >
         <XR referenceSpace="local-floor" foveation={1} frameRate={72}>
