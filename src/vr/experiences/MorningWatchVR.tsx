@@ -152,7 +152,7 @@ function HorizonGlow({ brightness = 0 }: { brightness?: number }) {
   return (
     <mesh ref={ref} position={[0, -0.5, -15]} rotation={[-0.2, 0, 0]}>
       <planeGeometry args={[40, 8]} />
-      <meshBasicMaterial color="#f59e0b" transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial color="#C026D3" transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
