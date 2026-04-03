@@ -3,8 +3,8 @@
  *
  * Flow: User taps "Begin Watch" →
  *   1. callJeeves generates meditation script
- *   2. Script passed as generateAudio callback (Supabase TTS)
- *   3. ImmersiveAudioPlayer opens fullscreen
+ *   2. Script passed to watch-tts edge function (ElevenLabs, calming female voice)
+ *   3. ImmersiveAudioPlayer opens fullscreen with ambient music
  *   4. On close, onComplete fires to mark day as done
  */
 import { useState, useCallback, useRef } from "react";
@@ -129,29 +129,49 @@ CRITICAL RULES:
 - Second person ("you") throughout. End with resolve and momentum, not a question.`;
 }
 
-async function generateTTSUrl(script: string): Promise<string | null> {
+async function generateWatchTTS(script: string, watchType: "night" | "morning"): Promise<string | null> {
+  try {
+    const { data, error } = await supabase.functions.invoke("watch-tts", {
+      body: {
+        text: script.trim(),
+        watchType,
+      },
+    });
+    if (error) throw error;
+    if (data?.audioUrl) return data.audioUrl;
+    if (data?.audioContent) {
+      // base64 fallback
+      const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+      return audioUrl;
+    }
+    return null;
+  } catch (err) {
+    console.error("[WatchPlayer] ElevenLabs TTS error:", err);
+    // Fallback to OpenAI TTS
+    console.log("[WatchPlayer] Falling back to OpenAI TTS...");
+    return generateFallbackTTS(script);
+  }
+}
+
+async function generateFallbackTTS(script: string): Promise<string | null> {
   try {
     const { data, error } = await supabase.functions.invoke("text-to-speech", {
       body: {
         text: script.trim(),
         voice: "nova",
         provider: "openai",
-        speed: 1.0,
+        speed: 0.9,
         useCache: true,
       },
     });
     if (error) throw error;
     if (data?.audioUrl) return data.audioUrl;
     if (data?.audioContent) {
-      const blob = new Blob(
-        [Uint8Array.from(atob(data.audioContent), (c) => c.charCodeAt(0))],
-        { type: "audio/mpeg" },
-      );
-      return URL.createObjectURL(blob);
+      return `data:audio/mpeg;base64,${data.audioContent}`;
     }
     return null;
   } catch (err) {
-    console.error("[WatchPlayer] TTS error:", err);
+    console.error("[WatchPlayer] Fallback TTS error:", err);
     return null;
   }
 }
@@ -202,7 +222,7 @@ export function useWatchPlayer(options?: UseWatchPlayerOptions) {
           type: "devotional",
           icon: "🌙",
           modeName: "Night Watch",
-          generateAudio: () => generateTTSUrl(script),
+          generateAudio: () => generateWatchTTS(script, "night"),
           ambientMode: "ambient-sounds",
         };
 
@@ -252,7 +272,7 @@ export function useWatchPlayer(options?: UseWatchPlayerOptions) {
           type: "devotional",
           icon: "🌅",
           modeName: "Morning Watch",
-          generateAudio: () => generateTTSUrl(script),
+          generateAudio: () => generateWatchTTS(script, "morning"),
           ambientMode: "ambient-sounds",
         };
 

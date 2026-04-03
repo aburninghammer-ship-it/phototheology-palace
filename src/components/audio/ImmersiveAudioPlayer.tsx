@@ -35,13 +35,24 @@ const AMBIENT_BG_TRACKS = [
   { id: "follow", name: "Follow", url: "/audio/follow.mp3" },
 ];
 
-// For "ambient-sounds" mode, use the softest existing tracks at lower volume
+// Meditation ambient tracks — calming, gentle, designed to sit under voice
 const AMBIENT_SOUND_TRACKS = [
-  { id: "deep-drone", name: "Deep Drone", url: "/audio/ambient-deep-drone.mp3" },
-  { id: "celestial-pad", name: "Celestial Pad", url: "/audio/ambient-celestial-pad.mp3" },
-  { id: "soft-wind", name: "Soft Wind", url: "/audio/ambient-soft-wind.mp3" },
-  { id: "gentle-rain", name: "Gentle Rain", url: "/audio/ambient-gentle-rain.mp3" },
+  { id: "still-water-mind", name: "Still Water Mind", url: "/audio/still-water-mind.mp3" },
+  { id: "still-water-mind-2", name: "Still Water Mind II", url: "/audio/still-water-mind-2.mp3" },
+  { id: "still-waters-gentle-word", name: "Still Waters Gentle Word", url: "/audio/still-waters-gentle-word.mp3" },
+  { id: "still-waters-gentle-word-2", name: "Still Waters Gentle Word II", url: "/audio/still-waters-gentle-word-2.mp3" },
+  { id: "breath-of-your-presence", name: "Breath of Your Presence", url: "/audio/breath-of-your-presence.mp3" },
+  { id: "breath-of-your-presence-2", name: "Breath of Your Presence II", url: "/audio/breath-of-your-presence-2.mp3" },
+  { id: "still-waters-quiet-soul", name: "Still Waters Quiet Soul", url: "/audio/still-waters-quiet-soul.mp3" },
+  { id: "still-waters-quiet-soul-2", name: "Still Waters Quiet Soul II", url: "/audio/still-waters-quiet-soul-2.mp3" },
+  { id: "weightless-river", name: "Weightless River", url: "/audio/weightless-river.mp3" },
+  { id: "weightless-river-2", name: "Weightless River II", url: "/audio/weightless-river-2.mp3" },
 ];
+
+// Crossfade duration in ms
+const CROSSFADE_DURATION = 4000;
+// Voice ducking: music volume multiplier when voice is playing (lower = more ducking)
+const VOICE_DUCK_RATIO = 0.25;
 
 interface ImmersiveAudioPlayerProps {
   isOpen: boolean;
@@ -92,8 +103,10 @@ export function ImmersiveAudioPlayer({
   const [mainVolume, setMainVolume] = useState(1);
   const [mainMuted, setMainMuted] = useState(false);
   
-  // Ambient music
+  // Ambient music — two audio elements for crossfade
   const ambientRef = useRef<HTMLAudioElement | null>(null);
+  const ambientNextRef = useRef<HTMLAudioElement | null>(null);
+  const crossfadeTimerRef = useRef<number>();
   const [ambientTrackIdx, setAmbientTrackIdx] = useState(0);
   const [ambientPlaying, setAmbientPlaying] = useState(false);
   
@@ -114,6 +127,13 @@ export function ImmersiveAudioPlayer({
   
   // Verse progress (for karaoke word-level sync)
   const [verseProgress, setVerseProgress] = useState(0);
+
+  // Compute ducked ambient volume — lower when voice is playing
+  const getAmbientTargetVolume = useCallback((modeMultiplier: number) => {
+    const base = ambientVolume * modeMultiplier * sleepFadeMultiplier;
+    // When voice is playing, duck the music significantly
+    return isPlaying ? base * VOICE_DUCK_RATIO : base;
+  }, [ambientVolume, sleepFadeMultiplier, isPlaying]);
   
   // Initialize main audio
   useEffect(() => {
@@ -126,6 +146,11 @@ export function ImmersiveAudioPlayer({
       ambientRef.current.preload = "auto";
       ambientRef.current.loop = false;
     }
+    if (!ambientNextRef.current) {
+      ambientNextRef.current = new Audio();
+      ambientNextRef.current.preload = "auto";
+      ambientNextRef.current.loop = false;
+    }
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -134,6 +159,13 @@ export function ImmersiveAudioPlayer({
       if (ambientRef.current) {
         ambientRef.current.pause();
         ambientRef.current.src = "";
+      }
+      if (ambientNextRef.current) {
+        ambientNextRef.current.pause();
+        ambientNextRef.current.src = "";
+      }
+      if (crossfadeTimerRef.current) {
+        clearInterval(crossfadeTimerRef.current);
       }
     };
   }, []);
@@ -269,19 +301,57 @@ export function ImmersiveAudioPlayer({
     setAmbientModeOverride(null);
   }, [currentIndex]);
 
+  // Crossfade helper: fade out old ambient, fade in new one
+  const crossfadeToNext = useCallback((trackList: typeof AMBIENT_SOUND_TRACKS, nextIdx: number) => {
+    const outgoing = ambientRef.current;
+    const incoming = ambientNextRef.current;
+    if (!outgoing || !incoming) return;
+
+    const nextTrack = trackList[nextIdx % trackList.length];
+    const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+    const targetVol = getAmbientTargetVolume(modeMultiplier);
+
+    incoming.src = nextTrack.url;
+    incoming.volume = 0;
+    incoming.load();
+    incoming.play().catch(() => {});
+
+    const steps = 40;
+    const stepMs = CROSSFADE_DURATION / steps;
+    let step = 0;
+    
+    if (crossfadeTimerRef.current) clearInterval(crossfadeTimerRef.current);
+    crossfadeTimerRef.current = window.setInterval(() => {
+      step++;
+      const progress = step / steps;
+      if (outgoing) outgoing.volume = Math.max(0, targetVol * (1 - progress));
+      if (incoming) incoming.volume = targetVol * progress;
+      if (step >= steps) {
+        clearInterval(crossfadeTimerRef.current);
+        outgoing.pause();
+        outgoing.src = "";
+        // Swap refs
+        const temp = ambientRef.current;
+        ambientRef.current = ambientNextRef.current;
+        ambientNextRef.current = temp;
+      }
+    }, stepMs);
+  }, [ambientMode, getAmbientTargetVolume]);
+
   useEffect(() => {
     if (!ambientRef.current) return;
 
     // If track requests no background audio, stay silent
     if (ambientMode === "none") {
       ambientRef.current.pause();
+      if (ambientNextRef.current) ambientNextRef.current.pause();
       setAmbientPlaying(false);
       return;
     }
 
     const trackList = ambientMode === "ambient-sounds" ? AMBIENT_SOUND_TRACKS : AMBIENT_BG_TRACKS;
 
-    if (isOpen && ambientMusicEnabled && isPlaying) {
+    if (isOpen && ambientMusicEnabled) {
       const ambient = ambientRef.current;
       const bgTrack = trackList[ambientTrackIdx % trackList.length];
 
@@ -289,28 +359,58 @@ export function ImmersiveAudioPlayer({
         ambient.src = bgTrack.url;
         ambient.load();
       }
-      // Ambient sounds play much quieter — gentle background tones, not the focus
-      const modeVolume = ambientMode === "ambient-sounds" ? ambientVolume * 0.35 : ambientVolume;
-      ambient.volume = modeVolume;
+
+      const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+      const targetVol = getAmbientTargetVolume(modeMultiplier);
+      ambient.volume = Math.max(0, targetVol);
       ambient.play().then(() => setAmbientPlaying(true)).catch(() => {});
 
-      // When ambient track ends, play next
+      // When ambient track ends, crossfade to next
       ambient.onended = () => {
-        setAmbientTrackIdx(i => (i + 1) % trackList.length);
+        const nextIdx = (ambientTrackIdx + 1) % trackList.length;
+        setAmbientTrackIdx(nextIdx);
+        crossfadeToNext(trackList, nextIdx);
       };
-    } else {
+    } else if (!isOpen) {
       ambientRef.current.pause();
+      if (ambientNextRef.current) ambientNextRef.current.pause();
       setAmbientPlaying(false);
     }
-  }, [isOpen, ambientMusicEnabled, isPlaying, ambientTrackIdx, ambientVolume, ambientMode]);
+  }, [isOpen, ambientMusicEnabled, ambientTrackIdx, ambientVolume, ambientMode, crossfadeToNext, getAmbientTargetVolume]);
 
-  // Update ambient volume live (with sleep fade)
+  // Duck ambient volume when voice is playing, restore when paused
   useEffect(() => {
-    if (ambientRef.current) {
-      const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
-      ambientRef.current.volume = ambientMusicEnabled ? ambientVolume * modeMultiplier * sleepFadeMultiplier : 0;
+    if (!ambientRef.current || !ambientMusicEnabled) return;
+    const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+    const targetVol = getAmbientTargetVolume(modeMultiplier);
+    
+    // Smooth volume transition for ducking
+    const current = ambientRef.current.volume;
+    if (Math.abs(current - targetVol) < 0.01) {
+      ambientRef.current.volume = Math.max(0, targetVol);
+      return;
     }
-  }, [ambientVolume, ambientMusicEnabled, sleepFadeMultiplier, ambientMode]);
+    const steps = 20;
+    const stepMs = 50;
+    let step = 0;
+    const startVol = current;
+    const timer = setInterval(() => {
+      step++;
+      const p = step / steps;
+      if (ambientRef.current) {
+        ambientRef.current.volume = Math.max(0, startVol + (targetVol - startVol) * p);
+      }
+      if (step >= steps) clearInterval(timer);
+    }, stepMs);
+    return () => clearInterval(timer);
+  }, [isPlaying, ambientVolume, ambientMusicEnabled, sleepFadeMultiplier, ambientMode, getAmbientTargetVolume]);
+
+  // Update ambient volume live (with sleep fade + ducking)
+  useEffect(() => {
+    if (ambientRef.current && !ambientMusicEnabled) {
+      ambientRef.current.volume = 0;
+    }
+  }, [ambientMusicEnabled]);
 
   // Update main volume (with sleep fade)
   useEffect(() => {
@@ -337,6 +437,8 @@ export function ImmersiveAudioPlayer({
     if (!isOpen) {
       if (audioRef.current) { audioRef.current.pause(); }
       if (ambientRef.current) { ambientRef.current.pause(); }
+      if (ambientNextRef.current) { ambientNextRef.current.pause(); }
+      if (crossfadeTimerRef.current) { clearInterval(crossfadeTimerRef.current); }
       setIsPlaying(false);
       setAmbientPlaying(false);
     }
