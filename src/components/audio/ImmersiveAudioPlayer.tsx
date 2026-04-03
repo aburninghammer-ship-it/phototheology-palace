@@ -301,19 +301,57 @@ export function ImmersiveAudioPlayer({
     setAmbientModeOverride(null);
   }, [currentIndex]);
 
+  // Crossfade helper: fade out old ambient, fade in new one
+  const crossfadeToNext = useCallback((trackList: typeof AMBIENT_SOUND_TRACKS, nextIdx: number) => {
+    const outgoing = ambientRef.current;
+    const incoming = ambientNextRef.current;
+    if (!outgoing || !incoming) return;
+
+    const nextTrack = trackList[nextIdx % trackList.length];
+    const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+    const targetVol = getAmbientTargetVolume(modeMultiplier);
+
+    incoming.src = nextTrack.url;
+    incoming.volume = 0;
+    incoming.load();
+    incoming.play().catch(() => {});
+
+    const steps = 40;
+    const stepMs = CROSSFADE_DURATION / steps;
+    let step = 0;
+    
+    if (crossfadeTimerRef.current) clearInterval(crossfadeTimerRef.current);
+    crossfadeTimerRef.current = window.setInterval(() => {
+      step++;
+      const progress = step / steps;
+      if (outgoing) outgoing.volume = Math.max(0, targetVol * (1 - progress));
+      if (incoming) incoming.volume = targetVol * progress;
+      if (step >= steps) {
+        clearInterval(crossfadeTimerRef.current);
+        outgoing.pause();
+        outgoing.src = "";
+        // Swap refs
+        const temp = ambientRef.current;
+        ambientRef.current = ambientNextRef.current;
+        ambientNextRef.current = temp;
+      }
+    }, stepMs);
+  }, [ambientMode, getAmbientTargetVolume]);
+
   useEffect(() => {
     if (!ambientRef.current) return;
 
     // If track requests no background audio, stay silent
     if (ambientMode === "none") {
       ambientRef.current.pause();
+      if (ambientNextRef.current) ambientNextRef.current.pause();
       setAmbientPlaying(false);
       return;
     }
 
     const trackList = ambientMode === "ambient-sounds" ? AMBIENT_SOUND_TRACKS : AMBIENT_BG_TRACKS;
 
-    if (isOpen && ambientMusicEnabled && isPlaying) {
+    if (isOpen && ambientMusicEnabled) {
       const ambient = ambientRef.current;
       const bgTrack = trackList[ambientTrackIdx % trackList.length];
 
@@ -321,28 +359,58 @@ export function ImmersiveAudioPlayer({
         ambient.src = bgTrack.url;
         ambient.load();
       }
-      // Ambient sounds play much quieter — gentle background tones, not the focus
-      const modeVolume = ambientMode === "ambient-sounds" ? ambientVolume * 0.35 : ambientVolume;
-      ambient.volume = modeVolume;
+
+      const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+      const targetVol = getAmbientTargetVolume(modeMultiplier);
+      ambient.volume = Math.max(0, targetVol);
       ambient.play().then(() => setAmbientPlaying(true)).catch(() => {});
 
-      // When ambient track ends, play next
+      // When ambient track ends, crossfade to next
       ambient.onended = () => {
-        setAmbientTrackIdx(i => (i + 1) % trackList.length);
+        const nextIdx = (ambientTrackIdx + 1) % trackList.length;
+        setAmbientTrackIdx(nextIdx);
+        crossfadeToNext(trackList, nextIdx);
       };
-    } else {
+    } else if (!isOpen) {
       ambientRef.current.pause();
+      if (ambientNextRef.current) ambientNextRef.current.pause();
       setAmbientPlaying(false);
     }
-  }, [isOpen, ambientMusicEnabled, isPlaying, ambientTrackIdx, ambientVolume, ambientMode]);
+  }, [isOpen, ambientMusicEnabled, ambientTrackIdx, ambientVolume, ambientMode, crossfadeToNext, getAmbientTargetVolume]);
 
-  // Update ambient volume live (with sleep fade)
+  // Duck ambient volume when voice is playing, restore when paused
   useEffect(() => {
-    if (ambientRef.current) {
-      const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
-      ambientRef.current.volume = ambientMusicEnabled ? ambientVolume * modeMultiplier * sleepFadeMultiplier : 0;
+    if (!ambientRef.current || !ambientMusicEnabled) return;
+    const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+    const targetVol = getAmbientTargetVolume(modeMultiplier);
+    
+    // Smooth volume transition for ducking
+    const current = ambientRef.current.volume;
+    if (Math.abs(current - targetVol) < 0.01) {
+      ambientRef.current.volume = Math.max(0, targetVol);
+      return;
     }
-  }, [ambientVolume, ambientMusicEnabled, sleepFadeMultiplier, ambientMode]);
+    const steps = 20;
+    const stepMs = 50;
+    let step = 0;
+    const startVol = current;
+    const timer = setInterval(() => {
+      step++;
+      const p = step / steps;
+      if (ambientRef.current) {
+        ambientRef.current.volume = Math.max(0, startVol + (targetVol - startVol) * p);
+      }
+      if (step >= steps) clearInterval(timer);
+    }, stepMs);
+    return () => clearInterval(timer);
+  }, [isPlaying, ambientVolume, ambientMusicEnabled, sleepFadeMultiplier, ambientMode, getAmbientTargetVolume]);
+
+  // Update ambient volume live (with sleep fade + ducking)
+  useEffect(() => {
+    if (ambientRef.current && !ambientMusicEnabled) {
+      ambientRef.current.volume = 0;
+    }
+  }, [ambientMusicEnabled]);
 
   // Update main volume (with sleep fade)
   useEffect(() => {
