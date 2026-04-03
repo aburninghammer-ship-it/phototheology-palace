@@ -18,7 +18,8 @@ interface NightWatchVRProps {
 // ── Audio generation (same pipeline as useWatchPlayer) ──
 
 function buildPrompt(session: WatchSession, tractName: string): string {
-  return `Generate a Night Watch meditation script to be read aloud as audio.
+  return `Generate a 15-minute Night Watch meditation script to be read aloud as audio. This must be LONG — approximately 2,500 to 3,000 words. Do NOT cut it short.
+
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
 Scripture: ${session.scripture}
@@ -27,27 +28,46 @@ Master Mind Insight: ${session.masterMindInsight}
 Mood: ${session.mood}
 Primary Struggle: ${session.struggle}
 
-Structure the script in 5 phases (no time stamps, no duration labels — just flow naturally):
-1. ENTRY — Set the emotional tone with gentle breathing guidance. Settle the listener.
-2. SCENE IMMERSION — Present tense, sensory-rich narration of the biblical scene. Paint the setting vividly.
-3. MASTER MIND MOMENT — Observe what Christ does. Recognize the pattern. Receive the transformation.
-4. HEALING — Address the struggle of ${session.struggle} directly and specifically with compassion.
-5. REST — Identity reinforcement, fading to peace.
+Follow this 7-phase structure inspired by the Calm app. Each phase flows naturally into the next — no labels, no headers, no time references. Just seamless spoken narration.
+
+PHASE 1 — SETTLING (~90 seconds of audio):
+Begin with a warm welcome. Guide the listener to find a comfortable position. Lead 3-4 slow, deep breaths with gentle instruction. Let the ambient stillness settle. Use [long pause] markers between breaths. The voice should model calm — unhurried, soft, grounding.
+
+PHASE 2 — TEACHING (~2.5 minutes):
+Introduce tonight's theme through a brief, conversational reflection. Weave in the Scripture (${session.scripture}) naturally. Connect it to the human experience of ${session.struggle}. This should feel like a wise friend sharing an insight by firelight.
+
+PHASE 3 — TRANSITION TO SCENE (~1 minute):
+Gently shift from teaching into immersive experience. Bridge the listener from intellectual understanding into embodied imagination. Pacing begins to slow here.
+
+PHASE 4 — SCENE IMMERSION (~4 minutes):
+Present-tense, sensory-rich narration of the biblical scene (${session.scene}). Paint the setting with vivid detail. Place the listener inside the scene as a witness. Let them observe Christ. Pacing should be notably slower, with [long pause] after every 2-3 sentences. Let images breathe.
+
+PHASE 5 — MASTER MIND MOMENT (~3 minutes):
+This is the heart. Observe what Christ does. The Master Mind insight: ${session.masterMindInsight}. Speak this truth over the listener. Address ${session.struggle} with direct compassion. Use very long pauses here. Minimal words, maximum weight.
+
+PHASE 6 — OPEN AWARENESS / SILENCE (~2.5 minutes):
+Reduce verbal guidance dramatically. Offer a single gentle prompt, then [long pause] [long pause] [long pause] for extended silence. Another brief prompt. Another long silence. Only 3-4 sentences total in this phase.
+
+PHASE 7 — GENTLE RETURN AND CLOSE (~1.5 minutes):
+Slowly bring awareness back. Brief closing reflection tying back to the opening theme. End with an identity statement rooted in Scripture. Final breath together. Soft close.
 
 CRITICAL RULES:
-- Write in complete, flowing sentences. Not fragments or bullet-style phrases.
-- Include [pause] markers generously between sentences and sections.
-- Do NOT include any time references. The listener should not be aware of time.
-- Do NOT include stage directions, section headers, or meta-commentary. Only words to be spoken aloud.
+- THIS MUST BE 2,500-3,000 WORDS. A 15-minute meditation requires substantial content. Do NOT write a short script.
+- Write in complete, flowing sentences. Every thought should read naturally when spoken aloud.
+- Use TWO types of pause markers:
+  [pause] = 3-5 seconds of silence (use frequently, after every 1-2 sentences)
+  [long pause] = 10-20 seconds of silence (use in phases 5-6, and between breaths in phase 1)
+- The pacing must DECELERATE through the session. Phases 1-2: conversational. Phases 3-4: noticeably slower. Phases 5-6: very slow, spacious. Phase 7: gentle return.
+- Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
 - This is BIBLICAL meditation — filling the mind with truth through Scripture, not emptying it.
 - The Master Mind = the mind of Christ (Philippians 2:5).
-- Be cinematic, intimate, and immersive. Second person ("you") throughout.`;
+- Second person ("you") throughout. Intimate. Cinematic.`;
 }
 
 async function generateTTSUrl(script: string): Promise<string | null> {
   try {
     const { data, error } = await supabase.functions.invoke('text-to-speech', {
-      body: { text: script.trim(), voice: 'onyx', provider: 'openai', speed: 0.9, useCache: true },
+      body: { text: script.trim(), voice: 'onyx', provider: 'openai', speed: 0.82, useCache: true },
     });
     if (error) throw error;
     if (data?.audioUrl) return data.audioUrl;

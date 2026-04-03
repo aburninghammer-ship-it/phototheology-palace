@@ -16,7 +16,8 @@ interface MorningWatchVRProps {
 }
 
 function buildPrompt(session: MorningWatchSession, tractName: string): string {
-  return `Generate a Morning Watch activation script to be read aloud as audio.
+  return `Generate a 15-minute Morning Watch activation script to be read aloud as audio. This must be LONG — approximately 2,500 to 3,000 words. Do NOT cut it short.
+
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
 Paired Night Watch: "${session.pairedNightTitle}"
@@ -24,28 +25,48 @@ Night Insight: ${session.nightInsight}
 Morning Scripture: ${session.morningScripture}
 Activation Principle: ${session.activationPrinciple}
 Energy: ${session.energy}
+Commitment Style: ${session.commitmentStyle}
+Scenario Types: ${session.scenarioTypes.join(', ')}
 
-Structure the script in 5 phases (no time stamps, no duration labels — just flow naturally):
-1. REMEMBER — Brief recall of last night's Master Mind insight.
-2. TRUTH DECLARATION — Core Scripture spoken with weight, followed by an identity statement.
-3. MENTAL ALIGNMENT — Translate the pattern into today's thinking.
-4. REAL-LIFE SCENARIOS — 3 distinct scenarios: situation, old reaction, then the Master Mind response.
-5. COMMITMENT — Brief, resolute, memorable.
+Follow this 7-phase structure inspired by the Calm app's morning meditations. Each phase flows naturally into the next — no labels, no headers, no time references. The Morning Watch is more alert and directed than the Night Watch, but still begins with grounding.
+
+PHASE 1 — SETTLING AND AWAKENING (~90 seconds of audio):
+Begin with a warm good morning. Guide the listener to sit up, plant their feet, take a few deep, intentional breaths. This is not sleepy — it's gathering yourself before a purposeful day. 3-4 breaths with [pause] between each.
+
+PHASE 2 — REMEMBER LAST NIGHT (~2 minutes):
+Recall last night's Master Mind insight from "${session.pairedNightTitle}". Briefly revisit the scene, the core truth. Weave in the night scripture naturally. The listener should feel continuity between night and morning.
+
+PHASE 3 — TRUTH DECLARATION (~2.5 minutes):
+Shift to this morning's Scripture: ${session.morningScripture}. Speak it with weight and conviction. Then unpack it into an identity statement. The activation principle: ${session.activationPrinciple}. Repeat the key Scripture phrase 2-3 times with [pause] after each, letting it sink deeper.
+
+PHASE 4 — MENTAL ALIGNMENT (~3 minutes):
+Translate the pattern into today's thinking. Walk through the mental shift — from the old default reaction to the Christ-pattern response. Be specific and practical. Use [pause] generously. Steady and clear, like a coach walking you through a play.
+
+PHASE 5 — REAL-LIFE SCENARIOS (~4 minutes):
+Present 3 distinct, vivid scenarios based on: ${session.scenarioTypes.join(', ')}. For each: paint the situation concretely, name the old reaction honestly, then speak the Master Mind response. [pause] after each scenario. Make these feel REAL with sensory details.
+
+PHASE 6 — OPEN STILLNESS (~1.5 minutes):
+Reduced guidance. "Take a moment to let these truths settle into your body." [long pause] One more gentle prompt. [long pause] Only 2-3 sentences total.
+
+PHASE 7 — COMMITMENT AND SEND-OFF (~1.5 minutes):
+End with resolve, not a question. ${session.commitmentStyle} style commitment. Bring energy up slightly — resolute and warm. One final breath. A brief blessing or send-off.
 
 CRITICAL RULES:
-- Write in complete, flowing sentences. Not fragments or bullet-style phrases.
-- Include [pause] markers generously between sentences and sections.
-- Do NOT include any time references. The listener should not be aware of time.
-- Do NOT include stage directions, section headers, or meta-commentary. Only words to be spoken aloud.
+- THIS MUST BE 2,500-3,000 WORDS. A 15-minute session requires substantial content. Do NOT write a short script.
+- Write in complete, flowing sentences. Every thought should read naturally when spoken aloud.
+- Use TWO types of pause markers:
+  [pause] = 3-5 seconds of silence (use frequently, after every 1-2 sentences)
+  [long pause] = 10-20 seconds of silence (use in phases 1 and 6, and after key truth declarations)
+- Morning Watch tone is CLEAR, WARM, and DIRECTED — not dreamy. Energy level: ${session.energy}.
+- Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
 - The Master Mind = the mind of Christ (Philippians 2:5).
-- Tone should be CLEAR and DIRECT, not dreamy. Energy: ${session.energy}.
-- Use "you" throughout. Second person. End with resolve, not a question.`;
+- Second person ("you") throughout. End with resolve and momentum.`;
 }
 
 async function generateTTSUrl(script: string): Promise<string | null> {
   try {
     const { data, error } = await supabase.functions.invoke('text-to-speech', {
-      body: { text: script.trim(), voice: 'onyx', provider: 'openai', speed: 0.9, useCache: true },
+      body: { text: script.trim(), voice: 'onyx', provider: 'openai', speed: 0.82, useCache: true },
     });
     if (error) throw error;
     if (data?.audioUrl) return data.audioUrl;
