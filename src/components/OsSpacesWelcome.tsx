@@ -201,8 +201,22 @@ export const OsSpacesWelcome = () => {
   const [activeSpace, setActiveSpace] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isSimple, isMaster } = useExperienceMode();
 
   const active = OS_SPACES.find(s => s.id === activeSpace);
+
+  // Mode-aware hero text
+  const heroTitle = user
+    ? isSimple
+      ? "Welcome back"
+      : "Welcome back, Phototheologist"
+    : isSimple
+      ? "Explore the Bible"
+      : "The Art of Phototheology";
+
+  const heroSubtitle = isSimple
+    ? "70+ Bible study tools across 8 categories"
+    : <>The Art of Seeing Christ in All Things — powered by <span className="font-semibold" style={{ color: "#d4a017" }}>Biblical Intelligence (BI)</span></>;
 
   return (
     <div className="px-4 py-6 space-y-6">
@@ -216,10 +230,10 @@ export const OsSpacesWelcome = () => {
           className="text-2xl sm:text-3xl font-bold tracking-wide"
           style={{ fontFamily: "'Cinzel', serif", color: "#d4a017" }}
         >
-          {user ? "Welcome back, Phototheologist" : "The Art of Phototheology"}
+          {heroTitle}
         </h2>
         <p className="text-sm text-muted-foreground max-w-lg mx-auto">
-          The Art of Seeing Christ in All Things — powered by <span className="font-semibold" style={{ color: "#d4a017" }}>Biblical Intelligence (BI)</span>
+          {heroSubtitle}
         </p>
       </motion.div>
 
