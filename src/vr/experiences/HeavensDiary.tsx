@@ -460,19 +460,34 @@ function CockpitPorthole({ phaseColor }: { phaseColor: string }) {
   return (
     <>
       <mesh ref={meshRef} position={[0, 0, -1.5]}>
-        <torusGeometry args={[1.8, 0.08, 12, 64]} />
-        <meshStandardMaterial
-          color="#334455"
+        <torusGeometry args={[1.8, 0.1, 16, 64]} />
+        <meshPhysicalMaterial
+          color="#8B7535"
           emissive={phaseColor}
           emissiveIntensity={0.2}
-          metalness={0.85}
-          roughness={0.2}
+          metalness={0.92}
+          roughness={0.08}
+          clearcoat={0.8}
+          clearcoatRoughness={0.05}
         />
       </mesh>
-      {/* Inner glow ring */}
+      {/* Inner glow ring — golden */}
       <mesh position={[0, 0, -1.48]}>
-        <torusGeometry args={[1.72, 0.02, 8, 48]} />
-        <meshBasicMaterial color={phaseColor} transparent opacity={0.3} blending={THREE.AdditiveBlending} />
+        <torusGeometry args={[1.72, 0.025, 8, 48]} />
+        <meshBasicMaterial color="#FFD700" transparent opacity={0.3} blending={THREE.AdditiveBlending} />
+      </mesh>
+      {/* Outer decorative ring */}
+      <mesh position={[0, 0, -1.52]}>
+        <torusGeometry args={[1.88, 0.02, 8, 48]} />
+        <meshStandardMaterial
+          color="#A08830"
+          emissive="#FFD700"
+          emissiveIntensity={0.4}
+          metalness={0.9}
+          roughness={0.1}
+          transparent
+          opacity={0.6}
+        />
       </mesh>
     </>
   );
