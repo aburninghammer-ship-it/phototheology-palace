@@ -83,7 +83,7 @@ const TOUR_SCENES: TourScene[] = [
     label: 'The Holy City',
     subtitle: 'Revelation 21:2 — New Jerusalem, coming down from God',
     start: 0.80, end: 1.0,
-    colors: { nebula: ['#FFD700', '#FFEE88', '#FFFFFF', '#FFB700'], ambient: '#332800', fog: '#1a1400', accent: '#FFD700' },
+    colors: { nebula: ['#FFD700', '#C4B5FD', '#FFFFFF', '#7C3AED'], ambient: '#0c0818', fog: '#060818', accent: '#FFD700' },
     cameraPath: (t) => ({ x: 0, y: t * 8, z: -5 - t * 15 }),
     particleColor: '#FFD700',
     lightIntensity: 3.0,
