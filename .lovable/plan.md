@@ -1,43 +1,58 @@
-## Phase 1: Quick Wins (This Session)
 
-### 1. A/B Test CTAs on Landing Page
-- Create an A/B testing utility that randomly assigns users to variants and tracks conversions
-- Test hero CTA button text variants (e.g., "Start Free" vs "Try the Palace" vs "Begin Your Journey")
-- Store variant assignment in localStorage, track clicks via user_events table
+# 3-Mode System: Simple → Guided → Master
 
-### 2. Lighthouse Performance Review
-- Run performance profile on current site
-- Identify and fix top bottlenecks (bundle size, render-blocking resources, image optimization)
-- Document findings and improvements
+## Overview
+Add a global user experience mode that controls how much Phototheology architecture (rooms, principles, codes) is exposed. The engine stays identical — only the presentation layer changes.
 
-## Phase 2: Gamification (Next Session)
+## The 3 Modes
 
-### 3. Floor Completion Badges
-- Create visual badge/award system for completing each of the 8 Palace floors
-- Track floor completion progress and award badges automatically
-- Display badges on user profile and dashboard
+### 🟢 Simple Mode ("The Clock")
+- No mention of rooms, floors, principles, or codes
+- Actions presented as: "Understand", "Apply", "Defend", "Connect"
+- Jeeves speaks in plain language: "Here are 3 layers of meaning..." instead of "Let's use the Dimensions Room"
+- Palace rooms still fire behind the scenes, just invisible
+- Best for: New users, non-SDA audiences, casual Bible students
 
-### 4. Scripture Memory Battles
-- 1v1 verse memorization challenges (fill-in-the-blank, word ordering)
-- Matchmaking system using realtime channels
-- Scoring and results tracking
+### 🟡 Guided Mode ("Learning the Engine")
+- Occasional mentions: "This insight uses a pattern-recognition technique..."
+- After showing results, a subtle tag appears: "💡 This used the Dimensions principle"
+- Tooltips explain PT concepts when hovered
+- Progressive disclosure — users learn PT vocabulary naturally through use
+- Best for: Growing users who want to understand why insights are powerful
 
-### 5. Multiplayer Bible Trivia
-- Real-time trivia rooms with multiple players
-- Question bank from Palace method content
-- Live scoring and leaderboard per session
+### 🔴 Master Mode ("Full Engine")
+- Full room names, floor numbers, codes visible
+- Claim Ladder, debate tools, all PT terminology
+- Current experience preserved exactly as-is
+- Best for: Advanced users, teachers, apologists, course students
 
-## Phase 3: AI Features (Following Session)
+## Implementation Plan
 
-### 6. Personalized Study Plans
-- Edge function that analyzes user's reading history, completed rooms, and study patterns
-- AI generates a weekly study plan targeting weak areas
-- Suggests specific rooms, chapters, and exercises
+### Step 1: Create the Mode System (Context + Storage)
+- Create a `UserExperienceMode` context provider
+- Store preference in localStorage + user profile (database)
+- Default new users to **Simple** mode
+- Provide a clean toggle UI accessible from Settings and a floating indicator
 
-### 7. Situational Verse Finder
-- "What are you going through?" input
-- AI matches life situations (grief, anxiety, joy, doubt) to relevant verses
-- Includes Palace room context for deeper study
+### Step 2: Create Mode-Aware Components
+- `<PTLabel>` component that renders differently per mode:
+  - Simple: plain language only
+  - Guided: plain language + subtle PT tag
+  - Master: full PT terminology
+- `<PTSection>` wrapper that shows/hides architectural UI per mode
 
----
-**Recommended order:** Start with Phase 1 (A/B testing + Lighthouse) since they directly impact conversion and performance. Then gamification, then AI features.
+### Step 3: Update Key Surfaces
+- **Welcome/Home**: Action-based buttons in Simple, space tiles in Master
+- **Palace Rooms**: Show as "Study Tools" in Simple, room names in Master
+- **Jeeves**: System prompt adjusts per mode (no jargon → some context → full PT)
+- **Navigation labels**: "Memory Training" vs "Floor 1 - Furnishing"
+- **Study results**: Hide room tags in Simple, show progressively in Guided
+
+### Step 4: Mode Selector UI
+- Settings page toggle (primary)
+- First-time user onboarding prompt
+- Quick-switch in sidebar/header for power users
+
+### Step 5: Persist to Database
+- Add `experience_mode` column to profiles table
+- Sync between localStorage and database
