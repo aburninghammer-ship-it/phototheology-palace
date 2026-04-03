@@ -7,6 +7,8 @@ import { OsSpacesWelcome } from "@/components/OsSpacesWelcome";
 import { PtGlossaryTable } from "@/components/PtGlossaryTable";
 import { UpgradeFloatingCard } from "@/components/UpgradeFloatingCard";
 import { WhatsNewTicker } from "@/components/WhatsNewTicker";
+import { ExperienceModeSelector } from "@/components/experience-mode";
+import { PTSection } from "@/components/experience-mode/PTSection";
 
 const Welcome = () => {
   return (
@@ -18,13 +20,16 @@ const Welcome = () => {
       <div className="px-4 pt-6 space-y-4">
         <WhatsNewTicker />
         <ReginaldGreeting />
+        <ExperienceModeSelector variant="compact" className="justify-center" />
         <UpgradeFloatingCard />
         <AudioTourBanner />
         <DailyAudioDevotional />
         <ContinueWhereYouLeftOff />
       </div>
       <OsSpacesWelcome />
-      <PtGlossaryTable />
+      <PTSection showIn={["guided", "master"]}>
+        <PtGlossaryTable />
+      </PTSection>
     </>
   );
 };

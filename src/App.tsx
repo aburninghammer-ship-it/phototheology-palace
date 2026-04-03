@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ExperienceModeProvider } from "@/contexts/ExperienceModeContext";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -384,6 +385,7 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
+        <ExperienceModeProvider>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TooltipProvider>
           <Toaster />
@@ -850,6 +852,7 @@ function App() {
           )}
         </TooltipProvider>
         </ThemeProvider>
+        </ExperienceModeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

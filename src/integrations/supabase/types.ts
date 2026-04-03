@@ -12769,6 +12769,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           equations_streak: number | null
+          experience_mode: string
           first_meaningful_action_at: string | null
           first_win_achieved_at: string | null
           first_win_type: string | null
@@ -12852,6 +12853,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           equations_streak?: number | null
+          experience_mode?: string
           first_meaningful_action_at?: string | null
           first_win_achieved_at?: string | null
           first_win_type?: string | null
@@ -12935,6 +12937,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           equations_streak?: number | null
+          experience_mode?: string
           first_meaningful_action_at?: string | null
           first_win_achieved_at?: string | null
           first_win_type?: string | null

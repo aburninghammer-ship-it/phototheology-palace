@@ -29,6 +29,7 @@ import { FontSizeSettings } from "@/components/settings/FontSizeSettings";
 import { DisplaySettings } from "@/components/settings/DisplaySettings";
 import { useTranslation } from "react-i18next";
 import { UserAiUsageWidget } from "@/components/profile/UserAiUsageWidget";
+import { ExperienceModeSelector } from "@/components/experience-mode";
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -403,6 +404,13 @@ export default function Settings() {
             </CardHeader>
             <CardContent>
               <DisplaySettings />
+            </CardContent>
+          </Card>
+
+          {/* Experience Mode */}
+          <Card>
+            <CardContent className="pt-6">
+              <ExperienceModeSelector variant="full" />
             </CardContent>
           </Card>
 
