@@ -265,7 +265,7 @@ Respond with ONLY a JSON array:
         cards_generated: 0,
         success: false,
         error_message: errorMessage,
-      });
+      }).catch(() => {});
     } catch { /* ignore logging failure */ }
 
     return new Response(
