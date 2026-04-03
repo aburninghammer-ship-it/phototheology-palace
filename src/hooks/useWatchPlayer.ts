@@ -29,11 +29,15 @@ Metaphor Family: ${session.metaphor}
 
 Follow this 7-phase structure inspired by the Calm app. Each phase flows naturally into the next — no labels, no headers, no time references. Just seamless spoken narration.
 
-PHASE 1 — SETTLING (first ~90 seconds of audio):
-Begin with a warm welcome. Guide the listener to find a comfortable position. Lead 3-4 slow, deep breaths with gentle instruction ("Breathe in slowly through your nose... [long pause] ...and release"). Let the ambient stillness settle. Use [long pause] markers between breaths. The voice should model calm — unhurried, soft, grounding.
+PHASE 1 — SETTLING AND FRAMING (first ~2 minutes of audio):
+Begin with a warm welcome. Invite the listener to get comfortable and take a moment to simply be still. Do NOT make deep breathing the centerpiece — you may mention one calming breath briefly, but do not dwell on breathing technique as if it has mystical power. Instead, quickly move into framing the purpose of this session:
 
-PHASE 2 — TEACHING (next ~2.5 minutes):
-Introduce tonight's theme through a brief, conversational reflection. This is the "why" — give the mind a narrative hook before practice. Weave in the Scripture (${session.scripture}) naturally, not as a citation but as living words. Connect it to the human experience of ${session.struggle}. This should feel like a wise friend sharing an insight by firelight.
+Explain that this is a Night Watch — a practice of beholding the thoughts and feelings of Christ. Biblical meditation is not about emptying the mind or breathing exercises. It is about filling the mind with the thoughts of Jesus. The goal tonight is to step into a scene from Scripture, observe how Christ thinks and feels, and begin to take those thoughts and feelings as your own. This is what Paul meant when he said "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Tonight, you are accessing the Master Mind — the thoughts and feelings of Christ — and making them your own. [pause]
+
+Then briefly introduce tonight's specific theme and Scripture (${session.scripture}), connecting it to ${session.struggle}. This should feel like a wise friend explaining what you're about to experience together.
+
+PHASE 2 — TEACHING (next ~2 minutes):
+Go deeper into the Scripture and tonight's theme. This is conversational and warm — the "why" behind tonight's meditation. Weave in the Scripture naturally, not as a citation but as living words. Connect it to the human experience of ${session.struggle}. This should feel like insight by firelight.
 
 PHASE 3 — TRANSITION TO SCENE (~1 minute):
 Gently shift from teaching into immersive experience. "Now let yourself be drawn into this scene..." Bridge the listener from intellectual understanding into embodied imagination. Pacing begins to slow here. Pauses between sentences grow slightly longer.
@@ -59,8 +63,9 @@ CRITICAL RULES:
 - The pacing must DECELERATE through the session. Phase 1-2: normal conversational pace. Phase 3-4: noticeably slower. Phase 5-6: very slow, spacious. Phase 7: gentle return to slightly more alert pace.
 - Do NOT include any time references ("for the next few minutes", "over the next 7 minutes"). The listener should never be aware of time.
 - Do NOT include section headers, stage directions, labels, or meta-commentary. Only words to be spoken aloud plus [pause]/[long pause] markers.
-- This is BIBLICAL meditation — filling the mind with truth through Scripture, not emptying it.
-- The Master Mind = the mind of Christ (Philippians 2:5).
+- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ and making them your own. NOT emptying the mind, NOT breathing exercises, NOT Eastern mysticism. The power is in what you behold, not how you breathe.
+- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to ACCESS His thoughts and feelings and take them as your own.
+- Do NOT spend more than one sentence on breathing. Get to the Scripture and Christ quickly.
 - Second person ("you") throughout. Intimate. Cinematic. Like a trusted voice guiding you through the night.`;
 }
 
@@ -80,11 +85,13 @@ Scenario Types: ${session.scenarioTypes.join(", ")}
 
 Follow this 7-phase structure inspired by the Calm app's morning meditations. Each phase flows naturally into the next — no labels, no headers, no time references. The Morning Watch is more alert and directed than the Night Watch, but still begins with grounding.
 
-PHASE 1 — SETTLING AND AWAKENING (~90 seconds of audio):
-Begin with a warm good morning. Guide the listener to sit up, plant their feet, take a few deep, intentional breaths. "Fill your lungs completely... [pause] ...and let it go." This is not sleepy — it's the feeling of gathering yourself before a purposeful day. 3-4 breaths with [pause] between each. End with the body feeling alert, present, grounded.
+PHASE 1 — AWAKENING AND FRAMING (~2 minutes of audio):
+Begin with a warm good morning. Invite the listener to sit up, plant their feet, and gather themselves. You may mention one centering breath, but do NOT dwell on breathing technique — move quickly into the purpose.
+
+Explain that this is a Morning Watch — the activation half of the Master Mind practice. Last night you beheld the thoughts and feelings of Christ. You watched how He thinks, how He responds, what He feels. This morning, the goal is to TAKE those thoughts and feelings as your own and carry them into your day. This is biblical meditation — not emptying the mind, but filling it with the mind of Christ. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Today you are not just remembering what Christ thought — you are thinking WITH Him. [pause]
 
 PHASE 2 — REMEMBER LAST NIGHT (~2 minutes):
-Recall last night's Master Mind insight from "${session.pairedNightTitle}". Briefly revisit the scene, the core truth, what was received. "Last night you stood in that place and watched how Christ responded. You saw ${session.nightInsight}." This is warm, brief, connective — like picking up a thread. Weave in the night scripture (${session.nightScripture}) naturally. The listener should feel continuity between night and morning.
+Recall last night's Master Mind insight from "${session.pairedNightTitle}". Briefly revisit the scene, the core truth, what was received. "Last night you beheld the thoughts and feelings of Christ. You saw ${session.nightInsight}." This is warm, brief, connective — like picking up a thread. Weave in the night scripture (${session.nightScripture}) naturally. The listener should feel continuity between night and morning.
 
 PHASE 3 — TRUTH DECLARATION (~2.5 minutes):
 Now shift to this morning's Scripture: ${session.morningScripture}. Speak it with weight and conviction — not shouting, but with the quiet authority of someone who believes every word. Then unpack it into an identity statement: "This is who you are. This is how you think now." The activation principle: ${session.activationPrinciple}. Repeat the key Scripture phrase 2-3 times, each time with a [pause] after, letting it sink deeper. This phase should feel like planting a flag.
@@ -116,8 +123,9 @@ CRITICAL RULES:
 - Morning Watch tone is CLEAR, WARM, and DIRECTED — not dreamy. Energy level: ${session.energy}. Think of a trusted coach at sunrise, not a sleep guide.
 - Do NOT include any time references ("for the next few minutes", "over the next 5 minutes"). The listener should never be aware of time.
 - Do NOT include section headers, stage directions, labels, or meta-commentary. Only words to be spoken aloud plus [pause]/[long pause] markers.
-- Night Watch: "See how Christ thinks — and receive it." Morning Watch: "Now think like Christ — and walk in it."
-- The Master Mind = the mind of Christ (Philippians 2:5).
+- Night Watch: "Behold the thoughts and feelings of Christ — and receive them." Morning Watch: "Now take those thoughts as your own — and walk in them."
+- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to ACCESS His thoughts and feelings and make them your own.
+- Do NOT spend more than one sentence on breathing. The power is in beholding Christ, not in breath work.
 - Second person ("you") throughout. End with resolve and momentum, not a question.`;
 }
 

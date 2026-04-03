@@ -35,11 +35,10 @@ const AMBIENT_BG_TRACKS = [
   { id: "follow", name: "Follow", url: "/audio/follow.mp3" },
 ];
 
-// Gentle ambient soundscapes for meditation/Watch sessions
+// For "ambient-sounds" mode, use the softest existing tracks at lower volume
 const AMBIENT_SOUND_TRACKS = [
-  { id: "soft-rain", name: "Soft Rain", url: "https://cdn.freesound.org/previews/531/531947_6890478-lq.mp3" },
-  { id: "night-crickets", name: "Night Crickets", url: "https://cdn.freesound.org/previews/372/372181_6505547-lq.mp3" },
-  { id: "gentle-stream", name: "Gentle Stream", url: "https://cdn.freesound.org/previews/398/398339_2908767-lq.mp3" },
+  { id: "wings-of-stillness", name: "Wings of Stillness", url: "/audio/wings-of-stillness.mp3" },
+  { id: "eternal-echoes", name: "Eternal Echoes", url: "/audio/eternal-echoes.mp3" },
 ];
 
 interface ImmersiveAudioPlayerProps {
@@ -288,8 +287,8 @@ export function ImmersiveAudioPlayer({
         ambient.src = bgTrack.url;
         ambient.load();
       }
-      // Ambient sounds play quieter by default
-      const modeVolume = ambientMode === "ambient-sounds" ? ambientVolume * 0.6 : ambientVolume;
+      // Ambient sounds play much quieter — gentle background tones, not the focus
+      const modeVolume = ambientMode === "ambient-sounds" ? ambientVolume * 0.35 : ambientVolume;
       ambient.volume = modeVolume;
       ambient.play().then(() => setAmbientPlaying(true)).catch(() => {});
 

@@ -30,8 +30,10 @@ Scenario Types: ${session.scenarioTypes.join(', ')}
 
 Follow this 7-phase structure inspired by the Calm app's morning meditations. Each phase flows naturally into the next — no labels, no headers, no time references. The Morning Watch is more alert and directed than the Night Watch, but still begins with grounding.
 
-PHASE 1 — SETTLING AND AWAKENING (~90 seconds of audio):
-Begin with a warm good morning. Guide the listener to sit up, plant their feet, take a few deep, intentional breaths. This is not sleepy — it's gathering yourself before a purposeful day. 3-4 breaths with [pause] between each.
+PHASE 1 — AWAKENING AND FRAMING (~2 minutes of audio):
+Begin with a warm good morning. Invite the listener to sit up, plant their feet, and gather themselves. You may mention one centering breath, but do NOT dwell on breathing technique — move quickly into the purpose.
+
+Explain that this is a Morning Watch — the activation half of the Master Mind practice. Last night you beheld the thoughts and feelings of Christ. You watched how He thinks, how He responds, what He feels. This morning, the goal is to TAKE those thoughts and feelings as your own and carry them into your day. This is biblical meditation — not emptying the mind, but filling it with the mind of Christ. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Today you are not just remembering what Christ thought — you are thinking WITH Him. [pause]
 
 PHASE 2 — REMEMBER LAST NIGHT (~2 minutes):
 Recall last night's Master Mind insight from "${session.pairedNightTitle}". Briefly revisit the scene, the core truth. Weave in the night scripture naturally. The listener should feel continuity between night and morning.
@@ -57,10 +59,13 @@ CRITICAL RULES:
 - Use TWO types of pause markers:
   [pause] = 3-5 seconds of silence (use frequently, after every 1-2 sentences)
   [long pause] = 10-20 seconds of silence (use in phases 1 and 6, and after key truth declarations)
-- Morning Watch tone is CLEAR, WARM, and DIRECTED — not dreamy. Energy level: ${session.energy}.
+- Morning Watch tone is CLEAR, WARM, and DIRECTED — not dreamy. Energy level: ${session.energy}. Think of a trusted coach at sunrise, not a sleep guide.
 - Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
-- The Master Mind = the mind of Christ (Philippians 2:5).
-- Second person ("you") throughout. End with resolve and momentum.`;
+- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ and making them your own. NOT emptying the mind, NOT breathing exercises, NOT Eastern mysticism. The power is in what you behold, not how you breathe.
+- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to ACCESS His thoughts and feelings and make them your own.
+- Night Watch: "Behold the thoughts and feelings of Christ — and receive them." Morning Watch: "Now take those thoughts as your own — and walk in them."
+- Do NOT spend more than one sentence on breathing. The power is in beholding Christ, not in breath work.
+- Second person ("you") throughout. End with resolve and momentum, not a question.`;
 }
 
 async function generateTTSUrl(script: string): Promise<string | null> {

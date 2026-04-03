@@ -30,11 +30,15 @@ Primary Struggle: ${session.struggle}
 
 Follow this 7-phase structure inspired by the Calm app. Each phase flows naturally into the next — no labels, no headers, no time references. Just seamless spoken narration.
 
-PHASE 1 — SETTLING (~90 seconds of audio):
-Begin with a warm welcome. Guide the listener to find a comfortable position. Lead 3-4 slow, deep breaths with gentle instruction. Let the ambient stillness settle. Use [long pause] markers between breaths. The voice should model calm — unhurried, soft, grounding.
+PHASE 1 — SETTLING AND FRAMING (~2 minutes of audio):
+Begin with a warm welcome. Invite the listener to get comfortable and be still. You may mention one calming breath, but do NOT dwell on breathing technique as if it has mystical power. Move quickly into framing the purpose:
 
-PHASE 2 — TEACHING (~2.5 minutes):
-Introduce tonight's theme through a brief, conversational reflection. Weave in the Scripture (${session.scripture}) naturally. Connect it to the human experience of ${session.struggle}. This should feel like a wise friend sharing an insight by firelight.
+Explain that this is a Night Watch — a practice of beholding the thoughts and feelings of Christ. Biblical meditation is not about emptying the mind or breathing exercises. It is about filling the mind with the thoughts of Jesus. The goal tonight is to step into a scene from Scripture, observe how Christ thinks and feels, and begin to take those thoughts and feelings as your own. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Tonight, you are accessing the Master Mind. [pause]
+
+Then briefly introduce tonight's specific theme and Scripture (${session.scripture}), connecting it to ${session.struggle}.
+
+PHASE 2 — TEACHING (~2 minutes):
+Go deeper into the Scripture and tonight's theme. Weave in the Scripture naturally. Connect it to the human experience of ${session.struggle}. This should feel like a wise friend sharing insight by firelight.
 
 PHASE 3 — TRANSITION TO SCENE (~1 minute):
 Gently shift from teaching into immersive experience. Bridge the listener from intellectual understanding into embodied imagination. Pacing begins to slow here.
@@ -59,8 +63,9 @@ CRITICAL RULES:
   [long pause] = 10-20 seconds of silence (use in phases 5-6, and between breaths in phase 1)
 - The pacing must DECELERATE through the session. Phases 1-2: conversational. Phases 3-4: noticeably slower. Phases 5-6: very slow, spacious. Phase 7: gentle return.
 - Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
-- This is BIBLICAL meditation — filling the mind with truth through Scripture, not emptying it.
-- The Master Mind = the mind of Christ (Philippians 2:5).
+- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ and making them your own. NOT emptying the mind, NOT breathing exercises. The power is in what you behold, not how you breathe.
+- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to ACCESS His thoughts and feelings and take them as your own.
+- Do NOT spend more than one sentence on breathing. Get to the Scripture and Christ quickly.
 - Second person ("you") throughout. Intimate. Cinematic.`;
 }
 
