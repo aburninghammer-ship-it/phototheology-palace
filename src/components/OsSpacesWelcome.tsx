@@ -63,6 +63,7 @@ const OS_SPACES: OsSpace[] = [
       { label: "Timeline", path: "/bible-timeline", icon: Clock, description: "Chronological map", tooltip: "View biblical history on an interactive chronological timeline." },
       { label: "Bible Atlas", path: "/bible-atlas", icon: Map, description: "Geographic explorer", tooltip: "Explore the lands of Scripture on interactive maps." },
       { label: "Source Library", path: "/libraries", icon: Library, description: "Reference materials", tooltip: "Access a curated library of Spirit of Prophecy writings, historical commentaries, and reference documents." },
+      { label: "Audio Library", path: "/audio-library", icon: Headphones, description: "Audio studies", tooltip: "Listen to narrated Bible studies, devotionals, and PT teachings." },
     ],
   },
   {
