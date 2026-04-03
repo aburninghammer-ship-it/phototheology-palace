@@ -26,11 +26,9 @@ import {
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
-import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
 
 export default function StudySuiteSales() {
   const { t } = useTranslation();
-  const paymentLinks = useTrackedPaymentLinks();
   const floors = [
     {
       number: 1,
