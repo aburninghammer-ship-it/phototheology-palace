@@ -168,6 +168,7 @@ const OS_SPACES: OsSpace[] = [
   {
     id: "university",
     label: "Phototheology University",
+    simpleLabel: "Courses",
     subtitle: "Courses & Certificates",
     icon: GraduationCap,
     color: "45 90% 50%",
