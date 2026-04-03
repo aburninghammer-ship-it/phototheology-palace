@@ -235,7 +235,7 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#1a0f05" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#0a0818" metalness={0.3} roughness={0.6} />
       </mesh>
 
       {/* Lighting — warm sunrise */}

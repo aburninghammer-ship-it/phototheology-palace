@@ -225,7 +225,7 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
       {/* Subtle floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#0a0a20" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#080818" metalness={0.3} roughness={0.6} />
       </mesh>
 
       {/* Lighting */}

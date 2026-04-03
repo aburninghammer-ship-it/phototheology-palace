@@ -74,7 +74,7 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       <pointLight position={[0, -0.8, -2]} intensity={0.6} color="#FFD700" distance={10} decay={2} />
 
       {/* Fog for depth — warm tint, deeper range */}
-      <fog attach="fog" args={['#060810', 12, 32]} />
+      <fog attach="fog" args={['#060818', 12, 32]} />
 
       {/* === TITLE === */}
       <Suspense fallback={null}>
