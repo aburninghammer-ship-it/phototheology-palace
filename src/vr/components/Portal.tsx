@@ -113,6 +113,8 @@ function useRuneTexture() {
 }
 
 export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }: PortalProps) {
+  // Counter-rotate label so text always faces the viewer correctly
+  const labelYRotation = -rotation[1];
   const outerRingRef = useRef<THREE.Mesh>(null);
   const innerRingRef = useRef<THREE.Mesh>(null);
   const energyRef = useRef<THREE.Mesh>(null);
@@ -265,7 +267,7 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
 
       {/* === LABEL === */}
       <Suspense fallback={null}>
-        <group position={[0, 1.9, 0]}>
+        <group position={[0, 1.9, 0]} rotation={[0, labelYRotation, 0]}>
           {/* Text glow backing */}
           <mesh position={[0, 0, -0.02]}>
             <planeGeometry args={[2.2, 0.35]} />
