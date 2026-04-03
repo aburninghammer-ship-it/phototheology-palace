@@ -50,6 +50,7 @@ const EXPERIENCES: ExperienceCard[] = [
   { id: 'palace', name: 'Palace Tour', icon: '🏛️', description: 'Guided tour through the Phototheology memory palace', color: 'from-orange-500/20 to-orange-900/20 border-orange-500/30' },
   { id: 'nightWatch', name: 'Night Watch', icon: '🌙', description: 'Meditative starfield environment for Night Watch audio sessions', color: 'from-indigo-500/20 to-indigo-900/20 border-indigo-500/30' },
   { id: 'morningWatch', name: 'Morning Watch', icon: '🌅', description: 'Sunrise activation space for Morning Watch sessions', color: 'from-amber-400/20 to-rose-900/20 border-amber-400/30' },
+  { id: 'swordOfTheSpirit', name: 'Sword of the Spirit', icon: '⚔️', description: 'Slash lies, catch truth — collect the Armor of God', color: 'from-red-500/20 to-red-900/20 border-red-500/30' },
 ];
 
 export default function VRHub() {

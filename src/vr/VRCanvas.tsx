@@ -19,6 +19,7 @@ const GameArcade = React.lazy(() => import('./experiences/GameArcade'));
 const PalaceTour = React.lazy(() => import('./experiences/PalaceTour'));
 const NightWatchVR = React.lazy(() => import('./experiences/NightWatchVR'));
 const MorningWatchVR = React.lazy(() => import('./experiences/MorningWatchVR'));
+const SwordOfTheSpirit = React.lazy(() => import('./experiences/SwordOfTheSpirit'));
 
 /** Disable OrbitControls when inside an XR session (head tracking takes over) */
 function DesktopControls() {
@@ -199,6 +200,7 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
           {displayedExperience === 'palace' && <PalaceTour onBack={goToLobby} />}
           {displayedExperience === 'nightWatch' && <NightWatchVR onBack={goToLobby} />}
           {displayedExperience === 'morningWatch' && <MorningWatchVR onBack={goToLobby} />}
+          {displayedExperience === 'swordOfTheSpirit' && <SwordOfTheSpirit onBack={goToLobby} />}
         </Suspense>
 
         <FadeOverlay fadeState={fadeState} />

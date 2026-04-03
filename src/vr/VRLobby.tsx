@@ -4,7 +4,7 @@ import { Portal } from './components/Portal';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-export type VRExperience = 'lobby' | 'sanctuary' | 'gallery' | 'audio' | 'heavensDiary' | 'arcade' | 'palace' | 'nightWatch' | 'morningWatch';
+export type VRExperience = 'lobby' | 'sanctuary' | 'gallery' | 'audio' | 'heavensDiary' | 'arcade' | 'palace' | 'nightWatch' | 'morningWatch' | 'swordOfTheSpirit';
 
 interface VRLobbyProps {
   onEnterExperience: (experience: VRExperience) => void;
@@ -249,6 +249,15 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
         label="Morning Watch"
         color="#f59e0b"
         onClick={() => onEnterExperience('morningWatch')}
+      />
+
+      {/* Sword of the Spirit game portal */}
+      <Portal
+        position={[0, 0.5, -7.5]}
+        rotation={[0, 0, 0]}
+        label="Sword of the Spirit"
+        color="#FF4466"
+        onClick={() => onEnterExperience('swordOfTheSpirit')}
       />
     </group>
   );
