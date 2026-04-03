@@ -12,33 +12,46 @@ interface PortalProps {
   onClick: () => void;
 }
 
-/** Procedural energy field texture */
+/** Procedural energy field texture with more detail */
 function useEnergyTexture(color: string) {
   return useMemo(() => {
-    const size = 256;
+    const size = 512;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d')!;
     const half = size / 2;
 
-    // Radial gradient with color stops
+    // Deep radial gradient
     const grad = ctx.createRadialGradient(half, half, 0, half, half, half);
-    grad.addColorStop(0, `${color}CC`);
-    grad.addColorStop(0.3, `${color}88`);
-    grad.addColorStop(0.6, `${color}33`);
-    grad.addColorStop(0.85, `${color}11`);
+    grad.addColorStop(0, '#FFFFFFCC');
+    grad.addColorStop(0.15, `${color}BB`);
+    grad.addColorStop(0.35, `${color}66`);
+    grad.addColorStop(0.55, `${color}33`);
+    grad.addColorStop(0.75, `${color}11`);
     grad.addColorStop(1, `${color}00`);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, size, size);
 
-    // Concentric rings for energy feel
-    ctx.strokeStyle = `${color}44`;
-    ctx.lineWidth = 1;
-    for (let r = 20; r < half; r += 18) {
+    // Concentric energy rings
+    for (let r = 15; r < half; r += 12) {
+      const opacity = Math.max(0, 80 - r);
+      ctx.strokeStyle = `${color}${Math.floor(opacity).toString(16).padStart(2, '0')}`;
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(half, half, r, 0, Math.PI * 2);
       ctx.stroke();
+    }
+
+    // Noise-like dots for depth
+    for (let i = 0; i < 200; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.random() * half * 0.8;
+      const x = half + Math.cos(angle) * dist;
+      const y = half + Math.sin(angle) * dist;
+      const alpha = 0.1 + Math.random() * 0.3;
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fillRect(x, y, 1.5, 1.5);
     }
 
     const tex = new THREE.CanvasTexture(canvas);
@@ -51,7 +64,7 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
   const outerRingRef = useRef<THREE.Mesh>(null);
   const innerRingRef = useRef<THREE.Mesh>(null);
   const energyRef = useRef<THREE.Mesh>(null);
-  const runeRingRef = useRef<THREE.Mesh>(null);
+  const decorRingRef = useRef<THREE.Mesh>(null);
   const lightRef = useRef<THREE.PointLight>(null);
   const [hovered, setHovered] = useState(false);
   const energyTex = useEnergyTexture(color);
@@ -59,147 +72,153 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
 
-    // Outer ring slow rotation
     if (outerRingRef.current) {
-      outerRingRef.current.rotation.z = t * 0.15;
-      const s = hovered ? 1.06 : 1.0;
+      outerRingRef.current.rotation.z = t * 0.12;
+      const s = hovered ? 1.08 : 1.0;
       outerRingRef.current.scale.lerp(new THREE.Vector3(s, s, s), 0.08);
     }
 
-    // Inner ring counter-rotation
     if (innerRingRef.current) {
-      innerRingRef.current.rotation.z = -t * 0.25;
+      innerRingRef.current.rotation.z = -t * 0.2;
     }
 
-    // Rune ring faster rotation
-    if (runeRingRef.current) {
-      runeRingRef.current.rotation.z = t * 0.4;
+    if (decorRingRef.current) {
+      decorRingRef.current.rotation.z = t * 0.35;
     }
 
-    // Energy field pulse
     if (energyRef.current) {
       const mat = energyRef.current.material as THREE.MeshBasicMaterial;
       mat.opacity = hovered
-        ? 0.5 + Math.sin(t * 4) * 0.15
-        : 0.25 + Math.sin(t * 2) * 0.1;
+        ? 0.55 + Math.sin(t * 4) * 0.15
+        : 0.3 + Math.sin(t * 2) * 0.1;
+      // Subtle rotation of energy field
+      energyRef.current.rotation.z = t * 0.05;
     }
 
-    // Light intensity pulse
     if (lightRef.current) {
       lightRef.current.intensity = hovered
-        ? 4 + Math.sin(t * 3) * 1.5
-        : 2 + Math.sin(t * 1.5) * 0.8;
+        ? 5 + Math.sin(t * 3) * 2
+        : 3 + Math.sin(t * 1.5) * 1;
     }
   });
 
   return (
     <group position={position} rotation={rotation}>
-      {/* === OUTER RING — thick metallic torus === */}
+      {/* === THICK OUTER RING — ornate golden metallic === */}
       <mesh ref={outerRingRef} castShadow>
-        <torusGeometry args={[1.3, 0.08, 16, 64]} />
+        <torusGeometry args={[1.35, 0.12, 24, 64]} />
         <meshPhysicalMaterial
-          color="#888"
+          color="#B8962E"
           metalness={0.95}
-          roughness={0.08}
+          roughness={0.06}
           emissive={color}
-          emissiveIntensity={hovered ? 0.6 : 0.15}
+          emissiveIntensity={hovered ? 0.5 : 0.12}
           clearcoat={1}
-          clearcoatRoughness={0.05}
-          iridescence={0.5}
+          clearcoatRoughness={0.03}
+          iridescence={0.3}
           iridescenceIOR={1.5}
-          envMapIntensity={1.5}
+          envMapIntensity={2.0}
         />
       </mesh>
 
-      {/* === INNER RING — thinner accent ring === */}
+      {/* === INNER ACCENT RING === */}
       <mesh ref={innerRingRef}>
-        <torusGeometry args={[1.15, 0.04, 12, 48]} />
+        <torusGeometry args={[1.18, 0.05, 16, 48]} />
         <meshPhysicalMaterial
           color={color}
-          metalness={0.9}
-          roughness={0.1}
+          metalness={0.92}
+          roughness={0.08}
           emissive={color}
-          emissiveIntensity={0.8}
+          emissiveIntensity={0.9}
           clearcoat={0.8}
         />
       </mesh>
 
-      {/* === RUNE RING — segmented decorative ring === */}
-      <mesh ref={runeRingRef} position={[0, 0, 0.01]}>
-        <torusGeometry args={[1.22, 0.02, 6, 12]} />
+      {/* === DECORATIVE SEGMENTED RING === */}
+      <mesh ref={decorRingRef} position={[0, 0, 0.01]}>
+        <torusGeometry args={[1.26, 0.025, 6, 16]} />
         <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={1.5}
+          color="#FFD700"
+          emissive="#FFD700"
+          emissiveIntensity={1.2}
           transparent
-          opacity={0.7}
+          opacity={0.6}
         />
       </mesh>
 
-      {/* === LEFT PILLAR — ornate column === */}
-      <group position={[-1.3, -0.7, 0]}>
-        {/* Main column */}
-        <mesh castShadow>
-          <cylinderGeometry args={[0.08, 0.1, 1.4, 8]} />
-          <meshPhysicalMaterial
-            color="#666"
-            metalness={0.9}
-            roughness={0.1}
-            emissive={color}
-            emissiveIntensity={0.05}
-            clearcoat={0.6}
-          />
-        </mesh>
-        {/* Base cap */}
-        <mesh position={[0, -0.72, 0]} castShadow>
-          <cylinderGeometry args={[0.14, 0.14, 0.06, 8]} />
-          <meshPhysicalMaterial color="#555" metalness={0.9} roughness={0.1} />
-        </mesh>
-        {/* Top cap */}
-        <mesh position={[0, 0.72, 0]}>
-          <cylinderGeometry args={[0.12, 0.08, 0.06, 8]} />
-          <meshPhysicalMaterial color="#555" metalness={0.9} roughness={0.1} emissive={color} emissiveIntensity={0.2} />
-        </mesh>
-      </group>
-
-      {/* === RIGHT PILLAR — mirror of left === */}
-      <group position={[1.3, -0.7, 0]}>
-        <mesh castShadow>
-          <cylinderGeometry args={[0.08, 0.1, 1.4, 8]} />
-          <meshPhysicalMaterial
-            color="#666"
-            metalness={0.9}
-            roughness={0.1}
-            emissive={color}
-            emissiveIntensity={0.05}
-            clearcoat={0.6}
-          />
-        </mesh>
-        <mesh position={[0, -0.72, 0]} castShadow>
-          <cylinderGeometry args={[0.14, 0.14, 0.06, 8]} />
-          <meshPhysicalMaterial color="#555" metalness={0.9} roughness={0.1} />
-        </mesh>
-        <mesh position={[0, 0.72, 0]}>
-          <cylinderGeometry args={[0.12, 0.08, 0.06, 8]} />
-          <meshPhysicalMaterial color="#555" metalness={0.9} roughness={0.1} emissive={color} emissiveIntensity={0.2} />
-        </mesh>
-      </group>
+      {/* === OUTER GLOW RING (soft bloom feeder) === */}
+      <mesh position={[0, 0, -0.02]}>
+        <torusGeometry args={[1.4, 0.2, 12, 48]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.04}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
 
       {/* === ENERGY FIELD — the portal surface === */}
       <mesh ref={energyRef} position={[0, 0, 0.02]}>
-        <circleGeometry args={[1.1, 48]} />
+        <circleGeometry args={[1.12, 64]} />
         <meshBasicMaterial
           map={energyTex}
           color={color}
           transparent
-          opacity={0.3}
+          opacity={0.35}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </mesh>
 
-      {/* === HIT AREA — invisible interactive surface === */}
+      {/* === LEFT PILLAR — golden ornate column === */}
+      <group position={[-1.4, -0.8, 0]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.09, 0.12, 1.6, 10]} />
+          <meshPhysicalMaterial
+            color="#8B7535"
+            metalness={0.92}
+            roughness={0.08}
+            emissive={color}
+            emissiveIntensity={0.03}
+            clearcoat={0.7}
+          />
+        </mesh>
+        <mesh position={[0, -0.82, 0]} castShadow>
+          <cylinderGeometry args={[0.16, 0.18, 0.08, 10]} />
+          <meshPhysicalMaterial color="#6B5B25" metalness={0.9} roughness={0.1} />
+        </mesh>
+        <mesh position={[0, 0.82, 0]}>
+          <cylinderGeometry args={[0.14, 0.09, 0.08, 10]} />
+          <meshPhysicalMaterial color="#A08830" metalness={0.92} roughness={0.08} emissive={color} emissiveIntensity={0.15} />
+        </mesh>
+      </group>
+
+      {/* === RIGHT PILLAR === */}
+      <group position={[1.4, -0.8, 0]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.09, 0.12, 1.6, 10]} />
+          <meshPhysicalMaterial
+            color="#8B7535"
+            metalness={0.92}
+            roughness={0.08}
+            emissive={color}
+            emissiveIntensity={0.03}
+            clearcoat={0.7}
+          />
+        </mesh>
+        <mesh position={[0, -0.82, 0]} castShadow>
+          <cylinderGeometry args={[0.16, 0.18, 0.08, 10]} />
+          <meshPhysicalMaterial color="#6B5B25" metalness={0.9} roughness={0.1} />
+        </mesh>
+        <mesh position={[0, 0.82, 0]}>
+          <cylinderGeometry args={[0.14, 0.09, 0.08, 10]} />
+          <meshPhysicalMaterial color="#A08830" metalness={0.92} roughness={0.08} emissive={color} emissiveIntensity={0.15} />
+        </mesh>
+      </group>
+
+      {/* === INTERACTIVE HIT AREA === */}
       <Interactive onSelect={onClick} onHover={() => setHovered(true)} onBlur={() => setHovered(false)}>
         <mesh
           position={[0, 0, 0.05]}
@@ -208,16 +227,16 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
           onPointerOver={() => setHovered(true)}
           onPointerOut={() => setHovered(false)}
         >
-          <circleGeometry args={[1.35, 32]} />
+          <circleGeometry args={[1.4, 32]} />
           <meshBasicMaterial color={color} transparent opacity={0.02} side={THREE.DoubleSide} />
         </mesh>
       </Interactive>
 
-      {/* === LABEL — floating holographic text === */}
+      {/* === LABEL === */}
       <Suspense fallback={null}>
         <Text
-          position={[0, 1.7, 0]}
-          fontSize={0.16}
+          position={[0, 1.8, 0]}
+          fontSize={0.15}
           color={color}
           anchorX="center"
           anchorY="middle"
@@ -232,17 +251,24 @@ export function Portal({ position, rotation = [0, 0, 0], label, color, onClick }
       {/* === GLOW LIGHTS === */}
       <pointLight
         ref={lightRef}
-        position={[0, 0, 0.8]}
+        position={[0, 0, 1]}
         color={color}
-        intensity={2.5}
-        distance={5}
+        intensity={3}
+        distance={6}
         decay={2}
       />
-      {/* Rim light behind portal */}
       <pointLight
-        position={[0, 0, -0.5]}
+        position={[0, 0, -0.6]}
         color={color}
-        intensity={1}
+        intensity={1.5}
+        distance={4}
+        decay={2}
+      />
+      {/* Ground reflection light */}
+      <pointLight
+        position={[0, -1.5, 0.3]}
+        color={color}
+        intensity={0.8}
         distance={3}
         decay={2}
       />
