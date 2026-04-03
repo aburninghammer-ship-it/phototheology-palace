@@ -676,7 +676,7 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
       </Text>
 
       {/* Back button */}
-      <BackToLobbyButton onBack={onBack} position={[0, 0.2, 2]} />
+      <BackToLobbyButton onBack={onBack} position={[0, 0.2, -1.5]} />
     </group>
   );
 }

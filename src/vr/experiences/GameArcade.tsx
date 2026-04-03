@@ -257,7 +257,7 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
       ))}
 
       {/* Back button */}
-      <BackToLobbyButton onBack={onBack} position={[0, 0.3, 2]} />
+      <BackToLobbyButton onBack={onBack} position={[0, 0.3, -1.5]} />
     </group>
   );
 }

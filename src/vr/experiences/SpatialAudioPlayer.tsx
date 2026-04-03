@@ -4,6 +4,7 @@ import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { StarField } from '../components/StarField';
+import { NebulaClouds } from '../components/NebulaClouds';
 import { useStreamingAudio } from '../hooks/useStreamingAudio';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 import {
@@ -35,9 +36,9 @@ const CATEGORY_COLORS: Record<string, string> = {
 // Suite voice colors
 const SUITE_COLORS = ['#FFD700', '#FF44AA', '#44CCCC', '#888866', '#4488FF', '#8844FF'];
 
-// ── Campfire Particles ──────────────────────────────────────────────────────
+// ── Energy Hearth Particles (replaces CampfireParticles) ──────────────────
 
-function CampfireParticles() {
+function EnergyHearthParticles() {
   const pointsRef = useRef<THREE.Points>(null);
   const count = 60;
 
@@ -77,40 +78,79 @@ function CampfireParticles() {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial size={0.08} color="#FF6600" transparent opacity={0.8} blending={THREE.AdditiveBlending} depthWrite={false} sizeAttenuation />
+      <pointsMaterial size={0.08} color="#4488FF" transparent opacity={0.8} blending={THREE.AdditiveBlending} depthWrite={false} sizeAttenuation />
     </points>
   );
 }
 
-// ── Campfire Scene (shared across screens) ──────────────────────────────────
+// ── Energy Hearth Scene (replaces CampfireScene) ─────────────────────────────
 
-function CampfireScene() {
-  const fireRef = useRef<THREE.PointLight>(null);
+function EnergyHearthScene() {
+  const lightRef = useRef<THREE.PointLight>(null);
 
   useFrame(({ clock }) => {
-    if (fireRef.current) {
+    if (lightRef.current) {
       const t = clock.getElapsedTime();
-      fireRef.current.intensity = 2 + Math.sin(t * 8) * 0.5 + Math.sin(t * 12) * 0.3;
+      lightRef.current.intensity = 2 + Math.sin(t * 8) * 0.5 + Math.sin(t * 12) * 0.3;
     }
   });
 
   return (
     <group position={[0, -1.2, -2]}>
-      <pointLight ref={fireRef} position={[0, 0.5, 0]} color="#FF4400" intensity={2.5} distance={10} castShadow />
+      <pointLight ref={lightRef} position={[0, 0.5, 0]} color="#4466FF" intensity={2.5} distance={10} castShadow />
+      {/* Core energy sphere */}
       <mesh position={[0, 0.3, 0]}>
         <sphereGeometry args={[0.15, 8, 8]} />
-        <meshBasicMaterial color="#FF6600" transparent opacity={0.6} />
+        <meshBasicMaterial color="#44AAFF" transparent opacity={0.7} />
       </mesh>
-      <CampfireParticles />
+      {/* Outer glow */}
+      <mesh position={[0, 0.3, 0]}>
+        <sphereGeometry args={[0.25, 8, 8]} />
+        <meshBasicMaterial color="#4488FF" transparent opacity={0.15} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <EnergyHearthParticles />
+      {/* Crystal ring instead of stones */}
       {Array.from({ length: 8 }, (_, i) => {
         const angle = (i / 8) * Math.PI * 2;
         return (
           <mesh key={i} position={[Math.cos(angle) * 0.5, 0, Math.sin(angle) * 0.5]}>
-            <sphereGeometry args={[0.08, 6, 6]} />
-            <meshStandardMaterial color="#555" roughness={0.9} />
+            <octahedronGeometry args={[0.06, 0]} />
+            <meshStandardMaterial color="#2244AA" emissive="#4466FF" emissiveIntensity={0.3} metalness={0.6} roughness={0.3} />
           </mesh>
         );
       })}
+    </group>
+  );
+}
+
+// ── Energy Rings ─────────────────────────────────────────────────────────────
+
+function EnergyRings() {
+  const ring1Ref = useRef<THREE.Mesh>(null);
+  const ring2Ref = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (ring1Ref.current) {
+      ring1Ref.current.rotation.y = t * 0.15;
+      ring1Ref.current.rotation.x = Math.sin(t * 0.1) * 0.1;
+    }
+    if (ring2Ref.current) {
+      ring2Ref.current.rotation.y = -t * 0.1;
+      ring2Ref.current.rotation.z = Math.cos(t * 0.08) * 0.15;
+    }
+  });
+
+  return (
+    <group position={[0, 1, -2]}>
+      <mesh ref={ring1Ref}>
+        <torusGeometry args={[5, 0.02, 8, 64]} />
+        <meshBasicMaterial color="#8844FF" transparent opacity={0.3} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh ref={ring2Ref}>
+        <torusGeometry args={[6.5, 0.015, 8, 64]} />
+        <meshBasicMaterial color="#4466FF" transparent opacity={0.2} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
     </group>
   );
 }
@@ -161,10 +201,10 @@ function MenuScreen({ onSelect }: { onSelect: (screen: 'library' | 'suite') => v
   return (
     <group>
       <Suspense fallback={null}>
-        <Text position={[0, 2.5, -2]} fontSize={0.25} color="#e8d5b7" anchorX="center" outlineWidth={0.01} outlineColor="#000">
+        <Text position={[0, 2.5, -2]} fontSize={0.25} color="#44DDFF" anchorX="center" outlineWidth={0.01} outlineColor="#001122">
           Audio Theater
         </Text>
-        <Text position={[0, 2.2, -2]} fontSize={0.1} color="#888" anchorX="center">
+        <Text position={[0, 2.2, -2]} fontSize={0.1} color="#8899bb" anchorX="center">
           Choose your experience
         </Text>
       </Suspense>
@@ -238,7 +278,7 @@ function LibraryScreen({
   return (
     <group>
       <Suspense fallback={null}>
-        <Text position={[0, 2.5, -2]} fontSize={0.2} color="#e8d5b7" anchorX="center" outlineWidth={0.01} outlineColor="#000">
+        <Text position={[0, 2.5, -2]} fontSize={0.2} color="#44DDFF" anchorX="center" outlineWidth={0.01} outlineColor="#001122">
           Audio Library
         </Text>
       </Suspense>
@@ -333,10 +373,10 @@ function SuiteScreen({
   return (
     <group>
       <Suspense fallback={null}>
-        <Text position={[0, 2.5, -2]} fontSize={0.2} color="#BB88FF" anchorX="center" outlineWidth={0.01} outlineColor="#000">
+        <Text position={[0, 2.5, -2]} fontSize={0.2} color="#BB88FF" anchorX="center" outlineWidth={0.01} outlineColor="#001122">
           Audio Suite
         </Text>
-        <Text position={[0, 2.2, -2]} fontSize={0.08} color="#888" anchorX="center">
+        <Text position={[0, 2.2, -2]} fontSize={0.08} color="#8899bb" anchorX="center">
           6 Voices — Each brings a unique perspective to Scripture
         </Text>
       </Suspense>
@@ -454,7 +494,7 @@ function PlayerScreen({
     <group>
       {/* Now Playing info */}
       <Suspense fallback={null}>
-        <Text position={[0, 2.5, -2]} fontSize={0.18} color="#e8d5b7" anchorX="center" outlineWidth={0.01} outlineColor="#000">
+        <Text position={[0, 2.5, -2]} fontSize={0.18} color="#44DDFF" anchorX="center" outlineWidth={0.01} outlineColor="#001122">
           Now Playing
         </Text>
         <Text position={[0, 2.1, -2]} fontSize={0.1} color={trackColor} anchorX="center" maxWidth={3}>
@@ -497,7 +537,7 @@ function PlayerScreen({
 
       {/* Back button */}
       <VRButton
-        position={[0, -0.2, 2]}
+        position={[0, -0.2, -1.5]}
         size={[1.5, 0.3]}
         label="< Back"
         color="#FF6666"
@@ -538,17 +578,33 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
 
   return (
     <group>
-      <StarField count={1500} radius={80} />
-      <ambientLight intensity={0.05} color="#4466aa" />
+      <StarField count={2500} radius={80} />
+      <NebulaClouds count={10} radius={50} colors={['#6622AA', '#2244AA', '#4400AA', '#220066']} opacity={0.1} />
+      <ambientLight intensity={0.12} color="#4466aa" />
 
-      {/* Ground */}
+      {/* Dark reflective floor with blue emissive */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]} receiveShadow>
         <circleGeometry args={[15, 32]} />
-        <meshStandardMaterial color="#1a1508" roughness={0.95} />
+        <meshStandardMaterial color="#080816" emissive="#112244" emissiveIntensity={0.1} metalness={0.6} roughness={0.4} />
       </mesh>
 
-      {/* Campfire — always visible */}
-      <CampfireScene />
+      {/* Concentric glow rings on floor */}
+      {[3, 5, 7, 10].map((radius, i) => (
+        <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.18, 0]}>
+          <ringGeometry args={[radius - 0.02, radius + 0.02, 64]} />
+          <meshBasicMaterial color="#2244AA" transparent opacity={0.15 - i * 0.025} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+
+      {/* Energy Rings */}
+      <EnergyRings />
+
+      {/* Enhanced lighting */}
+      <pointLight position={[0, -0.5, -2]} color="#2244AA" intensity={0.8} distance={12} />
+      <pointLight position={[0, 5, -2]} color="#6644AA" intensity={0.6} distance={15} />
+
+      {/* Energy Hearth — always visible */}
+      <EnergyHearthScene />
 
       {/* Screens */}
       {screen === 'menu' && (
@@ -568,7 +624,7 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
       )}
 
       {/* Back to Lobby — always visible */}
-      <BackToLobbyButton onBack={onBack} position={[0, -0.8, 2.5]} />
+      <BackToLobbyButton onBack={onBack} position={[0, -0.8, -1.5]} />
     </group>
   );
 }
