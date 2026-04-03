@@ -177,7 +177,8 @@ Tone should be CLEAR and DIRECT, not dreamy. Energy: ${session.energy}.
 Use "you" throughout. Second person. End with resolve, not a question.`,
       }, "morning-watches");
 
-      const script = data?.response || data?.result || data;
+      const d = data as Record<string, unknown> | string | null;
+      const script = typeof d === "object" && d ? ((d as any).response || (d as any).result || d) : d;
       if (typeof script === "string") {
         setGeneratedScript(script);
       } else {

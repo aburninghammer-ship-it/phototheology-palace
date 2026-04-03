@@ -168,7 +168,8 @@ The Master Mind = the mind of Christ (Philippians 2:5).
 Use short sentences (3-10 words). Include [pause] markers. Be cinematic and immersive.`,
       }, "night-watches");
 
-      const script = data?.response || data?.result || data;
+      const d = data as Record<string, unknown> | string | null;
+      const script = typeof d === "object" && d ? ((d as any).response || (d as any).result || d) : d;
       if (typeof script === "string") {
         setGeneratedScript(script);
       } else {
