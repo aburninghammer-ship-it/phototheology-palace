@@ -126,9 +126,9 @@ async function generateTTSUrl(script: string): Promise<string | null> {
     const { data, error } = await supabase.functions.invoke("text-to-speech", {
       body: {
         text: script.trim(),
-        voice: "onyx",
+        voice: "nova",
         provider: "openai",
-        speed: 0.82,
+        speed: 1.0,
         useCache: true,
       },
     });
@@ -195,6 +195,7 @@ export function useWatchPlayer(options?: UseWatchPlayerOptions) {
           icon: "🌙",
           modeName: "Night Watch",
           generateAudio: () => generateTTSUrl(script),
+          ambientMode: "ambient-sounds",
         };
 
         if (tractId) {
@@ -244,6 +245,7 @@ export function useWatchPlayer(options?: UseWatchPlayerOptions) {
           icon: "🌅",
           modeName: "Morning Watch",
           generateAudio: () => generateTTSUrl(script),
+          ambientMode: "ambient-sounds",
         };
 
         if (tractId) {

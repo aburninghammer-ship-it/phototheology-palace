@@ -26,13 +26,20 @@ import { ImmersiveParticles } from "./immersive/ImmersiveParticles";
 import { ImmersiveKaraokeVerse } from "./immersive/ImmersiveKaraokeVerse";
 import { ImmersiveSleepTimer } from "./immersive/ImmersiveSleepTimer";
 
-// Ambient tracks for background layering
+// Cinematic music tracks for background layering
 const AMBIENT_BG_TRACKS = [
   { id: "flight", name: "Flight", url: "/audio/flight.mp3" },
   { id: "wings-of-stillness", name: "Wings of Stillness", url: "/audio/wings-of-stillness.mp3" },
   { id: "eternal-echoes", name: "Eternal Echoes", url: "/audio/eternal-echoes.mp3" },
   { id: "dreams-of-joseph", name: "Dreams of Joseph", url: "/audio/dreams-of-joseph.mp3" },
   { id: "follow", name: "Follow", url: "/audio/follow.mp3" },
+];
+
+// Gentle ambient soundscapes for meditation/Watch sessions
+const AMBIENT_SOUND_TRACKS = [
+  { id: "soft-rain", name: "Soft Rain", url: "https://cdn.freesound.org/previews/531/531947_6890478-lq.mp3" },
+  { id: "night-crickets", name: "Night Crickets", url: "https://cdn.freesound.org/previews/372/372181_6505547-lq.mp3" },
+  { id: "gentle-stream", name: "Gentle Stream", url: "https://cdn.freesound.org/previews/398/398339_2908767-lq.mp3" },
 ];
 
 interface ImmersiveAudioPlayerProps {
@@ -250,30 +257,51 @@ export function ImmersiveAudioPlayer({
     }
   }, [activeVerseIndex]);
 
-  // Ambient music management
+  // Ambient music/sound management — picks track list based on current track's ambientMode
+  const currentTrackObj = tracks[currentIndex];
+  const defaultAmbientMode = currentTrackObj?.ambientMode ?? "music";
+  const [ambientModeOverride, setAmbientModeOverride] = useState<"music" | "ambient-sounds" | null>(null);
+  const ambientMode = ambientModeOverride ?? defaultAmbientMode;
+
+  // Reset override when track changes
+  useEffect(() => {
+    setAmbientModeOverride(null);
+  }, [currentIndex]);
+
   useEffect(() => {
     if (!ambientRef.current) return;
-    
+
+    // If track requests no background audio, stay silent
+    if (ambientMode === "none") {
+      ambientRef.current.pause();
+      setAmbientPlaying(false);
+      return;
+    }
+
+    const trackList = ambientMode === "ambient-sounds" ? AMBIENT_SOUND_TRACKS : AMBIENT_BG_TRACKS;
+
     if (isOpen && ambientMusicEnabled && isPlaying) {
       const ambient = ambientRef.current;
-      const bgTrack = AMBIENT_BG_TRACKS[ambientTrackIdx % AMBIENT_BG_TRACKS.length];
-      
+      const bgTrack = trackList[ambientTrackIdx % trackList.length];
+
       if (!ambient.src.includes(bgTrack.url)) {
         ambient.src = bgTrack.url;
         ambient.load();
       }
-      ambient.volume = ambientVolume;
+      // Ambient sounds play quieter by default
+      const modeVolume = ambientMode === "ambient-sounds" ? ambientVolume * 0.6 : ambientVolume;
+      ambient.volume = modeVolume;
       ambient.play().then(() => setAmbientPlaying(true)).catch(() => {});
-      
+
       // When ambient track ends, play next
       ambient.onended = () => {
-        setAmbientTrackIdx(i => (i + 1) % AMBIENT_BG_TRACKS.length);
+        setAmbientTrackIdx(i => (i + 1) % trackList.length);
       };
     } else {
       ambientRef.current.pause();
       setAmbientPlaying(false);
     }
-  }, [isOpen, ambientMusicEnabled, isPlaying, ambientTrackIdx, ambientVolume]);
+  }, [isOpen, ambientMusicEnabled, isPlaying, ambientTrackIdx, ambientVolume, ambientMode]);
 
   // Update ambient volume live (with sleep fade)
   useEffect(() => {
@@ -422,17 +450,45 @@ export function ImmersiveAudioPlayer({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Music className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">Ambient Background Music</span>
+                    <span className="text-sm">{ambientMode === "ambient-sounds" ? "Ambient Sounds" : "Ambient Background Music"}</span>
                   </div>
                   <Switch
                     checked={ambientMusicEnabled}
                     onCheckedChange={onSetAmbientMusic}
                   />
                 </div>
+                {/* Ambient mode toggle — switch between sounds and music */}
+                {ambientMusicEnabled && (
+                  <div className="flex items-center justify-between pl-6">
+                    <span className="text-xs text-muted-foreground">Background type</span>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => { setAmbientModeOverride("ambient-sounds"); setAmbientTrackIdx(0); }}
+                        className={`text-xs px-3 py-1 rounded-full transition-colors ${
+                          ambientMode === "ambient-sounds"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        }`}
+                      >
+                        Sounds
+                      </button>
+                      <button
+                        onClick={() => { setAmbientModeOverride("music"); setAmbientTrackIdx(0); }}
+                        className={`text-xs px-3 py-1 rounded-full transition-colors ${
+                          ambientMode === "music"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        }`}
+                      >
+                        Music
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {/* Ambient volume */}
                 {ambientMusicEnabled && (
                   <div className="flex items-center gap-3 pl-6">
-                    <span className="text-xs text-muted-foreground w-20">Music Volume</span>
+                    <span className="text-xs text-muted-foreground w-20">{ambientMode === "ambient-sounds" ? "Sound Vol" : "Music Volume"}</span>
                     <Slider
                       value={[ambientVolume * 100]}
                       onValueChange={([v]) => onSetAmbientVolume(v / 100)}

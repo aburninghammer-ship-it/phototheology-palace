@@ -67,7 +67,7 @@ CRITICAL RULES:
 async function generateTTSUrl(script: string): Promise<string | null> {
   try {
     const { data, error } = await supabase.functions.invoke('text-to-speech', {
-      body: { text: script.trim(), voice: 'onyx', provider: 'openai', speed: 0.82, useCache: true },
+      body: { text: script.trim(), voice: 'nova', provider: 'openai', speed: 1.0, useCache: true },
     });
     if (error) throw error;
     if (data?.audioUrl) return data.audioUrl;

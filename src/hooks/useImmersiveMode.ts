@@ -22,6 +22,8 @@ export interface ImmersiveTrack {
   modeName?: string;
   /** Icon emoji */
   icon?: string;
+  /** Background audio mode: "music" (default cinematic tracks), "ambient-sounds" (nature/tones), "none" */
+  ambientMode?: "music" | "ambient-sounds" | "none";
 }
 
 export interface ImmersiveQueue {
