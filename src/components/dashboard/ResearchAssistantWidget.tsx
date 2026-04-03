@@ -723,7 +723,7 @@ export function ResearchAssistantWidget({ defaultExpanded = false, resumeStudyId
     if (!trimmed || genealogyIsLoading) return;
 
     setGenealogyIsLoading(true);
-    const query = `Decode this biblical genealogy using Phototheology principles:\n\n${trimmed}`;
+    const query = `Decode this biblical genealogy or person using Phototheology principles. If this is a person's name, analyze their full genealogical context — ancestors, descendants, notable figures in their lineage, and lessons from their placement in Scripture's family lines:\n\n${trimmed}`;
 
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
