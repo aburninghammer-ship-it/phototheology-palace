@@ -7,6 +7,8 @@ import { OsSpacesWelcome } from "@/components/OsSpacesWelcome";
 import { PtGlossaryTable } from "@/components/PtGlossaryTable";
 import { UpgradeFloatingCard } from "@/components/UpgradeFloatingCard";
 import { WhatsNewTicker } from "@/components/WhatsNewTicker";
+import { ExperienceModeSelector } from "@/components/experience-mode";
+import { PTSection } from "@/components/experience-mode/PTSection";
 
 const Welcome = () => {
   return (
