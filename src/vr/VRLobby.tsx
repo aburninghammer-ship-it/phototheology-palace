@@ -36,41 +36,45 @@ export function VRLobby({ onEnterExperience }: VRLobbyProps) {
       <Candlestick position={[4.5, -1.2, -3.8]} />
       <Candlestick position={[6.8, -1.2, -1.5]} />
 
-      {/* === LIGHTING RIG — warm golden sanctuary === */}
-      <ambientLight intensity={0.2} color="#D4C5A0" />
+      {/* === LIGHTING RIG — rich warm golden sanctuary === */}
+      <ambientLight intensity={0.25} color="#D4C5A0" />
 
       {/* Key light — warm golden from above */}
       <directionalLight
-        position={[5, 10, 3]}
-        intensity={1.2}
+        position={[5, 12, 3]}
+        intensity={1.4}
         color="#FFE4B0"
         castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-camera-near={0.1}
-        shadow-camera-far={30}
-        shadow-camera-left={-12}
-        shadow-camera-right={12}
-        shadow-camera-top={12}
-        shadow-camera-bottom={-12}
+        shadow-camera-far={35}
+        shadow-camera-left={-14}
+        shadow-camera-right={14}
+        shadow-camera-top={14}
+        shadow-camera-bottom={-14}
       />
 
       {/* Fill light — warm from left */}
-      <directionalLight position={[-6, 5, 2]} intensity={0.4} color="#FFD080" />
+      <directionalLight position={[-8, 6, 2]} intensity={0.5} color="#FFD080" />
 
       {/* Rim light — golden from behind */}
-      <directionalLight position={[0, 5, -10]} intensity={0.6} color="#FFD700" />
+      <directionalLight position={[0, 6, -12]} intensity={0.7} color="#FFD700" />
 
-      {/* Portal atmosphere lights — warm tones */}
-      <pointLight position={[-5, 4, -3]} intensity={0.6} color="#FFD700" distance={14} decay={2} />
-      <pointLight position={[5, 4, -3]} intensity={0.6} color="#FFD700" distance={14} decay={2} />
-      <pointLight position={[0, 3, -7]} intensity={0.5} color="#FFE4A0" distance={12} decay={2} />
+      {/* Overhead zenith light */}
+      <directionalLight position={[0, 15, -3]} intensity={0.3} color="#FFFBE0" />
 
-      {/* Floor warmth */}
-      <pointLight position={[0, -0.5, -2]} intensity={0.5} color="#FFD700" distance={8} decay={2} />
+      {/* Portal atmosphere lights */}
+      <pointLight position={[-6, 5, -3]} intensity={0.8} color="#FFD700" distance={16} decay={2} />
+      <pointLight position={[6, 5, -3]} intensity={0.8} color="#FFD700" distance={16} decay={2} />
+      <pointLight position={[0, 4, -8]} intensity={0.6} color="#FFE4A0" distance={14} decay={2} />
+      <pointLight position={[0, 1, 2]} intensity={0.4} color="#FFD700" distance={8} decay={2} />
 
-      {/* Fog for depth — warm tint */}
-      <fog attach="fog" args={['#080810', 10, 28]} />
+      {/* Floor warmth & reflections */}
+      <pointLight position={[0, -0.8, -2]} intensity={0.6} color="#FFD700" distance={10} decay={2} />
+
+      {/* Fog for depth — warm tint, deeper range */}
+      <fog attach="fog" args={['#060810', 12, 32]} />
 
       {/* === TITLE === */}
       <Suspense fallback={null}>
