@@ -507,7 +507,7 @@ function RoomView({
       <HoloPalaceInterior wallColor={wallColor} floorColor={groundColor} accentColor={floorColor} />
 
       {/* Study chamber lighting — holographic */}
-      <ambientLight intensity={0.15} color="#aabbee" />
+      <ambientLight intensity={0.35} color="#aabbee" />
       <pointLight position={[0, 3, -3]} color="#00CCFF" intensity={1} distance={8} />
       <pointLight position={[0, 2, -3.2]} color={floorColor} intensity={0.8} distance={6} />
 
