@@ -160,6 +160,13 @@ export function ImmersiveAudioPlayer({
         ambientRef.current.pause();
         ambientRef.current.src = "";
       }
+      if (ambientNextRef.current) {
+        ambientNextRef.current.pause();
+        ambientNextRef.current.src = "";
+      }
+      if (crossfadeTimerRef.current) {
+        clearInterval(crossfadeTimerRef.current);
+      }
     };
   }, []);
 
