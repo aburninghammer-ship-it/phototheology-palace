@@ -203,12 +203,14 @@ RULES:
 - Use the correct PT terminology: 1H = DoL1/NE1 (Babylonian/Restoration), 2H = DoL2/NE2 (70 AD/New Covenant), 3H = DoL3/NE3 (Final New Creation). NEVER use atmospheric labels.`;
 
 const GENEALOGY_EXAMPLES = [
-  { label: "Esau's Line", ref: "Genesis 36", desc: "Edom's kings & chiefs" },
+  { label: "Jabez", ref: "Jabez", desc: "The prayer warrior of 1 Chronicles" },
+  { label: "Rahab", ref: "Rahab", desc: "From Jericho to Christ's lineage" },
   { label: "Christ's Lineage", ref: "Matthew 1:1-17", desc: "Abraham to Jesus" },
   { label: "Cain vs Seth", ref: "Genesis 4-5", desc: "Two seeds diverge" },
-  { label: "Ishmael's Line", ref: "Genesis 25:12-18", desc: "The other son" },
-  { label: "Jacob's Sons", ref: "Genesis 35:22-26", desc: "12 tribes origin" },
-  { label: "Post-Exile Return", ref: "Ezra 2", desc: "Remnant genealogy" },
+  { label: "Boaz", ref: "Boaz", desc: "Kinsman redeemer of Ruth" },
+  { label: "Esau's Line", ref: "Genesis 36", desc: "Edom's kings & chiefs" },
+  { label: "Tamar", ref: "Tamar", desc: "Unlikely mother in Christ's line" },
+  { label: "Enoch", ref: "Enoch", desc: "Walked with God, taken up" },
 ];
 
 // Format response content: bold headers, verse highlights, etc.
