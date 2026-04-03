@@ -99,8 +99,8 @@ function GameScreen({ name, route, emoji, color, glowColor, desc, position, rota
   });
 
   const handleClick = () => {
-    // Open in new tab to preserve VR session stability
-    window.open(route, '_blank');
+    // Navigate in same window so the game loads properly
+    window.location.href = route;
   };
 
   return (

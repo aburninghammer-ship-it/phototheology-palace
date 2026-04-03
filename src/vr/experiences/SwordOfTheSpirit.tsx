@@ -1,9 +1,9 @@
 /**
- * Sword of the Spirit — VR thought-capture game
+ * Sword of the Spirit — VR sword & shield battle
  *
- * Bad thoughts (dark orbs with text) fly toward you — slash them with the sword.
- * Good thoughts (golden orbs with scripture) fly toward you — catch them (let them pass through you).
- * Armor gauge fills with caught good thoughts. Health depletes when bad thoughts hit you.
+ * Bad thoughts (dark orbs) fly toward you — STRIKE with sword (click/tap).
+ * Good thoughts (golden orbs) fly toward you — BLOCK with shield (let them pass / click to absorb).
+ * Armor gauge fills with absorbed good thoughts. Health depletes when bad thoughts hit you.
  *
  * Desktop: click orbs. VR: ray-select or swing controller.
  */
@@ -85,19 +85,115 @@ interface ActiveOrb {
   velocity: THREE.Vector3;
   alive: boolean;
   spawnTime: number;
-  hitFlash: number; // 0-1 flash when hit
+  hitFlash: number;
 }
 
 type GameState = 'menu' | 'playing' | 'gameover';
+
+// ── Pointed Sword 3D ──
+
+function SwordModel({ position, swinging }: { position: [number, number, number]; swinging: boolean }) {
+  const groupRef = useRef<THREE.Group>(null);
+  const swingRef = useRef(0);
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) return;
+    if (swinging) {
+      swingRef.current = Math.min(1, swingRef.current + delta * 8);
+    } else {
+      swingRef.current = Math.max(0, swingRef.current - delta * 4);
+    }
+    const swingAngle = Math.sin(swingRef.current * Math.PI) * 0.8;
+    groupRef.current.rotation.z = -0.3 + swingAngle;
+    groupRef.current.rotation.x = swingAngle * 0.3;
+  });
+
+  return (
+    <group ref={groupRef} position={position}>
+      {/* Blade — pointed */}
+      <mesh position={[0, 0.8, 0]}>
+        <coneGeometry args={[0.06, 1.8, 4]} />
+        <meshStandardMaterial color="#C0C0C0" metalness={0.9} roughness={0.1} emissive="#88AAFF" emissiveIntensity={0.3} />
+      </mesh>
+      {/* Cross guard */}
+      <mesh position={[0, -0.1, 0]}>
+        <boxGeometry args={[0.5, 0.06, 0.08]} />
+        <meshStandardMaterial color="#FFD700" metalness={0.8} roughness={0.2} />
+      </mesh>
+      {/* Handle */}
+      <mesh position={[0, -0.4, 0]}>
+        <cylinderGeometry args={[0.04, 0.04, 0.5, 8]} />
+        <meshStandardMaterial color="#8B4513" roughness={0.8} />
+      </mesh>
+      {/* Pommel */}
+      <mesh position={[0, -0.65, 0]}>
+        <sphereGeometry args={[0.06, 8, 6]} />
+        <meshStandardMaterial color="#FFD700" metalness={0.8} roughness={0.2} />
+      </mesh>
+      {/* Glow */}
+      <pointLight position={[0, 0.5, 0]} color="#88CCFF" intensity={0.5 + (swinging ? 1.5 : 0)} distance={3} />
+    </group>
+  );
+}
+
+// ── Shield 3D ──
+
+function ShieldModel({ position, blocking }: { position: [number, number, number]; blocking: boolean }) {
+  const groupRef = useRef<THREE.Group>(null);
+  const blockRef = useRef(0);
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) return;
+    if (blocking) {
+      blockRef.current = Math.min(1, blockRef.current + delta * 6);
+    } else {
+      blockRef.current = Math.max(0, blockRef.current - delta * 3);
+    }
+    groupRef.current.position.z = position[2] + blockRef.current * -0.3;
+    groupRef.current.scale.setScalar(1 + blockRef.current * 0.15);
+  });
+
+  return (
+    <group ref={groupRef} position={position}>
+      {/* Shield face — rounded rectangle shape using a circle */}
+      <mesh>
+        <circleGeometry args={[0.4, 6]} />
+        <meshStandardMaterial
+          color="#FFD700"
+          metalness={0.7}
+          roughness={0.3}
+          emissive="#AA8800"
+          emissiveIntensity={blocking ? 0.8 : 0.2}
+        />
+      </mesh>
+      {/* Shield rim */}
+      <mesh position={[0, 0, -0.02]}>
+        <ringGeometry args={[0.35, 0.42, 6]} />
+        <meshStandardMaterial color="#886600" metalness={0.8} roughness={0.2} />
+      </mesh>
+      {/* Cross emblem on shield */}
+      <mesh position={[0, 0, 0.01]}>
+        <boxGeometry args={[0.05, 0.3, 0.01]} />
+        <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={blocking ? 1 : 0.3} />
+      </mesh>
+      <mesh position={[0, 0, 0.01]}>
+        <boxGeometry args={[0.2, 0.05, 0.01]} />
+        <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={blocking ? 1 : 0.3} />
+      </mesh>
+      {/* Shield glow */}
+      <pointLight position={[0, 0, 0.3]} color="#FFD700" intensity={blocking ? 2 : 0.3} distance={3} />
+    </group>
+  );
+}
 
 // ── Orb Component ──
 
 function ThoughtOrb({
   orb,
-  onSlash,
+  onAction,
 }: {
   orb: ActiveOrb;
-  onSlash: (id: number) => void;
+  onAction: (id: number) => void;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
@@ -112,20 +208,18 @@ function ThoughtOrb({
       const pulse = 1 + Math.sin(t * 3 + orb.id) * 0.15;
       glowRef.current.scale.setScalar(pulse);
     }
-    // Gentle rotation
     meshRef.current.rotation.y += 0.01;
   });
 
   const handleClick = () => {
-    if (isBad && orb.alive) {
-      onSlash(orb.id);
+    if (orb.alive) {
+      onAction(orb.id);
     }
   };
 
   if (!orb.alive) return null;
 
   const baseColor = isBad ? '#FF2244' : '#FFD700';
-  const glowColor = isBad ? '#880022' : '#886600';
 
   return (
     <group>
@@ -142,12 +236,8 @@ function ThoughtOrb({
       </mesh>
 
       {/* Main orb */}
-      <Interactive onSelect={() => handleClick()}>
-        <mesh
-          ref={meshRef}
-          onClick={handleClick}
-          onPointerDown={handleClick}
-        >
+      <Interactive onSelect={handleClick}>
+        <mesh ref={meshRef} onClick={handleClick} onPointerDown={handleClick}>
           <sphereGeometry args={[0.25, 16, 12]} />
           <meshStandardMaterial
             color={orb.hitFlash > 0 ? '#FFFFFF' : baseColor}
@@ -161,24 +251,34 @@ function ThoughtOrb({
         </mesh>
       </Interactive>
 
-      {/* Text label */}
+      {/* Type indicator icon */}
       <Suspense fallback={null}>
         <Text
-          position={[orb.position.x, orb.position.y + 0.4, orb.position.z]}
-          fontSize={0.08}
+          position={[orb.position.x, orb.position.y + 0.5, orb.position.z]}
+          fontSize={0.12}
+          color={isBad ? '#FF6688' : '#FFEE88'}
+          anchorX="center"
+          anchorY="bottom"
+          outlineWidth={0.005}
+          outlineColor="#000"
+        >
+          {isBad ? '⚔️ STRIKE' : '🛡️ BLOCK'}
+        </Text>
+        <Text
+          position={[orb.position.x, orb.position.y + 0.35, orb.position.z]}
+          fontSize={0.07}
           color={isBad ? '#FF6688' : '#FFEE88'}
           anchorX="center"
           anchorY="bottom"
           maxWidth={1.5}
           textAlign="center"
-          outlineWidth={0.004}
+          outlineWidth={0.003}
           outlineColor="#000"
         >
           {orb.thought.text}
         </Text>
       </Suspense>
 
-      {/* Point light */}
       <pointLight
         position={[orb.position.x, orb.position.y, orb.position.z]}
         color={baseColor}
@@ -189,16 +289,17 @@ function ThoughtOrb({
   );
 }
 
-// ── Slash effect particles ──
+// ── Slash/Block effects ──
 
-interface SlashEffect {
+interface HitEffect {
   id: number;
   position: THREE.Vector3;
   color: string;
+  type: 'slash' | 'block';
   time: number;
 }
 
-function SlashParticles({ effects }: { effects: SlashEffect[] }) {
+function HitEffects({ effects }: { effects: HitEffect[] }) {
   return (
     <>
       {effects.map((fx) => {
@@ -207,17 +308,23 @@ function SlashParticles({ effects }: { effects: SlashEffect[] }) {
         const opacity = 1 - age / 0.8;
         const scale = 0.5 + age * 2;
         return (
-          <mesh key={fx.id} position={fx.position} scale={scale}>
-            <ringGeometry args={[0.2, 0.35, 8]} />
-            <meshBasicMaterial
-              color={fx.color}
-              transparent
-              opacity={opacity * 0.6}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
+          <group key={fx.id}>
+            <mesh position={fx.position} scale={scale}>
+              {fx.type === 'slash' ? (
+                <ringGeometry args={[0.2, 0.35, 8]} />
+              ) : (
+                <circleGeometry args={[0.4, 16]} />
+              )}
+              <meshBasicMaterial
+                color={fx.color}
+                transparent
+                opacity={opacity * 0.6}
+                blending={THREE.AdditiveBlending}
+                depthWrite={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
         );
       })}
     </>
@@ -239,12 +346,10 @@ function ArmorDisplay({ level, progress }: { level: number; progress: number }) 
           {currentArmor.scripture}
         </Text>
       </Suspense>
-      {/* Progress bar background */}
       <mesh position={[0, -0.28, 0]}>
         <planeGeometry args={[1, 0.06]} />
         <meshBasicMaterial color="#222" transparent opacity={0.8} />
       </mesh>
-      {/* Progress bar fill */}
       <mesh position={[-0.5 + (progress * 0.5), -0.28, 0.001]}>
         <planeGeometry args={[Math.max(progress, 0.01), 0.05]} />
         <meshBasicMaterial color={currentArmor.color} />
@@ -295,7 +400,18 @@ function GameHUD({ health, score, combo, level, armorProgress }: {
         </Suspense>
       </group>
 
-      {/* Armor gauge */}
+      {/* Instructions */}
+      <group position={[0, -0.8, -3]}>
+        <Suspense fallback={null}>
+          <Text position={[-0.8, 0, 0]} fontSize={0.06} color="#FF6688" anchorX="center">
+            ⚔️ STRIKE dark thoughts
+          </Text>
+          <Text position={[0.8, 0, 0]} fontSize={0.06} color="#FFEE88" anchorX="center">
+            🛡️ BLOCK to absorb truth
+          </Text>
+        </Suspense>
+      </group>
+
       <ArmorDisplay level={level} progress={armorProgress} />
     </group>
   );
@@ -306,26 +422,22 @@ function GameHUD({ health, score, combo, level, armorProgress }: {
 function BattleArena() {
   return (
     <group>
-      {/* Dark floor with glowing grid */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[20, 20]} />
         <meshStandardMaterial color="#080818" metalness={0.6} roughness={0.3} />
       </mesh>
       <gridHelper args={[20, 30, '#1a1a4a', '#0a0a2a']} position={[0, -1.19, 0]} />
 
-      {/* Subtle ring on floor around player */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.18, 0]}>
         <ringGeometry args={[2, 2.2, 32]} />
         <meshBasicMaterial color="#6366f1" transparent opacity={0.15} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
 
-      {/* Dome */}
       <mesh position={[0, 5, 0]}>
         <sphereGeometry args={[15, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
         <meshStandardMaterial color="#040412" side={THREE.BackSide} />
       </mesh>
 
-      {/* Atmospheric lighting */}
       <ambientLight intensity={0.15} color="#222244" />
       <pointLight position={[0, 4, 0]} intensity={0.5} color="#6366f1" distance={15} />
       <pointLight position={[-5, 3, -5]} intensity={0.4} color="#FF4466" distance={10} />
@@ -354,10 +466,12 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
   const [combo, setCombo] = useState(0);
   const [armorLevel, setArmorLevel] = useState(0);
   const [wave, setWave] = useState(1);
+  const [swordSwinging, setSwordSwinging] = useState(false);
+  const [shieldBlocking, setShieldBlocking] = useState(false);
 
   const orbsRef = useRef<ActiveOrb[]>([]);
   const [orbs, setOrbs] = useState<ActiveOrb[]>([]);
-  const [effects, setEffects] = useState<SlashEffect[]>([]);
+  const [effects, setEffects] = useState<HitEffect[]>([]);
 
   const spawnTimerRef = useRef(0);
   const difficultyRef = useRef(1);
@@ -365,7 +479,6 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
   const scoreRef = useRef(0);
   const healthRef = useRef(100);
 
-  // Keep refs in sync
   useEffect(() => { comboRef.current = combo; }, [combo]);
   useEffect(() => { scoreRef.current = score; }, [score]);
   useEffect(() => { healthRef.current = health; }, [health]);
@@ -388,30 +501,45 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
     nextOrbId = 0;
   }, []);
 
-  const handleSlash = useCallback((id: number) => {
+  const handleAction = useCallback((id: number) => {
     const orb = orbsRef.current.find((o) => o.id === id);
     if (!orb || !orb.alive) return;
 
+    orb.alive = false;
+    orb.hitFlash = 1;
+
     if (orb.thought.type === 'bad') {
-      // Slash bad thought — score!
-      orb.alive = false;
-      orb.hitFlash = 1;
+      // SWORD STRIKE — slash the dark thought!
+      setSwordSwinging(true);
+      setTimeout(() => setSwordSwinging(false), 300);
+
       const newCombo = comboRef.current + 1;
       const points = 10 * Math.min(newCombo, 10);
       setCombo(newCombo);
       setScore((s) => {
         const newScore = s + points;
-        // Check armor level up
         const currentLvl = ARMOR_LEVELS.findIndex((a) => newScore < a.targetScore);
         if (currentLvl > 0) setArmorLevel(currentLvl);
         else if (currentLvl === -1) setArmorLevel(ARMOR_LEVELS.length - 1);
         return newScore;
       });
 
-      // Spawn slash effect
       setEffects((prev) => [
         ...prev.slice(-10),
-        { id: nextFxId++, position: orb.position.clone(), color: '#FF4466', time: Date.now() },
+        { id: nextFxId++, position: orb.position.clone(), color: '#FF4466', type: 'slash', time: Date.now() },
+      ]);
+    } else {
+      // SHIELD BLOCK — absorb the truth!
+      setShieldBlocking(true);
+      setTimeout(() => setShieldBlocking(false), 400);
+
+      const newCombo = comboRef.current + 1;
+      setCombo(newCombo);
+      setScore((s) => s + 25);
+
+      setEffects((prev) => [
+        ...prev.slice(-10),
+        { id: nextFxId++, position: orb.position.clone(), color: '#FFD700', type: 'block', time: Date.now() },
       ]);
     }
   }, []);
@@ -425,11 +553,10 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
     // Spawn orbs
     spawnTimerRef.current -= delta;
     if (spawnTimerRef.current <= 0) {
-      const isBad = Math.random() < 0.6; // 60% bad, 40% good
+      const isBad = Math.random() < 0.6;
       const pool = isBad ? BAD_THOUGHTS : GOOD_THOUGHTS;
       const thought = pool[Math.floor(Math.random() * pool.length)];
 
-      // Spawn from random position in front arc
       const angle = (Math.random() - 0.5) * Math.PI * 0.8;
       const dist = 6 + Math.random() * 3;
       const spawnPos = new THREE.Vector3(
@@ -438,7 +565,6 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
         -Math.cos(angle) * dist,
       );
 
-      // Move toward player (0, 1.2, 0)
       const dir = new THREE.Vector3(0, 1.2, 0).sub(spawnPos).normalize();
       const speed = 0.8 + difficultyRef.current * 0.3;
 
@@ -453,17 +579,12 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
       };
 
       orbsRef.current.push(orb);
-
-      // Spawn interval decreases with difficulty
       spawnTimerRef.current = Math.max(0.6, 2.5 - difficultyRef.current * 0.3);
-
-      // Increase difficulty over time
       difficultyRef.current = Math.min(5, 1 + scoreRef.current / 200);
     }
 
     // Update orbs
     let healthDelta = 0;
-    let scoreDelta = 0;
     let lostCombo = false;
 
     for (const orb of orbsRef.current) {
@@ -472,39 +593,27 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
         continue;
       }
 
-      // Move
       orb.position.add(orb.velocity.clone().multiplyScalar(delta));
 
-      // Check if reached player zone (distance < 0.8 from origin)
       const distToPlayer = orb.position.distanceTo(new THREE.Vector3(0, 1.2, 0));
 
       if (distToPlayer < 0.8) {
         orb.alive = false;
         if (orb.thought.type === 'bad') {
-          // Bad thought hit — lose health
+          // Bad thought hit you — lose health
           healthDelta -= 15;
           lostCombo = true;
         } else {
-          // Good thought caught — bonus score!
-          scoreDelta += 25;
-          setEffects((prev) => [
-            ...prev.slice(-10),
-            { id: nextFxId++, position: orb.position.clone(), color: '#FFD700', time: Date.now() },
-          ]);
-        }
-      }
-
-      // Remove if too far behind
-      if (orb.position.z > 5) {
-        orb.alive = false;
-        if (orb.thought.type === 'good') {
-          // Missed a good thought — small penalty
+          // Good thought passed through — missed block, small penalty
           healthDelta -= 5;
         }
       }
+
+      if (orb.position.z > 5) {
+        orb.alive = false;
+      }
     }
 
-    // Apply deltas
     if (healthDelta !== 0) {
       setHealth((h) => {
         const newH = Math.max(0, Math.min(100, h + healthDelta));
@@ -513,25 +622,19 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
         return newH;
       });
     }
-    if (scoreDelta > 0) {
-      setScore((s) => s + scoreDelta);
-    }
     if (lostCombo) {
       setCombo(0);
       comboRef.current = 0;
     }
 
-    // Clean up dead orbs older than 2s
     orbsRef.current = orbsRef.current.filter(
       (o) => o.alive || now - o.spawnTime < 2000,
     );
 
-    // Wave progression
     if (scoreRef.current > wave * 200) {
       setWave((w) => w + 1);
     }
 
-    // Sync rendered orbs
     setOrbs([...orbsRef.current]);
   });
 
@@ -543,7 +646,6 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Armor progress for current level
   const currentArmorTarget = ARMOR_LEVELS[Math.min(armorLevel, ARMOR_LEVELS.length - 1)];
   const prevTarget = armorLevel > 0 ? ARMOR_LEVELS[armorLevel - 1].targetScore : 0;
   const armorProgress = Math.min(1, (score - prevTarget) / (currentArmorTarget.targetScore - prevTarget));
@@ -551,6 +653,12 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
   return (
     <group>
       <BattleArena />
+
+      {/* Sword (right side) */}
+      <SwordModel position={[0.7, 0.3, -0.5]} swinging={swordSwinging} />
+
+      {/* Shield (left side) */}
+      <ShieldModel position={[-0.6, 0.6, -0.5]} blocking={shieldBlocking} />
 
       {/* ─── MENU ─── */}
       {gameState === 'menu' && (
@@ -562,8 +670,8 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
             Ephesians 6:17 — "The sword of the Spirit, which is the word of God"
           </Text>
 
-          <Text position={[0, 1.5, -3]} fontSize={0.08} color="#aaa" anchorX="center" maxWidth={3} textAlign="center">
-            Slash the dark thoughts. Let the golden truths reach you.{'\n'}Collect all 6 pieces of the Armor of God.
+          <Text position={[0, 1.5, -3]} fontSize={0.08} color="#aaa" anchorX="center" maxWidth={3.5} textAlign="center">
+            ⚔️ STRIKE dark thoughts with the Sword{'\n'}🛡️ BLOCK to absorb golden truths with the Shield{'\n'}Collect all 6 pieces of the Armor of God.
           </Text>
 
           <Interactive onSelect={startGame}>
@@ -589,15 +697,12 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
             armorProgress={armorProgress}
           />
 
-          {/* Thought orbs */}
           {orbs.filter((o) => o.alive || o.hitFlash > 0).map((orb) => (
-            <ThoughtOrb key={orb.id} orb={orb} onSlash={handleSlash} />
+            <ThoughtOrb key={orb.id} orb={orb} onAction={handleAction} />
           ))}
 
-          {/* Slash effects */}
-          <SlashParticles effects={effects} />
+          <HitEffects effects={effects} />
 
-          {/* Wave indicator */}
           <Suspense fallback={null}>
             <Text position={[-2.5, 2.2, -3]} fontSize={0.06} color="#666" anchorX="center">
               Wave {wave}
