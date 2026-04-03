@@ -437,6 +437,8 @@ export function ImmersiveAudioPlayer({
     if (!isOpen) {
       if (audioRef.current) { audioRef.current.pause(); }
       if (ambientRef.current) { ambientRef.current.pause(); }
+      if (ambientNextRef.current) { ambientNextRef.current.pause(); }
+      if (crossfadeTimerRef.current) { clearInterval(crossfadeTimerRef.current); }
       setIsPlaying(false);
       setAmbientPlaying(false);
     }
