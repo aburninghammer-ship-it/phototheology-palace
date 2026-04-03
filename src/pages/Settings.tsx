@@ -29,6 +29,7 @@ import { FontSizeSettings } from "@/components/settings/FontSizeSettings";
 import { DisplaySettings } from "@/components/settings/DisplaySettings";
 import { useTranslation } from "react-i18next";
 import { UserAiUsageWidget } from "@/components/profile/UserAiUsageWidget";
+import { ExperienceModeSelector } from "@/components/experience-mode";
 
 export default function Settings() {
   const { t } = useTranslation();
