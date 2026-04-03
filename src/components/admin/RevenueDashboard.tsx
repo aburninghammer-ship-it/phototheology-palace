@@ -19,7 +19,7 @@ export function RevenueDashboard() {
   const productOptions = [
     { key: null, label: "All Products" },
     { key: "genesis-6-days", label: "Genesis in 6 Days ($9)" },
-    { key: "study-suite", label: "Study Suite ($97)" },
+    { key: "study-suite", label: "Study Suite (discontinued)" },
     { key: "quick-start-guide", label: "Quick-Start Guide ($12)" },
   ];
 
