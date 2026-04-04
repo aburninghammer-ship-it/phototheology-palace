@@ -166,7 +166,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, scale: 0.95, y: 30 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          className="mb-8 px-4"
+          className="mb-6 sm:mb-8 px-2 sm:px-4"
         >
           {/* Gradient border glow wrapper */}
           <div className="relative p-[2px] sm:p-[3px] rounded-2xl bg-gradient-to-r from-green-400 via-cyan-400 to-primary max-w-xs sm:max-w-2xl md:max-w-4xl mx-auto shadow-[0_0_30px_rgba(34,211,238,0.3),0_0_60px_rgba(34,211,238,0.1)]">
