@@ -1,5 +1,5 @@
-import { useRef, useMemo, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useRef, useMemo, useState, useEffect, useCallback } from 'react';
+import { useFrame, useLoader } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
@@ -8,23 +8,77 @@ import { useStreamingAudio } from '../hooks/useStreamingAudio';
 import { getSoftCircleTexture, getNebulaBlobTexture } from '../utils/softTextures';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
+// Backdrop images
+import hdCreation from '@/assets/vr/hd-creation.jpg';
+import hdGarden from '@/assets/vr/hd-garden.jpg';
+import hdCross from '@/assets/vr/hd-cross.jpg';
+import hdResurrection from '@/assets/vr/hd-resurrection.jpg';
+import hdThrone from '@/assets/vr/hd-throne.jpg';
+import hdNewJerusalem from '@/assets/vr/hd-new-jerusalem.jpg';
+
 const AUDIO_SRC = '/audio/heavens-diary.m4a';
 
 interface HeavensDiaryProps {
   onBack: () => void;
 }
 
+// ─── Scripture Data ───────────────────────────────────────
+interface ScriptureVerse {
+  ref: string;
+  text: string;
+}
+
+const SCENE_SCRIPTURES: Record<string, ScriptureVerse[]> = {
+  creation: [
+    { ref: 'Genesis 1:1', text: 'In the beginning God created the heaven and the earth.' },
+    { ref: 'Genesis 1:3', text: 'And God said, Let there be light: and there was light.' },
+    { ref: 'Psalm 33:6', text: 'By the word of the LORD were the heavens made.' },
+    { ref: 'John 1:1', text: 'In the beginning was the Word, and the Word was with God.' },
+  ],
+  garden: [
+    { ref: 'Genesis 2:8', text: 'And the LORD God planted a garden eastward in Eden.' },
+    { ref: 'Genesis 2:9', text: 'The tree of life also in the midst of the garden.' },
+    { ref: 'Genesis 2:10', text: 'And a river went out of Eden to water the garden.' },
+    { ref: 'Revelation 22:2', text: 'The tree of life, which bare twelve manner of fruits.' },
+  ],
+  cross: [
+    { ref: 'John 19:30', text: 'It is finished.' },
+    { ref: 'Isaiah 53:5', text: 'He was wounded for our transgressions, bruised for our iniquities.' },
+    { ref: 'Romans 5:8', text: 'While we were yet sinners, Christ died for us.' },
+    { ref: '1 Peter 2:24', text: 'Who his own self bare our sins in his own body on the tree.' },
+  ],
+  resurrection: [
+    { ref: 'Matthew 28:6', text: 'He is not here: for He is risen, as He said.' },
+    { ref: 'Romans 6:9', text: 'Christ being raised from the dead dieth no more.' },
+    { ref: '1 Corinthians 15:55', text: 'O death, where is thy sting? O grave, where is thy victory?' },
+    { ref: 'John 11:25', text: 'I am the resurrection, and the life.' },
+  ],
+  throne: [
+    { ref: 'Revelation 4:2', text: 'A throne was set in heaven, and one sat on the throne.' },
+    { ref: 'Revelation 4:8', text: 'Holy, holy, holy, Lord God Almighty, which was, and is, and is to come.' },
+    { ref: 'Daniel 7:9', text: 'The Ancient of days did sit, whose garment was white as snow.' },
+    { ref: 'Revelation 4:3', text: 'There was a rainbow round about the throne, like unto an emerald.' },
+  ],
+  newJerusalem: [
+    { ref: 'Revelation 21:2', text: 'I saw the holy city, new Jerusalem, coming down from God out of heaven.' },
+    { ref: 'Revelation 21:4', text: 'God shall wipe away all tears from their eyes.' },
+    { ref: 'Revelation 22:1', text: 'A pure river of water of life, clear as crystal.' },
+    { ref: 'Revelation 21:23', text: 'The city had no need of the sun, for the glory of God did lighten it.' },
+  ],
+};
+
 // ─── Tour Scenes ──────────────────────────────────────────
 interface TourScene {
   id: string;
   label: string;
   subtitle: string;
-  start: number;  // progress 0-1
+  start: number;
   end: number;
   colors: { nebula: string[]; ambient: string; fog: string; accent: string };
   cameraPath: (t: number) => { x: number; y: number; z: number };
   particleColor: string;
   lightIntensity: number;
+  backdrop: string;
 }
 
 const TOUR_SCENES: TourScene[] = [
@@ -37,6 +91,7 @@ const TOUR_SCENES: TourScene[] = [
     cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 2) * 3, y: t * 4 - 2, z: -5 - t * 20 }),
     particleColor: '#4488FF',
     lightIntensity: 0.8,
+    backdrop: hdCreation,
   },
   {
     id: 'garden',
@@ -47,6 +102,7 @@ const TOUR_SCENES: TourScene[] = [
     cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 4) * 5, y: 1 + Math.sin(t * Math.PI * 2) * 2, z: -10 - t * 15 }),
     particleColor: '#88FF44',
     lightIntensity: 1.2,
+    backdrop: hdGarden,
   },
   {
     id: 'cross',
@@ -57,6 +113,7 @@ const TOUR_SCENES: TourScene[] = [
     cameraPath: (t) => ({ x: Math.cos(t * Math.PI) * 2, y: -1 + t * 6, z: -8 - t * 10 }),
     particleColor: '#FF4444',
     lightIntensity: 0.6,
+    backdrop: hdCross,
   },
   {
     id: 'resurrection',
@@ -67,6 +124,7 @@ const TOUR_SCENES: TourScene[] = [
     cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 3) * 4, y: 2 + t * 5, z: -5 - t * 25 }),
     particleColor: '#FFD700',
     lightIntensity: 2.0,
+    backdrop: hdResurrection,
   },
   {
     id: 'throne',
@@ -77,6 +135,7 @@ const TOUR_SCENES: TourScene[] = [
     cameraPath: (t) => ({ x: Math.sin(t * Math.PI * 6) * 6, y: Math.sin(t * Math.PI * 3) * 3, z: -15 - t * 20 }),
     particleColor: '#CC88FF',
     lightIntensity: 1.5,
+    backdrop: hdThrone,
   },
   {
     id: 'newJerusalem',
@@ -87,6 +146,7 @@ const TOUR_SCENES: TourScene[] = [
     cameraPath: (t) => ({ x: 0, y: t * 8, z: -5 - t * 15 }),
     particleColor: '#FFD700',
     lightIntensity: 3.0,
+    backdrop: hdNewJerusalem,
   },
 ];
 
@@ -99,6 +159,198 @@ function getCurrentScene(progress: number): TourScene {
 
 function getSceneLocalProgress(progress: number, scene: TourScene): number {
   return Math.max(0, Math.min(1, (progress - scene.start) / (scene.end - scene.start)));
+}
+
+// ─── Ambient Soundscapes (Web Audio API) ──────────────────
+const AMBIENT_CONFIGS: Record<string, { type: OscillatorType; freq: number; gain: number; lfoFreq: number; lfoDepth: number }[]> = {
+  creation: [
+    { type: 'sine', freq: 60, gain: 0.06, lfoFreq: 0.1, lfoDepth: 10 },
+    { type: 'sine', freq: 120, gain: 0.03, lfoFreq: 0.05, lfoDepth: 5 },
+    { type: 'sine', freq: 200, gain: 0.02, lfoFreq: 0.08, lfoDepth: 8 },
+  ],
+  garden: [
+    { type: 'sine', freq: 280, gain: 0.025, lfoFreq: 0.3, lfoDepth: 15 },
+    { type: 'sine', freq: 420, gain: 0.015, lfoFreq: 0.2, lfoDepth: 10 },
+    { type: 'triangle', freq: 180, gain: 0.02, lfoFreq: 0.15, lfoDepth: 12 },
+  ],
+  cross: [
+    { type: 'sawtooth', freq: 55, gain: 0.03, lfoFreq: 0.08, lfoDepth: 3 },
+    { type: 'sine', freq: 110, gain: 0.04, lfoFreq: 0.12, lfoDepth: 5 },
+    { type: 'sine', freq: 82, gain: 0.025, lfoFreq: 0.06, lfoDepth: 4 },
+  ],
+  resurrection: [
+    { type: 'sine', freq: 330, gain: 0.03, lfoFreq: 0.4, lfoDepth: 20 },
+    { type: 'sine', freq: 440, gain: 0.025, lfoFreq: 0.35, lfoDepth: 15 },
+    { type: 'triangle', freq: 550, gain: 0.02, lfoFreq: 0.3, lfoDepth: 12 },
+  ],
+  throne: [
+    { type: 'sine', freq: 220, gain: 0.03, lfoFreq: 0.15, lfoDepth: 8 },
+    { type: 'sine', freq: 330, gain: 0.02, lfoFreq: 0.1, lfoDepth: 6 },
+    { type: 'sine', freq: 440, gain: 0.015, lfoFreq: 0.2, lfoDepth: 10 },
+    { type: 'sine', freq: 660, gain: 0.01, lfoFreq: 0.12, lfoDepth: 5 },
+  ],
+  newJerusalem: [
+    { type: 'sine', freq: 396, gain: 0.025, lfoFreq: 0.25, lfoDepth: 12 },
+    { type: 'sine', freq: 528, gain: 0.02, lfoFreq: 0.2, lfoDepth: 10 },
+    { type: 'triangle', freq: 264, gain: 0.015, lfoFreq: 0.15, lfoDepth: 8 },
+    { type: 'sine', freq: 792, gain: 0.008, lfoFreq: 0.3, lfoDepth: 6 },
+  ],
+};
+
+function useAmbientSoundscape(sceneId: string, isPlaying: boolean) {
+  const ctxRef = useRef<AudioContext | null>(null);
+  const nodesRef = useRef<{ osc: OscillatorNode; gain: GainNode; lfo: OscillatorNode; lfoGain: GainNode }[]>([]);
+  const prevSceneRef = useRef('');
+
+  const cleanup = useCallback(() => {
+    nodesRef.current.forEach(n => {
+      try { n.osc.stop(); n.lfo.stop(); } catch {}
+    });
+    nodesRef.current = [];
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying || sceneId === prevSceneRef.current) return;
+    prevSceneRef.current = sceneId;
+
+    cleanup();
+
+    if (!ctxRef.current) {
+      try { ctxRef.current = new AudioContext(); } catch { return; }
+    }
+    const ctx = ctxRef.current;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const configs = AMBIENT_CONFIGS[sceneId] || AMBIENT_CONFIGS.creation;
+    const masterGain = ctx.createGain();
+    masterGain.gain.value = 0;
+    masterGain.connect(ctx.destination);
+    // Fade in
+    masterGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 2);
+
+    configs.forEach(cfg => {
+      const osc = ctx.createOscillator();
+      osc.type = cfg.type;
+      osc.frequency.value = cfg.freq;
+
+      const gain = ctx.createGain();
+      gain.gain.value = cfg.gain;
+
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = cfg.lfoFreq;
+
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = cfg.lfoDepth;
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start();
+      lfo.start();
+      nodesRef.current.push({ osc, gain, lfo, lfoGain });
+    });
+
+    return () => {};
+  }, [sceneId, isPlaying, cleanup]);
+
+  useEffect(() => {
+    return () => cleanup();
+  }, [cleanup]);
+}
+
+// ─── Backdrop Billboard ──────────────────────────────────
+function SceneBackdrop({ scene, localT }: { scene: TourScene; localT: number }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const texture = useLoader(THREE.TextureLoader, scene.backdrop);
+
+  useFrame(({ camera }) => {
+    if (!meshRef.current) return;
+    // Billboard: always face camera, positioned far behind scene
+    meshRef.current.quaternion.copy(camera.quaternion);
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 2, -50]}>
+      <planeGeometry args={[80, 45]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0.35 + localT * 0.25}
+        depthWrite={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
+// ─── Scripture Display ───────────────────────────────────
+function ScriptureOverlay({ sceneId, localT }: { sceneId: string; localT: number }) {
+  const verses = SCENE_SCRIPTURES[sceneId] || [];
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [opacity, setOpacity] = useState(0);
+  const timerRef = useRef(0);
+
+  useFrame((_, delta) => {
+    timerRef.current += delta;
+    // Cycle every 6 seconds
+    const cycleTime = 6;
+    const phase = timerRef.current % cycleTime;
+
+    if (phase < 0.8) {
+      // Fade in
+      setOpacity(Math.min(1, phase / 0.8));
+    } else if (phase > cycleTime - 0.8) {
+      // Fade out
+      setOpacity(Math.max(0, (cycleTime - phase) / 0.8));
+    } else {
+      setOpacity(1);
+    }
+
+    if (phase < delta && timerRef.current > 1) {
+      setCurrentIdx(prev => (prev + 1) % verses.length);
+    }
+  });
+
+  if (verses.length === 0) return null;
+  const verse = verses[currentIdx];
+
+  return (
+    <group position={[0, -0.8, -3]}>
+      {/* Scripture reference */}
+      <Text
+        position={[0, 0.15, 0]}
+        fontSize={0.06}
+        color="#FFD700"
+        anchorX="center"
+        outlineWidth={0.005}
+        outlineColor="#000"
+        maxWidth={3}
+      >
+        {verse.ref}
+      </Text>
+      {/* Scripture text */}
+      <Text
+        position={[0, 0, 0]}
+        fontSize={0.055}
+        color="#FFFFFF"
+        anchorX="center"
+        outlineWidth={0.004}
+        outlineColor="#000"
+        maxWidth={3}
+        textAlign="center"
+      >
+        {`"${verse.text}"`}
+      </Text>
+      {/* Fade mask via material opacity */}
+      <mesh position={[0, 0.05, -0.01]}>
+        <planeGeometry args={[3.5, 0.5]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0} depthWrite={false} />
+      </mesh>
+    </group>
+  );
 }
 
 // ─── WarpStars ────────────────────────────────────────────
@@ -165,7 +417,6 @@ function WarpStars({ progress, scene, avgVolume }: { progress: number; scene: To
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
 
-      // Tint stars with scene color
       colorObj.setRGB(
         colors[i3] * 0.6 + tintColor.r * 0.4,
         colors[i3 + 1] * 0.6 + tintColor.g * 0.4,
@@ -197,7 +448,6 @@ function CreationScene({ localT, avgVolume }: { localT: number; avgVolume: numbe
 
   return (
     <group ref={groupRef} position={[0, 0, -30]}>
-      {/* Swirling proto-matter */}
       {Array.from({ length: 12 }, (_, i) => {
         const angle = (i / 12) * Math.PI * 2;
         const r = 8 + i * 0.5;
@@ -213,7 +463,6 @@ function CreationScene({ localT, avgVolume }: { localT: number; avgVolume: numbe
           </mesh>
         );
       })}
-      {/* Central light burst */}
       <pointLight color="#FFFFFF" intensity={localT * 5 + avgVolume * 3} distance={40} />
       <mesh>
         <sphereGeometry args={[2 + localT * 3, 24, 24]} />
@@ -224,11 +473,8 @@ function CreationScene({ localT, avgVolume }: { localT: number; avgVolume: numbe
 }
 
 function GardenScene({ localT, avgVolume }: { localT: number; avgVolume: number }) {
-  const groupRef = useRef<THREE.Group>(null);
-
   return (
-    <group ref={groupRef} position={[0, -2, -25]}>
-      {/* Trees of life — glowing pillars */}
+    <group position={[0, -2, -25]}>
       {Array.from({ length: 8 }, (_, i) => {
         const angle = (i / 8) * Math.PI * 2;
         const r = 10;
@@ -238,22 +484,18 @@ function GardenScene({ localT, avgVolume }: { localT: number; avgVolume: number 
               <cylinderGeometry args={[0.3, 0.5, 8, 8]} />
               <meshStandardMaterial color="#44AA22" emissive="#22CC44" emissiveIntensity={0.4 + avgVolume * 0.3} transparent opacity={localT} />
             </mesh>
-            {/* Canopy */}
             <mesh position={[0, 5, 0]}>
               <sphereGeometry args={[2.5, 12, 8]} />
               <meshStandardMaterial color="#22CC44" emissive="#88FF44" emissiveIntensity={0.3 + avgVolume * 0.2} transparent opacity={localT * 0.7} />
             </mesh>
-            {/* Fruit glow */}
             <pointLight position={[0, 4, 0]} color="#FFD700" intensity={0.5 * localT} distance={8} />
           </group>
         );
       })}
-      {/* River of life */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.1, 0]}>
         <planeGeometry args={[3, 25]} />
         <meshBasicMaterial color="#44CCFF" transparent opacity={0.3 * localT} blending={THREE.AdditiveBlending} />
       </mesh>
-      {/* Warm golden sunlight */}
       <pointLight position={[0, 12, 0]} color="#FFD700" intensity={2 * localT} distance={30} />
     </group>
   );
@@ -263,13 +505,11 @@ function CrossScene({ localT, avgVolume }: { localT: number; avgVolume: number }
   const groupRef = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
-    // Slow dramatic rotation
     groupRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.2) * 0.05;
   });
 
   return (
     <group ref={groupRef} position={[0, 0, -20]}>
-      {/* The Cross — glowing beams */}
       <mesh position={[0, 2, 0]}>
         <boxGeometry args={[0.6, 10, 0.6]} />
         <meshStandardMaterial color="#8B4513" emissive="#FF2200" emissiveIntensity={0.3 + avgVolume * 0.5} transparent opacity={localT} />
@@ -278,19 +518,15 @@ function CrossScene({ localT, avgVolume }: { localT: number; avgVolume: number }
         <boxGeometry args={[6, 0.6, 0.6]} />
         <meshStandardMaterial color="#8B4513" emissive="#FF2200" emissiveIntensity={0.3 + avgVolume * 0.5} transparent opacity={localT} />
       </mesh>
-      {/* Blood-red glow at base */}
       <pointLight position={[0, 0, 2]} color="#FF0000" intensity={localT * 3} distance={15} />
-      {/* Crown of thorns ring */}
       <mesh position={[0, 7, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.8, 0.1, 8, 24]} />
         <meshStandardMaterial color="#8B6914" emissive="#FFD700" emissiveIntensity={0.5 * localT} transparent opacity={localT} />
       </mesh>
-      {/* Darkness effect — dark atmosphere */}
       <mesh position={[0, 5, 0]}>
         <sphereGeometry args={[20, 16, 16]} />
         <meshBasicMaterial color="#110000" transparent opacity={0.2 * localT} side={THREE.BackSide} />
       </mesh>
-      {/* Dramatic rays breaking through */}
       {localT > 0.5 && Array.from({ length: 6 }, (_, i) => {
         const angle = (i / 6) * Math.PI * 2;
         return (
@@ -313,7 +549,6 @@ function ResurrectionScene({ localT, avgVolume }: { localT: number; avgVolume: n
 
   return (
     <group ref={groupRef} position={[0, 0, -15]}>
-      {/* Burst of golden light */}
       <mesh>
         <sphereGeometry args={[3 + localT * 8, 32, 32]} />
         <meshBasicMaterial color="#FFD700" transparent opacity={localT * 0.4} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
@@ -322,7 +557,6 @@ function ResurrectionScene({ localT, avgVolume }: { localT: number; avgVolume: n
         <sphereGeometry args={[1 + localT * 4, 24, 24]} />
         <meshBasicMaterial color="#FFFFFF" transparent opacity={localT * 0.6} blending={THREE.AdditiveBlending} />
       </mesh>
-      {/* Radiating light shafts */}
       {Array.from({ length: 12 }, (_, i) => {
         const angle = (i / 12) * Math.PI * 2;
         return (
@@ -332,7 +566,6 @@ function ResurrectionScene({ localT, avgVolume }: { localT: number; avgVolume: n
           </mesh>
         );
       })}
-      {/* Empty tomb stone rolled away */}
       <mesh position={[5, -3, 0]} rotation={[0, 0, localT * Math.PI * 0.3]}>
         <cylinderGeometry args={[1.5, 1.5, 0.5, 16]} />
         <meshStandardMaterial color="#888888" emissive="#444444" emissiveIntensity={0.2} transparent opacity={localT * 0.8} />
@@ -351,7 +584,6 @@ function ThroneScene({ localT, avgVolume }: { localT: number; avgVolume: number 
 
   return (
     <group ref={groupRef} position={[0, 0, -25]}>
-      {/* Throne — golden stepped platform */}
       {[0, 1, 2].map(step => (
         <mesh key={step} position={[0, step * 1.5, 0]}>
           <boxGeometry args={[6 - step * 1.5, 1, 4 - step]} />
@@ -361,17 +593,14 @@ function ThroneScene({ localT, avgVolume }: { localT: number; avgVolume: number 
           />
         </mesh>
       ))}
-      {/* Throne seat */}
       <mesh position={[0, 5, -0.5]}>
         <boxGeometry args={[2.5, 3, 1]} />
         <meshStandardMaterial color="#FFD700" emissive="#FFAA00" emissiveIntensity={0.6} metalness={0.9} roughness={0.1} transparent opacity={localT} />
       </mesh>
-      {/* Rainbow around throne — Revelation 4:3 */}
-      <mesh position={[0, 6, 0]} rotation={[0, 0, 0]}>
+      <mesh position={[0, 6, 0]}>
         <torusGeometry args={[5, 0.3, 16, 64, Math.PI]} />
         <meshBasicMaterial color="#44FFAA" transparent opacity={0.4 * localT} blending={THREE.AdditiveBlending} />
       </mesh>
-      {/* 24 Elder seats in circle */}
       {Array.from({ length: 24 }, (_, i) => {
         const angle = (i / 24) * Math.PI * 2;
         const r = 12;
@@ -382,12 +611,10 @@ function ThroneScene({ localT, avgVolume }: { localT: number; avgVolume: number 
           </mesh>
         );
       })}
-      {/* Sea of glass */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
         <circleGeometry args={[15, 64]} />
         <meshPhysicalMaterial color="#88CCFF" transparent opacity={0.3 * localT} metalness={0.1} roughness={0.0} clearcoat={1} />
       </mesh>
-      {/* Four living creatures — 4 glowing orbs */}
       {[[-3, 3, 3], [3, 3, 3], [-3, 3, -3], [3, 3, -3]].map((pos, i) => (
         <group key={i} position={pos as [number, number, number]}>
           <mesh>
@@ -406,13 +633,12 @@ function NewJerusalemScene({ localT, avgVolume }: { localT: number; avgVolume: n
   const groupRef = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
-    groupRef.current.position.y = 10 - localT * 12; // Descending city
+    groupRef.current.position.y = 10 - localT * 12;
     groupRef.current.rotation.y = clock.getElapsedTime() * 0.08;
   });
 
   return (
     <group ref={groupRef} position={[0, 10, -30]}>
-      {/* City walls — 4 sides of golden cubic */}
       {[0, 1, 2, 3].map(side => {
         const angle = (side / 4) * Math.PI * 2;
         return (
@@ -425,7 +651,6 @@ function NewJerusalemScene({ localT, avgVolume }: { localT: number; avgVolume: n
           </mesh>
         );
       })}
-      {/* 12 Gates — pearls */}
       {Array.from({ length: 12 }, (_, i) => {
         const angle = (i / 12) * Math.PI * 2;
         return (
@@ -435,17 +660,14 @@ function NewJerusalemScene({ localT, avgVolume }: { localT: number; avgVolume: n
           </mesh>
         );
       })}
-      {/* Street of gold */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.1, 0]}>
         <planeGeometry args={[4, 20]} />
         <meshPhysicalMaterial color="#FFD700" emissive="#AA8800" emissiveIntensity={0.4} metalness={0.95} roughness={0.05} clearcoat={1} transparent opacity={localT * 0.7} />
       </mesh>
-      {/* River of life from throne */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.2, 0]}>
         <planeGeometry args={[1.5, 20]} />
         <meshBasicMaterial color="#44EEFF" transparent opacity={0.4 * localT} blending={THREE.AdditiveBlending} />
       </mesh>
-      {/* Tree of life */}
       <group position={[0, 0, 0]}>
         <mesh>
           <cylinderGeometry args={[0.4, 0.6, 6, 8]} />
@@ -456,7 +678,6 @@ function NewJerusalemScene({ localT, avgVolume }: { localT: number; avgVolume: n
           <meshStandardMaterial color="#22FF44" emissive="#88FF44" emissiveIntensity={0.4 + avgVolume * 0.3} transparent opacity={localT * 0.6} />
         </mesh>
       </group>
-      {/* Glory light — no need for sun */}
       <pointLight position={[0, 15, 0]} color="#FFFFFF" intensity={localT * 10} distance={50} />
       <pointLight position={[0, 5, 0]} color="#FFD700" intensity={localT * 5 + avgVolume * 3} distance={30} />
     </group>
@@ -584,7 +805,6 @@ function ProgressRing({ progress, color }: { progress: number; color: string }) 
 
 // ─── Scene Transition Overlay ─────────────────────────────
 function SceneTransition({ progress, scenes }: { progress: number; scenes: TourScene[] }) {
-  // Show brief flash at scene boundaries
   const isTransitioning = useMemo(() => {
     for (const scene of scenes) {
       const dist = Math.abs(progress - scene.start);
@@ -626,6 +846,9 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
   const localT = getSceneLocalProgress(audioState.progress, currentScene);
   const speed = 0.3 + localT * 0.7 + avgVolume * 0.3;
 
+  // Ambient soundscape
+  useAmbientSoundscape(currentScene.id, audioState.isPlaying);
+
   // Camera flythrough path
   useFrame(({ clock }) => {
     if (!cameraGroupRef.current) return;
@@ -634,7 +857,6 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
     target.x += (camPos.x * 0.3 - target.x) * 0.02;
     target.y += (camPos.y * 0.3 - target.y) * 0.02;
 
-    // Audio-reactive shake
     const t = clock.getElapsedTime();
     const shakeX = Math.sin(t * 17) * bassVolume * 0.03;
     const shakeY = Math.cos(t * 13) * bassVolume * 0.02;
@@ -652,6 +874,9 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
         {/* Scene accent lights */}
         <pointLight position={[-5, 3, -5]} color={currentScene.colors.accent} intensity={currentScene.lightIntensity + avgVolume * 0.8} distance={25} />
         <pointLight position={[5, 3, -5]} color={currentScene.colors.nebula[1] || currentScene.colors.accent} intensity={1 + avgVolume * 0.6} distance={20} />
+
+        {/* Backdrop image */}
+        <SceneBackdrop scene={currentScene} localT={localT} />
 
         {/* Warp stars */}
         <WarpStars progress={audioState.progress} scene={currentScene} avgVolume={avgVolume} />
@@ -695,10 +920,13 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
           {currentScene.label}
         </Text>
 
-        {/* Scripture subtitle */}
+        {/* Scripture subtitle (original) */}
         <Text position={[0, 1.9, -3]} fontSize={0.07} color="#CCCCAA" anchorX="center" maxWidth={3}>
           {currentScene.subtitle}
         </Text>
+
+        {/* Cycling scripture overlay */}
+        <ScriptureOverlay sceneId={currentScene.id} localT={localT} />
 
         {/* Play/Pause button */}
         <Interactive onSelect={audioControls.togglePlayPause}>
