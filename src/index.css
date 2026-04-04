@@ -1044,3 +1044,51 @@ All colors MUST be HSL.
   height: 1px;
   background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), transparent);
 }
+
+/* === Spin animation for rotating conic-gradient borders === */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* === Eden Hero moving light particles === */
+.eden-light {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.25;
+  animation: eden-float 8s ease-in-out infinite;
+}
+.eden-light-1 {
+  width: 300px; height: 300px;
+  background: hsl(40 90% 50%);
+  top: -80px; left: 10%;
+  animation-duration: 7s;
+}
+.eden-light-2 {
+  width: 250px; height: 250px;
+  background: hsl(270 60% 50%);
+  top: -40px; right: 15%;
+  animation-duration: 9s;
+  animation-delay: -3s;
+}
+.eden-light-3 {
+  width: 200px; height: 200px;
+  background: hsl(340 70% 50%);
+  bottom: -60px; left: 30%;
+  animation-duration: 11s;
+  animation-delay: -5s;
+}
+.eden-light-4 {
+  width: 180px; height: 180px;
+  background: hsl(200 80% 50%);
+  bottom: -30px; right: 25%;
+  animation-duration: 10s;
+  animation-delay: -2s;
+}
+@keyframes eden-float {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+  25% { transform: translate(30px, -20px) scale(1.1); opacity: 0.35; }
+  50% { transform: translate(-20px, 15px) scale(0.95); opacity: 0.25; }
+  75% { transform: translate(15px, 25px) scale(1.05); opacity: 0.3; }
+}
