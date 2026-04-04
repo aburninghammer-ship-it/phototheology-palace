@@ -387,11 +387,13 @@ export default function PhototheologyTicTacToe() {
                       ${isWinningCell ? 'ring-4 ring-yellow-400 bg-yellow-400/20' : ''}
                     `}
                   >
-                    <AnimatePresence>
+                    <AnimatePresence mode="wait">
                       {cell && (
                         <motion.span
+                          key={`cell-${index}-${cell}`}
                           initial={{ scale: 0, rotate: -180 }}
                           animate={{ scale: 1, rotate: 0 }}
+                          exit={{ scale: 0 }}
                           className={cell === 'X' ? 'text-blue-400' : 'text-pink-400'}
                         >
                           {cell === 'X' ? <X className="w-16 h-16 sm:w-20 sm:h-20" /> : <Circle className="w-16 h-16 sm:w-20 sm:h-20" />}
