@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Q1_2026_LESSONS, Q1_2026_TITLE, Q1_2026_DESCRIPTION, Q1_2026_QUARTER } from "@/data/quarterlyQ1_2026";
+import { Q2_2026_LESSONS, Q2_2026_TITLE, Q2_2026_DESCRIPTION, Q2_2026_QUARTER } from "@/data/quarterlyQ2_2026";
 import { q4_2025_lessons } from "@/data/q4-2025-lesson-content";
 
 export interface QuarterlyLesson {
