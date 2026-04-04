@@ -1,13 +1,15 @@
-import { useMemo, useRef, useState, Suspense } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { Text, Instances, Instance } from '@react-three/drei';
+import { useMemo, useRef, useState, useEffect, Suspense } from 'react';
+import { useFrame, useThree, useLoader } from '@react-three/fiber';
+import { Text } from '@react-three/drei';
 import { TeleportationPlane, Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
+// Import genesis images
+import { genesisImages } from '@/assets/24fps/genesis';
+
 // Import all bible sets from allBooks
 import {
-  genesisSet,
   type ChapterFrame,
   type BibleSet,
 } from '@/data/bible24fps/allBooks';
@@ -55,6 +57,27 @@ function getAllChapters(): ChapterFrame[] {
   return chapters;
 }
 
+// Build a map of genesis chapter number -> image URL
+function getGenesisImageUrl(book: string, chapter: number): string | null {
+  if (book !== 'Genesis') return null;
+  const idx = chapter - 1;
+  if (idx >= 0 && idx < genesisImages.length) {
+    return genesisImages[idx];
+  }
+  return null;
+}
+
+// Component that loads and displays an actual image texture
+function ImageFrame({ imageUrl, width, height }: { imageUrl: string; width: number; height: number }) {
+  const texture = useLoader(THREE.TextureLoader, imageUrl);
+  return (
+    <mesh position={[0, 0.2, 0.002]}>
+      <planeGeometry args={[width, height]} />
+      <meshBasicMaterial map={texture} />
+    </mesh>
+  );
+}
+
 interface FrameLabelProps {
   frame: ChapterFrame;
   position: [number, number, number];
@@ -64,6 +87,7 @@ interface FrameLabelProps {
 
 function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
   const [hovered, setHovered] = useState(false);
+  const imageUrl = getGenesisImageUrl(frame.book, frame.chapter);
 
   return (
     <group position={position} rotation={rotation}>
@@ -103,24 +127,37 @@ function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
         </mesh>
       </Interactive>
 
-      {/* Colored image area (top half) — more vibrant */}
-      <mesh position={[0, 0.2, 0.001]}>
-        <planeGeometry args={[0.74, 0.52]} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={hovered ? 0.3 : 0.12}
-          transparent
-          opacity={0.35}
-        />
-      </mesh>
+      {/* Actual image if available, otherwise colored placeholder with symbol */}
+      {imageUrl ? (
+        <Suspense fallback={
+          <mesh position={[0, 0.2, 0.001]}>
+            <planeGeometry args={[0.74, 0.52]} />
+            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.12} transparent opacity={0.35} />
+          </mesh>
+        }>
+          <ImageFrame imageUrl={imageUrl} width={0.74} height={0.52} />
+        </Suspense>
+      ) : (
+        <>
+          {/* Colored image area (fallback for non-Genesis) */}
+          <mesh position={[0, 0.2, 0.001]}>
+            <planeGeometry args={[0.74, 0.52]} />
+            <meshStandardMaterial
+              color={color}
+              emissive={color}
+              emissiveIntensity={hovered ? 0.3 : 0.12}
+              transparent
+              opacity={0.35}
+            />
+          </mesh>
+          {/* Large symbol as visual centerpiece */}
+          <Text position={[0, 0.22, 0.01]} fontSize={0.24} anchorX="center" anchorY="middle" color={color}>
+            {frame.symbol}
+          </Text>
+        </>
+      )}
 
-      {/* Large symbol as visual centerpiece */}
-      <Text position={[0, 0.22, 0.01]} fontSize={0.24} anchorX="center" anchorY="middle" color={color}>
-        {frame.symbol}
-      </Text>
-
-      {/* Color accent bar — brighter */}
+      {/* Color accent bar */}
       <mesh position={[0, -0.08, 0.001]}>
         <planeGeometry args={[0.74, 0.025]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.2} />
@@ -142,6 +179,75 @@ function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
       </Text>
     </group>
   );
+}
+
+// Keyboard + mouse navigation controller
+function WalkController() {
+  const { camera, gl } = useThree();
+  const keysRef = useRef<Set<string>>(new Set());
+  const isDragging = useRef(false);
+  const lastMouse = useRef({ x: 0, y: 0 });
+  const yaw = useRef(0);
+  const pitch = useRef(0);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => keysRef.current.add(e.key.toLowerCase());
+    const handleKeyUp = (e: KeyboardEvent) => keysRef.current.delete(e.key.toLowerCase());
+
+    const handleMouseDown = (e: MouseEvent) => {
+      isDragging.current = true;
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+    };
+    const handleMouseUp = () => { isDragging.current = false; };
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const dx = e.clientX - lastMouse.current.x;
+      const dy = e.clientY - lastMouse.current.y;
+      yaw.current -= dx * 0.003;
+      pitch.current -= dy * 0.003;
+      pitch.current = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, pitch.current));
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    const canvas = gl.domElement;
+    canvas.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [gl]);
+
+  useFrame((_, delta) => {
+    const speed = 4 * delta;
+    const keys = keysRef.current;
+
+    // Build direction from yaw
+    const forward = new THREE.Vector3(-Math.sin(yaw.current), 0, -Math.cos(yaw.current));
+    const right = new THREE.Vector3(Math.cos(yaw.current), 0, -Math.sin(yaw.current));
+
+    if (keys.has('w') || keys.has('arrowup')) camera.position.addScaledVector(forward, speed);
+    if (keys.has('s') || keys.has('arrowdown')) camera.position.addScaledVector(forward, -speed);
+    if (keys.has('a') || keys.has('arrowleft')) camera.position.addScaledVector(right, -speed);
+    if (keys.has('d') || keys.has('arrowright')) camera.position.addScaledVector(right, speed);
+
+    // Clamp position within corridor
+    camera.position.x = Math.max(-2.5, Math.min(2.5, camera.position.x));
+    camera.position.y = 0;
+
+    // Apply rotation from mouse drag
+    const euler = new THREE.Euler(pitch.current, yaw.current, 0, 'YXZ');
+    camera.quaternion.setFromEuler(euler);
+  });
+
+  return null;
 }
 
 interface GalleryCorridorProps {
@@ -177,7 +283,6 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
     }
 
     if (startIdx === Infinity) { startIdx = 0; endIdx = 50; }
-    // Add buffer
     startIdx = Math.max(0, startIdx - 4);
     endIdx = Math.min(allChapters.length - 1, endIdx + 4);
 
@@ -194,13 +299,11 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
     }));
   }, [allChapters, visibleRange]);
 
-  // Only render lights near the camera
   const visibleLightIndices = useMemo(() => {
     const indices: number[] = [];
     const totalLights = Math.ceil(allChapters.length / 40);
     for (let i = 0; i < totalLights; i++) {
       const lightZ = -i * FRAME_SPACING * 20;
-      // Use a broader range for lights since they illuminate a large area
       if (Math.abs(lightZ - (visibleRange.startIdx > 0 ? -Math.floor(visibleRange.startIdx / 2) * FRAME_SPACING : 0)) < CULL_DISTANCE + 20) {
         indices.push(i);
       }
@@ -210,6 +313,9 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
 
   return (
     <group>
+      {/* Keyboard + mouse walk controller */}
+      <WalkController />
+
       {/* Rich ambient lighting */}
       <ambientLight intensity={0.4} color="#e8d0ff" />
 
@@ -234,7 +340,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
       {/* Fog for atmospheric depth */}
       <fog attach="fog" args={['#0a0a18', 8, 40]} />
 
-      {/* Teleportation plane */}
+      {/* Teleportation plane for VR controllers */}
       <TeleportationPlane leftHand rightHand maxDistance={20} />
 
       {/* Rich marble floor */}
@@ -249,7 +355,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
         <meshStandardMaterial color="#2a1830" emissive="#4400AA" emissiveIntensity={0.03} metalness={0.3} roughness={0.6} />
       </mesh>
 
-      {/* Left wall — deeper color */}
+      {/* Left wall */}
       <mesh position={[-WALL_OFFSET - 0.5, 1, -CORRIDOR_LENGTH / 2]}>
         <boxGeometry args={[0.15, 5, CORRIDOR_LENGTH + 10]} />
         <meshStandardMaterial color="#2a1840" roughness={0.7} />
@@ -271,7 +377,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
         <meshStandardMaterial color="#FFD700" emissive="#FFD700" emissiveIntensity={0.2} metalness={0.9} roughness={0.15} />
       </mesh>
 
-      {/* Vaulted ceiling — arched */}
+      {/* Vaulted ceiling */}
       <mesh position={[0, 3.8, -CORRIDOR_LENGTH / 2]}>
         <boxGeometry args={[8.2, 0.15, CORRIDOR_LENGTH + 10]} />
         <meshStandardMaterial color="#0a0a15" roughness={0.9} />
@@ -296,13 +402,18 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
         );
       })}
 
-      {/* Entrance label — more prominent */}
-      <Text position={[0, 2, 2]} fontSize={0.28} color="#44AAFF" anchorX="center" outlineWidth={0.012} outlineColor="#000">
-        24FPS Bible Gallery
-      </Text>
-      <Text position={[0, 1.6, 2]} fontSize={0.1} color="#AAAACC" anchorX="center">
-        Genesis 1 → Revelation 22 — {allChapters.length} chapter frames
-      </Text>
+      {/* Entrance label */}
+      <Suspense fallback={null}>
+        <Text position={[0, 2, 2]} fontSize={0.28} color="#44AAFF" anchorX="center" outlineWidth={0.012} outlineColor="#000">
+          24FPS Bible Gallery
+        </Text>
+        <Text position={[0, 1.6, 2]} fontSize={0.1} color="#AAAACC" anchorX="center">
+          Genesis 1 → Revelation 22 — {allChapters.length} chapter frames
+        </Text>
+        <Text position={[0, 1.2, 2]} fontSize={0.08} color="#88AACC" anchorX="center">
+          WASD or Arrow Keys to walk • Click + Drag to look around
+        </Text>
+      </Suspense>
 
       {/* Back button */}
       <BackToLobbyButton onBack={onBack} />
