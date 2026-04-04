@@ -66,7 +66,7 @@ const Bible = () => {
         <div className="container mx-auto max-w-7xl">
 
           {/* Header - Glass Card */}
-          <div className="glass-card mb-8 p-6 rounded-2xl">
+          <div className="glass-card mb-4 sm:mb-8 p-3 sm:p-6 rounded-xl sm:rounded-2xl">
             <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <img 
