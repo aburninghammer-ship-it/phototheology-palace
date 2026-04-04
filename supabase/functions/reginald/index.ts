@@ -1,9 +1,62 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// In-memory cache for knowledge updates (refreshed every 6 hours per cold start)
+let cachedKnowledge: string | null = null;
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+async function getKnowledgeUpdates(): Promise<string> {
+  const now = Date.now();
+  if (cachedKnowledge && (now - cacheTimestamp) < CACHE_TTL_MS) {
+    return cachedKnowledge;
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data, error } = await supabase
+      .from("reginald_knowledge_updates")
+      .select("category, title, content")
+      .eq("is_active", true)
+      .order("priority", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error || !data || data.length === 0) {
+      cachedKnowledge = "";
+      cacheTimestamp = now;
+      return "";
+    }
+
+    const sections: Record<string, string[]> = {};
+    for (const entry of data) {
+      const cat = entry.category || "general";
+      if (!sections[cat]) sections[cat] = [];
+      sections[cat].push(`• ${entry.title}: ${entry.content}`);
+    }
+
+    let block = "\n\n──── LATEST PLATFORM UPDATES (auto-refreshed) ────\n";
+    for (const [cat, items] of Object.entries(sections)) {
+      block += `\n**${cat.toUpperCase()}:**\n${items.join("\n")}\n`;
+    }
+    block += "\nUse these updates when users ask about new features or recent changes.\n";
+
+    cachedKnowledge = block;
+    cacheTimestamp = now;
+    return block;
+  } catch (e) {
+    console.error("[REGINALD] Failed to fetch knowledge updates:", e);
+    return cachedKnowledge || "";
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
