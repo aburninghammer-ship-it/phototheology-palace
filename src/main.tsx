@@ -25,6 +25,7 @@ const previewFreshnessKey = "__preview_sw_freshened_v2__";
 const chunkReloadKey = "__chunk_reload_once__";
 const metaForceReloadKey = "__meta_force_reload_v2__";
 const questBuildRefreshKeyPrefix = "__quest_build_refresh__:";
+const standardBuildRefreshKeyPrefix = "__standard_build_refresh__:";
 
 function readCurrentBuildTag() {
   return document.querySelector('meta[name="app-build"]')?.getAttribute("content") ?? null;
@@ -60,18 +61,26 @@ async function hardRefresh(cacheBusterKey: string) {
   }
 }
 
-async function maybeRefreshQuestBuild() {
+async function maybeRefreshForNewBuild(refreshKeyPrefix: string, cacheBusterKey: string) {
   const currentBuild = readCurrentBuildTag();
   if (!currentBuild) return;
 
   const nextBuild = await fetchLatestBuildTag().catch(() => null);
   if (!nextBuild || nextBuild === currentBuild) return;
 
-  const refreshKey = `${questBuildRefreshKeyPrefix}${nextBuild}`;
+  const refreshKey = `${refreshKeyPrefix}${nextBuild}`;
   if (sessionStorage.getItem(refreshKey) === "1") return;
 
   sessionStorage.setItem(refreshKey, "1");
-  await hardRefresh("__quest_refresh");
+  await hardRefresh(cacheBusterKey);
+}
+
+async function maybeRefreshQuestBuild() {
+  await maybeRefreshForNewBuild(questBuildRefreshKeyPrefix, "__quest_refresh");
+}
+
+async function maybeRefreshStandardBuild() {
+  await maybeRefreshForNewBuild(standardBuildRefreshKeyPrefix, "__app_refresh");
 }
 
 function reloadOnce(key: string) {
@@ -168,12 +177,38 @@ if ("serviceWorker" in navigator) {
       );
     })();
   } else {
-    // Production: let PWAUpdatePrompt (useRegisterSW) handle updates & prompt.
-    // Still force an update check so Quest picks up the newest SW as soon as possible.
-    void navigator.serviceWorker
-      .getRegistration()
-      .then((registration) => registration?.update())
-      .catch(() => undefined);
+    // Production: proactively detect newer builds and hard-refresh so published
+    // users are not stuck on an older shell waiting for the SW prompt.
+    void (async () => {
+      const checkForStandardUpdate = () => {
+        void navigator.serviceWorker
+          .getRegistration()
+          .then((registration) => registration?.update())
+          .catch(() => undefined);
+        void maybeRefreshStandardBuild();
+      };
+
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === "visible") {
+          checkForStandardUpdate();
+        }
+      };
+
+      checkForStandardUpdate();
+
+      const intervalId = window.setInterval(checkForStandardUpdate, 60_000);
+      window.addEventListener("focus", checkForStandardUpdate);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+      window.addEventListener(
+        "beforeunload",
+        () => {
+          window.clearInterval(intervalId);
+          window.removeEventListener("focus", checkForStandardUpdate);
+          document.removeEventListener("visibilitychange", handleVisibilityChange);
+        },
+        { once: true },
+      );
+    })();
   }
 }
 
