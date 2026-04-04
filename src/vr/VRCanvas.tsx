@@ -1,6 +1,6 @@
 import React, { useState, Suspense, useCallback, useRef, useEffect, useMemo, Component, type ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { XR, VRButton, ARButton, useXR, Controllers, Hands } from '@react-three/xr';
+import { XR, VRButton, ARButton, useXR, Controllers, Hands, Interactive } from '@react-three/xr';
 import { OrbitControls, Environment, Text } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette, ToneMapping, HueSaturation, BrightnessContrast } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
@@ -154,6 +154,49 @@ function XRSceneAnchor({ children }: { children: React.ReactNode }) {
   return <group position={sceneOffset}>{children}</group>;
 }
 
+/** 3D reload button visible inside XR sessions (HTML overlays are hidden in immersive mode) */
+function VRReloadButton() {
+  const { isPresenting } = useXR();
+  const [hovered, setHovered] = useState(false);
+
+  if (!isPresenting) return null;
+
+  return (
+    <group position={[2, 2.8, -2]}>
+      <Interactive
+        onSelect={() => window.location.reload()}
+        onHover={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
+      >
+        <mesh>
+          <planeGeometry args={[0.6, 0.2]} />
+          <meshBasicMaterial
+            color={hovered ? '#6366f1' : '#333'}
+            transparent
+            opacity={0.85}
+          />
+        </mesh>
+      </Interactive>
+      {/* Border */}
+      <mesh position={[0, 0, -0.001]}>
+        <planeGeometry args={[0.64, 0.24]} />
+        <meshBasicMaterial color={hovered ? '#818cf8' : '#555'} transparent opacity={0.6} />
+      </mesh>
+      <Suspense fallback={null}>
+        <Text
+          position={[0, 0, 0.001]}
+          fontSize={0.07}
+          color="#fff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          ↻ Reload
+        </Text>
+      </Suspense>
+    </group>
+  );
+}
+
 function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperience?: VRExperience; onBackToHub?: () => void }) {
   const [currentExperience, setCurrentExperience] = useState<VRExperience>(initialExperience);
   const [displayedExperience, setDisplayedExperience] = useState<VRExperience>(initialExperience);
@@ -198,6 +241,7 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
       <DesktopControls />
       <Controllers rayMaterial={{ color: '#6366f1' }} />
       <Hands />
+      <VRReloadButton />
 
       <XRSceneAnchor>
         <mesh renderOrder={-1}>
