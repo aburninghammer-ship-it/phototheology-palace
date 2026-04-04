@@ -208,8 +208,8 @@ export const OsSpacesWelcome = () => {
   // Mode-aware hero text
   const heroTitle = user
     ? isSimple
-      ? "Welcome back"
-      : "Welcome back, Phototheologist"
+      ? "Explore the Bible"
+      : "Explore the Bible, Phototheologist"
     : isSimple
       ? "Explore the Bible"
       : "The Art of Phototheology";
