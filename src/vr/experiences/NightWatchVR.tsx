@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState, useCallback, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { StarField } from '../components/StarField';
@@ -136,7 +136,95 @@ function MeditationParticles({ count = 40, brightness = 1 }: { count?: number; b
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <sphereGeometry args={[1, 6, 6]} />
-      <meshBasicMaterial color="#7C3AED" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <meshBasicMaterial color="#8899cc" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+// Shooting stars — occasional bright streaks across the sky
+function ShootingStars() {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const count = 5;
+
+  const stars = useMemo(() =>
+    Array.from({ length: count }, () => ({
+      x: (Math.random() - 0.5) * 40,
+      y: 15 + Math.random() * 20,
+      z: -20 - Math.random() * 30,
+      speed: 8 + Math.random() * 12,
+      angle: -0.3 - Math.random() * 0.4,
+      offset: Math.random() * 60,
+      length: 0.3 + Math.random() * 0.5,
+    })),
+  []);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    stars.forEach((s, i) => {
+      const cycle = ((t + s.offset) % 20) / 20;
+      const visible = cycle < 0.05;
+      const progress = visible ? cycle / 0.05 : 0;
+      dummy.position.set(
+        s.x + progress * s.speed * 3,
+        s.y - progress * s.speed * Math.abs(s.angle) * 3,
+        s.z,
+      );
+      dummy.scale.setScalar(visible ? s.length * (1 - progress * 0.5) : 0);
+      dummy.rotation.z = s.angle;
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+    (meshRef.current.material as THREE.MeshBasicMaterial).opacity = 0.9;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <planeGeometry args={[2, 0.02]} />
+      <meshBasicMaterial color="#FFFFFF" transparent opacity={0.9} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+// Fireflies near ground — warm yellowish dots that drift lazily
+function Fireflies({ count = 25 }: { count?: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  const flies = useMemo(() =>
+    Array.from({ length: count }, () => ({
+      x: (Math.random() - 0.5) * 12,
+      y: -1 + Math.random() * 1.5,
+      z: (Math.random() - 0.5) * 12 - 2,
+      speed: 0.2 + Math.random() * 0.3,
+      wobble: Math.random() * Math.PI * 2,
+      blinkPhase: Math.random() * Math.PI * 2,
+    })),
+  [count]);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    flies.forEach((f, i) => {
+      const blink = Math.max(0, Math.sin(t * 2 + f.blinkPhase));
+      dummy.position.set(
+        f.x + Math.sin(t * f.speed + f.wobble) * 0.8,
+        f.y + Math.sin(t * 0.5 + f.wobble) * 0.3,
+        f.z + Math.cos(t * f.speed * 0.7 + f.wobble) * 0.6,
+      );
+      dummy.scale.setScalar(0.02 * blink);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <sphereGeometry args={[1, 4, 4]} />
+      <meshBasicMaterial color="#FFEE88" transparent opacity={0.8} blending={THREE.AdditiveBlending} depthWrite={false} />
     </instancedMesh>
   );
 }
@@ -218,26 +306,40 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
 
   return (
     <group>
-      {/* Deep space backdrop */}
-      <StarField count={2500} radius={60} brightness={screen === 'playing' ? 0.6 + avgVolume * 0.4 : 0.8} />
-      <NebulaClouds count={8} radius={35} colors={['#2e1065', '#6B21A8', '#4338CA', '#C026D3']} opacity={0.1 + avgVolume * 0.1} />
+      {/* HDRI night sky for IBL reflections */}
+      <Environment preset="night" background />
 
-      {/* Subtle floor */}
+      {/* Vast star field */}
+      <StarField count={3500} radius={60} brightness={screen === 'playing' ? 0.7 + avgVolume * 0.3 : 0.9} />
+      <NebulaClouds count={8} radius={35} colors={['#0a1030', '#1a2060', '#0d1840', '#0a0828']} opacity={0.08 + avgVolume * 0.06} />
+
+      {/* Shooting stars */}
+      <ShootingStars />
+
+      {/* Fireflies near ground */}
+      <Fireflies count={20} />
+
+      {/* Stone platform / clearing */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
-        <planeGeometry args={[20, 20]} />
-        <meshPhysicalMaterial color="#080818" metalness={0.4} roughness={0.4} clearcoat={0.6} clearcoatRoughness={0.2} />
+        <circleGeometry args={[8, 32]} />
+        <meshPhysicalMaterial color="#1a1a2a" metalness={0.3} roughness={0.6} clearcoat={0.4} clearcoatRoughness={0.4} />
+      </mesh>
+      {/* Stone platform rim */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.19, 0]}>
+        <ringGeometry args={[7.5, 8.2, 32]} />
+        <meshPhysicalMaterial color="#2a2a3a" metalness={0.4} roughness={0.5} />
       </mesh>
 
-      {/* Lighting */}
-      <ambientLight intensity={0.15} color="#ccccee" />
-      <directionalLight position={[0, 8, -5]} intensity={0.3} color="#8899ff" />
-      <directionalLight position={[-5, 3, 2]} intensity={0.15} color="#C026D3" />
-      <pointLight position={[0, 3, -2]} intensity={0.4 + avgVolume * 0.3} color="#7C3AED" distance={12} />
-      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#C026D3" distance={8} />
+      {/* Moonlight — cool directional from above */}
+      <ambientLight intensity={0.08} color="#8899cc" />
+      <directionalLight position={[2, 12, -8]} intensity={0.5} color="#aabbee" />
+      <directionalLight position={[-5, 3, 2]} intensity={0.1} color="#667799" />
+      <pointLight position={[0, 3, -2]} intensity={0.3 + avgVolume * 0.3} color="#6677aa" distance={12} />
+      <pointLight position={[-3, 2, -4]} intensity={0.2 + avgVolume * 0.2} color="#556699" distance={8} />
 
-      <fog attach="fog" args={['#060818', 12, 50]} />
+      <fog attach="fog" args={['#040810', 15, 55]} />
 
-      <MeditationParticles brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
+      <MeditationParticles count={50} brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
 
       {/* ─── MENU SCREEN ─── */}
       {screen === 'menu' && (

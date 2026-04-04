@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo, Suspense } from 'react';
-import { Text } from '@react-three/drei';
+import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -194,10 +194,13 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
 
   return (
     <group>
+      {/* Environment IBL for neon reflections */}
+      <Environment preset="city" />
+
       {/* Dark reflective floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]} receiveShadow>
         <planeGeometry args={[20, 20]} />
-        <meshPhysicalMaterial color="#050510" metalness={0.8} roughness={0.2} clearcoat={0.6} clearcoatRoughness={0.15} />
+        <meshPhysicalMaterial color="#050510" metalness={0.85} roughness={0.15} clearcoat={0.7} clearcoatRoughness={0.1} envMapIntensity={0.3} />
       </mesh>
 
       {/* Neon grid on floor */}
@@ -229,8 +232,8 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
       <NeonTube position={[-4, 0.5, -6]} color="#FF4444" />
       <NeonTube position={[4, 0.5, -6]} color="#4488FF" />
 
-      {/* Floating particles */}
-      <ArcadeParticles />
+      {/* Floating particles — doubled */}
+      <ArcadeParticles count={120} />
 
       {/* Fog for atmosphere */}
       <fog attach="fog" args={['#050510', 10, 25]} />

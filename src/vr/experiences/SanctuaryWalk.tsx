@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, Suspense, useCallback } from 'react';
-import { Text } from '@react-three/drei';
+import { Text, Environment } from '@react-three/drei';
 import { TeleportationPlane, Interactive, useController } from '@react-three/xr';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -265,27 +265,24 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
   return (
     <>
     <group ref={sceneRef}>
+      {/* HDRI sunset sky — warm desert environment */}
+      <Environment preset="sunset" background />
+
       {/* Rich warm lighting */}
-      <ambientLight intensity={0.3} color="#fff5e6" />
-      <directionalLight position={[5, 10, 5]} intensity={1} color="#ffe8c4" castShadow />
-      <directionalLight position={[-5, 4, -3]} intensity={0.4} color="#ffd088" />
+      <ambientLight intensity={0.4} color="#fff5e6" />
+      <directionalLight position={[5, 10, 5]} intensity={1.2} color="#ffe8c4" castShadow />
+      <directionalLight position={[-5, 4, -3]} intensity={0.5} color="#ffd088" />
       <directionalLight position={[0, 2, 8]} intensity={0.3} color="#ffe8d0" />
 
-      {/* Sky dome — warm desert gradient */}
-      <mesh>
-        <sphereGeometry args={[60, 24, 16]} />
-        <meshBasicMaterial color="#1a1520" side={THREE.BackSide} />
-      </mesh>
-
-      {/* Fog for depth */}
-      <fog attach="fog" args={['#1a1520', 12, 45]} />
+      {/* Warm desert fog for depth */}
+      <fog attach="fog" args={['#2a1f15', 15, 50]} />
 
       <TeleportationPlane leftHand rightHand maxDistance={20} />
 
       {/* Rich ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -18]} receiveShadow>
         <planeGeometry args={[14, 55]} />
-        <meshPhysicalMaterial color="#3a2a1a" roughness={0.7} metalness={0.2} clearcoat={0.3} clearcoatRoughness={0.8} />
+        <meshPhysicalMaterial color="#3a2a1a" roughness={0.7} metalness={0.2} clearcoat={0.3} clearcoatRoughness={0.8} envMapIntensity={0.2} />
       </mesh>
 
       {/* Decorative path center */}
@@ -334,7 +331,7 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
           <pointLight position={[0, 3, -3]} color={zone.ambientColor} intensity={0.8} distance={12} />
 
           {/* Floating incense/dust particles */}
-          <IncenseParticles position={[0, 0, -2]} color={zone.color} count={30} />
+          <IncenseParticles position={[0, 0, -2]} color={zone.color} count={45} />
 
           {zone.elements.map((el, i) => {
             const spacing = 2.5;

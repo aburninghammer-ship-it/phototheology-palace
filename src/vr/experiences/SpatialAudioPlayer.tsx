@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { StarField } from '../components/StarField';
@@ -578,16 +578,19 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
 
   return (
     <group>
-      <StarField count={2500} radius={80} />
-      <NebulaClouds count={10} radius={50} colors={['#6622AA', '#2244AA', '#4400AA', '#220066']} opacity={0.1} />
-      <ambientLight intensity={0.12} color="#4466aa" />
-      <directionalLight position={[0, 5, -3]} intensity={0.3} color="#4466aa" />
-      <directionalLight position={[-4, 3, 2]} intensity={0.2} color="#6622AA" />
+      {/* HDRI for cinematic IBL reflections */}
+      <Environment preset="night" />
+
+      <StarField count={3000} radius={80} />
+      <NebulaClouds count={10} radius={50} colors={['#0a1040', '#182060', '#0c0830', '#060420']} opacity={0.1} />
+      <ambientLight intensity={0.1} color="#334466" />
+      <directionalLight position={[0, 5, -3]} intensity={0.35} color="#4466aa" />
+      <directionalLight position={[-4, 3, 2]} intensity={0.2} color="#442266" />
 
       {/* Dark reflective floor with blue emissive */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]} receiveShadow>
         <circleGeometry args={[15, 32]} />
-        <meshPhysicalMaterial color="#080816" emissive="#112244" emissiveIntensity={0.1} metalness={0.7} roughness={0.3} clearcoat={0.5} clearcoatRoughness={0.2} />
+        <meshPhysicalMaterial color="#080816" emissive="#112244" emissiveIntensity={0.1} metalness={0.8} roughness={0.2} clearcoat={0.6} clearcoatRoughness={0.15} envMapIntensity={0.5} />
       </mesh>
 
       {/* Concentric glow rings on floor */}

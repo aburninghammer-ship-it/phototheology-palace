@@ -1,6 +1,6 @@
 import { useState, Suspense, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { palaceFloors, type Floor, type Room } from '@/data/palaceData';
@@ -194,7 +194,7 @@ function HoloPalaceInterior({ wallColor = '#0a0e20', floorColor = '#0a0e1e', acc
       {/* Dark indigo floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -2]} receiveShadow>
         <planeGeometry args={[16, 16]} />
-        <meshPhysicalMaterial color={floorColor} emissive={accentColor} emissiveIntensity={0.02} metalness={0.5} roughness={0.4} clearcoat={0.5} clearcoatRoughness={0.3} />
+        <meshPhysicalMaterial color={floorColor} emissive={accentColor} emissiveIntensity={0.02} metalness={0.6} roughness={0.3} clearcoat={0.6} clearcoatRoughness={0.2} envMapIntensity={0.4} />
       </mesh>
 
       {/* Emissive grid lines on floor */}
@@ -613,14 +613,17 @@ export default function PalaceTour({ onBack }: PalaceTourProps) {
 
   return (
     <group>
+      {/* Environment IBL for rich reflections on interior surfaces */}
+      <Environment preset="lobby" />
+
       {/* Opaque dark interior sky */}
       <mesh renderOrder={-1}>
         <sphereGeometry args={[30, 16, 16]} />
-        <meshBasicMaterial color="#030310" side={THREE.BackSide} depthWrite={false} />
+        <meshBasicMaterial color="#0a0818" side={THREE.BackSide} depthWrite={false} />
       </mesh>
 
-      <directionalLight position={[5, 8, 5]} intensity={0.5} color="#44CCFF" />
-      <directionalLight position={[-5, 4, -3]} intensity={0.3} color="#8844FF" />
+      <directionalLight position={[5, 8, 5]} intensity={0.6} color="#FFD088" />
+      <directionalLight position={[-5, 4, -3]} intensity={0.3} color="#8866CC" />
 
       {viewMode === 'elevator' && (
         <ElevatorView onSelectFloor={handleSelectFloor} onBack={onBack} />

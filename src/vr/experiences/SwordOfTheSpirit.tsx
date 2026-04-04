@@ -9,7 +9,7 @@
  */
 import { useRef, useMemo, useState, useCallback, Suspense, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
@@ -417,39 +417,87 @@ function GameHUD({ health, score, combo, level, armorProgress }: {
   );
 }
 
+// Dust/debris floating in arena
+function ArenaDust({ count = 40 }: { count?: number }) {
+  const pointsRef = useRef<THREE.Points>(null);
+  const basePositions = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 10;
+      pos[i * 3 + 1] = -0.5 + Math.random() * 3;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+    }
+    return pos;
+  }, [count]);
+
+  useFrame(({ clock }) => {
+    if (!pointsRef.current) return;
+    const arr = pointsRef.current.geometry.attributes.position.array as Float32Array;
+    const t = clock.getElapsedTime();
+    for (let i = 0; i < count; i++) {
+      arr[i * 3] = basePositions[i * 3] + Math.sin(t * 0.15 + i * 0.7) * 0.5;
+      arr[i * 3 + 1] = ((basePositions[i * 3 + 1] + t * 0.04) % 3) - 0.5;
+      arr[i * 3 + 2] = basePositions[i * 3 + 2] + Math.cos(t * 0.1 + i) * 0.4;
+    }
+    pointsRef.current.geometry.attributes.position.needsUpdate = true;
+  });
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={count} array={new Float32Array(basePositions)} itemSize={3} />
+      </bufferGeometry>
+      <pointsMaterial size={0.04} color="#887766" transparent opacity={0.3} depthWrite={false} sizeAttenuation blending={THREE.AdditiveBlending} />
+    </points>
+  );
+}
+
 // ── Arena environment ──
 
 function BattleArena() {
   return (
     <group>
+      {/* Environment IBL for dramatic arena reflections */}
+      <Environment preset="night" />
+
+      {/* Arena floor — stone-like */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[20, 20]} />
-        <meshPhysicalMaterial color="#080818" metalness={0.7} roughness={0.2} clearcoat={0.4} clearcoatRoughness={0.3} />
+        <meshPhysicalMaterial color="#0c0c1a" metalness={0.6} roughness={0.3} clearcoat={0.4} clearcoatRoughness={0.3} envMapIntensity={0.4} />
       </mesh>
       <gridHelper args={[20, 30, '#1a1a4a', '#0a0a2a']} position={[0, -1.19, 0]} />
 
+      {/* Arena ring */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.18, 0]}>
         <ringGeometry args={[2, 2.2, 32]} />
-        <meshBasicMaterial color="#6366f1" transparent opacity={0.15} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#6366f1" transparent opacity={0.2} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      {/* Outer arena ring */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.18, 0]}>
+        <ringGeometry args={[6, 6.15, 48]} />
+        <meshBasicMaterial color="#FF4466" transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
 
+      {/* Dramatic dome sky */}
       <mesh position={[0, 5, 0]}>
         <sphereGeometry args={[15, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
         <meshStandardMaterial color="#040412" side={THREE.BackSide} />
       </mesh>
 
-      <ambientLight intensity={0.15} color="#222244" />
-      <pointLight position={[0, 4, 0]} intensity={0.5} color="#6366f1" distance={15} />
-      <pointLight position={[-5, 3, -5]} intensity={0.4} color="#FF4466" distance={10} />
-      <pointLight position={[5, 3, -5]} intensity={0.4} color="#FFD700" distance={10} />
+      {/* Dramatic overhead lighting */}
+      <ambientLight intensity={0.12} color="#222244" />
+      <pointLight position={[0, 6, 0]} intensity={0.8} color="#6366f1" distance={18} />
+      <pointLight position={[-5, 3, -5]} intensity={0.5} color="#FF4466" distance={12} />
+      <pointLight position={[5, 3, -5]} intensity={0.5} color="#FFD700" distance={12} />
 
-      <directionalLight position={[0, 10, -5]} intensity={0.5} color="#6366f1" />
-      <directionalLight position={[-8, 4, 3]} intensity={0.3} color="#FF4466" />
-      <directionalLight position={[8, 4, 3]} intensity={0.3} color="#FFD700" />
+      <directionalLight position={[0, 12, -5]} intensity={0.6} color="#6366f1" />
+      <directionalLight position={[-8, 4, 3]} intensity={0.35} color="#FF4466" />
+      <directionalLight position={[8, 4, 3]} intensity={0.35} color="#FFD700" />
 
-      <fog attach="fog" args={['#040412', 10, 25]} />
+      <fog attach="fog" args={['#040412', 12, 28]} />
 
-      <StarField count={1000} radius={14} brightness={0.4} />
+      <StarField count={1500} radius={14} brightness={0.5} />
+      <ArenaDust count={50} />
     </group>
   );
 }

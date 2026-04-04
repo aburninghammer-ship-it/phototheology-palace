@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState, useCallback, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { StarField } from '../components/StarField';
@@ -135,7 +135,7 @@ function SunriseParticles({ count = 40, brightness = 1 }: { count?: number; brig
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <sphereGeometry args={[1, 6, 6]} />
-      <meshBasicMaterial color="#C026D3" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <meshBasicMaterial color="#FFB347" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
     </instancedMesh>
   );
 }
@@ -152,7 +152,7 @@ function HorizonGlow({ brightness = 0 }: { brightness?: number }) {
   return (
     <mesh ref={ref} position={[0, -0.5, -15]} rotation={[-0.2, 0, 0]}>
       <planeGeometry args={[40, 8]} />
-      <meshBasicMaterial color="#C026D3" transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial color="#FF8C00" transparent opacity={0.12} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
@@ -226,28 +226,31 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
 
   return (
     <group>
-      {/* Stars fading into dawn */}
-      <StarField count={1500} radius={60} brightness={screen === 'playing' ? 0.3 + avgVolume * 0.2 : 0.4} />
-      <NebulaClouds count={6} radius={30} colors={['#7C3AED', '#C026D3', '#DB2777', '#6B21A8']} opacity={0.08 + avgVolume * 0.06} />
+      {/* HDRI dawn skybox + image-based lighting */}
+      <Environment preset="dawn" background />
+
+      {/* Fading stars at dawn — subtle */}
+      <StarField count={800} radius={60} brightness={screen === 'playing' ? 0.1 + avgVolume * 0.1 : 0.15} />
+      <NebulaClouds count={6} radius={30} colors={['#FFB347', '#FF8C00', '#FFD700', '#FFA07A']} opacity={0.06 + avgVolume * 0.04} />
 
       <HorizonGlow brightness={avgVolume} />
 
-      {/* Floor */}
+      {/* Rolling ground — warm earth */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
-        <planeGeometry args={[20, 20]} />
-        <meshPhysicalMaterial color="#0a0818" metalness={0.4} roughness={0.4} clearcoat={0.5} clearcoatRoughness={0.3} />
+        <planeGeometry args={[40, 40]} />
+        <meshPhysicalMaterial color="#2a1f10" metalness={0.15} roughness={0.8} clearcoat={0.2} clearcoatRoughness={0.9} />
       </mesh>
 
-      {/* Lighting — warm sunrise */}
-      <ambientLight intensity={0.2} color="#ddd8f0" />
-      <directionalLight position={[3, 6, -8]} intensity={0.4} color="#f59e0b" />
-      <directionalLight position={[-4, 3, 2]} intensity={0.2} color="#C026D3" />
-      <pointLight position={[0, 3, -6]} intensity={0.6 + avgVolume * 0.4} color="#C026D3" distance={15} />
-      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#7C3AED" distance={8} />
+      {/* Lighting — warm golden sunrise */}
+      <ambientLight intensity={0.35} color="#FFF5E6" />
+      <directionalLight position={[3, 6, -8]} intensity={0.8} color="#FFB347" />
+      <directionalLight position={[-4, 3, 2]} intensity={0.3} color="#FFA07A" />
+      <pointLight position={[0, 3, -6]} intensity={0.5 + avgVolume * 0.4} color="#FFD700" distance={15} />
+      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#FF8C00" distance={8} />
 
-      <fog attach="fog" args={['#0a0818', 12, 50]} />
+      <fog attach="fog" args={['#1a150e', 15, 60]} />
 
-      <SunriseParticles brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
+      <SunriseParticles count={60} brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
 
       {/* ─── MENU SCREEN ─── */}
       {screen === 'menu' && (
