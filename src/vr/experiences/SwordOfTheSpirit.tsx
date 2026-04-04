@@ -8,12 +8,13 @@
  * Desktop: click orbs. VR: ray-select or swing controller.
  */
 import { useRef, useMemo, useState, useCallback, Suspense, useEffect } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 import { StarField } from '../components/StarField';
+import swordArenaBg from '@/assets/vr/sword-arena.png';
 
 // ── Game Data ──
 
@@ -417,14 +418,40 @@ function GameHUD({ health, score, combo, level, armorProgress }: {
   );
 }
 
+// ── Arena Backdrop ──
+
+function ArenaBackdrop() {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const texture = useLoader(THREE.TextureLoader, swordArenaBg);
+
+  useFrame(({ camera }) => {
+    if (!meshRef.current) return;
+    meshRef.current.quaternion.copy(camera.quaternion);
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 3, -40]}>
+      <planeGeometry args={[60, 34]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0.35}
+        depthWrite={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
 // ── Arena environment ──
 
 function BattleArena() {
   return (
     <group>
+      <ArenaBackdrop />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#080818" metalness={0.6} roughness={0.3} />
+        <meshPhysicalMaterial color="#080818" metalness={0.7} roughness={0.2} clearcoat={0.4} clearcoatRoughness={0.3} />
       </mesh>
       <gridHelper args={[20, 30, '#1a1a4a', '#0a0a2a']} position={[0, -1.19, 0]} />
 
@@ -442,6 +469,10 @@ function BattleArena() {
       <pointLight position={[0, 4, 0]} intensity={0.5} color="#6366f1" distance={15} />
       <pointLight position={[-5, 3, -5]} intensity={0.4} color="#FF4466" distance={10} />
       <pointLight position={[5, 3, -5]} intensity={0.4} color="#FFD700" distance={10} />
+
+      <directionalLight position={[0, 10, -5]} intensity={0.5} color="#6366f1" />
+      <directionalLight position={[-8, 4, 3]} intensity={0.3} color="#FF4466" />
+      <directionalLight position={[8, 4, 3]} intensity={0.3} color="#FFD700" />
 
       <fog attach="fog" args={['#040412', 10, 25]} />
 

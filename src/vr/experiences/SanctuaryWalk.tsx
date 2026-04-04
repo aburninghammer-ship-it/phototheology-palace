@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, Suspense, useCallback } from 'react';
 import { Text } from '@react-three/drei';
 import { TeleportationPlane, Interactive, useController } from '@react-three/xr';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   getSanctuaryElementsByZone,
@@ -9,6 +9,9 @@ import {
   type SanctuaryElement,
 } from '@/data/sanctuaryLibrary';
 import { parseDimensions, cubitsToMeters } from '../utils/cubitsToMeters';
+import sanctuaryExterior from '@/assets/vr/sanctuary-exterior.png';
+import sanctuaryHolyPlace from '@/assets/vr/sanctuary-holy-place.png';
+import sanctuaryMostHoly from '@/assets/vr/sanctuary-most-holy.png';
 import { InfoPanel } from '../components/InfoPanel';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
@@ -18,6 +21,13 @@ const ZONES: { id: SanctuaryZone; label: string; color: string; groundColor: str
   { id: 'holy-place', label: 'The Holy Place', color: '#FFD700', groundColor: '#2a2210', ambientColor: '#FFD088', zOffset: -24 },
   { id: 'most-holy-place', label: 'The Most Holy Place', color: '#FFD700', groundColor: '#2a2010', ambientColor: '#FFCC44', zOffset: -36 },
 ];
+
+const ZONE_BACKDROPS: Record<string, string> = {
+  'camp': sanctuaryExterior,
+  'courtyard': sanctuaryExterior,
+  'holy-place': sanctuaryHolyPlace,
+  'most-holy-place': sanctuaryMostHoly,
+};
 
 // Flickering torch for sanctuary atmosphere
 function SanctuaryTorch({ position, color = '#FF8822' }: { position: [number, number, number]; color?: string }) {
@@ -222,6 +232,30 @@ function useSmoothPosition(groupRef: React.RefObject<THREE.Group | null>, posRef
   });
 }
 
+function SceneBackdrop({ zoneId }: { zoneId: string }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const backdropUrl = ZONE_BACKDROPS[zoneId];
+  const texture = useLoader(THREE.TextureLoader, backdropUrl || sanctuaryExterior);
+
+  useFrame(({ camera }) => {
+    if (!meshRef.current) return;
+    meshRef.current.quaternion.copy(camera.quaternion);
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 2, -40]}>
+      <planeGeometry args={[60, 34]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0.4}
+        depthWrite={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
 interface SanctuaryWalkProps {
   onBack: () => void;
 }
@@ -265,9 +299,13 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
   return (
     <>
     <group ref={sceneRef}>
+      <SceneBackdrop zoneId={ZONES[activeZone].id} />
+
       {/* Rich warm lighting */}
       <ambientLight intensity={0.3} color="#fff5e6" />
       <directionalLight position={[5, 10, 5]} intensity={1} color="#ffe8c4" castShadow />
+      <directionalLight position={[-5, 4, -3]} intensity={0.4} color="#ffd088" />
+      <directionalLight position={[0, 2, 8]} intensity={0.3} color="#ffe8d0" />
 
       {/* Sky dome — warm desert gradient */}
       <mesh>
@@ -283,7 +321,7 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
       {/* Rich ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -18]} receiveShadow>
         <planeGeometry args={[14, 55]} />
-        <meshStandardMaterial color="#3a2a1a" roughness={0.85} metalness={0.1} />
+        <meshPhysicalMaterial color="#3a2a1a" roughness={0.7} metalness={0.2} clearcoat={0.3} clearcoatRoughness={0.8} />
       </mesh>
 
       {/* Decorative path center */}
@@ -332,7 +370,7 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
           <pointLight position={[0, 3, -3]} color={zone.ambientColor} intensity={0.8} distance={12} />
 
           {/* Floating incense/dust particles */}
-          <IncenseParticles position={[0, 0, -2]} color={zone.color} count={15} />
+          <IncenseParticles position={[0, 0, -2]} color={zone.color} count={30} />
 
           {zone.elements.map((el, i) => {
             const spacing = 2.5;

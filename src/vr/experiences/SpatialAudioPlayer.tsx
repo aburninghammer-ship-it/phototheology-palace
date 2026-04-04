@@ -581,11 +581,13 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
       <StarField count={2500} radius={80} />
       <NebulaClouds count={10} radius={50} colors={['#6622AA', '#2244AA', '#4400AA', '#220066']} opacity={0.1} />
       <ambientLight intensity={0.12} color="#4466aa" />
+      <directionalLight position={[0, 5, -3]} intensity={0.3} color="#4466aa" />
+      <directionalLight position={[-4, 3, 2]} intensity={0.2} color="#6622AA" />
 
       {/* Dark reflective floor with blue emissive */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]} receiveShadow>
         <circleGeometry args={[15, 32]} />
-        <meshStandardMaterial color="#080816" emissive="#112244" emissiveIntensity={0.1} metalness={0.6} roughness={0.4} />
+        <meshPhysicalMaterial color="#080816" emissive="#112244" emissiveIntensity={0.1} metalness={0.7} roughness={0.3} clearcoat={0.5} clearcoatRoughness={0.2} />
       </mesh>
 
       {/* Concentric glow rings on floor */}

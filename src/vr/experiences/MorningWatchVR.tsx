@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState, useCallback, Suspense } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useLoader } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
@@ -11,6 +11,7 @@ import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
 import { callJeeves } from '@/lib/jeevesClient';
 import { supabase } from '@/integrations/supabase/client';
 import { WATCH_TRACTS, type MorningWatchSession } from '@/data/watchSeries';
+import morningWatchBg from '@/assets/vr/morning-watch.png';
 
 interface MorningWatchVRProps {
   onBack: () => void;
@@ -94,6 +95,31 @@ async function generateTTSUrl(script: string): Promise<string | null> {
     console.error('[MorningWatchVR] TTS error:', err);
     return null;
   }
+}
+
+// ── Visual: Scene backdrop ──
+
+function MorningBackdrop() {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const texture = useLoader(THREE.TextureLoader, morningWatchBg);
+
+  useFrame(({ camera }) => {
+    if (!meshRef.current) return;
+    meshRef.current.quaternion.copy(camera.quaternion);
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 2, -50]}>
+      <planeGeometry args={[70, 40]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0.4}
+        depthWrite={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
 }
 
 // ── Visual: Sunrise particles ──
@@ -226,6 +252,7 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
 
   return (
     <group>
+      <MorningBackdrop />
       {/* Stars fading into dawn */}
       <StarField count={1500} radius={60} brightness={screen === 'playing' ? 0.3 + avgVolume * 0.2 : 0.4} />
       <NebulaClouds count={6} radius={30} colors={['#7C3AED', '#C026D3', '#DB2777', '#6B21A8']} opacity={0.08 + avgVolume * 0.06} />
@@ -235,13 +262,17 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#0a0818" metalness={0.3} roughness={0.6} />
+        <meshPhysicalMaterial color="#0a0818" metalness={0.4} roughness={0.4} clearcoat={0.5} clearcoatRoughness={0.3} />
       </mesh>
 
       {/* Lighting — warm sunrise */}
       <ambientLight intensity={0.2} color="#ddd8f0" />
+      <directionalLight position={[3, 6, -8]} intensity={0.4} color="#f59e0b" />
+      <directionalLight position={[-4, 3, 2]} intensity={0.2} color="#C026D3" />
       <pointLight position={[0, 3, -6]} intensity={0.6 + avgVolume * 0.4} color="#C026D3" distance={15} />
       <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#7C3AED" distance={8} />
+
+      <fog attach="fog" args={['#0a0818', 12, 50]} />
 
       <SunriseParticles brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
 

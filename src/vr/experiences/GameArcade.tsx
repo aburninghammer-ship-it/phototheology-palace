@@ -38,7 +38,7 @@ function NeonTube({ position, color, length = 4 }: { position: [number, number, 
 }
 
 // Floating arcade particles
-function ArcadeParticles({ count = 40 }: { count?: number }) {
+function ArcadeParticles({ count = 80 }: { count?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
   const basePositions = useMemo(() => {
     const pos = new Float32Array(count * 3);
@@ -197,7 +197,7 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
       {/* Dark reflective floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]} receiveShadow>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#050510" metalness={0.7} roughness={0.3} />
+        <meshPhysicalMaterial color="#050510" metalness={0.8} roughness={0.2} clearcoat={0.6} clearcoatRoughness={0.15} />
       </mesh>
 
       {/* Neon grid on floor */}
@@ -214,6 +214,8 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
 
       {/* Vibrant multi-colored lighting */}
       <ambientLight intensity={0.35} color="#444466" />
+      <directionalLight position={[0, 5, 0]} intensity={0.3} color="#39FF14" />
+      <directionalLight position={[-5, 3, -3]} intensity={0.2} color="#BB44FF" />
       <pointLight position={[0, 4, 0]} intensity={1.2} color="#39FF14" distance={15} />
       <pointLight position={[-5, 3, -3]} intensity={0.8} color="#BB44FF" distance={10} />
       <pointLight position={[5, 3, -3]} intensity={0.8} color="#FF4444" distance={10} />

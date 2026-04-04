@@ -1,6 +1,7 @@
 import { useState, Suspense, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useLoader } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
+import palaceExterior from '@/assets/vr/palace-exterior.png';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { palaceFloors, type Floor, type Room } from '@/data/palaceData';
@@ -29,6 +30,31 @@ type ViewMode = 'elevator' | 'floor' | 'room';
 
 interface PalaceTourProps {
   onBack: () => void;
+}
+
+// ── Palace Backdrop ─────────────────────────────────────────────────────────
+
+function PalaceBackdrop() {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const texture = useLoader(THREE.TextureLoader, palaceExterior);
+
+  useFrame(({ camera }) => {
+    if (!meshRef.current) return;
+    meshRef.current.quaternion.copy(camera.quaternion);
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 2, -40]}>
+      <planeGeometry args={[60, 34]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0.3}
+        depthWrite={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
 }
 
 // ── Energy Orb (replaces Torch) ─────────────────────────────────────────────
@@ -194,7 +220,7 @@ function HoloPalaceInterior({ wallColor = '#0a0e20', floorColor = '#0a0e1e', acc
       {/* Dark indigo floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -2]} receiveShadow>
         <planeGeometry args={[16, 16]} />
-        <meshStandardMaterial color={floorColor} emissive={accentColor} emissiveIntensity={0.02} metalness={0.4} roughness={0.6} />
+        <meshPhysicalMaterial color={floorColor} emissive={accentColor} emissiveIntensity={0.02} metalness={0.5} roughness={0.4} clearcoat={0.5} clearcoatRoughness={0.3} />
       </mesh>
 
       {/* Emissive grid lines on floor */}
@@ -288,6 +314,7 @@ function ElevatorView({
 }) {
   return (
     <group>
+      <PalaceBackdrop />
       <HoloPalaceInterior wallColor="#0a0e20" floorColor="#0a0e1e" accentColor="#00AAFF" />
 
       {/* Holographic lighting */}
@@ -618,6 +645,9 @@ export default function PalaceTour({ onBack }: PalaceTourProps) {
         <sphereGeometry args={[30, 16, 16]} />
         <meshBasicMaterial color="#030310" side={THREE.BackSide} depthWrite={false} />
       </mesh>
+
+      <directionalLight position={[5, 8, 5]} intensity={0.5} color="#44CCFF" />
+      <directionalLight position={[-5, 4, -3]} intensity={0.3} color="#8844FF" />
 
       {viewMode === 'elevator' && (
         <ElevatorView onSelectFloor={handleSelectFloor} onBack={onBack} />

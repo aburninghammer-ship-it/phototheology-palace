@@ -318,6 +318,8 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
 
       {/* Rich ambient lighting */}
       <ambientLight intensity={0.4} color="#e8d0ff" />
+      <directionalLight position={[0, 4, 2]} intensity={0.6} color="#ffe8d0" />
+      <directionalLight position={[-3, 3, -5]} intensity={0.3} color="#e8d0ff" />
 
       {/* Spot lights — only render visible ones */}
       {visibleLightIndices.map((i) => (
@@ -346,7 +348,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
       {/* Rich marble floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -CORRIDOR_LENGTH / 2]} receiveShadow>
         <planeGeometry args={[8, CORRIDOR_LENGTH + 10]} />
-        <meshStandardMaterial color="#1a1520" metalness={0.4} roughness={0.5} />
+        <meshPhysicalMaterial color="#1a1520" metalness={0.5} roughness={0.3} clearcoat={0.6} clearcoatRoughness={0.2} />
       </mesh>
 
       {/* Floor runner (decorative center strip) */}

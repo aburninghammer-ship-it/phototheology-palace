@@ -15,6 +15,7 @@ import hdCross from '@/assets/vr/hd-cross.jpg';
 import hdResurrection from '@/assets/vr/hd-resurrection.jpg';
 import hdThrone from '@/assets/vr/hd-throne.jpg';
 import hdNewJerusalem from '@/assets/vr/hd-new-jerusalem.jpg';
+import hdNewJerusalem2 from '@/assets/vr/hd-new-jerusalem-2.png';
 
 const AUDIO_SRC = '/audio/heavens-diary.m4a';
 
@@ -146,7 +147,7 @@ const TOUR_SCENES: TourScene[] = [
     cameraPath: (t) => ({ x: 0, y: t * 8, z: -5 - t * 15 }),
     particleColor: '#FFD700',
     lightIntensity: 3.0,
-    backdrop: hdNewJerusalem,
+    backdrop: hdNewJerusalem2,
   },
 ];
 

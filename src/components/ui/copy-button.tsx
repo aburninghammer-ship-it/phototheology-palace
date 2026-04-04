@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { Check, Copy } from "lucide-react";
 import { Button } from "./button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface CopyButtonProps {
   text: string;
@@ -19,6 +20,9 @@ export function CopyButton({ text, className, variant = "ghost", size = "sm", la
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      toast.success("Copied to clipboard", {
+        description: "Tip: Use 'Save to My Studies' to keep permanently",
+      });
     } catch {
       // Fallback for older browsers
       const textarea = document.createElement("textarea");
@@ -31,6 +35,9 @@ export function CopyButton({ text, className, variant = "ghost", size = "sm", la
       document.body.removeChild(textarea);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      toast.success("Copied to clipboard", {
+        description: "Tip: Use 'Save to My Studies' to keep permanently",
+      });
     }
   }, [text]);
 
