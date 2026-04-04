@@ -720,29 +720,6 @@ function SpeedLines({ speed, color }: { speed: number; color: string }) {
   );
 }
 
-// ─── Cockpit Porthole ────────────────────────────────────
-function CockpitPorthole({ phaseColor }: { phaseColor: string }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    if (!meshRef.current) return;
-    const mat = meshRef.current.material as THREE.MeshStandardMaterial;
-    mat.emissiveIntensity = 0.2 + Math.sin(clock.getElapsedTime() * 0.5) * 0.08;
-  });
-
-  return (
-    <>
-      <mesh ref={meshRef} position={[0, 0, -1.5]}>
-        <torusGeometry args={[1.8, 0.1, 16, 64]} />
-        <meshPhysicalMaterial color="#8B7535" emissive={phaseColor} emissiveIntensity={0.2} metalness={0.92} roughness={0.08} clearcoat={0.8} clearcoatRoughness={0.05} />
-      </mesh>
-      <mesh position={[0, 0, -1.48]}>
-        <torusGeometry args={[1.72, 0.025, 8, 48]} />
-        <meshBasicMaterial color="#FFD700" transparent opacity={0.3} blending={THREE.AdditiveBlending} />
-      </mesh>
-    </>
-  );
-}
-
 // ─── Floating Particles ──────────────────────────────────
 function FloatingEmbers({ count, color, avgVolume }: { count: number; color: string; avgVolume: number }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
@@ -789,17 +766,6 @@ function FloatingEmbers({ count, color, avgVolume }: { count: number; color: str
       <planeGeometry args={[1, 1]} />
       <meshBasicMaterial map={map} color={color} transparent opacity={0.6} depthWrite={false} blending={THREE.AdditiveBlending} />
     </instancedMesh>
-  );
-}
-
-// ─── Progress Ring ────────────────────────────────────────
-function ProgressRing({ progress, color }: { progress: number; color: string }) {
-  const geometry = useMemo(() => new THREE.RingGeometry(1.8, 1.88, 64, 1, 0, progress * Math.PI * 2), [progress]);
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
-      <primitive object={geometry} attach="geometry" />
-      <meshBasicMaterial color={color} transparent opacity={0.5} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
-    </mesh>
   );
 }
 
@@ -866,50 +832,64 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
 
   return (
     <group ref={sceneGroupRef}>
+      {/* === FIXED BACKGROUND — does NOT move with camera === */}
+      {/* Dynamic ambient */}
+      <ambientLight intensity={0.3} color={currentScene.colors.ambient} />
+      <directionalLight position={[0, 5, -10]} intensity={0.4} color="#FFE4B0" />
+
+      {/* Scene accent lights */}
+      <pointLight position={[-5, 3, -5]} color={currentScene.colors.accent} intensity={currentScene.lightIntensity + avgVolume * 0.8} distance={25} />
+      <pointLight position={[5, 3, -5]} color={currentScene.colors.nebula[1] || currentScene.colors.accent} intensity={1 + avgVolume * 0.6} distance={20} />
+
+      {/* Warp stars — fixed in world space */}
+      <WarpStars progress={audioState.progress} scene={currentScene} avgVolume={avgVolume} />
+
+      {/* Nebula clouds — fixed in world space */}
+      <NebulaClouds count={18} radius={40} colors={currentScene.colors.nebula} opacity={0.12 + avgVolume * 0.15} zSpeed={speed * 15} />
+
+      {/* Scene-specific geometry — fixed in world space */}
+      {currentScene.id === 'creation' && <CreationScene localT={localT} avgVolume={avgVolume} />}
+      {currentScene.id === 'garden' && <GardenScene localT={localT} avgVolume={avgVolume} />}
+      {currentScene.id === 'cross' && <CrossScene localT={localT} avgVolume={avgVolume} />}
+      {currentScene.id === 'resurrection' && <ResurrectionScene localT={localT} avgVolume={avgVolume} />}
+      {currentScene.id === 'throne' && <ThroneScene localT={localT} avgVolume={avgVolume} />}
+      {currentScene.id === 'newJerusalem' && <NewJerusalemScene localT={localT} avgVolume={avgVolume} />}
+
+      {/* Speed lines — fixed in world space */}
+      <SpeedLines speed={speed} color={currentScene.particleColor} />
+
+      {/* Floating embers */}
+      <FloatingEmbers count={200} color={currentScene.particleColor} avgVolume={avgVolume} />
+
+      {/* Scene transition flash */}
+      <SceneTransition progress={audioState.progress} scenes={TOUR_SCENES} />
+
+      {/* Fog */}
+      <fog attach="fog" args={[currentScene.colors.fog, 12, 55]} />
+
+      {/* Distant heaven glow — grows brighter as you progress */}
+      <mesh position={[0, 5, -80 + audioState.progress * 40]}>
+        <sphereGeometry args={[4 + audioState.progress * 12, 32, 32]} />
+        <meshBasicMaterial
+          color="#FFD700"
+          transparent
+          opacity={0.05 + audioState.progress * 0.25}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+      <pointLight
+        position={[0, 5, -80 + audioState.progress * 40]}
+        color="#FFD700"
+        intensity={audioState.progress * 8}
+        distance={60}
+      />
+
+      {/* Backdrop image — fixed in world space */}
+      <SceneBackdrop scene={currentScene} localT={localT} />
+
+      {/* === HUD — moves with subtle camera drift === */}
       <group ref={cameraGroupRef}>
-        {/* Dynamic ambient */}
-        <ambientLight intensity={0.3} color={currentScene.colors.ambient} />
-        <directionalLight position={[0, 5, -10]} intensity={0.4} color="#FFE4B0" />
-
-        {/* Scene accent lights */}
-        <pointLight position={[-5, 3, -5]} color={currentScene.colors.accent} intensity={currentScene.lightIntensity + avgVolume * 0.8} distance={25} />
-        <pointLight position={[5, 3, -5]} color={currentScene.colors.nebula[1] || currentScene.colors.accent} intensity={1 + avgVolume * 0.6} distance={20} />
-
-        {/* Backdrop image */}
-        <SceneBackdrop scene={currentScene} localT={localT} />
-
-        {/* Warp stars */}
-        <WarpStars progress={audioState.progress} scene={currentScene} avgVolume={avgVolume} />
-
-        {/* Nebula clouds */}
-        <NebulaClouds count={18} radius={40} colors={currentScene.colors.nebula} opacity={0.12 + avgVolume * 0.15} zSpeed={speed * 15} />
-
-        {/* Scene-specific geometry */}
-        {currentScene.id === 'creation' && <CreationScene localT={localT} avgVolume={avgVolume} />}
-        {currentScene.id === 'garden' && <GardenScene localT={localT} avgVolume={avgVolume} />}
-        {currentScene.id === 'cross' && <CrossScene localT={localT} avgVolume={avgVolume} />}
-        {currentScene.id === 'resurrection' && <ResurrectionScene localT={localT} avgVolume={avgVolume} />}
-        {currentScene.id === 'throne' && <ThroneScene localT={localT} avgVolume={avgVolume} />}
-        {currentScene.id === 'newJerusalem' && <NewJerusalemScene localT={localT} avgVolume={avgVolume} />}
-
-        {/* Speed lines */}
-        <SpeedLines speed={speed} color={currentScene.particleColor} />
-
-        {/* Floating embers */}
-        <FloatingEmbers count={200} color={currentScene.particleColor} avgVolume={avgVolume} />
-
-        {/* Scene transition flash */}
-        <SceneTransition progress={audioState.progress} scenes={TOUR_SCENES} />
-
-        {/* Cockpit porthole */}
-        <CockpitPorthole phaseColor={currentScene.colors.accent} />
-
-        {/* Progress ring */}
-        <ProgressRing progress={audioState.progress} color={currentScene.colors.accent} />
-
-        {/* Fog */}
-        <fog attach="fog" args={[currentScene.colors.fog, 12, 55]} />
-
         {/* Title */}
         <Text position={[0, 2.5, -3]} fontSize={0.25} color={currentScene.colors.accent} anchorX="center" outlineWidth={0.012} outlineColor="#000">
           Heaven's Diary
