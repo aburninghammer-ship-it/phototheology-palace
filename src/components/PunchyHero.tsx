@@ -261,7 +261,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-2xl mx-auto mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-border/50 px-4"
+          className="grid grid-cols-3 gap-3 sm:gap-6 md:gap-8 max-w-2xl mx-auto mt-6 sm:mt-10 pt-4 sm:pt-8 border-t border-border/50 px-4"
         >
           <div className="text-center">
             <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">8</div>
