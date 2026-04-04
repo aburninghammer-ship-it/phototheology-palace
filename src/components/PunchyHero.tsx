@@ -193,7 +193,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex flex-col items-center justify-center gap-4 px-4"
+          className="flex flex-col items-center justify-center gap-3 sm:gap-4 px-3 sm:px-4"
         >
           {!loading && !user ? (
             <>
