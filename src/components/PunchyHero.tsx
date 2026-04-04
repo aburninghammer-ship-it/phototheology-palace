@@ -37,14 +37,14 @@ export const PunchyHero = () => {
   };
 
   return (
-    <section className="relative min-h-[90vh] sm:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10 pb-safe">
+    <section className="relative min-h-[75vh] sm:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10 pb-safe">
       {/* Subtle animated background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-96 sm:h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 sm:w-96 sm:h-96 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-8 sm:py-0">
+      <div className="relative z-10 max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 text-center py-4 sm:py-0">
         {/* Main Title - Glass Style */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -85,7 +85,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-5 leading-tight sm:leading-[1.1] px-2"
+          className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 sm:mb-5 leading-tight sm:leading-[1.1] px-2"
         >
           {/* Mobile: Shorter, punchier headline */}
           <span className="sm:hidden">
@@ -116,7 +116,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 px-4"
+          className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 sm:mb-6 px-4"
         >
           {/* Mobile: Ultra-short */}
           <span className="sm:hidden">
@@ -137,7 +137,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex flex-wrap justify-center gap-2 mb-4"
+          className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-3 sm:mb-4"
         >
           {socialProof.map((item, i) => (
             <Badge 
@@ -156,7 +156,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
-          className="mb-6"
+          className="mb-4 sm:mb-6"
         >
           <UserCountBadge />
         </motion.div>
@@ -166,11 +166,11 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, scale: 0.95, y: 30 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          className="mb-8 px-4"
+          className="mb-6 sm:mb-8 px-2 sm:px-4"
         >
           {/* Gradient border glow wrapper */}
-          <div className="relative p-[2px] sm:p-[3px] rounded-2xl bg-gradient-to-r from-green-400 via-cyan-400 to-primary max-w-xs sm:max-w-2xl md:max-w-4xl mx-auto shadow-[0_0_30px_rgba(34,211,238,0.3),0_0_60px_rgba(34,211,238,0.1)]">
-            <div className="relative p-3 sm:p-5 md:p-6 rounded-[14px] bg-background/95 backdrop-blur-md overflow-hidden">
+          <div className="relative p-[2px] sm:p-[3px] rounded-2xl bg-gradient-to-r from-green-400 via-cyan-400 to-primary max-w-[280px] sm:max-w-2xl md:max-w-4xl mx-auto shadow-[0_0_30px_rgba(34,211,238,0.3),0_0_60px_rgba(34,211,238,0.1)]">
+            <div className="relative p-2 sm:p-5 md:p-6 rounded-[14px] bg-background/95 backdrop-blur-md overflow-hidden">
               {/* Inner gradient glow */}
               <div className="absolute inset-0 rounded-[14px] bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
               {/* Animated floating orbs */}
@@ -193,7 +193,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex flex-col items-center justify-center gap-4 px-4"
+          className="flex flex-col items-center justify-center gap-3 sm:gap-4 px-3 sm:px-4"
         >
           {!loading && !user ? (
             <>
@@ -261,7 +261,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-2xl mx-auto mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-border/50 px-4"
+          className="grid grid-cols-3 gap-3 sm:gap-6 md:gap-8 max-w-2xl mx-auto mt-6 sm:mt-10 pt-4 sm:pt-8 border-t border-border/50 px-4"
         >
           <div className="text-center">
             <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">8</div>

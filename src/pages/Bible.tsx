@@ -62,28 +62,28 @@ const Bible = () => {
     <div className="min-h-screen gradient-subtle">
       <Navigation />
       
-      <div className="pt-4 pb-24 md:pb-16 px-3 sm:px-4 md:px-6">
+      <div className="pt-2 sm:pt-4 pb-24 md:pb-16 px-2 sm:px-4 md:px-6">
         <div className="container mx-auto max-w-7xl">
 
           {/* Header - Glass Card */}
-          <div className="glass-card mb-8 p-6 rounded-2xl">
+          <div className="glass-card mb-4 sm:mb-8 p-3 sm:p-6 rounded-xl sm:rounded-2xl">
             <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <img 
                   src="/pwa-192x192.png" 
                   alt="Phototheology" 
-                  className="h-14 w-14 rounded-xl shadow-lg shadow-primary/20"
+                  className="h-10 w-10 sm:h-14 sm:w-14 rounded-xl shadow-lg shadow-primary/20"
                 />
                 <div>
-                  <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
+                  <h1 className="font-serif text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-1 sm:mb-2 bg-gradient-palace bg-clip-text text-transparent">
                     {t('bible.title', 'Phototheology Study Bible (PSB)')}
                   </h1>
-                  <p className="text-base sm:text-lg text-muted-foreground">
+                  <p className="text-sm sm:text-lg text-muted-foreground">
                     {t('bible.subtitle', 'Scripture through principle lenses')}
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                 <Button
                   variant="outline"
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
@@ -177,7 +177,7 @@ const Bible = () => {
 
             <div className={`flex-1 min-w-0 ${sidebarOpen && !isMobile ? 'pl-4' : ''}`}>
               {/* Navigation */}
-              <div className="mb-6 sm:mb-8 bible-navigation-area">
+              <div className="mb-4 sm:mb-8 bible-navigation-area">
                 <BibleNavigation />
               </div>
 

@@ -61,13 +61,13 @@ const ExitIntentPopup = lazy(() =>
 
 // Simple section skeleton
 const SectionSkeleton = () => (
-  <div className="py-16 px-4">
+  <div className="py-8 sm:py-16 px-3 sm:px-4">
     <div className="max-w-6xl mx-auto animate-pulse">
-      <div className="h-8 bg-muted rounded w-1/3 mx-auto mb-4" />
-      <div className="h-4 bg-muted rounded w-1/2 mx-auto mb-8" />
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="h-6 sm:h-8 bg-muted rounded w-1/3 mx-auto mb-3 sm:mb-4" />
+      <div className="h-4 bg-muted rounded w-1/2 mx-auto mb-6 sm:mb-8" />
+      <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-48 bg-muted rounded-lg" />
+          <div key={i} className="h-36 sm:h-48 bg-muted rounded-lg" />
         ))}
       </div>
     </div>
@@ -118,24 +118,24 @@ const Index = () => {
       {/* Install Banner */}
       {showInstallBanner && !focusMode && (
         <div className="sticky top-16 z-40 bg-gradient-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg border-b border-primary/20">
-          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Download className="w-5 h-5 flex-shrink-0" />
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-3">
+            <div className="flex items-center justify-between gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <Download className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold text-sm">📱 Install Phototheology</p>
-                  <p className="text-xs opacity-90">Access offline anytime</p>
+                  <p className="font-bold text-xs sm:text-sm">📱 Install Phototheology</p>
+                  <p className="text-[10px] sm:text-xs opacity-90 hidden sm:block">Access offline anytime</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <PWAInstallButton />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={dismissBanner}
-                  className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+                  className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground hover:bg-primary-foreground/20"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </div>
@@ -193,7 +193,7 @@ const Index = () => {
 
       {/* Language Selector for public visitors */}
       {!focusMode && (
-        <div className="fixed bottom-20 right-4 z-50 md:bottom-6 zen-hideable">
+        <div className="fixed bottom-20 right-3 z-50 md:bottom-6 md:right-4 zen-hideable">
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="icon" className="rounded-full shadow-lg bg-background/95 backdrop-blur-sm h-10 w-10">
