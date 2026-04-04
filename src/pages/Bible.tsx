@@ -72,13 +72,13 @@ const Bible = () => {
                 <img 
                   src="/pwa-192x192.png" 
                   alt="Phototheology" 
-                  className="h-14 w-14 rounded-xl shadow-lg shadow-primary/20"
+                  className="h-10 w-10 sm:h-14 sm:w-14 rounded-xl shadow-lg shadow-primary/20"
                 />
                 <div>
-                  <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
+                  <h1 className="font-serif text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-1 sm:mb-2 bg-gradient-palace bg-clip-text text-transparent">
                     {t('bible.title', 'Phototheology Study Bible (PSB)')}
                   </h1>
-                  <p className="text-base sm:text-lg text-muted-foreground">
+                  <p className="text-sm sm:text-lg text-muted-foreground">
                     {t('bible.subtitle', 'Scripture through principle lenses')}
                   </p>
                 </div>
