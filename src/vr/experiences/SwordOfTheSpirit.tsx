@@ -10,7 +10,7 @@
 import { useRef, useMemo, useState, useCallback, Suspense, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text, Environment } from '@react-three/drei';
-import { Interactive } from '@react-three/xr';
+import { Interactive, useController } from '@react-three/xr';
 import * as THREE from 'three';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 import { StarField } from '../components/StarField';
@@ -90,22 +90,39 @@ interface ActiveOrb {
 
 type GameState = 'menu' | 'playing' | 'gameover';
 
-// ── Pointed Sword 3D ──
+// ── Pointed Sword 3D — tracks right VR controller when in headset ──
 
 function SwordModel({ position, swinging }: { position: [number, number, number]; swinging: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const swingRef = useRef(0);
+  const rightController = useController('right');
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
+
+    // Track VR right controller if available
+    if (rightController?.controller) {
+      const ctrl = rightController.controller;
+      groupRef.current.position.copy(ctrl.position);
+      groupRef.current.quaternion.copy(ctrl.quaternion);
+      // Offset sword forward from grip
+      groupRef.current.translateY(0.15);
+      groupRef.current.translateZ(-0.05);
+    }
+
+    // Swing animation
     if (swinging) {
       swingRef.current = Math.min(1, swingRef.current + delta * 8);
     } else {
       swingRef.current = Math.max(0, swingRef.current - delta * 4);
     }
-    const swingAngle = Math.sin(swingRef.current * Math.PI) * 0.8;
-    groupRef.current.rotation.z = -0.3 + swingAngle;
-    groupRef.current.rotation.x = swingAngle * 0.3;
+
+    // Only apply swing rotation when no controller (desktop mode)
+    if (!rightController?.controller) {
+      const swingAngle = Math.sin(swingRef.current * Math.PI) * 0.8;
+      groupRef.current.rotation.z = -0.3 + swingAngle;
+      groupRef.current.rotation.x = swingAngle * 0.3;
+    }
   });
 
   return (
@@ -136,21 +153,39 @@ function SwordModel({ position, swinging }: { position: [number, number, number]
   );
 }
 
-// ── Shield 3D ──
+// ── Shield 3D — tracks left VR controller when in headset ──
 
 function ShieldModel({ position, blocking }: { position: [number, number, number]; blocking: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const blockRef = useRef(0);
+  const leftController = useController('left');
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
+
+    // Track VR left controller if available
+    if (leftController?.controller) {
+      const ctrl = leftController.controller;
+      groupRef.current.position.copy(ctrl.position);
+      groupRef.current.quaternion.copy(ctrl.quaternion);
+      // Offset shield in front of hand
+      groupRef.current.translateZ(-0.1);
+    }
+
+    // Block animation
     if (blocking) {
       blockRef.current = Math.min(1, blockRef.current + delta * 6);
     } else {
       blockRef.current = Math.max(0, blockRef.current - delta * 3);
     }
-    groupRef.current.position.z = position[2] + blockRef.current * -0.3;
-    groupRef.current.scale.setScalar(1 + blockRef.current * 0.15);
+
+    // Desktop fallback positioning
+    if (!leftController?.controller) {
+      groupRef.current.position.z = position[2] + blockRef.current * -0.3;
+      groupRef.current.scale.setScalar(1 + blockRef.current * 0.15);
+    } else {
+      groupRef.current.scale.setScalar(1 + blockRef.current * 0.15);
+    }
   });
 
   return (
