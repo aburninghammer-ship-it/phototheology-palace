@@ -154,12 +154,39 @@ function XRSceneAnchor({ children }: { children: React.ReactNode }) {
   return <group position={sceneOffset}>{children}</group>;
 }
 
-/** 3D reload button visible inside XR sessions (HTML overlays are hidden in immersive mode) */
+/** 3D reload button visible inside XR sessions — only appears when an update is available */
 function VRReloadButton() {
   const { isPresenting } = useXR();
   const [hovered, setHovered] = useState(false);
+  const [updateReady, setUpdateReady] = useState(false);
 
-  if (!isPresenting) return null;
+  useEffect(() => {
+    if (!isPresenting) return;
+
+    const checkBuildTag = async () => {
+      try {
+        const currentBuild = document.querySelector('meta[name="app-build"]')?.getAttribute('content');
+        if (!currentBuild) return;
+
+        const url = `${window.location.origin}/?__buildcheck=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const html = await fetch(url, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache, no-store, max-age=0', Pragma: 'no-cache' },
+        }).then(r => r.text());
+
+        const match = html.match(/<meta\s+name=["']app-build["']\s+content=["']([^"']+)["']/i);
+        if (match?.[1] && match[1] !== currentBuild) {
+          setUpdateReady(true);
+        }
+      } catch { /* ignore */ }
+    };
+
+    checkBuildTag();
+    const id = window.setInterval(checkBuildTag, 30_000);
+    return () => window.clearInterval(id);
+  }, [isPresenting]);
+
+  if (!isPresenting || !updateReady) return null;
 
   return (
     <group position={[2, 2.8, -2]}>
@@ -171,26 +198,25 @@ function VRReloadButton() {
         <mesh>
           <planeGeometry args={[0.6, 0.2]} />
           <meshBasicMaterial
-            color={hovered ? '#6366f1' : '#333'}
+            color={hovered ? '#22c55e' : '#1a7a3a'}
             transparent
-            opacity={0.85}
+            opacity={0.9}
           />
         </mesh>
       </Interactive>
-      {/* Border */}
       <mesh position={[0, 0, -0.001]}>
         <planeGeometry args={[0.64, 0.24]} />
-        <meshBasicMaterial color={hovered ? '#818cf8' : '#555'} transparent opacity={0.6} />
+        <meshBasicMaterial color={hovered ? '#4ade80' : '#166534'} transparent opacity={0.6} />
       </mesh>
       <Suspense fallback={null}>
         <Text
           position={[0, 0, 0.001]}
-          fontSize={0.07}
+          fontSize={0.065}
           color="#fff"
           anchorX="center"
           anchorY="middle"
         >
-          ↻ Reload
+          ↻ Update Ready
         </Text>
       </Suspense>
     </group>
