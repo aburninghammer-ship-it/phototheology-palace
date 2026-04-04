@@ -360,6 +360,10 @@ COMPLETE FEATURE CATALOG (for your reference — know ALL of these):
 
 Keep responses concise and warm — 2-5 sentences for simple questions, slightly longer for coaching suggestions. Always end complex explanations with an offer to help further.`;
 
+    // Fetch dynamic knowledge updates from DB
+    const knowledgeBlock = await getKnowledgeUpdates();
+    const fullPrompt = systemPrompt + knowledgeBlock;
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
