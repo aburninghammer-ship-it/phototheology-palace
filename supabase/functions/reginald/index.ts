@@ -373,7 +373,7 @@ Keep responses concise and warm — 2-5 sentences for simple questions, slightly
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: fullPrompt },
           ...messages,
         ],
         max_tokens: 800,
