@@ -8,13 +8,14 @@ import { CacheFirst } from 'workbox-strategies';
 
 declare let self: ServiceWorkerGlobalScope;
 
-const IMAGE_CACHE = 'pt-images-2026-04-02-7';
-const GOOGLE_FONTS_CACHE = 'pt-google-fonts-2026-04-02-7';
-const GSTATIC_FONTS_CACHE = 'pt-gstatic-fonts-2026-04-02-7';
+const IMAGE_CACHE = 'pt-images-2026-04-03-8';
+const GOOGLE_FONTS_CACHE = 'pt-google-fonts-2026-04-03-8';
+const GSTATIC_FONTS_CACHE = 'pt-gstatic-fonts-2026-04-03-8';
 const ALLOWED_CACHES = new Set([cacheNames.precache, IMAGE_CACHE, GOOGLE_FONTS_CACHE, GSTATIC_FONTS_CACHE]);
 
-// Don't call skipWaiting() at top level — let the PWAUpdatePrompt control
-// when the new SW activates so the user sees the reload prompt.
+// Activate new SW immediately so reloads always get latest code
+// (critical for VR mode where HTML update prompts are invisible)
+self.skipWaiting();
 clientsClaim();
 
 precacheAndRoute(self.__WB_MANIFEST);
