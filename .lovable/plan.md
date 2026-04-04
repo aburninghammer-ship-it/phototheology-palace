@@ -1,58 +1,39 @@
+## Heaven's Diary VR Enhancement Plan
 
-# 3-Mode System: Simple → Guided → Master
+### 1. Richer Visual Environments
+Generate 6 cosmic-style backdrop images (one per stage) matching the established aesthetic:
+- **Creation**: Swirling nebula with cosmic matter forming, deep blues and golds
+- **Garden**: Lush ethereal garden with glowing trees, rivers of light
+- **Cross**: Dark dramatic sky with a radiant cross breaking through darkness
+- **Resurrection**: Explosive golden light burst, empty tomb with dawn breaking
+- **Throne Room**: Majestic golden architecture, rainbow aurora, sea of glass
+- **New Jerusalem**: Descending city of light, pearl gates, crystal river
 
-## Overview
-Add a global user experience mode that controls how much Phototheology architecture (rooms, principles, codes) is exposed. The engine stays identical — only the presentation layer changes.
+These will be rendered as large billboard planes behind each scene for depth and atmosphere.
 
-## The 3 Modes
+### 2. Scripture Integration
+Add a rotating scripture display to each stage showing 3-4 key verses that cycle during the scene:
+- Creation: Gen 1:1, Gen 1:3, Ps 33:6, John 1:1
+- Garden: Gen 2:8-9, Gen 2:10, Rev 22:2
+- Cross: John 19:30, Isa 53:5, Rom 5:8, 1 Pet 2:24
+- Resurrection: Matt 28:6, Rom 6:9, 1 Cor 15:55
+- Throne: Rev 4:2-3, Rev 4:8, Dan 7:9-10
+- New Jerusalem: Rev 21:2-4, Rev 22:1-2, Rev 21:23
 
-### 🟢 Simple Mode ("The Clock")
-- No mention of rooms, floors, principles, or codes
-- Actions presented as: "Understand", "Apply", "Defend", "Connect"
-- Jeeves speaks in plain language: "Here are 3 layers of meaning..." instead of "Let's use the Dimensions Room"
-- Palace rooms still fire behind the scenes, just invisible
-- Best for: New users, non-SDA audiences, casual Bible students
+Verses will gently fade in/out as floating text panels within the 3D scene.
 
-### 🟡 Guided Mode ("Learning the Engine")
-- Occasional mentions: "This insight uses a pattern-recognition technique..."
-- After showing results, a subtle tag appears: "💡 This used the Dimensions principle"
-- Tooltips explain PT concepts when hovered
-- Progressive disclosure — users learn PT vocabulary naturally through use
-- Best for: Growing users who want to understand why insights are powerful
+### 3. Ambient Soundscapes (Layered)
+Add subtle ambient audio layers per scene using the Web Audio API:
+- Creation: Deep cosmic rumble, ethereal tones
+- Garden: Gentle water flowing, birds, rustling leaves
+- Cross: Thunder, wind, solemn tone
+- Resurrection: Rising orchestral swell, triumphant horns
+- Throne: Angelic choir hum, reverberant chimes
+- New Jerusalem: Crystal bells, flowing water, peaceful chimes
 
-### 🔴 Master Mode ("Full Engine")
-- Full room names, floor numbers, codes visible
-- Claim Ladder, debate tools, all PT terminology
-- Current experience preserved exactly as-is
-- Best for: Advanced users, teachers, apologists, course students
+We'll generate these via the ElevenLabs SFX API and cache them in storage.
 
-## Implementation Plan
-
-### Step 1: Create the Mode System (Context + Storage)
-- Create a `UserExperienceMode` context provider
-- Store preference in localStorage + user profile (database)
-- Default new users to **Simple** mode
-- Provide a clean toggle UI accessible from Settings and a floating indicator
-
-### Step 2: Create Mode-Aware Components
-- `<PTLabel>` component that renders differently per mode:
-  - Simple: plain language only
-  - Guided: plain language + subtle PT tag
-  - Master: full PT terminology
-- `<PTSection>` wrapper that shows/hides architectural UI per mode
-
-### Step 3: Update Key Surfaces
-- **Welcome/Home**: Action-based buttons in Simple, space tiles in Master
-- **Palace Rooms**: Show as "Study Tools" in Simple, room names in Master
-- **Jeeves**: System prompt adjusts per mode (no jargon → some context → full PT)
-- **Navigation labels**: "Memory Training" vs "Floor 1 - Furnishing"
-- **Study results**: Hide room tags in Simple, show progressively in Guided
-
-### Step 4: Mode Selector UI
-- Settings page toggle (primary)
-- First-time user onboarding prompt
-- Quick-switch in sidebar/header for power users
-
-### Step 5: Persist to Database
-- Add `experience_mode` column to profiles table
-- Sync between localStorage and database
+### Implementation Order
+1. Generate backdrop images (6 images)
+2. Add scripture cycling system
+3. Wire up ambient soundscapes
