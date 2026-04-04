@@ -137,7 +137,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex flex-wrap justify-center gap-2 mb-4"
+          className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-3 sm:mb-4"
         >
           {socialProof.map((item, i) => (
             <Badge 
