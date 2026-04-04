@@ -231,7 +231,15 @@ function Fireflies({ count = 25 }: { count?: number }) {
 
 // ── Screens ──
 
-type Screen = 'menu' | 'playing';
+type Screen = 'tracts' | 'sessions' | 'playing';
+
+const SESSIONS_PER_PAGE = 7;
+
+const TRACT_TYPE_COLORS: Record<string, string> = {
+  free: '#22CC66',
+  '40-day': '#FFD700',
+  '365-day': '#FF6644',
+};
 
 function formatTime(s: number): string {
   if (!s || !isFinite(s)) return '0:00';
@@ -239,26 +247,34 @@ function formatTime(s: number): string {
 }
 
 export default function NightWatchVR({ onBack }: NightWatchVRProps) {
-  const [screen, setScreen] = useState<Screen>('menu');
+  const [screen, setScreen] = useState<Screen>('tracts');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [statusText, setStatusText] = useState('');
   const [activeSession, setActiveSession] = useState<{ session: WatchSession; tractName: string } | null>(null);
+  const [selectedTract, setSelectedTract] = useState<WatchTract | null>(null);
+  const [sessionPage, setSessionPage] = useState(0);
+  const [tractPage, setTractPage] = useState(0);
 
   const [audioState, audioControls] = useStreamingAudio(audioUrl || '');
   const bgMusic = useBackgroundMusic('night');
 
-  // Get tracts that have night sessions
-  const availableTracts = useMemo(() =>
-    WATCH_TRACTS.filter((t) => t.sessions.length > 0),
-  []);
+  // All tracts (show all — populated ones playable, others "Coming Soon")
+  const allTracts = useMemo(() => WATCH_TRACTS, []);
+  const tractPages = Math.ceil(allTracts.length / 6);
+  const visibleTracts = allTracts.slice(tractPage * 6, (tractPage + 1) * 6);
 
-  // Flatten first 7 sessions from the free tract for quick access
-  const quickSessions = useMemo(() => {
-    const free = availableTracts.find((t) => t.isFree);
-    if (!free) return [];
-    return free.sessions.slice(0, 7).map((s) => ({ session: s, tractName: free.name, tractId: free.id }));
-  }, [availableTracts]);
+  // Sessions in selected tract (paginated)
+  const tractSessions = useMemo(() => {
+    if (!selectedTract) return [];
+    return selectedTract.sessions;
+  }, [selectedTract]);
+
+  const sessionPages = Math.ceil(tractSessions.length / SESSIONS_PER_PAGE);
+  const visibleSessions = tractSessions.slice(
+    sessionPage * SESSIONS_PER_PAGE,
+    (sessionPage + 1) * SESSIONS_PER_PAGE,
+  );
 
   const avgVolume = useMemo(() => {
     if (!audioState.analyserData) return 0;
@@ -341,32 +357,138 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
 
       <MeditationParticles count={50} brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
 
-      {/* ─── MENU SCREEN ─── */}
-      {screen === 'menu' && (
+      {/* ─── TRACT SELECTION SCREEN ─── */}
+      {screen === 'tracts' && (
         <Suspense fallback={null}>
-          <Text position={[0, 2.4, -4]} fontSize={0.3} color="#8b5cf6" anchorX="center" outlineWidth={0.01} outlineColor="#000">
+          <Text position={[0, 2.6, -4]} fontSize={0.3} color="#8b5cf6" anchorX="center" outlineWidth={0.01} outlineColor="#000">
             Night Watch
           </Text>
-          <Text position={[0, 2.05, -4]} fontSize={0.1} color="#6366f1" anchorX="center">
-            Select a session to begin your meditation
+          <Text position={[0, 2.25, -4]} fontSize={0.1} color="#6366f1" anchorX="center">
+            Choose a meditation series
           </Text>
 
-          {/* Status text */}
+          {/* Tract cards — 2 columns, 3 rows per page */}
+          {visibleTracts.map((tract, i) => {
+            const col = i % 2;
+            const row = Math.floor(i / 2);
+            const x = (col - 0.5) * 2.8;
+            const y = 1.5 - row * 0.55;
+            const hasSessions = tract.sessions.length > 0;
+            const typeColor = TRACT_TYPE_COLORS[tract.type] || '#888';
+
+            return (
+              <group key={tract.id} position={[x, y, -4]}>
+                <Interactive onSelect={() => {
+                  if (hasSessions) {
+                    setSelectedTract(tract);
+                    setSessionPage(0);
+                    setScreen('sessions');
+                  }
+                }}>
+                  <mesh
+                    onClick={() => {
+                      if (hasSessions) {
+                        setSelectedTract(tract);
+                        setSessionPage(0);
+                        setScreen('sessions');
+                      }
+                    }}
+                    onPointerDown={() => {
+                      if (hasSessions) {
+                        setSelectedTract(tract);
+                        setSessionPage(0);
+                        setScreen('sessions');
+                      }
+                    }}
+                  >
+                    <planeGeometry args={[2.5, 0.45]} />
+                    <meshStandardMaterial
+                      color={hasSessions ? '#0f0a2a' : '#0a0815'}
+                      emissive={typeColor}
+                      emissiveIntensity={hasSessions ? 0.12 : 0.03}
+                    />
+                  </mesh>
+                </Interactive>
+                {/* Type badge */}
+                <mesh position={[1.05, 0.15, 0.01]}>
+                  <planeGeometry args={[0.4, 0.12]} />
+                  <meshBasicMaterial color={typeColor} transparent opacity={hasSessions ? 0.8 : 0.3} />
+                </mesh>
+                <Text position={[1.05, 0.15, 0.02]} fontSize={0.04} color="#000" anchorX="center" anchorY="middle">
+                  {tract.type === 'free' ? 'FREE' : tract.type.toUpperCase()}
+                </Text>
+                <Text position={[-0.1, 0.05, 0.01]} fontSize={0.07} color={hasSessions ? '#a78bfa' : '#555'} anchorX="center" anchorY="middle" maxWidth={2.2}>
+                  {tract.icon} {tract.name}
+                </Text>
+                <Text position={[-0.1, -0.12, 0.01]} fontSize={0.04} color={hasSessions ? '#6366f1' : '#444'} anchorX="center" anchorY="middle" maxWidth={2.2}>
+                  {hasSessions ? `${tract.totalSessions} sessions — ${tract.subtitle}` : 'Coming Soon'}
+                </Text>
+              </group>
+            );
+          })}
+
+          {/* Pagination */}
+          {tractPages > 1 && (
+            <group position={[0, -0.4, -4]}>
+              {tractPage > 0 && (
+                <Interactive onSelect={() => setTractPage((p) => p - 1)}>
+                  <mesh position={[-1.2, 0, 0]} onClick={() => setTractPage((p) => p - 1)}>
+                    <planeGeometry args={[0.8, 0.25]} />
+                    <meshStandardMaterial color="#0f0a2a" emissive="#6366f1" emissiveIntensity={0.15} />
+                  </mesh>
+                </Interactive>
+              )}
+              {tractPage > 0 && (
+                <Text position={[-1.2, 0, 0.01]} fontSize={0.07} color="#a78bfa" anchorX="center" anchorY="middle">
+                  ← Prev
+                </Text>
+              )}
+              <Text position={[0, 0, 0.01]} fontSize={0.06} color="#666" anchorX="center" anchorY="middle">
+                {tractPage + 1} / {tractPages}
+              </Text>
+              {tractPage < tractPages - 1 && (
+                <Interactive onSelect={() => setTractPage((p) => p + 1)}>
+                  <mesh position={[1.2, 0, 0]} onClick={() => setTractPage((p) => p + 1)}>
+                    <planeGeometry args={[0.8, 0.25]} />
+                    <meshStandardMaterial color="#0f0a2a" emissive="#6366f1" emissiveIntensity={0.15} />
+                  </mesh>
+                </Interactive>
+              )}
+              {tractPage < tractPages - 1 && (
+                <Text position={[1.2, 0, 0.01]} fontSize={0.07} color="#a78bfa" anchorX="center" anchorY="middle">
+                  Next →
+                </Text>
+              )}
+            </group>
+          )}
+        </Suspense>
+      )}
+
+      {/* ─── SESSION SELECTION SCREEN ─── */}
+      {screen === 'sessions' && selectedTract && (
+        <Suspense fallback={null}>
+          <Text position={[0, 2.6, -4]} fontSize={0.22} color="#8b5cf6" anchorX="center" outlineWidth={0.008} outlineColor="#000">
+            {selectedTract.icon} {selectedTract.name}
+          </Text>
+          <Text position={[0, 2.3, -4]} fontSize={0.08} color="#6366f1" anchorX="center">
+            {selectedTract.subtitle} — {selectedTract.totalSessions} sessions
+          </Text>
+
           {statusText && (
-            <Text position={[0, 1.75, -4]} fontSize={0.09} color="#a78bfa" anchorX="center">
+            <Text position={[0, 2.0, -4]} fontSize={0.09} color="#a78bfa" anchorX="center">
               {statusText}
             </Text>
           )}
 
-          {/* Session buttons — arranged in a row */}
-          {quickSessions.map((qs, i) => {
-            const x = (i - 3) * 0.9;
+          {/* Session buttons — row layout */}
+          {visibleSessions.map((session, i) => {
+            const x = (i - Math.min(visibleSessions.length - 1, SESSIONS_PER_PAGE - 1) / 2) * 0.9;
             return (
-              <group key={qs.session.dayNumber} position={[x, 1.2, -4]}>
-                <Interactive onSelect={() => !generating && handleSelectSession(qs.session, qs.tractName)}>
+              <group key={session.dayNumber} position={[x, 1.2, -4]}>
+                <Interactive onSelect={() => !generating && handleSelectSession(session, selectedTract.name)}>
                   <mesh
-                    onClick={() => !generating && handleSelectSession(qs.session, qs.tractName)}
-                    onPointerDown={() => !generating && handleSelectSession(qs.session, qs.tractName)}
+                    onClick={() => !generating && handleSelectSession(session, selectedTract.name)}
+                    onPointerDown={() => !generating && handleSelectSession(session, selectedTract.name)}
                   >
                     <planeGeometry args={[0.75, 0.6]} />
                     <meshStandardMaterial
@@ -377,21 +499,66 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
                   </mesh>
                 </Interactive>
                 <Text position={[0, 0.12, 0.01]} fontSize={0.12} color="#a78bfa" anchorX="center" anchorY="middle">
-                  Day {qs.session.dayNumber}
+                  Day {session.dayNumber}
                 </Text>
                 <Text position={[0, -0.06, 0.01]} fontSize={0.05} color="#7c3aed" anchorX="center" anchorY="middle" maxWidth={0.65}>
-                  {qs.session.title}
+                  {session.title}
                 </Text>
                 <Text position={[0, -0.2, 0.01]} fontSize={0.04} color="#4c1d95" anchorX="center" anchorY="middle" maxWidth={0.65}>
-                  {qs.session.scripture}
+                  {session.scripture}
                 </Text>
               </group>
             );
           })}
 
-          {/* Generating spinner indicator */}
+          {/* Session pagination */}
+          {sessionPages > 1 && (
+            <group position={[0, 0.4, -4]}>
+              {sessionPage > 0 && (
+                <Interactive onSelect={() => setSessionPage((p) => p - 1)}>
+                  <mesh position={[-1.5, 0, 0]} onClick={() => setSessionPage((p) => p - 1)}>
+                    <planeGeometry args={[0.8, 0.25]} />
+                    <meshStandardMaterial color="#0f0a2a" emissive="#6366f1" emissiveIntensity={0.15} />
+                  </mesh>
+                </Interactive>
+              )}
+              {sessionPage > 0 && (
+                <Text position={[-1.5, 0, 0.01]} fontSize={0.07} color="#a78bfa" anchorX="center" anchorY="middle">
+                  ← Prev
+                </Text>
+              )}
+              <Text position={[0, 0, 0.01]} fontSize={0.06} color="#666" anchorX="center" anchorY="middle">
+                Page {sessionPage + 1} / {sessionPages}
+              </Text>
+              {sessionPage < sessionPages - 1 && (
+                <Interactive onSelect={() => setSessionPage((p) => p + 1)}>
+                  <mesh position={[1.5, 0, 0]} onClick={() => setSessionPage((p) => p + 1)}>
+                    <planeGeometry args={[0.8, 0.25]} />
+                    <meshStandardMaterial color="#0f0a2a" emissive="#6366f1" emissiveIntensity={0.15} />
+                  </mesh>
+                </Interactive>
+              )}
+              {sessionPage < sessionPages - 1 && (
+                <Text position={[1.5, 0, 0.01]} fontSize={0.07} color="#a78bfa" anchorX="center" anchorY="middle">
+                  Next →
+                </Text>
+              )}
+            </group>
+          )}
+
+          {/* Back to tracts */}
+          <Interactive onSelect={() => setScreen('tracts')}>
+            <mesh position={[0, -0.2, -3.5]} onClick={() => setScreen('tracts')} onPointerDown={() => setScreen('tracts')}>
+              <planeGeometry args={[1.4, 0.25]} />
+              <meshStandardMaterial color="#0f0a2a" emissive="#4338ca" emissiveIntensity={0.1} />
+            </mesh>
+          </Interactive>
+          <Text position={[0, -0.2, -3.48]} fontSize={0.08} color="#7c3aed" anchorX="center" anchorY="middle">
+            ← Back to Series
+          </Text>
+
           {generating && (
-            <group position={[0, 0.5, -3]}>
+            <group position={[0, 0.7, -3]}>
               <mesh>
                 <torusGeometry args={[0.15, 0.02, 8, 32]} />
                 <meshBasicMaterial color="#8b5cf6" transparent opacity={0.6} />
@@ -439,11 +606,11 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
           </Text>
 
           {/* Back to session select */}
-          <Interactive onSelect={() => { audioControls.pause(); bgMusic.pause(); setScreen('menu'); setAudioUrl(null); }}>
+          <Interactive onSelect={() => { audioControls.pause(); bgMusic.pause(); setScreen('sessions'); setAudioUrl(null); }}>
             <mesh
               position={[0, 0.55, -3.5]}
-              onClick={() => { audioControls.pause(); bgMusic.pause(); setScreen('menu'); setAudioUrl(null); }}
-              onPointerDown={() => { audioControls.pause(); bgMusic.pause(); setScreen('menu'); setAudioUrl(null); }}
+              onClick={() => { audioControls.pause(); bgMusic.pause(); setScreen('sessions'); setAudioUrl(null); }}
+              onPointerDown={() => { audioControls.pause(); bgMusic.pause(); setScreen('sessions'); setAudioUrl(null); }}
             >
               <planeGeometry args={[1.2, 0.25]} />
               <meshStandardMaterial color="#0f0a2a" emissive="#4338ca" emissiveIntensity={0.1} />

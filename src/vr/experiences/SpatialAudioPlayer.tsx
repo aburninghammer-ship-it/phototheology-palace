@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, Suspense } from 'react';
+import { useRef, useMemo, useState, useEffect, useCallback, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
@@ -14,6 +14,30 @@ import {
   type AudioEntry,
   type AudioCategory,
 } from '@/data/audioLibraryData';
+import { supabase } from '@/integrations/supabase/client';
+
+// ── TTS Generation ──────────────────────────────────────────────────────────
+
+async function generateTTSUrl(text: string, voice?: string): Promise<string | null> {
+  try {
+    const { data, error } = await supabase.functions.invoke('text-to-speech', {
+      body: { text: text.trim(), voice: voice || 'nova', provider: 'openai', speed: 1.0, useCache: true },
+    });
+    if (error) throw error;
+    if (data?.audioUrl) return data.audioUrl;
+    if (data?.audioContent) {
+      const blob = new Blob(
+        [Uint8Array.from(atob(data.audioContent), (c) => c.charCodeAt(0))],
+        { type: 'audio/mpeg' },
+      );
+      return URL.createObjectURL(blob);
+    }
+    return null;
+  } catch (err) {
+    console.error('[SpatialAudioPlayer] TTS error:', err);
+    return null;
+  }
+}
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -301,7 +325,7 @@ function LibraryScreen({
       {/* Track list — center */}
       <group position={[0.3, 1.5, -2.5]}>
         {pageItems.map((entry, i) => {
-          const hasAudio = !!entry.audioUrl;
+          const hasAudio = !!entry.audioUrl || !!entry.audioMeta?.text;
           return (
             <VRButton
               key={entry.id}
@@ -478,10 +502,45 @@ function PlayerScreen({
   entry: AudioEntry;
   onBack: () => void;
 }) {
-  const audioUrl = entry.audioUrl || '';
+  const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
+  const [ttsStatus, setTtsStatus] = useState<string>('');
+  const [ttsGenerating, setTtsGenerating] = useState(false);
+
+  const audioUrl = entry.audioUrl || generatedUrl || '';
   const [audioState, audioControls] = useStreamingAudio(audioUrl);
 
   const trackColor = CATEGORY_COLORS[entry.category] || '#FFD700';
+  const needsTTS = !entry.audioUrl && !!entry.audioMeta?.text;
+
+  // Auto-generate TTS for entries without audioUrl
+  useEffect(() => {
+    if (!needsTTS || generatedUrl || ttsGenerating) return;
+    let cancelled = false;
+
+    const generate = async () => {
+      setTtsGenerating(true);
+      setTtsStatus('Generating audio...');
+      try {
+        const voice = entry.audioMeta?.voice as string | undefined;
+        const url = await generateTTSUrl(entry.audioMeta.text as string, voice);
+        if (cancelled) return;
+        if (url) {
+          setGeneratedUrl(url);
+          setTtsStatus('');
+          setTimeout(() => audioControls.play(), 500);
+        } else {
+          setTtsStatus('Audio generation failed');
+        }
+      } catch {
+        if (!cancelled) setTtsStatus('Audio generation failed');
+      } finally {
+        if (!cancelled) setTtsGenerating(false);
+      }
+    };
+
+    generate();
+    return () => { cancelled = true; };
+  }, [needsTTS, entry.id]);
 
   const formatTime = (seconds: number): string => {
     if (!seconds || !isFinite(seconds)) return '0:00';
@@ -495,13 +554,13 @@ function PlayerScreen({
       {/* Now Playing info */}
       <Suspense fallback={null}>
         <Text position={[0, 2.5, -2]} fontSize={0.18} color="#44DDFF" anchorX="center" outlineWidth={0.01} outlineColor="#001122">
-          Now Playing
+          {ttsGenerating ? 'Generating...' : 'Now Playing'}
         </Text>
         <Text position={[0, 2.1, -2]} fontSize={0.1} color={trackColor} anchorX="center" maxWidth={3}>
           {entry.title}
         </Text>
         <Text position={[0, 1.85, -2]} fontSize={0.07} color="#aaa" anchorX="center" maxWidth={3}>
-          {entry.description.slice(0, 100)}{entry.description.length > 100 ? '...' : ''}
+          {ttsStatus || (entry.description.slice(0, 100) + (entry.description.length > 100 ? '...' : ''))}
         </Text>
         <Text position={[0, 1.6, -2]} fontSize={0.07} color="#888" anchorX="center">
           {formatTime(audioState.currentTime)} / {formatTime(audioState.duration)}
@@ -529,7 +588,7 @@ function PlayerScreen({
       {/* Transcript panel */}
       {entry.audioMeta?.text && (
         <TranscriptPanel
-          text={entry.audioMeta.text}
+          text={entry.audioMeta.text as string}
           progress={audioState.progress}
           color={trackColor}
         />
@@ -560,7 +619,7 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
   const [returnScreen, setReturnScreen] = useState<'library' | 'suite'>('library');
 
   const handleSelectTrack = (entry: AudioEntry) => {
-    if (!entry.audioUrl) return;
+    if (!entry.audioUrl && !entry.audioMeta?.text) return;
     setSelectedEntry(entry);
     setReturnScreen('library');
     setScreen('player');
