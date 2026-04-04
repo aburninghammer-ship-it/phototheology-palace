@@ -85,7 +85,7 @@ export const PunchyHero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-5 leading-tight sm:leading-[1.1] px-2"
+          className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 sm:mb-5 leading-tight sm:leading-[1.1] px-2"
         >
           {/* Mobile: Shorter, punchier headline */}
           <span className="sm:hidden">
