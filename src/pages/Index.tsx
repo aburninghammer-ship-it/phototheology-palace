@@ -193,7 +193,7 @@ const Index = () => {
 
       {/* Language Selector for public visitors */}
       {!focusMode && (
-        <div className="fixed bottom-20 right-4 z-50 md:bottom-6 zen-hideable">
+        <div className="fixed bottom-20 right-3 z-50 md:bottom-6 md:right-4 zen-hideable">
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="icon" className="rounded-full shadow-lg bg-background/95 backdrop-blur-sm h-10 w-10">
