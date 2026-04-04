@@ -62,7 +62,7 @@ const Bible = () => {
     <div className="min-h-screen gradient-subtle">
       <Navigation />
       
-      <div className="pt-4 pb-24 md:pb-16 px-3 sm:px-4 md:px-6">
+      <div className="pt-2 sm:pt-4 pb-24 md:pb-16 px-2 sm:px-4 md:px-6">
         <div className="container mx-auto max-w-7xl">
 
           {/* Header - Glass Card */}
