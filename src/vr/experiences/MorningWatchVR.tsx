@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState, useCallback, Suspense } from 'react';
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
@@ -11,7 +11,6 @@ import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
 import { callJeeves } from '@/lib/jeevesClient';
 import { supabase } from '@/integrations/supabase/client';
 import { WATCH_TRACTS, type MorningWatchSession } from '@/data/watchSeries';
-import morningWatchBg from '@/assets/vr/morning-watch.png';
 
 interface MorningWatchVRProps {
   onBack: () => void;
@@ -95,31 +94,6 @@ async function generateTTSUrl(script: string): Promise<string | null> {
     console.error('[MorningWatchVR] TTS error:', err);
     return null;
   }
-}
-
-// ── Visual: Scene backdrop ──
-
-function MorningBackdrop() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const texture = useLoader(THREE.TextureLoader, morningWatchBg);
-
-  useFrame(({ camera }) => {
-    if (!meshRef.current) return;
-    meshRef.current.quaternion.copy(camera.quaternion);
-  });
-
-  return (
-    <mesh ref={meshRef} position={[0, 2, -50]}>
-      <planeGeometry args={[70, 40]} />
-      <meshBasicMaterial
-        map={texture}
-        transparent
-        opacity={0.4}
-        depthWrite={false}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
 }
 
 // ── Visual: Sunrise particles ──
@@ -252,7 +226,6 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
 
   return (
     <group>
-      <MorningBackdrop />
       {/* Stars fading into dawn */}
       <StarField count={1500} radius={60} brightness={screen === 'playing' ? 0.3 + avgVolume * 0.2 : 0.4} />
       <NebulaClouds count={6} radius={30} colors={['#7C3AED', '#C026D3', '#DB2777', '#6B21A8']} opacity={0.08 + avgVolume * 0.06} />

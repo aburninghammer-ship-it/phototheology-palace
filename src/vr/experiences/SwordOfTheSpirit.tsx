@@ -8,13 +8,12 @@
  * Desktop: click orbs. VR: ray-select or swing controller.
  */
 import { useRef, useMemo, useState, useCallback, Suspense, useEffect } from 'react';
-import { useFrame, useThree, useLoader } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 import { StarField } from '../components/StarField';
-import swordArenaBg from '@/assets/vr/sword-arena.png';
 
 // ── Game Data ──
 
@@ -418,37 +417,11 @@ function GameHUD({ health, score, combo, level, armorProgress }: {
   );
 }
 
-// ── Arena Backdrop ──
-
-function ArenaBackdrop() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const texture = useLoader(THREE.TextureLoader, swordArenaBg);
-
-  useFrame(({ camera }) => {
-    if (!meshRef.current) return;
-    meshRef.current.quaternion.copy(camera.quaternion);
-  });
-
-  return (
-    <mesh ref={meshRef} position={[0, 3, -40]}>
-      <planeGeometry args={[60, 34]} />
-      <meshBasicMaterial
-        map={texture}
-        transparent
-        opacity={0.35}
-        depthWrite={false}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
-}
-
 // ── Arena environment ──
 
 function BattleArena() {
   return (
     <group>
-      <ArenaBackdrop />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <planeGeometry args={[20, 20]} />
         <meshPhysicalMaterial color="#080818" metalness={0.7} roughness={0.2} clearcoat={0.4} clearcoatRoughness={0.3} />

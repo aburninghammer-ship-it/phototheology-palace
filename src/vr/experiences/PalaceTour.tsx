@@ -1,7 +1,6 @@
 import { useState, Suspense, useMemo, useRef } from 'react';
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import palaceExterior from '@/assets/vr/palace-exterior.png';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { palaceFloors, type Floor, type Room } from '@/data/palaceData';
@@ -30,31 +29,6 @@ type ViewMode = 'elevator' | 'floor' | 'room';
 
 interface PalaceTourProps {
   onBack: () => void;
-}
-
-// ── Palace Backdrop ─────────────────────────────────────────────────────────
-
-function PalaceBackdrop() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const texture = useLoader(THREE.TextureLoader, palaceExterior);
-
-  useFrame(({ camera }) => {
-    if (!meshRef.current) return;
-    meshRef.current.quaternion.copy(camera.quaternion);
-  });
-
-  return (
-    <mesh ref={meshRef} position={[0, 2, -40]}>
-      <planeGeometry args={[60, 34]} />
-      <meshBasicMaterial
-        map={texture}
-        transparent
-        opacity={0.3}
-        depthWrite={false}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
 }
 
 // ── Energy Orb (replaces Torch) ─────────────────────────────────────────────
@@ -314,7 +288,6 @@ function ElevatorView({
 }) {
   return (
     <group>
-      <PalaceBackdrop />
       <HoloPalaceInterior wallColor="#0a0e20" floorColor="#0a0e1e" accentColor="#00AAFF" />
 
       {/* Holographic lighting */}

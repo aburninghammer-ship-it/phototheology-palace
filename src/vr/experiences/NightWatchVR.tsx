@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState, useCallback, Suspense } from 'react';
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
@@ -11,7 +11,6 @@ import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
 import { callJeeves } from '@/lib/jeevesClient';
 import { supabase } from '@/integrations/supabase/client';
 import { WATCH_TRACTS, type WatchSession, type WatchTract } from '@/data/watchSeries';
-import nightWatchBg from '@/assets/vr/night-watch.png';
 
 interface NightWatchVRProps {
   onBack: () => void;
@@ -99,29 +98,6 @@ async function generateTTSUrl(script: string): Promise<string | null> {
 }
 
 // ── Visual components ──
-
-function NightBackdrop() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const texture = useLoader(THREE.TextureLoader, nightWatchBg);
-
-  useFrame(({ camera }) => {
-    if (!meshRef.current) return;
-    meshRef.current.quaternion.copy(camera.quaternion);
-  });
-
-  return (
-    <mesh ref={meshRef} position={[0, 2, -50]}>
-      <planeGeometry args={[70, 40]} />
-      <meshBasicMaterial
-        map={texture}
-        transparent
-        opacity={0.45}
-        depthWrite={false}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
-}
 
 function MeditationParticles({ count = 40, brightness = 1 }: { count?: number; brightness?: number }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
@@ -242,7 +218,6 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
 
   return (
     <group>
-      <NightBackdrop />
       {/* Deep space backdrop */}
       <StarField count={2500} radius={60} brightness={screen === 'playing' ? 0.6 + avgVolume * 0.4 : 0.8} />
       <NebulaClouds count={8} radius={35} colors={['#2e1065', '#6B21A8', '#4338CA', '#C026D3']} opacity={0.1 + avgVolume * 0.1} />
