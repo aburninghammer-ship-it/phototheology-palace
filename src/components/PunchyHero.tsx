@@ -169,7 +169,7 @@ export const PunchyHero = () => {
           className="mb-6 sm:mb-8 px-2 sm:px-4"
         >
           {/* Gradient border glow wrapper */}
-          <div className="relative p-[2px] sm:p-[3px] rounded-2xl bg-gradient-to-r from-green-400 via-cyan-400 to-primary max-w-xs sm:max-w-2xl md:max-w-4xl mx-auto shadow-[0_0_30px_rgba(34,211,238,0.3),0_0_60px_rgba(34,211,238,0.1)]">
+          <div className="relative p-[2px] sm:p-[3px] rounded-2xl bg-gradient-to-r from-green-400 via-cyan-400 to-primary max-w-[280px] sm:max-w-2xl md:max-w-4xl mx-auto shadow-[0_0_30px_rgba(34,211,238,0.3),0_0_60px_rgba(34,211,238,0.1)]">
             <div className="relative p-3 sm:p-5 md:p-6 rounded-[14px] bg-background/95 backdrop-blur-md overflow-hidden">
               {/* Inner gradient glow */}
               <div className="absolute inset-0 rounded-[14px] bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
