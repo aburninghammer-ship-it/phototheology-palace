@@ -194,6 +194,25 @@ export async function getQuarterlyLesson(
       };
     }
     
+    // Fallback: Use Q2 2026 local data
+    const q2Lesson = Q2_2026_LESSONS.find((l) => l.id === lessonId);
+    if (q2Lesson) {
+      return {
+        lesson: {
+          id: q2Lesson.id,
+          title: q2Lesson.title,
+          bible_reading: q2Lesson.scriptures.join(", "),
+        },
+        days: q2Lesson.days.map((day, idx) => ({
+          id: String(idx + 1).padStart(2, "0"),
+          title: `${day.day} - ${day.title}`,
+          date: day.date,
+          read: `<p><strong>${day.title}</strong></p><p>Scriptures: ${day.scriptures.join(", ")}</p><p>${day.content}</p>`,
+          content: `<p><strong>${day.title}</strong></p><p>Scriptures: ${day.scriptures.join(", ")}</p><p>${day.content}</p>`,
+        })),
+      };
+    }
+
     // Fallback: Use Q1 2026 local data
     const localLesson = Q1_2026_LESSONS.find((l) => l.id === lessonId);
     if (localLesson) {
