@@ -177,7 +177,7 @@ const Bible = () => {
 
             <div className={`flex-1 min-w-0 ${sidebarOpen && !isMobile ? 'pl-4' : ''}`}>
               {/* Navigation */}
-              <div className="mb-6 sm:mb-8 bible-navigation-area">
+              <div className="mb-4 sm:mb-8 bible-navigation-area">
                 <BibleNavigation />
               </div>
 
