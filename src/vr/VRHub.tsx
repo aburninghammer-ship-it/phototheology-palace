@@ -115,31 +115,6 @@ export default function VRHub() {
         </React.Suspense>
       </VRErrorBoundary>
 
-      {/* Always-visible reload button for VR — top-right */}
-      <button
-        onClick={applyUpdate}
-        style={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          zIndex: 10001,
-          background: updateAvailable ? 'rgba(99,102,241,0.95)' : 'rgba(255,255,255,0.15)',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 8,
-          padding: '10px 18px',
-          fontSize: 14,
-          fontWeight: 600,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          boxShadow: updateAvailable ? '0 4px 20px rgba(99,102,241,0.5)' : '0 2px 8px rgba(0,0,0,0.3)',
-        }}
-      >
-        <RefreshCw size={16} />
-        {updateAvailable ? 'Update Available — Reload' : 'Reload'}
-      </button>
     </div>
   );
 }
