@@ -147,6 +147,70 @@ function EnergyHearthScene() {
   );
 }
 
+// ── Audio Waveform Visualization — ring of bars responding to audio ──
+function AudioWaveform({ analyserData }: { analyserData: Uint8Array | null }) {
+  const barsRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const barCount = 32;
+
+  useFrame(() => {
+    if (!barsRef.current) return;
+    for (let i = 0; i < barCount; i++) {
+      const angle = (i / barCount) * Math.PI * 2;
+      const radius = 2.5;
+      const value = analyserData ? analyserData[Math.floor(i * (analyserData.length / barCount))] / 255 : 0;
+      const height = 0.05 + value * 1.2;
+      dummy.position.set(
+        Math.cos(angle) * radius,
+        -1.2 + height / 2,
+        Math.sin(angle) * radius - 2,
+      );
+      dummy.scale.set(0.06, height, 0.06);
+      dummy.updateMatrix();
+      barsRef.current.setMatrixAt(i, dummy.matrix);
+    }
+    barsRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={barsRef} args={[undefined, undefined, barCount]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="#4488FF" emissive="#4488FF" emissiveIntensity={0.5} transparent opacity={0.7} />
+    </instancedMesh>
+  );
+}
+
+// ── Pulsar Effect — expanding rings from the hearth synchronized with audio ──
+function PulsarEffect({ volume = 0 }: { volume?: number }) {
+  const ring1Ref = useRef<THREE.Mesh>(null);
+  const ring2Ref = useRef<THREE.Mesh>(null);
+  const ring3Ref = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    const refs = [ring1Ref, ring2Ref, ring3Ref];
+    refs.forEach((ref, i) => {
+      if (!ref.current) return;
+      const offset = i * 1.2;
+      const cycle = ((t * 0.6 + offset) % 3.6) / 3.6;
+      const scale = 0.5 + cycle * 4 + volume * 2;
+      ref.current.scale.setScalar(scale);
+      (ref.current.material as THREE.MeshBasicMaterial).opacity = Math.max(0, (1 - cycle) * 0.12 * (0.5 + volume));
+    });
+  });
+
+  return (
+    <group position={[0, -0.5, -2]}>
+      {[ring1Ref, ring2Ref, ring3Ref].map((ref, i) => (
+        <mesh key={i} ref={ref} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.9, 1, 32]} />
+          <meshBasicMaterial color="#6644FF" transparent opacity={0.1} blending={THREE.AdditiveBlending} depthWrite={false} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 // ── Energy Rings ─────────────────────────────────────────────────────────────
 
 function EnergyRings() {
@@ -638,7 +702,7 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
   return (
     <group>
       {/* HDRI for cinematic IBL reflections */}
-      <Environment preset="night" />
+      <Environment preset="night" background />
 
       <StarField count={3000} radius={80} />
       <NebulaClouds count={10} radius={50} colors={['#0a1040', '#182060', '#0c0830', '#060420']} opacity={0.1} />
@@ -662,6 +726,12 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
 
       {/* Energy Rings */}
       <EnergyRings />
+
+      {/* Audio Waveform — visible during playback (decorative, no live data from parent) */}
+      <AudioWaveform analyserData={null} />
+
+      {/* Pulsar effect from hearth */}
+      <PulsarEffect volume={0} />
 
       {/* Enhanced lighting */}
       <pointLight position={[0, -0.5, -2]} color="#2244AA" intensity={0.8} distance={12} />

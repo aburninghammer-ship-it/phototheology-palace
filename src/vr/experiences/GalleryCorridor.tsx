@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useEffect, Suspense } from 'react';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Environment } from '@react-three/drei';
 import { TeleportationPlane, Interactive } from '@react-three/xr';
 import * as THREE from 'three';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
@@ -181,6 +181,129 @@ function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
   );
 }
 
+// ── Dust motes floating in light shafts ──
+function DustMotes({ camZ }: { camZ: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const count = 80;
+
+  const motes = useMemo(() =>
+    Array.from({ length: count }, () => ({
+      offsetX: (Math.random() - 0.5) * 5,
+      offsetY: Math.random() * 4 - 0.5,
+      offsetZ: (Math.random() - 0.5) * 30,
+      speed: 0.03 + Math.random() * 0.06,
+      wobble: Math.random() * Math.PI * 2,
+      scale: 0.008 + Math.random() * 0.015,
+    })),
+  []);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    motes.forEach((m, i) => {
+      const y = ((m.offsetY + m.speed * t) % 4) - 0.5;
+      dummy.position.set(
+        m.offsetX + Math.sin(t * 0.2 + m.wobble) * 0.3,
+        y,
+        camZ + m.offsetZ,
+      );
+      dummy.scale.setScalar(m.scale);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <sphereGeometry args={[1, 4, 4]} />
+      <meshBasicMaterial color="#FFD088" transparent opacity={0.35} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+// ── Spotlight cones from ceiling ──
+function SpotlightCones({ camZ }: { camZ: number }) {
+  const cones = useMemo(() => {
+    const arr: { z: number; side: number }[] = [];
+    for (let i = 0; i < 8; i++) {
+      arr.push({ z: -i * 15, side: i % 2 === 0 ? -1 : 1 });
+    }
+    return arr;
+  }, []);
+
+  const visible = cones.filter((c) => Math.abs(c.z - camZ) < 25);
+
+  return (
+    <>
+      {visible.map((c, i) => (
+        <group key={i}>
+          <mesh position={[c.side * 2.5, 1.5, c.z]} rotation={[0, 0, c.side * 0.15]}>
+            <coneGeometry args={[0.8, 4, 8, 1, true]} />
+            <meshBasicMaterial color="#FFD700" transparent opacity={0.015} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+          </mesh>
+          <pointLight position={[c.side * 2.5, 3.5, c.z]} color="#FFE088" intensity={0.6} distance={6} />
+        </group>
+      ))}
+    </>
+  );
+}
+
+// ── Gold frame shimmer effect ──
+function GoldShimmer({ camZ }: { camZ: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const count = 30;
+
+  const sparkles = useMemo(() =>
+    Array.from({ length: count }, () => ({
+      side: Math.random() > 0.5 ? 1 : -1,
+      offsetZ: (Math.random() - 0.5) * 40,
+      y: 0.3 + Math.random() * 0.8,
+      phase: Math.random() * Math.PI * 2,
+    })),
+  []);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    sparkles.forEach((s, i) => {
+      const blink = Math.max(0, Math.sin(t * 3 + s.phase));
+      dummy.position.set(s.side * 2.95, s.y, camZ + s.offsetZ);
+      dummy.scale.setScalar(0.015 * blink);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <sphereGeometry args={[1, 4, 4]} />
+      <meshBasicMaterial color="#FFD700" transparent opacity={0.7} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+// ── Gallery atmosphere wrapper ──
+function GalleryAtmosphere() {
+  const { camera } = useThree();
+  const [camZ, setCamZ] = useState(0);
+
+  useFrame(() => {
+    setCamZ(camera.position.z);
+  });
+
+  return (
+    <>
+      <DustMotes camZ={camZ} />
+      <SpotlightCones camZ={camZ} />
+      <GoldShimmer camZ={camZ} />
+    </>
+  );
+}
+
 // Keyboard + mouse navigation controller
 function WalkController() {
   const { camera, gl } = useThree();
@@ -313,13 +436,20 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
 
   return (
     <group>
+      {/* HDRI for rich reflections on marble and gold */}
+      <Environment preset="lobby" />
+
       {/* Keyboard + mouse walk controller */}
       <WalkController />
 
+      {/* Atmospheric dust, spotlights, shimmer */}
+      <GalleryAtmosphere />
+
       {/* Rich ambient lighting */}
-      <ambientLight intensity={0.4} color="#e8d0ff" />
-      <directionalLight position={[0, 4, 2]} intensity={0.6} color="#ffe8d0" />
+      <ambientLight intensity={0.35} color="#e8d0ff" />
+      <directionalLight position={[0, 4, 2]} intensity={0.7} color="#ffe8d0" />
       <directionalLight position={[-3, 3, -5]} intensity={0.3} color="#e8d0ff" />
+      <directionalLight position={[2, 6, -3]} intensity={0.2} color="#FFD088" />
 
       {/* Spot lights — only render visible ones */}
       {visibleLightIndices.map((i) => (
@@ -348,7 +478,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
       {/* Rich marble floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, -CORRIDOR_LENGTH / 2]} receiveShadow>
         <planeGeometry args={[8, CORRIDOR_LENGTH + 10]} />
-        <meshPhysicalMaterial color="#1a1520" metalness={0.5} roughness={0.3} clearcoat={0.6} clearcoatRoughness={0.2} />
+        <meshPhysicalMaterial color="#1a1520" metalness={0.5} roughness={0.3} clearcoat={0.6} clearcoatRoughness={0.2} envMapIntensity={0.6} />
       </mesh>
 
       {/* Floor runner (decorative center strip) */}

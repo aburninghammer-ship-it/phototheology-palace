@@ -452,13 +452,89 @@ function ArenaDust({ count = 40 }: { count?: number }) {
   );
 }
 
+// ── Arena Pillars with Braziers ──
+function ArenaPillars() {
+  const brazierRefs = useRef<(THREE.PointLight | null)[]>([]);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    brazierRefs.current.forEach((light, i) => {
+      if (light) {
+        light.intensity = 1.2 + Math.sin(t * 5 + i * 2) * 0.4 + Math.sin(t * 8 + i) * 0.2;
+      }
+    });
+  });
+
+  const pillars = useMemo(() => {
+    const arr: { x: number; z: number; angle: number }[] = [];
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      arr.push({
+        x: Math.cos(angle) * 7,
+        z: Math.sin(angle) * 7,
+        angle,
+      });
+    }
+    return arr;
+  }, []);
+
+  return (
+    <group>
+      {pillars.map((p, i) => (
+        <group key={i} position={[p.x, -1.2, p.z]}>
+          {/* Stone pillar */}
+          <mesh position={[0, 1.5, 0]}>
+            <cylinderGeometry args={[0.15, 0.2, 3, 6]} />
+            <meshStandardMaterial color="#1a1a2a" roughness={0.8} metalness={0.3} />
+          </mesh>
+          {/* Brazier bowl */}
+          <mesh position={[0, 3.1, 0]}>
+            <cylinderGeometry args={[0.25, 0.15, 0.15, 6]} />
+            <meshStandardMaterial color="#2a2a3a" metalness={0.6} roughness={0.4} />
+          </mesh>
+          {/* Fire glow */}
+          <mesh position={[0, 3.3, 0]}>
+            <sphereGeometry args={[0.12, 6, 6]} />
+            <meshBasicMaterial color={i % 2 === 0 ? '#FF4466' : '#FFD700'} transparent opacity={0.7} />
+          </mesh>
+          <pointLight
+            ref={(el) => { brazierRefs.current[i] = el; }}
+            position={[0, 3.4, 0]}
+            color={i % 2 === 0 ? '#FF4466' : '#FFD700'}
+            intensity={1.2}
+            distance={6}
+          />
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// ── Screen Shake on Hit ──
+function ScreenShake({ shakeIntensity }: { shakeIntensity: number }) {
+  const { camera } = useThree();
+  const basePos = useRef<THREE.Vector3 | null>(null);
+
+  useFrame(() => {
+    if (shakeIntensity <= 0) {
+      basePos.current = null;
+      return;
+    }
+    if (!basePos.current) basePos.current = camera.position.clone();
+    camera.position.x = basePos.current.x + (Math.random() - 0.5) * shakeIntensity * 0.08;
+    camera.position.y = basePos.current.y + (Math.random() - 0.5) * shakeIntensity * 0.04;
+  });
+
+  return null;
+}
+
 // ── Arena environment ──
 
 function BattleArena() {
   return (
     <group>
       {/* Environment IBL for dramatic arena reflections */}
-      <Environment preset="night" />
+      <Environment preset="night" background />
 
       {/* Arena floor — stone-like */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
@@ -498,6 +574,9 @@ function BattleArena() {
 
       <StarField count={1500} radius={14} brightness={0.5} />
       <ArenaDust count={50} />
+
+      {/* Stone pillars with braziers around the arena */}
+      <ArenaPillars />
     </group>
   );
 }
@@ -520,6 +599,7 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
   const [wave, setWave] = useState(1);
   const [swordSwinging, setSwordSwinging] = useState(false);
   const [shieldBlocking, setShieldBlocking] = useState(false);
+  const [shakeIntensity, setShakeIntensity] = useState(0);
 
   const orbsRef = useRef<ActiveOrb[]>([]);
   const [orbs, setOrbs] = useState<ActiveOrb[]>([]);
@@ -667,6 +747,9 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
     }
 
     if (healthDelta !== 0) {
+      // Screen shake on damage
+      setShakeIntensity(Math.abs(healthDelta) / 15);
+      setTimeout(() => setShakeIntensity(0), 200);
       setHealth((h) => {
         const newH = Math.max(0, Math.min(100, h + healthDelta));
         healthRef.current = newH;
@@ -705,6 +788,7 @@ export default function SwordOfTheSpirit({ onBack }: SwordOfTheSpiritProps) {
   return (
     <group>
       <BattleArena />
+      <ScreenShake shakeIntensity={shakeIntensity} />
 
       {/* Sword (right side) */}
       <SwordModel position={[0.7, 0.3, -0.5]} swinging={swordSwinging} />

@@ -168,6 +168,135 @@ function GameScreen({ name, route, emoji, color, glowColor, desc, position, rota
   );
 }
 
+// ── CRT Scanline overlay on screens ──
+function ScanlineOverlay({ position, rotation, width = 1.2, height = 0.9 }: {
+  position: [number, number, number]; rotation: [number, number, number]; width?: number; height?: number;
+}) {
+  const ref = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.getElapsedTime();
+    (ref.current.material as THREE.MeshBasicMaterial).opacity = 0.03 + Math.sin(t * 60) * 0.01;
+  });
+
+  return (
+    <mesh ref={ref} position={position} rotation={rotation}>
+      <planeGeometry args={[width, height]} />
+      <meshBasicMaterial color="#00FF00" transparent opacity={0.03} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </mesh>
+  );
+}
+
+// ── Laser beam energy walls between screens ──
+function LaserWalls() {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const count = 6;
+
+  const beams = useMemo(() => {
+    const arr: { x: number; z: number; rotY: number; color: string }[] = [];
+    const arcAngle = Math.PI * 0.8;
+    const startAngle = -arcAngle / 2;
+    const radius = 5.3;
+    for (let i = 0; i < count; i++) {
+      const angle = startAngle + ((i + 0.5) / GAMES.length) * arcAngle;
+      arr.push({
+        x: Math.sin(angle) * radius,
+        z: -Math.cos(angle) * radius,
+        rotY: -angle,
+        color: ['#39FF14', '#BB44FF', '#FF4444', '#4488FF', '#FFD700', '#FF3366'][i],
+      });
+    }
+    return arr;
+  }, []);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    beams.forEach((b, i) => {
+      dummy.position.set(b.x, 0.5 + Math.sin(t * 2 + i) * 0.1, b.z);
+      dummy.rotation.set(0, b.rotY, 0);
+      dummy.scale.set(0.01, 2.5, 0.01);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+    (meshRef.current.material as THREE.MeshBasicMaterial).opacity = 0.3 + Math.sin(t * 4) * 0.1;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshBasicMaterial color="#39FF14" transparent opacity={0.3} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+// ── Holographic floating arcade sign ──
+function ArcadeHoloSign() {
+  const ref = useRef<THREE.Group>(null);
+
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.getElapsedTime();
+    ref.current.position.y = 4 + Math.sin(t * 0.5) * 0.15;
+    ref.current.rotation.y = Math.sin(t * 0.2) * 0.05;
+  });
+
+  return (
+    <group ref={ref} position={[0, 4, -3]}>
+      {/* Glow backing */}
+      <mesh position={[0, 0, -0.05]}>
+        <planeGeometry args={[4, 0.6]} />
+        <meshBasicMaterial color="#39FF14" transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      {/* Border lines */}
+      <mesh position={[0, 0.28, 0]}>
+        <planeGeometry args={[3.8, 0.01]} />
+        <meshBasicMaterial color="#39FF14" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh position={[0, -0.28, 0]}>
+        <planeGeometry args={[3.8, 0.01]} />
+        <meshBasicMaterial color="#39FF14" transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── Floor pulse rings ──
+function FloorPulseRings() {
+  const ring1Ref = useRef<THREE.Mesh>(null);
+  const ring2Ref = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (ring1Ref.current) {
+      const s = ((t * 0.3) % 2) * 4;
+      ring1Ref.current.scale.setScalar(s);
+      (ring1Ref.current.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.06 * (1 - s / 8));
+    }
+    if (ring2Ref.current) {
+      const s = (((t * 0.3 + 1) % 2)) * 4;
+      ring2Ref.current.scale.setScalar(s);
+      (ring2Ref.current.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.06 * (1 - s / 8));
+    }
+  });
+
+  return (
+    <group position={[0, -1.17, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh ref={ring1Ref}>
+        <ringGeometry args={[0.9, 1, 32]} />
+        <meshBasicMaterial color="#39FF14" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh ref={ring2Ref}>
+        <ringGeometry args={[0.9, 1, 32]} />
+        <meshBasicMaterial color="#BB44FF" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
 interface GameArcadeProps {
   onBack: () => void;
 }
@@ -195,7 +324,7 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
   return (
     <group>
       {/* Environment IBL for neon reflections */}
-      <Environment preset="city" />
+      <Environment preset="city" background />
 
       {/* Dark reflective floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]} receiveShadow>
@@ -234,6 +363,15 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
 
       {/* Floating particles — doubled */}
       <ArcadeParticles count={120} />
+
+      {/* Laser beam walls between screens */}
+      <LaserWalls />
+
+      {/* Holographic floating sign */}
+      <ArcadeHoloSign />
+
+      {/* Floor pulse rings */}
+      <FloorPulseRings />
 
       {/* Fog for atmosphere */}
       <fog attach="fog" args={['#050510', 10, 25]} />

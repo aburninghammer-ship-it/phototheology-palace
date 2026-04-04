@@ -222,6 +222,120 @@ function useSmoothPosition(groupRef: React.RefObject<THREE.Group | null>, posRef
   });
 }
 
+// ── Desert terrain with dunes ──
+function DesertTerrain() {
+  const geo = useMemo(() => {
+    const g = new THREE.PlaneGeometry(80, 80, 40, 40);
+    const pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getY(i);
+      const dist = Math.sqrt(x * x + (z + 18) * (z + 18));
+      const flatRadius = 8;
+      const duneFactor = Math.max(0, (dist - flatRadius) / 12);
+      const height = duneFactor * (
+        Math.sin(x * 0.08 + 1) * 1.5 +
+        Math.cos(z * 0.06) * 2 +
+        Math.sin(x * 0.15 + z * 0.12) * 0.8
+      );
+      pos.setZ(i, height);
+    }
+    g.computeVertexNormals();
+    return g;
+  }, []);
+
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.25, -18]} geometry={geo}>
+      <meshStandardMaterial color="#3a2a16" roughness={0.95} metalness={0} />
+    </mesh>
+  );
+}
+
+// ── Palm trees and desert rocks ──
+function DesertVegetation() {
+  const items = useMemo(() => {
+    const arr: { x: number; z: number; type: 'palm' | 'rock'; height: number; rotation: number }[] = [];
+    for (let i = 0; i < 14; i++) {
+      const angle = (i / 14) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+      const dist = 10 + Math.random() * 15;
+      arr.push({
+        x: Math.cos(angle) * dist,
+        z: Math.sin(angle) * dist - 18,
+        type: Math.random() > 0.5 ? 'palm' : 'rock',
+        height: 2 + Math.random() * 4,
+        rotation: Math.random() * 0.2 - 0.1,
+      });
+    }
+    return arr;
+  }, []);
+
+  return (
+    <group>
+      {items.map((item, i) => (
+        <group key={i} position={[item.x, -1.2, item.z]}>
+          {item.type === 'palm' ? (
+            <>
+              {/* Trunk */}
+              <mesh position={[0, item.height / 2, 0]} rotation={[0, 0, item.rotation]}>
+                <cylinderGeometry args={[0.06, 0.1, item.height, 6]} />
+                <meshStandardMaterial color="#4a3520" roughness={0.9} />
+              </mesh>
+              {/* Fronds — simple cones fanning out */}
+              {[0, 1, 2, 3, 4].map((f) => (
+                <mesh key={f} position={[Math.cos(f * 1.26) * 0.6, item.height + 0.3, Math.sin(f * 1.26) * 0.6]} rotation={[0.8, f * 1.26, 0]}>
+                  <coneGeometry args={[0.3, 1.5, 3]} />
+                  <meshStandardMaterial color="#2a3a12" roughness={0.9} />
+                </mesh>
+              ))}
+            </>
+          ) : (
+            <mesh position={[0, item.height * 0.15, 0]} rotation={[0.1, item.rotation * 5, 0.05]}>
+              <dodecahedronGeometry args={[item.height * 0.3, 0]} />
+              <meshStandardMaterial color="#3a2a1a" roughness={0.95} />
+            </mesh>
+          )}
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// ── Heat shimmer effect ──
+function HeatShimmer() {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const count = 8;
+
+  const shimmers = useMemo(() =>
+    Array.from({ length: count }, (_, i) => ({
+      x: (i - count / 2) * 4,
+      z: -15 - Math.random() * 20,
+      scaleX: 3 + Math.random() * 4,
+      phase: Math.random() * Math.PI * 2,
+    })),
+  []);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    shimmers.forEach((s, i) => {
+      dummy.position.set(s.x, 0.5 + Math.sin(t * 0.5 + s.phase) * 0.3, s.z);
+      dummy.scale.set(s.scaleX, 2, 1);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+    (meshRef.current.material as THREE.MeshBasicMaterial).opacity = 0.015 + Math.sin(t * 0.7) * 0.005;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial color="#FFE8C4" transparent opacity={0.015} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+    </instancedMesh>
+  );
+}
+
 interface SanctuaryWalkProps {
   onBack: () => void;
 }
@@ -275,7 +389,16 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
       <directionalLight position={[0, 2, 8]} intensity={0.3} color="#ffe8d0" />
 
       {/* Warm desert fog for depth */}
-      <fog attach="fog" args={['#2a1f15', 15, 50]} />
+      <fog attach="fog" args={['#2a1f15', 12, 45]} />
+
+      {/* Desert terrain with dunes beyond the path */}
+      <DesertTerrain />
+
+      {/* Palm trees and rocks */}
+      <DesertVegetation />
+
+      {/* Heat shimmer effect */}
+      <HeatShimmer />
 
       <TeleportationPlane leftHand rightHand maxDistance={20} />
 

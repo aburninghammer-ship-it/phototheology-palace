@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState, useCallback, Suspense } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
@@ -229,6 +229,329 @@ function Fireflies({ count = 25 }: { count?: number }) {
   );
 }
 
+// ── 1. Moon with glow halo ──
+function Moon({ volume = 0 }: { volume?: number }) {
+  const glowRef = useRef<THREE.Mesh>(null);
+  const haloRef = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    // Gentle pulse + audio reactivity
+    const pulse = 1 + Math.sin(t * 0.3) * 0.05 + volume * 0.15;
+    if (glowRef.current) glowRef.current.scale.setScalar(pulse);
+    if (haloRef.current) {
+      (haloRef.current.material as THREE.MeshBasicMaterial).opacity = 0.08 + Math.sin(t * 0.2) * 0.02 + volume * 0.04;
+      haloRef.current.scale.setScalar(pulse * 1.1);
+    }
+  });
+
+  return (
+    <group position={[15, 25, -35]}>
+      {/* Moon surface */}
+      <mesh>
+        <sphereGeometry args={[2.5, 32, 32]} />
+        <meshStandardMaterial color="#e8e4d4" emissive="#ddd8c8" emissiveIntensity={0.6} />
+      </mesh>
+      {/* Inner glow */}
+      <mesh ref={glowRef}>
+        <sphereGeometry args={[3, 32, 32]} />
+        <meshBasicMaterial color="#aabbdd" transparent opacity={0.15} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.BackSide} />
+      </mesh>
+      {/* Outer halo */}
+      <mesh ref={haloRef}>
+        <sphereGeometry args={[6, 32, 32]} />
+        <meshBasicMaterial color="#8899bb" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.BackSide} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 2. Rolling terrain hills ──
+function Terrain() {
+  const geo = useMemo(() => {
+    const g = new THREE.PlaneGeometry(120, 120, 64, 64);
+    const pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getY(i); // in plane geometry, y maps to z after rotation
+      const dist = Math.sqrt(x * x + z * z);
+      // Keep center flat (the clearing), raise edges into hills
+      const flatRadius = 10;
+      const hillFactor = Math.max(0, (dist - flatRadius) / 20);
+      const height = hillFactor * (
+        Math.sin(x * 0.08) * 1.5 +
+        Math.cos(z * 0.06) * 2 +
+        Math.sin(x * 0.15 + z * 0.12) * 0.8
+      );
+      pos.setZ(i, height);
+    }
+    g.computeVertexNormals();
+    return g;
+  }, []);
+
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.25, 0]} geometry={geo}>
+      <meshStandardMaterial color="#0a0f08" roughness={0.95} metalness={0} />
+    </mesh>
+  );
+}
+
+// ── 3. Tree silhouettes around the clearing ──
+function TreeSilhouettes() {
+  const trees = useMemo(() => {
+    const arr: { x: number; z: number; height: number; trunkH: number; radius: number; rotation: number }[] = [];
+    for (let i = 0; i < 18; i++) {
+      const angle = (i / 18) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+      const dist = 12 + Math.random() * 15;
+      arr.push({
+        x: Math.cos(angle) * dist,
+        z: Math.sin(angle) * dist - 2,
+        height: 3 + Math.random() * 5,
+        trunkH: 1.5 + Math.random() * 2,
+        radius: 0.8 + Math.random() * 1.2,
+        rotation: Math.random() * 0.2 - 0.1,
+      });
+    }
+    return arr;
+  }, []);
+
+  return (
+    <group>
+      {trees.map((t, i) => (
+        <group key={i} position={[t.x, -1.2, t.z]} rotation={[0, 0, t.rotation]}>
+          {/* Trunk */}
+          <mesh position={[0, t.trunkH / 2, 0]}>
+            <cylinderGeometry args={[0.08, 0.15, t.trunkH, 5]} />
+            <meshStandardMaterial color="#0a0a08" />
+          </mesh>
+          {/* Canopy — pine cone shape */}
+          <mesh position={[0, t.trunkH + t.height * 0.4, 0]}>
+            <coneGeometry args={[t.radius, t.height, 6]} />
+            <meshStandardMaterial color="#060d04" />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// ── 4. Reflective water puddles around the platform ──
+function WaterReflection() {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.22, 0]}>
+      <ringGeometry args={[8.5, 14, 32]} />
+      <meshPhysicalMaterial
+        color="#060810"
+        metalness={0.9}
+        roughness={0.1}
+        clearcoat={1}
+        clearcoatRoughness={0.05}
+        envMapIntensity={0.8}
+        transparent
+        opacity={0.7}
+      />
+    </mesh>
+  );
+}
+
+// ── 5. Drifting clouds across the moon ──
+function DriftingClouds({ count = 6 }: { count?: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  const clouds = useMemo(() =>
+    Array.from({ length: count }, (_, i) => ({
+      x: -30 + i * 12 + (Math.random() - 0.5) * 8,
+      y: 22 + Math.random() * 10,
+      z: -30 - Math.random() * 15,
+      speed: 0.15 + Math.random() * 0.2,
+      scaleX: 4 + Math.random() * 6,
+      scaleY: 0.8 + Math.random() * 1.2,
+      opacity: 0.03 + Math.random() * 0.04,
+    })),
+  [count]);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    clouds.forEach((c, i) => {
+      const x = ((c.x + t * c.speed + 40) % 80) - 40;
+      dummy.position.set(x, c.y, c.z);
+      dummy.scale.set(c.scaleX, c.scaleY, 1);
+      dummy.lookAt(x, c.y, c.z + 1); // face camera-ish direction
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial color="#334466" transparent opacity={0.04} blending={THREE.NormalBlending} depthWrite={false} side={THREE.DoubleSide} />
+    </instancedMesh>
+  );
+}
+
+// ── 7. Ground-level fog layers ──
+function GroundFog({ count = 12 }: { count?: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  const wisps = useMemo(() =>
+    Array.from({ length: count }, () => ({
+      x: (Math.random() - 0.5) * 20,
+      z: (Math.random() - 0.5) * 20 - 2,
+      speed: 0.05 + Math.random() * 0.1,
+      scaleX: 3 + Math.random() * 5,
+      scaleZ: 2 + Math.random() * 3,
+      phase: Math.random() * Math.PI * 2,
+    })),
+  [count]);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    wisps.forEach((w, i) => {
+      const opacity = 0.04 + Math.sin(t * 0.3 + w.phase) * 0.02;
+      dummy.position.set(
+        w.x + Math.sin(t * w.speed + w.phase) * 2,
+        -1.0,
+        w.z + Math.cos(t * w.speed * 0.7 + w.phase) * 1.5,
+      );
+      dummy.rotation.set(-Math.PI / 2, 0, t * w.speed * 0.1);
+      dummy.scale.set(w.scaleX, w.scaleZ, 1);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+      // Can't set per-instance opacity with instanced mesh, so use uniform
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+    (meshRef.current.material as THREE.MeshBasicMaterial).opacity = 0.04 + Math.sin(t * 0.2) * 0.015;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <circleGeometry args={[1, 8]} />
+      <meshBasicMaterial color="#1a2040" transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+// ── 8. Stone platform detail — concentric rings + scattered rocks ──
+function PlatformDetail() {
+  const rocks = useMemo(() =>
+    Array.from({ length: 15 }, () => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 7 + Math.random() * 2;
+      return {
+        x: Math.cos(angle) * dist,
+        z: Math.sin(angle) * dist,
+        scale: 0.1 + Math.random() * 0.25,
+        rotY: Math.random() * Math.PI * 2,
+      };
+    }),
+  []);
+
+  return (
+    <group>
+      {/* Concentric etched rings */}
+      {[2, 4, 6].map((r) => (
+        <mesh key={r} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.18, 0]}>
+          <ringGeometry args={[r - 0.02, r + 0.02, 64]} />
+          <meshBasicMaterial color="#2a2a3f" transparent opacity={0.3} />
+        </mesh>
+      ))}
+      {/* Scattered rocks around edge */}
+      {rocks.map((r, i) => (
+        <mesh key={i} position={[r.x, -1.15, r.z]} rotation={[0.2, r.rotY, 0.1]} scale={[r.scale, r.scale * 0.6, r.scale]}>
+          <dodecahedronGeometry args={[1, 0]} />
+          <meshStandardMaterial color="#1a1a25" roughness={0.9} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+// ── 9. Constellation lines connecting some stars ──
+function Constellations() {
+  const lines = useMemo(() => {
+    // Define a few simple constellation shapes
+    const constellations: THREE.Vector3[][] = [];
+    const makeConstellation = (points: [number, number, number][]) =>
+      points.map((p) => new THREE.Vector3(...p));
+
+    // Orion-like
+    constellations.push(makeConstellation([
+      [-8, 18, -40], [-6, 20, -42], [-5, 22, -40], [-4, 20, -38],
+      [-3, 18, -40], [-5, 16, -41], [-7, 16, -39],
+    ]));
+    // Cross
+    constellations.push(makeConstellation([
+      [10, 25, -45], [10, 22, -44], [10, 19, -43],
+    ]));
+    constellations.push(makeConstellation([
+      [8, 22, -44], [10, 22, -44], [12, 22, -44],
+    ]));
+    // Dipper-like
+    constellations.push(makeConstellation([
+      [20, 28, -50], [22, 27, -48], [24, 28, -47], [23, 30, -49],
+      [20, 28, -50],
+    ]));
+    // Small triangle
+    constellations.push(makeConstellation([
+      [-20, 22, -38], [-18, 25, -40], [-16, 22, -39], [-20, 22, -38],
+    ]));
+
+    return constellations;
+  }, []);
+
+  return (
+    <group>
+      {lines.map((points, i) => (
+        <line key={i}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              count={points.length}
+              array={new Float32Array(points.flatMap((p) => [p.x, p.y, p.z]))}
+              itemSize={3}
+            />
+          </bufferGeometry>
+          <lineBasicMaterial color="#334466" transparent opacity={0.2} blending={THREE.AdditiveBlending} />
+        </line>
+      ))}
+      {/* Star dots at constellation vertices */}
+      {lines.flatMap((pts) => pts).map((p, i) => (
+        <mesh key={i} position={p}>
+          <sphereGeometry args={[0.08, 4, 4]} />
+          <meshBasicMaterial color="#aabbdd" transparent opacity={0.6} blending={THREE.AdditiveBlending} depthWrite={false} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+// ── 11. Gentle camera sway during meditation ──
+function CameraSway({ active, intensity = 0.003 }: { active: boolean; intensity?: number }) {
+  const { camera } = useThree();
+  const baseRotation = useRef<THREE.Euler | null>(null);
+
+  useFrame(({ clock }) => {
+    if (!active) {
+      baseRotation.current = null;
+      return;
+    }
+    if (!baseRotation.current) {
+      baseRotation.current = camera.rotation.clone();
+    }
+    const t = clock.getElapsedTime();
+    camera.rotation.x = baseRotation.current.x + Math.sin(t * 0.15) * intensity;
+    camera.rotation.z = baseRotation.current.z + Math.cos(t * 0.1) * intensity * 0.5;
+  });
+
+  return null;
+}
+
 // ── Screens ──
 
 type Screen = 'tracts' | 'sessions' | 'playing';
@@ -325,20 +648,38 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
       {/* HDRI night sky for IBL reflections */}
       <Environment preset="night" background />
 
+      {/* 1. Moon with audio-reactive glow */}
+      <Moon volume={avgVolume} />
+
       {/* Vast star field */}
       <StarField count={3500} radius={60} brightness={screen === 'playing' ? 0.7 + avgVolume * 0.3 : 0.9} />
       <NebulaClouds count={8} radius={35} colors={['#0a1030', '#1a2060', '#0d1840', '#0a0828']} opacity={0.08 + avgVolume * 0.06} />
 
+      {/* 9. Constellation lines */}
+      <Constellations />
+
+      {/* 5. Drifting clouds across the moon */}
+      <DriftingClouds count={6} />
+
       {/* Shooting stars */}
       <ShootingStars />
 
-      {/* Fireflies near ground */}
-      <Fireflies count={20} />
+      {/* 10. Fireflies — more during meditation */}
+      <Fireflies count={screen === 'playing' ? 35 + Math.floor(avgVolume * 15) : 20} />
+
+      {/* 2. Rolling terrain hills */}
+      <Terrain />
+
+      {/* 3. Tree silhouettes around clearing */}
+      <TreeSilhouettes />
+
+      {/* 4. Reflective water ring around platform */}
+      <WaterReflection />
 
       {/* Stone platform / clearing */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
         <circleGeometry args={[8, 32]} />
-        <meshPhysicalMaterial color="#1a1a2a" metalness={0.3} roughness={0.6} clearcoat={0.4} clearcoatRoughness={0.4} />
+        <meshPhysicalMaterial color="#1a1a2a" metalness={0.3} roughness={0.6} clearcoat={0.4} clearcoatRoughness={0.4} envMapIntensity={0.5} />
       </mesh>
       {/* Stone platform rim */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.19, 0]}>
@@ -346,16 +687,25 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
         <meshPhysicalMaterial color="#2a2a3a" metalness={0.4} roughness={0.5} />
       </mesh>
 
-      {/* Moonlight — cool directional from above */}
-      <ambientLight intensity={0.08} color="#8899cc" />
-      <directionalLight position={[2, 12, -8]} intensity={0.5} color="#aabbee" />
-      <directionalLight position={[-5, 3, 2]} intensity={0.1} color="#667799" />
-      <pointLight position={[0, 3, -2]} intensity={0.3 + avgVolume * 0.3} color="#6677aa" distance={12} />
-      <pointLight position={[-3, 2, -4]} intensity={0.2 + avgVolume * 0.2} color="#556699" distance={8} />
+      {/* 8. Platform detail — etched rings + rocks */}
+      <PlatformDetail />
 
-      <fog attach="fog" args={['#040810', 15, 55]} />
+      {/* 7. Ground fog layers */}
+      <GroundFog count={12} />
+
+      {/* 6. Audio-reactive moonlight — cool directional from moon direction */}
+      <ambientLight intensity={0.06 + avgVolume * 0.04} color="#8899cc" />
+      <directionalLight position={[15, 25, -35]} intensity={0.4 + avgVolume * 0.2} color="#aabbee" />
+      <directionalLight position={[-5, 3, 2]} intensity={0.08} color="#667799" />
+      <pointLight position={[0, 3, -2]} intensity={0.2 + avgVolume * 0.4} color="#6677aa" distance={12} />
+      <pointLight position={[-3, 2, -4]} intensity={0.15 + avgVolume * 0.25} color="#556699" distance={8} />
+
+      <fog attach="fog" args={['#030610', 12, 50]} />
 
       <MeditationParticles count={50} brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
+
+      {/* 11. Gentle camera sway during meditation */}
+      <CameraSway active={screen === 'playing'} />
 
       {/* ─── TRACT SELECTION SCREEN ─── */}
       {screen === 'tracts' && (

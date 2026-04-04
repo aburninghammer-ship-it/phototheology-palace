@@ -1,4 +1,4 @@
-import { useState, Suspense, useMemo, useRef } from 'react';
+import { useState, Suspense, useMemo, useRef, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
@@ -279,6 +279,95 @@ function VRButton({
   );
 }
 
+// ── Holographic Scan Line — sweeps up and down ──
+function HoloScanLine({ color = '#00CCFF' }: { color?: string }) {
+  const ref = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.getElapsedTime();
+    ref.current.position.y = -1 + ((t * 0.4) % 5);
+    (ref.current.material as THREE.MeshBasicMaterial).opacity = 0.03 + Math.sin(t * 2) * 0.01;
+  });
+
+  return (
+    <mesh ref={ref} position={[0, 0, -3]}>
+      <planeGeometry args={[16, 0.02]} />
+      <meshBasicMaterial color={color} transparent opacity={0.03} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </mesh>
+  );
+}
+
+// ── Data Stream Particles — vertical rising data-like dots ──
+function DataStreams({ color = '#00CCFF', count = 40 }: { color?: string; count?: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  const streams = useMemo(() =>
+    Array.from({ length: count }, () => ({
+      x: (Math.random() - 0.5) * 14,
+      z: (Math.random() - 0.5) * 12 - 2,
+      speed: 0.5 + Math.random() * 1,
+      phase: Math.random() * 10,
+      size: 0.015 + Math.random() * 0.02,
+    })),
+  [count]);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    streams.forEach((s, i) => {
+      const y = ((s.phase + t * s.speed) % 5) - 1.2;
+      const blink = Math.max(0, Math.sin(t * 4 + s.phase * 3));
+      dummy.position.set(s.x, y, s.z);
+      dummy.scale.setScalar(s.size * blink);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshBasicMaterial color={color} transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+// ── Holographic Wave Ring — expanding rings on the floor ──
+function HoloWaveRings({ color = '#00CCFF' }: { color?: string }) {
+  const ring1Ref = useRef<THREE.Mesh>(null);
+  const ring2Ref = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (ring1Ref.current) {
+      const s1 = ((t * 0.5) % 3) * 3;
+      ring1Ref.current.scale.setScalar(s1);
+      (ring1Ref.current.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.08 * (1 - s1 / 9));
+    }
+    if (ring2Ref.current) {
+      const s2 = (((t * 0.5 + 1.5) % 3)) * 3;
+      ring2Ref.current.scale.setScalar(s2);
+      (ring2Ref.current.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.08 * (1 - s2 / 9));
+    }
+  });
+
+  return (
+    <group position={[0, -1.17, -2]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh ref={ring1Ref}>
+        <ringGeometry args={[0.9, 1, 32]} />
+        <meshBasicMaterial color={color} transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh ref={ring2Ref}>
+        <ringGeometry args={[0.9, 1, 32]} />
+        <meshBasicMaterial color={color} transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
 // ── Elevator View — Holographic Atrium ──────────────────────────────────────
 
 function ElevatorView({
@@ -303,6 +392,11 @@ function ElevatorView({
       <EnergyOrb position={[5.5, 2.5, 0]} color="#8844FF" />
 
       <FloatingOrbs color="#44CCFF" />
+
+      {/* Holographic effects */}
+      <HoloScanLine />
+      <DataStreams count={40} />
+      <HoloWaveRings />
 
       {/* Fog */}
       <fog attach="fog" args={['#050515', 8, 25]} />

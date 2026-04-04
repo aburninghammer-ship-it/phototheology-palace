@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState, useCallback, Suspense } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Text, Environment } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import * as THREE from 'three';
@@ -157,6 +157,253 @@ function HorizonGlow({ brightness = 0 }: { brightness?: number }) {
   );
 }
 
+// ── Sun with corona and audio-reactive glow ──
+function SunMesh({ volume = 0 }: { volume?: number }) {
+  const coronaRef = useRef<THREE.Mesh>(null);
+  const haloRef = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    const pulse = 1 + Math.sin(t * 0.4) * 0.04 + volume * 0.12;
+    if (coronaRef.current) coronaRef.current.scale.setScalar(pulse);
+    if (haloRef.current) {
+      (haloRef.current.material as THREE.MeshBasicMaterial).opacity = 0.1 + Math.sin(t * 0.3) * 0.03 + volume * 0.05;
+      haloRef.current.scale.setScalar(pulse * 1.15);
+    }
+  });
+
+  return (
+    <group position={[0, 4, -45]}>
+      {/* Sun disc */}
+      <mesh>
+        <sphereGeometry args={[3, 32, 32]} />
+        <meshBasicMaterial color="#FFE4B5" />
+      </mesh>
+      {/* Inner corona */}
+      <mesh ref={coronaRef}>
+        <sphereGeometry args={[4.5, 32, 32]} />
+        <meshBasicMaterial color="#FFD700" transparent opacity={0.2} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.BackSide} />
+      </mesh>
+      {/* Outer halo */}
+      <mesh ref={haloRef}>
+        <sphereGeometry args={[8, 32, 32]} />
+        <meshBasicMaterial color="#FF8C00" transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.BackSide} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── Terrain with rolling hills ──
+function DawnTerrain() {
+  const geo = useMemo(() => {
+    const g = new THREE.PlaneGeometry(100, 100, 48, 48);
+    const pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getY(i);
+      const dist = Math.sqrt(x * x + z * z);
+      const flatRadius = 6;
+      const hillFactor = Math.max(0, (dist - flatRadius) / 15);
+      const height = hillFactor * (
+        Math.sin(x * 0.06) * 2 +
+        Math.cos(z * 0.05) * 2.5 +
+        Math.sin(x * 0.12 + z * 0.1) * 1
+      );
+      pos.setZ(i, height);
+    }
+    g.computeVertexNormals();
+    return g;
+  }, []);
+
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.25, 0]} geometry={geo}>
+      <meshStandardMaterial color="#1a1508" roughness={0.92} metalness={0} />
+    </mesh>
+  );
+}
+
+// ── Scattered trees/bushes around the clearing ──
+function DawnTrees() {
+  const trees = useMemo(() => {
+    const arr: { x: number; z: number; height: number; trunkH: number; radius: number; type: 'tree' | 'bush' }[] = [];
+    for (let i = 0; i < 20; i++) {
+      const angle = (i / 20) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+      const dist = 10 + Math.random() * 18;
+      arr.push({
+        x: Math.cos(angle) * dist,
+        z: Math.sin(angle) * dist - 2,
+        height: 2 + Math.random() * 4,
+        trunkH: 1 + Math.random() * 1.5,
+        radius: 0.6 + Math.random() * 1,
+        type: Math.random() > 0.4 ? 'tree' : 'bush',
+      });
+    }
+    return arr;
+  }, []);
+
+  return (
+    <group>
+      {trees.map((t, i) => (
+        <group key={i} position={[t.x, -1.2, t.z]}>
+          {t.type === 'tree' ? (
+            <>
+              <mesh position={[0, t.trunkH / 2, 0]}>
+                <cylinderGeometry args={[0.06, 0.12, t.trunkH, 5]} />
+                <meshStandardMaterial color="#2a1a08" />
+              </mesh>
+              <mesh position={[0, t.trunkH + t.height * 0.35, 0]}>
+                <sphereGeometry args={[t.radius, 6, 6]} />
+                <meshStandardMaterial color="#1a2a08" />
+              </mesh>
+            </>
+          ) : (
+            <mesh position={[0, t.radius * 0.4, 0]}>
+              <sphereGeometry args={[t.radius * 0.6, 5, 5]} />
+              <meshStandardMaterial color="#1a2808" />
+            </mesh>
+          )}
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// ── Drifting golden clouds ──
+function DawnClouds({ count = 8 }: { count?: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  const clouds = useMemo(() =>
+    Array.from({ length: count }, (_, i) => ({
+      x: -35 + i * 10 + (Math.random() - 0.5) * 6,
+      y: 8 + Math.random() * 8,
+      z: -30 - Math.random() * 15,
+      speed: 0.1 + Math.random() * 0.15,
+      scaleX: 5 + Math.random() * 8,
+      scaleY: 1 + Math.random() * 1.5,
+    })),
+  [count]);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    clouds.forEach((c, i) => {
+      const x = ((c.x + t * c.speed + 45) % 90) - 45;
+      dummy.position.set(x, c.y, c.z);
+      dummy.scale.set(c.scaleX, c.scaleY, 1);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial color="#FFD088" transparent opacity={0.06} depthWrite={false} side={THREE.DoubleSide} />
+    </instancedMesh>
+  );
+}
+
+// ── Ground mist that pools at low elevation ──
+function DawnMist({ count = 15 }: { count?: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  const wisps = useMemo(() =>
+    Array.from({ length: count }, () => ({
+      x: (Math.random() - 0.5) * 24,
+      z: (Math.random() - 0.5) * 24 - 2,
+      speed: 0.04 + Math.random() * 0.08,
+      scaleX: 3 + Math.random() * 5,
+      scaleZ: 2 + Math.random() * 3,
+      phase: Math.random() * Math.PI * 2,
+    })),
+  [count]);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    wisps.forEach((w, i) => {
+      dummy.position.set(
+        w.x + Math.sin(t * w.speed + w.phase) * 2,
+        -0.9,
+        w.z + Math.cos(t * w.speed * 0.7 + w.phase) * 1.5,
+      );
+      dummy.rotation.set(-Math.PI / 2, 0, t * w.speed * 0.1);
+      dummy.scale.set(w.scaleX, w.scaleZ, 1);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+    (meshRef.current.material as THREE.MeshBasicMaterial).opacity = 0.05 + Math.sin(t * 0.25) * 0.02;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <circleGeometry args={[1, 8]} />
+      <meshBasicMaterial color="#FFD088" transparent opacity={0.05} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+// ── Gentle camera sway during meditation ──
+function MorningSway({ active, intensity = 0.002 }: { active: boolean; intensity?: number }) {
+  const { camera } = useThree();
+  const baseRotation = useRef<THREE.Euler | null>(null);
+
+  useFrame(({ clock }) => {
+    if (!active) { baseRotation.current = null; return; }
+    if (!baseRotation.current) baseRotation.current = camera.rotation.clone();
+    const t = clock.getElapsedTime();
+    camera.rotation.x = baseRotation.current.x + Math.sin(t * 0.12) * intensity;
+    camera.rotation.z = baseRotation.current.z + Math.cos(t * 0.08) * intensity * 0.5;
+  });
+
+  return null;
+}
+
+// ── Golden grass patches on the ground ──
+function GrassPatches() {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const count = 60;
+
+  const patches = useMemo(() =>
+    Array.from({ length: count }, () => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 3 + Math.random() * 8;
+      return {
+        x: Math.cos(angle) * dist,
+        z: Math.sin(angle) * dist,
+        scale: 0.05 + Math.random() * 0.1,
+        rotY: Math.random() * Math.PI,
+        phase: Math.random() * Math.PI * 2,
+      };
+    }),
+  []);
+
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const t = clock.getElapsedTime();
+    patches.forEach((p, i) => {
+      dummy.position.set(p.x, -1.15, p.z);
+      dummy.rotation.set(0, p.rotY, Math.sin(t * 0.8 + p.phase) * 0.15);
+      dummy.scale.set(p.scale, p.scale * 2, p.scale);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <coneGeometry args={[1, 3, 3]} />
+      <meshStandardMaterial color="#8B7355" roughness={0.9} />
+    </instancedMesh>
+  );
+}
+
 type Screen = 'tracts' | 'sessions' | 'playing';
 
 const SESSIONS_PER_PAGE = 7;
@@ -251,28 +498,49 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
       {/* HDRI dawn skybox + image-based lighting */}
       <Environment preset="dawn" background />
 
+      {/* Visible sun with corona */}
+      <SunMesh volume={avgVolume} />
+
       {/* Fading stars at dawn — subtle */}
       <StarField count={800} radius={60} brightness={screen === 'playing' ? 0.1 + avgVolume * 0.1 : 0.15} />
       <NebulaClouds count={6} radius={30} colors={['#FFB347', '#FF8C00', '#FFD700', '#FFA07A']} opacity={0.06 + avgVolume * 0.04} />
 
+      {/* Drifting golden clouds */}
+      <DawnClouds count={8} />
+
       <HorizonGlow brightness={avgVolume} />
 
-      {/* Rolling ground — warm earth */}
+      {/* Terrain with rolling hills */}
+      <DawnTerrain />
+
+      {/* Trees and bushes around clearing */}
+      <DawnTrees />
+
+      {/* Grass patches on ground */}
+      <GrassPatches />
+
+      {/* Ground mist */}
+      <DawnMist count={15} />
+
+      {/* Warm earth clearing */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
-        <planeGeometry args={[40, 40]} />
-        <meshPhysicalMaterial color="#2a1f10" metalness={0.15} roughness={0.8} clearcoat={0.2} clearcoatRoughness={0.9} />
+        <circleGeometry args={[6, 32]} />
+        <meshPhysicalMaterial color="#2a1f10" metalness={0.15} roughness={0.8} clearcoat={0.2} clearcoatRoughness={0.9} envMapIntensity={0.3} />
       </mesh>
 
-      {/* Lighting — warm golden sunrise */}
-      <ambientLight intensity={0.35} color="#FFF5E6" />
-      <directionalLight position={[3, 6, -8]} intensity={0.8} color="#FFB347" />
-      <directionalLight position={[-4, 3, 2]} intensity={0.3} color="#FFA07A" />
-      <pointLight position={[0, 3, -6]} intensity={0.5 + avgVolume * 0.4} color="#FFD700" distance={15} />
-      <pointLight position={[-3, 2, -4]} intensity={0.3 + avgVolume * 0.2} color="#FF8C00" distance={8} />
+      {/* Lighting — warm golden sunrise from sun direction */}
+      <ambientLight intensity={0.3 + avgVolume * 0.08} color="#FFF5E6" />
+      <directionalLight position={[0, 4, -45]} intensity={0.7 + avgVolume * 0.25} color="#FFB347" />
+      <directionalLight position={[-4, 3, 2]} intensity={0.25} color="#FFA07A" />
+      <pointLight position={[0, 3, -6]} intensity={0.4 + avgVolume * 0.5} color="#FFD700" distance={15} />
+      <pointLight position={[-3, 2, -4]} intensity={0.25 + avgVolume * 0.25} color="#FF8C00" distance={8} />
 
-      <fog attach="fog" args={['#1a150e', 15, 60]} />
+      <fog attach="fog" args={['#1a150e', 12, 50]} />
 
       <SunriseParticles count={60} brightness={screen === 'playing' ? 0.5 + avgVolume * 0.5 : 0.6} />
+
+      {/* Camera sway during meditation */}
+      <MorningSway active={screen === 'playing'} />
 
       {/* ─── TRACT SELECTION SCREEN ─── */}
       {screen === 'tracts' && (
