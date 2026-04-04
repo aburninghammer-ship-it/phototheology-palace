@@ -61,13 +61,13 @@ const ExitIntentPopup = lazy(() =>
 
 // Simple section skeleton
 const SectionSkeleton = () => (
-  <div className="py-16 px-4">
+  <div className="py-8 sm:py-16 px-3 sm:px-4">
     <div className="max-w-6xl mx-auto animate-pulse">
-      <div className="h-8 bg-muted rounded w-1/3 mx-auto mb-4" />
-      <div className="h-4 bg-muted rounded w-1/2 mx-auto mb-8" />
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="h-6 sm:h-8 bg-muted rounded w-1/3 mx-auto mb-3 sm:mb-4" />
+      <div className="h-4 bg-muted rounded w-1/2 mx-auto mb-6 sm:mb-8" />
+      <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-48 bg-muted rounded-lg" />
+          <div key={i} className="h-36 sm:h-48 bg-muted rounded-lg" />
         ))}
       </div>
     </div>
