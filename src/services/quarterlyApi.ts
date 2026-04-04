@@ -113,9 +113,30 @@ export async function getCurrentQuarterly(language: string = "en"): Promise<Quar
       console.warn('API fetch failed:', apiError);
     }
     
-    // Q1 2026 - Uniting Heaven and Earth (Philippians & Colossians)
+    // Fallback: Use local quarterly data based on current quarter
     const pdfUrl = sdpQuarterly?.pdfUrl || 'https://www.sabbath.school/LessonBook';
 
+    // Q2 2026 - Growing in a Relationship With God
+    if (year === 2026 && quarter === 2) {
+      return {
+        id: `2026-02-${language}`,
+        title: sdpQuarterly?.title || Q2_2026_TITLE,
+        description: Q2_2026_DESCRIPTION,
+        introduction: Q2_2026_DESCRIPTION,
+        lessons: Q2_2026_LESSONS.map((lesson) => ({
+          id: lesson.id,
+          title: lesson.title,
+          start_date: lesson.startDate,
+          end_date: lesson.endDate,
+          index: lesson.num,
+          full_read: pdfUrl,
+          bible_verses: lesson.scriptures,
+        })),
+        quarter: Q2_2026_QUARTER,
+      };
+    }
+
+    // Q1 2026 - Uniting Heaven and Earth (Philippians & Colossians)
     return {
       id: `2026-01-${language}`,
       title: sdpQuarterly?.title || Q1_2026_TITLE,
