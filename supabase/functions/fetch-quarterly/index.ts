@@ -10,6 +10,16 @@ const SEVENTH_DAY_PRESS_BASE = "https://seventhdaypress.org/wp-content/uploads";
 
 // Known quarterly URLs - updated quarterly
 const QUARTERLY_URLS: Record<string, { url: string; title: string; topic: string }> = {
+  "2026-Q2": {
+    url: `${SEVENTH_DAY_PRESS_BASE}/2026/03/SS-QUARTERLY_2ND-QTR-2026_GROWING_IN_A_RELATIONSHIP_WITH_GOD_FP.pdf`,
+    title: "Growing in a Relationship With God",
+    topic: "Christian Growth & Devotion"
+  },
+  "2026-Q1": {
+    url: `${SEVENTH_DAY_PRESS_BASE}/2025/12/SS-QUARTERLY_1ST-QTR-2026_UNITING_HEAVEN_AND_EARTH_FP.pdf`,
+    title: "Uniting Heaven and Earth",
+    topic: "Philippians & Colossians"
+  },
   "2025-Q4": {
     url: `${SEVENTH_DAY_PRESS_BASE}/2025/09/SS-QUARTERLY_4th-QTR-2025_CHRIST_OBJECT_LESSONS_FP.pdf`,
     title: "Christ's Object Lessons",

@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Q1_2026_LESSONS, Q1_2026_TITLE, Q1_2026_DESCRIPTION, Q1_2026_QUARTER } from "@/data/quarterlyQ1_2026";
+import { Q2_2026_LESSONS, Q2_2026_TITLE, Q2_2026_DESCRIPTION, Q2_2026_QUARTER } from "@/data/quarterlyQ2_2026";
 import { q4_2025_lessons } from "@/data/q4-2025-lesson-content";
 
 export interface QuarterlyLesson {
@@ -112,9 +113,30 @@ export async function getCurrentQuarterly(language: string = "en"): Promise<Quar
       console.warn('API fetch failed:', apiError);
     }
     
-    // Q1 2026 - Uniting Heaven and Earth (Philippians & Colossians)
+    // Fallback: Use local quarterly data based on current quarter
     const pdfUrl = sdpQuarterly?.pdfUrl || 'https://www.sabbath.school/LessonBook';
 
+    // Q2 2026 - Growing in a Relationship With God
+    if (year === 2026 && quarter === 2) {
+      return {
+        id: `2026-02-${language}`,
+        title: sdpQuarterly?.title || Q2_2026_TITLE,
+        description: Q2_2026_DESCRIPTION,
+        introduction: Q2_2026_DESCRIPTION,
+        lessons: Q2_2026_LESSONS.map((lesson) => ({
+          id: lesson.id,
+          title: lesson.title,
+          start_date: lesson.startDate,
+          end_date: lesson.endDate,
+          index: lesson.num,
+          full_read: pdfUrl,
+          bible_verses: lesson.scriptures,
+        })),
+        quarter: Q2_2026_QUARTER,
+      };
+    }
+
+    // Q1 2026 - Uniting Heaven and Earth (Philippians & Colossians)
     return {
       id: `2026-01-${language}`,
       title: sdpQuarterly?.title || Q1_2026_TITLE,
@@ -172,6 +194,25 @@ export async function getQuarterlyLesson(
       };
     }
     
+    // Fallback: Use Q2 2026 local data
+    const q2Lesson = Q2_2026_LESSONS.find((l) => l.id === lessonId);
+    if (q2Lesson) {
+      return {
+        lesson: {
+          id: q2Lesson.id,
+          title: q2Lesson.title,
+          bible_reading: q2Lesson.scriptures.join(", "),
+        },
+        days: q2Lesson.days.map((day, idx) => ({
+          id: String(idx + 1).padStart(2, "0"),
+          title: `${day.day} - ${day.title}`,
+          date: day.date,
+          read: `<p><strong>${day.title}</strong></p><p>Scriptures: ${day.scriptures.join(", ")}</p><p>${day.content}</p>`,
+          content: `<p><strong>${day.title}</strong></p><p>Scriptures: ${day.scriptures.join(", ")}</p><p>${day.content}</p>`,
+        })),
+      };
+    }
+
     // Fallback: Use Q1 2026 local data
     const localLesson = Q1_2026_LESSONS.find((l) => l.id === lessonId);
     if (localLesson) {
