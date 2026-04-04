@@ -72,15 +72,23 @@ export default function VRHub() {
     return () => { cancelled = true; clearInterval(interval); };
   }, []);
 
-  const applyUpdate = useCallback(async () => {
+  const applyUpdate = useCallback(() => {
+    // Force a hard reload — works even when SW is absent (preview/iframe)
     try {
-      const reg = await navigator.serviceWorker.getRegistration();
-      if (reg?.waiting) {
-        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then((reg) => {
+          if (reg?.waiting) {
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+        }).catch(() => {});
       }
-    } finally {
-      window.location.reload();
+    } catch (_) {
+      // ignore
     }
+    // Use location.replace with cache-buster to guarantee a fresh load
+    const target = new URL(window.location.href);
+    target.searchParams.set('_r', Date.now().toString());
+    window.location.replace(target.toString());
   }, []);
 
   return (
