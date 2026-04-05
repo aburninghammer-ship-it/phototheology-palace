@@ -661,75 +661,78 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
         </AnimatePresence>
       )}
 
-      <div className={cn(
-        "rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)] transition-all duration-500",
-        xpFlash && "shadow-[0_0_30px_rgba(234,179,8,0.25)]"
-      )}>
-        {/* Avatar with Health Ring */}
-        <Link to="/profile" className="flex-shrink-0">
-          <StudyHealthRing
-            roomsExplored={stats.roomsExplored}
-            chaptersRead={stats.chaptersRead}
-            currentStreak={stats.currentStreak}
-            totalXp={stats.totalXp}
-            gemsCount={stats.gemsCount}
-          >
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
-              <AvatarFallback className="text-xs bg-blue-500/20 text-blue-300 font-bold">{initials}</AvatarFallback>
-            </Avatar>
-          </StudyHealthRing>
-        </Link>
-
-        {/* Name (clickable → Mission Dropdown) + rank */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <MissionDropdown displayName={stats.displayName}>
-              <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none hover:text-blue-300 transition-colors">
-                {stats.displayName}
-              </span>
-            </MissionDropdown>
-            <Badge className={cn("text-[10px] border-0 font-bold uppercase tracking-wider px-2", titleBadgeStyle)}>
-              {displayTitle}
-            </Badge>
-          </div>
-          {/* Accountability indicators */}
-          <div className="mt-0.5">
-            <AccountabilityBar
-              currentStreak={stats.currentStreak}
-              chaptersRead={stats.chaptersRead}
+      {/* Stats row — hidden in Basic mode */}
+      {!isBasic && (
+        <div className={cn(
+          "rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)] transition-all duration-500",
+          xpFlash && "shadow-[0_0_30px_rgba(234,179,8,0.25)]"
+        )}>
+          {/* Avatar with Health Ring */}
+          <Link to="/profile" className="flex-shrink-0">
+            <StudyHealthRing
               roomsExplored={stats.roomsExplored}
-            />
-          </div>
-        </div>
-
-        {/* Clickable Stats chips — each opens mini-dashboard */}
-        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap justify-end">
-          <LockInPassChip />
-
-          <motion.div animate={xpFlash ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.4 }}>
-            <XpPopover
+              chaptersRead={stats.chaptersRead}
+              currentStreak={stats.currentStreak}
               totalXp={stats.totalXp}
-              roomsExplored={stats.roomsExplored}
-              chaptersRead={stats.chaptersRead}
-              currentStreak={stats.currentStreak}
               gemsCount={stats.gemsCount}
-            />
-          </motion.div>
+            >
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
+                <AvatarFallback className="text-xs bg-blue-500/20 text-blue-300 font-bold">{initials}</AvatarFallback>
+              </Avatar>
+            </StudyHealthRing>
+          </Link>
 
-          <GemsPopover gemsCount={stats.gemsCount} />
-          <RoomsPopover roomsExplored={stats.roomsExplored} />
+          {/* Name (clickable → Mission Dropdown) + rank */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <MissionDropdown displayName={stats.displayName}>
+                <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none hover:text-blue-300 transition-colors">
+                  {stats.displayName}
+                </span>
+              </MissionDropdown>
+              <Badge className={cn("text-[10px] border-0 font-bold uppercase tracking-wider px-2", titleBadgeStyle)}>
+                {displayTitle}
+              </Badge>
+            </div>
+            {/* Accountability indicators */}
+            <div className="mt-0.5">
+              <AccountabilityBar
+                currentStreak={stats.currentStreak}
+                chaptersRead={stats.chaptersRead}
+                roomsExplored={stats.roomsExplored}
+              />
+            </div>
+          </div>
 
-          <div className="hidden sm:block">
-            <ChaptersPopover chaptersRead={stats.chaptersRead} />
+          {/* Clickable Stats chips — each opens mini-dashboard */}
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap justify-end">
+            <LockInPassChip />
+
+            <motion.div animate={xpFlash ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.4 }}>
+              <XpPopover
+                totalXp={stats.totalXp}
+                roomsExplored={stats.roomsExplored}
+                chaptersRead={stats.chaptersRead}
+                currentStreak={stats.currentStreak}
+                gemsCount={stats.gemsCount}
+              />
+            </motion.div>
+
+            <GemsPopover gemsCount={stats.gemsCount} />
+            <RoomsPopover roomsExplored={stats.roomsExplored} />
+
+            <div className="hidden sm:block">
+              <ChaptersPopover chaptersRead={stats.chaptersRead} />
+            </div>
+            <div className="hidden sm:block">
+              <FloorsPopover floorsUnlocked={stats.floorsUnlocked} />
+            </div>
+            
+            <StreakPopover currentStreak={stats.currentStreak} />
           </div>
-          <div className="hidden sm:block">
-            <FloorsPopover floorsUnlocked={stats.floorsUnlocked} />
-          </div>
-          
-          <StreakPopover currentStreak={stats.currentStreak} />
         </div>
-      </div>
+      )}
 
       {/* Row 2: Rotating Prompt Card */}
       {!dismissed && (
