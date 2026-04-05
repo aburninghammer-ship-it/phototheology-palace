@@ -6,9 +6,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callJeeves } from "@/lib/jeevesClient";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Sparkles, BookOpen, Eye, Layers, Link2, MapPin, Palette, ChevronRight, Search, Shield, Repeat, Compass, Heart } from "lucide-react";
+import { Send, Sparkles, BookOpen, Eye, Layers, Link2, MapPin, Palette, ChevronRight, Search, Shield, Repeat, Compass, Heart, Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import { SaveChatResponseDialog } from "../SaveChatResponseDialog";
 
 interface Message {
   role: "user" | "assistant";
