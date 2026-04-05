@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 
 // Pages that shouldn't be navigated back to - these are entry points/onboarding
 const SKIP_BACK_PATHS = [
@@ -12,7 +13,9 @@ const SKIP_BACK_PATHS = [
 ];
 
 // Map of current path patterns to their sensible "parent" routes
-const getParentRoute = (pathname: string): string => {
+const getParentRoute = (pathname: string, isBasic: boolean): string => {
+  const home = isBasic ? "/welcome" : "/dashboard";
+
   // Devotional profile detail pages go back to devotionals
   if (pathname.startsWith("/devotionals/profile/")) {
     return "/devotionals";
@@ -33,27 +36,34 @@ const getParentRoute = (pathname: string): string => {
   if (pathname.startsWith("/my-studies/")) {
     return "/my-studies";
   }
-  // Default top-level pages go to dashboard
+  // Default top-level pages go to home
   const topLevelParents: Record<string, string> = {
-    "/devotionals": "/dashboard",
-    "/bible": "/dashboard",
-    "/palace": "/dashboard",
-    "/games": "/dashboard",
-    "/my-studies": "/dashboard",
-    "/profile": "/dashboard",
-    "/settings": "/dashboard",
-    "/community": "/dashboard",
+    "/devotionals": home,
+    "/bible": home,
+    "/palace": home,
+    "/games": home,
+    "/my-studies": home,
+    "/profile": home,
+    "/settings": home,
+    "/community": home,
+    "/audio-library": home,
+    "/level-select": home,
   };
-  return topLevelParents[pathname] || "/dashboard";
+  return topLevelParents[pathname] || home;
 };
 
 export const BackButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isBasic } = useExperienceMode();
 
-  // Don't show on dashboard/home page or entry points
+  const home = isBasic ? "/welcome" : "/dashboard";
+
+  // Don't show on home page or entry points
   if (
     location.pathname === "/" || 
+    location.pathname === home ||
+    location.pathname === "/welcome" ||
     location.pathname === "/dashboard" ||
     SKIP_BACK_PATHS.some(path => location.pathname.startsWith(path))
   ) {
@@ -61,9 +71,7 @@ export const BackButton = () => {
   }
 
   const handleBack = () => {
-    // Always navigate to the logical parent route
-    // This avoids the browser history issues with SPA navigation
-    const parentRoute = getParentRoute(location.pathname);
+    const parentRoute = getParentRoute(location.pathname, isBasic);
     navigate(parentRoute);
   };
 
