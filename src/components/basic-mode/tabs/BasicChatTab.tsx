@@ -48,7 +48,7 @@ export default function BasicChatTab() {
         ? "I'm sorry, I couldn't process that right now. Please try again."
         : typeof data === "string"
           ? data
-          : data?.response || data?.reply || "I'm here to help. Could you rephrase that?";
+          : (data as any)?.response || (data as any)?.reply || "I'm here to help. Could you rephrase that?";
 
       setMessages(prev => [...prev, { role: "assistant", content: reply }]);
     } catch {
