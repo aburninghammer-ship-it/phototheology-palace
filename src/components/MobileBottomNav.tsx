@@ -16,18 +16,24 @@ const primaryNavItems = [
   { icon: Crown, labelKey: "nav.subscribe", path: "/pricing" },
 ];
 
-const moreNavItems = [
+// Items always visible regardless of level
+const alwaysVisibleMoreItems = [
+  { icon: User, label: "My Profile", path: "/profile" },
+  { icon: Users, label: "Community", path: "/community" },
+  { icon: MessageCircle, label: "Public Chat", path: "/public-chat" },
+];
+
+// Items gated by feature registry
+const gatedMoreNavItems = [
   { icon: Headphones, label: "Tour Palace", path: "/palace/tour" },
   { icon: GraduationCap, label: "Test Me", path: "/test-me" },
   { icon: Eye, label: "Prophecy Watch", path: "/prophecy-watch" },
   { icon: Scale, label: "Christ & Culture", path: "/culture-controversy" },
-  { icon: User, label: "My Profile", path: "/my-profile" },
   { icon: Zap, label: "Freestyle", path: "/palace/freestyle" },
   { icon: Crown, label: "COTA Series", path: "/cota-series" },
   { icon: Microscope, label: "Research Mode", path: "/research-mode" },
   { icon: BrainCircuit, label: "Analyze My Thoughts", path: "/analyze-thoughts" },
-  { icon: Users, label: "Discover", path: "/discover" },
-  { icon: MessageCircle, label: "Public Chat", path: "/public-chat" },
+  { icon: UserRound, label: "Discover", path: "/discover" },
   { icon: Scroll, label: "Bible Studies", path: "/bible-study-series" },
   { icon: UserRound, label: "Characters", path: "/character-profiles" },
 ];
@@ -51,9 +57,12 @@ export function MobileBottomNav() {
     return primaryNavItems;
   }, [currentMode]);
 
-  // Filter moreNavItems to only accessible features
+  // Combine always-visible items with gated items filtered by access level
   const filteredMoreNavItems = useMemo(
-    () => moreNavItems.filter(item => isAccessible(item.path)),
+    () => [
+      ...alwaysVisibleMoreItems,
+      ...gatedMoreNavItems.filter(item => isAccessible(item.path)),
+    ],
     [isAccessible],
   );
 
