@@ -298,27 +298,27 @@ export default function BasicChatTab() {
                     {getRotatedLenses().map((lens) => {
                       const Icon = lens.icon;
                       return (
-                        <button
+                         <button
                           key={lens.id}
                           onClick={() => handleLensSelect(lens.id)}
                           className={cn(
-                            "flex items-center gap-3 p-3 rounded-xl text-left transition-all",
+                            "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl text-left transition-all",
                             "bg-card border hover:scale-[1.02] hover:shadow-lg group",
                             lens.borderColor
                           )}
                         >
                           <div className={cn(
-                            "shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br text-white",
+                            "shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center bg-gradient-to-br text-white",
                             lens.color
                           )}>
-                            <Icon className="h-4 w-4" />
+                            <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold text-foreground flex items-center gap-1">
+                            <div className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1">
                               {lens.label}
-                              <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+                              <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hidden sm:block" />
                             </div>
-                            <div className="text-xs text-muted-foreground truncate">{lens.hint}</div>
+                            <div className="text-[10px] sm:text-xs text-muted-foreground truncate">{lens.hint}</div>
                           </div>
                         </button>
                       );
