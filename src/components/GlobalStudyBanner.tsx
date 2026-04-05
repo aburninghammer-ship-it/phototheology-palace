@@ -337,6 +337,17 @@ const BASIC_PROMPTS: DailyPrompt[] = [
     text: "Tell me about the life of Jesus — who was He really?", actionLabel: "Ask", actionLink: "/jeeves?q=Tell+me+about+the+life+of+Jesus" },
 ];
 
+// Immersion-only action links — filtered out for Explorer
+const IMMERSION_ONLY_LINKS = [
+  "/living-manna?tab=defense",
+  "/sermon-builder",
+];
+
+// Explorer prompts = ALL_PROMPTS minus Immersion-only features
+const EXPLORER_PROMPTS: DailyPrompt[] = ALL_PROMPTS.filter(
+  p => !p.actionLink || !IMMERSION_ONLY_LINKS.some(link => p.actionLink?.startsWith(link))
+);
+
 const CATEGORY_STYLES: Record<string, { accent: string; iconColor: string; badgeBg: string }> = {
   motivation: { accent: "from-amber-500/15 to-orange-500/5 border-amber-500/25", iconColor: "text-amber-500", badgeBg: "bg-amber-500/20 text-amber-400" },
   action:     { accent: "from-blue-500/15 to-cyan-500/5 border-blue-500/25", iconColor: "text-blue-500", badgeBg: "bg-blue-500/20 text-blue-400" },
@@ -578,7 +589,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
 
   if (!resolvedUserId) return null;
 
-  const activePrompts = isBasic ? BASIC_PROMPTS : ALL_PROMPTS;
+  const activePrompts = isBasic ? BASIC_PROMPTS : isExplorer ? EXPLORER_PROMPTS : ALL_PROMPTS;
   const prompt = activePrompts[promptIdx % activePrompts.length];
   const style = CATEGORY_STYLES[prompt.category];
   const rank = getXpRank(stats.totalXp);
