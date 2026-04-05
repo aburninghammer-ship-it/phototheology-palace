@@ -14,9 +14,9 @@ const ELEVENLABS_VOICES: Record<string, string> = {
   ancient:   "onwK4e9ZLuTAKqWW03F9", // Daniel
   preacher:  "iP95p4xoKVk53GoZ742B", // Chris
   scholar:   "ErXwobaYiN019PkySvjV", // Antoni
-  counselor: "SAz9YHcvj6GT2YYXdXww", // River
+  counselor: "XrExE9yKIg1WjnnlVkGX", // Matilda (warm, female)
   kids:      "pFZP5JQG7iQjIQuC4Bku", // Lily
-  mirror:    "SAz9YHcvj6GT2YYXdXww", // River (shared)
+  mirror:    "SAz9YHcvj6GT2YYXdXww", // River
   // Legacy name mappings to ElevenLabs IDs
   george:    "JBFqnCBsd6RMkjVDRZzb",
   roger:     "CwhRBWXzGAHq8TQ4Fs17",
