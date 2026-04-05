@@ -9529,7 +9529,9 @@ FORMAT: Use clear markdown with headers, bullet points, and bold for emphasis. S
       const greeting = userFirstName || userName || "there";
       const conversationMessages = requestBody.conversationHistory || [];
       
-      systemPrompt = `You are Jeeves, ${greeting}'s personal Bible study partner. You are a world-class theologian who thinks through Scripture with extraordinary depth.
+      systemPrompt = `${MASTER_IDENTITY}
+
+You are Jeeves, ${greeting}'s personal Bible study partner. You are a world-class theologian who thinks through Scripture with extraordinary depth.
 
 ## WHAT MAKES YOU DIFFERENT — PHOTOTHEOLOGY
 
