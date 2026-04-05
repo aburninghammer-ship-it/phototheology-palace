@@ -417,7 +417,7 @@ const Gatehouse = () => {
                 style={{
                   background: 'linear-gradient(145deg, rgba(127,29,29,0.15) 0%, rgba(153,27,27,0.08) 50%, rgba(239,68,68,0.05) 100%)',
                 }}
-                onClick={() => navigate('/palace')}
+                onClick={() => navigate('/level-select')}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-red-400/15 via-red-500/5 to-red-900/20 pointer-events-none" />
                 <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-red-300/10 via-red-400/5 to-transparent pointer-events-none" />
