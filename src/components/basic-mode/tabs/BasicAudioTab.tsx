@@ -73,18 +73,6 @@ export default function BasicAudioTab() {
             <BookOpen className="h-4 w-4" />
             Open Full Audio Library
           </button>
-          <button
-            onClick={() => navigate("/cota-series")}
-            className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all"
-            style={{
-              background: "hsl(220 10% 90% / 0.06)",
-              color: "hsl(220 10% 65%)",
-              border: "1px solid hsl(220 10% 18%)",
-            }}
-          >
-            <Play className="h-4 w-4" />
-            COTA Series
-          </button>
         </div>
       </div>
     </div>
