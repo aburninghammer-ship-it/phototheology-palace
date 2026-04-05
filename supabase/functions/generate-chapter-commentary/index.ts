@@ -448,7 +448,7 @@ serve(async (req) => {
       ? `\n\n${userStudiesContext}\n`
       : "";
 
-    let systemPrompt = getSystemPrompt(depth as CommentaryDepth, userName, language as SupportedLanguage);
+    let systemPrompt = getSystemPrompt(depth as CommentaryDepth, userName, language as SupportedLanguage) + '\n\n' + getContentBehavioralEngine();
 
     // RAG corpus injection
     const ragResult = await getCorpusContext({
