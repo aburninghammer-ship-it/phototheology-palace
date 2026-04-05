@@ -324,7 +324,7 @@ export default function GameArcade({ onBack }: GameArcadeProps) {
   return (
     <group>
       {/* Environment IBL for neon reflections */}
-      <Environment preset="city" background />
+      <Environment preset="city" background resolution={512} />
 
       {/* Dark reflective floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]} receiveShadow>

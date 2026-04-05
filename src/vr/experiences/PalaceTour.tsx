@@ -708,7 +708,7 @@ export default function PalaceTour({ onBack }: PalaceTourProps) {
   return (
     <group>
       {/* Environment IBL for rich reflections on interior surfaces */}
-      <Environment preset="lobby" />
+      <Environment preset="lobby" resolution={512} />
 
       {/* Opaque dark interior sky */}
       <mesh renderOrder={-1}>

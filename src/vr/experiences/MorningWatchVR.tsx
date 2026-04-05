@@ -496,7 +496,7 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
   return (
     <group>
       {/* HDRI dawn skybox + image-based lighting */}
-      <Environment preset="dawn" background />
+      <Environment preset="dawn" background resolution={512} />
 
       {/* Visible sun with corona */}
       <SunMesh volume={avgVolume} />

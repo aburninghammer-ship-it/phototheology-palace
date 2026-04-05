@@ -646,7 +646,7 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
   return (
     <group>
       {/* HDRI night sky for IBL reflections */}
-      <Environment preset="night" background />
+      <Environment preset="night" background resolution={512} />
 
       {/* 1. Moon with audio-reactive glow */}
       <Moon volume={avgVolume} />

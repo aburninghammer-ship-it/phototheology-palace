@@ -380,7 +380,7 @@ export default function SanctuaryWalk({ onBack }: SanctuaryWalkProps) {
     <>
     <group ref={sceneRef}>
       {/* HDRI sunset sky — warm desert environment */}
-      <Environment preset="sunset" background />
+      <Environment preset="sunset" background resolution={512} />
 
       {/* Rich warm lighting */}
       <ambientLight intensity={0.4} color="#fff5e6" />

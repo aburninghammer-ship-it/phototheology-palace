@@ -569,7 +569,7 @@ function BattleArena() {
   return (
     <group>
       {/* Environment IBL for dramatic arena reflections */}
-      <Environment preset="night" background />
+      <Environment preset="night" background resolution={512} />
 
       {/* Arena floor — stone-like */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>

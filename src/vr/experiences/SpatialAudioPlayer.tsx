@@ -702,7 +702,7 @@ export default function SpatialAudioPlayer({ onBack }: SpatialAudioPlayerProps) 
   return (
     <group>
       {/* HDRI for cinematic IBL reflections */}
-      <Environment preset="night" background />
+      <Environment preset="night" background resolution={512} />
 
       <StarField count={3000} radius={80} />
       <NebulaClouds count={10} radius={50} colors={['#0a1040', '#182060', '#0c0830', '#060420']} opacity={0.1} />

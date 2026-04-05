@@ -298,7 +298,7 @@ function VRScene({ initialExperience = 'lobby', onBackToHub }: { initialExperien
 
       {/* Global post-processing — cinematic look; guarded so VR still works if it crashes */}
       <PostFXGuard>
-        <EffectComposer multisampling={0}>
+        <EffectComposer multisampling={4}>
           <Bloom intensity={1.0} luminanceThreshold={0.35} luminanceSmoothing={0.9} mipmapBlur radius={0.85} />
           <BrightnessContrast brightness={0.03} contrast={grading.contrast + 0.06} />
           <HueSaturation hue={grading.hue} saturation={grading.saturation + 0.08} />
@@ -413,7 +413,14 @@ export default function VRCanvas({ initialExperience, onBackToHub }: VRCanvasPro
       {/* R3F Canvas — alpha:true required for AR compositor to show our rendered content */}
       <Canvas
         style={{ width: '100%', height: '100%' }}
-        gl={{ antialias: true, alpha: true, toneMapping: THREE.NoToneMapping }}
+        dpr={[1, 2]}
+        shadows
+        gl={{
+          antialias: true,
+          alpha: true,
+          toneMapping: THREE.NoToneMapping,
+          shadowMap: { type: THREE.PCFSoftShadowMap },
+        } as any}
         camera={{ position: [0, 1.6, 3], fov: 75, near: 0.1, far: 200 }}
       >
         <XR referenceSpace="local-floor" foveation={1} frameRate={72}>

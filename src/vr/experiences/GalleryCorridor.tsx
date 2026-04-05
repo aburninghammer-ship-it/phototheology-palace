@@ -437,7 +437,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
   return (
     <group>
       {/* HDRI for rich reflections on marble and gold */}
-      <Environment preset="lobby" />
+      <Environment preset="lobby" resolution={512} />
 
       {/* Keyboard + mouse walk controller */}
       <WalkController />
