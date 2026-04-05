@@ -589,7 +589,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
 
   if (!resolvedUserId) return null;
 
-  const activePrompts = isBasic ? BASIC_PROMPTS : ALL_PROMPTS;
+  const activePrompts = isBasic ? BASIC_PROMPTS : isExplorer ? EXPLORER_PROMPTS : ALL_PROMPTS;
   const prompt = activePrompts[promptIdx % activePrompts.length];
   const style = CATEGORY_STYLES[prompt.category];
   const rank = getXpRank(stats.totalXp);
