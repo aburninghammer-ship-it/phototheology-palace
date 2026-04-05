@@ -1910,7 +1910,8 @@ async function generateEpicAudio(
   const chunkSize = useElevenLabs ? 600 : 3900;
   const chunks = splitTextIntoChunks(processedText, chunkSize);
 
-  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? `ElevenLabs (${mode}:${voiceId})` : "OpenAI (onyx)"}`);
+  const openaiVoiceName = OPENAI_FALLBACK_VOICES[mode] || OPENAI_FALLBACK_VOICES.epic;
+  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? `ElevenLabs (${mode}:${voiceId})` : `OpenAI (${openaiVoiceName})`}`);
 
   const audioBuffers: ArrayBuffer[] = [];
 
