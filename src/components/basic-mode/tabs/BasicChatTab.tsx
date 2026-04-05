@@ -269,6 +269,17 @@ export default function BasicChatTab() {
                   ) : (
                     msg.content
                   )}
+                  {msg.role === "assistant" && (
+                    <div className="flex justify-end mt-2 pt-2 border-t border-primary/10">
+                      <button
+                        onClick={() => setSaveDialog({ open: true, msgIndex: i })}
+                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <Bookmark className="h-3.5 w-3.5" />
+                        Save
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
