@@ -4,17 +4,22 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useFeatureGate } from "@/hooks/useFeatureGate";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { getMinModeForPath, MODE_LABELS } from "@/config/featureRegistry";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const primaryNavItems = [
-  { icon: Home, labelKey: "common.home", path: "/dashboard" },
-  { icon: BookOpen, labelKey: "nav.bible", path: "/bible" },
-  { icon: Church, labelKey: "nav.church", path: "/living-manna" },
-  { icon: Building2, labelKey: "nav.palace", path: "/palace" },
-  { icon: Crown, labelKey: "nav.subscribe", path: "/pricing" },
-];
+const getPrimaryNavItems = (mode: string) => {
+  // Home route depends on experience level
+  const homePath = mode === "immersion" ? "/dashboard" : "/welcome";
+  return [
+    { icon: Home, labelKey: "common.home", path: homePath },
+    { icon: BookOpen, labelKey: "nav.bible", path: "/bible" },
+    { icon: Church, labelKey: "nav.church", path: "/living-manna" },
+    { icon: Building2, labelKey: "nav.palace", path: "/palace" },
+    { icon: Crown, labelKey: "nav.subscribe", path: "/pricing" },
+  ];
+};
 
 // Items always visible regardless of level
 const alwaysVisibleMoreItems = [
@@ -43,7 +48,10 @@ export function MobileBottomNav() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const { isAccessible, currentMode } = useFeatureGate();
+  const { mode } = useExperienceMode();
   const [showMore, setShowMore] = useState(false);
+
+  const primaryNavItems = useMemo(() => getPrimaryNavItems(mode), [mode]);
 
   // In basic mode, replace Palace (locked) with Devotional
   const activePrimaryNavItems = useMemo(() => {
@@ -140,9 +148,11 @@ export function MobileBottomNav() {
         }}
       >
         <div className="flex items-center justify-evenly h-[64px] px-2 w-full">
-          {activePrimaryNavItems.map((item) => {
-            const isActive = location.pathname === item.path ||
-              (item.path !== "/dashboard" && location.pathname.startsWith(item.path));
+          {activePrimaryNavItems.map((item, idx) => {
+            const isHome = idx === 0;
+            const isActive = isHome
+              ? (location.pathname === item.path || location.pathname === "/dashboard" || location.pathname === "/welcome")
+              : (location.pathname === item.path || location.pathname.startsWith(item.path));
 
             return (
               <Link
