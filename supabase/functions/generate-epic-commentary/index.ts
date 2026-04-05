@@ -26,6 +26,18 @@ const VOICE_IDS: Record<string, string> = {
   mirror: "SAz9YHcvj6GT2YYXdXww",    // River - Warm reflective (shared with Counselor for pastoral warmth)
 };
 
+// OpenAI TTS fallback voices per mode (used when ElevenLabs is unavailable)
+const OPENAI_FALLBACK_VOICES: Record<string, string> = {
+  epic: "onyx",        // Deep, authoritative — matches William
+  urban: "nova",       // Warm, expressive — matches Jessica
+  ancient: "fable",    // Measured, narrative — matches Daniel
+  preacher: "echo",    // Clear, bold — matches Chris
+  scholar: "ash",      // Calm, analytical — matches Antoni
+  counselor: "shimmer",// Warm, gentle — matches River
+  kids: "coral",       // Bright, friendly — matches Lily
+  mirror: "shimmer",   // Warm, reflective — matches River
+};
+
 const ALLOWED_COMMENTARY_MODES = new Set([
   "epic",
   "urban",
@@ -1768,7 +1780,9 @@ async function generateEpicAudioChunkElevenLabs(
   return ttsResponse.arrayBuffer();
 }
 
-async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, totalChunks: number): Promise<ArrayBuffer> {
+async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, totalChunks: number, mode: string = "epic"): Promise<ArrayBuffer> {
+  const openaiVoice = OPENAI_FALLBACK_VOICES[mode] || OPENAI_FALLBACK_VOICES.epic;
+  console.log(`[EpicCommentary] OpenAI fallback using voice "${openaiVoice}" for mode "${mode}" (chunk ${chunkIndex + 1}/${totalChunks})`);
   const ttsResponse = await fetch("https://api.openai.com/v1/audio/speech", {
     method: "POST",
     headers: {
@@ -1778,7 +1792,7 @@ async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, to
     body: JSON.stringify({
       model: "tts-1-hd",
       input: text,
-      voice: "onyx",
+      voice: openaiVoice,
       response_format: "mp3",
       speed: 0.95,
     }),
@@ -1896,7 +1910,8 @@ async function generateEpicAudio(
   const chunkSize = useElevenLabs ? 600 : 3900;
   const chunks = splitTextIntoChunks(processedText, chunkSize);
 
-  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? `ElevenLabs (${mode}:${voiceId})` : "OpenAI (onyx)"}`);
+  const openaiVoiceName = OPENAI_FALLBACK_VOICES[mode] || OPENAI_FALLBACK_VOICES.epic;
+  console.log(`[EpicCommentary] Text is ${text.length} chars, split into ${chunks.length} TTS chunk(s), provider: ${useElevenLabs ? `ElevenLabs (${mode}:${voiceId})` : `OpenAI (${openaiVoiceName})`}`);
 
   const audioBuffers: ArrayBuffer[] = [];
 
@@ -1939,7 +1954,7 @@ async function generateEpicAudio(
         for (let b = 0; b < openaiChunks.length; b += BATCH_SIZE) {
           const batch = openaiChunks.slice(b, b + BATCH_SIZE);
           const results = await Promise.all(
-            batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, openaiChunks.length))
+            batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, openaiChunks.length, mode))
           );
           audioBuffers.push(...results);
         }
@@ -1952,7 +1967,7 @@ async function generateEpicAudio(
     for (let b = 0; b < chunks.length; b += BATCH_SIZE) {
       const batch = chunks.slice(b, b + BATCH_SIZE);
       const results = await Promise.all(
-        batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, chunks.length))
+        batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, chunks.length, mode))
       );
       audioBuffers.push(...results);
     }
@@ -2016,7 +2031,7 @@ serve(async (req) => {
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const expectedModeVoiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
-    const expectedVoiceLabel = ELEVENLABS_API_KEY ? `elevenlabs:${expectedModeVoiceId}` : "onyx";
+    const expectedVoiceLabel = ELEVENLABS_API_KEY ? `elevenlabs:${expectedModeVoiceId}` : (OPENAI_FALLBACK_VOICES[mode] || "onyx");
 
     // Clean up stuck "generating" records older than 5 minutes
     {
