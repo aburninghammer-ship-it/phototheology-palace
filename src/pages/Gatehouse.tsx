@@ -341,8 +341,7 @@ const Gatehouse = () => {
             </div>
           </motion.div>
 
-          {/* OS Spaces Dashboard */}
-          <OsSpacesWelcome />
+          {/* OS Spaces Dashboard removed — only visible in Level 3 authenticated view */}
 
           {/* Full Card Layout */}
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full">
