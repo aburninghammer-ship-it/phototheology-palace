@@ -1,5 +1,5 @@
 /**
- * BasicModeShell — Level 1 interface with teal/green palette
+ * BasicModeShell — Level 1 interface with warm indigo/slate palette
  * 3 tabs: Ask Jeeves, Study Bible, Chapel
  */
 import { useState, lazy, Suspense } from "react";
@@ -8,7 +8,7 @@ import { LevelToggleChip } from "./LevelToggleChip";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogIn, HelpCircle } from "lucide-react";
+import { LogIn, Volume2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
 import { BASIC_MODE_TOUR } from "@/data/basicModeTour";
@@ -37,30 +37,30 @@ export function BasicModeShell() {
   };
 
   return (
-    <div className="flex h-screen w-full" style={{ background: "hsl(170 20% 7%)", color: "hsl(170 10% 88%)" }}>
+    <div className="flex h-screen w-full" style={{ background: "hsl(230 25% 8%)", color: "hsl(220 15% 88%)" }}>
       <BasicModeSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-12 flex items-center justify-between px-4 shrink-0"
           style={{
-            borderBottom: "1px solid hsl(170 20% 15%)",
-            background: "linear-gradient(90deg, hsl(170 22% 9%), hsl(170 18% 8%))",
+            borderBottom: "1px solid hsl(230 20% 16%)",
+            background: "linear-gradient(90deg, hsl(230 22% 10%), hsl(230 18% 9%))",
           }}>
           <div className="flex items-center gap-3">
-            <h1 className="text-sm font-semibold" style={{ color: "hsl(170 20% 65%)" }}>Phototheology</h1>
+            <h1 className="text-sm font-semibold" style={{ color: "hsl(230 30% 70%)" }}>Phototheology</h1>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={startTour}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:brightness-125"
               style={{
-                background: "hsl(170 40% 40% / 0.15)",
-                color: "hsl(170 50% 55%)",
-                border: "1px solid hsl(170 40% 40% / 0.25)",
+                background: "hsl(250 45% 45% / 0.18)",
+                color: "hsl(250 60% 72%)",
+                border: "1px solid hsl(250 45% 45% / 0.3)",
               }}
             >
-              <HelpCircle className="h-3 w-3" />
-              Tour
+              <Volume2 className="h-3 w-3" />
+              Audio Tour
             </button>
             <div data-tour="level-chip">
               <LevelToggleChip />
@@ -72,8 +72,8 @@ export function BasicModeShell() {
                 onClick={() => navigate("/auth")}
                 className="h-7 text-xs bg-transparent"
                 style={{
-                  borderColor: "hsl(170 20% 25%)",
-                  color: "hsl(170 20% 65%)",
+                  borderColor: "hsl(230 20% 25%)",
+                  color: "hsl(230 20% 65%)",
                 }}
               >
                 <LogIn className="h-3.5 w-3.5 mr-1.5" />
@@ -94,7 +94,7 @@ export function BasicModeShell() {
         <GuidedTourOverlay
           steps={BASIC_MODE_TOUR}
           onClose={() => setTourOpen(false)}
-          accentColor="emerald-500"
+          accentColor="indigo-500"
         />
       )}
     </div>
