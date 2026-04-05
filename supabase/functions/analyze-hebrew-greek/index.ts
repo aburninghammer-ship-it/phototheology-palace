@@ -49,6 +49,7 @@ Context: "${verse}"
 Full context: "${context}"
 
 Format your response in clean markdown with bold headings.`;
+    const behavioralEngine = getContentBehavioralEngine();
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

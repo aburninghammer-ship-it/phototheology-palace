@@ -54,6 +54,7 @@ Respond in this exact JSON format:
     }
   ]
 }`;
+    const behavioralEngine = getContentBehavioralEngine();
 
     const userPrompt = `Analyze this sermon idea and provide 3 distinct sermon options:
 

@@ -20,6 +20,7 @@ serve(async (req) => {
     }
 
     let systemPrompt = "";
+    const behavioralEngine = getContentBehavioralEngine();
     let userPrompt = "";
 
     if (mode === "generate_challenge") {

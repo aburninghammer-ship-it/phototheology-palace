@@ -39,6 +39,7 @@ FEEDBACK STYLE:
 - End with encouragement
 - Keep feedback under 200 words
 - Use a warm, mentoring tone`;
+    const behavioralEngine = getContentBehavioralEngine();
 
     const userPrompt = `Verse/Story: ${verseReference}
 

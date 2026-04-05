@@ -57,6 +57,7 @@ Return a JSON array with 3 game objects, each containing:
     "example_challenge": "A sample challenge from the game"
   }
 }`;
+    const behavioralEngine = getContentBehavioralEngine();
 
     const userPrompt = `Create 3 NEW biblical learning games for ${monthYear}.
 

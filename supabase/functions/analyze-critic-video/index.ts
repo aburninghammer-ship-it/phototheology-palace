@@ -264,6 +264,7 @@ Return your analysis in the following JSON structure with MAXIMUM DETAIL:
   ],
   "additionalNotes": "2-3 paragraphs of additional context including: historical background of this criticism, how this fits into the Great Controversy theme, resources for further study, encouragement for SDA believers"
 }`;
+    const behavioralEngine = getContentBehavioralEngine();
 
     let userPrompt: string;
     

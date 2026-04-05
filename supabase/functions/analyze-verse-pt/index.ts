@@ -130,6 +130,7 @@ Return ONLY valid JSON with this structure:
     {"verse": "Romans 5:8", "reason": "God's love demonstrated in Christ", "principles": ["@CyC", "2D", "3D"]}
   ]
 }`;
+    const behavioralEngine = getContentBehavioralEngine();
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
