@@ -26,9 +26,13 @@ const STUDY_LENSES = [
 
 const SUGGESTIONS = [
   { text: "Break down Genesis 3:15", gradient: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20", hoverGlow: "hover:shadow-blue-500/40" },
-  { text: "What does the Sanctuary teach about salvation?", gradient: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20", hoverGlow: "hover:shadow-purple-500/40" },
-  { text: "Who is the Lamb in Revelation 5?", gradient: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", glow: "shadow-amber-500/20", hoverGlow: "hover:shadow-amber-500/40" },
-  { text: "Trace the theme of 'three days' through the Bible", gradient: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20", hoverGlow: "hover:shadow-emerald-500/40" },
+  { text: "How can I learn to find Christ in the Old Testament?", gradient: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", glow: "shadow-amber-500/20", hoverGlow: "hover:shadow-amber-500/40" },
+  { text: "What principles can I use to study the Bible better?", gradient: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20", hoverGlow: "hover:shadow-purple-500/40" },
+  { text: "Analyze my thoughts on why David picked 5 stones", gradient: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20", hoverGlow: "hover:shadow-emerald-500/40" },
+  { text: "What does the Sanctuary teach about salvation?", gradient: "from-rose-500/20 to-red-500/20", border: "border-rose-400/30", glow: "shadow-rose-500/20", hoverGlow: "hover:shadow-rose-500/40" },
+  { text: "Who is the Lamb in Revelation 5?", gradient: "from-indigo-500/20 to-violet-500/20", border: "border-indigo-400/30", glow: "shadow-indigo-500/20", hoverGlow: "hover:shadow-indigo-500/40" },
+  { text: "Trace the theme of 'three days' through the Bible", gradient: "from-teal-500/20 to-cyan-500/20", border: "border-teal-400/30", glow: "shadow-teal-500/20", hoverGlow: "hover:shadow-teal-500/40" },
+  { text: "Show me how Psalm 23 connects to Jesus", gradient: "from-sky-500/20 to-blue-500/20", border: "border-sky-400/30", glow: "shadow-sky-500/20", hoverGlow: "hover:shadow-sky-500/40" },
 ];
 
 /** Maps plain-language lens IDs to hidden PT instructions for the AI */
