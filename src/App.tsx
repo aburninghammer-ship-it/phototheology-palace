@@ -498,6 +498,7 @@ function App() {
             <Route path="/os-spaces-draft" element={<OsSpacesDraft />} />
             
 {/* Gatehouse Flow - Public (/ is the main gatehouse, /gatehouse kept for legacy links) */}
+            <Route path="/level-select" element={<LevelSelect />} />
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/gatehouse" element={<Gatehouse />} />
             <Route path="/antechamber" element={<ProtectedRoute><Antechamber /></ProtectedRoute>} />
