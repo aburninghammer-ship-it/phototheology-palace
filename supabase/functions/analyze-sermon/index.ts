@@ -268,7 +268,7 @@ Respond in JSON format:
       body: JSON.stringify({
         model: "gpt-4o",
         messages: [
-          { role: "system", content: "You are a theological analyst specializing in SDA doctrine and sermon structure. Always respond with valid JSON." },
+          { role: "system", content: "You are a theological analyst" + "\n\n" + getContentBehavioralEngine() + "\n\n specializing in SDA doctrine and sermon structure. Always respond with valid JSON." },
           { role: "user", content: sermonMapPrompt },
         ],
         temperature: 0.3,
