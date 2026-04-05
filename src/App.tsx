@@ -471,7 +471,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/pricing" element={<Pricing />} />
-            <Route path="/audio-library" element={<ProtectedRoute><AudioLibrary /></ProtectedRoute>} />
+            <Route path="/audio-library" element={<BasicModeGate><ProtectedRoute><AudioLibrary /></ProtectedRoute></BasicModeGate>} />
             <Route path="/fix-billing" element={<ProtectedRoute><FixBilling /></ProtectedRoute>} />
             <Route path="/gift" element={<GiftAndShare />} />
             <Route path="/gift-and-share" element={<GiftAndShare />} />
@@ -485,9 +485,9 @@ function App() {
             <Route path="/challenge/:shareCode" element={<PublicChallenge />} />
             <Route path="/donate" element={<DonationPage />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
-            <Route path="/credit-purchase-success" element={<ProtectedRoute><CreditPurchaseSuccess /></ProtectedRoute>} />
+            <Route path="/credit-purchase-success" element={<BasicModeGate><ProtectedRoute><CreditPurchaseSuccess /></ProtectedRoute></BasicModeGate>} />
             <Route path="/paths" element={<Paths />} />
-            <Route path="/path/week" element={<ProtectedRoute><PathWeek /></ProtectedRoute>} />
+            <Route path="/path/week" element={<BasicModeGate><ProtectedRoute><PathWeek /></ProtectedRoute></BasicModeGate>} />
             <Route path="/why-phototheology" element={<WhyPhototheology />} />
             <Route path="/quick-start" element={<QuickStartSales />} />
             <Route path="/quick-start/success" element={<QuickStartSuccess />} />
@@ -550,8 +550,8 @@ function App() {
             <Route path="/encyclopedia/:slug" element={<BasicModeGate><ProtectedRoute><EncyclopediaArticle /></ProtectedRoute></BasicModeGate>} />
             <Route path="/character-profiles" element={<BasicModeGate><ProtectedRoute><CharacterProfiles /></ProtectedRoute></BasicModeGate>} />
             <Route path="/video-training" element={<BasicModeGate><ProtectedRoute><VideoTraining /></ProtectedRoute></BasicModeGate>} />
-            <Route path="/video_admin" element={<ProtectedRoute><VideoTraining /></ProtectedRoute>} />
-            <Route path="/music" element={<ProtectedRoute><MusicCategories /></ProtectedRoute>} />
+            <Route path="/video_admin" element={<BasicModeGate><ProtectedRoute><VideoTraining /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/music" element={<BasicModeGate><ProtectedRoute><MusicCategories /></ProtectedRoute></BasicModeGate>} />
             <Route path="/daily-reading" element={<ProtectedRoute><DailyReading /></ProtectedRoute>} />
             <Route path="/memorization-verses" element={<BasicModeGate><ProtectedRoute><MemorizationVerses /></ProtectedRoute></BasicModeGate>} />
             <Route path="/verse-memory-hall" element={<BasicModeGate><ProtectedRoute><VerseMemoryHall /></ProtectedRoute></BasicModeGate>} />
@@ -565,117 +565,117 @@ function App() {
             <Route path="/memory/palace-builder/:listId" element={<BasicModeGate><ProtectedRoute><MemoryPalaceBuilder /></ProtectedRoute></BasicModeGate>} />
             <Route path="/memory/palace-practice/:listId" element={<BasicModeGate><ProtectedRoute><MemoryPalacePractice /></ProtectedRoute></BasicModeGate>} />
             
-            <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
-            <Route path="/community-challenges" element={<ProtectedRoute><CommunityChallengeFeedPage /></ProtectedRoute>} />
-            <Route path="/challenge-board" element={<ProtectedRoute><ChallengeBoard /></ProtectedRoute>} />
-            <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
-            <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
-            <Route path="/equations-battle" element={<ProtectedRoute><EquationBattle /></ProtectedRoute>} />
-            <Route path="/equations-battle/:gameId" element={<ProtectedRoute><EquationBattle /></ProtectedRoute>} />
-            <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
+            <Route path="/daily-challenges" element={<BasicModeGate><ProtectedRoute><DailyChallenges /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/community-challenges" element={<BasicModeGate><ProtectedRoute><CommunityChallengeFeedPage /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/challenge-board" element={<BasicModeGate><ProtectedRoute><ChallengeBoard /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/growth-journal" element={<BasicModeGate><ProtectedRoute><GrowthJournal /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/equations-challenge" element={<BasicModeGate><ProtectedRoute><EquationsChallenge /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/equations-battle" element={<BasicModeGate><ProtectedRoute><EquationBattle /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/equations-battle/:gameId" element={<BasicModeGate><ProtectedRoute><EquationBattle /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games" element={<BasicModeGate><ProtectedRoute><Games /></ProtectedRoute></BasicModeGate>} />
             <Route path="/game-night" element={<GameNightGuest />} />
-            <Route path="/pt-scrabble" element={<ProtectedRoute><PTScrabble /></ProtectedRoute>} />
-            <Route path="/group-study" element={<ProtectedRoute><GroupStudySession /></ProtectedRoute>} />
-            <Route path="/games/chef-challenge" element={<ProtectedRoute><ChefChallenge /></ProtectedRoute>} />
+            <Route path="/pt-scrabble" element={<BasicModeGate><ProtectedRoute><PTScrabble /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/group-study" element={<BasicModeGate><ProtectedRoute><GroupStudySession /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/chef-challenge" element={<BasicModeGate><ProtectedRoute><ChefChallenge /></ProtectedRoute></BasicModeGate>} />
             {/* Chain War removed — merged into PT Scrabble Quick Play */}
-            <Route path="/games/sanctuary-run" element={<ProtectedRoute><SanctuaryRun /></ProtectedRoute>} />
-            <Route path="/games/time-zone-invasion" element={<ProtectedRoute><TimeZoneInvasion /></ProtectedRoute>} />
-            <Route path="/games/connect6-draft" element={<ProtectedRoute><Connect6Draft /></ProtectedRoute>} />
-            <Route path="/games/christ-lock" element={<ProtectedRoute><ChristLock /></ProtectedRoute>} />
-            <Route path="/games/controversy-raid" element={<ProtectedRoute><ControversyRaid /></ProtectedRoute>} />
-            <Route path="/games/escape-dragon" element={<ProtectedRoute><EscapeTheDragon /></ProtectedRoute>} />
-            <Route path="/games/equation-builder" element={<ProtectedRoute><EquationBuilder /></ProtectedRoute>} />
-            <Route path="/games/witness-trial" element={<ProtectedRoute><WitnessTrial /></ProtectedRoute>} />
-            <Route path="/games/principle-sprint" element={<ProtectedRoute><PrincipleSprint /></ProtectedRoute>} />
+            <Route path="/games/sanctuary-run" element={<BasicModeGate><ProtectedRoute><SanctuaryRun /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/time-zone-invasion" element={<BasicModeGate><ProtectedRoute><TimeZoneInvasion /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/connect6-draft" element={<BasicModeGate><ProtectedRoute><Connect6Draft /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/christ-lock" element={<BasicModeGate><ProtectedRoute><ChristLock /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/controversy-raid" element={<BasicModeGate><ProtectedRoute><ControversyRaid /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/escape-dragon" element={<BasicModeGate><ProtectedRoute><EscapeTheDragon /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/equation-builder" element={<BasicModeGate><ProtectedRoute><EquationBuilder /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/witness-trial" element={<BasicModeGate><ProtectedRoute><WitnessTrial /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/principle-sprint" element={<BasicModeGate><ProtectedRoute><PrincipleSprint /></ProtectedRoute></BasicModeGate>} />
             
-            <Route path="/games/phototheology-uno" element={<ProtectedRoute><PhototheologyUno /></ProtectedRoute>} />
-            <Route path="/games/frame-snapshot" element={<ProtectedRoute><FrameSnapshot /></ProtectedRoute>} />
-            <Route path="/games/story-room" element={<ProtectedRoute><StoryRoomGame /></ProtectedRoute>} />
+            <Route path="/games/phototheology-uno" element={<BasicModeGate><ProtectedRoute><PhototheologyUno /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/frame-snapshot" element={<BasicModeGate><ProtectedRoute><FrameSnapshot /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/story-room" element={<BasicModeGate><ProtectedRoute><StoryRoomGame /></ProtectedRoute></BasicModeGate>} />
             
             
             
-            <Route path="/games/observation-room" element={<ProtectedRoute><ObservationFlux /></ProtectedRoute>} />
-            <Route path="/games/concentration-room" element={<ProtectedRoute><ConcentrationRoom /></ProtectedRoute>} />
-            <Route path="/games/dimensions-room" element={<ProtectedRoute><DimensionsRoom /></ProtectedRoute>} />
-            <Route path="/games/blue-room" element={<ProtectedRoute><BlueRoomGame /></ProtectedRoute>} />
-            <Route path="/games/jeopardy" element={<ProtectedRoute><PhototheologyJeopardy /></ProtectedRoute>} />
-            <Route path="/games/chess" element={<ProtectedRoute><PhototheologyChess /></ProtectedRoute>} />
-            <Route path="/games/checkers" element={<ProtectedRoute><PhototheologyCheckers /></ProtectedRoute>} />
-            <Route path="/games/tic-tac-toe" element={<ProtectedRoute><PhototheologyTicTacToe /></ProtectedRoute>} />
-            <Route path="/games/connect-four" element={<ProtectedRoute><PhototheologyConnectFour /></ProtectedRoute>} />
-            <Route path="/games/symbol-decoder" element={<ProtectedRoute><SymbolDecoder /></ProtectedRoute>} />
-            <Route path="/games/pt-jeopardy" element={<ProtectedRoute><PTJeopardy /></ProtectedRoute>} />
-            <Route path="/games/pt-family-feud" element={<ProtectedRoute><PTFamilyFeud /></ProtectedRoute>} />
+            <Route path="/games/observation-room" element={<BasicModeGate><ProtectedRoute><ObservationFlux /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/concentration-room" element={<BasicModeGate><ProtectedRoute><ConcentrationRoom /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/dimensions-room" element={<BasicModeGate><ProtectedRoute><DimensionsRoom /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/blue-room" element={<BasicModeGate><ProtectedRoute><BlueRoomGame /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/jeopardy" element={<BasicModeGate><ProtectedRoute><PhototheologyJeopardy /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/chess" element={<BasicModeGate><ProtectedRoute><PhototheologyChess /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/checkers" element={<BasicModeGate><ProtectedRoute><PhototheologyCheckers /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/tic-tac-toe" element={<BasicModeGate><ProtectedRoute><PhototheologyTicTacToe /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/connect-four" element={<BasicModeGate><ProtectedRoute><PhototheologyConnectFour /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/symbol-decoder" element={<BasicModeGate><ProtectedRoute><SymbolDecoder /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/pt-jeopardy" element={<BasicModeGate><ProtectedRoute><PTJeopardy /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/pt-family-feud" element={<BasicModeGate><ProtectedRoute><PTFamilyFeud /></ProtectedRoute></BasicModeGate>} />
 
-            <Route path="/games/principles-classification" element={<ProtectedRoute><PrinciplesClassification /></ProtectedRoute>} />
-            <Route path="/games/principle-cards" element={<ProtectedRoute><PrincipleCards /></ProtectedRoute>} />
-            <Route path="/games/principle-cards/game/:gameId" element={<ProtectedRoute><PrincipleCardsGame /></ProtectedRoute>} />
-            <Route path="/games/principle-cards/tournaments" element={<ProtectedRoute><PrincipleTournaments /></ProtectedRoute>} />
-            <Route path="/games/principle-cards/tournament/:tournamentId" element={<ProtectedRoute><TournamentDetail /></ProtectedRoute>} />
+            <Route path="/games/principles-classification" element={<BasicModeGate><ProtectedRoute><PrinciplesClassification /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/principle-cards" element={<BasicModeGate><ProtectedRoute><PrincipleCards /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/principle-cards/game/:gameId" element={<BasicModeGate><ProtectedRoute><PrincipleCardsGame /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/principle-cards/tournaments" element={<BasicModeGate><ProtectedRoute><PrincipleTournaments /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/principle-cards/tournament/:tournamentId" element={<BasicModeGate><ProtectedRoute><TournamentDetail /></ProtectedRoute></BasicModeGate>} />
             {/* Redirect routes for easier access */}
-            <Route path="/chain-chess" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
-            <Route path="/games/chain-chess/:gameId/:mode?" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
-            <Route path="/games/concentration" element={<ProtectedRoute><ConcentrationGame /></ProtectedRoute>} />
-            <Route path="/games/palace-cards" element={<ProtectedRoute><PalaceCardGame /></ProtectedRoute>} />
-            <Route path="/games/memory-battle" element={<ProtectedRoute><MemoryBattle /></ProtectedRoute>} />
-            <Route path="/games/bible-trivia" element={<ProtectedRoute><BibleTrivia /></ProtectedRoute>} />
-            <Route path="/study-plan" element={<ProtectedRoute><PersonalStudyPlan /></ProtectedRoute>} />
+            <Route path="/chain-chess" element={<BasicModeGate><ProtectedRoute><ChainChess /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/chain-chess/:gameId/:mode?" element={<BasicModeGate><ProtectedRoute><ChainChess /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/concentration" element={<BasicModeGate><ProtectedRoute><ConcentrationGame /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/palace-cards" element={<BasicModeGate><ProtectedRoute><PalaceCardGame /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/memory-battle" element={<BasicModeGate><ProtectedRoute><MemoryBattle /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/bible-trivia" element={<BasicModeGate><ProtectedRoute><BibleTrivia /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/study-plan" element={<BasicModeGate><ProtectedRoute><PersonalStudyPlan /></ProtectedRoute></BasicModeGate>} />
             <Route path="/verse-finder" element={<SituationalVerseFinder />} />
-            <Route path="/games/palace_quiz/:mode?" element={<ProtectedRoute><PalaceQuiz /></ProtectedRoute>} />
-            <Route path="/games/principle_puzzle/:mode?" element={<ProtectedRoute><PrinciplePuzzle /></ProtectedRoute>} />
-            <Route path="/games/master-exam" element={<ProtectedRoute><MasterExam /></ProtectedRoute>} />
-            <Route path="/test-me" element={<ProtectedRoute><MasterExam /></ProtectedRoute>} />
-            <Route path="/games/gideon-300" element={<ProtectedRoute><Gideon300 /></ProtectedRoute>} />
-            <Route path="/games/freestyle-zone" element={<ProtectedRoute><FreestyleZone /></ProtectedRoute>} />
-            <Route path="/games/room-game/:gameId" element={<ProtectedRoute><RoomGamePlay /></ProtectedRoute>} />
-            <Route path="/games/:gameId/:mode?" element={<ProtectedRoute><GamePlay /></ProtectedRoute>} />
-            <Route path="/kids-games" element={<ProtectedRoute><KidsGames /></ProtectedRoute>} />
-            <Route path="/kids-games/:gameId" element={<ProtectedRoute><KidsGamePlay /></ProtectedRoute>} />
-            <Route path="/treasure-hunt" element={<ProtectedRoute><TreasureHunt /></ProtectedRoute>} />
-            <Route path="/treasure-hunt/:huntId" element={<ProtectedRoute><TreasureHuntPlay /></ProtectedRoute>} />
-            <Route path="/escape-room" element={<ProtectedRoute><EscapeRoom /></ProtectedRoute>} />
-            <Route path="/escape-room/play/:roomId" element={<ProtectedRoute><EscapeRoomPlay /></ProtectedRoute>} />
+            <Route path="/games/palace_quiz/:mode?" element={<BasicModeGate><ProtectedRoute><PalaceQuiz /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/principle_puzzle/:mode?" element={<BasicModeGate><ProtectedRoute><PrinciplePuzzle /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/master-exam" element={<BasicModeGate><ProtectedRoute><MasterExam /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/test-me" element={<BasicModeGate><ProtectedRoute><MasterExam /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/gideon-300" element={<BasicModeGate><ProtectedRoute><Gideon300 /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/freestyle-zone" element={<BasicModeGate><ProtectedRoute><FreestyleZone /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/room-game/:gameId" element={<BasicModeGate><ProtectedRoute><RoomGamePlay /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/games/:gameId/:mode?" element={<BasicModeGate><ProtectedRoute><GamePlay /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/kids-games" element={<BasicModeGate><ProtectedRoute><KidsGames /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/kids-games/:gameId" element={<BasicModeGate><ProtectedRoute><KidsGamePlay /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/treasure-hunt" element={<BasicModeGate><ProtectedRoute><TreasureHunt /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/treasure-hunt/:huntId" element={<BasicModeGate><ProtectedRoute><TreasureHuntPlay /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/escape-room" element={<BasicModeGate><ProtectedRoute><EscapeRoom /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/escape-room/play/:roomId" element={<BasicModeGate><ProtectedRoute><EscapeRoomPlay /></ProtectedRoute></BasicModeGate>} />
             
-            <Route path="/photo31" element={<ProtectedRoute><Photo31 /></ProtectedRoute>} />
-            <Route path="/training-drills" element={<ProtectedRoute><TrainingDrills /></ProtectedRoute>} />
-            <Route path="/drill-drill" element={<ProtectedRoute><DrillDrill /></ProtectedRoute>} />
-            <Route path="/live-study" element={<ProtectedRoute><LiveStudy /></ProtectedRoute>} />
-            <Route path="/live-study/:roomId" element={<ProtectedRoute><LiveStudyRoom /></ProtectedRoute>} />
-            <Route path="/discover" element={<ProtectedRoute><DiscoverPeople /></ProtectedRoute>} />
-            <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
-            <Route path="/community-optimized" element={<ProtectedRoute><CommunityOptimized /></ProtectedRoute>} />
-            <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-            <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
+            <Route path="/photo31" element={<BasicModeGate><ProtectedRoute><Photo31 /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/training-drills" element={<BasicModeGate><ProtectedRoute><TrainingDrills /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/drill-drill" element={<BasicModeGate><ProtectedRoute><DrillDrill /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/live-study" element={<BasicModeGate><ProtectedRoute><LiveStudy /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/live-study/:roomId" element={<BasicModeGate><ProtectedRoute><LiveStudyRoom /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/discover" element={<BasicModeGate><ProtectedRoute><DiscoverPeople /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/community" element={<BasicModeGate><ProtectedRoute><Community /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/community-optimized" element={<BasicModeGate><ProtectedRoute><CommunityOptimized /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/leaderboard" element={<BasicModeGate><ProtectedRoute><Leaderboard /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/achievements" element={<BasicModeGate><ProtectedRoute><Achievements /></ProtectedRoute></BasicModeGate>} />
             <Route path="/feedback" element={<ProtectedRoute><Feedback /></ProtectedRoute>} />
             <Route path="/testimonials" element={<ProtectedRoute><TestimonialWall /></ProtectedRoute>} />
-          <Route path="/culture-controversy" element={<ProtectedRoute><CultureControversy /></ProtectedRoute>} />
+          <Route path="/culture-controversy" element={<BasicModeGate><ProtectedRoute><CultureControversy /></ProtectedRoute></BasicModeGate>} />
           <Route path="/prophecy-watch" element={<ProtectedRoute><ProphecyWatch /></ProtectedRoute>} />
           <Route path="/night-watches" element={<ProtectedRoute><NightWatches /></ProtectedRoute>} />
           <Route path="/morning-watches" element={<ProtectedRoute><MorningWatches /></ProtectedRoute>} />
-          <Route path="/research-mode" element={<ProtectedRoute><ResearchMode /></ProtectedRoute>} />
-          <Route path="/interlinear" element={<ProtectedRoute><InterlinearBible /></ProtectedRoute>} />
-          <Route path="/interlinear/:book/:chapter" element={<ProtectedRoute><InterlinearBible /></ProtectedRoute>} />
+          <Route path="/research-mode" element={<BasicModeGate><ProtectedRoute><ResearchMode /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/interlinear" element={<BasicModeGate><ProtectedRoute><InterlinearBible /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/interlinear/:book/:chapter" element={<BasicModeGate><ProtectedRoute><InterlinearBible /></ProtectedRoute></BasicModeGate>} />
           <Route path="/bible-timeline" element={<ProtectedRoute><BibleTimeline /></ProtectedRoute>} />
           <Route path="/bible-atlas" element={<ProtectedRoute><BibleAtlas /></ProtectedRoute>} />
           <Route path="/bible-lexicon" element={<ProtectedRoute><BibleLexicon /></ProtectedRoute>} />
-          <Route path="/research-assistant" element={<ProtectedRoute><ResearchAssistant /></ProtectedRoute>} />
+          <Route path="/research-assistant" element={<BasicModeGate><ProtectedRoute><ResearchAssistant /></ProtectedRoute></BasicModeGate>} />
             <Route path="/bible-image-library" element={<ProtectedRoute><BibleImageLibrary /></ProtectedRoute>} />
-          <Route path="/sermon-builder" element={<ProtectedRoute><SermonBuilder /></ProtectedRoute>} />
-          <Route path="/sermon-ideas" element={<ProtectedRoute><SermonIdeas /></ProtectedRoute>} />
-          <Route path="/sermon-simmer" element={<ProtectedRoute><SermonSimmer /></ProtectedRoute>} />
-          <Route path="/sermon-writer" element={<ProtectedRoute><SermonWriter /></ProtectedRoute>} />
-          <Route path="/sermon-archive" element={<ProtectedRoute><SermonArchive /></ProtectedRoute>} />
-          <Route path="/sermon-topics" element={<ProtectedRoute><SermonTopicsHub /></ProtectedRoute>} />
-          <Route path="/sermon-topics/:slug" element={<ProtectedRoute><SermonTopicDetail /></ProtectedRoute>} />
+          <Route path="/sermon-builder" element={<BasicModeGate><ProtectedRoute><SermonBuilder /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/sermon-ideas" element={<BasicModeGate><ProtectedRoute><SermonIdeas /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/sermon-simmer" element={<BasicModeGate><ProtectedRoute><SermonSimmer /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/sermon-writer" element={<BasicModeGate><ProtectedRoute><SermonWriter /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/sermon-archive" element={<BasicModeGate><ProtectedRoute><SermonArchive /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/sermon-topics" element={<BasicModeGate><ProtectedRoute><SermonTopicsHub /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/sermon-topics/:slug" element={<BasicModeGate><ProtectedRoute><SermonTopicDetail /></ProtectedRoute></BasicModeGate>} />
           <Route path="/weekly-challenge" element={<WeeklyChallenge />} />
-          <Route path="/sermon-powerpoint" element={<ProtectedRoute><SermonPowerPoint /></ProtectedRoute>} />
-          <Route path="/flashcards" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
+          <Route path="/sermon-powerpoint" element={<BasicModeGate><ProtectedRoute><SermonPowerPoint /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/flashcards" element={<BasicModeGate><ProtectedRoute><Flashcards /></ProtectedRoute></BasicModeGate>} />
           
-          <Route path="/my-studies" element={<ProtectedRoute><MyStudies /></ProtectedRoute>} />
-          <Route path="/my-studies/:id" element={<ProtectedRoute><StudyEditor /></ProtectedRoute>} />
-          <Route path="/power-of-the-lamb" element={<ProtectedRoute><PowerOfTheLamb /></ProtectedRoute>} />
-          <Route path="/spiritual-training" element={<ProtectedRoute><SpiritualTraining /></ProtectedRoute>} />
-          <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
+          <Route path="/my-studies" element={<BasicModeGate><ProtectedRoute><MyStudies /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/my-studies/:id" element={<BasicModeGate><ProtectedRoute><StudyEditor /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/power-of-the-lamb" element={<BasicModeGate><ProtectedRoute><PowerOfTheLamb /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/spiritual-training" element={<BasicModeGate><ProtectedRoute><SpiritualTraining /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/courses" element={<BasicModeGate><ProtectedRoute><Courses /></ProtectedRoute></BasicModeGate>} />
           <Route path="/blueprint-course" element={<ProtectedRoute><BlueprintCourse /></ProtectedRoute>} />
           <Route path="/blueprint-weight-loss" element={<ProtectedRoute><BlueprintWeightLoss /></ProtectedRoute>} />
           <Route path="/blueprint-mental-health" element={<ProtectedRoute><BlueprintMentalHealth /></ProtectedRoute>} />
@@ -684,32 +684,32 @@ function App() {
           <Route path="/blueprint-stronghold" element={<ProtectedRoute><BlueprintStronghold /></ProtectedRoute>} />
           <Route path="/blueprint-financial" element={<ProtectedRoute><BlueprintFinancial /></ProtectedRoute>} />
           <Route path="/blueprint-stress" element={<ProtectedRoute><BlueprintStress /></ProtectedRoute>} />
-          <Route path="/phototheology-course" element={<ProtectedRoute><PhototheologyCourse /></ProtectedRoute>} />
+          <Route path="/phototheology-course" element={<BasicModeGate><ProtectedRoute><PhototheologyCourse /></ProtectedRoute></BasicModeGate>} />
           <Route path="/bible-101" element={<ProtectedRoute><Bible101 /></ProtectedRoute>} />
-          <Route path="/daniel-course" element={<ProtectedRoute><DanielCourse /></ProtectedRoute>} />
-          <Route path="/revelation-course" element={<ProtectedRoute><RevelationCourse /></ProtectedRoute>} />
-           <Route path="/revelation-course/kids" element={<ProtectedRoute><RevelationCourseKids /></ProtectedRoute>} />
-           <Route path="/cota-series" element={<ProtectedRoute><COTASeries /></ProtectedRoute>} />
+          <Route path="/daniel-course" element={<BasicModeGate><ProtectedRoute><DanielCourse /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/revelation-course" element={<BasicModeGate><ProtectedRoute><RevelationCourse /></ProtectedRoute></BasicModeGate>} />
+           <Route path="/revelation-course/kids" element={<BasicModeGate><ProtectedRoute><RevelationCourseKids /></ProtectedRoute></BasicModeGate>} />
+           <Route path="/cota-series" element={<BasicModeGate><ProtectedRoute><COTASeries /></ProtectedRoute></BasicModeGate>} />
            <Route path="/defense-mode" element={<Navigate to="/cota-series?tab=defense" replace />} />
-          <Route path="/kidgpt" element={<ProtectedRoute><KidGPT /></ProtectedRoute>} />
-          <Route path="/kid-gpt" element={<ProtectedRoute><KidGPT /></ProtectedRoute>} />
-          <Route path="/pt-kids-games" element={<ProtectedRoute><PTKidsGames /></ProtectedRoute>} />
-          <Route path="/pt-kids-game/:gameId" element={<ProtectedRoute><PTKidsGamePlay /></ProtectedRoute>} />
+          <Route path="/kidgpt" element={<BasicModeGate><ProtectedRoute><KidGPT /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/kid-gpt" element={<BasicModeGate><ProtectedRoute><KidGPT /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/pt-kids-games" element={<BasicModeGate><ProtectedRoute><PTKidsGames /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/pt-kids-game/:gameId" element={<BasicModeGate><ProtectedRoute><PTKidsGamePlay /></ProtectedRoute></BasicModeGate>} />
           <Route path="/phototheologygpt" element={<ProtectedRoute><PhototheologyGPT /></ProtectedRoute>} />
           <Route path="/jeeves" element={<ProtectedRoute><PhototheologyGPT /></ProtectedRoute>} />
           <Route path="/jeeves-reasoning" element={<ProtectedRoute><JeevesReasoning /></ProtectedRoute>} />
-          <Route path="/daniel-revelation-gpt" element={<ProtectedRoute><DanielRevelationGPT /></ProtectedRoute>} />
-          <Route path="/daniel-revelation-gpt" element={<ProtectedRoute><DanielRevelationGPT /></ProtectedRoute>} />
-          <Route path="/apologetics-gpt" element={<ProtectedRoute><ApologeticsGPT /></ProtectedRoute>} />
-          <Route path="/quarterly-study" element={<ProtectedRoute><QuarterlyStudy /></ProtectedRoute>} />
-          <Route path="/study-buddy" element={<ProtectedRoute><StudyBuddy /></ProtectedRoute>} />
-          <Route path="/study-ideas" element={<ProtectedRoute><StudyIdeaLibrary /></ProtectedRoute>} />
-          <Route path="/give-me-a-gem" element={<ProtectedRoute><GiveMeAGem /></ProtectedRoute>} />
-          <Route path="/sources" element={<ProtectedRoute><SourceLibrary /></ProtectedRoute>} />
-          <Route path="/infographics" element={<ProtectedRoute><InfographicGenerator /></ProtectedRoute>} />
-          <Route path="/study-series" element={<ProtectedRoute><StudySeriesGenerator /></ProtectedRoute>} />
+          <Route path="/daniel-revelation-gpt" element={<BasicModeGate><ProtectedRoute><DanielRevelationGPT /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/daniel-revelation-gpt" element={<BasicModeGate><ProtectedRoute><DanielRevelationGPT /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/apologetics-gpt" element={<BasicModeGate><ProtectedRoute><ApologeticsGPT /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/quarterly-study" element={<BasicModeGate><ProtectedRoute><QuarterlyStudy /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/study-buddy" element={<BasicModeGate><ProtectedRoute><StudyBuddy /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/study-ideas" element={<BasicModeGate><ProtectedRoute><StudyIdeaLibrary /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/give-me-a-gem" element={<BasicModeGate><ProtectedRoute><GiveMeAGem /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/sources" element={<BasicModeGate><ProtectedRoute><SourceLibrary /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/infographics" element={<BasicModeGate><ProtectedRoute><InfographicGenerator /></ProtectedRoute></BasicModeGate>} />
+          <Route path="/study-series" element={<BasicModeGate><ProtectedRoute><StudySeriesGenerator /></ProtectedRoute></BasicModeGate>} />
            <Route path="/bible-study-series" element={<ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute>} />
-           <Route path="/character-profiles" element={<ProtectedRoute><CharacterProfiles /></ProtectedRoute>} />
+           <Route path="/character-profiles" element={<BasicModeGate><ProtectedRoute><CharacterProfiles /></ProtectedRoute></BasicModeGate>} />
            <Route path="/devotionals" element={<ProtectedRoute><Devotionals /></ProtectedRoute>} />
            <Route path="/daily-audio-devotional" element={<ProtectedRoute><DailyAudioDevotionalPage /></ProtectedRoute>} />
            <Route path="/devotionals/:planId" element={<ProtectedRoute><DevotionalView /></ProtectedRoute>} />
@@ -720,33 +720,33 @@ function App() {
            {/* Redirect singular /devotional to plural /devotionals for notification links */}
            <Route path="/devotional/:planId" element={<DevotionalRedirect />} />
            <Route path="/bible-study-series/discover" element={<ProtectedRoute><PublicSeriesBrowser /></ProtectedRoute>} />
-           <Route path="/series/:seriesId" element={<ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute>} />
-           <Route path="/series/:seriesId/lesson/:lessonNumber" element={<ProtectedRoute><SeriesLessonEditor /></ProtectedRoute>} />
-           <Route path="/series/:seriesId/present" element={<ProtectedRoute><SeriesPresentationMode /></ProtectedRoute>} />
-            <Route path="/public-image-library" element={<ProtectedRoute><PublicImageLibrary /></ProtectedRoute>} />
+           <Route path="/series/:seriesId" element={<BasicModeGate><ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute></BasicModeGate>} />
+           <Route path="/series/:seriesId/lesson/:lessonNumber" element={<BasicModeGate><ProtectedRoute><SeriesLessonEditor /></ProtectedRoute></BasicModeGate>} />
+           <Route path="/series/:seriesId/present" element={<BasicModeGate><ProtectedRoute><SeriesPresentationMode /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/public-image-library" element={<BasicModeGate><ProtectedRoute><PublicImageLibrary /></ProtectedRoute></BasicModeGate>} />
             <Route path="/app-update-ideas" element={<ProtectedRoute><AppUpdateIdeas /></ProtectedRoute>} />
-            <Route path="/offline-content" element={<ProtectedRoute><OfflineContent /></ProtectedRoute>} />
+            <Route path="/offline-content" element={<BasicModeGate><ProtectedRoute><OfflineContent /></ProtectedRoute></BasicModeGate>} />
             <Route path="/notes" element={<ProtectedRoute><Notes /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/my-profile" element={<ProtectedRoute><MyProfileRedirect /></ProtectedRoute>} />
             <Route path="/user/:userId" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-            <Route path="/following-feed" element={<ProtectedRoute><FollowingFeed /></ProtectedRoute>} />
-            <Route path="/critics-analysis" element={<ProtectedRoute><CriticsAnalysis /></ProtectedRoute>} />
+            <Route path="/following-feed" element={<BasicModeGate><ProtectedRoute><FollowingFeed /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/critics-analysis" element={<BasicModeGate><ProtectedRoute><CriticsAnalysis /></ProtectedRoute></BasicModeGate>} />
             <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
             <Route path="/student-verify" element={<ProtectedRoute><StudentVerification /></ProtectedRoute>} />
             <Route path="/admin/access-codes" element={<ProtectedRoute><AdminAccessCodes /></ProtectedRoute>} />
-            <Route path="/admin-access-codes" element={<ProtectedRoute><AdminAccessCodes /></ProtectedRoute>} />
+            <Route path="/admin-access-codes" element={<BasicModeGate><ProtectedRoute><AdminAccessCodes /></ProtectedRoute></BasicModeGate>} />
             <Route path="/admin/subscriptions" element={<ProtectedRoute><AdminSubscriptions /></ProtectedRoute>} />
             <Route path="/admin/strongs-import" element={<ProtectedRoute><AdminStrongsImport /></ProtectedRoute>} />
             <Route path="/admin/bible-import" element={<ProtectedRoute><AdminBibleImport /></ProtectedRoute>} />
             <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
             <Route path="/certificates" element={<ProtectedRoute><Certificates /></ProtectedRoute>} />
-            <Route path="/study-partners" element={<ProtectedRoute><StudyPartners /></ProtectedRoute>} />
-            <Route path="/study-groups" element={<ProtectedRoute><StudyGroups /></ProtectedRoute>} />
-            <Route path="/content-library" element={<ProtectedRoute><ContentLibrary /></ProtectedRoute>} />
-            <Route path="/my-progress" element={<ProtectedRoute><UserAnalytics /></ProtectedRoute>} />
-            <Route path="/streaks" element={<ProtectedRoute><Streaks /></ProtectedRoute>} />
+            <Route path="/study-partners" element={<BasicModeGate><ProtectedRoute><StudyPartners /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/study-groups" element={<BasicModeGate><ProtectedRoute><StudyGroups /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/content-library" element={<BasicModeGate><ProtectedRoute><ContentLibrary /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/my-progress" element={<BasicModeGate><ProtectedRoute><UserAnalytics /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/streaks" element={<BasicModeGate><ProtectedRoute><Streaks /></ProtectedRoute></BasicModeGate>} />
             <Route path="/church-admin" element={<ProtectedRoute><ChurchAdmin /></ProtectedRoute>} />
             <Route path="/living-manna" element={<ProtectedRoute><LivingManna /></ProtectedRoute>} />
             <Route path="/join-church" element={<JoinChurch />} />
