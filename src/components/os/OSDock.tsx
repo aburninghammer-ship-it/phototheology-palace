@@ -20,7 +20,10 @@ export function OSDock() {
 
   const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
   const isPublicPage = publicPaths.some(p => currentPath === p) || currentPath.startsWith("/auth");
-  if (isMobile || isPublicPage) return null;
+  if (isMobile || isPublicPage || isBasic) return null;
+
+  // Filter pinned items to only show accessible ones for current mode
+  const accessiblePinned = pinnedItems.filter(item => isFeatureAccessible(mode, item.path));
 
   const isActive = (path: string) => currentPath === path || currentPath.startsWith(path + "/");
 
