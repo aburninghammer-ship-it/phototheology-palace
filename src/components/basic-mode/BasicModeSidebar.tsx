@@ -1,6 +1,7 @@
 /**
  * BasicModeSidebar — Left sidebar for Level 1 (Basic) mode
  * Teal/green themed — distinct from Level 3's purple palette
+ * Includes data-tour attributes for guided tour highlighting
  */
 import { cn } from "@/lib/utils";
 import { MessageCircle, BookOpen, Headphones, CalendarDays, Sun, Moon, Sparkles, Settings } from "lucide-react";
@@ -14,16 +15,17 @@ interface TabItem {
   label: string;
   icon: typeof MessageCircle;
   description: string;
+  tourId: string;
 }
 
 const TABS: TabItem[] = [
-  { id: "chat", label: "Ask Jeeves", icon: MessageCircle, description: "Ask anything about the Bible" },
-  { id: "bible", label: "Study Bible", icon: BookOpen, description: "Read with commentary" },
-  { id: "audio", label: "Audio", icon: Headphones, description: "Listen to commentary" },
-  { id: "plans", label: "Reading Plans", icon: CalendarDays, description: "Daily Bible reading" },
-  { id: "morning", label: "Morning Watch", icon: Sun, description: "Start your day with God" },
-  { id: "night", label: "Night Watch", icon: Moon, description: "Evening meditation" },
-  { id: "devotional", label: "Daily Word", icon: Sparkles, description: "Today's devotional" },
+  { id: "chat", label: "Ask Jeeves", icon: MessageCircle, description: "Ask anything about the Bible", tourId: "tab-chat" },
+  { id: "bible", label: "Study Bible", icon: BookOpen, description: "Read with commentary", tourId: "tab-bible" },
+  { id: "audio", label: "Audio", icon: Headphones, description: "Listen to commentary", tourId: "tab-audio" },
+  { id: "plans", label: "Reading Plans", icon: CalendarDays, description: "Daily Bible reading", tourId: "tab-plans" },
+  { id: "morning", label: "Morning Watch", icon: Sun, description: "Start your day with God", tourId: "tab-morning" },
+  { id: "night", label: "Night Watch", icon: Moon, description: "Evening meditation", tourId: "tab-night" },
+  { id: "devotional", label: "Daily Word", icon: Sparkles, description: "Today's devotional", tourId: "tab-devotional" },
 ];
 
 interface BasicModeSidebarProps {
@@ -68,6 +70,7 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
           return (
             <button
               key={tab.id}
+              data-tour={tab.tourId}
               onClick={() => onTabChange(tab.id)}
               className={cn(
                 "w-full flex items-center gap-3 rounded-lg transition-colors text-left",
