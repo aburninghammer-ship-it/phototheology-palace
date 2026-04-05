@@ -68,6 +68,7 @@ const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
   { path: "/character-profiles", minMode: "immersion" },
   { path: "/libraries", minMode: "immersion" },
   { path: "/bible-atlas", minMode: "immersion" },
+  { path: "/quarterly-study", minMode: "immersion" },
 
   // ── Explorer features (Level 2) ──
   // Study Space

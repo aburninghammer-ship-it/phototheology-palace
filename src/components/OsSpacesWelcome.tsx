@@ -70,6 +70,7 @@ const OS_SPACES: OsSpace[] = [
       { label: "Bible Atlas", path: "/bible-atlas", icon: Map, description: "Geographic explorer", tooltip: "Explore the lands of Scripture on interactive maps." },
       { label: "Source Library", path: "/libraries", icon: Library, description: "Reference materials", tooltip: "Access a curated library of Spirit of Prophecy writings, historical commentaries, and reference documents." },
       { label: "Audio Library", path: "/audio-library", icon: Headphones, description: "Audio studies", tooltip: "Listen to narrated Bible studies, devotionals, and PT teachings." },
+      { label: "Lesson Study", path: "/quarterly-study", icon: Calendar, description: "Sabbath School quarterly", tooltip: "Follow along with the current Sabbath School quarterly — daily lessons, discussion questions, and Scripture references auto-selected for today." },
     ],
   },
   {
