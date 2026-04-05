@@ -9,12 +9,17 @@ import { WhatsNewTicker } from "@/components/WhatsNewTicker";
 import { ExperienceModeSelector } from "@/components/experience-mode";
 import { PTSection } from "@/components/experience-mode/PTSection";
 import { NewcomerWelcomeBanner } from "@/components/NewcomerWelcomeBanner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { BasicModeShell } from "@/components/basic-mode/BasicModeShell";
+
+/** Level 2 users go straight to the Palace */
+function ExplorerRedirect() {
+  return <Navigate to="/palace" replace />;
+}
 
 const Welcome = () => {
   const navigate = useNavigate();
