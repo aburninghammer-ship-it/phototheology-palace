@@ -1,39 +1,57 @@
-## Heaven's Diary VR Enhancement Plan
 
-### 1. Richer Visual Environments
-Generate 6 cosmic-style backdrop images (one per stage) matching the established aesthetic:
-- **Creation**: Swirling nebula with cosmic matter forming, deep blues and golds
-- **Garden**: Lush ethereal garden with glowing trees, rivers of light
-- **Cross**: Dark dramatic sky with a radiant cross breaking through darkness
-- **Resurrection**: Explosive golden light burst, empty tomb with dawn breaking
-- **Throne Room**: Majestic golden architecture, rainbow aurora, sea of glass
-- **New Jerusalem**: Descending city of light, pearl gates, crystal river
+# Level 1 "Basic" Mode — ChatGPT-Style Interface
 
-These will be rendered as large billboard planes behind each scene for depth and atmosphere.
+## Overview
+When a user is in Level 1 (Basic), the entire app shell transforms into a dark, modern ChatGPT-like interface. No Spaces dashboard, no palace navigation — just a clean left sidebar with tool tabs and a main content area.
 
-### 2. Scripture Integration
-Add a rotating scripture display to each stage showing 3-4 key verses that cycle during the scene:
-- Creation: Gen 1:1, Gen 1:3, Ps 33:6, John 1:1
-- Garden: Gen 2:8-9, Gen 2:10, Rev 22:2
-- Cross: John 19:30, Isa 53:5, Rom 5:8, 1 Pet 2:24
-- Resurrection: Matt 28:6, Rom 6:9, 1 Cor 15:55
-- Throne: Rev 4:2-3, Rev 4:8, Dan 7:9-10
-- New Jerusalem: Rev 21:2-4, Rev 22:1-2, Rev 21:23
+## Naming Updates
+- Simple → **Basic** (Level 1)
+- Guided → **Explorer** (Level 2)  
+- Master → **Immersion** (Level 3)
 
-Verses will gently fade in/out as floating text panels within the 3D scene.
+## Level 1 Interface Layout
+```
+┌──────────────────────────────────────────────┐
+│ [≡] Phototheology    [Basic ▾]    [👤]       │  ← Header with level chip
+├────────┬─────────────────────────────────────┤
+│ 💬 Ask │                                     │
+│ 📖 Bible│    Main Content Area               │
+│ 🎧 Audio│   (Chat / Bible / etc.)            │
+│ 📅 Plans│                                    │
+│ 🌅 AM   │                                    │
+│ 🌙 PM   │                                    │
+│ ✨ Daily │                                    │
+│        │                                     │
+│────────│                                     │
+│ ⚙️ Settings                                  │
+└────────┴─────────────────────────────────────┘
+```
 
-### 3. Ambient Soundscapes (Layered)
-Add subtle ambient audio layers per scene using the Web Audio API:
-- Creation: Deep cosmic rumble, ethereal tones
-- Garden: Gentle water flowing, birds, rustling leaves
-- Cross: Thunder, wind, solemn tone
-- Resurrection: Rising orchestral swell, triumphant horns
-- Throne: Angelic choir hum, reverberant chimes
-- New Jerusalem: Crystal bells, flowing water, peaceful chimes
+## Sidebar Tabs (7 items)
+1. **Ask Jeeves** — Primary chat (default tab, ChatGPT-like)
+2. **Study Bible** — Bible reader with commentary
+3. **Audio Commentary** — Listen to chapter commentaries
+4. **Reading Plans** — Bible reading plans
+5. **Morning Watch** — AM devotional
+6. **Night Watch** — PM meditation
+7. **Daily Devotional** — Reginald's daily entry
 
-We'll generate these via the ElevenLabs SFX API and cache them in storage.
+## Level Toggle
+- Header shows current level as a styled chip (e.g., "Basic")
+- Clicking opens a modal with descriptions of all 3 levels
+- Settings menu also has the toggle
 
-### Implementation Order
-1. Generate backdrop images (6 images)
-2. Add scripture cycling system
-3. Wire up ambient soundscapes
+## Visual Style
+- Dark background (similar to ChatGPT dark mode)
+- Clean, minimal sidebar with icons + labels
+- Chat area with centered content, max-width container
+- Smooth transitions between tabs
+
+## Implementation Steps
+1. Update ExperienceModeContext: rename simple→basic, guided→explorer, master→immersion
+2. Create `BasicModeShell.tsx` — the Level 1 app shell with sidebar + content area
+3. Create `BasicModeSidebar.tsx` — left sidebar with 7 tabs
+4. Create `LevelToggleChip.tsx` — header chip + modal for switching levels
+5. Update main layout to conditionally render BasicModeShell when level=basic
+6. Add a welcome/explainer screen shown on first entry to Basic mode
+7. Wire existing components (Jeeves chat, Bible reader, etc.) into the tabs
