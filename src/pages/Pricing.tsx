@@ -762,66 +762,75 @@ export default function Pricing() {
             </div>
           </div>
           
-          <Card className="glass-card max-w-4xl mx-auto">
+          <Card className="glass-card max-w-6xl mx-auto">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4 font-semibold">{t('pricing.comparison.feature')}</th>
-                      <th className="text-center p-4 font-semibold">{t('pricing.comparison.freeTrial')}</th>
-                      <th className="text-center p-4 font-semibold">{t('pricing.comparison.essential')}</th>
-                      <th className="text-center p-4 font-semibold bg-primary/5">{t('pricing.comparison.premium')}</th>
+                      <th className="text-left p-3 font-semibold">{t('pricing.comparison.feature')}</th>
+                      <th className="text-center p-3 font-semibold">{t('pricing.comparison.freeTrial')}</th>
+                      <th className="text-center p-3 font-semibold">{t('pricing.comparison.essential')}</th>
+                      <th className="text-center p-3 font-semibold bg-primary/5">{t('pricing.comparison.premium')}</th>
+                      <th className="text-center p-3 font-semibold bg-amber-500/5">Unlimited</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.palace')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.palace')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.bibleReader')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">Text AI (Jeeves, Gems, Defense)</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b bg-amber-500/5">
+                      <td className="p-3 font-semibold">🔊 Audio Engine</td>
+                      <td className="text-center p-3 text-muted-foreground text-xs">Browser TTS</td>
+                      <td className="text-center p-3 text-xs">HD Audio<br/><span className="text-muted-foreground">15/mo</span></td>
+                      <td className="text-center p-3 bg-primary/5 text-xs">HD Audio<br/><span className="text-muted-foreground">75/mo</span></td>
+                      <td className="text-center p-3 bg-amber-500/5 text-xs font-semibold">HD + Premium HD<br/><span className="text-muted-foreground">250 + 50/mo</span></td>
+                    </tr>
+                    <tr className="border-b bg-amber-500/5">
+                      <td className="p-3 font-semibold">🎧 8-Voice Immerse Mode</td>
+                      <td className="text-center p-3 text-muted-foreground">—</td>
+                      <td className="text-center p-3 text-muted-foreground">—</td>
+                      <td className="text-center p-3 bg-primary/5 text-muted-foreground">—</td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.coreGames')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.artOfWar')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 text-muted-foreground">{t('pricing.comparison.limited')}</td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.basicAI')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b bg-yellow-500/5">
-                      <td className="p-4 font-semibold">{t('pricing.comparison.rows.artOfWar')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.limited')}</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.specializedAI')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 text-muted-foreground">{t('pricing.comparison.basic')}</td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.specializedAI')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.basic')}</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.prioritySupport')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 text-muted-foreground">{t('pricing.comparison.email')}</td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.escapeRooms')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.limited')}</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.prioritySupport')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.email')}</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">Credit Packs Available</td>
+                      <td className="text-center p-3 text-muted-foreground">—</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                   </tbody>
                 </table>
