@@ -56,6 +56,7 @@ export function OSTitleBar() {
     <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
       {/* Left: Brand */}
       <div className="flex items-center gap-2.5 shrink-0">
+        <BackButton />
         <div className="w-7 h-7 rounded-[8px] flex items-center justify-center shrink-0"
           style={{ 
             background: "linear-gradient(135deg, hsl(40 75% 55%), hsl(30 70% 45%))",
