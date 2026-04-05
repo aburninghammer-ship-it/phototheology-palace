@@ -10,7 +10,7 @@ export default function BasicNightTab() {
           End your day with a 15-minute cinematic meditation. Let Scripture quiet your mind for restful sleep.
         </p>
         <button
-          onClick={() => navigate("/night-watch")}
+          onClick={() => navigate("/night-watches")}
           className="px-6 py-2.5 bg-[hsl(220,50%,45%)] hover:bg-[hsl(220,50%,50%)] text-white rounded-lg text-sm font-medium transition-colors"
         >
           Begin Night Watch
