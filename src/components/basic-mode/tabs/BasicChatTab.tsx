@@ -395,6 +395,20 @@ export default function BasicChatTab() {
           Powered by deep theological analysis — Christ-centered, Scripture-grounded answers.
         </p>
       </div>
+
+      {/* Save Dialog */}
+      {saveDialog.msgIndex !== null && (
+        <SaveChatResponseDialog
+          open={saveDialog.open}
+          onOpenChange={(open) => setSaveDialog({ open, msgIndex: open ? saveDialog.msgIndex : null })}
+          responseContent={messages[saveDialog.msgIndex]?.content || ""}
+          userQuestion={
+            // Find the preceding user message
+            messages.slice(0, saveDialog.msgIndex).reverse().find((m) => m.role === "user")?.content || ""
+          }
+          conversationHistory={messages.slice(0, saveDialog.msgIndex + 1)}
+        />
+      )}
     </div>
   );
 }
