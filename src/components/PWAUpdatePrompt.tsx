@@ -213,7 +213,6 @@ export function PWAUpdatePrompt() {
     if (isUpdating) return;
 
     setIsUpdating(true);
-    suppressBuild(pendingBuild);
     sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
 
     try {
@@ -222,32 +221,14 @@ export function PWAUpdatePrompt() {
         return;
       }
 
-      if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.getRegistration();
-        await registration?.update().catch(() => undefined);
+      const updateAttempt = updateServiceWorker(true);
+      const timeoutGuard = new Promise<never>((_, reject) => {
+        window.setTimeout(() => reject(new Error('PWA update timed out')), WAITING_SW_TIMEOUT_MS + 4000);
+      });
 
-        const waitingWorker = await waitForWaitingWorker();
-        if (waitingWorker) {
-          await new Promise<void>((resolve) => {
-            let settled = false;
-            const finish = () => {
-              if (settled) return;
-              settled = true;
-              navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
-              resolve();
-            };
-            const handleControllerChange = () => finish();
-
-            navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
-            window.setTimeout(finish, WAITING_SW_TIMEOUT_MS);
-            waitingWorker.postMessage({ type: 'SKIP_WAITING' });
-          });
-        }
-      }
-
-      const target = new URL(window.location.href);
-      target.searchParams.set('__app_refresh', Date.now().toString());
-      window.location.replace(target.toString());
+      await Promise.race([updateAttempt, timeoutGuard]);
+      suppressBuild(pendingBuild);
+      setShowReload(false);
     } catch (error) {
       console.error('Error during update:', error);
       await forceHardRefresh('__app_refresh', `fallback-${Date.now()}`);
@@ -387,18 +368,17 @@ export function useCheckForUpdates() {
       return;
     }
 
-    if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.getRegistration();
-      await registration?.update().catch(() => undefined);
+    try {
+      const updateAttempt = updateServiceWorker(true);
+      const timeoutGuard = new Promise<never>((_, reject) => {
+        window.setTimeout(() => reject(new Error('PWA update timed out')), WAITING_SW_TIMEOUT_MS + 4000);
+      });
 
-      const waitingWorker = await waitForWaitingWorker();
-      if (waitingWorker) {
-        waitingWorker.postMessage({ type: 'SKIP_WAITING' });
-      }
+      await Promise.race([updateAttempt, timeoutGuard]);
+    } catch {
+      await forceHardRefresh('__app_refresh', `hook-${Date.now()}`);
     }
-
-    await forceHardRefresh('__app_refresh', `hook-${Date.now()}`);
-  }, []);
+  }, [updateServiceWorker]);
 
   return { checkForUpdates, applyUpdate, isChecking, updateAvailable };
 }
