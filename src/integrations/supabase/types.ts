@@ -746,6 +746,45 @@ export type Database = {
         }
         Relationships: []
       }
+      bible_audio_cache_archive: {
+        Row: {
+          archived_at: string | null
+          book: string | null
+          chapter: number | null
+          created_at: string | null
+          duration_ms: number | null
+          file_size_bytes: number | null
+          id: string | null
+          storage_path: string | null
+          verse: number | null
+          voice_id: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          book?: string | null
+          chapter?: number | null
+          created_at?: string | null
+          duration_ms?: number | null
+          file_size_bytes?: number | null
+          id?: string | null
+          storage_path?: string | null
+          verse?: number | null
+          voice_id?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          book?: string | null
+          chapter?: number | null
+          created_at?: string | null
+          duration_ms?: number | null
+          file_size_bytes?: number | null
+          id?: string | null
+          storage_path?: string | null
+          verse?: number | null
+          voice_id?: string | null
+        }
+        Relationships: []
+      }
       bible_commentaries: {
         Row: {
           audio_url: string | null
@@ -779,6 +818,45 @@ export type Database = {
           tier?: string
           updated_at?: string
           verse?: number
+        }
+        Relationships: []
+      }
+      bible_commentaries_archive: {
+        Row: {
+          archived_at: string | null
+          audio_url: string | null
+          book: string | null
+          chapter: number | null
+          commentary_text: string | null
+          created_at: string | null
+          id: string | null
+          tier: string | null
+          updated_at: string | null
+          verse: number | null
+        }
+        Insert: {
+          archived_at?: string | null
+          audio_url?: string | null
+          book?: string | null
+          chapter?: number | null
+          commentary_text?: string | null
+          created_at?: string | null
+          id?: string | null
+          tier?: string | null
+          updated_at?: string | null
+          verse?: number | null
+        }
+        Update: {
+          archived_at?: string | null
+          audio_url?: string | null
+          book?: string | null
+          chapter?: number | null
+          commentary_text?: string | null
+          created_at?: string | null
+          id?: string | null
+          tier?: string | null
+          updated_at?: string | null
+          verse?: number | null
         }
         Relationships: []
       }
@@ -6584,6 +6662,39 @@ export type Database = {
         }
         Relationships: []
       }
+      egw_chapter_cache_archive: {
+        Row: {
+          archived_at: string | null
+          book_id: string | null
+          chapter_number: number | null
+          chapter_title: string | null
+          created_at: string | null
+          id: string | null
+          paragraphs: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          book_id?: string | null
+          chapter_number?: number | null
+          chapter_title?: string | null
+          created_at?: string | null
+          id?: string | null
+          paragraphs?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          book_id?: string | null
+          chapter_number?: number | null
+          chapter_title?: string | null
+          created_at?: string | null
+          id?: string | null
+          paragraphs?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       email_campaign_logs: {
         Row: {
           campaign_name: string
@@ -9403,6 +9514,42 @@ export type Database = {
           public_url?: string
           storage_path?: string
           theme?: string
+        }
+        Relationships: []
+      }
+      image_bible_cache_archive: {
+        Row: {
+          archived_at: string | null
+          book: string | null
+          chapter: number | null
+          generated_at: string | null
+          id: string | null
+          prompt_used: string | null
+          public_url: string | null
+          storage_path: string | null
+          theme: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          book?: string | null
+          chapter?: number | null
+          generated_at?: string | null
+          id?: string | null
+          prompt_used?: string | null
+          public_url?: string | null
+          storage_path?: string | null
+          theme?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          book?: string | null
+          chapter?: number | null
+          generated_at?: string | null
+          id?: string | null
+          prompt_used?: string | null
+          public_url?: string | null
+          storage_path?: string | null
+          theme?: string | null
         }
         Relationships: []
       }
@@ -20152,6 +20299,48 @@ export type Database = {
           id?: string
           updated_at?: string | null
           verse?: number
+          voice_id?: string | null
+        }
+        Relationships: []
+      }
+      verse_commentary_cache_archive: {
+        Row: {
+          archived_at: string | null
+          audio_storage_path: string | null
+          book: string | null
+          chapter: number | null
+          commentary_text: string | null
+          created_at: string | null
+          depth: string | null
+          id: string | null
+          updated_at: string | null
+          verse: number | null
+          voice_id: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          audio_storage_path?: string | null
+          book?: string | null
+          chapter?: number | null
+          commentary_text?: string | null
+          created_at?: string | null
+          depth?: string | null
+          id?: string | null
+          updated_at?: string | null
+          verse?: number | null
+          voice_id?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          audio_storage_path?: string | null
+          book?: string | null
+          chapter?: number | null
+          commentary_text?: string | null
+          created_at?: string | null
+          depth?: string | null
+          id?: string | null
+          updated_at?: string | null
+          verse?: number | null
           voice_id?: string | null
         }
         Relationships: []
