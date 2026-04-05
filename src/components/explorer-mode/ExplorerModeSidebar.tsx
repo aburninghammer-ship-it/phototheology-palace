@@ -12,7 +12,7 @@ import { useState } from "react";
 
 export type ExplorerTab =
   | "chat" | "bible" | "chapel"
-  | "study-space" | "games-space" | "university-space" | "chapel-space";
+  | "games-space" | "university-space";
 
 interface TabItem {
   id: ExplorerTab;
@@ -67,18 +67,6 @@ const TABS: TabItem[] = [
   },
   // === SPACES (Level 2) ===
   {
-    id: "study-space",
-    label: "Study Space",
-    icon: BookOpenCheck,
-    section: "spaces",
-    activeGradient: "bg-gradient-to-r from-sky-500/20 via-sky-400/10 to-transparent",
-    activeBorder: "border border-sky-400/30",
-    activeGlow: "shadow-[0_0_15px_rgba(56,189,248,0.25)]",
-    activeText: "text-sky-300",
-    hoverBg: "hover:bg-sky-500/10",
-    iconGlow: "drop-shadow-[0_0_6px_rgba(56,189,248,0.6)]",
-  },
-  {
     id: "games-space",
     label: "Games",
     icon: Gamepad2,
@@ -101,18 +89,6 @@ const TABS: TabItem[] = [
     activeText: "text-yellow-300",
     hoverBg: "hover:bg-yellow-500/10",
     iconGlow: "drop-shadow-[0_0_6px_rgba(250,204,21,0.6)]",
-  },
-  {
-    id: "chapel-space",
-    label: "Chapel Space",
-    icon: Building2,
-    section: "spaces",
-    activeGradient: "bg-gradient-to-r from-emerald-500/20 via-emerald-400/10 to-transparent",
-    activeBorder: "border border-emerald-400/30",
-    activeGlow: "shadow-[0_0_15px_rgba(52,211,153,0.25)]",
-    activeText: "text-emerald-300",
-    hoverBg: "hover:bg-emerald-500/10",
-    iconGlow: "drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]",
   },
 ];
 

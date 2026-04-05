@@ -68,10 +68,8 @@ export function ExplorerModeShell() {
         return <BasicBibleTab />;
       case "chapel":
         return <BasicChapelTab />;
-      case "study-space":
       case "games-space":
       case "university-space":
-      case "chapel-space":
         return <ExplorerSpaceTab spaceId={activeTab} />;
       default:
         return <BasicChatTab />;
