@@ -6,6 +6,8 @@ import { PanelLeftClose, PanelLeftOpen, LayoutGrid, Pin } from "lucide-react";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePinnedDock } from "@/hooks/usePinnedDock";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
+import { isFeatureAccessible } from "@/config/featureRegistry";
 
 export function OSDock() {
   const location = useLocation();
@@ -13,11 +15,15 @@ export function OSDock() {
   const isMobile = useIsMobile();
   const [visible, setVisible] = useState(true);
   const { pinnedItems, togglePin } = usePinnedDock();
+  const { mode, isBasic } = useExperienceMode();
   const currentPath = location.pathname;
 
   const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
   const isPublicPage = publicPaths.some(p => currentPath === p) || currentPath.startsWith("/auth");
-  if (isMobile || isPublicPage) return null;
+  if (isMobile || isPublicPage || isBasic) return null;
+
+  // Filter pinned items to only show accessible ones for current mode
+  const accessiblePinned = pinnedItems.filter(item => isFeatureAccessible(mode, item.path));
 
   const isActive = (path: string) => currentPath === path || currentPath.startsWith(path + "/");
 
@@ -54,20 +60,20 @@ export function OSDock() {
       </div>
 
       {/* Back to Spaces */}
-      {currentPath !== "/" && (
+      {currentPath !== "/" && currentPath !== "/welcome" && currentPath !== "/palace" && (
         <div className="shrink-0 px-2 pt-2 flex justify-center">
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <button
-                onClick={() => navigate("/")}
+                onClick={() => navigate(mode === "explorer" ? "/palace" : "/")}
                 className="p-2.5 rounded-xl transition-all backdrop-blur-md border border-white/10 bg-primary/10 hover:bg-primary/20 text-primary hover:border-primary/30"
-                title="Back to Spaces"
+                title={mode === "explorer" ? "Back to Palace" : "Back to Spaces"}
               >
                 <LayoutGrid className="h-4 w-4" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" sideOffset={8} className="font-medium backdrop-blur-xl bg-popover/90 border-white/10 z-50">
-              Back to Spaces
+              {mode === "explorer" ? "Back to Palace" : "Back to Spaces"}
             </TooltipContent>
           </Tooltip>
         </div>
@@ -75,12 +81,12 @@ export function OSDock() {
 
       {/* Pinned Favorites */}
       <div className="flex-1 flex flex-col items-center gap-1 py-3 px-1 overflow-visible">
-        {pinnedItems.length === 0 && (
+        {accessiblePinned.length === 0 && (
           <div className="text-[9px] text-muted-foreground/40 text-center px-1 mt-4">
             Pin tools from Spaces
           </div>
         )}
-        {pinnedItems.map((item) => {
+        {accessiblePinned.map((item) => {
           const active = isActive(item.path);
           const Icon = item.icon;
           const itemColor = `hsl(${item.glow})`;
