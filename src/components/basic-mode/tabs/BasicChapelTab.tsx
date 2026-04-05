@@ -16,7 +16,7 @@ interface ChapelItem {
 const CHAPEL_ITEMS: ChapelItem[] = [
   { label: "Night Watches", path: "/night-watches", icon: Moon, description: "Evening cinematic meditations", iconColor: "hsl(250 60% 70%)", iconBg: "hsl(250 60% 70% / 0.15)" },
   { label: "Morning Watches", path: "/morning-watches", icon: Flame, description: "5–8 min morning activation", iconColor: "hsl(25 80% 55%)", iconBg: "hsl(25 80% 55% / 0.15)" },
-  { label: "Daily Audio Devotional", path: "/daily-audio-devotional", icon: Headphones, description: "Today's Phototheology devotional", iconColor: "hsl(170 55% 50%)", iconBg: "hsl(170 55% 50% / 0.15)" },
+  { label: "Daily Audio Devotional", path: "/daily-audio-devotional", icon: Headphones, description: "Today's Phototheology devotional", iconColor: "hsl(200 55% 55%)", iconBg: "hsl(200 55% 55% / 0.15)" },
   { label: "Devotionals", path: "/devotionals", icon: Flame, description: "Browse all devotional series", iconColor: "hsl(38 65% 55%)", iconBg: "hsl(38 65% 55% / 0.15)" },
   { label: "Daily Reading", path: "/daily-reading", icon: BookOpen, description: "Today's Bible reading", iconColor: "hsl(200 60% 55%)", iconBg: "hsl(200 60% 55% / 0.15)" },
   { label: "Reading Plans", path: "/reading-plans", icon: Calendar, description: "Structured reading paths", iconColor: "hsl(280 50% 55%)", iconBg: "hsl(280 50% 55% / 0.15)" },
@@ -38,13 +38,13 @@ export default function BasicChapelTab() {
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-2"
-            style={{ background: "hsl(170 25% 12%)" }}>
-            <Church className="h-7 w-7" style={{ color: "hsl(142 55% 50%)" }} />
+            style={{ background: "hsl(250 25% 14%)" }}>
+            <Church className="h-7 w-7" style={{ color: "hsl(250 55% 70%)" }} />
           </div>
-          <h2 className="text-xl font-bold" style={{ color: "hsl(170 10% 93%)" }}>
+          <h2 className="text-xl font-bold" style={{ color: "hsl(220 15% 93%)" }}>
             Phototheology Chapel
           </h2>
-          <p className="text-sm" style={{ color: "hsl(170 15% 48%)" }}>
+          <p className="text-sm" style={{ color: "hsl(230 15% 50%)" }}>
             Devotionals, watches, reading plans, community, and life resources — all in one place.
           </p>
         </div>
@@ -59,8 +59,8 @@ export default function BasicChapelTab() {
                 onClick={() => navigate(item.path)}
                 className="w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all hover:brightness-110"
                 style={{
-                  background: "hsl(170 22% 9%)",
-                  borderColor: "hsl(170 20% 18%)",
+                  background: "hsl(230 22% 10%)",
+                  borderColor: "hsl(230 20% 18%)",
                 }}
               >
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
@@ -68,10 +68,10 @@ export default function BasicChapelTab() {
                   <Icon className="h-5 w-5" style={{ color: item.iconColor }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold" style={{ color: "hsl(170 10% 88%)" }}>
+                  <div className="text-sm font-semibold" style={{ color: "hsl(220 15% 88%)" }}>
                     {item.label}
                   </div>
-                  <div className="text-xs" style={{ color: "hsl(170 15% 48%)" }}>
+                  <div className="text-xs" style={{ color: "hsl(230 15% 50%)" }}>
                     {item.description}
                   </div>
                 </div>
