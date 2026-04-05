@@ -10,7 +10,7 @@ export default function BasicMorningTab() {
           Start your day with a guided morning meditation. 5–8 minutes of Scripture, reflection, and prayer.
         </p>
         <button
-          onClick={() => navigate("/morning-watch")}
+          onClick={() => navigate("/morning-watches")}
           className="px-6 py-2.5 bg-[hsl(220,50%,45%)] hover:bg-[hsl(220,50%,50%)] text-white rounded-lg text-sm font-medium transition-colors"
         >
           Begin Morning Watch
