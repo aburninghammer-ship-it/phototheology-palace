@@ -593,69 +593,73 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
       "mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5 transition-opacity duration-700 zen-hideable",
       isInactive && "opacity-80"
     )}>
-      {/* Nudge bar */}
-      <AnimatePresence>
-        {nudge && !dismissed && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className={cn(
-              "rounded-lg px-3 py-1.5 text-center text-xs font-medium",
-              isInactive
-                ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-            )}>
-              {nudge}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Nudge bar — hidden in Basic mode */}
+      {!isBasic && (
+        <AnimatePresence>
+          {nudge && !dismissed && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className={cn(
+                "rounded-lg px-3 py-1.5 text-center text-xs font-medium",
+                isInactive
+                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                  : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+              )}>
+                {nudge}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
-      {/* New Feature Highlight */}
-      <AnimatePresence>
-        {!newFeatureDismissed && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="rounded-lg border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-teal-500/5 px-3 py-2 flex items-center gap-3">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <Sparkles className="h-4 w-4 text-emerald-400" />
-                <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">New</Badge>
+      {/* New Feature Highlight — hidden in Basic mode */}
+      {!isBasic && (
+        <AnimatePresence>
+          {!newFeatureDismissed && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="rounded-lg border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-teal-500/5 px-3 py-2 flex items-center gap-3">
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <Sparkles className="h-4 w-4 text-emerald-400" />
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">New</Badge>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-foreground">Test Me — PT Diagnostic Assessment</p>
+                  <p className="text-[11px] text-muted-foreground line-clamp-1">Discover your strengths across all 8 floors with AI-powered analysis & personalized growth plans.</p>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Button asChild size="sm" variant="ghost" className="text-[11px] h-6 px-2 text-emerald-400 hover:bg-emerald-500/10">
+                    <Link to="/test-me">
+                      Try It
+                      <ChevronRight className="h-3 w-3 ml-0.5" />
+                    </Link>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                     onClick={() => {
+                      setNewFeatureDismissed(true);
+                      localStorage.setItem("pt_new_feature_testme_dismissed_v2", Date.now().toString());
+                    }}
+                    title="Dismiss"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-foreground">Test Me — PT Diagnostic Assessment</p>
-                <p className="text-[11px] text-muted-foreground line-clamp-1">Discover your strengths across all 8 floors with AI-powered analysis & personalized growth plans.</p>
-              </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <Button asChild size="sm" variant="ghost" className="text-[11px] h-6 px-2 text-emerald-400 hover:bg-emerald-500/10">
-                  <Link to="/test-me">
-                    Try It
-                    <ChevronRight className="h-3 w-3 ml-0.5" />
-                  </Link>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                   onClick={() => {
-                    setNewFeatureDismissed(true);
-                    localStorage.setItem("pt_new_feature_testme_dismissed_v2", Date.now().toString());
-                  }}
-                  title="Dismiss"
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
       <div className={cn(
         "rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)] transition-all duration-500",
