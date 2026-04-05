@@ -1,5 +1,6 @@
 /**
  * BasicChatTab — ChatGPT-style Jeeves chat for Level 1 (Basic) mode
+ * Uses "basic-deep" mode for Master-level depth without exposing the Palace engine
  */
 import { useState, useRef, useEffect } from "react";
 import { callJeeves } from "@/lib/jeevesClient";
@@ -13,10 +14,10 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  "What does John 3:16 really mean?",
-  "Explain the Sanctuary in simple terms",
+  "Give me a breakdown of Joseph, the butler, and the baker",
+  "What does the Sanctuary teach us about salvation?",
   "Who is the Lamb in Revelation 5?",
-  "How do I start studying the Bible daily?",
+  "Trace the theme of 'three days' through the Bible",
 ];
 
 export default function BasicChatTab() {
@@ -33,14 +34,17 @@ export default function BasicChatTab() {
   const sendMessage = async (text: string) => {
     if (!text.trim() || loading) return;
     const userMsg: Message = { role: "user", content: text.trim() };
-    setMessages(prev => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInput("");
     setLoading(true);
 
     try {
+      // Send full conversation history for context continuity
       const { data, error } = await callJeeves({
-        mode: "general",
+        mode: "basic-deep",
         message: text.trim(),
+        conversationHistory: updatedMessages.slice(-20), // Last 20 messages for context
         experienceMode: "simple",
       }, "basic-mode-chat");
 
@@ -77,7 +81,7 @@ export default function BasicChatTab() {
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Ask Jeeves Anything</h2>
             <p className="text-sm text-[hsl(220,10%,50%)] text-center mb-8 max-w-md">
-              Your personal Bible study assistant. Ask about any verse, topic, doctrine, or question — Jeeves uses the Phototheology method to give you deep, Christ-centered answers.
+              Your personal Bible study partner. Ask about any verse, story, doctrine, or question — and get deep, Christ-centered insight.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
@@ -106,13 +110,13 @@ export default function BasicChatTab() {
                   </div>
                 )}
                 <div className={cn(
-                  "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                  "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                   msg.role === "user"
                     ? "bg-[hsl(220,50%,45%)] text-white"
                     : "bg-[hsl(220,10%,15%)] text-[hsl(220,10%,85%)]"
                 )}>
                   {msg.role === "assistant" ? (
-                    <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1.5 [&>ul]:my-2 [&>ol]:my-2">
+                    <div className="prose prose-sm prose-invert max-w-none [&>p]:my-2 [&>ul]:my-2 [&>ol]:my-2 [&>blockquote]:border-amber-500/30 [&>blockquote]:text-amber-100/80">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   ) : (
@@ -149,7 +153,7 @@ export default function BasicChatTab() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about any Bible verse, topic, or question..."
+            placeholder="Ask about any Bible verse, story, or topic..."
             rows={1}
             className="w-full resize-none rounded-xl bg-[hsl(220,10%,15%)] border border-[hsl(220,10%,22%)] text-white placeholder:text-[hsl(220,10%,40%)] px-4 py-3 pr-12 text-sm focus:outline-none focus:border-[hsl(220,10%,35%)] transition-colors"
             style={{ minHeight: 44, maxHeight: 120 }}
@@ -173,7 +177,7 @@ export default function BasicChatTab() {
           </button>
         </div>
         <p className="text-center text-[10px] text-[hsl(220,10%,35%)] mt-2">
-          Jeeves uses Phototheology principles to provide Christ-centered, Scripture-grounded answers.
+          Powered by deep theological analysis — Christ-centered, Scripture-grounded answers.
         </p>
       </div>
     </div>
