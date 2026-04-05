@@ -5,7 +5,7 @@
  */
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callJeeves } from "@/lib/jeevesClient";
-import { Send, Sparkles, BookOpen, Eye, Layers, Link2, MapPin, Palette, ChevronRight } from "lucide-react";
+import { Send, Sparkles, BookOpen, Eye, Layers, Link2, MapPin, Palette, ChevronRight, Search, Shield, Repeat, Compass, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 
@@ -15,7 +15,7 @@ interface Message {
 }
 
 /** Study lenses — plain-language labels for hidden PT rooms */
-const STUDY_LENSES = [
+const STUDY_LENSES_A = [
   { id: "5d", icon: Layers, label: "5 Perspectives", hint: "Literal, Christ, Personal, Church, Heavenly", color: "from-blue-500 to-cyan-500", borderColor: "border-blue-500/30" },
   { id: "c6", icon: Link2, label: "6 Scripture Categories", hint: "Prophecy, Poetry, History, Gospels, Epistles, Parables", color: "from-purple-500 to-pink-500", borderColor: "border-purple-500/30" },
   { id: "christ", icon: Eye, label: "Find Christ Here", hint: "Typology, parallels, and fulfillment", color: "from-amber-500 to-orange-500", borderColor: "border-amber-500/30" },
@@ -23,6 +23,22 @@ const STUDY_LENSES = [
   { id: "visual", icon: Palette, label: "Paint the Picture", hint: "An image you'll never forget", color: "from-rose-500 to-red-500", borderColor: "border-rose-500/30" },
   { id: "deep", icon: BookOpen, label: "Go All In", hint: "Everything — the full deep dive", color: "from-indigo-500 to-violet-500", borderColor: "border-indigo-500/30" },
 ];
+
+const STUDY_LENSES_B = [
+  { id: "detective", icon: Search, label: "Be the Detective", hint: "30+ observations before interpreting", color: "from-sky-500 to-blue-500", borderColor: "border-sky-500/30" },
+  { id: "sanctuary", icon: Shield, label: "The Blueprint", hint: "Trace it through the Sanctuary design", color: "from-cyan-500 to-teal-500", borderColor: "border-cyan-500/30" },
+  { id: "patterns", icon: Repeat, label: "Spot the Pattern", hint: "Recurring motifs — 3s, 7s, 40s, deliverers", color: "from-fuchsia-500 to-purple-500", borderColor: "border-fuchsia-500/30" },
+  { id: "freestyle", icon: Compass, label: "Connect It to Life", hint: "Nature, experience, history — see it everywhere", color: "from-lime-500 to-green-500", borderColor: "border-lime-500/30" },
+  { id: "fruit", icon: Heart, label: "The Heart Test", hint: "Does this grow love, joy, peace, patience?", color: "from-pink-500 to-rose-500", borderColor: "border-pink-500/30" },
+  { id: "deep", icon: BookOpen, label: "Go All In", hint: "Everything — the full deep dive", color: "from-indigo-500 to-violet-500", borderColor: "border-indigo-500/30" },
+];
+
+/** Rotate lenses — alternate sets based on the hour */
+function getRotatedLenses() {
+  const hour = new Date().getHours();
+  return hour % 2 === 0 ? STUDY_LENSES_A : STUDY_LENSES_B;
+}
+
 
 const ALL_SUGGESTIONS = [
   // Set A
@@ -59,6 +75,11 @@ function getLensInstruction(lensId: string, originalMessage: string): string {
     "timeline": `The user wants temporal placement. Show where "${originalMessage}" sits in redemptive history — past fulfillment, present application, future completion. Show both the earthly and heavenly dimensions of time. Use the Time Zone Room engine internally but NEVER name it.`,
     "visual": `The user wants a memorable visual. Create a vivid, unforgettable mental image for "${originalMessage}" — like a movie frame they can recall instantly. Draw on the 24FPS and Imagination Room concepts but NEVER name them. Make it immersive and cinematic.`,
     "deep": `The user wants the FULL deep dive. Run "${originalMessage}" through ALL 8 floors of analysis exhaustively. Give 5 Dimensions, Christ connections, cross-references, sanctuary parallels, prophetic significance, patterns, emotional weight, and practical application. This should be your most comprehensive answer possible — 10+ paragraphs with extensive KJV quotations.`,
+    "detective": `The user wants the detective approach. For "${originalMessage}", log 30+ raw observations first — fingerprints, footprints, details that casual readers miss. Then note word definitions (Greek/Hebrew where relevant), cultural context, and structural details. Present it as an investigation — clues first, theory second. Use the Observation and Def-Com Room engines internally but NEVER name them.`,
+    "sanctuary": `The user wants the Sanctuary blueprint lens. Show how "${originalMessage}" maps onto the sanctuary furniture and services — altar, laver, lampstand, showbread, incense, ark, veil, gate. Trace the passage through the sanctuary as a map of salvation. Use the Blue Room engine internally but NEVER name it.`,
+    "patterns": `The user wants to spot recurring patterns. For "${originalMessage}", identify biblical patterns: recurring numbers (3, 7, 12, 40), repeated story structures (deliverer stories, fall-covenant-sanctuary-enemy-restoration), and motifs that echo across Scripture. Show how history rhymes. Use the Patterns Room engine internally but NEVER name it.`,
+    "freestyle": `The user wants real-life connections. For "${originalMessage}", connect it to nature, personal experience, history, and culture. Show how this truth appears in everyday life — sunrise, storms, seasons, work, relationships, current events. Make the Bible feel alive outside the page. Use the Freestyle Floor engine internally but NEVER name it.`,
+    "fruit": `The user wants the heart test. For "${originalMessage}", examine: What character does this passage cultivate? Does it produce love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control? How does this text transform the reader's heart and life? What practical change should it inspire? Use the Fruit Room engine internally but NEVER name it.`,
   };
   return instructions[lensId] || `Analyze "${originalMessage}" with maximum depth.`;
 }
@@ -239,7 +260,7 @@ export default function BasicChatTab() {
                     Great question! How would you like me to approach this?
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {STUDY_LENSES.map((lens) => {
+                    {getRotatedLenses().map((lens) => {
                       const Icon = lens.icon;
                       return (
                         <button
