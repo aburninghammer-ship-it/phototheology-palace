@@ -5,6 +5,7 @@
  */
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callJeeves } from "@/lib/jeevesClient";
+import { supabase } from "@/integrations/supabase/client";
 import { Send, Sparkles, BookOpen, Eye, Layers, Link2, MapPin, Palette, ChevronRight, Search, Shield, Repeat, Compass, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
@@ -40,30 +41,23 @@ function getRotatedLenses() {
 }
 
 
-const ALL_SUGGESTIONS = [
-  // Set A
-  { text: "Break down Genesis 3:15", gradient: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20", hoverGlow: "hover:shadow-blue-500/40" },
-  { text: "How can I learn to find Christ in the Old Testament?", gradient: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", glow: "shadow-amber-500/20", hoverGlow: "hover:shadow-amber-500/40" },
-  { text: "What principles can I use to study the Bible better?", gradient: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20", hoverGlow: "hover:shadow-purple-500/40" },
-  { text: "Analyze my thoughts on why David picked 5 stones", gradient: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20", hoverGlow: "hover:shadow-emerald-500/40" },
-  { text: "What does the Sanctuary teach about salvation?", gradient: "from-rose-500/20 to-red-500/20", border: "border-rose-400/30", glow: "shadow-rose-500/20", hoverGlow: "hover:shadow-rose-500/40" },
-  { text: "Who is the Lamb in Revelation 5?", gradient: "from-indigo-500/20 to-violet-500/20", border: "border-indigo-400/30", glow: "shadow-indigo-500/20", hoverGlow: "hover:shadow-indigo-500/40" },
-  // Set B
-  { text: "Trace the theme of 'three days' through the Bible", gradient: "from-teal-500/20 to-cyan-500/20", border: "border-teal-400/30", glow: "shadow-teal-500/20", hoverGlow: "hover:shadow-teal-500/40" },
-  { text: "Show me how Psalm 23 connects to Jesus", gradient: "from-sky-500/20 to-blue-500/20", border: "border-sky-400/30", glow: "shadow-sky-500/20", hoverGlow: "hover:shadow-sky-500/40" },
-  { text: "What makes Jeeves different from ChatGPT?", gradient: "from-violet-500/20 to-fuchsia-500/20", border: "border-violet-400/30", glow: "shadow-violet-500/20", hoverGlow: "hover:shadow-violet-500/40" },
-  { text: "Why did God ask Abraham to sacrifice Isaac?", gradient: "from-orange-500/20 to-yellow-500/20", border: "border-orange-400/30", glow: "shadow-orange-500/20", hoverGlow: "hover:shadow-orange-500/40" },
-  { text: "How does the number 40 repeat across Scripture?", gradient: "from-cyan-500/20 to-sky-500/20", border: "border-cyan-400/30", glow: "shadow-cyan-500/20", hoverGlow: "hover:shadow-cyan-500/40" },
-  { text: "What can nature teach me about God?", gradient: "from-lime-500/20 to-green-500/20", border: "border-lime-400/30", glow: "shadow-lime-500/20", hoverGlow: "hover:shadow-lime-500/40" },
+const GRADIENT_STYLES = [
+  { gradient: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20", hoverGlow: "hover:shadow-blue-500/40" },
+  { gradient: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", glow: "shadow-amber-500/20", hoverGlow: "hover:shadow-amber-500/40" },
+  { gradient: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20", hoverGlow: "hover:shadow-purple-500/40" },
+  { gradient: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20", hoverGlow: "hover:shadow-emerald-500/40" },
+  { gradient: "from-rose-500/20 to-red-500/20", border: "border-rose-400/30", glow: "shadow-rose-500/20", hoverGlow: "hover:shadow-rose-500/40" },
+  { gradient: "from-indigo-500/20 to-violet-500/20", border: "border-indigo-400/30", glow: "shadow-indigo-500/20", hoverGlow: "hover:shadow-indigo-500/40" },
 ];
 
-/** Rotate suggestions — show 6 at a time, cycling based on the current day */
-function getRotatedSuggestions() {
-  const day = new Date().getDate();
-  const setIndex = day % 2; // alternates daily
-  const start = setIndex * 6;
-  return ALL_SUGGESTIONS.slice(start, start + 6);
-}
+const FALLBACK_SUGGESTIONS = [
+  "Break down Genesis 3:15",
+  "How can I learn to find Christ in the Old Testament?",
+  "What principles can I use to study the Bible better?",
+  "Analyze my thoughts on why David picked 5 stones",
+  "What does the Sanctuary teach about salvation?",
+  "Who is the Lamb in Revelation 5?",
+];
 
 
 /** Maps plain-language lens IDs to hidden PT instructions for the AI */
@@ -89,8 +83,33 @@ export default function BasicChatTab() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
+  const [dailySuggestions, setDailySuggestions] = useState<string[]>(FALLBACK_SUGGESTIONS);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Fetch today's AI-generated sample questions
+  useEffect(() => {
+    const fetchDailyQuestions = async () => {
+      try {
+        const today = new Date().toISOString().split("T")[0];
+        const { data, error } = await supabase
+          .from("generated_sample_questions")
+          .select("questions")
+          .eq("generation_date", today)
+          .maybeSingle();
+        
+        if (!error && data?.questions && Array.isArray(data.questions) && data.questions.length === 6) {
+          const texts = data.questions.map((q: any) => 
+            q.emoji ? `${q.emoji} ${q.text}` : q.text
+          );
+          setDailySuggestions(texts);
+        }
+      } catch {
+        // silently fall back to static suggestions
+      }
+    };
+    fetchDailyQuestions();
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -193,19 +212,22 @@ export default function BasicChatTab() {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
-              {getRotatedSuggestions().map((s) => (
-                <button
-                  key={s.text}
-                  onClick={() => sendMessage(s.text)}
-                  className={cn(
-                    "text-left p-4 rounded-xl text-sm transition-all duration-300 border backdrop-blur-md",
-                    "bg-gradient-to-br", s.gradient, s.border, s.glow, s.hoverGlow,
-                    "shadow-lg hover:shadow-xl hover:scale-[1.03] hover:text-foreground text-muted-foreground"
-                  )}
-                >
-                  {s.text}
-                </button>
-              ))}
+              {dailySuggestions.map((text, i) => {
+                const style = GRADIENT_STYLES[i % GRADIENT_STYLES.length];
+                return (
+                  <button
+                    key={text}
+                    onClick={() => sendMessage(text)}
+                    className={cn(
+                      "text-left p-4 rounded-xl text-sm transition-all duration-300 border backdrop-blur-md",
+                      "bg-gradient-to-br", style.gradient, style.border, style.glow, style.hoverGlow,
+                      "shadow-lg hover:shadow-xl hover:scale-[1.03] hover:text-foreground text-muted-foreground"
+                    )}
+                  >
+                    {text}
+                  </button>
+                );
+              })}
             </div>
           </div>
         ) : (

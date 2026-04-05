@@ -8395,6 +8395,27 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_sample_questions: {
+        Row: {
+          created_at: string
+          generation_date: string
+          id: string
+          questions: Json
+        }
+        Insert: {
+          created_at?: string
+          generation_date: string
+          id?: string
+          questions?: Json
+        }
+        Update: {
+          created_at?: string
+          generation_date?: string
+          id?: string
+          questions?: Json
+        }
+        Relationships: []
+      }
       generated_spark_cards: {
         Row: {
           category: string
