@@ -2,24 +2,49 @@
  * Experience Mode System
  * 
  * Controls how much Phototheology architecture is visible to the user.
- * - simple: No PT jargon. Actions & insights only. ("The Clock")
- * - guided: Occasional PT context. Learn the engine through use.
- * - master: Full rooms, floors, codes, principles. ("The Engine")
+ * - basic: No PT jargon. ChatGPT-like interface. Answers only. ("The Clock")
+ * - explorer: Guided PT context. Learn the engine through use. ("The Workshop")
+ * - immersion: Full rooms, floors, codes, principles. ("The Engine")
  */
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type ExperienceMode = "simple" | "guided" | "master";
+export type ExperienceMode = "basic" | "explorer" | "immersion";
+
+// Map old DB values to new ones
+const MIGRATE_MAP: Record<string, ExperienceMode> = {
+  simple: "basic",
+  guided: "explorer",
+  master: "immersion",
+};
+
+// Map new values to old DB values for storage compatibility
+const DB_VALUE_MAP: Record<ExperienceMode, string> = {
+  basic: "simple",
+  explorer: "guided",
+  immersion: "master",
+};
+
+function normalizeMode(raw: string | null): ExperienceMode {
+  if (!raw) return "basic";
+  if (raw === "basic" || raw === "explorer" || raw === "immersion") return raw;
+  if (MIGRATE_MAP[raw]) return MIGRATE_MAP[raw];
+  return "basic";
+}
 
 interface ExperienceModeContextType {
   mode: ExperienceMode;
   setMode: (mode: ExperienceMode) => void;
+  isBasic: boolean;
+  isExplorer: boolean;
+  isImmersion: boolean;
+  /** Backward compat aliases */
   isSimple: boolean;
   isGuided: boolean;
   isMaster: boolean;
-  /** Returns true if PT terminology should be shown (guided or master) */
+  /** Returns true if PT terminology should be shown (explorer or immersion) */
   showPTLabels: boolean;
-  /** Returns true if full PT architecture should be shown (master only) */
+  /** Returns true if full PT architecture should be shown (immersion only) */
   showFullArchitecture: boolean;
 }
 
@@ -29,9 +54,7 @@ const STORAGE_KEY = "pt-experience-mode";
 
 export function ExperienceModeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ExperienceMode>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "simple" || stored === "guided" || stored === "master") return stored;
-    return "simple";
+    return normalizeMode(localStorage.getItem(STORAGE_KEY));
   });
 
   // Sync from database on auth
@@ -46,9 +69,10 @@ export function ExperienceModeProvider({ children }: { children: ReactNode }) {
         .eq("id", user.id)
         .single();
 
-      if (data?.experience_mode && ["simple", "guided", "master"].includes(data.experience_mode)) {
-        setModeState(data.experience_mode as ExperienceMode);
-        localStorage.setItem(STORAGE_KEY, data.experience_mode);
+      if (data?.experience_mode) {
+        const normalized = normalizeMode(data.experience_mode);
+        setModeState(normalized);
+        localStorage.setItem(STORAGE_KEY, normalized);
       }
     };
 
@@ -59,12 +83,12 @@ export function ExperienceModeProvider({ children }: { children: ReactNode }) {
     setModeState(newMode);
     localStorage.setItem(STORAGE_KEY, newMode);
 
-    // Persist to database
+    // Persist to database (use old DB values for compat)
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       await supabase
         .from("profiles")
-        .update({ experience_mode: newMode } as any)
+        .update({ experience_mode: DB_VALUE_MAP[newMode] } as any)
         .eq("id", user.id);
     }
   }, []);
@@ -72,11 +96,15 @@ export function ExperienceModeProvider({ children }: { children: ReactNode }) {
   const value: ExperienceModeContextType = {
     mode,
     setMode,
-    isSimple: mode === "simple",
-    isGuided: mode === "guided",
-    isMaster: mode === "master",
-    showPTLabels: mode === "guided" || mode === "master",
-    showFullArchitecture: mode === "master",
+    isBasic: mode === "basic",
+    isExplorer: mode === "explorer",
+    isImmersion: mode === "immersion",
+    // Backward compat
+    isSimple: mode === "basic",
+    isGuided: mode === "explorer",
+    isMaster: mode === "immersion",
+    showPTLabels: mode === "explorer" || mode === "immersion",
+    showFullArchitecture: mode === "immersion",
   };
 
   return (

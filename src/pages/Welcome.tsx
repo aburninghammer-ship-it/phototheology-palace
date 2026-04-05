@@ -13,9 +13,17 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
+import { BasicModeShell } from "@/components/basic-mode/BasicModeShell";
 
 const Welcome = () => {
   const navigate = useNavigate();
+  const { isBasic } = useExperienceMode();
+
+  // Level 1 (Basic) mode: show the ChatGPT-style interface
+  if (isBasic) {
+    return <BasicModeShell />;
+  }
 
   return (
     <>
@@ -110,7 +118,7 @@ const Welcome = () => {
         <ContinueWhereYouLeftOff />
       </div>
 
-      <PTSection showIn={["guided", "master"]}>
+      <PTSection showIn={["explorer", "immersion"]}>
         <PtGlossaryTable />
       </PTSection>
     </>

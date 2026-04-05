@@ -2,20 +2,20 @@
  * PTLabel — Mode-aware label component
  * 
  * Renders different text based on the current experience mode:
- * - Simple: shows only the plain language label
- * - Guided: shows plain label + subtle PT tag on hover/after
- * - Master: shows full PT terminology
+ * - Basic: shows only the plain language label
+ * - Explorer: shows plain label + subtle PT tag on hover/after
+ * - Immersion: shows full PT terminology
  */
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PTLabelProps {
-  /** Plain language label shown in Simple & Guided modes */
+  /** Plain language label shown in Basic & Explorer modes */
   simple: string;
-  /** Full PT terminology shown in Master mode */
+  /** Full PT terminology shown in Immersion mode */
   master: string;
-  /** Optional PT code (e.g., "CR", "DR") shown as badge in Guided/Master */
+  /** Optional PT code (e.g., "CR", "DR") shown as badge in Explorer/Immersion */
   code?: string;
   /** Optional explanation of the PT concept */
   description?: string;
@@ -24,13 +24,13 @@ interface PTLabelProps {
 }
 
 export function PTLabel({ simple, master, code, description, className = "" }: PTLabelProps) {
-  const { mode } = useExperienceMode();
+  const { isBasic, isExplorer } = useExperienceMode();
 
-  if (mode === "simple") {
+  if (isBasic) {
     return <span className={className}>{simple}</span>;
   }
 
-  if (mode === "guided") {
+  if (isExplorer) {
     return (
       <TooltipProvider>
         <Tooltip>
@@ -55,7 +55,7 @@ export function PTLabel({ simple, master, code, description, className = "" }: P
     );
   }
 
-  // Master mode
+  // Immersion mode
   return (
     <span className={`inline-flex items-center gap-1.5 ${className}`}>
       {master}

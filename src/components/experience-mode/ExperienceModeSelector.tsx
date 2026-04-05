@@ -1,47 +1,51 @@
 /**
- * ExperienceModeSelector — Toggle between Simple, Guided, and Master modes
+ * ExperienceModeSelector — Toggle between Basic, Explorer, and Immersion modes
  */
 import { motion } from "framer-motion";
 import { useExperienceMode, type ExperienceMode } from "@/contexts/ExperienceModeContext";
-import { Eye, BookOpen, Wrench } from "lucide-react";
+import { Zap, Compass, Flame } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface ModeOption {
   mode: ExperienceMode;
+  level: number;
   label: string;
   tagline: string;
   description: string;
-  icon: typeof Eye;
+  icon: typeof Zap;
   color: string;
   bgActive: string;
 }
 
 const MODE_OPTIONS: ModeOption[] = [
   {
-    mode: "simple",
-    label: "Simple",
-    tagline: "Just show me insights",
-    description: "Clean, action-based experience. No technical terminology — just understanding, application, and discovery.",
-    icon: Eye,
+    mode: "basic",
+    level: 1,
+    label: "Basic",
+    tagline: "Just give me answers",
+    description: "Clean, conversational experience. No technical terminology — just understanding, application, and discovery.",
+    icon: Zap,
     color: "text-emerald-400",
     bgActive: "bg-emerald-500/20 border-emerald-500/50",
   },
   {
-    mode: "guided",
-    label: "Guided",
+    mode: "explorer",
+    level: 2,
+    label: "Explorer",
     tagline: "Teach me as I go",
     description: "See insights first, then learn the principles behind them. Phototheology concepts are introduced naturally through use.",
-    icon: BookOpen,
+    icon: Compass,
     color: "text-amber-400",
     bgActive: "bg-amber-500/20 border-amber-500/50",
   },
   {
-    mode: "master",
-    label: "Master",
+    mode: "immersion",
+    level: 3,
+    label: "Immersion",
     tagline: "Show me everything",
     description: "Full access to all 8 Floors, Rooms, Codes, Cycles, and architectural tools. Built for teachers and advanced students.",
-    icon: Wrench,
+    icon: Flame,
     color: "text-violet-400",
     bgActive: "bg-violet-500/20 border-violet-500/50",
   },
@@ -85,7 +89,7 @@ export function ExperienceModeSelector({ variant = "full", className }: Experien
   return (
     <div className={cn("space-y-3", className)}>
       <div>
-        <h3 className="text-lg font-semibold text-foreground">Experience Mode</h3>
+        <h3 className="text-lg font-semibold text-foreground">Experience Level</h3>
         <p className="text-sm text-muted-foreground">
           Choose how much of the Phototheology system you want to see
         </p>
@@ -112,7 +116,7 @@ export function ExperienceModeSelector({ variant = "full", className }: Experien
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-foreground">{opt.label}</span>
+                      <span className="font-semibold text-foreground">Level {opt.level}: {opt.label}</span>
                       <span className="text-xs text-muted-foreground">— {opt.tagline}</span>
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">{opt.description}</p>
