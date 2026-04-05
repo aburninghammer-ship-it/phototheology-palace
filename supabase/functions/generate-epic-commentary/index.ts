@@ -26,6 +26,18 @@ const VOICE_IDS: Record<string, string> = {
   mirror: "SAz9YHcvj6GT2YYXdXww",    // River - Warm reflective (shared with Counselor for pastoral warmth)
 };
 
+// OpenAI TTS fallback voices per mode (used when ElevenLabs is unavailable)
+const OPENAI_FALLBACK_VOICES: Record<string, string> = {
+  epic: "onyx",        // Deep, authoritative — matches William
+  urban: "nova",       // Warm, expressive — matches Jessica
+  ancient: "fable",    // Measured, narrative — matches Daniel
+  preacher: "echo",    // Clear, bold — matches Chris
+  scholar: "ash",      // Calm, analytical — matches Antoni
+  counselor: "shimmer",// Warm, gentle — matches River
+  kids: "coral",       // Bright, friendly — matches Lily
+  mirror: "shimmer",   // Warm, reflective — matches River
+};
+
 const ALLOWED_COMMENTARY_MODES = new Set([
   "epic",
   "urban",
