@@ -6,6 +6,7 @@ import { Download, RefreshCw } from 'lucide-react';
 
 const SUPPRESSED_BUILD_PREFIX = 'pwa_update_suppressed_build:';
 const WAITING_SW_DISMISS_KEY = 'pwa_waiting_sw_dismissed';
+export const MANUAL_UPDATE_REQUIRED_EVENT = 'pt:manual-update-required';
 const BUILD_CHECK_INTERVAL_MS = 30_000;
 const INITIAL_BUILD_CHECK_DELAY_MS = 4_000;
 const WAITING_SW_TIMEOUT_MS = 4_000;
@@ -138,6 +139,16 @@ export function PWAUpdatePrompt() {
   }, [needRefresh]);
 
   useEffect(() => {
+    const handleManualUpdateRequired = () => {
+      sessionStorage.removeItem(WAITING_SW_DISMISS_KEY);
+      setShowReload(true);
+    };
+
+    window.addEventListener(MANUAL_UPDATE_REQUIRED_EVENT, handleManualUpdateRequired);
+    return () => window.removeEventListener(MANUAL_UPDATE_REQUIRED_EVENT, handleManualUpdateRequired);
+  }, []);
+
+  useEffect(() => {
     if (isMetaWebView || isPreviewHost || isInIframe) return;
 
     const currentBuild = readCurrentBuildTag();
@@ -231,9 +242,6 @@ export function PWAUpdatePrompt() {
             window.setTimeout(finish, WAITING_SW_TIMEOUT_MS);
             waitingWorker.postMessage({ type: 'SKIP_WAITING' });
           });
-        } else {
-          await updateServiceWorker(true);
-          return;
         }
       }
 
