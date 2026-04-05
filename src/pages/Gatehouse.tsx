@@ -12,7 +12,7 @@ import { useEventTracking } from '@/hooks/useEventTracking';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { UserCountBadge } from '@/components/UserCountBadge';
-import { OsSpacesWelcome } from '@/components/OsSpacesWelcome';
+
 import { Headphones } from 'lucide-react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
@@ -341,8 +341,7 @@ const Gatehouse = () => {
             </div>
           </motion.div>
 
-          {/* OS Spaces Dashboard */}
-          <OsSpacesWelcome />
+          {/* OS Spaces Dashboard removed — only visible in Level 3 authenticated view */}
 
           {/* Full Card Layout */}
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full">
@@ -520,8 +519,7 @@ const Gatehouse = () => {
           </div>
         </motion.div>
 
-        {/* OS Spaces Dashboard */}
-        <OsSpacesWelcome />
+        {/* OS Spaces Dashboard removed — only visible in Level 3 authenticated view */}
 
         {/* The Two Paths - Glass Cards */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
