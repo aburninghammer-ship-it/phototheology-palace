@@ -22,7 +22,7 @@ const VOICE_IDS: Record<string, string> = {
   ancient: "onwK4e9ZLuTAKqWW03F9",    // Daniel - Measured authoritative
   preacher: "iP95p4xoKVk53GoZ742B",   // Chris - Clear natural male voice
   scholar: "ErXwobaYiN019PkySvjV",     // Antoni - Calm analytical
-  counselor: "SAz9YHcvj6GT2YYXdXww",  // River - Warm reflective
+  counselor: "XrExE9yKIg1WjnnlVkGX",  // Matilda - Warm empathetic female voice
   kids: "pFZP5JQG7iQjIQuC4Bku",      // Lily - Young bright expressive voice
   mirror: "SAz9YHcvj6GT2YYXdXww",    // River - Warm reflective (shared with Counselor for pastoral warmth)
 };
@@ -34,7 +34,7 @@ const OPENAI_FALLBACK_VOICES: Record<string, string> = {
   ancient: "fable",    // Measured, narrative — matches Daniel
   preacher: "echo",    // Clear, bold — matches Chris
   scholar: "ash",      // Calm, analytical — matches Antoni
-  counselor: "shimmer",// Warm, gentle — matches River
+  counselor: "shimmer",// Warm, gentle — matches Matilda
   kids: "coral",       // Bright, friendly — matches Lily
   mirror: "shimmer",   // Warm, reflective — matches River
 };
@@ -2077,18 +2077,18 @@ serve(async (req) => {
       const { data: existing } = await existingQuery.maybeSingle();
 
       if (existing) {
-        const hasWrongKidsVoice =
-          mode === "kids" &&
-          existing.voice_id !== `elevenlabs:${VOICE_IDS.kids}`;
+        const hasWrongModeVoice =
+          typeof existing.voice_id === "string" &&
+          existing.voice_id !== voiceIdLabel;
 
         const hasWrongKidsPath =
           mode === "kids" &&
           typeof existing.audio_storage_path === "string" &&
           !existing.audio_storage_path.startsWith("kids/");
 
-        if (hasWrongKidsVoice || hasWrongKidsPath) {
+        if (hasWrongModeVoice || hasWrongKidsPath) {
           console.warn(
-            `[EpicCommentary] Kids cache mismatch for ${effectiveBook} ${effectiveChapter}. Regenerating. Existing voice=${existing.voice_id}, path=${existing.audio_storage_path}`,
+            `[EpicCommentary] Cache mismatch for ${mode} ${effectiveBook} ${effectiveChapter}. Regenerating. Existing voice=${existing.voice_id}, expected=${voiceIdLabel}, path=${existing.audio_storage_path}`,
           );
         } else {
         // Build audio URL if audio exists

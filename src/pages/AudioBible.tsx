@@ -70,6 +70,7 @@ interface Theme {
 type EpicModeType = "epic" | "urban" | "ancient" | "preacher" | "scholar" | "counselor" | "kids" | "mirror";
 
 const KIDS_VOICE_ID = "elevenlabs:pFZP5JQG7iQjIQuC4Bku";
+const COUNSELOR_VOICE_ID = "elevenlabs:XrExE9yKIg1WjnnlVkGX";
 
 interface ChapterSelection {
   book: string;
@@ -460,21 +461,23 @@ export default function AudioBible() {
       if (error) throw error;
 
       const hasWrongKidsVoice = currentMode === "kids" && data?.voice_id !== KIDS_VOICE_ID;
+      const hasWrongCounselorVoice = currentMode === "counselor" && data?.voice_id !== COUNSELOR_VOICE_ID;
       const hasWrongKidsPath = currentMode === "kids" && !!data?.audio_storage_path && !data.audio_storage_path.startsWith("kids/");
 
-      // If not cached (or kids cache is mismatched), generate on demand
-      if (!data || !data.audio_storage_path || hasWrongKidsVoice || hasWrongKidsPath) {
-        if (hasWrongKidsVoice || hasWrongKidsPath) {
-          console.warn("[AudioBible] Rejecting stale kids cache; forcing regeneration", {
+      // If not cached (or known stale cache is mismatched), generate on demand
+      if (!data || !data.audio_storage_path || hasWrongKidsVoice || hasWrongCounselorVoice || hasWrongKidsPath) {
+        if (hasWrongKidsVoice || hasWrongCounselorVoice || hasWrongKidsPath) {
+          console.warn("[AudioBible] Rejecting stale commentary cache; forcing regeneration", {
             voice_id: data?.voice_id,
             audio_storage_path: data?.audio_storage_path,
+            mode: currentMode,
           });
         }
 
         toast.info(`Generating ${modeName} commentary for ${book} ${chapter}... This may take a moment.`);
 
         const genResponse = await supabase.functions.invoke("generate-epic-commentary", {
-          body: { book, chapter, mode: currentMode, regenerate: hasWrongKidsVoice || hasWrongKidsPath },
+          body: { book, chapter, mode: currentMode, regenerate: hasWrongKidsVoice || hasWrongCounselorVoice || hasWrongKidsPath },
         });
 
         if (genResponse.error || genResponse.data?.error) {
