@@ -36,6 +36,7 @@ export const cacheChapterCommentary = (
     commentary,
     timestamp: Date.now(),
     depth,
+    cacheVersion: CACHE_VERSION,
   };
 
   try {
@@ -69,6 +70,7 @@ export const cacheVerseCommentary = (
     commentary,
     timestamp: Date.now(),
     depth,
+    cacheVersion: CACHE_VERSION,
   };
 
   try {
@@ -102,6 +104,13 @@ export const getCachedChapterCommentary = (
 
     const cached: CachedCommentary = JSON.parse(data);
 
+    // Check version — entries from before the master regeneration are expired
+    if ((cached.cacheVersion ?? 0) < CACHE_VERSION) {
+      localStorage.removeItem(key);
+      console.log(`[Commentary Cache] EXPIRED (old version): ${book} ${chapter} (${depth})`);
+      return null;
+    }
+
     // Check expiry
     const expiryMs = CACHE_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
     if (Date.now() - cached.timestamp > expiryMs) {
@@ -133,6 +142,13 @@ export const getCachedVerseCommentary = (
     if (!data) return null;
 
     const cached: CachedCommentary = JSON.parse(data);
+
+    // Check version
+    if ((cached.cacheVersion ?? 0) < CACHE_VERSION) {
+      localStorage.removeItem(key);
+      console.log(`[Commentary Cache] EXPIRED (old version): ${book} ${chapter}:${verse} (${depth})`);
+      return null;
+    }
 
     const expiryMs = CACHE_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
     if (Date.now() - cached.timestamp > expiryMs) {
