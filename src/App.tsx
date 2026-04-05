@@ -423,10 +423,11 @@ function App() {
                         {/* Session Mode Prompt Dialog */}
                         <SessionPromptDialog />
                         </>}
-                        <CommandPalette />
-                        {!isWorkspacePane && <OSTitleBar />}
-                        {!isWorkspacePane && <GlobalStudyBanner />}
+                        <BasicModeHide><CommandPalette /></BasicModeHide>
+                        {!isWorkspacePane && <BasicModeHide><OSTitleBar /></BasicModeHide>}
+                        {!isWorkspacePane && <BasicModeHide><GlobalStudyBanner /></BasicModeHide>}
                         {!isWorkspacePane && (
+                          <BasicModeHide>
                           <div className="zen-hideable">
                             <AnnouncementBanner />
                             <TrialUpgradePrompt variant="banner" />
@@ -439,10 +440,11 @@ function App() {
                             <IncompleteSignupPrompt />
                             <GuidedPathChecklist />
                           </div>
+                          </BasicModeHide>
                         )}
                         <div className="flex flex-1 w-full">
-                          {!isWorkspacePane && <OSDock />}
-                          <MessagingSidebar />
+                          {!isWorkspacePane && <BasicModeHide><OSDock /></BasicModeHide>}
+                          <BasicModeHide><MessagingSidebar /></BasicModeHide>
                           <main className="flex-1 w-full overflow-x-hidden pb-mobile-nav min-w-0">
                           <Suspense fallback={<LoadingScreen />}>
                             <KeepAliveRoutes maxCached={20} excludePaths={["/auth", "/auth/callback", "/guesthouse", "/vr"]}>
