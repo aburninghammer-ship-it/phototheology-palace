@@ -8,6 +8,7 @@ import { UpgradeFloatingCard } from "@/components/UpgradeFloatingCard";
 import { WhatsNewTicker } from "@/components/WhatsNewTicker";
 import { ExperienceModeSelector } from "@/components/experience-mode";
 import { PTSection } from "@/components/experience-mode/PTSection";
+import { NewcomerWelcomeBanner } from "@/components/NewcomerWelcomeBanner";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Headphones } from "lucide-react";
