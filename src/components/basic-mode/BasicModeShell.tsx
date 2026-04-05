@@ -8,8 +8,10 @@ import { LevelToggleChip } from "./LevelToggleChip";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogIn } from "lucide-react";
+import { LogIn, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
+import { BASIC_MODE_TOUR } from "@/data/basicModeTour";
 
 // Lazy load tab content
 const BasicChatTab = lazy(() => import("./tabs/BasicChatTab"));
@@ -32,10 +34,16 @@ const TAB_COMPONENTS: Record<BasicTab, React.LazyExoticComponent<() => JSX.Eleme
 
 export function BasicModeShell() {
   const [activeTab, setActiveTab] = useState<BasicTab>("chat");
+  const [tourOpen, setTourOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const ActiveComponent = TAB_COMPONENTS[activeTab];
+
+  const startTour = () => {
+    primeAudioForTour();
+    setTourOpen(true);
+  };
 
   return (
     <div className="flex h-screen w-full" style={{ background: "hsl(170 20% 7%)", color: "hsl(170 10% 88%)" }}>
@@ -54,7 +62,21 @@ export function BasicModeShell() {
             <h1 className="text-sm font-semibold" style={{ color: "hsl(170 20% 65%)" }}>Phototheology</h1>
           </div>
           <div className="flex items-center gap-3">
-            <LevelToggleChip />
+            <button
+              onClick={startTour}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:brightness-125"
+              style={{
+                background: "hsl(170 40% 40% / 0.15)",
+                color: "hsl(170 50% 55%)",
+                border: "1px solid hsl(170 40% 40% / 0.25)",
+              }}
+            >
+              <HelpCircle className="h-3 w-3" />
+              Tour
+            </button>
+            <div data-tour="level-chip">
+              <LevelToggleChip />
+            </div>
             {!user && (
               <Button
                 size="sm"
@@ -80,6 +102,15 @@ export function BasicModeShell() {
           </Suspense>
         </main>
       </div>
+
+      {/* Guided Tour */}
+      {tourOpen && (
+        <GuidedTourOverlay
+          steps={BASIC_MODE_TOUR}
+          onClose={() => setTourOpen(false)}
+          accentColor="emerald-500"
+        />
+      )}
     </div>
   );
 }
