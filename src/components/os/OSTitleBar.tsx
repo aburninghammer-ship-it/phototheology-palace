@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
+import { LevelToggleChip } from "@/components/basic-mode/LevelToggleChip";
 import { Sparkles, User, LogOut, Settings, Languages, MessageCircle } from "lucide-react";
 import { useDirectMessages } from "@/hooks/useDirectMessages";
 import { CommandPaletteTrigger } from "./CommandPalette";
@@ -108,6 +109,7 @@ export function OSTitleBar() {
             </span>
           </div>
         </div>
+        <LevelToggleChip />
       </div>
 
       {/* Center: Search */}
