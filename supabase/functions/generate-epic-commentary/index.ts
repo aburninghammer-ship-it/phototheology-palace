@@ -1967,7 +1967,7 @@ async function generateEpicAudio(
     for (let b = 0; b < chunks.length; b += BATCH_SIZE) {
       const batch = chunks.slice(b, b + BATCH_SIZE);
       const results = await Promise.all(
-        batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, chunks.length))
+        batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, chunks.length, mode))
       );
       audioBuffers.push(...results);
     }
