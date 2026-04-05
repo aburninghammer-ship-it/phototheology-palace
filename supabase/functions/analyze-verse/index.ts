@@ -250,7 +250,7 @@ ANALYSIS REQUIREMENTS:
 2) ALWAYS write room abbreviations with full names in parentheses: "SR (Story Room)", "DC (Def-Com Room)", "DR (Dimensions Room)"
 3) When using DC (Def-Com Room), MUST include Hebrew/Greek definitions with Strong's numbers AND cite standard commentaries (Gill, Clarke, Matthew Henry, Barnes)
 4) For DR (Dimensions Room), clarify which dimensions: 1D=Literal, 2D=Christ, 3D=Me, 4D=Church, 5D=Heaven
-5) Provide specific insights for EACH room`
+5) Provide specific insights for EACH room\n\n` + getContentBehavioralEngine()
           },
           {
             role: 'user',
