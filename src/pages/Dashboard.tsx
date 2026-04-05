@@ -19,6 +19,7 @@ import { DashboardSkeleton } from "@/components/SkeletonLoader";
 import { PalaceProgressDashboard } from "@/components/PalaceProgressDashboard";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
+import { ExperienceModeIndicator } from "@/components/experience-mode/ExperienceModeIndicator";
 import { JeevesWelcomeModal } from "@/components/retention/JeevesWelcomeModal";
 import { PathBanner, PathDashboardWidget } from "@/components/path";
 import { QuickNotes } from "@/components/notes/QuickNotes";
