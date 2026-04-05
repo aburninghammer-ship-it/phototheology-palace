@@ -14,11 +14,12 @@ const logStep = (step: string, details?: any) => {
 };
 
 // Price IDs for subscriptions (no trial)
-const PLAN_PRICES = {
+const PLAN_PRICES: Record<string, string> = {
   essential_monthly: "price_1SZNyCFGDAd3RU8IPwPJVesp", // Essential $9/month
   essential_annual: "price_1SZNyVFGDAd3RU8IPgRPqKXH",  // Essential $90/year
   premium_monthly: "price_1SZNyiFGDAd3RU8I4JHYEsEi",   // Premium $15/month
   premium_annual: "price_1SZNyuFGDAd3RU8IjeGIvPEb",    // Premium $150/year
+  unlimited_monthly: "price_1TIsQjFGDAd3RU8IvQcPln55",  // Unlimited $49/month
 };
 
 // Price amounts in cents
@@ -27,14 +28,16 @@ const PLAN_AMOUNTS: Record<string, number> = {
   essential_annual: 9000,
   premium_monthly: 1500,
   premium_annual: 15000,
+  unlimited_monthly: 4900,
 };
 
 // Map plan to tier for profile update
-const PLAN_TIERS = {
+const PLAN_TIERS: Record<string, string> = {
   essential_monthly: "essential",
   essential_annual: "essential",
   premium_monthly: "premium",
   premium_annual: "premium",
+  unlimited_monthly: "unlimited",
 };
 
 // Send notification email directly
