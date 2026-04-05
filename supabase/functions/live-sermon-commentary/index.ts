@@ -69,6 +69,7 @@ Provide instant Phototheology commentary for this moment.`;
     });
     if (ragResult.chunkCount > 0) {
       systemPrompt += ragResult.corpusContext;
+    systemPrompt += "\n\n" + getContentBehavioralEngine();
     }
 
     console.log("Generating live commentary for:", sermonPoint);
