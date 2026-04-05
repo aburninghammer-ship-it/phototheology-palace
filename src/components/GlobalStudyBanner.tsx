@@ -531,7 +531,7 @@ function LockInPassChip() {
 
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
   const { user: authUser } = useAuth();
-  const { isBasic } = useExperienceMode();
+  const { isBasic, isExplorer, isImmersion } = useExperienceMode();
   const navigate = useNavigate();
   const resolvedUserId = userId ?? authUser?.id ?? null;
   const fallbackDisplayName = (userEmail ?? authUser?.email)?.split("@")[0] || "Scholar";
