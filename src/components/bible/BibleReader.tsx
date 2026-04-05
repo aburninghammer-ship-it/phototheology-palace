@@ -62,6 +62,7 @@ export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
   const navigate = useNavigate();
   const chapter = parseInt(chapterParam);
+  const { isBasic } = useExperienceMode();
   
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,7 +71,7 @@ export const BibleReader = () => {
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [activeDimensions, setActiveDimensions] = useState<string[]>(["1D", "2D", "3D", "4D", "5D"]);
-  const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics" | "preacher-mentor">("advanced");
+  const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics" | "preacher-mentor">(isBasic ? "beginner" : "advanced");
   const [sermonIdeasMode, setSermonIdeasMode] = useState(false);
   
   const toggleDimension = (dimension: string) => {
