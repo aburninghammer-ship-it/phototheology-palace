@@ -203,17 +203,21 @@ export default function BasicChatTab() {
                   "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                   msg.role === "user"
                     ? "bg-primary text-primary-foreground"
-                    : "bg-card border border-border text-foreground"
+                    : "bg-gradient-to-br from-card via-card to-primary/5 border border-primary/20 shadow-lg shadow-primary/5 text-foreground"
                 )}>
                   {msg.role === "assistant" ? (
                     <div className="prose prose-sm prose-invert max-w-none 
                       [&>p]:my-2 [&>ul]:my-2 [&>ol]:my-2 
-                      [&>h1]:text-primary [&>h2]:text-primary [&>h3]:text-secondary 
+                      [&>h1]:text-lg [&>h1]:font-bold [&>h1]:text-primary [&>h1]:mb-3
+                      [&>h2]:text-base [&>h2]:font-bold [&>h2]:text-primary [&>h2]:mb-2
+                      [&>h3]:text-sm [&>h3]:font-semibold [&>h3]:text-secondary [&>h3]:mb-1
                       [&>h4]:text-accent [&>h5]:text-emerald-400
-                      [&>blockquote]:border-primary/40 [&>blockquote]:text-muted-foreground [&>blockquote]:bg-muted/30 [&>blockquote]:rounded-r-lg [&>blockquote]:px-4 [&>blockquote]:py-2
-                      [&>hr]:border-border
-                      [&_strong]:text-primary [&_em]:text-secondary
-                      [&>ul>li]:marker:text-accent [&>ol>li]:marker:text-accent
+                      [&>blockquote]:border-l-4 [&>blockquote]:border-primary/50 [&>blockquote]:text-muted-foreground [&>blockquote]:bg-primary/5 [&>blockquote]:rounded-r-lg [&>blockquote]:px-4 [&>blockquote]:py-2 [&>blockquote]:my-3 [&>blockquote]:italic
+                      [&>hr]:border-primary/20 [&>hr]:my-4
+                      [&_strong]:text-primary [&_strong]:font-semibold
+                      [&_em]:text-secondary/90
+                      [&>ul>li]:marker:text-primary [&>ol>li]:marker:text-primary
+                      [&>ul]:space-y-1 [&>ol]:space-y-1
                     ">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
