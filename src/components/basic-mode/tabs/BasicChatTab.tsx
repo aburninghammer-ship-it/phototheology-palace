@@ -212,19 +212,22 @@ export default function BasicChatTab() {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
-              {getRotatedSuggestions().map((s) => (
-                <button
-                  key={s.text}
-                  onClick={() => sendMessage(s.text)}
-                  className={cn(
-                    "text-left p-4 rounded-xl text-sm transition-all duration-300 border backdrop-blur-md",
-                    "bg-gradient-to-br", s.gradient, s.border, s.glow, s.hoverGlow,
-                    "shadow-lg hover:shadow-xl hover:scale-[1.03] hover:text-foreground text-muted-foreground"
-                  )}
-                >
-                  {s.text}
-                </button>
-              ))}
+              {dailySuggestions.map((text, i) => {
+                const style = GRADIENT_STYLES[i % GRADIENT_STYLES.length];
+                return (
+                  <button
+                    key={text}
+                    onClick={() => sendMessage(text)}
+                    className={cn(
+                      "text-left p-4 rounded-xl text-sm transition-all duration-300 border backdrop-blur-md",
+                      "bg-gradient-to-br", style.gradient, style.border, style.glow, style.hoverGlow,
+                      "shadow-lg hover:shadow-xl hover:scale-[1.03] hover:text-foreground text-muted-foreground"
+                    )}
+                  >
+                    {text}
+                  </button>
+                );
+              })}
             </div>
           </div>
         ) : (
