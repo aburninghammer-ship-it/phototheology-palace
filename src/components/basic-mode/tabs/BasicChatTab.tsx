@@ -201,19 +201,19 @@ export default function BasicChatTab() {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto">
         {messages.length === 0 && !pendingQuestion ? (
-          <div className="flex flex-col items-center justify-center h-full px-6 max-w-2xl mx-auto">
-            <div className="p-4 rounded-2xl mb-6 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/20">
-              <Sparkles className="h-8 w-8 text-primary" />
+          <div className="flex flex-col items-center justify-center h-full px-4 sm:px-6 max-w-2xl mx-auto py-6">
+            <div className="p-3 sm:p-4 rounded-2xl mb-4 sm:mb-6 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/20">
+              <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold mb-2 text-foreground">Ask Jeeves Anything</h2>
-            <p className="text-sm text-center mb-2 max-w-md text-muted-foreground">
+            <h2 className="text-xl sm:text-2xl font-bold mb-1.5 sm:mb-2 text-foreground">Ask Jeeves Anything</h2>
+            <p className="text-xs sm:text-sm text-center mb-1.5 sm:mb-2 max-w-md text-muted-foreground">
               Your personal Bible study partner. Ask about any verse, story, doctrine, or question — and get deep, Christ-centered insight.
             </p>
-            <p className="text-xs text-center mb-8 max-w-md text-muted-foreground/70 italic leading-relaxed">
-              Other AIs search a Bible. Jeeves <span className="text-primary font-medium not-italic">thinks</span> through one — running every answer through a proprietary engine of <span className="text-primary font-medium not-italic">38 interconnected study principles</span> that trace patterns, symbols, prophecy, sanctuary design, and Christ across all 66 books. That's why Jeeves will never answer the same question the same way twice — and why no other AI can replicate what happens here.
+            <p className="text-[10px] sm:text-xs text-center mb-5 sm:mb-8 max-w-md text-muted-foreground/70 italic leading-relaxed">
+              Other AIs search a Bible. Jeeves <span className="text-primary font-medium not-italic">thinks</span> through one — running every answer through a proprietary engine of <span className="text-primary font-medium not-italic">38 interconnected study principles</span> that trace patterns, symbols, prophecy, sanctuary design, and Christ across all 66 books.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 w-full max-w-lg">
               {dailySuggestions.map((text, i) => {
                 const style = GRADIENT_STYLES[i % GRADIENT_STYLES.length];
                 return (
@@ -221,7 +221,7 @@ export default function BasicChatTab() {
                     key={text}
                     onClick={() => sendMessage(text)}
                     className={cn(
-                      "text-left p-4 rounded-xl text-sm transition-all duration-300 border backdrop-blur-md",
+                      "text-left p-3 sm:p-4 rounded-xl text-xs sm:text-sm transition-all duration-300 border backdrop-blur-md",
                       "bg-gradient-to-br", style.gradient, style.border, style.glow, style.hoverGlow,
                       "shadow-lg hover:shadow-xl hover:scale-[1.03] hover:text-foreground text-muted-foreground"
                     )}
@@ -233,19 +233,19 @@ export default function BasicChatTab() {
             </div>
           </div>
         ) : (
-          <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+          <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
             {messages.map((msg, i) => (
               <div key={i} className={cn(
-                "flex gap-3",
+                "flex gap-2 sm:gap-3",
                 msg.role === "user" ? "justify-end" : "justify-start"
               )}>
                 {msg.role === "assistant" && (
-                  <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-1 bg-primary/15">
-                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  <div className="shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center mt-1 bg-primary/15">
+                    <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
                   </div>
                 )}
                 <div className={cn(
-                  "max-w-[85%] rounded-2xl px-5 py-4 text-sm leading-relaxed",
+                  "max-w-[90%] sm:max-w-[85%] rounded-2xl px-3.5 py-3 sm:px-5 sm:py-4 text-[13px] sm:text-sm leading-relaxed",
                   msg.role === "user"
                     ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25 border border-primary/30"
                     : "backdrop-blur-xl bg-gradient-to-br from-card/80 via-card/60 to-primary/10 border border-primary/20 shadow-[0_0_25px_-5px] shadow-primary/15 text-foreground ring-1 ring-primary/10"
@@ -286,39 +286,39 @@ export default function BasicChatTab() {
 
             {/* Study Lens Menu — shown when Jeeves detects a Bible study question */}
             {pendingQuestion && !loading && (
-              <div className="flex gap-3 justify-start">
-                <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-1 bg-primary/15">
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+              <div className="flex gap-2 sm:gap-3 justify-start">
+                <div className="shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center mt-1 bg-primary/15">
+                  <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
                 </div>
-                <div className="max-w-[90%] space-y-3">
-                  <div className="rounded-2xl px-4 py-3 bg-card border border-border text-foreground text-sm">
+                <div className="max-w-[95%] sm:max-w-[90%] space-y-2 sm:space-y-3">
+                  <div className="rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 bg-card border border-border text-foreground text-xs sm:text-sm">
                     Great question! How would you like me to approach this?
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 gap-1.5 sm:gap-2">
                     {getRotatedLenses().map((lens) => {
                       const Icon = lens.icon;
                       return (
-                        <button
+                         <button
                           key={lens.id}
                           onClick={() => handleLensSelect(lens.id)}
                           className={cn(
-                            "flex items-center gap-3 p-3 rounded-xl text-left transition-all",
+                            "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl text-left transition-all",
                             "bg-card border hover:scale-[1.02] hover:shadow-lg group",
                             lens.borderColor
                           )}
                         >
                           <div className={cn(
-                            "shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br text-white",
+                            "shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center bg-gradient-to-br text-white",
                             lens.color
                           )}>
-                            <Icon className="h-4 w-4" />
+                            <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold text-foreground flex items-center gap-1">
+                            <div className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1">
                               {lens.label}
-                              <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+                              <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hidden sm:block" />
                             </div>
-                            <div className="text-xs text-muted-foreground truncate">{lens.hint}</div>
+                            <div className="text-[10px] sm:text-xs text-muted-foreground truncate">{lens.hint}</div>
                           </div>
                         </button>
                       );
@@ -356,8 +356,8 @@ export default function BasicChatTab() {
         )}
       </div>
 
-      {/* Input Bar */}
-      <div className="p-4 border-t border-primary/15 backdrop-blur-xl bg-gradient-to-r from-card/80 via-card/60 to-primary/5 shadow-[0_-4px_20px_-5px] shadow-primary/10">
+      {/* Input Bar — mobile-optimized with safe area */}
+      <div className="p-2.5 sm:p-4 border-t border-primary/15 backdrop-blur-xl bg-gradient-to-r from-card/80 via-card/60 to-primary/5 shadow-[0_-4px_20px_-5px] shadow-primary/10">
         <div className="max-w-3xl mx-auto relative">
           <textarea
             ref={inputRef}
@@ -366,10 +366,10 @@ export default function BasicChatTab() {
             onKeyDown={handleKeyDown}
             placeholder="Ask about any Bible verse, story, or topic..."
             rows={1}
-            className="w-full resize-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all backdrop-blur-md bg-background/70 border border-primary/20 text-foreground placeholder:text-muted-foreground shadow-inner shadow-primary/5"
+            className="w-full resize-none rounded-xl text-[13px] sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all backdrop-blur-md bg-background/70 border border-primary/20 text-foreground placeholder:text-muted-foreground shadow-inner shadow-primary/5"
             style={{
-              padding: "0.75rem 3rem 0.75rem 1rem",
-              minHeight: 44,
+              padding: "0.625rem 2.75rem 0.625rem 0.75rem",
+              minHeight: 40,
               maxHeight: 120,
             }}
             onInput={(e) => {
@@ -382,7 +382,7 @@ export default function BasicChatTab() {
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || loading}
             className={cn(
-              "absolute right-2 bottom-2 p-2 rounded-lg transition-colors",
+              "absolute right-1.5 bottom-1.5 p-2 rounded-lg transition-colors",
               input.trim() && !loading
                 ? "bg-primary text-primary-foreground hover:bg-primary/90"
                 : "bg-muted text-muted-foreground cursor-not-allowed"
@@ -391,7 +391,7 @@ export default function BasicChatTab() {
             <Send className="h-4 w-4" />
           </button>
         </div>
-        <p className="text-center text-[10px] mt-2 text-muted-foreground/50">
+        <p className="text-center text-[9px] sm:text-[10px] mt-1.5 sm:mt-2 text-muted-foreground/50">
           Powered by deep theological analysis — Christ-centered, Scripture-grounded answers.
         </p>
       </div>

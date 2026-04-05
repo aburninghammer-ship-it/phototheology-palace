@@ -1,6 +1,6 @@
 /**
  * ExplorerModeShell — Level 2 interface
- * Includes Level 1 tabs (Ask Jeeves, Study Bible, Chapel) + 4 Spaces tabs
+ * Desktop: sidebar + header. Mobile: fullscreen content + bottom tabs.
  */
 import { useState, lazy, Suspense } from "react";
 import { ExplorerModeSidebar, type ExplorerTab } from "./ExplorerModeSidebar";
@@ -8,7 +8,7 @@ import { LevelToggleChip } from "@/components/basic-mode/LevelToggleChip";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogIn, Volume2, BookOpen, Flame, Compass } from "lucide-react";
+import { LogIn, Volume2, Flame, Compass } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
 import { BASIC_MODE_TOUR } from "@/data/basicModeTour";
@@ -80,27 +80,27 @@ export function ExplorerModeShell() {
   };
 
   return (
-    <div className="flex h-screen w-full bg-background text-foreground">
+    <div className="flex h-[100dvh] w-full bg-background text-foreground">
       <ExplorerModeSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Profile bar */}
-        <header className="h-12 flex items-center justify-between px-4 shrink-0 border-b border-border bg-card/50">
-          <div className="flex items-center gap-3">
+        {/* Header — compact on mobile */}
+        <header className="h-11 md:h-12 flex items-center justify-between px-3 md:px-4 shrink-0 border-b border-border bg-card/50">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
             {user && profile ? (
-              <div className="flex items-center gap-2.5">
-                <Avatar className="h-7 w-7">
+              <div className="flex items-center gap-2 min-w-0">
+                <Avatar className="h-6 w-6 md:h-7 md:w-7 shrink-0">
                   <AvatarImage src={profile.avatarUrl || undefined} alt={profile.displayName} />
-                  <AvatarFallback className="text-[10px] bg-primary/15 text-primary font-bold">
+                  <AvatarFallback className="text-[9px] md:text-[10px] bg-primary/15 text-primary font-bold">
                     {profile.initials}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium text-foreground truncate max-w-[120px] sm:max-w-none">
+                <span className="text-xs md:text-sm font-medium text-foreground truncate max-w-[100px] sm:max-w-none">
                   {profile.displayName}
                 </span>
                 {(profile.streak ?? 0) > 0 && (
-                  <div className="flex items-center gap-1 text-xs text-amber-400" title="Reading streak">
-                    <Flame className="h-3.5 w-3.5" />
+                  <div className="flex items-center gap-0.5 text-xs text-amber-400 shrink-0" title="Reading streak">
+                    <Flame className="h-3 w-3" />
                     <span className="font-semibold">{profile.streak}</span>
                   </div>
                 )}
@@ -114,10 +114,10 @@ export function ExplorerModeShell() {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
             <button
               onClick={startTour}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:brightness-125 bg-primary/10 text-primary border border-primary/20"
+              className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] md:text-xs font-medium transition-all hover:brightness-125 bg-primary/10 text-primary border border-primary/20"
             >
               <Volume2 className="h-3 w-3" />
               <span className="hidden sm:inline">Audio Tour</span>
@@ -132,14 +132,15 @@ export function ExplorerModeShell() {
                 onClick={() => navigate("/auth")}
                 className="h-7 text-xs"
               >
-                <LogIn className="h-3.5 w-3.5 mr-1.5" />
-                Sign In
+                <LogIn className="h-3.5 w-3.5 mr-1" />
+                <span className="hidden sm:inline">Sign In</span>
               </Button>
             )}
           </div>
         </header>
 
-        <main className="flex-1 overflow-hidden">
+        {/* Main content — on mobile, add bottom padding for the tab bar */}
+        <main className="flex-1 overflow-hidden pb-[62px] md:pb-0">
           <Suspense fallback={<LoadingScreen />}>
             {renderContent()}
           </Suspense>
