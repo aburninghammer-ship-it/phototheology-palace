@@ -164,6 +164,7 @@ const BlueprintStronghold = lazy(() => import("./pages/BlueprintStronghold"));
 const BlueprintFinancial = lazy(() => import("./pages/BlueprintFinancial"));
 const BlueprintStress = lazy(() => import("./pages/BlueprintStress"));
 const PhototheologyCourse = lazy(() => import("./pages/PhototheologyCourse"));
+const Bible101 = lazy(() => import("./pages/Bible101"));
 const DanielCourse = lazy(() => import("./pages/DanielCourse"));
 const RevelationCourse = lazy(() => import("./pages/RevelationCourse"));
 const RevelationCourseKids = lazy(() => import("./pages/RevelationCourseKids"));
