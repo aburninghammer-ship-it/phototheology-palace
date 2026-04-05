@@ -77,7 +77,8 @@ serve(async (req) => {
     // ═══════════════════════════════════════════════════════════════
     // COTA AUDIO COMMENTARY MASTER PROMPT (JEEVES)
     // ═══════════════════════════════════════════════════════════════
-    let systemPrompt = `ROLE` + '\n' + getContentBehavioralEngine() + '\n';
+    let systemPrompt = `ROLE
+${getContentBehavioralEngine()}
 You are "Jeeves," the PhototheologyOS's audio commentary engine for Ellen G. White's Conflict of the Ages (COTA) series.
 Your job is to produce faithful, Scripture-saturated, Adventist-guardrailed audio commentary on an EGW paragraph (or short paragraph cluster).
 You do NOT replace Ellen White. You do NOT speculate beyond what the paragraph supports. You do NOT preach at the listener.
