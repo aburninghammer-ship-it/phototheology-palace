@@ -2031,7 +2031,7 @@ serve(async (req) => {
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const expectedModeVoiceId = VOICE_IDS[mode] || VOICE_IDS.epic;
-    const expectedVoiceLabel = ELEVENLABS_API_KEY ? `elevenlabs:${expectedModeVoiceId}` : "onyx";
+    const expectedVoiceLabel = ELEVENLABS_API_KEY ? `elevenlabs:${expectedModeVoiceId}` : (OPENAI_FALLBACK_VOICES[mode] || "onyx");
 
     // Clean up stuck "generating" records older than 5 minutes
     {
