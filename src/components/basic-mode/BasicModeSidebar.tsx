@@ -1,6 +1,6 @@
 /**
  * BasicModeSidebar — Left sidebar for Level 1 (Basic) mode
- * Glassified, color-coded tabs with glow effects
+ * Desktop: vertical sidebar. Mobile: horizontal bottom tab bar.
  */
 import { cn } from "@/lib/utils";
 import { MessageCircle, BookOpen, Church, Settings } from "lucide-react";
@@ -71,66 +71,104 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
   const navigate = useNavigate();
 
   return (
-    <aside
-      className={cn(
-        "flex flex-col h-full border-r border-border/50 transition-all duration-200 bg-card/80 backdrop-blur-xl",
-        collapsed ? "w-14" : "w-56"
-      )}
-    >
-      {/* Sidebar Header */}
-      <div className="h-12 flex items-center px-3 border-b border-border/50">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-md transition-colors text-muted-foreground hover:text-foreground"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 12h18M3 6h18M3 18h18" />
-          </svg>
-        </button>
-      </div>
+    <>
+      {/* ─── DESKTOP: vertical sidebar (hidden on mobile) ─── */}
+      <aside
+        className={cn(
+          "hidden md:flex flex-col h-full border-r border-border/50 transition-all duration-200 bg-card/80 backdrop-blur-xl",
+          collapsed ? "w-14" : "w-56"
+        )}
+      >
+        <div className="h-12 flex items-center px-3 border-b border-border/50">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            </svg>
+          </button>
+        </div>
 
-      {/* Tab List */}
-      <nav className="flex-1 py-3 px-2 space-y-2 overflow-y-auto">
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.id;
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              data-tour={tab.tourId}
-              onClick={() => onTabChange(tab.id)}
-              className={cn(
-                "w-full flex items-center gap-3 rounded-xl transition-all duration-300 text-left backdrop-blur-md",
-                collapsed ? "justify-center p-2.5" : "px-3 py-2.5",
-                isActive
-                  ? cn(tab.activeGradient, tab.activeBorder, tab.activeGlow, tab.activeText)
-                  : cn("text-muted-foreground hover:text-foreground border border-transparent", tab.hoverBg)
-              )}
-              title={collapsed ? tab.label : undefined}
-            >
-              <Icon className={cn("h-[18px] w-[18px] shrink-0 transition-all duration-300", isActive && tab.iconGlow)} />
-              {!collapsed && (
-                <span className={cn("text-sm font-medium truncate", isActive && "font-semibold")}>{tab.label}</span>
-              )}
-            </button>
-          );
-        })}
+        <nav className="flex-1 py-3 px-2 space-y-2 overflow-y-auto">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                data-tour={tab.tourId}
+                onClick={() => onTabChange(tab.id)}
+                className={cn(
+                  "w-full flex items-center gap-3 rounded-xl transition-all duration-300 text-left backdrop-blur-md",
+                  collapsed ? "justify-center p-2.5" : "px-3 py-2.5",
+                  isActive
+                    ? cn(tab.activeGradient, tab.activeBorder, tab.activeGlow, tab.activeText)
+                    : cn("text-muted-foreground hover:text-foreground border border-transparent", tab.hoverBg)
+                )}
+                title={collapsed ? tab.label : undefined}
+              >
+                <Icon className={cn("h-[18px] w-[18px] shrink-0 transition-all duration-300", isActive && tab.iconGlow)} />
+                {!collapsed && (
+                  <span className={cn("text-sm font-medium truncate", isActive && "font-semibold")}>{tab.label}</span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="px-2 pb-3 pt-2 border-t border-border/50">
+          <button
+            onClick={() => navigate("/settings")}
+            className={cn(
+              "w-full flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 text-muted-foreground hover:text-foreground hover:bg-muted/30 backdrop-blur-md border border-transparent hover:border-muted-foreground/10",
+              collapsed && "justify-center px-2.5"
+            )}
+          >
+            <Settings className="h-[18px] w-[18px] shrink-0" />
+            {!collapsed && <span className="text-sm">Settings</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* ─── MOBILE: bottom tab bar (hidden on desktop) ─── */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-[60] md:hidden bg-card/95 backdrop-blur-xl border-t border-border/50 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.15)]"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 6px)" }}
+      >
+        <div className="flex items-center justify-evenly h-[56px] px-1">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                data-tour={tab.tourId}
+                onClick={() => onTabChange(tab.id)}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[64px] active:scale-95",
+                  isActive
+                    ? cn("bg-primary/12", tab.activeText)
+                    : "text-muted-foreground"
+                )}
+              >
+                <Icon className={cn("h-5 w-5 shrink-0", isActive && tab.iconGlow)} />
+                <span className={cn("text-[10px] font-medium", isActive && "font-semibold")}>
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => navigate("/settings")}
+            className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[64px] text-muted-foreground active:scale-95"
+          >
+            <Settings className="h-5 w-5 shrink-0" />
+            <span className="text-[10px] font-medium">Settings</span>
+          </button>
+        </div>
       </nav>
-
-      {/* Settings at bottom */}
-      <div className="px-2 pb-3 pt-2 border-t border-border/50">
-        <button
-          onClick={() => navigate("/settings")}
-          className={cn(
-            "w-full flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 text-muted-foreground hover:text-foreground hover:bg-muted/30 backdrop-blur-md border border-transparent hover:border-muted-foreground/10",
-            collapsed && "justify-center px-2.5"
-          )}
-        >
-          <Settings className="h-[18px] w-[18px] shrink-0" />
-          {!collapsed && <span className="text-sm">Settings</span>}
-        </button>
-      </div>
-    </aside>
+    </>
   );
 }
