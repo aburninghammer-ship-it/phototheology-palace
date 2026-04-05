@@ -1,12 +1,15 @@
 import { useMemo, useRef, useState, useEffect, Suspense } from 'react';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import { Text, Environment } from '@react-three/drei';
-import { TeleportationPlane, Interactive } from '@react-three/xr';
+import { TeleportationPlane, Interactive, useController } from '@react-three/xr';
 import * as THREE from 'three';
 import { BackToLobbyButton } from '../components/BackToLobbyButton';
 
 // Import genesis images
 import { genesisImages } from '@/assets/24fps/genesis';
+
+// Import Supabase image bible images
+import { useImageBibleImages, getChapterImageUrl } from '@/hooks/useImageBibleImages';
 
 // Import all bible sets from allBooks
 import {
@@ -57,12 +60,19 @@ function getAllChapters(): ChapterFrame[] {
   return chapters;
 }
 
-// Build a map of genesis chapter number -> image URL
-function getGenesisImageUrl(book: string, chapter: number): string | null {
-  if (book !== 'Genesis') return null;
-  const idx = chapter - 1;
-  if (idx >= 0 && idx < genesisImages.length) {
-    return genesisImages[idx];
+// Get image URL: Supabase storage first, then bundled genesis fallback
+function getFrameImageUrl(
+  book: string,
+  chapter: number,
+  imageMap: Map<string, string> | undefined,
+): string | null {
+  // 1. Check Supabase image-bible storage
+  const supabaseUrl = getChapterImageUrl(imageMap, book, chapter);
+  if (supabaseUrl) return supabaseUrl;
+  // 2. Fallback to bundled genesis images
+  if (book === 'Genesis') {
+    const idx = chapter - 1;
+    if (idx >= 0 && idx < genesisImages.length) return genesisImages[idx];
   }
   return null;
 }
@@ -83,11 +93,12 @@ interface FrameLabelProps {
   position: [number, number, number];
   rotation: [number, number, number];
   color: string;
+  imageMap?: Map<string, string>;
 }
 
-function FrameLabel({ frame, position, rotation, color }: FrameLabelProps) {
+function FrameLabel({ frame, position, rotation, color, imageMap }: FrameLabelProps) {
   const [hovered, setHovered] = useState(false);
-  const imageUrl = getGenesisImageUrl(frame.book, frame.chapter);
+  const imageUrl = getFrameImageUrl(frame.book, frame.chapter, imageMap);
 
   return (
     <group position={position} rotation={rotation}>
@@ -373,6 +384,28 @@ function WalkController() {
   return null;
 }
 
+// VR thumbstick locomotion — move forward/backward along corridor with left stick
+function VRThumbstickWalk() {
+  const { camera } = useThree();
+  const leftController = useController('left');
+
+  useFrame((_, delta) => {
+    if (!leftController?.inputSource?.gamepad) return;
+    const gp = leftController.inputSource.gamepad;
+    // axes[3] = left stick Y (forward/back)
+    const y = gp.axes[3] ?? 0;
+    if (Math.abs(y) < 0.15) return; // deadzone
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    forward.y = 0;
+    forward.normalize();
+    camera.position.addScaledVector(forward, -y * 4 * delta);
+    camera.position.x = Math.max(-2.5, Math.min(2.5, camera.position.x));
+    camera.position.y = Math.max(-1.2, Math.min(2, camera.position.y));
+  });
+
+  return null;
+}
+
 interface GalleryCorridorProps {
   onBack: () => void;
 }
@@ -380,6 +413,7 @@ interface GalleryCorridorProps {
 export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
   const allChapters = useMemo(() => getAllChapters(), []);
   const { camera } = useThree();
+  const { data: imageMap } = useImageBibleImages();
   const frameCounterRef = useRef(0);
   const [visibleRange, setVisibleRange] = useState({ startIdx: 0, endIdx: 100 });
 
@@ -439,8 +473,10 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
       {/* HDRI for rich reflections on marble and gold */}
       <Environment preset="lobby" resolution={512} />
 
-      {/* Keyboard + mouse walk controller */}
+      {/* Keyboard + mouse walk controller (desktop) */}
       <WalkController />
+      {/* VR thumbstick locomotion */}
+      <VRThumbstickWalk />
 
       {/* Atmospheric dust, spotlights, shimmer */}
       <GalleryAtmosphere />
@@ -530,6 +566,7 @@ export default function GalleryCorridor({ onBack }: GalleryCorridorProps) {
             position={[x, 0.5, z]}
             rotation={[0, rotY, 0]}
             color={color}
+            imageMap={imageMap}
           />
         );
       })}
