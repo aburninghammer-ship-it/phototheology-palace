@@ -1,31 +1,25 @@
 /**
  * BasicModeSidebar — Left sidebar for Level 1 (Basic) mode
- * Teal/green themed — distinct from Level 3's purple palette
- * Includes data-tour attributes for guided tour highlighting
+ * Simplified to 3 tabs: Ask Jeeves, Study Bible, Chapel
  */
 import { cn } from "@/lib/utils";
-import { MessageCircle, BookOpen, Headphones, CalendarDays, Sun, Moon, Sparkles, Settings } from "lucide-react";
+import { MessageCircle, BookOpen, Church, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-export type BasicTab = "chat" | "bible" | "audio" | "plans" | "morning" | "night" | "devotional";
+export type BasicTab = "chat" | "bible" | "chapel";
 
 interface TabItem {
   id: BasicTab;
   label: string;
   icon: typeof MessageCircle;
-  description: string;
   tourId: string;
 }
 
 const TABS: TabItem[] = [
-  { id: "chat", label: "Ask Jeeves", icon: MessageCircle, description: "Ask anything about the Bible", tourId: "tab-chat" },
-  { id: "bible", label: "Study Bible", icon: BookOpen, description: "Read with commentary", tourId: "tab-bible" },
-  { id: "audio", label: "Audio", icon: Headphones, description: "Listen to commentary", tourId: "tab-audio" },
-  { id: "plans", label: "Reading Plans", icon: CalendarDays, description: "Daily Bible reading", tourId: "tab-plans" },
-  { id: "morning", label: "Morning Watch", icon: Sun, description: "Start your day with God", tourId: "tab-morning" },
-  { id: "night", label: "Night Watch", icon: Moon, description: "Evening meditation", tourId: "tab-night" },
-  { id: "devotional", label: "Daily Word", icon: Sparkles, description: "Today's devotional", tourId: "tab-devotional" },
+  { id: "chat", label: "Ask Jeeves", icon: MessageCircle, tourId: "tab-chat" },
+  { id: "bible", label: "Study Bible", icon: BookOpen, tourId: "tab-bible" },
+  { id: "chapel", label: "Chapel", icon: Church, tourId: "tab-chapel" },
 ];
 
 interface BasicModeSidebarProps {
