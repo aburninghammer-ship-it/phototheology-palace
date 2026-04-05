@@ -37,7 +37,7 @@ function useBasicProfile(userId: string | undefined) {
       if (!userId) return null;
       const { data } = await supabase
         .from("profiles")
-        .select("display_name, username, avatar_url, study_streak")
+        .select("display_name, username, avatar_url")
         .eq("id", userId)
         .single();
 
@@ -51,7 +51,7 @@ function useBasicProfile(userId: string | undefined) {
       return {
         displayName: data?.display_name || data?.username || "Scholar",
         avatarUrl: data?.avatar_url || null,
-        streak: streak?.current_streak || data?.study_streak || 0,
+        streak: streak?.current_streak || 0,
         initials: (data?.display_name || data?.username || "S").slice(0, 2).toUpperCase(),
       };
     },
