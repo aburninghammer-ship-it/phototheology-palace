@@ -155,14 +155,14 @@ if ("serviceWorker" in navigator) {
     })();
   } else if (isQuestBrowser) {
     // Quest browser can cling to an older shell after deploys.
-    // Poll the live app-build tag and force a one-time hard refresh when it changes.
+    // Poll for updates but let the user choose when to reload via PWAUpdatePrompt.
     void (async () => {
       const checkForQuestUpdate = () => {
         void navigator.serviceWorker
           .getRegistration()
           .then((registration) => registration?.update())
           .catch(() => undefined);
-        void maybeRefreshQuestBuild();
+        // Do NOT auto-refresh — let PWAUpdatePrompt handle it
       };
 
       checkForQuestUpdate();
@@ -177,15 +177,15 @@ if ("serviceWorker" in navigator) {
       );
     })();
   } else {
-    // Production: proactively detect newer builds and hard-refresh so published
-    // users are not stuck on an older shell waiting for the SW prompt.
+    // Production: check for newer builds periodically and trigger SW update.
+    // The PWAUpdatePrompt component will show a "Reload Now" button — no auto-refresh.
     void (async () => {
       const checkForStandardUpdate = () => {
         void navigator.serviceWorker
           .getRegistration()
           .then((registration) => registration?.update())
           .catch(() => undefined);
-        void maybeRefreshStandardBuild();
+        // Do NOT call maybeRefreshStandardBuild() — let the user decide when to reload
       };
 
       const handleVisibilityChange = () => {
