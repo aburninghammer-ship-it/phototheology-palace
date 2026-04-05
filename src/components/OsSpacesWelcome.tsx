@@ -52,6 +52,7 @@ const OS_SPACES: OsSpace[] = [
     color: "210 100% 56%",
     items: [
       { label: "Study Bible", path: "/bible", icon: BookOpen, description: "Read & study Scripture", tooltip: "Open the full KJV Bible with chapter navigation, verse highlighting, and integrated commentary. Your primary workspace for reading and marking up Scripture." },
+      { label: "Lesson Study", path: "/quarterly-study", icon: Calendar, description: "Sabbath School quarterly", tooltip: "Follow along with the current Sabbath School quarterly — daily lessons, discussion questions, and Scripture references auto-selected for today." },
       { label: "My Studies", path: "/my-studies", icon: BookMarked, description: "Your saved studies", tooltip: "Access all your saved Phototheology studies, notes, and insights in one organized library. Pick up right where you left off." },
       { label: "Study Ideas", path: "/study-ideas", icon: Lightbulb, description: "AI-generated prompts", tooltip: "Get AI-generated study prompts based on PT principles. Each idea comes with a suggested passage, room sequence, and guiding questions to jumpstart your study." },
       { label: "Study Buddy", path: "/study-buddy", icon: Brain, description: "AI companion", tooltip: "Your personal AI study partner trained in Phototheology. Ask questions, get verse connections, and explore passages together in real time." },
@@ -70,7 +71,6 @@ const OS_SPACES: OsSpace[] = [
       { label: "Bible Atlas", path: "/bible-atlas", icon: Map, description: "Geographic explorer", tooltip: "Explore the lands of Scripture on interactive maps." },
       { label: "Source Library", path: "/libraries", icon: Library, description: "Reference materials", tooltip: "Access a curated library of Spirit of Prophecy writings, historical commentaries, and reference documents." },
       { label: "Audio Library", path: "/audio-library", icon: Headphones, description: "Audio studies", tooltip: "Listen to narrated Bible studies, devotionals, and PT teachings." },
-      { label: "Lesson Study", path: "/quarterly-study", icon: Calendar, description: "Sabbath School quarterly", tooltip: "Follow along with the current Sabbath School quarterly — daily lessons, discussion questions, and Scripture references auto-selected for today." },
     ],
   },
   {
