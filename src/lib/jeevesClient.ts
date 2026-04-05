@@ -61,8 +61,12 @@ export const callJeeves = async (
   // Auto-inject experienceMode from localStorage
   if (!body.experienceMode) {
     const storedMode = localStorage.getItem("pt-experience-mode");
-    if (storedMode === "simple" || storedMode === "guided" || storedMode === "master") {
-      body.experienceMode = storedMode;
+    // Support both old and new mode names
+    const validModes = ["simple", "guided", "master", "basic", "explorer", "immersion"];
+    if (storedMode && validModes.includes(storedMode)) {
+      // Map new names to old for backend compatibility
+      const modeMap: Record<string, string> = { basic: "simple", explorer: "guided", immersion: "master" };
+      body.experienceMode = modeMap[storedMode] || storedMode;
     }
   }
 
