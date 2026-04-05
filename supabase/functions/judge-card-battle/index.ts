@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getContentBehavioralEngine } from "../_shared/content-behavioral-engine.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -110,7 +111,7 @@ Judge this response.`;
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.7,

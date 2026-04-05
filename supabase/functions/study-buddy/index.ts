@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getContentBehavioralEngine } from "../_shared/content-behavioral-engine.ts";
 import { THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
 import { QUALITY_TESTS, OUTPUT_TYPES, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";
 import { getCorpusContext } from '../_shared/corpus-rag.ts';
@@ -235,7 +236,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: STUDY_BUDDY_SYSTEM_PROMPT },
+          { role: "system", content: STUDY_BUDDY_SYSTEM_PROMPT + "\n\n" + getContentBehavioralEngine() },
           { role: "user", content: userMessage }
         ],
         max_tokens: 4096,

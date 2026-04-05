@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { getContentBehavioralEngine } from "../_shared/content-behavioral-engine.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
@@ -103,7 +104,7 @@ Return ONLY a valid JSON array of 3 game objects.`;
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: 'user', content: userPrompt }
         ],
       }),
