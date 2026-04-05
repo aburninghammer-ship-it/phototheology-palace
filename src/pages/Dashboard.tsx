@@ -218,8 +218,11 @@ export default function Dashboard() {
             alt="Phototheology"
             className="h-12 w-12 md:h-14 md:w-14 rounded-xl shadow-lg shadow-primary/20"
           />
-          <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">{t('dashboard.welcomeBack')}</h1>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">{t('dashboard.welcomeBack')}</h1>
+              <ExperienceModeIndicator className="mb-1 md:mb-2" />
+            </div>
             <p className="text-sm md:text-base text-foreground/80">{t('dashboard.learningProgress')}</p>
           </div>
         </div>
