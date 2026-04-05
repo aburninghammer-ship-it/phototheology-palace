@@ -153,7 +153,7 @@ export default function BasicChatTab() {
               Your personal Bible study partner. Ask about any verse, story, doctrine, or question — and get deep, Christ-centered insight.
             </p>
             <p className="text-xs text-center mb-8 max-w-md text-muted-foreground/70 italic leading-relaxed">
-              Jeeves doesn't just search — he <span className="text-primary font-medium not-italic">sees</span>. Every answer traces Christ through five dimensions of meaning, connects your verse across all 66 books, and maps it into the sweep of salvation history — from Eden to Revelation. This isn't AI with a Bible. This is a Bible that thinks.
+              Other AIs search a Bible. Jeeves <span className="text-primary font-medium not-italic">thinks</span> through one — running every answer through a proprietary engine of <span className="text-primary font-medium not-italic">38 interconnected study principles</span> that trace patterns, symbols, prophecy, sanctuary design, and Christ across all 66 books. That's why Jeeves will never answer the same question the same way twice — and why no other AI can replicate what happens here.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
