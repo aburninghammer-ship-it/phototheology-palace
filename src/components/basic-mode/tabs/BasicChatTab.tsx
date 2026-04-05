@@ -6,9 +6,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callJeeves } from "@/lib/jeevesClient";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Sparkles, BookOpen, Eye, Layers, Link2, MapPin, Palette, ChevronRight, Search, Shield, Repeat, Compass, Heart } from "lucide-react";
+import { Send, Sparkles, BookOpen, Eye, Layers, Link2, MapPin, Palette, ChevronRight, Search, Shield, Repeat, Compass, Heart, Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import { SaveChatResponseDialog } from "../SaveChatResponseDialog";
 
 interface Message {
   role: "user" | "assistant";
@@ -84,6 +85,7 @@ export default function BasicChatTab() {
   const [loading, setLoading] = useState(false);
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
   const [dailySuggestions, setDailySuggestions] = useState<string[]>(FALLBACK_SUGGESTIONS);
+  const [saveDialog, setSaveDialog] = useState<{ open: boolean; msgIndex: number | null }>({ open: false, msgIndex: null });
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -267,6 +269,17 @@ export default function BasicChatTab() {
                   ) : (
                     msg.content
                   )}
+                  {msg.role === "assistant" && (
+                    <div className="flex justify-end mt-2 pt-2 border-t border-primary/10">
+                      <button
+                        onClick={() => setSaveDialog({ open: true, msgIndex: i })}
+                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <Bookmark className="h-3.5 w-3.5" />
+                        Save
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -382,6 +395,20 @@ export default function BasicChatTab() {
           Powered by deep theological analysis — Christ-centered, Scripture-grounded answers.
         </p>
       </div>
+
+      {/* Save Dialog */}
+      {saveDialog.msgIndex !== null && (
+        <SaveChatResponseDialog
+          open={saveDialog.open}
+          onOpenChange={(open) => setSaveDialog({ open, msgIndex: open ? saveDialog.msgIndex : null })}
+          responseContent={messages[saveDialog.msgIndex]?.content || ""}
+          userQuestion={
+            // Find the preceding user message
+            messages.slice(0, saveDialog.msgIndex).reverse().find((m) => m.role === "user")?.content || ""
+          }
+          conversationHistory={messages.slice(0, saveDialog.msgIndex + 1)}
+        />
+      )}
     </div>
   );
 }
