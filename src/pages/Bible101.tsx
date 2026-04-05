@@ -26,10 +26,10 @@ const Bible101 = () => {
       if (!user) return [];
       const { data } = await supabase
         .from("user_course_progress")
-        .select("module_id")
+        .select("day_number")
         .eq("user_id", user.id)
         .eq("course_id", "bible-101");
-      return (data || []).map(d => parseInt(d.module_id));
+      return (data || []).map(d => d.day_number);
     },
     enabled: !!user,
   });
@@ -37,12 +37,12 @@ const Bible101 = () => {
   const markComplete = useMutation({
     mutationFn: async (day: number) => {
       if (!user) return;
-      await supabase.from("user_course_progress").upsert({
+      await supabase.from("user_course_progress").insert({
         user_id: user.id,
         course_id: "bible-101",
-        module_id: String(day),
+        day_number: day,
         completed_at: new Date().toISOString(),
-      }, { onConflict: "user_id,course_id,module_id" });
+      });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["bible101-progress"] }),
   });
