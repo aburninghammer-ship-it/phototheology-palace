@@ -61,7 +61,7 @@ export function PTLabel({ simple, master, code, description, className = "" }: P
     <span className={`inline-flex items-center gap-1.5 ${className}`}>
       {master}
       {code && (
-        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-mono">
+        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-mono bg-amber-500/15 text-amber-400 border border-amber-500/25">
           {code}
         </Badge>
       )}
