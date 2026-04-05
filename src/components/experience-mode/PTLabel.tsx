@@ -38,16 +38,17 @@ export function PTLabel({ simple, master, code, description, className = "" }: P
             <span className={`inline-flex items-center gap-1.5 ${className}`}>
               {simple}
               {code && (
-                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 font-mono opacity-60">
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 font-mono bg-teal-500/10 text-teal-400 border-teal-500/30 hover:bg-teal-500/20 transition-colors">
                   {code}
                 </Badge>
               )}
             </span>
           </TooltipTrigger>
           {description && (
-            <TooltipContent side="bottom" className="max-w-[250px]">
-              <p className="font-medium text-xs">{master}</p>
+            <TooltipContent side="bottom" className="max-w-[260px] border-teal-500/20">
+              <p className="font-medium text-xs text-teal-400">{master}</p>
               <p className="text-xs opacity-80 mt-1">{description}</p>
+              <p className="text-[10px] text-muted-foreground mt-1.5 italic">🧭 Learning this principle in Workshop mode</p>
             </TooltipContent>
           )}
         </Tooltip>
@@ -60,7 +61,7 @@ export function PTLabel({ simple, master, code, description, className = "" }: P
     <span className={`inline-flex items-center gap-1.5 ${className}`}>
       {master}
       {code && (
-        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-mono">
+        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-mono bg-amber-500/15 text-amber-400 border border-amber-500/25">
           {code}
         </Badge>
       )}

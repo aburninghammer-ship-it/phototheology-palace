@@ -1,57 +1,34 @@
 
-# Level 1 "Basic" Mode — ChatGPT-Style Interface
+## Level 2 (Explorer) Visual Distinction Plan
 
-## Overview
-When a user is in Level 1 (Basic), the entire app shell transforms into a dark, modern ChatGPT-like interface. No Spaces dashboard, no palace navigation — just a clean left sidebar with tool tabs and a main content area.
+### 1. Explorer Mode Banner/Header Badge
+- Add a subtle **"Workshop Mode"** indicator badge in the dashboard/sidebar that shows when in Explorer mode
+- Uses a distinct **teal/cyan** accent color (vs primary gold for Immersion)
+- Includes a coaching tooltip: "You're in guided mode — PT principles are introduced gently as you study"
 
-## Naming Updates
-- Simple → **Basic** (Level 1)
-- Guided → **Explorer** (Level 2)  
-- Master → **Immersion** (Level 3)
+### 2. Coaching Indicators on Features
+- Explorer features get a subtle **"🧭 Guided"** badge overlay on cards/tiles
+- Immersion features show a **"⚡ Full Access"** badge instead
+- Locked Immersion-only features show a tasteful **"🔒 Immersion"** lock badge with a "Level up" tooltip
 
-## Level 1 Interface Layout
-```
-┌──────────────────────────────────────────────┐
-│ [≡] Phototheology    [Basic ▾]    [👤]       │  ← Header with level chip
-├────────┬─────────────────────────────────────┤
-│ 💬 Ask │                                     │
-│ 📖 Bible│    Main Content Area               │
-│ 🎧 Audio│   (Chat / Bible / etc.)            │
-│ 📅 Plans│                                    │
-│ 🌅 AM   │                                    │
-│ 🌙 PM   │                                    │
-│ ✨ Daily │                                    │
-│        │                                     │
-│────────│                                     │
-│ ⚙️ Settings                                  │
-└────────┴─────────────────────────────────────┘
-```
+### 3. Dashboard Differentiation
+- Explorer dashboard shows a **"Your Workshop"** section header with coaching language
+- Add a **progress indicator** showing how many Explorer tools they've tried (encouraging advancement)
+- Show a **"Ready for Immersion?"** prompt after significant Explorer usage
 
-## Sidebar Tabs (7 items)
-1. **Ask Jeeves** — Primary chat (default tab, ChatGPT-like)
-2. **Study Bible** — Bible reader with commentary
-3. **Audio Commentary** — Listen to chapter commentaries
-4. **Reading Plans** — Bible reading plans
-5. **Morning Watch** — AM devotional
-6. **Night Watch** — PM meditation
-7. **Daily Devotional** — Reginald's daily entry
+### 4. Navigation Visual Cues
+- Explorer sidebar items get a subtle left-border accent in teal
+- Immersion sidebar items use the primary gold accent
+- Locked items show dimmed with lock icon
 
-## Level Toggle
-- Header shows current level as a styled chip (e.g., "Basic")
-- Clicking opens a modal with descriptions of all 3 levels
-- Settings menu also has the toggle
+### 5. PT Label Enhancement
+- Explorer: PT codes appear as **learning tooltips** with explanations (already partly done)
+- Immersion: PT codes appear as **professional badges** (compact, no tooltip needed)
+- Make the visual gap between these more pronounced
 
-## Visual Style
-- Dark background (similar to ChatGPT dark mode)
-- Clean, minimal sidebar with icons + labels
-- Chat area with centered content, max-width container
-- Smooth transitions between tabs
-
-## Implementation Steps
-1. Update ExperienceModeContext: rename simple→basic, guided→explorer, master→immersion
-2. Create `BasicModeShell.tsx` — the Level 1 app shell with sidebar + content area
-3. Create `BasicModeSidebar.tsx` — left sidebar with 7 tabs
-4. Create `LevelToggleChip.tsx` — header chip + modal for switching levels
-5. Update main layout to conditionally render BasicModeShell when level=basic
-6. Add a welcome/explainer screen shown on first entry to Basic mode
-7. Wire existing components (Jeeves chat, Bible reader, etc.) into the tabs
+### Files to modify:
+- `src/contexts/ExperienceModeContext.tsx` — add mode-specific accent color tokens
+- `src/components/experience-mode/ExperienceModeIndicator.tsx` — NEW: floating mode badge
+- `src/pages/Dashboard.tsx` — Explorer-specific dashboard section
+- `src/index.css` — Explorer accent color tokens
+- Sidebar/navigation components — mode-aware styling

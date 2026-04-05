@@ -19,6 +19,7 @@ import { DashboardSkeleton } from "@/components/SkeletonLoader";
 import { PalaceProgressDashboard } from "@/components/PalaceProgressDashboard";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
+import { ExperienceModeIndicator } from "@/components/experience-mode/ExperienceModeIndicator";
 import { JeevesWelcomeModal } from "@/components/retention/JeevesWelcomeModal";
 import { PathBanner, PathDashboardWidget } from "@/components/path";
 import { QuickNotes } from "@/components/notes/QuickNotes";
@@ -140,7 +141,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { getRecentReading } = useReadingHistory();
   const { preferences } = useUserPreferences();
-  const { meetsMinMode } = useExperienceMode();
+  const { meetsMinMode, isExplorer, isImmersion } = useExperienceMode();
   const showGuidedWidgets = meetsMinMode("explorer"); // explorer + immersion
   const [stats, setStats] = useState<DashboardStats>({
     dailyStreak: 0,
@@ -217,8 +218,11 @@ export default function Dashboard() {
             alt="Phototheology"
             className="h-12 w-12 md:h-14 md:w-14 rounded-xl shadow-lg shadow-primary/20"
           />
-          <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">{t('dashboard.welcomeBack')}</h1>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">{t('dashboard.welcomeBack')}</h1>
+              <ExperienceModeIndicator className="mb-1 md:mb-2" />
+            </div>
             <p className="text-sm md:text-base text-foreground/80">{t('dashboard.learningProgress')}</p>
           </div>
         </div>
@@ -249,21 +253,25 @@ export default function Dashboard() {
         </div>
 
         {showGuidedWidgets && (
-          <div className="mb-8">
-            <FeatureHighlights />
-          </div>
-        )}
-
-        {showGuidedWidgets && (
-          <div className="mb-8">
-            <StudyToolsQuickAccess />
-          </div>
-        )}
-
-        {showGuidedWidgets && (
-          <div className="mb-8">
-            <ResearchAssistantWidget />
-          </div>
+          <>
+            {/* Explorer/Immersion section header */}
+            <div className="mb-4 flex items-center gap-3">
+              <div className={`h-px flex-1 ${isExplorer ? "bg-gradient-to-r from-teal-500/40 to-transparent" : "bg-gradient-to-r from-amber-500/40 to-transparent"}`} />
+              <span className={`text-xs font-semibold uppercase tracking-wider ${isExplorer ? "text-teal-400" : "text-amber-400"}`}>
+                {isExplorer ? "🧭 Your Workshop" : "⚡ Palace Tools"}
+              </span>
+              <div className={`h-px flex-1 ${isExplorer ? "bg-gradient-to-l from-teal-500/40 to-transparent" : "bg-gradient-to-l from-amber-500/40 to-transparent"}`} />
+            </div>
+            <div className="mb-8">
+              <FeatureHighlights />
+            </div>
+            <div className="mb-8">
+              <StudyToolsQuickAccess />
+            </div>
+            <div className="mb-8">
+              <ResearchAssistantWidget />
+            </div>
+          </>
         )}
 
         <Card className={`mb-8 ${featured.gradient} border-0 text-white overflow-hidden relative`}>
