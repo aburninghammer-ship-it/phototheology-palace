@@ -5,7 +5,7 @@
 import { cn } from "@/lib/utils";
 import {
   MessageCircle, BookOpen, Church, Settings,
-  Gamepad2, GraduationCap, Layers,
+  Gamepad2, GraduationCap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
