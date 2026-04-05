@@ -1780,7 +1780,9 @@ async function generateEpicAudioChunkElevenLabs(
   return ttsResponse.arrayBuffer();
 }
 
-async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, totalChunks: number): Promise<ArrayBuffer> {
+async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, totalChunks: number, mode: string = "epic"): Promise<ArrayBuffer> {
+  const openaiVoice = OPENAI_FALLBACK_VOICES[mode] || OPENAI_FALLBACK_VOICES.epic;
+  console.log(`[EpicCommentary] OpenAI fallback using voice "${openaiVoice}" for mode "${mode}" (chunk ${chunkIndex + 1}/${totalChunks})`);
   const ttsResponse = await fetch("https://api.openai.com/v1/audio/speech", {
     method: "POST",
     headers: {
@@ -1790,7 +1792,7 @@ async function generateEpicAudioChunkOpenAI(text: string, chunkIndex: number, to
     body: JSON.stringify({
       model: "tts-1-hd",
       input: text,
-      voice: "onyx",
+      voice: openaiVoice,
       response_format: "mp3",
       speed: 0.95,
     }),
