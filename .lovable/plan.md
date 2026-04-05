@@ -1,34 +1,23 @@
+## Daily Generated Sample Questions
 
-## Level 2 (Explorer) Visual Distinction Plan
+### What we're building:
+Replace the static/hourly-rotating sample questions in Level 1 chat with 6 fresh AI-generated questions every day, each touching a different Palace principle.
 
-### 1. Explorer Mode Banner/Header Badge
-- Add a subtle **"Workshop Mode"** indicator badge in the dashboard/sidebar that shows when in Explorer mode
-- Uses a distinct **teal/cyan** accent color (vs primary gold for Immersion)
-- Includes a coaching tooltip: "You're in guided mode — PT principles are introduced gently as you study"
+### Steps:
 
-### 2. Coaching Indicators on Features
-- Explorer features get a subtle **"🧭 Guided"** badge overlay on cards/tiles
-- Immersion features show a **"⚡ Full Access"** badge instead
-- Locked Immersion-only features show a tasteful **"🔒 Immersion"** lock badge with a "Level up" tooltip
+1. **Database table** — `generated_sample_questions` to store daily batches (date, questions array, palace principles used)
 
-### 3. Dashboard Differentiation
-- Explorer dashboard shows a **"Your Workshop"** section header with coaching language
-- Add a **progress indicator** showing how many Explorer tools they've tried (encouraging advancement)
-- Show a **"Ready for Immersion?"** prompt after significant Explorer usage
+2. **Edge function** — `generate-daily-questions` that:
+   - Uses Gemini Flash to generate 6 diverse questions
+   - Each question maps to a different Palace principle area (Sanctuary, Prophecy, Christ Types, Patterns, Freestyle, etc.)
+   - Stores them with the generation date
+   - Includes a fallback static set if generation fails
 
-### 4. Navigation Visual Cues
-- Explorer sidebar items get a subtle left-border accent in teal
-- Immersion sidebar items use the primary gold accent
-- Locked items show dimmed with lock icon
+3. **Cron job** — Schedule at 5:00 AM UTC daily (same as existing spark cards)
 
-### 5. PT Label Enhancement
-- Explorer: PT codes appear as **learning tooltips** with explanations (already partly done)
-- Immersion: PT codes appear as **professional badges** (compact, no tooltip needed)
-- Make the visual gap between these more pronounced
+4. **Update BasicChatTab** — Fetch today's questions from DB; fall back to static array if none found
 
-### Files to modify:
-- `src/contexts/ExperienceModeContext.tsx` — add mode-specific accent color tokens
-- `src/components/experience-mode/ExperienceModeIndicator.tsx` — NEW: floating mode badge
-- `src/pages/Dashboard.tsx` — Explorer-specific dashboard section
-- `src/index.css` — Explorer accent color tokens
-- Sidebar/navigation components — mode-aware styling
+### No changes to:
+- Jeeves backend logic
+- Level 2/3 interfaces
+- Chapel or other sections
