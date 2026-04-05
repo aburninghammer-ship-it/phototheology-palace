@@ -4,7 +4,7 @@
  */
 
 const DB_NAME = "phototheology-audio-bible";
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Bumped 2026-04-05 to flush stale commentary after master regeneration
 const VERSE_STORE = "verses";
 const COMMENTARY_STORE = "commentary";
 
@@ -56,17 +56,20 @@ async function initDB(): Promise<IDBDatabase> {
     request.onupgradeneeded = (event) => {
       const database = (event.target as IDBOpenDBRequest).result;
 
-      // Verses store
+      // On version bump, delete old stores to flush stale content
+      if (database.objectStoreNames.contains(COMMENTARY_STORE)) {
+        database.deleteObjectStore(COMMENTARY_STORE);
+      }
+
+      // Verses store (text doesn't change, keep if exists)
       if (!database.objectStoreNames.contains(VERSE_STORE)) {
         const verseStore = database.createObjectStore(VERSE_STORE, { keyPath: "key" });
         verseStore.createIndex("book_chapter", ["book", "chapter"], { unique: false });
       }
 
-      // Commentary store
-      if (!database.objectStoreNames.contains(COMMENTARY_STORE)) {
-        const commentaryStore = database.createObjectStore(COMMENTARY_STORE, { keyPath: "key" });
-        commentaryStore.createIndex("book_chapter_verse", ["book", "chapter", "verse"], { unique: false });
-      }
+      // Recreate commentary store fresh
+      const commentaryStore = database.createObjectStore(COMMENTARY_STORE, { keyPath: "key" });
+      commentaryStore.createIndex("book_chapter_verse", ["book", "chapter", "verse"], { unique: false });
     };
   });
 }

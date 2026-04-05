@@ -3,10 +3,15 @@
 const COMMENTARY_CACHE_PREFIX = "bible_commentary_";
 const CACHE_EXPIRY_DAYS = 90; // Commentary doesn't change, cache longer
 
+// Bump this version whenever a master regeneration is performed.
+// All locally-cached entries stamped with an older version are treated as expired.
+const CACHE_VERSION = 2; // v2 = 2026-04-05 post-master-regeneration
+
 interface CachedCommentary {
   commentary: string;
   timestamp: number;
   depth: string;
+  cacheVersion?: number; // Added in v2 — older entries without this field are auto-expired
 }
 
 const getCacheKey = (book: string, chapter: number, depth: string, isChapter: boolean, verse?: number) => {
@@ -31,6 +36,7 @@ export const cacheChapterCommentary = (
     commentary,
     timestamp: Date.now(),
     depth,
+    cacheVersion: CACHE_VERSION,
   };
 
   try {
@@ -64,6 +70,7 @@ export const cacheVerseCommentary = (
     commentary,
     timestamp: Date.now(),
     depth,
+    cacheVersion: CACHE_VERSION,
   };
 
   try {
@@ -97,6 +104,13 @@ export const getCachedChapterCommentary = (
 
     const cached: CachedCommentary = JSON.parse(data);
 
+    // Check version — entries from before the master regeneration are expired
+    if ((cached.cacheVersion ?? 0) < CACHE_VERSION) {
+      localStorage.removeItem(key);
+      console.log(`[Commentary Cache] EXPIRED (old version): ${book} ${chapter} (${depth})`);
+      return null;
+    }
+
     // Check expiry
     const expiryMs = CACHE_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
     if (Date.now() - cached.timestamp > expiryMs) {
@@ -128,6 +142,13 @@ export const getCachedVerseCommentary = (
     if (!data) return null;
 
     const cached: CachedCommentary = JSON.parse(data);
+
+    // Check version
+    if ((cached.cacheVersion ?? 0) < CACHE_VERSION) {
+      localStorage.removeItem(key);
+      console.log(`[Commentary Cache] EXPIRED (old version): ${book} ${chapter}:${verse} (${depth})`);
+      return null;
+    }
 
     const expiryMs = CACHE_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
     if (Date.now() - cached.timestamp > expiryMs) {
