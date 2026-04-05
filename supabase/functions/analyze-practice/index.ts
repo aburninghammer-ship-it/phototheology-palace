@@ -39,7 +39,6 @@ FEEDBACK STYLE:
 - End with encouragement
 - Keep feedback under 200 words
 - Use a warm, mentoring tone`;
-    const behavioralEngine = getContentBehavioralEngine();
 
     const userPrompt = `Verse/Story: ${verseReference}
 
@@ -60,7 +59,7 @@ Please analyze this practice work. Does it properly apply the ${roomName} princi
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: 'user', content: userPrompt }
         ],
       }),

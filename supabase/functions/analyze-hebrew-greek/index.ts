@@ -49,7 +49,6 @@ Context: "${verse}"
 Full context: "${context}"
 
 Format your response in clean markdown with bold headings.`;
-    const behavioralEngine = getContentBehavioralEngine();
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -60,7 +59,7 @@ Format your response in clean markdown with bold headings.`;
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: 'user', content: `Analyze the word "${word}" in this context.` }
         ],
       }),

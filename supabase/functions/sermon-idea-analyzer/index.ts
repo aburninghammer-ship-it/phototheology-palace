@@ -54,7 +54,6 @@ Respond in this exact JSON format:
     }
   ]
 }`;
-    const behavioralEngine = getContentBehavioralEngine();
 
     const userPrompt = `Analyze this sermon idea and provide 3 distinct sermon options:
 
@@ -72,7 +71,7 @@ Provide your analysis as JSON.`;
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: "user", content: userPrompt },
         ],
         max_tokens: 2000,

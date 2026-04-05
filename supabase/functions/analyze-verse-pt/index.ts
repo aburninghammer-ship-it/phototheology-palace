@@ -130,7 +130,6 @@ Return ONLY valid JSON with this structure:
     {"verse": "Romans 5:8", "reason": "God's love demonstrated in Christ", "principles": ["@CyC", "2D", "3D"]}
   ]
 }`;
-    const behavioralEngine = getContentBehavioralEngine();
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -141,7 +140,7 @@ Return ONLY valid JSON with this structure:
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: "user", content: `Analyze this verse using PT principles:\n\nReference: ${verse_reference}\nText: ${verse_text}` }
         ],
         temperature: 0.7,

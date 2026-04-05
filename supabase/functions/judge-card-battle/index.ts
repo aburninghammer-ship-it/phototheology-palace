@@ -95,7 +95,6 @@ Response format (JSON only):
   "bonuses": ["cross_reference", "typology", "practical"],
   "feedback": "Warm, detailed feedback with emojis and clear paragraph breaks. No asterisks or markdown allowed. Start by addressing the player by name (${playerName})."
 }`;
-    const behavioralEngine = getContentBehavioralEngine();
 
     const userPrompt = `Card Played: ${cardCode}
 Player's Response:
@@ -112,7 +111,7 @@ Judge this response.`;
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.7,

@@ -20,7 +20,6 @@ serve(async (req) => {
     }
 
     let systemPrompt = "";
-    const behavioralEngine = getContentBehavioralEngine();
     let userPrompt = "";
 
     if (mode === "generate_challenge") {
@@ -154,7 +153,7 @@ RESPONSE FORMAT (JSON):
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.8,

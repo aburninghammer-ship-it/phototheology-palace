@@ -57,7 +57,6 @@ Return a JSON array with 3 game objects, each containing:
     "example_challenge": "A sample challenge from the game"
   }
 }`;
-    const behavioralEngine = getContentBehavioralEngine();
 
     const userPrompt = `Create 3 NEW biblical learning games for ${monthYear}.
 
@@ -105,7 +104,7 @@ Return ONLY a valid JSON array of 3 game objects.`;
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: 'user', content: userPrompt }
         ],
       }),

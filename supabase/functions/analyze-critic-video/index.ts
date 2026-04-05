@@ -264,7 +264,6 @@ Return your analysis in the following JSON structure with MAXIMUM DETAIL:
   ],
   "additionalNotes": "2-3 paragraphs of additional context including: historical background of this criticism, how this fits into the Great Controversy theme, resources for further study, encouragement for SDA believers"
 }`;
-    const behavioralEngine = getContentBehavioralEngine();
 
     let userPrompt: string;
     
@@ -335,7 +334,7 @@ Even without the transcript, make this analysis EXTREMELY DETAILED and BIBLICALL
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
           { role: 'user', content: userPrompt }
         ],
         response_format: { type: "json_object" }
