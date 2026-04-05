@@ -57,9 +57,12 @@ export function MobileBottomNav() {
     return primaryNavItems;
   }, [currentMode]);
 
-  // Filter moreNavItems to only accessible features
+  // Combine always-visible items with gated items filtered by access level
   const filteredMoreNavItems = useMemo(
-    () => moreNavItems.filter(item => isAccessible(item.path)),
+    () => [
+      ...alwaysVisibleMoreItems,
+      ...gatedMoreNavItems.filter(item => isAccessible(item.path)),
+    ],
     [isAccessible],
   );
 
