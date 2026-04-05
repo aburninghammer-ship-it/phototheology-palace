@@ -9,11 +9,11 @@ export default function BasicNightTab() {
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-2"
-            style={{ background: "hsl(220 10% 15%)" }}>
+            style={{ background: "hsl(170 25% 12%)" }}>
             <Moon className="h-7 w-7" style={{ color: "hsl(250 60% 70%)" }} />
           </div>
-          <h2 className="text-xl font-bold" style={{ color: "hsl(220 10% 92%)" }}>Night & Evening Watches</h2>
-          <p className="text-sm" style={{ color: "hsl(220 10% 50%)" }}>
+          <h2 className="text-xl font-bold" style={{ color: "hsl(170 10% 93%)" }}>Night & Evening Watches</h2>
+          <p className="text-sm" style={{ color: "hsl(170 15% 48%)" }}>
             Cinematic meditations to quiet your mind and prepare for restful sleep.
           </p>
         </div>
@@ -25,8 +25,8 @@ export default function BasicNightTab() {
             onClick={() => navigate("/night-watches")}
             className="w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all hover:brightness-110"
             style={{
-              background: "hsl(220 13% 10%)",
-              borderColor: "hsl(220 10% 18%)",
+              background: "hsl(170 22% 9%)",
+              borderColor: "hsl(170 20% 18%)",
             }}
           >
             <div className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
@@ -34,10 +34,10 @@ export default function BasicNightTab() {
               <Moon className="h-5 w-5" style={{ color: "hsl(250 60% 70%)" }} />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold" style={{ color: "hsl(220 10% 88%)" }}>
+              <div className="text-sm font-semibold" style={{ color: "hsl(170 10% 88%)" }}>
                 Free Night Watches
               </div>
-              <div className="text-xs" style={{ color: "hsl(220 10% 50%)" }}>
+              <div className="text-xs" style={{ color: "hsl(170 15% 48%)" }}>
                 15-minute cinematic meditations on Scripture themes
               </div>
             </div>
@@ -48,8 +48,8 @@ export default function BasicNightTab() {
             onClick={() => navigate("/night-watches")}
             className="w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all hover:brightness-110"
             style={{
-              background: "hsl(220 13% 10%)",
-              borderColor: "hsl(220 10% 18%)",
+              background: "hsl(170 22% 9%)",
+              borderColor: "hsl(170 20% 18%)",
             }}
           >
             <div className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
@@ -57,10 +57,10 @@ export default function BasicNightTab() {
               <Flame className="h-5 w-5" style={{ color: "hsl(15 70% 60%)" }} />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold" style={{ color: "hsl(220 10% 88%)" }}>
+              <div className="text-sm font-semibold" style={{ color: "hsl(170 10% 88%)" }}>
                 40-Day Tracts
               </div>
-              <div className="text-xs" style={{ color: "hsl(220 10% 50%)" }}>
+              <div className="text-xs" style={{ color: "hsl(170 15% 48%)" }}>
                 Deep 40-day guided journeys through major biblical themes
               </div>
             </div>
@@ -71,8 +71,8 @@ export default function BasicNightTab() {
             onClick={() => navigate("/night-watches")}
             className="w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all hover:brightness-110"
             style={{
-              background: "hsl(220 13% 10%)",
-              borderColor: "hsl(220 10% 18%)",
+              background: "hsl(170 22% 9%)",
+              borderColor: "hsl(170 20% 18%)",
             }}
           >
             <div className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
@@ -80,10 +80,10 @@ export default function BasicNightTab() {
               <Calendar className="h-5 w-5" style={{ color: "hsl(38 65% 60%)" }} />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold" style={{ color: "hsl(220 10% 88%)" }}>
+              <div className="text-sm font-semibold" style={{ color: "hsl(170 10% 88%)" }}>
                 365-Day Journeys
               </div>
-              <div className="text-xs" style={{ color: "hsl(220 10% 50%)" }}>
+              <div className="text-xs" style={{ color: "hsl(170 15% 48%)" }}>
                 Year-long nightly meditation through the entire Bible
               </div>
             </div>
