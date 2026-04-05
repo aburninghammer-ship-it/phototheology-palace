@@ -141,7 +141,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { getRecentReading } = useReadingHistory();
   const { preferences } = useUserPreferences();
-  const { meetsMinMode } = useExperienceMode();
+  const { meetsMinMode, isExplorer, isImmersion } = useExperienceMode();
   const showGuidedWidgets = meetsMinMode("explorer"); // explorer + immersion
   const [stats, setStats] = useState<DashboardStats>({
     dailyStreak: 0,
