@@ -18,11 +18,16 @@ import { BasicModeShell } from "@/components/basic-mode/BasicModeShell";
 
 const Welcome = () => {
   const navigate = useNavigate();
-  const { isBasic } = useExperienceMode();
+  const { isBasic, isExplorer } = useExperienceMode();
 
   // Level 1 (Basic) mode: show the ChatGPT-style interface
   if (isBasic) {
     return <BasicModeShell />;
+  }
+
+  // Level 2 (Explorer) mode: go straight to the Palace
+  if (isExplorer) {
+    return <ExplorerRedirect />;
   }
 
   return (
