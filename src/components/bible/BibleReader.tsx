@@ -777,7 +777,7 @@ export const BibleReader = () => {
                     verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
                   />
 
-                  {(studyMode === "apologetics" || studyMode === "advanced") && (
+                  {!isBasic && (studyMode === "apologetics" || studyMode === "advanced") && (
                     <ApologeticsPanel
                       book={book}
                       chapter={chapter}
