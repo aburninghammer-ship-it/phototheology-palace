@@ -545,8 +545,8 @@ function App() {
             <Route path="/daily-verse" element={<ProtectedRoute><DailyVerse /></ProtectedRoute>} />
             <Route path="/reading-plans" element={<ProtectedRoute><ReadingPlans /></ProtectedRoute>} />
             <Route path="/bible-reference" element={<ProtectedRoute><BibleReference /></ProtectedRoute>} />
-            <Route path="/ascensions-expansions" element={<ProtectedRoute><AscensionsExpansions /></ProtectedRoute>} />
-            <Route path="/encyclopedia" element={<ProtectedRoute><BibleEncyclopedia /></ProtectedRoute>} />
+            <Route path="/ascensions-expansions" element={<BasicModeGate><ProtectedRoute><AscensionsExpansions /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/encyclopedia" element={<BasicModeGate><ProtectedRoute><BibleEncyclopedia /></ProtectedRoute></BasicModeGate>} />
             <Route path="/encyclopedia/:slug" element={<ProtectedRoute><EncyclopediaArticle /></ProtectedRoute>} />
             <Route path="/character-profiles" element={<ProtectedRoute><CharacterProfiles /></ProtectedRoute>} />
             <Route path="/video-training" element={<ProtectedRoute><VideoTraining /></ProtectedRoute>} />
