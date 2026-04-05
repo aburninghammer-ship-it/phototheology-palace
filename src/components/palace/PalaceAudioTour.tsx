@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ALL_TOURS, TOUR_TIERS, buildAllSegments, getTotalSeconds } from "@/data/tourScripts";
+import { ALL_TOURS, getTourTiers, buildAllSegments, getTotalSeconds } from "@/data/tourScripts";
 import type { TourDefinition, TourSegment } from "@/data/tourScripts";
 import type { TourTier } from "@/data/tourScripts";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import reginaldAvatar from "@/assets/avatars/reginald-avatar.png";
 
 const FLOOR_COLORS: Record<number, string> = {
@@ -182,6 +183,8 @@ function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?:
 }
 
 function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }) {
+  const { mode } = useExperienceMode();
+  const tiers = getTourTiers(mode);
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
@@ -191,7 +194,7 @@ function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }
         </p>
       </div>
 
-      {TOUR_TIERS.map((tier) => (
+      {tiers.map((tier) => (
         <div key={tier.label} className="space-y-2">
           <div className="flex items-center gap-2 px-1">
             <h4 className="text-sm font-bold text-foreground">{tier.label}</h4>
