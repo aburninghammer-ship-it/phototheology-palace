@@ -20,6 +20,7 @@ const BasicChatTab = lazy(() => import("@/components/basic-mode/tabs/BasicChatTa
 const BasicBibleTab = lazy(() => import("@/components/basic-mode/tabs/BasicBibleTab"));
 const BasicChapelTab = lazy(() => import("@/components/basic-mode/tabs/BasicChapelTab"));
 const ExplorerSpaceTab = lazy(() => import("./ExplorerSpaceTab"));
+const ExplorerPalaceTab = lazy(() => import("./ExplorerPalaceTab"));
 
 function useExplorerProfile(userId: string | undefined) {
   return useQuery({
@@ -68,6 +69,8 @@ export function ExplorerModeShell() {
         return <BasicBibleTab />;
       case "chapel":
         return <BasicChapelTab />;
+      case "palace":
+        return <ExplorerPalaceTab />;
       case "games-space":
       case "university-space":
         return <ExplorerSpaceTab spaceId={activeTab} />;
