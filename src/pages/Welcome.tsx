@@ -110,7 +110,7 @@ const Welcome = () => {
         <ContinueWhereYouLeftOff />
       </div>
 
-      <PTSection showIn={["guided", "master"]}>
+      <PTSection showIn={["explorer", "immersion"]}>
         <PtGlossaryTable />
       </PTSection>
     </>
