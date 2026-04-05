@@ -93,8 +93,9 @@ const Welcome = () => {
         </div>
       </div>
 
-      {/* === TICKER & GREETING === */}
+      {/* === NEWCOMER BANNER (Experience Mode + Bible 101 + Guest House) === */}
       <div className="px-4 space-y-4">
+        <NewcomerWelcomeBanner />
         <WhatsNewTicker />
         <ReginaldGreeting />
         <UpgradeFloatingCard />

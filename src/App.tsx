@@ -682,6 +682,7 @@ function App() {
           <Route path="/blueprint-financial" element={<ProtectedRoute><BlueprintFinancial /></ProtectedRoute>} />
           <Route path="/blueprint-stress" element={<ProtectedRoute><BlueprintStress /></ProtectedRoute>} />
           <Route path="/phototheology-course" element={<ProtectedRoute><PhototheologyCourse /></ProtectedRoute>} />
+          <Route path="/bible-101" element={<ProtectedRoute><Bible101 /></ProtectedRoute>} />
           <Route path="/daniel-course" element={<ProtectedRoute><DanielCourse /></ProtectedRoute>} />
           <Route path="/revelation-course" element={<ProtectedRoute><RevelationCourse /></ProtectedRoute>} />
            <Route path="/revelation-course/kids" element={<ProtectedRoute><RevelationCourseKids /></ProtectedRoute>} />
