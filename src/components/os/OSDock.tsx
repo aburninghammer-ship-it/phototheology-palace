@@ -6,6 +6,8 @@ import { PanelLeftClose, PanelLeftOpen, LayoutGrid, Pin } from "lucide-react";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePinnedDock } from "@/hooks/usePinnedDock";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
+import { isFeatureAccessible } from "@/config/featureRegistry";
 
 export function OSDock() {
   const location = useLocation();
@@ -13,6 +15,7 @@ export function OSDock() {
   const isMobile = useIsMobile();
   const [visible, setVisible] = useState(true);
   const { pinnedItems, togglePin } = usePinnedDock();
+  const { mode, isBasic } = useExperienceMode();
   const currentPath = location.pathname;
 
   const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
