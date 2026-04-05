@@ -356,8 +356,8 @@ export default function BasicChatTab() {
         )}
       </div>
 
-      {/* Input Bar */}
-      <div className="p-4 border-t border-primary/15 backdrop-blur-xl bg-gradient-to-r from-card/80 via-card/60 to-primary/5 shadow-[0_-4px_20px_-5px] shadow-primary/10">
+      {/* Input Bar — mobile-optimized with safe area */}
+      <div className="p-2.5 sm:p-4 border-t border-primary/15 backdrop-blur-xl bg-gradient-to-r from-card/80 via-card/60 to-primary/5 shadow-[0_-4px_20px_-5px] shadow-primary/10">
         <div className="max-w-3xl mx-auto relative">
           <textarea
             ref={inputRef}
@@ -366,10 +366,10 @@ export default function BasicChatTab() {
             onKeyDown={handleKeyDown}
             placeholder="Ask about any Bible verse, story, or topic..."
             rows={1}
-            className="w-full resize-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all backdrop-blur-md bg-background/70 border border-primary/20 text-foreground placeholder:text-muted-foreground shadow-inner shadow-primary/5"
+            className="w-full resize-none rounded-xl text-[13px] sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all backdrop-blur-md bg-background/70 border border-primary/20 text-foreground placeholder:text-muted-foreground shadow-inner shadow-primary/5"
             style={{
-              padding: "0.75rem 3rem 0.75rem 1rem",
-              minHeight: 44,
+              padding: "0.625rem 2.75rem 0.625rem 0.75rem",
+              minHeight: 40,
               maxHeight: 120,
             }}
             onInput={(e) => {
@@ -382,7 +382,7 @@ export default function BasicChatTab() {
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || loading}
             className={cn(
-              "absolute right-2 bottom-2 p-2 rounded-lg transition-colors",
+              "absolute right-1.5 bottom-1.5 p-2 rounded-lg transition-colors",
               input.trim() && !loading
                 ? "bg-primary text-primary-foreground hover:bg-primary/90"
                 : "bg-muted text-muted-foreground cursor-not-allowed"
@@ -391,7 +391,7 @@ export default function BasicChatTab() {
             <Send className="h-4 w-4" />
           </button>
         </div>
-        <p className="text-center text-[10px] mt-2 text-muted-foreground/50">
+        <p className="text-center text-[9px] sm:text-[10px] mt-1.5 sm:mt-2 text-muted-foreground/50">
           Powered by deep theological analysis — Christ-centered, Scripture-grounded answers.
         </p>
       </div>
