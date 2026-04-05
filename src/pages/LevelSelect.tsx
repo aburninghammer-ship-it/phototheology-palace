@@ -67,6 +67,7 @@ const LEVELS: LevelOption[] = [
       "Everything in Explorer",
       "Sermon Prep, Amplify & Remix",
       "Apologetics, Debate & Equip",
+      "Ministries & ministry-minded tools",
       "VR Palace, Train & Mastery",
     ],
     icon: Flame,
