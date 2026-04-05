@@ -515,26 +515,26 @@ function App() {
                 <StudentVerification />
               </ProtectedRoute>
             } />
-            <Route path="/palace" element={<ProtectedRoute><Palace /></ProtectedRoute>} />
-            <Route path="/palace/explorer" element={<ProtectedRoute><PalaceExplorer /></ProtectedRoute>} />
-            <Route path="/palace/floor/:floorNumber" element={<ProtectedRoute><FloorDetail /></ProtectedRoute>} />
-            <Route path="/palace/floor/:floorNumber/room/:roomId" element={<ProtectedRoute><RoomDetail /></ProtectedRoute>} />
-            <Route path="/card-deck" element={<ProtectedRoute><CardDeck /></ProtectedRoute>} />
+            <Route path="/palace" element={<BasicModeGate><ProtectedRoute><Palace /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/palace/explorer" element={<BasicModeGate><ProtectedRoute><PalaceExplorer /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/palace/floor/:floorNumber" element={<BasicModeGate><ProtectedRoute><FloorDetail /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/palace/floor/:floorNumber/room/:roomId" element={<BasicModeGate><ProtectedRoute><RoomDetail /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/card-deck" element={<BasicModeGate><ProtectedRoute><CardDeck /></ProtectedRoute></BasicModeGate>} />
             <Route path="/jeeves" element={<ProtectedRoute><CardDeck /></ProtectedRoute>} />
             <Route path="/gems-room" element={<Navigate to="/give-me-a-gem" replace />} />
             <Route path="/gems" element={<Navigate to="/give-me-a-gem" replace />} />
-            <Route path="/pt-multiplayer" element={<ProtectedRoute><PTMultiplayerLobby /></ProtectedRoute>} />
-            <Route path="/pt-multiplayer/:gameId" element={<ProtectedRoute><PTMultiplayerGame /></ProtectedRoute>} />
-            <Route path="/analyze-thoughts" element={<ProtectedRoute><AnalyzeThoughts /></ProtectedRoute>} />
-            <Route path="/polish" element={<ProtectedRoute><Polish /></ProtectedRoute>} />
-            <Route path="/remix" element={<ProtectedRoute><Remix /></ProtectedRoute>} />
-            <Route path="/amplify" element={<ProtectedRoute><Amplify /></ProtectedRoute>} />
-            <Route path="/sparks" element={<ProtectedRoute><SparksLibrary /></ProtectedRoute>} />
-            <Route path="/libraries" element={<ProtectedRoute><Libraries /></ProtectedRoute>} />
-            <Route path="/palace/freestyle" element={<ProtectedRoute><PalaceFreestyle /></ProtectedRoute>} />
-            <Route path="/palace/tour" element={<ProtectedRoute><PalaceTourPage /></ProtectedRoute>} />
-            <Route path="/palace/graphics" element={<ProtectedRoute><GraphicsGallery /></ProtectedRoute>} />
-            <Route path="/mind-map" element={<ProtectedRoute><MindMapPalace /></ProtectedRoute>} />
+            <Route path="/pt-multiplayer" element={<BasicModeGate><ProtectedRoute><PTMultiplayerLobby /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/pt-multiplayer/:gameId" element={<BasicModeGate><ProtectedRoute><PTMultiplayerGame /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/analyze-thoughts" element={<BasicModeGate><ProtectedRoute><AnalyzeThoughts /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/polish" element={<BasicModeGate><ProtectedRoute><Polish /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/remix" element={<BasicModeGate><ProtectedRoute><Remix /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/amplify" element={<BasicModeGate><ProtectedRoute><Amplify /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/sparks" element={<BasicModeGate><ProtectedRoute><SparksLibrary /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/libraries" element={<BasicModeGate><ProtectedRoute><Libraries /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/palace/freestyle" element={<BasicModeGate><ProtectedRoute><PalaceFreestyle /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/palace/tour" element={<BasicModeGate><ProtectedRoute><PalaceTourPage /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/palace/graphics" element={<BasicModeGate><ProtectedRoute><GraphicsGallery /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/mind-map" element={<BasicModeGate><ProtectedRoute><MindMapPalace /></ProtectedRoute></BasicModeGate>} />
             
             <Route path="/bible" element={<ProtectedRoute><Bible /></ProtectedRoute>} />
             <Route path="/audio-bible" element={<ProtectedRoute><AudioBible /></ProtectedRoute>} />
