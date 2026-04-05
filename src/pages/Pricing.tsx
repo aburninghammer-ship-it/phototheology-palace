@@ -241,7 +241,7 @@ export default function Pricing() {
     }
   };
 
-  const startDirectSubscription = async (plan: 'essential' | 'premium') => {
+  const startDirectSubscription = async (plan: 'essential' | 'premium' | 'unlimited') => {
     if (!user) {
       navigate("/auth");
       return;
