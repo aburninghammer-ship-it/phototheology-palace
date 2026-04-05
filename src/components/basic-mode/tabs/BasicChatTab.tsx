@@ -25,10 +25,10 @@ const STUDY_LENSES = [
 ];
 
 const SUGGESTIONS = [
-  "Break down Genesis 3:15",
-  "What does the Sanctuary teach about salvation?",
-  "Who is the Lamb in Revelation 5?",
-  "Trace the theme of 'three days' through the Bible",
+  { text: "Break down Genesis 3:15", gradient: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20", hoverGlow: "hover:shadow-blue-500/40" },
+  { text: "What does the Sanctuary teach about salvation?", gradient: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20", hoverGlow: "hover:shadow-purple-500/40" },
+  { text: "Who is the Lamb in Revelation 5?", gradient: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", glow: "shadow-amber-500/20", hoverGlow: "hover:shadow-amber-500/40" },
+  { text: "Trace the theme of 'three days' through the Bible", gradient: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20", hoverGlow: "hover:shadow-emerald-500/40" },
 ];
 
 /** Maps plain-language lens IDs to hidden PT instructions for the AI */
