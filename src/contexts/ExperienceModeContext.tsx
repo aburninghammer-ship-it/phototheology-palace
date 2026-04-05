@@ -8,6 +8,7 @@
  */
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { MODE_LEVEL } from "@/config/featureRegistry";
 
 export type ExperienceMode = "basic" | "explorer" | "immersion";
 
@@ -32,6 +33,8 @@ function normalizeMode(raw: string | null): ExperienceMode {
   return "basic";
 }
 
+export { MODE_LEVEL };
+
 interface ExperienceModeContextType {
   mode: ExperienceMode;
   setMode: (mode: ExperienceMode) => void;
@@ -46,6 +49,8 @@ interface ExperienceModeContextType {
   showPTLabels: boolean;
   /** Returns true if full PT architecture should be shown (immersion only) */
   showFullArchitecture: boolean;
+  /** Returns true if the current mode meets or exceeds the given minimum */
+  meetsMinMode: (minMode: ExperienceMode) => boolean;
 }
 
 const ExperienceModeContext = createContext<ExperienceModeContextType | undefined>(undefined);
@@ -93,6 +98,11 @@ export function ExperienceModeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const meetsMinModeCheck = useCallback(
+    (minMode: ExperienceMode) => MODE_LEVEL[mode] >= MODE_LEVEL[minMode],
+    [mode],
+  );
+
   const value: ExperienceModeContextType = {
     mode,
     setMode,
@@ -105,6 +115,7 @@ export function ExperienceModeProvider({ children }: { children: ReactNode }) {
     isMaster: mode === "immersion",
     showPTLabels: mode === "explorer" || mode === "immersion",
     showFullArchitecture: mode === "immersion",
+    meetsMinMode: meetsMinModeCheck,
   };
 
   return (

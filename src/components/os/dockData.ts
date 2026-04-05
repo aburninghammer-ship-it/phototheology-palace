@@ -10,6 +10,7 @@ import {
   Glasses,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { isFeatureAccessible, getMinModeForPath, type ExperienceMode } from "@/config/featureRegistry";
 
 export interface DockSubItem {
   id: string;
@@ -170,19 +171,40 @@ export const DOCK_ITEMS: DockItem[] = [
   },
 ];
 
-/** Flatten all items + children into a searchable list */
-export function getAllDockItems(): { label: string; path: string; icon: LucideIcon; glow: string; parent?: string }[] {
-  const result: { label: string; path: string; icon: LucideIcon; glow: string; parent?: string }[] = [];
+export interface FlatDockItem {
+  label: string;
+  path: string;
+  icon: LucideIcon;
+  glow: string;
+  parent?: string;
+  locked?: boolean;
+  minMode?: ExperienceMode;
+}
+
+/** Flatten all items + children into a searchable list, with optional mode-based locking */
+export function getAllDockItems(mode?: ExperienceMode): FlatDockItem[] {
+  const result: FlatDockItem[] = [];
   for (const item of DOCK_ITEMS) {
-    result.push({ label: item.label, path: item.path, icon: item.icon, glow: item.glow });
+    const locked = mode ? !isFeatureAccessible(mode, item.path) : false;
+    result.push({
+      label: item.label,
+      path: item.path,
+      icon: item.icon,
+      glow: item.glow,
+      locked,
+      minMode: locked ? getMinModeForPath(item.path) : undefined,
+    });
     if (item.children) {
       for (const child of item.children) {
+        const childLocked = mode ? !isFeatureAccessible(mode, child.path) : false;
         result.push({
           label: child.label,
           path: child.path,
           icon: child.icon || item.icon,
           glow: child.glow || item.glow,
           parent: item.label,
+          locked: childLocked,
+          minMode: childLocked ? getMinModeForPath(child.path) : undefined,
         });
       }
     }

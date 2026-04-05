@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useExperienceMode } from "@/contexts/ExperienceModeContext";
+import { useFeatureGate } from "@/hooks/useFeatureGate";
+import { getMinModeForPath } from "@/config/featureRegistry";
+import { LockedFeatureOverlay } from "@/components/experience-mode/LockedFeatureOverlay";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   BookOpenCheck, Dumbbell, Mic2, Gamepad2, Church, Wrench,
@@ -203,6 +206,7 @@ export const OsSpacesWelcome = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isSimple, isMaster } = useExperienceMode();
+  const { isAccessible } = useFeatureGate();
 
   const active = OS_SPACES.find(s => s.id === activeSpace);
 
@@ -342,44 +346,60 @@ export const OsSpacesWelcome = () => {
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                 {active.items.map((item, idx) => {
                   const ItemIcon = item.icon;
+                  const locked = !isAccessible(item.path);
                   // Deterministic "random" hue per item using golden angle for max spread
                   const goldenAngle = 137.508;
                   const itemHue = Math.round((idx * goldenAngle + active.id.charCodeAt(0) * 47) % 360);
                   const sat = 65 + (idx % 3) * 10; // 65-85%
                   const light = 50 + (idx % 4) * 5; // 50-65%
                   const itemColor = `${itemHue} ${sat}% ${light}%`;
+
+                  const itemContent = (
+                    <button
+                      onClick={locked ? undefined : () => navigate(item.path)}
+                      className="relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/30 transition-all group hover:scale-[1.04]"
+                      style={{
+                        background: `linear-gradient(135deg, hsl(${itemColor} / 0.14), hsl(${itemColor} / 0.05))`,
+                        boxShadow: `0 0 12px hsl(${itemColor} / 0.1)`,
+                      }}
+                    >
+                      {/* Pin button — top-right corner */}
+                      {!locked && (
+                        <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                          <PinToDockButton path={item.path} label={item.label} />
+                        </div>
+                      )}
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center transition-all group-hover:scale-110 relative overflow-hidden"
+                        style={{
+                          background: `linear-gradient(160deg, hsl(${itemColor} / 0.85), hsl(${itemColor} / 0.55) 50%, hsl(${itemColor} / 0.35))`,
+                          boxShadow: `0 4px 14px hsl(${itemColor} / 0.35), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.18)`,
+                        }}
+                      >
+                        <div className="absolute inset-0 rounded-xl" style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 45%)' }} />
+                        <ItemIcon className="w-4 h-4 text-white/95 group-hover:text-white transition-colors relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
+                      </div>
+                      <span className="text-[10px] font-medium leading-tight text-center line-clamp-2">{item.label}</span>
+                    </button>
+                  );
+
+                  if (locked) {
+                    return (
+                      <LockedFeatureOverlay key={item.path + item.label} minMode={getMinModeForPath(item.path)}>
+                        {itemContent}
+                      </LockedFeatureOverlay>
+                    );
+                  }
+
                   return (
                     <TooltipProvider key={item.path + item.label} delayDuration={300}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button
-                            onClick={() => navigate(item.path)}
-                            className="relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl backdrop-blur-md border border-white/10 hover:border-white/30 transition-all group hover:scale-[1.04]"
-                            style={{
-                              background: `linear-gradient(135deg, hsl(${itemColor} / 0.14), hsl(${itemColor} / 0.05))`,
-                              boxShadow: `0 0 12px hsl(${itemColor} / 0.1)`,
-                            }}
-                          >
-                            {/* Pin button — top-right corner */}
-                            <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                              <PinToDockButton path={item.path} label={item.label} />
-                            </div>
-                            <div
-                              className="w-10 h-10 rounded-xl flex items-center justify-center transition-all group-hover:scale-110 relative overflow-hidden"
-                              style={{
-                                background: `linear-gradient(160deg, hsl(${itemColor} / 0.85), hsl(${itemColor} / 0.55) 50%, hsl(${itemColor} / 0.35))`,
-                                boxShadow: `0 4px 14px hsl(${itemColor} / 0.35), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.18)`,
-                              }}
-                            >
-                              <div className="absolute inset-0 rounded-xl" style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 45%)' }} />
-                              <ItemIcon className="w-4 h-4 text-white/95 group-hover:text-white transition-colors relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
-                            </div>
-                            <span className="text-[10px] font-medium leading-tight text-center line-clamp-2">{item.label}</span>
-                          </button>
+                          {itemContent}
                         </TooltipTrigger>
                         {item.tooltip && (
-                          <TooltipContent 
-                            side="top" 
+                          <TooltipContent
+                            side="top"
                             sideOffset={8}
                             className="max-w-[280px] text-xs leading-relaxed px-4 py-3 rounded-xl border-primary/20 bg-popover/95 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
                           >

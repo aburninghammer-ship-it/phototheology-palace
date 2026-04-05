@@ -1,6 +1,9 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useFeatureGate } from "@/hooks/useFeatureGate";
+import { getMinModeForPath } from "@/config/featureRegistry";
+import { UpgradePromptPage } from "@/components/experience-mode/UpgradePromptPage";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
@@ -67,6 +70,19 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return null;
   }
 
-  // User is authenticated, show the protected content
-  return <>{children}</>;
+  // User is authenticated — check experience mode gating
+  return <ModeGatedContent>{children}</ModeGatedContent>;
 };
+
+/** Checks if the current route is accessible for the user's experience mode */
+function ModeGatedContent({ children }: { children: ReactNode }) {
+  const location = useLocation();
+  const { isAccessible } = useFeatureGate();
+
+  if (!isAccessible(location.pathname)) {
+    const requiredMode = getMinModeForPath(location.pathname);
+    return <UpgradePromptPage requiredMode={requiredMode} />;
+  }
+
+  return <>{children}</>;
+}

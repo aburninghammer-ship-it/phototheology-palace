@@ -18,6 +18,7 @@ import { SpacedRepetitionReview } from "@/components/SpacedRepetitionReview";
 import { DashboardSkeleton } from "@/components/SkeletonLoader";
 import { PalaceProgressDashboard } from "@/components/PalaceProgressDashboard";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { JeevesWelcomeModal } from "@/components/retention/JeevesWelcomeModal";
 import { PathBanner, PathDashboardWidget } from "@/components/path";
 import { QuickNotes } from "@/components/notes/QuickNotes";
@@ -139,6 +140,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { getRecentReading } = useReadingHistory();
   const { preferences } = useUserPreferences();
+  const { meetsMinMode } = useExperienceMode();
+  const showGuidedWidgets = meetsMinMode("explorer"); // explorer + immersion
   const [stats, setStats] = useState<DashboardStats>({
     dailyStreak: 0,
     totalPoints: 0,
@@ -245,17 +248,23 @@ export default function Dashboard() {
           <PathDashboardWidget />
         </div>
 
-        <div className="mb-8">
-          <FeatureHighlights />
-        </div>
+        {showGuidedWidgets && (
+          <div className="mb-8">
+            <FeatureHighlights />
+          </div>
+        )}
 
-        <div className="mb-8">
-          <StudyToolsQuickAccess />
-        </div>
+        {showGuidedWidgets && (
+          <div className="mb-8">
+            <StudyToolsQuickAccess />
+          </div>
+        )}
 
-        <div className="mb-8">
-          <ResearchAssistantWidget />
-        </div>
+        {showGuidedWidgets && (
+          <div className="mb-8">
+            <ResearchAssistantWidget />
+          </div>
+        )}
 
         <Card className={`mb-8 ${featured.gradient} border-0 text-white overflow-hidden relative`}>
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
@@ -341,7 +350,7 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <PalaceProgressDashboard />
+          {showGuidedWidgets && <PalaceProgressDashboard />}
 
           <div className="space-y-6">
             <Card variant="glass">
@@ -353,22 +362,26 @@ export default function Dashboard() {
                 <CardDescription>{t('dashboard.pickUpWhereLeftOff')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border-yellow-500/30 hover:from-yellow-500/20 hover:to-amber-500/20 md:hidden"
-                  onClick={() => navigate("/analyze-thoughts")}
-                >
-                  <Lightbulb className="mr-2 h-4 w-4 text-yellow-500" />
-                  <span className="font-semibold text-yellow-700 dark:text-yellow-400">{t('dashboard.analyzeMyThoughts')}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => navigate("/palace")}
-                >
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  {t('dashboard.explorePalace')}
-                </Button>
+                {showGuidedWidgets && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border-yellow-500/30 hover:from-yellow-500/20 hover:to-amber-500/20 md:hidden"
+                    onClick={() => navigate("/analyze-thoughts")}
+                  >
+                    <Lightbulb className="mr-2 h-4 w-4 text-yellow-500" />
+                    <span className="font-semibold text-yellow-700 dark:text-yellow-400">{t('dashboard.analyzeMyThoughts')}</span>
+                  </Button>
+                )}
+                {showGuidedWidgets && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => navigate("/palace")}
+                  >
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    {t('dashboard.explorePalace')}
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   className="w-full justify-start"
@@ -393,14 +406,16 @@ export default function Dashboard() {
                   <Calendar className="mr-2 h-4 w-4 text-primary" />
                   {t('dashboard.lessonStudy')}
                 </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => navigate("/revelation-course")}
-                >
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  {t('dashboard.continueRevelation')}
-                </Button>
+                {showGuidedWidgets && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => navigate("/revelation-course")}
+                  >
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    {t('dashboard.continueRevelation')}
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   className="w-full justify-start"
@@ -424,23 +439,25 @@ export default function Dashboard() {
 
             <QuickAIPrompt />
 
-            <WeeklyChallengeWidget />
+            {showGuidedWidgets && <WeeklyChallengeWidget />}
 
-            <SermonForgeWidget />
+            {showGuidedWidgets && <SermonForgeWidget />}
 
             <CommunityHighlight />
 
             <QuickNotes compact />
 
-            <SpacedRepetitionReview />
+            {showGuidedWidgets && <SpacedRepetitionReview />}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <XPSystem />
-          <BadgeSystem />
-          <WeeklyLeaderboard />
-        </div>
+        {showGuidedWidgets && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <XPSystem />
+            <BadgeSystem />
+            <WeeklyLeaderboard />
+          </div>
+        )}
 
         <Card variant="glass">
           <CardHeader>

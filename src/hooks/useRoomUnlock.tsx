@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 
 export const useRoomUnlock = (floorNumber: number, roomId: string) => {
   const { user } = useAuth();
+  const { mode } = useExperienceMode();
   const { translatedFloors } = useTranslatedPalaceData();
   const [isUnlocked, setIsUnlocked] = useState(true); // Always unlocked now (soft lock)
   const [loading, setLoading] = useState(true);
@@ -13,6 +15,18 @@ export const useRoomUnlock = (floorNumber: number, roomId: string) => {
 
   useEffect(() => {
     const checkUnlock = async () => {
+      // Hard lock: mode-based floor restrictions
+      if (mode === "basic") {
+        setIsUnlocked(false);
+        setLoading(false);
+        return;
+      }
+      if (mode === "explorer" && floorNumber > 3) {
+        setIsUnlocked(false);
+        setLoading(false);
+        return;
+      }
+
       if (!user) {
         setIsUnlocked(true);
         setLoading(false);
@@ -100,7 +114,7 @@ export const useRoomUnlock = (floorNumber: number, roomId: string) => {
     };
 
     checkUnlock();
-  }, [user, floorNumber, roomId]);
+  }, [user, mode, floorNumber, roomId]);
 
   return { isUnlocked, loading, missingPrerequisites, recommendationWarning };
 };

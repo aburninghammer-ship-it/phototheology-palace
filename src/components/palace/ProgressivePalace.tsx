@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight, Lock, CheckCircle, Sparkles, Play, BookOpen, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
 import { usePalaceProgress } from "@/hooks/usePalaceProgress";
@@ -31,8 +32,22 @@ interface ProgressivePalaceProps {
 export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalaceProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { mode } = useExperienceMode();
   const { translatedFloors } = useTranslatedPalaceData();
   const { progressPercentage } = usePalaceProgress();
+
+  /** Is this floor hard-locked by the current experience mode? */
+  const isFloorLockedByMode = (floorNum: number): boolean => {
+    if (mode === "basic") return true; // All floors locked in basic
+    if (mode === "explorer") return floorNum > 3; // Floors 4-8 locked in Explorer
+    return false; // Immersion: all open
+  };
+
+  const getFloorLockMessage = (floorNum: number): string => {
+    if (mode === "basic") return "Upgrade to Explorer to unlock the Palace";
+    if (mode === "explorer" && floorNum > 3) return "Complete Floor 3 first, or upgrade to Immersion";
+    return "";
+  };
   
   // Progressive disclosure: only first 2 floors expanded by default for new users
   const [expandedFloors, setExpandedFloors] = useState<number[]>(
@@ -76,18 +91,20 @@ export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalacePro
       <div className="space-y-3">
         {translatedFloors.map((floor, idx) => {
           const theme = FLOOR_THEMES[idx];
-          const isExpanded = expandedFloors.includes(floor.number);
+          const modeLocked = isFloorLockedByMode(floor.number);
+          const isExpanded = !modeLocked && expandedFloors.includes(floor.number);
           // Soft lock: show warning but allow access
-          const hasWarning = floor.number > 2 && progressPercentage < (floor.number - 2) * 12;
-          
+          const hasWarning = !modeLocked && floor.number > 2 && progressPercentage < (floor.number - 2) * 12;
+
           return (
-            <div key={floor.number} className="rounded-xl border border-border overflow-hidden">
+            <div key={floor.number} className={cn("rounded-xl border border-border overflow-hidden", modeLocked && "opacity-50")}>
               {/* Floor Header */}
               <button
-                onClick={() => toggleFloor(floor.number)}
+                onClick={modeLocked ? undefined : () => toggleFloor(floor.number)}
                 className={cn(
                   "w-full flex items-center justify-between p-4 transition-all",
-                  `bg-gradient-to-r ${theme.gradient}`
+                  `bg-gradient-to-r ${theme.gradient}`,
+                  modeLocked && "cursor-not-allowed"
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -97,17 +114,27 @@ export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalacePro
                       <span className="font-bold text-white">{t('palace.floorNumber', { number: floor.number, defaultValue: `Floor ${floor.number}` })}</span>
                       <span className="text-white/80">•</span>
                       <span className="text-white/90">{floor.name}</span>
+                      {modeLocked && (
+                        <Lock className="h-4 w-4 text-white/70" />
+                      )}
                       {hasWarning && (
                         <span className="text-amber-300 text-xs" title={t('palace.completeEarlierFirst', 'Recommended: complete earlier floors first')}>⚠️</span>
                       )}
                     </div>
-                    <span className="text-white/70 text-sm">{t('palace.roomsCount', { count: floor.rooms.length, defaultValue: `${floor.rooms.length} rooms` })}</span>
+                    <span className="text-white/70 text-sm">
+                      {modeLocked
+                        ? getFloorLockMessage(floor.number)
+                        : t('palace.roomsCount', { count: floor.rooms.length, defaultValue: `${floor.rooms.length} rooms` })}
+                    </span>
                   </div>
                 </div>
-                {isExpanded 
-                  ? <ChevronDown className="h-5 w-5 text-white" />
-                  : <ChevronRight className="h-5 w-5 text-white" />
-                }
+                {modeLocked ? (
+                  <Lock className="h-5 w-5 text-white/50" />
+                ) : isExpanded ? (
+                  <ChevronDown className="h-5 w-5 text-white" />
+                ) : (
+                  <ChevronRight className="h-5 w-5 text-white" />
+                )}
               </button>
 
               {/* Rooms Grid */}

@@ -139,7 +139,12 @@
       "Bash(echo === game_scores with user_id counts ===:*)",
       "Bash(echo === profiles count ===:*)",
       "Bash(bun run:*)",
-      "Bash(ffprobe:*)"
+      "Bash(ffprobe:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(sox:*)",
+      "Bash(md5:*)",
+      "Bash(rm:*)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,9 +1,11 @@
-import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle, User, Users, UserRound, Eye, Scale, GraduationCap, Headphones } from "lucide-react";
+import { Home, BookOpen, Building2, Zap, MoreHorizontal, Crown, Microscope, BrainCircuit, Church, Scroll, X, MessageCircle, User, Users, UserRound, Eye, Scale, GraduationCap, Headphones, Lock, Flame, Gamepad2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import { useState } from "react";
+import { useFeatureGate } from "@/hooks/useFeatureGate";
+import { getMinModeForPath, MODE_LABELS } from "@/config/featureRegistry";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const primaryNavItems = [
@@ -34,7 +36,26 @@ export function MobileBottomNav() {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { isAccessible, currentMode } = useFeatureGate();
   const [showMore, setShowMore] = useState(false);
+
+  // In basic mode, replace Palace (locked) with Devotional
+  const activePrimaryNavItems = useMemo(() => {
+    if (currentMode === "basic") {
+      return primaryNavItems.map(item =>
+        item.path === "/palace"
+          ? { icon: Flame, labelKey: "nav.devotional" as const, path: "/devotionals" }
+          : item
+      );
+    }
+    return primaryNavItems;
+  }, [currentMode]);
+
+  // Filter moreNavItems to only accessible features
+  const filteredMoreNavItems = useMemo(
+    () => moreNavItems.filter(item => isAccessible(item.path)),
+    [isAccessible],
+  );
 
   if (!user) return null;
 
@@ -44,7 +65,7 @@ export function MobileBottomNav() {
   const hiddenPaths = ["/auth", "/onboarding", "/interactive-demo"];
   if (hiddenPaths.some(path => location.pathname.startsWith(path))) return null;
 
-  const isMoreActive = moreNavItems.some(item =>
+  const isMoreActive = filteredMoreNavItems.some(item =>
     location.pathname === item.path || location.pathname.startsWith(item.path)
   );
 
@@ -76,7 +97,7 @@ export function MobileBottomNav() {
                 </button>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {moreNavItems.map((item) => {
+                {filteredMoreNavItems.map((item) => {
                   const isActive = location.pathname === item.path || location.pathname.startsWith(item.path);
                   return (
                     <Link
@@ -110,7 +131,7 @@ export function MobileBottomNav() {
         }}
       >
         <div className="flex items-center justify-evenly h-[64px] px-2 w-full">
-          {primaryNavItems.map((item) => {
+          {activePrimaryNavItems.map((item) => {
             const isActive = location.pathname === item.path ||
               (item.path !== "/dashboard" && location.pathname.startsWith(item.path));
 
