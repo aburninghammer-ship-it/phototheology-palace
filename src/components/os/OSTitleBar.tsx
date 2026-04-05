@@ -109,6 +109,7 @@ export function OSTitleBar() {
             </span>
           </div>
         </div>
+        <LevelToggleChip />
       </div>
 
       {/* Center: Search */}
