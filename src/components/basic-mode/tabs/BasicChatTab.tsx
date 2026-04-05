@@ -85,6 +85,7 @@ export default function BasicChatTab() {
   const [loading, setLoading] = useState(false);
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
   const [dailySuggestions, setDailySuggestions] = useState<string[]>(FALLBACK_SUGGESTIONS);
+  const [saveDialog, setSaveDialog] = useState<{ open: boolean; msgIndex: number | null }>({ open: false, msgIndex: null });
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
