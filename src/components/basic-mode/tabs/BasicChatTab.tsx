@@ -25,10 +25,10 @@ const STUDY_LENSES = [
 ];
 
 const SUGGESTIONS = [
-  "Break down Genesis 3:15",
-  "What does the Sanctuary teach about salvation?",
-  "Who is the Lamb in Revelation 5?",
-  "Trace the theme of 'three days' through the Bible",
+  { text: "Break down Genesis 3:15", gradient: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20", hoverGlow: "hover:shadow-blue-500/40" },
+  { text: "What does the Sanctuary teach about salvation?", gradient: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20", hoverGlow: "hover:shadow-purple-500/40" },
+  { text: "Who is the Lamb in Revelation 5?", gradient: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", glow: "shadow-amber-500/20", hoverGlow: "hover:shadow-amber-500/40" },
+  { text: "Trace the theme of 'three days' through the Bible", gradient: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20", hoverGlow: "hover:shadow-emerald-500/40" },
 ];
 
 /** Maps plain-language lens IDs to hidden PT instructions for the AI */
@@ -152,11 +152,15 @@ export default function BasicChatTab() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
               {SUGGESTIONS.map((s) => (
                 <button
-                  key={s}
-                  onClick={() => sendMessage(s)}
-                  className="text-left p-3 rounded-xl text-sm transition-all border border-border bg-card text-muted-foreground hover:bg-muted/50 hover:border-primary/30 hover:text-foreground"
+                  key={s.text}
+                  onClick={() => sendMessage(s.text)}
+                  className={cn(
+                    "text-left p-4 rounded-xl text-sm transition-all duration-300 border backdrop-blur-md",
+                    "bg-gradient-to-br", s.gradient, s.border, s.glow, s.hoverGlow,
+                    "shadow-lg hover:shadow-xl hover:scale-[1.03] hover:text-foreground text-muted-foreground"
+                  )}
                 >
-                  {s}
+                  {s.text}
                 </button>
               ))}
             </div>
