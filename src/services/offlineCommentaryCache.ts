@@ -3,10 +3,15 @@
 const COMMENTARY_CACHE_PREFIX = "bible_commentary_";
 const CACHE_EXPIRY_DAYS = 90; // Commentary doesn't change, cache longer
 
+// Bump this version whenever a master regeneration is performed.
+// All locally-cached entries stamped with an older version are treated as expired.
+const CACHE_VERSION = 2; // v2 = 2026-04-05 post-master-regeneration
+
 interface CachedCommentary {
   commentary: string;
   timestamp: number;
   depth: string;
+  cacheVersion?: number; // Added in v2 — older entries without this field are auto-expired
 }
 
 const getCacheKey = (book: string, chapter: number, depth: string, isChapter: boolean, verse?: number) => {
