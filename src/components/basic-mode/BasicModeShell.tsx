@@ -92,7 +92,7 @@ export function BasicModeShell() {
                 <span className="text-sm font-medium text-foreground truncate max-w-[120px] sm:max-w-none">
                   {profile.displayName}
                 </span>
-                {profile.streak > 0 && (
+                {(profile.streak ?? 0) > 0 && (
                   <div className="flex items-center gap-1 text-xs text-amber-400" title="Reading streak">
                     <Flame className="h-3.5 w-3.5" />
                     <span className="font-semibold">{profile.streak}</span>
