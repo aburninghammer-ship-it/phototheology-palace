@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { LogIn, Volume2, Flame, Compass } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
-import { BASIC_MODE_TOUR } from "@/data/basicModeTour";
+import { EXPLORER_MODE_TOUR } from "@/data/explorerModeTour";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -149,7 +149,7 @@ export function ExplorerModeShell() {
 
       {tourOpen && (
         <GuidedTourOverlay
-          steps={BASIC_MODE_TOUR}
+          steps={EXPLORER_MODE_TOUR}
           onClose={() => setTourOpen(false)}
           accentColor="primary"
         />

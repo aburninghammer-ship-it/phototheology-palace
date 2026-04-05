@@ -1,0 +1,67 @@
+import type { GuidedTourStep } from "@/components/guided-tour/GuidedTourOverlay";
+
+export const EXPLORER_MODE_TOUR: GuidedTourStep[] = [
+  {
+    id: "welcome",
+    title: "Welcome to Explorer Mode",
+    description: "Reginald introduces Level 2 — where study becomes exploration.",
+    narration: "Good day! I'm Reginald, your concierge and navigator. Welcome to Explorer Mode — Level 2 of PhototheologyOS. You've stepped beyond the basics, and now you're standing at the gates of the Phototheology Palace. Everything you had in Level 1 is still here — Jeeves, the Study Bible, the Chapel — but now you also have access to the Palace itself, Games and Challenges, and University courses. Together, these four spaces will transform how you read, remember, and experience the Bible. Explorer Mode is about searching out the treasures God has hidden in His Word. Proverbs 25:2 says, 'It is the glory of God to conceal a thing: but the honour of kings is to search out a matter.' You don't need to master everything today. I'm going to walk you through each space, show you the highlights, and give you a clear starting point. Let's begin.",
+    tooltipPosition: "center",
+  },
+  {
+    id: "ask-jeeves",
+    title: "Ask Jeeves — Still Your Bible Scholar",
+    description: "The same powerful AI Bible assistant, now with Palace context.",
+    narration: "Jeeves is still right here — your AI Bible scholar powered by the Phototheology engine. Everything you loved in Level 1 carries over. But now in Explorer Mode, Jeeves can reference the Palace rooms and principles as he teaches you. When he mentions the Observation Room or the Dimensions framework, you can actually go explore those rooms yourself. It's like having a tutor who can now point to the textbook and say, 'Go read chapter three.' Ask him anything — a verse, a doctrine, a life question — and he'll give you the same deep, Christ-centered insight, now with connections to the Palace system you're learning.",
+    targetSelector: "[data-tour='tab-chat']",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "study-bible",
+    title: "Study Bible — Read, Listen, Explore",
+    description: "Full Bible with 8 audio commentary voices and research tools.",
+    narration: "The Study Bible is your reading room — the same powerful tool from Level 1 with all eight audio commentary voices: Epic Narrator, Modern Preacher, Gentle Counselor, Ancient voice, Scholar, Preacher, Kids Adventure, and the Mirror voice. Each one illuminates the same passage from a completely different angle. All powered by the Christ-centered Phototheology framework. Open any book, any chapter, and let the Word come alive.",
+    targetSelector: "[data-tour='tab-bible']",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "chapel",
+    title: "The Chapel — Devotion & Community",
+    description: "Devotionals, Morning & Night Watches, My Church, and Community.",
+    narration: "The Chapel carries over from Level 1 — your Morning Watch, Night Watch, daily devotionals, reading plans, and your church community. Everything that feeds your heart and keeps your rhythm with God. The Chapel reminds you that Phototheology is never just intellectual — it's transformational. Come here when your heart needs what your mind already knows.",
+    targetSelector: "[data-tour='tab-chapel']",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "palace",
+    title: "The Palace — Your New Superpower",
+    description: "All 8 floors and 38+ rooms of the Phototheology framework, visually laid out.",
+    narration: "Now here's what's new — the Phototheology Palace. This is the heart of everything. When you open it, you'll see all eight floors laid out visually — each floor with its rooms, each room with its code and description. Floor 1 is the Furnishing Floor where you stock your mind with stories and images. Floor 2 is the Investigation Floor where you become a detective of Scripture. Floor 3 trains Freestyle thinking. Floor 4 is the Next Level — Christ-centered depth. Floor 5 opens prophecy and sanctuary. Floor 6 maps the Cycles and Heavens. Floor 7 is the Fire and Meditation floor. And Floor 8 is Mastery. You don't need to memorize all eight right now. Most explorers start with just Floor 1 and Floor 2, and that alone transforms their study. The rest unfolds naturally as you grow. Think of it like a gym — you don't use every machine on day one.",
+    targetSelector: "[data-tour='tab-palace']",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "games",
+    title: "Games & Challenges — Training in Disguise",
+    description: "PT Scrabble, daily challenges, and training games that sharpen your skills.",
+    narration: "The Games space is new in Explorer Mode — and don't let the word 'games' fool you. These are training systems disguised as games. Every single one targets a specific Phototheology skill. PT Scrabble, Chain Chess, Sanctuary Run, Christ Lock, Symbol Decoder — each one trains a different room of the Palace. Plus Daily Challenges give you a new exercise each day — five to ten minutes, Jeeves grades it, done. Start with whichever game sounds fun. The best training is the training you actually do.",
+    targetSelector: "[data-tour='tab-games']",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "university",
+    title: "University — Structured Courses",
+    description: "Guided courses, certifications, and structured learning paths.",
+    narration: "The University space offers guided courses that build on the Palace framework. The Phototheology Course walks you through all eight floors room by room. The Daniel and Revelation courses apply Phototheology to apocalyptic prophecy. Blueprint courses address real-life topics through a biblical lens. And the 90-Day Mastery course gives you a structured daily journey with assignments and milestones. Pick one course that matches where you are. If you're new, start the Phototheology Course. One course at a time — that's how growth compounds.",
+    targetSelector: "[data-tour='tab-university']",
+    tooltipPosition: "bottom",
+  },
+  {
+    id: "level-switch",
+    title: "Three Levels — Grow at Your Pace",
+    description: "You're on Level 2. Level 3 unlocks sermon prep, apologetics, VR, and mastery tools.",
+    narration: "You're on Level 2 now, and it's packed with power. But when you're ready for even more — sermon preparation tools like Amplify and Remix, apologetics and debate training, the VR Palace experience, and the full advanced mastery toolkit — Level 3 Immersion Mode will be waiting. There's no rush. Many users stay in Explorer Mode for months and find it more than enough. The system grows with you. Just tap this chip anytime to see what's available. For now, explore. The Palace is yours. And I'm always here to guide you. God bless.",
+    targetSelector: "[data-tour='level-chip']",
+    tooltipPosition: "bottom",
+  },
+];
