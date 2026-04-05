@@ -11,6 +11,7 @@ import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { BasicModeGate } from "./components/BasicModeGate";
+import { BasicModeHide } from "./components/BasicModeHide";
 import { KeepAliveRoutes } from "@/components/KeepAliveRoutes";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { MessagingSidebar } from "@/components/MessagingSidebar";
