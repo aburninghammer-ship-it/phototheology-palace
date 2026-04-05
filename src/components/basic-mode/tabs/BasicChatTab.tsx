@@ -233,19 +233,19 @@ export default function BasicChatTab() {
             </div>
           </div>
         ) : (
-          <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+          <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
             {messages.map((msg, i) => (
               <div key={i} className={cn(
-                "flex gap-3",
+                "flex gap-2 sm:gap-3",
                 msg.role === "user" ? "justify-end" : "justify-start"
               )}>
                 {msg.role === "assistant" && (
-                  <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-1 bg-primary/15">
-                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  <div className="shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center mt-1 bg-primary/15">
+                    <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
                   </div>
                 )}
                 <div className={cn(
-                  "max-w-[85%] rounded-2xl px-5 py-4 text-sm leading-relaxed",
+                  "max-w-[90%] sm:max-w-[85%] rounded-2xl px-3.5 py-3 sm:px-5 sm:py-4 text-[13px] sm:text-sm leading-relaxed",
                   msg.role === "user"
                     ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25 border border-primary/30"
                     : "backdrop-blur-xl bg-gradient-to-br from-card/80 via-card/60 to-primary/10 border border-primary/20 shadow-[0_0_25px_-5px] shadow-primary/15 text-foreground ring-1 ring-primary/10"
@@ -286,15 +286,15 @@ export default function BasicChatTab() {
 
             {/* Study Lens Menu — shown when Jeeves detects a Bible study question */}
             {pendingQuestion && !loading && (
-              <div className="flex gap-3 justify-start">
-                <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-1 bg-primary/15">
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+              <div className="flex gap-2 sm:gap-3 justify-start">
+                <div className="shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center mt-1 bg-primary/15">
+                  <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
                 </div>
-                <div className="max-w-[90%] space-y-3">
-                  <div className="rounded-2xl px-4 py-3 bg-card border border-border text-foreground text-sm">
+                <div className="max-w-[95%] sm:max-w-[90%] space-y-2 sm:space-y-3">
+                  <div className="rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 bg-card border border-border text-foreground text-xs sm:text-sm">
                     Great question! How would you like me to approach this?
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 gap-1.5 sm:gap-2">
                     {getRotatedLenses().map((lens) => {
                       const Icon = lens.icon;
                       return (
