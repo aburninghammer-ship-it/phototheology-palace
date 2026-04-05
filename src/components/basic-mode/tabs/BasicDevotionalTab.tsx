@@ -10,7 +10,7 @@ export default function BasicDevotionalTab() {
           A fresh, deep devotional written daily by Reginald using Phototheology principles. Read or listen.
         </p>
         <button
-          onClick={() => navigate("/audio-devotionals")}
+          onClick={() => navigate("/daily-audio-devotional")}
           className="px-6 py-2.5 bg-[hsl(220,50%,45%)] hover:bg-[hsl(220,50%,50%)] text-white rounded-lg text-sm font-medium transition-colors"
         >
           Today's Devotional
