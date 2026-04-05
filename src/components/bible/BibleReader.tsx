@@ -56,11 +56,13 @@ import { SparkContainer, SparkSettings } from "@/components/sparks";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 
 export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
   const navigate = useNavigate();
   const chapter = parseInt(chapterParam);
+  const { isBasic } = useExperienceMode();
   
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +71,7 @@ export const BibleReader = () => {
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [activeDimensions, setActiveDimensions] = useState<string[]>(["1D", "2D", "3D", "4D", "5D"]);
-  const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics" | "preacher-mentor">("advanced");
+  const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics" | "preacher-mentor">(isBasic ? "beginner" : "advanced");
   const [sermonIdeasMode, setSermonIdeasMode] = useState(false);
   
   const toggleDimension = (dimension: string) => {
@@ -392,8 +394,8 @@ export const BibleReader = () => {
 
       {/* Compact Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
-        {/* Study Mode Selector */}
-        <StudyModeSelector activeMode={studyMode} onModeChange={setStudyMode} />
+        {/* Study Mode Selector — hidden in Basic mode */}
+        {!isBasic && <StudyModeSelector activeMode={studyMode} onModeChange={setStudyMode} />}
 
         <div className="h-6 w-px bg-border" />
 
@@ -775,7 +777,7 @@ export const BibleReader = () => {
                     verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
                   />
 
-                  {(studyMode === "apologetics" || studyMode === "advanced") && (
+                  {!isBasic && (studyMode === "apologetics" || studyMode === "advanced") && (
                     <ApologeticsPanel
                       book={book}
                       chapter={chapter}
