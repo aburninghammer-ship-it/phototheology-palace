@@ -253,21 +253,25 @@ export default function Dashboard() {
         </div>
 
         {showGuidedWidgets && (
-          <div className="mb-8">
-            <FeatureHighlights />
-          </div>
-        )}
-
-        {showGuidedWidgets && (
-          <div className="mb-8">
-            <StudyToolsQuickAccess />
-          </div>
-        )}
-
-        {showGuidedWidgets && (
-          <div className="mb-8">
-            <ResearchAssistantWidget />
-          </div>
+          <>
+            {/* Explorer/Immersion section header */}
+            <div className="mb-4 flex items-center gap-3">
+              <div className={`h-px flex-1 ${isExplorer ? "bg-gradient-to-r from-teal-500/40 to-transparent" : "bg-gradient-to-r from-amber-500/40 to-transparent"}`} />
+              <span className={`text-xs font-semibold uppercase tracking-wider ${isExplorer ? "text-teal-400" : "text-amber-400"}`}>
+                {isExplorer ? "🧭 Your Workshop" : "⚡ Palace Tools"}
+              </span>
+              <div className={`h-px flex-1 ${isExplorer ? "bg-gradient-to-l from-teal-500/40 to-transparent" : "bg-gradient-to-l from-amber-500/40 to-transparent"}`} />
+            </div>
+            <div className="mb-8">
+              <FeatureHighlights />
+            </div>
+            <div className="mb-8">
+              <StudyToolsQuickAccess />
+            </div>
+            <div className="mb-8">
+              <ResearchAssistantWidget />
+            </div>
+          </>
         )}
 
         <Card className={`mb-8 ${featured.gradient} border-0 text-white overflow-hidden relative`}>
