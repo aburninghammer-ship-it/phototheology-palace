@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
@@ -296,6 +297,46 @@ const ALL_PROMPTS: DailyPrompt[] = [
     text: "Think of the hardest objection to your faith. Now build a 3-step biblical response. Offense and defense.", actionLabel: "FORGE", actionLink: "/living-manna?tab=defense" },
 ];
 
+// ─── Level 1 (Basic) prompts — simple Bible questions that route to Ask Jeeves ───
+const BASIC_PROMPTS: DailyPrompt[] = [
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "What does it mean that Jesus is the Lamb of God?", actionLabel: "Ask", actionLink: "/jeeves?q=What+does+it+mean+that+Jesus+is+the+Lamb+of+God" },
+  { category: "try_this", icon: <BookOpen className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "Break down Psalm 23 for me — what is David really saying?", actionLabel: "Ask", actionLink: "/jeeves?q=Break+down+Psalm+23" },
+  { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Devotional",
+    text: "\"Be still and know that I am God.\" Let that wash over you today.", actionLabel: "Psalm 46", actionLink: "/bible?book=Psalms&chapter=46" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "Why did Jesus have to die on the cross? What was the purpose?", actionLabel: "Ask", actionLink: "/jeeves?q=Why+did+Jesus+have+to+die+on+the+cross" },
+  { category: "motivation", icon: <Star className="h-3.5 w-3.5" />, label: "Encouragement",
+    text: "Every time you open the Bible, you're stepping into a conversation with the Creator of the universe." },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "What are the Ten Commandments and why do they still matter?", actionLabel: "Ask", actionLink: "/jeeves?q=What+are+the+Ten+Commandments+and+why+do+they+matter" },
+  { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Devotional",
+    text: "\"For God so loved the world...\" — the most powerful sentence ever written. Sit with it.", actionLabel: "John 3", actionLink: "/bible?book=John&chapter=3" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "Who is the Holy Spirit and what does He do?", actionLabel: "Ask", actionLink: "/jeeves?q=Who+is+the+Holy+Spirit+and+what+does+He+do" },
+  { category: "motivation", icon: <Flame className="h-3.5 w-3.5" />, label: "Keep Going",
+    text: "You don't have to understand everything at once. Just keep showing up. The Word will do the rest." },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "What is grace and how does it work in my life?", actionLabel: "Ask", actionLink: "/jeeves?q=What+is+grace+and+how+does+it+work" },
+  { category: "spiritual", icon: <Sparkles className="h-3.5 w-3.5" />, label: "Devotional",
+    text: "\"I can do all things through Christ which strengtheneth me.\" You are not alone.", actionLabel: "Philippians 4", actionLink: "/bible?book=Philippians&chapter=4" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "What does the Bible say about prayer? How should I pray?", actionLabel: "Ask", actionLink: "/jeeves?q=What+does+the+Bible+say+about+prayer" },
+  { category: "try_this", icon: <BookOpen className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "Explain the story of creation in Genesis 1.", actionLabel: "Ask", actionLink: "/jeeves?q=Explain+the+story+of+creation+in+Genesis+1" },
+  { category: "spiritual", icon: <Heart className="h-3.5 w-3.5" />, label: "Devotional",
+    text: "\"The Lord is my shepherd; I shall not want.\" He's guiding you even now — trust the path.", actionLabel: "Psalm 23", actionLink: "/bible?book=Psalms&chapter=23" },
+  { category: "motivation", icon: <Crown className="h-3.5 w-3.5" />, label: "You Matter",
+    text: "God wrote 66 books across thousands of years — and He wants a personal conversation with you." },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "What does it mean to be 'born again'?", actionLabel: "Ask", actionLink: "/jeeves?q=What+does+it+mean+to+be+born+again" },
+  { category: "try_this", icon: <Lightbulb className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "What is heaven like according to the Bible?", actionLabel: "Ask", actionLink: "/jeeves?q=What+is+heaven+like+according+to+the+Bible" },
+  { category: "try_this", icon: <BookOpen className="h-3.5 w-3.5" />, label: "Ask Jeeves",
+    text: "Tell me about the life of Jesus — who was He really?", actionLabel: "Ask", actionLink: "/jeeves?q=Tell+me+about+the+life+of+Jesus" },
+];
+
 const CATEGORY_STYLES: Record<string, { accent: string; iconColor: string; badgeBg: string }> = {
   motivation: { accent: "from-amber-500/15 to-orange-500/5 border-amber-500/25", iconColor: "text-amber-500", badgeBg: "bg-amber-500/20 text-amber-400" },
   action:     { accent: "from-blue-500/15 to-cyan-500/5 border-blue-500/25", iconColor: "text-blue-500", badgeBg: "bg-blue-500/20 text-blue-400" },
@@ -490,6 +531,7 @@ function LockInPassChip() {
 
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
   const { user: authUser } = useAuth();
+  const { isBasic } = useExperienceMode();
   const navigate = useNavigate();
   const resolvedUserId = userId ?? authUser?.id ?? null;
   const fallbackDisplayName = (userEmail ?? authUser?.email)?.split("@")[0] || "Scholar";
@@ -536,7 +578,8 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
 
   if (!resolvedUserId) return null;
 
-  const prompt = ALL_PROMPTS[promptIdx];
+  const activePrompts = isBasic ? BASIC_PROMPTS : ALL_PROMPTS;
+  const prompt = activePrompts[promptIdx % activePrompts.length];
   const style = CATEGORY_STYLES[prompt.category];
   const rank = getXpRank(stats.totalXp);
   const initials = (stats.displayName || fallbackDisplayName).slice(0, 2).toUpperCase();
@@ -550,139 +593,146 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
       "mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5 transition-opacity duration-700 zen-hideable",
       isInactive && "opacity-80"
     )}>
-      {/* Nudge bar */}
-      <AnimatePresence>
-        {nudge && !dismissed && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className={cn(
-              "rounded-lg px-3 py-1.5 text-center text-xs font-medium",
-              isInactive
-                ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-            )}>
-              {nudge}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* New Feature Highlight */}
-      <AnimatePresence>
-        {!newFeatureDismissed && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="rounded-lg border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-teal-500/5 px-3 py-2 flex items-center gap-3">
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <Sparkles className="h-4 w-4 text-emerald-400" />
-                <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">New</Badge>
+      {/* Nudge bar — hidden in Basic mode */}
+      {!isBasic && (
+        <AnimatePresence>
+          {nudge && !dismissed && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className={cn(
+                "rounded-lg px-3 py-1.5 text-center text-xs font-medium",
+                isInactive
+                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                  : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+              )}>
+                {nudge}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-foreground">Test Me — PT Diagnostic Assessment</p>
-                <p className="text-[11px] text-muted-foreground line-clamp-1">Discover your strengths across all 8 floors with AI-powered analysis & personalized growth plans.</p>
-              </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <Button asChild size="sm" variant="ghost" className="text-[11px] h-6 px-2 text-emerald-400 hover:bg-emerald-500/10">
-                  <Link to="/test-me">
-                    Try It
-                    <ChevronRight className="h-3 w-3 ml-0.5" />
-                  </Link>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                   onClick={() => {
-                    setNewFeatureDismissed(true);
-                    localStorage.setItem("pt_new_feature_testme_dismissed_v2", Date.now().toString());
-                  }}
-                  title="Dismiss"
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
-      <div className={cn(
-        "rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)] transition-all duration-500",
-        xpFlash && "shadow-[0_0_30px_rgba(234,179,8,0.25)]"
-      )}>
-        {/* Avatar with Health Ring */}
-        <Link to="/profile" className="flex-shrink-0">
-          <StudyHealthRing
-            roomsExplored={stats.roomsExplored}
-            chaptersRead={stats.chaptersRead}
-            currentStreak={stats.currentStreak}
-            totalXp={stats.totalXp}
-            gemsCount={stats.gemsCount}
-          >
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
-              <AvatarFallback className="text-xs bg-blue-500/20 text-blue-300 font-bold">{initials}</AvatarFallback>
-            </Avatar>
-          </StudyHealthRing>
-        </Link>
+      {/* New Feature Highlight — hidden in Basic mode */}
+      {!isBasic && (
+        <AnimatePresence>
+          {!newFeatureDismissed && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="rounded-lg border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-teal-500/5 px-3 py-2 flex items-center gap-3">
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <Sparkles className="h-4 w-4 text-emerald-400" />
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">New</Badge>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-foreground">Test Me — PT Diagnostic Assessment</p>
+                  <p className="text-[11px] text-muted-foreground line-clamp-1">Discover your strengths across all 8 floors with AI-powered analysis & personalized growth plans.</p>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Button asChild size="sm" variant="ghost" className="text-[11px] h-6 px-2 text-emerald-400 hover:bg-emerald-500/10">
+                    <Link to="/test-me">
+                      Try It
+                      <ChevronRight className="h-3 w-3 ml-0.5" />
+                    </Link>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                     onClick={() => {
+                      setNewFeatureDismissed(true);
+                      localStorage.setItem("pt_new_feature_testme_dismissed_v2", Date.now().toString());
+                    }}
+                    title="Dismiss"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
-        {/* Name (clickable → Mission Dropdown) + rank */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <MissionDropdown displayName={stats.displayName}>
-              <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none hover:text-blue-300 transition-colors">
-                {stats.displayName}
-              </span>
-            </MissionDropdown>
-            <Badge className={cn("text-[10px] border-0 font-bold uppercase tracking-wider px-2", titleBadgeStyle)}>
-              {displayTitle}
-            </Badge>
-          </div>
-          {/* Accountability indicators */}
-          <div className="mt-0.5">
-            <AccountabilityBar
-              currentStreak={stats.currentStreak}
-              chaptersRead={stats.chaptersRead}
+      {/* Stats row — hidden in Basic mode */}
+      {!isBasic && (
+        <div className={cn(
+          "rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)] transition-all duration-500",
+          xpFlash && "shadow-[0_0_30px_rgba(234,179,8,0.25)]"
+        )}>
+          {/* Avatar with Health Ring */}
+          <Link to="/profile" className="flex-shrink-0">
+            <StudyHealthRing
               roomsExplored={stats.roomsExplored}
-            />
-          </div>
-        </div>
-
-        {/* Clickable Stats chips — each opens mini-dashboard */}
-        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap justify-end">
-          <LockInPassChip />
-
-          <motion.div animate={xpFlash ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.4 }}>
-            <XpPopover
+              chaptersRead={stats.chaptersRead}
+              currentStreak={stats.currentStreak}
               totalXp={stats.totalXp}
-              roomsExplored={stats.roomsExplored}
-              chaptersRead={stats.chaptersRead}
-              currentStreak={stats.currentStreak}
               gemsCount={stats.gemsCount}
-            />
-          </motion.div>
+            >
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
+                <AvatarFallback className="text-xs bg-blue-500/20 text-blue-300 font-bold">{initials}</AvatarFallback>
+              </Avatar>
+            </StudyHealthRing>
+          </Link>
 
-          <GemsPopover gemsCount={stats.gemsCount} />
-          <RoomsPopover roomsExplored={stats.roomsExplored} />
+          {/* Name (clickable → Mission Dropdown) + rank */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <MissionDropdown displayName={stats.displayName}>
+                <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none hover:text-blue-300 transition-colors">
+                  {stats.displayName}
+                </span>
+              </MissionDropdown>
+              <Badge className={cn("text-[10px] border-0 font-bold uppercase tracking-wider px-2", titleBadgeStyle)}>
+                {displayTitle}
+              </Badge>
+            </div>
+            {/* Accountability indicators */}
+            <div className="mt-0.5">
+              <AccountabilityBar
+                currentStreak={stats.currentStreak}
+                chaptersRead={stats.chaptersRead}
+                roomsExplored={stats.roomsExplored}
+              />
+            </div>
+          </div>
 
-          <div className="hidden sm:block">
-            <ChaptersPopover chaptersRead={stats.chaptersRead} />
+          {/* Clickable Stats chips — each opens mini-dashboard */}
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap justify-end">
+            <LockInPassChip />
+
+            <motion.div animate={xpFlash ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.4 }}>
+              <XpPopover
+                totalXp={stats.totalXp}
+                roomsExplored={stats.roomsExplored}
+                chaptersRead={stats.chaptersRead}
+                currentStreak={stats.currentStreak}
+                gemsCount={stats.gemsCount}
+              />
+            </motion.div>
+
+            <GemsPopover gemsCount={stats.gemsCount} />
+            <RoomsPopover roomsExplored={stats.roomsExplored} />
+
+            <div className="hidden sm:block">
+              <ChaptersPopover chaptersRead={stats.chaptersRead} />
+            </div>
+            <div className="hidden sm:block">
+              <FloorsPopover floorsUnlocked={stats.floorsUnlocked} />
+            </div>
+            
+            <StreakPopover currentStreak={stats.currentStreak} />
           </div>
-          <div className="hidden sm:block">
-            <FloorsPopover floorsUnlocked={stats.floorsUnlocked} />
-          </div>
-          
-          <StreakPopover currentStreak={stats.currentStreak} />
         </div>
-      </div>
+      )}
 
       {/* Row 2: Rotating Prompt Card */}
       {!dismissed && (
