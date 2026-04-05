@@ -173,6 +173,7 @@ const OS_SPACES: OsSpace[] = [
     icon: GraduationCap,
     color: "45 90% 50%",
     items: [
+      { label: "Bible 101", path: "/bible-101", icon: Eye, description: "30-day visual journey", tooltip: "New to the Bible? Start here. A 30-day visual journey that teaches Bible basics through images and the Christ-Lens — no experience needed." },
       { label: "PT Course", path: "/phototheology-course", icon: BookText, description: "90-day flagship course", tooltip: "The 90-day flagship Phototheology course covering all 8 floors, 40+ rooms, and the full system." },
       { label: "Blueprint Course", path: "/blueprint-course", icon: BookOpen, description: "Prophecy foundations", tooltip: "A foundational course on prophecy, sanctuary symbolism, and end-time events." },
       { label: "Daniel Course", path: "/daniel-course", icon: Scroll, description: "Book of Daniel deep dive", tooltip: "A comprehensive deep dive into the book of Daniel — its prophecies, types, and sanctuary connections." },
