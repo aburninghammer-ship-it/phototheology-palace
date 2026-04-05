@@ -152,11 +152,15 @@ export default function BasicChatTab() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
               {SUGGESTIONS.map((s) => (
                 <button
-                  key={s}
-                  onClick={() => sendMessage(s)}
-                  className="text-left p-3 rounded-xl text-sm transition-all border border-border bg-card text-muted-foreground hover:bg-muted/50 hover:border-primary/30 hover:text-foreground"
+                  key={s.text}
+                  onClick={() => sendMessage(s.text)}
+                  className={cn(
+                    "text-left p-4 rounded-xl text-sm transition-all duration-300 border backdrop-blur-md",
+                    "bg-gradient-to-br", s.gradient, s.border, s.glow, s.hoverGlow,
+                    "shadow-lg hover:shadow-xl hover:scale-[1.03] hover:text-foreground text-muted-foreground"
+                  )}
                 >
-                  {s}
+                  {s.text}
                 </button>
               ))}
             </div>
