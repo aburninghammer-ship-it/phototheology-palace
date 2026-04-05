@@ -1954,7 +1954,7 @@ async function generateEpicAudio(
         for (let b = 0; b < openaiChunks.length; b += BATCH_SIZE) {
           const batch = openaiChunks.slice(b, b + BATCH_SIZE);
           const results = await Promise.all(
-            batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, openaiChunks.length))
+            batch.map((chunk, idx) => generateEpicAudioChunkOpenAI(chunk, b + idx, openaiChunks.length, mode))
           );
           audioBuffers.push(...results);
         }
