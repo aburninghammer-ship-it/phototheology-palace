@@ -489,7 +489,7 @@ Respond ONLY with valid JSON in this exact format:
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages: [{ role: "system", content: expoundSystemPrompt }, { role: "user", content: userPrompt }], max_tokens: 1500, temperature: 0.7 }),
+    body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages: [{ role: "system", content: expoundSystemPrompt + "\n\n" + getContentBehavioralEngine() }, { role: "user", content: userPrompt }], max_tokens: 1500, temperature: 0.7 }),
   });
 
   if (!response.ok) {
@@ -551,7 +551,7 @@ async function handleStudy(body: any) {
     body: JSON.stringify({
       model: "google/gemini-2.5-flash",
       messages: [
-        { role: "system", content: STUDY_SYSTEM_PROMPT + "\n\n" + (modeInstructions[mode] || modeInstructions.scholar) + ragSection },
+        { role: "system", content: STUDY_SYSTEM_PROMPT + "\n\n" + getContentBehavioralEngine() + "\n\n" + (modeInstructions[mode] || modeInstructions.scholar) + ragSection },
         { role: "user", content: `Generate a comprehensive Phototheology study based on this seed text:\n\n${truncatedText}` },
       ],
       temperature: 0.7,

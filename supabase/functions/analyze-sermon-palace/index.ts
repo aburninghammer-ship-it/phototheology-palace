@@ -333,7 +333,7 @@ ${(sermonText || "").substring(0, 15000)}`;
           body: JSON.stringify({
             model,
             messages: [
-              { role: "system", content: systemPrompt },
+              { role: "system", content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
               { role: "user", content: userPrompt },
             ],
             temperature: 0.5,

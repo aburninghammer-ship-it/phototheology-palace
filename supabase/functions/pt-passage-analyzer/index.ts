@@ -243,7 +243,7 @@ Return ONLY the JSON object with scores for each room code, genre, doctrinal_sen
         body: JSON.stringify({
           model: "google/gemini-2.5-flash",
           messages: [
-            { role: "system", content: systemPrompt },
+            { role: "system", content: systemPrompt + "\n\n" + getContentBehavioralEngine() },
             { role: "user", content: userPrompt },
           ],
         }),

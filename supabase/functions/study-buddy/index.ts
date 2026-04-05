@@ -236,7 +236,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: STUDY_BUDDY_SYSTEM_PROMPT },
+          { role: "system", content: STUDY_BUDDY_SYSTEM_PROMPT + "\n\n" + getContentBehavioralEngine() },
           { role: "user", content: userMessage }
         ],
         max_tokens: 4096,
