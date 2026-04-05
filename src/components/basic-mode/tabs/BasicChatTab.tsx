@@ -201,19 +201,19 @@ export default function BasicChatTab() {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto">
         {messages.length === 0 && !pendingQuestion ? (
-          <div className="flex flex-col items-center justify-center h-full px-6 max-w-2xl mx-auto">
-            <div className="p-4 rounded-2xl mb-6 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/20">
-              <Sparkles className="h-8 w-8 text-primary" />
+          <div className="flex flex-col items-center justify-center h-full px-4 sm:px-6 max-w-2xl mx-auto py-6">
+            <div className="p-3 sm:p-4 rounded-2xl mb-4 sm:mb-6 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/20">
+              <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold mb-2 text-foreground">Ask Jeeves Anything</h2>
-            <p className="text-sm text-center mb-2 max-w-md text-muted-foreground">
+            <h2 className="text-xl sm:text-2xl font-bold mb-1.5 sm:mb-2 text-foreground">Ask Jeeves Anything</h2>
+            <p className="text-xs sm:text-sm text-center mb-1.5 sm:mb-2 max-w-md text-muted-foreground">
               Your personal Bible study partner. Ask about any verse, story, doctrine, or question — and get deep, Christ-centered insight.
             </p>
-            <p className="text-xs text-center mb-8 max-w-md text-muted-foreground/70 italic leading-relaxed">
-              Other AIs search a Bible. Jeeves <span className="text-primary font-medium not-italic">thinks</span> through one — running every answer through a proprietary engine of <span className="text-primary font-medium not-italic">38 interconnected study principles</span> that trace patterns, symbols, prophecy, sanctuary design, and Christ across all 66 books. That's why Jeeves will never answer the same question the same way twice — and why no other AI can replicate what happens here.
+            <p className="text-[10px] sm:text-xs text-center mb-5 sm:mb-8 max-w-md text-muted-foreground/70 italic leading-relaxed">
+              Other AIs search a Bible. Jeeves <span className="text-primary font-medium not-italic">thinks</span> through one — running every answer through a proprietary engine of <span className="text-primary font-medium not-italic">38 interconnected study principles</span> that trace patterns, symbols, prophecy, sanctuary design, and Christ across all 66 books.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 w-full max-w-lg">
               {dailySuggestions.map((text, i) => {
                 const style = GRADIENT_STYLES[i % GRADIENT_STYLES.length];
                 return (
@@ -221,7 +221,7 @@ export default function BasicChatTab() {
                     key={text}
                     onClick={() => sendMessage(text)}
                     className={cn(
-                      "text-left p-4 rounded-xl text-sm transition-all duration-300 border backdrop-blur-md",
+                      "text-left p-3 sm:p-4 rounded-xl text-xs sm:text-sm transition-all duration-300 border backdrop-blur-md",
                       "bg-gradient-to-br", style.gradient, style.border, style.glow, style.hoverGlow,
                       "shadow-lg hover:shadow-xl hover:scale-[1.03] hover:text-foreground text-muted-foreground"
                     )}
