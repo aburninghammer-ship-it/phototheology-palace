@@ -110,20 +110,7 @@ export const ReginaldGreeting = () => {
     }
   }, []);
 
-  // Auto-play for returning users after a short delay
-  useEffect(() => {
-    if (!user || autoplayAttemptedRef.current) return;
-    autoplayAttemptedRef.current = true;
-    // Small delay to let page settle
-    const timer = setTimeout(() => {
-      // Only autoplay; if browser blocks it, user can tap play manually
-      playGreeting().catch(() => {
-        // Autoplay blocked by browser — that's OK, user can tap
-        console.log("[ReginaldGreeting] Autoplay blocked, user can tap play");
-      });
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [user, playGreeting]);
+  // No auto-play — user must tap play manually
 
   // Cleanup on unmount
   useEffect(() => {

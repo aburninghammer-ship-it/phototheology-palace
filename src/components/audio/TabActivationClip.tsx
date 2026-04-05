@@ -22,15 +22,8 @@ export function TabActivationClip({ tabId, tabName, tabPurpose }: TabActivationC
 
   const alreadyListened = hasListenedTab(tabId);
 
-  // Show on first visit only
-  useEffect(() => {
-    if (!alreadyListened && !dismissed) {
-      const timer = setTimeout(() => setVisible(true), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [alreadyListened, dismissed]);
-
-  if (alreadyListened || dismissed || !visible) return null;
+  // Never auto-show — audio should only play when user explicitly requests it
+  if (true) return null;
 
   const handlePlay = async () => {
     setIsLoading(true);
