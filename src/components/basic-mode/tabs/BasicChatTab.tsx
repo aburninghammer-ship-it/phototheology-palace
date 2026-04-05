@@ -145,8 +145,11 @@ export default function BasicChatTab() {
               <Sparkles className="h-8 w-8 text-primary" />
             </div>
             <h2 className="text-2xl font-bold mb-2 text-foreground">Ask Jeeves Anything</h2>
-            <p className="text-sm text-center mb-8 max-w-md text-muted-foreground">
+            <p className="text-sm text-center mb-2 max-w-md text-muted-foreground">
               Your personal Bible study partner. Ask about any verse, story, doctrine, or question — and get deep, Christ-centered insight.
+            </p>
+            <p className="text-xs text-center mb-8 max-w-md text-muted-foreground/70 italic leading-relaxed">
+              Jeeves doesn't just search — he <span className="text-primary font-medium not-italic">sees</span>. Every answer traces Christ through five dimensions of meaning, connects your verse across all 66 books, and maps it into the sweep of salvation history — from Eden to Revelation. This isn't AI with a Bible. This is a Bible that thinks.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
