@@ -531,7 +531,7 @@ function LockInPassChip() {
 
 export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps = {}) {
   const { user: authUser } = useAuth();
-  const { isBasic } = useExperienceMode();
+  const { isBasic, isExplorer, isImmersion } = useExperienceMode();
   const navigate = useNavigate();
   const resolvedUserId = userId ?? authUser?.id ?? null;
   const fallbackDisplayName = (userEmail ?? authUser?.email)?.split("@")[0] || "Scholar";
@@ -593,8 +593,8 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
       "mx-auto max-w-7xl px-3 sm:px-4 md:px-6 mt-2 space-y-1.5 transition-opacity duration-700 zen-hideable",
       isInactive && "opacity-80"
     )}>
-      {/* Nudge bar — hidden in Basic mode */}
-      {!isBasic && (
+      {/* Nudge bar — Immersion only */}
+      {isImmersion && (
         <AnimatePresence>
           {nudge && !dismissed && (
             <motion.div
@@ -616,7 +616,7 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
         </AnimatePresence>
       )}
 
-      {/* New Feature Highlight — hidden in Basic mode */}
+      {/* New Feature Highlight — Explorer & Immersion only */}
       {!isBasic && (
         <AnimatePresence>
           {!newFeatureDismissed && (
@@ -661,14 +661,24 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
         </AnimatePresence>
       )}
 
-      {/* Stats row — hidden in Basic mode */}
-      {!isBasic && (
-        <div className={cn(
-          "rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 backdrop-blur-sm px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_rgba(59,130,246,0.08)] transition-all duration-500",
-          xpFlash && "shadow-[0_0_30px_rgba(234,179,8,0.25)]"
-        )}>
-          {/* Avatar with Health Ring */}
-          <Link to="/profile" className="flex-shrink-0">
+      {/* Stats row — adapted per level */}
+      <div className={cn(
+        "rounded-xl border backdrop-blur-sm px-4 py-3 flex items-center gap-3 transition-all duration-500",
+        isBasic
+          ? "border-emerald-500/20 bg-gradient-to-r from-emerald-950/60 via-teal-950/40 to-cyan-950/30 shadow-[0_0_15px_rgba(16,185,129,0.06)]"
+          : isExplorer
+            ? "border-amber-500/20 bg-gradient-to-r from-amber-950/60 via-orange-950/40 to-yellow-950/30 shadow-[0_0_15px_rgba(251,191,36,0.06)]"
+            : cn("border-blue-500/20 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-teal-950/50 shadow-[0_0_20px_rgba(59,130,246,0.08)]",
+                xpFlash && "shadow-[0_0_30px_rgba(234,179,8,0.25)]")
+      )}>
+        {/* Avatar with Health Ring */}
+        <Link to="/profile" className="flex-shrink-0">
+          {isBasic ? (
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={stats.avatarUrl || undefined} alt={stats.displayName} />
+              <AvatarFallback className="text-xs bg-emerald-500/20 text-emerald-300 font-bold">{initials}</AvatarFallback>
+            </Avatar>
+          ) : (
             <StudyHealthRing
               roomsExplored={stats.roomsExplored}
               chaptersRead={stats.chaptersRead}
@@ -681,21 +691,31 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
                 <AvatarFallback className="text-xs bg-blue-500/20 text-blue-300 font-bold">{initials}</AvatarFallback>
               </Avatar>
             </StudyHealthRing>
-          </Link>
+          )}
+        </Link>
 
-          {/* Name (clickable → Mission Dropdown) + rank */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
+        {/* Name + rank */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {isBasic ? (
+              <Link to="/profile">
+                <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none hover:text-emerald-300 transition-colors">
+                  {stats.displayName}
+                </span>
+              </Link>
+            ) : (
               <MissionDropdown displayName={stats.displayName}>
                 <span className="text-sm font-semibold text-foreground truncate max-w-[140px] sm:max-w-none hover:text-blue-300 transition-colors">
                   {stats.displayName}
                 </span>
               </MissionDropdown>
-              <Badge className={cn("text-[10px] border-0 font-bold uppercase tracking-wider px-2", titleBadgeStyle)}>
-                {displayTitle}
-              </Badge>
-            </div>
-            {/* Accountability indicators */}
+            )}
+            <Badge className={cn("text-[10px] border-0 font-bold uppercase tracking-wider px-2", titleBadgeStyle)}>
+              {displayTitle}
+            </Badge>
+          </div>
+          {/* Accountability indicators — Explorer & Immersion */}
+          {!isBasic && (
             <div className="mt-0.5">
               <AccountabilityBar
                 currentStreak={stats.currentStreak}
@@ -703,12 +723,16 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
                 roomsExplored={stats.roomsExplored}
               />
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Clickable Stats chips — each opens mini-dashboard */}
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap justify-end">
-            <LockInPassChip />
+        {/* Stats chips — adapted per level */}
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap justify-end">
+          {/* Lock-In Pass — Immersion only */}
+          {isImmersion && <LockInPassChip />}
 
+          {/* XP — Explorer & Immersion */}
+          {!isBasic && (
             <motion.div animate={xpFlash ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.4 }}>
               <XpPopover
                 totalXp={stats.totalXp}
@@ -718,21 +742,30 @@ export function GlobalStudyBanner({ userId, userEmail }: GlobalStudyBannerProps 
                 gemsCount={stats.gemsCount}
               />
             </motion.div>
+          )}
 
-            <GemsPopover gemsCount={stats.gemsCount} />
-            <RoomsPopover roomsExplored={stats.roomsExplored} />
+          {/* Gems — Explorer & Immersion */}
+          {!isBasic && <GemsPopover gemsCount={stats.gemsCount} />}
 
-            <div className="hidden sm:block">
-              <ChaptersPopover chaptersRead={stats.chaptersRead} />
-            </div>
+          {/* Rooms — Explorer & Immersion */}
+          {!isBasic && <RoomsPopover roomsExplored={stats.roomsExplored} />}
+
+          {/* Chapters — all levels */}
+          <div className={isBasic ? "" : "hidden sm:block"}>
+            <ChaptersPopover chaptersRead={stats.chaptersRead} />
+          </div>
+
+          {/* Floors — Explorer & Immersion */}
+          {!isBasic && (
             <div className="hidden sm:block">
               <FloorsPopover floorsUnlocked={stats.floorsUnlocked} />
             </div>
-            
-            <StreakPopover currentStreak={stats.currentStreak} />
-          </div>
+          )}
+
+          {/* Streak — all levels */}
+          <StreakPopover currentStreak={stats.currentStreak} />
         </div>
-      )}
+      </div>
 
       {/* Row 2: Rotating Prompt Card */}
       {!dismissed && (
