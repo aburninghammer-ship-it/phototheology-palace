@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorpusContext } from '../_shared/corpus-rag.ts';
+import { getContentBehavioralEngine } from '../_shared/content-behavioral-engine.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -68,6 +69,7 @@ Provide instant Phototheology commentary for this moment.`;
     });
     if (ragResult.chunkCount > 0) {
       systemPrompt += ragResult.corpusContext;
+    systemPrompt += "\n\n" + getContentBehavioralEngine();
     }
 
     console.log("Generating live commentary for:", sermonPoint);

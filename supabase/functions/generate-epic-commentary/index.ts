@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2?target=deno";
 import { getCorpusContext } from '../_shared/corpus-rag.ts';
+import { getContentBehavioralEngine } from '../_shared/content-behavioral-engine.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -1491,7 +1492,7 @@ async function generateEpicText(
 
   const isBookScope = scope === "book";
   const isStoryScope = scope === "story";
-  const systemPrompt = getSystemPrompts(mode, scope);
+  const systemPrompt = getSystemPrompts(mode, scope) + '\n\n' + getContentBehavioralEngine();
 
   // ── Fetch curated Christ-in-Every-Chapter anchors from the database ──
   let cecAnchorBlock = "";

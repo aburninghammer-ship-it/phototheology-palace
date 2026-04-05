@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorpusContext } from '../_shared/corpus-rag.ts';
+import { getContentBehavioralEngine } from '../_shared/content-behavioral-engine.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -429,6 +430,7 @@ Unique seed: ${uniqueSeed}`;
     });
     if (ragResult.chunkCount > 0) {
       systemPrompt += ragResult.corpusContext;
+    systemPrompt += "\n\n" + getContentBehavioralEngine();
     }
 
     const userPrompt = `Produce a ${styleConfig.name} at ${depthConfig.name} depth. ${passage ? `Connect to ${passage} but pair it with a verse from a COMPLETELY DIFFERENT genre that shares NO obvious keywords.` : 'Select verses from DIFFERENT genres (Law/Wisdom/Prophets/Gospel/Epistle) that appear to have NOTHING in common on the surface.'} Apply the Anti-Obvious Filter — disqualify any connection a study Bible margin would already make. The reader should feel intellectual tension before clarity. Follow the Gem structure exactly. Include THE QUESTION section. Seed: ${uniqueSeed}`;

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorpusContext } from '../_shared/corpus-rag.ts';
+import { getContentBehavioralEngine } from '../_shared/content-behavioral-engine.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -447,7 +448,7 @@ serve(async (req) => {
       ? `\n\n${userStudiesContext}\n`
       : "";
 
-    let systemPrompt = getSystemPrompt(depth as CommentaryDepth, userName, language as SupportedLanguage);
+    let systemPrompt = getSystemPrompt(depth as CommentaryDepth, userName, language as SupportedLanguage) + '\n\n' + getContentBehavioralEngine();
 
     // RAG corpus injection
     const ragResult = await getCorpusContext({
