@@ -81,12 +81,12 @@ export function OSDock() {
 
       {/* Pinned Favorites */}
       <div className="flex-1 flex flex-col items-center gap-1 py-3 px-1 overflow-visible">
-        {pinnedItems.length === 0 && (
+        {accessiblePinned.length === 0 && (
           <div className="text-[9px] text-muted-foreground/40 text-center px-1 mt-4">
             Pin tools from Spaces
           </div>
         )}
-        {pinnedItems.map((item) => {
+        {accessiblePinned.map((item) => {
           const active = isActive(item.path);
           const Icon = item.icon;
           const itemColor = `hsl(${item.glow})`;
