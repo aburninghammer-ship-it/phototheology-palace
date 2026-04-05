@@ -78,7 +78,7 @@ const InstallApp = () => {
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container max-w-2xl mx-auto px-4 py-12 text-center">
-          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+          <CheckCircle className="h-16 w-16 text-primary mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-2">Already Installed!</h1>
           <p className="text-muted-foreground">You're already using Phototheology as an app. Enjoy!</p>
         </div>
@@ -122,10 +122,10 @@ const InstallApp = () => {
 
         {/* Browser-specific unsupported warning */}
         {!supportsInstall && (
-          <Card className="border-amber-500/40 bg-amber-500/5">
+          <Card className="border-destructive/40 bg-destructive/5">
             <CardContent className="p-6 space-y-3">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="h-6 w-6 text-amber-500 shrink-0 mt-0.5" />
+                <AlertTriangle className="h-6 w-6 text-destructive shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-bold text-lg">
                     {browserLabels[browser]} doesn't support app installation
