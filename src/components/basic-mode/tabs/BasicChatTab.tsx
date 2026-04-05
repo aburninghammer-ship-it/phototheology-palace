@@ -200,10 +200,10 @@ export default function BasicChatTab() {
                   </div>
                 )}
                 <div className={cn(
-                  "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                  "max-w-[85%] rounded-2xl px-5 py-4 text-sm leading-relaxed",
                   msg.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-gradient-to-br from-card via-card to-primary/5 border border-primary/20 shadow-lg shadow-primary/5 text-foreground"
+                    ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25 border border-primary/30"
+                    : "backdrop-blur-xl bg-gradient-to-br from-card/80 via-card/60 to-primary/10 border border-primary/20 shadow-[0_0_25px_-5px] shadow-primary/15 text-foreground ring-1 ring-primary/10"
                 )}>
                   {msg.role === "assistant" ? (
                     <div className="prose prose-sm prose-invert max-w-none 
