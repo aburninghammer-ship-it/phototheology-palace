@@ -553,17 +553,17 @@ function App() {
             <Route path="/video_admin" element={<ProtectedRoute><VideoTraining /></ProtectedRoute>} />
             <Route path="/music" element={<ProtectedRoute><MusicCategories /></ProtectedRoute>} />
             <Route path="/daily-reading" element={<ProtectedRoute><DailyReading /></ProtectedRoute>} />
-            <Route path="/memorization-verses" element={<ProtectedRoute><MemorizationVerses /></ProtectedRoute>} />
-            <Route path="/verse-memory-hall" element={<ProtectedRoute><VerseMemoryHall /></ProtectedRoute>} />
-            <Route path="/memory" element={<ProtectedRoute><Memory /></ProtectedRoute>} />
-            <Route path="/memory/games" element={<ProtectedRoute><MemoryGameSelect /></ProtectedRoute>} />
-            <Route path="/memory/game/:gameId" element={<ProtectedRoute><MemoryGame /></ProtectedRoute>} />
-            <Route path="/memory/list/:listId" element={<ProtectedRoute><MemoryListEditor /></ProtectedRoute>} />
-            <Route path="/memory/play/:listId" element={<ProtectedRoute><MemoryGamePlay /></ProtectedRoute>} />
-            <Route path="/memory/complete/:listId" element={<ProtectedRoute><MemoryGameComplete /></ProtectedRoute>} />
-            <Route path="/memory/game/:listId/first-letter" element={<ProtectedRoute><FirstLetterGame /></ProtectedRoute>} />
-            <Route path="/memory/palace-builder/:listId" element={<ProtectedRoute><MemoryPalaceBuilder /></ProtectedRoute>} />
-            <Route path="/memory/palace-practice/:listId" element={<ProtectedRoute><MemoryPalacePractice /></ProtectedRoute>} />
+            <Route path="/memorization-verses" element={<BasicModeGate><ProtectedRoute><MemorizationVerses /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/verse-memory-hall" element={<BasicModeGate><ProtectedRoute><VerseMemoryHall /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/memory" element={<BasicModeGate><ProtectedRoute><Memory /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/memory/games" element={<BasicModeGate><ProtectedRoute><MemoryGameSelect /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/memory/game/:gameId" element={<BasicModeGate><ProtectedRoute><MemoryGame /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/memory/list/:listId" element={<BasicModeGate><ProtectedRoute><MemoryListEditor /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/memory/play/:listId" element={<BasicModeGate><ProtectedRoute><MemoryGamePlay /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/memory/complete/:listId" element={<BasicModeGate><ProtectedRoute><MemoryGameComplete /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/memory/game/:listId/first-letter" element={<BasicModeGate><ProtectedRoute><FirstLetterGame /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/memory/palace-builder/:listId" element={<BasicModeGate><ProtectedRoute><MemoryPalaceBuilder /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/memory/palace-practice/:listId" element={<BasicModeGate><ProtectedRoute><MemoryPalacePractice /></ProtectedRoute></BasicModeGate>} />
             
             <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
             <Route path="/community-challenges" element={<ProtectedRoute><CommunityChallengeFeedPage /></ProtectedRoute>} />
