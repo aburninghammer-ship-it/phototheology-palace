@@ -24,16 +24,31 @@ const STUDY_LENSES = [
   { id: "deep", icon: BookOpen, label: "Go All In", hint: "Everything — the full deep dive", color: "from-indigo-500 to-violet-500", borderColor: "border-indigo-500/30" },
 ];
 
-const SUGGESTIONS = [
+const ALL_SUGGESTIONS = [
+  // Set A
   { text: "Break down Genesis 3:15", gradient: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20", hoverGlow: "hover:shadow-blue-500/40" },
   { text: "How can I learn to find Christ in the Old Testament?", gradient: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", glow: "shadow-amber-500/20", hoverGlow: "hover:shadow-amber-500/40" },
   { text: "What principles can I use to study the Bible better?", gradient: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20", hoverGlow: "hover:shadow-purple-500/40" },
   { text: "Analyze my thoughts on why David picked 5 stones", gradient: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20", hoverGlow: "hover:shadow-emerald-500/40" },
   { text: "What does the Sanctuary teach about salvation?", gradient: "from-rose-500/20 to-red-500/20", border: "border-rose-400/30", glow: "shadow-rose-500/20", hoverGlow: "hover:shadow-rose-500/40" },
   { text: "Who is the Lamb in Revelation 5?", gradient: "from-indigo-500/20 to-violet-500/20", border: "border-indigo-400/30", glow: "shadow-indigo-500/20", hoverGlow: "hover:shadow-indigo-500/40" },
+  // Set B
   { text: "Trace the theme of 'three days' through the Bible", gradient: "from-teal-500/20 to-cyan-500/20", border: "border-teal-400/30", glow: "shadow-teal-500/20", hoverGlow: "hover:shadow-teal-500/40" },
   { text: "Show me how Psalm 23 connects to Jesus", gradient: "from-sky-500/20 to-blue-500/20", border: "border-sky-400/30", glow: "shadow-sky-500/20", hoverGlow: "hover:shadow-sky-500/40" },
+  { text: "What makes Jeeves different from ChatGPT?", gradient: "from-violet-500/20 to-fuchsia-500/20", border: "border-violet-400/30", glow: "shadow-violet-500/20", hoverGlow: "hover:shadow-violet-500/40" },
+  { text: "Why did God ask Abraham to sacrifice Isaac?", gradient: "from-orange-500/20 to-yellow-500/20", border: "border-orange-400/30", glow: "shadow-orange-500/20", hoverGlow: "hover:shadow-orange-500/40" },
+  { text: "How does the number 40 repeat across Scripture?", gradient: "from-cyan-500/20 to-sky-500/20", border: "border-cyan-400/30", glow: "shadow-cyan-500/20", hoverGlow: "hover:shadow-cyan-500/40" },
+  { text: "What can nature teach me about God?", gradient: "from-lime-500/20 to-green-500/20", border: "border-lime-400/30", glow: "shadow-lime-500/20", hoverGlow: "hover:shadow-lime-500/40" },
 ];
+
+/** Rotate suggestions — show 6 at a time, cycling based on the current day */
+function getRotatedSuggestions() {
+  const day = new Date().getDate();
+  const setIndex = day % 2; // alternates daily
+  const start = setIndex * 6;
+  return ALL_SUGGESTIONS.slice(start, start + 6);
+}
+
 
 /** Maps plain-language lens IDs to hidden PT instructions for the AI */
 function getLensInstruction(lensId: string, originalMessage: string): string {
@@ -157,7 +172,7 @@ export default function BasicChatTab() {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
-              {SUGGESTIONS.map((s) => (
+              {getRotatedSuggestions().map((s) => (
                 <button
                   key={s.text}
                   onClick={() => sendMessage(s.text)}
@@ -188,17 +203,21 @@ export default function BasicChatTab() {
                   "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                   msg.role === "user"
                     ? "bg-primary text-primary-foreground"
-                    : "bg-card border border-border text-foreground"
+                    : "bg-gradient-to-br from-card via-card to-primary/5 border border-primary/20 shadow-lg shadow-primary/5 text-foreground"
                 )}>
                   {msg.role === "assistant" ? (
                     <div className="prose prose-sm prose-invert max-w-none 
                       [&>p]:my-2 [&>ul]:my-2 [&>ol]:my-2 
-                      [&>h1]:text-primary [&>h2]:text-primary [&>h3]:text-secondary 
+                      [&>h1]:text-lg [&>h1]:font-bold [&>h1]:text-primary [&>h1]:mb-3
+                      [&>h2]:text-base [&>h2]:font-bold [&>h2]:text-primary [&>h2]:mb-2
+                      [&>h3]:text-sm [&>h3]:font-semibold [&>h3]:text-secondary [&>h3]:mb-1
                       [&>h4]:text-accent [&>h5]:text-emerald-400
-                      [&>blockquote]:border-primary/40 [&>blockquote]:text-muted-foreground [&>blockquote]:bg-muted/30 [&>blockquote]:rounded-r-lg [&>blockquote]:px-4 [&>blockquote]:py-2
-                      [&>hr]:border-border
-                      [&_strong]:text-primary [&_em]:text-secondary
-                      [&>ul>li]:marker:text-accent [&>ol>li]:marker:text-accent
+                      [&>blockquote]:border-l-4 [&>blockquote]:border-primary/50 [&>blockquote]:text-muted-foreground [&>blockquote]:bg-primary/5 [&>blockquote]:rounded-r-lg [&>blockquote]:px-4 [&>blockquote]:py-2 [&>blockquote]:my-3 [&>blockquote]:italic
+                      [&>hr]:border-primary/20 [&>hr]:my-4
+                      [&_strong]:text-primary [&_strong]:font-semibold
+                      [&_em]:text-secondary/90
+                      [&>ul>li]:marker:text-primary [&>ol>li]:marker:text-primary
+                      [&>ul]:space-y-1 [&>ol]:space-y-1
                     ">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
