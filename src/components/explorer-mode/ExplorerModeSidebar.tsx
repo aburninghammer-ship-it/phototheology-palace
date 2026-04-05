@@ -12,7 +12,7 @@ import { useState } from "react";
 
 export type ExplorerTab =
   | "chat" | "bible" | "chapel"
-  | "study-space" | "games-space" | "university-space" | "chapel-space";
+  | "games-space" | "university-space";
 
 interface TabItem {
   id: ExplorerTab;
