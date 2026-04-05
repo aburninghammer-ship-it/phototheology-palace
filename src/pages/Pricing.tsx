@@ -284,7 +284,7 @@ export default function Pricing() {
     }
   };
 
-  // 3 plans: Free Trial, Essential, Premium
+  // 4 plans: Free Trial, Essential, Premium, Unlimited
   const plans = [
     {
       id: "trial",
@@ -308,6 +308,7 @@ export default function Pricing() {
         t('pricing.plans.trial.features.sevenDaysFree'),
         t('pricing.plans.trial.features.cancelAnytime'),
       ],
+      audioNote: "Browser TTS only",
     },
     {
       id: "essential",
@@ -331,8 +332,10 @@ export default function Pricing() {
         t('pricing.plans.essential.features.bibleReader'),
         t('pricing.plans.essential.features.coreGames'),
         t('pricing.plans.essential.features.basicAI'),
+        "15 HD Audio requests/mo (OpenAI)",
         t('pricing.plans.essential.features.emailSupport'),
       ],
+      audioNote: "15 HD Audio/mo",
     },
     {
       id: "premium",
@@ -354,9 +357,36 @@ export default function Pricing() {
         t('pricing.plans.premium.features.allFloors'),
         t('pricing.plans.premium.features.artOfWar'),
         t('pricing.plans.premium.features.specializedAI'),
+        "75 HD Audio requests/mo (OpenAI)",
         t('pricing.plans.premium.features.unlimitedHunts'),
         t('pricing.plans.premium.features.prioritySupport'),
       ],
+      audioNote: "75 HD Audio/mo",
+    },
+    {
+      id: "unlimited",
+      name: "Unlimited",
+      icon: Headphones,
+      iconColor: "text-amber-500",
+      monthlyPrice: "$49",
+      annualPrice: "$490",
+      monthlySavings: null,
+      annualSavings: "Save $98/yr",
+      period: "/month",
+      description: "Maximum AI voice power. 8-voice ElevenLabs suite, Immerse Mode, and all features unlocked.",
+      badge: "Power User",
+      badgeVariant: "default" as const,
+      ctaText: "Go Unlimited",
+      ctaVariant: "default" as const,
+      features: [
+        "Everything in Premium",
+        "250 OpenAI HD Audio/mo",
+        "50 ElevenLabs Premium HD/mo",
+        "8-voice immersive suite (Epic, Ancient, Scholar...)",
+        "Immerse Mode cinematic playback",
+        "All features & future releases",
+      ],
+      audioNote: "250 HD + 50 Premium HD/mo",
     },
   ];
 
