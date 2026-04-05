@@ -1,6 +1,6 @@
 /// <reference lib="WebWorker" />
 
-import { cacheNames, clientsClaim } from 'workbox-core';
+import { cacheNames } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
@@ -13,10 +13,8 @@ const GOOGLE_FONTS_CACHE = 'pt-google-fonts-2026-04-03-8';
 const GSTATIC_FONTS_CACHE = 'pt-gstatic-fonts-2026-04-03-8';
 const ALLOWED_CACHES = new Set([cacheNames.precache, IMAGE_CACHE, GOOGLE_FONTS_CACHE, GSTATIC_FONTS_CACHE]);
 
-// Activate new SW immediately so reloads always get latest code
-// (critical for VR mode where HTML update prompts are invisible)
-self.skipWaiting();
-clientsClaim();
+// Keep the new service worker in the waiting state until the user explicitly
+// accepts the reload prompt. This preserves the "Reload" button flow.
 
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
