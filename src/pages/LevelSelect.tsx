@@ -91,7 +91,7 @@ export default function LevelSelect() {
   return (
     <>
       <SEO title="Choose Your Level | PhototheologyOS" description="Select your experience level to begin." />
-      <div className="min-h-[calc(100vh-3rem)] flex flex-col items-center justify-center px-4 py-12"
+      <div className="min-h-[100dvh] flex flex-col items-center justify-start sm:justify-center px-4 py-6 sm:py-12"
         style={{ background: "radial-gradient(ellipse at top, hsl(220 15% 10%), hsl(220 15% 4%))" }}>
 
         {/* Heading */}
@@ -99,18 +99,18 @@ export default function LevelSelect() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-6 sm:mb-12"
         >
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "hsl(220 10% 93%)" }}>
+          <h1 className="text-2xl sm:text-4xl font-bold tracking-tight" style={{ color: "hsl(220 10% 93%)" }}>
             How do you want to explore?
           </h1>
-          <p className="text-sm mt-3" style={{ color: "hsl(220 10% 50%)" }}>
+          <p className="text-xs sm:text-sm mt-2 sm:mt-3" style={{ color: "hsl(220 10% 50%)" }}>
             Each level is a unique experience. Switch anytime from the top bar.
           </p>
         </motion.div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 max-w-5xl w-full">
           {LEVELS.map((level, i) => {
             const Icon = level.icon;
             const isActive = mode === level.mode;
@@ -131,43 +131,43 @@ export default function LevelSelect() {
                 {/* Top accent bar */}
                 <div className="h-1 w-full" style={{ background: level.gradient }} />
 
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   {isActive && (
-                    <span className="absolute top-4 right-4 flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium"
+                    <span className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium"
                       style={{ background: level.accentHsl + "22", color: level.accentHsl }}>
                       <Check className="h-2.5 w-2.5" /> Current
                     </span>
                   )}
 
                   {/* Icon & Title */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="p-3 rounded-xl" style={{ background: level.gradient }}>
-                      <Icon className="h-6 w-6 text-white" />
+                  <div className="flex items-center gap-3 mb-3 sm:mb-5">
+                    <div className="p-2.5 sm:p-3 rounded-xl" style={{ background: level.gradient }}>
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
                     <div>
-                      <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: level.accentHsl }}>
+                      <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider" style={{ color: level.accentHsl }}>
                         Level {level.level}
                       </div>
-                      <div className="text-xl font-bold" style={{ color: "hsl(220 10% 93%)" }}>
+                      <div className="text-lg sm:text-xl font-bold" style={{ color: "hsl(220 10% 93%)" }}>
                         {level.label}
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-sm font-medium mb-5 italic" style={{ color: "hsl(220 10% 55%)" }}>
+                  <p className="text-xs sm:text-sm font-medium mb-3 sm:mb-5 italic" style={{ color: "hsl(220 10% 55%)" }}>
                     "{level.tagline}"
                   </p>
 
-                  <ul className="space-y-2.5 mb-6">
+                  <ul className="space-y-1.5 sm:space-y-2.5 mb-4 sm:mb-6">
                     {level.features.map((f, j) => (
-                      <li key={j} className="flex items-start gap-2.5 text-[13px]" style={{ color: "hsl(220 10% 65%)" }}>
+                      <li key={j} className="flex items-start gap-2 text-[12px] sm:text-[13px]" style={{ color: "hsl(220 10% 65%)" }}>
                         <span className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style={{ background: level.accentHsl }} />
                         {f}
                       </li>
                     ))}
                   </ul>
 
-                  <div className="w-full py-3 rounded-xl text-center text-sm font-bold transition-all"
+                  <div className="w-full py-2.5 sm:py-3 rounded-xl text-center text-sm font-bold transition-all"
                     style={{
                       background: isActive ? level.gradient : "hsl(220 10% 90% / 0.06)",
                       color: isActive ? "white" : "hsl(220 10% 65%)",
