@@ -64,13 +64,20 @@ export function ExplorerModeShell() {
   const renderContent = () => {
     switch (activeTab) {
       case "chat":
-        return <BasicChatTab />;
+        return (
+          <div className="h-full flex flex-col overflow-hidden">
+            <div className="flex-1 min-h-0">
+              <BasicChatTab />
+            </div>
+            <div className="border-t border-border/50 max-h-[45%] overflow-y-auto shrink-0">
+              <ExplorerPalaceTab />
+            </div>
+          </div>
+        );
       case "bible":
         return <BasicBibleTab />;
       case "chapel":
         return <BasicChapelTab />;
-      case "palace":
-        return <ExplorerPalaceTab />;
       case "games-space":
       case "university-space":
         return <ExplorerSpaceTab spaceId={activeTab} />;
