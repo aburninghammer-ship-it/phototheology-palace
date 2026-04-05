@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useExperienceMode, type ExperienceMode } from "@/contexts/ExperienceModeContext";
 import { motion } from "framer-motion";
-import { Zap, Compass, Flame } from "lucide-react";
+import { Zap, Compass, Flame, Check } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 interface LevelOption {
@@ -11,8 +11,12 @@ interface LevelOption {
   tagline: string;
   features: string[];
   icon: typeof Zap;
-  borderColor: string;
-  iconColor: string;
+  gradient: string;
+  accentHsl: string;
+  glowColor: string;
+  bgCard: string;
+  bgCardActive: string;
+  btnGradient: string;
 }
 
 const LEVELS: LevelOption[] = [
@@ -28,8 +32,12 @@ const LEVELS: LevelOption[] = [
       "Morning & Night Watch",
     ],
     icon: Zap,
-    borderColor: "hsl(160 60% 40%)",
-    iconColor: "hsl(160 60% 50%)",
+    gradient: "linear-gradient(135deg, hsl(170 55% 42%), hsl(140 50% 45%))",
+    accentHsl: "hsl(160 55% 50%)",
+    glowColor: "hsl(160 55% 45% / 0.3)",
+    bgCard: "linear-gradient(160deg, hsl(170 25% 12%), hsl(160 20% 8%))",
+    bgCardActive: "linear-gradient(160deg, hsl(170 30% 14%), hsl(160 25% 10%))",
+    btnGradient: "linear-gradient(135deg, hsl(170 55% 42%), hsl(140 50% 45%))",
   },
   {
     mode: "explorer",
@@ -43,8 +51,12 @@ const LEVELS: LevelOption[] = [
       "Learn the method by using it",
     ],
     icon: Compass,
-    borderColor: "hsl(38 65% 55%)",
-    iconColor: "hsl(38 65% 60%)",
+    gradient: "linear-gradient(135deg, hsl(28 80% 55%), hsl(45 75% 55%))",
+    accentHsl: "hsl(35 80% 58%)",
+    glowColor: "hsl(35 80% 50% / 0.3)",
+    bgCard: "linear-gradient(160deg, hsl(30 25% 12%), hsl(25 20% 8%))",
+    bgCardActive: "linear-gradient(160deg, hsl(30 30% 14%), hsl(25 25% 10%))",
+    btnGradient: "linear-gradient(135deg, hsl(28 80% 55%), hsl(45 75% 55%))",
   },
   {
     mode: "immersion",
@@ -58,8 +70,12 @@ const LEVELS: LevelOption[] = [
       "Built for scholars & teachers",
     ],
     icon: Flame,
-    borderColor: "hsl(270 55% 55%)",
-    iconColor: "hsl(270 55% 60%)",
+    gradient: "linear-gradient(135deg, hsl(270 55% 55%), hsl(290 50% 50%))",
+    accentHsl: "hsl(270 55% 60%)",
+    glowColor: "hsl(270 55% 50% / 0.3)",
+    bgCard: "linear-gradient(160deg, hsl(270 20% 12%), hsl(260 15% 8%))",
+    bgCardActive: "linear-gradient(160deg, hsl(270 25% 14%), hsl(260 20% 10%))",
+    btnGradient: "linear-gradient(135deg, hsl(270 55% 55%), hsl(290 50% 50%))",
   },
 ];
 
@@ -76,7 +92,7 @@ export default function LevelSelect() {
     <>
       <SEO title="Choose Your Level | PhototheologyOS" description="Select your experience level to begin." />
       <div className="min-h-[calc(100vh-3rem)] flex flex-col items-center justify-center px-4 py-12"
-        style={{ background: "hsl(220 15% 6%)" }}>
+        style={{ background: "radial-gradient(ellipse at top, hsl(220 15% 10%), hsl(220 15% 4%))" }}>
 
         {/* Heading */}
         <motion.div
@@ -85,74 +101,80 @@ export default function LevelSelect() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight" style={{ color: "hsl(220 10% 90%)" }}>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "hsl(220 10% 93%)" }}>
             How do you want to explore?
           </h1>
-          <p className="text-sm mt-2" style={{ color: "hsl(220 10% 50%)" }}>
-            You can switch levels anytime from the top bar.
+          <p className="text-sm mt-3" style={{ color: "hsl(220 10% 50%)" }}>
+            Each level is a unique experience. Switch anytime from the top bar.
           </p>
         </motion.div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
           {LEVELS.map((level, i) => {
             const Icon = level.icon;
             const isActive = mode === level.mode;
             return (
               <motion.button
                 key={level.mode}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 25 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 + i * 0.1 }}
+                transition={{ duration: 0.45, delay: 0.1 + i * 0.12 }}
                 onClick={() => handleSelect(level.mode)}
-                className="relative text-left p-6 rounded-2xl border transition-all duration-300 group"
+                className="relative text-left rounded-2xl border transition-all duration-300 group overflow-hidden"
                 style={{
-                  background: isActive ? "hsl(220 13% 11%)" : "hsl(220 13% 8%)",
-                  borderColor: isActive ? level.borderColor : "hsl(220 10% 16%)",
-                  boxShadow: isActive ? `0 0 30px ${level.borderColor}22` : "none",
+                  background: isActive ? level.bgCardActive : level.bgCard,
+                  borderColor: isActive ? level.accentHsl : "hsl(220 10% 16%)",
+                  boxShadow: isActive ? `0 0 40px ${level.glowColor}` : "none",
                 }}
               >
-                {isActive && (
-                  <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full font-medium"
-                    style={{ background: "hsl(220 10% 90% / 0.1)", color: "hsl(220 10% 70%)" }}>
-                    Current
-                  </span>
-                )}
+                {/* Top accent bar */}
+                <div className="h-1 w-full" style={{ background: level.gradient }} />
 
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2.5 rounded-xl" style={{ background: "hsl(220 10% 90% / 0.06)" }}>
-                    <Icon className="h-6 w-6" style={{ color: level.iconColor }} />
-                  </div>
-                  <div>
-                    <div className="text-xs font-medium" style={{ color: "hsl(220 10% 55%)" }}>
-                      Level {level.level}
+                <div className="p-6">
+                  {isActive && (
+                    <span className="absolute top-4 right-4 flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium"
+                      style={{ background: level.accentHsl + "22", color: level.accentHsl }}>
+                      <Check className="h-2.5 w-2.5" /> Current
+                    </span>
+                  )}
+
+                  {/* Icon & Title */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="p-3 rounded-xl" style={{ background: level.gradient }}>
+                      <Icon className="h-6 w-6 text-white" />
                     </div>
-                    <div className="text-lg font-bold" style={{ color: "hsl(220 10% 92%)" }}>
-                      {level.label}
+                    <div>
+                      <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: level.accentHsl }}>
+                        Level {level.level}
+                      </div>
+                      <div className="text-xl font-bold" style={{ color: "hsl(220 10% 93%)" }}>
+                        {level.label}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <p className="text-sm font-medium mb-4 italic" style={{ color: "hsl(220 10% 50%)" }}>
-                  "{level.tagline}"
-                </p>
+                  <p className="text-sm font-medium mb-5 italic" style={{ color: "hsl(220 10% 55%)" }}>
+                    "{level.tagline}"
+                  </p>
 
-                <ul className="space-y-2.5 mb-5">
-                  {level.features.map((f, j) => (
-                    <li key={j} className="flex items-start gap-2.5 text-xs" style={{ color: "hsl(220 10% 62%)" }}>
-                      <span className="mt-1.5 w-1 h-1 rounded-full shrink-0" style={{ background: level.iconColor }} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+                  <ul className="space-y-2.5 mb-6">
+                    {level.features.map((f, j) => (
+                      <li key={j} className="flex items-start gap-2.5 text-[13px]" style={{ color: "hsl(220 10% 65%)" }}>
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style={{ background: level.accentHsl }} />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
 
-                <div className="w-full py-2.5 rounded-xl text-center text-sm font-semibold transition-all"
-                  style={{
-                    background: isActive ? `${level.borderColor}22` : "hsl(220 10% 90% / 0.05)",
-                    color: isActive ? level.iconColor : "hsl(220 10% 65%)",
-                    border: `1px solid ${isActive ? level.borderColor + "44" : "hsl(220 10% 18%)"}`,
-                  }}>
-                  {isActive ? "Continue →" : "Select"}
+                  <div className="w-full py-3 rounded-xl text-center text-sm font-bold transition-all"
+                    style={{
+                      background: isActive ? level.gradient : "hsl(220 10% 90% / 0.06)",
+                      color: isActive ? "white" : "hsl(220 10% 65%)",
+                      border: `1px solid ${isActive ? "transparent" : "hsl(220 10% 18%)"}`,
+                    }}>
+                    {isActive ? "Continue →" : "Select"}
+                  </div>
                 </div>
               </motion.button>
             );
