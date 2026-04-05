@@ -34,6 +34,7 @@ import { VoiceChatInviteNotification } from "@/components/voice/VoiceChatInviteN
 import { PageTracker } from "@/components/PageTracker";
 import { LiveDemoNotification } from "@/components/live/LiveDemoNotification";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { InstallBanner } from "@/components/pwa/InstallBanner";
 import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
 import { PlaylistPanel } from "@/components/audio/PlaylistPanel";
@@ -437,6 +438,7 @@ function App() {
                             <VoiceChatInviteNotification />
                             <LiveDemoNotification />
                             <InstallPrompt />
+                            <InstallBanner />
                             <ExitIntentPopup />
                             <IncompleteSignupPrompt />
                             <GuidedPathChecklist />
@@ -493,6 +495,7 @@ function App() {
             <Route path="/paths" element={<Paths />} />
             <Route path="/path/week" element={<BasicModeGate><ProtectedRoute><PathWeek /></ProtectedRoute></BasicModeGate>} />
             <Route path="/why-phototheology" element={<WhyPhototheology />} />
+            <Route path="/install" element={<InstallApp />} />
             <Route path="/quick-start" element={<QuickStartSales />} />
             <Route path="/quick-start/success" element={<QuickStartSuccess />} />
             <Route path="/study-suite" element={<StudySuiteSales />} />
