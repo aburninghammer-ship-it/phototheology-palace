@@ -83,8 +83,33 @@ export default function BasicChatTab() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
+  const [dailySuggestions, setDailySuggestions] = useState<string[]>(FALLBACK_SUGGESTIONS);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Fetch today's AI-generated sample questions
+  useEffect(() => {
+    const fetchDailyQuestions = async () => {
+      try {
+        const today = new Date().toISOString().split("T")[0];
+        const { data, error } = await supabase
+          .from("generated_sample_questions")
+          .select("questions")
+          .eq("generation_date", today)
+          .maybeSingle();
+        
+        if (!error && data?.questions && Array.isArray(data.questions) && data.questions.length === 6) {
+          const texts = data.questions.map((q: any) => 
+            q.emoji ? `${q.emoji} ${q.text}` : q.text
+          );
+          setDailySuggestions(texts);
+        }
+      } catch {
+        // silently fall back to static suggestions
+      }
+    };
+    fetchDailyQuestions();
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
