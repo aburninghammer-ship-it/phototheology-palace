@@ -41,30 +41,23 @@ function getRotatedLenses() {
 }
 
 
-const ALL_SUGGESTIONS = [
-  // Set A
-  { text: "Break down Genesis 3:15", gradient: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20", hoverGlow: "hover:shadow-blue-500/40" },
-  { text: "How can I learn to find Christ in the Old Testament?", gradient: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", glow: "shadow-amber-500/20", hoverGlow: "hover:shadow-amber-500/40" },
-  { text: "What principles can I use to study the Bible better?", gradient: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20", hoverGlow: "hover:shadow-purple-500/40" },
-  { text: "Analyze my thoughts on why David picked 5 stones", gradient: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20", hoverGlow: "hover:shadow-emerald-500/40" },
-  { text: "What does the Sanctuary teach about salvation?", gradient: "from-rose-500/20 to-red-500/20", border: "border-rose-400/30", glow: "shadow-rose-500/20", hoverGlow: "hover:shadow-rose-500/40" },
-  { text: "Who is the Lamb in Revelation 5?", gradient: "from-indigo-500/20 to-violet-500/20", border: "border-indigo-400/30", glow: "shadow-indigo-500/20", hoverGlow: "hover:shadow-indigo-500/40" },
-  // Set B
-  { text: "Trace the theme of 'three days' through the Bible", gradient: "from-teal-500/20 to-cyan-500/20", border: "border-teal-400/30", glow: "shadow-teal-500/20", hoverGlow: "hover:shadow-teal-500/40" },
-  { text: "Show me how Psalm 23 connects to Jesus", gradient: "from-sky-500/20 to-blue-500/20", border: "border-sky-400/30", glow: "shadow-sky-500/20", hoverGlow: "hover:shadow-sky-500/40" },
-  { text: "What makes Jeeves different from ChatGPT?", gradient: "from-violet-500/20 to-fuchsia-500/20", border: "border-violet-400/30", glow: "shadow-violet-500/20", hoverGlow: "hover:shadow-violet-500/40" },
-  { text: "Why did God ask Abraham to sacrifice Isaac?", gradient: "from-orange-500/20 to-yellow-500/20", border: "border-orange-400/30", glow: "shadow-orange-500/20", hoverGlow: "hover:shadow-orange-500/40" },
-  { text: "How does the number 40 repeat across Scripture?", gradient: "from-cyan-500/20 to-sky-500/20", border: "border-cyan-400/30", glow: "shadow-cyan-500/20", hoverGlow: "hover:shadow-cyan-500/40" },
-  { text: "What can nature teach me about God?", gradient: "from-lime-500/20 to-green-500/20", border: "border-lime-400/30", glow: "shadow-lime-500/20", hoverGlow: "hover:shadow-lime-500/40" },
+const GRADIENT_STYLES = [
+  { gradient: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", glow: "shadow-blue-500/20", hoverGlow: "hover:shadow-blue-500/40" },
+  { gradient: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", glow: "shadow-amber-500/20", hoverGlow: "hover:shadow-amber-500/40" },
+  { gradient: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", glow: "shadow-purple-500/20", hoverGlow: "hover:shadow-purple-500/40" },
+  { gradient: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", glow: "shadow-emerald-500/20", hoverGlow: "hover:shadow-emerald-500/40" },
+  { gradient: "from-rose-500/20 to-red-500/20", border: "border-rose-400/30", glow: "shadow-rose-500/20", hoverGlow: "hover:shadow-rose-500/40" },
+  { gradient: "from-indigo-500/20 to-violet-500/20", border: "border-indigo-400/30", glow: "shadow-indigo-500/20", hoverGlow: "hover:shadow-indigo-500/40" },
 ];
 
-/** Rotate suggestions — show 6 at a time, cycling based on the current day */
-function getRotatedSuggestions() {
-  const day = new Date().getDate();
-  const setIndex = day % 2; // alternates daily
-  const start = setIndex * 6;
-  return ALL_SUGGESTIONS.slice(start, start + 6);
-}
+const FALLBACK_SUGGESTIONS = [
+  "Break down Genesis 3:15",
+  "How can I learn to find Christ in the Old Testament?",
+  "What principles can I use to study the Bible better?",
+  "Analyze my thoughts on why David picked 5 stones",
+  "What does the Sanctuary teach about salvation?",
+  "Who is the Lamb in Revelation 5?",
+];
 
 
 /** Maps plain-language lens IDs to hidden PT instructions for the AI */
