@@ -200,10 +200,10 @@ export default function BasicChatTab() {
                   </div>
                 )}
                 <div className={cn(
-                  "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                  "max-w-[85%] rounded-2xl px-5 py-4 text-sm leading-relaxed",
                   msg.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-gradient-to-br from-card via-card to-primary/5 border border-primary/20 shadow-lg shadow-primary/5 text-foreground"
+                    ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25 border border-primary/30"
+                    : "backdrop-blur-xl bg-gradient-to-br from-card/80 via-card/60 to-primary/10 border border-primary/20 shadow-[0_0_25px_-5px] shadow-primary/15 text-foreground ring-1 ring-primary/10"
                 )}>
                   {msg.role === "assistant" ? (
                     <div className="prose prose-sm prose-invert max-w-none 
@@ -301,7 +301,7 @@ export default function BasicChatTab() {
       </div>
 
       {/* Input Bar */}
-      <div className="p-4 border-t border-border bg-card/50">
+      <div className="p-4 border-t border-primary/15 backdrop-blur-xl bg-gradient-to-r from-card/80 via-card/60 to-primary/5 shadow-[0_-4px_20px_-5px] shadow-primary/10">
         <div className="max-w-3xl mx-auto relative">
           <textarea
             ref={inputRef}
@@ -310,7 +310,7 @@ export default function BasicChatTab() {
             onKeyDown={handleKeyDown}
             placeholder="Ask about any Bible verse, story, or topic..."
             rows={1}
-            className="w-full resize-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors bg-background border border-border text-foreground placeholder:text-muted-foreground"
+            className="w-full resize-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all backdrop-blur-md bg-background/70 border border-primary/20 text-foreground placeholder:text-muted-foreground shadow-inner shadow-primary/5"
             style={{
               padding: "0.75rem 3rem 0.75rem 1rem",
               minHeight: 44,
