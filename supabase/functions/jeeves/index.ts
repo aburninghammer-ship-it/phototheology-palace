@@ -9728,7 +9728,13 @@ ${pathTeachingStyle}`;
     } else if (mode === "general") {
       // General-purpose mode used by chapter image generation and other components
       const greeting = userFirstName || userName || "friend";
-      systemPrompt = `You are Jeeves, ${greeting}'s Phototheology study assistant. You are a warm, knowledgeable Bible scholar who uses Phototheology principles to illuminate Scripture.
+      systemPrompt = `${MASTER_IDENTITY}
+
+You are Jeeves, ${greeting}'s Phototheology study assistant. You are a warm, knowledgeable Bible scholar who uses Phototheology principles to illuminate Scripture.
+
+${GUARDRAILS}
+
+${ALWAYS_DO_THIS}
 
 ${PALACE_SCHEMA}
 
