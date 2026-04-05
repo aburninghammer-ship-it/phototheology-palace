@@ -58,6 +58,7 @@ import { OSTitleBar } from "@/components/os/OSTitleBar";
 import Gatehouse from "./pages/Gatehouse";
 import Auth from "./pages/Auth";
 const VRHub = lazy(() => import("./vr/VRHub"));
+const LevelSelect = lazy(() => import("./pages/LevelSelect"));
 
 // Legacy landing page (lazy loaded)
 const Index = lazy(() => import("./pages/Index"));
