@@ -183,6 +183,8 @@ function ShareTourButton({ tour, size = "icon" }: { tour: TourDefinition; size?:
 }
 
 function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }) {
+  const { mode } = useExperienceMode();
+  const tiers = getTourTiers(mode);
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
@@ -192,7 +194,7 @@ function TourSelector({ onSelect }: { onSelect: (tour: TourDefinition) => void }
         </p>
       </div>
 
-      {TOUR_TIERS.map((tier) => (
+      {tiers.map((tier) => (
         <div key={tier.label} className="space-y-2">
           <div className="flex items-center gap-2 px-1">
             <h4 className="text-sm font-bold text-foreground">{tier.label}</h4>
