@@ -135,7 +135,7 @@ export const AUDIO_LIBRARY: AudioEntry[] = [
   {
     id: "suite-counselor-psalm42",
     title: "Counselor — Psalm 42: When Your Soul Is Downcast",
-    description: "River's warm, empathetic voice walks you through seasons of spiritual depression with compassion.",
+    description: "Matilda's warm, empathetic voice walks you through seasons of spiritual depression with compassion.",
     category: "commentary",
     duration: "7 min",
     iconName: "Crown",
@@ -143,7 +143,7 @@ export const AUDIO_LIBRARY: AudioEntry[] = [
     audioMeta: { text: "As the deer pants for the water brooks, so pants my soul for You, O God. My soul thirsts for God, for the living God. When shall I come and appear before God? If you're listening to this and your heart feels heavy — you're not alone. The psalmist knew exactly what spiritual depression feels like. My tears have been my food day and night, while they continually say to me, Where is your God? Have you heard that voice? The one that whispers God has forgotten you? That you're too far gone? That everyone else has it together except you? Listen to what the psalmist does next. He doesn't pretend. He doesn't perform. He talks to his own soul: Why are you cast down, O my soul? And why are you disquieted within me? Hope in God. He preaches truth to himself. He reminds himself of who God is — not based on feelings, but on memory. I will remember You from the land of the Jordan. Sometimes the bravest thing you can do is remember. Deep calls unto deep. God meets you in the depths. You are not forgotten.", voice: "XrExE9yKIg1WjnnlVkGX" },
     badge: "Counselor Voice",
     isSuite: true,
-    suiteVoiceName: "River — Counselor",
+    suiteVoiceName: "Matilda — Counselor",
     suitePassage: "Psalm 42",
   },
   {
