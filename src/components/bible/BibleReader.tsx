@@ -56,6 +56,7 @@ import { SparkContainer, SparkSettings } from "@/components/sparks";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 
 export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
