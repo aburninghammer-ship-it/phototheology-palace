@@ -60,20 +60,20 @@ export function OSDock() {
       </div>
 
       {/* Back to Spaces */}
-      {currentPath !== "/" && (
+      {currentPath !== "/" && currentPath !== "/welcome" && currentPath !== "/palace" && (
         <div className="shrink-0 px-2 pt-2 flex justify-center">
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <button
-                onClick={() => navigate("/")}
+                onClick={() => navigate(mode === "explorer" ? "/palace" : "/")}
                 className="p-2.5 rounded-xl transition-all backdrop-blur-md border border-white/10 bg-primary/10 hover:bg-primary/20 text-primary hover:border-primary/30"
-                title="Back to Spaces"
+                title={mode === "explorer" ? "Back to Palace" : "Back to Spaces"}
               >
                 <LayoutGrid className="h-4 w-4" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" sideOffset={8} className="font-medium backdrop-blur-xl bg-popover/90 border-white/10 z-50">
-              Back to Spaces
+              {mode === "explorer" ? "Back to Palace" : "Back to Spaces"}
             </TooltipContent>
           </Tooltip>
         </div>
