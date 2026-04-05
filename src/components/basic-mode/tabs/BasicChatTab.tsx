@@ -15,7 +15,7 @@ interface Message {
 }
 
 /** Study lenses — plain-language labels for hidden PT rooms */
-const STUDY_LENSES = [
+const STUDY_LENSES_A = [
   { id: "5d", icon: Layers, label: "5 Perspectives", hint: "Literal, Christ, Personal, Church, Heavenly", color: "from-blue-500 to-cyan-500", borderColor: "border-blue-500/30" },
   { id: "c6", icon: Link2, label: "6 Scripture Categories", hint: "Prophecy, Poetry, History, Gospels, Epistles, Parables", color: "from-purple-500 to-pink-500", borderColor: "border-purple-500/30" },
   { id: "christ", icon: Eye, label: "Find Christ Here", hint: "Typology, parallels, and fulfillment", color: "from-amber-500 to-orange-500", borderColor: "border-amber-500/30" },
@@ -23,6 +23,22 @@ const STUDY_LENSES = [
   { id: "visual", icon: Palette, label: "Paint the Picture", hint: "An image you'll never forget", color: "from-rose-500 to-red-500", borderColor: "border-rose-500/30" },
   { id: "deep", icon: BookOpen, label: "Go All In", hint: "Everything — the full deep dive", color: "from-indigo-500 to-violet-500", borderColor: "border-indigo-500/30" },
 ];
+
+const STUDY_LENSES_B = [
+  { id: "detective", icon: Search, label: "Be the Detective", hint: "30+ observations before interpreting", color: "from-sky-500 to-blue-500", borderColor: "border-sky-500/30" },
+  { id: "sanctuary", icon: Shield, label: "The Blueprint", hint: "Trace it through the Sanctuary design", color: "from-cyan-500 to-teal-500", borderColor: "border-cyan-500/30" },
+  { id: "patterns", icon: Repeat, label: "Spot the Pattern", hint: "Recurring motifs — 3s, 7s, 40s, deliverers", color: "from-fuchsia-500 to-purple-500", borderColor: "border-fuchsia-500/30" },
+  { id: "freestyle", icon: Compass, label: "Connect It to Life", hint: "Nature, experience, history — see it everywhere", color: "from-lime-500 to-green-500", borderColor: "border-lime-500/30" },
+  { id: "fruit", icon: Heart, label: "The Heart Test", hint: "Does this grow love, joy, peace, patience?", color: "from-pink-500 to-rose-500", borderColor: "border-pink-500/30" },
+  { id: "deep", icon: BookOpen, label: "Go All In", hint: "Everything — the full deep dive", color: "from-indigo-500 to-violet-500", borderColor: "border-indigo-500/30" },
+];
+
+/** Rotate lenses — alternate sets based on the hour */
+function getRotatedLenses() {
+  const hour = new Date().getHours();
+  return hour % 2 === 0 ? STUDY_LENSES_A : STUDY_LENSES_B;
+}
+
 
 const ALL_SUGGESTIONS = [
   // Set A
