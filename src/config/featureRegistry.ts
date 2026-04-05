@@ -33,29 +33,44 @@ export function meetsMinMode(current: ExperienceMode, min: ExperienceMode): bool
  * Paths not listed here default to "basic" (accessible to all).
  */
 const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
-  // ── Immersion-only features ──
+  // ── Immersion-only features (Level 3) ──
+  // Train Space
   { path: "/mastery", minMode: "immersion" },
   { path: "/palace/freestyle", minMode: "immersion" },
   { path: "/spiritual-training", minMode: "immersion" },
-  { path: "/cota-series", minMode: "immersion" },
-  { path: "/apologetics-gpt", minMode: "immersion" },
-  { path: "/culture-controversy", minMode: "immersion" },
-  { path: "/prophecy-watch", minMode: "immersion" },
-  { path: "/phototheologygpt", minMode: "immersion" },
-  { path: "/daniel-revelation-gpt", minMode: "immersion" },
-  { path: "/kidgpt", minMode: "immersion" },
+  { path: "/video-training", minMode: "immersion" },
+  { path: "/photo31", minMode: "immersion" },
+  { path: "/vr", minMode: "immersion" },
+  { path: "/card-deck", minMode: "immersion" },
+
+  // Teach Space
+  { path: "/sermon-builder", minMode: "immersion" },
+  { path: "/sermon-ideas", minMode: "immersion" },
   { path: "/amplify", minMode: "immersion" },
   { path: "/remix", minMode: "immersion" },
   { path: "/polish", minMode: "immersion" },
-  { path: "/video-training", minMode: "immersion" },
+
+  // Equip Space
+  { path: "/cota-series", minMode: "immersion" },
+  { path: "/apologetics-gpt", minMode: "immersion" },
+  { path: "/culture-controversy", minMode: "immersion" },
+
+  // Workshop / AI Tools Space
+  { path: "/phototheologygpt", minMode: "immersion" },
+  { path: "/branch-study", minMode: "immersion" },
+  { path: "/kidgpt", minMode: "immersion" },
+  { path: "/daniel-revelation-gpt", minMode: "immersion" },
+
+  // Other Immersion features
+  { path: "/prophecy-watch", minMode: "immersion" },
   { path: "/research-mode", minMode: "immersion" },
   { path: "/encyclopedia", minMode: "immersion" },
   { path: "/character-profiles", minMode: "immersion" },
   { path: "/libraries", minMode: "immersion" },
   { path: "/bible-atlas", minMode: "immersion" },
-  { path: "/branch-study", minMode: "immersion" },
 
-  // ── Explorer features ──
+  // ── Explorer features (Level 2) ──
+  // Study Space
   { path: "/palace/tour", minMode: "explorer" },
   { path: "/palace", minMode: "explorer" },
   { path: "/image-bible", minMode: "explorer" },
@@ -70,17 +85,21 @@ const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
   { path: "/mind-map", minMode: "explorer" },
   { path: "/test-me", minMode: "explorer" },
   { path: "/drill-drill", minMode: "explorer" },
-  { path: "/sermon-builder", minMode: "explorer" },
-  { path: "/sermon-ideas", minMode: "explorer" },
-  { path: "/phototheology-course", minMode: "explorer" },
-  { path: "/daniel-course", minMode: "explorer" },
-  { path: "/revelation-course", minMode: "explorer" },
+
+  // Games Space
   { path: "/daily-challenges", minMode: "explorer" },
   { path: "/challenge-board", minMode: "explorer" },
   { path: "/leaderboard", minMode: "explorer" },
   { path: "/achievements", minMode: "explorer" },
+
+  // Chapel Space
   { path: "/night-watches", minMode: "explorer" },
   { path: "/morning-watches", minMode: "explorer" },
+
+  // University Space
+  { path: "/phototheology-course", minMode: "explorer" },
+  { path: "/daniel-course", minMode: "explorer" },
+  { path: "/revelation-course", minMode: "explorer" },
   { path: "/bible-study-series", minMode: "explorer" },
   { path: "/audio-library", minMode: "explorer" },
   { path: "/40-day-challenge", minMode: "explorer" },
