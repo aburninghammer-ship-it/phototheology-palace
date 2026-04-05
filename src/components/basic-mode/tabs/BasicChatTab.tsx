@@ -255,7 +255,7 @@ export default function BasicChatTab() {
                     Great question! How would you like me to approach this?
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {STUDY_LENSES.map((lens) => {
+                    {getRotatedLenses().map((lens) => {
                       const Icon = lens.icon;
                       return (
                         <button
