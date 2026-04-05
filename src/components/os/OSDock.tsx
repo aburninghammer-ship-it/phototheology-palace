@@ -18,7 +18,7 @@ export function OSDock() {
   const { mode, isBasic } = useExperienceMode();
   const currentPath = location.pathname;
 
-  const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
+  const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service", "/level-select"];
   const isPublicPage = publicPaths.some(p => currentPath === p) || currentPath.startsWith("/auth");
   if (isMobile || isPublicPage || isBasic) return null;
 
