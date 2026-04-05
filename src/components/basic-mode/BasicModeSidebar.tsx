@@ -1,6 +1,6 @@
 /**
  * BasicModeSidebar — Left sidebar for Level 1 (Basic) mode
- * Warm indigo/slate palette
+ * Uses the same dark theme as Level 3 via Tailwind tokens
  */
 import { cn } from "@/lib/utils";
 import { MessageCircle, BookOpen, Church, Settings } from "lucide-react";
@@ -34,20 +34,15 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
   return (
     <aside
       className={cn(
-        "flex flex-col h-full border-r transition-all duration-200",
+        "flex flex-col h-full border-r border-border transition-all duration-200 bg-card",
         collapsed ? "w-14" : "w-56"
       )}
-      style={{
-        borderColor: "hsl(230 20% 18%)",
-        background: "linear-gradient(180deg, hsl(230 25% 10%), hsl(230 22% 6%))",
-      }}
     >
       {/* Sidebar Header */}
-      <div className="h-12 flex items-center px-3" style={{ borderBottom: "1px solid hsl(230 20% 18%)" }}>
+      <div className="h-12 flex items-center px-3 border-b border-border">
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-md transition-colors"
-          style={{ color: "hsl(250 35% 55%)" }}
+          className="p-1.5 rounded-md transition-colors text-muted-foreground hover:text-foreground"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -69,11 +64,10 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
               className={cn(
                 "w-full flex items-center gap-3 rounded-lg transition-colors text-left",
                 collapsed ? "justify-center p-2.5" : "px-3 py-2.5",
+                isActive
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
-              style={{
-                background: isActive ? "hsl(250 30% 18%)" : "transparent",
-                color: isActive ? "hsl(250 55% 82%)" : "hsl(230 15% 50%)",
-              }}
               title={collapsed ? tab.label : undefined}
             >
               <Icon className="h-4.5 w-4.5 shrink-0" />
@@ -86,14 +80,13 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
       </nav>
 
       {/* Settings at bottom */}
-      <div className="px-2 pb-3 pt-2" style={{ borderTop: "1px solid hsl(230 20% 18%)" }}>
+      <div className="px-2 pb-3 pt-2 border-t border-border">
         <button
           onClick={() => navigate("/settings")}
           className={cn(
-            "w-full flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
+            "w-full flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors text-muted-foreground hover:text-foreground",
             collapsed && "justify-center px-2.5"
           )}
-          style={{ color: "hsl(230 15% 42%)" }}
         >
           <Settings className="h-4.5 w-4.5 shrink-0" />
           {!collapsed && <span className="text-sm">Settings</span>}
