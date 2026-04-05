@@ -5,6 +5,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { VoiceChatProvider } from "./contexts/VoiceChatContext";
+import { MANUAL_UPDATE_REQUIRED_EVENT } from "./components/PWAUpdatePrompt";
 import App from "./App.tsx";
 import "./index.css";
 
@@ -83,10 +84,8 @@ async function maybeRefreshStandardBuild() {
   await maybeRefreshForNewBuild(standardBuildRefreshKeyPrefix, "__app_refresh");
 }
 
-function reloadOnce(key: string) {
-  if (sessionStorage.getItem(key) === "1") return;
-  sessionStorage.setItem(key, "1");
-  window.location.reload();
+function requestManualUpdate() {
+  window.dispatchEvent(new Event(MANUAL_UPDATE_REQUIRED_EVENT));
 }
 
 function bindChunkLoadRecovery() {
@@ -106,13 +105,17 @@ function bindChunkLoadRecovery() {
 
   window.addEventListener("unhandledrejection", (event) => {
     if (shouldReloadForReason(event.reason)) {
-      reloadOnce(chunkReloadKey);
+      if (sessionStorage.getItem(chunkReloadKey) === "1") return;
+      sessionStorage.setItem(chunkReloadKey, "1");
+      requestManualUpdate();
     }
   });
 
   window.addEventListener("error", (event) => {
     if (shouldReloadForReason(event.error ?? event.message)) {
-      reloadOnce(chunkReloadKey);
+      if (sessionStorage.getItem(chunkReloadKey) === "1") return;
+      sessionStorage.setItem(chunkReloadKey, "1");
+      requestManualUpdate();
     }
   });
 }
