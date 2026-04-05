@@ -103,9 +103,9 @@ const Gatehouse = () => {
     await advanceGuidedPath(); // Advance from step 0 to step 1
 
     if (user) {
-      navigate('/antechamber');
+      navigate('/level-select');
     } else {
-      navigate('/auth?redirect=/antechamber');
+      navigate('/auth?redirect=/level-select');
     }
   };
 
