@@ -1,6 +1,6 @@
 /**
- * BasicModeShell — ChatGPT-style interface for Level 1 (Basic) users
- * Dark, clean, minimal. Left sidebar tabs + main content area.
+ * BasicModeShell — Level 1 interface with teal/green palette
+ * Distinct from Level 3's dark purple aesthetic
  */
 import { useState, lazy, Suspense } from "react";
 import { BasicModeSidebar, type BasicTab } from "./BasicModeSidebar";
@@ -38,16 +38,20 @@ export function BasicModeShell() {
   const ActiveComponent = TAB_COMPONENTS[activeTab];
 
   return (
-    <div className="flex h-screen w-full bg-[hsl(220,13%,10%)] text-[hsl(220,10%,90%)]">
+    <div className="flex h-screen w-full" style={{ background: "hsl(170 20% 7%)", color: "hsl(170 10% 88%)" }}>
       {/* Left Sidebar */}
       <BasicModeSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <header className="h-12 flex items-center justify-between px-4 border-b border-[hsl(220,10%,18%)] bg-[hsl(220,13%,12%)] shrink-0">
+        <header className="h-12 flex items-center justify-between px-4 shrink-0"
+          style={{
+            borderBottom: "1px solid hsl(170 20% 15%)",
+            background: "linear-gradient(90deg, hsl(170 22% 9%), hsl(170 18% 8%))",
+          }}>
           <div className="flex items-center gap-3">
-            <h1 className="text-sm font-semibold text-[hsl(220,10%,75%)]">Phototheology</h1>
+            <h1 className="text-sm font-semibold" style={{ color: "hsl(170 20% 65%)" }}>Phototheology</h1>
           </div>
           <div className="flex items-center gap-3">
             <LevelToggleChip />
@@ -56,7 +60,11 @@ export function BasicModeShell() {
                 size="sm"
                 variant="outline"
                 onClick={() => navigate("/auth")}
-                className="h-7 text-xs border-[hsl(220,10%,25%)] bg-transparent text-[hsl(220,10%,70%)] hover:bg-[hsl(220,10%,18%)]"
+                className="h-7 text-xs bg-transparent"
+                style={{
+                  borderColor: "hsl(170 20% 25%)",
+                  color: "hsl(170 20% 65%)",
+                }}
               >
                 <LogIn className="h-3.5 w-3.5 mr-1.5" />
                 Sign In

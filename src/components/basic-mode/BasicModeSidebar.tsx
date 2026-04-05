@@ -1,6 +1,6 @@
 /**
  * BasicModeSidebar — Left sidebar for Level 1 (Basic) mode
- * ChatGPT-style vertical tab navigation
+ * Teal/green themed — distinct from Level 3's purple palette
  */
 import { cn } from "@/lib/utils";
 import { MessageCircle, BookOpen, Headphones, CalendarDays, Sun, Moon, Sparkles, Settings } from "lucide-react";
@@ -38,15 +38,20 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
   return (
     <aside
       className={cn(
-        "flex flex-col h-full border-r border-[hsl(220,10%,18%)] bg-[hsl(220,13%,8%)] transition-all duration-200",
+        "flex flex-col h-full border-r transition-all duration-200",
         collapsed ? "w-14" : "w-56"
       )}
+      style={{
+        borderColor: "hsl(170 20% 18%)",
+        background: "linear-gradient(180deg, hsl(170 25% 8%), hsl(170 20% 5%))",
+      }}
     >
       {/* Sidebar Header */}
-      <div className="h-12 flex items-center px-3 border-b border-[hsl(220,10%,18%)]">
+      <div className="h-12 flex items-center px-3" style={{ borderBottom: "1px solid hsl(170 20% 18%)" }}>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-md hover:bg-[hsl(220,10%,15%)] text-[hsl(220,10%,60%)]"
+          className="p-1.5 rounded-md transition-colors"
+          style={{ color: "hsl(170 30% 50%)" }}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -67,10 +72,11 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
               className={cn(
                 "w-full flex items-center gap-3 rounded-lg transition-colors text-left",
                 collapsed ? "justify-center p-2.5" : "px-3 py-2.5",
-                isActive
-                  ? "bg-[hsl(220,10%,18%)] text-white"
-                  : "text-[hsl(220,10%,55%)] hover:bg-[hsl(220,10%,14%)] hover:text-[hsl(220,10%,80%)]"
               )}
+              style={{
+                background: isActive ? "hsl(170 30% 16%)" : "transparent",
+                color: isActive ? "hsl(170 50% 80%)" : "hsl(170 15% 50%)",
+              }}
               title={collapsed ? tab.label : undefined}
             >
               <Icon className="h-4.5 w-4.5 shrink-0" />
@@ -83,13 +89,14 @@ export function BasicModeSidebar({ activeTab, onTabChange }: BasicModeSidebarPro
       </nav>
 
       {/* Settings at bottom */}
-      <div className="px-2 pb-3 border-t border-[hsl(220,10%,18%)] pt-2">
+      <div className="px-2 pb-3 pt-2" style={{ borderTop: "1px solid hsl(170 20% 18%)" }}>
         <button
           onClick={() => navigate("/settings")}
           className={cn(
-            "w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-[hsl(220,10%,45%)] hover:bg-[hsl(220,10%,14%)] hover:text-[hsl(220,10%,70%)] transition-colors",
+            "w-full flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
             collapsed && "justify-center px-2.5"
           )}
+          style={{ color: "hsl(170 15% 42%)" }}
         >
           <Settings className="h-4.5 w-4.5 shrink-0" />
           {!collapsed && <span className="text-sm">Settings</span>}
