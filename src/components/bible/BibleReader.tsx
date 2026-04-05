@@ -394,8 +394,8 @@ export const BibleReader = () => {
 
       {/* Compact Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
-        {/* Study Mode Selector */}
-        <StudyModeSelector activeMode={studyMode} onModeChange={setStudyMode} />
+        {/* Study Mode Selector — hidden in Basic mode */}
+        {!isBasic && <StudyModeSelector activeMode={studyMode} onModeChange={setStudyMode} />}
 
         <div className="h-6 w-px bg-border" />
 
