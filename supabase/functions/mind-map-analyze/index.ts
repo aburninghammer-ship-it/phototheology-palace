@@ -1,4 +1,5 @@
 import "https://deno.land/x/xhr@0.3.0/mod.ts";
+import { getContentBehavioralEngine } from "../_shared/content-behavioral-engine.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
 import { QUALITY_TESTS, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";

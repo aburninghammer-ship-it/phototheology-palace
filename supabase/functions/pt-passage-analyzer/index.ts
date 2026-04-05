@@ -1,4 +1,5 @@
 // PT Passage Analyzer - Standalone edge function for Palace lens detection
+import { getContentBehavioralEngine } from "../_shared/content-behavioral-engine.ts";
 // Detects primary + secondary rooms for a given passage using AI scoring
 
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
