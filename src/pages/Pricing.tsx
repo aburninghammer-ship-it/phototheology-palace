@@ -5,7 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Star, Crown, Zap, Building2, ArrowRight, CreditCard, Gift, GraduationCap } from "lucide-react";
+import { Check, Sparkles, Star, Crown, Zap, Building2, ArrowRight, CreditCard, Gift, GraduationCap, Volume2, Headphones, Mic } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -241,7 +241,7 @@ export default function Pricing() {
     }
   };
 
-  const startDirectSubscription = async (plan: 'essential' | 'premium') => {
+  const startDirectSubscription = async (plan: 'essential' | 'premium' | 'unlimited') => {
     if (!user) {
       navigate("/auth");
       return;
@@ -284,7 +284,7 @@ export default function Pricing() {
     }
   };
 
-  // 3 plans: Free Trial, Essential, Premium
+  // 4 plans: Free Trial, Essential, Premium, Unlimited
   const plans = [
     {
       id: "trial",
@@ -308,6 +308,7 @@ export default function Pricing() {
         t('pricing.plans.trial.features.sevenDaysFree'),
         t('pricing.plans.trial.features.cancelAnytime'),
       ],
+      audioNote: "Browser TTS only",
     },
     {
       id: "essential",
@@ -331,8 +332,10 @@ export default function Pricing() {
         t('pricing.plans.essential.features.bibleReader'),
         t('pricing.plans.essential.features.coreGames'),
         t('pricing.plans.essential.features.basicAI'),
+        "15 HD Audio requests/mo (OpenAI)",
         t('pricing.plans.essential.features.emailSupport'),
       ],
+      audioNote: "15 HD Audio/mo",
     },
     {
       id: "premium",
@@ -354,9 +357,36 @@ export default function Pricing() {
         t('pricing.plans.premium.features.allFloors'),
         t('pricing.plans.premium.features.artOfWar'),
         t('pricing.plans.premium.features.specializedAI'),
+        "75 HD Audio requests/mo (OpenAI)",
         t('pricing.plans.premium.features.unlimitedHunts'),
         t('pricing.plans.premium.features.prioritySupport'),
       ],
+      audioNote: "75 HD Audio/mo",
+    },
+    {
+      id: "unlimited",
+      name: "Unlimited",
+      icon: Headphones,
+      iconColor: "text-amber-500",
+      monthlyPrice: "$49",
+      annualPrice: "$490",
+      monthlySavings: null,
+      annualSavings: "Save $98/yr",
+      period: "/month",
+      description: "Maximum AI voice power. 8-voice ElevenLabs suite, Immerse Mode, and all features unlocked.",
+      badge: "Power User",
+      badgeVariant: "default" as const,
+      ctaText: "Go Unlimited",
+      ctaVariant: "default" as const,
+      features: [
+        "Everything in Premium",
+        "250 OpenAI HD Audio/mo",
+        "50 ElevenLabs Premium HD/mo",
+        "8-voice immersive suite (Epic, Ancient, Scholar...)",
+        "Immerse Mode cinematic playback",
+        "All features & future releases",
+      ],
+      audioNote: "250 HD + 50 Premium HD/mo",
     },
   ];
 
@@ -552,13 +582,13 @@ export default function Pricing() {
         </Card>
 
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {plans.map((plan) => (
             <Card
               key={plan.id}
               className={`glass-card relative ${
-                plan.popular ? "border-primary shadow-2xl shadow-primary/20 scale-105" : ""
-              }`}
+                plan.popular ? "border-primary shadow-2xl shadow-primary/20 scale-[1.03]" : ""
+              } ${plan.id === "unlimited" ? "border-amber-500/40 shadow-lg shadow-amber-500/10" : ""}`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -568,21 +598,29 @@ export default function Pricing() {
                   </Badge>
                 </div>
               )}
+              {plan.id === "unlimited" && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-amber-500 text-white border-0">
+                    <Headphones className="h-3 w-3 mr-1" />
+                    HD Audio
+                  </Badge>
+                </div>
+              )}
 
-              <CardHeader className="text-center pb-8">
-                <div className="mx-auto mb-4 p-4 rounded-2xl bg-muted/50 w-fit">
-                  <plan.icon className={`h-8 w-8 ${plan.iconColor}`} />
+              <CardHeader className="text-center pb-6">
+                <div className="mx-auto mb-3 p-3 rounded-2xl bg-muted/50 w-fit">
+                  <plan.icon className={`h-7 w-7 ${plan.iconColor}`} />
                 </div>
                 <Badge variant={plan.badgeVariant} className="mx-auto mb-2">
                   {plan.badge}
                 </Badge>
-                <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
-                <div className="mt-4">
-                  <div className="text-5xl font-bold">
+                <CardTitle className="text-xl mb-1">{plan.name}</CardTitle>
+                <CardDescription className="text-xs">{plan.description}</CardDescription>
+                <div className="mt-3">
+                  <div className="text-4xl font-bold">
                     {billingPeriod === 'monthly' ? plan.monthlyPrice : plan.annualPrice}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">
+                  <div className="text-xs text-muted-foreground mt-1">
                     {plan.id === 'free' ? (
                       `/ ${plan.period}`
                     ) : billingPeriod === 'monthly' ? (
@@ -592,19 +630,26 @@ export default function Pricing() {
                     )}
                   </div>
                   {billingPeriod === 'annual' && plan.annualSavings && (
-                    <Badge variant="secondary" className="mt-2">
+                    <Badge variant="secondary" className="mt-2 text-xs">
                       {plan.annualSavings}
                     </Badge>
                   )}
                 </div>
+                {/* Audio badge */}
+                {plan.audioNote && (
+                  <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                    <Volume2 className="h-3.5 w-3.5" />
+                    <span>{plan.audioNote}</span>
+                  </div>
+                )}
               </CardHeader>
 
               <CardContent className="pb-6">
-                <ul className="space-y-3">
+                <ul className="space-y-2.5">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
+                      <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                      <span className="text-xs">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -623,9 +668,9 @@ export default function Pricing() {
                   </Button>
                 ) : (
                   <Button
-                    onClick={() => startDirectSubscription(plan.id as 'essential' | 'premium')}
+                    onClick={() => startDirectSubscription(plan.id as 'essential' | 'premium' | 'unlimited')}
                     variant={plan.ctaVariant}
-                    className="w-full gradient-palace"
+                    className={`w-full ${plan.id === 'unlimited' ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'gradient-palace'}`}
                     size="lg"
                     disabled={isSubscribing}
                   >
@@ -637,6 +682,77 @@ export default function Pricing() {
           ))}
         </div>
 
+        {/* Audio Engine Comparison */}
+        <div className="mt-16 max-w-5xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-muted/50">
+              <Headphones className="h-5 w-5 text-primary" />
+              <span className="font-medium">Audio Experience by Tier</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-3 max-w-lg mx-auto">
+              All text-based AI (Jeeves, Gem Mining, Defense Mode) is <strong className="text-foreground">free and unlimited</strong> on every tier. Audio is where tiers differ.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Browser TTS */}
+            <Card className="border-border">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto p-3 rounded-full bg-muted w-fit mb-2">
+                  <Volume2 className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-lg">Browser TTS</CardTitle>
+                <Badge variant="secondary">Free</Badge>
+              </CardHeader>
+              <CardContent className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">Built-in device voice. Functional but robotic.</p>
+                <p className="text-xs text-muted-foreground">Included with: <strong>All tiers</strong></p>
+                <p className="text-xs text-muted-foreground">Cost to you: <strong className="text-green-500">$0</strong></p>
+              </CardContent>
+            </Card>
+
+            {/* OpenAI HD */}
+            <Card className="border-primary/30">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto p-3 rounded-full bg-primary/10 w-fit mb-2">
+                  <Mic className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle className="text-lg">HD Audio</CardTitle>
+                <Badge>Standard</Badge>
+              </CardHeader>
+              <CardContent className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">Natural, high-quality AI voice. Smooth and clear narration.</p>
+                <p className="text-xs text-muted-foreground">Included with: <strong>Essential, Premium, Unlimited</strong></p>
+                <p className="text-xs text-muted-foreground">1 credit per request</p>
+              </CardContent>
+            </Card>
+
+            {/* ElevenLabs Premium HD */}
+            <Card className="border-amber-500/30 bg-gradient-to-b from-amber-500/5 to-transparent">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto p-3 rounded-full bg-amber-500/10 w-fit mb-2">
+                  <Headphones className="h-6 w-6 text-amber-500" />
+                </div>
+                <CardTitle className="text-lg">Premium HD</CardTitle>
+                <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">8 Voices</Badge>
+              </CardHeader>
+              <CardContent className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">8 cinematic voices: Epic, Ancient, Scholar, Preacher, and more. Immerse Mode.</p>
+                <p className="text-xs text-muted-foreground">Included with: <strong>Unlimited ($49/mo)</strong></p>
+                <p className="text-xs text-muted-foreground">5 credits per request (or buy credit packs)</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Credit Packs callout */}
+          <div className="mt-6 text-center p-4 rounded-xl border border-dashed border-muted-foreground/30 bg-muted/20">
+            <p className="text-sm text-muted-foreground">
+              <CreditCard className="h-4 w-4 inline mr-1.5 -mt-0.5" />
+              Need more audio? <strong>Credit Packs</strong> are available on any tier — 25 HD requests for $5, up to 150 for $25.
+            </p>
+          </div>
+        </div>
+
         {/* Compare Plans Section */}
         <div className="mt-16">
           <div className="text-center mb-8">
@@ -646,66 +762,75 @@ export default function Pricing() {
             </div>
           </div>
           
-          <Card className="glass-card max-w-4xl mx-auto">
+          <Card className="glass-card max-w-6xl mx-auto">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4 font-semibold">{t('pricing.comparison.feature')}</th>
-                      <th className="text-center p-4 font-semibold">{t('pricing.comparison.freeTrial')}</th>
-                      <th className="text-center p-4 font-semibold">{t('pricing.comparison.essential')}</th>
-                      <th className="text-center p-4 font-semibold bg-primary/5">{t('pricing.comparison.premium')}</th>
+                      <th className="text-left p-3 font-semibold">{t('pricing.comparison.feature')}</th>
+                      <th className="text-center p-3 font-semibold">{t('pricing.comparison.freeTrial')}</th>
+                      <th className="text-center p-3 font-semibold">{t('pricing.comparison.essential')}</th>
+                      <th className="text-center p-3 font-semibold bg-primary/5">{t('pricing.comparison.premium')}</th>
+                      <th className="text-center p-3 font-semibold bg-amber-500/5">Unlimited</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.palace')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.palace')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.bibleReader')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">Text AI (Jeeves, Gems, Defense)</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b bg-amber-500/5">
+                      <td className="p-3 font-semibold">🔊 Audio Engine</td>
+                      <td className="text-center p-3 text-muted-foreground text-xs">Browser TTS</td>
+                      <td className="text-center p-3 text-xs">HD Audio<br/><span className="text-muted-foreground">15/mo</span></td>
+                      <td className="text-center p-3 bg-primary/5 text-xs">HD Audio<br/><span className="text-muted-foreground">75/mo</span></td>
+                      <td className="text-center p-3 bg-amber-500/5 text-xs font-semibold">HD + Premium HD<br/><span className="text-muted-foreground">250 + 50/mo</span></td>
+                    </tr>
+                    <tr className="border-b bg-amber-500/5">
+                      <td className="p-3 font-semibold">🎧 8-Voice Immerse Mode</td>
+                      <td className="text-center p-3 text-muted-foreground">—</td>
+                      <td className="text-center p-3 text-muted-foreground">—</td>
+                      <td className="text-center p-3 bg-primary/5 text-muted-foreground">—</td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.coreGames')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.artOfWar')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 text-muted-foreground">{t('pricing.comparison.limited')}</td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.basicAI')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b bg-yellow-500/5">
-                      <td className="p-4 font-semibold">{t('pricing.comparison.rows.artOfWar')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.limited')}</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.specializedAI')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 text-muted-foreground">{t('pricing.comparison.basic')}</td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.specializedAI')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.basic')}</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">{t('pricing.comparison.rows.prioritySupport')}</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 text-muted-foreground">{t('pricing.comparison.email')}</td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.escapeRooms')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.limited')}</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">{t('pricing.comparison.rows.prioritySupport')}</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.email')}</td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="p-3">Credit Packs Available</td>
+                      <td className="text-center p-3 text-muted-foreground">—</td>
+                      <td className="text-center p-3"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-primary/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center p-3 bg-amber-500/5"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                     </tr>
                   </tbody>
                 </table>

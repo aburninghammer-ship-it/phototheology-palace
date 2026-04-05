@@ -29,7 +29,8 @@ export interface CreditPackage {
 }
 
 // Feature credit costs — FREE features cost 0 (text-based AI)
-// Only TTS audio and long-form generation cost credits
+// OpenAI HD Audio costs 1 credit, ElevenLabs Premium HD costs 5 credits
+// Long-form generation costs credits proportional to compute
 export const FEATURE_COSTS: Record<string, number> = {
   // FREE — text-based AI (no credits consumed)
   'jeeves-response': 0,
@@ -45,11 +46,17 @@ export const FEATURE_COSTS: Record<string, number> = {
   'web-research': 0,
   'chapter-commentary-text': 0,
 
-  // PAID — TTS audio generation (expensive API calls)
-  'tts-verse': 5,
-  'tts-chapter': 15,
-  'tts-epic': 25,
-  'tts-commentary-audio': 10,
+  // STANDARD HD — OpenAI TTS (1 credit each)
+  'tts-verse': 1,
+  'tts-chapter': 1,
+  'tts-commentary-audio': 1,
+
+  // PREMIUM HD — ElevenLabs 8-voice suite (5 credits each)
+  'tts-verse-elevenlabs': 5,
+  'tts-chapter-elevenlabs': 5,
+  'tts-epic-elevenlabs': 5,
+  'tts-commentary-audio-elevenlabs': 5,
+  'tts-epic': 5,
 
   // PAID — long-form AI generation
   'infographic': 5,
