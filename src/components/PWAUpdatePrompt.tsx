@@ -368,17 +368,8 @@ export function useCheckForUpdates() {
       return;
     }
 
-    try {
-      const updateAttempt = updateServiceWorker(true);
-      const timeoutGuard = new Promise<never>((_, reject) => {
-        window.setTimeout(() => reject(new Error('PWA update timed out')), WAITING_SW_TIMEOUT_MS + 4000);
-      });
-
-      await Promise.race([updateAttempt, timeoutGuard]);
-    } catch {
-      await forceHardRefresh('__app_refresh', `hook-${Date.now()}`);
-    }
-  }, [updateServiceWorker]);
+    await forceHardRefresh('__app_refresh', `hook-${Date.now()}`);
+  }, []);
 
   return { checkForUpdates, applyUpdate, isChecking, updateAvailable };
 }
