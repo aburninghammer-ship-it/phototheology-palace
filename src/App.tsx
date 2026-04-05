@@ -80,6 +80,7 @@ const LockInRedeem = lazy(() => import("./pages/LockInRedeem"));
 const GuestPassTracker = lazy(() => import("./pages/GuestPassTracker"));
 const PublicChallenge = lazy(() => import("./pages/PublicChallenge"));
 const GoalsSurveyPage = lazy(() => import("./pages/GoalsSurveyPage"));
+const InstallApp = lazy(() => import("./pages/InstallApp"));
 
 // Lazy load all other pages
 const Palace = lazy(() => import("./pages/Palace"));
