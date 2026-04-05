@@ -357,7 +357,7 @@ export default function BasicChatTab() {
       </div>
 
       {/* Input Bar — mobile-optimized with safe area */}
-      <div className="p-2.5 sm:p-4 border-t border-primary/15 backdrop-blur-xl bg-gradient-to-r from-card/80 via-card/60 to-primary/5 shadow-[0_-4px_20px_-5px] shadow-primary/10">
+      <div className="p-2 sm:p-4 border-t border-primary/15 backdrop-blur-xl bg-gradient-to-r from-card/80 via-card/60 to-primary/5 shadow-[0_-4px_20px_-5px] shadow-primary/10 mb-[56px] md:mb-0" style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0.5rem))" }}>
         <div className="max-w-3xl mx-auto relative">
           <textarea
             ref={inputRef}
@@ -368,8 +368,8 @@ export default function BasicChatTab() {
             rows={1}
             className="w-full resize-none rounded-xl text-[13px] sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all backdrop-blur-md bg-background/70 border border-primary/20 text-foreground placeholder:text-muted-foreground shadow-inner shadow-primary/5"
             style={{
-              padding: "0.625rem 2.75rem 0.625rem 0.75rem",
-              minHeight: 40,
+              padding: "0.5rem 2.75rem 0.5rem 0.75rem",
+              minHeight: 38,
               maxHeight: 120,
             }}
             onInput={(e) => {
@@ -391,7 +391,7 @@ export default function BasicChatTab() {
             <Send className="h-4 w-4" />
           </button>
         </div>
-        <p className="text-center text-[9px] sm:text-[10px] mt-1.5 sm:mt-2 text-muted-foreground/50">
+        <p className="text-center text-[9px] sm:text-[10px] mt-1 sm:mt-2 text-muted-foreground/50 hidden sm:block">
           Powered by deep theological analysis — Christ-centered, Scripture-grounded answers.
         </p>
       </div>
