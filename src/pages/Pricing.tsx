@@ -5,7 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Star, Crown, Zap, Building2, ArrowRight, CreditCard, Gift, GraduationCap } from "lucide-react";
+import { Check, Sparkles, Star, Crown, Zap, Building2, ArrowRight, CreditCard, Gift, GraduationCap, Volume2, Headphones, Mic } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
