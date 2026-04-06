@@ -107,7 +107,7 @@ export function ImmersiveAudioPlayer({
   const ambientRef = useRef<HTMLAudioElement | null>(null);
   const ambientNextRef = useRef<HTMLAudioElement | null>(null);
   const crossfadeTimerRef = useRef<number>();
-  const [ambientTrackIdx, setAmbientTrackIdx] = useState(0);
+  const [ambientTrackIdx, setAmbientTrackIdx] = useState(() => Math.floor(Math.random() * AMBIENT_BG_TRACKS.length));
   const [ambientPlaying, setAmbientPlaying] = useState(false);
   
   // Verse display
