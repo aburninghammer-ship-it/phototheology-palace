@@ -981,6 +981,54 @@ export function ImmersiveAudioPlayer({
             </span>
           </div>
         </div>
+        {/* Watch share/download buttons (after recording available) */}
+        {isWatchSession && recorder.videoBlob && !showSharePanel && (
+          <div className="relative z-10 px-6 py-2 flex items-center justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => setShowSharePanel(true)}
+            >
+              <Share2 className="h-4 w-4" />
+              Share Session
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => recorder.downloadVideo(`${(track?.title || "watch-session").replace(/[^a-z0-9]/gi, "_").toLowerCase()}.webm`)}
+            >
+              <Download className="h-4 w-4" />
+              Download
+            </Button>
+          </div>
+        )}
+        </div>
+
+        {/* Hidden recording canvas */}
+        <canvas
+          ref={recorder.canvasRef}
+          className="hidden"
+          width={1280}
+          height={720}
+        />
+
+        {/* Share panel overlay */}
+        {showSharePanel && recorder.videoBlob && (
+          <WatchSharePanel
+            videoBlob={recorder.videoBlob}
+            videoUrl={recorder.videoUrl}
+            title={track?.title || "Watch Session"}
+            subtitle={track?.subtitle || track?.modeName}
+            watchType={track?.modeName?.includes("Morning") ? "morning" : "night"}
+            onClose={() => {
+              setShowSharePanel(false);
+              onClose();
+            }}
+            onDownload={(filename) => recorder.downloadVideo(filename)}
+          />
+        )}
       </motion.div>
     </AnimatePresence>
   );
