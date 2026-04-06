@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Moon, Play, ChevronDown, Lock } from "lucide-react";
 import nightWatchImage from "@/assets/night-watch-starry.jpg";
 import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
+import { WatchQuickShare } from "@/components/audio/WatchQuickShare";
 import { useWatchPlayer } from "@/hooks/useWatchPlayer";
 import { useWatchProgress } from "@/hooks/useWatchProgress";
 import {
@@ -72,17 +73,28 @@ export default function NightWatches() {
                 <p className="text-xs text-muted-foreground">{session.scripture}</p>
               </div>
             </div>
-            {!unlocked ? (
-              <Lock className="w-4 h-4 text-muted-foreground/50" />
-            ) : isGenerating ? (
-              <div className="w-4 h-4 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
-            ) : isCurrent ? (
-              <span className="text-xs font-semibold text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full">
-                Begin Watch
-              </span>
-            ) : (
-              <Play className="w-4 h-4 text-indigo-400" />
-            )}
+            <div className="flex items-center gap-1">
+              {unlocked && (
+                <WatchQuickShare
+                  title={session.title}
+                  scripture={session.scripture}
+                  watchType="night"
+                  dayNumber={session.dayNumber}
+                  tractName={tract.name}
+                />
+              )}
+              {!unlocked ? (
+                <Lock className="w-4 h-4 text-muted-foreground/50" />
+              ) : isGenerating ? (
+                <div className="w-4 h-4 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
+              ) : isCurrent ? (
+                <span className="text-xs font-semibold text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full">
+                  Begin Watch
+                </span>
+              ) : (
+                <Play className="w-4 h-4 text-indigo-400" />
+              )}
+            </div>
           </div>
           <p className="text-xs text-muted-foreground mb-3 italic line-clamp-2">"{session.scene}"</p>
           <div className="flex flex-wrap gap-1.5">

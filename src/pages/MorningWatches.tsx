@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sun, Play, ChevronDown, Lock } from "lucide-react";
 import morningWatchImage from "@/assets/morning-watch-sunrise.jpg";
+import { WatchQuickShare } from "@/components/audio/WatchQuickShare";
 import { ImmersiveAudioPlayer } from "@/components/audio/ImmersiveAudioPlayer";
 import { useWatchPlayer } from "@/hooks/useWatchPlayer";
 import { useWatchProgress } from "@/hooks/useWatchProgress";
@@ -69,17 +70,28 @@ export default function MorningWatches() {
                 <p className="text-xs text-muted-foreground">{session.morningScripture}</p>
               </div>
             </div>
-            {!unlocked ? (
-              <Lock className="w-4 h-4 text-muted-foreground/50" />
-            ) : isGenerating ? (
-              <div className="w-4 h-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
-            ) : isCurrent ? (
-              <span className="text-xs font-semibold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full">
-                Begin Watch
-              </span>
-            ) : (
-              <Play className="w-4 h-4 text-amber-400" />
-            )}
+            <div className="flex items-center gap-1">
+              {unlocked && (
+                <WatchQuickShare
+                  title={session.title}
+                  scripture={session.morningScripture}
+                  watchType="morning"
+                  dayNumber={session.dayNumber}
+                  tractName={tract.name}
+                />
+              )}
+              {!unlocked ? (
+                <Lock className="w-4 h-4 text-muted-foreground/50" />
+              ) : isGenerating ? (
+                <div className="w-4 h-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+              ) : isCurrent ? (
+                <span className="text-xs font-semibold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full">
+                  Begin Watch
+                </span>
+              ) : (
+                <Play className="w-4 h-4 text-amber-400" />
+              )}
+            </div>
           </div>
           <p className="text-xs text-muted-foreground mb-3">
             <span className="text-amber-400/70">Paired:</span> {session.pairedNightTitle}
