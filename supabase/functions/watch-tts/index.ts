@@ -123,7 +123,7 @@ serve(async (req) => {
 
     const { data: existing } = await supabase.storage
       .from("bible-audio")
-      .list(`watch-tts/${watchType}`, { search: `${cacheKey}.mp3`, limit: 1 });
+      .list(`watch-tts/${WATCH_CACHE_VERSION}/${watchType}`, { search: `${cacheKey}.mp3`, limit: 1 });
 
     if (existing && existing.length > 0) {
       const { data: urlData } = supabase.storage
