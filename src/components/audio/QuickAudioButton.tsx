@@ -4,6 +4,7 @@ import { Volume2, VolumeX, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
+import { buildCacheKey, getCachedAudio, setCachedAudio } from "@/lib/ttsAudioCache";
 import { getGlobalMusicVolume, subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
 import { globalAudioManager } from "@/lib/globalAudioManager";
 import { VoiceQualitySelector } from "./VoiceQualitySelector";
@@ -135,6 +136,39 @@ export function QuickAudioButton({
     setIsLoading(true);
 
     try {
+      const truncatedText = textToSpeak.length > 12000 
+        ? textToSpeak.slice(0, 12000).replace(/\s\S*$/, '') + '...' 
+        : textToSpeak;
+
+      const voiceKey = tier === 'premium' ? 'pFZP5JQG7iQjIQuC4Bku' : 'nova';
+      const cacheKey = await buildCacheKey(truncatedText, voiceKey, tier);
+
+      // Check client-side cache first (no credits used)
+      const cachedBlob = await getCachedAudio(cacheKey);
+      if (cachedBlob) {
+        const audioSrc = URL.createObjectURL(cachedBlob);
+        if (!audioRef.current) audioRef.current = new Audio();
+        const audio = audioRef.current;
+        audio.src = audioSrc;
+        audio.volume = volumeRef.current / 100;
+        audio.onended = () => {
+          globalAudioManager.unregister(audio);
+          setIsPlaying(false);
+          notifyTTSStopped();
+        };
+        audio.onerror = () => {
+          globalAudioManager.unregister(audio);
+          setIsPlaying(false);
+          notifyTTSStopped();
+        };
+        await audio.play();
+        globalAudioManager.register(audio);
+        setIsPlaying(true);
+        setIsLoading(false);
+        notifyTTSStarted();
+        return;
+      }
+
       // Check credits first
       const allowed = await canUseTier(tier);
       if (!allowed) {
@@ -147,22 +181,16 @@ export function QuickAudioButton({
         return;
       }
 
-      const truncatedText = textToSpeak.length > 12000 
-        ? textToSpeak.slice(0, 12000).replace(/\s\S*$/, '') + '...' 
-        : textToSpeak;
-
       let data: any;
       let error: any;
 
       if (tier === 'premium') {
-        // ElevenLabs Premium HD
         const result = await supabase.functions.invoke("text-to-speech-elevenlabs", {
           body: { text: truncatedText, voiceId: "pFZP5JQG7iQjIQuC4Bku", returnType: "url" }
         });
         data = result.data;
         error = result.error;
       } else {
-        // OpenAI HD
         const result = await supabase.functions.invoke("text-to-speech", {
           body: { text: truncatedText, voice: "nova", returnType: "url" }
         });
@@ -176,14 +204,15 @@ export function QuickAudioButton({
         throw new Error("No audio content returned");
       }
 
+      let audioBlob: Blob | null = null;
       let audioSrc: string;
 
       if (data?.audioUrl) {
         try {
           const response = await fetch(data.audioUrl);
           if (response.ok) {
-            const blob = await response.blob();
-            audioSrc = URL.createObjectURL(blob);
+            audioBlob = await response.blob();
+            audioSrc = URL.createObjectURL(audioBlob);
           } else {
             audioSrc = data.audioUrl;
           }
@@ -191,7 +220,16 @@ export function QuickAudioButton({
           audioSrc = data.audioUrl;
         }
       } else {
-        audioSrc = `data:audio/mpeg;base64,${data.audioContent}`;
+        audioBlob = new Blob(
+          [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
+          { type: 'audio/mpeg' }
+        );
+        audioSrc = URL.createObjectURL(audioBlob);
+      }
+
+      // Cache the blob for future replay
+      if (audioBlob) {
+        setCachedAudio(cacheKey, audioBlob);
       }
 
       if (!audioRef.current) {
