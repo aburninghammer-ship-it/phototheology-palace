@@ -50,7 +50,30 @@ export function OSTitleBar() {
   const isPublicPage = publicPaths.some(p => location.pathname === p) || location.pathname.startsWith("/auth");
   const isWorkspacePane = new URLSearchParams(window.location.search).has('workspace');
 
-  if (!user || isPublicPage || isWorkspacePane || isMobile) return null;
+  if (!user || isPublicPage || isWorkspacePane) return null;
+
+  // Level 1 (Basic): show minimal title bar on sub-pages (both desktop and mobile)
+  if (isBasic) {
+    if (location.pathname === "/welcome") return null;
+    return (
+      <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
+        <div className="flex items-center gap-2.5">
+          <BackButton />
+          <button
+            onClick={() => navigate("/welcome")}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+          >
+            <Home className="h-3.5 w-3.5" />
+            Home
+          </button>
+        </div>
+        <LevelToggleChip />
+      </div>
+    );
+  }
+
+  // Non-basic levels: hide on mobile (OSDock handles navigation)
+  if (isMobile) return null;
 
   // Level 1 (Basic): show minimal title bar only on sub-pages (not /welcome where BasicModeShell has its own header)
   if (isBasic) {
