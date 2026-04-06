@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { getGlobalMusicVolume, subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
 import { globalAudioManager } from "@/lib/globalAudioManager";
+import { VoiceQualitySelector } from "./VoiceQualitySelector";
+import { useVoiceQuality, VoiceQualityTier } from "@/hooks/useVoiceQuality";
 
 // Longer silent audio that works more reliably on iOS
 const SILENT_AUDIO = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
@@ -22,6 +24,8 @@ interface QuickAudioButtonProps {
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
   showLabel?: boolean;
+  /** Hide the voice quality selector badge */
+  hideQualitySelector?: boolean;
 }
 
 export function QuickAudioButton({ 
@@ -30,6 +34,7 @@ export function QuickAudioButton({
   size = "icon",
   className,
   showLabel = false,
+  hideQualitySelector = false,
 }: QuickAudioButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +42,8 @@ export function QuickAudioButton({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUnlockedRef = useRef(false);
   const volumeRef = useRef(volume);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const { selectedTier, getConfig, canUseTier } = useVoiceQuality();
 
   // Keep volumeRef in sync and apply to current audio
   useEffect(() => {
@@ -61,6 +68,9 @@ export function QuickAudioButton({
         globalAudioManager.unregister(audioRef.current);
         audioRef.current.pause();
       }
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+      }
     };
   }, []);
 
@@ -80,52 +90,85 @@ export function QuickAudioButton({
       audio.currentTime = 0;
       audioUnlockedRef.current = true;
       console.log('[QuickAudio] Audio unlocked for mobile');
-    }).catch(() => {
-      // Expected to fail if not in user gesture context
-    });
+    }).catch(() => {});
   }, []);
 
-  const handleClick = async () => {
-    if (isPlaying && audioRef.current) {
-      audioRef.current.pause();
-      globalAudioManager.unregister(audioRef.current);
+  /** Play using browser SpeechSynthesis (Standard tier - free) */
+  const playBrowserTTS = useCallback((textToSpeak: string) => {
+    if (!('speechSynthesis' in window)) {
+      toast.error('Browser speech not supported. Try HD quality.');
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak.substring(0, 4000));
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = volumeRef.current / 100;
+
+    utterance.onstart = () => {
+      setIsPlaying(true);
+      setIsLoading(false);
+      notifyTTSStarted();
+    };
+
+    utterance.onend = () => {
       setIsPlaying(false);
       notifyTTSStopped();
-      return;
-    }
+      utteranceRef.current = null;
+    };
 
-    // Stop browser speech synthesis if somehow running
-    if ('speechSynthesis' in window) {
-      speechSynthesis.cancel();
-    }
+    utterance.onerror = () => {
+      setIsPlaying(false);
+      setIsLoading(false);
+      notifyTTSStopped();
+      utteranceRef.current = null;
+    };
 
-    // CRITICAL: Stop all other audio before starting this one
-    globalAudioManager.stopAll();
+    utteranceRef.current = utterance;
+    setIsLoading(true);
+    speechSynthesis.speak(utterance);
+  }, []);
 
-    if (!text.trim()) {
-      toast.error("No text to read");
-      return;
-    }
-
-    // Truncate to ~12000 chars to allow full polish narration without cutting off
-    const truncatedText = text.length > 12000 
-      ? text.slice(0, 12000).replace(/\s\S*$/, '') + '...' 
-      : text;
-
-    // On mobile, use cloud TTS directly (browser speechSynthesis is unreliable on iOS/Android)
-    console.log('[QuickAudio] Using cloud TTS, mobile:', isMobile());
-
-    // CRITICAL: Unlock audio BEFORE async work to preserve user gesture on mobile
+  /** Play using cloud TTS (HD = OpenAI, Premium = ElevenLabs) */
+  const playCloudTTS = useCallback(async (textToSpeak: string, tier: VoiceQualityTier) => {
     unlockAudio();
-
     setIsLoading(true);
 
     try {
-      console.log('[QuickAudio] Calling text-to-speech, mobile:', isMobile());
+      // Check credits first
+      const allowed = await canUseTier(tier);
+      if (!allowed) {
+        toast.error(
+          tier === 'premium'
+            ? 'Not enough credits for Premium HD. Try HD or Standard.'
+            : 'Not enough credits for HD. Try Standard (free).'
+        );
+        setIsLoading(false);
+        return;
+      }
 
-      const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text: truncatedText, voice: "nova", returnType: "url" }
-      });
+      const truncatedText = textToSpeak.length > 12000 
+        ? textToSpeak.slice(0, 12000).replace(/\s\S*$/, '') + '...' 
+        : textToSpeak;
+
+      let data: any;
+      let error: any;
+
+      if (tier === 'premium') {
+        // ElevenLabs Premium HD
+        const result = await supabase.functions.invoke("text-to-speech-elevenlabs", {
+          body: { text: truncatedText, voiceId: "pFZP5JQG7iQjIQuC4Bku", returnType: "url" }
+        });
+        data = result.data;
+        error = result.error;
+      } else {
+        // OpenAI HD
+        const result = await supabase.functions.invoke("text-to-speech", {
+          body: { text: truncatedText, voice: "nova", returnType: "url" }
+        });
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) throw error;
 
@@ -135,25 +178,19 @@ export function QuickAudioButton({
 
       let audioSrc: string;
 
-      // Fetch as blob for reliable mobile playback
       if (data?.audioUrl) {
-        console.log('[QuickAudio] Got audio URL, fetching as blob for reliable mobile playback...');
         try {
           const response = await fetch(data.audioUrl);
           if (response.ok) {
             const blob = await response.blob();
             audioSrc = URL.createObjectURL(blob);
-            console.log('[QuickAudio] Created blob URL for playback');
           } else {
-            console.warn('[QuickAudio] Failed to fetch blob, using URL directly');
             audioSrc = data.audioUrl;
           }
-        } catch (fetchErr) {
-          console.warn('[QuickAudio] Blob fetch failed, using URL directly:', fetchErr);
+        } catch {
           audioSrc = data.audioUrl;
         }
       } else {
-        console.log('[QuickAudio] Using base64 fallback');
         audioSrc = `data:audio/mpeg;base64,${data.audioContent}`;
       }
 
@@ -164,7 +201,6 @@ export function QuickAudioButton({
       const audio = audioRef.current;
       audio.src = audioSrc;
       audio.volume = volumeRef.current / 100;
-      console.log('[QuickAudio] Volume set to:', volumeRef.current, '%');
 
       audio.onended = () => {
         globalAudioManager.unregister(audio);
@@ -172,66 +208,84 @@ export function QuickAudioButton({
         notifyTTSStopped();
       };
 
-      audio.onerror = (e) => {
-        console.error("Audio playback error:", e);
+      audio.onerror = () => {
         globalAudioManager.unregister(audio);
         setIsPlaying(false);
         notifyTTSStopped();
         toast.error("Audio playback failed. Please try again.");
       };
 
-      try {
-        console.log('[QuickAudio] Attempting to play audio...');
-        await audio.play();
-        console.log('[QuickAudio] Audio playing successfully');
-        globalAudioManager.register(audio);
-        setIsPlaying(true);
-        notifyTTSStarted();
-      } catch (playErr: any) {
-        console.warn("[QuickAudio] Play error:", playErr?.name, playErr?.message);
-
-        // Handle autoplay blocked specifically
-        if (playErr?.name === 'NotAllowedError') {
-          toast.info('Tap the play button again to start audio');
-          setIsPlaying(false);
-          return;
-        }
-
-        toast.error('Audio playback failed. Please try again.');
-      }
+      await audio.play();
+      globalAudioManager.register(audio);
+      setIsPlaying(true);
+      notifyTTSStarted();
     } catch (err) {
       console.error("TTS error:", err);
       toast.error("Audio generation failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  }, [unlockAudio, canUseTier]);
+
+  const handleClick = async () => {
+    // Stop if currently playing
+    if (isPlaying) {
+      if (selectedTier === 'standard') {
+        speechSynthesis.cancel();
+        utteranceRef.current = null;
+      } else if (audioRef.current) {
+        audioRef.current.pause();
+        globalAudioManager.unregister(audioRef.current);
+      }
+      setIsPlaying(false);
+      notifyTTSStopped();
+      return;
+    }
+
+    // Stop all other audio
+    globalAudioManager.stopAll();
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+
+    if (!text.trim()) {
+      toast.error("No text to read");
+      return;
+    }
+
+    if (selectedTier === 'standard') {
+      playBrowserTTS(text);
+    } else {
+      await playCloudTTS(text, selectedTier);
+    }
   };
 
   return (
-    <Button
-      variant={variant}
-      size={showLabel ? size : "icon"}
-      onClick={handleClick}
-      disabled={isLoading}
-      className={className}
-      title={isPlaying ? "Stop" : "Listen"}
-    >
-      {isLoading ? (
-        <>
-          <Loader2 className="h-4 w-4 animate-spin" />
-          {showLabel && <span className="ml-2">Loading...</span>}
-        </>
-      ) : isPlaying ? (
-        <>
-          <VolumeX className="h-4 w-4" />
-          {showLabel && <span className="ml-2">Stop</span>}
-        </>
-      ) : (
-        <>
-          <Volume2 className="h-4 w-4" />
-          {showLabel && <span className="ml-2">Listen</span>}
-        </>
-      )}
-    </Button>
+    <div className="inline-flex items-center gap-1">
+      <Button
+        variant={variant}
+        size={showLabel ? size : "icon"}
+        onClick={handleClick}
+        disabled={isLoading}
+        className={className}
+        title={isPlaying ? "Stop" : "Listen"}
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {showLabel && <span className="ml-2">Loading...</span>}
+          </>
+        ) : isPlaying ? (
+          <>
+            <VolumeX className="h-4 w-4" />
+            {showLabel && <span className="ml-2">Stop</span>}
+          </>
+        ) : (
+          <>
+            <Volume2 className="h-4 w-4" />
+            {showLabel && <span className="ml-2">Listen</span>}
+          </>
+        )}
+      </Button>
+      {!hideQualitySelector && <VoiceQualitySelector compact />}
+    </div>
   );
 }
