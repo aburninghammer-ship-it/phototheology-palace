@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { WatchSession, MorningWatchSession } from "@/data/watchSeries";
 
 function buildNightPrompt(session: WatchSession, tractName: string): string {
-  return `Generate a Night Watch meditation script to be read aloud as audio. This is a SHORT, SPACIOUS script — only 700 to 1,000 words of actual spoken text. The voice portion should last only 5-7 minutes. The remaining 8-10 minutes of the 15-minute session is PURE MUSIC with NO voice. Less is more. Every word must carry weight.
+  return `Generate a Night Watch meditation script to be read aloud as audio. The voice narration should be 800 to 1,200 words — about 5-8 minutes of speaking. The remaining time of the 15-minute session is PURE MUSIC with NO voice. Less is more. Every word must carry weight.
 
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
@@ -27,56 +27,82 @@ Primary Struggle: ${session.struggle}
 Entry Type: ${session.entryType}
 Metaphor Family: ${session.metaphor}
 
-ABSOLUTELY NO BREATHING INSTRUCTIONS. ABSOLUTELY NO POSTURE GUIDANCE. NONE. ZERO.
+ABSOLUTELY NO BREATHING INSTRUCTIONS. ABSOLUTELY NO POSTURE GUIDANCE. NONE. ZERO. Do NOT mention breathing, inhaling, exhaling, deep breaths, settling into the body, relaxing muscles, or any physical awareness exercises. Do NOT use mindfulness language from secular meditation.
 
-THE STYLE: Write in SHORT, PUNCHY lines — often just 1 to 5 words per line. Use line breaks aggressively. Think of the sample below as your exact template for rhythm and pacing. The voice speaks a thought, then STOPS. Silence. Then another thought. Then STOPS. Long reflective gaps between ideas. This is NOT a lecture. This is NOT a sermon. This is cinematic, sparse, powerful.
+THIS IS NOT A DEVOTIONAL. This is not teaching content. This is a mental formation experience. Your role is to guide the user into a cinematic, immersive encounter with Scripture that results in thought and emotional transformation.
 
-SAMPLE RHYTHM (match this exact style):
+THE STYLE: Speak naturally in complete, flowing sentences — but keep them concise and weighted. This is not a lecture and not a sermon. It is cinematic, intimate, and spacious. Use line breaks between thoughts. After each idea, leave room for silence. The voice shares a thought, then silence. Another thought, then silence. Think of a compelling narrator in a film — natural speech, but every word matters. Do NOT make it overly choppy or fragmented — speak like a real person, but with authority and restraint. Build intensity gradually.
+
+HERE IS THE EXACT STYLE TO MATCH. Study this sample carefully and replicate its rhythm, tone, and pacing:
+
 "Lock in.
 [pause]
 Do not let anything else enter this space.
 [pause]
-This moment is not casual. It is not background noise.
-This is sacred time. Guard it.
+This moment is not casual. It is not background noise. This is sacred time. Guard it.
 [long pause]
-Your mind becomes a theater.
-The screen is not in front of you.
-The screen is within you.
+Push out the distractions. The notifications. The wandering thoughts. They will try to intrude — do not entertain them.
+[pause]
+Right now, your mind becomes a theater. The screen is not in front of you. The screen is within you. And what you place on that screen will shape you.
 [long pause]
-Now step into the scene.
-See it.
-Not faintly. Not vaguely.
-See it in full color.
-[long pause]"
+Now step into the scene. See it. Not faintly. Not vaguely. See it in full color.
+[long pause]
+The sky is heavy — dark, unnatural, pressing down. The ground beneath is rough, stained. There is noise — voices, sharp, angry, relentless.
+[pause]
+You are standing at the foot of the cross. Lift your eyes. There He is.
+[long pause]
+Now stop. Do not rush past this moment. This is where the meditation begins. What is He thinking? Not what He looks like. What is happening in His mind?
+[long pause]
+He has the power to end this. One thought — and it all stops. One command — and angels move. But He does not. Why?
+[pause]
+Enter His thoughts. See beyond the pain. He is thinking of others. Not Himself. He sees faces — generations — souls. He sees the guilty. He sees the broken. He sees you.
+[long pause]
+And instead of anger — there is mercy. Instead of retaliation — there is restraint. Instead of hatred — there is love that refuses to let go.
+[pause]
+Now do not just observe. Enter. This is the purpose. This is the goal. Not information. Transformation.
+[long pause]
+Speak quietly within: Lord, let me see what You see. Let me feel what You feel. Let me think what You think.
+[long pause]
+Download Your thoughts into my thoughts. Download Your feelings into my feelings. Replace my reactions with Yours.
+[long pause]
+Stay in this moment. Let it imprint. Let it sink deeper than words. Let it become instinct.
+[pause]
+Say it: I receive the mind of Christ. And mean it.
+[long pause]
+The voice will end now. Take the rest of this time to sit with what you received. The screen never turns off. And what you continue to behold, you will become. Let the music hold the space."
 
-Follow this structure — keep it SPARSE and SHORT:
+Follow this MANDATORY FLOW:
 
-PHASE 1 — LOCK IN (~1 minute):
-Command the listener to lock in. Guard this time. Push out distractions. Your mind is a movie theatre. The screen is within you. Tonight you are downloading the thoughts and feelings of Christ. You are accessing the Master Mind. [long pause] Briefly name the Scripture (${session.scripture}).
+1. LOCK-IN COMMAND (~1 minute):
+Start strong. Direct. "Lock in." "Guard this moment." "Do not let anything crowd this space." Set the tone as sacred, intentional, focused. Establish the mind as a screen — "Your mind becomes the screen. The screen is within you. What you place on that screen will shape you." Briefly name the Scripture (${session.scripture}). [long pause]
 
-PHASE 2 — ENTER THE SCENE (~2 minutes):
-"Step into the scene. See it. Full color." Vivid, sensory narration of the scene (${session.scene}) in SHORT punchy lines. What do you see? Hear? Present tense. Place the listener there. Use [long pause] after every 2-3 lines. Let images breathe. Do NOT rush. Do NOT over-describe. A few vivid details are better than many.
+2. CINEMATIC SCENE ENTRY (~2 minutes):
+Drop the user into the biblical moment. "Step into the scene. See it in full color." Vivid, sensory narration of the scene (${session.scene}) — environment, tension, movement, voices, atmosphere. Use natural flowing sentences. No rushing. No summary. Use [long pause] between imagery blocks. Let images breathe.
 
-PHASE 3 — THE MIND OF CHRIST (~2 minutes):
-"Now stop. What is He thinking?" Enter Christ's inner world. What thoughts? What feelings? The Master Mind insight: ${session.masterMindInsight}. Short, weighty lines. [long pause] between ideas. Then: "Do not just observe. Enter." Ask the Spirit to download these thoughts. "Download Your thoughts into my thoughts. Replace my reactions with Yours." Address ${session.struggle} briefly. [long pause]
+3. FOCUS SHIFT — THOUGHTS AND FEELINGS (~2 minutes):
+Pivot from the scene to the inner world. "Now stop. What is He thinking?" Explore the internal mindset, decision-making, perspective, unseen mental world. Then: "What is He feeling?" — emotional state, pressure vs peace, divine vs natural reaction. The Master Mind insight: ${session.masterMindInsight}. Clearly NAME the divine mindset: "This is the mind of [surrender/mercy/authority/faith]." [long pause] between ideas.
 
-PHASE 4 — SEAL AND RELEASE (~1 minute):
-"Stay in this moment. Let it imprint." [long pause] "Say it: I receive the mind of Christ." [long pause] "The screen never turns off. What you behold, you become." Then: "The voice will end now. Take the rest of this time to sit with what you received. Let the music hold the space." Soft close.
+4. USER INSERTION AND DOWNLOAD (~1.5 minutes):
+"Now do not just observe. Enter." Bring the user's life into it. Address ${session.struggle} naturally. Include the DOWNLOAD LANGUAGE: "Download Your thoughts into my thoughts. Download Your feelings into my feelings. Replace my reactions with Yours." Make it direct and intentional. [long pause]
+
+5. IMPRINT AND RELEASE (~1 minute):
+"Stay in this moment. Let it imprint. Let it sink deeper than words." [long pause] Declaration: "Say it: I receive the mind of Christ." [long pause] Carryover: "The screen never turns off. What you continue to behold, you will become." Then: "The voice will end now. Take the rest of this time to sit with what you received. Let the music hold the space." Soft close.
 
 CRITICAL RULES:
-- ONLY 700-1,000 WORDS OF SPOKEN TEXT. Do NOT exceed this. The session is 15 minutes but the voice is only 5-7 minutes. The rest is music.
-- NO BREATHING. NO POSTURE. NONE.
-- Write in SHORT lines. 1-5 words per line is ideal. Use line breaks constantly.
-- Use [pause] (3-5 seconds) VERY frequently — after almost every thought.
-- Use [long pause] (10-20 seconds) between major ideas and throughout phases 3-4. At least 8-10 [long pause] markers in the script.
-- The script should feel SPACIOUS. More silence than words. The voice drops a thought, then silence. Another thought, then silence.
-- No section headers, stage directions, labels, or meta-commentary.
-- Second person ("you"). Intimate. Cinematic. Authoritative. Sparse.
-- TTS formatting: write scripture refs in spoken form ("Philippians chapter two, verse five" not "Philippians 2:5").`;
+- ONLY 800-1,200 WORDS OF SPOKEN TEXT. Do NOT exceed this. The voice is 5-8 minutes. The rest of the 15 minutes is music.
+- NO BREATHING. NO POSTURE. NONE. ZERO.
+- Write in natural, complete sentences — not overly choppy fragments. Speak like a compelling narrator, not a telegram.
+- Use [pause] (3-5 seconds) frequently between thoughts.
+- Use [long pause] (10-20 seconds) between major ideas. At least 8-10 [long pause] markers throughout the script.
+- The script should feel SPACIOUS. More silence than words.
+- No section headers, stage directions, labels, or meta-commentary. Deliver ONLY the meditation.
+- Second person ("you"). Intimate. Cinematic. Authoritative but natural.
+- TTS formatting: write scripture refs in spoken form ("Philippians chapter two, verse five" not "Philippians 2:5").
+- MANDATORY BEFORE OUTPUT: Ensure the scene is vivid, thoughts are explored deeply, feelings are clearly identified, "Download" language is included, the user is personally engaged, and the ending leaves a lasting imprint.`;
 }
 
 function buildMorningPrompt(session: MorningWatchSession, tractName: string): string {
-  return `Generate a Morning Watch activation script to be read aloud as audio. This is a SHORT, SPACIOUS script — only 700 to 1,000 words of actual spoken text. The voice portion should last only 5-7 minutes. The remaining 8-10 minutes of the 15-minute session is PURE MUSIC with NO voice. Less is more. Every word must carry weight.
+  return `Generate a Morning Watch activation script to be read aloud as audio. The voice narration should be 800 to 1,200 words — about 5-8 minutes of speaking. The remaining time of the 15-minute session is PURE MUSIC with NO voice. Less is more. Every word must carry weight.
 
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
@@ -89,56 +115,64 @@ Energy: ${session.energy}
 Commitment Style: ${session.commitmentStyle}
 Scenario Types: ${session.scenarioTypes.join(", ")}
 
-ABSOLUTELY NO BREATHING INSTRUCTIONS. ABSOLUTELY NO POSTURE GUIDANCE. NONE. ZERO.
+ABSOLUTELY NO BREATHING INSTRUCTIONS. ABSOLUTELY NO POSTURE GUIDANCE. NONE. ZERO. Do NOT mention breathing, inhaling, exhaling, deep breaths, settling into the body, relaxing muscles, or any physical awareness exercises. Do NOT use mindfulness language from secular meditation.
 
-THE STYLE: Write in SHORT, PUNCHY lines — often just 1 to 5 words per line. Use line breaks aggressively. Think of the sample below as your exact template for rhythm and pacing. The voice speaks a thought, then STOPS. Silence. Then another thought. Then STOPS. Long reflective gaps between ideas. This is NOT a lecture. This is NOT a sermon. This is cinematic, sparse, powerful.
+THIS IS NOT A DEVOTIONAL. This is not teaching content. This is a mental formation experience. Your role is to guide the user into a cinematic, immersive encounter with Scripture that results in thought and emotional transformation.
 
-SAMPLE RHYTHM (match this exact style):
+THE STYLE: Speak naturally in complete, flowing sentences — but keep them concise and weighted. This is not a lecture and not a sermon. It is cinematic, intimate, and spacious. Use line breaks between thoughts. After each idea, leave room for silence. The voice shares a thought, then silence. Another thought, then silence. Think of a compelling narrator in a film — natural speech, but every word matters. Do NOT make it overly choppy or fragmented — speak like a real person, but with authority and restraint. Build intensity gradually.
+
+HERE IS THE EXACT STYLE TO MATCH. Study this sample carefully and replicate its rhythm, tone, and pacing:
+
 "Lock in.
 [pause]
-This is not casual.
-This is not a morning routine you sleepwalk through.
+This is not casual. This is not a morning routine you sleepwalk through. This is the moment your mind gets armed for the day.
+[long pause]
+Your mind is a theatre — and right now, you choose what plays on that screen.
 [pause]
-This is the moment your mind gets armed.
+Last night, you downloaded something. The thoughts and feelings of Christ. They are still in you. This morning, you install them. You walk in them. You think with His mind.
 [long pause]
-Last night, you downloaded something.
-The thoughts and feelings of Christ.
-They are still in you.
+Last night you stepped into the scene. You saw what He saw. You felt what He felt. You asked the Spirit to download those thoughts and feelings into your mind.
+[pause]
+That download is still active. Those thoughts are still in you. This morning, we activate them.
 [long pause]
-This morning, you install them.
-You walk in them.
-You think with His mind.
-[long pause]"
+Now shift. Now bring your life into this. Where does this meet you?
+[pause]
+When the familiar thought arises — the old pattern, the gut response, the fear — you now have a different mind. Christ's mind. The old reaction is the old programme. The download overwrites it.
+[long pause]
+Today, you walk differently. Today, you think with the mind of Christ. When pressure comes — you already have His response loaded.
+[pause]
+The voice will end now. Take the rest of this time in silence. Ask the Spirit to seal what was downloaded. Let the music hold the space."
 
-Follow this structure — keep it SPARSE and SHORT:
+Follow this MANDATORY FLOW:
 
-PHASE 1 — LOCK IN (~1 minute):
-"Lock in." Command the listener. This is not casual. Your mind is a theatre. You choose what plays on that screen. Last night you downloaded the thoughts and feelings of Christ. This morning you install them. You think WITH Him. Briefly reference Philippians 2:5 in spoken form. [long pause]
+1. LOCK-IN COMMAND (~1 minute):
+Start strong. Direct. "Lock in." "Guard this moment." "Do not let anything crowd this space." Set the tone as sacred, intentional, focused. Establish the mind as a screen — "Your mind becomes the screen. This is not imagination — it is engagement." Reference Philippians 2:5 in spoken form. [long pause]
 
-PHASE 2 — RECALL THE DOWNLOAD (~1 minute):
+2. RECALL THE DOWNLOAD (~1.5 minutes):
 Brief vivid flash of last night's scene: "${session.pairedNightTitle}". NOT a full retelling — just a spark. "Last night you stepped into the scene. You saw ${session.nightInsight}." Weave in ${session.nightScripture} naturally. "That download is still active. This morning, we activate it." [long pause]
 
-PHASE 3 — TRUTH DECLARATION (~1 minute):
-This morning's Scripture: ${session.morningScripture}. Speak it with weight. Unpack it into an identity statement in 2-3 SHORT lines. The activation principle: ${session.activationPrinciple}. Repeat the key phrase once with [long pause] after. "This is who you are now." [long pause]
+3. TRUTH DECLARATION — NAME THE DIVINE MINDSET (~1.5 minutes):
+This morning's Scripture: ${session.morningScripture}. Speak it with weight and quiet authority. Unpack it into an identity statement. The activation principle: ${session.activationPrinciple}. Clearly identify what kind of mind this is — "This is the mind of [surrender/mercy/authority/faith]." Include the DOWNLOAD LANGUAGE: "Download this into me. Replace my thoughts with Yours. Replace my reactions with Yours." [long pause]
 
-PHASE 4 — ACTIVATE (~1.5 minutes):
-One vivid scenario from: ${session.scenarioTypes.join(", ")}. Paint it in full color — SHORT lines. Name the old reaction in one line. Then overlay Christ's mind — what the Master Mind response looks like. "This is the download in action." [long pause] Then a second brief scenario, even shorter. [long pause]
+4. USER INSERTION — ACTIVATE (~2 minutes):
+"Now shift. Now bring your life into this." One vivid scenario from: ${session.scenarioTypes.join(", ")}. Paint it cinematically — sensory detail, full color. Name the old reaction honestly. Then overlay Christ's mind — what the Master Mind response looks like in that exact moment. "This is the download in action." [long pause] A second brief scenario, shorter. [long pause]
 
-PHASE 5 — COMMISSION AND RELEASE (~1 minute):
-${session.commitmentStyle} style. "Today, you walk differently." [pause] "When pressure comes — you already have His response loaded." [long pause] "The voice will end now. Take the rest of this time in silence. Ask the Spirit to seal what was downloaded. Let the music hold the space." Soft but resolute close.
+5. IMPRINT AND COMMISSION (~1 minute):
+"Stay here. Let this settle. Let this imprint." [long pause] Declaration: "I receive the mind of Christ." [long pause] ${session.commitmentStyle} style close. "Today, you walk differently. When pressure comes — you already have His response loaded. When the moment comes — this returns. The screen never turns off." Then: "The voice will end now. Take the rest of this time in silence. Ask the Spirit to seal what was downloaded. Let the music hold the space." Soft but resolute close.
 
 CRITICAL RULES:
-- ONLY 700-1,000 WORDS OF SPOKEN TEXT. Do NOT exceed this. The session is 15 minutes but the voice is only 5-7 minutes. The rest is music.
-- NO BREATHING. NO POSTURE. NONE.
-- Write in SHORT lines. 1-5 words per line is ideal. Use line breaks constantly.
-- Use [pause] (3-5 seconds) VERY frequently — after almost every thought.
-- Use [long pause] (10-20 seconds) between major ideas and between phases. At least 8-10 [long pause] markers in the script.
-- The script should feel SPACIOUS. More silence than words. The voice drops a thought, then silence. Another thought, then silence.
-- No section headers, stage directions, labels, or meta-commentary.
+- ONLY 800-1,200 WORDS OF SPOKEN TEXT. Do NOT exceed this. The voice is 5-8 minutes. The rest of the 15 minutes is music.
+- NO BREATHING. NO POSTURE. NONE. ZERO.
+- Write in natural, complete sentences — not overly choppy fragments. Speak like a compelling narrator, not a telegram.
+- Use [pause] (3-5 seconds) frequently between thoughts.
+- Use [long pause] (10-20 seconds) between major ideas. At least 8-10 [long pause] markers throughout the script.
+- The script should feel SPACIOUS. More silence than words.
+- No section headers, stage directions, labels, or meta-commentary. Deliver ONLY the meditation.
 - Morning Watch tone is CLEAR, WARM, and DIRECTED. Energy level: ${session.energy}. Think trusted coach at sunrise, not sleep guide.
 - The Master Mind = the mind of Christ (Philippians 2:5). The metaphor is DOWNLOADING thoughts and feelings. The mind is a THEATRE. Godly imagination in VIVID COLOR.
-- Second person ("you"). Intimate. Cinematic. Authoritative. Sparse.
-- TTS formatting: write scripture refs in spoken form ("Philippians chapter two, verse five" not "Philippians 2:5").`;
+- Second person ("you"). Intimate. Cinematic. Authoritative but natural.
+- TTS formatting: write scripture refs in spoken form ("Philippians chapter two, verse five" not "Philippians 2:5").
+- MANDATORY BEFORE OUTPUT: Ensure the scene is vivid, thoughts are explored deeply, feelings are clearly identified, "Download" language is included, the user is personally engaged, and the ending leaves a lasting imprint.`;
 }
 
 async function generateWatchTTS(script: string, watchType: "night" | "morning"): Promise<string | null> {
