@@ -559,7 +559,17 @@ export function ImmersiveAudioPlayer({
     }
   }, [duration]);
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  // For watch sessions: seek forward/back by 15 seconds
+  const seekRelative = useCallback((seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, Math.min(audioRef.current.duration || 0, audioRef.current.currentTime + seconds));
+    }
+  }, []);
+
+  // For watch sessions, use 15-min session progress; otherwise audio progress
+  const displayDuration = isWatchSession ? WATCH_SESSION_DURATION : duration;
+  const displayCurrentTime = isWatchSession ? sessionElapsed : currentTime;
+  const progress = displayDuration > 0 ? (displayCurrentTime / displayDuration) * 100 : 0;
   const typeIcon = track?.icon || (
     track?.type === "commentary" ? "📖" :
     track?.type === "apologetics" ? "⚔️" :
@@ -898,8 +908,9 @@ export function ImmersiveAudioPlayer({
         <div className="relative z-10 border-t border-border/30 px-6 py-5 backdrop-blur-sm bg-background/50">
           {/* Progress bar */}
           <div
-            className="w-full h-2 bg-muted/50 rounded-full mb-5 overflow-hidden cursor-pointer group"
+            className={cn("w-full h-2 bg-muted/50 rounded-full mb-5 overflow-hidden group", !isWatchSession && "cursor-pointer")}
             onClick={(e) => {
+              if (isWatchSession) return; // Don't seek session timer
               const rect = e.currentTarget.getBoundingClientRect();
               const pct = ((e.clientX - rect.left) / rect.width) * 100;
               seekTo(pct);
@@ -916,7 +927,7 @@ export function ImmersiveAudioPlayer({
           <div className="flex items-center justify-between">
             {/* Time */}
             <span className="text-xs text-muted-foreground font-mono w-16">
-              {formatTime(currentTime)}
+              {formatTime(displayCurrentTime)}
             </span>
 
             {/* Center controls */}
@@ -930,12 +941,13 @@ export function ImmersiveAudioPlayer({
                 {mainMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </Button>
 
-              {/* Previous */}
+              {/* Previous / Rewind */}
               <Button
                 variant="ghost" size="icon"
-                onClick={onPrevTrack}
-                disabled={!hasPrev}
+                onClick={isWatchSession ? () => seekRelative(-15) : onPrevTrack}
+                disabled={isWatchSession ? false : !hasPrev}
                 className="h-10 w-10"
+                title={isWatchSession ? "Rewind 15s" : "Previous"}
               >
                 <SkipBack className="h-5 w-5" />
               </Button>
@@ -954,12 +966,13 @@ export function ImmersiveAudioPlayer({
                 )}
               </Button>
 
-              {/* Next */}
+              {/* Next / Forward */}
               <Button
                 variant="ghost" size="icon"
-                onClick={onNextTrack}
-                disabled={!hasNext}
+                onClick={isWatchSession ? () => seekRelative(15) : onNextTrack}
+                disabled={isWatchSession ? false : !hasNext}
                 className="h-10 w-10"
+                title={isWatchSession ? "Forward 15s" : "Next"}
               >
                 <SkipForward className="h-5 w-5" />
               </Button>
@@ -977,7 +990,7 @@ export function ImmersiveAudioPlayer({
 
             {/* Duration */}
             <span className="text-xs text-muted-foreground font-mono w-16 text-right">
-              {formatTime(duration)}
+              {formatTime(displayDuration)}
             </span>
           </div>
         </div>
