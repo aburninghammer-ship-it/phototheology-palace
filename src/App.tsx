@@ -479,6 +479,7 @@ function App() {
             } />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/audio-library" element={<BasicModeGate><ProtectedRoute><AudioLibrary /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/music-manager" element={<ProtectedRoute><MusicManager /></ProtectedRoute>} />
             <Route path="/fix-billing" element={<ProtectedRoute><FixBilling /></ProtectedRoute>} />
             <Route path="/gift" element={<GiftAndShare />} />
             <Route path="/gift-and-share" element={<GiftAndShare />} />
