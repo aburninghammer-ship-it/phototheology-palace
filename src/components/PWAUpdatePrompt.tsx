@@ -90,6 +90,50 @@ async function waitForWaitingWorker(timeoutMs = WAITING_SW_TIMEOUT_MS): Promise<
   return finalRegistration?.waiting ?? null;
 }
 
+async function activateWaitingWorker(waitingWorker: ServiceWorker): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    let settled = false;
+
+    const cleanup = () => {
+      navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+      waitingWorker.removeEventListener('statechange', handleStateChange);
+      window.clearTimeout(timeoutId);
+    };
+
+    const finishResolve = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve();
+    };
+
+    const finishReject = (error: Error) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(error);
+    };
+
+    const handleControllerChange = () => {
+      finishResolve();
+    };
+
+    const handleStateChange = () => {
+      if (waitingWorker.state === 'activated' && navigator.serviceWorker.controller) {
+        finishResolve();
+      }
+    };
+
+    const timeoutId = window.setTimeout(() => {
+      finishReject(new Error('Waiting service worker activation timed out'));
+    }, WAITING_SW_TIMEOUT_MS + 4_000);
+
+    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+    waitingWorker.addEventListener('statechange', handleStateChange);
+    waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+  });
+}
+
 export function PWAUpdatePrompt() {
   const [showReload, setShowReload] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -98,7 +142,6 @@ export function PWAUpdatePrompt() {
   const {
     offlineReady: [offlineReady, setOfflineReady],
     needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker,
   } = useRegisterSW({
     onRegisteredSW(swUrl, registration) {
       console.log('SW registered:', swUrl);
@@ -221,14 +264,22 @@ export function PWAUpdatePrompt() {
         return;
       }
 
-      const updateAttempt = updateServiceWorker(true);
-      const timeoutGuard = new Promise<never>((_, reject) => {
-        window.setTimeout(() => reject(new Error('PWA update timed out')), WAITING_SW_TIMEOUT_MS + 4000);
-      });
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        await forceHardRefresh('__app_refresh', `no-registration-${Date.now()}`);
+        return;
+      }
 
-      await Promise.race([updateAttempt, timeoutGuard]);
+      await registration.update().catch(() => undefined);
+
+      const waitingWorker = registration.waiting ?? await waitForWaitingWorker();
+      if (!waitingWorker) {
+        await forceHardRefresh('__app_refresh', `no-waiting-worker-${Date.now()}`);
+        return;
+      }
+
+      await activateWaitingWorker(waitingWorker);
       suppressBuild(pendingBuild);
-      // Actually reload the page so the new SW takes effect
       window.location.reload();
     } catch (error) {
       console.error('Error during update:', error);
@@ -236,7 +287,7 @@ export function PWAUpdatePrompt() {
     } finally {
       setIsUpdating(false);
     }
-  }, [isUpdating, pendingBuild, updateServiceWorker]);
+  }, [isUpdating, pendingBuild]);
 
   const close = useCallback(() => {
     suppressBuild(pendingBuild);
