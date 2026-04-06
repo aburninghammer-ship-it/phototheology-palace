@@ -7,6 +7,7 @@
  * - Layered ambient background music
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { VoiceQualitySelector } from "./VoiceQualitySelector";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -686,6 +687,14 @@ export function ImmersiveAudioPlayer({
                     checked={continuousPlay}
                     onCheckedChange={onSetContinuousPlay}
                   />
+                </div>
+                {/* Voice quality selector */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Volume2 className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Voice Quality</span>
+                  </div>
+                  <VoiceQualitySelector compact />
                 </div>
               </div>
             </motion.div>
