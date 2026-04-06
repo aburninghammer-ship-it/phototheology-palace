@@ -23,6 +23,7 @@ interface WatchQuickShareProps {
 }
 
 const SUITE_URL = "https://phototheologybible.com";
+const INVITATION = `\n\n🏛️ Experience PhototheologyOS — the Art of Seeing Christ in All Things.\n🔗 ${SUITE_URL}`;
 
 export function WatchQuickShare({
   title,
@@ -35,7 +36,7 @@ export function WatchQuickShare({
   const shareUrl = getShareUrl(watchType === "morning" ? "/morning-watches" : "/night-watches");
   const emoji = watchType === "morning" ? "🌅" : "🌙";
 
-  const shareText = `${emoji} ${title}\n📖 ${scripture}\n📅 ${tractName} — Day ${dayNumber}\n\n— Shared from Phototheology Palace\n#Phototheology #BibleStudy\n✨ Explore more: ${SUITE_URL}`;
+  const shareText = `${emoji} ${title}\n📖 ${scripture}\n📅 ${tractName} — Day ${dayNumber}\n\n— Shared from Phototheology Palace\n#Phototheology #BibleStudy${INVITATION}`;
 
   const openIntent = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer,width=600,height=500");

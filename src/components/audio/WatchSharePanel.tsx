@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { getShareUrl } from "@/lib/utils";
+import { AddToPlaylistButton } from "./AddToPlaylistButton";
 
 interface WatchSharePanelProps {
   videoBlob: Blob | null;
@@ -28,6 +29,7 @@ interface WatchSharePanelProps {
 }
 
 const SUITE_URL = "https://phototheologybible.com";
+const INVITATION = `\n\n🏛️ Experience PhototheologyOS — the Art of Seeing Christ in All Things.\n🔗 ${SUITE_URL}`;
 
 export function WatchSharePanel({
   videoBlob,
@@ -41,7 +43,7 @@ export function WatchSharePanel({
   const [copied, setCopied] = useState(false);
   const shareUrl = getShareUrl(watchType === "morning" ? "/morning-watches" : "/night-watches");
 
-  const shareText = `${watchType === "morning" ? "🌅" : "🌙"} ${title}\n\n${subtitle || ""}\n\n— Shared from Phototheology Palace\n#Phototheology #BibleStudy\n✨ Explore more: ${SUITE_URL}`;
+  const shareText = `${watchType === "morning" ? "🌅" : "🌙"} ${title}\n\n${subtitle || ""}\n\n— Shared from Phototheology Palace\n#Phototheology #BibleStudy${INVITATION}`;
 
   const handleNativeShare = async () => {
     if (!navigator.share) {
@@ -55,7 +57,6 @@ export function WatchSharePanel({
       url: shareUrl,
     };
 
-    // Try sharing with video file if supported
     if (videoBlob && navigator.canShare) {
       const file = new File([videoBlob], `${title.replace(/[^a-z0-9]/gi, "_")}.webm`, {
         type: videoBlob.type,
@@ -142,16 +143,27 @@ export function WatchSharePanel({
           </div>
         )}
 
-        {/* Download */}
-        <Button
-          onClick={() => onDownload(`${safeFilename}.webm`)}
-          className="w-full gap-2"
-          variant="default"
-          disabled={!videoBlob}
-        >
-          <Download className="h-4 w-4" />
-          Download Video
-        </Button>
+        {/* Download + Add to Playlist */}
+        <div className="flex gap-2">
+          <Button
+            onClick={() => onDownload(`${safeFilename}.webm`)}
+            className="flex-1 gap-2"
+            variant="default"
+            disabled={!videoBlob}
+          >
+            <Download className="h-4 w-4" />
+            Download Video
+          </Button>
+          <AddToPlaylistButton
+            title={title}
+            description={subtitle}
+            audioType={watchType === "morning" ? "morning-watch" : "night-watch"}
+            audioMeta={{ watchType, subtitle }}
+            variant="secondary"
+            size="default"
+            showLabel
+          />
+        </div>
 
         {/* Social share buttons */}
         <div className="space-y-2">
