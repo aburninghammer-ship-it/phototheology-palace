@@ -228,7 +228,8 @@ export function PWAUpdatePrompt() {
 
       await Promise.race([updateAttempt, timeoutGuard]);
       suppressBuild(pendingBuild);
-      setShowReload(false);
+      // Actually reload the page so the new SW takes effect
+      window.location.reload();
     } catch (error) {
       console.error('Error during update:', error);
       await forceHardRefresh('__app_refresh', `fallback-${Date.now()}`);
