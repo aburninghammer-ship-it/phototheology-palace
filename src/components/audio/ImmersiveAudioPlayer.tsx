@@ -614,6 +614,12 @@ export function ImmersiveAudioPlayer({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Recording indicator */}
+            {recorder.isRecording && (
+              <Badge variant="destructive" className="text-xs gap-1 animate-pulse">
+                <Video className="h-3 w-3" /> REC
+              </Badge>
+            )}
             {/* Ambient music indicator */}
             {ambientPlaying && (
               <Badge variant="secondary" className="text-xs gap-1 animate-pulse">
