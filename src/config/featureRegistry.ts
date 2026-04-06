@@ -93,9 +93,7 @@ const FEATURE_REGISTRY: Array<{ path: string; minMode: ExperienceMode }> = [
   { path: "/leaderboard", minMode: "explorer" },
   { path: "/achievements", minMode: "explorer" },
 
-  // Chapel Space
-  { path: "/night-watches", minMode: "explorer" },
-  { path: "/morning-watches", minMode: "explorer" },
+  // Chapel Space — morning/night watches are basic (part of Chapel, accessible to all)
 
   // University Space
   { path: "/phototheology-course", minMode: "explorer" },
