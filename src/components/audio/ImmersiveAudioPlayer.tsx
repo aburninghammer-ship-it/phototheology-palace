@@ -275,8 +275,8 @@ export function ImmersiveAudioPlayer({
           // Auto-start recording for watch sessions
           if (isWatchSession && !recorder.isRecording && !recorder.videoBlob) {
             try {
-              (recorder as any).setTitle?.(track.title || "Watch Session");
-              (recorder as any).setSubtitle?.(track.subtitle || track.modeName || "");
+              recorder.setTitle(track.title || "Watch Session");
+              recorder.setSubtitle(track.subtitle || track.modeName || "");
               recorder.startRecording(audio, ambientRef.current);
             } catch (e) {
               console.warn("[Immersive] Recording auto-start failed:", e);
