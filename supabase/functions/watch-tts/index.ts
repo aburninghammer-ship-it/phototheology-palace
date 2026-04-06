@@ -12,6 +12,9 @@ const corsHeaders = {
 const VOICE_ID = "pFZP5JQG7iQjIQuC4Bku";
 const MODEL_ID = "eleven_turbo_v2_5";
 const MAX_CHUNK = 4500;
+// Bump this version to invalidate ALL cached watch TTS audio
+// v2 = 2026-04-06 Master Mind prompt overhaul (no breathing/posture)
+const WATCH_CACHE_VERSION = "v2";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
@@ -50,8 +53,10 @@ function splitAtSentences(text: string, max: number): string[] {
  * the text around [long pause] to let us insert actual silence gaps.
  */
 function preprocessPauses(text: string): string {
+  // Replace [extended silence] with very long pause (used in VR sessions)
+  let processed = text.replace(/\[extended silence\]/gi, "\n\n...\n\n...\n\n...\n\n...\n\n...\n\n");
   // Replace [long pause] with a triple ellipsis and extra whitespace
-  let processed = text.replace(/\[long pause\]/gi, "\n\n...\n\n...\n\n...\n\n");
+  processed = processed.replace(/\[long pause\]/gi, "\n\n...\n\n...\n\n...\n\n");
   // Replace [pause] with a double ellipsis
   processed = processed.replace(/\[pause\]/gi, "\n\n...\n\n");
   return processed;
@@ -114,13 +119,13 @@ serve(async (req) => {
 
     // Check hash-based cache
     const cacheKey = await sha256Hex(
-      JSON.stringify({ voice: VOICE_ID, text: text.trim(), type: watchType }),
+      JSON.stringify({ voice: VOICE_ID, text: text.trim(), type: watchType, v: WATCH_CACHE_VERSION }),
     );
-    const storagePath = `watch-tts/${watchType}/${cacheKey}.mp3`;
+    const storagePath = `watch-tts/${WATCH_CACHE_VERSION}/${watchType}/${cacheKey}.mp3`;
 
     const { data: existing } = await supabase.storage
       .from("bible-audio")
-      .list(`watch-tts/${watchType}`, { search: `${cacheKey}.mp3`, limit: 1 });
+      .list(`watch-tts/${WATCH_CACHE_VERSION}/${watchType}`, { search: `${cacheKey}.mp3`, limit: 1 });
 
     if (existing && existing.length > 0) {
       const { data: urlData } = supabase.storage
