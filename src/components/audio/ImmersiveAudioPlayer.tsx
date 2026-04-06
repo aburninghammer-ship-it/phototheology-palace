@@ -8,6 +8,8 @@
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { VoiceQualitySelector } from "./VoiceQualitySelector";
+import { WatchSharePanel } from "./WatchSharePanel";
+import { useWatchRecorder } from "@/hooks/useWatchRecorder";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -16,6 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   X, Play, Pause, SkipForward, SkipBack, Volume2, VolumeX,
   Music, ListMusic, Maximize2, Settings, Loader2, ChevronUp, ChevronDown,
+  Video, VideoOff, Share2, Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +29,7 @@ import type { ImmersiveTrack } from "@/hooks/useImmersiveMode";
 import { ImmersiveParticles } from "./immersive/ImmersiveParticles";
 import { ImmersiveKaraokeVerse } from "./immersive/ImmersiveKaraokeVerse";
 import { ImmersiveSleepTimer } from "./immersive/ImmersiveSleepTimer";
+import { toast } from "sonner";
 
 // Cinematic music tracks for background layering
 const AMBIENT_BG_TRACKS = [
@@ -138,6 +142,10 @@ export function ImmersiveAudioPlayer({
   const [inMeditationPhase, setInMeditationPhase] = useState(false);
   const sessionFadeTimerRef = useRef<number>();
   const narrationEndedRef = useRef(false);
+
+  // ── Video recording for Watch sessions ──
+  const recorder = useWatchRecorder();
+  const [showSharePanel, setShowSharePanel] = useState(false);
 
   // Ambient mode — declared early so timer effect can reference it
   const currentTrackObj = tracks[currentIndex];
@@ -262,7 +270,19 @@ export function ImmersiveAudioPlayer({
         }
         
         await audio.play();
-        if (!cancelled) setIsPlaying(true);
+        if (!cancelled) {
+          setIsPlaying(true);
+          // Auto-start recording for watch sessions
+          if (isWatchSession && !recorder.isRecording && !recorder.videoBlob) {
+            try {
+              recorder.setTitle(track.title || "Watch Session");
+              recorder.setSubtitle(track.subtitle || track.modeName || "");
+              recorder.startRecording(audio, ambientRef.current);
+            } catch (e) {
+              console.warn("[Immersive] Recording auto-start failed:", e);
+            }
+          }
+        }
       } catch (err) {
         if (!cancelled) {
           console.error("[Immersive] Failed to load track:", err);
@@ -301,14 +321,18 @@ export function ImmersiveAudioPlayer({
       // Session complete at 15 minutes
       if (elapsed >= WATCH_SESSION_DURATION) {
         clearInterval(interval);
+        // Stop recording
+        if (recorder.isRecording) {
+          recorder.stopRecording();
+        }
         // Stop all audio
         if (ambientRef.current) { ambientRef.current.pause(); }
         if (ambientNextRef.current) { ambientNextRef.current.pause(); }
         if (audioRef.current) { audioRef.current.pause(); }
         setIsPlaying(false);
         setAmbientPlaying(false);
-        // Auto-close after a brief moment
-        setTimeout(() => onClose(), 1500);
+        // Show share panel instead of auto-closing
+        setTimeout(() => setShowSharePanel(true), 500);
       }
     }, 250);
     
@@ -590,6 +614,12 @@ export function ImmersiveAudioPlayer({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Recording indicator */}
+            {recorder.isRecording && (
+              <Badge variant="destructive" className="text-xs gap-1 animate-pulse">
+                <Video className="h-3 w-3" /> REC
+              </Badge>
+            )}
             {/* Ambient music indicator */}
             {ambientPlaying && (
               <Badge variant="secondary" className="text-xs gap-1 animate-pulse">
@@ -951,6 +981,53 @@ export function ImmersiveAudioPlayer({
             </span>
           </div>
         </div>
+        {/* Watch share/download buttons (after recording available) */}
+        {isWatchSession && recorder.videoBlob && !showSharePanel && (
+          <div className="relative z-10 px-6 py-2 flex items-center justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => setShowSharePanel(true)}
+            >
+              <Share2 className="h-4 w-4" />
+              Share Session
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => recorder.downloadVideo(`${(track?.title || "watch-session").replace(/[^a-z0-9]/gi, "_").toLowerCase()}.webm`)}
+            >
+              <Download className="h-4 w-4" />
+              Download
+            </Button>
+          </div>
+        )}
+
+        {/* Hidden recording canvas */}
+        <canvas
+          ref={recorder.canvasRef}
+          className="hidden"
+          width={1280}
+          height={720}
+        />
+
+        {/* Share panel overlay */}
+        {showSharePanel && recorder.videoBlob && (
+          <WatchSharePanel
+            videoBlob={recorder.videoBlob}
+            videoUrl={recorder.videoUrl}
+            title={track?.title || "Watch Session"}
+            subtitle={track?.subtitle || track?.modeName}
+            watchType={track?.modeName?.includes("Morning") ? "morning" : "night"}
+            onClose={() => {
+              setShowSharePanel(false);
+              onClose();
+            }}
+            onDownload={(filename) => recorder.downloadVideo(filename)}
+          />
+        )}
       </motion.div>
     </AnimatePresence>
   );
