@@ -47,10 +47,11 @@ function drawFrequencyBars(
   const barWidth = (width / barCount) * 0.7;
   const gap = (width / barCount) * 0.3;
 
-  let dataArray: Uint8Array;
+  let dataArray: Uint8Array<ArrayBuffer>;
   if (analyser) {
-    dataArray = new Uint8Array(analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
-    analyser.getByteFrequencyData(dataArray);
+    const buf = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(buf);
+    dataArray = buf as Uint8Array<ArrayBuffer>;
   } else {
     // Fallback: generate fake waveform
     dataArray = new Uint8Array(barCount);
