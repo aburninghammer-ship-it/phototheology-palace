@@ -368,10 +368,6 @@ export function ImmersiveAudioPlayer({
   }, [activeVerseIndex]);
 
   // Ambient music/sound management — picks track list based on current track's ambientMode
-  const currentTrackObj = tracks[currentIndex];
-  const defaultAmbientMode = currentTrackObj?.ambientMode ?? "music";
-  const [ambientModeOverride, setAmbientModeOverride] = useState<"music" | "ambient-sounds" | null>(null);
-  const ambientMode = ambientModeOverride ?? defaultAmbientMode;
 
   // Reset override when track changes
   useEffect(() => {
