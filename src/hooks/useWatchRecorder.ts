@@ -19,6 +19,8 @@ interface UseWatchRecorderReturn extends RecorderState {
   stopRecording: () => void;
   clearRecording: () => void;
   downloadVideo: (filename?: string) => void;
+  setTitle: (t: string) => void;
+  setSubtitle: (s: string) => void;
 }
 
 // Audio frequency bar colors matching the app theme
@@ -299,8 +301,7 @@ export function useWatchRecorder(): UseWatchRecorderReturn {
     stopRecording,
     clearRecording,
     downloadVideo,
-    // Expose setters for title via ref
     setTitle: (t: string) => { titleRef.current = t; },
     setSubtitle: (s: string) => { subtitleRef.current = s; },
-  } as UseWatchRecorderReturn & { setTitle: (t: string) => void; setSubtitle: (s: string) => void };
+  };
 }
