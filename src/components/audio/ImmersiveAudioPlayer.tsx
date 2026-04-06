@@ -908,8 +908,9 @@ export function ImmersiveAudioPlayer({
         <div className="relative z-10 border-t border-border/30 px-6 py-5 backdrop-blur-sm bg-background/50">
           {/* Progress bar */}
           <div
-            className="w-full h-2 bg-muted/50 rounded-full mb-5 overflow-hidden cursor-pointer group"
+            className={cn("w-full h-2 bg-muted/50 rounded-full mb-5 overflow-hidden group", !isWatchSession && "cursor-pointer")}
             onClick={(e) => {
+              if (isWatchSession) return; // Don't seek session timer
               const rect = e.currentTarget.getBoundingClientRect();
               const pct = ((e.clientX - rect.left) / rect.width) * 100;
               seekTo(pct);
