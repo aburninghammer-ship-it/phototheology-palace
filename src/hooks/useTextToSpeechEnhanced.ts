@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { buildCacheKey, getCachedAudio, setCachedAudio } from '@/lib/ttsAudioCache';
 import { isOnline } from '@/services/offlineAudioCache';
 import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from '@/lib/mediaSessionHelper';
 
