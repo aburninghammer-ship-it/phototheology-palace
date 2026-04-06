@@ -559,6 +559,13 @@ export function ImmersiveAudioPlayer({
     }
   }, [duration]);
 
+  // For watch sessions: seek forward/back by 15 seconds
+  const seekRelative = useCallback((seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, Math.min(audioRef.current.duration || 0, audioRef.current.currentTime + seconds));
+    }
+  }, []);
+
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const typeIcon = track?.icon || (
     track?.type === "commentary" ? "📖" :
