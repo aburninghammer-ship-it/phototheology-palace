@@ -740,44 +740,98 @@ export function ImmersiveAudioPlayer({
               </div>
             </ScrollArea>
           ) : (
-            /* Ambient visual mode (no text) */
+            /* Ambient visual mode (no text) — includes Watch meditation phase */
             <div className="flex flex-col items-center justify-center h-full gap-6">
-              <motion.div
-                className="text-8xl"
-                animate={{
-                  scale: [1, 1.05, 1],
-                  opacity: [0.8, 1, 0.8],
-                }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              >
-                {typeIcon}
-              </motion.div>
-              <div className="text-center">
-                <h3 className="text-xl font-semibold text-foreground/80">{track?.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{track?.subtitle || track?.modeName}</p>
-              </div>
-              {/* Audio waveform visualization */}
-              <div className="flex items-end gap-1 h-16">
-                {Array.from({ length: 24 }).map((_, i) => (
+              {inMeditationPhase ? (
+                /* Meditation phase: narration ended, music continues */
+                <>
                   <motion.div
-                    key={i}
-                    className="w-1.5 bg-primary/40 rounded-full"
-                    animate={isPlaying ? {
-                      height: [
-                        `${10 + Math.random() * 40}px`,
-                        `${10 + Math.random() * 50}px`,
-                        `${10 + Math.random() * 30}px`,
-                      ],
-                    } : { height: "8px" }}
-                    transition={{
-                      duration: 0.6 + Math.random() * 0.4,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: i * 0.05,
+                    className="text-6xl"
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    🕊️
+                  </motion.div>
+                  <div className="text-center max-w-md px-4 space-y-3">
+                    <h3 className="text-xl font-semibold text-foreground/80">
+                      Meditation Time
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      The narration has ended. Take the remaining time to meditate on the thoughts and feelings you've received. Ask the Spirit to make them your own.
+                    </p>
+                    <p className="text-xs text-muted-foreground/60 font-mono">
+                      {formatTime(Math.max(0, WATCH_SESSION_DURATION - sessionElapsed))} remaining
+                    </p>
+                  </div>
+                  {/* Gentle pulsing waveform for meditation */}
+                  <div className="flex items-end gap-1 h-12">
+                    {Array.from({ length: 16 }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="w-1 bg-primary/25 rounded-full"
+                        animate={{
+                          height: [
+                            `${6 + Math.sin(i * 0.5) * 8}px`,
+                            `${10 + Math.sin(i * 0.5 + 1) * 12}px`,
+                            `${6 + Math.sin(i * 0.5) * 8}px`,
+                          ],
+                        }}
+                        transition={{
+                          duration: 3 + Math.random(),
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: i * 0.1,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <motion.div
+                    className="text-8xl"
+                    animate={{
+                      scale: [1, 1.05, 1],
+                      opacity: [0.8, 1, 0.8],
                     }}
-                  />
-                ))}
-              </div>
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    {typeIcon}
+                  </motion.div>
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-foreground/80">{track?.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{track?.subtitle || track?.modeName}</p>
+                  </div>
+                  {/* Audio waveform visualization */}
+                  <div className="flex items-end gap-1 h-16">
+                    {Array.from({ length: 24 }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="w-1.5 bg-primary/40 rounded-full"
+                        animate={isPlaying ? {
+                          height: [
+                            `${10 + Math.random() * 40}px`,
+                            `${10 + Math.random() * 50}px`,
+                            `${10 + Math.random() * 30}px`,
+                          ],
+                        } : { height: "8px" }}
+                        transition={{
+                          duration: 0.6 + Math.random() * 0.4,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: i * 0.05,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+              {/* Watch session timer */}
+              {isWatchSession && sessionStartRef.current && !inMeditationPhase && (
+                <p className="text-xs text-muted-foreground/50 font-mono">
+                  Session: {formatTime(sessionElapsed)} / {formatTime(WATCH_SESSION_DURATION)}
+                </p>
+              )}
             </div>
           )}
         </div>
