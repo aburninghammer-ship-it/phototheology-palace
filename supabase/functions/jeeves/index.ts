@@ -10562,7 +10562,13 @@ ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[
 Write in second person ("you"). Use short sentences (3-10 words per line). Include [pause] markers for breathing moments.
 This is BIBLICAL meditation — filling the mind with truth through Scripture, not emptying it.
 The Master Mind = the mind of Christ (Philippians 2:5).
-Be cinematic, sensory-rich, and deeply immersive. Write the full script ready for text-to-speech narration.`;
+Be cinematic, sensory-rich, and deeply immersive. Write the full script ready for text-to-speech narration.
+
+TTS FORMATTING RULES (CRITICAL — this will be read aloud by TTS):
+- Write ALL scripture references in SPOKEN form: "John chapter one, verse one" NOT "John 1:1". "Genesis chapter three, verse fifteen" NOT "Genesis 3:15".
+- Write numbers as words when under 100: "twelve disciples" not "12 disciples". "forty days" not "40 days".
+- Avoid colons, slashes, or abbreviations that TTS will mispronounce.
+- Use full book names: "First Corinthians" not "1 Cor". "Second Samuel" not "2 Sam".`;
       userPrompt = message || "Generate a Night Watch meditation session.";
 
     } else if (mode === "morning-watch") {
@@ -10571,7 +10577,13 @@ Write in second person ("you"). Tone should be CLEAR and DIRECT, not dreamy.
 The Master Mind = the mind of Christ (Philippians 2:5).
 Night Watch: "See how Christ thinks — and receive it."
 Morning Watch: "Now think like Christ — and walk in it."
-End with resolve, not a question. Write the full script ready for text-to-speech narration.`;
+End with resolve, not a question. Write the full script ready for text-to-speech narration.
+
+TTS FORMATTING RULES (CRITICAL — this will be read aloud by TTS):
+- Write ALL scripture references in SPOKEN form: "John chapter one, verse one" NOT "John 1:1". "Genesis chapter three, verse fifteen" NOT "Genesis 3:15".
+- Write numbers as words when under 100: "twelve disciples" not "12 disciples". "forty days" not "40 days".
+- Avoid colons, slashes, or abbreviations that TTS will mispronounce.
+- Use full book names: "First Corinthians" not "1 Cor". "Second Samuel" not "2 Sam".`;
       userPrompt = message || "Generate a Morning Watch activation session.";
 
     }

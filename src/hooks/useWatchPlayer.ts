@@ -76,7 +76,14 @@ CRITICAL RULES:
 - Do NOT include section headers, stage directions, labels, or meta-commentary.
 - The power is in BEHOLDING, not breathing. The power is in what you SEE and THINK, not how you sit.
 - Second person ("you") throughout. Intimate. Authoritative. Cinematic.
-- The phrase "Download" is literal — the listener is asking the Spirit to literally transplant Christ's thoughts and feelings into their neural pathways.`;
+- The phrase "Download" is literal — the listener is asking the Spirit to literally transplant Christ's thoughts and feelings into their neural pathways.
+
+TTS FORMATTING RULES (CRITICAL — this text will be read aloud by a text-to-speech engine):
+- Write ALL scripture references in SPOKEN form: "John chapter one, verse one" NOT "John 1:1". "Genesis chapter three, verse fifteen" NOT "Genesis 3:15". "Philippians chapter two, verse five" NOT "Philippians 2:5".
+- Write numbers as words when under 100: "twelve disciples" not "12 disciples". "forty days" not "40 days".
+- Avoid colons, slashes, or abbreviations that TTS will mispronounce.
+- Use full book names: "First Corinthians" not "1 Cor". "Second Samuel" not "2 Sam".
+- Write "verses" ranges naturally: "verses one through three" not "1-3".`;
 }
 
 function buildMorningPrompt(session: MorningWatchSession, tractName: string): string {
@@ -137,7 +144,14 @@ CRITICAL RULES:
 - Use [pause] (3-5 seconds) frequently and [long pause] (10-20 seconds) in phase 5.
 - Do NOT include section headers, stage directions, labels, or meta-commentary.
 - The power is in BEHOLDING and DEPLOYING, not breathing. The download becomes the operating system.
-- Second person ("you") throughout. End with authority and momentum.`;
+- Second person ("you") throughout. End with authority and momentum.
+
+TTS FORMATTING RULES (CRITICAL — this text will be read aloud by a text-to-speech engine):
+- Write ALL scripture references in SPOKEN form: "John chapter one, verse one" NOT "John 1:1". "Genesis chapter three, verse fifteen" NOT "Genesis 3:15". "Philippians chapter two, verse five" NOT "Philippians 2:5".
+- Write numbers as words when under 100: "twelve disciples" not "12 disciples". "forty days" not "40 days".
+- Avoid colons, slashes, or abbreviations that TTS will mispronounce.
+- Use full book names: "First Corinthians" not "1 Cor". "Second Samuel" not "2 Sam".
+- Write "verses" ranges naturally: "verses one through three" not "1-3".`;
 }
 
 async function generateWatchTTS(script: string, watchType: "night" | "morning"): Promise<string | null> {
