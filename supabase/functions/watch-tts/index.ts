@@ -117,9 +117,9 @@ serve(async (req) => {
 
     // Check hash-based cache
     const cacheKey = await sha256Hex(
-      JSON.stringify({ voice: VOICE_ID, text: text.trim(), type: watchType }),
+      JSON.stringify({ voice: VOICE_ID, text: text.trim(), type: watchType, v: WATCH_CACHE_VERSION }),
     );
-    const storagePath = `watch-tts/${watchType}/${cacheKey}.mp3`;
+    const storagePath = `watch-tts/${WATCH_CACHE_VERSION}/${watchType}/${cacheKey}.mp3`;
 
     const { data: existing } = await supabase.storage
       .from("bible-audio")
