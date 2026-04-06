@@ -107,7 +107,7 @@ export function ImmersiveAudioPlayer({
   const ambientRef = useRef<HTMLAudioElement | null>(null);
   const ambientNextRef = useRef<HTMLAudioElement | null>(null);
   const crossfadeTimerRef = useRef<number>();
-  const [ambientTrackIdx, setAmbientTrackIdx] = useState(0);
+  const [ambientTrackIdx, setAmbientTrackIdx] = useState(() => Math.floor(Math.random() * AMBIENT_BG_TRACKS.length));
   const [ambientPlaying, setAmbientPlaying] = useState(false);
   
   // Verse display
@@ -640,7 +640,7 @@ export function ImmersiveAudioPlayer({
                     <span className="text-xs text-muted-foreground">Background type</span>
                     <div className="flex gap-1">
                       <button
-                        onClick={() => { setAmbientModeOverride("ambient-sounds"); setAmbientTrackIdx(0); }}
+                        onClick={() => { setAmbientModeOverride("ambient-sounds"); setAmbientTrackIdx(Math.floor(Math.random() * AMBIENT_SOUND_TRACKS.length)); }}
                         className={`text-xs px-3 py-1 rounded-full transition-colors ${
                           ambientMode === "ambient-sounds"
                             ? "bg-primary text-primary-foreground"
@@ -650,7 +650,7 @@ export function ImmersiveAudioPlayer({
                         Sounds
                       </button>
                       <button
-                        onClick={() => { setAmbientModeOverride("music"); setAmbientTrackIdx(0); }}
+                        onClick={() => { setAmbientModeOverride("music"); setAmbientTrackIdx(Math.floor(Math.random() * AMBIENT_BG_TRACKS.length)); }}
                         className={`text-xs px-3 py-1 rounded-full transition-colors ${
                           ambientMode === "music"
                             ? "bg-primary text-primary-foreground"
