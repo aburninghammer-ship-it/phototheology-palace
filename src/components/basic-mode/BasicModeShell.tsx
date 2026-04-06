@@ -8,8 +8,9 @@ import { BasicModeSidebar, type BasicTab } from "./BasicModeSidebar";
 import { LevelToggleChip } from "./LevelToggleChip";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
+import { useActiveUsers } from "@/hooks/useActiveUsers";
 import { Button } from "@/components/ui/button";
-import { LogIn, Volume2, BookOpen, Flame } from "lucide-react";
+import { LogIn, Volume2, BookOpen, Flame, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { GuidedTourOverlay, primeAudioForTour } from "@/components/guided-tour/GuidedTourOverlay";
 import { BASIC_MODE_TOUR } from "@/data/basicModeTour";
@@ -61,6 +62,7 @@ export function BasicModeShell() {
   const [activeTab, setActiveTab] = useState<BasicTab>("chat");
   const [tourOpen, setTourOpen] = useState(false);
   const { user } = useAuth();
+  const { activeCount } = useActiveUsers();
   const navigate = useNavigate();
   const { data: profile } = useBasicProfile(user?.id);
 
@@ -107,6 +109,17 @@ export function BasicModeShell() {
           </div>
 
           <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+            {activeCount > 0 && (
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                </span>
+                <Users className="h-3 w-3 text-green-600" />
+                <span className="text-[10px] md:text-xs font-semibold text-green-600">{activeCount}</span>
+                <span className="hidden sm:inline text-[10px] md:text-xs text-green-600/80">online</span>
+              </div>
+            )}
             <button
               onClick={startTour}
               className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] md:text-xs font-medium transition-all hover:brightness-125 bg-primary/10 text-primary border border-primary/20"
