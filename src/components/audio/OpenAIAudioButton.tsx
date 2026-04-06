@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { globalAudioManager } from "@/lib/globalAudioManager";
+import { VoiceQualitySelector } from "./VoiceQualitySelector";
 
 interface OpenAIAudioButtonProps {
   text: string;
@@ -122,17 +123,20 @@ export function OpenAIAudioButton({
   const Icon = isLoading ? Loader2 : isPlaying ? Square : Volume2;
 
   return (
-    <Button
-      variant={variant}
-      size={size}
-      onClick={handleClick}
-      disabled={isLoading}
-      className={className}
-      title={label}
-    >
-      <Icon className={`h-4 w-4 ${isLoading ? "animate-spin" : ""} ${showLabel ? "mr-2" : ""}`} />
-      {showLabel && label}
-    </Button>
+    <div className="inline-flex items-center gap-1">
+      <Button
+        variant={variant}
+        size={size}
+        onClick={handleClick}
+        disabled={isLoading}
+        className={className}
+        title={label}
+      >
+        <Icon className={`h-4 w-4 ${isLoading ? "animate-spin" : ""} ${showLabel ? "mr-2" : ""}`} />
+        {showLabel && label}
+      </Button>
+      <VoiceQualitySelector compact />
+    </div>
   );
 }
 
