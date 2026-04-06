@@ -147,6 +147,7 @@ export function ImmersiveAudioPlayer({
   const recorder = useWatchRecorder();
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [requiresManualStart, setRequiresManualStart] = useState(false);
+  const trackObjectUrlRef = useRef<string | null>(null);
 
   // Ambient mode — declared early so timer effect can reference it
   const currentTrackObj = tracks[currentIndex];
@@ -160,6 +161,35 @@ export function ImmersiveAudioPlayer({
     // When voice is playing, duck the music significantly
     return isPlaying ? base * VOICE_DUCK_RATIO : base;
   }, [ambientVolume, sleepFadeMultiplier, isPlaying]);
+
+  const cleanupTrackObjectUrl = useCallback(() => {
+    if (trackObjectUrlRef.current) {
+      URL.revokeObjectURL(trackObjectUrlRef.current);
+      trackObjectUrlRef.current = null;
+    }
+  }, []);
+
+  const materializeTrackUrl = useCallback(async (sourceUrl: string) => {
+    if (!isWatchSession || sourceUrl.startsWith("blob:") || sourceUrl.startsWith("data:")) {
+      return sourceUrl;
+    }
+
+    try {
+      const response = await fetch(sourceUrl);
+      if (!response.ok) {
+        throw new Error(`Audio fetch failed: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      cleanupTrackObjectUrl();
+      const objectUrl = URL.createObjectURL(blob);
+      trackObjectUrlRef.current = objectUrl;
+      return objectUrl;
+    } catch (err) {
+      console.warn("[Immersive] Falling back to remote audio URL:", err);
+      return sourceUrl;
+    }
+  }, [cleanupTrackObjectUrl, isWatchSession]);
   
   // Initialize main audio
   useEffect(() => {
@@ -178,6 +208,7 @@ export function ImmersiveAudioPlayer({
       ambientNextRef.current.loop = false;
     }
     return () => {
+      cleanupTrackObjectUrl();
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
@@ -194,7 +225,7 @@ export function ImmersiveAudioPlayer({
         clearInterval(crossfadeTimerRef.current);
       }
     };
-  }, []);
+  }, [cleanupTrackObjectUrl]);
 
   // Reset watch session state on track change
   useEffect(() => {
@@ -216,6 +247,7 @@ export function ImmersiveAudioPlayer({
       setCurrentTime(0);
       setDuration(0);
       setRequiresManualStart(false);
+      cleanupTrackObjectUrl();
       
       try {
         let url = track.audioUrl;
@@ -229,48 +261,23 @@ export function ImmersiveAudioPlayer({
         if (!url) {
           throw new Error("Audio generation returned no playable URL");
         }
+
+        url = await materializeTrackUrl(url);
+
+        if (cancelled || !audioRef.current) return;
         
         globalAudioManager.stopAllExcept(audioRef.current);
         
         const audio = audioRef.current;
-        audio.crossOrigin = "anonymous";
-        audio.src = url;
-        audio.load();
-        audio.volume = mainMuted ? 0 : mainVolume;
-        
-        audio.onloadedmetadata = () => {
-          if (!cancelled) {
-            setDuration(audio.duration || 0);
-            setIsLoading(false);
-          }
+        const markReady = () => {
+          if (cancelled) return;
+          setDuration(audio.duration || 0);
+          setIsLoading(false);
         };
 
-        audio.oncanplay = () => {
-          if (!cancelled) {
-            setIsLoading(false);
-          }
-        };
-        
-        audio.onended = () => {
-          if (!cancelled) {
-            setIsPlaying(false);
-            narrationEndedRef.current = true;
-            
-            // For Watch sessions: enter meditation phase, don't auto-advance
-            if (isWatchSession) {
-              setInMeditationPhase(true);
-              // Un-duck ambient music to full volume (narration is done)
-              return;
-            }
-            
-            if (continuousPlay && hasNext) {
-              setTimeout(() => {
-                if (!cancelled) onNextTrack();
-              }, 1500);
-            }
-          }
-        };
-        
+        audio.onloadedmetadata = markReady;
+        audio.onloadeddata = markReady;
+        audio.oncanplay = markReady;
         audio.onerror = () => {
           if (!cancelled) {
             setIsLoading(false);
@@ -278,6 +285,36 @@ export function ImmersiveAudioPlayer({
             toast.error("This watch audio could not be played.");
           }
         };
+
+        audio.onended = () => {
+          if (!cancelled) {
+            setIsPlaying(false);
+            narrationEndedRef.current = true;
+
+            // For Watch sessions: enter meditation phase, don't auto-advance
+            if (isWatchSession) {
+              setInMeditationPhase(true);
+              // Un-duck ambient music to full volume (narration is done)
+              return;
+            }
+
+            if (continuousPlay && hasNext) {
+              setTimeout(() => {
+                if (!cancelled) onNextTrack();
+              }, 1500);
+            }
+          }
+        };
+
+        audio.crossOrigin = "anonymous";
+        audio.pause();
+        audio.src = url;
+        audio.volume = mainMuted ? 0 : mainVolume;
+        audio.load();
+
+        if (audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          markReady();
+        }
         
         // Start session timer for Watch sessions
         if (isWatchSession && !sessionStartRef.current) {
@@ -319,8 +356,30 @@ export function ImmersiveAudioPlayer({
     };
 
     loadTrack();
-    return () => { cancelled = true; };
-  }, [isOpen, track, currentIndex]);
+    return () => {
+      cancelled = true;
+      if (audioRef.current) {
+        audioRef.current.onloadedmetadata = null;
+        audioRef.current.onloadeddata = null;
+        audioRef.current.oncanplay = null;
+        audioRef.current.onended = null;
+        audioRef.current.onerror = null;
+      }
+    };
+  }, [
+    cleanupTrackObjectUrl,
+    continuousPlay,
+    currentIndex,
+    hasNext,
+    isOpen,
+    isWatchSession,
+    mainMuted,
+    mainVolume,
+    materializeTrackUrl,
+    onNextTrack,
+    recorder,
+    track,
+  ]);
 
   // ── Watch session 15-minute timer ──
   useEffect(() => {
@@ -564,10 +623,11 @@ export function ImmersiveAudioPlayer({
       if (ambientRef.current) { ambientRef.current.pause(); }
       if (ambientNextRef.current) { ambientNextRef.current.pause(); }
       if (crossfadeTimerRef.current) { clearInterval(crossfadeTimerRef.current); }
+      cleanupTrackObjectUrl();
       setIsPlaying(false);
       setAmbientPlaying(false);
     }
-  }, [isOpen]);
+  }, [cleanupTrackObjectUrl, isOpen]);
 
   const togglePlayPause = useCallback(() => {
     const audio = audioRef.current;
