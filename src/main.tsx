@@ -22,9 +22,9 @@ const isQuestBrowser = /OculusBrowser|Meta Quest/i.test(navigator.userAgent);
 const isMetaWebView =
   /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent) &&
   !isQuestBrowser;
-const previewFreshnessKey = "__preview_sw_freshened_v2__";
+const previewFreshnessKey = "__preview_sw_freshened_v3__";
 const chunkReloadKey = "__chunk_reload_once__";
-const metaForceReloadKey = "__meta_force_reload_v2__";
+const metaForceReloadKey = "__meta_force_reload_v3__";
 const questBuildRefreshKeyPrefix = "__quest_build_refresh__:";
 const standardBuildRefreshKeyPrefix = "__standard_build_refresh__:";
 
