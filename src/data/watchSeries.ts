@@ -449,6 +449,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "The mind that delivers a nation — from slavery to Sinai.",
     icon: "🔥",
     sessions: [],
+    mornings: MOSES_MORNING,
     weekOverviews: MOSES_WEEKS,
   },
   {
@@ -461,6 +462,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "The mind that stands alone against a culture — from brook to chariot.",
     icon: "⚡",
     sessions: [],
+    mornings: ELIJAH_MORNING,
     weekOverviews: ELIJAH_WEEKS,
   },
   {
@@ -473,6 +475,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "A man after God's own heart — from the fields to the throne.",
     icon: "👑",
     sessions: [],
+    mornings: DAVID_MORNING,
     weekOverviews: DAVID_WEEKS,
   },
   {
@@ -485,6 +488,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "What you meant for evil, God meant for good.",
     icon: "🌾",
     sessions: [],
+    mornings: JOSEPH_MORNING,
     weekOverviews: JOSEPH_WEEKS,
   },
   {
@@ -497,6 +501,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "Faithfulness in exile — the mind that won't bow.",
     icon: "🦁",
     sessions: [],
+    mornings: DANIEL_MORNING,
     weekOverviews: DANIEL_WEEKS,
   },
   {
@@ -509,6 +514,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "Leave everything, gain everything — the father of faith.",
     icon: "⭐",
     sessions: [],
+    mornings: ABRAHAM_MORNING,
     weekOverviews: ABRAHAM_WEEKS,
   },
   {
@@ -521,6 +527,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "Women who changed everything — from Eve to the empty tomb.",
     icon: "💎",
     sessions: [],
+    mornings: WOMEN_MORNING,
     weekOverviews: WOMEN_WEEKS,
   },
   {
@@ -533,6 +540,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "They finished the race — will you?",
     icon: "🕊️",
     sessions: [],
+    mornings: RIGHTEOUS_DEAD_MORNING,
     weekOverviews: RIGHTEOUS_DEAD_WEEKS,
   },
   {
@@ -545,6 +553,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "The Spirit continues what the Son started.",
     icon: "🔥",
     sessions: [],
+    mornings: ACTS_MORNING,
     weekOverviews: ACTS_WEEKS,
   },
   {
@@ -557,6 +566,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "Stories that rearrange how you see everything.",
     icon: "📖",
     sessions: [],
+    mornings: PARABLES_MORNING,
     weekOverviews: PARABLES_WEEKS,
   },
   {
@@ -569,6 +579,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "The Lamb who was slain now reigns.",
     icon: "🌟",
     sessions: [],
+    mornings: REVELATION_MORNING,
     weekOverviews: REVELATION_WEEKS,
   },
 
@@ -583,6 +594,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "The whole story, one night at a time.",
     icon: "📜",
     sessions: [],
+    mornings: CHRONOLOGICAL_365_MORNING,
     seriesBlocks: CHRONOLOGICAL_365_BLOCKS,
   },
   {
@@ -595,6 +607,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "Every theme of Scripture, explored deeply.",
     icon: "🧠",
     sessions: [],
+    mornings: THEMATIC_365_MORNING,
     seriesBlocks: THEMATIC_365_BLOCKS,
   },
   {
@@ -607,6 +620,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "26 lives, one year, the same Master Mind in all.",
     icon: "👤",
     sessions: [],
+    mornings: CHARACTER_365_MORNING,
     seriesBlocks: CHARACTER_365_BLOCKS,
   },
 ];
