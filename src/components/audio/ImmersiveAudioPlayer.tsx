@@ -383,6 +383,13 @@ export function ImmersiveAudioPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, isOpen, isWatchSession, cleanupTrackObjectUrl, materializeTrackUrl]);
 
+  // Sync volume changes to live audio without restarting the track
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = mainMuted ? 0 : mainVolume;
+    }
+  }, [mainVolume, mainMuted]);
+
   // ── Watch session 15-minute timer ──
   useEffect(() => {
     if (!isOpen || !isWatchSession || !sessionStartRef.current) return;
