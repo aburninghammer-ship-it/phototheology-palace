@@ -3,9 +3,12 @@
  * Uses the same dark theme as Level 3 via Tailwind tokens
  */
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Sunrise, Moon, BookOpenCheck, CalendarDays, Church, Heart,
   GraduationCap, Users, Baby, Gem, Shield, Globe, HeartHandshake,
+  Sparkles, ArrowRight,
 } from "lucide-react";
 
 const CHAPEL_ITEMS = [
@@ -24,6 +27,52 @@ const CHAPEL_ITEMS = [
   { icon: HeartHandshake, label: "Blueprint: Friendship", path: "/blueprint-friendship", description: "Godly friendship principles", color: "text-lime-400" },
 ];
 
+function DailyVersePreview() {
+  const navigate = useNavigate();
+  const today = new Date().toISOString().split("T")[0];
+
+  const { data: verse } = useQuery({
+    queryKey: ["chapel-daily-verse", today],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("daily_verses")
+        .select("verse_reference, verse_text")
+        .eq("date", today)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 1000 * 60 * 30,
+  });
+
+  if (!verse) return null;
+
+  return (
+    <button
+      onClick={() => navigate("/daily-verse")}
+      className="w-full text-left rounded-xl border border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 to-amber-500/5 p-4 transition-all hover:border-yellow-400/50 hover:shadow-[0_0_16px_2px_rgba(234,179,8,0.15)]"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1.5 min-w-0">
+          <div className="flex items-center gap-2 text-yellow-400">
+            <Sparkles className="h-4 w-4 shrink-0" />
+            <span className="text-xs font-semibold uppercase tracking-wide">
+              Today's Verse
+            </span>
+          </div>
+          <p className="text-sm font-semibold text-foreground">
+            {verse.verse_reference}
+          </p>
+          <p className="text-xs text-muted-foreground line-clamp-2 italic">
+            "{verse.verse_text}"
+          </p>
+        </div>
+        <ArrowRight className="h-4 w-4 shrink-0 text-yellow-400 mt-1" />
+      </div>
+    </button>
+  );
+}
+
 export default function BasicChapelTab() {
   const navigate = useNavigate();
 
@@ -38,6 +87,9 @@ export default function BasicChapelTab() {
             Devotionals, watches, reading plans, community, and life resources — all in one place.
           </p>
         </div>
+
+        {/* Daily Verse preview card — always visible */}
+        <DailyVersePreview />
 
         <div className="grid gap-3">
           {CHAPEL_ITEMS.map((item) => {
