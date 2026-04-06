@@ -273,11 +273,14 @@ export function useWatchPlayer(options?: UseWatchPlayerOptions) {
     async (session: MorningWatchSession, tractName: string, tractId?: string) => {
       setIsGenerating(true);
       try {
+        console.log("[WatchPlayer] Starting Morning Watch generation for day", session.dayNumber);
         const prompt = buildMorningPrompt(session, tractName);
+        console.log("[WatchPlayer] Prompt length:", prompt.length, "chars");
         const { data, error } = await callJeeves(
           { mode: "morning-watch", message: prompt },
           "morning-watches",
         );
+        console.log("[WatchPlayer] Jeeves response:", { hasData: !!data, error: error ? String(error) : null });
         if (error) throw new Error(String(error));
 
         const d = data as Record<string, unknown> | string | null;
@@ -288,6 +291,7 @@ export function useWatchPlayer(options?: UseWatchPlayerOptions) {
               ? String((d as any).response || (d as any).result || JSON.stringify(d))
               : "";
 
+        console.log("[WatchPlayer] Script length:", script.length, "chars");
         if (!script) throw new Error("Empty script returned");
 
         const track: ImmersiveTrack = {
