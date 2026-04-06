@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
+import { VoiceQualitySelector } from "./VoiceQualitySelector";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { setupMediaSession, updateMediaSessionPlaybackState, clearMediaSession } from "@/lib/mediaSessionHelper";
 
@@ -340,12 +341,15 @@ export const AudioNarrator = ({
       <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary" />
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          {title && (
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <Headphones className="h-4 w-4 text-primary" />
-              {title}
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {title && (
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Headphones className="h-4 w-4 text-primary" />
+                {title}
+              </div>
+            )}
+            <VoiceQualitySelector compact />
+          </div>
           
           {showVoiceSelector && (
             <div className="flex items-center gap-3 flex-wrap">
