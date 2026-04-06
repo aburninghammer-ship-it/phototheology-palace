@@ -32,7 +32,7 @@ const MODE_OPTIONS: ModeOption[] = [
   {
     mode: "explorer",
     level: 2,
-    label: "Builder",
+    label: "Explorer",
     tagline: "I'm ready to think",
     description: "Connect Scripture for yourself — see patterns, structures, and meaning unfold with clarity and precision.",
     icon: Compass,

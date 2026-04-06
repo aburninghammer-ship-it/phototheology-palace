@@ -109,7 +109,7 @@ export const useChangeManager = () => {
     // Get identity messaging
     getIdentityMessage: () => {
       if (changeSpine.phase === 'orientation') return "Welcome, Seeker";
-      if (changeSpine.phase === 'first_win') return "Builder in Training";
+      if (changeSpine.phase === 'first_win') return "Explorer in Training";
       if (changeSpine.phase === 'reinforcement') return "Rising Architect";
       if (changeSpine.phase === 'commitment') return "Sanctuary Architect";
       return "Seeker";

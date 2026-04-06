@@ -22,7 +22,7 @@ const LEVELS: LevelInfo[] = [
   {
     mode: "explorer",
     level: 2,
-    label: "Builder",
+    label: "Explorer",
     icon: Compass,
     chipColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
   },

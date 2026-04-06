@@ -43,7 +43,7 @@ const LEVELS: LevelOption[] = [
   {
     mode: "explorer",
     level: 2,
-    identity: "Builder",
+    identity: "Explorer",
     declaration: "\"I'm ready to think.\"",
     description:
       "I'm ready to connect Scripture for myself — to see patterns, structures, and meaning unfold with clarity and precision.",
