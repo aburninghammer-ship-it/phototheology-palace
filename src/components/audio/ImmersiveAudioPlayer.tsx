@@ -146,6 +146,7 @@ export function ImmersiveAudioPlayer({
   // ── Video recording for Watch sessions ──
   const recorder = useWatchRecorder();
   const [showSharePanel, setShowSharePanel] = useState(false);
+  const [requiresManualStart, setRequiresManualStart] = useState(false);
 
   // Ambient mode — declared early so timer effect can reference it
   const currentTrackObj = tracks[currentIndex];
@@ -200,6 +201,7 @@ export function ImmersiveAudioPlayer({
     sessionStartRef.current = null;
     setSessionElapsed(0);
     setInMeditationPhase(false);
+    setRequiresManualStart(false);
     narrationEndedRef.current = false;
   }, [currentIndex]);
 
@@ -213,6 +215,7 @@ export function ImmersiveAudioPlayer({
       setIsPlaying(false);
       setCurrentTime(0);
       setDuration(0);
+      setRequiresManualStart(false);
       
       try {
         let url = track.audioUrl;
@@ -222,17 +225,28 @@ export function ImmersiveAudioPlayer({
           url = await track.generateAudio();
         }
         
-        if (cancelled || !url || !audioRef.current) return;
+        if (cancelled || !audioRef.current) return;
+        if (!url) {
+          throw new Error("Audio generation returned no playable URL");
+        }
         
         globalAudioManager.stopAllExcept(audioRef.current);
         
         const audio = audioRef.current;
+        audio.crossOrigin = "anonymous";
         audio.src = url;
+        audio.load();
         audio.volume = mainMuted ? 0 : mainVolume;
         
         audio.onloadedmetadata = () => {
           if (!cancelled) {
             setDuration(audio.duration || 0);
+            setIsLoading(false);
+          }
+        };
+
+        audio.oncanplay = () => {
+          if (!cancelled) {
             setIsLoading(false);
           }
         };
@@ -261,6 +275,7 @@ export function ImmersiveAudioPlayer({
           if (!cancelled) {
             setIsLoading(false);
             console.error("[Immersive] Audio error for track:", track.title);
+            toast.error("This watch audio could not be played.");
           }
         };
         
@@ -268,25 +283,37 @@ export function ImmersiveAudioPlayer({
         if (isWatchSession && !sessionStartRef.current) {
           sessionStartRef.current = Date.now();
         }
-        
-        await audio.play();
-        if (!cancelled) {
-          setIsPlaying(true);
-          // Auto-start recording for watch sessions
-          if (isWatchSession && !recorder.isRecording && !recorder.videoBlob) {
-            try {
-              recorder.setTitle(track.title || "Watch Session");
-              recorder.setSubtitle(track.subtitle || track.modeName || "");
-              recorder.startRecording(audio, ambientRef.current);
-            } catch (e) {
-              console.warn("[Immersive] Recording auto-start failed:", e);
+
+        try {
+          await audio.play();
+          if (!cancelled) {
+            setIsPlaying(true);
+            setIsLoading(false);
+            // Auto-start recording for watch sessions
+            if (isWatchSession && !recorder.isRecording && !recorder.videoBlob) {
+              try {
+                recorder.setTitle(track.title || "Watch Session");
+                recorder.setSubtitle(track.subtitle || track.modeName || "");
+                recorder.startRecording(audio, ambientRef.current);
+              } catch (e) {
+                console.warn("[Immersive] Recording auto-start failed:", e);
+              }
             }
+          }
+        } catch (playErr) {
+          if (!cancelled) {
+            console.warn("[Immersive] Autoplay blocked or failed:", playErr);
+            setIsPlaying(false);
+            setIsLoading(false);
+            setRequiresManualStart(true);
+            toast("Audio is ready — tap Play to start your watch.");
           }
         }
       } catch (err) {
         if (!cancelled) {
           console.error("[Immersive] Failed to load track:", err);
           setIsLoading(false);
+          toast.error("Morning Watch audio could not be prepared. Please try again.");
         }
       }
     };
@@ -546,7 +573,19 @@ export function ImmersiveAudioPlayer({
     const audio = audioRef.current;
     if (!audio) return;
     if (audio.paused) {
-      audio.play().then(() => setIsPlaying(true)).catch(() => {});
+      setIsLoading(true);
+      audio.play()
+        .then(() => {
+          setIsPlaying(true);
+          setIsLoading(false);
+          setRequiresManualStart(false);
+        })
+        .catch((err) => {
+          console.error("[Immersive] Manual play failed:", err);
+          setIsPlaying(false);
+          setIsLoading(false);
+          toast.error("Unable to start audio on this device.");
+        });
     } else {
       audio.pause();
       setIsPlaying(false);
@@ -901,6 +940,14 @@ export function ImmersiveAudioPlayer({
                 )}
               />
             ))}
+          </div>
+        )}
+
+        {requiresManualStart && !isLoading && (
+          <div className="relative z-10 px-6">
+            <div className="mx-auto mb-3 max-w-md rounded-full border border-border/50 bg-background/60 px-4 py-2 text-center text-xs text-muted-foreground backdrop-blur-sm">
+              Audio is ready. Tap play to start your watch.
+            </div>
           </div>
         )}
 
