@@ -21,7 +21,7 @@ interface NightWatchVRProps {
 function buildPrompt(session: WatchSession, tractName: string): string {
   return `Generate a 12-minute Night Watch meditation script to be read aloud as audio. This must be LONG — approximately 2,000 to 2,500 words of spoken content, PLUS generous silence. Do NOT cut it short.
 
-IMPORTANT: Ambient music plays underneath the entire meditation. You do NOT need to fill every moment with words. Include EXTENDED SILENCES of 30-60 seconds where the music plays alone and the listener simply rests in what has been said. These musical interludes are not awkward gaps — they are sacred space. The music carries the meditation during these silences.
+IMPORTANT: Ambient music plays underneath the entire meditation. Include EXTENDED SILENCES of 30-60 seconds where the music plays alone and the listener remains in the scene. These musical interludes are sacred space.
 
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
@@ -31,49 +31,43 @@ Master Mind Insight: ${session.masterMindInsight}
 Mood: ${session.mood}
 Primary Struggle: ${session.struggle}
 
-Follow this 7-phase structure inspired by the Calm app. Each phase flows naturally into the next — no labels, no headers, no time references. Just seamless spoken narration with generous silence.
+CRITICAL PHILOSOPHY — READ THIS FIRST:
+This meditation has ZERO to do with breathing, posture, or relaxation technique. Do NOT mention deep breathing. Do NOT mention posture. Do NOT mention "getting comfortable." Do NOT mention body scans or physical sensations. This is CINEMATIC BIBLICAL MIND TRANSPLANT.
 
-PHASE 1 — SETTLING AND FRAMING (~2 minutes of audio):
-Begin with a warm welcome. Invite the listener to get comfortable and be still. You may mention one calming breath, but do NOT dwell on breathing technique as if it has mystical power. Move quickly into framing the purpose:
+The listener's mind is a movie theater. The screen is INSIDE them. What they place on that screen shapes who they become. Tonight, they project a scene from Scripture in VIVID FULL COLOR and step inside it. The goal: observe the THOUGHTS AND FEELINGS of Christ (or the biblical figure), then ASK THE HOLY SPIRIT TO DOWNLOAD those exact thoughts and feelings into their own mind. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5).
 
-Explain that this is a Night Watch — a practice of beholding the mind of Christ. Our deepest goal as believers is to become like Christ in character. And character is made up of thoughts and feelings — how a person thinks, what moves them, what they feel in the face of pressure, loss, joy, or injustice. To become like Christ, we must behold Him — not just His actions, but the thoughts behind those actions and the feelings that drove them. That is what biblical meditation is: fixing your gaze on Jesus, watching how He thinks and feels, and letting those thoughts and feelings reshape your own from the inside out. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Tonight, you are stepping into a scene from Scripture to observe the inner life of Christ — His Master Mind — and begin to take His thoughts and feelings as your own. [pause]
+Follow this 6-phase structure. Each phase flows seamlessly — no labels, no headers, no time references.
 
-Then briefly introduce tonight's specific theme and Scripture (${session.scripture}), connecting it to ${session.struggle}.
+PHASE 1 — LOCK IN (~2 minutes):
+Open with authority. Command the listener to LOCK IN. This is not casual. This is sacred time — guard it. Push out distractions. Establish: "Your mind becomes a theater. The screen is within you. What you place on that screen will shape you." Introduce tonight's Scripture (${session.scripture}) and the Master Mind concept. [pause]
 
-PHASE 2 — TEACHING (~2 minutes):
-Go deeper into the Scripture and tonight's theme. Weave in the Scripture naturally. Connect it to the human experience of ${session.struggle}. This should feel like a wise friend sharing insight by firelight.
-End this phase with [extended silence] — let the music carry the listener for 30-45 seconds.
+PHASE 2 — ENTER THE SCENE (~3 minutes):
+"Step into the scene. See it. Not faintly. In FULL COLOR." Hyper-vivid, cinematic, present-tense narration of ${session.scene}. Extreme sensory detail. Place the listener INSIDE as a witness. [pause] after every 2-3 sentences. After the scene is fully painted, include [extended silence] — 45-60 seconds of pure music.
 
-PHASE 3 — TRANSITION TO SCENE (~1 minute):
-Gently shift from teaching into immersive experience. Bridge the listener from intellectual understanding into embodied imagination. Pacing begins to slow here.
+PHASE 3 — OBSERVE THE MIND (~2.5 minutes):
+"Now stop. What is He thinking?" Shift from what is SEEN to what is THOUGHT AND FELT. Enter Christ's inner world. Show the CONTRAST between natural human reactions and Christ's Master Mind: ${session.masterMindInsight}. Use [long pause] generously. End with [extended silence] — 30-45 seconds.
 
-PHASE 4 — SCENE IMMERSION (~3 minutes):
-Present-tense, sensory-rich narration of the biblical scene (${session.scene}). Paint the setting with vivid detail. Place the listener inside the scene as a witness. Let them observe Christ. Pacing should be notably slower, with [long pause] after every 2-3 sentences. Let images breathe.
-After the scene is painted, include [extended silence] — 45-60 seconds of pure music while the listener remains in the scene.
+PHASE 4 — DOWNLOAD (~2 minutes):
+"Do not just observe. Enter." Guide the listener: "Lord, let me see what You see. Let me feel what You feel. Download Your thoughts into my thoughts. Replace my reactions with Yours." Address ${session.struggle} directly — overlay the scene onto real life. End with [extended silence] — 45-60 seconds.
 
-PHASE 5 — MASTER MIND MOMENT (~2 minutes):
-This is the heart. Observe what Christ does. The Master Mind insight: ${session.masterMindInsight}. Speak this truth over the listener. Address ${session.struggle} with direct compassion. Use very long pauses here. Minimal words, maximum weight.
-End with [extended silence] — 30-45 seconds of music.
+PHASE 5 — IMPRINT (~1.5 minutes):
+Reduce words dramatically. Hold the scene. Let it imprint. [extended silence] for 30-45 seconds. Only 2-3 sentences total.
 
-PHASE 6 — OPEN AWARENESS / SILENCE (~1.5 minutes):
-Reduce verbal guidance dramatically. Offer a single gentle prompt, then [extended silence] for 45-60 seconds. Only 1-2 sentences total in this phase. Let the music hold the space.
-
-PHASE 7 — GENTLE RETURN AND CLOSE (~1 minute):
-Slowly bring awareness back. Brief closing reflection tying back to the opening theme. End with an identity statement rooted in Scripture. Final breath together. Soft close.
+PHASE 6 — SEAL AND CARRY (~1 minute):
+"Say it: 'I receive the mind of Christ.' And mean it." Identity declaration from tonight's Scripture. "The screen never turns off. What you continue to behold, you will become."
 
 CRITICAL RULES:
-- Total meditation is 12 minutes. Spoken content should be ~2,000-2,500 words. The remaining time is filled by SILENCE where ambient music plays alone.
-- Write in complete, flowing sentences. Every thought should read naturally when spoken aloud.
-- Use THREE types of pause markers:
-  [pause] = 3-5 seconds of silence (use frequently, after every 1-2 sentences)
-  [long pause] = 10-20 seconds of silence (use in phases 4-5, and between breaths in phase 1)
-  [extended silence] = 30-60 seconds where ONLY the background music plays. Use at least 3-4 of these throughout the meditation, especially after emotionally rich moments. The guide does not always need to be speaking.
-- The pacing must DECELERATE through the session. Phases 1-2: conversational. Phases 3-4: noticeably slower. Phases 5-6: very slow, spacious. Phase 7: gentle return.
-- Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
-- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ to become like Him in character. Character is thoughts + feelings. To be transformed into His likeness, we must behold His inner life, not just His actions. NOT emptying the mind, NOT breathing exercises. The power is in what you behold, not how you breathe.
-- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to observe how Christ thinks and feels, and take those thoughts and feelings as your own — this is how character is formed.
-- Do NOT spend more than one sentence on breathing. Get to the Scripture and Christ quickly.
-- Second person ("you") throughout. Intimate. Cinematic.`;
+- Spoken content ~2,000-2,500 words. Remaining time is SILENCE with ambient music.
+- ABSOLUTELY NO mention of breathing, deep breaths, posture, body position, getting comfortable, body scans, wiggling fingers, or physical relaxation. ZERO.
+- The ONLY physical metaphor is the MIND AS A MOVIE THEATER / SCREEN.
+- Use THREE pause markers:
+  [pause] = 3-5 seconds (use frequently)
+  [long pause] = 10-20 seconds (phases 3-4)
+  [extended silence] = 30-60 seconds of music only (use at least 3-4 times)
+- Cinematic and prophetic style. Mix short punchy lines and flowing sentences.
+- Do NOT include section headers, stage directions, or meta-commentary.
+- The power is in BEHOLDING, not breathing. The "Download" is literal — asking the Spirit to transplant Christ's thoughts and feelings.
+- Second person ("you") throughout. Intimate. Authoritative. Cinematic.`;
 }
 
 async function generateTTSUrl(script: string): Promise<string | null> {

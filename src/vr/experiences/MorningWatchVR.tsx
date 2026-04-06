@@ -19,7 +19,7 @@ interface MorningWatchVRProps {
 function buildPrompt(session: MorningWatchSession, tractName: string): string {
   return `Generate a 12-minute Morning Watch activation script to be read aloud as audio. This must be LONG — approximately 2,000 to 2,500 words of spoken content, PLUS generous silence. Do NOT cut it short.
 
-IMPORTANT: Ambient music plays underneath the entire meditation. You do NOT need to fill every moment with words. Include EXTENDED SILENCES of 30-60 seconds where the music plays alone and the listener simply sits in what has been declared. These musical interludes are not awkward gaps — they are sacred space. The music carries the activation during these silences.
+IMPORTANT: Ambient music plays underneath. Include EXTENDED SILENCES of 30-60 seconds where the music plays alone. These are sacred space — the music carries the activation.
 
 Title: ${session.title}
 Series: ${tractName}, Day ${session.dayNumber}
@@ -31,48 +31,52 @@ Energy: ${session.energy}
 Commitment Style: ${session.commitmentStyle}
 Scenario Types: ${session.scenarioTypes.join(', ')}
 
-Follow this 7-phase structure inspired by the Calm app's morning meditations. Each phase flows naturally into the next — no labels, no headers, no time references. The Morning Watch is more alert and directed than the Night Watch, but still includes generous moments of musical silence.
+CRITICAL PHILOSOPHY — READ THIS FIRST:
+This meditation has ZERO to do with breathing, posture, or relaxation. Do NOT mention deep breathing. Do NOT mention posture. Do NOT mention "getting comfortable" or body awareness. This is CINEMATIC BIBLICAL MIND ACTIVATION.
 
-PHASE 1 — AWAKENING AND FRAMING (~2 minutes of audio):
-Begin with a warm good morning. Invite the listener to sit up, plant their feet, and gather themselves. You may mention one centering breath, but do NOT dwell on breathing technique — move quickly into the purpose.
+Last night the listener BEHELD the thoughts and feelings of Christ on the screen of their mind. This morning, those thoughts and feelings become THEIRS. The download completes. The mind transplant activates. They are THINKING WITH HIM today. The screen never turns off. Every situation gets overlaid with the Master Mind.
 
-Explain that this is a Morning Watch — the activation half of the Master Mind practice. Last night you beheld the inner life of Christ — not just what He did, but how He thought and what He felt. Character is made up of thoughts and feelings, and to become like Christ in character, you must first behold those thoughts and feelings and then take them as your own. That is what you did last night. This morning, the goal is to CARRY those thoughts and feelings into your day — to think with Christ, to feel with Christ, to respond as He would. This is biblical meditation — not emptying the mind, but filling it with the mind of Christ until His character becomes yours. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Today you are not just remembering what Christ thought — you are thinking WITH Him. [pause]
+Follow this 6-phase structure. Each phase flows seamlessly — no labels, no headers, no time references.
 
-PHASE 2 — REMEMBER LAST NIGHT (~1.5 minutes):
-Recall last night's Master Mind insight from "${session.pairedNightTitle}". Briefly revisit the scene, the core truth. Weave in the night scripture naturally. The listener should feel continuity between night and morning.
-End with [extended silence] — 30-45 seconds of music alone while the memory settles.
+PHASE 1 — LOCK IN AND ACTIVATE (~2 minutes):
+Open with energy and authority. "Lock in. The screen is still on. The download activates NOW." The listener's mind is a theater — this morning the film continues, but now they are BECOMING the character. Establish: "This is not emptying the mind — it is FILLING it with the mind of Christ and CARRYING it into your day." [pause]
+
+PHASE 2 — RECALL THE SCENE (~1.5 minutes):
+Flash back to last night: "${session.pairedNightTitle}". Trigger the memory vividly. "${session.nightInsight}." The listener should feel: last night you received; this morning you deploy.
+End with [extended silence] — 30-45 seconds.
 
 PHASE 3 — TRUTH DECLARATION (~2 minutes):
-Shift to this morning's Scripture: ${session.morningScripture}. Speak it with weight and conviction. Then unpack it into an identity statement. The activation principle: ${session.activationPrinciple}. Repeat the key Scripture phrase 2-3 times with [pause] after each, letting it sink deeper.
-Follow with [extended silence] — 30-40 seconds of music while the declaration reverberates.
+Morning Scripture: ${session.morningScripture}. Speak it with conviction — this is DECLARING, not reading. Unpack as identity upgrade: "This is who you are now. This is how you think now." Activation principle: ${session.activationPrinciple}. Repeat key phrase 2-3 times with [pause].
+Follow with [extended silence] — 30-40 seconds.
 
-PHASE 4 — MENTAL ALIGNMENT (~2 minutes):
-Translate the pattern into today's thinking. Walk through the mental shift — from the old default reaction to the Christ-pattern response. Be specific and practical. Use [pause] generously. Steady and clear, like a coach walking you through a play.
+PHASE 4 — OVERLAY ONTO REAL LIFE (~3 minutes):
+Present 3 vivid real-life scenarios based on: ${session.scenarioTypes.join(', ')}. For each:
+- Paint it cinematically with sensory detail
+- Name the OLD reaction honestly
+- OVERLAY the Master Mind: "The screen is still on. You see it differently now."
+- Show Christ's pattern in THAT EXACT MOMENT
+- [pause] after each
+After final scenario: [extended silence] — 45-60 seconds.
 
-PHASE 5 — REAL-LIFE SCENARIOS (~2.5 minutes):
-Present 3 distinct, vivid scenarios based on: ${session.scenarioTypes.join(', ')}. For each: paint the situation concretely, name the old reaction honestly, then speak the Master Mind response. [pause] after each scenario. Make these feel REAL with sensory details.
-After the final scenario, include [extended silence] — 45-60 seconds of music. Let the scenarios settle into the body.
+PHASE 5 — LOCK THE DOWNLOAD (~1.5 minutes):
+"The download is complete. The thoughts of Christ are running in your system." Declare: "I carry the mind of Christ today. His thoughts are my thoughts." [extended silence] — 30-40 seconds.
 
-PHASE 6 — OPEN STILLNESS (~1 minute):
-Reduced guidance. "Take a moment to let these truths settle into your body." [extended silence] for 30-40 seconds. Only 1-2 sentences total. Let the music hold the space.
-
-PHASE 7 — COMMITMENT AND SEND-OFF (~1 minute):
-End with resolve, not a question. ${session.commitmentStyle} style commitment. Bring energy up slightly — resolute and warm. One final breath. A brief blessing or send-off.
+PHASE 6 — SEND-OFF WITH AUTHORITY (~1 minute):
+${session.commitmentStyle} energy. "Today, you walk differently. When the old mind tries to run its program — you override it. You have a new operating system. The Master Mind." Identity statement from morning Scripture. "Now go. The screen is on. What you behold, you become."
 
 CRITICAL RULES:
-- Total meditation is 12 minutes. Spoken content should be ~2,000-2,500 words. The remaining time is filled by SILENCE where ambient music plays alone.
-- Write in complete, flowing sentences. Every thought should read naturally when spoken aloud.
-- Use THREE types of pause markers:
-  [pause] = 3-5 seconds of silence (use frequently, after every 1-2 sentences)
-  [long pause] = 10-20 seconds of silence (use after key truth declarations and between scenarios)
-  [extended silence] = 30-60 seconds where ONLY the background music plays. Use at least 3-4 of these throughout the meditation, especially after emotionally rich moments. The guide does not always need to be speaking.
-- Morning Watch tone is CLEAR, WARM, and DIRECTED — not dreamy. Energy level: ${session.energy}. Think of a trusted coach at sunrise, not a sleep guide.
-- Do NOT include any time references, section headers, stage directions, or meta-commentary. Only words to be spoken aloud plus pause markers.
-- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ to become like Him in character. Character = thoughts + feelings. To be transformed, we behold His inner life, not just His actions. NOT emptying the mind, NOT breathing exercises, NOT Eastern mysticism. The power is in what you behold, not how you breathe.
-- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to observe how Christ thinks and feels, take those thoughts and feelings as your own, and walk in them — this is how Christlike character is formed.
-- Night Watch: "Behold the thoughts and feelings of Christ — and receive them." Morning Watch: "Now take those thoughts as your own — and walk in them."
-- Do NOT spend more than one sentence on breathing. The power is in beholding Christ, not in breath work.
-- Second person ("you") throughout. End with resolve and momentum, not a question.`;
+- Spoken content ~2,000-2,500 words. Remaining time is SILENCE with ambient music.
+- ABSOLUTELY NO mention of breathing, deep breaths, posture, body position, getting comfortable, body scans, sitting up, planting feet, wiggling fingers, or physical relaxation. ZERO.
+- The ONLY physical metaphor is MIND AS THEATER / SCREEN / OPERATING SYSTEM.
+- Use THREE pause markers:
+  [pause] = 3-5 seconds (frequent)
+  [long pause] = 10-20 seconds (after key declarations)
+  [extended silence] = 30-60 seconds of music only (at least 3-4 times)
+- Morning Watch tone is CLEAR, BOLD, ACTIVATED — like a coach before a championship game. Energy: ${session.energy}.
+- Cinematic and prophetic style. Mix short punchy lines and flowing sentences.
+- Do NOT include section headers, stage directions, or meta-commentary.
+- The power is in BEHOLDING and DEPLOYING. The download becomes the operating system.
+- Second person ("you") throughout. End with authority and momentum.`;
 }
 
 async function generateTTSUrl(script: string): Promise<string | null> {
