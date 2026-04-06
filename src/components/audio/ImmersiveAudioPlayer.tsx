@@ -566,7 +566,10 @@ export function ImmersiveAudioPlayer({
     }
   }, []);
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  // For watch sessions, use 15-min session progress; otherwise audio progress
+  const displayDuration = isWatchSession ? WATCH_SESSION_DURATION : duration;
+  const displayCurrentTime = isWatchSession ? sessionElapsed : currentTime;
+  const progress = displayDuration > 0 ? (displayCurrentTime / displayDuration) * 100 : 0;
   const typeIcon = track?.icon || (
     track?.type === "commentary" ? "📖" :
     track?.type === "apologetics" ? "⚔️" :
