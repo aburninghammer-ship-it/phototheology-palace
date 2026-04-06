@@ -7,9 +7,6 @@
  * - Layered ambient background music
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { VoiceQualitySelector } from "./VoiceQualitySelector";
-import { WatchSharePanel } from "./WatchSharePanel";
-import { useWatchRecorder } from "@/hooks/useWatchRecorder";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -18,7 +15,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   X, Play, Pause, SkipForward, SkipBack, Volume2, VolumeX,
   Music, ListMusic, Maximize2, Settings, Loader2, ChevronUp, ChevronDown,
-  Video, VideoOff, Share2, Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,7 +25,6 @@ import type { ImmersiveTrack } from "@/hooks/useImmersiveMode";
 import { ImmersiveParticles } from "./immersive/ImmersiveParticles";
 import { ImmersiveKaraokeVerse } from "./immersive/ImmersiveKaraokeVerse";
 import { ImmersiveSleepTimer } from "./immersive/ImmersiveSleepTimer";
-import { toast } from "sonner";
 
 // Cinematic music tracks for background layering
 const AMBIENT_BG_TRACKS = [
@@ -103,6 +98,7 @@ export function ImmersiveAudioPlayer({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [mainVolume, setMainVolume] = useState(1);
@@ -112,7 +108,7 @@ export function ImmersiveAudioPlayer({
   const ambientRef = useRef<HTMLAudioElement | null>(null);
   const ambientNextRef = useRef<HTMLAudioElement | null>(null);
   const crossfadeTimerRef = useRef<number>();
-  const [ambientTrackIdx, setAmbientTrackIdx] = useState(() => Math.floor(Math.random() * AMBIENT_BG_TRACKS.length));
+  const [ambientTrackIdx, setAmbientTrackIdx] = useState(0);
   const [ambientPlaying, setAmbientPlaying] = useState(false);
   
   // Verse display
@@ -133,27 +129,14 @@ export function ImmersiveAudioPlayer({
   // Verse progress (for karaoke word-level sync)
   const [verseProgress, setVerseProgress] = useState(0);
 
-  // ── 15-minute Watch session timer ──
-  const WATCH_SESSION_DURATION = 15 * 60; // 15 minutes in seconds
-  const WATCH_FADE_OUT_DURATION = 10; // fade out music over last 10 seconds
-  const isWatchSession = track?.type === "devotional" && (track?.modeName?.includes("Watch") ?? false);
-  const sessionStartRef = useRef<number | null>(null);
+  // Session timer (for Watch sessions with fixed duration)
+  const sessionStartRef = useRef<number>(0);
   const [sessionElapsed, setSessionElapsed] = useState(0);
-  const [inMeditationPhase, setInMeditationPhase] = useState(false);
-  const sessionFadeTimerRef = useRef<number>();
-  const narrationEndedRef = useRef(false);
-
-  // ── Video recording for Watch sessions ──
-  const recorder = useWatchRecorder();
-  const [showSharePanel, setShowSharePanel] = useState(false);
-  const [requiresManualStart, setRequiresManualStart] = useState(false);
-  const trackObjectUrlRef = useRef<string | null>(null);
-
-  // Ambient mode — declared early so timer effect can reference it
-  const currentTrackObj = tracks[currentIndex];
-  const defaultAmbientMode = currentTrackObj?.ambientMode ?? "music";
-  const [ambientModeOverride, setAmbientModeOverride] = useState<"music" | "ambient-sounds" | null>(null);
-  const ambientMode = ambientModeOverride ?? defaultAmbientMode;
+  const [voiceEnded, setVoiceEnded] = useState(false);
+  const sessionFadeRef = useRef<number>();
+  const sessionDuration = track?.sessionDurationSec || 0;
+  const isWatchSession = sessionDuration > 0;
+  const SESSION_FADE_DURATION = 8000; // 8 second fade out at end
 
   // Compute ducked ambient volume — lower when voice is playing
   const getAmbientTargetVolume = useCallback((modeMultiplier: number) => {
@@ -161,35 +144,6 @@ export function ImmersiveAudioPlayer({
     // When voice is playing, duck the music significantly
     return isPlaying ? base * VOICE_DUCK_RATIO : base;
   }, [ambientVolume, sleepFadeMultiplier, isPlaying]);
-
-  const cleanupTrackObjectUrl = useCallback(() => {
-    if (trackObjectUrlRef.current) {
-      URL.revokeObjectURL(trackObjectUrlRef.current);
-      trackObjectUrlRef.current = null;
-    }
-  }, []);
-
-  const materializeTrackUrl = useCallback(async (sourceUrl: string) => {
-    if (!isWatchSession || sourceUrl.startsWith("blob:") || sourceUrl.startsWith("data:")) {
-      return sourceUrl;
-    }
-
-    try {
-      const response = await fetch(sourceUrl);
-      if (!response.ok) {
-        throw new Error(`Audio fetch failed: ${response.status}`);
-      }
-
-      const blob = await response.blob();
-      cleanupTrackObjectUrl();
-      const objectUrl = URL.createObjectURL(blob);
-      trackObjectUrlRef.current = objectUrl;
-      return objectUrl;
-    } catch (err) {
-      console.warn("[Immersive] Falling back to remote audio URL:", err);
-      return sourceUrl;
-    }
-  }, [cleanupTrackObjectUrl, isWatchSession]);
   
   // Initialize main audio
   useEffect(() => {
@@ -208,7 +162,6 @@ export function ImmersiveAudioPlayer({
       ambientNextRef.current.loop = false;
     }
     return () => {
-      cleanupTrackObjectUrl();
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
@@ -225,32 +178,9 @@ export function ImmersiveAudioPlayer({
         clearInterval(crossfadeTimerRef.current);
       }
     };
-  }, [cleanupTrackObjectUrl]);
+  }, []);
 
-  // Reset watch session state on track change
-  useEffect(() => {
-    sessionStartRef.current = null;
-    setSessionElapsed(0);
-    setInMeditationPhase(false);
-    setRequiresManualStart(false);
-    narrationEndedRef.current = false;
-  }, [currentIndex]);
-
-  // Stable refs for values needed inside loadTrack but that should NOT re-trigger it
-  const mainVolumeRef = useRef(mainVolume);
-  mainVolumeRef.current = mainVolume;
-  const mainMutedRef = useRef(mainMuted);
-  mainMutedRef.current = mainMuted;
-  const continuousPlayRef = useRef(continuousPlay);
-  continuousPlayRef.current = continuousPlay;
-  const hasNextRef = useRef(hasNext);
-  hasNextRef.current = hasNext;
-  const onNextTrackRef = useRef(onNextTrack);
-  onNextTrackRef.current = onNextTrack;
-  const recorderRef = useRef(recorder);
-  recorderRef.current = recorder;
-
-  // Load and play current track — only re-runs when track identity changes (currentIndex / isOpen)
+  // Load and play current track
   useEffect(() => {
     if (!isOpen || !track) return;
     let cancelled = false;
@@ -258,181 +188,80 @@ export function ImmersiveAudioPlayer({
     const loadTrack = async () => {
       setIsLoading(true);
       setIsPlaying(false);
+      setLoadError(null);
       setCurrentTime(0);
       setDuration(0);
-      setRequiresManualStart(false);
-      cleanupTrackObjectUrl();
-      
+
       try {
         let url = track.audioUrl;
-        
+
         // If no URL but has generator, call it
         if (!url && track.generateAudio) {
           url = await track.generateAudio();
         }
-        
-        if (cancelled || !audioRef.current) return;
-        if (!url) {
-          throw new Error("Audio generation returned no playable URL");
+
+        if (cancelled) return;
+
+        if (!url || !audioRef.current) {
+          setIsLoading(false);
+          setLoadError("Voice generation failed. Please try again.");
+          console.error("[Immersive] No audio URL returned for track:", track.title);
+          return;
         }
 
-        url = await materializeTrackUrl(url);
-
-        if (cancelled || !audioRef.current) return;
-        
         globalAudioManager.stopAllExcept(audioRef.current);
-        
-        const audio = audioRef.current;
-        const markReady = () => {
-          if (cancelled) return;
-          setDuration(audio.duration || 0);
-          setIsLoading(false);
-        };
 
-        audio.onloadedmetadata = markReady;
-        audio.onloadeddata = markReady;
-        audio.oncanplay = markReady;
-        audio.onerror = () => {
+        const audio = audioRef.current;
+        audio.src = url;
+        audio.volume = mainMuted ? 0 : mainVolume;
+
+        audio.onloadedmetadata = () => {
           if (!cancelled) {
+            setDuration(audio.duration || 0);
             setIsLoading(false);
-            console.error("[Immersive] Audio error for track:", track.title);
-            toast.error("This watch audio could not be played.");
           }
         };
 
         audio.onended = () => {
           if (!cancelled) {
             setIsPlaying(false);
-            narrationEndedRef.current = true;
-
-            // For Watch sessions: enter meditation phase, don't auto-advance
+            // For Watch sessions: voice ends but session continues with ambient music
             if (isWatchSession) {
-              setInMeditationPhase(true);
+              setVoiceEnded(true);
+              // Don't close or advance — ambient music keeps playing until session timer ends
               return;
             }
-
-            if (continuousPlayRef.current && hasNextRef.current) {
+            if (continuousPlay && hasNext) {
+              // Auto-advance after short pause
               setTimeout(() => {
-                if (!cancelled) onNextTrackRef.current();
+                if (!cancelled) onNextTrack();
               }, 1500);
             }
           }
         };
 
-        audio.crossOrigin = "anonymous";
-        audio.pause();
-        audio.src = url;
-        audio.volume = mainMutedRef.current ? 0 : mainVolumeRef.current;
-        audio.load();
-
-        if (audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-          markReady();
-        }
-        
-        // Start session timer for Watch sessions
-        if (isWatchSession && !sessionStartRef.current) {
-          sessionStartRef.current = Date.now();
-        }
-
-        try {
-          await audio.play();
+        audio.onerror = () => {
           if (!cancelled) {
-            setIsPlaying(true);
             setIsLoading(false);
-            // Auto-start recording for watch sessions
-            const rec = recorderRef.current;
-            if (isWatchSession && !rec.isRecording && !rec.videoBlob) {
-              try {
-                rec.setTitle(track.title || "Watch Session");
-                rec.setSubtitle(track.subtitle || track.modeName || "");
-                rec.startRecording(audio, ambientRef.current);
-              } catch (e) {
-                console.warn("[Immersive] Recording auto-start failed:", e);
-              }
-            }
+            setLoadError("Audio failed to load. Please try again.");
+            console.error("[Immersive] Audio error for track:", track.title);
           }
-        } catch (playErr) {
-          if (!cancelled) {
-            console.warn("[Immersive] Autoplay blocked or failed:", playErr);
-            setIsPlaying(false);
-            setIsLoading(false);
-            setRequiresManualStart(true);
-            toast("Audio is ready — tap Play to start your watch.");
-          }
-        }
+        };
+
+        await audio.play();
+        if (!cancelled) setIsPlaying(true);
       } catch (err) {
         if (!cancelled) {
           console.error("[Immersive] Failed to load track:", err);
           setIsLoading(false);
-          toast.error("Morning Watch audio could not be prepared. Please try again.");
+          setLoadError("Failed to play audio. Please try again.");
         }
       }
     };
 
     loadTrack();
-    return () => {
-      cancelled = true;
-      if (audioRef.current) {
-        audioRef.current.onloadedmetadata = null;
-        audioRef.current.onloadeddata = null;
-        audioRef.current.oncanplay = null;
-        audioRef.current.onended = null;
-        audioRef.current.onerror = null;
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, isOpen, isWatchSession, cleanupTrackObjectUrl, materializeTrackUrl]);
-
-  // Sync volume changes to live audio without restarting the track
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = mainMuted ? 0 : mainVolume;
-    }
-  }, [mainVolume, mainMuted]);
-
-  // ── Watch session 15-minute timer ──
-  useEffect(() => {
-    if (!isOpen || !isWatchSession || !sessionStartRef.current) return;
-    
-    const interval = window.setInterval(() => {
-      if (!sessionStartRef.current) return;
-      const elapsed = (Date.now() - sessionStartRef.current) / 1000;
-      setSessionElapsed(elapsed);
-      
-      // Fade out music in the last 10 seconds
-      const remaining = WATCH_SESSION_DURATION - elapsed;
-      if (remaining <= WATCH_FADE_OUT_DURATION && remaining > 0) {
-        const fadeProgress = remaining / WATCH_FADE_OUT_DURATION;
-        // Gradually reduce ambient volume
-        if (ambientRef.current) {
-          const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
-          ambientRef.current.volume = Math.max(0, ambientVolume * modeMultiplier * sleepFadeMultiplier * fadeProgress);
-        }
-        if (ambientNextRef.current && ambientNextRef.current.src) {
-          ambientNextRef.current.volume = 0;
-        }
-      }
-      
-      // Session complete at 15 minutes
-      if (elapsed >= WATCH_SESSION_DURATION) {
-        clearInterval(interval);
-        // Stop recording
-        if (recorder.isRecording) {
-          recorder.stopRecording();
-        }
-        // Stop all audio
-        if (ambientRef.current) { ambientRef.current.pause(); }
-        if (ambientNextRef.current) { ambientNextRef.current.pause(); }
-        if (audioRef.current) { audioRef.current.pause(); }
-        setIsPlaying(false);
-        setAmbientPlaying(false);
-        // Show share panel instead of auto-closing
-        setTimeout(() => setShowSharePanel(true), 500);
-      }
-    }, 250);
-    
-    return () => clearInterval(interval);
-  }, [isOpen, isWatchSession, ambientVolume, ambientMode, sleepFadeMultiplier, onClose]);
+    return () => { cancelled = true; };
+  }, [isOpen, track, currentIndex]);
 
   // Load verses for commentary tracks
   useEffect(() => {
@@ -488,6 +317,10 @@ export function ImmersiveAudioPlayer({
   }, [activeVerseIndex]);
 
   // Ambient music/sound management — picks track list based on current track's ambientMode
+  const currentTrackObj = tracks[currentIndex];
+  const defaultAmbientMode = currentTrackObj?.ambientMode ?? "music";
+  const [ambientModeOverride, setAmbientModeOverride] = useState<"music" | "ambient-sounds" | null>(null);
+  const ambientMode = ambientModeOverride ?? defaultAmbientMode;
 
   // Reset override when track changes
   useEffect(() => {
@@ -612,6 +445,54 @@ export function ImmersiveAudioPlayer({
     }
   }, [mainVolume, mainMuted, sleepFadeMultiplier]);
 
+  // Session timer for Watch sessions (15-minute fixed duration)
+  useEffect(() => {
+    if (!isOpen || !isWatchSession) {
+      sessionStartRef.current = 0;
+      setSessionElapsed(0);
+      setVoiceEnded(false);
+      return;
+    }
+    // Start session clock when the player opens and starts playing
+    if (!sessionStartRef.current && (isPlaying || voiceEnded)) {
+      sessionStartRef.current = Date.now();
+    }
+    if (!sessionStartRef.current) return;
+
+    const timer = setInterval(() => {
+      const elapsed = (Date.now() - sessionStartRef.current) / 1000;
+      setSessionElapsed(elapsed);
+
+      // Begin fade-out 8 seconds before session end
+      const fadeStart = sessionDuration - SESSION_FADE_DURATION / 1000;
+      if (elapsed >= fadeStart && elapsed < sessionDuration) {
+        const fadeProgress = (elapsed - fadeStart) / (SESSION_FADE_DURATION / 1000);
+        const fadeVol = Math.max(0, 1 - fadeProgress);
+        if (ambientRef.current) {
+          const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+          const baseVol = ambientVolume * modeMultiplier * sleepFadeMultiplier;
+          const ducked = voiceEnded ? baseVol : baseVol * VOICE_DUCK_RATIO;
+          ambientRef.current.volume = Math.max(0, ducked * fadeVol);
+        }
+        if (ambientNextRef.current) {
+          ambientNextRef.current.volume = 0;
+        }
+      }
+
+      // Session complete
+      if (elapsed >= sessionDuration) {
+        clearInterval(timer);
+        if (ambientRef.current) { ambientRef.current.pause(); }
+        if (ambientNextRef.current) { ambientNextRef.current.pause(); }
+        if (audioRef.current) { audioRef.current.pause(); }
+        setIsPlaying(false);
+        setAmbientPlaying(false);
+      }
+    }, 250);
+
+    return () => clearInterval(timer);
+  }, [isOpen, isWatchSession, isPlaying, voiceEnded, sessionDuration, ambientVolume, ambientMode, sleepFadeMultiplier]);
+
   // Keyboard shortcuts
   useEffect(() => {
     if (!isOpen) return;
@@ -632,29 +513,20 @@ export function ImmersiveAudioPlayer({
       if (ambientRef.current) { ambientRef.current.pause(); }
       if (ambientNextRef.current) { ambientNextRef.current.pause(); }
       if (crossfadeTimerRef.current) { clearInterval(crossfadeTimerRef.current); }
-      cleanupTrackObjectUrl();
+      if (sessionFadeRef.current) { clearInterval(sessionFadeRef.current); }
       setIsPlaying(false);
       setAmbientPlaying(false);
+      setVoiceEnded(false);
+      sessionStartRef.current = 0;
+      setSessionElapsed(0);
     }
-  }, [cleanupTrackObjectUrl, isOpen]);
+  }, [isOpen]);
 
   const togglePlayPause = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     if (audio.paused) {
-      setIsLoading(true);
-      audio.play()
-        .then(() => {
-          setIsPlaying(true);
-          setIsLoading(false);
-          setRequiresManualStart(false);
-        })
-        .catch((err) => {
-          console.error("[Immersive] Manual play failed:", err);
-          setIsPlaying(false);
-          setIsLoading(false);
-          toast.error("Unable to start audio on this device.");
-        });
+      audio.play().then(() => setIsPlaying(true)).catch(() => {});
     } else {
       audio.pause();
       setIsPlaying(false);
@@ -667,17 +539,12 @@ export function ImmersiveAudioPlayer({
     }
   }, [duration]);
 
-  // For watch sessions: seek forward/back by 15 seconds
-  const seekRelative = useCallback((seconds: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = Math.max(0, Math.min(audioRef.current.duration || 0, audioRef.current.currentTime + seconds));
-    }
-  }, []);
-
-  // For watch sessions, use 15-min session progress; otherwise audio progress
-  const displayDuration = isWatchSession ? WATCH_SESSION_DURATION : duration;
-  const displayCurrentTime = isWatchSession ? sessionElapsed : currentTime;
-  const progress = displayDuration > 0 ? (displayCurrentTime / displayDuration) * 100 : 0;
+  // For Watch sessions, show progress across the full 15-min session; otherwise just voice progress
+  const sessionProgress = isWatchSession && sessionDuration > 0
+    ? Math.min(100, (sessionElapsed / sessionDuration) * 100)
+    : 0;
+  const voiceProgress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const progress = isWatchSession ? sessionProgress : voiceProgress;
   const typeIcon = track?.icon || (
     track?.type === "commentary" ? "📖" :
     track?.type === "apologetics" ? "⚔️" :
@@ -732,12 +599,6 @@ export function ImmersiveAudioPlayer({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {/* Recording indicator */}
-            {recorder.isRecording && (
-              <Badge variant="destructive" className="text-xs gap-1 animate-pulse">
-                <Video className="h-3 w-3" /> REC
-              </Badge>
-            )}
             {/* Ambient music indicator */}
             {ambientPlaying && (
               <Badge variant="secondary" className="text-xs gap-1 animate-pulse">
@@ -789,7 +650,7 @@ export function ImmersiveAudioPlayer({
                     <span className="text-xs text-muted-foreground">Background type</span>
                     <div className="flex gap-1">
                       <button
-                        onClick={() => { setAmbientModeOverride("ambient-sounds"); setAmbientTrackIdx(Math.floor(Math.random() * AMBIENT_SOUND_TRACKS.length)); }}
+                        onClick={() => { setAmbientModeOverride("ambient-sounds"); setAmbientTrackIdx(0); }}
                         className={`text-xs px-3 py-1 rounded-full transition-colors ${
                           ambientMode === "ambient-sounds"
                             ? "bg-primary text-primary-foreground"
@@ -799,7 +660,7 @@ export function ImmersiveAudioPlayer({
                         Sounds
                       </button>
                       <button
-                        onClick={() => { setAmbientModeOverride("music"); setAmbientTrackIdx(Math.floor(Math.random() * AMBIENT_BG_TRACKS.length)); }}
+                        onClick={() => { setAmbientModeOverride("music"); setAmbientTrackIdx(0); }}
                         className={`text-xs px-3 py-1 rounded-full transition-colors ${
                           ambientMode === "music"
                             ? "bg-primary text-primary-foreground"
@@ -836,14 +697,6 @@ export function ImmersiveAudioPlayer({
                     onCheckedChange={onSetContinuousPlay}
                   />
                 </div>
-                {/* Voice quality selector */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Volume2 className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">Voice Quality</span>
-                  </div>
-                  <VoiceQualitySelector compact />
-                </div>
               </div>
             </motion.div>
           )}
@@ -851,7 +704,49 @@ export function ImmersiveAudioPlayer({
 
         {/* Main content area */}
         <div className="relative flex-1 overflow-hidden z-10">
-          {isLoading ? (
+          {loadError ? (
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <div className="text-4xl">⚠️</div>
+              <p className="text-muted-foreground text-sm text-center max-w-xs">{loadError}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setLoadError(null);
+                  // Re-trigger load by toggling a state
+                  setIsLoading(true);
+                  const retryLoad = async () => {
+                    try {
+                      let url = track?.generateAudio ? await track.generateAudio() : track?.audioUrl;
+                      if (!url || !audioRef.current) {
+                        setIsLoading(false);
+                        setLoadError("Voice generation failed. Please close and try again.");
+                        return;
+                      }
+                      audioRef.current.src = url;
+                      audioRef.current.volume = mainMuted ? 0 : mainVolume;
+                      audioRef.current.onloadedmetadata = () => {
+                        setDuration(audioRef.current?.duration || 0);
+                        setIsLoading(false);
+                      };
+                      audioRef.current.onerror = () => {
+                        setIsLoading(false);
+                        setLoadError("Audio failed to load. Please try again.");
+                      };
+                      await audioRef.current.play();
+                      setIsPlaying(true);
+                    } catch {
+                      setIsLoading(false);
+                      setLoadError("Failed to play audio. Please try again.");
+                    }
+                  };
+                  retryLoad();
+                }}
+              >
+                Try Again
+              </Button>
+            </div>
+          ) : isLoading ? (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <motion.div
                 animate={{ rotate: 360 }}
@@ -897,96 +792,74 @@ export function ImmersiveAudioPlayer({
               </div>
             </ScrollArea>
           ) : (
-            /* Ambient visual mode (no text) — includes Watch meditation phase */
+            /* Ambient visual mode (no text) */
             <div className="flex flex-col items-center justify-center h-full gap-6">
-              {inMeditationPhase ? (
-                /* Meditation phase: narration ended, music continues */
-                <>
-                  <motion.div
-                    className="text-6xl"
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    🕊️
-                  </motion.div>
-                  <div className="text-center max-w-md px-4 space-y-3">
-                    <h3 className="text-xl font-semibold text-foreground/80">
-                      Meditation Time
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      The narration has ended. Take the remaining time to meditate on the thoughts and feelings you've received. Ask the Spirit to make them your own.
-                    </p>
-                    <p className="text-xs text-muted-foreground/60 font-mono">
-                      {formatTime(Math.max(0, WATCH_SESSION_DURATION - sessionElapsed))} remaining
-                    </p>
-                  </div>
-                  {/* Gentle pulsing waveform for meditation */}
-                  <div className="flex items-end gap-1 h-12">
-                    {Array.from({ length: 16 }).map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="w-1 bg-primary/25 rounded-full"
-                        animate={{
-                          height: [
-                            `${6 + Math.sin(i * 0.5) * 8}px`,
-                            `${10 + Math.sin(i * 0.5 + 1) * 12}px`,
-                            `${6 + Math.sin(i * 0.5) * 8}px`,
-                          ],
-                        }}
-                        transition={{
-                          duration: 3 + Math.random(),
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                          delay: i * 0.1,
-                        }}
-                      />
-                    ))}
-                  </div>
-                </>
+              <motion.div
+                className="text-8xl"
+                animate={{
+                  scale: [1, 1.05, 1],
+                  opacity: [0.8, 1, 0.8],
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              >
+                {typeIcon}
+              </motion.div>
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-foreground/80">{track?.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{track?.subtitle || track?.modeName}</p>
+              </div>
+              {/* Silent meditation phase for Watch sessions */}
+              {isWatchSession && voiceEnded && sessionElapsed < sessionDuration ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center space-y-3"
+                >
+                  <p className="text-sm text-primary/80 font-medium">Silent Meditation</p>
+                  <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                    Let the music hold the space. Ask the Spirit to make these thoughts and feelings your own.
+                  </p>
+                  <p className="text-xs text-muted-foreground/60 font-mono">
+                    {formatTime(Math.max(0, sessionDuration - sessionElapsed))} remaining
+                  </p>
+                </motion.div>
+              ) : isWatchSession && sessionElapsed >= sessionDuration ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center space-y-2"
+                >
+                  <p className="text-sm text-primary/80 font-medium">Session Complete</p>
+                  <p className="text-xs text-muted-foreground">Carry the mind of Christ with you.</p>
+                </motion.div>
               ) : (
-                <>
-                  <motion.div
-                    className="text-8xl"
-                    animate={{
-                      scale: [1, 1.05, 1],
-                      opacity: [0.8, 1, 0.8],
-                    }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    {typeIcon}
-                  </motion.div>
-                  <div className="text-center">
-                    <h3 className="text-xl font-semibold text-foreground/80">{track?.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{track?.subtitle || track?.modeName}</p>
-                  </div>
-                  {/* Audio waveform visualization */}
-                  <div className="flex items-end gap-1 h-16">
-                    {Array.from({ length: 24 }).map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="w-1.5 bg-primary/40 rounded-full"
-                        animate={isPlaying ? {
-                          height: [
-                            `${10 + Math.random() * 40}px`,
-                            `${10 + Math.random() * 50}px`,
-                            `${10 + Math.random() * 30}px`,
-                          ],
-                        } : { height: "8px" }}
-                        transition={{
-                          duration: 0.6 + Math.random() * 0.4,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                          delay: i * 0.05,
-                        }}
-                      />
-                    ))}
-                  </div>
-                </>
+                /* Audio waveform visualization */
+                <div className="flex items-end gap-1 h-16">
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-1.5 bg-primary/40 rounded-full"
+                      animate={isPlaying ? {
+                        height: [
+                          `${10 + Math.random() * 40}px`,
+                          `${10 + Math.random() * 50}px`,
+                          `${10 + Math.random() * 30}px`,
+                        ],
+                      } : { height: "8px" }}
+                      transition={{
+                        duration: 0.6 + Math.random() * 0.4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: i * 0.05,
+                      }}
+                    />
+                  ))}
+                </div>
               )}
-              {/* Watch session timer */}
-              {isWatchSession && sessionStartRef.current && !inMeditationPhase && (
-                <p className="text-xs text-muted-foreground/50 font-mono">
-                  Session: {formatTime(sessionElapsed)} / {formatTime(WATCH_SESSION_DURATION)}
+              {/* Session timer for Watch sessions */}
+              {isWatchSession && sessionStartRef.current > 0 && sessionElapsed < sessionDuration && !voiceEnded && (
+                <p className="text-[10px] text-muted-foreground/40 font-mono">
+                  {formatTime(sessionElapsed)} / {formatTime(sessionDuration)}
                 </p>
               )}
             </div>
@@ -1012,21 +885,12 @@ export function ImmersiveAudioPlayer({
           </div>
         )}
 
-        {requiresManualStart && !isLoading && (
-          <div className="relative z-10 px-6">
-            <div className="mx-auto mb-3 max-w-md rounded-full border border-border/50 bg-background/60 px-4 py-2 text-center text-xs text-muted-foreground backdrop-blur-sm">
-              Audio is ready. Tap play to start your watch.
-            </div>
-          </div>
-        )}
-
         {/* Bottom controls */}
         <div className="relative z-10 border-t border-border/30 px-6 py-5 backdrop-blur-sm bg-background/50">
           {/* Progress bar */}
           <div
-            className={cn("w-full h-2 bg-muted/50 rounded-full mb-5 overflow-hidden group", !isWatchSession && "cursor-pointer")}
+            className="w-full h-2 bg-muted/50 rounded-full mb-5 overflow-hidden cursor-pointer group"
             onClick={(e) => {
-              if (isWatchSession) return; // Don't seek session timer
               const rect = e.currentTarget.getBoundingClientRect();
               const pct = ((e.clientX - rect.left) / rect.width) * 100;
               seekTo(pct);
@@ -1043,7 +907,7 @@ export function ImmersiveAudioPlayer({
           <div className="flex items-center justify-between">
             {/* Time */}
             <span className="text-xs text-muted-foreground font-mono w-16">
-              {formatTime(displayCurrentTime)}
+              {isWatchSession ? formatTime(sessionElapsed) : formatTime(currentTime)}
             </span>
 
             {/* Center controls */}
@@ -1057,13 +921,12 @@ export function ImmersiveAudioPlayer({
                 {mainMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </Button>
 
-              {/* Previous / Rewind */}
+              {/* Previous */}
               <Button
                 variant="ghost" size="icon"
-                onClick={isWatchSession ? () => seekRelative(-15) : onPrevTrack}
-                disabled={isWatchSession ? false : !hasPrev}
+                onClick={onPrevTrack}
+                disabled={!hasPrev}
                 className="h-10 w-10"
-                title={isWatchSession ? "Rewind 15s" : "Previous"}
               >
                 <SkipBack className="h-5 w-5" />
               </Button>
@@ -1082,13 +945,12 @@ export function ImmersiveAudioPlayer({
                 )}
               </Button>
 
-              {/* Next / Forward */}
+              {/* Next */}
               <Button
                 variant="ghost" size="icon"
-                onClick={isWatchSession ? () => seekRelative(15) : onNextTrack}
-                disabled={isWatchSession ? false : !hasNext}
+                onClick={onNextTrack}
+                disabled={!hasNext}
                 className="h-10 w-10"
-                title={isWatchSession ? "Forward 15s" : "Next"}
               >
                 <SkipForward className="h-5 w-5" />
               </Button>
@@ -1106,57 +968,10 @@ export function ImmersiveAudioPlayer({
 
             {/* Duration */}
             <span className="text-xs text-muted-foreground font-mono w-16 text-right">
-              {formatTime(displayDuration)}
+              {isWatchSession ? formatTime(sessionDuration) : formatTime(duration)}
             </span>
           </div>
         </div>
-        {/* Watch share/download buttons (after recording available) */}
-        {isWatchSession && recorder.videoBlob && !showSharePanel && (
-          <div className="relative z-10 px-6 py-2 flex items-center justify-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => setShowSharePanel(true)}
-            >
-              <Share2 className="h-4 w-4" />
-              Share Session
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => recorder.downloadVideo(`${(track?.title || "watch-session").replace(/[^a-z0-9]/gi, "_").toLowerCase()}.webm`)}
-            >
-              <Download className="h-4 w-4" />
-              Download
-            </Button>
-          </div>
-        )}
-
-        {/* Hidden recording canvas */}
-        <canvas
-          ref={recorder.canvasRef}
-          className="hidden"
-          width={1280}
-          height={720}
-        />
-
-        {/* Share panel overlay */}
-        {showSharePanel && recorder.videoBlob && (
-          <WatchSharePanel
-            videoBlob={recorder.videoBlob}
-            videoUrl={recorder.videoUrl}
-            title={track?.title || "Watch Session"}
-            subtitle={track?.subtitle || track?.modeName}
-            watchType={track?.modeName?.includes("Morning") ? "morning" : "night"}
-            onClose={() => {
-              setShowSharePanel(false);
-              onClose();
-            }}
-            onDownload={(filename) => recorder.downloadVideo(filename)}
-          />
-        )}
       </motion.div>
     </AnimatePresence>
   );

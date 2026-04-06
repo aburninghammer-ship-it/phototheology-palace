@@ -790,11 +790,60 @@ function SceneTransition({ progress, scenes }: { progress: number; scenes: TourS
   );
 }
 
+// ─── HUD Fade Layer ──────────────────────────────────────
+function HudLayer({ opacity, children }: { opacity: React.MutableRefObject<number>; children: React.ReactNode }) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame(() => {
+    if (!groupRef.current) return;
+    const o = opacity.current;
+    groupRef.current.visible = o > 0.01;
+    groupRef.current.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh || (child as any).isSprite) {
+        const mat = (child as THREE.Mesh).material;
+        if (mat && 'opacity' in mat) {
+          (mat as THREE.Material).transparent = true;
+          (mat as any).opacity = (mat as any)._baseOpacity !== undefined
+            ? (mat as any)._baseOpacity * o
+            : o;
+        }
+      }
+    });
+  });
+
+  return <group ref={groupRef}>{children}</group>;
+}
+
 // ─── Main Component ───────────────────────────────────────
 export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
   const [audioState, audioControls] = useStreamingAudio(AUDIO_SRC);
   const sceneGroupRef = useRef<THREE.Group>(null);
   const cameraGroupRef = useRef<THREE.Group>(null);
+
+  // ─── Auto-hide HUD during playback ──────────────────────
+  const [hudVisible, setHudVisible] = useState(true);
+  const hudOpacityRef = useRef(1);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const HUD_HIDE_DELAY = 4000; // ms before HUD fades out
+
+  const showHud = useCallback(() => {
+    setHudVisible(true);
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    if (audioState.isPlaying) {
+      hideTimerRef.current = setTimeout(() => setHudVisible(false), HUD_HIDE_DELAY);
+    }
+  }, [audioState.isPlaying]);
+
+  // Show HUD when paused, start hide timer when playing
+  useEffect(() => {
+    if (!audioState.isPlaying) {
+      setHudVisible(true);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    } else {
+      hideTimerRef.current = setTimeout(() => setHudVisible(false), HUD_HIDE_DELAY);
+    }
+    return () => { if (hideTimerRef.current) clearTimeout(hideTimerRef.current); };
+  }, [audioState.isPlaying]);
 
   const avgVolume = useMemo(() => {
     if (!audioState.analyserData) return 0;
@@ -816,7 +865,7 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
   // Ambient soundscape
   useAmbientSoundscape(currentScene.id, audioState.isPlaying);
 
-  // Camera flythrough path
+  // Camera flythrough path + HUD opacity animation
   useFrame(({ clock }) => {
     if (!cameraGroupRef.current) return;
     const camPos = currentScene.cameraPath(localT);
@@ -829,6 +878,10 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
     const shakeY = Math.cos(t * 13) * bassVolume * 0.02;
     target.x += shakeX;
     target.y += shakeY;
+
+    // Smoothly lerp HUD opacity
+    const targetOpacity = hudVisible ? 1 : 0;
+    hudOpacityRef.current += (targetOpacity - hudOpacityRef.current) * 0.06;
   });
 
   return (
@@ -891,64 +944,77 @@ export default function HeavensDiary({ onBack }: HeavensDiaryProps) {
 
       {/* === HUD — moves with subtle camera drift === */}
       <group ref={cameraGroupRef}>
-        {/* Title */}
-        <Text position={[0, 2.5, -3]} fontSize={0.25} color={currentScene.colors.accent} anchorX="center" outlineWidth={0.012} outlineColor="#000">
-          Heaven's Diary
-        </Text>
+        {/* Invisible tap target to show/hide HUD */}
+        <Interactive onSelect={showHud}>
+          <mesh position={[0, 1.5, -2.9]} onClick={showHud} onPointerDown={showHud}>
+            <planeGeometry args={[4, 4]} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+          </mesh>
+        </Interactive>
 
-        {/* Scene label */}
-        <Text position={[0, 2.15, -3]} fontSize={0.14} color="#FFFFFF" anchorX="center" outlineWidth={0.008} outlineColor="#000">
-          {currentScene.label}
-        </Text>
+        {/* Fading HUD elements */}
+        <HudLayer opacity={hudOpacityRef}>
+          {/* Title */}
+          <Text position={[0, 2.5, -3]} fontSize={0.25} color={currentScene.colors.accent} anchorX="center" outlineWidth={0.012} outlineColor="#000">
+            Heaven's Diary
+          </Text>
 
-        {/* Scripture subtitle (original) */}
-        <Text position={[0, 1.9, -3]} fontSize={0.07} color="#CCCCAA" anchorX="center" maxWidth={3}>
-          {currentScene.subtitle}
-        </Text>
+          {/* Scene label */}
+          <Text position={[0, 2.15, -3]} fontSize={0.14} color="#FFFFFF" anchorX="center" outlineWidth={0.008} outlineColor="#000">
+            {currentScene.label}
+          </Text>
 
-        {/* Cycling scripture overlay */}
-        <ScriptureOverlay sceneId={currentScene.id} localT={localT} />
+          {/* Scripture subtitle (original) */}
+          <Text position={[0, 1.9, -3]} fontSize={0.07} color="#CCCCAA" anchorX="center" maxWidth={3}>
+            {currentScene.subtitle}
+          </Text>
 
-        {/* Play/Pause button */}
-        <Interactive onSelect={audioControls.togglePlayPause}>
-          <mesh position={[0, 1.45, -3]} onClick={audioControls.togglePlayPause} onPointerDown={audioControls.togglePlayPause}>
+          {/* Cycling scripture overlay */}
+          <ScriptureOverlay sceneId={currentScene.id} localT={localT} />
+
+          {/* Time display */}
+          <Text position={[0, 1.15, -3]} fontSize={0.07} color="#CCCCEE" anchorX="center">
+            {formatTime(audioState.currentTime)} / {formatTime(audioState.duration)}
+            {audioState.isLoading ? '  Loading...' : ''}
+          </Text>
+
+          {/* Scene progress dots */}
+          <group position={[0, 1.0, -3]}>
+            {TOUR_SCENES.map((scene, i) => {
+              const isCurrent = scene.id === currentScene.id;
+              const isPast = audioState.progress >= scene.end;
+              return (
+                <mesh key={scene.id} position={[(i - (TOUR_SCENES.length - 1) / 2) * 0.2, 0, 0]}>
+                  <circleGeometry args={[isCurrent ? 0.04 : 0.025, 16]} />
+                  <meshBasicMaterial
+                    color={isCurrent ? scene.colors.accent : isPast ? '#888888' : '#444444'}
+                    transparent opacity={isCurrent ? 1 : 0.6}
+                  />
+                </mesh>
+              );
+            })}
+          </group>
+
+          {/* Back button */}
+          <BackToLobbyButton onBack={onBack} position={[0, 0.2, -1.5]} />
+        </HudLayer>
+
+        {/* Play/Pause — always visible (minimum opacity) so user can always tap */}
+        <Interactive onSelect={() => { audioControls.togglePlayPause(); showHud(); }}>
+          <mesh position={[0, 1.45, -3]} onClick={() => { audioControls.togglePlayPause(); showHud(); }} onPointerDown={() => { audioControls.togglePlayPause(); showHud(); }}>
             <circleGeometry args={[0.18, 32]} />
             <meshStandardMaterial
               color={audioState.isPlaying ? '#FF4444' : '#44FF44'}
               emissive={audioState.isPlaying ? '#FF4444' : '#44FF44'}
               emissiveIntensity={0.8}
+              transparent
+              opacity={Math.max(0.3, hudOpacityRef.current)}
             />
           </mesh>
         </Interactive>
         <Text position={[0, 1.45, -2.98]} fontSize={0.1} color="white" anchorX="center" anchorY="middle">
           {audioState.isPlaying ? '⏸' : '▶'}
         </Text>
-
-        {/* Time display */}
-        <Text position={[0, 1.15, -3]} fontSize={0.07} color="#CCCCEE" anchorX="center">
-          {formatTime(audioState.currentTime)} / {formatTime(audioState.duration)}
-          {audioState.isLoading ? '  Loading...' : ''}
-        </Text>
-
-        {/* Scene progress dots */}
-        <group position={[0, 1.0, -3]}>
-          {TOUR_SCENES.map((scene, i) => {
-            const isCurrent = scene.id === currentScene.id;
-            const isPast = audioState.progress >= scene.end;
-            return (
-              <mesh key={scene.id} position={[(i - (TOUR_SCENES.length - 1) / 2) * 0.2, 0, 0]}>
-                <circleGeometry args={[isCurrent ? 0.04 : 0.025, 16]} />
-                <meshBasicMaterial
-                  color={isCurrent ? scene.colors.accent : isPast ? '#888888' : '#444444'}
-                  transparent opacity={isCurrent ? 1 : 0.6}
-                />
-              </mesh>
-            );
-          })}
-        </group>
-
-        {/* Back button */}
-        <BackToLobbyButton onBack={onBack} position={[0, 0.2, -1.5]} />
       </group>
     </group>
   );

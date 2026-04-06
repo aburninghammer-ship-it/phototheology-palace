@@ -144,7 +144,8 @@
       "Bash(sox:*)",
       "Bash(md5:*)",
       "Bash(rm:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "WebFetch(domain:encyclopedia.adventist.org)"
     ],
     "deny": [],
     "ask": []

@@ -138,7 +138,7 @@ const OS_SPACES: OsSpace[] = [
     color: "142 71% 45%",
     items: [
       { label: "Night Watches", path: "/night-watches", icon: Moon, description: "Evening meditation", tooltip: "A 15-minute evening Master Mind meditation — cinematic, scriptural, sanctuary-mapped reflection before sleep." },
-      { label: "Morning Watches", path: "/morning-watches", icon: Flame, description: "Morning activation", tooltip: "5-8 minute morning activation session — remember, declare, align, and commit using last night's meditation." },
+      { label: "Morning Watches", path: "/morning-watches", icon: Flame, description: "Morning activation", tooltip: "15-minute morning activation session — download, install, and walk in the Master Mind from last night." },
       { label: "Devotionals", path: "/devotionals", icon: Flame, description: "Daily devotions", tooltip: "Start your day with a devotional built on PT principles. Includes Scripture, meditation prompts, and a Christ-connection." },
       { label: "Daily Audio", path: "/daily-audio-devotional", icon: Headphones, description: "Audio devotions", tooltip: "Listen to today's Phototheology-based audio devotional — deep, Christ-centered, sanctuary-mapped reflections delivered daily." },
       { label: "Daily Reading", path: "/daily-reading", icon: Calendar, description: "Reading plan", tooltip: "Follow a structured daily Bible reading plan that covers the entire Bible." },

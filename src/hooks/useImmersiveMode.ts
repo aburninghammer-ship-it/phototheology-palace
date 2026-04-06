@@ -24,6 +24,8 @@ export interface ImmersiveTrack {
   icon?: string;
   /** Background audio mode: "music" (default cinematic tracks), "ambient-sounds" (nature/tones), "none" */
   ambientMode?: "music" | "ambient-sounds" | "none";
+  /** Total session duration in seconds. When set, ambient music continues after voice ends and fades out at this mark. */
+  sessionDurationSec?: number;
 }
 
 export interface ImmersiveQueue {

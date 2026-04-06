@@ -229,8 +229,8 @@ export default function MorningWatches() {
               </h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto text-sm">
-              Walk in the Master Mind — 5-8 minute audio activation sessions that translate last night's
-              formation into today's action. Think like Christ before the first challenge arrives.
+              Walk in the Master Mind — 15-minute audio activation sessions that download last night's
+              formation into today's mind. Think like Christ before the first challenge arrives.
             </p>
             <p className="text-xs text-muted-foreground/70 mt-2">
               Night Watch: Receive. Morning Watch: Walk.
@@ -248,7 +248,7 @@ export default function MorningWatches() {
               {[
                 { label: "Evening Reflection", time: "Before bed", duration: "2 min", icon: "🌆" },
                 { label: "Night Watch", time: "Bedtime", duration: "15 min", icon: "🌙" },
-                { label: "Morning Watch", time: "Waking", duration: "5-8 min", icon: "🌅", active: true },
+                { label: "Morning Watch", time: "Waking", duration: "15 min", icon: "🌅", active: true },
                 { label: "Midday Reset", time: "Noon", duration: "2 min", icon: "☀️" },
               ].map((touch) => (
                 <div
