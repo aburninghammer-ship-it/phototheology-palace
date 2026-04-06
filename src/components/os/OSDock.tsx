@@ -20,13 +20,65 @@ export function OSDock() {
 
   const publicPaths = ["/", "/landing", "/auth", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service", "/level-select"];
   const isPublicPage = publicPaths.some(p => currentPath === p) || currentPath.startsWith("/auth");
-  if (isMobile || isPublicPage || isBasic) return null;
+  if (isPublicPage || isBasic) return null;
 
   // Filter pinned items to only show accessible ones for current mode
   const accessiblePinned = pinnedItems.filter(item => isFeatureAccessible(mode, item.path));
 
   const isActive = (path: string) => currentPath === path || currentPath.startsWith(path + "/");
 
+  const homePath = mode === "immersion" ? "/dashboard" : "/welcome";
+  const showHomeButton = currentPath !== "/" && currentPath !== "/welcome" && currentPath !== "/dashboard";
+
+  // Mobile: horizontal bottom dock
+  if (isMobile) {
+    if (accessiblePinned.length === 0 && !showHomeButton) return null;
+
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-sidebar/80 backdrop-blur-2xl border-t border-white/[0.06] safe-area-bottom">
+        <div className="flex items-center justify-center gap-1 px-2 py-1.5 overflow-x-auto">
+          {showHomeButton && (
+            <button
+              onClick={() => navigate(homePath)}
+              className="p-2.5 rounded-xl transition-all border border-white/10 bg-primary/10 text-primary shrink-0"
+            >
+              <LayoutGrid className="h-5 w-5" />
+            </button>
+          )}
+          {accessiblePinned.map((item) => {
+            const active = isActive(item.path);
+            const Icon = item.icon;
+            const itemColor = `hsl(${item.glow})`;
+
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={cn(
+                  "relative p-2.5 rounded-xl transition-all shrink-0",
+                  "border border-transparent",
+                  active && "border-white/10"
+                )}
+                style={{
+                  backgroundColor: active ? `hsl(${item.glow} / 0.15)` : undefined,
+                }}
+              >
+                {active && (
+                  <div
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 rounded-t-full"
+                    style={{ backgroundColor: itemColor, width: "24px" }}
+                  />
+                )}
+                <Icon className="h-5 w-5" style={{ color: itemColor }} />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: vertical sidebar dock
   if (!visible) {
     return (
       <div className="shrink-0 relative z-40">
@@ -60,12 +112,12 @@ export function OSDock() {
       </div>
 
       {/* Back to Spaces */}
-      {currentPath !== "/" && currentPath !== "/welcome" && currentPath !== "/dashboard" && (
+      {showHomeButton && (
         <div className="shrink-0 px-2 pt-2 flex justify-center">
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <button
-                onClick={() => navigate(mode === "immersion" ? "/dashboard" : "/welcome")}
+                onClick={() => navigate(homePath)}
                 className="p-2.5 rounded-xl transition-all backdrop-blur-md border border-white/10 bg-primary/10 hover:bg-primary/20 text-primary hover:border-primary/30"
                 title={mode === "immersion" ? "Back to Spaces" : "Home"}
               >
