@@ -62,6 +62,7 @@ export function BasicModeShell() {
   const [activeTab, setActiveTab] = useState<BasicTab>("chat");
   const [tourOpen, setTourOpen] = useState(false);
   const { user } = useAuth();
+  const { activeCount } = useActiveUsers();
   const navigate = useNavigate();
   const { data: profile } = useBasicProfile(user?.id);
 
