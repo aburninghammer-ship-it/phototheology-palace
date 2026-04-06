@@ -236,7 +236,21 @@ export function ImmersiveAudioPlayer({
     narrationEndedRef.current = false;
   }, [currentIndex]);
 
-  // Load and play current track
+  // Stable refs for values needed inside loadTrack but that should NOT re-trigger it
+  const mainVolumeRef = useRef(mainVolume);
+  mainVolumeRef.current = mainVolume;
+  const mainMutedRef = useRef(mainMuted);
+  mainMutedRef.current = mainMuted;
+  const continuousPlayRef = useRef(continuousPlay);
+  continuousPlayRef.current = continuousPlay;
+  const hasNextRef = useRef(hasNext);
+  hasNextRef.current = hasNext;
+  const onNextTrackRef = useRef(onNextTrack);
+  onNextTrackRef.current = onNextTrack;
+  const recorderRef = useRef(recorder);
+  recorderRef.current = recorder;
+
+  // Load and play current track — only re-runs when track identity changes (currentIndex / isOpen)
   useEffect(() => {
     if (!isOpen || !track) return;
     let cancelled = false;
@@ -294,13 +308,12 @@ export function ImmersiveAudioPlayer({
             // For Watch sessions: enter meditation phase, don't auto-advance
             if (isWatchSession) {
               setInMeditationPhase(true);
-              // Un-duck ambient music to full volume (narration is done)
               return;
             }
 
-            if (continuousPlay && hasNext) {
+            if (continuousPlayRef.current && hasNextRef.current) {
               setTimeout(() => {
-                if (!cancelled) onNextTrack();
+                if (!cancelled) onNextTrackRef.current();
               }, 1500);
             }
           }
@@ -309,7 +322,7 @@ export function ImmersiveAudioPlayer({
         audio.crossOrigin = "anonymous";
         audio.pause();
         audio.src = url;
-        audio.volume = mainMuted ? 0 : mainVolume;
+        audio.volume = mainMutedRef.current ? 0 : mainVolumeRef.current;
         audio.load();
 
         if (audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
@@ -327,11 +340,12 @@ export function ImmersiveAudioPlayer({
             setIsPlaying(true);
             setIsLoading(false);
             // Auto-start recording for watch sessions
-            if (isWatchSession && !recorder.isRecording && !recorder.videoBlob) {
+            const rec = recorderRef.current;
+            if (isWatchSession && !rec.isRecording && !rec.videoBlob) {
               try {
-                recorder.setTitle(track.title || "Watch Session");
-                recorder.setSubtitle(track.subtitle || track.modeName || "");
-                recorder.startRecording(audio, ambientRef.current);
+                rec.setTitle(track.title || "Watch Session");
+                rec.setSubtitle(track.subtitle || track.modeName || "");
+                rec.startRecording(audio, ambientRef.current);
               } catch (e) {
                 console.warn("[Immersive] Recording auto-start failed:", e);
               }
@@ -366,20 +380,8 @@ export function ImmersiveAudioPlayer({
         audioRef.current.onerror = null;
       }
     };
-  }, [
-    cleanupTrackObjectUrl,
-    continuousPlay,
-    currentIndex,
-    hasNext,
-    isOpen,
-    isWatchSession,
-    mainMuted,
-    mainVolume,
-    materializeTrackUrl,
-    onNextTrack,
-    recorder,
-    track,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, isOpen, isWatchSession, cleanupTrackObjectUrl, materializeTrackUrl]);
 
   // ── Watch session 15-minute timer ──
   useEffect(() => {
