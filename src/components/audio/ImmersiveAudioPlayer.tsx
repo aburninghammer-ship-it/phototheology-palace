@@ -926,7 +926,7 @@ export function ImmersiveAudioPlayer({
           <div className="flex items-center justify-between">
             {/* Time */}
             <span className="text-xs text-muted-foreground font-mono w-16">
-              {formatTime(currentTime)}
+              {formatTime(displayCurrentTime)}
             </span>
 
             {/* Center controls */}
@@ -940,12 +940,13 @@ export function ImmersiveAudioPlayer({
                 {mainMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </Button>
 
-              {/* Previous */}
+              {/* Previous / Rewind */}
               <Button
                 variant="ghost" size="icon"
-                onClick={onPrevTrack}
-                disabled={!hasPrev}
+                onClick={isWatchSession ? () => seekRelative(-15) : onPrevTrack}
+                disabled={isWatchSession ? false : !hasPrev}
                 className="h-10 w-10"
+                title={isWatchSession ? "Rewind 15s" : "Previous"}
               >
                 <SkipBack className="h-5 w-5" />
               </Button>
@@ -964,12 +965,13 @@ export function ImmersiveAudioPlayer({
                 )}
               </Button>
 
-              {/* Next */}
+              {/* Next / Forward */}
               <Button
                 variant="ghost" size="icon"
-                onClick={onNextTrack}
-                disabled={!hasNext}
+                onClick={isWatchSession ? () => seekRelative(15) : onNextTrack}
+                disabled={isWatchSession ? false : !hasNext}
                 className="h-10 w-10"
+                title={isWatchSession ? "Forward 15s" : "Next"}
               >
                 <SkipForward className="h-5 w-5" />
               </Button>
@@ -987,7 +989,7 @@ export function ImmersiveAudioPlayer({
 
             {/* Duration */}
             <span className="text-xs text-muted-foreground font-mono w-16 text-right">
-              {formatTime(duration)}
+              {formatTime(displayDuration)}
             </span>
           </div>
         </div>
