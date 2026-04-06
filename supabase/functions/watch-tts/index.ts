@@ -53,8 +53,10 @@ function splitAtSentences(text: string, max: number): string[] {
  * the text around [long pause] to let us insert actual silence gaps.
  */
 function preprocessPauses(text: string): string {
+  // Replace [extended silence] with very long pause (used in VR sessions)
+  let processed = text.replace(/\[extended silence\]/gi, "\n\n...\n\n...\n\n...\n\n...\n\n...\n\n");
   // Replace [long pause] with a triple ellipsis and extra whitespace
-  let processed = text.replace(/\[long pause\]/gi, "\n\n...\n\n...\n\n...\n\n");
+  processed = processed.replace(/\[long pause\]/gi, "\n\n...\n\n...\n\n...\n\n");
   // Replace [pause] with a double ellipsis
   processed = processed.replace(/\[pause\]/gi, "\n\n...\n\n");
   return processed;
