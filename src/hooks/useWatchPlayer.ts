@@ -27,46 +27,56 @@ Primary Struggle: ${session.struggle}
 Entry Type: ${session.entryType}
 Metaphor Family: ${session.metaphor}
 
-Follow this 7-phase structure inspired by the Calm app. Each phase flows naturally into the next — no labels, no headers, no time references. Just seamless spoken narration.
+CRITICAL PHILOSOPHY — READ THIS FIRST:
+This meditation has ZERO to do with breathing, posture, or relaxation technique. Do NOT mention deep breathing. Do NOT mention posture. Do NOT mention "getting comfortable." Do NOT mention body scans or physical sensations of relaxation. This is NOT a Calm app session. This is CINEMATIC BIBLICAL MIND TRANSPLANT.
 
-PHASE 1 — SETTLING AND FRAMING (first ~2 minutes of audio):
-Begin with a warm welcome. Invite the listener to get comfortable and take a moment to simply be still. Do NOT make deep breathing the centerpiece — you may mention one calming breath briefly, but do not dwell on breathing technique as if it has mystical power. Instead, quickly move into framing the purpose of this session:
+The core concept: The listener's mind is a movie theater. The screen is INSIDE them. What they place on that screen shapes who they become. Tonight, they are projecting a scene from Scripture onto that screen in VIVID, FULL COLOR — and stepping inside it. The goal is to observe the THOUGHTS AND FEELINGS of Christ (or the biblical figure), and then ASK THE HOLY SPIRIT TO DOWNLOAD those exact thoughts and feelings into their own mind. This is what Paul meant: "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5).
 
-Explain that this is a Night Watch — a practice of beholding the thoughts and feelings of Christ. Biblical meditation is not about emptying the mind or breathing exercises. It is about filling the mind with the thoughts of Jesus. The goal tonight is to step into a scene from Scripture, observe how Christ thinks and feels, and begin to take those thoughts and feelings as your own. This is what Paul meant when he said "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Tonight, you are accessing the Master Mind — the thoughts and feelings of Christ — and making them your own. [pause]
+Follow this 6-phase structure. Each phase flows seamlessly — no labels, no headers, no time references.
 
-Then briefly introduce tonight's specific theme and Scripture (${session.scripture}), connecting it to ${session.struggle}. This should feel like a wise friend explaining what you're about to experience together.
+PHASE 1 — LOCK IN (~2 minutes):
+Open with authority. Command the listener to LOCK IN. This is not casual. This is not background noise. This is sacred time — guard it. Tell them to push out distractions: notifications, wandering thoughts, the noise of the day. They will try to intrude — do not entertain them. Then establish the metaphor: "Right now, your mind becomes a theater. The screen is not in front of you — the screen is within you. And what you place on that screen will shape you." Explain the Master Mind concept: tonight you are stepping into a scene from Scripture to observe how Christ thinks and feels — and then you are going to ask the Spirit to download those thoughts and feelings directly into your mind. This is not information. This is transformation. [pause]
 
-PHASE 2 — TEACHING (next ~2 minutes):
-Go deeper into the Scripture and tonight's theme. This is conversational and warm — the "why" behind tonight's meditation. Weave in the Scripture naturally, not as a citation but as living words. Connect it to the human experience of ${session.struggle}. This should feel like insight by firelight.
+Briefly introduce tonight's Scripture (${session.scripture}) and theme, connecting it to ${session.struggle}. Frame it as: "Tonight, you are accessing the Master Mind."
 
-PHASE 3 — TRANSITION TO SCENE (~1 minute):
-Gently shift from teaching into immersive experience. "Now let yourself be drawn into this scene..." Bridge the listener from intellectual understanding into embodied imagination. Pacing begins to slow here. Pauses between sentences grow slightly longer.
+PHASE 2 — ENTER THE SCENE (~4 minutes):
+Command: "Step into the scene. See it. Not faintly. Not vaguely. See it in FULL COLOR."
 
-PHASE 4 — SCENE IMMERSION (~4 minutes):
-Present-tense, sensory-rich narration of the biblical scene (${session.scene}). Paint the setting with vivid detail — what do you see, hear, smell, feel? Place the listener inside the scene as a witness. Let them observe Christ. The pacing should be notably slower now, with [long pause] after every 2-3 sentences. Let images breathe. Don't rush through the scene — linger on details.
+Present-tense, hyper-vivid, cinematic narration of the biblical scene (${session.scene}). Paint with extreme sensory detail — the sky, the ground, the air, the sounds, the smells, the light. Place the listener INSIDE the scene as a witness standing right there. Use short, punchy sentences mixed with longer descriptive ones. Use [pause] after every 2-3 sentences. This should feel like a movie unfolding on the screen of the mind. Let images breathe — linger on details that matter.
 
-PHASE 5 — MASTER MIND MOMENT (~3 minutes):
-This is the heart. Observe what Christ does in this scene. Recognize the pattern of His thinking. The Master Mind insight: ${session.masterMindInsight}. Speak this truth over the listener personally and specifically. Address ${session.struggle} with direct compassion — not as a problem to fix but as a wound being held by Christ's presence. Use very long pauses here. Minimal words, maximum weight. Let silence do its work.
+PHASE 3 — OBSERVE THE MIND (~4 minutes):
+This is the heart. Command: "Now stop. Do not rush past this moment. This is where the meditation begins."
 
-PHASE 6 — OPEN AWARENESS / SILENCE (~2.5 minutes):
-Reduce verbal guidance dramatically. Offer a single gentle prompt, then [long pause] for 15-20 seconds of silence. Another brief prompt. Another long silence. The ambient sound holds the space. The listener rests in what they've received. Only 3-4 sentences total in this phase, separated by extended silence markers: [long pause] [long pause] [long pause].
+Shift from what is SEEN to what is THOUGHT AND FELT. Ask: "What is He thinking?" Enter the inner world of Christ (or the biblical figure). What thoughts are running through His mind? What emotions are present? What choices is He making internally? Be specific and profound. Connect the Master Mind insight (${session.masterMindInsight}) here.
 
-PHASE 7 — GENTLE RETURN AND CLOSE (~1.5 minutes):
-Slowly bring awareness back. "When you're ready, let your awareness gently return..." Wiggle fingers, notice the weight of the body. A brief closing reflection that ties back to the opening theme. End with an identity statement rooted in Scripture. Final breath together. Soft close.
+Show the CONTRAST between what a natural human mind would think/feel and what Christ's mind thinks/feels. The natural mind retaliates — His mind forgives. The natural mind panics — His mind trusts. The natural mind gives up — His mind perseveres.
+
+Use [pause] and [long pause] generously. Minimal words, maximum weight. Let the listener sit in the weight of Christ's thoughts and feelings.
+
+PHASE 4 — DOWNLOAD (~3 minutes):
+Command: "Now… do not just observe. Enter. This is the purpose. This is the goal. Not information. Transformation."
+
+Guide the listener to speak internally: "Lord, let me see what You see. Let me feel what You feel. Let me think what You think." Then the direct download request: "Download Your thoughts into my thoughts. Download Your feelings into my feelings. Replace my reactions with Yours."
+
+Address ${session.struggle} directly — overlay the scene of Christ onto the listener's real life. "Someone wrongs you. Someone disrespects you. Someone wounds you. What rises up naturally? Now replace it. Overlay the scene onto your life. And choose His mind."
+
+PHASE 5 — IMPRINT (~1.5 minutes):
+Reduce words dramatically. Command the listener to HOLD the scene. Let it imprint. Let it sink deeper than words. Let it become instinct. [long pause] [long pause] [long pause] Only 3-4 sentences total in this phase, separated by extended silence.
+
+PHASE 6 — SEAL AND CARRY (~1.5 minutes):
+Bring back to present with authority, not gentleness. "Say it: 'I receive the mind of Christ.' And mean it." Final identity declaration rooted in tonight's Scripture. Then: "When you step out of this moment, carry the scene with you. Because the screen never turns off. And what you continue to behold… you will become."
 
 CRITICAL RULES:
-- THIS MUST BE 2,500-3,000 WORDS. A 15-minute meditation requires substantial content. Do NOT write a short script.
-- Write in complete, flowing sentences. Not fragments, not bullet-style phrases. Every thought should read naturally when spoken aloud.
-- Use TWO types of pause markers:
-  [pause] = 3-5 seconds of silence (use frequently, after every 1-2 sentences)
-  [long pause] = 10-20 seconds of silence (use in phases 5-6, and between breaths in phase 1)
-- The pacing must DECELERATE through the session. Phase 1-2: normal conversational pace. Phase 3-4: noticeably slower. Phase 5-6: very slow, spacious. Phase 7: gentle return to slightly more alert pace.
-- Do NOT include any time references ("for the next few minutes", "over the next 7 minutes"). The listener should never be aware of time.
-- Do NOT include section headers, stage directions, labels, or meta-commentary. Only words to be spoken aloud plus [pause]/[long pause] markers.
-- This is BIBLICAL meditation — beholding the thoughts and feelings of Christ and making them your own. NOT emptying the mind, NOT breathing exercises, NOT Eastern mysticism. The power is in what you behold, not how you breathe.
-- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to ACCESS His thoughts and feelings and take them as your own.
-- Do NOT spend more than one sentence on breathing. Get to the Scripture and Christ quickly.
-- Second person ("you") throughout. Intimate. Cinematic. Like a trusted voice guiding you through the night.`;
+- THIS MUST BE 2,500-3,000 WORDS.
+- ABSOLUTELY NO mention of breathing, deep breaths, posture, body position, getting comfortable, body scans, or physical relaxation. ZERO. NOT EVEN ONE SENTENCE.
+- Do NOT say "take a deep breath." Do NOT say "notice your body." Do NOT say "settle in." Do NOT say "get comfortable."
+- The ONLY physical metaphor is the MIND AS A MOVIE THEATER / SCREEN.
+- Write in a mix of short punchy lines and flowing sentences. The style should feel cinematic — like a movie narrator mixed with a prophetic voice.
+- Use [pause] (3-5 seconds) frequently and [long pause] (10-20 seconds) in phases 4-5.
+- Do NOT include section headers, stage directions, labels, or meta-commentary.
+- The power is in BEHOLDING, not breathing. The power is in what you SEE and THINK, not how you sit.
+- Second person ("you") throughout. Intimate. Authoritative. Cinematic.
+- The phrase "Download" is literal — the listener is asking the Spirit to literally transplant Christ's thoughts and feelings into their neural pathways.`;
 }
 
 function buildMorningPrompt(session: MorningWatchSession, tractName: string): string {
@@ -83,50 +93,51 @@ Energy: ${session.energy}
 Commitment Style: ${session.commitmentStyle}
 Scenario Types: ${session.scenarioTypes.join(", ")}
 
-Follow this 7-phase structure inspired by the Calm app's morning meditations. Each phase flows naturally into the next — no labels, no headers, no time references. The Morning Watch is more alert and directed than the Night Watch, but still begins with grounding.
+CRITICAL PHILOSOPHY — READ THIS FIRST:
+This meditation has ZERO to do with breathing, posture, or relaxation technique. Do NOT mention deep breathing. Do NOT mention posture. Do NOT mention "getting comfortable." Do NOT mention body scans or physical awareness. This is NOT a wellness app session. This is CINEMATIC BIBLICAL MIND ACTIVATION.
 
-PHASE 1 — AWAKENING AND FRAMING (~2 minutes of audio):
-Begin with a warm good morning. Invite the listener to sit up, plant their feet, and gather themselves. You may mention one centering breath, but do NOT dwell on breathing technique — move quickly into the purpose.
+The core concept: Last night the listener BEHELD the thoughts and feelings of Christ on the screen of their mind. This morning, those thoughts and feelings become THEIRS. The download completes. The mind transplant activates. They are not just remembering what Christ thought — they are THINKING WITH HIM today. The screen never turns off. Today, every situation they face gets overlaid with the Master Mind.
 
-Explain that this is a Morning Watch — the activation half of the Master Mind practice. Last night you beheld the thoughts and feelings of Christ. You watched how He thinks, how He responds, what He feels. This morning, the goal is to TAKE those thoughts and feelings as your own and carry them into your day. This is biblical meditation — not emptying the mind, but filling it with the mind of Christ. "Let this mind be in you which was also in Christ Jesus" (Philippians 2:5). Today you are not just remembering what Christ thought — you are thinking WITH Him. [pause]
+Follow this 6-phase structure. Each phase flows seamlessly — no labels, no headers, no time references.
 
-PHASE 2 — REMEMBER LAST NIGHT (~2 minutes):
-Recall last night's Master Mind insight from "${session.pairedNightTitle}". Briefly revisit the scene, the core truth, what was received. "Last night you beheld the thoughts and feelings of Christ. You saw ${session.nightInsight}." This is warm, brief, connective — like picking up a thread. Weave in the night scripture (${session.nightScripture}) naturally. The listener should feel continuity between night and morning.
+PHASE 1 — LOCK IN AND ACTIVATE (~2 minutes):
+Open with energy and authority. "Lock in. The screen is still on. The download from last night is not finished — it activates NOW." This is not a gentle wake-up. This is activation. The listener's mind is a theater, and this morning, the film continues — but now they are not just watching. They are BECOMING the character. They are taking on the Master Mind as their operating system for the day. [pause]
+
+Establish: "This is biblical meditation — not emptying the mind, but FILLING it with the mind of Christ and CARRYING it into your day."
+
+PHASE 2 — RECALL THE SCENE (~2 minutes):
+Flash back to last night's Master Mind session: "${session.pairedNightTitle}". Briefly but vividly recall the scene — not retelling it, but triggering the memory. "Last night you stood there. You saw it. You felt it. ${session.nightInsight}." Reference the night scripture (${session.nightScripture}) naturally. The listener should feel the continuity — last night you received; this morning you deploy.
 
 PHASE 3 — TRUTH DECLARATION (~2.5 minutes):
-Now shift to this morning's Scripture: ${session.morningScripture}. Speak it with weight and conviction — not shouting, but with the quiet authority of someone who believes every word. Then unpack it into an identity statement: "This is who you are. This is how you think now." The activation principle: ${session.activationPrinciple}. Repeat the key Scripture phrase 2-3 times, each time with a [pause] after, letting it sink deeper. This phase should feel like planting a flag.
+Now bring this morning's Scripture: ${session.morningScripture}. Speak it with weight and conviction. This is not reading — this is DECLARING. Unpack it as an identity upgrade: "This is who you are now. This is how you think now. This is how you respond now." The activation principle: ${session.activationPrinciple}. Repeat the key phrase 2-3 times with [pause] after each. This is planting a flag in the ground. The listener is not hoping to become this — they are CLAIMING it.
 
-PHASE 4 — MENTAL ALIGNMENT (~3 minutes):
-Translate the pattern into today's thinking. How does the Master Mind operate in ordinary life? Walk through the mental shift — from the old default reaction to the Christ-pattern response. Be specific and practical. "When the familiar thought arises that says [old pattern], you now have a different response available." Use [pause] generously. The pacing is steady and clear, like a coach walking you through a play before the game.
+PHASE 4 — OVERLAY ONTO REAL LIFE (~4 minutes):
+Present 3 vivid, specific, real-life scenarios based on: ${session.scenarioTypes.join(", ")}. For each scenario:
+- Paint it cinematically — a specific moment, place, interaction with sensory detail
+- Name the OLD reaction honestly — the gut response, the fear, the habit, the default
+- Then OVERLAY the Master Mind: "But the screen is still on. And you see it differently now."
+- Show what Christ's pattern looks like in THAT EXACT MOMENT — specific thoughts, specific feelings, specific words
+- [pause] after each scenario
 
-PHASE 5 — REAL-LIFE SCENARIOS (~4 minutes):
-Present 3 distinct, vivid scenarios based on: ${session.scenarioTypes.join(", ")}. For each scenario:
-- Paint the situation concretely (a specific moment, place, interaction)
-- Name the old reaction honestly (the gut response, the fear, the habit)
-- Then speak the Master Mind response — what Christ's pattern looks like in that exact moment
-- [pause] after each scenario to let it land
+Make these feel REAL. The listener should recognize their own life. Each scenario should contrast the old mind vs. the downloaded mind.
 
-Make these scenarios feel REAL — not abstract. Use sensory details. The listener should recognize their own life in these moments. Each scenario should take about 60-80 seconds including pauses.
+PHASE 5 — LOCK THE DOWNLOAD (~2 minutes):
+"The download is complete. The thoughts of Christ are now running in your system." Guide the listener to declare: "I carry the mind of Christ today. His thoughts are my thoughts. His feelings are my feelings. His reactions are my reactions." [long pause] Let it settle. [long pause] The screen stays on all day.
 
-PHASE 6 — OPEN STILLNESS (~1.5 minutes):
-A brief window of reduced guidance. "Take a moment now to let these truths settle into your body, into your bones." [long pause] One more gentle prompt. [long pause] The ambient sound holds the space. Only 2-3 sentences in this phase. The listener integrates what they've received.
-
-PHASE 7 — COMMITMENT AND SEND-OFF (~1.5 minutes):
-End with resolve, not a question. A clear, memorable commitment — ${session.commitmentStyle} style. "Today, you walk differently. Today, you think with the mind of Christ." Bring the energy up slightly — not aggressive, but resolute and warm. One final deep breath together. A brief blessing or send-off. The listener should feel equipped and ready.
+PHASE 6 — SEND-OFF WITH AUTHORITY (~1.5 minutes):
+End with resolve, not a question. ${session.commitmentStyle} energy. "Today, you walk differently. Today, you think differently. Today, when the old mind tries to run its program — you override it. Because you have a new operating system. The Master Mind." Close with a one-line identity statement from the morning Scripture. Final send-off: "Now go. The screen is on. What you behold, you become."
 
 CRITICAL RULES:
-- THIS MUST BE 2,500-3,000 WORDS. A 15-minute session requires substantial content. Do NOT write a short script.
-- Write in complete, flowing sentences. Not fragments, not bullet-style phrases. Every thought should read naturally when spoken aloud.
-- Use TWO types of pause markers:
-  [pause] = 3-5 seconds of silence (use frequently, after every 1-2 sentences)
-  [long pause] = 10-20 seconds of silence (use in phases 1 and 6, and after key truth declarations)
-- Morning Watch tone is CLEAR, WARM, and DIRECTED — not dreamy. Energy level: ${session.energy}. Think of a trusted coach at sunrise, not a sleep guide.
-- Do NOT include any time references ("for the next few minutes", "over the next 5 minutes"). The listener should never be aware of time.
-- Do NOT include section headers, stage directions, labels, or meta-commentary. Only words to be spoken aloud plus [pause]/[long pause] markers.
-- Night Watch: "Behold the thoughts and feelings of Christ — and receive them." Morning Watch: "Now take those thoughts as your own — and walk in them."
-- The Master Mind = the mind of Christ (Philippians 2:5). The goal is to ACCESS His thoughts and feelings and make them your own.
-- Do NOT spend more than one sentence on breathing. The power is in beholding Christ, not in breath work.
-- Second person ("you") throughout. End with resolve and momentum, not a question.`;
+- THIS MUST BE 2,500-3,000 WORDS.
+- ABSOLUTELY NO mention of breathing, deep breaths, posture, body position, getting comfortable, body scans, wiggling fingers, planting feet, or physical relaxation. ZERO. NOT EVEN ONE SENTENCE.
+- Do NOT say "take a breath." Do NOT say "notice your body." Do NOT say "sit up." Do NOT say "ground yourself."
+- The ONLY physical metaphor is the MIND AS A MOVIE THEATER / SCREEN / OPERATING SYSTEM.
+- Morning Watch tone is CLEAR, BOLD, and ACTIVATED — like a coach before a championship game, not a yoga instructor. Energy level: ${session.energy}.
+- Write in a mix of short punchy lines and flowing sentences. Cinematic and prophetic.
+- Use [pause] (3-5 seconds) frequently and [long pause] (10-20 seconds) in phase 5.
+- Do NOT include section headers, stage directions, labels, or meta-commentary.
+- The power is in BEHOLDING and DEPLOYING, not breathing. The download becomes the operating system.
+- Second person ("you") throughout. End with authority and momentum.`;
 }
 
 async function generateWatchTTS(script: string, watchType: "night" | "morning"): Promise<string | null> {
