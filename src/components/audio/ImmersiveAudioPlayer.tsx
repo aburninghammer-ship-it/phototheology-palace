@@ -8,6 +8,8 @@
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { VoiceQualitySelector } from "./VoiceQualitySelector";
+import { WatchSharePanel } from "./WatchSharePanel";
+import { useWatchRecorder } from "@/hooks/useWatchRecorder";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -16,6 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   X, Play, Pause, SkipForward, SkipBack, Volume2, VolumeX,
   Music, ListMusic, Maximize2, Settings, Loader2, ChevronUp, ChevronDown,
+  Video, VideoOff, Share2, Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +29,7 @@ import type { ImmersiveTrack } from "@/hooks/useImmersiveMode";
 import { ImmersiveParticles } from "./immersive/ImmersiveParticles";
 import { ImmersiveKaraokeVerse } from "./immersive/ImmersiveKaraokeVerse";
 import { ImmersiveSleepTimer } from "./immersive/ImmersiveSleepTimer";
+import { toast } from "sonner";
 
 // Cinematic music tracks for background layering
 const AMBIENT_BG_TRACKS = [
