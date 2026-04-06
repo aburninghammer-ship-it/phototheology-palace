@@ -1004,7 +1004,6 @@ export function ImmersiveAudioPlayer({
             </Button>
           </div>
         )}
-        </div>
 
         {/* Hidden recording canvas */}
         <canvas
