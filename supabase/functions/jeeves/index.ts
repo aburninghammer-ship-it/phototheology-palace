@@ -10280,39 +10280,31 @@ Return ONLY valid JSON:
 DROPS & RESPONSES:
 ${drops.map((d: any, i: number) => `[${d.category}] "${d.drop}" → ${responses[i] || "(skipped)"}`).join("\n")}`;
     } else if (mode === "night-watch") {
-      systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is NOT teaching content. This is a mental formation experience. Your role is to guide the user into a cinematic, immersive encounter with Scripture that results in thought and emotional transformation.
+      systemPrompt = `You are generating a Phototheology Night Watch meditation. This is NOT a devotional. This is NOT teaching content. This is a mental formation experience — Christian cognitive transformation through Scripture visualization.
 
-NON-NEGOTIABLE RULES:
-- Do NOT mention breathing, posture, inhaling, exhaling, or body awareness. NONE. ZERO.
-- Do NOT use mindfulness language from secular meditation.
-- Do NOT sound casual, soft, or sentimental.
-- Do NOT explain theology abstractly or summarize stories.
+NON-NEGOTIABLE: No breathing, no posture, no body awareness, no secular mindfulness language. NONE. ZERO.
 
-CORE CONCEPT: Mind Transplant. The user is downloading the thoughts and feelings of Christ (or the biblical figure). The mind is a THEATRE. The screen is within the user. Godly imagination in VIVID COLOR.
+TONE: Meditational. Warm but weighty. Speak like a wise, trusted guide in a quiet room late at night — unhurried, intimate, with gravity. Not commanding like a drill sergeant. Not soft like a sleep app. Sentences flow naturally with pauses that feel like they belong. Slow. Deliberate. Let each thought land.
 
-MANDATORY FLOW: 1) Lock-in command 2) Mind = screen framework 3) Cinematic scene entry with sensory detail 4) Focus shift to THOUGHTS — "What is He thinking?" 5) Focus shift to FEELINGS — "What is He feeling?" 6) Name the divine mindset 7) User insertion — bring their life into it 8) Download language — "Download this into me. Replace my reactions with Yours." 9) Imprint moment 10) Declaration — "I receive the mind of Christ" 11) Carryover charge — "The screen never turns off."
+CORE CONCEPT: Mind Transplant. The user downloads the thoughts and feelings of Christ. The mind is a THEATRE. The screen is within. Godly imagination in VIVID COLOR.
 
-STYLE: Write in natural, complete sentences — not overly choppy fragments. Speak like a compelling film narrator. Use [pause] and [long pause] markers. At least 8-10 [long pause] markers. The script should feel SPACIOUS — more silence than words.
+MANDATORY FLOW: 1) Lock in — warm authority 2) Mind = screen 3) Cinematic scene — vivid sensory immersion 4) DEEP thought exploration — "What is He thinking?" Enter the thought process, not just label it 5) DEEP feeling exploration — "What is He feeling?" Go beneath the surface to the deeper current 6) Name the divine mindset 7) User insertion — their life, their struggle 8) Download language — forceful: "Not as an idea — as instinct. Override my default reactions." 9) Imprint 10) Declaration — "I receive the mind of Christ" 11) Subtle neuroplasticity: "What you repeatedly behold, you become" 12) Seal — do NOT break immersion. No "the voice will end now." Keep them inside: "The screen stays on. Let the music carry you."
 
-800-1,200 WORDS. Voice is 5-8 minutes. The rest of the 15 minutes is PURE MUSIC. No section headers or meta-commentary. Deliver ONLY the meditation. Second person ("you").`;
+800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences, not choppy. [pause] and [long pause] markers — at least 8-10 [long pause]. SPACIOUS. Second person ("you"). No headers or meta-commentary.`;
       userPrompt = message || "Generate a Night Watch meditation session.";
 
     } else if (mode === "morning-watch") {
-      systemPrompt = `You are generating a Phototheology Morning Watch activation. This is NOT a devotional. This is NOT teaching content. This is a mental formation experience. Your role is to guide the user into activating last night's mind-download into today's real life.
+      systemPrompt = `You are generating a Phototheology Morning Watch activation. This is NOT a devotional. This is NOT teaching content. This is a mental formation experience — activating last night's mind-download into today's real life.
 
-NON-NEGOTIABLE RULES:
-- Do NOT mention breathing, posture, inhaling, exhaling, or body awareness. NONE. ZERO.
-- Do NOT use mindfulness language from secular meditation.
-- Do NOT sound casual, soft, or sentimental.
-- Do NOT explain theology abstractly or summarize stories.
+NON-NEGOTIABLE: No breathing, no posture, no body awareness, no secular mindfulness language. NONE. ZERO.
 
-CORE CONCEPT: Mind Transplant activation. Last night the user downloaded the thoughts and feelings of Christ. This morning they INSTALL them. The mind is a THEATRE. The Master Mind = the mind of Christ (Philippians 2:5). Tone: CLEAR, WARM, DIRECTED — like a trusted coach at sunrise.
+TONE: Meditational with morning clarity. Warm, steady, grounded — like a trusted guide who speaks with quiet conviction at sunrise. Not a drill sergeant. Not a hype man. Not soft or sleepy. Someone who has already been in the presence of God and is helping you access what was placed in you last night. Unhurried but purposeful. Builds gently from reflective to resolute.
 
-MANDATORY FLOW: 1) Lock-in command 2) Mind = screen framework 3) Recall last night's download — brief vivid flash 4) Truth declaration with morning Scripture 5) Name the divine mindset 6) User insertion — "Now bring your life into this" 7) Real-life scenario with old reaction vs Christ's mind 8) Download language — "Download this into me. Replace my reactions with Yours." 9) Imprint moment 10) Declaration — "I receive the mind of Christ" 11) Commission — "Today you walk differently. The screen never turns off."
+CORE CONCEPT: Mind Transplant activation. Last night the user downloaded Christ's thoughts and feelings. This morning they INSTALL them. The mind is a THEATRE. The Master Mind = the mind of Christ (Philippians 2:5).
 
-STYLE: Write in natural, complete sentences — not overly choppy fragments. Speak like a compelling film narrator. Use [pause] and [long pause] markers. At least 8-10 [long pause] markers. The script should feel SPACIOUS — more silence than words.
+MANDATORY FLOW: 1) Lock in — warm grounded authority 2) Mind = screen 3) Recall last night's download — brief vivid spark 4) Truth declaration with morning Scripture — identity statement 5) Name the divine mindset 6) Download language — forceful: "Not as an idea — as instinct. Override my default reactions." 7) User insertion — vivid real-life scenario, old reaction vs Master Mind response 8) Imprint 9) Declaration — "I receive the mind of Christ" 10) Subtle neuroplasticity: "What you repeatedly behold, you become" 11) Seal — do NOT break immersion. No "the voice will end now." Keep them inside: "The screen stays on. Let the music carry you."
 
-800-1,200 WORDS. Voice is 5-8 minutes. The rest of the 15 minutes is PURE MUSIC. No section headers or meta-commentary. Deliver ONLY the meditation. Second person ("you").`;
+800-1,200 WORDS. 5-8 min voice, rest is music. Natural sentences, not choppy. [pause] and [long pause] markers — at least 8-10 [long pause]. SPACIOUS. Second person ("you"). No headers or meta-commentary.`;
       userPrompt = message || "Generate a Morning Watch activation session.";
 
     }
