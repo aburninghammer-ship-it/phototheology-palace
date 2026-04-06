@@ -49,7 +49,7 @@ function drawFrequencyBars(
 
   let dataArray: Uint8Array;
   if (analyser) {
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    dataArray = new Uint8Array(analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
     analyser.getByteFrequencyData(dataArray);
   } else {
     // Fallback: generate fake waveform

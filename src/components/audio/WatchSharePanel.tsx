@@ -158,11 +158,11 @@ export function WatchSharePanel({
           <p className="text-xs text-muted-foreground font-medium">Share to Social Media</p>
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" size="sm" className="gap-2" onClick={handleTwitter}>
-              <Twitter className="h-4 w-4 text-sky-500" />
+              <Twitter className="h-4 w-4 text-primary" />
               X / Twitter
             </Button>
             <Button variant="outline" size="sm" className="gap-2" onClick={handleFacebook}>
-              <Facebook className="h-4 w-4 text-blue-600" />
+              <Facebook className="h-4 w-4 text-primary" />
               Facebook
             </Button>
             <Button variant="outline" size="sm" className="gap-2" onClick={handleEmail}>
@@ -170,7 +170,7 @@ export function WatchSharePanel({
               Email
             </Button>
             <Button variant="outline" size="sm" className="gap-2" onClick={handleCopyText}>
-              {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+              {copied ? <Check className="h-4 w-4 text-accent" /> : <Copy className="h-4 w-4" />}
               {copied ? "Copied!" : "Copy Text"}
             </Button>
           </div>
