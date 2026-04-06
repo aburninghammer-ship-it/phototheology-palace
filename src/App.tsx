@@ -71,6 +71,7 @@ const Pricing = lazy(() => import("./pages/Pricing"));
 const FixBilling = lazy(() => import("./pages/FixBilling"));
 const InteractiveDemo = lazy(() => import("./pages/InteractiveDemo"));
 const AudioLibrary = lazy(() => import("./pages/AudioLibrary"));
+const MusicManager = lazy(() => import("./pages/MusicManager"));
 const Comparison = lazy(() => import("./pages/Comparison"));
 const DonationPage = lazy(() => import("./pages/DonationPage"));
 const GiftAndShare = lazy(() => import("./pages/GiftAndShare"));
