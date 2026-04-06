@@ -12,6 +12,9 @@ const corsHeaders = {
 const VOICE_ID = "pFZP5JQG7iQjIQuC4Bku";
 const MODEL_ID = "eleven_turbo_v2_5";
 const MAX_CHUNK = 4500;
+// Bump this version to invalidate ALL cached watch TTS audio
+// v2 = 2026-04-06 Master Mind prompt overhaul (no breathing/posture)
+const WATCH_CACHE_VERSION = "v2";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
