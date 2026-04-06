@@ -128,6 +128,22 @@ export function ImmersiveAudioPlayer({
   // Verse progress (for karaoke word-level sync)
   const [verseProgress, setVerseProgress] = useState(0);
 
+  // ── 15-minute Watch session timer ──
+  const WATCH_SESSION_DURATION = 15 * 60; // 15 minutes in seconds
+  const WATCH_FADE_OUT_DURATION = 10; // fade out music over last 10 seconds
+  const isWatchSession = track?.type === "devotional" && (track?.modeName?.includes("Watch") ?? false);
+  const sessionStartRef = useRef<number | null>(null);
+  const [sessionElapsed, setSessionElapsed] = useState(0);
+  const [inMeditationPhase, setInMeditationPhase] = useState(false);
+  const sessionFadeTimerRef = useRef<number>();
+  const narrationEndedRef = useRef(false);
+
+  // Ambient mode — declared early so timer effect can reference it
+  const currentTrackObj = tracks[currentIndex];
+  const defaultAmbientMode = currentTrackObj?.ambientMode ?? "music";
+  const [ambientModeOverride, setAmbientModeOverride] = useState<"music" | "ambient-sounds" | null>(null);
+  const ambientMode = ambientModeOverride ?? defaultAmbientMode;
+
   // Compute ducked ambient volume — lower when voice is playing
   const getAmbientTargetVolume = useCallback((modeMultiplier: number) => {
     const base = ambientVolume * modeMultiplier * sleepFadeMultiplier;
@@ -170,6 +186,14 @@ export function ImmersiveAudioPlayer({
     };
   }, []);
 
+  // Reset watch session state on track change
+  useEffect(() => {
+    sessionStartRef.current = null;
+    setSessionElapsed(0);
+    setInMeditationPhase(false);
+    narrationEndedRef.current = false;
+  }, [currentIndex]);
+
   // Load and play current track
   useEffect(() => {
     if (!isOpen || !track) return;
@@ -207,8 +231,16 @@ export function ImmersiveAudioPlayer({
         audio.onended = () => {
           if (!cancelled) {
             setIsPlaying(false);
+            narrationEndedRef.current = true;
+            
+            // For Watch sessions: enter meditation phase, don't auto-advance
+            if (isWatchSession) {
+              setInMeditationPhase(true);
+              // Un-duck ambient music to full volume (narration is done)
+              return;
+            }
+            
             if (continuousPlay && hasNext) {
-              // Auto-advance after short pause
               setTimeout(() => {
                 if (!cancelled) onNextTrack();
               }, 1500);
@@ -223,6 +255,11 @@ export function ImmersiveAudioPlayer({
           }
         };
         
+        // Start session timer for Watch sessions
+        if (isWatchSession && !sessionStartRef.current) {
+          sessionStartRef.current = Date.now();
+        }
+        
         await audio.play();
         if (!cancelled) setIsPlaying(true);
       } catch (err) {
@@ -236,6 +273,46 @@ export function ImmersiveAudioPlayer({
     loadTrack();
     return () => { cancelled = true; };
   }, [isOpen, track, currentIndex]);
+
+  // ── Watch session 15-minute timer ──
+  useEffect(() => {
+    if (!isOpen || !isWatchSession || !sessionStartRef.current) return;
+    
+    const interval = window.setInterval(() => {
+      if (!sessionStartRef.current) return;
+      const elapsed = (Date.now() - sessionStartRef.current) / 1000;
+      setSessionElapsed(elapsed);
+      
+      // Fade out music in the last 10 seconds
+      const remaining = WATCH_SESSION_DURATION - elapsed;
+      if (remaining <= WATCH_FADE_OUT_DURATION && remaining > 0) {
+        const fadeProgress = remaining / WATCH_FADE_OUT_DURATION;
+        // Gradually reduce ambient volume
+        if (ambientRef.current) {
+          const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+          ambientRef.current.volume = Math.max(0, ambientVolume * modeMultiplier * sleepFadeMultiplier * fadeProgress);
+        }
+        if (ambientNextRef.current && ambientNextRef.current.src) {
+          ambientNextRef.current.volume = 0;
+        }
+      }
+      
+      // Session complete at 15 minutes
+      if (elapsed >= WATCH_SESSION_DURATION) {
+        clearInterval(interval);
+        // Stop all audio
+        if (ambientRef.current) { ambientRef.current.pause(); }
+        if (ambientNextRef.current) { ambientNextRef.current.pause(); }
+        if (audioRef.current) { audioRef.current.pause(); }
+        setIsPlaying(false);
+        setAmbientPlaying(false);
+        // Auto-close after a brief moment
+        setTimeout(() => onClose(), 1500);
+      }
+    }, 250);
+    
+    return () => clearInterval(interval);
+  }, [isOpen, isWatchSession, ambientVolume, ambientMode, sleepFadeMultiplier, onClose]);
 
   // Load verses for commentary tracks
   useEffect(() => {
@@ -291,10 +368,6 @@ export function ImmersiveAudioPlayer({
   }, [activeVerseIndex]);
 
   // Ambient music/sound management — picks track list based on current track's ambientMode
-  const currentTrackObj = tracks[currentIndex];
-  const defaultAmbientMode = currentTrackObj?.ambientMode ?? "music";
-  const [ambientModeOverride, setAmbientModeOverride] = useState<"music" | "ambient-sounds" | null>(null);
-  const ambientMode = ambientModeOverride ?? defaultAmbientMode;
 
   // Reset override when track changes
   useEffect(() => {
@@ -667,44 +740,98 @@ export function ImmersiveAudioPlayer({
               </div>
             </ScrollArea>
           ) : (
-            /* Ambient visual mode (no text) */
+            /* Ambient visual mode (no text) — includes Watch meditation phase */
             <div className="flex flex-col items-center justify-center h-full gap-6">
-              <motion.div
-                className="text-8xl"
-                animate={{
-                  scale: [1, 1.05, 1],
-                  opacity: [0.8, 1, 0.8],
-                }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              >
-                {typeIcon}
-              </motion.div>
-              <div className="text-center">
-                <h3 className="text-xl font-semibold text-foreground/80">{track?.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{track?.subtitle || track?.modeName}</p>
-              </div>
-              {/* Audio waveform visualization */}
-              <div className="flex items-end gap-1 h-16">
-                {Array.from({ length: 24 }).map((_, i) => (
+              {inMeditationPhase ? (
+                /* Meditation phase: narration ended, music continues */
+                <>
                   <motion.div
-                    key={i}
-                    className="w-1.5 bg-primary/40 rounded-full"
-                    animate={isPlaying ? {
-                      height: [
-                        `${10 + Math.random() * 40}px`,
-                        `${10 + Math.random() * 50}px`,
-                        `${10 + Math.random() * 30}px`,
-                      ],
-                    } : { height: "8px" }}
-                    transition={{
-                      duration: 0.6 + Math.random() * 0.4,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: i * 0.05,
+                    className="text-6xl"
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    🕊️
+                  </motion.div>
+                  <div className="text-center max-w-md px-4 space-y-3">
+                    <h3 className="text-xl font-semibold text-foreground/80">
+                      Meditation Time
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      The narration has ended. Take the remaining time to meditate on the thoughts and feelings you've received. Ask the Spirit to make them your own.
+                    </p>
+                    <p className="text-xs text-muted-foreground/60 font-mono">
+                      {formatTime(Math.max(0, WATCH_SESSION_DURATION - sessionElapsed))} remaining
+                    </p>
+                  </div>
+                  {/* Gentle pulsing waveform for meditation */}
+                  <div className="flex items-end gap-1 h-12">
+                    {Array.from({ length: 16 }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="w-1 bg-primary/25 rounded-full"
+                        animate={{
+                          height: [
+                            `${6 + Math.sin(i * 0.5) * 8}px`,
+                            `${10 + Math.sin(i * 0.5 + 1) * 12}px`,
+                            `${6 + Math.sin(i * 0.5) * 8}px`,
+                          ],
+                        }}
+                        transition={{
+                          duration: 3 + Math.random(),
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: i * 0.1,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <motion.div
+                    className="text-8xl"
+                    animate={{
+                      scale: [1, 1.05, 1],
+                      opacity: [0.8, 1, 0.8],
                     }}
-                  />
-                ))}
-              </div>
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    {typeIcon}
+                  </motion.div>
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-foreground/80">{track?.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{track?.subtitle || track?.modeName}</p>
+                  </div>
+                  {/* Audio waveform visualization */}
+                  <div className="flex items-end gap-1 h-16">
+                    {Array.from({ length: 24 }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="w-1.5 bg-primary/40 rounded-full"
+                        animate={isPlaying ? {
+                          height: [
+                            `${10 + Math.random() * 40}px`,
+                            `${10 + Math.random() * 50}px`,
+                            `${10 + Math.random() * 30}px`,
+                          ],
+                        } : { height: "8px" }}
+                        transition={{
+                          duration: 0.6 + Math.random() * 0.4,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: i * 0.05,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+              {/* Watch session timer */}
+              {isWatchSession && sessionStartRef.current && !inMeditationPhase && (
+                <p className="text-xs text-muted-foreground/50 font-mono">
+                  Session: {formatTime(sessionElapsed)} / {formatTime(WATCH_SESSION_DURATION)}
+                </p>
+              )}
             </div>
           )}
         </div>
