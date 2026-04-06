@@ -50,9 +50,9 @@ export function OSTitleBar() {
   const isPublicPage = publicPaths.some(p => location.pathname === p) || location.pathname.startsWith("/auth");
   const isWorkspacePane = new URLSearchParams(window.location.search).has('workspace');
 
-  if (!user || isPublicPage || isWorkspacePane || isMobile) return null;
+  if (!user || isPublicPage || isWorkspacePane) return null;
 
-  // Level 1 (Basic): show minimal title bar only on sub-pages (not /welcome where BasicModeShell has its own header)
+  // Level 1 (Basic): show minimal title bar on sub-pages (both desktop and mobile)
   if (isBasic) {
     if (location.pathname === "/welcome") return null;
     return (
@@ -71,6 +71,10 @@ export function OSTitleBar() {
       </div>
     );
   }
+
+  // Non-basic levels: hide on mobile (OSDock handles navigation)
+  if (isMobile) return null;
+
 
   const initials = user.email?.slice(0, 2).toUpperCase() || "U";
 
