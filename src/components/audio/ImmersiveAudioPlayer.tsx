@@ -270,7 +270,19 @@ export function ImmersiveAudioPlayer({
         }
         
         await audio.play();
-        if (!cancelled) setIsPlaying(true);
+        if (!cancelled) {
+          setIsPlaying(true);
+          // Auto-start recording for watch sessions
+          if (isWatchSession && !recorder.isRecording && !recorder.videoBlob) {
+            try {
+              (recorder as any).setTitle?.(track.title || "Watch Session");
+              (recorder as any).setSubtitle?.(track.subtitle || track.modeName || "");
+              recorder.startRecording(audio, ambientRef.current);
+            } catch (e) {
+              console.warn("[Immersive] Recording auto-start failed:", e);
+            }
+          }
+        }
       } catch (err) {
         if (!cancelled) {
           console.error("[Immersive] Failed to load track:", err);
