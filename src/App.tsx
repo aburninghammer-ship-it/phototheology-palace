@@ -649,7 +649,7 @@ function App() {
             <Route path="/live-study" element={<BasicModeGate><ProtectedRoute><LiveStudy /></ProtectedRoute></BasicModeGate>} />
             <Route path="/live-study/:roomId" element={<BasicModeGate><ProtectedRoute><LiveStudyRoom /></ProtectedRoute></BasicModeGate>} />
             <Route path="/discover" element={<BasicModeGate><ProtectedRoute><DiscoverPeople /></ProtectedRoute></BasicModeGate>} />
-            <Route path="/community" element={<BasicModeGate><ProtectedRoute><Community /></ProtectedRoute></BasicModeGate>} />
+            <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
             <Route path="/community-optimized" element={<BasicModeGate><ProtectedRoute><CommunityOptimized /></ProtectedRoute></BasicModeGate>} />
             <Route path="/leaderboard" element={<BasicModeGate><ProtectedRoute><Leaderboard /></ProtectedRoute></BasicModeGate>} />
             <Route path="/achievements" element={<BasicModeGate><ProtectedRoute><Achievements /></ProtectedRoute></BasicModeGate>} />
