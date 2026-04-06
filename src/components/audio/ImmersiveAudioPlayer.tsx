@@ -143,6 +143,10 @@ export function ImmersiveAudioPlayer({
   const sessionFadeTimerRef = useRef<number>();
   const narrationEndedRef = useRef(false);
 
+  // ── Video recording for Watch sessions ──
+  const recorder = useWatchRecorder();
+  const [showSharePanel, setShowSharePanel] = useState(false);
+
   // Ambient mode — declared early so timer effect can reference it
   const currentTrackObj = tracks[currentIndex];
   const defaultAmbientMode = currentTrackObj?.ambientMode ?? "music";
