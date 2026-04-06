@@ -321,14 +321,18 @@ export function ImmersiveAudioPlayer({
       // Session complete at 15 minutes
       if (elapsed >= WATCH_SESSION_DURATION) {
         clearInterval(interval);
+        // Stop recording
+        if (recorder.isRecording) {
+          recorder.stopRecording();
+        }
         // Stop all audio
         if (ambientRef.current) { ambientRef.current.pause(); }
         if (ambientNextRef.current) { ambientNextRef.current.pause(); }
         if (audioRef.current) { audioRef.current.pause(); }
         setIsPlaying(false);
         setAmbientPlaying(false);
-        // Auto-close after a brief moment
-        setTimeout(() => onClose(), 1500);
+        // Show share panel instead of auto-closing
+        setTimeout(() => setShowSharePanel(true), 500);
       }
     }, 250);
     
