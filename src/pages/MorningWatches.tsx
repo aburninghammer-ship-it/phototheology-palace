@@ -10,18 +10,24 @@ import { useWatchProgress } from "@/hooks/useWatchProgress";
 import {
   WATCH_TRACTS,
   ENERGY_COLORS,
+  getTractsByType,
   type WatchTract,
   type MorningWatchSession,
 } from "@/data/watchSeries";
+
+type TractTab = "free" | "40-day" | "365-day";
 
 export default function MorningWatches() {
   const { startTract, markDayComplete, isDayUnlocked, getProgress } = useWatchProgress();
   const { startMorningWatch, isGenerating, immersive, handleClose } = useWatchPlayer({
     onComplete: (tractId, day) => markDayComplete(tractId, day),
   });
+  const [activeTab, setActiveTab] = useState<TractTab>("free");
   const [expandedTract, setExpandedTract] = useState<string | null>(null);
 
-  const tractsWithMornings = WATCH_TRACTS.filter((t) => t.mornings && t.mornings.length > 0);
+  const freeTracts = WATCH_TRACTS.filter((t) => t.isFree);
+  const fortyDayTracts = getTractsByType("40-day").filter((t) => !t.isFree);
+  const yearTracts = getTractsByType("365-day");
 
   const handleBeginWatch = (session: MorningWatchSession, tract: WatchTract) => {
     startTract(tract.id);
@@ -93,7 +99,7 @@ export default function MorningWatches() {
 
   const renderTractCard = (tract: WatchTract) => {
     const isExpanded = expandedTract === tract.id;
-    const mornings = tract.mornings || [];
+    const hasMornings = tract.mornings && tract.mornings.length > 0;
     const progress = getProgress(tract.id);
 
     return (
@@ -114,32 +120,86 @@ export default function MorningWatches() {
                 )}
               </div>
               <p className="text-xs text-amber-400">{tract.subtitle} — Morning Activations</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Walk in the Master Mind pattern received during the Night Watch.
-              </p>
-              {mornings.length > 0 && progress.completedDays.length > 0 && (
+              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{tract.description}</p>
+              {hasMornings && progress.completedDays.length > 0 && (
                 <p className="text-[10px] text-amber-400/70 mt-1">
-                  Day {progress.currentDay} of {mornings.length} · {progress.completedDays.length} completed
+                  Day {progress.currentDay} of {tract.mornings!.length} · {progress.completedDays.length} completed
                 </p>
               )}
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Badge variant="outline" className="text-[10px]">
-                {mornings.length} sessions
+                {tract.totalSessions} days
               </Badge>
               <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
             </div>
           </button>
 
-          {isExpanded && (
+          {isExpanded && hasMornings && (
             <div className="border-t border-border/30 p-4 space-y-2 max-h-96 overflow-y-auto">
-              {mornings.map((s) => renderSessionCard(s, tract))}
+              {tract.mornings!.map((s) => renderSessionCard(s, tract))}
+            </div>
+          )}
+
+          {isExpanded && !hasMornings && tract.weekOverviews && (
+            <div className="border-t border-border/30 p-4 space-y-2">
+              <p className="text-xs text-muted-foreground mb-3">
+                Morning activations generated on demand by the Master Mind AI, paired with each Night Watch.
+              </p>
+              {tract.weekOverviews.map((w) => (
+                <div key={w.week} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20">
+                  <div className="w-7 h-7 rounded-full bg-amber-500/20 flex items-center justify-center text-xs font-bold text-amber-300">
+                    {w.week}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">{w.title}</p>
+                    <p className="text-xs text-muted-foreground">{w.theme}</p>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">{w.scriptureRange}</p>
+                  <Lock className="w-3 h-3 text-muted-foreground" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {isExpanded && !hasMornings && tract.seriesBlocks && (
+            <div className="border-t border-border/30 p-4 space-y-2 max-h-96 overflow-y-auto">
+              <p className="text-xs text-muted-foreground mb-3">
+                {tract.seriesBlocks.length} series blocks · Morning activations generated on demand
+              </p>
+              {tract.seriesBlocks.map((b) => (
+                <div key={b.name} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20">
+                  <div className="text-right shrink-0">
+                    <p className="text-[10px] text-amber-400 font-mono">
+                      Day {b.dayRange[0]}-{b.dayRange[1]}
+                    </p>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">{b.name}</p>
+                    <p className="text-xs text-muted-foreground">{b.scriptureScope}</p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">{b.sessions}</Badge>
+                </div>
+              ))}
             </div>
           )}
         </CardContent>
       </Card>
     );
   };
+
+  const tabs: { id: TractTab; label: string; count: number }[] = [
+    { id: "free", label: "Free", count: freeTracts.length },
+    { id: "40-day", label: "40-Day Tracts", count: fortyDayTracts.length },
+    { id: "365-day", label: "365-Day Journeys", count: yearTracts.length },
+  ];
+
+  const currentTracts =
+    activeTab === "free"
+      ? freeTracts
+      : activeTab === "40-day"
+        ? fortyDayTracts
+        : yearTracts;
 
   return (
     <div className="min-h-screen bg-background">
@@ -194,6 +254,27 @@ export default function MorningWatches() {
           </CardContent>
         </Card>
 
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setExpandedTract(null);
+              }}
+              className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+                activeTab === tab.id
+                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                  : "bg-muted/30 text-muted-foreground hover:bg-muted/50 border border-transparent"
+              }`}
+            >
+              {tab.label}
+              <span className="ml-1.5 text-[10px] opacity-60">({tab.count})</span>
+            </button>
+          ))}
+        </div>
+
         {/* Generating overlay */}
         {isGenerating && (
           <Card className="mb-4 bg-amber-950/50 border-amber-500/30">
@@ -209,13 +290,13 @@ export default function MorningWatches() {
 
         {/* Tract List */}
         <div className="space-y-3">
-          {tractsWithMornings.map(renderTractCard)}
+          {currentTracts.map(renderTractCard)}
         </div>
 
-        {tractsWithMornings.length === 0 && (
+        {currentTracts.length === 0 && (
           <div className="text-center py-12">
             <Sun className="w-12 h-12 text-amber-400/20 mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">Morning activations coming soon.</p>
+            <p className="text-sm text-muted-foreground">No tracts in this category yet.</p>
           </div>
         )}
       </div>
