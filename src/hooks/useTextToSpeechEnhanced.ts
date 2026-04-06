@@ -402,47 +402,69 @@ export function useTextToSpeechEnhanced(options: UseTextToSpeechEnhancedOptions 
           ? 'fable'
           : requestedVoice) as VoiceId;
 
-      const invokePromise = supabase.functions.invoke('text-to-speech', {
-        body: {
-          text: text.trim(),
-          voice: normalizedVoice,
-          provider: 'openai',
-          book: opts.book,
-          chapter: opts.chapter,
-          verse: opts.verse,
-          useCache: opts.useCache !== false
-        }
-      });
-
-      // Race between invoke and timeout
-      const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as Awaited<typeof invokePromise>;
-
-      if (timeoutId) clearTimeout(timeoutId);
-      
-      if (timedOut) {
-        throw new Error('Network timeout - connection too slow');
-      }
-
-      if (error) {
-        throw new Error(error.message || 'Failed to generate speech');
-      }
+      const clientCacheKey = await buildCacheKey(text.trim(), normalizedVoice, 'openai');
+      const cachedBlob = await getCachedAudio(clientCacheKey);
 
       let audioUrl: string;
 
-      // Check if we got a cached URL or need to decode base64
-      if (data?.audioUrl) {
-        audioUrl = data.audioUrl;
-        setWasCached(data.cached === true);
-        console.log(`[TTS] Using ${data.cached ? 'cached' : 'newly cached'} audio`);
-      } else if (data?.audioContent) {
-        const audioBlob = new Blob(
-          [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
-          { type: 'audio/mpeg' }
-        );
-        audioUrl = URL.createObjectURL(audioBlob);
-        setWasCached(false);
+      if (cachedBlob) {
+        if (timeoutId) clearTimeout(timeoutId);
+        audioUrl = URL.createObjectURL(cachedBlob);
+        setWasCached(true);
+        console.log('[TTS Enhanced] Client cache hit, no edge function call');
       } else {
-        throw new Error('No audio content received');
+        const invokePromise = supabase.functions.invoke('text-to-speech', {
+          body: {
+            text: text.trim(),
+            voice: normalizedVoice,
+            provider: 'openai',
+            book: opts.book,
+            chapter: opts.chapter,
+            verse: opts.verse,
+            useCache: opts.useCache !== false
+          }
+        });
+
+        // Race between invoke and timeout
+        const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as Awaited<typeof invokePromise>;
+
+        if (timeoutId) clearTimeout(timeoutId);
+        
+        if (timedOut) {
+          throw new Error('Network timeout - connection too slow');
+        }
+
+        if (error) {
+          throw new Error(error.message || 'Failed to generate speech');
+        }
+
+        // Check if we got a cached URL or need to decode base64
+        if (data?.audioUrl) {
+          try {
+            const resp = await fetch(data.audioUrl);
+            if (resp.ok) {
+              const blob = await resp.blob();
+              setCachedAudio(clientCacheKey, blob);
+              audioUrl = URL.createObjectURL(blob);
+            } else {
+              audioUrl = data.audioUrl;
+            }
+          } catch {
+            audioUrl = data.audioUrl;
+          }
+          setWasCached(data.cached === true);
+          console.log(`[TTS] Using ${data.cached ? 'cached' : 'newly cached'} audio`);
+        } else if (data?.audioContent) {
+          const audioBlob = new Blob(
+            [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
+            { type: 'audio/mpeg' }
+          );
+          setCachedAudio(clientCacheKey, audioBlob);
+          audioUrl = URL.createObjectURL(audioBlob);
+          setWasCached(false);
+        } else {
+          throw new Error('No audio content received');
+        }
       }
 
       // Audio element and AudioContext already primed above — reuse them
