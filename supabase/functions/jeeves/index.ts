@@ -624,7 +624,6 @@ You have 38 internal study principles across 8 categories. For EVERY answer, int
 - Victorian-style language or overly theatrical phrasing
 - Clichéd expressions that sound forced`;
       }
-      }
       if (mode === 'guided') {
         return `\n\n**LANGUAGE MODE: GUIDED**
 You may occasionally mention Phototheology room names or principles, but ALWAYS pair them with a plain-language explanation.
