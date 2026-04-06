@@ -138,6 +138,12 @@ export function ImmersiveAudioPlayer({
   const sessionFadeTimerRef = useRef<number>();
   const narrationEndedRef = useRef(false);
 
+  // Ambient mode — declared early so timer effect can reference it
+  const currentTrackObj = tracks[currentIndex];
+  const defaultAmbientMode = currentTrackObj?.ambientMode ?? "music";
+  const [ambientModeOverride, setAmbientModeOverride] = useState<"music" | "ambient-sounds" | null>(null);
+  const ambientMode = ambientModeOverride ?? defaultAmbientMode;
+
   // Compute ducked ambient volume — lower when voice is playing
   const getAmbientTargetVolume = useCallback((modeMultiplier: number) => {
     const base = ambientVolume * modeMultiplier * sleepFadeMultiplier;
