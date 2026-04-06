@@ -436,6 +436,7 @@ export const WATCH_TRACTS: WatchTract[] = [
     throughline: "The mind that surrenders to win — from Upper Room to empty tomb.",
     icon: "✝️",
     sessions: PASSION_NIGHT,
+    mornings: PASSION_MORNING,
     isFree: true,
   },
   {
