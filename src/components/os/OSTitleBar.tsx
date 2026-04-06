@@ -2,7 +2,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LevelToggleChip } from "@/components/basic-mode/LevelToggleChip";
 import { BackButton } from "@/components/BackButton";
-import { Sparkles, User, LogOut, Settings, Languages, MessageCircle } from "lucide-react";
+import { Sparkles, User, LogOut, Settings, Languages, MessageCircle, Home } from "lucide-react";
+import { useExperienceMode } from "@/contexts/ExperienceModeContext";
 import { useDirectMessages } from "@/hooks/useDirectMessages";
 import { CommandPaletteTrigger } from "./CommandPalette";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -42,6 +43,7 @@ export function OSTitleBar() {
   const navigate = useNavigate();
   const { activeCount } = useActiveUsers();
   const { conversations } = useDirectMessages();
+  const { isBasic } = useExperienceMode();
   const chatUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
 
   const publicPaths = ["/", "/landing", "/auth", "/pricing", "/interactive-demo", "/comparison", "/privacy-policy", "/terms-of-service"];
@@ -49,6 +51,26 @@ export function OSTitleBar() {
   const isWorkspacePane = new URLSearchParams(window.location.search).has('workspace');
 
   if (!user || isPublicPage || isWorkspacePane || isMobile) return null;
+
+  // Level 1 (Basic): show minimal title bar only on sub-pages (not /welcome where BasicModeShell has its own header)
+  if (isBasic) {
+    if (location.pathname === "/welcome") return null;
+    return (
+      <div className="h-11 flex items-center justify-between px-4 bg-background/80 backdrop-blur-xl border-b border-border/40 shrink-0 z-50">
+        <div className="flex items-center gap-2.5">
+          <BackButton />
+          <button
+            onClick={() => navigate("/welcome")}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+          >
+            <Home className="h-3.5 w-3.5" />
+            Home
+          </button>
+        </div>
+        <LevelToggleChip />
+      </div>
+    );
+  }
 
   const initials = user.email?.slice(0, 2).toUpperCase() || "U";
 

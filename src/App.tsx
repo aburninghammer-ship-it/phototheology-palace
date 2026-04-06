@@ -426,7 +426,7 @@ function App() {
                         <SessionPromptDialog />
                         </>}
                         <BasicModeHide><CommandPalette /></BasicModeHide>
-                        {!isWorkspacePane && <BasicModeHide><OSTitleBar /></BasicModeHide>}
+                        {!isWorkspacePane && <OSTitleBar />}
                         {!isWorkspacePane && <BasicModeHide><GlobalStudyBanner /></BasicModeHide>}
                         {!isWorkspacePane && (
                           <BasicModeHide>
