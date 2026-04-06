@@ -12546,6 +12546,39 @@ export type Database = {
         }
         Relationships: []
       }
+      pre_registered_grants: {
+        Row: {
+          created_at: string
+          duration_days: number
+          email: string
+          grant_type: string
+          id: string
+          note: string | null
+          redeemed_at: string | null
+          redeemed_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_days?: number
+          email: string
+          grant_type?: string
+          id?: string
+          note?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_days?: number
+          email?: string
+          grant_type?: string
+          id?: string
+          note?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Relationships: []
+      }
       principle_card_games: {
         Row: {
           created_at: string
