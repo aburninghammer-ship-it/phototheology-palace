@@ -180,6 +180,14 @@ export function ImmersiveAudioPlayer({
     };
   }, []);
 
+  // Reset watch session state on track change
+  useEffect(() => {
+    sessionStartRef.current = null;
+    setSessionElapsed(0);
+    setInMeditationPhase(false);
+    narrationEndedRef.current = false;
+  }, [currentIndex]);
+
   // Load and play current track
   useEffect(() => {
     if (!isOpen || !track) return;
@@ -217,8 +225,16 @@ export function ImmersiveAudioPlayer({
         audio.onended = () => {
           if (!cancelled) {
             setIsPlaying(false);
+            narrationEndedRef.current = true;
+            
+            // For Watch sessions: enter meditation phase, don't auto-advance
+            if (isWatchSession) {
+              setInMeditationPhase(true);
+              // Un-duck ambient music to full volume (narration is done)
+              return;
+            }
+            
             if (continuousPlay && hasNext) {
-              // Auto-advance after short pause
               setTimeout(() => {
                 if (!cancelled) onNextTrack();
               }, 1500);
@@ -233,6 +249,11 @@ export function ImmersiveAudioPlayer({
           }
         };
         
+        // Start session timer for Watch sessions
+        if (isWatchSession && !sessionStartRef.current) {
+          sessionStartRef.current = Date.now();
+        }
+        
         await audio.play();
         if (!cancelled) setIsPlaying(true);
       } catch (err) {
@@ -246,6 +267,46 @@ export function ImmersiveAudioPlayer({
     loadTrack();
     return () => { cancelled = true; };
   }, [isOpen, track, currentIndex]);
+
+  // ── Watch session 15-minute timer ──
+  useEffect(() => {
+    if (!isOpen || !isWatchSession || !sessionStartRef.current) return;
+    
+    const interval = window.setInterval(() => {
+      if (!sessionStartRef.current) return;
+      const elapsed = (Date.now() - sessionStartRef.current) / 1000;
+      setSessionElapsed(elapsed);
+      
+      // Fade out music in the last 10 seconds
+      const remaining = WATCH_SESSION_DURATION - elapsed;
+      if (remaining <= WATCH_FADE_OUT_DURATION && remaining > 0) {
+        const fadeProgress = remaining / WATCH_FADE_OUT_DURATION;
+        // Gradually reduce ambient volume
+        if (ambientRef.current) {
+          const modeMultiplier = ambientMode === "ambient-sounds" ? 0.35 : 1;
+          ambientRef.current.volume = Math.max(0, ambientVolume * modeMultiplier * sleepFadeMultiplier * fadeProgress);
+        }
+        if (ambientNextRef.current && ambientNextRef.current.src) {
+          ambientNextRef.current.volume = 0;
+        }
+      }
+      
+      // Session complete at 15 minutes
+      if (elapsed >= WATCH_SESSION_DURATION) {
+        clearInterval(interval);
+        // Stop all audio
+        if (ambientRef.current) { ambientRef.current.pause(); }
+        if (ambientNextRef.current) { ambientNextRef.current.pause(); }
+        if (audioRef.current) { audioRef.current.pause(); }
+        setIsPlaying(false);
+        setAmbientPlaying(false);
+        // Auto-close after a brief moment
+        setTimeout(() => onClose(), 1500);
+      }
+    }, 250);
+    
+    return () => clearInterval(interval);
+  }, [isOpen, isWatchSession, ambientVolume, ambientMode, sleepFadeMultiplier, onClose]);
 
   // Load verses for commentary tracks
   useEffect(() => {
