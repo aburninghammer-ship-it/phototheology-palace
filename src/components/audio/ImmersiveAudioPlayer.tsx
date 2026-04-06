@@ -128,6 +128,16 @@ export function ImmersiveAudioPlayer({
   // Verse progress (for karaoke word-level sync)
   const [verseProgress, setVerseProgress] = useState(0);
 
+  // ── 15-minute Watch session timer ──
+  const WATCH_SESSION_DURATION = 15 * 60; // 15 minutes in seconds
+  const WATCH_FADE_OUT_DURATION = 10; // fade out music over last 10 seconds
+  const isWatchSession = track?.type === "devotional" && (track?.modeName?.includes("Watch") ?? false);
+  const sessionStartRef = useRef<number | null>(null);
+  const [sessionElapsed, setSessionElapsed] = useState(0);
+  const [inMeditationPhase, setInMeditationPhase] = useState(false);
+  const sessionFadeTimerRef = useRef<number>();
+  const narrationEndedRef = useRef(false);
+
   // Compute ducked ambient volume — lower when voice is playing
   const getAmbientTargetVolume = useCallback((modeMultiplier: number) => {
     const base = ambientVolume * modeMultiplier * sleepFadeMultiplier;
