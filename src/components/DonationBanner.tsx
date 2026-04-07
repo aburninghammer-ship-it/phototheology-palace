@@ -85,14 +85,14 @@ export const DonationBanner = () => {
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <Heart className="h-5 w-5 text-primary-foreground animate-pulse flex-shrink-0" fill="currentColor" />
             <p className="text-sm text-primary-foreground font-semibold hidden sm:block drop-shadow-sm">
-              Help keep the Phototheology Bible Suite running!{" "}
+              Help keep PhototheologyOS running!{" "}
               <Link to="/donate" className="underline hover:no-underline font-bold">
                 Learn more
               </Link>
             </p>
             <p className="text-xs text-primary-foreground font-semibold sm:hidden truncate">
               <Link to="/donate" className="underline">
-                Support Phototheology!
+                Support PhototheologyOS!
               </Link>
             </p>
           </div>
