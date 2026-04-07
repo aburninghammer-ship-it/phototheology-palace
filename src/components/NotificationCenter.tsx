@@ -16,6 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 export function NotificationCenter() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   const handleNotificationClick = async (notification: any) => {
     console.log('🔔 NotificationCenter: Notification clicked', {
