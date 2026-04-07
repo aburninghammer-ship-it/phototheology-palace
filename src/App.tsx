@@ -56,6 +56,7 @@ import { useUTMCapture } from "@/hooks/useUTMCapture";
 import { OSDock } from "@/components/os/OSDock";
 import { CommandPalette } from "@/components/os/CommandPalette";
 import { OSTitleBar } from "@/components/os/OSTitleBar";
+import { DonationBanner } from "@/components/DonationBanner";
 
 // Critical pages - load immediately (landing + auth only)
 import Gatehouse from "./pages/Gatehouse";
@@ -427,6 +428,7 @@ function App() {
                         <SessionPromptDialog />
                         </>}
                         <BasicModeHide><CommandPalette /></BasicModeHide>
+                        {!isWorkspacePane && <DonationBanner />}
                         {!isWorkspacePane && <OSTitleBar />}
                         {!isWorkspacePane && <BasicModeHide><GlobalStudyBanner /></BasicModeHide>}
                         {!isWorkspacePane && (
