@@ -14,7 +14,7 @@ const MODEL_ID = "eleven_multilingual_v2";
 const MAX_CHUNK = 4500;
 // Bump this version to invalidate ALL cached watch TTS audio
 // v8 = 2026-04-07 Switch to George (British male epic)
-const WATCH_CACHE_VERSION = "v8";
+const WATCH_CACHE_VERSION = "v9";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
@@ -76,7 +76,7 @@ async function generateElevenLabs(
       similarity_boost: 0.75,
       style: 0.10,
       use_speaker_boost: true,
-      speed: 0.8, // slow, deliberate meditation pacing
+      speed: 1.0, // normal speed for George
     },
   };
   if (previousText) body.previous_text = previousText;
