@@ -8,13 +8,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Lily – calming female ElevenLabs voice
-const VOICE_ID = "pFZP5JQG7iQjIQuC4Bku";
+// Matilda – warm, smooth, mellow female ElevenLabs voice
+const VOICE_ID = "XrExE9yKIg1WjnnlVkGX";
 const MODEL_ID = "eleven_turbo_v2_5";
 const MAX_CHUNK = 4500;
 // Bump this version to invalidate ALL cached watch TTS audio
-// v3 = 2026-04-07 Full cache clear and regeneration
-const WATCH_CACHE_VERSION = "v3";
+// v4 = 2026-04-07 Switch to Matilda voice (warm/mellow)
+const WATCH_CACHE_VERSION = "v4";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
