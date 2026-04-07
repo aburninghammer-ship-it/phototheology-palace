@@ -50,12 +50,12 @@ function loadPrefs() {
       const p = JSON.parse(saved);
       return {
         ambientMusicEnabled: p.ambientMusicEnabled ?? true,
-        ambientVolume: p.ambientVolume ?? 0.25,
+        ambientVolume: p.ambientVolume ?? 0.35,
         continuousPlay: p.continuousPlay ?? true,
       };
     }
   } catch {}
-  return { ambientMusicEnabled: true, ambientVolume: 0.25, continuousPlay: true };
+  return { ambientMusicEnabled: true, ambientVolume: 0.35, continuousPlay: true };
 }
 
 export function useImmersiveMode() {

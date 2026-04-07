@@ -15,7 +15,7 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
   useEffect(() => {
     const audio = new Audio();
     audio.loop = false;
-    audio.volume = 0.18;
+    audio.volume = 0.30;
     audio.preload = 'auto';
     audio.src = SHARED_TRACKS[trackIndexRef.current];
     audioRef.current = audio;
