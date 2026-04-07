@@ -427,6 +427,7 @@ function App() {
                         <SessionPromptDialog />
                         </>}
                         <BasicModeHide><CommandPalette /></BasicModeHide>
+                        {!isWorkspacePane && <DonationBanner />}
                         {!isWorkspacePane && <OSTitleBar />}
                         {!isWorkspacePane && <BasicModeHide><GlobalStudyBanner /></BasicModeHide>}
                         {!isWorkspacePane && (
