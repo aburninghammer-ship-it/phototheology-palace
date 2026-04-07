@@ -616,8 +616,8 @@ export default function NightWatchVR({ onBack }: NightWatchVRProps) {
   }, [audioState.analyserData]);
 
   const handleSelectSession = useCallback(async (session: WatchSession, tractName: string) => {
-    // Start background music immediately — must be inside user gesture
-    bgMusic.play();
+    // Start a freshly shuffled background music session inside the user gesture
+    bgMusic.startNewSession();
 
     setGenerating(true);
     setStatusText('Generating meditation script...');

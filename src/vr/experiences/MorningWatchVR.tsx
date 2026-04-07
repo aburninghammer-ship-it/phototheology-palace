@@ -476,8 +476,8 @@ export default function MorningWatchVR({ onBack }: MorningWatchVRProps) {
   }, [audioState.analyserData]);
 
   const handleSelectSession = useCallback(async (session: MorningWatchSession, tractName: string) => {
-    // Start background music immediately — must be inside user gesture
-    bgMusic.play();
+    // Start a freshly shuffled background music session inside the user gesture
+    bgMusic.startNewSession();
 
     setGenerating(true);
     setStatusText('Generating activation script...');
