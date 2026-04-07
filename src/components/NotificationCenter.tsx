@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Bell, Check, X } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -16,6 +17,7 @@ import { formatDistanceToNow } from "date-fns";
 export function NotificationCenter() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   const handleNotificationClick = async (notification: any) => {
     console.log('🔔 NotificationCenter: Notification clicked', {
@@ -50,6 +52,7 @@ export function NotificationCenter() {
       }));
       
       console.log('🔔 NotificationCenter: Event dispatched successfully');
+      setOpen(false);
     } else {
       // Handle non-message notifications with navigation links
       // Prefer explicit link field, then metadata.link, then type-specific defaults
@@ -61,6 +64,7 @@ export function NotificationCenter() {
 
       if (link) {
         console.log('🔔 NotificationCenter: Navigating to', link);
+        setOpen(false);
         navigate(link);
       } else {
         console.log('🔔 NotificationCenter: No navigation link found for notification', {
@@ -73,7 +77,7 @@ export function NotificationCenter() {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
