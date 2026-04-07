@@ -346,6 +346,9 @@ export default function LevelSelect() {
               but based on who you're ready to become.
             </span>
           </motion.p>
+
+          {/* Saved Items Section */}
+          <SavedItemsTab />
         </div>
       </div>
     </>
