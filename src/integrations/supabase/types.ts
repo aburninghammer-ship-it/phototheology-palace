@@ -20633,6 +20633,48 @@ export type Database = {
         }
         Relationships: []
       }
+      watch_music_tracks: {
+        Row: {
+          assigned_sessions: string[] | null
+          category: string
+          created_at: string
+          file_url: string
+          id: string
+          is_active: boolean
+          mood: string | null
+          name: string
+          sort_order: number
+          storage_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_sessions?: string[] | null
+          category?: string
+          created_at?: string
+          file_url: string
+          id?: string
+          is_active?: boolean
+          mood?: string | null
+          name: string
+          sort_order?: number
+          storage_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_sessions?: string[] | null
+          category?: string
+          created_at?: string
+          file_url?: string
+          id?: string
+          is_active?: boolean
+          mood?: string | null
+          name?: string
+          sort_order?: number
+          storage_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       weekly_challenge_guest_contributions: {
         Row: {
           challenge_id: string | null
