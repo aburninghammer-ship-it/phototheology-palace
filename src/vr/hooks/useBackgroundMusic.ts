@@ -1,22 +1,48 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
-const SHARED_TRACKS = [
+const FALLBACK_TRACKS = [
   '/audio/still-water-mind.mp3',
   '/audio/still-water-mind-2.mp3',
   '/audio/still-waters-quiet-soul.mp3',
   '/audio/weightless-river.mp3',
 ];
 
-const CROSSFADE_MS = 4000; // 4-second crossfade between songs
+const CROSSFADE_MS = 4000;
 const BASE_VOLUME = 0.30;
 
 export function useBackgroundMusic(_variant: 'night' | 'morning') {
   const audioARef = useRef<HTMLAudioElement | null>(null);
   const audioBRef = useRef<HTMLAudioElement | null>(null);
   const activeRef = useRef<'a' | 'b'>('a');
-  const trackIndexRef = useRef(Math.floor(Math.random() * SHARED_TRACKS.length));
+  const trackIndexRef = useRef(0);
   const wantPlayRef = useRef(false);
   const crossfadeTimerRef = useRef<number>();
+  const tracksRef = useRef<string[]>(FALLBACK_TRACKS);
+  const [tracksLoaded, setTracksLoaded] = useState(false);
+
+  // Load tracks from DB
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('watch_music_tracks')
+          .select('file_url')
+          .eq('is_active', true)
+          .eq('category', 'watch')
+          .order('sort_order', { ascending: true });
+
+        if (data && data.length > 0) {
+          tracksRef.current = data.map((t: any) => t.file_url);
+        }
+      } catch {
+        // Use fallback
+      }
+      // Randomize start position
+      trackIndexRef.current = Math.floor(Math.random() * tracksRef.current.length);
+      setTracksLoaded(true);
+    })();
+  }, []);
 
   const getActive = useCallback(() =>
     activeRef.current === 'a' ? audioARef.current : audioBRef.current, []);
@@ -25,18 +51,15 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
 
   const crossfadeToNext = useCallback(() => {
     if (!wantPlayRef.current) return;
-
     const outgoing = getActive();
     const incoming = getIncoming();
     if (!outgoing || !incoming) return;
 
-    // Prepare next track
-    trackIndexRef.current = (trackIndexRef.current + 1) % SHARED_TRACKS.length;
-    incoming.src = SHARED_TRACKS[trackIndexRef.current];
+    trackIndexRef.current = (trackIndexRef.current + 1) % tracksRef.current.length;
+    incoming.src = tracksRef.current[trackIndexRef.current];
     incoming.volume = 0;
     incoming.play().catch((e) => console.warn('[bgMusic] crossfade play failed:', e));
 
-    // Crossfade: ramp volumes over CROSSFADE_MS
     const steps = 40;
     const stepMs = CROSSFADE_MS / steps;
     let step = 0;
@@ -59,6 +82,8 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
   }, [getActive, getIncoming]);
 
   useEffect(() => {
+    if (!tracksLoaded) return;
+
     const audioA = new Audio();
     const audioB = new Audio();
     [audioA, audioB].forEach(a => {
@@ -67,12 +92,11 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
       a.preload = 'auto';
     });
     audioA.volume = BASE_VOLUME;
-    audioA.src = SHARED_TRACKS[trackIndexRef.current];
+    audioA.src = tracksRef.current[trackIndexRef.current];
     audioARef.current = audioA;
     audioBRef.current = audioB;
     activeRef.current = 'a';
 
-    // When active track is near end, start crossfade
     const handleTimeUpdate = () => {
       const active = activeRef.current === 'a' ? audioA : audioB;
       if (
@@ -88,7 +112,6 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
     audioA.addEventListener('timeupdate', handleTimeUpdate);
     audioB.addEventListener('timeupdate', handleTimeUpdate);
 
-    // Fallback: if track ends without crossfade trigger
     const handleEnded = () => {
       if (wantPlayRef.current) crossfadeToNext();
     };
@@ -113,7 +136,7 @@ export function useBackgroundMusic(_variant: 'night' | 'morning') {
       });
       wantPlayRef.current = false;
     };
-  }, [crossfadeToNext]);
+  }, [tracksLoaded, crossfadeToNext]);
 
   const play = useCallback(() => {
     wantPlayRef.current = true;

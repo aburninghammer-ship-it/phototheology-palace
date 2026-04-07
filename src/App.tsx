@@ -279,6 +279,7 @@ const ChurchSignupCancelled = lazy(() => import("./pages/ChurchSignupCancelled")
 const ManageSubscription = lazy(() => import("./pages/ManageSubscription"));
 const AdminStrongsImport = lazy(() => import("./pages/AdminStrongsImport"));
 const AdminBibleImport = lazy(() => import("./pages/AdminBibleImport"));
+const AdminWatchMusic = lazy(() => import("./pages/AdminWatchMusic"));
 const OfflineContent = lazy(() => import("./pages/OfflineContent"));
 const VideoTraining = lazy(() => import("./pages/VideoTraining"));
 const MyStudies = lazy(() => import("./pages/MyStudies"));
@@ -752,6 +753,7 @@ function App() {
             <Route path="/admin/strongs-import" element={<ProtectedRoute><AdminStrongsImport /></ProtectedRoute>} />
             <Route path="/admin/bible-import" element={<ProtectedRoute><AdminBibleImport /></ProtectedRoute>} />
             <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
+            <Route path="/admin/watch-music" element={<ProtectedRoute><AdminWatchMusic /></ProtectedRoute>} />
             <Route path="/certificates" element={<ProtectedRoute><Certificates /></ProtectedRoute>} />
             <Route path="/study-partners" element={<BasicModeGate><ProtectedRoute><StudyPartners /></ProtectedRoute></BasicModeGate>} />
             <Route path="/study-groups" element={<BasicModeGate><ProtectedRoute><StudyGroups /></ProtectedRoute></BasicModeGate>} />
