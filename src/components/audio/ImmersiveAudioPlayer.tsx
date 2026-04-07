@@ -365,10 +365,19 @@ export function ImmersiveAudioPlayer({
   }, [currentIndex]);
 
   // Randomize ambient starting track each time the player opens or DB tracks load
+  // Avoid starting on the same track as the previous session
   useEffect(() => {
     if (isOpen) {
       const trackList = defaultAmbientMode === "ambient-sounds" ? ambientSoundTracks : AMBIENT_BG_TRACKS;
-      setAmbientTrackIdx(Math.floor(Math.random() * trackList.length));
+      const storageKey = `ambient_lastFirstTrack_${defaultAmbientMode}`;
+      const lastUrl = localStorage.getItem(storageKey);
+      let idx = Math.floor(Math.random() * trackList.length);
+      // If we landed on the same track as last time, pick another
+      if (trackList.length > 1 && lastUrl && trackList[idx]?.url === lastUrl) {
+        idx = (idx + 1) % trackList.length;
+      }
+      setAmbientTrackIdx(idx);
+      try { localStorage.setItem(storageKey, trackList[idx]?.url || ''); } catch {}
     }
   }, [isOpen, defaultAmbientMode, dbAmbientTracks]);
 
