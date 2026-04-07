@@ -52,6 +52,7 @@ export function NotificationCenter() {
       }));
       
       console.log('🔔 NotificationCenter: Event dispatched successfully');
+      setOpen(false);
     } else {
       // Handle non-message notifications with navigation links
       // Prefer explicit link field, then metadata.link, then type-specific defaults
@@ -75,7 +76,7 @@ export function NotificationCenter() {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
