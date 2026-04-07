@@ -93,7 +93,7 @@ export const roomToolsMap: Record<string, RoomTool[]> = {
     { id: "bf-freestyle", name: "Freestyle Arena", description: "Verse Genetics — connect verse families", path: "/palace/freestyle", icon: "🧬", category: "tool" },
     { id: "bf-search", name: "Bible Search", description: "Find verse relatives across Scripture", path: "/bible-search", icon: "🔍", category: "tool" },
     { id: "bf-scrabble", name: "PT Scrabble", description: "Build verse connections competitively", path: "/games", icon: "🎯", category: "game" },
-    { id: "bf-chef", name: "Chef Challenge", description: "Cook up connections from random verses", path: "/chef-challenge", icon: "👨‍🍳", category: "game" },
+    { id: "bf-chef", name: "Chef Challenge", description: "Cook up connections from random verses", path: "/games/chef-challenge", icon: "👨‍🍳", category: "game" },
   ],
   hf: [
     { id: "hf-freestyle", name: "Freestyle Arena", description: "Connect history and culture to Scripture", path: "/palace/freestyle", icon: "🏛️", category: "tool" },
@@ -200,7 +200,7 @@ export const roomToolsMap: Record<string, RoomTool[]> = {
     { id: "jr-research", name: "Research Mode", description: "Squeeze a book with all principles", path: "/research-mode", icon: "🔬", category: "tool" },
     { id: "jr-bible", name: "Bible Reader", description: "Select a book to juice", path: "/bible", icon: "📖", category: "nav" },
     { id: "jr-ptgpt", name: "PhototheologyGPT", description: "AI-guided book juicing", path: "/phototheologygpt", icon: "🤖", category: "gpt" },
-    { id: "jr-chef", name: "Chef Challenge", description: "Juice verses like a master chef", path: "/chef-challenge", icon: "👨‍🍳", category: "game" },
+    { id: "jr-chef", name: "Chef Challenge", description: "Juice verses like a master chef", path: "/games/chef-challenge", icon: "👨‍🍳", category: "game" },
   ],
   math: [
     { id: "math-bible", name: "Bible Reader", description: "Find numerical patterns in Scripture", path: "/bible", icon: "📖", category: "nav" },
