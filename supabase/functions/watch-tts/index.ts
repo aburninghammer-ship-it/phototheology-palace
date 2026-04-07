@@ -10,11 +10,11 @@ const corsHeaders = {
 
 // Matilda – warm, smooth, mellow female ElevenLabs voice
 const VOICE_ID = "XrExE9yKIg1WjnnlVkGX";
-const MODEL_ID = "eleven_turbo_v2_5";
+const MODEL_ID = "eleven_multilingual_v2";
 const MAX_CHUNK = 4500;
 // Bump this version to invalidate ALL cached watch TTS audio
-// v4 = 2026-04-07 Switch to Matilda voice (warm/mellow)
-const WATCH_CACHE_VERSION = "v4";
+// v5 = 2026-04-07 Slower speed, warmer settings, richer model, authentic prompts
+const WATCH_CACHE_VERSION = "v5";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
@@ -72,11 +72,11 @@ async function generateElevenLabs(
     text,
     model_id: MODEL_ID,
     voice_settings: {
-      stability: 0.65,
+      stability: 0.80,
       similarity_boost: 0.75,
-      style: 0.3,
+      style: 0.10,
       use_speaker_boost: true,
-      speed: 1.0, // natural pacing — pauses come from script markers, not speed
+      speed: 0.8, // slow, deliberate meditation pacing
     },
   };
   if (previousText) body.previous_text = previousText;
